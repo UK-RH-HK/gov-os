@@ -1,6 +1,6 @@
 ---
 id: DAEO-lc4q
-status: open
+status: closed
 deps: [DAEO-uudf]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -18,7 +18,7 @@ depends_on:
 - W1-08
 allowed_paths:
 - template/openspec/schemas/**
-- template/governance/kernel/templates/openspec/**
+- template/openspec/config.yaml
 kpis:
   success:
   - The forked OpenSpec schema carries all 26 rows x 5 states exactly as docs/contract/readiness-dimensions.yaml [CAP-30.a]

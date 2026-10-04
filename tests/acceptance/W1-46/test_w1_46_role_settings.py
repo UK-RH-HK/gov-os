@@ -10,7 +10,8 @@ that both variables reach the guard (DEC-161)".
 KPI success 3 [CAP-61.c]: "engineer, independent test designer and independent
 auditor get an empty allowlist; research or experiment work gets an allowlist
 built from an owner-extensible list (GitHub, PyPI, npm, Hugging Face, arXiv,
-documentation sites)".
+documentation sites)". The empty allowlist is here; the research allowlist
+(DEC-241) is in ``test_w1_46_research_allowlist.py``.
 
 KPI success 7 [CAP-61.d]: "It sets a per-session temp directory for each worker
 session".
@@ -144,15 +145,4 @@ def test_engineer_test_designer_and_auditor_get_an_empty_allowlist(launch, role)
     assert domains == [], f"the allowlist of a launched {role} is not empty: {domains}"
 
 
-@pytest.mark.parametrize("service", sorted(support.RESEARCH_HOSTS))
-def test_the_research_allowlist_accepts_the_research_domains(launch, service):
-    domains = support.allowed_domains(launch(support.RESEARCH).settings())
-    refused = [host for host in support.RESEARCH_HOSTS[service] if not support.accepts(domains, host)]
-    assert refused == [], f"the research allowlist does not accept {refused} ({service}); it holds {domains}"
-
-
-def test_the_research_allowlist_is_a_list_of_named_domains(launch):
-    """Strict: no entry accepts every host, and a made-up host is not accepted."""
-    domains = support.allowed_domains(launch(support.RESEARCH).settings())
-    assert all(isinstance(entry, str) and entry.strip("*.") for entry in domains), f"an entry names no domain: {domains}"
-    assert not support.accepts(domains, support.NOT_A_RESEARCH_HOST), "the research allowlist accepts a made-up host"
+# The research allowlist (DEC-241) is in ``test_w1_46_research_allowlist.py``.

@@ -224,7 +224,9 @@ def main() -> None:
             # Bash call, check for sudo and install commands.
             command = tool_input.get("command", "")
             try:
-                from gov.guard.install import has_sudo, has_install, acting_role
+                from gov.guard.install import (
+                    has_sudo, has_install, acting_role,
+                    install_in_experiment_folder)
             except Exception as exc:
                 session_id = data.get("session_id", "")
                 _fail(project_root, "import_error",
@@ -242,11 +244,18 @@ def main() -> None:
                     _take_snapshot(project_root, data)
                     _ask(f"install command requires owner approval "
                          f"(tool registry record required): {command}")
+                elif ar == "research" and install_in_experiment_folder(
+                        command, cwd, project_root, ticket_id):
+                    # DEC-163: the research role's one exception; the
+                    # sandbox's write fence holds it to the folder.
+                    _take_snapshot(project_root, data)
+                    _allow()
                 else:
                     _deny(
                         f"install by role "
                         f"'{ar or 'none'}' denied: only the "
-                        f"orchestrator may propose installs")
+                        f"orchestrator may propose installs, and research "
+                        f"may install inside its experiment folder")
             else:
                 # Non-install Bash: take the before-snapshot (DEC-126)
                 # and allow.

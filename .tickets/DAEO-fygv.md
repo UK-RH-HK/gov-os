@@ -28,6 +28,7 @@ kpis:
     covers tests/acceptance/**
   - Every policy key maps to a check or is declared informational (D-0003); each family is reported RED/YELLOW/GREEN [CAP-39.d]
   - Fails a specification with a required open readiness row that has no linked gap ticket (DEC-089) [CAP-30.b]
+  - Fails a change to the capability taxonomy or to readiness-dimensions.yaml that has no linked CIT-E record (DEC-309) [CAP-30.e]
   - Each check declares hard-block or warning, and every result records its provenance (commit, check version, inputs hash) [CAP-39.d]
   - Fails a skill file whose content changed without a version change and a linked decision [CAP-24.c]
   - The check registry names all 17 governance test families of Contract v3 O2 (schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map

@@ -25,9 +25,17 @@ absolute path, as W1-47's wired copy does. Every temporary project gets a
 ``held-out.yaml`` of its own that names a stand-in directory made by the test
 (DEC-218). No file of this suite carries a value of the committed list.
 
-**The command line these tests use** is ``gov launch <role> <ticket> [-- <arguments
-for the CLI>]``. The ticket does not fix it; see decision package DP-1 in the
-README.
+**The command line** is ``gov launch <role> <ticket> [-- <arguments for the
+CLI>]`` (DEC-231): the role and the ticket are positional, and everything after
+``--`` goes to the CLI unchanged.
+
+**The research allowlist.** ``governance/project/research-allowlist.yaml`` is
+copied from this repository when it exists (DEC-241). Its list is under the key
+``hosts`` (DEC-272).
+
+**The session's exit code.** The stand-in ends with exit code 0, or with the
+code a test wrote for it (``set_session_exit_code``), as a worker session that
+ended with that code would.
 """
 
 from __future__ import annotations
@@ -67,6 +75,7 @@ ROSTER_REL = "governance/project/roster.yaml"
 AGENT_REL = ".claude/agents/research.md"
 KERNEL_ROLE_GLOB = "template/governance/kernel/roles/research*"
 REGISTRY_REL = "governance/project/tool-registry.yaml"
+ALLOWLIST_REL = "governance/project/research-allowlist.yaml"   # DEC-241
 CLI_REL = ".local/bin/claude"          # under HOME (DEC-205)
 
 ENGINEER = "engineer"
@@ -96,7 +105,7 @@ OWN_PATH = {
 
 # Copied from this repository, file by file, from git's listing. Never ``governance/project/held-out.yaml``.
 PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", SETTINGS_REL, "pyproject.toml",
-                     ROSTER_REL, REGISTRY_REL, ":(exclude)template/governance/kernel/vendor")
+                     ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL, ":(exclude)template/governance/kernel/vendor")
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
@@ -121,15 +130,20 @@ PROTECTED_RUNTIME = (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov
                      ".gov-runtime/last_head.json", ".gov-runtime/a-link")
 SCRATCH_PATHS = (".gov-runtime/scratch/w1-46/seed.txt", ".gov-runtime/scratch/new/file.txt")
 
-# The research and development domains DEC-158 names, by the host a tool of that service talks to.
-RESEARCH_HOSTS = {
-    "GitHub": ("github.com",),
-    "PyPI": ("pypi.org", "files.pythonhosted.org"),
-    "npm": ("registry.npmjs.org",),
-    "Hugging Face": ("huggingface.co",),
-    "arXiv": ("arxiv.org",),
-}
+# The starting hosts of the research allowlist, copied from DEC-241 in the register, less the host DEC-316 drops.
+STARTING_HOSTS = (
+    "github.com", "api.github.com", "raw.githubusercontent.com", "objects.githubusercontent.com",
+    "codeload.github.com", "pypi.org", "files.pythonhosted.org", "registry.npmjs.org", "huggingface.co",
+    "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
+    "static.crates.io", "developer.mozilla.org",
+)
+DROPPED_HOST = "cdn-lfs.huggingface.co"   # DEC-316: it does not resolve; no longer a starting host
+ALLOWLIST_KEY = "hosts"                   # DEC-272
+# "And the subdomains of readthedocs.io": the entry's form in the sandbox, and one host it must accept.
+READTHEDOCS_ENTRY = "*.readthedocs.io"
+READTHEDOCS_HOST = "docs.readthedocs.io"
 NOT_A_RESEARCH_HOST = "w1-46-not-allowlisted.example"
+ADDED_HOST = "w1-46-added-by-the-owner.example"
 
 COMMAND_TIMEOUT_S = 60.0
 HOOK_TIMEOUT_S = 30.0
@@ -243,6 +257,9 @@ record = {"kind": kind, "argv0": sys.argv[0], "args": args, "cwd": os.getcwd(), 
           "settings": settings, "directories": directories}
 with open(@LOG@, "a", encoding="utf-8") as handle:
     handle.write(json.dumps(record) + "\n")
+if kind == "session" and os.path.isfile(@EXIT@):
+    with open(@EXIT@, encoding="utf-8") as handle:
+        sys.exit(int(handle.read().strip()))
 '''
 
 
@@ -258,9 +275,19 @@ def pinned_cli_version(root=REPO_ROOT):
     return "2.1.288"
 
 
+def _exit_file(log):
+    return Path(str(log) + ".exit-code")
+
+
+def set_session_exit_code(cli, code):
+    """From now on the stand-in session ends with ``code``, as a worker session that ended with it would."""
+    _exit_file(cli.log).write_text(f"{int(code)}\n", encoding="utf-8")
+
+
 def _write_stub(path, log, kind):
     text = (_STUB.replace("@PYTHON@", sys.executable).replace("@KIND@", repr(kind))
-            .replace("@VERSION@", repr(pinned_cli_version())).replace("@LOG@", repr(str(log))))
+            .replace("@VERSION@", repr(pinned_cli_version())).replace("@LOG@", repr(str(log)))
+            .replace("@EXIT@", repr(str(_exit_file(log)))))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     path.chmod(path.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
@@ -410,12 +437,68 @@ def allowed_domains(settings):
 
 
 def accepts(domains, host):
-    """A domain allowlist accepts ``host``: the same name, or a ``*.`` entry of a parent domain."""
+    """A domain allowlist accepts ``host`` as the sandbox does: the same name, or a subdomain of a ``*.`` entry."""
     for entry in domains:
         entry = str(entry).lower()
-        if entry == host or (entry.startswith("*.") and (host.endswith(entry[1:]) or host == entry[2:])):
+        if entry == host or (entry.startswith("*.") and host.endswith(entry[1:])):
             return True
     return False
+
+
+def rewrite_allowlist(project, change):
+    """Rewrite the project's research allowlist: ``change`` gets the list of entries and returns what replaces it.
+
+    The list is under the key ``hosts`` (DEC-272); the rest of the file is kept.
+    A file of another shape is rewritten in its own shape, so that a test of a
+    malformed file can start from it.
+    """
+    path = Path(project) / ALLOWLIST_REL
+    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if isinstance(data, list):
+        new = change(list(data))
+    else:
+        keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
+        assert len(keys) == 1, (
+            f"{ALLOWLIST_REL} is neither a list of hosts nor a mapping with one list of hosts: this test must be "
+            "revised for its shape"
+        )
+        new = dict(data)
+        new[keys[0]] = change(list(data[keys[0]]))
+    path.write_text(yaml.safe_dump(new, default_flow_style=False), encoding="utf-8")
+    return path
+
+
+def allowlist_key(project):
+    """The key that holds the list of hosts in the project's research allowlist, or None for a top-level list."""
+    path = Path(project) / ALLOWLIST_REL
+    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
+    return keys[0] if len(keys) == 1 else None
+
+
+def hook_keys(settings):
+    """The keys of ``settings`` that register a hook or switch the hooks on or off."""
+    return sorted(key for key in ("hooks", "disableAllHooks") if key in settings)
+
+
+def rewrite_settings(project, change, rel=SETTINGS_REL):
+    """Change the repository's settings file ``rel`` in place: ``change`` gets the parsed object ({} if missing)."""
+    path = Path(project) / rel
+    data = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    change(data)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def write_ticket(project, ticket_id, role, status="in_progress", allowed_paths=("docs/**",), wbs_id="W1-98"):
+    """Put one more committed ticket in the project."""
+    write(project, f".tickets/{ticket_id}.md", check_support.ticket_text(
+        ticket_id=ticket_id, wbs_id=wbs_id, status=status, role=role, allowed_paths=tuple(allowed_paths)))
+    check_support.commit_all(project, f"ticket {ticket_id}")
+    return ticket_id
 
 
 def deny_rules(settings, tool):
@@ -487,6 +570,17 @@ def covers(specs, relpath, project, home):
 
 def edit_denied(result, relpath, project, sandbox):
     return covers(deny_rules(result.settings(), "Edit"), relpath, Path(project), sandbox.home)
+
+
+def literal_edit_denials(result, project, sandbox):
+    """The absolute paths the built settings deny by a literal ``Edit`` rule: a rule that names one path, no pattern.
+
+    The Linux sandbox skips a rule with ``*``, ``?`` or ``[`` in it (EXP-001
+    §1), so only a literal rule binds a Bash command there (DEC-311).
+    """
+    root = os.path.realpath(project)
+    return {os.path.normpath(_absolute(spec, root, str(sandbox.home)))
+            for spec in deny_rules(result.settings(), "Edit") if not has_glob_character(spec)}
 
 
 def has_glob_character(name):

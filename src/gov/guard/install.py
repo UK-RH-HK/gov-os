@@ -9,7 +9,9 @@ from __future__ import annotations
 import os
 import shlex
 
-from gov.guard.decide import KNOWN_ROLES
+from gov.guard.decide import (
+    _GOV_RUNTIME, KNOWN_ROLES, _expand_token, _is_under_acceptance,
+    _load_ticket)
 
 _PKG = frozenset({
     "pip", "pip3", "npm", "cargo", "apt", "apt-get",
@@ -107,12 +109,15 @@ def _uv_install(args):
     ``uv sync`` and ``uv run --with`` / ``-w`` (DEC-174), with options
     before the subcommand; a value option's value is skipped (DEC-216)."""
     words = []
+    first = 0  # where the subcommand is
     i = 0
     while i < len(args):
         if args[i] in _UV_VALUE_OPTS:
             i += 2
             continue
         if not args[i].startswith("-"):
+            if not words:
+                first = i
             words.append(args[i])
         i += 1
     if not words:
@@ -120,8 +125,17 @@ def _uv_install(args):
     if words[0] in ("add", "sync"):
         return True
     if words[0] == "run":
-        return any(a in ("--with", "-w") or a.startswith("--with=")
-                   for a in args)
+        if any(a in ("--with", "-w") or a.startswith("--with=")
+               for a in args):
+            return True
+        # -w<package>: the value joined, among run's own options, which
+        # end at the first word after run.
+        for a in args[first + 1:]:
+            if not a.startswith("-"):
+                return False
+            if a.startswith("-w"):
+                return True
+        return False
     return (len(words) >= 2 and words[0] in ("pip", "tool")
             and words[1] == "install")
 
@@ -175,6 +189,54 @@ def has_install(command):
                                 os.path.dirname(t)) in pd:
                         return True
     return False
+
+
+def experiment_folder(project_root, ticket_id):
+    """The real path of a research ticket's experiment folder, or None.
+
+    The ticket is ``in_progress``, its role is ``research`` and its
+    ``allowed_paths`` is exactly one entry ``<folder>/**`` naming an
+    existing directory inside the project (DEC-242).
+    """
+    t = _load_ticket(project_root, ticket_id or "")
+    if not t or t.get("status") != "in_progress" or t.get("role") != "research":
+        return None
+    paths = t.get("allowed_paths", [])
+    if len(paths) != 1 or not paths[0].endswith("/**"):
+        return None
+    rel = paths[0][:-3]
+    if not rel or any(c in rel for c in "*?["):
+        return None
+    # Written as the folder it reaches (no ..), and never the acceptance
+    # tests (MR-3) or the runtime directory (DEC-180).
+    if (os.path.normpath(rel) != rel or _is_under_acceptance(rel)
+            or rel.split("/")[0] == _GOV_RUNTIME):
+        return None
+    root = os.path.realpath(project_root)
+    real = os.path.realpath(os.path.join(root, rel))
+    if not real.startswith(root + "/") or not os.path.isdir(real):
+        return None
+    return real
+
+
+def install_in_experiment_folder(command, cwd, project_root, ticket_id):
+    """True when a research install is inside its experiment folder
+    (DEC-240): the working directory is the folder or below it, or the
+    command first changes into it with ``cd``.  ``uv --directory`` and
+    ``uv --project`` are not followed."""
+    folder = experiment_folder(project_root, ticket_id)
+    if folder is None:
+        return False
+    segs = _segments(command)
+    if any(_head(s)[0] in ("cd", "pushd", "popd") for s in segs[1:]):
+        return False
+    if segs and segs[0][0] == "cd":
+        target = _expand_token(segs[0][1]) if len(segs[0]) == 2 else None
+        if target is None:
+            return False
+        cwd = os.path.join(cwd, target)
+    real = os.path.realpath(cwd)
+    return real == folder or real.startswith(folder + "/")
 
 
 def acting_role(session_role, subagent_type):

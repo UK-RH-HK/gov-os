@@ -25,8 +25,13 @@ reads what its session left behind. The KPI lines that ask for it:
   empty";
 - success 10: a write under ``.gov-runtime/`` fails "through an opaque Bash form
   and through ln, while .gov-runtime/scratch/** stays writable";
+- success 11 (DEC-315): a write to the acceptance tests, the tickets and
+  ``.claude`` fails "through an opaque Bash form": three assertions in the
+  engineer session;
 - DEC-136: ``ln`` into ``.gov-runtime/``, and a here-string write outside the
-  repository.
+  repository. DEC-311: the two ``ln`` cases target names that exist at launch
+  (the findings file, the snapshots directory); a new name created under
+  ``.gov-runtime/`` after launch is a recorded residual and is not tested.
 
 **Cost and needs.** Two headless sessions with the real CLI at
 ``~/.local/bin/claude`` and the caller's own credentials: the engineer session
@@ -91,7 +96,7 @@ def _prerequisites():
         pytest.fail(f"a launched session needs {missing} on this machine", pytrace=False)
 
 
-def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=None):
+def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=None, watch=()):
     """Build a project, start one real session through ``gov launch`` and return what it left."""
     _prerequisites()
     project = tmp / "repo"
@@ -106,7 +111,7 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
     support.write(project, probe_rel, probe.replace("@OUTSIDE@", str(outside)).replace("@STAND_IN@", str(stand_in))
                   .replace("@RESULTS@", results_rel))
     before = {rel: (project / rel).read_text(encoding="utf-8")
-              for rel in ("README.md", "experiments/spikes/exp-900/data.txt")}
+              for rel in ("README.md", "experiments/spikes/exp-900/data.txt", *watch)}
     env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     run = support.run_gov(project, sandbox, "launch", role, support.TICKET_OF[role], "--",
@@ -125,6 +130,12 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
 # The engineer session: one Bash call, one Write call
 # --------------------------------------------------------------------------
 
+# DEC-315: one file that exists at launch in each of the three trees.
+ACCEPTANCE_FILE = "tests/acceptance/W1-90/test_fixture.py"
+TICKET_FILE = f"{support.TICKET_OF[support.ENGINEER]}.md"
+SETTINGS_FILE = support.SETTINGS_REL
+PROTECTED_TREES = (ACCEPTANCE_FILE, f".tickets/{TICKET_FILE}", SETTINGS_FILE)
+
 ENGINEER_PROBE = f"""#!/bin/bash
 # W1-46 acceptance probe. Every write below is one the sandbox must stop, except the ones under scratch.
 OUT=@RESULTS@
@@ -136,8 +147,11 @@ python3 -c "open('.gov-runtime/freeze','w').write('x')" 2>/dev/null
 echo {MARK} >> "$(printf %s .gov-runtime)/findings.jsonl" 2>/dev/null
 echo {MARK} >> "$(printf %s .gov-runtime)/records.jsonl" 2>/dev/null
 python3 -c "open('.gov-runtime/snapshots/{MARK}.json','w').write('x')" 2>/dev/null
-ln -s scratch/w1-46/seed.txt .gov-runtime/{MARK}-symlink 2>/dev/null
-ln {SCRATCH}/seed.txt .gov-runtime/{MARK}-hardlink 2>/dev/null
+ln -sf scratch/w1-46/seed.txt .gov-runtime/findings.jsonl 2>/dev/null
+ln {SCRATCH}/seed.txt .gov-runtime/snapshots/{MARK}-hardlink 2>/dev/null
+python3 -c "open('{ACCEPTANCE_FILE}','a').write('# {MARK}')" 2>/dev/null; echo "tree_0=$?" >> "$OUT"
+echo {MARK} >> "$(printf %s .tickets)/{TICKET_FILE}" 2>/dev/null; echo "tree_1=$?" >> "$OUT"
+sh -c 'echo >> {SETTINGS_FILE}' 2>/dev/null; echo "tree_2=$?" >> "$OUT"
 echo x > {SCRATCH}/scratch-write.txt
 echo "held_out_entries=$(ls -A '@STAND_IN@' 2>/dev/null | wc -l)" >> "$OUT"
 echo "role=$GOV_ROLE" >> "$OUT"
@@ -157,7 +171,7 @@ ENGINEER_PROMPT = (
 @pytest.fixture(scope="module")
 def engineer(launcher, tmp_path_factory):
     return _start(launcher, tmp_path_factory.mktemp("w1-46-live-engineer"), support.ENGINEER, ENGINEER_PROMPT,
-                  f"{SCRATCH}/probe.sh", ENGINEER_PROBE, f"{SCRATCH}/results.txt")
+                  f"{SCRATCH}/probe.sh", ENGINEER_PROBE, f"{SCRATCH}/results.txt", watch=PROTECTED_TREES)
 
 
 @pytest.mark.parametrize("name", ("interpreter.txt", "substitution.txt", "here-string.txt"))
@@ -182,10 +196,36 @@ def test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable(enginee
     assert (engineer.project / SCRATCH / "scratch-write.txt").is_file(), ".gov-runtime/scratch/ was not writable"
 
 
-@pytest.mark.parametrize("name", (f"{MARK}-symlink", f"{MARK}-hardlink"))
-def test_ln_into_gov_runtime_fails(engineer, name):
-    """Success 10, DEC-136: a link created with ``ln`` into ``.gov-runtime/``, outside ``scratch/``."""
-    assert not os.path.lexists(engineer.project / ".gov-runtime" / name), f"ln created .gov-runtime/{name}"
+@pytest.mark.parametrize("kind", ("symlink", "hardlink"))
+def test_ln_into_gov_runtime_fails(engineer, kind):
+    """Success 10, DEC-136, DEC-311: ``ln`` onto and into a name that exists under ``.gov-runtime/`` at launch.
+
+    The symbolic link is forced onto the findings file; the hard link is made in
+    the snapshots directory. Both names have a literal ``Edit`` deny rule.
+    """
+    runtime = engineer.project / ".gov-runtime"
+    if kind == "symlink":
+        assert not (runtime / "findings.jsonl").is_symlink(), "ln -sf replaced .gov-runtime/findings.jsonl by a link"
+        assert (runtime / "findings.jsonl").is_file(), ".gov-runtime/findings.jsonl is gone"
+    else:
+        assert not os.path.lexists(runtime / "snapshots" / f"{MARK}-hardlink"), (
+            "ln created a hard link in .gov-runtime/snapshots/"
+        )
+
+
+@pytest.mark.parametrize("rel", PROTECTED_TREES, ids=("an-acceptance-test", "a-ticket", "the-settings"))
+def test_an_opaque_bash_write_to_the_acceptance_tests_the_tickets_and_dot_claude_fails(engineer, rel):
+    """Success 11 (DEC-315): an interpreter one-liner, a command substitution, ``sh -c``.
+
+    The write itself must fail, which its exit code shows: a write that lands
+    and is restored afterwards by the containment check (DEC-143) is not what
+    the line asks for. The file is unchanged as well.
+    """
+    status = engineer.results.get(f"tree_{PROTECTED_TREES.index(rel)}")
+    assert status not in (None, "0"), f"the launched engineer session's Bash wrote to {rel} (exit code {status!r})"
+    assert (engineer.project / rel).read_text(encoding="utf-8") == engineer.before[rel], (
+        f"the launched engineer session's Bash changed {rel}"
+    )
 
 
 def test_the_held_out_directory_looks_empty_from_the_sessions_bash(engineer):
@@ -219,7 +259,8 @@ def test_the_role_and_the_ticket_reach_the_session_and_its_hooks(engineer):
 # The research session: two Bash calls
 # --------------------------------------------------------------------------
 
-RESEARCH_HOSTS = sorted(host for hosts in support.RESEARCH_HOSTS.values() for host in hosts)
+# DEC-241, DEC-316: every starting host the owner left, and one subdomain of readthedocs.io for the subdomain entry.
+RESEARCH_HOSTS = (*support.STARTING_HOSTS, support.READTHEDOCS_HOST)
 INSTALL = (f"cd {FOLDER} && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index "
            f"--python .venv/bin/python vendor/{support.WHEEL_NAME}")
 RESEARCH_PROBE = f"""#!/bin/bash
@@ -233,7 +274,7 @@ uv --no-cache pip install --offline --no-index --target '@OUTSIDE@/site' {FOLDER
 echo "outside_install=$?" >> "$OUT"
 echo "mktemp=$(mktemp)" >> "$OUT"
 for host in {' '.join(RESEARCH_HOSTS)} example.com; do
-  curl -s -o /dev/null -m 20 "https://$host/"; echo "net_$host=$?" >> "$OUT"
+  code=$(curl -s -o /dev/null -m 20 -w '%{{http_code}}' "https://$host/"); echo "net_$host=$? $code" >> "$OUT"
 done
 echo "end=1" >> "$OUT"
 """
@@ -268,7 +309,7 @@ def test_a_research_bash_write_to_a_sibling_directory_fails(research):
     """Success 4 [CAP-61.c], failure 4: paths that existed at launch outside the experiment folder."""
     assert research.results.get("sibling") not in (None, "0"), "the write to the sibling experiment succeeded"
     assert research.results.get("top_level") not in (None, "0"), "the write to README.md succeeded"
-    for rel, text in research.before.items():
+    for rel, text in research.before.items():   # README.md and the sibling experiment's file
         assert (research.project / rel).read_text(encoding="utf-8") == text, f"{rel} was changed by the session"
 
 
@@ -281,17 +322,32 @@ def test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reporte
     )
 
 
+def _connection(session, host):
+    """What ``curl`` left for ``host``: its exit code and the HTTP status of the answer (000 when there was none)."""
+    exit_code, _, status = session.results.get(f"net_{host}", "").partition(" ")
+    return exit_code, status
+
+
 @pytest.mark.parametrize("host", RESEARCH_HOSTS)
-def test_the_research_allowlist_accepts_a_connection_to_a_research_domain(research, host):
-    """Success 3 [CAP-61.c], DEC-161: "the domain allowlist accepts the research domains". Needs the network."""
-    assert research.results.get(f"net_{host}") == "0", (
-        f"a launched research session could not connect to {host}: curl ended with "
-        f"{research.results.get(f'net_{host}')!r}"
+def test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist(research, host):
+    """Success 3 [CAP-61.c], DEC-161, DEC-241: "the sandbox accepts these entries". Needs the network.
+
+    ``curl`` ends with 0 when the host itself answered over TLS, with any HTTP
+    status: the connection went through the sandbox's proxy. The status is kept
+    for the failure message. ``docs.readthedocs.io`` stands for the subdomain
+    entry of ``readthedocs.io``.
+    """
+    exit_code, status = _connection(research, host)
+    assert exit_code == "0", (
+        f"a launched research session got no answer from {host}: curl ended with {exit_code!r}, HTTP status {status!r}"
     )
 
 
 def test_the_research_allowlist_refuses_a_domain_that_is_not_on_it(research):
-    assert research.results.get("net_example.com") not in (None, "0"), "the research session connected to example.com"
+    exit_code, status = _connection(research, "example.com")
+    assert exit_code not in ("", "0"), (
+        f"the research session connected to example.com: curl ended with {exit_code!r}, HTTP status {status!r}"
+    )
 
 
 # --------------------------------------------------------------------------

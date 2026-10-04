@@ -1,6 +1,6 @@
 ---
 id: DAEO-lkeb
-status: open
+status: in_progress
 deps: [DAEO-7nne]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -19,12 +19,18 @@ depends_on:
 allowed_paths:
 - src/gov/codeintel/**
 - tests/unit/codeintel/**
+- template/.gitleaks.toml
+- .gitleaks.toml
+- src/gov/secrets/**
+- tests/unit/secrets/**
 kpis:
   success:
   - The index lives in a per-repository home under .gov-runtime/; list_projects in one repository shows only its own project [CAP-12.b]
   - A secret-exclusion test proves no planted secret enters the codebase-memory index [CAP-03.e, CAP-12.b]
   - 'Definitions, references, callers, impact and dead code are answered across Rust, Python and TypeScript on the dev tiers, before and after a rename: callers/impact hit@5 >= 60 % (S0b2 C1 baseline) [CAP-12.a]'
+  - 'The gov-token rule of template/.gitleaks.toml and .gitleaks.toml flags a prefixed string (sk, pk, rk or tok, then _ or -) only when its body holds a digit, or both an upper-case and a lower-case letter: an ordinary identifier with such a prefix is not flagged and its file reaches the index, a token-shaped string is still flagged, and the seven dev canaries are still detected; the requirement is in the rule itself, not in an allowlist; the W1-15 acceptance tests that assert the old rule are revised (DEC-324, DEC-325)'
   failure:
+  - A file whose only match is an ordinary identifier with a token prefix is kept out of an index
   - An index file of this repository exists outside .gov-runtime/ after a run
   - A planted secret is found in the code graph
 profile: FULL

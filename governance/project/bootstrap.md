@@ -440,3 +440,198 @@ Recorded at W1-18's close, from the ticket lead's summary. None is a defect.
 - **G-22's text** exists only in the archived sources; the decisions rest on the in-tree sources (DEC-260, DEC-261,
   DEC-257).
 - **The ticket body** still says "on-demand start and stop"; DEC-261 decides start only.
+
+## W1-10 residuals (store and record graph, 2026-10-04)
+
+Recorded at W1-10's close, from the ticket lead's summary. None is a defect; each is for a later ticket.
+
+- **Who writes `.gov-runtime/store.db` in a live session** is decided (DEC-322, 2026-10-04): only orchestrator-role
+  sessions write the live store; tests and workers build their own stores in temporary directories; revisit when
+  `gov rebuild` is wired (W1-27). The guard keeps
+  `.gov-runtime/` outside `scratch/` closed to worker roles, and W1-17, W1-20 and W1-24 read the store in worker
+  sessions. Every W1-10 test builds the store in a temporary repository.
+- **What loads as a record today (DEC-274).** The charter, the contract and the plan have `id` and `status` but no
+  `type`, so the load reports them invalid. The seven kernel templates load as records with placeholder ids.
+  Decisions are headings in the register, not files, so every `DEC-…` reference is dangling. Two files with one id
+  both load.
+- **Dangling edges in this repository (DEC-277).** A ticket's `depends_on` holds WBS ids while its `id` is the tk id.
+  Trailer values such as `decision-record`, `owner-prompt` and `CAP-58.a` name no record. Unresolved trailers appear
+  in `dangling()` with type `IMPLEMENTS` or `TASK`; `TASK` is outside the eight edge types.
+- **The four edge keys DEC-012 does not name** (`evidence_for`, `tests`, `generates`, `validates`) are to be checked
+  against the archived Framework §11.2 by a product-spec worker before any real record uses them (DEC-277).
+- **Records are read from `HEAD`**, not the working tree: an uncommitted edit to a record is not in the graph.
+  Untested.
+- **The DEC-182 boundary** uses the committer date in the commit's own time zone; no test fixes which date decides.
+- **The digest (DEC-276)** covers records (path, id, type, status), edges, commits, trailers and each commit's
+  changed paths. It does not cover other frontmatter keys or the record body, and no `content_hash` is stored.
+- **Merge commits** list no changed paths, so they never match `commits(root, path=…)`. Renames are untested.
+- **Two new error codes**, `STORE_MISSING` and `STORE_GIT_FAILED`, are untested.
+- **Not tested:** the `owner` and free `links` filters of CAP-08.a; no KPI line names them.
+- **A load replaces only its own five tables**, in one transaction, so tables a later ticket adds to the same file
+  survive.
+
+## W1-15 residuals (secret rules, pre-index filter and the secrets-indexing check, 2026-10-04)
+
+Recorded at W1-15's close, from the ticket lead's summaries and the reviewer's fourteen findings, seven of which were
+fixed. None of the following is a defect of the ticket; each names who should settle it.
+
+- **A project can remove or rewrite a template rule** (DEC-299). The project's `.gitleaks.toml` is the one source of
+  rules (DEC-287); its allowlists and disabled rules are ignored by the filter and the check (DEC-290, DEC-298), but a
+  rule the project deleted, such as the canary rule, is not put back. A file with no rules at all is refused. A
+  project file that extends another file with rules of its own still inherits that file's allowlists.
+- **The rules over-block.** The token rule flags ordinary identifiers (`pk_…`, `tok_…`, `rk_…`, `sk-…` of 16 or more
+  characters), and the canary rule flags any upper-case identifier with the canary word in the middle. This
+  repository loses only the W1-15 ticket file from an index; an adopting product could lose code files. Requiring a
+  digit or mixed case in the token body is the suggested repair. The owner decided that repair, before W1-41
+  (DEC-324); W1-16 carries it (DEC-325). The canary rule's over-blocking stays a residual.
+- **Near spellings of the canary are missed** (lower case, other separators, markdown-escaped underscores); they are
+  outside DEC-286. The owner still confirms the count of seven canaries against the S0b1 manifest.
+- **Path-map patterns match narrowly.** `**/x/**` does not match a top-level `x/`; a trailing slash, a leading `/` or
+  `./`, `?` and `[]` match nothing; `paths` given as a string is read character by character with no error. For the
+  path-map schema (W1-27 replaces the minimal one, DEC-228).
+- **The two W1-08 residuals that named W1-15** (closed lists for the free-text namespace fields; the meaning of
+  `permitted_roles`) move to the first ticket that reads export or embedding policy, W1-17 or W1-24 (DEC-289). W1-15
+  reads only a namespace's `paths` and `memory_class`.
+- **What the check does not see.** Compressed stores and bundles (`.gz`, deflated `.zip`, `.tar.gz`, a gzip BLOB),
+  for W1-24 if bundles are compressed; UTF-32 text; a secret in a store file's or folder's name, which is also
+  printed in the check's output when the content matches; SQLite WAL side files are scanned as plain bytes only.
+- **What the filter cannot see.** A file replaced after the filter answered and before the indexer reads it (for
+  W1-16, W1-17 and W1-19; the check is the backstop); a hard link to a product file; a secret split across lines or
+  reversed.
+- **`.gov-runtime/scratch/` counts as a store for the check**, so the check would be red in this repository on lead
+  briefs and worker logs that name the canary. W1-26 settles this before `gov check` runs the check here.
+- **gitleaks is trusted by name.** A stand-in `gitleaks` first on `PATH` that exits 0 passes everything; the version
+  is not verified. The filter and check cases need gitleaks where they run; putting it on CI is an install for the
+  owner, raised with W1-40 (DEC-287).
+- **Edges that fail closed or noisily.** A configuration whose only rules come through `[extend] path` is refused as
+  "no rules"; one with a TOML date value, or larger than about 128 KB, makes the filter raise; a not-green check on a
+  ruleless configuration or an unreadable store exits with a Python traceback; a clean store with an unloadable
+  virtual table, or a table name with a double quote, keeps the check red; a FIFO in a governance namespace would
+  block the filter (reasoned, not run).
+- **The root allowlist.** With the template's rules and no allowlist, gitleaks flags four tracked paths: the W1-15
+  ticket file, which names the canary, and three brownfield fixture files. W1-15 allowlisted only the ticket file; the
+  fixtures were already allowlisted. The list is the lead's reconstruction, not the first engineer's report.
+- **A guard observation.** Twice in the parallel run a worker wrote a file inside its allowed paths through a Python
+  script fed by a here-document in Bash, and the guard did not stop it. For W1-46 and W1-47's residual lists.
+
+## W1-49 residuals (light auto-resume hooks, 2026-10-04)
+
+Recorded at W1-49's close, from the ticket lead's summaries and two reviews. None is a defect of the ticket; W1-29
+replaces the checkpoint file and settles most of them.
+
+- **An in-place save during the hook's read–write window can be lost** (DEC-306, accepted by the owner). If the
+  session saves its checkpoint in place between the PreCompact hook's read and its write, the new text is cut or
+  overwritten. A save by rename, or a save while `tk` runs, is safe. PreCompact runs while the session is idle, and
+  the reviewer reached the window only by wrapping the hook's file object. Until W1-29.
+- **The warning shows after every compaction** until the session rewrites its checkpoint (DEC-283, confirmed by
+  DEC-323). W1-29 may refine it. A write in the same second as the compaction gets no warning, and a file time in the
+  future never warns.
+- **"Pending owner decisions" is not known to the hook** (DEC-284): the block points to the written part.
+- **Not proved:** that a compaction really starts near 300k tokens; the `auto` trigger was never run live. The
+  auto-compact setting takes effect only in sessions started after the merge (`840f1e37`).
+- **A half-written block** after a kill or a double write failure stays as written text and is injected with the last
+  section. Eight compactions at once gave this in about 1 of 40 to 1 of 80 rounds.
+- **The modification time is not set back** after a kill, or when the user does not own the file, so the warning is
+  missing then.
+- **File kinds.** A checkpoint that is a symbolic link is written through to its target. A FIFO hangs both hooks
+  until Claude Code's hook timeout. An empty checkpoint gets a block with no written part.
+- **Text written after the block** freezes the old block into the written part. Whitespace-only lines after the block
+  are dropped.
+- **Headings and fences.** Heading variants (lower case, bold, indented, after a byte-order mark) are not found; with
+  two RESUME HERE sections the first wins; tilde fences, indented fences and an unclosed fence are not handled; a
+  form feed or U+2028 before a heading-like line cuts the section.
+- **Sizes.** The 10,000 cap is counted in code points, not UTF-16 units. The block has no size limit. A very long or
+  multi-line `GOV_TICKET` breaks the cap's promises and is injected verbatim.
+- **Process edges.** A timed-out `tk` leaves its children running; there is no fsync; the message is wrong after a
+  failed truncate; the hooks exit 120, not 0, when stdout cannot be written (nothing is blocked).
+- **Neither hook reads stdin**, so SessionStart would also inject on `startup` if that source were registered. A
+  missing or broken `precompact.py` makes SessionStart inject nothing, silently. A `CLAUDE_PROJECT_DIR` at a
+  subdirectory only reports the checkpoint missing.
+- **Two stale git-ignored `.pyc` files** remain in `template/governance/kernel/hooks/__pycache__/` in the ticket's
+  worktree; they went with the worktree.
+- **A guard observation.** The batch 4 engineer wrote its two allowed files with `python3 - <<'EOF'` scripts and the
+  guard did not refuse them. Same observation as under W1-15; for W1-46's residual list.
+
+## W1-09 residuals (ticket vendoring, claims and the READY rule, 2026-10-04)
+
+Recorded at W1-09's close, from the ticket lead's summary and the reviewer's findings, three of which were fixed.
+None is a defect of the ticket; each names who should settle it.
+
+- **Stale store.** The READY rule reads records from the store as last loaded. A specification reopened, a package
+  added or an input superseded after the load leaves tickets READY until the next `gov.store.load`. The store has no
+  freshness mark. For W1-13 and W1-26, which call the rule.
+- **Packages that do not load block nothing** (with DEC-308): broken frontmatter, no `status`, a status in another
+  case, a ticket named by its WBS id. For W1-34 and W1-11.
+- **Specification gate edges** (with DEC-307): an empty `specification:` key reads as absent; duplicate record ids
+  give an order-dependent answer; a `CLOSED` specification superseded by a draft still counts; any record type
+  counts. For W1-13.
+- **Holder comparison is on the stripped text.** `" a "` is released by `"a"` and not by itself; an empty lock is
+  released by anyone passing `""`.
+- **A ticket that is `in_progress` without a lock can be claimed.** DEC-292 left the link between `claim` and
+  `in_progress` open. `claim` also accepts `status: Closed` (capitalised) and a ticket with no status.
+- **`create` trusts the script's last output line** and does not check the script's sha256 before running it. Not
+  reachable with the pinned script. Which copy of `tk` `create` runs in this repository is open under DEC-295: it
+  always runs `<root>/governance/kernel/bin/tk`.
+- **Acceptance folder cases left open under DEC-293 and DEC-300:** a path naming another ticket's folder, and an
+  empty folder, both still count.
+- **Raw exceptions instead of `GovError`:** ids `.`, `..` or with a NUL in `holder` and `release`; a lock that is a
+  directory; a claims folder that is a file; a release on an unreadable claims folder; `create` when the script is
+  missing or fails; a holder that cannot be encoded leaves a stuck empty lock. All fail closed.
+- **`blocked` can give an empty reason list** for an unreadable ticket, an unreadable store or an unknown status; a
+  reason code for "cannot be read" needs a decision.
+- **Only `deps` is read, not `depends_on`.** A record with status `SUPERSEDED` or `REJECTED` but no edge is a good
+  input.
+- **Minor lock and ticket edges.** A dangling-link lock cannot be released through the interface; with two `status`
+  keys the last wins; a lock is keyed by file name, not by the frontmatter id. A claims folder that is a symbolic
+  link is recorded under DEC-297.
+- **The release `flock` is advisory and POSIX-only.** A lock removed by hand is outside it. The double hold the
+  reviewer saw was not reproduced (about 1,800 rounds by the designer, 480 by the lead); the fix rests on the lead's
+  reading of the diff.
+
+## W1-12 residuals (readiness schema and proposal templates, 2026-10-04)
+
+Recorded at W1-12's close, from the ticket lead's summaries and a product-spec worker's reading of G-07 and G-09
+(DEC-310). None is a defect of the ticket; each names who should settle it.
+
+- **The CIT-E rule is stated only** (DEC-309). The schema carries the source and the extension rule of
+  `readiness-dimensions.yaml`, and W1-12's suite goes red when the YAML changes without the schema. The check that a
+  change to the taxonomy or to the YAML has a linked CIT-E record is a KPI line of W1-26.
+- **The kernel `templates/openspec/` folder holds nothing** (DEC-304, DEC-326). G-07 and G-09 name no path there, and
+  OpenSpec reads templates only from the schema's own `templates/` folder. The path left the ticket's `allowed_paths`.
+- **Names.** G-07 calls the artefact `feature-readiness`; as built, the schema is `feature-readiness` and the
+  artefact is `readiness`, file `readiness.yaml` (DEC-305). G-08, W1-13's source, says the checker reads
+  `feature-readiness.md`: DEC-305 supersedes that file name. For W1-13's test design brief.
+- **The record lacks profile and capability types.** `readiness.yaml` has no `profile` or declared capability-type
+  field, and `cell_states` holds only the state names and `requires: [reason]` on N/A. The readiness YAML's
+  `meaning`, `satisfies`, `mandatory`, `rules` and `profiles` are not copied. W1-13 needs them or must read the
+  contract YAML.
+- **Artifact order.** `readiness` requires `specs`, while `tasks` and `apply` keep their upstream requirements, so
+  OpenSpec does not force the record before tasks.
+- **`validate --strict` parses only the spec deltas and `.openspec.yaml`**; the proposal, design, tasks and readiness
+  files cannot fail it. The stock `spec.md` template fails `--strict`, so the fork replaces it with plain "replace
+  this" sentences, one SHALL requirement and one scenario. The other three templates are byte-identical to upstream;
+  about 317 lines are upstream `spec-driven` text.
+- **Free fields.** `evidence` and `gap_ticket` carry no id pattern, so nothing duplicates the shared id grammars
+  (DEC-227). Validation falls to W1-13.
+- **Untested:** a `config.yaml` naming an unknown schema makes `openspec new change` exit 1 with "Unknown schema".
+
+## W1-34 residuals (decision-package template, 2026-10-04)
+
+Recorded at W1-34's close, from the ticket lead's summaries. None is a defect of the ticket; each names who should
+settle it.
+
+- **Nothing enforces the template.** The tests check what the template lets through: nothing renders a package or
+  records an answer. Refusing a package without a recommendation or confidence, or an answer without a date, falls to
+  W1-35 and W1-11.
+- **The schema does not hold the five `status` values** (DEC-328). `status` is still any non-empty string and extra
+  keys are accepted, so the five values, "no second state key", `rank`, `cit` and `constrains` hold only in the
+  template and its test. W1-34 could not change schemas.
+- **What a declined, revoked or stale package does to waiting tickets** is W1-11's (DEC-308).
+- **Choices the sources do not fix.** The CIT id has no grammar (`CIT-0000` is a placeholder). The frontmatter key
+  `rank` and its default `P2`. Packages over the cap "wait, highest rank first" (DEC-093 gives only the cap and the
+  P1 bypass). "Human-resolvable" is read as "precedence does not settle it, or it is one of MR-6's questions that
+  matter". "Only an answered gate of the same CIT permits the next actions" also excludes an open gate, which
+  CAP-34.d does not list. The answer form reads `ACCEPTED (who, YYYY-MM-DD)`, not `owner`, because DEC-220 records
+  delegated answers under the orchestrator.
+- **The rules sit in an HTML comment inside the form**, which the author deletes from a filled package. W1-35's
+  skills need to carry the routing, batching and state rules themselves.
