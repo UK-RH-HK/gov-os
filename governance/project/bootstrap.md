@@ -145,6 +145,12 @@ experiment):
   entry DEC-067 names the directory historically. The guard and the launcher take the path from `held-out.yaml`, and
   no acceptance test names it. The owner confirms the value in `held-out.yaml` when W1-47 closes. A Bash command that
   reaches the oracle without naming its path is seen by neither layer. The owner accepted this residual (DEC-162).
+  What "names the path" covers is decided by DEC-215: the guard denies a call whose input contains the held-out path
+  literally anywhere, or reaches it through a relative path, `..`, `~`, `$HOME` or a symbolic link, except edits to
+  the two files that hold it. Three forms stay under this residual: a parent directory given to a recursive tool,
+  a glob that matches the path without naming it, and a look-alike sibling whose name starts with the same
+  characters. The path is held in `governance/project/held-out.yaml` under the key `held_out_paths`, written by the
+  owner (DEC-218); the oracle is outside the repository (DEC-213).
 
 **Open for every session:**
 
