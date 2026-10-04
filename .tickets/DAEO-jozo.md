@@ -12,6 +12,7 @@ tags: [wave-1, implementation, standard]
 wbs_id: W1-20
 title: gov closure
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-10

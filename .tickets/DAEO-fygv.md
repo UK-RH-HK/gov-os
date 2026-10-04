@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-26
 title: gov check G0-G2
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-09

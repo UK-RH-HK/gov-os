@@ -12,6 +12,7 @@ tags: [wave-1, config, standard]
 wbs_id: W1-38
 title: rulesync adapters and .claude ownership
 class: config
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-04

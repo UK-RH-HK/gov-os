@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-09
 title: Ticket vendoring, claims and READY rule
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-07

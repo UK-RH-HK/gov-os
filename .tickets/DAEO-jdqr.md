@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-46
 title: Worker session launcher (gov launch)
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-07

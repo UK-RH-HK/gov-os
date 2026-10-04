@@ -12,6 +12,7 @@ tags: [wave-1, schema, standard]
 wbs_id: W1-12
 title: Readiness schema and proposal templates
 class: schema
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-08

@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-04
 title: Install-approval rule
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-02

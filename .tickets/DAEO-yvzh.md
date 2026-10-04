@@ -12,6 +12,7 @@ tags: [wave-1, config, lite]
 wbs_id: W1-37
 title: Superpowers three-skill vendoring
 class: config
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-06

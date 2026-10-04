@@ -12,6 +12,7 @@ tags: [wave-1, implementation, standard]
 wbs_id: W1-19
 title: Semantic retrieval, RRF and rerank
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-17

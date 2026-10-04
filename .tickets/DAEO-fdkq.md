@@ -12,6 +12,7 @@ tags: [wave-1, config, standard]
 wbs_id: W1-40
 title: lefthook and CI workflow
 class: config
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-22

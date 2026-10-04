@@ -12,6 +12,7 @@ tags: [wave-1, audit, full]
 wbs_id: W1-43
 title: Wave 1 exit audit
 class: audit
+state_class: AUTHORITATIVE
 role: independent-auditor
 depends_on:
 - W1-42

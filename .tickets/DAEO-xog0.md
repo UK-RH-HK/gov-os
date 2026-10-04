@@ -12,6 +12,7 @@ tags: [wave-1, role-definition, standard]
 wbs_id: W1-33
 title: Wave 1 role definitions
 class: role-definition
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-05

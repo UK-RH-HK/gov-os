@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-13
 title: gov readiness
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-09

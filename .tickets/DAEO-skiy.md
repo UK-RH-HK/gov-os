@@ -12,6 +12,7 @@ tags: [wave-1, skill, standard]
 wbs_id: W1-36
 title: 'Skills: retrieval, audit, checkpoint/resume, adopt'
 class: skill
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-21

@@ -12,6 +12,7 @@ tags: [wave-1, config, lite]
 wbs_id: W1-01
 title: Interim bootstrap guardrails
 class: config
+state_class: AUTHORITATIVE
 role: orchestrator
 depends_on: []
 allowed_paths:

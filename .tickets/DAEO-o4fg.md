@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-47
 title: 'Guard hardening: escape hatch, failed commands, oracle path'
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-45

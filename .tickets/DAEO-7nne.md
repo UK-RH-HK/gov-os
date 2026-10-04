@@ -12,6 +12,7 @@ tags: [wave-1, implementation, full]
 wbs_id: W1-15
 title: Secret rules and pre-index filter
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-07

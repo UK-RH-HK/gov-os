@@ -12,6 +12,7 @@ tags: [wave-1, template, lite]
 wbs_id: W1-34
 title: Decision-package template
 class: template
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-08

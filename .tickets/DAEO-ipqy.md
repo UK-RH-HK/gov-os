@@ -12,6 +12,7 @@ tags: [wave-1, ops, standard]
 wbs_id: W1-06
 title: Wave 1 tool prerequisites
 class: ops
+state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
 - W1-05

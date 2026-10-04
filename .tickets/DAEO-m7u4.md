@@ -12,6 +12,7 @@ tags: [wave-1, config, lite]
 wbs_id: W1-05
 title: Dogfood switch-over
 class: config
+state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
 - W1-02

@@ -12,6 +12,7 @@ tags: [wave-1, skill, standard]
 wbs_id: W1-35
 title: 'Skills: discovery, planning, independent test design, change'
 class: skill
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-12

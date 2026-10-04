@@ -12,6 +12,7 @@ tags: [wave-1, documentation, lite]
 wbs_id: W1-44
 title: Phase-2 lessons as lesson records
 class: documentation
+state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
 - W1-08

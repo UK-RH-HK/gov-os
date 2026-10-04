@@ -12,6 +12,7 @@ tags: [wave-1, integration, full]
 wbs_id: W1-42
 title: Wave 1 exit run on the dev tiers
 class: integration
+state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
 - W1-23

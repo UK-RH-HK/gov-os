@@ -12,6 +12,7 @@ tags: [wave-1, ops, lite]
 wbs_id: W1-48
 title: Claude Code version pin
 class: ops
+state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
 - W1-06

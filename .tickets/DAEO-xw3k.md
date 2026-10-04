@@ -12,6 +12,7 @@ tags: [wave-1, implementation, standard]
 wbs_id: W1-27
 title: gov doctor and gov rebuild
 class: implementation
+state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - W1-04
