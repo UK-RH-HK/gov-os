@@ -26,12 +26,12 @@ import w1_16_support as support
 pytestmark = pytest.mark.local_only
 
 TOKEN_NAMED = f"app/{support.PATH_TOKEN}.py"
-IN_CANARY_FOLDER = f"web/{support.FOLDER_SECRET}/panel.ts"
+UNDER_SECRET_FOLDER = f"web/{support.FOLDER_SECRET}/panel.ts"
 # Clean in their content: only the path holds a planted value.
 PATH_SECRET_FILES = {
     TOKEN_NAMED: "def token_named_helper(value):\n    return value + 1\n\n\n"
                  "def token_named_entry(value):\n    return token_named_helper(value)\n",
-    IN_CANARY_FOLDER: "export function canaryFolderLabel(name: string): string {\n  return name.trim();\n}\n\n"
+    UNDER_SECRET_FOLDER: "export function canaryFolderLabel(name: string): string {\n  return name.trim();\n}\n\n"
                       "export function canaryFolderTitle(name: string): string {\n"
                       "  return canaryFolderLabel(name);\n}\n",
 }
