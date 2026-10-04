@@ -256,6 +256,39 @@ def _is_punct(tok: str) -> bool:
     return bool(tok) and all(c in _PUNCT for c in tok)
 
 
+def _cp_operands(args: list[str]) -> tuple[list[str], list[str]] | None:
+    """Split the arguments of ``cp`` into operands and target directories.
+
+    The directories are the values of ``-t`` and ``--target-directory``, in
+    their four spellings.  ``None`` when an option cannot be read.
+    """
+    operands: list[str] = []
+    dirs: list[str] = []
+    i = 0
+    while i < len(args):
+        a = args[i]
+        i += 1
+        if a.startswith("--t"):
+            opt, eq, val = a.partition("=")
+            if not "--target-directory".startswith(opt):
+                return None
+        elif a.startswith("-") and not a.startswith("--") and "t" in a:
+            val = a[a.index("t") + 1:]
+            eq = val
+        elif a.startswith("-"):
+            continue
+        else:
+            operands.append(a)
+            continue
+        if not eq:
+            if i >= len(args):
+                return None
+            val = args[i]
+            i += 1
+        dirs.append(val)
+    return operands, dirs
+
+
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     """Return absolute write-target paths, or None when the command is read-only.
 
@@ -279,8 +312,10 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     ecwd = cwd
     ecwd_ok = True
     targets: list[str] = []
+    link_sources: list[str] = []  # what the links made by this command name
+    link_dests = 0                # how many of *targets* are their destinations
 
-    def _resolve(raw: str) -> None:
+    def _resolve(raw: str, targets: list[str] = targets) -> None:
         """Expand, glob-expand and resolve *raw* into *targets*."""
         exp = _expand_token(raw)
         if exp is None:
@@ -417,8 +452,21 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     _resolve(a)
             continue
         if name == "cp":
-            nf = [a for a in args if not a.startswith("-")]
-            if len(nf) >= 2:
+            parsed = _cp_operands(args)
+            if parsed is None:
+                targets.append(_UNRESOLVABLE)
+                continue
+            nf, dirs = parsed
+            # -t, --target-directory: every operand is a source, and the
+            # copy lands in the directory under the operand's own name.
+            for d in dirs:
+                for a in nf:
+                    base = os.path.basename(a.rstrip("/"))
+                    if base in ("", ".", ".."):
+                        targets.append(_UNRESOLVABLE)
+                    else:
+                        _resolve(os.path.join(d, base) if d else d)
+            if not dirs and len(nf) >= 2:
                 _resolve(nf[-1])
             continue
         if name == "ln":
@@ -432,11 +480,30 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 targets.append(_UNRESOLVABLE)
                 continue
             nf = [a for a in args if not a.startswith("-")]
+            before = len(targets)
             if len(nf) >= 2:
                 _resolve(nf[-1])
             elif nf:
                 # "ln <target>" links under the target's name, here.
                 _resolve(os.path.basename(nf[0].rstrip("/")) or ".")
+            link_dests += len(targets) - before
+            # What the link names, for a write through it in this command.
+            # A relative name of a symbolic link is read from the link's
+            # directory, which is not resolved here: it is refused.
+            symbolic = any(a.startswith("--s")
+                           or (a.startswith("-") and not a.startswith("--")
+                               and "s" in a)
+                           for a in args)
+            for a in (nf[:-1] if len(nf) >= 2 else nf):
+                if symbolic and not os.path.isabs(_expand_token(a) or ""):
+                    link_sources.append(_UNRESOLVABLE)
+                else:
+                    _resolve(a, link_sources)
+
+    # A command that makes a link and writes anything else may write through
+    # the link: what the link names is judged as a write target too.
+    if len(targets) > link_dests:
+        targets.extend(link_sources)
 
     return targets or None
 

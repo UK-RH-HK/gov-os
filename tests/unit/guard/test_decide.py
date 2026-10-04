@@ -1890,3 +1890,81 @@ class TestGovRuntimeProtected:
             project_root=project, role="orchestrator", ticket_id="DAEO-orch",
         )
         assert d == "deny"
+
+
+# ---------------------------------------------------------------------------
+# W1-46 batch 5: a write through a link made in the same command, and cp
+# with its directory in an option (DEC-311, DEC-135)
+# ---------------------------------------------------------------------------
+
+def _bash(project, command):
+    d, _ = decide(
+        tool_name="Bash", tool_input={"command": command},
+        project_root=project, role="engineer", ticket_id=TID,
+    )
+    return d
+
+
+class TestLinkThenWrite:
+
+    def _project(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        os.makedirs(os.path.join(project, "src"))
+        os.makedirs(os.path.join(project, "tests/acceptance/W1-99"))
+        return project
+
+    @pytest.mark.parametrize("command", [
+        "ln -s {p}/tests/acceptance/W1-99 src/l && echo x > src/l/t.py",
+        "ln -s {p}/tests/acceptance/W1-99 src/l; touch src/l/t.py",
+        "ln tests/acceptance/W1-99/t.py src/l.py && echo x > src/l.py",
+        "ln -s {p}/.gov-runtime/freeze src/l && touch src/l",
+        "touch src/a && ln -s {p}/tests/acceptance/W1-99 src/l",
+        # A relative name of a symbolic link is not resolved: refused.
+        "ln -s ../tests/acceptance/W1-99 src/l && touch src/l/t.py",
+        "ln -s a.py src/l.py && touch src/b.py",
+    ])
+    def test_link_and_write_denied(self, tmp_path, command):
+        project = self._project(tmp_path)
+        assert _bash(project, command.format(p=project)) == "deny"
+
+    @pytest.mark.parametrize("command", [
+        "ln -s {p}/src/a.py src/l.py",
+        "ln src/a.py src/l.py",
+        "ln -s {p}/tests/acceptance/W1-99 src/l",
+        "ln -s {p}/src/a.py src/l.py && echo x > src/l.py",
+        "ln src/a.py src/l.py && touch src/b.py",
+    ])
+    def test_link_inside_the_paths_allowed(self, tmp_path, command):
+        project = self._project(tmp_path)
+        assert _bash(project, command.format(p=project)) == "allow"
+
+
+class TestCpTargetDirectory:
+
+    @pytest.mark.parametrize("option", [
+        "-t {d}", "-t{d}", "-rt {d}", "--target-directory={d}",
+        "--target-directory {d}", "--target={d}",
+    ])
+    @pytest.mark.parametrize("directory", ["tests/acceptance/W1-99", ".tickets"])
+    def test_outside_the_paths_denied(self, tmp_path, option, directory):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, f"cp {option.format(d=directory)} src/a.py") == "deny"
+
+    @pytest.mark.parametrize("command", [
+        "cp src/a.py -t",                     # no value
+        "cp --target-directory= src/a.py",    # an empty value
+        "cp --tmpfoo=x src/a.py src/b.py",    # an option the guard cannot read
+        "cp -t src ..",                       # no name to land under
+    ])
+    def test_unreadable_form_denied(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "deny"
+
+    @pytest.mark.parametrize("command", [
+        "cp -t src docs/a.py",
+        "cp --target-directory=src/gov docs/a.py docs/b.py",
+        "cp docs/a.py src/b.py",
+    ])
+    def test_inside_the_paths_allowed(self, tmp_path, command):
+        project = _make_project(tmp_path, _std_tickets())
+        assert _bash(project, command) == "allow"
