@@ -29,6 +29,7 @@ TEMPLATE_ROOT = REPO_ROOT / "template"
 SOURCE_REL = "docs/contract/readiness-dimensions.yaml"
 SCHEMAS_REL = "openspec/schemas"
 SCHEMA_NAME = "feature-readiness"
+CONFIG_REL = "openspec/config.yaml"
 BASE_SCHEMA = "spec-driven"
 # The artifacts of the schema the ticket forks; the fork keeps them and adds the readiness record.
 BASE_ARTIFACTS = ("proposal", "specs", "design", "tasks")
@@ -199,6 +200,21 @@ def template_path(artifact):
     return path
 
 
+def config_doc():
+    """``template/openspec/config.yaml``, the project config OpenSpec reads its default schema from (DEC-303)."""
+    path = TEMPLATE_ROOT / CONFIG_REL
+    if not path.is_file():
+        raise Missing(f"template/{CONFIG_REL} does not exist: W1-12 has not delivered the project config that makes "
+                      f"`{SCHEMA_NAME}` the default schema (DEC-303)")
+    try:
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        raise Missing(f"template/{CONFIG_REL} is not valid YAML: {exc}") from exc
+    if not isinstance(doc, dict):
+        raise Missing(f"template/{CONFIG_REL} is not a YAML mapping")
+    return doc
+
+
 # --- the readiness record template -----------------------------------------------------------------------------------
 
 def _clean(cell):
@@ -319,9 +335,11 @@ class Project:
             raise AssertionError(f"`openspec {' '.join(args)} --json` printed no JSON (exit {done.returncode}):\n"
                                  f"{done.stdout}\n{done.stderr}") from None
 
-    def new_change(self, name, schema):
-        done = self.run("new", "change", name, "--schema", schema)
-        assert done.returncode == 0, (f"`openspec new change {name} --schema {schema}` failed (exit "
+    def new_change(self, name, schema=None):
+        """``openspec new change <name>``; without ``schema`` no ``--schema`` is passed (the project's default)."""
+        option = [] if schema is None else ["--schema", schema]
+        done = self.run("new", "change", name, *option)
+        assert done.returncode == 0, (f"`openspec {' '.join(['new', 'change', name, *option])}` failed (exit "
                                       f"{done.returncode}):\n{done.stdout}\n{done.stderr}")
         return self.root / "openspec" / "changes" / name
 

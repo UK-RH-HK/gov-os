@@ -1,7 +1,8 @@
 # W1-12 acceptance tests — readiness schema and proposal templates
 
 Ticket `DAEO-lc4q` (W1-12), profile STANDARD. Written by the Independent Test Designer (MR-3, DEC-069) before
-implementation. 19 tests: 13 read the delivered files only, 6 run the `openspec` binary and are marked `local_only`.
+implementation. 21 tests: 14 read the delivered files only, 7 run the `openspec` binary and are marked `local_only`.
+Two of them were added after implementation began, for DEC-303 (see "Tests added after implementation").
 
 ## Run
 
@@ -25,6 +26,7 @@ PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH python3 -m pytest tests/accepta
 |---|---|
 | `template/openspec/schemas/feature-readiness/schema.yaml` | The fork of OpenSpec's `spec-driven` schema, `name: feature-readiness`. Keeps the artifacts `proposal`, `specs`, `design`, `tasks`; adds one artifact with `readiness` in its id. Carries `dimensions`, `cell_states` and `capability_types` (see "Readings"). |
 | `template/openspec/schemas/feature-readiness/templates/<file>` | One template per artifact, at the name the artifact's `template` gives. OpenSpec reads templates only from this folder. |
+| `template/openspec/config.yaml` | The project config, a YAML mapping with `schema: feature-readiness` (DEC-303). Other keys are free. |
 | `template/governance/kernel/templates/openspec/**` | Not read by any test (decision package DP-3). |
 
 ## Red reason (observed 2026-10-04, before implementation)
@@ -63,6 +65,35 @@ Files: `rows` = `test_w1_12_rows_and_states.py`, `types` = `test_w1_12_capabilit
 
 Key edge cases: order of rows and states; a row carried twice; a table entry that names a row the schema does not
 carry; `validate --all --strict`, the form CI runs (DEC-087); the readiness record in either form.
+
+## Tests added after implementation
+
+Reason: **delegated decision** (DEC-303, on decision package DP-2). Added 2026-10-04, after the forked schema was
+delivered and before `template/openspec/config.yaml` was. No existing test was rewritten; the 19 tests above keep
+their meaning. File: `test_w1_12_default_schema.py`.
+
+| Decision | Behaviour | Test |
+|---|---|---|
+| **DEC-303** | The committed `template/openspec/config.yaml` exists and names the schema `feature-readiness`. | `test_the_project_config_names_the_forked_schema` |
+| **DEC-303** | In a temporary project made from the template's `openspec/` folder, a change made with `openspec new change <name>`, with no `--schema`, uses `feature-readiness` and has the artifact `readiness`, file `readiness.yaml`. | `test_a_change_made_without_the_schema_option_gets_the_readiness_record` (`local_only`) |
+
+Red reason (observed 2026-10-04): `2 failed, 19 passed`. Both failures carry the same line:
+
+```
+template/openspec/config.yaml does not exist: W1-12 has not delivered the project config that makes `feature-readiness` the default schema (DEC-303)
+```
+
+How the tool reports it (looked up in the installed 1.13.2, in a temporary project): `openspec new change --help`
+gives `--schema <name>` with the default `spec-driven`. Without `openspec/config.yaml` a change made with no
+`--schema` is `spec-driven` and has four artifacts. With `schema: feature-readiness` in `openspec/config.yaml` the
+same command writes `schema: feature-readiness` into the change's `.openspec.yaml`, and
+`openspec status --change <name> --json` reports `schemaName: feature-readiness` and, in `artifacts`, the entry
+`id: readiness`, `outputPath: readiness.yaml`. The test reads that report. A config that names an unknown schema
+makes `openspec new change` exit 1 (`Unknown schema`).
+
+Checked against stand-in configs in a temporary copy of `template/` (not committed): `schema: feature-readiness`
+gives 21 passed; `schema: spec-driven`, a misspelt key (`schemas:`) and a file that is not a mapping each turn both
+tests red. No edge case is added beyond the two behaviours (DEC-221; DEC-303: "One test covers it").
 
 ## What was looked up
 
@@ -107,5 +138,6 @@ carry; `validate --all --strict`, the form CI runs (DEC-087); the readiness reco
   W1-13 needs them; its test design should say where it reads them.
 - The wording of any template and of the artifact instructions.
 - That the installed `openspec` is the pinned 1.13.2 (`gov doctor` checks the pin).
-- Anything under `template/governance/kernel/templates/openspec/` (DP-3) and `template/openspec/config.yaml` (DP-2).
+- Anything under `template/governance/kernel/templates/openspec/` (DP-3, DEC-304).
+- Any key of `template/openspec/config.yaml` other than `schema` (`context`, `rules`).
 - That a change to the YAML or the taxonomy carries a linked CIT-E record (DP-5).
