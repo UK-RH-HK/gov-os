@@ -28,11 +28,15 @@ SECTION_MAX_CHARS = 9_000
 
 def resume_section(text: str) -> str:
     """The heading that begins with RESUME HERE and everything up to
-    the next heading of the same or a higher level."""
+    the next heading of the same or a higher level. A line inside a
+    fenced code block (three backticks) is not a heading."""
     kept: list[str] = []
     level = 0
+    fenced = False
     for line in text.splitlines():
-        heading = re.match(r"(#{1,6})\s+(.*)", line)
+        if line.startswith("```"):
+            fenced = not fenced
+        heading = None if fenced else re.match(r"(#{1,6})\s+(.*)", line)
         if level:
             if heading and len(heading.group(1)) <= level:
                 break
