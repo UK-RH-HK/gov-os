@@ -18,7 +18,6 @@ depends_on:
 - W1-08
 allowed_paths:
 - template/openspec/schemas/**
-- template/governance/kernel/templates/openspec/**
 - template/openspec/config.yaml
 kpis:
   success:
