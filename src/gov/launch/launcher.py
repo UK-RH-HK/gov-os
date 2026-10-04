@@ -21,7 +21,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.decide import FREEZE_FLAG, _load_ticket
+from gov.guard.decide import ACCEPTANCE, FREEZE_FLAG, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 
@@ -34,6 +34,15 @@ REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
 GUARD_HOOK = "hooks/pretooluse.py"  # the guard, as the repository's settings register it
 GUARDED_TOOLS = frozenset({"Write", "Edit", "Bash"})
+# DEC-315: no worker edits the tickets or .claude, and only the independent test
+# designer the acceptance tests, whatever the ticket's allowed_paths name.
+PROTECTED_TREES = (".tickets", ".claude")
+# DEC-273: a research ticket's one folder lies under this root. How a project
+# names another root is open (DP-18): there is no configuration key for it.
+EXPERIMENTS_ROOT = "experiments"
+# DEC-313: arguments that take the permission checks away or add a writable directory.
+BYPASS_FLAGS = ("--dangerously-skip-permissions", "--allow-dangerously-skip-permissions")
+BYPASS_MODE = "bypassPermissions"
 # Open package DP-9: both files hold a list of host names under this key; the
 # project's file extends the kernel default, and may be absent (DEC-241).
 ALLOWLIST_KEY = "hosts"
@@ -96,14 +105,27 @@ def _fence_rules(root: Path, folder: str) -> list[str]:
     return rules
 
 
+def _tree_rules(root: Path, role: str) -> list[str]:
+    """``Edit`` deny rules for the acceptance tests, the tickets and ``.claude`` (DEC-315).
+
+    The literal rule binds the sandbox, which skips a pattern on Linux; the
+    pattern says the same to the file tools.
+    """
+    trees = PROTECTED_TREES if role == "independent-test-designer" else (ACCEPTANCE, *PROTECTED_TREES)
+    return [f"Edit(/{root}/{tree}{tail})" for tree in trees for tail in ("", "/**")]
+
+
 def build_settings(root: Path, role: str, ticket_id: str) -> dict:
     """The ``--settings`` value of a worker session, less its temp directory. ``root`` is a real path."""
-    deny = _runtime_rules(root)
+    deny = _runtime_rules(root) + _tree_rules(root, role)
     domains: list[str] = []
     if role == "research":
         folder = experiment_folder(str(root), ticket_id)
         if folder is None:
             raise _refuse("the research ticket's allowed_paths is not exactly one experiment folder (DEC-242)")
+        if Path(folder).relative_to(root).parts[0] != EXPERIMENTS_ROOT or Path(folder) == root / EXPERIMENTS_ROOT:
+            raise _refuse(f"the research ticket's allowed_paths names a folder that is not under the experiments "
+                          f"root, {EXPERIMENTS_ROOT}/ (DEC-273)")
         deny += _fence_rules(root, folder)
         domains = _research_allowlist(root)
     try:
@@ -183,6 +205,15 @@ def _check_repository_settings(root: Path) -> None:
             raise _refuse(f"{rel} carries a sandbox key: the sandbox settings come from the launcher alone (DEC-233)")
         if data.get("disableAllHooks", False) is not False:
             raise _refuse(f"{rel} sets disableAllHooks: a worker session would have no guard")
+        permissions = data.get("permissions", {})
+        if not isinstance(permissions, dict):
+            raise _refuse(f"{rel}: permissions is not a map, so it cannot be shown to carry no bypass mode")
+        if permissions.get("defaultMode") == BYPASS_MODE:
+            raise _refuse(f"{rel} sets permissions.defaultMode to {BYPASS_MODE}: a worker session would run "
+                          f"without the permission checks (DEC-313)")
+        if "additionalDirectories" in permissions:
+            raise _refuse(f"{rel} carries permissions.additionalDirectories: a worker session gets no added "
+                          f"directory (DEC-313)")
         wired = wired or (rel == REPO_SETTINGS[0] and _guard_wired(data))
     if not wired:
         raise _refuse(f"{REPO_SETTINGS[0]} does not register the guard ({GUARD_HOOK}) as a PreToolUse hook for "
@@ -191,7 +222,14 @@ def _check_repository_settings(root: Path) -> None:
 
 def _check_cli_args(cli_args: list[str]) -> None:
     """Refuse the arguments that take the launcher's settings or the guard away from the session."""
-    for arg in cli_args:
+    for arg, value in zip(cli_args, [*cli_args[1:], None]):
+        if arg in BYPASS_FLAGS:
+            raise _refuse(f"the CLI arguments carry {arg}: a worker session keeps its permission checks (DEC-313)")
+        if arg == f"--permission-mode={BYPASS_MODE}" or (arg == "--permission-mode" and value == BYPASS_MODE):
+            raise _refuse(f"the CLI arguments carry --permission-mode {BYPASS_MODE}: a worker session keeps its "
+                          f"permission checks (DEC-313)")
+        if arg == "--add-dir" or arg.startswith("--add-dir="):
+            raise _refuse("the CLI arguments carry --add-dir: a worker session gets no added directory (DEC-313)")
         if arg == "--settings" or arg.startswith("--settings="):
             raise _refuse("the CLI arguments carry --settings: the sandbox settings come from the launcher alone")
         if arg == "--bare":

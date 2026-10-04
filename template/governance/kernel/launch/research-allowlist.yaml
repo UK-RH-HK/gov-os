@@ -12,7 +12,6 @@ hosts:
   - files.pythonhosted.org
   - registry.npmjs.org
   - huggingface.co
-  - cdn-lfs.huggingface.co
   - arxiv.org
   - export.arxiv.org
   - docs.python.org
