@@ -47,8 +47,8 @@ RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "conte
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).
 # Every other reserved command, and ``check`` without ``--list``, is not built yet.
 # Planned revision (DEC-190, "planned: command implemented"): W1-25 builds ``checkpoint``; its cases are in
-# ``tests/acceptance/W1-25/``.
-BUILT_LATER = ("checkpoint",)
+# ``tests/acceptance/W1-25/``. The same for W1-13, which builds ``readiness``: ``tests/acceptance/W1-13/``.
+BUILT_LATER = ("checkpoint", "readiness")
 NOT_BUILT = tuple(name for name in RESERVED_COMMANDS if name != "status" and name not in BUILT_LATER)
 
 # The read commands of CAP-27's acceptance line, as argument lists, plus ``check --list`` (DEC-186).

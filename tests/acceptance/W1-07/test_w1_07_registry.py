@@ -7,6 +7,9 @@ another command revises that command's case here.
 Planned revision (DEC-190, reason "planned: command implemented"): ``checkpoint``
 is built by W1-25 and is no longer expected to return ``NOT_IMPLEMENTED``; the
 list is ``NOT_BUILT`` in ``w1_07_support.py``.
+
+Planned revision (DEC-190, reason "planned: command implemented"): ``readiness``
+is built by W1-13 and leaves the same list.
 """
 
 from __future__ import annotations
