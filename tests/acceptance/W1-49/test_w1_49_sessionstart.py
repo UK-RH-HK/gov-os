@@ -13,6 +13,7 @@ open. See the README for the source.
 
 **The RESUME HERE section** is the heading whose text begins with ``RESUME
 HERE`` and everything up to the next heading of the same or a higher level.
+A line inside a fenced code block (three backticks) is not a heading.
 
 The last tests stand on the recommendation of DP-2 (the hooks act for the
 orchestrator role only); the worktree tests assert no prompt path (DP-3).
@@ -116,6 +117,80 @@ def test_a_plain_startup_does_not_fail_the_hook(run, project):
 def test_a_hook_that_cannot_read_its_input_does_not_end_with_a_blocking_code(run, project):
     result = run.sessionstart(project, "resume", stdin="this is not JSON")
     assert result.returncode is not None and result.returncode != 2, result.describe()
+    support.assert_within_cap(result)
+
+
+# --------------------------------------------------------------------------
+# A line inside a fenced code block is not a heading (second batch, DEC-136)
+# --------------------------------------------------------------------------
+
+FENCE = "```"
+
+
+def test_a_code_block_inside_the_section_does_not_end_it(run, project):
+    """Failure 2: a shell comment in a fenced block is not a heading; the block and the bullets after it are injected."""
+    body = (
+        "- Active tickets: ZQ-71 (engineer implementing)\n"
+        "\n"
+        "Run this first:\n"
+        "\n"
+        f"{FENCE}sh\n"
+        "# FENCED-COMMENT-MARKER rebuild the invented index before anything else\n"
+        "zephyr index --rebuild ZQ-71\n"
+        f"{FENCE}\n"
+        "\n"
+        "- AFTER-BLOCK-MARKER next ticket: ZQ-88 (waiting for its audit)\n"
+        "- ZQ-71 review-repair loop: 17\n"
+    )
+    support.write_checkpoint(project, ORCH, support.checkpoint_text(body, before=EARLIER, after=LATER))
+    result = run.sessionstart(project, "compact")
+    assert result.returncode == 0, result.describe()
+    _assert_whole_section(result.injection, body)
+    assert support.TRUNCATED not in result.injection.lower(), "a section that fits the cap is reported as cut"
+    assert "HISTORY-MARKER" not in result.injection, "the injection runs past the real heading that ends the section"
+    support.assert_within_cap(result)
+
+
+def test_a_heading_inside_a_code_block_in_the_section_does_not_end_it(run, project):
+    """Failure 2: a fenced line that looks like a heading of the section's own level does not end the section."""
+    body = (
+        "- Active tickets: ZQ-71 (engineer implementing)\n"
+        "\n"
+        f"{FENCE}\n"
+        "## FENCED-HEADING-MARKER a heading of the invented report, quoted\n"
+        f"{FENCE}\n"
+        "\n"
+        "- AFTER-BLOCK-MARKER ZQ-88 test-fix loop: 23\n"
+    )
+    support.write_checkpoint(project, ORCH, support.checkpoint_text(body, after=LATER))
+    result = run.sessionstart(project, "resume")
+    assert result.returncode == 0, result.describe()
+    _assert_whole_section(result.injection, body)
+    assert "HISTORY-MARKER" not in result.injection, "the injection runs past the real heading that ends the section"
+    support.assert_within_cap(result)
+
+
+def test_a_resume_here_heading_inside_a_code_block_is_not_the_section(run, project):
+    """Failure 2: an example of the heading in a fenced block before the real section is not taken for the section."""
+    template = (
+        "## How this file is written\n"
+        "\n"
+        "The section the hook injects looks like this:\n"
+        "\n"
+        f"{FENCE}\n"
+        "## RESUME HERE\n"
+        "\n"
+        "- EXAMPLE-MARKER active tickets: <ticket> (<state>)\n"
+        f"{FENCE}\n"
+        "\n"
+    )
+    body = support.resume_section("ZQ")
+    support.write_checkpoint(project, ORCH, support.checkpoint_text(body, before=template, after=LATER))
+    result = run.sessionstart(project, "compact")
+    assert result.returncode == 0, result.describe()
+    _assert_whole_section(result.injection, body)
+    assert "EXAMPLE-MARKER" not in result.injection, "the example in the code block was injected as the RESUME HERE section"
+    assert "HISTORY-MARKER" not in result.injection, "the injection runs past the real heading that ends the section"
     support.assert_within_cap(result)
 
 
