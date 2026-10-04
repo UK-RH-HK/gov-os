@@ -1,6 +1,6 @@
 ---
 id: DAEO-0qs5
-status: in_progress
+status: closed
 deps: [DAEO-ipqy]
 links: []
 created: 2026-10-03T13:05:33Z
