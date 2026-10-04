@@ -13,6 +13,10 @@ paths, and builds one ``Read`` deny rule per path; "a missing key, or a broken
 file, makes the guard fail closed", and the launcher refuses to launch on a
 missing key, an empty list or a broken file.
 
+DEC-242, with DEC-223: a project with no ``held-out.yaml`` at all launches
+normally, with no held-out rule. Only a file that exists and is not of the
+stated shape refuses.
+
 Every project here has a ``held-out.yaml`` written by the test, with made-up
 paths. "Looks empty from a launched worker's Bash" needs a session: see
 ``test_w1_46_live_sessions.py``.
@@ -75,6 +79,22 @@ def test_the_launcher_refuses_to_launch_on_a_broken_held_out_file(launch, projec
     support.assert_refused(launch(role), "held-out", w47.CONFIG_KEY)
 
 
+@pytest.mark.parametrize("role", (support.ENGINEER, support.RESEARCH))
+def test_a_project_without_a_held_out_file_launches_with_no_held_out_rule(launch, project, stand_in, role):
+    """DEC-242, DEC-223: a missing file means no rule. A product repository without an oracle still launches."""
+    with_file = launch(role).settings()
+    (project / w47.CONFIG_REL).unlink()
+    result = launch(role)
+    assert result.run.returncode == 0, f"gov launch refused a project without held-out.yaml\n{result.describe()}"
+    built = result.settings()
+    assert support.sandbox_faults(built) == [], "the session without held-out.yaml is not strictly sandboxed"
+    assert not w47.held_out_read_rules(built, str(stand_in)), "a Read deny rule is left for a path no file configures"
+    assert len(support.deny_rules(built, "Read")) == len(support.deny_rules(with_file, "Read")) - 1, (
+        "without held-out.yaml the built settings differ by more than the one held-out Read rule: "
+        f"{support.deny_rules(built, 'Read')}"
+    )
+
+
 def test_no_file_of_this_ticket_names_a_held_out_path():
     """KPI failure 9. The committed list is read at run time, as in W1-47; no value is ever shown.
 
@@ -86,7 +106,7 @@ def test_no_file_of_this_ticket_names_a_held_out_path():
         "tests/acceptance/W1-46/**/*", "src/gov/launch/**/*", "src/gov/cli/**/*", "src/gov/guard/**/*",
         "template/governance/kernel/launch/**/*", "template/governance/kernel/hooks/pretooluse*",
         "template/governance/kernel/roles/research*", ".claude/agents/research.md", support.ROSTER_REL,
-        "tests/unit/launch/**/*", "tests/unit/guard/**/*",
+        "tests/unit/launch/**/*", "tests/unit/guard/**/*", support.ALLOWLIST_REL,
     ))
     assert files, "no file of the ticket was found"
     naming = [str(path.relative_to(support.REPO_ROOT)) for path in w47.files_naming(files, configured.values)]

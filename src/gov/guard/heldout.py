@@ -26,6 +26,22 @@ class HeldOutError(Exception):
     """``held-out.yaml`` exists and is not of the stated shape (DEC-218)."""
 
 
+def load_yaml_unique(stream):
+    """yaml.safe_load that refuses a mapping with a key written twice:
+    a reader that kept the last value would drop the first without a word."""
+    import yaml
+
+    class Loader(yaml.SafeLoader):
+        def construct_mapping(self, node, deep=False):
+            mapping = super().construct_mapping(node, deep=deep)
+            if len(mapping) != len(node.value):
+                raise yaml.constructor.ConstructorError(
+                    None, None, "a key is written twice", node.start_mark)
+            return mapping
+
+    return yaml.load(stream, Loader=Loader)
+
+
 def load_held_out(project_root: str) -> list[str]:
     """Return the held-out paths; ``[]`` when the project has no such file.
 
@@ -37,9 +53,8 @@ def load_held_out(project_root: str) -> list[str]:
     if not os.path.lexists(path):
         return []
     try:
-        import yaml
         with open(path, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+            data = load_yaml_unique(f)
     except Exception:
         # The parser's own message may quote the file: fixed text only.
         raise HeldOutError(f"{CONFIG_REL} cannot be read") from None
