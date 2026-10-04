@@ -264,6 +264,33 @@ orchestrator change outside its ticket's paths is then a record, not a containme
   when its session-role argument is left out. Its only caller passes the argument, so no session gains a write
   today. W1-47 makes it fail closed, with a builder test. A finding that makes the guard fail open is a defect.
 
+**What the reviewer's probe left at W1-47 (DEC-137), recorded by the orchestrator under DEC-135 on 2026-10-04.** The
+reviewer found no case in which the hardened guard fails open on a KPI of W1-47, loses work, or lets an implementer
+change acceptance tests. These edge cases stay:
+
+- **The held-out rule.**
+  - A relative path is resolved against the session's working directory only. A relative path after a `cd` inside
+    the same command, or inside `--option=value`, is not resolved.
+  - The literal match is a substring match, so a look-alike sibling of a held-out path is denied too.
+  - The holder exception follows a symbolic link: if `.claude/settings.json` were replaced by a link to another
+    file in a role's scope, a write that carries the path into that file would pass. It needs `ln`, which the
+    guard does not judge (see W1-45's probe above), and a ticket whose paths include the settings file.
+  - Reading `governance/project/held-out.yaml` or `.claude/settings.json` is not denied: the rule is about the
+    held-out path, not about the two files that hold it. An agent that reads them sees the value. Briefs tell
+    workers not to, and no agent writes or retypes it (DEC-218).
+  - A key written twice in `held-out.yaml` keeps only its last value (the YAML reader's behaviour). The owner writes
+    the file.
+  - With some ten thousand held-out paths the hook would pass its 100 ms budget (182 ms measured); with one to three
+    paths the rule adds under 1 ms.
+- **The escape hatch.** Any truthy value of `dangerouslyDisableSandbox` is denied, not only `true`; the rule is for
+  Bash calls.
+- **The install rule's `uv` forms (CAP-25.c).** `uv run -w<package>`, with the option joined to its value, is not
+  seen. A `-w` or `--with` that belongs to the program after `uv run` is taken for `uv`'s own, so the command is
+  asked about or denied. `env uv add …` and `command uv add …` are not seen, as with every prefix command above.
+- **A here-string.** `sh <<< "<command>"` is read by the guard as a command that writes nothing, like the other
+  opaque forms (`bash -c`, `eval`). Inside the repository the containment check reports or restores the change;
+  in a launched worker session the sandbox stops a write outside it.
+
 ## Denied attempts
 
 One attempt per class (DEC-100), made in a headless session started in the repository root, where `.claude/settings.json` applies. The session ran in `acceptEdits` mode with `Write` and `pip install` allowed, so each refusal comes from a deny rule. No file was created.
