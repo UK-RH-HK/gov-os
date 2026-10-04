@@ -74,7 +74,20 @@ TK_STAND_IN = (
     '  *) echo "stand-in tk: unexpected call: $*" >&2; exit 64 ;;\n'
     "esac\n"
 )
-FAILING_STAND_IN = "#!/bin/sh\necho \"$(basename \"$0\"): stand-in failure\" >&2\nexit 1\n"
+TK_SAVING_STAND_IN = (                     # batch 4: the session saves its checkpoint while tk runs, once
+    "#!/bin/sh\n"
+    "# Stand-in tk (W1-49 acceptance tests): saves the checkpoint on its first call, then answers as the other one.\n"
+    'here="$(dirname "$0")"\n'
+    'if [ -f "$here/tk-saves-once.txt" ]; then\n'
+    '  cat "$here/tk-saves-once.txt" > "$(cat "$here/tk-saves-where.txt")"\n'
+    '  rm "$here/tk-saves-once.txt"\n'
+    "fi\n"
+    'case "$1 $2" in\n'
+    '  "ls --status=in_progress"|"list --status=in_progress") cat "$here/tk-in-progress.txt" ;;\n'
+    '  *) echo "stand-in tk: unexpected call: $*" >&2; exit 64 ;;\n'
+    "esac\n"
+)
+FAILING_STAND_IN ="#!/bin/sh\necho \"$(basename \"$0\"): stand-in failure\" >&2\nexit 1\n"
 
 WINDOW_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"
 WINDOW_TOKENS = 300_000
@@ -275,6 +288,52 @@ def marker_lines(text, marker=BLOCK_BEGIN):
     return sum(1 for line in text.splitlines() if line.strip() == marker)
 
 
+def exact_lines(text, marker=BLOCK_BEGIN):
+    """How many lines of ``text`` are the marker exactly: nothing before it on the line, nothing after it (batch 4)."""
+    return sum(1 for line in text.split("\n") if line == marker)
+
+
+def one_block_after(path, written):
+    """The one generated block that follows ``written`` in the checkpoint at ``path``, by the rule of batch 4.
+
+    ``written`` stays first, byte for byte. What follows it is one block and nothing else: its first line is the
+    begin marker exactly, the next one starts with ``generated:``, its last line is the end marker exactly, and no
+    other line of it is a marker line or a ``generated:`` line (what a command printed is indented).
+    """
+    data = Path(path).read_bytes()
+    kept = written.encode("utf-8")
+    assert data.startswith(kept), (
+        "text the session wrote is no longer in the checkpoint byte for byte, or no longer comes first: "
+        f"{len(kept)} bytes were written, the file now holds {len(data)} and begins {data[:120]!r}"
+    )
+    rest = data[len(kept):].decode("utf-8").strip("\n")
+    assert rest.strip(), f"no generated state block was appended to {Path(path).name}: the file is unchanged"
+    lines = rest.split("\n")
+    assert lines[0] == BLOCK_BEGIN and lines[-1] == BLOCK_END and lines[1].startswith("generated:"), (
+        f"what follows the written part is not one block from `{BLOCK_BEGIN}` and its `generated:` line to "
+        f"`{BLOCK_END}`: {rest[:300]!r}"
+    )
+    counts = (exact_lines(rest), exact_lines(rest, BLOCK_END), sum(1 for line in lines if line.startswith("generated:")))
+    assert counts == (1, 1, 1), (
+        f"what follows the written part holds {counts[0]} begin marker line(s), {counts[1]} end marker line(s) and "
+        f"{counts[2]} `generated:` line(s), not one block: {rest[:600]!r}"
+    )
+    return rest
+
+
+def directory_state(directory):
+    """Every entry of ``directory`` by name: a link with its target, a file with its bytes, or a directory."""
+    state = {}
+    for entry in sorted(Path(directory).iterdir()):
+        if entry.is_symlink():
+            state[entry.name] = ("link", os.readlink(entry))
+        elif entry.is_file():
+            state[entry.name] = ("file", entry.read_bytes())
+        else:
+            state[entry.name] = ("other", None)
+    return state
+
+
 # --------------------------------------------------------------------------
 # Running a hook as the harness does
 # --------------------------------------------------------------------------
@@ -293,6 +352,15 @@ class Sandbox:
     def tk_fails(self):
         """The stand-in ``tk`` ends with 1 and prints nothing on stdout."""
         return _executable(self.bin / "tk", FAILING_STAND_IN)
+
+    def tk_saves_the_checkpoint(self, checkpoint, text):
+        """The stand-in ``tk`` takes a moment: on its first call it saves ``text`` as the checkpoint, as the
+        session would, and then prints the tickets in progress. Returns the file that is gone once it has done so."""
+        once = self.bin / "tk-saves-once.txt"
+        once.write_text(text, encoding="utf-8")
+        (self.bin / "tk-saves-where.txt").write_text(str(checkpoint), encoding="utf-8")
+        _executable(self.bin / "tk", TK_SAVING_STAND_IN)
+        return once
 
     def git_fails(self):
         """A ``git`` that ends with 1 for every call, first on the hook's ``PATH`` (the tests' own git is not this one)."""

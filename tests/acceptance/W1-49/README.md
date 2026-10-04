@@ -6,7 +6,7 @@ DEC-069) from the ticket's KPI lines, CAP-37 and DEC-248, DEC-208, DEC-237, DEC-
 Run: `python3 -m pytest tests/acceptance/W1-49 -q -p no:cacheprovider`
 Without the real session and the CLI: add `-m "not local_only"`.
 
-93 tests: 83 deterministic with no network, 10 marked `local_only` (9 share one real session, 1 runs
+105 tests: 95 deterministic with no network, 10 marked `local_only` (9 share one real session, 1 runs
 `claude --help`). Their history:
 
 | Batch | When | Tests |
@@ -14,8 +14,9 @@ Without the real session and the CLI: add `-m "not local_only"`.
 | 1 | Before the implementation | 62 written |
 | 2 | After it, from a review's findings (DEC-136) | 3 added: 65 |
 | 3 | After it, on the owner's decisions DEC-263 and DEC-264 | 15 rewritten and 2 removed (reason "owner decision, DEC-264"), 30 added (reason "owner decision"): 93 |
+| 4 | After it, from a review's findings (DEC-136): the written part is never lost | 12 added in `test_w1_49_written_part.py`: 105. No existing test was changed. |
 
-Batch 3 by name is in section 2.1.
+Batch 3 by name is in section 2.1, batch 4 in section 2.2.
 
 ## 1. What the engineer builds (the interface these tests fix)
 
@@ -44,7 +45,12 @@ pending owner decisions: not known to the hook; see the written part of this che
 | What | Fixed by these tests |
 |---|---|
 | The written part | Everything the session wrote: the file's content before the block. The hook never changes, cuts or reorders it; it stays first, byte for byte. If it doesn't end with a newline the hook may add one before the block, once. |
-| How the block is found | A file holds a generated block only when its last line that is not empty is the end marker. The block then starts at the **last** line that is the begin marker and nothing else. On the next compaction the hook replaces exactly that block: there is one block, the newest, and what separates it from the written part doesn't grow. Marker text anywhere else belongs to the written part and stays: quoted in a sentence, or as whole lines in a code block that the file doesn't end with. The block holds no heading line, so it can't be taken for a section. |
+| How the block is found | A file holds a generated block only when its last line that is not empty is the end marker. The block then starts at the **last** line that is the begin marker and nothing else. On the next compaction the hook replaces exactly that block: there is one block, the newest, and what separates it from the written part doesn't grow. Marker text anywhere else belongs to the written part and stays: quoted in a sentence, or as whole lines in a code block that the file doesn't end with. The block holds no heading line, so it can't be taken for a section. Batch 4 narrows this to a block the hook can recognise as its own (next row). |
+| The hook's own block (batch 4) | Both hooks use one rule. A block is the hook's only when all four hold: (1) the end marker line is the marker **exactly**, with nothing before it and nothing after it on the line (no indentation, no trailing space or tab); (2) so is the begin marker line; (3) the line straight after the begin marker starts with `generated:`; (4) every line between the two markers is as the hook wrote it. For (4) the hook needs a check of its own lines: the simplest is a digest of the block's lines kept on the `generated:` line after the time (the rest of that line is free); a rule on the shape of the lines is not enough, because a line the session adds under the tickets, indented as they are, has the shape of what `tk` printed. |
+| Anything else is written text (batch 4) | Marker lines that fail the rule, and everything between them, are text the session wrote: the PreCompact hook keeps them byte for byte and appends the new block after them, and the SessionStart hook injects them with the section they stand in and takes no warning from them. So a generated block the session edited (a line added, changed or removed) stays in the file as written text, whole, and a new block follows it; that new one is replaced at the next compaction as any generated block is. The hook copies nothing of the session's into its own block. |
+| What a command printed (batch 4) | Each line `tk` or git printed is written in the block with two spaces before it, as the layout shows, and is otherwise unchanged. So a line of command output that is exactly a marker, or that starts with `generated:`, is never a marker line or a `generated:` line of the checkpoint: after any number of compactions there is one block, and the file does not grow. |
+| A checkpoint saved during the hook (batch 4) | The hook never puts back content it read before it ran `tk` and git. When the session saves its checkpoint while the hook gathers its state, the saved text is in the file after the hook ends, whole and first. Both outcomes are accepted and the choice is the engineer's: the block follows the new text (gather the state first, then read the file and write it), or the hook appends nothing and says so with the checkpoint's path. A save in the instant between the hook's read and its write is not covered. |
+| No file but the checkpoint (batch 4) | The hook writes, replaces and removes no file but the checkpoint, and follows no link beside it. It leaves no side file with a fixed name that a session's file or a link could collide with: every entry that was in the checkpoint's directory before the hook ran is there after it, unchanged, and no new one remains. The checkpoint stays a regular file. Writing the checkpoint in place does this; a temporary file is allowed only under a name nobody else has (created exclusively) and is gone when the hook ends. |
 | `tk` and git | Both are run in the tree (`CLAUDE_PROJECT_DIR`): `tk ls --status=in_progress`, `git rev-parse HEAD`, `git worktree list`. When one is not on `PATH`, fails or times out, the hook still ends with 0 and still appends the block; the label's line then reads `<label>: unavailable (<why>)`. What the other command gave stays in the block. |
 | Pending owner decisions (DP-5) | A hook is a command and doesn't know them. The line says `not known to the hook` and points to the written part. The hook copies no decision from the written part into the block: that would give old text the look of generated state. |
 | The file's modification time (DP-4) | After the append the hook sets the file's modification time back to what it was before (`os.utime`). So the file's time is always the time of its written part, and the hook's own appends never make an old written part look fresh. |
@@ -130,7 +136,40 @@ does that much today: `test_no_compaction_is_blocked` for `current-manual`, `cur
 `test_a_checkpoint_without_a_state_block_is_not_warned_about`;
 `test_a_checkpoint_that_cannot_be_read_does_not_fail_the_hook` (2). They are there to stay green.
 
-### 2.2 The earlier red records
+### 2.2 Batch 4: the written part is never lost
+
+KPI success 5 [CAP-37.g], "appends a generated state block to the checkpoint": the written part is the session's
+work and is never lost, cut or reordered. Added after the implementation from a read-only review's findings
+(DEC-136), 12 cases in `test_w1_49_written_part.py`. No existing test was changed or removed.
+
+Red, as observed on 2026-10-04 against the implementation of commit `6002df0f`: **11 failed, 84 passed** of the 95
+deterministic tests. The 83 earlier ones stayed green. The `local_only` tests were not run.
+
+| Behaviour | Tests | Red reason observed |
+|---|---|---|
+| 1. Text the session wrote between marker lines is not deleted | `test_session_text_between_a_begin_marker_near_the_top_and_an_end_marker_at_the_end_is_kept`; `test_marker_lines_that_are_not_exact_do_not_make_a_block_of_the_text_between_them` (3: indented, trailing spaces, trailing tab); `test_a_line_the_session_wrote_inside_the_block_is_not_deleted` (2: at the start of the line, indented as the tickets are); `test_session_text_between_marker_lines_at_the_end_of_the_section_is_injected` | Failed, 7 of 7. Six: "text the session wrote is no longer in the checkpoint byte for byte, or no longer comes first: 490 bytes were written, the file now holds 575 and begins b'# Checkpoint (stand-in, invented)\n\n<!-- GENERATED STATE BLOCK BEGIN -->\ngenerated: …'" (the RESUME HERE section under the begin marker is gone; the like for the three shapes, 705, 689 and 687 bytes written, and for the line inside the block, 1018 and 1030 bytes written, 956 left). The session start: "the injection leaves out 4 line(s) of the RESUME HERE section, first: '<!-- GENERATED STATE BLOCK BEGIN -->'". |
+| 2. A marker line in what `tk` prints does not break the block | `test_a_marker_line_in_what_tk_prints_does_not_break_the_block` (2: begin, end) | Failed, 1 of 2. Begin: "what follows the written part holds 2 begin marker line(s), 1 end marker line(s) and 2 `generated:` line(s), not one block: …" after the second compaction (the first block's first five lines stay in the file). End: green already, and there to stay green. |
+| 3. A checkpoint saved while the hook gathers its state is not put back | `test_a_checkpoint_saved_while_the_hook_gathers_its_state_keeps_the_new_text` | Failed: "the checkpoint was saved while the hook gathered its state, and the hook put back what it had read before: the new text is gone, the file begins '# Checkpoint (stand-in, invented)\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 …'". |
+| 4. The hook writes and removes no file but the checkpoint | `test_a_file_beside_the_checkpoint_is_neither_changed_nor_removed`; `test_a_link_beside_the_checkpoint_is_not_written_through_and_does_not_become_the_checkpoint` | Failed, 2 of 2: "the hook removed 1 file(s) beside the checkpoint, first: CHECKPOINT.md.precompact"; "the hook wrote through a link beside the checkpoint: target-00.txt elsewhere no longer holds what it held". |
+
+How the tests look at the file: `one_block_after` (in `w1_49_support.py`) asserts that the written text is first,
+byte for byte, and that what follows is one block: the begin marker exactly, the `generated:` line next, the end
+marker exactly, and no other marker line or `generated:` line at the start of a line. The side-file tests put 27
+files (then 27 links) beside the checkpoint, under the names a hook might take (`CHECKPOINT.md.precompact`, `.tmp`,
+`.new`, `.bak`, `.swp`, `.lock`, `.part`, `.orig`, `~`, for three stems), and compare the whole directory before
+and after: nothing removed, nothing changed, nothing new. The first name is the one today's hook uses, found by
+running it; the interface names no side file, and the rule of section 1 covers every name, listed here or not.
+The save during the hook is deterministic: the stand-in `tk` itself saves the new text on its first call, in place,
+then prints the tickets; nothing sleeps.
+
+The deterministic hook tests were checked for satisfiability against a new throwaway reference pair kept outside the
+repository (164 lines together, blank lines included; a digest on the `generated:` line, the state gathered before
+the file is read, the checkpoint written in place): the 12 tests of this batch and the 67 of
+`test_w1_49_precompact.py` and `test_w1_49_sessionstart.py` passed with it, 79 of 79. The registration and
+threshold files were not run against it (they read this repository's settings file). The reference was not
+committed and is not the design.
+
+### 2.3 The earlier red records
 
 - Batch 1, before the implementation, 2026-10-04: 9 failed, 8 passed, 45 errors (the hooks did not exist and were
   not registered).
@@ -309,7 +348,16 @@ DP-1, DP-2 and DP-3 are answered and kept here for the record. DP-4 and DP-5 are
 | A fenced code block before the section that shows a `## RESUME HERE` line (an example or a template) | Not the section. The real section is injected, the example's text is not. | Yes |
 | Fences of tildes, indented code blocks, an unclosed fence, a heading-like line in a code block after the section | Not specified. | No |
 | The markers quoted in the written part: in a sentence, or as whole lines in a code block | Written text. Never replaced, never cut, and the section that holds them is injected whole. | Yes |
-| A written part whose very last lines are both markers, as whole lines, with nothing after them | It can't be told from a generated block and is replaced at the next compaction. Close the code block after it, or write a line after it. | No |
+| A written part whose very last lines are both markers, as whole lines, with nothing after them (batch 4; before it this row read "can't be told from a generated block and is replaced") | Written text unless it is a block the hook generated and nobody changed (section 1, "The hook's own block"). Kept byte for byte; the new block is appended after it; at a session start it is injected with its section and gives no warning. | Yes |
+| Marker lines that are indented, or carry a trailing space or tab | Not marker lines: written text, with what stands between them. | Yes |
+| A line the session wrote inside the generated block, at the start of the line or indented as command output is | The block is no longer the hook's: it stays whole as written text and a new block follows it. | Yes |
+| A line of the generated block the session changed or removed | The same rule (the block is no longer as the hook wrote it). | No |
+| A byte-for-byte copy of a whole generated block, pasted by the session as the file's last lines | It can't be told from the hook's own block and is replaced. | No |
+| `tk` or git prints a line that is exactly a marker, or starts with `generated:` | Indented in the block as every line of command output; one block after any number of compactions; nothing generated in the injection; the warning is given. | Yes (`tk`, both markers); git and `generated:` no |
+| The session saves its checkpoint while the hook runs `tk` or git | The saved text is in the file afterwards, whole and first; the block follows it, or the hook appends nothing and says so with the path. | Yes (during `tk`) |
+| The session saves its checkpoint in the instant between the hook's read and its write | Not specified (residual). | No |
+| A file or a symbolic link beside the checkpoint, under a name the hook might use for its own work | Not written, not replaced, not removed, not followed; the hook leaves no file of its own; the checkpoint stays a regular file. | Yes |
+| A checkpoint that is itself a symbolic or hard link; text the session writes after the block; an empty checkpoint; a very long or multi-line `GOV_TICKET`; a write of the block in the same second as the session's; the size of what a command prints; orphan processes; fsync | Not specified (recorded as residuals of the review; no test). | No |
 | RESUME HERE as the last section of the file | It ends where the generated block begins. | Yes |
 | The session rewrites the whole file (the block is gone) | No block, no warning; the next compaction appends a new one. | Yes (no block) |
 | `tk` gives no ticket in progress | The label's line and nothing under it, or `none`. | No |
