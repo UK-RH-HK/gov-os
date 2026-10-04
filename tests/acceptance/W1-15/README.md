@@ -1,0 +1,146 @@
+# W1-15 — Secret rules and pre-index filter: acceptance tests
+
+Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-7nne` (W1-15), Contract v4
+CAP-03 (covers CAP-03.a, CAP-03.b, CAP-03.e) and CAP-38 (CAP-38.b), DEC-074 Q8 and Q9, DEC-076, DEC-186, DEC-187,
+DEC-225 and DEC-221 (profile FULL). Written before implementation. No earlier ticket's test was rewritten.
+
+The suite has **36 test functions, 59 cases**.
+
+## Run
+
+```sh
+python3 -m pytest tests/acceptance/W1-15 -q -p no:cacheprovider
+```
+
+Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About 20 seconds once the ticket is
+built.
+
+- **No secret is committed.** Every planted string (the canary of the first KPI line, the seven dev-tier values, a
+  private key block, an access token) is built at run time from parts in `w1_15_support.py`. None stands whole in a
+  committed file, this README included, so the suite cannot trip the rules it tests.
+- **Everything planted lives in a temporary directory.** No test writes into the repository. The dev tiers are only
+  cloned (`git clone --no-hardlinks`) into a temporary directory.
+- **The code under test** is the repository's `src/`, put on `PYTHONPATH` of a child process. The child's
+  environment is built from scratch (`PATH`, an empty temporary `HOME`, `TMPDIR`, locale); `GOV_ROLE` and
+  `GOV_TICKET` are not passed on. The child's working directory is never the project.
+- **A test project** is a temporary directory with a full path map (this repository's own, with the tests'
+  namespaces in place of its namespaces) and `template/.gitleaks.toml` copied to its root as `.gitleaks.toml`, as
+  an adopting project would have it.
+
+## The public interface the tests assume
+
+The engineer of W1-15, and the tickets that build indexers (W1-16, W1-17, W1-19), can rely on this.
+
+1. **`gov.secrets.indexable(root, paths)`** (package `src/gov/secrets/`).
+   - `root`: the project root (a `pathlib.Path`). The working directory is not used.
+   - `paths`: a list of project-relative POSIX paths (strings) an indexer wants to read.
+   - Returns the paths an indexer may read: a sub-list of `paths`, in the order asked, no path twice, no path that
+     was not asked.
+   - A path is left out when its file holds a secret (by content, whole file), or when the project's
+     `governance/project/path-map.yaml` does not class its namespace as `memory_class: governance`, or when it is
+     not a readable file. A link is judged by what it points to.
+   - Default deny: when the filter cannot decide (no scanner, a map it cannot read) it raises, or leaves the path
+     out. It never lets the path through. The tests accept either.
+   - It writes nothing into the project outside `.gov-runtime/`, leaves no copy of a secret in the project, `HOME`
+     or `TMPDIR`, and does not print a secret.
+   - **For an indexer ticket:** "calls the content filter before chunking" means the indexer reads and chunks only
+     what this function returned. This ticket cannot assert that of an indexer that does not exist; the suites of
+     W1-16, W1-17 and W1-19 plant a secret and a product-data file and assert both are absent from their store.
+2. **The two gitleaks files.** `.gitleaks.toml` (this repository) and `template/.gitleaks.toml` (shipped to an
+   adopting project) both have `[extend] useDefault = true` and at least one `[[rules]]` entry of their own. The
+   template file allowlists no path.
+3. **The family check.** One declaration file matching `template/governance/kernel/checks/secrets-indexing*.yaml`
+   (DEC-186), listed by `gov check --list --json` with a `family` that reads "secrets indexing" (case and
+   punctuation are ignored). Its `command` is run by `sh -c` **in the project's root**, with the `gov` package
+   importable. Exit code 0: no secret in a derived store. Any other code: a secret was found. The derived stores are
+   every file under `.gov-runtime/`, text or SQLite. Source files are not its subject. Its output names the file and
+   never repeats the secret.
+
+## KPI → tests → red reason today
+
+Red run on `w1/W1-15` at `092cd013` plus this suite: **45 errors, 7 failed, 7 passed**.
+
+- The 45 errors come from three fixtures, each with one reason: **`the secret filter does not exist: there is no
+  src/gov/secrets/__init__.py`** (27 cases), **`the secrets-indexing check is not registered: nothing matches
+  template/governance/kernel/checks/secrets-indexing*.yaml`** (12 cases) and **`template/.gitleaks.toml does not
+  exist`** (6 cases).
+- The 7 failures: 3 give `template/.gitleaks.toml does not exist`; 1 gives `.gitleaks.toml adds no [[rules]] to the
+  defaults`; 2 give `gitleaks with .gitleaks.toml does not detect the canary` (one per form); 1 gives `gitleaks
+  with .gitleaks.toml does not report` the dev tier's token file.
+- Without the `local_only` cases: 37 errors, 4 failed, 1 passed.
+- The suite was also run against a throwaway stand-in in a scratch directory outside the repository (about 70
+  lines: the filter, the check, two rules): 59 passed. So every test can go green, and none is red from a mistake
+  in the test code.
+
+| KPI line | Test file | Test functions | Red reason today |
+|---|---|---|---|
+| **Success 1.** `.gitleaks.toml` extends the defaults with token and canary rules; the canary is detected | `test_w1_15_gitleaks_rules.py` | `test_the_configuration_extends_the_gitleaks_defaults[2]` · `test_the_configuration_adds_rules_of_its_own[2]` · `test_the_template_configuration_allowlists_no_path` · `test_the_canary_is_detected[4]` · `test_the_gitleaks_defaults_alone_miss_the_canary[2]` · `test_a_secret_the_defaults_find_is_still_detected[4]` · `test_text_about_canaries_and_tokens_is_not_a_finding[2]` · `test_the_token_canary_file_of_the_dev_tier_is_reported[2]` | No template file; the repository file has no rules and misses the canary |
+| **Success 2.** Every indexer calls the content filter before chunking; 0 of 7 dev canaries reach any store [CAP-03.a, CAP-03.e] | `test_w1_15_filter.py` | `test_a_file_without_a_secret_is_indexable` · `test_a_file_with_the_canary_is_not_indexable[2]` · `test_a_file_with_a_secret_the_defaults_find_is_not_indexable[2]` · `test_the_secret_is_found_by_content_whatever_the_file_is[5]` · `test_a_secret_far_into_a_long_file_is_found` · `test_only_the_files_with_a_secret_are_dropped_and_the_order_is_kept` · `test_a_link_to_a_file_with_a_secret_is_not_indexable` · `test_a_path_that_is_no_file_is_not_indexable` · `test_without_a_scanner_nothing_with_a_secret_is_let_through` · `test_the_filter_leaves_no_copy_of_a_secret_behind` · `test_the_dev_tiers_hold_the_seven_canaries` · `test_no_dev_canary_is_in_a_file_an_indexer_may_read[2]` | The filter does not exist |
+| **Success 3.** Indexers skip every namespace the path map classes as product data [CAP-03.b] | `test_w1_15_product_data.py` | `test_a_file_in_a_product_namespace_is_not_indexable` · `test_the_same_file_is_indexable_once_the_map_classes_its_namespace_as_governance` · `test_a_namespace_the_map_turns_into_product_data_is_skipped` · `test_the_product_folder_of_this_repository_has_no_special_place` · `test_every_product_namespace_and_every_pattern_of_it_is_skipped` · `test_the_patterns_are_read_as_the_path_map_writes_them` · `test_a_namespace_the_map_does_not_class_as_governance_is_not_let_through[2]` · `test_a_secret_in_a_governance_file_is_dropped_whatever_the_map_says` | The filter does not exist |
+| **Success 4.** Registers the secrets-indexing family check: no planted secret or canary in any derived store [CAP-38.b] | `test_w1_15_family_check.py` | `test_the_check_is_registered_in_the_kernel_template` · `test_the_check_passes_when_there_is_no_derived_store` · `test_the_check_passes_on_stores_without_a_secret` · `test_the_check_fails_on_a_canary_in_a_store_packet_or_bundle[3]` · `test_the_check_fails_on_a_planted_secret_in_a_database_store[3]` · `test_one_bad_store_among_clean_ones_fails_the_check` · `test_a_failing_check_names_the_store_and_does_not_repeat_the_secret` · `test_a_secret_in_a_source_file_is_not_a_store_finding` | The check is not registered |
+| **Failure 1.** Any planted secret appears in a derived store, packet or bundle | `test_w1_15_family_check.py` · `test_w1_15_filter.py` | the six `test_the_check_fails_on_…` cases · `test_one_bad_store_among_clean_ones_fails_the_check` · every "is not indexable" test of the filter · `test_the_filter_leaves_no_copy_of_a_secret_behind` · `test_no_dev_canary_is_in_a_file_an_indexer_may_read[2]` | As above |
+| **Failure 2.** The filter relies on a hard-coded path list | `test_w1_15_product_data.py` | the three tests that change the map and see the filter follow (`…once_the_map_classes_its_namespace_as_governance`, `…the_map_turns_into_product_data…`, `…has_no_special_place`) · `…every_pattern_of_it_is_skipped` · `…read_as_the_path_map_writes_them` | The filter does not exist |
+
+**Count.** KPI lines with tests: 6 of 6 (4 success, 2 failure).
+
+| Covers id | Tests |
+|---|---|
+| **CAP-03.a** default-deny content filter; class per namespace before index | all of `test_w1_15_filter.py`; the default-deny cases `test_without_a_scanner_…`, `test_a_path_that_is_no_file_…`, `test_a_namespace_the_map_does_not_class_as_governance_…[2]`; `test_w1_15_gitleaks_rules.py` |
+| **CAP-03.b** governance memory separated from product data | all of `test_w1_15_product_data.py` |
+| **CAP-03.e** exclusion holds on every route, the code route included | `test_the_secret_is_found_by_content_whatever_the_file_is[5]` (code files go through the same filter) · `test_the_check_fails_on_a_canary_in_a_store_packet_or_bundle[code-index]` · `test_no_dev_canary_is_in_a_file_an_indexer_may_read[b-dev]` (the canary stands in a TypeScript file) |
+| **CAP-38.b** governance test family "secrets indexing" | all of `test_w1_15_family_check.py` |
+
+## The 7 cases that pass before implementation
+
+| Case | Why it passes today |
+|---|---|
+| `test_the_configuration_extends_the_gitleaks_defaults[repository]` | The existing `.gitleaks.toml` already extends the defaults; the test keeps that true. |
+| `test_the_gitleaks_defaults_alone_miss_the_canary[2]` | A baseline, not a test of the ticket: it shows the planted strings really are ones the defaults miss (CAP-03 acceptance), so `test_the_canary_is_detected` can only pass through a rule the ticket adds. |
+| `test_a_secret_the_defaults_find_is_still_detected[2 × repository]` | The existing file has the defaults on; the test guards against the new rules switching them off. |
+| `test_text_about_canaries_and_tokens_is_not_a_finding[repository]` | The existing file has no rule that could match prose; the test guards the new rules against matching the words "canary" and "token". |
+| `test_the_dev_tiers_hold_the_seven_canaries` | The premise of the dev-tier test: it reads the tiers, not the ticket's code. |
+
+## `local_only` (17 cases)
+
+Deselect with `-m "not local_only"` (42 cases remain).
+
+- **Run the `gitleaks` binary directly** (14 cases): `test_the_canary_is_detected[4]`,
+  `test_the_gitleaks_defaults_alone_miss_the_canary[2]`, `test_a_secret_the_defaults_find_is_still_detected[4]`,
+  `test_text_about_canaries_and_tokens_is_not_a_finding[2]`,
+  `test_the_token_canary_file_of_the_dev_tier_is_reported[2]`. Skipped when `gitleaks` is not on `PATH`.
+- **Clone a dev tier** (`$GOV_DEV_TIERS`, default `~/gov-os-workbench/synthetic`; tiers `a-dev` and `b-dev`, by
+  exact path): `test_the_dev_tiers_hold_the_seven_canaries`, `test_no_dev_canary_is_in_a_file_an_indexer_may_read[2]`
+  and the two `…dev_tier_is_reported` cases above. Skipped when the tier is absent.
+- The other filter and check tests are not marked. They pass `PATH` on to the child, so a filter that runs the
+  `gitleaks` binary finds it; on a machine without the binary they depend on package DP-3.
+
+## How the tests decide
+
+- **Detected** means `gitleaks dir <tree> --config <file>` reports the planted file. The canary is planted in
+  ordinary prose, with no key name beside it, in two forms: as the KPI writes it and as the b-dev tier holds it.
+- **Not indexable** means the path is absent from what `gov.secrets.indexable` returns. A neighbour without a
+  secret must stay, so "return nothing" does not pass.
+- **The map decides** (failure 2). The product namespace of the test project is `tenant-exports/**`; no namespace
+  or path of the test project is classed as product by this repository's own map. Three tests rewrite the map
+  between two calls and expect the result to follow, and one classes `fixtures/**` as governance and expects its
+  file to be let through.
+- **The seven dev canaries** are the seven planted secret values of the two public dev tiers: three values with the
+  canary word and an example cloud key pair in `a-dev`, the token canary and the key-file canary in `b-dev`
+  (package DP-2). The dev-tier test adopts a clone with a one-namespace governance map, asks the filter about every
+  tracked file, and expects no file holding one of the values to be let through, `README.md` to be let through,
+  and more than half of the files to remain.
+- **The check** is run by the tests, not by `gov check` (running checks is W1-26, DEC-186). A SQLite store with the
+  secret in a row must fail the check: the Wave 1 stores are SQLite (DEC-074 R1). Note for the engineer:
+  `gitleaks dir` skips a file it recognises as binary, a SQLite file included, so a plain scan of `.gov-runtime/`
+  does not pass these three cases.
+
+## Not tested, on purpose
+
+- That an indexer calls the filter (no indexer exists; see the interface above).
+- A path that matches no namespace, and a project with no path map at all: the sources do not say. The tests give
+  every path a namespace.
+- The namespace fields `sensitivity`, `export_policy`, `embedding_policy`, `retention` and `permitted_roles`: no
+  KPI of this ticket reads them (package DP-5). Only `paths` and `memory_class` are read.
+- The check's `tier` and `severity` values, beyond being valid.
+- `.gov-runtime/scratch/`: whether it counts as a derived store.
+- That this repository's own tree stays clean under the new rules (package DP-6).
