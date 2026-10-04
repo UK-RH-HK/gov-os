@@ -1730,6 +1730,7 @@ capabilities:
     wave: W1
     provider:
     - W1-12
+    - W1-26
   - id: CAP-30.f
     item: 'Order of specification work: discovery and research, scenarios, representative data, UX for a feature with a user
       interface, acceptance tests, implementation; the owner reviews scenarios and UX designs, not test code'
