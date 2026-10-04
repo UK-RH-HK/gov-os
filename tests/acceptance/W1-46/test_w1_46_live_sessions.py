@@ -219,7 +219,8 @@ def test_the_role_and_the_ticket_reach_the_session_and_its_hooks(engineer):
 # The research session: two Bash calls
 # --------------------------------------------------------------------------
 
-RESEARCH_HOSTS = sorted(host for hosts in support.RESEARCH_HOSTS.values() for host in hosts)
+# DEC-241: every starting host, and one subdomain of readthedocs.io for the subdomain entry.
+RESEARCH_HOSTS = (*support.STARTING_HOSTS, support.READTHEDOCS_HOST)
 INSTALL = (f"cd {FOLDER} && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index "
            f"--python .venv/bin/python vendor/{support.WHEEL_NAME}")
 RESEARCH_PROBE = f"""#!/bin/bash
@@ -233,7 +234,7 @@ uv --no-cache pip install --offline --no-index --target '@OUTSIDE@/site' {FOLDER
 echo "outside_install=$?" >> "$OUT"
 echo "mktemp=$(mktemp)" >> "$OUT"
 for host in {' '.join(RESEARCH_HOSTS)} example.com; do
-  curl -s -o /dev/null -m 20 "https://$host/"; echo "net_$host=$?" >> "$OUT"
+  code=$(curl -s -o /dev/null -m 20 -w '%{{http_code}}' "https://$host/"); echo "net_$host=$? $code" >> "$OUT"
 done
 echo "end=1" >> "$OUT"
 """
@@ -281,17 +282,32 @@ def test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reporte
     )
 
 
+def _connection(session, host):
+    """What ``curl`` left for ``host``: its exit code and the HTTP status of the answer (000 when there was none)."""
+    exit_code, _, status = session.results.get(f"net_{host}", "").partition(" ")
+    return exit_code, status
+
+
 @pytest.mark.parametrize("host", RESEARCH_HOSTS)
-def test_the_research_allowlist_accepts_a_connection_to_a_research_domain(research, host):
-    """Success 3 [CAP-61.c], DEC-161: "the domain allowlist accepts the research domains". Needs the network."""
-    assert research.results.get(f"net_{host}") == "0", (
-        f"a launched research session could not connect to {host}: curl ended with "
-        f"{research.results.get(f'net_{host}')!r}"
+def test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist(research, host):
+    """Success 3 [CAP-61.c], DEC-161, DEC-241: "the sandbox accepts these entries". Needs the network.
+
+    ``curl`` ends with 0 when the host itself answered over TLS, with any HTTP
+    status: the connection went through the sandbox's proxy. The status is kept
+    for the failure message. ``docs.readthedocs.io`` stands for the subdomain
+    entry of ``readthedocs.io``.
+    """
+    exit_code, status = _connection(research, host)
+    assert exit_code == "0", (
+        f"a launched research session got no answer from {host}: curl ended with {exit_code!r}, HTTP status {status!r}"
     )
 
 
 def test_the_research_allowlist_refuses_a_domain_that_is_not_on_it(research):
-    assert research.results.get("net_example.com") not in (None, "0"), "the research session connected to example.com"
+    exit_code, status = _connection(research, "example.com")
+    assert exit_code not in ("", "0"), (
+        f"the research session connected to example.com: curl ended with {exit_code!r}, HTTP status {status!r}"
+    )
 
 
 # --------------------------------------------------------------------------

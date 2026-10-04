@@ -25,9 +25,13 @@ absolute path, as W1-47's wired copy does. Every temporary project gets a
 ``held-out.yaml`` of its own that names a stand-in directory made by the test
 (DEC-218). No file of this suite carries a value of the committed list.
 
-**The command line these tests use** is ``gov launch <role> <ticket> [-- <arguments
-for the CLI>]``. The ticket does not fix it; see decision package DP-1 in the
-README.
+**The command line** is ``gov launch <role> <ticket> [-- <arguments for the
+CLI>]`` (DEC-231): the role and the ticket are positional, and everything after
+``--`` goes to the CLI unchanged.
+
+**The research allowlist.** ``governance/project/research-allowlist.yaml`` is
+copied from this repository when it exists (DEC-241). A test that changes it
+changes the list it finds there, whatever key holds it.
 """
 
 from __future__ import annotations
@@ -67,6 +71,7 @@ ROSTER_REL = "governance/project/roster.yaml"
 AGENT_REL = ".claude/agents/research.md"
 KERNEL_ROLE_GLOB = "template/governance/kernel/roles/research*"
 REGISTRY_REL = "governance/project/tool-registry.yaml"
+ALLOWLIST_REL = "governance/project/research-allowlist.yaml"   # DEC-241
 CLI_REL = ".local/bin/claude"          # under HOME (DEC-205)
 
 ENGINEER = "engineer"
@@ -96,7 +101,7 @@ OWN_PATH = {
 
 # Copied from this repository, file by file, from git's listing. Never ``governance/project/held-out.yaml``.
 PROJECT_PATHSPECS = ("src/gov", "template/governance/kernel", ".claude/agents", SETTINGS_REL, "pyproject.toml",
-                     ROSTER_REL, REGISTRY_REL, ":(exclude)template/governance/kernel/vendor")
+                     ROSTER_REL, REGISTRY_REL, ALLOWLIST_REL, ":(exclude)template/governance/kernel/vendor")
 PROJECT_FILES = {
     "README.md": "# Launch fixture project\n",
     ".gitignore": ".gov-runtime/\n__pycache__/\n",
@@ -121,15 +126,18 @@ PROTECTED_RUNTIME = (".gov-runtime/freeze", ".gov-runtime/findings.jsonl", ".gov
                      ".gov-runtime/last_head.json", ".gov-runtime/a-link")
 SCRATCH_PATHS = (".gov-runtime/scratch/w1-46/seed.txt", ".gov-runtime/scratch/new/file.txt")
 
-# The research and development domains DEC-158 names, by the host a tool of that service talks to.
-RESEARCH_HOSTS = {
-    "GitHub": ("github.com",),
-    "PyPI": ("pypi.org", "files.pythonhosted.org"),
-    "npm": ("registry.npmjs.org",),
-    "Hugging Face": ("huggingface.co",),
-    "arXiv": ("arxiv.org",),
-}
+# The starting hosts of the research allowlist, copied from DEC-241 in the register.
+STARTING_HOSTS = (
+    "github.com", "api.github.com", "raw.githubusercontent.com", "objects.githubusercontent.com",
+    "codeload.github.com", "pypi.org", "files.pythonhosted.org", "registry.npmjs.org", "huggingface.co",
+    "cdn-lfs.huggingface.co", "arxiv.org", "export.arxiv.org", "docs.python.org", "docs.rs", "crates.io",
+    "static.crates.io", "developer.mozilla.org",
+)
+# "And the subdomains of readthedocs.io": the entry's form in the sandbox, and one host it must accept.
+READTHEDOCS_ENTRY = "*.readthedocs.io"
+READTHEDOCS_HOST = "docs.readthedocs.io"
 NOT_A_RESEARCH_HOST = "w1-46-not-allowlisted.example"
+ADDED_HOST = "w1-46-added-by-the-owner.example"
 
 COMMAND_TIMEOUT_S = 60.0
 HOOK_TIMEOUT_S = 30.0
@@ -410,12 +418,43 @@ def allowed_domains(settings):
 
 
 def accepts(domains, host):
-    """A domain allowlist accepts ``host``: the same name, or a ``*.`` entry of a parent domain."""
+    """A domain allowlist accepts ``host`` as the sandbox does: the same name, or a subdomain of a ``*.`` entry."""
     for entry in domains:
         entry = str(entry).lower()
-        if entry == host or (entry.startswith("*.") and (host.endswith(entry[1:]) or host == entry[2:])):
+        if entry == host or (entry.startswith("*.") and host.endswith(entry[1:])):
             return True
     return False
+
+
+def rewrite_allowlist(project, change):
+    """Rewrite the project's research allowlist: ``change`` gets the list of entries and returns what replaces it.
+
+    The file's key is not fixed by DEC-241. The list is the file's top level,
+    or the one list a top-level mapping holds; the rest of the file is kept.
+    """
+    path = Path(project) / ALLOWLIST_REL
+    assert path.is_file(), f"{ALLOWLIST_REL} does not exist in the project (DEC-241)"
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if isinstance(data, list):
+        new = change(list(data))
+    else:
+        keys = [key for key, value in data.items() if isinstance(value, list)] if isinstance(data, dict) else []
+        assert len(keys) == 1, (
+            f"{ALLOWLIST_REL} is neither a list of hosts nor a mapping with one list of hosts: this test must be "
+            "revised for its shape"
+        )
+        new = dict(data)
+        new[keys[0]] = change(list(data[keys[0]]))
+    path.write_text(yaml.safe_dump(new, default_flow_style=False), encoding="utf-8")
+    return path
+
+
+def write_ticket(project, ticket_id, role, status="in_progress", allowed_paths=("docs/**",), wbs_id="W1-98"):
+    """Put one more committed ticket in the project."""
+    write(project, f".tickets/{ticket_id}.md", check_support.ticket_text(
+        ticket_id=ticket_id, wbs_id=wbs_id, status=status, role=role, allowed_paths=tuple(allowed_paths)))
+    check_support.commit_all(project, f"ticket {ticket_id}")
+    return ticket_id
 
 
 def deny_rules(settings, tool):
