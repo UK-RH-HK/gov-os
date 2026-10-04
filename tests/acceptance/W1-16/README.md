@@ -2,13 +2,16 @@
 
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-lkeb` (W1-16), Contract v4
 CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-078, DEC-285 to DEC-290, DEC-298,
-DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation.
+DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation; the later batches
+serve DEC-338, DEC-339, DEC-346 and DEC-347.
 
-The suite has **58 test functions, 145 cases** in six files, a support module, a conftest and the question set
+The suite has **64 test functions, 157 cases** in seven files, a support module, a conftest and the question set
 `questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
 the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. The sixth file,
 `test_w1_16_daemon_dir_and_names.py` (10 functions, 13 cases), is a third batch, added after implementation for the
-delegated decisions DEC-338 and DEC-339; see "The third batch" below. **No W1-15
+delegated decisions DEC-338 and DEC-339; see "The third batch" below. The seventh file,
+`test_w1_16_builtin_allowlist_and_daemon_secrets.py` (6 functions, 12 cases), is a fourth batch, added after
+implementation for the delegated decisions DEC-346 and DEC-347; see "The fourth batch" below. **No W1-15
 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
@@ -17,7 +20,7 @@ acceptance test was rewritten**: none asserts the old token rule (see "The W1-15
 python3 -m pytest tests/acceptance/W1-16 -q -p no:cacheprovider
 ```
 
-Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About five minutes with the ticket built (the tool
+Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About seven minutes with the ticket built (the tool
 takes 5 to 6 seconds per indexing run, and one runs at a time). Run it alone: one test watches this repository's
 `.gov-runtime/`.
 
@@ -68,7 +71,8 @@ came with the third batch); each takes the project root as a `pathlib.Path` and 
 - The functions need the `codebase-memory-mcp` and `gitleaks` binaries on `PATH`.
 
 One more function is fixed in the package `gov.secrets` (W1-15's, next to `indexable` and `stores_with_secrets`),
-by the third batch (DEC-339 R-3):
+by the third batch (DEC-339 R-3). The fourth batch holds it and `indexable` to one thing more: gitleaks' built-in
+allowlist shelters no finding of the project's rules (DEC-347).
 
 | Function | What the tests hold it to |
 |---|---|
@@ -116,17 +120,19 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (139 cases)
+## `local_only` (151 cases)
 
 Deselect with `-m "not local_only"` (6 cases remain: the interface test, the four that read the two gitleaks
 files as TOML, and the one that reads what the wrapper's source imports).
 
 - **Run the `codebase-memory-mcp` binary** (through the wrapper, or directly for the premise and `list_projects`):
   all of `test_w1_16_home.py` but the interface test, all of `test_w1_16_secret_exclusion.py`, the wrapper cases of
-  `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, and all of
-  `test_w1_16_paths_and_roots.py` but its premise. Skipped when the binary is not on `PATH`.
+  `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, all of
+  `test_w1_16_paths_and_roots.py` but its premise, and the daemon directory case of the fourth batch. Skipped
+  when the binary is not on `PATH`.
 - **Run the `gitleaks` binary**, directly or through the filter: the other marked cases of
-  `test_w1_16_token_rule.py`, and the premise of `test_w1_16_paths_and_roots.py`. Skipped when the binary is not on `PATH`.
+  `test_w1_16_token_rule.py`, the premise of `test_w1_16_paths_and_roots.py`, and the other eleven cases of the
+  fourth batch. Skipped when the binary is not on `PATH`.
 - **Clone a dev tier** (`$GOV_DEV_TIERS`, default `~/gov-os-workbench/synthetic`; tiers `a-dev` and `b-dev`, by
   exact path): the wrapper cases of `test_w1_16_code_answers.py`, its tier premise,
   `test_no_dev_canary_reaches_the_code_index[2]` and `test_every_file_holding_a_dev_canary_is_still_reported[4]`.
@@ -343,6 +349,89 @@ Not tested in this batch, on purpose: where the wrapper puts the directory, and 
 directory; what happens to the directory of a repository that was moved or deleted; two bodies' worth of leading
 separators (`sk___…`); a secret in the content of the file `path_holds_secret` is asked about; a path that does
 not exist; an absolute path or one that leaves the repository; R-2 of DEC-339 (traced by the engineer).
+
+## The fourth batch: gitleaks' built-in allowlist, and no secret in the daemon directory
+
+`test_w1_16_builtin_allowlist_and_daemon_secrets.py`, 6 test functions, 12 cases. Tests added after
+implementation, reason "delegated decision": DEC-347 (package R-2, fix option 1) and DEC-346 (packages DP-5 and
+DP-6). No KPI line was added; the batch serves failure line 3 and CAP-03.e.
+
+Red run on `w1/W1-16` at `11e9a536` plus this batch: the new file alone **8 failed, 4 passed**; the whole suite
+**8 failed, 149 passed**. The 145 cases of the first three batches stay green.
+
+| Decision | Test functions | Red reason today |
+|---|---|---|
+| **DEC-347** the planted values are secrets by the project's rules | `test_the_sheltered_values_are_secrets_by_the_projects_rules_alone` (premise) | Passes: a premise that keeps true. |
+| **DEC-347** `gov.secrets.indexable(root, paths)` leaves out a file whose content holds a sheltered canary or token | `test_a_file_with_a_secret_the_builtin_allowlist_shelters_is_not_indexable[5]` (`alphabet-lower`, `alphabet-upper`, `false`, `leading-true`, `trailing-null`) | 5 red: **`a token that gitleaks' built-in allowlist shelters (alphabet-lower) is let through to the indexer: ['app/planted.py', 'notes/clean.md']`**, and the same for the canary in `notes/planted.md` and for the other shelters. The filter scans with the project's file as it is, `[extend]` included, so the built-in allowlist hides the finding. |
+| **DEC-347** `gov.secrets.path_holds_secret(root, path)` is true for a path name that holds one | `test_a_path_name_with_a_secret_the_builtin_allowlist_shelters_holds_a_secret[3]` (`alphabet-upper`, `false`, `trailing-null`) | 3 red: **`a path name with a canary that gitleaks' built-in allowlist shelters (false) is not told as a secret`** (the function answers `False`), and the same for the token and for the other two shelters. |
+| **DEC-347** clean stays clean | `test_a_file_with_the_sheltering_words_and_no_secret_is_indexable` · `test_a_path_name_with_the_sheltering_words_and_no_secret_holds_no_secret` | Pass: premises that keep true. |
+| **DEC-346** no planted secret in the daemon directory | `test_no_planted_secret_stands_in_the_daemon_directory_after_an_index_run` | Passes: the behaviour already holds. A premise that keeps true. |
+
+The batch was also run against a throwaway stand-in in a scratch directory outside the repository (a copy of
+`src/` whose filter scans a second time with the project's rules and no `[extend]` table): **12 passed**, and
+the whole suite **157 passed**. The stand-in is not part of the suite and was not committed.
+
+### The facts observed
+
+With gitleaks 8.30.1, by `gitleaks stdin --config <file>`, for `template/.gitleaks.toml` and for `.gitleaks.toml`,
+each as it is and with its `[extend]` table taken out ("the rules alone"). Every value was scanned in prose, as a
+string value in code, and as a path name (`app/<value>.py` and `<value>.py` on lines of their own). The results
+were the same for both files and for the three places.
+
+| Value (built from parts, as in the support module) | The file as it is | The rules alone |
+|---|---|---|
+| A token with digits and mixed case, and a canary, with none of the words below (controls) | flagged | flagged |
+| A token or a canary that holds the 26 letters of the alphabet in a row, in lower case | **nothing** | `gov-token-digit` · `gov-canary` |
+| The same with the run in upper case; a token with the run half in upper and half in lower case | **nothing** | `gov-token-digit` · `gov-canary` |
+| A token or a canary that holds the word for the negative truth value: in lower case (both), in upper case (the canary), capitalised (the token) | **nothing** | `gov-token-digit` · `gov-canary` |
+| A canary that begins with the word for the positive truth value, in lower or upper case, followed by `_` or glued to the next characters | **nothing** | `gov-canary` |
+| A token or a canary that ends with the word for the missing value, in lower case; a token that ends with it in upper case | **nothing** | `gov-token-digit` · `gov-canary` |
+| A canary with the positive truth value in the middle or at the end; a token with the missing value in the middle; a canary that begins with the missing value | flagged | flagged |
+| Ordinary code and prose with those words and the alphabet runs, and ordinary path names with them | nothing | nothing |
+
+- So the shelter is a pattern over the matched value: the alphabet run and the negative truth value anywhere, the
+  positive one only at the beginning, the missing value only at the end, each in any case.
+- A token begins with its prefix (`sk`, `pk`, `rk`, `tok`), so only a canary can begin with the positive truth
+  value: the `leading-true` shelter has no token case.
+- The default uuid stopword DEC-347 also names was not observed and is not planted.
+
+How these tests decide:
+
+- **The planted values** (`support.SHELTERED`, `support.PATH_SHELTERED`) are built at run time from parts. In
+  content: a token with the lower-case run, a canary with the upper-case run, a token that holds the negative
+  truth value, a canary that begins with the positive one, a token that ends with the missing value. In a path
+  name: a token with the upper-case run as a file name (`app/<token>.py`), a canary that holds the negative truth
+  value and a canary that ends with the missing value as folder names (`web/<canary>/panel.ts`). Each kind and
+  each shelter is met; the shelters are not multiplied by the kinds and the places.
+- **The premise** scans the planted values with the rules alone of each gitleaks file (the file written without
+  its `[extend]` table into a temporary directory): each value is reported under its own rule, an id that begins
+  with `gov-token` or `gov-canary`, and the files with ordinary words are reported under none. So a refusal the
+  other tests ask for is a finding of the project's rules, and no new over-blocking is asked for. The premise
+  says nothing about a scan with either file as it is.
+- **Not indexable**: the project has `template/.gitleaks.toml` as its `.gitleaks.toml`. A token stands as a
+  string value in `app/planted.py`, a canary in the prose of `notes/planted.md`. `gov.secrets.indexable` is asked
+  about that file and a clean page, and must answer the clean page alone.
+- **A path name**: the file's content is clean. `path_holds_secret` must answer `True` for the path and `False`
+  for `app/beside.py` in the same project; a truthy or falsy value of another type fails.
+- **Clean stays clean**: a Python file with the two alphabet runs as string values and `True`, `False` and `None`,
+  a TypeScript file with `true`, `false` and `null`, and a page of prose with all of them are returned by
+  `indexable`, in the order asked. Four ordinary path names (`app/true_or_false.py`, a folder named as the
+  lower-case run with a file `letters_null.ts`, `docs/null_and_false_values_true.md`, a Rust file named as the
+  upper-case run) give `False`.
+- **The daemon directory** (DEC-346): a temporary repository holds `app/settings.py` with a planted secret as a
+  string value, in a comment and as the name of a function, and the clean `app/clean.py`. After `index(root)` the
+  clean function has its caller (the index was built) and a function of the planted file has no definition (the
+  file was left out). Then the bytes of every regular file under `daemon_dir(root)` are read, and no file or
+  folder name there and no file's bytes may hold one of the three planted strings. **Skipped**: an entry that is
+  no regular file (the daemon's socket, a link) and a regular file that cannot be opened and read. The directory
+  must exist; that it holds files, is empty or is removed is not held (the leftovers are an accepted residual).
+
+Not tested in this batch, on purpose: the pre-commit hook and a plain `gitleaks` run with either file as it is
+(DEC-347 leaves them as they are); how the filter decides (a second scan, or another way); a secret of gitleaks'
+built-in rules that the built-in allowlist shelters (a residual of DEC-347); the default uuid stopword;
+`gov.secrets.stores_with_secrets` and the code index with a sheltered secret; every shelter with every kind and
+every place; the 16-character floor after a leading separator (DEC-346, as built: the third batch holds 14 and
+16 characters); that the daemon directory is empty or removed.
 
 ## The W1-15 suite
 

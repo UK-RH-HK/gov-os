@@ -25,9 +25,11 @@ import os
 import re
 import shutil
 import sqlite3
+import stat
 import subprocess
 import sys
 import tempfile
+import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -166,6 +168,69 @@ LEADING_SHORT = ("rk", "_", "_", "a1B2c3D4e5F6g7")   # the rest has 14 character
 def leading(prefix, separator, first, rest):
     """A prefixed string whose body begins with ``first``, put together at run time."""
     return prefix + separator + first + rest
+
+
+# DEC-347: secrets by the project's own rules that gitleaks' built-in global allowlist shelters when the project's
+# file extends the defaults. ``shelter -> (kind, value)``: the kind is the rule that flags the value once the
+# built-in allowlist is not there. The shelters: the alphabet run in either case anywhere in the value, ``false``
+# anywhere, ``true`` at its beginning, ``null`` at its end (observed with gitleaks 8.30.1; see the README).
+_RUN = "abcdefghijklm" + "nopqrstuvwxyz"
+CANARY_RULE = "gov-canary"
+SHELTERED = {
+    "alphabet-lower": ("token", "sk_" + "7Qd2" + _RUN + "X9"),
+    "alphabet-upper": ("canary", "_".join(["W116", _RUN.upper(), _WORD, "5KD9"])),
+    "false": ("token", "tok-" + "9fK2mQ7x" + "fal" + "se" + "Lp0Zr4Tb"),
+    "leading-true": ("canary", "_".join(["tr" + "ue", "W116", _WORD, "8PL4"])),
+    "trailing-null": ("token", "pk_" + "4Wm8Kd2Qx7Lp0Zr9" + "nu" + "ll"),
+}
+# The same shelters over a secret that stands in a path name; the kinds are the other way round.
+PATH_SHELTERED = {
+    "alphabet-upper": ("token", "sk_" + "3Hv6" + _RUN.upper() + "x9"),
+    "false": ("canary", "_".join(["W116", "fal" + "se", _WORD, "3HV6"])),
+    "trailing-null": ("canary", "_".join(["W116", _WORD, "2MZ7", "nu" + "ll"])),
+}
+# The same words with no secret: ordinary code and prose, and ordinary path names.
+SHELTER_WORDS_CLEAN = {
+    "app/letters.py": (
+        f'LETTERS = "{_RUN}"\nCAPITALS = "{_RUN.upper()}"\n\n\n'
+        "def is_letter(value, strict=False):\n"
+        "    if value is None:\n        return False\n"
+        "    return True if value in LETTERS else value in CAPITALS and not strict\n"
+    ),
+    "web/values.ts": (
+        "export function orNull(value: string | null): string | null {\n"
+        "  const strict = false;\n  const loose = true;\n"
+        "  return value === null || (strict && !loose) ? null : value;\n}\n"
+    ),
+    "notes/words.md": (
+        f"# Notes\n\nThe run {_RUN} and the run {_RUN.upper()} are letters.\n"
+        "A flag is true or false; a missing value is null.\n"
+    ),
+}
+SHELTER_WORDS_PATHS = ("app/true_or_false.py", f"web/{_RUN}/letters_null.ts", "docs/null_and_false_values_true.md",
+                       f"lib/{_RUN.upper()}.rs")
+
+
+def rule_family(kind):
+    """The beginning of the rule ids that flag a planted value of ``kind``: the canary rule or the token rules."""
+    return {"canary": CANARY_RULE, "token": TOKEN_RULE}[kind]
+
+
+def sheltered_path(kind, value):
+    """A path whose name holds ``value``: a token as a file name, a canary as a folder name."""
+    return f"app/{value}.py" if kind == "token" else f"web/{value}/panel.ts"
+
+
+def rules_alone(which, destination):
+    """The rules of a gitleaks file without its ``[extend]`` table, written to ``destination``: no built-in rule, no built-in allowlist."""
+    text = config_path(which).read_text(encoding="utf-8")
+    alone = re.sub(r"(?ms)^\[extend\]\n.*?(?=^\[|\Z)", "", text)
+    before, after = tomllib.loads(text), tomllib.loads(alone)
+    assert "extend" in before and "extend" not in after and after["rules"] == before["rules"], \
+        f"{CONFIGS[which]}: the [extend] table could not be taken out of the rules"
+    destination = Path(destination)
+    destination.write_text(alone, encoding="utf-8")
+    return destination
 
 
 def in_prose(text):
@@ -672,6 +737,31 @@ def files_holding(root, needles, skip=(".git",)):
         if hits:
             found[rel] = hits
     return found
+
+
+def regular_files_holding(root, needles):
+    """Where a needle stands in the bytes of the regular files under ``root`` (DEC-346).
+
+    Returns ``(relative path -> needles found, files read, entries skipped)``. A socket, a link or any other entry
+    that is no regular file is skipped, and so is a regular file that cannot be opened and read.
+    """
+    root = Path(root)
+    found, read, skipped = {}, [], []
+    for rel in sorted(listing(root)):
+        path = root / rel
+        try:
+            if not stat.S_ISREG(os.lstat(path).st_mode):
+                skipped.append(rel)
+                continue
+            data = path.read_bytes()
+        except OSError:
+            skipped.append(rel)
+            continue
+        read.append(rel)
+        hits = [needle for needle in needles if needle.encode() in data]
+        if hits:
+            found[rel] = hits
+    return found, read, skipped
 
 
 # --------------------------------------------------------------------------
