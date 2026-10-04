@@ -1,6 +1,6 @@
 ---
 id: DAEO-o4fg
-status: in_progress
+status: closed
 deps: [DAEO-6cc2]
 links: []
 created: 2026-10-03T13:05:33Z
