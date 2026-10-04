@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ticket",
+  "description": "Frontmatter of a ticket: the task contract (CAP-31.a) beside the fields tk writes. `type` and `status` are tk's own fields.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "required": ["role", "allowed_paths", "kpis"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/ticket_id" },
+    "deps": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/ticket_id" } },
+    "wbs_id": { "$ref": "common.schema.json#/$defs/wbs_id" },
+    "class": { "type": "string", "minLength": 1 },
+    "role": { "type": "string", "minLength": 1 },
+    "depends_on": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/wbs_id" } },
+    "allowed_paths": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "kpis": {
+      "type": "object",
+      "required": ["success", "failure"],
+      "properties": {
+        "success": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "failure": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "profile": { "enum": ["LITE", "STANDARD", "FULL"] },
+    "sources": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "est_loc": { "type": "integer", "minimum": 0 },
+    "acceptance_tests": { "type": "object" }
+  }
+}
