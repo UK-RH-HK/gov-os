@@ -2148,3 +2148,45 @@ drafts the answers first (DEC-222).
 | Version | Date | Change |
 |---|---|---|
 | 0.43 | 2026-10-04 | Delegated under DEC-220: DEC-226 (W1-08 DP-5: lesson scope and severity in lower case), DEC-227 (W1-08 DP-6: one shared definitions file for the id grammars), DEC-228 (W1-08 DP-7: W1-27 replaces the minimal path-map schema in `src/gov/config/`). |
+
+## 44. Delegated decisions on W1-08 from the product-spec drafts (register v0.44, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the drafts a product-spec worker returned for W1-08's
+gaps (DEC-222, DEC-224; sources: the archived Framework v4.1.2 §3, §7, §20, §21 and Contract v3 W1, with DEC-012,
+DEC-046, DEC-060 and API-0002). Two parts of the drafts are not decided here and go to the owner: the kernel minimum
+per policy with the capability list (the worker's confidence is below medium), and the rewording of W1-08's KPI line
+on the identity fields (it changes a KPI's meaning, and the worker asked for the owner).
+
+### DEC-229 — W1-08 DP-4: `state_class` takes the six values of Framework §3
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-4 option (a) and the product-spec draft (confidence high for the values, medium for the per-type defaults) · **Under:** CAP-07.b, DEC-046
+- **Decision:**
+  - `state_class` is one of `AUTHORITATIVE`, `DERIVED`, `NARRATIVE`, `EVIDENCE`, `HISTORICAL`,
+    `UNKNOWN_OR_CONFLICTING`, held once in the shared definitions file (DEC-227). Every record schema accepts all six.
+  - The templates carry these defaults, which the schemas do not pin: decision, ticket, lesson, gate or decision
+    package and path map `AUTHORITATIVE`; failure and research record `EVIDENCE`; checkpoint `NARRATIVE`.
+  - Tickets carry it too: the 48 committed tickets each get `state_class: AUTHORITATIVE` in one orchestrator commit
+    with the trailer `Task: DAEO-uudf`, and W1-09 adds the key when a ticket is created.
+
+### DEC-230 — W1-08 DP-1, the parts that qualify: strengths, policy keys, systems and the shape in `path-map.yaml`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** DEC-224 and the product-spec draft option (a) (confidence high for the systems, medium for the shape) · **Under:** CAP-06.e, CAP-54.b, DEC-060
+- **Decision:**
+  - `path-map.yaml` gets three top-level keys beside `namespaces`: `capabilities`, `policies` and `systems`.
+  - Policy strengths, weakest to strongest: `informational`, `warning`, `hard-block`.
+  - `policies` has the thirteen policy keys of Framework §20, in lower case: `security`, `authority`, `test`,
+    `change`, `human_gate`, `tool`, `memory`, `context`, `checkpoint`, `model_routing`, `budget`, `learning`,
+    `archive`. All are required. The schema gives each key only the strengths at or above its kernel minimum, so the
+    validator alone refuses a value below the floor.
+  - `systems` has the twenty-two constitutional systems of Framework §7 as keys, all required:
+    `constitution-and-policies`, `knowledge-fabric`, `repository-contract`, `agent-organisation`, `skills`,
+    `tools-and-capabilities`, `command-surface`, `model-adapters`, `orchestration-and-handoffs`,
+    `specification-and-planning`, `research-and-experiments`, `task-system`, `product-delivery`,
+    `verification-and-governance-tests`, `change-impact-control`, `checkpoint-and-recovery`,
+    `observability-and-cost`, `organisational-learning`, `independent-audit`, `security-and-permissions`,
+    `budget-governance`, `emergency-stop-and-rollback`. Each has `status` (`implemented`, `minimal` or `absent`),
+    `where` (at least one path pattern or tool name) unless absent, and `reason` when absent. That is what
+    "identifies each constitutional system at least minimally" requires.
+  - **Not decided here, with the owner:** the kernel minimum of each policy, and the list of capabilities.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.44 | 2026-10-04 | Delegated under DEC-220, from the product-spec drafts: DEC-229 (W1-08 DP-4: the six `state_class` values; tickets carry it), DEC-230 (W1-08 DP-1 in part: the three top-level keys, the strength order, the thirteen policy keys, the twenty-two systems; the kernel minimums and the capability list go to the owner). |
