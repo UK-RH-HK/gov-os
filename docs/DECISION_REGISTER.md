@@ -2423,3 +2423,274 @@ Owner decisions of 2026-10-04, given during the parallel run.
 | Version | Date | Change |
 |---|---|---|
 | 0.48 | 2026-10-04 | Owner decisions: DEC-248 (new ticket W1-49, light auto-resume hooks, a light form of CAP-37; engineer, FULL, priority high), DEC-249 (a mid-wave audit by a fresh read-only independent auditor when W1-21 is merged), DEC-250 (after W1-49 closes the orchestrator stops only for owner-level packages, escalations and `WAVE_1_EXIT_READY`). |
+
+## 49. Delegated decisions on W1-08's packages DP-8 and DP-9 (register v0.49, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the two packages the W1-08 (`DAEO-uudf`) ticket lead
+returned after implementation. For each, the proposer's recommendation and the orchestrator's agree, the confidence
+is medium or higher, and the choice is reversible: no reader of either key exists yet.
+
+### DEC-251 — W1-08 DP-8: the value of a `capabilities` entry
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-8 option (a), the test designer's and the lead's recommendation; confidence medium-high for the shape, medium for "both required" · **Under:** DEC-238, CAP-06.e
+- **Decision:** Both keys, `code_intelligence` and `research_corpus`, are required. Each is a closed map with a
+  required boolean `enabled`. `code_intelligence` also has `languages`, a non-empty list of strings when it is
+  enabled. The path map already has this form; the schema is tightened to it, after a short test design round.
+
+### DEC-252 — W1-08 DP-9: the lesson id grammar is the carried form
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-9 option (a), the lead's recommendation; confidence medium-high · **Under:** DEC-227, CAP-41.d
+- **Decision:** `lesson_id` is `^L-[0-9]{4,}$`, the form of the carried lesson `L-0074`, in the shared definitions
+  file and the lesson template. W1-44 carries the Phase-2 lessons without renumbering.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.49 | 2026-10-04 | Delegated under DEC-220: DEC-251 (W1-08 DP-8: both capabilities required, each a closed map with a boolean `enabled`; `languages` non-empty when `code_intelligence` is enabled), DEC-252 (W1-08 DP-9: `lesson_id` is `^L-[0-9]{4,}$`). |
+
+## 50. Owner decisions: integration merges, the W1-01 history test, and containment by commit trailers (W1-50) (register v0.50, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner decisions of 2026-10-04, on the orchestrator's P1 package (the W1-37 merge commit `00e3d539` made
+`test_only_the_test_designer_commits_to_acceptance_tests` of W1-01 fail) and its package on containment findings.
+
+### DEC-253 — The W1-01 history test accepts an integration merge of test-designer commits
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the P1 package, option (a) · **Under:** MR-3, DEC-235, DEC-106
+- **Decision:**
+  - A test designer revises `test_only_the_test_designer_commits_to_acceptance_tests` so that an integration merge
+    commit passes when every change it brings under `tests/acceptance/` comes from commits on the merged side
+    carrying `Role: independent-test-designer`.
+  - Every non-merge commit is still checked exactly as now.
+  - The revision is recorded as a rewrite after implementation, reason "owner decision: integration merges".
+
+### DEC-254 — Merge findings and worker-commit misattributions are records, for now
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the containment package, option (a) · **Under:** DEC-171, DEC-235, DEC-206
+- **Decision:** Until W1-50 is built, a containment finding raised by an integration merge of the main
+  orchestrator, and a finding that attributes a worker's commit to the call of the lead that was waiting for it, are
+  records of permitted actions. They are noted in `governance/project/bootstrap.md` and in each ticket's close row;
+  they are not defects.
+
+### DEC-255 — New ticket W1-50: containment attribution by commit trailers
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER · **Under:** CAP-58, DEC-076, DEC-182, DEC-235 · **Amends:** the Wave 1 ticket set (49 → 50 tickets)
+- **Decision:**
+  - A new ticket, W1-50: role engineer, profile FULL, priority high, depends on W1-03.
+  - KPIs:
+    - a forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each
+      commit's paths against the allowed paths of its own `Role` and `Task` trailers, not against the caller;
+    - a merge commit itself is not a finding when every commit it brings passes that check;
+    - a worker's commit made during another actor's call is judged by its own trailers;
+    - a commit with no `Role` or `Task` trailer is judged against the caller, as today.
+  - Allowed paths: `src/gov/guard/containment*`, `template/governance/kernel/hooks/posttooluse*`,
+    `template/governance/kernel/hooks/pretooluse*`, `tests/unit/containment/**`.
+  - Its test design batch also carries the W1-01 revision of DEC-253.
+  - The Contract gets a covers item under CAP-58, in its own commit.
+  - Written by the orchestrator to make the ticket valid, and open to the owner's change: the estimate of 100 LOC
+    and the failure KPI lines, which mirror the success lines.
+
+### DEC-256 — Order of work around W1-50
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER · **Under:** DEC-235
+- **Decision:**
+  - W1-50 is claimed now, and only its test design batch runs, in its own worktree.
+  - That batch is merged, with the revised W1-01 test included.
+  - The orchestrator confirms W1-01 is green on `w1/integrate` (the W1-37 merge then passes).
+  - Merges and closes resume, W1-37 included.
+  - W1-50's implementation starts after W1-46 is merged, because both touch `src/gov/guard/**`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.50 | 2026-10-04 | Owner decisions: DEC-253 (the W1-01 history test accepts an integration merge whose acceptance-test changes all come from test-designer commits; a rewrite after implementation, "owner decision: integration merges"), DEC-254 (merge findings and worker-commit misattributions are records for now), DEC-255 (new ticket W1-50, containment attribution by commit trailers; engineer, FULL, priority high, depends on W1-03), DEC-256 (W1-50's test batch first and merged; then merges and closes resume; its implementation after W1-46). |
+
+## 51. Delegated decision on W1-18's package DP-3 (register v0.51, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on one of the three packages the W1-18 (`DAEO-1ve2`) ticket
+lead returned. The designer's, the lead's and the orchestrator's recommendations agree, the confidence is medium, and
+the choice is reversible: W1-19 and W1-21, the only callers, are not written. DP-1 (the module's public interface) and
+DP-2 (whether `gov` stops the daemon) are not decided here and go to the owner: on DP-1 the confidence in the names is
+low and it changes the ticket's `allowed_paths`; DP-2 sets aside a phrase of ADR-0002.
+
+### DEC-257 — W1-18 DP-3: "the facet state recorded" is the state in the module's result
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-18 package DP-3 option (a); confidence medium · **Under:** DEC-033, DEC-034, DEC-037, DEC-074 Q4
+- **Decision:**
+  - When Ollama is unavailable, the lifecycle module's result names the facet `semantic`, the state
+    `FACET_UNAVAILABLE` and a non-empty warning that names Ollama and says results are FTS-only. The warning is
+    also written once to standard error. No file is written.
+  - The module reports the state; it does not set a bundle's stopping reason. W1-21 copies the state into the
+    bundle, and how an FTS-only bundle's stopping reason (CAP-55) relates to it is settled there.
+  - The form in which the result is returned follows the owner's answer on DP-1.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.51 | 2026-10-04 | Delegated under DEC-220: DEC-257 (W1-18 DP-3: facet `semantic`, state `FACET_UNAVAILABLE` and a warning in the module's result and on standard error; no file). |
+
+## 52. Delegated decisions on W1-49's packages DP-1 and DP-2 (register v0.52, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on two of the three packages the W1-49 (`DAEO-32n6`) ticket
+lead returned from its test design. For each, the designer's, the lead's and the orchestrator's recommendations
+agree, the confidence is medium or higher, and the choice is reversible: W1-29 replaces both hook files. DP-3 (the
+prompt path injected for a ticket lead) is not decided here: the designer and the lead recommend differently, so it
+goes to the owner. Meanwhile the suite stands as the designer wrote it (option (a): in a worktree, the lead
+checkpoint's path and its RESUME HERE section only), and the owner's answer may add one assertion.
+
+### DEC-258 — W1-49 DP-1: what "ensures the checkpoint is current" means for a PreCompact hook
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-49 package DP-1 option (a) with measure (i); confidence medium-high on the option, medium on the 30 minutes · **Under:** DEC-248, CAP-37.g
+- **Decision:**
+  - A hook can check and block; it cannot write the checkpoint's content. The checkpoint is current when its file
+    is at most 30 minutes old.
+  - On a manual compaction over a checkpoint that is not current, the hook blocks (exit 2) and says why.
+  - On an automatic compaction it lets the compaction through and tells the user, and the SessionStart injection
+    after it says `CHECKPOINT NOT CURRENT` with the path.
+  - **Known gap, told to the owner:** an automatic compaction over a stale checkpoint still proceeds; the session
+    is told only afterwards. With auto-compaction replacing the `CONTEXT_CHECKPOINT` stop (DEC-250) that is the
+    common case, and it rests on the orchestrator and the leads rewriting their checkpoint after every merge,
+    close and stop, as the prompt's section 1 already asks of the orchestrator.
+
+### DEC-259 — W1-49 DP-2: the hooks act only for the orchestrator role
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-49 package DP-2 option (a); confidence high · **Under:** DEC-248, DEC-096, DEC-236
+- **Decision:** The PreCompact and SessionStart hooks act only when `GOV_ROLE` is `orchestrator` (the main
+  orchestrator and the ticket leads). A worker session gets no injection and is not blocked: the lead's checkpoint
+  holds the loop count, which no session inside the loop may see. An unset `GOV_ROLE` is not the orchestrator.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.52 | 2026-10-04 | Delegated under DEC-220: DEC-258 (W1-49 DP-1: current means at most 30 minutes old; a manual compaction is blocked, an automatic one goes through with a notice and a `CHECKPOINT NOT CURRENT` line after it), DEC-259 (W1-49 DP-2: the hooks act only for `GOV_ROLE=orchestrator`). DP-3 goes to the owner. |
+
+## 53. Owner answers on W1-18, W1-37 and W1-49 (register v0.53, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Owner decisions of 2026-10-04, on the three packages the orchestrator presented (W1-18 DP-1 and DP-2, the CAP-24
+version question of W1-37), on W1-49's DP-3, and on the gap the orchestrator reported in DEC-258.
+
+### DEC-260 — W1-18 DP-1: the public interface of the Ollama lifecycle module
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-18 package DP-1 option (a), with both riders · **Under:** DEC-074 Q4, G-22
+- **Decision:**
+  - One function, `gov.retrieval.ollama.ensure_available(*, timeout_s, env=None)`. It returns `available`,
+    `started`, `facet`, `state` and `warning`, and never raises when the daemon is unavailable.
+  - The executable comes from `GOV_OLLAMA_BIN`, then `ollama` on `PATH`, then `~/.local/ollama/bin/ollama`.
+  - The endpoint comes from `OLLAMA_HOST` (default `127.0.0.1:11434`); healthy means `GET /api/version` answers 200.
+  - The default total deadline is 20 s.
+  - `src/gov/retrieval/__init__.py` is added to W1-18's `allowed_paths`, in its own commit with the trailer
+    `Task: DAEO-1ve2`.
+
+### DEC-261 — W1-18 DP-2: `gov` starts the daemon and never stops it
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-18 package DP-2 option (a) · **Under:** DEC-074 Q4, ADR-0002 §3
+- **Decision:**
+  - `gov` starts `ollama serve` on demand and never stops it. Ollama's 5-minute idle unload frees the model's GPU
+    memory, which was the owner's intent.
+  - W1-18 delivers "started by `gov`", not "stopped by `gov`" (ADR-0002 §3). This is an accepted difference,
+    recorded in `governance/project/bootstrap.md`. The ADR is not changed.
+
+### DEC-262 — The owner's reading of CAP-24 for vendored skills
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the W1-37 question left open by DEC-245, option (a) · **Under:** CAP-24, DEC-245, DEC-246
+- **Decision:**
+  - For a vendored skill, the version recorded beside it (`vendored.yaml`) satisfies CAP-24. The copies stay
+    byte-identical to upstream.
+  - This is the owner's reading of CAP-24 for vendored skills; the Contract's text is not changed.
+  - It is noted in W1-30's brief: `gov close` reads a vendored skill's version from the record beside it.
+
+### DEC-263 — W1-49 DP-3: the SessionStart injection is role-specific
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on W1-49 package DP-3 option (b), role-specific · **Under:** DEC-248, DEC-236, CAP-37.g
+- **Decision:**
+  - In the main tree, the injection points to the orchestrator prompt and the orchestrator's checkpoint.
+  - In a worktree, it says "you are the ticket lead for <ticket>; read appendix A5 of
+    governance/project/prompts/w1-orchestrator.md and your checkpoint", plus the lead checkpoint's RESUME HERE
+    section.
+
+### DEC-264 — The PreCompact hook never blocks; it appends a generated state block
+- **Status:** ACCEPTED (owner, 2026-10-04) · **Basis:** OWNER, on the gap reported with DEC-258 · **Amends:** DEC-258 (no compaction is blocked; "current" is no longer a 30-minute age) · **Under:** DEC-248, DEC-250, CAP-37.g
+- **Decision:**
+  - The PreCompact hook doesn't block a compaction. It appends a generated state block to the checkpoint: the git
+    head, the tickets in progress from `tk`, the worktree list and the pending owner decisions.
+  - The SessionStart injection warns when the checkpoint's written part is older than that block, and tells the
+    session to re-derive state from git and the tickets before acting.
+  - This is added to W1-49's KPIs, in its own commit with the trailer `Task: DAEO-32n6`.
+  - The tests that assert a blocked manual compaction are revised by a test designer, as rewrites after
+    implementation where the implementation exists by then, reason "owner decision, DEC-264".
+
+| Version | Date | Change |
+|---|---|---|
+| 0.53 | 2026-10-04 | Owner answers: DEC-260 (W1-18 DP-1: `ensure_available`, executable and endpoint lookup, 20 s total deadline, `src/gov/retrieval/__init__.py` in the ticket's paths), DEC-261 (W1-18 DP-2: `gov` starts the daemon and never stops it; accepted difference from ADR-0002 §3), DEC-262 (CAP-24 for vendored skills: the version in `vendored.yaml` is enough), DEC-263 (W1-49 DP-3: role-specific injection), DEC-264 (the PreCompact hook never blocks and appends a generated state block; amends DEC-258). |
+
+## 54. Delegated decision on W1-08's package DP-10 (register v0.54, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on the package the W1-08 (`DAEO-uudf`) ticket lead returned
+with its DONE. The designer's, the repair worker's, the lead's and the orchestrator's recommendations agree, the
+confidence is medium-high, and the choice is reversible: no reader of the key exists yet.
+
+### DEC-265 — W1-08 DP-10: `languages` is required only when `code_intelligence` is enabled
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-08 package DP-10 option (a); confidence medium-high · **Under:** DEC-251, CAP-06.e
+- **Decision:** When `code_intelligence` has `enabled: true`, `languages` is required and is a non-empty list of
+  strings. When it has `enabled: false`, `languages` may be left out or be any list of strings. The schema is
+  already written this way. The one test case for the disabled form goes to the next test design batch that
+  touches the path-map schema (W1-27, DEC-228), as a described behaviour.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.54 | 2026-10-04 | Delegated under DEC-220: DEC-265 (W1-08 DP-10: `languages` is required only when `code_intelligence` is enabled; the test case goes to W1-27's test design). |
+
+## 55. Delegated decisions on W1-50's test design packages (register v0.55, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on five of the seven packages the W1-50 (`DAEO-xnbx`)
+ticket lead returned with its test design batch. For each, the designer's, the lead's and the orchestrator's
+recommendations agree, the confidence is medium or higher, the choice is reversible, and it never lets through
+something today's containment check flags without the commit's own trailers allowing it. DP-4 (trailers naming a
+ticket that is closed or not started) and DP-5 (a worker's call that makes a commit carrying another role's
+trailers) are not decided here: they set how strong containment is, and on DP-4 the confidence is low. They go to
+the owner.
+
+### DEC-266 — W1-50 DP-1: only a merge in the orchestrator's own call is judged commit by commit
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-1 option (a); confidence high · **Under:** DEC-255, CAP-58.h
+- **Decision:** A non-fast-forward merge is judged commit by commit only when it is made in an orchestrator
+  session's own call (the main orchestrator's integration merge, or a lead taking `w1/integrate` into its ticket
+  branch). A merge in any other caller's call stays flagged, as W1-03 tests it.
+
+### DEC-267 — W1-50 DP-2: own-trailer judging needs both trailers in the final block
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-2 option (a); confidence medium-high · **Under:** DEC-255, DEC-182
+- **Decision:** A commit is judged by its own trailers only when its final trailer block carries both `Role` and
+  `Task`. A commit with one of the two, or with `Role:` and `Task:` lines only in the message body, is judged
+  against the caller, as today.
+
+### DEC-268 — W1-50 DP-3: trailers that name nothing valid allow nothing
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-3 option (a), the fail-closed reading; confidence medium · **Under:** DEC-255
+- **Decision:** When a commit's trailers name an unknown role, an unknown ticket, a role that is not the ticket's,
+  or several different `Role` or `Task` values, the commit has no allowed paths and every path it changes is a
+  finding. A ticket is found by its `id` or its `wbs_id`, as the guard does.
+
+### DEC-269 — W1-50 DP-6: a path the merge commit itself changes is judged by the merge commit's trailers
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-6 option (a); confidence medium-high · **Under:** DEC-255, DEC-156, DEC-253
+- **Decision:** A path a merge commit changes beyond what its parents hold (a conflict resolution, a hand edit) is
+  judged by the merge commit's own trailers, or against the caller when it has none. An orchestrator's conflict
+  resolution under `tests/acceptance/**` is therefore a finding, and elsewhere it is not.
+
+### DEC-270 — W1-50 DP-7: the finding record keeps the caller's role and ticket
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-50 package DP-7 option (a); confidence medium · **Under:** DEC-122, DEC-255
+- **Decision:** In a finding for a commit judged by its trailers, `role` and `ticket` hold the caller's values, as
+  today; the commit id and its trailers are named in `reason`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.55 | 2026-10-04 | Delegated under DEC-220: DEC-266 (W1-50 DP-1: only the orchestrator's own merge is judged commit by commit), DEC-267 (DP-2: both trailers, in the final block), DEC-268 (DP-3: invalid trailers allow nothing), DEC-269 (DP-6: a merge commit's own changes are judged by its trailers), DEC-270 (DP-7: the finding keeps the caller's role and ticket). DP-4 and DP-5 go to the owner. |
+
+## 56. Delegated decisions on W1-46's packages DP-8, DP-9 and DP-13 (register v0.56, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-04 under DEC-220, on three of the nine packages the W1-46 (`DAEO-jdqr`)
+ticket lead returned after implementation and review. For each, the lead's recommendation and the orchestrator's
+agree, the confidence is medium, the choice is reversible, and none loosens the guard, the sandbox or the network
+grant. The other six go to the owner: DP-10, DP-11, DP-12, DP-14 and DP-16 are P1 or set how strong the sandbox and
+the guard are; DP-15 changes the owner's list of research hosts.
+
+### DEC-271 — W1-46 DP-8: which tickets each role may be launched on
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-8 option (a); confidence medium · **Under:** DEC-242, DEC-161
+- **Decision:** `gov launch` starts an engineer or a research session only on a ticket of its own role. An
+  independent test designer and an independent auditor are launched on any ticket that is `in_progress`: their work
+  is always on another role's ticket. This is how "a ticket of another role" in DEC-242 is read.
+
+### DEC-272 — W1-46 DP-9: the key of `research-allowlist.yaml`, and a project without the file
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-9 option (a); confidence medium · **Under:** DEC-241
+- **Decision:** The list is under the key `hosts`. A project without `governance/project/research-allowlist.yaml`
+  launches a research session on the kernel default alone: no file means no extension. One test covers the missing
+  file.
+
+### DEC-273 — W1-46 DP-13: an experiment folder lies under a root the project names
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-04) · **Basis:** W1-46 package DP-13 option (a); confidence medium · **Under:** DEC-242, DEC-163
+- **Decision:** The one folder of a research ticket must lie under a root the project names, `experiments/` by
+  default. `gov launch` refuses a research ticket whose folder is anywhere else, so a research ticket on `.claude/`,
+  `.tickets/`, `governance/project/`, `src/` or `.git/` does not launch.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.56 | 2026-10-04 | Delegated under DEC-220: DEC-271 (W1-46 DP-8: engineer and research on their own role's ticket; test designer and auditor on any ticket in progress), DEC-272 (DP-9: key `hosts`; no project file means the kernel default alone), DEC-273 (DP-13: an experiment folder lies under a named root, `experiments/` by default). DP-10, DP-11, DP-12, DP-14, DP-15 and DP-16 go to the owner. |

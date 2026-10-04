@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "lesson",
+  "description": "Frontmatter of a lesson record. Scope and severity are required from Wave 1 (DEC-168), in lower case (DEC-226); `lifecycle` holds the lesson's state in the lesson loop (CAP-41.a).",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "required": ["lifecycle", "scope", "severity"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/lesson_id" },
+    "type": { "const": "lesson" },
+    "lifecycle": { "enum": ["candidate", "corroborated", "scoped", "proposed", "validated", "approved"] },
+    "scope": { "enum": ["project", "product", "framework"] },
+    "severity": { "enum": ["low", "medium", "high", "critical"] }
+  }
+}

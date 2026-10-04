@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "failure",
+  "description": "Frontmatter of a failure record.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/record_id" },
+    "type": { "const": "failure" }
+  }
+}

@@ -2,7 +2,7 @@
 id: WAVE-1-WBS
 status: PROPOSED
 depends_on: [CHARTER-v5, CONTRACT-v4, ADR-0002]
-decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174, DEC-179, DEC-180, DEC-182, DEC-183, DEC-235, DEC-236, DEC-237, DEC-248, DEC-249, DEC-250]
+decisions: [DEC-065, DEC-076, DEC-080, DEC-083, DEC-084, DEC-086, DEC-087, DEC-088, DEC-089, DEC-090, DEC-091, DEC-092, DEC-093, DEC-094, DEC-096, DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-150, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-174, DEC-179, DEC-180, DEC-182, DEC-183, DEC-235, DEC-236, DEC-237, DEC-248, DEC-249, DEC-250, DEC-253, DEC-254, DEC-255, DEC-256]
 ---
 
 # Wave 1 (Integrate) — work breakdown
@@ -37,6 +37,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 - **Covers items:** every Wave 1 `covers` item of Contract v4 is named by a KPI line of the ticket that delivers it. The line ends with the item id in brackets, for example `[CAP-03.b]`, and the contract item names that ticket as its `provider`. `docs/plan/tools/validate_s1.py` checks this both ways.
 - **Dependencies carry the KPIs:** a ticket depends on every ticket whose output its KPIs need. Each governance test family's check is registered by the ticket that builds its subject, and W1-42 asserts that 17 of 17 families have an executable check.
 - **Audits:** closing a spine, STANDARD or FULL feature specification creates an audit ticket for a fresh Independent Auditor (DEC-088).
+- **Integration merges and containment** (DEC-253, DEC-254, DEC-255). The W1-01 history test accepts an integration merge commit when every change it brings under `tests/acceptance/` comes from commits on the merged side carrying `Role: independent-test-designer`. Until W1-50 judges a HEAD move commit by commit, by each commit's own `Role` and `Task` trailers, a containment finding raised by an integration merge, or one that attributes a worker's commit to its lead's call, is a record of a permitted action, noted in `bootstrap.md` and in the ticket's close row.
 - **Mid-wave audit** (DEC-249). When W1-21 (`gov retrieve`) is merged, a fresh read-only Independent Auditor, in its own worktree and writing to no ticket, checks every ticket closed so far against Contract v4.1 and its covers items, and reports findings. Findings follow the delegation rule (DEC-220); owner-level ones go to the owner.
 - **Stops** (DEC-250). Until W1-49 closes, the orchestrator keeps the `CONTEXT_CHECKPOINT` stop (DEC-237). After W1-49 closes it stops only for owner-level decision packages, escalations and `WAVE_1_EXIT_READY`; context is handled by auto-compaction with the W1-49 hooks.
 - **Loop policy** (DEC-096, amending DEC-044). Every review→repair, audit→repair, test→fix or verification loop runs until it converges, or until three consecutive iterations fail to converge. The third failure goes to the owner as an escalation package. The ticket lead (DEC-236), the orchestrator or `gov` holds the count and never discloses it to the sessions inside the loop.
@@ -94,6 +95,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | W1-47 | `DAEO-o4fg` | Guard hardening: escape hatch, failed commands, oracle path | implementation | engineer | FULL | W1-45 | 60 | DEC-152, DEC-153, DEC-162, DEC-172, DEC-174, DEC-179, DEC-083, EXP-001, CAP-25, CAP-49, CAP-58, CAP-62 |
 | W1-48 | `DAEO-0qs5` | Claude Code version pin | ops | orchestrator | LITE | W1-06 | 10 | DEC-153, DEC-141, DEC-157, DEC-083, CAP-25, CAP-61 |
 | W1-49 | `DAEO-32n6` | Light auto-resume hooks | implementation | engineer | FULL | W1-05 | 120 | DEC-248, DEC-208, DEC-237, DEC-025, CAP-37 |
+| W1-50 | `DAEO-xnbx` | Containment attribution by commit trailers | implementation | engineer | FULL | W1-03 | 100 | DEC-255, DEC-253, DEC-254, DEC-182, DEC-235, DEC-076, CAP-58 |
 
 Bold rows are on the critical path. KPIs (success and failure criteria), `allowed_paths` and the acceptance-test path are in each ticket file.
 
@@ -106,7 +108,7 @@ Layers: a ticket depends only on tickets in earlier layers, so the tickets withi
 | 1 | W1-01 |
 | 2 | W1-02 |
 | 3 | W1-03, W1-04 |
-| 4 | W1-05 |
+| 4 | W1-05, W1-50 |
 | 5 | W1-06, W1-07, W1-08, W1-33, W1-45, W1-49 |
 | 6 | W1-10, W1-12, W1-15, W1-18, W1-25, W1-34, W1-37, W1-47, W1-48 |
 | 7 | W1-09, W1-11, W1-16, W1-17, W1-46 |
@@ -134,7 +136,7 @@ Why this path:
 
 | Class | est. LOC |
 |---|---|
-| implementation | 5580 |
+| implementation | 5680 |
 | skill | 960 |
 | schema | 310 |
 | role-definition | 300 |
@@ -144,9 +146,9 @@ Why this path:
 | template | 60 |
 | integration | 0 |
 | audit | 0 |
-| **Total** | **7630** |
+| **Total** | **7730** |
 
-- **Glue code** (class implementation, Python): **≈ 5,580 LOC**.
+- **Glue code** (class implementation, Python): **≈ 5,680 LOC**.
 - **Everything else** (markdown skills and roles, schemas, templates, YAML): ≈ 2,050 lines.
 - **The one figure:** ADR-0002 quotes this total.
 - **Why the code estimate is higher than earlier ones.** Architecture v0.3 put Wave 1 at ≈ 2,400 LOC, and S0b2's W1 glue list at ≈ 1,830 LOC. Wave 1 is now larger because:
@@ -159,6 +161,7 @@ Why this path:
   - the S2 specification change added the orchestrator write scope (W1-45, 40), the worker session launcher with the minimal research role (W1-46, 220) and the guard hardening (W1-47, 60): +320 LOC (DEC-152, DEC-153, DEC-156, DEC-162, DEC-163);
   - the KPIs the S2 change added to existing tickets were re-estimated (S2A-F-09): W1-30 200 → 220 (the post-green probe record check) and W1-31 120 → 150 (the learning metrics and the sandbox token line, DEC-170), +50 LOC. The KPIs added to W1-33 (role definitions) and W1-35 (skills) fit their existing estimates: both are markdown, and W1-35's skill bodies are capped at 2.5k tokens each. W1-08's two lesson fields and W1-48's two registry entries also fit. The round-2 repair changes no estimate: removing the settings ask rules (DEC-172) fits W1-47's 60, and the launch-time deny list with its later-path test fits W1-46's 220. The four `uv` forms of DEC-174 are a few lines in the install rule and also fit W1-47's 60.
   - the owner added light auto-resume hooks during the parallel run (W1-49, 120): +120 LOC (DEC-248). W1-49 hangs off W1-05 and is off the critical path;
+  - the owner added containment attribution by commit trailers after the first integration merge (W1-50, 100): +100 LOC (DEC-255). W1-50 hangs off W1-03 and is off the critical path; its implementation follows W1-46 (DEC-256);
 - DEC-064 makes the size check a per-wave review, not a stop.
 - **Calibration:** the S0b2 prototypes (guard 174 LOC, decision checker 249 LOC, R1 retrieval 549 LOC) and the carried `cli/govbridge` FTS5 and chunking code.
 

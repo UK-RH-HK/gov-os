@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "path-map",
+  "description": "governance/project/path-map.yaml: the namespaces that classify every tracked path (DEC-225), and the project floor: capabilities, policies and systems (DEC-224, DEC-230, DEC-238).",
+  "type": "object",
+  "required": ["state_class", "namespaces", "capabilities", "policies", "systems"],
+  "properties": {
+    "state_class": { "$ref": "common.schema.json#/$defs/state_class" },
+    "namespaces": {
+      "description": "A name mapped to a namespace. Every tracked path matches a pattern of exactly one namespace.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/namespace" }
+    },
+    "capabilities": {
+      "description": "The capabilities of the project: a closed list of two, both required (DEC-238, DEC-251). A capability that is off is written `enabled: false`, not left out.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code_intelligence", "research_corpus"],
+      "properties": {
+        "code_intelligence": {
+          "description": "When enabled, `languages` is required and non-empty; when not enabled it is not required and, if present, is a list of strings (DEC-251).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "languages": { "type": "array", "items": { "$ref": "#/$defs/text" } }
+          },
+          "if": { "required": ["enabled"], "properties": { "enabled": { "const": true } } },
+          "then": { "required": ["languages"], "properties": { "languages": { "minItems": 1 } } }
+        },
+        "research_corpus": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enabled"],
+          "properties": {
+            "enabled": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "policies": {
+      "description": "The strength of each policy. A key takes only the strengths at or above its kernel minimum (DEC-238), so no project value goes below the kernel floor.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "security", "authority", "test", "change", "human_gate", "tool", "memory", "context", "checkpoint",
+        "model_routing", "budget", "learning", "archive"
+      ],
+      "properties": {
+        "security": { "$ref": "#/$defs/hard_block" },
+        "authority": { "$ref": "#/$defs/hard_block" },
+        "test": { "$ref": "#/$defs/hard_block" },
+        "change": { "$ref": "#/$defs/hard_block" },
+        "human_gate": { "$ref": "#/$defs/hard_block" },
+        "tool": { "$ref": "#/$defs/hard_block" },
+        "memory": { "$ref": "#/$defs/warning_or_stronger" },
+        "context": { "$ref": "#/$defs/warning_or_stronger" },
+        "checkpoint": { "$ref": "#/$defs/warning_or_stronger" },
+        "model_routing": { "$ref": "#/$defs/any_strength" },
+        "budget": { "$ref": "#/$defs/any_strength" },
+        "learning": { "$ref": "#/$defs/any_strength" },
+        "archive": { "$ref": "#/$defs/any_strength" }
+      }
+    },
+    "systems": {
+      "description": "The twenty-two constitutional systems, each identified at least minimally (CAP-54.b, DEC-230).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "constitution-and-policies", "knowledge-fabric", "repository-contract", "agent-organisation", "skills",
+        "tools-and-capabilities", "command-surface", "model-adapters", "orchestration-and-handoffs",
+        "specification-and-planning", "research-and-experiments", "task-system", "product-delivery",
+        "verification-and-governance-tests", "change-impact-control", "checkpoint-and-recovery",
+        "observability-and-cost", "organisational-learning", "independent-audit", "security-and-permissions",
+        "budget-governance", "emergency-stop-and-rollback"
+      ],
+      "properties": {
+        "constitution-and-policies": { "$ref": "#/$defs/system" },
+        "knowledge-fabric": { "$ref": "#/$defs/system" },
+        "repository-contract": { "$ref": "#/$defs/system" },
+        "agent-organisation": { "$ref": "#/$defs/system" },
+        "skills": { "$ref": "#/$defs/system" },
+        "tools-and-capabilities": { "$ref": "#/$defs/system" },
+        "command-surface": { "$ref": "#/$defs/system" },
+        "model-adapters": { "$ref": "#/$defs/system" },
+        "orchestration-and-handoffs": { "$ref": "#/$defs/system" },
+        "specification-and-planning": { "$ref": "#/$defs/system" },
+        "research-and-experiments": { "$ref": "#/$defs/system" },
+        "task-system": { "$ref": "#/$defs/system" },
+        "product-delivery": { "$ref": "#/$defs/system" },
+        "verification-and-governance-tests": { "$ref": "#/$defs/system" },
+        "change-impact-control": { "$ref": "#/$defs/system" },
+        "checkpoint-and-recovery": { "$ref": "#/$defs/system" },
+        "observability-and-cost": { "$ref": "#/$defs/system" },
+        "organisational-learning": { "$ref": "#/$defs/system" },
+        "independent-audit": { "$ref": "#/$defs/system" },
+        "security-and-permissions": { "$ref": "#/$defs/system" },
+        "budget-governance": { "$ref": "#/$defs/system" },
+        "emergency-stop-and-rollback": { "$ref": "#/$defs/system" }
+      }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "namespace": {
+      "description": "One namespace: its paths, its memory class and the seven fields of CAP-03.c.",
+      "type": "object",
+      "required": [
+        "paths", "memory_class", "sensitivity", "permitted_roles", "retention", "export_policy",
+        "embedding_policy", "provenance", "deletion_rebuild"
+      ],
+      "properties": {
+        "paths": {
+          "description": "Patterns in the language of ticket allowed_paths: `**` crosses folders, `*` stays inside one folder.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/text" }
+        },
+        "memory_class": {
+          "description": "Governance and development memory, or customer and runtime product data: one, never both (CAP-03.b).",
+          "enum": ["governance", "product"]
+        },
+        "sensitivity": { "$ref": "#/$defs/text" },
+        "permitted_roles": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "retention": { "$ref": "#/$defs/text" },
+        "export_policy": { "$ref": "#/$defs/text" },
+        "embedding_policy": { "$ref": "#/$defs/text" },
+        "provenance": { "$ref": "#/$defs/text" },
+        "deletion_rebuild": { "$ref": "#/$defs/text" }
+      }
+    },
+    "any_strength": { "enum": ["informational", "warning", "hard-block"] },
+    "warning_or_stronger": { "enum": ["warning", "hard-block"] },
+    "hard_block": { "enum": ["hard-block"] },
+    "system": {
+      "description": "A system is implemented or minimal, with where it lives (path patterns or tool names), or absent, with the reason.",
+      "type": "object",
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["implemented", "minimal", "absent"] },
+        "where": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/text" } },
+        "reason": { "$ref": "#/$defs/text" }
+      },
+      "if": { "properties": { "status": { "const": "absent" } } },
+      "then": { "required": ["reason"] },
+      "else": { "required": ["where"] }
+    }
+  }
+}

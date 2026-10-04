@@ -18,6 +18,7 @@ depends_on:
 - W1-07
 allowed_paths:
 - src/gov/retrieval/ollama*
+- src/gov/retrieval/__init__.py
 - tests/unit/ollama/**
 kpis:
   success:

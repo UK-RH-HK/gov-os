@@ -343,3 +343,46 @@ Live attempts on 2026-10-02, in headless sessions started in the repository root
 | default | Read `README.md` | Allowed |
 
 No file was created and nothing was installed. The session logs are kept by the orchestrator at `~/gov-os-workbench/w1-build/log/w1-05-live-*.jsonl`.
+
+## Parallel run: containment records that are not defects (DEC-254, 2026-10-04)
+
+Until W1-50 (`DAEO-xnbx`) judges a HEAD move commit by commit, by each commit's own `Role` and `Task` trailers, the
+post-command containment check (W1-03) writes two kinds of finding for permitted actions of the parallel run
+(DEC-235). The owner accepted both as records, not defects (DEC-254). Each is also noted in its ticket's close row in
+the orchestrator's checkpoint.
+
+- **An integration merge.** The check flags any HEAD move that contains a merge commit ("HEAD moved (not a forward
+  move on the same branch)"). Every merge of a ticket branch into `w1/integrate` by the main orchestrator, as the
+  orchestrator prompt's section 3 prescribes, writes one such line to `.gov-runtime/findings.jsonl` in the main tree.
+  First seen: the merge of `w1/W1-37`, commit `00e3d539`.
+- **A worker's commit attributed to its lead.** In a ticket's worktree the lead (role orchestrator) waits for its
+  worker with its own Bash calls. When the test designer commits under `tests/acceptance/<W1-id>/` during such a
+  call, the check attributes the commit to the lead's call and flags "committed path(s) outside allowed paths" in
+  that worktree's `.gov-runtime/findings.jsonl`. The commit is the designer's, in the designer's scope. Seen in the
+  worktrees of W1-37, W1-18 and W1-08. A worktree's findings file is copied to
+  `.gov-runtime/scratch/orchestrator/log/<W1-id>-findings.jsonl` in the main tree before the worktree is removed.
+- **The W1-01 history test** failed on the first integration merge for the same reason, and is revised under
+  DEC-253 in W1-50's test design batch.
+
+## Ollama: started by `gov`, not stopped by `gov` (DEC-261, 2026-10-04)
+
+ADR-0002 §3 says the Ollama daemon is "started and stopped by `gov`". W1-18 (`DAEO-1ve2`) delivers the first half
+only: `gov` starts `ollama serve` on demand and never stops it. Ollama's 5-minute idle unload frees the model's GPU
+memory, which was the owner's intent; the `serve` process itself stays. The owner accepted this difference (DEC-261).
+The ADR is not changed.
+
+## W1-37 residuals (Superpowers three-skill copy, 2026-10-04)
+
+Recorded at W1-37's close, from the ticket lead's summary. None is a defect.
+
+- **Zero headroom on the sizes.** The three `SKILL.md` sizes (2,389, 2,360 and 899 by floor(characters ÷ 4),
+  DEC-247) sit exactly on their ceilings. "Characters" is read as decoded UTF-8; counted as bytes the three would be
+  2,394, 2,366 and 911 and fail. Any upstream change to a `SKILL.md` breaks the test.
+- **File modes are not asserted.** `find-polluter.sh` kept its executable bit in the copy, but no test protects it.
+- **No licence in the copy.** `template/governance/kernel/skills/superpowers/` holds no `LICENSE`; the upstream
+  licence stays in the vendor folder, which is the only source (DEC-244).
+- **CAP-24 for vendored skills.** The version is recorded beside the copies, in `vendored.yaml`, not in each
+  `SKILL.md` frontmatter; the owner reads CAP-24 this way for vendored skills (DEC-262). `gov close` (W1-30) reads a
+  vendored skill's version from that record.
+- **Guard refusals met by the engineer.** `mkdir -p` with `cp -R` onto the `superpowers` folder itself was refused,
+  so the files were copied one by one to literal paths.

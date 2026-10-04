@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "decision-package",
+  "description": "Frontmatter of a gate or decision package: the question put to the owner, and the answer once given.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/record_id" },
+    "type": { "enum": ["gate", "decision-package"] }
+  }
+}
