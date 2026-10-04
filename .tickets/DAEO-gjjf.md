@@ -34,6 +34,7 @@ kpis:
   - 'All twelve Wave 1 gov commands are implemented: none returns NOT_IMPLEMENTED [CAP-28.b]'
   - The exit run starts its engineer, test designer and auditor sessions as worker sessions through gov launch, sandboxed with their network profiles (DEC-161)
   - 'The exit report gives, per ticket, the three Wave 1 learning metrics: KPI disputes, acceptance tests rewritten after implementation began with their reasons, and governance share (DEC-106) [CAP-40.c]'
+  - 'The exit report shows, from the orchestrator''s records, that Wave 1 ran tickets in parallel in the light form of DEC-235: each ticket in its own worktree with a ticket lead, merged into the integration branch only by the main orchestrator after green, with every suite re-run after each merge; git worktree list shows no ticket worktree left [CAP-23.c]'
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme
@@ -54,6 +55,8 @@ sources:
 - DEC-106
 - DEC-161
 - CAP-40
+- CAP-23
+- DEC-235
 est_loc: 0
 acceptance_tests:
   path: tests/acceptance/W1-42/

@@ -75,7 +75,7 @@ Generated from the closed Gov OS specification (MR-2): Charter v5, Contract v4 (
 | **W1-39** | `DAEO-5ylr` | Copier kernel template and lock | implementation | engineer | STANDARD | W1-27, W1-38 | 100 | G-14, S0a-G-15, DEC-023, DEC-027, CAP-02, CAP-43, CAP-44, CAP-54 |
 | W1-40 | `DAEO-fdkq` | lefthook and CI workflow | config | engineer | STANDARD | W1-22, W1-26, W1-30 | 80 | S0a-G-11, DEC-075, DEC-087, CAP-39 |
 | **W1-41** | `DAEO-cdoi` | gov adopt --lite and legacy importer | implementation | engineer | FULL | W1-27, W1-33, W1-38, W1-39 | 440 | S0a-G-13, G-10, DEC-006, DEC-090, CAP-06, CAP-42, CAP-44, CAP-54 |
-| **W1-42** | `DAEO-gjjf` | Wave 1 exit run on the dev tiers | integration | orchestrator | FULL | W1-23, W1-32, W1-35, W1-36, W1-40, W1-41, W1-44, W1-46, W1-47 | 0 | DEC-080, DEC-086, DEC-088, DEC-089, DEC-091, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-28, CAP-38, DEC-106, DEC-161, CAP-40 |
+| **W1-42** | `DAEO-gjjf` | Wave 1 exit run on the dev tiers | integration | orchestrator | FULL | W1-23, W1-32, W1-35, W1-36, W1-40, W1-41, W1-44, W1-46, W1-47 | 0 | DEC-080, DEC-086, DEC-088, DEC-089, DEC-091, MR-1, MR-2, MR-3, MR-4, MR-6, CAP-28, CAP-38, DEC-106, DEC-161, CAP-40, CAP-23, DEC-235 |
 | **W1-43** | `DAEO-03pw` | Wave 1 exit audit | audit | independent-auditor | FULL | W1-42 | 0 | DEC-070, DEC-088, DEC-092, DEC-096, MR-4, CAP-47, CAP-59 |
 | W1-44 | `DAEO-wqd6` | Phase-2 lessons as lesson records | documentation | product-spec | LITE | W1-08, W1-21 | 150 | DEC-046, OWNER-DECISION-P2-0008, OWNER-DIRECTION-BR-0004, OWNER-AMENDMENT-P2-0010, CAP-14, CAP-41, CAP-59, DEC-168 |
 | W1-45 | `DAEO-6cc2` | Orchestrator write scope | implementation | engineer | FULL | W1-05 | 40 | DEC-150, DEC-156, DEC-112, DEC-106, DEC-171, MR-3, CAP-58 |
