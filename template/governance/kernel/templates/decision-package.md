@@ -23,7 +23,9 @@ Batching. At most five open packages are asked at a time; the rest wait, highest
 A P1 package may bypass the cap (DEC-093).
 
 State. A gate is in one of five states: open, answered, declined, revoked, stale.
-Open is `status: PROPOSED`. Only an answered gate of the same CIT permits the next actions.
+The state lives in `status` alone, with no second key (DEC-328): `PROPOSED` is open, `ACCEPTED` is answered,
+`DECLINED` is declined, `REVOKED` is revoked and `STALE` is stale.
+Only an answered gate of the same CIT permits the next actions.
 -->
 
 ## Question
