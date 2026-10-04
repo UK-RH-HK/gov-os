@@ -1,6 +1,6 @@
 ---
 id: DAEO-jdqr
-status: open
+status: in_progress
 deps: [DAEO-drvn, DAEO-0qs5, DAEO-o4fg]
 links: []
 created: 2026-10-03T13:05:33Z
