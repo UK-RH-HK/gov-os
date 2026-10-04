@@ -10,16 +10,19 @@ whatever the tool and whatever the call does (a read, a listing, a search, a
 write or a command), in a session started in the repository root".
 
 Every test works in a fixture project whose ``held-out.yaml`` names a stand-in
-directory (see ``w1_47_support.configure_stand_in``). No call is ever made: the
-hook is asked for its decision and nothing else happens.
+directory: a file the test builds itself, with ``held_out_paths`` holding a
+made-up path (``w1_47_support.configure_stand_in``, DEC-218). The committed
+file of this repository plays no part. No call is ever made: the hook is asked
+for its decision and nothing else happens.
 
-"Names the oracle path" is tested where the sources leave no doubt: the input
-carries the configured absolute path, word for word, as a path of its own or as
-the beginning of a path under it. In a Bash command that is a word of the
-command, bare or quoted. In any other tool it is the whole value of an input
-field, at any depth. The other forms (a relative path, a parent directory, a
-glob that matches without naming, a path inside free text or inside code) are a
-decision package in the README, not tests.
+This file holds the plain forms: the input carries the configured absolute
+path, word for word, as a path of its own or as the beginning of a path under
+it. In a Bash command that is a word of the command, bare or quoted. In any
+other tool it is the whole value of an input field, at any depth. The forms
+DEC-215 adds (the path inside free text or code, a relative path, ``..``,
+``~``, ``$HOME``, a symbolic link) and its exception are in
+``test_w1_47_oracle_naming.py``; what the guard does with a missing or broken
+``held-out.yaml`` is in ``test_w1_47_oracle_config.py``.
 """
 
 from __future__ import annotations
@@ -133,28 +136,45 @@ def test_a_read_of_the_oracle_path_is_denied_while_frozen(project, guard, temp_s
 # The path comes from held-out.yaml
 # --------------------------------------------------------------------------
 
-def test_the_guard_takes_the_path_from_the_configuration(project, sandbox, guard, configured):
+def test_the_guard_takes_the_path_from_the_configuration(project, sandbox, guard):
     """KPI success 4: change the configured path and the guard hides the new one and no longer the old one."""
     first = support.make_stand_in(sandbox.tmpdir / "first-stand-in")
     second = support.make_stand_in(sandbox.tmpdir / "second-stand-in")
 
-    support.configure_stand_in(project, first, configured)
+    support.configure_stand_in(project, first)
     result = guard(project, "Read", {"file_path": f"{first}/answers.md"}, ORCHESTRATOR)
     support.assert_denied_by_rule(result, "Read on the configured stand-in")
     result = guard(project, "Read", {"file_path": f"{second}/answers.md"}, ORCHESTRATOR)
     support.assert_allowed(result, "Read on a directory the configuration does not name")
 
-    support.configure_stand_in(project, second, configured)
+    support.configure_stand_in(project, second)
     result = guard(project, "Read", {"file_path": f"{second}/answers.md"}, ORCHESTRATOR)
     support.assert_denied_by_rule(result, "Read on the stand-in, once the configuration names it,")
     result = guard(project, "Read", {"file_path": f"{first}/answers.md"}, ORCHESTRATOR)
     support.assert_allowed(result, "Read on the directory the configuration no longer names")
 
 
-def test_the_oracle_path_is_hidden_through_the_committed_settings(wired, live, live_sandbox, configured):
+@pytest.mark.parametrize("who", (support.ORCHESTRATOR, support.ENGINEER))
+def test_every_path_of_the_list_is_hidden(project, sandbox, guard, who):
+    """DEC-218: ``held_out_paths`` is a list; the guard hides each path of it, and nothing beside them."""
+    first = support.make_stand_in(sandbox.tmpdir / "first-stand-in")
+    second = support.make_stand_in(sandbox.elsewhere / "second-stand-in")
+    third = support.make_stand_in(sandbox.tmpdir / "not-in-the-list")
+    support.configure_stand_in(project, first, second)
+    actor = support.EVERY_SESSION[who]
+    for position, directory in (("first", first), ("second", second)):
+        result = guard(project, "Read", {"file_path": f"{directory}/answers.md"}, actor)
+        support.assert_denied_by_rule(result, f"Read on the {position} of two stand-in paths by {who}")
+        result = guard(project, "Bash", support.bash_input(f"cat {directory}/answers.md"), actor)
+        support.assert_denied_by_rule(result, f"Bash cat on the {position} of two stand-in paths by {who}")
+    result = guard(project, "Read", {"file_path": f"{third}/answers.md"}, actor)
+    support.assert_allowed(result, f"Read on a directory the list does not hold, by {who},")
+
+
+def test_the_oracle_path_is_hidden_through_the_committed_settings(wired, live, live_sandbox):
     """KPI success 4: the rule is live in this repository, through the commands its settings register."""
     stand_in = support.make_stand_in(live_sandbox.tmpdir / "held-out-stand-in")
-    support.configure_stand_in(wired, stand_in, configured)
+    support.configure_stand_in(wired, stand_in)
     for tool_name, tool_input in (
         ("Read", {"file_path": f"{stand_in}/answers.md"}),
         ("Grep", {"pattern": "answers", "path": f"{stand_in}"}),

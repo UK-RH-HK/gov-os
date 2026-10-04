@@ -6,32 +6,35 @@ tests drive the kernel hooks the way the harness does (one JSON object on
 standard input, the decision on standard output) and read the committed settings
 files. Nothing here imports ``src/gov/guard/``.
 
-Three kinds of project are used, all in temporary directories:
+Two kinds of project are used, both in temporary directories:
 
 - the **fixture project** of W1-03 (``w1_03_support.make_project``): a small
   committed repository with both kernel hooks installed at
   ``governance/kernel/hooks/``, the place Copier puts them, and the fixture
-  tickets in progress;
+  tickets in progress. It is also the "project that has the kernel installed"
+  in which the commands of the kernel template's settings file are run
+  (DEC-217);
 - the **wired copy** (``make_wired_copy``): the guard's own files of this
   repository (``src/gov``, the kernel hooks, ``.claude/settings.json``) copied
   into a new repository, so that the commands the committed settings register
-  can be run as the harness runs them, with no ``PYTHONPATH`` from the test;
-- a throw-away root for the static checks' own self-tests.
+  can be run as the harness runs them, with no ``PYTHONPATH`` from the test.
 
-**The qualification oracle.** Its path is held in
-``governance/project/held-out.yaml``. No file of this suite carries that path,
-and no function here opens, lists or stats anything under it. The value is read
-at run time for two purposes only: to check the committed ``Read`` deny rule
-against it, and to check that no file of the ticket repeats it. It is never put
-in a failure message, a test id or a file: every failure about it is raised with
-``pytest.fail(..., pytrace=False)`` and a fixed text.
+**The held-out path.** The paths are held in
+``governance/project/held-out.yaml`` under the key ``held_out_paths``, a list of
+absolute paths (DEC-218). No file of this suite carries a value of that list,
+and no function here opens, lists or stats anything under one. The committed
+file is read at run time by the static checks only (``load_configured``): the
+committed ``Read`` deny rule is built from every path of the list, and no file
+of the ticket repeats one. A value is never put in a failure message, a test id
+or a file: every failure about it is raised with ``pytest.fail(...,
+pytrace=False)`` and a fixed text, and the object that holds the values hides
+them in its ``repr``.
 
 The guard's behaviour is tested against a **stand-in**: a directory created in
-the temporary area, set through the same configuration. ``configure_stand_in``
-takes the committed ``held-out.yaml``, replaces its one path value with the
-stand-in's path and writes the result into the temporary project. So the test
-needs to know nothing about the file's keys, and the temporary project never
-names the oracle.
+the temporary area. ``configure_stand_in`` writes a ``held-out.yaml`` of its own
+into the temporary project, with ``held_out_paths`` holding the stand-in's path.
+The committed file plays no part in it, and the temporary project never names
+the real path: the wired copy leaves the committed absolute ``Read`` rules out.
 """
 
 from __future__ import annotations
@@ -58,10 +61,13 @@ import w1_05_support as live_support    # noqa: E402  the registered commands of
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SUITE_DIR = Path(__file__).resolve().parent
 CONFIG_REL = "governance/project/held-out.yaml"
+CONFIG_KEY = "held_out_paths"
 SETTINGS_REL = ".claude/settings.json"
 TEMPLATE_KERNEL_REL = "template/governance/kernel"
-TEMPLATE_SETTINGS_GLOB = "settings*"
+TEMPLATE_SETTINGS_REL = f"{TEMPLATE_KERNEL_REL}/settings.json"
 CONTAINMENT_HOOK_STEM = "posttooluse"
+GUARD_HOOK_STEM = "pretooluse"
+PROJECT_DIR_VARIABLE = "CLAUDE_PROJECT_DIR"
 
 ENGINEER = check_support.ENGINEER
 ORCHESTRATOR = check_support.ORCHESTRATOR
@@ -111,7 +117,7 @@ KEPT_DENY_RULES = (
     "Edit(config/secrets*)",
     "Bash(sudo:*)",
 )
-# The ticket's ``allowed_paths``, without the two files that may carry the oracle path.
+# The ticket's ``allowed_paths``, without the two files that may carry a held-out path.
 IMPLEMENTATION_GLOBS = (
     "src/gov/guard/**/*",
     "template/governance/kernel/hooks/pretooluse*",
@@ -123,77 +129,66 @@ IMPLEMENTATION_GLOBS = (
 
 
 # --------------------------------------------------------------------------
-# The oracle configuration. The value is never shown.
+# The held-out configuration. A value of the committed file is never shown.
 # --------------------------------------------------------------------------
-
-def _absolute_path_scalars(node):
-    """Every string value of a parsed YAML document that is an absolute path. Keys are not values."""
-    if isinstance(node, str):
-        return [node] if node.startswith("/") else []
-    if isinstance(node, dict):
-        return [found for value in node.values() for found in _absolute_path_scalars(value)]
-    if isinstance(node, (list, tuple)):
-        return [found for value in node for found in _absolute_path_scalars(value)]
-    return []
-
-
-def paths_in_config_text(text):
-    """The absolute paths a ``held-out.yaml`` text holds; ``None`` when the text is not YAML."""
-    try:
-        return _absolute_path_scalars(yaml.safe_load(text))
-    except yaml.YAMLError:
-        return None
-
 
 @dataclass(frozen=True)
 class Configured:
-    """The committed configuration. ``repr`` hides both fields, so no report can print the value."""
-    text: str = ""
-    value: str = ""
+    """The paths of the committed configuration. ``repr`` hides them, so no report can print a value."""
+    values: tuple = ()
 
     def __repr__(self):
         return "Configured(<hidden>)"
 
 
 def load_configured(root=REPO_ROOT):
-    """Read ``governance/project/held-out.yaml`` of ``root``. Opens that one file and nothing else."""
+    """Read ``held_out_paths`` of ``governance/project/held-out.yaml``. Opens that one file and nothing else.
+
+    For the static checks only. Every failure is a fixed text; no value, and
+    nothing derived from one, is shown.
+    """
     path = Path(root) / CONFIG_REL
     if not path.is_file():
-        pytest.fail(
-            f"{CONFIG_REL} does not exist: the oracle path is not configured, so there is nothing the committed "
-            "Read deny rule and the guard's rule could be built from",
-            pytrace=False,
-        )
-    text = path.read_text(encoding="utf-8")
-    found = paths_in_config_text(text)
-    if found is None:
+        pytest.fail(f"{CONFIG_REL} does not exist", pytrace=False)
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except yaml.YAMLError:
         pytest.fail(f"{CONFIG_REL} is not valid YAML", pytrace=False)
-    if len(found) != 1:
-        pytest.fail(
-            f"{CONFIG_REL} holds {len(found)} values that are absolute paths; it must hold exactly one, "
-            "the oracle path (the value itself is not shown)",
-            pytrace=False,
-        )
-    value = found[0]
-    if value.rstrip("/") == "" or "\n" in value:
-        pytest.fail(f"the path value of {CONFIG_REL} is the file-system root or spans lines", pytrace=False)
-    return Configured(text, value)
+    paths = data.get(CONFIG_KEY) if isinstance(data, dict) else None
+    if not isinstance(paths, list) or not paths:
+        pytest.fail(f"{CONFIG_REL} does not hold a non-empty list under the key {CONFIG_KEY} (DEC-218)",
+                    pytrace=False)
+    for value in paths:
+        if not isinstance(value, str) or not value.startswith("/") or value.rstrip("/") == "" or "\n" in value:
+            pytest.fail(
+                f"an entry of {CONFIG_KEY} in {CONFIG_REL} is not an absolute path on one line, or is the "
+                "file-system root (the entry is not shown)",
+                pytrace=False,
+            )
+    return Configured(tuple(value.rstrip("/") for value in paths))
 
 
-def configure_stand_in(project, stand_in, configured):
-    """Write a ``held-out.yaml`` into ``project`` that names ``stand_in`` where the committed one names the oracle."""
-    stand_in = str(stand_in)
-    text = configured.text.replace(configured.value, stand_in)
-    if paths_in_config_text(text) != [stand_in] or (configured.value in text and configured.value not in stand_in):
-        pytest.fail(
-            f"the path value of {CONFIG_REL} could not be replaced by a stand-in: the value must appear in the "
-            "file as it is parsed, once, with no escaping",
-            pytrace=False,
-        )
+def write_config(project, text):
+    """Write ``text`` as the ``held-out.yaml`` of a temporary project."""
     target = Path(project) / CONFIG_REL
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(text, encoding="utf-8")
     return target
+
+
+def stand_in_config_text(*stand_ins):
+    """A ``held-out.yaml`` of the stated shape (DEC-218) whose list holds made-up paths."""
+    return yaml.safe_dump({CONFIG_KEY: [str(path) for path in stand_ins]}, default_flow_style=False)
+
+
+def configure_stand_in(project, *stand_ins):
+    """Give the temporary ``project`` a ``held-out.yaml`` of its own that names the stand-in directories.
+
+    The committed file of this repository is not read: the key is known
+    (DEC-218), so the file is built here from made-up paths alone.
+    """
+    assert stand_ins, "a stand-in path is needed"
+    return write_config(project, stand_in_config_text(*stand_ins))
 
 
 def make_stand_in(directory):
@@ -263,14 +258,14 @@ def is_withdrawn_install_rule(rule):
     return any(prefix == withdrawn or prefix.startswith(withdrawn + " ") for withdrawn in WITHDRAWN_ASK_PREFIXES)
 
 
-def oracle_read_rules(settings, configured):
-    """The ``Read`` deny rules built from the configured path.
+def held_out_read_rules(settings, value):
+    """The ``Read`` deny rules built from one configured path.
 
     The absolute form of a path in a permission rule is ``//<path>``: the rule
     is ``Read(/`` + the configured value + ``)``, where the value may be
     followed by ``/`` or ``/**`` to cover what is under the directory.
     """
-    value = configured.value.rstrip("/")
+    value = value.rstrip("/")
     wanted = {f"/{value}{suffix}" for suffix in ("", "/", "/**")}
     found = []
     for rule in permission_rules(settings, "deny"):
@@ -280,30 +275,85 @@ def oracle_read_rules(settings, configured):
     return found
 
 
-def template_settings_files(root=REPO_ROOT):
-    """Every regular file matching ``template/governance/kernel/settings*``."""
-    directory = Path(root) / TEMPLATE_KERNEL_REL
-    if not directory.is_dir():
-        return []
-    return sorted(path for path in directory.glob(TEMPLATE_SETTINGS_GLOB) if path.is_file())
-
-
 def load_template_settings(root=REPO_ROOT):
-    """The kernel template's settings file, parsed. There must be exactly one."""
-    files = template_settings_files(root)
-    where = f"{TEMPLATE_KERNEL_REL}/{TEMPLATE_SETTINGS_GLOB}"
-    if not files:
-        pytest.fail(f"no file matches {where}: the kernel template has no settings file", pytrace=False)
-    if len(files) != 1:
-        pytest.fail(f"{where} matches {', '.join(p.name for p in files)}; one settings file is expected",
+    """``template/governance/kernel/settings.json``, parsed (DEC-217)."""
+    path = Path(root) / TEMPLATE_SETTINGS_REL
+    if not path.is_file():
+        pytest.fail(f"{TEMPLATE_SETTINGS_REL} does not exist: the kernel template has no settings file",
                     pytrace=False)
-    return load_json_object(files[0], f"{TEMPLATE_KERNEL_REL}/{files[0].name}")
+    return load_json_object(path, TEMPLATE_SETTINGS_REL)
 
 
 def containment_commands(settings, event):
     """The commands registered for ``event`` on Bash that run the containment hook."""
     return [command for command in live_support.hook_commands(settings, event, "Bash")
             if CONTAINMENT_HOOK_STEM in command]
+
+
+def every_hook_command(settings):
+    """Every command a settings file registers, whatever the event and the matcher."""
+    hooks = settings.get("hooks")
+    commands = []
+    for entries in hooks.values() if isinstance(hooks, dict) else []:
+        for entry in entries if isinstance(entries, list) else []:
+            for hook in entry.get("hooks", []) if isinstance(entry, dict) else []:
+                if isinstance(hook, dict) and isinstance(hook.get("command"), str):
+                    commands.append(hook["command"])
+    return commands
+
+
+# --------------------------------------------------------------------------
+# The commands of a settings file, run in a project that has the kernel installed
+# --------------------------------------------------------------------------
+
+def installed_environment(project, sandbox, role=None, ticket=None):
+    """The environment of a hook command in a product repository.
+
+    The kernel hooks are at ``governance/kernel/hooks/`` of the project and
+    the ``gov`` package is installed. Nothing is installed by a test, so the
+    package is put on Python's path instead; a command that sets its own
+    ``PYTHONPATH`` (this repository's ``src``) finds no ``gov`` there.
+    """
+    env = live_support.command_environment(project, sandbox, role, ticket)
+    env["PYTHONPATH"] = str(REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL)
+    return env
+
+
+def run_registered(project, settings, sandbox, event, tool_name, tool_input, role=None, ticket=None,
+                   tool_use_id="toolu_w1_47_template", permission_mode="default"):
+    """Run the commands ``settings`` registers for ``event`` and ``tool_name`` through the shell, one by one."""
+    stdin = json.dumps(live_support.hook_input(project, sandbox, event, tool_name, tool_input,
+                                               permission_mode=permission_mode, tool_use_id=tool_use_id))
+    results = []
+    for command in live_support.hook_commands(settings, event, tool_name):
+        try:
+            proc = subprocess.run(["sh", "-c", command], input=stdin, capture_output=True, text=True,
+                                  cwd=str(project), env=installed_environment(project, sandbox, role, ticket),
+                                  timeout=HOOK_TIMEOUT_S, check=False)
+            results.append(GuardResult(_decision(proc.returncode, proc.stdout), proc.returncode, proc.stdout,
+                                       proc.stderr))
+        except subprocess.TimeoutExpired:
+            results.append(GuardResult("timeout", None, "", "timed out"))
+    return results
+
+
+def combined_decision(results):
+    """What the harness makes of several PreToolUse results: the strictest one; ``none`` when no command ran."""
+    decisions = [result.decision for result in results]
+    for outcome in ("deny", "timeout", "error", "ask"):
+        if outcome in decisions:
+            return outcome
+    return "allow" if decisions else "none"
+
+
+def describe_all(results):
+    return "; ".join(result.describe() for result in results) or "no command is registered"
+
+
+def report_text(results):
+    """The text the post-command results put in front of the agent."""
+    texts = [check_support.agent_text(result.returncode, result.stdout, result.stderr) for result in results]
+    return "\n".join(text for text in texts if text)
 
 
 # --------------------------------------------------------------------------
@@ -405,6 +455,11 @@ def assert_allowed(result, what):
     assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
 
 
+def assert_stopped(result, what):
+    """The call does not go through: a deny decision, or exit code 2, the hook's report of its own failure."""
+    assert result.decision == "deny", f"{what} was let through: {result.describe()}"
+
+
 # --------------------------------------------------------------------------
 # The wired copy: this repository's guard files and committed settings
 # --------------------------------------------------------------------------
@@ -423,6 +478,11 @@ def make_wired_copy(directory, root=REPO_ROOT):
     Only ``src/gov``, the kernel hooks and ``.claude/settings.json`` are copied,
     file by file from git's listing of those three places. Nothing else of the
     working tree is read. The copy gets W1-05's fixture ticket, ``DAEO-zz90``.
+
+    The copy of the settings file leaves out the ``Read`` deny rules with an
+    absolute path (``Read(//...)``), so no temporary project carries a held-out
+    path. Nothing else of the file changes; the hooks are run from the
+    committed file itself.
     """
     import shutil
 
@@ -443,6 +503,12 @@ def make_wired_copy(directory, root=REPO_ROOT):
         path = directory / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+    copied = load_settings(directory)
+    permissions = copied.get("permissions")
+    if isinstance(permissions, dict) and isinstance(permissions.get("deny"), list):
+        permissions["deny"] = [rule for rule in permissions["deny"]
+                               if not (isinstance(rule, str) and rule.replace(" ", "").startswith("Read(//"))]
+        (directory / SETTINGS_REL).write_text(json.dumps(copied, indent=2) + "\n", encoding="utf-8")
     ticket = directory / ".tickets" / f"{live_support.FIXTURE_TICKET_ID}.md"
     ticket.parent.mkdir(parents=True, exist_ok=True)
     ticket.write_text(live_support.fixture_ticket_text(), encoding="utf-8")
@@ -466,6 +532,11 @@ def files_matching(globs, root=REPO_ROOT):
     return sorted(found)
 
 
-def files_naming(paths, needle):
-    """The files among ``paths`` whose text holds ``needle``."""
-    return [path for path in paths if needle in path.read_text(encoding="utf-8", errors="replace")]
+def files_naming(paths, needles):
+    """The files among ``paths`` whose text holds one of ``needles``."""
+    found = []
+    for path in paths:
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if any(needle in text for needle in needles):
+            found.append(path)
+    return found

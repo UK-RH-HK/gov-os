@@ -14,10 +14,15 @@ auditor without a denial".
 Each command is text in the hook's input. None is run, so nothing is installed
 and no network is used.
 
-Not tested here, and why: the research role's exception (the role comes with
-W1-46, which depends on this ticket), and an option before the subcommand that
-takes its value as a separate word (``--directory <path>``). Both are decision
-packages in the README.
+DEC-216: "The install rule knows uv's value options --directory, --project,
+--cache-dir and --config-file, plus uv run -w, and skips their value when
+looking for the subcommand." So ``uv --directory sub add requests`` is an
+install, and ``uv run -w requests script.py`` is one, with the same decisions
+per role as the other forms.
+
+Not tested here: the research role's exception. The role comes with W1-46,
+which depends on this ticket; the clause is tested in W1-46's test design
+(DEC-219).
 """
 
 from __future__ import annotations
@@ -36,8 +41,8 @@ PLAIN = {
     "uv-run-with": "uv run --with requests python script.py",
     "uvx": "uvx ruff check .",
 }
-# The same forms with more words, and with options before the subcommand. Every option here is one word:
-# a flag, or ``--name=value``.
+# The same forms with more words, and with options before the subcommand that are one word: a flag, or
+# ``--name=value``.
 VARIANTS = {
     "uv-add-several": "uv add requests rich",
     "uv-add-dev": "uv add --dev pytest",
@@ -59,7 +64,30 @@ VARIANTS = {
     "after-another-command": "git status --porcelain; uvx ruff check .",
     "second-of-two": "echo start && uv sync",
 }
-INSTALLS = {**PLAIN, **VARIANTS}
+# DEC-216: the four options of ``uv`` that take their value as the next word, and ``-w``, the short ``--with``.
+VALUE_OPTIONS = {
+    "directory-add": "uv --directory sub add requests",
+    "project-add": "uv --project sub add requests",
+    "cache-dir-sync": "uv --cache-dir .uv-cache sync",
+    "config-file-sync": "uv --config-file uv.toml sync",
+    "directory-run-with": "uv --directory sub run --with requests python script.py",
+    "project-run-with": "uv --project sub run --with requests python script.py",
+    "directory-with-equals-add": "uv --directory=sub add requests",
+    "two-value-options-add": "uv --directory sub --cache-dir .uv-cache add requests",
+    "value-option-then-flag-sync": "uv --project sub -q sync",
+    "flag-then-value-option-add": "uv -q --directory sub add requests",
+    "value-that-is-a-subcommand-name-add": "uv --directory run add requests",
+    "value-that-is-a-subcommand-name-sync": "uv --project lock sync",
+    "run-w": "uv run -w requests script.py",
+    "run-w-python": "uv run -w requests python script.py",
+    "run-w-after-a-run-option": "uv run --no-project -w rich python script.py",
+    "option-q-run-w": "uv -q run -w requests script.py",
+    "directory-run-w": "uv --directory sub run -w requests script.py",
+    "second-of-two-directory-add": "echo start && uv --directory sub add requests",
+}
+INSTALLS = {**PLAIN, **VARIANTS, **VALUE_OPTIONS}
+# The forms as DEC-216 words them, for the permission modes.
+NAMED_BY_DEC_216 = ("directory-add", "run-w")
 
 # Commands this change does not classify. The KPI names ``uv run`` without ``--with``; the ticket's body and
 # ``governance/project/bootstrap.md`` ("What stays without a prompt") name the others.
@@ -75,6 +103,12 @@ NOT_CLASSIFIED = {
     "uv-pip-list": "uv pip list",
     "uv-tool-run": "uv tool run ruff check .",
     "uv-version": "uv --version",
+    # DEC-216: the value is skipped, not taken for the subcommand; what follows is a ``uv run`` without ``--with``.
+    "directory-run": "uv --directory sub run python script.py",
+    "directory-named-add-run": "uv --directory add run python script.py",
+    "project-named-sync-run": "uv --project sync run pytest -q",
+    "cache-dir-named-add-lock": "uv --cache-dir add lock",
+    "config-file-run": "uv --config-file uv.toml run python script.py",
 }
 
 
@@ -91,6 +125,17 @@ def test_the_orchestrator_is_asked(project, guard, name):
 def test_the_orchestrator_is_asked_in_every_permission_mode(project, guard, name, mode):
     """KPI failure 6: no permission mode runs the command without the prompt (W1-04: also in Auto mode)."""
     command = PLAIN[name]
+    result = guard(project, "Bash", support.bash_input(command), ORCHESTRATOR, mode=mode)
+    assert result.decision == "ask", (
+        f"`{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"
+    )
+
+
+@pytest.mark.parametrize("mode", support.PERMISSION_MODES)
+@pytest.mark.parametrize("name", NAMED_BY_DEC_216)
+def test_the_orchestrator_is_asked_for_the_forms_of_dec_216_in_every_permission_mode(project, guard, name, mode):
+    """DEC-216, KPI failure 6: "the same decisions as the other forms", in every permission mode."""
+    command = VALUE_OPTIONS[name]
     result = guard(project, "Bash", support.bash_input(command), ORCHESTRATOR, mode=mode)
     assert result.decision == "ask", (
         f"`{command}` by the orchestrator in {mode} mode did not ask: {result.describe()}"

@@ -61,29 +61,30 @@ def guard(sandbox):
 
 @pytest.fixture(scope="session")
 def configured():
-    """The committed ``governance/project/held-out.yaml``. Its value is never shown."""
+    """The paths of the committed ``governance/project/held-out.yaml``, for the static checks. Never shown."""
     return support.load_configured()
 
 
 @pytest.fixture(params=("in-the-temporary-directory", "in-the-repository"))
-def stand_in(request, project, sandbox, configured):
-    """A stand-in directory, configured in the fixture project as the oracle path.
+def stand_in(request, project, sandbox):
+    """A stand-in directory, configured in the fixture project as the held-out path.
 
     Two places: the system temporary directory, where a role's writes are
     otherwise allowed (the scratch set), and the project itself, where the
-    orchestrator's are.
+    orchestrator's are. The project's ``held-out.yaml`` is built from the
+    made-up path alone (DEC-218).
     """
     base = sandbox.tmpdir if request.param == "in-the-temporary-directory" else project
     directory = support.make_stand_in(base / "held-out-stand-in")
-    support.configure_stand_in(project, directory, configured)
+    support.configure_stand_in(project, directory)
     return directory
 
 
 @pytest.fixture()
-def temp_stand_in(project, sandbox, configured):
+def temp_stand_in(project, sandbox):
     """The stand-in in the system temporary directory only."""
     directory = support.make_stand_in(sandbox.tmpdir / "held-out-stand-in")
-    support.configure_stand_in(project, directory, configured)
+    support.configure_stand_in(project, directory)
     return directory
 
 
@@ -97,8 +98,24 @@ def settings():
 
 @pytest.fixture(scope="session")
 def template_settings():
-    """The settings file of the kernel template."""
+    """``template/governance/kernel/settings.json`` (DEC-217)."""
     return support.load_template_settings()
+
+
+@pytest.fixture()
+def installed(template_settings, live_sandbox):
+    """``installed(project, event, tool_name, tool_input, role, ticket)``: the template's commands, run for one call.
+
+    The commands of the kernel template's settings file are run through the
+    shell, as the harness runs them, in a project that has the kernel
+    installed (the fixture project). Returns one result for each command.
+    """
+
+    def _installed(project, event, tool_name, tool_input, role=None, ticket=None, **options):
+        return support.run_registered(project, template_settings, live_sandbox, event, tool_name, tool_input,
+                                      role=role, ticket=ticket, **options)
+
+    return _installed
 
 
 @pytest.fixture()
