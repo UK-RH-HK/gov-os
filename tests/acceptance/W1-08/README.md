@@ -82,8 +82,8 @@ none, by decision package. Covers ids with at least one test: 10 of 13. Without 
    `state_class` must be a non-empty string; null, a number and the empty string are refused.
 9. **Path map.** The top level is DEC-189's: `namespaces` maps a name to a map. Each of the seven namespace fields
    is found by the KPI's word in a key name, at any depth inside the namespace: `sensitiv` · `role` · `retention` or
-   `retain` · `export` · `embed` · `provenance` · `delet` or `rebuild`. One key may serve one field only if removing
-   it is refused. Removing the key from any one namespace must make the path map invalid.
+   `retain` · `export` · `embed` · `provenance` · `delet` or `rebuild`. Removing that key from any one namespace
+   must make the path map invalid.
 10. **The committed path map must load in `gov`** (DEC-185): `gov status --json --root <a folder holding only that
     file>` ends with exit code 0 and no `CONFIG_INVALID`. Today that means it must fit the minimal shape in
     `src/gov/config/`; see the note under "W1-07 revisions".
