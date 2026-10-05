@@ -5,7 +5,12 @@ Test Designer (MR-3). This file covers only the three KPI lines the owner added 
 (containment by commit trailers) are in `README.md` of this folder, by another designer, on another branch.
 
 Files of this half: `w1_50_freeze_support.py`, `test_w1_50_freeze_marker.py`, `test_w1_50_freeze_guard_reading.py`,
-`test_w1_50_freeze_launcher.py`, `test_w1_50_freeze_fixture_settings.py`, and this file.
+`test_w1_50_freeze_launcher.py`, `test_w1_50_freeze_fixture_settings.py`, and this file. A second batch, from the
+findings of a review (DEC-136), added `test_w1_50_freeze_records_file.py`, `test_w1_50_freeze_near_spellings.py`,
+`test_w1_50_freeze_pause_links.py` and `test_w1_50_freeze_live_pause.py`: see "The second batch" below.
+
+The whole half now: 108 cases, 106 run without a session and 2 are live. With the guard's reading, the record and the
+launcher's rule built and `gov pause` unchanged, 42 are red and 64 green.
 
 ## How the tests run
 
@@ -18,8 +23,8 @@ Files of this half: `w1_50_freeze_support.py`, `test_w1_50_freeze_marker.py`, `t
 - **`gov launch`** is read as W1-46's suite reads it: the `--settings` value a stand-in CLI is started with.
 - **The whole-tree fixtures** are run on a synthetic source repository with a settings file made up in the test.
   This repository's own settings file and held-out file are never opened.
-- Run: `python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider -m "not local_only"`. About 16 s for this
-  half. The `local_only` mark is not registered for this folder (its `conftest.py` is the other half's), so pytest
+- Run: `python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider -m "not local_only"`. About 65 s for this
+  half while the four named-pipe cases of the second batch are red (10 s each), about 25 s once they are green. The `local_only` mark is not registered for this folder (its `conftest.py` is the other half's), so pytest
   prints one "unknown mark" warning; the selection works.
 - **One live case** (`local_only`) starts a real engineer session through `gov launch`. A launched test designer
   cannot run it (the sandbox refuses the API host): the ticket lead runs it.
@@ -85,8 +90,9 @@ is a defect) and the brief's rule; the two shapes the sandbox itself makes must 
 | a file the guard may not open (mode 000, non-empty) | frozen | | cannot be read; as today |
 | a byte-order mark before the marker; CRLF line ends; another letter case; blank lines before it; trailing spaces; a very large file with the marker first | frozen | | the stricter reading of a near spelling |
 
-Not pinned: an empty file the guard may not open; the word `FROZEN` inside a line that starts with another word; a
-FIFO or a socket at the path (see "Notes for the engineer").
+Not pinned: an empty file the guard may not open; a FIFO or a socket at the path (see "Notes for the engineer"). The
+word `FROZEN` inside a line that starts with another word was not pinned by the first batch; the second batch pins it
+as frozen (below).
 
 ### The record
 
@@ -127,7 +133,69 @@ A `Read` deny rule with an absolute path, `Read(//...)`, spaces ignored: the for
 fixture that copies the whole tree" is read from the sources by W1-28's check
 (`w1_28_copy_check.whole_tree_copiers`); today it finds exactly those two.
 
-## Earlier suites revised in this batch
+## The second batch: behaviours a review found (DEC-136)
+
+Eight described behaviours, turned into tests from the decisions. 38 cases: 37 run without a session, 1 is live.
+Run on 2026-10-05 with the guard's reading, the record and the launcher's rule built and `gov pause` unchanged: 32 red,
+5 green. The first batch's cases are as they were (the 10 marker cases red by design, the other 59 green). No earlier
+suite's case is contradicted, so none is revised.
+
+| # | Behaviour | File and test | Cases | Red now, and why | Whose |
+|---|---|---|---|---|---|
+| 1 | The records file is a symbolic link | `test_w1_50_freeze_records_file.py`: `test_nothing_is_written_through_a_records_file_that_is_a_link` | 3 | 3 red: the hook appends through the link (into a test file of the project, into a file outside it) and creates a missing target outside the project | hook, now |
+| 2 | The records file is a named pipe | same file: `test_a_named_pipe_as_records_file_does_not_hold_the_hook` | 4 | 4 red: the hook gives no answer within 10 s for any of the four calls | hook, now |
+| 3 | A call a later rule denies is recorded | same file: `test_a_denied_call_is_not_recorded` | 3 | 2 red: the `sudo` call and the worker's install are in `records.jsonl` as "recorded". Green: a write outside the ticket's paths, denied by the guard's decision, leaves no line | hook, now |
+| 4 | Near spellings of the marker | `test_w1_50_freeze_near_spellings.py`: `test_a_near_spelling_of_the_marker_freezes` (17), `test_a_file_that_does_not_carry_the_word_is_no_freeze_in_any_encoding` (2) | 19 | 17 red: each form reads as no freeze. Green: the two files without the word | guard, now |
+| 5 | `.gov-runtime` is not a folder | same file: `test_a_project_without_a_runtime_folder_is_not_frozen`, `test_a_regular_file_where_the_runtime_folder_should_be_is_no_freeze`, `test_a_dangling_link_where_the_runtime_folder_should_be_freezes` | 3 | 1 red: a dangling link reads as nothing at the path. Green: no runtime folder; a regular file in its place | guard, now |
+| 6 | `gov pause` and links | `test_w1_50_freeze_pause_links.py`: `test_pause_over_a_link_at_the_flag_s_path_is_a_real_pause` (3), `test_pause_writes_nothing_through_a_runtime_folder_that_is_a_link` (1) | 4 | 4 red: "paused" with the link still at the path and nothing frozen; the dangling link's target created; the flag written in the folder outside the project | `gov pause`, later |
+| 7 | `gov pause --off` over a directory | same file: `test_lifting_a_pause_over_a_directory_is_refused_in_the_envelope` | 1 | 1 red: an unhandled `IsADirectoryError`, no envelope | `gov pause`, later |
+| 8 | A flag put over the placeholder during a command stays | `test_w1_50_freeze_live_pause.py`: `test_a_flag_put_over_the_placeholder_during_a_command_stays` (live) | 1 | Not run here | the lead runs it |
+
+The time limit of behaviour 2 is the test's own: the hook's process is killed after 10 s, so a run cannot hang. While
+those four cases are red they add about 40 s to a run.
+
+### The readings pinned by the second batch
+
+| Point | Reading | Source |
+|---|---|---|
+| A records file that is a symbolic link | Nothing is written through it, whatever it points to; a missing target is not created; the call is allowed as without the link. Whether the link is left, and whether the observation is kept elsewhere, is not pinned. | DEC-176, DEC-311 (the guard denies every role a write outside its paths; the hook itself runs outside the sandbox and must not be the way round that); "never blocks", first batch |
+| A named pipe as records file | The hook answers within the test's limit with the decision it gives without the pipe: `sudo` denied, a worker's install denied, a harmless command and a write inside the ticket's paths allowed. The pipe is still a pipe afterwards. | DEC-179: a hook that hangs is let through by the harness when its time limit ends, so a hang fails open; DEC-402: the record is an observation |
+| A denied call | Not in `records.jsonl`. Pinned for a call denied by the sudo rule, by the install rule and by the guard's own decision. | DEC-171 and DEC-177: a record is "a change the orchestrator makes", a call that happened; the first batch's "one line for each call that is let through". A line `action: "recorded"` for a `sudo` command says to its reader that the command ran. The guard's own denials already leave no line. |
+| An install that is answered "ask" | Not pinned: the owner may still refuse it. Today it is recorded. | no source |
+| The marker line in UTF-16 or UTF-32, with or without a byte-order mark; a doubled UTF-8 byte-order mark | frozen | DEC-179 and the first batch's reading of a byte-order mark: the file carries the word and the guard cannot tell that it is not a marker line. A flag written by hand on another system (a Windows shell writes UTF-16) must freeze. |
+| A NUL, a no-break space or a zero-width space before the word; a NUL right after it | frozen | the same: a person reading the file sees a marker line |
+| `FROZEN:`, `FROZEN,`, `FROZEN.`, `"FROZEN"`, `# FROZEN`, `state: FROZEN`, `FROZEN_BY` | frozen | the same. This pins what the first batch left open: the word inside a line that starts with another word. What follows the word is not read (W1-02; first batch). |
+| The rule behind the three rows above | **A file at the flag's path that carries the word, in any letter case and in any of these encodings, freezes.** The plainest rule that passes: take the NUL bytes out of what was read and look for the word. | DEC-179 |
+| A file that does not carry the word, in any encoding (other text in UTF-16; a byte-order mark alone) | no freeze | DEC-402: "an empty file, or one without that marker" |
+| The word inside a longer word or after a negation (`unfrozen`, `not frozen`) | Not tested. The rule above freezes them; an implementation that tells them apart is not contradicted by a test. | none; nothing the system writes puts such text at the path |
+| No `.gov-runtime` at all | no freeze | DEC-109; as today, must stay |
+| A regular file where `.gov-runtime` should be (empty, 0444) | no freeze; the call is allowed and the file is left as it is | The guard can tell: no flag can be at the path. And the sandbox puts its placeholder at the first missing part of a denied path, so this shape can be the sandbox's own in a project that has no runtime folder (not verified here). What the sandbox produces must not freeze. |
+| A dangling symbolic link where `.gov-runtime` should be | frozen; the link is left, its target is not created | DEC-179, and the first batch's reading of a dangling link at the flag's path: the folder that would hold the flag cannot be reached, so the guard cannot tell. The sandbox does not make this shape. |
+| `gov pause` over a link at the flag's path (to `/dev/null`, to another file, to nothing) | The pause succeeds and leaves a regular file that is not a link; the guard then denies the next write; the link's target is unchanged or not created. | The first batch's "a pause over an unmarked file becomes a real, marked flag" (DEC-402; W1-28: a successful pause freezes): a link to `/dev/null` or to an unmarked file is an unmarked presence. A refusal is not accepted here: replacing a name the command owns is always possible, and a planted link must not block the emergency stop (DEC-179). |
+| `gov pause` when `.gov-runtime` is a link to a folder elsewhere | Only what holds under both answers of package DP-F4: nothing is written in the folder elsewhere; "paused" only with a real folder, a regular flag and a guard that denies; otherwise an error of the command, with the link left. | the brief's expected result; DP-F4 |
+| `gov pause --off` with a directory at the flag's path | An error in the command's envelope (not a usage error) that names `.gov-runtime/freeze`; the directory stays and the tree stays frozen. The error code is not pinned. | API-0002 (every command answers in the envelope); DEC-365; the guard reads a directory as a freeze (first batch) |
+| A flag put over the sandbox's placeholder during a command | It is still there, with its content, at every moment after it was put: while the command runs, when it has ended, when the session has ended. | DEC-402; "a pause set at any moment stays set" (the brief) |
+
+### The live case of the second batch
+
+`test_a_flag_put_over_the_placeholder_during_a_command_stays` is marked `local_only` as the first batch's live case is,
+and needs the same things (`bwrap`, `socat`, the CLI, the API). It starts one engineer session through `gov launch` in
+a temporary project that holds a marked flag, so the session's settings name the flag's path. A thread of the test
+plays the owner from outside the sandbox:
+
+1. when the launcher's temp folder appears (the settings are built by then; the test gives the launcher a `TMPDIR` of
+   its own so that no other launch is mistaken for it), it removes the flag;
+2. when something appears at the path again (the sandbox's placeholder, while the session's one Bash command of
+   about 15 s runs), it renames a new marked flag over it;
+3. from then on it notes every change of what is at the path, with the time and whether the command had ended.
+
+The case fails without a verdict on the behaviour when it did not observe it (no session, the probe did not end, no
+placeholder appeared, or the placeholder appeared only after the command). When the flag did not stay, the failure
+message says what was at the path at each change (gone, emptied, replaced by what), whether during or after the
+command, and what was there when the session had ended. **It is not known what the sandbox's clean-up does: a red
+result is a decision package, not a defect of the ticket's code.**
+
+## Earlier suites revised in the first batch
 
 Each is a rewrite after implementation in the sense of DEC-106.
 
@@ -213,7 +281,37 @@ DP-F2.
 - **Does the implementation depend on it?** Only the line `gov pause` writes. It can be built to (a) and changed in
   one place.
 
+### DP-F4: `gov pause` when `.gov-runtime` is a symbolic link to a folder elsewhere
+
+- **Question.** When `.gov-runtime` of the project is a symbolic link to a folder outside the project, does
+  `gov pause` refuse, or does it replace the link by a real folder and set the flag there?
+- **Why now.** Today the command says "paused" and writes the flag in the folder elsewhere. The review's expected
+  result excludes writing through the link and leaves these two answers; no decision chooses between them.
+- **Options.** (a) Refuse: an error of the command that names the link; nothing is written; the owner repairs the
+  folder and pauses again. (b) Replace: remove the link, make a real `.gov-runtime`, write the flag; the pause
+  succeeds.
+- **Impact.** (a) The emergency stop does not work until the owner has repaired the folder; nothing is lost and the
+  owner sees the abnormal state. (b) The stop works at once; the findings, records and snapshots in the folder
+  elsewhere are no longer the project's (they stay where they are, unseen), and the command changes `.gov-runtime`
+  itself, which is outside what it declares it acts on (`ACT_PATHS`: `.gov-runtime/freeze`, `.tickets/**`).
+- **Reversibility.** (a) full. (b) the link can be put back by hand; what the hooks wrote into the new folder in the
+  meantime must then be merged by hand.
+- **Cost.** A few lines either way. One more test for the chosen answer.
+- **Recommendation.** (a). **Confidence:** medium. A linked runtime folder is a state the owner should see, and the
+  command should not rearrange the runtime folder on its own; against it, (a) lets a planted link delay a pause.
+- **Does the implementation depend on it?** Only this one case of `gov pause`, which is not built yet. The test in
+  place holds under both answers. Nothing of the guard or the hook depends on it.
+
 ## Notes for the engineer
+
+- **Second batch, the hook.** The record is to be written only to a regular file inside a real `.gov-runtime/`: no
+  following of a link, no blocking open (`O_NOFOLLOW`, `O_NONBLOCK`, then a check that what was opened is a regular
+  file), and only once the call is known to be let through. `_append_finding` of the hook and `_write_records` and
+  `_record_findings` of `containment.py` open their files the same way as the record did; no behaviour of this batch
+  covers them, so no test does (reported to the lead as a gap).
+- **Second batch, the guard.** One rule passes all near-spelling cases: the word, in any letter case, anywhere in
+  what was read once the NUL bytes are taken out. A dangling link at `.gov-runtime` is the one new shape of "cannot
+  tell"; a regular file there and no folder at all stay "nothing at the path".
 
 - **Do not open what is not a regular file.** A FIFO at the path would block a plain `open`, and the harness lets a
   call through when a hook times out. A very large file should not be read whole.
