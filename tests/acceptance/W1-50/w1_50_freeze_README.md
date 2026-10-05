@@ -9,8 +9,23 @@ Files of this half: `w1_50_freeze_support.py`, `test_w1_50_freeze_marker.py`, `t
 findings of a review (DEC-136), added `test_w1_50_freeze_records_file.py`, `test_w1_50_freeze_near_spellings.py`,
 `test_w1_50_freeze_pause_links.py` and `test_w1_50_freeze_live_pause.py`: see "The second batch" below.
 
-The whole half now: 108 cases, 106 run without a session and 2 are live. With the guard's reading, the record and the
-launcher's rule built and `gov pause` unchanged, 42 are red and 64 green.
+A third batch brought the cases to DEC-404 and repaired the second live case: see "The third batch" below.
+
+The whole half now: 111 cases, 109 run without a session and 2 are live. Run on 2026-10-05 with the guard's reading, the
+record and the launcher's rule built and `gov pause` unchanged: 16 red and 93 green. Every red case waits for
+`gov pause` (10 in `test_w1_50_freeze_marker.py`, 6 in `test_w1_50_freeze_pause_links.py`).
+
+| File | Cases | Red now | Green now |
+|---|---|---|---|
+| `test_w1_50_freeze_marker.py` | 11 | 10 | 1 |
+| `test_w1_50_freeze_guard_reading.py` | 33 | 0 | 33 |
+| `test_w1_50_freeze_launcher.py` | 16 and 1 live | 0 | 16 |
+| `test_w1_50_freeze_fixture_settings.py` | 10 | 0 | 10 |
+| `test_w1_50_freeze_records_file.py` | 10 | 0 | 10 |
+| `test_w1_50_freeze_near_spellings.py` | 22 | 0 | 22 |
+| `test_w1_50_freeze_pause_links.py` | 7 | 6 | 1 |
+| `test_w1_50_freeze_live_pause.py` | 1 live | not run here | |
+| **All** | **109 and 2 live** | **16** | **93** |
 
 ## How the tests run
 
@@ -23,15 +38,16 @@ launcher's rule built and `gov pause` unchanged, 42 are red and 64 green.
 - **`gov launch`** is read as W1-46's suite reads it: the `--settings` value a stand-in CLI is started with.
 - **The whole-tree fixtures** are run on a synthetic source repository with a settings file made up in the test.
   This repository's own settings file and held-out file are never opened.
-- Run: `python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider -m "not local_only"`. About 65 s for this
-  half while the four named-pipe cases of the second batch are red (10 s each), about 25 s once they are green. The `local_only` mark is not registered for this folder (its `conftest.py` is the other half's), so pytest
+- Run: `python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider -m "not local_only"`. About 25 s for this
+  half now that the four named-pipe cases of the second batch are green. The `local_only` mark is not registered for this folder (its `conftest.py` is the other half's), so pytest
   prints one "unknown mark" warning; the selection works.
-- **One live case** (`local_only`) starts a real engineer session through `gov launch`. A launched test designer
-  cannot run it (the sandbox refuses the API host): the ticket lead runs it.
+- **Two live cases** (`local_only`) each start a real engineer session through `gov launch`. A launched test
+  designer cannot run them (the sandbox refuses the API host): the ticket lead runs them, with `-m local_only`.
 
 ## The three KPI lines
 
-70 cases: 69 run without a session, 1 is live. Before implementation 30 are red and 39 green.
+70 cases when the first batch was written: 69 run without a session, 1 is live. Before implementation 30 were red
+and 39 green. The table is that batch's; the counts of today are in the table at the top.
 
 | KPI line | File | Cases | Red before implementation, and why |
 |---|---|---|---|
@@ -62,7 +78,7 @@ Success and failure of each line:
 | The word | `FROZEN` | DEC-402: "(for example `FROZEN`, with who and when)". The owner's own example is taken. |
 | Who | `owner` when `GOV_ROLE` is unset, `orchestrator` otherwise | DEC-365; DEC-378 uses the same two names for the `Role:` trailer |
 | When | UTC, `YYYY-MM-DDTHH:MM:SSZ`; the form is tested, never the value | the form the project's records use: `src/gov/guard/containment.py:432` |
-| The first line `gov pause` writes | `FROZEN <who> <when>`, single spaces | The three parts are DEC-402's. **Their order and the separator are this designer's plainest arrangement, decided by no source**: see package DP-F3. |
+| The first line `gov pause` writes | `FROZEN <who> <when>`, single spaces | DEC-404 (on package DP-F3, option a). The three parts are DEC-402's. |
 | Which commands write it | plain pause, `--cancel-agents`, `--rollback` (also when the rollback fails) | DEC-368, DEC-378 |
 | A pause over an unmarked file | it becomes a real, marked flag | DEC-402: only a marked flag freezes; W1-28: a successful pause freezes |
 | A second pause | succeeds, the first line is still a marker line; whether it is rewritten is not pinned | W1-28 `test_pause_on_a_paused_project_succeeds_and_stays_paused` |
@@ -124,7 +140,7 @@ outside the ticket's paths, so there is no package on this point.
 | A marked flag at launch | it has a literal rule, as every name that exists at launch | DEC-311 |
 | The pattern rules | unchanged: they cover the flag's path for the file tools | DEC-180 |
 | `s`, `sc`, `scr`, `scra`, `scrat`, `scratc`, and the names at launch | unchanged | DEC-402 names the flag alone |
-| An empty or unmarked file at the path at launch | **open**: package DP-F1, no test | DEC-311 and DEC-402 point different ways |
+| An empty or unmarked file at the path at launch | it has a literal rule, as every name that exists at launch | DEC-404 (on package DP-F1, option a); DEC-311 |
 
 ### The held-out deny line (DEC-399)
 
@@ -136,7 +152,8 @@ fixture that copies the whole tree" is read from the sources by W1-28's check
 ## The second batch: behaviours a review found (DEC-136)
 
 Eight described behaviours, turned into tests from the decisions. 38 cases: 37 run without a session, 1 is live.
-Run on 2026-10-05 with the guard's reading, the record and the launcher's rule built and `gov pause` unchanged: 32 red,
+The counts and the "red now" column below are that batch's, before the hook and the guard were changed; behaviours 1
+to 5 are green now, and the runtime-folder case of behaviour 6 was replaced in the third batch. Run on 2026-10-05 with the guard's reading, the record and the launcher's rule built and `gov pause` unchanged: 32 red,
 5 green. The first batch's cases are as they were (the 10 marker cases red by design, the other 59 green). No earlier
 suite's case is contradicted, so none is revised.
 
@@ -172,7 +189,7 @@ those four cases are red they add about 40 s to a run.
 | A regular file where `.gov-runtime` should be (empty, 0444) | no freeze; the call is allowed and the file is left as it is | The guard can tell: no flag can be at the path. And the sandbox puts its placeholder at the first missing part of a denied path, so this shape can be the sandbox's own in a project that has no runtime folder (not verified here). What the sandbox produces must not freeze. |
 | A dangling symbolic link where `.gov-runtime` should be | frozen; the link is left, its target is not created | DEC-179, and the first batch's reading of a dangling link at the flag's path: the folder that would hold the flag cannot be reached, so the guard cannot tell. The sandbox does not make this shape. |
 | `gov pause` over a link at the flag's path (to `/dev/null`, to another file, to nothing) | The pause succeeds and leaves a regular file that is not a link; the guard then denies the next write; the link's target is unchanged or not created. | The first batch's "a pause over an unmarked file becomes a real, marked flag" (DEC-402; W1-28: a successful pause freezes): a link to `/dev/null` or to an unmarked file is an unmarked presence. A refusal is not accepted here: replacing a name the command owns is always possible, and a planted link must not block the emergency stop (DEC-179). |
-| `gov pause` when `.gov-runtime` is a link to a folder elsewhere | Only what holds under both answers of package DP-F4: nothing is written in the folder elsewhere; "paused" only with a real folder, a regular flag and a guard that denies; otherwise an error of the command, with the link left. | the brief's expected result; DP-F4 |
+| `gov pause` when `.gov-runtime` is a symbolic link (to a folder elsewhere, or to nothing) | The command refuses: an error in the envelope whose message names `.gov-runtime`, and no "paused". Nothing is written: nothing new in the folder elsewhere, a missing target not created, no flag, the link left as it was. The error code is not pinned. | DEC-404 (on package DP-F4, option a). The second batch pinned only what held under both answers; the third batch brought the case to the decided one. |
 | `gov pause --off` with a directory at the flag's path | An error in the command's envelope (not a usage error) that names `.gov-runtime/freeze`; the directory stays and the tree stays frozen. The error code is not pinned. | API-0002 (every command answers in the envelope); DEC-365; the guard reads a directory as a freeze (first batch) |
 | A flag put over the sandbox's placeholder during a command | It is still there, with its content, at every moment after it was put: while the command runs, when it has ended, when the session has ended. | DEC-402; "a pause set at any moment stays set" (the brief) |
 
@@ -189,11 +206,46 @@ plays the owner from outside the sandbox:
    about 15 s runs), it renames a new marked flag over it;
 3. from then on it notes every change of what is at the path, with the time and whether the command had ended.
 
+**Repaired in the third batch.** The lead's first run failed after 7 s: the session answered DONE without running
+the probe, because its one Bash call was answered "Sandbox is required but failed to initialize: Failed to create
+bridge sockets after 5 attempts". The test's `TMPDIR` was a folder under pytest's temporary directory; the launcher
+makes the session's temp folder under it and the sandbox makes Unix sockets under that, whose path is limited to
+about 107 bytes. This is the likely cause and is not verified here. Now the launcher's `TMPDIR` is a folder the test
+makes with `tempfile.mkdtemp` directly under `/tmp` (`/tmp/w150-<8 characters>`, 18 bytes, checked against a limit
+of 20) and removes when it ends. The session's temp folder is then 47 bytes long, shorter than that of a launched
+test designer (51 bytes), whose sandbox starts on this machine. The session is started with
+`--output-format stream-json --verbose`, and every failure of the "observed nothing" kind shows the session's exit
+code, its tool calls, what the harness answered to each and its final answer.
+
 The case fails without a verdict on the behaviour when it did not observe it (no session, the probe did not end, no
-placeholder appeared, or the placeholder appeared only after the command). When the flag did not stay, the failure
+placeholder appeared, or the placeholder appeared only after the command). It never passes and is never skipped in
+those cases. When the flag did not stay, the failure
 message says what was at the path at each change (gone, emptied, replaced by what), whether during or after the
 command, and what was there when the session had ended. **It is not known what the sandbox's clean-up does: a red
 result is a decision package, not a defect of the ticket's code.**
+
+## The third batch: DEC-404, and the second live case repaired
+
+DEC-404 decided four of the five packages. The cases were read against it; none contradicted it. One case was brought
+to the decided answer and three were added. No earlier suite's case is revised in this batch.
+
+| What | File and test | Cases | Now, and why |
+|---|---|---|---|
+| DP-F4 (a): `gov pause` refuses when `.gov-runtime` is a symbolic link. It replaces `test_pause_writes_nothing_through_a_runtime_folder_that_is_a_link` (1 case, which allowed both answers of the package) | `test_w1_50_freeze_pause_links.py`: `test_pause_refuses_when_the_runtime_folder_is_a_link` (a folder elsewhere; nothing) | 2 | 2 red. A folder elsewhere: the command says "paused" and writes the flag in that folder. Nothing: an unhandled `FileExistsError`, no envelope. |
+| "A temporary file and a rename": no temporary file stays beside the flag | same file: `test_a_pause_leaves_no_other_name_beside_the_flag` (a pause over the placeholder) | 1 | Green: it pins something that holds today (`touch` leaves no other name) and must still hold once the write is a temporary file and a rename. |
+| DP-F1 (a): an unmarked file at the flag's path at launch is denied by name | `test_w1_50_freeze_launcher.py`: `test_an_unmarked_file_at_the_path_at_launch_has_a_literal_rule_too` | 1 | Green: the launcher as built names every name that exists at launch. |
+| The second live case observes something or fails | `test_w1_50_freeze_live_pause.py` | 1 live | Not run here: see "The live case of the second batch". |
+
+What DEC-404 names and the cases already held, unchanged: the layout `FROZEN <who> <when>`, with who and when
+(`assert_marker`, `MARKER_LINE`); `--cancel-agents` and `--rollback` leave a marked flag (`test_w1_50_freeze_marker.py`);
+a pause never writes through a link at the flag's path and leaves a regular file
+(`test_pause_over_a_link_at_the_flag_s_path_is_a_real_pause`); `--off` over a directory is a refusal in the envelope;
+the guard's wider reading (`test_w1_50_freeze_near_spellings.py`, `test_w1_50_freeze_guard_reading.py`).
+
+**No case for the read-back by the guard's own reader as a step of its own.** What can be seen of it from outside is
+that the flag `gov pause` leaves is one the guard reads as a freeze, which
+`test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask. A read-back that fails cannot be
+brought about through the command line without a fault put into the command, so it is the engineer's unit test.
 
 ## Earlier suites revised in the first batch
 
@@ -219,6 +271,18 @@ launched session cannot create `.gov-runtime/freeze`. Without the literal rule n
 DP-F2.
 
 ## Decision packages
+
+DP-F1, DP-F3, DP-F4 and DP-F5 are decided by **DEC-404** (orchestrator, delegated under DEC-220, 2026-10-05). **DP-F2
+stays open with the owner**; nothing of this half depends on it. DP-F1 to DP-F4 are kept below as they were
+returned; DP-F5 was the lead's package and is not written out here.
+
+| Package | State | How it was decided |
+|---|---|---|
+| DP-F1 | decided, DEC-404 | Option (a): `gov launch` denies the flag's path by name whenever a file exists there at launch, marked or not (DEC-311). A placeholder renewed this way freezes nothing. |
+| DP-F2 | **open, the owner's** | It lowers a protection. W1-46's live case `test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable` is left as it is until the answer. |
+| DP-F3 | decided, DEC-404 | Option (a): the first line is `FROZEN <who> <when>` with single spaces; who is `owner` or `orchestrator`, when is UTC `YYYY-MM-DDTHH:MM:SSZ`. The guard's wider reading stays as built. |
+| DP-F4 | decided, DEC-404 | Option (a): when `.gov-runtime` is a symbolic link, `gov pause` refuses with an error that names the link and writes nothing. The owner repairs the folder. |
+| DP-F5 | decided, DEC-404 | Option (a): `tests/unit/install/**` is added to the ticket's `allowed_paths`, so the engineer updates the one builder test that sets an empty flag. No acceptance test follows from it. |
 
 ### DP-F1: an empty or unmarked file at the flag's path at launch
 

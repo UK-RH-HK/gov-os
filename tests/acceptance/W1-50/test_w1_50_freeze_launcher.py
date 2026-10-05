@@ -16,8 +16,8 @@ Three parts:
   flag when nothing is at its path; a flag that exists at launch keeps its
   literal rule, as every name under ``.gov-runtime/`` does (DEC-311); the
   patterns still cover the path for the file tools; the launcher's other
-  by-name rules are as they were. What the launcher does with an *unmarked*
-  file at the path is an open package (README) and is not tested.
+  by-name rules are as they were. An *unmarked* file at the path at launch is
+  denied by name like any name that exists (DEC-404, on package DP-F1).
 - **What the guard still holds** once the literal rule is gone: a worker's
   Write, Edit and recognisable Bash writes to the flag's path are denied
   whether nothing, a placeholder or a real flag is there. These hold today.
@@ -78,6 +78,18 @@ def test_a_flag_that_exists_at_launch_keeps_its_literal_rule(freeze_launch, free
     assert FLAG_NAME in names, (
         f"a marked flag exists at launch and no literal Edit rule names it: a worker's Bash could remove it. "
         f"Literal names: {names}"
+    )
+
+
+def test_an_unmarked_file_at_the_path_at_launch_has_a_literal_rule_too(freeze_launch, freeze_launch_project,
+                                                                       freeze_sandbox):
+    """DEC-404 (DP-F1, option a): denied by name whenever a file exists there at launch, marked or not (DEC-311)."""
+    support.put_placeholder(freeze_launch_project)
+    result = freeze_launch(ENGINEER)
+    names = support.literal_runtime_names(result, freeze_launch_project, freeze_sandbox)
+    assert FLAG_NAME in names, (
+        f"an empty file exists at {support.FLAG_REL} at launch and no literal Edit rule names it, although every "
+        f"name that exists at launch has one. Literal names: {names}"
     )
 
 

@@ -14,13 +14,27 @@ clean-up at the end of the command must not take it away.
 **It is not known what the sandbox's clean-up does.** If this case is red when
 the lead runs it, it becomes a decision package: the failure message says
 exactly what was seen at the path (gone, emptied, replaced) and when.
+
+**The session's temp folder has a short path.** The launcher makes the
+session's temp folder under its own ``TMPDIR``, and the sandbox makes Unix
+sockets under the session's temp folder; a socket's path is limited to about
+107 bytes. Under pytest's temporary directory the sandbox did not start
+("Failed to create bridge sockets"), the session's one Bash call was refused
+and the session still answered DONE. So the launcher's ``TMPDIR`` is a folder
+the test makes directly under ``/tmp`` and removes when it ends.
+
+**A session that did not run its probe to the end is a failure**, never a pass
+and never a skip. The session is asked for its stream of messages, and the
+failure says what its Bash call returned and what it answered.
 """
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import stat
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -53,6 +67,58 @@ echo "end=1" >> "$OUT"
 """
 PROMPT = ("Do exactly this one step, once, and nothing else. If it is refused or fails, do not retry it and do not "
           f"work around it. Run this Bash command as written: bash {SCRATCH}/probe.sh  Then answer DONE.")
+# Where the test makes the launcher's ``TMPDIR``: the system's temp root itself, not this process's ``TMPDIR``, which
+# may be long. The launcher adds ``gov-launch-engineer-<8 characters>`` and the sandbox its socket names below that.
+# A launched session whose temp folder is ``/tmp/gov-launch-independent-test-designer-<8>`` (51 bytes) starts its
+# sandbox on this machine; the limit below keeps this case's session folder shorter than that.
+TEMP_ROOT = "/tmp"
+LAUNCH_TMP_PREFIX = "w150-"
+LAUNCH_TMP_MAX_BYTES = 20
+
+
+def _text_of(content):
+    """A tool result's content as text: a string, or a list of text blocks."""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "\n".join(block.get("text", "") if isinstance(block, dict) else str(block) for block in content)
+    return "" if content is None else json.dumps(content)
+
+
+def _session_account(stdout):
+    """What the session did, read from its stream of messages (``--output-format stream-json``), in words.
+
+    The Bash calls it made, what the harness answered to each, and its final
+    answer. When no line of the output is a message, the end of the output is
+    given as it is.
+    """
+    calls, results, answer, messages = [], [], None, 0
+    for line in stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        if not isinstance(event, dict):
+            continue
+        messages += 1
+        if event.get("type") == "result":
+            answer = f"{event.get('result')!r} (subtype {event.get('subtype')!r}, is_error {event.get('is_error')!r})"
+            continue
+        message = event.get("message")
+        content = message.get("content") if isinstance(message, dict) else None
+        for block in content if isinstance(content, list) else []:
+            if not isinstance(block, dict):
+                continue
+            if block.get("type") == "tool_use":
+                calls.append(f"{block.get('name')}: {json.dumps(block.get('input'))[:300]}")
+            elif block.get("type") == "tool_result":
+                results.append(f"{'an error' if block.get('is_error') else 'a result'}: "
+                               f"{_text_of(block.get('content'))[:600]!r}")
+    if not messages:
+        return f"the session's output holds no message of the stream; its end: {stdout[-800:]!r}"
+    return (f"tool calls of the session: {calls or 'none'}\n"
+            f"what the harness answered to them: {results or 'nothing'}\n"
+            f"the session's final answer: {answer or 'none'}")
 
 
 def _seen(path):
@@ -148,38 +214,52 @@ def test_a_flag_put_over_the_placeholder_during_a_command_stays(freeze_launch_ba
     flag = support.put_text(project, FLAG_AT_LAUNCH)          # a marked flag exists at launch: the settings name it
     new_flag = tmp_path / "the-flag-to-put"                   # on the project's file system: a rename, not a copy
     new_flag.write_bytes(FLAG_PUT_DURING_THE_COMMAND)
-    launch_tmp = tmp_path / "launch-tmp"                      # the launcher's temp folder appears here, alone
-    launch_tmp.mkdir()
     results_path = project / SCRATCH / "results.txt"
-
-    owner = _Owner(flag, launch_tmp, new_flag, results_path)
-    env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
-    env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
-                "TMPDIR": str(launch_tmp)})
-    owner.start()
     try:
-        run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER], "--",
-                                     "-p", PROMPT, "--permission-mode", "acceptEdits", "--model", "haiku",
-                                     "--max-turns", "6", "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
-        time.sleep(1.0)   # what the end of the session does at the path is in the log too
+        # The launcher's temp folder appears here, alone: a short path that is this test's own (see the module text).
+        launch_tmp = Path(tempfile.mkdtemp(prefix=LAUNCH_TMP_PREFIX, dir=TEMP_ROOT))
+    except OSError as error:
+        pytest.fail(f"this case needs a folder of its own directly under {TEMP_ROOT}, and cannot make one: {error}",
+                    pytrace=False)
+
+    try:
+        if len(os.fsencode(str(launch_tmp))) > LAUNCH_TMP_MAX_BYTES:
+            pytest.fail(f"the launcher's TMPDIR {launch_tmp} is longer than {LAUNCH_TMP_MAX_BYTES} bytes: the "
+                        f"sandbox's sockets under the session's temp folder may not fit a socket path", pytrace=False)
+        owner = _Owner(flag, launch_tmp, new_flag, results_path)
+        env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
+        env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+                    "TMPDIR": str(launch_tmp)})
+        owner.start()
+        try:
+            # The stream of messages, so that a failure can say what the session's Bash call returned.
+            run = launch_support.run_gov(project, sandbox, "launch", ENGINEER, launch_support.TICKET_OF[ENGINEER],
+                                         "--", "-p", PROMPT, "--output-format", "stream-json", "--verbose",
+                                         "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "6",
+                                         "--allowedTools", "Bash", env=env, timeout=SESSION_TIMEOUT_S)
+            time.sleep(1.0)   # what the end of the session does at the path is in the log too
+        finally:
+            owner.stop.set()
+            owner.join(timeout=5)
+        at_the_end = _seen(flag)
     finally:
-        owner.stop.set()
-        owner.join(timeout=5)
-    at_the_end = _seen(flag)
+        shutil.rmtree(launch_tmp, ignore_errors=True)
     history = "; ".join(f"{seconds} s after it was put ({'after' if ended else 'during'} the command): {what}"
                         for seconds, ended, what in owner.log) or "nothing was noted"
+    session = (f"the session's exit code: {run.returncode}\n{_session_account(run.stdout)}\n"
+               f"the end of its error output: {run.stderr[-600:]!r}")
 
-    # Did the case observe what it is about? If not, it shows nothing.
+    # Did the case observe what it is about? If not, it shows nothing: a failure, never a pass and never a skip.
     assert owner.error is None, f"the test's own watcher failed: {owner.error!r}"
     assert owner.lifted, f"the launcher's temp folder never appeared in {launch_tmp}: no session was started\n" \
-                         f"{run.describe()[-1500:]}"
+                         f"{session}"
     results = results_path.read_text(encoding="utf-8") if results_path.is_file() else ""
     if "end=1" not in results:
-        pytest.fail(f"the launched session did not run the probe to its end (results: {results!r})\n"
-                    f"{run.describe()[-1500:]}", pytrace=False)
+        pytest.fail(f"the launched session did not run the probe to its end (the probe's results file: {results!r}), "
+                    f"so this case observed nothing.\n{session}", pytrace=False)
     assert owner.put_at is not None, (
         f"after the flag was removed, nothing appeared at {FLAG} while the session's command ran: the sandbox put "
-        f"no placeholder there, so this case observed nothing. At the end: {at_the_end}"
+        f"no placeholder there, so this case observed nothing. At the end: {at_the_end}\n{session}"
     )
     assert owner.put_before_the_command_ended, (
         f"the placeholder at {FLAG} was seen only after the command had ended ({owner.placeholder}): the flag was "
