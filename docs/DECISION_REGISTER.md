@@ -4066,3 +4066,25 @@ held-out deny line) go to the owner.
 | Version | Date | Change |
 |---|---|---|
 | 0.90 | 2026-10-05 | Delegated under DEC-220: DEC-392 (W1-28 DP-13: a failed removal keeps the session's exit code and names the folder; SIGTERM and SIGHUP as an interrupt; exit code 130; carried by W1-32). W1-28 DP-12 and DP-15 go to the owner. |
+
+## 91. Delegated decisions on W1-20's packages DP-A and DP-B (register v0.91, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on two packages the W1-20 (`DAEO-jozo`) ticket lead
+returned after the implementation. Both are what is built, reversible in one line before W1-21 is written, and the
+lead's and the orchestrator's recommendations agree at medium confidence or higher. DP-8 (the tests' fixed list of
+stopping reasons) follows the owner's answer on DP-5 (DEC-391).
+
+### DEC-393 — W1-20 DP-A and DP-B: the depth cut wins over unresolved ids; an unasked code facet says `not_asked`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-20 packages DP-A option (a), confidence medium, and DP-B option (a), confidence medium-high · **Amends:** DEC-391 · **Under:** CAP-57.a, DEC-034
+- **Decision:**
+  - The stopping reason is chosen in this order: `FACET_UNAVAILABLE` when the code facet could not answer, then
+    `DEPTH_LIMIT_REACHED` when any gap lies beyond the depth, then the value for unresolved ids alone (with the
+    owner, DEC-391), then `CLOSURE_COMPLETE`. The reason on each gap carries the rest.
+  - `facets.code` is `not_asked` for a closure in which the code facet was never asked.
+  - Accepted as built: a repository without a store answers `STORE_MISSING` with exit code 1; a depth below zero is
+    refused with `CLOSURE_DEPTH_INVALID`; once the facet fails in a run it is not asked again; `start` is sorted and
+    de-duplicated.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.91 | 2026-10-05 | Delegated under DEC-220: DEC-393 (W1-20 DP-A: the order of stopping reasons; DP-B: `facets.code` is `not_asked` when the facet was not asked; four engineer choices as built). |
