@@ -174,3 +174,19 @@ def test_an_error_of_the_tool_is_not_an_empty_answer(tmp_path, monkeypatch):
         codeintel.definitions(root, "clean")
     with pytest.raises(RuntimeError):
         codeintel.projects(root)
+
+
+def test_callees_are_the_functions_a_symbol_calls_in_the_form_of_callers(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    staged = root / codeintel.BASE_REL / "files/app/flow.py"
+    staged.parent.mkdir(parents=True)
+    staged.touch()
+    key = "code.app.flow."
+    nodes = [[key + name, name, "Function", "app/flow.py"] for name in ("top", "mid", "leaf", "side")]
+    edges = [[key + "top", "CALLS", key + "mid"], [key + "top", "CALLS", key + "leaf"],
+             [key + "side", "CALLS", key + "leaf"], [key + "top", "USAGE", key + "side"]]
+    monkeypatch.setattr(codeintel, "_rows", lambda _root, query: edges if "type(r)" in query else nodes)
+    assert [entry["name"] for entry in codeintel.callees(root, "top")] == ["mid", "leaf"]  # a use is no call
+    assert codeintel.callees(root, "top")[0] == codeintel.callers(root, "leaf")[0] | {"name": "mid"}  # one entry shape
+    assert codeintel.callees(root, "leaf") == [] and codeintel.callees(root, "no_such_symbol") == []
+    assert [entry["name"] for entry in codeintel.callers(root, "leaf")] == ["top", "side"]

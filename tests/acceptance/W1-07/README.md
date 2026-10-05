@@ -152,6 +152,26 @@ Readings the sources do not spell out, for this batch:
     stated either way and are not tested; they are for W1-08's schema.
 21. **The documents are written from DEC-189's sentence**, not from the schema under `src/gov/config/`.
 
+## Planned revisions (DEC-190, reason "planned: command implemented")
+
+- **`checkpoint`** (W1-25) and **`readiness`** (W1-13) left `NOT_BUILT` in `w1_07_support.py`. Both run without an
+  argument, so nothing else changed.
+- **`closure`** (W1-20) left `NOT_BUILT`, and is the first built command that requires arguments: `gov closure
+  (--depth N | --radius R) <id>...` (DEC-391). Readings 7 and 12 above describe a command not yet built; for
+  `closure` they are replaced by these:
+  - **A call without the required arguments is a usage error**: exit code 2 (`docs/interfaces/API-0002.yaml`,
+    `"2": usage error`), with standard output as reading 8 has it for every usage error (empty, or an envelope with
+    `ok: false`). It is no envelope with exit code 0-1, so it cannot stand for "the command" in a case that asks
+    every command for an envelope. `test_closure_without_its_arguments_is_a_usage_error` (added) holds it.
+  - **The cases that run every command call `gov closure --depth 1 W1-07-NO-SUCH-ID`** (`support.invocation`,
+    used by `EVERY_INVOCATION`, `READ_COMMANDS` and `test_each_wave_1_operation_is_a_gov_command`), as
+    `context --dry-run` and `check --list` are already invocations with arguments. What each case asserts is
+    unchanged. The id names nothing, and the project copy has no store (`.gov-runtime/` is not copied): the cases
+    hold the envelope, the exit code range and the unchanged project, whatever `closure` answers there. What a
+    closure holds is tested in `tests/acceptance/W1-20/`.
+  - The test ids of those cases changed from `[closure]` to `[closure --depth 1 W1-07-NO-SUCH-ID]`; the number of
+    cases did not, but for the one added.
+
 ## Decision package
 
 ### DP-1 — What does a minimal valid `path-map.yaml` look like, so that "naming the key" can be tested?
