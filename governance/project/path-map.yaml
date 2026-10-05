@@ -152,7 +152,7 @@ systems:
     where: ["governance/project/path-map.yaml", "template/governance/kernel/schemas/**"]
   agent-organisation:
     status: minimal
-    where: [".claude/agents/**"]
+    where: [".claude/agents/**", "template/governance/kernel/roles/**", "governance/project/roster.yaml"]
   skills:
     status: minimal
     where: ["template/governance/kernel/vendor/**"]
@@ -172,8 +172,8 @@ systems:
     status: minimal
     where: ["docs/spec/**", "docs/plan/**"]
   research-and-experiments:
-    status: absent
-    reason: The research role and its launcher are not built yet.
+    status: minimal
+    where: ["src/gov/launch/**", "template/governance/kernel/roles/research*", ".claude/agents/research.md"]
   task-system:
     status: minimal
     where: [".tickets/**", "tk"]

@@ -410,8 +410,9 @@ settle it.
   the older schemas under `schemas/records/` were not carried over.
 - **Closed and open maps.** `policies`, `systems`, `capabilities` and its two entries refuse unknown keys; namespaces,
   the path map's top level and record frontmatter accept extras. No test covers the open ones.
-- **The `systems` snapshot** (13 minimal, 9 absent, none implemented) needs updating as tickets land, W1-46 first
-  (research).
+- **The `systems` snapshot** needs updating as tickets land. Updated at W1-33's close (2026-10-05): the research
+  system is `minimal` (the launcher and the research role), and the agent organisation also names the kernel role
+  files and the roster.
 - **New top-level folders.** The root namespace uses `*`, and `.github/` and `.rulesync/` are pre-listed. Any other
   new top-level folder fails "every tracked path in exactly one namespace" until a namespace is added.
 - **The two committed ADRs** lack `state_class` and would not validate against the decision schema until they get it.
@@ -737,8 +738,7 @@ where that is known; the rest go to EXP-002 and the mid-wave audit.
 
 **Carried to other tickets**
 
-- **W1-08's `systems` snapshot** in the path map still shows the launcher and the research role as before this
-  ticket; it is updated when W1-33 lands the remaining role definitions.
+- **W1-08's `systems` snapshot** in the path map was updated at W1-33's close (2026-10-05).
 - **The experiments root is the fixed name `experiments/`** (DEC-333); a project key waits for a project that needs
   one.
 - **Size.** 819 lines added outside tests against an estimate of 220, about 200 of them the DEC-317 change that
@@ -862,3 +862,51 @@ settle it where that is known.
 - **Codes beyond the tests:** `TASKS_NOT_FOUND` and `TICKET_FAILED`.
 - **Size and process.** 180 lines against 120. The lead had the engineer build before the five packages were
   decided; they were then decided as built (DEC-355, DEC-356). Workers ran unsandboxed (interim, DEC-183).
+
+## W1-33 residuals (Wave 1 role definitions, 2026-10-05)
+
+Recorded at W1-33's close, from the closing ticket lead's summary. The first lead's own list was not in its returned
+result, so this list is the closing lead's; none is a defect of the ticket.
+
+- **The definitions under `.claude/agents/` were placed by the owner** (`0f8b0d29`, DEC-352 P-2), because a headless
+  session is refused writes there. They count as generated until W1-38 produces the same files from the same sources.
+- **Permission classes are mapped as families** (DEC-352 P-3): `NETWORK_*`, `DB_*`, `CLOUD_*` and `DEPLOY_*`, not each
+  member class of Framework §32. For the mid-wave audit to weigh.
+- **Orchestrator and product-spec grants** (DEC-352 P-4): the orchestrator has `NETWORK_*` allowed and the database,
+  cloud, CI-trigger and deploy classes denied; product-spec has all denied. In these two unsandboxed sessions no
+  mechanism holds the denials, and the role files say so.
+- **Model tier.** No decision assigns one. The files say "standard" for the four workers and "the model of the
+  session the owner starts" for the orchestrator; there is no `model:` frontmatter, so nothing enforces it.
+- **The product-spec session.** `gov launch` has no product-spec role, so such a worker still starts under DEC-183
+  (DEC-371). Its roster entry has no `session` or `network_profile`.
+- **Web tools against `NETWORK_*: denied`.** The worker role files keep WebSearch and WebFetch available outside the
+  sandbox (DEC-158) and read the class as the sandbox's network grant. No source settles whether the web tools count
+  as a `NETWORK_*` class.
+- **`SECRET_READ` and `SYSTEM_INSTALL`.** No guard rule stops a secret read; the denial rests on DEC-074 Q9. An
+  orchestrator system install without `sudo` gets the same `ask` as any install.
+- **An auditor on another role's ticket.** The launcher starts an auditor on any `in_progress` ticket, but the guard
+  gives it a write path only when the ticket's `role` is independent-auditor. The role file states this.
+- **The roster's header comment** still says the other roles' entries "come with their own tickets"; it was left
+  byte-identical so the research-unchanged test holds.
+- **Size.** 306 lines added and 25 removed outside tests, against 300; the tests are 1,079 lines.
+
+## Observations from launched worker sessions (2026-10-05, the first round under DEC-371)
+
+Reported by the W1-19 and W1-28 ticket leads; for W1-32, EXP-002 and the mid-wave audit.
+
+- **A worker copied the held-out file.** The W1-28 test designer bulk-copied the tracked files into its session
+  scratchpad for a throwaway stand-in, which took `governance/project/held-out.yaml` with it. It reports it never
+  read it; its deletes were refused; the owner was told and removes the folder. Every worker brief now forbids a
+  bulk copy of the tree.
+- **A worker cannot delete its own scratchpad**: the sandbox refuses `rm -rf` there, so throwaway stand-ins and the
+  per-session temp directory stay (the W1-46 residual, seen again).
+- **The freeze flag's path is a placeholder inside the sandbox.** A launched session sees `.gov-runtime/freeze` as a
+  character device whether or not a flag exists, so code that reads the flag by existence sees the tree as paused
+  from inside a worker sandbox. W1-28's suite accepts only that placeholder; W1-32's `gov status` and any engineer's
+  own test runs must take it into account.
+- **Untracked placeholder files** (`.bashrc`, `.gitconfig`, `.idea`, `docs/source` and others) were seen at a
+  worktree's root during a launched session and were gone after it.
+- **A Python script fed by a here-document wrote a file inside the worker's paths** and the guard did not stop it
+  (the W1-15 residual, seen again).
+- **A read beyond DEC-370**: the W1-19 designer's search for G-20 also returned G-17's one row (package DP-7, with
+  the owner).
