@@ -53,6 +53,7 @@ SUPERSESSION_CYCLE = "SUPERSESSION_CYCLE"
 ACTIVE_UNAPPROVED = "ACTIVE_UNAPPROVED"
 GATE_NOT_AUTHORISING = "GATE_NOT_AUTHORISING"
 TICKET_WAITS_ON_DEAD_GATE = "TICKET_WAITS_ON_DEAD_GATE"
+FRONTMATTER_UNREADABLE = "FRONTMATTER_UNREADABLE"
 HAZARD_CODES = (ACTIVE_SUPERSEDED, DUPLICATE_ID, OVERLAPPING_ID, SUPERSESSION_CYCLE)
 
 # DEC-328: the five values of a gate record's `status`; only ACCEPTED is an answered gate.
@@ -266,6 +267,28 @@ class Project:
         for rel, text in files.items():
             self.write(rel, text)
         return self.commit(message, who=who)
+
+    def switch(self, branch, new=False):
+        """Check out ``branch``; ``new`` cuts it from the current commit."""
+        git(self.root, "checkout", "-q", *(["-b"] if new else []), branch)
+
+    def merge(self, branch, who=AGENT, keep=None, date=None):
+        """Merge ``branch`` into the current branch with a merge commit by ``who``. ``keep`` maps a path both
+        sides wrote to the side whose file the merge keeps: ``ours`` (the current branch) or ``theirs``."""
+        git(self.root, "merge", "-q", "--no-ff", "--no-commit", branch, who=who, check=False)
+        for rel, side in (keep or {}).items():
+            git(self.root, "checkout", f"--{side}", "--", rel)
+        commit = self.commit(f"Merge branch '{branch}'", who=who, date=date)
+        parents = git(self.root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+        assert len(parents) == 2, f"the merge of {branch} made no merge commit: parents {parents}"
+        return commit
+
+
+def assert_fails_naming(found, path, codes):
+    """A finding with one of ``codes`` names the file ``path``."""
+    hits = [finding for finding in found if finding["code"] in codes and path in finding["paths"]]
+    assert hits, (f"no {' or '.join(sorted(codes))} finding names the file {path}; the findings were:\n"
+                  f"{show(found)}")
 
 
 def clone(source, destination):
