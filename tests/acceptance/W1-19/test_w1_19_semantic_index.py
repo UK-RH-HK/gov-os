@@ -10,6 +10,7 @@ real model (that is ``test_w1_19_real_models.py``).
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 
@@ -88,9 +89,50 @@ def test_the_manifest_records_the_model_ids_and_their_revisions(api, indexed):
     assert embedder.get("model") == support.EMBED_MODEL, f"the embedding model's id is not recorded: {embedder!r}"
     assert support.is_revision(embedder.get("revision"), support.EMBED_REVISION), \
         f"the embedding model's revision {support.EMBED_REVISION} is not recorded: {embedder!r}"
+    assert support.records_digest(embedder.get("revision"), endpoint.digest), \
+        f"the embedder's revision is not the digest the endpoint's model list reports (DEC-374): {embedder!r}"
     assert reranker.get("model") == support.RERANK_MODEL, f"the reranker's id is not recorded: {reranker!r}"
     assert reranker.get("revision") == support.RERANK_REVISION, \
         f"the reranker's revision is not recorded: {reranker!r}"
+
+
+@INDEX
+def test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant(api, repo):
+    # DEC-374. This endpoint's model list reports a digest that is not the pin; no other answer carries a digest.
+    endpoint = support.OllamaStandIn(digest=support.OTHER_DIGEST)
+    try:
+        env = api.scratch_env(ollama_host=endpoint.host)
+        report = api.call(support.SEMANTIC, "refresh", ROOT(repo), env=env)
+        assert report["available"] is True, f"the vectors were not built: {report!r}"
+        manifest = api.call(support.SEMANTIC, "manifest", ROOT(repo), env=env)
+    finally:
+        endpoint.close()
+    assert isinstance(manifest, dict) and isinstance(manifest.get("embedder"), dict), \
+        f"the index has no manifest that names the embedder: {manifest!r}"
+    embedder = manifest["embedder"]
+    assert embedder.get("model") == support.EMBED_MODEL
+    assert not support.is_revision(embedder.get("revision"), support.EMBED_REVISION), \
+        f"the manifest records the pin {support.EMBED_REVISION} although the model list reports another digest: " \
+        f"the revision is a constant, not the one observed (DEC-374): {embedder!r}"
+    assert support.records_digest(embedder.get("revision"), support.OTHER_DIGEST), \
+        f"the manifest does not record the digest the model list reports ({support.OTHER_DIGEST[:12]}…): {embedder!r}"
+
+
+@INDEX
+def test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama(api, indexed, base, tmp_path):
+    # DEC-374. A second clone of the same commit is given the store's files and nothing else; its manifest is then
+    # read with no endpoint at all, so the manifest is in the store and reading it asks Ollama nothing.
+    root, endpoint, _ = indexed
+    manifest = api.call(support.SEMANTIC, "manifest", ROOT(root), env=api.scratch_env(ollama_host=endpoint.host))
+    assert isinstance(manifest, dict), f"the index has no manifest: {manifest!r}"
+    other = support.clone(base, tmp_path / "other")
+    (other / support.RUNTIME_REL).mkdir()
+    stores = [name for name in support.runtime_files(root) if name.startswith("store.db")]
+    for name in stores:
+        shutil.copy2(root / support.RUNTIME_REL / name, other / support.RUNTIME_REL / name)
+    assert api.call(support.SEMANTIC, "manifest", ROOT(other)) == manifest, \
+        f"the manifest is not read from {support.STORE_REL} alone: a clone given only {stores} has another, or none"
+    assert support.git(other, "status", "--porcelain") == "", "reading the manifest changed a tracked file"
 
 
 @INDEX

@@ -58,6 +58,18 @@ def repo(base, tmp_path):
     return support.clone(base, tmp_path / "repo")
 
 
+@pytest.fixture(scope="session")
+def policy_base(tmp_path_factory):
+    """The policy fixture (DEC-381): four namespaces that differ only in ``embedding_policy``. Never indexed."""
+    return support.build_policy_fixture(tmp_path_factory.mktemp("w1-19-policy") / "repo")
+
+
+@pytest.fixture()
+def policy_repo(policy_base, tmp_path):
+    """This test's own clone of the policy fixture, not indexed yet."""
+    return support.clone(policy_base, tmp_path / "policy")
+
+
 @pytest.fixture()
 def ollama():
     """The stand-in Ollama endpoint, healthy, on its own loopback port; ended afterwards."""

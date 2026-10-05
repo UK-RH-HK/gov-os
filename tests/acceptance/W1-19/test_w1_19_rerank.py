@@ -79,6 +79,24 @@ def test_no_candidate_means_no_load_and_no_pass(api):
     assert outcome.passes == []
 
 
+def test_reranking_with_no_reranker_that_can_be_loaded_keeps_the_order_given_and_does_not_raise(api):
+    # DEC-379: no function raises because the reranker is absent. DEC-374: nothing is reranked and the order is
+    # kept. No `reranker` is given, and the default cannot be loaded: this machine has no reranker process today
+    # (DEC-384), and the scratch environment has an empty HOME and no Hugging Face cache.
+    outcome = api.run([(support.RERANK, "rerank", (QUERY, CANDIDATES), {})], favour=[support.FAVOURED])
+    assert outcome.calls[0]["error"] is None, \
+        f"rerank raised when the default reranker could not be loaded: {outcome.calls[0]['error']}"
+    ordered = outcome.value()
+    assert isinstance(ordered, list), f"rerank did not return a list: {ordered!r}"
+    assert [entry.get("chunk_id") for entry in ordered] == [entry["chunk_id"] for entry in CANDIDATES], \
+        "with no reranker the candidates are not returned in the order given (plain, twice, once)"
+    for entry, given in zip(ordered, CANDIDATES):
+        assert {key: entry.get(key) for key in given} == given, f"a candidate lost what it came with: {entry!r}"
+        assert not isinstance(entry.get("rerank_score"), (int, float)), \
+            f"a candidate carries a reranker's score although nothing was reranked: {entry!r}"
+    assert outcome.loads == 0 and outcome.passes == [], "the tests' stand-in reranker was used: it was not given"
+
+
 def test_candidates_the_reranker_scores_alike_keep_the_order_they_came_in(api):
     alike = [candidate(name, "No favoured word here.") for name in ("first", "second", "third")]
     ordered, _ = rerank(api, alike)

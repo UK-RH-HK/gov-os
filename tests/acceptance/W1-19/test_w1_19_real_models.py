@@ -10,9 +10,12 @@ DEC-261 decides, leaves it running.
 **Run this file alone**, never beside another suite: the ticket is heavy, and the timed case is a latency case
 (DEC-372).
 
-The dev-tier measurement is taken once for the file: per tier, one process builds the index of a clone, asks
-three warm-up questions, then asks each question of the dev query set once, timed, while the peak resident
+The dev-tier measurement is taken once for the file (DEC-373): per tier, one process builds the index of a clone,
+asks three warm-up questions, then asks each question of the dev query set once, timed, while the peak resident
 memory of that process and of every process it starts (the Ollama daemon left out) is watched.
+
+Mean hit@5 follows S0b2's own method (DEC-380): the first five distinct paths of each query against its
+``must_cite``, a percentage per class, and the mean of the ten classes.
 """
 
 from __future__ import annotations
@@ -60,7 +63,8 @@ def measured(api, tmp_path_factory):
         if root is None:
             pytest.skip(f"no dev tier at {support.DEV_TIERS / tier} (GOV_DEV_TIERS)")
         asked = [query for query in queries if query["programme"] == programme]
-        search = {"limit": 5, "refresh": False}
+        # The whole reranked list: S0b2 scores the first five distinct paths, which may lie beyond the fifth chunk.
+        search = {"limit": None, "refresh": False}
         calls = [(support.SEMANTIC, "refresh", (ROOT(root),), {})]
         calls += [(support.FUSION, "search", (ROOT(root), text), search) for text in support.WARM_UP_QUERIES]
         calls += [(support.FUSION, "search", (ROOT(root), query["query"]), search) for query in asked]
@@ -79,35 +83,40 @@ def measured(api, tmp_path_factory):
 
 
 def _scored(measured):
-    """``tier -> [hit or miss, ...]`` over the queries that name a gold path, and the misses by id."""
+    """``class -> [hit or miss, ...]`` over every query of the class, both tiers together, and the misses by id.
+
+    S0b2's own method (DEC-380; ``RESULTS.md`` §1): the first five distinct paths of each query against its
+    ``must_cite``, a percentage per class, the mean of the ten classes. Its class sizes add up to all 52 queries, so
+    the two queries that name no ``must_cite`` path count in their classes, and they cannot be hits.
+    """
     scored, missed = {}, []
-    for tier, result in measured.items():
-        scored[tier] = []
+    for result in measured.values():
         for query, answer in zip(result["queries"], result["answers"]):
-            gold = query["gold"]["must_cite"]
-            if not gold:
-                continue  # nothing to reach: the gold answer is in the git history, not in a file (package DP-2)
-            scored[tier].append(support.is_hit(gold, answer["hits"]))
-            if not scored[tier][-1]:
+            hit = support.is_hit(query["gold"]["must_cite"], answer["hits"])
+            scored.setdefault(query["class"], []).append(hit)
+            if not hit:
                 missed.append(query["id"])
+    assert len(scored) == support.QUERY_CLASSES, \
+        f"the dev query set has {len(scored)} classes, not the ten S0b2 took the mean of: {sorted(scored)}"
     return scored, missed
 
 
 @FULL
 def test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5(measured):
     scored, missed = _scored(measured)
-    mean, per_tier = support.mean_hit_at_5(scored)
+    mean, per_class = support.mean_hit_at_5(scored)
     assert mean >= support.HIT_AT_5_BASELINE, \
-        f"mean hit@5 is {mean:.1f}, below the S0b2 R1 baseline of {support.HIT_AT_5_BASELINE:.0f} " \
-        f"(per tier: {per_tier}; missed: {missed})"
+        f"mean hit@5 over the ten classes is {mean:.1f}, below the S0b2 R1 baseline of " \
+        f"{support.HIT_AT_5_BASELINE:.0f} (per class: {per_class}; missed: {missed})"
 
 
 @FULL
 def test_mean_hit_at_5_is_not_below_the_failure_line(measured):
     scored, missed = _scored(measured)
-    mean, per_tier = support.mean_hit_at_5(scored)
+    mean, per_class = support.mean_hit_at_5(scored)
     assert not mean < support.HIT_AT_5_FAILURE, \
-        f"mean hit@5 is {mean:.1f}, below {support.HIT_AT_5_FAILURE:.0f} (per tier: {per_tier}; missed: {missed})"
+        f"mean hit@5 over the ten classes is {mean:.1f}, below {support.HIT_AT_5_FAILURE:.0f} " \
+        f"(per class: {per_class}; missed: {missed})"
 
 
 @FULL
@@ -137,4 +146,3 @@ def test_every_answer_is_one_fused_list_from_both_routes_reranked(measured):
             assert answer["facets"][support.SEMANTIC_FACET]["available"] is True, \
                 f"{query['id']} on {tier}: the semantic facet was unavailable, the measure is of FTS alone"
             assert answer["reranked"] is True, f"{query['id']} on {tier}: the list was not reranked"
-            assert len(answer["hits"]) <= 5

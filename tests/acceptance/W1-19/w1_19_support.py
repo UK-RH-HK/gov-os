@@ -1,8 +1,8 @@
 """Support code for the W1-19 acceptance tests (standard library and PyYAML only).
 
 W1-19 builds the semantic route, the fusion (RRF) and the one rerank. No KPI names a ``gov`` command and
-``src/gov/cli/**`` is outside the ticket's paths, so the tests use the Python interface the README states
-(package DP-1), reached as ``gov.retrieval.semantic``, ``gov.retrieval.fusion`` and ``gov.retrieval.rerank``.
+``src/gov/cli/**`` is outside the ticket's paths, so the tests use the Python interface of DEC-379, reached as
+``gov.retrieval.semantic``, ``gov.retrieval.fusion`` and ``gov.retrieval.rerank``.
 
 How the tests call it:
 
@@ -45,7 +45,7 @@ FUSION = "gov.retrieval.fusion"
 RERANK = "gov.retrieval.rerank"
 LEXICAL = "gov.retrieval.lexical"
 SECRETS = "gov.secrets"
-# The public interface the tests assume (README, package DP-1).
+# The public interface (DEC-379).
 INTERFACE = (
     (SEMANTIC, ("refresh", "search", "manifest")),
     (FUSION, ("rrf", "search")),
@@ -83,7 +83,7 @@ RERANK_RSS_LIMIT_BYTES = 2_500_000_000  # failure 2: 2.5 GB, read as 2.5 x 10^9 
 DEV_TIERS = Path(os.environ.get("GOV_DEV_TIERS") or "~/gov-os-workbench/synthetic").expanduser()
 QUERY_SET = DEV_TIERS / "dev-queryset.yaml"
 TIERS = {"A": "a-dev", "B": "b-dev"}
-# Asked before the timed pass, so the models are loaded and no timed question has been asked before (package DP-3).
+# Asked before the timed pass, so the models are loaded and no timed question has been asked before (DEC-373).
 WARM_UP_QUERIES = ("What does this repository contain?", "Which decisions are recorded here?",
                    "Where are the tests kept?")
 
@@ -274,6 +274,15 @@ class Api:
             **extra,
         }
 
+    def env_without_sqlite_vec(self, ollama_host=None):
+        """The scratch environment, in which ``import sqlite_vec`` fails whatever this machine has installed: a
+        module of that name that raises ``ImportError`` stands first on ``PYTHONPATH``."""
+        blocked = self.workdir / "no-sqlite-vec"
+        blocked.mkdir(exist_ok=True)
+        (blocked / "sqlite_vec.py").write_text(
+            'raise ImportError("sqlite_vec is held absent by the W1-19 tests")\n', encoding="utf-8")
+        return self.scratch_env(ollama_host=ollama_host, PYTHONPATH=os.pathsep.join([str(blocked), str(SRC)]))
+
     def real_env(self):
         """This machine's own environment, for the cases that measure the real models; nothing may be downloaded."""
         env = {key: value for key, value in os.environ.items() if key not in ("GOV_ROLE", "GOV_TICKET")}
@@ -443,6 +452,13 @@ def is_revision(value, pin):
     return text.removeprefix("sha256:").startswith(pin)
 
 
+def records_digest(value, digest):
+    """Whether ``value`` is the digest the endpoint's model list reported (DEC-374): the digest itself or its first
+    twelve or more characters, with ``sha256:`` allowed in front."""
+    text = str(value or "").lower().removeprefix("sha256:")
+    return len(text) >= 12 and digest.startswith(text)
+
+
 # --------------------------------------------------------------------------
 # git
 # --------------------------------------------------------------------------
@@ -495,13 +511,19 @@ def runtime_files(project):
 # The fixture project
 # --------------------------------------------------------------------------
 
+# The two values of ``embedding_policy`` whose meaning a source gives (DEC-381; the path maps in use). The schema of
+# W1-08 allows any non-empty text, so every other value, and a namespace without the field, is read as not embedded.
+EMBEDDED = "embedded"
+NOT_EMBEDDED = "not embedded"
+NO_FIELD = object()  # as a namespace's policy: the namespace has no ``embedding_policy`` at all
+
 _NAMESPACE_FIELDS = {
     "sensitivity": "internal",
     "permitted_roles": ["orchestrator", "product-spec", "independent-test-designer", "engineer",
                         "independent-auditor", "research"],
     "retention": "kept in git history",
     "export_policy": "allowed",
-    "embedding_policy": "embedded",
+    "embedding_policy": EMBEDDED,
     "provenance": "written by the W1-19 tests",
     "deletion_rebuild": "authoritative; restored from git only",
 }
@@ -518,11 +540,20 @@ NAMESPACES = {
 
 
 def path_map_text(namespaces):
-    """A full path map (DEC-225): this repository's own, with ``namespaces`` in place of its namespaces."""
+    """A full path map (DEC-225): this repository's own, with ``namespaces`` in place of its namespaces.
+
+    A namespace is ``(patterns, memory_class)`` or ``(patterns, memory_class, embedding_policy)``; the policy
+    ``NO_FIELD`` leaves the field out.
+    """
     document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
-    document["namespaces"] = {
-        name: {"paths": list(patterns), "memory_class": memory_class, **_NAMESPACE_FIELDS}
-        for name, (patterns, memory_class) in namespaces.items()}
+    document["namespaces"] = {}
+    for name, (patterns, memory_class, *policy) in namespaces.items():
+        entry = {"paths": list(patterns), "memory_class": memory_class, **_NAMESPACE_FIELDS}
+        if policy and policy[0] is NO_FIELD:
+            del entry["embedding_policy"]
+        elif policy:
+            entry["embedding_policy"] = policy[0]
+        document["namespaces"][name] = entry
     return yaml.safe_dump(document, sort_keys=False)
 
 
@@ -600,11 +631,67 @@ def build_fixture(project):
 
 
 # --------------------------------------------------------------------------
+# The policy fixture: one namespace for each reading of ``embedding_policy`` (DEC-381)
+# --------------------------------------------------------------------------
+
+# An unknown value. It begins with, and holds, the one value that embeds: a reading by prefix or by substring
+# takes it for ``embedded``.
+UNKNOWN_POLICY = "embedded on request"
+# An exact phrase all four files hold, so the lexical route returns all four (W1-17's index is not changed).
+POLICY_PHRASE = "pewter whistle signal"
+ORCHARD = "open/orchard.md"
+VAULT = "closed/vault.md"
+ATTIC = "odd/attic.md"
+CELLAR = "bare/cellar.md"
+POLICY_NAMESPACES = {
+    # The root files and the overlay are not embedded, as in this repository's own map.
+    "top": (["*"], "governance", NOT_EMBEDDED),
+    "overlay": (["governance/**"], "governance", NOT_EMBEDDED),
+    "open": (["open/**"], "governance", EMBEDDED),
+    "closed": (["closed/**"], "governance", NOT_EMBEDDED),
+    "odd": (["odd/**"], "governance", UNKNOWN_POLICY),
+    "bare": (["bare/**"], "governance", NO_FIELD),
+}
+POLICY_CORPUS = {
+    ORCHARD: f"# Orchard\n\nThe orchard keeper prunes the pear trees in February.\nThe {POLICY_PHRASE} ends the day.\n",
+    VAULT: f"# Vault\n\nThe cobalt ledger of the vault lists every sealed crate.\nThe {POLICY_PHRASE} opens it.\n",
+    ATTIC: f"# Attic\n\nThe saffron register of the attic lists every folded sail.\nThe {POLICY_PHRASE} airs it.\n",
+    CELLAR: f"# Cellar\n\nThe indigo roster of the cellar lists every corked barrel.\nThe {POLICY_PHRASE} locks it.\n",
+}
+ORCHARD_WORD = "February"
+ORCHARD_QUESTION = "who prunes the pear trees in the orchard"
+# ``file -> (why it is not embedded, a word only that file holds, a question near its text that lacks the word)``.
+# No question holds its file's word, so the word reaches the endpoint only if the file's text is sent.
+NEVER_EMBEDDED = {
+    VAULT: (f"its namespace says `{NOT_EMBEDDED}`", "cobalt", "which ledger of the vault lists every sealed crate"),
+    ATTIC: (f"its namespace says `{UNKNOWN_POLICY}`, an unknown value", "saffron",
+            "which register of the attic lists every folded sail"),
+    CELLAR: ("its namespace has no `embedding_policy`", "indigo",
+             "which roster of the cellar lists every corked barrel"),
+}
+
+
+def build_policy_fixture(project):
+    """A repository of four governance namespaces that differ only in ``embedding_policy``, one file in each."""
+    project = Path(project)
+    project.mkdir(parents=True, exist_ok=True)
+    git(project, "init", "-q", "-b", "main")
+    adopt(project, POLICY_NAMESPACES)
+    write(project, ".gitignore", GITIGNORE)
+    for rel, text in POLICY_CORPUS.items():
+        write(project, rel, text)
+    commit(project, "the policy fixture", BASE_DATE)
+    return project
+
+
+# --------------------------------------------------------------------------
 # The stand-in Ollama endpoint: the HTTP interface of the daemon, with vectors computed from words
 # --------------------------------------------------------------------------
 
 DIMENSIONS = 1024  # what Qwen3-Embedding-0.6B returns
 STAND_IN_DIGEST = EMBED_REVISION + hashlib.sha256(b"w1-19 stand-in").hexdigest()[:52]
+# A digest that does not begin with the pin: what a model list reports when the tag holds another build.
+OTHER_DIGEST = "5e" + hashlib.sha256(b"w1-19 another build of the embedder").hexdigest()[:62]
 _STOP = {"the", "and", "for", "with", "that", "this", "each", "does", "when", "who", "what", "into", "from",
          "its", "are", "was", "has", "have", "before", "after", "then", "any", "all", "given", "query",
          "instruct", "retrieve", "relevant", "passages", "search", "web", "answer", "document"}
@@ -630,12 +717,17 @@ def stand_in_vector(text):
 
 class OllamaStandIn:
     """A healthy Ollama endpoint on a free loopback port. It answers the version, the model list, the model's
-    description and both embedding requests, and records every request it receives."""
+    description and both embedding requests, and records every request it receives.
 
-    def __init__(self):
+    ``digest`` is the digest its model list (``GET /api/tags``) reports for the embedding model. No other answer
+    carries a digest, as with the daemon, so the model list is the one place a revision can be observed (DEC-374).
+    """
+
+    def __init__(self, digest=STAND_IN_DIGEST):
         self.requests = []
+        self.digest = digest
         requests = self.requests
-        model = {"name": EMBED_MODEL, "model": EMBED_MODEL, "digest": STAND_IN_DIGEST, "size": 639150000,
+        model = {"name": EMBED_MODEL, "model": EMBED_MODEL, "digest": digest, "size": 639150000,
                  "details": {"family": "qwen3", "parameter_size": "595.78M", "quantization_level": "Q8_0"}}
 
         class Handler(BaseHTTPRequestHandler):
@@ -656,7 +748,7 @@ class OllamaStandIn:
                 elif route == "/api/ps":
                     reply = {"models": []}
                 elif route == "/api/show":
-                    reply = {"details": model["details"], "digest": STAND_IN_DIGEST,
+                    reply = {"details": model["details"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS},
                              "capabilities": ["embedding"]}
                 elif route == "/api/embed":
@@ -726,16 +818,26 @@ def dev_queries():
     return yaml.safe_load(QUERY_SET.read_text(encoding="utf-8"))["queries"]
 
 
+QUERY_CLASSES = 10  # S0b2 RESULTS.md: "52 queries, ten classes"
+
+
+def distinct_paths(hits, depth=5):
+    """The first ``depth`` distinct paths of a ranked list (S0b2: "each candidate's top-5 distinct paths per
+    query")."""
+    return list(dict.fromkeys(paths(hits)))[:depth]
+
+
 def is_hit(gold_paths, hits, depth=5):
-    """hit@5: one of the query's gold paths is the path of one of the first five results (package DP-2)."""
-    return bool(set(gold_paths) & set(paths(hits[:depth])))
+    """hit@5: one of the query's ``must_cite`` paths is among the first five distinct paths (DEC-380). A query
+    that names no ``must_cite`` path cannot be a hit."""
+    return bool(set(gold_paths) & set(distinct_paths(hits, depth)))
 
 
 def mean_hit_at_5(scored):
-    """``scored`` is ``tier -> [bool, ...]``, one per query with a gold path. The percentage of hits per tier, and
-    the mean of the tiers' percentages (package DP-2)."""
-    per_tier = {tier: 100.0 * sum(hits) / len(hits) for tier, hits in scored.items()}
-    return sum(per_tier.values()) / len(per_tier), per_tier
+    """``scored`` is ``class -> [bool, ...]``, one per query of the class, both tiers together. The mean of the
+    classes' percentages of hits (S0b2: "Mean of ten classes"), and the percentage of each class."""
+    per_class = {name: 100.0 * sum(hits) / len(hits) for name, hits in scored.items()}
+    return sum(per_class.values()) / len(per_class), {name: round(value, 1) for name, value in per_class.items()}
 
 
 def p95(seconds):

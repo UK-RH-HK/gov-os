@@ -3,11 +3,13 @@
 
 "Absent" is the state of this machine's sandbox and of CI: no ``ollama`` on ``PATH``, none under ``HOME``, and
 nothing listening on the endpoint. No model and no ``sqlite_vec`` is needed: these cases can go green now.
+
+The same holds for the two other things that may be absent (DEC-379: no function raises because Ollama,
+``sqlite_vec`` or the reranker is absent): ``sqlite_vec`` cannot be imported, and the default reranker cannot be
+loaded (DEC-374: the fused order is kept and the answer says that nothing was reranked).
 """
 
 from __future__ import annotations
-
-import importlib.util
 
 import pytest
 
@@ -90,12 +92,43 @@ def test_a_limit_cuts_the_list_after_the_rerank_not_before(api, repo):
 
 @pytest.mark.needs("gitleaks")
 def test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so(api, repo):
-    # Package DP-4. The scratch environment has an empty HOME and names no reranker environment.
-    if importlib.util.find_spec("sentence_transformers") is not None:
-        pytest.skip("sentence_transformers can be imported by this interpreter: the reranker is not absent here")
-    outcome = api.run([(support.FUSION, "search", (ROOT(repo), support.PHRASE), {"limit": None})])
-    assert outcome.calls[0]["error"] is None, \
-        f"fusion.search raised when the reranker could not be loaded: {outcome.calls[0]['error']}"
-    answer = support.check_fused(outcome.value())
+    # DEC-374. No `reranker` is given, so the default is used, and the default cannot be loaded: this machine has
+    # no reranker process today (DEC-384), and the scratch environment has an empty HOME, no Hugging Face cache and
+    # the libraries held offline.
+    lexical = api.call(support.LEXICAL, "search", ROOT(repo), support.PHRASE)
+    routes = {support.LEXICAL_FACET: lexical["hits"], support.SEMANTIC_FACET: []}
+    outcome = api.run([(support.FUSION, "rrf", (routes,), {}),
+                       (support.FUSION, "search", (ROOT(repo), support.PHRASE), {"limit": None})])
+    assert outcome.calls[1]["error"] is None, \
+        f"fusion.search raised when the reranker could not be loaded: {outcome.calls[1]['error']}"
+    fused, answer = outcome.value(0), support.check_fused(outcome.value(1))
     assert answer["reranked"] is False, "the list is given as reranked although no reranker could be loaded"
+    assert outcome.loads == 0 and outcome.passes == [], "the tests' stand-in reranker was used: it was not given"
     assert set(support.PHRASE_FILES) <= set(support.paths(answer["hits"])), "the fused list was dropped"
+    assert [hit["chunk_id"] for hit in answer["hits"]] == [hit["chunk_id"] for hit in fused], \
+        "the list is not in the fused order: with no reranker the order of the fusion is kept (DEC-374)"
+
+
+@pytest.mark.needs("gitleaks")
+def test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises(api, repo, ollama):
+    # DEC-379: no function raises because `sqlite_vec` is absent. The endpoint is healthy here; what is missing is
+    # the module, which cannot be imported in this environment whatever the machine has installed.
+    env = api.env_without_sqlite_vec(ollama_host=ollama.host)
+    outcome = api.run([(support.SEMANTIC, "refresh", (ROOT(repo),), {}),
+                       (support.SEMANTIC, "search", (ROOT(repo), support.BAKERY_QUESTION), {}),
+                       (support.SEMANTIC, "manifest", (ROOT(repo),), {}),
+                       (support.FUSION, "search", (ROOT(repo), support.PHRASE),
+                        {"limit": None, "reranker": support.RERANKER})], env=env, favour=[support.FAVOURED])
+    names = ("semantic.refresh", "semantic.search", "semantic.manifest", "fusion.search")
+    for call, name in zip(outcome.calls, names):
+        assert call["error"] is None, f"{name} raised because sqlite_vec cannot be imported: {call['error']}"
+    report, answer, manifest, fused = outcome.values()
+    assert support.check_facet(report, support.SEMANTIC_FACET)["available"] is False, \
+        f"vectors are reported as built without sqlite_vec: {report!r}"
+    assert support.check_semantic(answer)["available"] is False
+    assert manifest is None, f"a manifest is given although no vector index could be built: {manifest!r}"
+    support.check_fused(fused)
+    assert fused["facets"][support.SEMANTIC_FACET]["available"] is False
+    assert fused["facets"][support.LEXICAL_FACET]["available"] is True
+    assert support.paths(fused["hits"])[0] == support.ZETA and fused["reranked"] is True, \
+        "without sqlite_vec the fused list is not the lexical route's, reranked"
