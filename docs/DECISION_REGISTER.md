@@ -4318,3 +4318,34 @@ DEC-400's drafts.
 | Version | Date | Change |
 |---|---|---|
 | 0.96 | 2026-10-05 | Owner: DEC-405 (product-spec role file and agent definition placed, `5d1d9cff`), DEC-406 (W1-19 DP-10: an exact-path read of S0b2's R1 prototype; dev-set tuning is not the fix), DEC-407 (W1-50 DP-F2: accepted for the merge; before the close, the flag is compared around every Bash call and owner-only actions refuse under a Claude Code parent process), DEC-408 (DEC-403 stands; three orchestrator choices confirmed). |
+
+## 97. Owner decision of 2026-10-05: lifting a freeze requires the owner in person (register v0.97, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05. It replaces the ancestry rule of DEC-407. The owner named DEC-367 and the W1-28
+DP-3 answer as amended; the W1-28 DP-3 answer is DEC-365 ("lifting a freeze works only with `GOV_ROLE` unset"), which
+this decision amends. DEC-367 (the record of a rollback or a cancel) says nothing about lifting and its text is not
+changed here; the orchestrator told the owner so.
+
+### DEC-409 — Lifting a freeze requires the owner in person: no Claude Code ancestor, an interactive terminal with a typed one-time code, and a guard rule on the lift form
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a
+- **Decision:**
+  1. `gov pause --off` refuses if any ancestor process is a Claude Code session, wherever that session was
+     started. The operator console cannot lift either; only a plain terminal can.
+  2. It requires an interactive terminal: stdin and stdout are TTYs, and it shows a one-time random code ("type
+     LIFT-<4 digits> to lift the freeze") that must be typed back. A wrong code, piped input, or no TTY refuses,
+     and nothing changes.
+  3. The guard refuses any agent Bash command whose text contains the lift form of `gov pause` (the `--off`
+     option), for every role, including a command that starts another Claude Code session with that text in its
+     prompt. Obfuscated forms are a residual.
+  4. The containment check, as DEC-407 decided: a removed or emptied freeze flag is a finding, and the flag is
+     restored with its marker line.
+  - Setting a freeze stays as decided: the owner (terminal or operator console) and the orchestrator may set it.
+  - Wherever else the code treats an unset `GOV_ROLE` as the owner, rule 1 applies to owner-only actions.
+  - All of this is built on the freeze branch before W1-50 closes, with acceptance tests for the refused cases (an
+    agent session, the operator console, piped input, a wrong code) and one manual check by the owner from a plain
+    terminal.
+  - The KPI lines are added to W1-50 in their own commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.97 | 2026-10-05 | Owner: DEC-409 (lifting a freeze requires the owner in person: no Claude Code ancestor process, an interactive terminal with a typed one-time code, a guard rule on the lift form; the flag comparison of DEC-407 stays; replaces DEC-407's ancestry rule, amends DEC-365). |
