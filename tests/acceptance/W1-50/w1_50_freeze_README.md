@@ -11,9 +11,12 @@ findings of a review (DEC-136), added `test_w1_50_freeze_records_file.py`, `test
 
 A third batch brought the cases to DEC-404 and repaired the second live case: see "The third batch" below.
 
-The whole half now: 111 cases, 109 run without a session and 2 are live. Run on 2026-10-05 with the guard's reading, the
-record and the launcher's rule built and `gov pause` unchanged: 16 red and 93 green. Every red case waits for
-`gov pause` (10 in `test_w1_50_freeze_marker.py`, 6 in `test_w1_50_freeze_pause_links.py`).
+A fourth batch added two cases on `gov pause --rollback` and the flag: see "The fourth batch" below.
+
+The whole half now: 113 cases, 111 run without a session and 2 are live. Run on 2026-10-05 with `gov pause` built
+(DEC-404): 2 red and 109 green. The 2 red cases are the fourth batch's, in `test_w1_50_freeze_rollback_flag.py`, and
+wait for `gov pause --rollback`. The table below is the third batch's, run with `gov pause` unchanged (16 red and 93
+green; every red case waited for `gov pause`); those 16 are green now.
 
 | File | Cases | Red now | Green now |
 |---|---|---|---|
@@ -246,6 +249,38 @@ the guard's wider reading (`test_w1_50_freeze_near_spellings.py`, `test_w1_50_fr
 that the flag `gov pause` leaves is one the guard reads as a freeze, which
 `test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask. A read-back that fails cannot be
 brought about through the command line without a fault put into the command, so it is the engineer's unit test.
+
+## The fourth batch: `--rollback` ends frozen (DEC-136)
+
+One behaviour a review found: `gov pause --rollback <ticket>` answers `paused: true` after its own reverts have taken
+the flag away. The command sets the flag and reads it back once, before the reverts. The project ignores
+`.gov-runtime/`, so git overwrites or removes the flag when a revert touches its path.
+
+| History | Test, in `test_w1_50_freeze_rollback_flag.py` | Red now, and why |
+|---|---|---|
+| The ticket force-added `.gov-runtime/freeze` to git in one commit and removed it in a later one | `test_rollback_of_a_ticket_that_added_and_removed_the_flag_ends_frozen` | Exit 0, `paused: true`, both commits reverted, and nothing is at the flag's path. |
+| The flag's path was tracked, empty, before the ticket; one commit of the ticket removed it | `test_rollback_of_a_ticket_that_removed_a_tracked_flag_ends_frozen` | Exit 0, `paused: true`, and the file at the path is the old empty one: no marker, no freeze. |
+
+**Pinned, and nothing more:** when `--rollback` has ended, with success or with an error, the flag at the path is a
+regular file whose first line is the marker line for the caller, and the guard denies the next write; a success says
+`paused: true`. Sources: DEC-378 (the rollback freezes first and the flag stays whatever its result), DEC-402 and
+DEC-404 (a real flag carries the marker; what `gov pause` leaves is read back as a freeze). Both repairs pass: the
+flag set again after the last step, or a commit that touches the flag's path not reverted. So the cases do not ask
+whether the command succeeds, which commits it reverts, what it records, or whether the tree is clean afterwards.
+
+The second history takes the same path through the command as the first. It is kept because it ends differently: a
+file is at the path, unmarked, so a repair that only looks for a missing flag would pass the first case and not this
+one.
+
+**`--cancel-agents` cannot end this way, so it has no case.** It makes no revert and no checkout: it removes claim
+locks and commits each ticket file by its path alone, which writes nothing else in the working tree. Run once on the
+first history, it ended with the marked flag and a denied write.
+
+**Seen and not written (the batch allowed two cases): the error ending.** With the first history and an older commit
+of the ticket that cannot be reverted, the command ends with `PAUSE_ROLLBACK_ABORTED` and nothing is at the flag's
+path: the reverts before the conflict removed the flag, and the reset to the starting commit does not bring back an
+ignored file. Run once as a throwaway case, not committed. It is the abort path of the command, which a repair made
+only at the end of a successful rollback does not reach.
 
 ## Earlier suites revised in the first batch
 
