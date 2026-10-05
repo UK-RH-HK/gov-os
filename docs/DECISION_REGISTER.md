@@ -4045,3 +4045,24 @@ of stopping reasons of ADR-0002 §4 and goes to the owner.
 | Version | Date | Change |
 |---|---|---|
 | 0.89 | 2026-10-05 | Delegated under DEC-220: DEC-391 (W1-20 DP-1 to DP-7: command and function, untyped start ids and edges both ways, depth by radius 1/3/8, the code facet asked lazily and stated when unavailable, three gap reasons, `callees` added to `gov.codeintel`, `uncommitted` paths). The stopping reason for unresolved ids alone goes to the owner. |
+
+## 90. Delegated decision on W1-28's package DP-13 (register v0.90, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on one of the three packages the W1-28 (`DAEO-9279`) ticket
+lead returned with DONE. It is reversible, the lead's and the orchestrator's recommendations agree, and the
+confidence is medium. DP-12 (the product-spec role file and agent definition) and DP-15 (the copied settings file's
+held-out deny line) go to the owner.
+
+### DEC-392 — W1-28 DP-13: the launcher's temp folder when a signal arrives or the removal fails
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 package DP-13 options 1a, 2a and 3a, confidence medium; the reviewer's findings F1 and F2 · **Amends:** DEC-386 · **Under:** DEC-332, DEC-159, CAP-58
+- **Decision:**
+  - When the removal of the temp folder fails, `gov launch` still ends with the session's exit code (DEC-332) and
+    writes one line to stderr that names the folder that stayed.
+  - SIGTERM and SIGHUP to the launcher are handled as an interrupt is: the session is ended and the folder removed.
+  - After an interrupt the launcher's exit code is 130.
+  - Ticket (orchestrator): W1-32 (`DAEO-8goq`), which already depends on W1-28, with `src/gov/launch/**` and
+    `tests/unit/launch/**` added to its `allowed_paths` and one KPI line, in its own commit. W1-28 closes as built.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.90 | 2026-10-05 | Delegated under DEC-220: DEC-392 (W1-28 DP-13: a failed removal keeps the session's exit code and names the folder; SIGTERM and SIGHUP as an interrupt; exit code 130; carried by W1-32). W1-28 DP-12 and DP-15 go to the owner. |
