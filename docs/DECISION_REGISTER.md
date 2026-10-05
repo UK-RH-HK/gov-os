@@ -3980,3 +3980,32 @@ owner was told of all three on 2026-10-05 and may reverse any of them.
 | Version | Date | Change |
 |---|---|---|
 | 0.87 | 2026-10-05 | Delegated under DEC-220: DEC-388 (W1-19 DP-8: an unknown `embedding_policy` is not embedded; DP-9: hit@5 per class over 52 queries, as S0b2 states), DEC-389 (W1-16: the UI is turned off with `config set ui_enabled false`; amends the mechanism of DEC-362). |
+
+## 88. Delegated decisions on W1-50's packages DP-11 to DP-16 (register v0.88, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its implementation and two reviews. Every option taken only makes the
+containment check report more, each is reversible, and the lead's and the orchestrator's recommendations agree.
+DP-11 and DP-12 touch owner decisions (DEC-360, DEC-366, DEC-367): they are kept as built, which is the literal and
+stricter reading, and were told to the owner, who may choose otherwise.
+
+### DEC-390 — W1-50 DP-11 to DP-16: the stricter reading in each case
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-11 (a), DP-12 (a), DP-13 (a), DP-14 (c), DP-15 (a), DP-16 (a finding); confidence medium-low to medium-high · **Under:** CAP-58, DEC-254, DEC-269, DEC-358, DEC-359, DEC-360
+- **Decision:**
+  - DP-15: when a merge commit has a parent that is not among the commits new in the move, every path it changes
+    against its first parent is judged by the merge commit's own trailers, or against the caller without them. An
+    ordinary integration merge, whose other parent is new in the move, is read as before (DEC-269).
+  - DP-16: a change under `.tickets/**` in a commit that carries a worker's `Role:` trailer is a finding.
+  - DP-13: a ticket file whose first version is already `closed` is not a close commit; the close commit itself is
+    not "before" itself when it carries a worker's trailers; a close made by a merge commit does not count.
+  - DP-14: a ticket's state and `allowed_paths` are read from `HEAD` and from the working tree, and both must allow.
+  - DP-11, as built until the owner says otherwise: a commit carrying `Role: owner` that becomes new to `HEAD` in an
+    agent session's call is a finding, also when it was made earlier from the owner's console and arrives by a merge
+    or a fast-forward. Such a finding is a record of a permitted action (DEC-254).
+  - DP-12, as built until the owner says otherwise: the revert commits and the record commit of
+    `gov pause --rollback` are judged like any other commit; where they are findings, the findings are records.
+  - `.git/info/grafts` is closed off for the check's git calls; this needs no decision, only tests and a fix.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.88 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-390 (W1-50 DP-11 to DP-16: a merge commit with a parent not new in the move is judged on its own change; a worker-trailer commit under `.tickets/**` is a finding; close-commit edges fail closed; ticket state from HEAD and the working tree together; DP-11 and DP-12 as built, told to the owner). |
