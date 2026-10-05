@@ -484,6 +484,63 @@ def test_read_merge_starts_six_git_processes_for_two_parents(tmp_path, monkeypat
     assert len(calls) == 6
 
 
+def test_read_merge_bounds_its_git_processes_by_the_number_of_parents(tmp_path, monkeypatch):
+    import pytest
+    from gov.guard import containment_merge
+    from gov.guard.containment_merge import MAX_PARENTS, MergeReadError
+
+    project = _make_project(tmp_path)
+    head = _git(project, "rev-parse", "HEAD").strip()
+    sides = [_branch_commit(project, f"s{n}", f"src/s{n}.py")
+             for n in range(MAX_PARENTS)]
+    calls = []
+    real = containment_merge._git
+    monkeypatch.setattr(containment_merge, "_git",
+                        lambda *a, **k: calls.append(a) or real(*a, **k))
+
+    def octopus(others, tree):
+        parents = [a for p in (head, *others) for a in ("-p", p)]
+        return _git(project, "commit-tree", tree, *parents, "-m",
+                    "octopus").strip()
+
+    # Nine parents, each side on top of the first: the commit, a diff
+    # for each parent, a merge base for each of the 36 pairs and one
+    # diff from the first parent to each side.
+    _git(project, "merge", "-q", "--no-ff", "-m", "octopus",
+         *(f"s{n}" for n in range(8)))
+    merged = _git(project, "rev-parse", "HEAD").strip()
+    assert containment_merge.read_merge(str(project), merged) == (
+        [], [f"src/s{n}.py" for n in range(8)])
+    assert len(calls) == 1 + 9 + 36 + 8
+    # The most parents that are read; the tree drops every side's change.
+    most = octopus(sides[:MAX_PARENTS - 1], f"{head}^{{tree}}")
+    assert containment_merge.read_merge(str(project), most) == (
+        sorted(f"src/s{n}.py" for n in range(MAX_PARENTS - 1)), [])
+    # One parent more is refused after the one process that lists them.
+    del calls[:]
+    with pytest.raises(MergeReadError):
+        containment_merge.read_merge(
+            str(project), octopus(sides, f"{head}^{{tree}}"))
+    assert len(calls) == 1
+
+
+def test_read_merge_refuses_a_commit_argument_that_is_not_the_commit_s_own_id(tmp_path):
+    import pytest
+    from gov.guard.containment_merge import MergeReadError, read_merge
+
+    project = _make_project(tmp_path)
+    _branch_commit(project, "side", "src/side.py")
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    merge = _git(project, "rev-parse", "HEAD").strip()
+    _git(project, "tag", "-a", "-m", "tag", "merged", merge)
+    _git(project, "branch", "0123456789abcdef" * 4, merge)
+    for commit in (_git(project, "rev-parse", "refs/tags/merged").strip(),
+                   "0123456789abcdef" * 4):
+        with pytest.raises(MergeReadError):
+            read_merge(str(project), commit)
+    assert read_merge(str(project), merge) == ([], ["src/side.py"])
+
+
 def test_read_merge_of_an_octopus_fails_closed_when_one_parent_has_no_merge_base(tmp_path):
     from gov.guard.containment_merge import read_merge
 

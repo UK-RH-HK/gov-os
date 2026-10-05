@@ -16,11 +16,17 @@ from gov.guard.containment import _GitError, _NotARepo, _git
 
 _COMMIT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 
+# The most parents of a merge commit that is read: the git processes
+# grow with the square of the number (853 at most for 24), and a check
+# that is stopped at its time limit judges nothing.
+MAX_PARENTS = 24
+
 
 class MergeReadError(ValueError):
     """``read_merge`` cannot read the merge: the ``commit`` argument is
-    not a full commit id, the commit is not a merge commit, or the
-    repository, a parent, a merge base or a tree cannot be read."""
+    not the full id of a commit, the commit is not a merge commit or has
+    more than ``MAX_PARENTS`` parents, or the repository, a parent, a
+    merge base or a tree cannot be read."""
 
 
 class MergeReading(NamedTuple):
@@ -79,24 +85,42 @@ def read_merge(root: str, commit: str) -> MergeReading:
 
     Raises ``MergeReadError`` (a ``ValueError``), before git is started,
     for a *commit* that is not a full commit id, so no argument is ever
-    read by git as an option; and for a commit that is not a merge
-    commit, and where the repository, a parent, a merge base or a tree
-    cannot be read.
+    read by git as an option; for a *commit* that git resolves to a
+    commit with another id (the id of a tag object, a ref whose name has
+    a commit id's form); for a commit that is not a merge commit or has
+    more than ``MAX_PARENTS`` parents; and where the repository, a
+    parent, a merge base or a tree cannot be read.
 
     The answer depends on the repository's real objects only: no caller,
     role or ticket, and no replacement ref, graft, shallow file,
     commit-graph or inherited ``GIT_DIR`` (the check's own git calls).
     For a merge commit with n parents at most 1 + n + 3n(n-1)/2 git
-    processes (six for two parents), whatever the number of paths.
+    processes (six for two parents), whatever the number of paths, and
+    one only when n is more than ``MAX_PARENTS``; no two of them compare
+    the same pair of commits.
     """
     if not isinstance(commit, str) or not _COMMIT_ID.fullmatch(commit):
         raise MergeReadError(f"{commit!r} is not a commit id")
     ids = _run(root, "rev-list", "--no-walk", "--parents", commit).split()
+    if ids[:1] != [commit]:
+        # A tag object's id, or a ref whose name has a commit id's form.
+        raise MergeReadError(f"{commit} is not the id of a commit")
     if len(ids) < 3:
         raise MergeReadError(f"{commit} is not a merge commit")
     parents = list(dict.fromkeys(ids[1:]))
+    if len(parents) > MAX_PARENTS:
+        raise MergeReadError(
+            f"{commit} has {len(parents)} parents, more than {MAX_PARENTS}")
     first = parents[0]
-    differs = {p: _changed(root, p, ids[0]) for p in parents}
+    seen: dict = {}
+
+    def changed(a: str, b: str) -> set:
+        # One git process for each pair of different commits.
+        if (a, b) not in seen:
+            seen[a, b] = _changed(root, a, b) if a != b else set()
+        return seen[a, b]
+
+    differs = {p: changed(p, ids[0]) for p in parents}
     # For each parent, the paths another parent brought against it.
     brought = {p: set() for p in parents}
     # The pairs with the first parent come first.
@@ -104,8 +128,8 @@ def read_merge(root: str, commit: str) -> MergeReading:
         # Exit code 1 with no output: no merge base.
         bases = _run(root, "merge-base", "--all", a, b, ok=(0, 1)).split()
         if len(bases) == 1:
-            brought[a] |= _changed(root, bases[0], b) - differs[b]
-            brought[b] |= _changed(root, bases[0], a) - differs[a]
+            brought[a] |= changed(bases[0], b) - differs[b]
+            brought[b] |= changed(bases[0], a) - differs[a]
         elif a == first:
             return MergeReading(sorted(set().union(*differs.values())), [])
     own = set().union(*(differs[p] - brought[p] for p in parents))
