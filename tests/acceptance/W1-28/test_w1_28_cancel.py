@@ -11,11 +11,11 @@ and read through ``gov.tasks``.
   ``status`` changes. It cannot stop a process.
 - **DEC-368.** It also sets the freeze flag.
 - **DEC-367.** The record is a commit to the ticket file, with the trailers
-  ``Task: <ticket>`` and ``Reverts-Task: <ticket>``. For each ticket whose
-  claim was released, the command makes a commit that changes that ticket's
-  file and carries both trailers with that ticket's id; the file then names
-  the session that held the claim. Whether two released tickets share one
-  commit is decision package DP-9: these cases hold either way.
+  ``Task: <ticket>`` and ``Reverts-Task: <ticket>``.
+- **DEC-375.** One record commit per released ticket: it changes that
+  ticket's file alone and carries that ticket's two trailers and no other
+  ticket's; the file then names the session that held the claim. A cancel
+  that releases nothing makes no commit (confirmed by DEC-378).
 - **The result** lists what was released as ``cancelled``, each entry with the
   ``ticket`` and its ``holder`` (the shape ``gov.tasks.release`` returns).
 - **On repeat** (DEC-357) nothing is held any more: the repeat succeeds and
@@ -61,27 +61,43 @@ def test_cancel_agents_sets_the_freeze_flag(project, sandbox, pause, interface, 
     support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER), "after --cancel-agents, the write")
 
 
-def test_the_cancel_is_recorded_by_a_commit_to_each_ticket_file(project, pause, interface, claims):
-    """DEC-367. The commit is made while the freeze the same call set is in force (DEC-368)."""
+def test_the_cancel_is_recorded_by_one_commit_per_released_ticket(project, pause, interface, claims):
+    """DEC-367, DEC-375. The commits are made while the freeze the same call set is in force (DEC-368)."""
     before = support.head(project)
     _cancel(pause, interface)
     made = support.new_commits(project, before)
-    assert made, "gov pause --cancel-agents made no commit: the cancel is not recorded"
-    for ticket in claims:
-        rel = support.ticket_rel(ticket)
-        records = [commit for commit in made if rel in support.changed_paths(project, commit)]
-        assert records, f"no commit of the cancel changes {rel}"
-        for commit in records:
-            for key in ("Task", "Reverts-Task"):
-                assert ticket in support.trailers(project, commit, key), \
-                    f"the commit {commit[:support.SHORT]} to {rel} has no trailer `{key}: {ticket}`:\n" \
-                    f"{support.message(project, commit)}"
-    allowed = {support.ticket_rel(ticket) for ticket in claims}
+    assert len(made) == len(claims), \
+        f"{len(claims)} claims were released and the cancel made {len(made)} commits, not one per released ticket"
+    recorded = {}
     for commit in made:
-        outside = sorted(set(support.changed_paths(project, commit)) - allowed)
-        assert not outside, f"the commit {commit[:support.SHORT]} of the cancel changes {outside}"
+        changed = support.changed_paths(project, commit)
+        tickets = [ticket for ticket in claims if changed == [support.ticket_rel(ticket)]]
+        assert len(tickets) == 1, \
+            f"the commit {commit[:support.SHORT]} of the cancel changes {changed}, not one released ticket's file alone"
+        ticket = tickets[0]
+        assert ticket not in recorded, f"two commits of the cancel record {ticket}"
+        recorded[ticket] = commit
+        for key in ("Task", "Reverts-Task"):
+            assert support.trailers(project, commit, key) == [ticket], \
+                f"the commit {commit[:support.SHORT]} to {support.ticket_rel(ticket)} has not the one trailer " \
+                f"`{key}: {ticket}`:\n{support.message(project, commit)}"
+    assert sorted(recorded) == sorted(claims)
     assert support.porcelain(project) == "", f"the cancel left uncommitted changes:\n{support.porcelain(project)}"
     assert support.is_paused(project)
+
+
+def test_a_cancel_that_releases_one_claim_makes_one_commit(project, sandbox, pause, interface):
+    """DEC-375, the smallest case: one claim, one record commit, and no other ticket's file is touched."""
+    support.tasks(project, sandbox, "claim", support.OTHER_TICKET, support.OTHER_HOLDER)
+    before, untouched = support.head(project), support.ticket_file(project, support.TICKET)
+    result = _cancel(pause, interface)
+    assert len(support.listed(result, "cancelled")) == 1, result
+    made = support.new_commits(project, before)
+    assert len(made) == 1, f"one claim was released and the cancel made {len(made)} commits"
+    assert support.changed_paths(project, made[0]) == [support.ticket_rel(support.OTHER_TICKET)]
+    assert support.trailers(project, made[0], "Task") == [support.OTHER_TICKET]
+    assert support.trailers(project, made[0], "Reverts-Task") == [support.OTHER_TICKET]
+    assert support.ticket_file(project, support.TICKET) == untouched, "the file of a ticket nobody held changed"
 
 
 def test_each_cancelled_session_is_recorded_in_its_ticket(project, pause, interface, claims):

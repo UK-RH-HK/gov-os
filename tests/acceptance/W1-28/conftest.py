@@ -115,6 +115,55 @@ def paused(project, pause, interface):
     return project
 
 
+@pytest.fixture(scope="session")
+def launch_base(tmp_path_factory):
+    """The launcher's temporary project (DEC-386), built once. Every test works on its own copy of it."""
+    import w1_28_launch_support as launch_support
+
+    return launch_support.make_project(tmp_path_factory.mktemp("w1-28-launch-base") / "repo")
+
+
+@pytest.fixture()
+def launch_project(launch_base, tmp_path, sandbox):
+    """This test's own copy of the launcher's project, with a ``held-out.yaml`` made up here (a stand-in directory)."""
+    import shutil
+
+    import w1_28_launch_support as launch_support
+
+    target = tmp_path / "launch-repo"
+    shutil.copytree(launch_base, target, symlinks=True)
+    stand_in = launch_support.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in")
+    launch_support.w47.configure_stand_in(target, stand_in)
+    return target
+
+
+@pytest.fixture()
+def stand_in(launch_project, sandbox):
+    """The stand-in directory this test's project names as held out. Never the real one."""
+    return sandbox.elsewhere / "held-out-stand-in"
+
+
+@pytest.fixture()
+def cli(sandbox):
+    """The stand-in CLI at ``<HOME>/.local/bin/claude``: it starts nothing and uses its temp folder as planned."""
+    import w1_28_launch_support as launch_support
+
+    return launch_support.install_stand_in_cli(sandbox)
+
+
+@pytest.fixture()
+def launch(launch_project, sandbox, cli):
+    """``launch(role, ticket=None, *cli_args)`` runs ``gov launch <role> <ticket> [-- cli_args]`` in the project."""
+    import w1_28_launch_support as launch_support
+
+    def _launch(role, ticket=None, *cli_args):
+        return launch_support.w46.launch(launch_project, sandbox, cli, role,
+                                         ticket or launch_support.TICKET_OF.get(role, launch_support.ENGINEER_TICKET),
+                                         *cli_args)
+
+    return _launch
+
+
 @pytest.fixture()
 def claims(project, sandbox):
     """Two tickets claimed by two sessions, through ``gov.tasks.claim``; ``{ticket: holder}``."""

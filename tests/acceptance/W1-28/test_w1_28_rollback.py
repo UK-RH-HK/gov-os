@@ -29,15 +29,16 @@ DEC-366, point by point:
 
 DEC-367: the record is one commit to the ticket file, made after the reverts,
 with the trailers ``Task: <ticket>`` and ``Reverts-Task: <ticket>``.
-DEC-368: the rollback also sets the freeze flag.
+DEC-375: a rollback that reverts nothing, on its first run as on a repeat,
+writes no record commit.
+DEC-368: the rollback also sets the freeze flag. DEC-378: it sets the flag
+first, once the caller is allowed, and the flag stays whatever the rollback's
+result: a conflict, an unknown ticket, a dirty tree. A caller who is not
+allowed sets nothing (``test_w1_28_roles.py``).
 
 **The result** lists the reverted commits as ``reverted``, newest first, and
 the skipped merge commits as ``skipped_merges``; an entry names its commit by
 at least seven characters of the hash.
-
-Not asserted (decision packages DP-10 and DP-11): whether the flag is set by a
-rollback that ends with an error, and whether a rollback that reverts nothing
-on its first run writes a record.
 """
 
 from __future__ import annotations
@@ -234,8 +235,27 @@ def test_rollback_skips_a_merge_commit_and_names_it(project, pause, interface):
     support.git(project, "merge-base", "--is-ancestor", merge, "HEAD")
 
 
-def test_a_conflicting_revert_aborts_everything_with_an_error(project, pause, interface):
-    """The newest commit reverts cleanly, the older one conflicts: nothing of the rollback is left, not the first revert."""
+def test_rollback_of_a_ticket_whose_only_commit_is_a_merge_reverts_nothing_and_writes_no_record(project, pause,
+                                                                                              interface):
+    """DEC-366: the merge is skipped and named. DEC-375: nothing was reverted, so no record commit is made."""
+    side, merge = support.merge_only_history(project)
+    before, tickets = support.head(project), support.ticket_files(project)
+    result = _rollback(pause, interface)
+    skipped = support.listed(result, "skipped_merges")
+    assert support.listed(result, "reverted") == [], f"`reverted` is not empty: {result}"
+    assert len(skipped) == 1 and support.names(skipped[0], merge), \
+        f"`skipped_merges` does not name the merge commit {merge[:SHORT]} alone: {skipped}"
+    assert support.head(project) == before, "a rollback that reverted nothing made a commit (DEC-375)"
+    assert support.ticket_files(project) == tickets, "a rollback that reverted nothing changed a ticket file"
+    assert support.committed(project, support.OTHER_REL) == support.OTHER_TEXT, "the merged commit was reverted"
+    assert support.is_paused(project), f"the rollback did not set {support.FREEZE_FLAG_REL} (DEC-368)"
+
+
+def test_a_conflicting_revert_aborts_everything_with_an_error(project, sandbox, pause, interface):
+    """The newest commit reverts cleanly, the older one conflicts: nothing of the rollback is left, not the first revert.
+
+    The freeze flag is what stays (DEC-378): it was set first, and the guard denies the next write.
+    """
     support.conflicting_history(project)
     before, tickets = support.head(project), support.ticket_files(project)
     run = pause("--rollback", support.TICKET)
@@ -248,6 +268,10 @@ def test_a_conflicting_revert_aborts_everything_with_an_error(project, pause, in
     assert (Path(project) / support.CHANGED_REL).read_text(encoding="utf-8") == "VALUE = 3\n", \
         "the conflict was left in the working tree"
     assert support.ticket_files(project) == tickets, "an aborted rollback was recorded in a ticket"
+    assert support.flag(project).is_file(), \
+        f"a rollback that ended in a conflicting revert left no {support.FREEZE_FLAG_REL} (DEC-378)\n{run.describe()}"
+    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER),
+                          "after a rollback that ended in a conflict, the write")
 
 
 def test_rollback_of_an_unknown_ticket_is_an_error(project, pause, interface, history):
@@ -257,14 +281,21 @@ def test_rollback_of_an_unknown_ticket_is_an_error(project, pause, interface, hi
     assert support.head(project) == before, f"HEAD moved\n{run.describe()}"
     assert support.porcelain(project) == "", f"it left changes:\n{support.porcelain(project)}"
     assert not support.ticket_path(project, support.UNKNOWN_TICKET).exists(), "a ticket file was created"
+    assert support.flag(project).is_file(), \
+        f"a rollback of an unknown ticket left no {support.FREEZE_FLAG_REL} (DEC-378)\n{run.describe()}"
 
 
 def test_rollback_of_a_ticket_with_no_commit_succeeds_with_an_empty_list(project, pause, interface):
-    """The other ticket has a file and no commit. Whether this writes a record is DP-11; nothing else changes."""
+    """The other ticket has a file and no commit. Nothing was reverted, so no record commit is made (DEC-375)."""
     support.commit(project, {support.FEATURE_REL: "STEP = 1\n"}, "feature, step 1", support.TICKET)
-    tree = support.tree_outside_tickets(project)
+    tree, before, tickets = support.tree_outside_tickets(project), support.head(project), support.ticket_files(project)
     result = _rollback(pause, interface, ticket=support.OTHER_TICKET)
     assert support.listed(result, "reverted") == [], f"`reverted` is not empty: {result}"
+    assert support.head(project) == before, \
+        "a rollback that reverted nothing on its first run made a commit (DEC-375: no record commit)"
+    assert support.ticket_files(project) == tickets, "a rollback that reverted nothing changed a ticket file"
+    assert support.porcelain(project) == "", f"it left changes:\n{support.porcelain(project)}"
+    assert support.is_paused(project), f"the rollback did not set {support.FREEZE_FLAG_REL} (DEC-368)"
     assert support.tree_outside_tickets(project) == tree, "committed files changed"
     assert (Path(project) / support.FEATURE_REL).read_text(encoding="utf-8") == "STEP = 1\n", \
         "the working tree lost another ticket's file"
@@ -283,6 +314,16 @@ def test_rollback_on_a_dirty_tree_is_refused(project, pause, interface, history)
     assert path.read_text(encoding="utf-8") == "STEP = 2\nUNCOMMITTED = True\n", \
         f"the uncommitted change to {support.FEATURE_REL} is gone\n{run.describe()}"
     assert not support.revert_in_progress(project), "a revert is still in progress"
+    assert support.flag(project).is_file(), \
+        f"a rollback refused for a dirty tree left no {support.FREEZE_FLAG_REL} (DEC-378)\n{run.describe()}"
+
+
+def test_a_failed_rollback_keeps_a_freeze_that_was_already_set(paused, pause, interface):
+    """DEC-378: "the flag stays whatever the rollback's result". Only the owner lifts it, with ``--off``."""
+    support.failed(pause("--rollback", support.UNKNOWN_TICKET), interface)
+    assert support.is_paused(paused), "a failed rollback cleared a freeze that was set before it"
+    support.succeeded(pause("--off"), interface)
+    assert not support.is_paused(paused), "the owner could not lift the freeze a failed rollback left"
 
 
 def test_rollback_finds_a_commit_made_before_the_trailer_rule_by_its_message_body(project, pause, interface):

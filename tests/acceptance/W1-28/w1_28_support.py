@@ -279,6 +279,23 @@ def merged_history(project):
     return side, other, merge, after
 
 
+def merge_only_history(project):
+    """The ticket's only commit is a merge commit: the merged side holds a commit of the other ticket.
+
+    ``(side, merge)``. The merge carries ``Task: <ticket>`` in its final block and merges cleanly.
+    """
+    main = branch(project)
+    git(project, "checkout", "-q", "-b", "w1-28-side")
+    side = commit(project, {OTHER_REL: OTHER_TEXT}, "a note of the other ticket", OTHER_TICKET)
+    git(project, "checkout", "-q", main)
+    git(project, "merge", "-q", "--no-ff", "w1-28-side", "-m", "Merge the side branch",
+        "-m", f"Task: {TICKET}\nRole: {ORCHESTRATOR}")
+    merge = head(project)
+    assert len(git(project, "rev-list", "--parents", "-1", merge).split()) == 3, "the fixture merge has not 2 parents"
+    assert trailers(project, merge, "Task") == [TICKET], "the fixture merge does not name the ticket"
+    return side, merge
+
+
 def conflicting_history(project):
     """The ticket's older commit cannot be reverted: the other ticket changed the same line since.
 

@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 PYPROJECT_REL = "pyproject.toml"
 API_REL = "docs/interfaces/API-0002.yaml"
 PATH_MAP_REL = "governance/project/path-map.yaml"
+HELD_OUT_REL = "governance/project/held-out.yaml"   # DEC-385: no fixture copies it into a temporary project
 CHECKS_REL = "template/governance/kernel/checks"
 
 # The twelve Wave 1 governance operations the registry reserves (ticket KPI, CAP-28.b).
@@ -104,6 +105,8 @@ def copy_working_tree(destination, root=REPO_ROOT):
         capture_output=True, text=True, check=True,
     ).stdout
     for rel in sorted(set(item for item in listing.split("\0") if item)):
+        if rel == HELD_OUT_REL:   # DEC-385: left out by its path, never opened
+            continue
         source = Path(root) / rel
         target = destination / rel
         if not (source.is_file() or source.is_symlink()):

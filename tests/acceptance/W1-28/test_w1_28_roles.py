@@ -13,7 +13,7 @@ invocation." DEC-365:
   calls.
 
 A refused call ends with the error ``PAUSE_REFUSED`` (named after
-``LAUNCH_REFUSED``, ``src/gov/launch/launcher.py``) and changes nothing: no
+``LAUNCH_REFUSED``, ``src/gov/launch/launcher.py``; DEC-378) and changes nothing: no
 flag, no released claim, no commit. A ``GOV_ROLE`` that names no role is
 neither the owner nor the orchestrator, and is refused like a worker.
 
@@ -66,6 +66,12 @@ def test_a_worker_cannot_roll_back(project, pause, interface, history):
     assert support.head(project) == before, "a worker's gov pause --rollback made a commit"
     assert support.porcelain(project) == "", f"it left changes:\n{support.porcelain(project)}"
     assert not support.is_paused(project), "a worker's gov pause --rollback set the flag"
+
+
+def test_a_workers_rollback_of_an_unknown_ticket_is_refused_as_a_workers_and_sets_nothing(project, pause, interface):
+    """DEC-378: the flag is set "once the caller is allowed". The caller is judged first, so nothing is set here."""
+    support.refused(pause("--rollback", support.UNKNOWN_TICKET, role=support.ENGINEER), interface)
+    assert not support.is_paused(project), "a refused caller's rollback of an unknown ticket set the flag"
 
 
 # --------------------------------------------------------------------------
