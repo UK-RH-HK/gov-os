@@ -3,15 +3,17 @@
 Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket `DAEO-lkeb` (W1-16), Contract v4
 CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-078, DEC-285 to DEC-290, DEC-298,
 DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation; the later batches
-serve DEC-338, DEC-339, DEC-346 and DEC-347.
+serve DEC-338, DEC-339, DEC-346, DEC-347 and DEC-362.
 
-The suite has **64 test functions, 157 cases** in seven files, a support module, a conftest and the question set
+The suite has **71 test functions, 166 cases** in eight files, a support module, a conftest and the question set
 `questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
 the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. The sixth file,
 `test_w1_16_daemon_dir_and_names.py` (10 functions, 13 cases), is a third batch, added after implementation for the
 delegated decisions DEC-338 and DEC-339; see "The third batch" below. The seventh file,
 `test_w1_16_builtin_allowlist_and_daemon_secrets.py` (6 functions, 12 cases), is a fourth batch, added after
-implementation for the delegated decisions DEC-346 and DEC-347; see "The fourth batch" below. **No W1-15
+implementation for the delegated decisions DEC-346 and DEC-347; see "The fourth batch" below. The eighth file,
+`test_w1_16_ui_off.py` (7 functions, 9 cases), is a fifth and last batch, added after implementation for the
+owner's decision DEC-362; see "The fifth batch" below. **No W1-15
 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
@@ -20,9 +22,9 @@ acceptance test was rewritten**: none asserts the old token rule (see "The W1-15
 python3 -m pytest tests/acceptance/W1-16 -q -p no:cacheprovider
 ```
 
-Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About seven minutes with the ticket built (the tool
-takes 5 to 6 seconds per indexing run, and one runs at a time). Run it alone: one test watches this repository's
-`.gov-runtime/`.
+Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About eight minutes with the ticket built (the tool
+takes 5 to 6 seconds per indexing run, and one runs at a time; the fifth batch adds about one minute). Run it
+alone: one test watches this repository's `.gov-runtime/`.
 
 - **No secret is committed.** Every planted string (canaries in a string, a comment and an identifier, token-shaped
   strings, the seven dev-tier values) and every prefixed identifier is built at run time from parts in
@@ -68,6 +70,9 @@ came with the third batch); each takes the project root as a `pathlib.Path` and 
   default home `~/.cache/codebase-memory-mcp` included), in `TMPDIR` or in the working directory; `git status` of
   the repository stays clean; the tool's `.codebase-memory/` persistence folder is not written. The one exception
   is the daemon's lock and socket files, which are no index files: they go to `daemon_dir(root)` (DEC-338).
+- **Every call that runs the tool leaves its loopback UI off** (DEC-362): the tool, asked in `home(root)`, says
+  `ui_enabled` is `false`, the daemon the call started does not serve the UI, and nothing a caller controls (its
+  environment, the root's name, a setting left in the home) turns it on. See "The fifth batch".
 - The functions need the `codebase-memory-mcp` and `gitleaks` binaries on `PATH`.
 
 One more function is fixed in the package `gov.secrets` (W1-15's, next to `indexable` and `stores_with_secrets`),
@@ -120,7 +125,7 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (151 cases)
+## `local_only` (160 cases)
 
 Deselect with `-m "not local_only"` (6 cases remain: the interface test, the four that read the two gitleaks
 files as TOML, and the one that reads what the wrapper's source imports).
@@ -128,8 +133,9 @@ files as TOML, and the one that reads what the wrapper's source imports).
 - **Run the `codebase-memory-mcp` binary** (through the wrapper, or directly for the premise and `list_projects`):
   all of `test_w1_16_home.py` but the interface test, all of `test_w1_16_secret_exclusion.py`, the wrapper cases of
   `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, all of
-  `test_w1_16_paths_and_roots.py` but its premise, and the daemon directory case of the fourth batch. Skipped
-  when the binary is not on `PATH`.
+  `test_w1_16_paths_and_roots.py` but its premise, the daemon directory case of the fourth batch, and the nine
+  cases of the fifth batch (`test_w1_16_ui_off.py`; they also need a user and network namespace, and are skipped
+  on a machine that gives none). Skipped when the binary is not on `PATH`.
 - **Run the `gitleaks` binary**, directly or through the filter: the other marked cases of
   `test_w1_16_token_rule.py`, the premise of `test_w1_16_paths_and_roots.py`, and the other eleven cases of the
   fourth batch. Skipped when the binary is not on `PATH`.
@@ -190,6 +196,9 @@ files as TOML, and the one that reads what the wrapper's source imports).
   workbench; its questions and expected answers are not in this repository, and not in the dev tiers. The public
   dev query set in the tiers' folder has five natural-language `callers-impact` queries whose gold answers are
   mostly documents; the code files it names for code questions are used here and marked with their query ids.
+- **Decided (DEC-377):** no S0b2 C1 question set exists; W1-16 closes with the designer's 26 questions as they
+  are, and the comparable measurement (hit@5 on the dev query set's code classes) is W1-42's, at the Wave 1 exit
+  run.
 - **Every expected answer was read from the source of the tier**, by a whole-word search, never from the tool. The
   tier premise test checks each one against a fresh clone.
 - **13 symbols**, 5 Rust, 5 Python, 3 TypeScript, each asked for callers and for impact: **26 questions**.
@@ -205,7 +214,7 @@ files as TOML, and the one that reads what the wrapper's source imports).
 - **Dead code**: the listed unreferenced functions are answered, and three functions that non-test code calls are
   not.
 - The stand-in scored 26 of 26, before and after. The set uses unique names and direct calls, so 60 % has slack
-  on it; a harder set is a choice for the owner (package DP-1).
+  on it; a harder set was a choice for the owner (package DP-1; decided by DEC-377: the set stays as it is).
 
 ### The token rule (success 4, failure 1)
 
@@ -433,6 +442,104 @@ built-in rules that the built-in allowlist shelters (a residual of DEC-347); the
 every place; the 16-character floor after a leading separator (DEC-346, as built: the third batch holds 14 and
 16 characters); that the daemon directory is empty or removed.
 
+## The fifth batch: the tool's loopback UI is off
+
+`test_w1_16_ui_off.py`, 7 test functions, 9 cases. Tests added after implementation, reason "owner decision":
+DEC-362 (the UI question package DP-4 left open). No KPI line was added; the batch serves CAP-12.
+
+**Red run: not run by the designer.** The designer's session is sandboxed: `/tmp` is read-only for it, so every
+fixture that makes a sandbox stops with `OSError: [Errno 30] Read-only file system: '/tmp/w16-…'`, and the tool's
+daemon cannot start there (`CBM daemon failed to start: socket_creation failed with EPERM`). Collection was run
+(166 cases; 6 without `local_only`, of which 5 passed there and the interface test stopped at the sandbox).
+Expected on `w1/W1-16` at `43a37956` plus this batch, for the lead's run to
+confirm: the new file alone **8 failed, 1 passed** (the premise); the whole suite **8 failed, 158 passed**. The
+157 cases of the first four batches stay green.
+
+| Decision | Test functions | Red reason today |
+|---|---|---|
+| **DEC-362** the tool alone serves its UI, and the setting of its home turns it off | `test_the_tool_alone_serves_its_ui_unless_the_setting_of_its_home_says_false` (premise) | Passes: a premise that keeps true. |
+| **DEC-362** every call the wrapper makes leaves the UI off, the first call in a fresh repository included | `test_a_call_of_the_wrapper_leaves_the_ui_off[3]` (`index`, `projects`, `callers`) | **`after index(root) the UI is on: the daemon log of the home holds 1 new line(s) with ui.serving; 127.0.0.1:9749 was open at … of … looks; the tool says ui_enabled = true in the home`**, and the same after `projects(root)` and `callers(root, name)`: the wrapper sets nothing, so the tool's default holds, and the default is on. |
+| **DEC-362** a second `index(root)` keeps it off | `test_a_second_index_keeps_the_ui_off` | **`after a second index(root) the UI is on: …`**, for the same reason. |
+| **DEC-362** a first call that is no index | `test_a_first_call_that_builds_no_index_does_not_serve_the_ui` | **`projects(root) as the first call served the UI: …`** is expected. If the tool refuses a home that does not exist before it starts a daemon, the case passes today and keeps true. |
+| **DEC-362** a caller cannot turn it back on | `test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on` · `test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on` · `test_a_setting_left_in_the_home_is_turned_off_by_the_next_call` | **`with UI variables in the caller's environment the UI is on: …`**, **`in a repository named --ui=true the UI is on: …`** and **`after a setting left on in the home, projects(root) leaves the UI on: …`**: today the UI is on with or without the caller's doing. |
+
+No stand-in was run: the tool's daemon does not start in the designer's session. The helpers were tried there
+with a listener of the test's own in place of the daemon (the port watch saw it, during the command and after it
+ended, and saw nothing without it) and with a daemon log written by hand.
+
+### The facts
+
+Observed by the designer with `codebase-memory-mcp` 0.11.0, each in a fresh home (`CBM_CACHE_DIR`), with the
+`config` commands only (they start no daemon: a fresh home holds `_config.db` and no `logs/` after one):
+
+- `config get ui_enabled` prints `true` in a fresh home. `config list` shows `ui_enabled = true` and
+  `ui_port = 9749`.
+- `config set ui_enabled false` prints `ui_enabled = false` and `(restart the daemon for this to take effect)`,
+  and `config get` then prints `false`. Only `true` and `false` are taken: `0`, `off`, `no` and `FALSE` are
+  refused (`error: ui_enabled must be true or false`).
+- **The setting is kept in `<home>/config.json`** (`{"ui_enabled": …, "ui_port": 9749}`), written at the first
+  `config set`. The `config` table of `<home>/_config.db` stays empty for it. A home without `config.json` says
+  `true`.
+- `config reset ui_enabled` writes `false`, though a fresh home says `true`. The tool's own help gives
+  `default=false` for the key.
+- The binary holds the log messages `ui.serving`, `ui.unavailable`, `ui.retry_scheduled` and `ui.no_assets`, the
+  switches `--ui=false` and `--ui=true` ("persisted"), and one UI variable, `CBM_UI_MAX_RENDER_NODES`.
+- A daemon writes `<home>/logs/cbm-daemon.log` from its start (`level=info msg=mem.init …`), before it listens.
+
+Reported by the lead, and not observed by the designer (the daemon cannot start in the designer's session). The
+premise test checks the first two at every run:
+
+- After a plain `cli --quiet --json list_projects` in a fresh home the port 9749 listens for about a second, the
+  home's daemon log holds a line with `ui.serving`, and `config get ui_enabled` prints `true`.
+- `config set ui_enabled false` in a home, before a daemon starts there, keeps the port closed, and no
+  `ui.serving` line is written.
+- The switch `--ui=false` has no effect on a `cli` call; only the server form of the binary persists it. So no
+  test looks for an argument of the tool's command line.
+- The daemon ends about a second after a call.
+
+How these tests decide:
+
+- **Off** is three signs, read after a call, and each must hold. The tool, asked in `gov.codeintel.home(root)`
+  (`config get ui_enabled`), prints `false`. The daemon log of that home holds no new line with `ui.serving`.
+  And `127.0.0.1:9749` was never open while the call ran, nor in the 1.5 seconds after it. The failure message
+  names every sign that shows the UI on.
+- **The home has a daemon log** after a call that ran the tool: without it nothing tells whether a daemon served
+  the UI, and the case fails.
+- **The port is the command's alone.** Port 9749 is one port for the whole machine, and another worktree's session
+  may run the tool: a foreign listener would make a case fail, and a foreign listener that takes the port first
+  would keep this daemon from writing `ui.serving`, so a case could pass. Every command that can start a daemon
+  (the wrapper's child, and the tool alone in the premise) therefore runs behind `support.port_watched`: a user
+  and network namespace of its own, with the loopback interface brought up. The launcher first shows that its
+  watch sees a listener of its own and that nothing holds the UI port; then it asks the port every 20 ms and
+  writes how often it was open. A machine that gives no such namespace skips the nine cases (fixture `port`). The
+  `config` commands start no daemon and run outside the namespace.
+- **The premise.** The tool alone, in a fresh home, shows the three signs on. In a second fresh home, with
+  `config set ui_enabled false` first, it shows them off. So a case can go green, only through the wrapper, and
+  the signs tell on from off on the machine of the run.
+- **Every call.** One fresh repository is indexed, listed, asked for the callers of a function, and indexed
+  again, each in a child of its own; the signs are read after each. The answers are checked (one project, the
+  right caller), so a wrapper that runs no tool does not pass. `index(root)` builds the home anew, so every
+  `ui.serving` line there after it is new; for the other calls the lines are counted before and after.
+- **A first call that is no index.** `projects(root)` in a repository that was never indexed. Whether it answers
+  or is refused is not held. The setting is not asked here: the call may leave no home, and the tool asked in an
+  empty home says `true`. The log and the port are read.
+- **The caller's environment.** `index(root)` and `callers(root, name)` run with `CBM_UI`, `CBM_UI_ENABLED`,
+  `UI_ENABLED` set to `true`, `CBM_UI_PORT` and `UI_PORT` set to the port, and `CBM_UI_MAX_RENDER_NODES`.
+- **A caller's arguments.** The wrapper's functions take the root and, for four of them, a symbol name. As built,
+  the name is never given to the tool, and the root stands on the tool's command line only inside the one JSON
+  argument of `index_repository` (the path of the staged copy). There is no other way in. One case holds both:
+  a repository whose folder is named `--ui=true`, indexed and asked, and `callers(root, "--ui=true")`, which
+  answers an empty list.
+- **A setting left in the home.** After `index(root)` and three seconds (the daemon has ended), someone runs
+  `config set ui_enabled true` in the repository's home; the tool then says `true` (checked). The wrapper's next
+  call, `projects(root)` and then again `callers(root, name)`, leaves the three signs off.
+
+Not tested in this batch, on purpose: that the argument `--ui=false` is, or is not, passed to the tool (it has
+no effect on a `cli` call; the lead reports the difference to DEC-362's wording); a daemon that already runs with
+the UI on when the wrapper is called (the tool says a restart is needed: a residual the lead reports);
+`config.json` written by hand, or made unreadable; the setting `ui_port`; the note in the tool registry; the
+user's own home of the tool; the tool's server form; a machine without namespaces.
+
 ## The W1-15 suite
 
 No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rewritten.
@@ -451,19 +558,20 @@ No test of `tests/acceptance/W1-15/` asserts the old token rule, so none was rew
 - A command (`gov …`) for the wrapper: no KPI names one.
 - How the wrapper gives the tool only the allowed files (a staged copy, an ignore mechanism): the tests see the
   result. A file replaced between the filter's answer and the indexer's read is a W1-15 residual.
-- The daemon's local UI port (package DP-4; DEC-338 leaves it to the owner). Where its lock and socket files go is
-  tested by the third batch.
+- The daemon's local UI port was not tested until the owner decided (package DP-4; DEC-362): the fifth batch tests
+  that it is off. Where the daemon's lock and socket files go is tested by the third batch.
 - Index time, memory and graph size (DEC-078 gives the envelope); other languages than Rust, Python, TypeScript.
 - Renaming a file or a folder; partial or stale indexes after a crash; two indexing jobs at once.
 - The tool's other queries (snippets, text search, architecture, traces): they are not in the interface.
 
 ## Decision packages returned with this suite
 
-- **DP-1** The question set and the measure of hit@5 (designer's set, provisional).
+- **DP-1** The question set and the measure of hit@5. (Decided by DEC-377: the designer's set as it is; the
+  comparable hit@5 is measured by W1-42 at the Wave 1 exit run.)
 - **DP-2** The wrapper's public interface (a Python interface, eight functions).
 - **DP-3** What "a rename" is (a function renamed in the clone).
 - **DP-4** The tool's daemon: runtime directory outside `.gov-runtime/` and a local UI port. (Decided for the
-  directory by DEC-338.)
+  directory by DEC-338, and for the UI by DEC-362: the wrapper turns it off.)
 - **DP-5** (third batch) The 16-character floor when a body begins with `_` or `-`: does the first character count?
 - **DP-6** (third batch) Who removes a repository's daemon directory, and what the suite's own `CBM_RUNTIME_DIR`
   still means.

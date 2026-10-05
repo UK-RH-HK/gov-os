@@ -10,7 +10,8 @@ answers of the code graph. It also carries the repair of the token rule
 - ``gov.secrets.indexable(root, paths)``, the filter of W1-15, called the same way;
 - the two gitleaks configuration files, given to the ``gitleaks`` binary;
 - the ``codebase-memory-mcp`` binary's own ``list_projects``, asked about the home the wrapper names;
-- ``gov.codeintel.daemon_dir(root)`` and ``gov.secrets.path_holds_secret(root, path)`` (the third batch).
+- ``gov.codeintel.daemon_dir(root)`` and ``gov.secrets.path_holds_secret(root, path)`` (the third batch);
+- the binary's own ``config get ui_enabled`` and the daemon log, in the home the wrapper names (the fifth batch).
 
 **No secret is committed.** Every planted string is built at run time from
 parts and written only into a temporary directory. No test writes into this
@@ -638,6 +639,111 @@ def tool_projects(home, sandbox):
     rows = [line.split() for line in text.splitlines() if line.startswith("  ")]
     assert len(rows) == int(count.group(1)), described
     return [(row[0], row[1] if len(row) > 1 else "") for row in rows]
+
+
+# --------------------------------------------------------------------------
+# The tool's loopback UI (DEC-362)
+# --------------------------------------------------------------------------
+
+# The tool's daemon serves an HTTP graph view on this address unless the setting ``ui_enabled`` of its home says
+# ``false``; when it serves, it writes a line with ``ui.serving`` to the daemon log of that home (version 0.11.0).
+UI_HOST, UI_PORT = "127.0.0.1", 9749
+UI_SETTING = "ui_enabled"
+UI_SERVING = "ui.serving"
+DAEMON_LOG_REL = "logs/cbm-daemon.log"
+# How long the port is still watched after a command ended. The daemon ends about a second after a call.
+PORT_LINGER_S = 1.5
+DAEMON_ENDS_S = 3.0
+
+# Run in front of a command: a user and network namespace of its own, in which the UI port is the command's alone
+# (the port is one for the whole machine, and another session may run the tool). The port is asked every 20 ms
+# while the command runs and for a while after; how often it was open goes to a file as JSON.
+_PORT_WATCH = (
+    "import fcntl, json, os, socket, struct, subprocess, sys, threading, time\n"
+    "record, linger, command = sys.argv[1], float(sys.argv[2]), sys.argv[3:]\n"
+    f"HOST, PORT = {UI_HOST!r}, {UI_PORT}\n"
+    "def is_open(port):\n"
+    "    with socket.socket() as probe:\n"
+    "        probe.settimeout(0.5)\n"
+    "        return probe.connect_ex((HOST, port)) == 0\n"
+    "try:\n"
+    "    uid, gid = os.getuid(), os.getgid()\n"
+    "    os.unshare(os.CLONE_NEWUSER | os.CLONE_NEWNET)\n"
+    "    for name, text in (('setgroups', 'deny'), ('uid_map', f'{uid} {uid} 1'), ('gid_map', f'{gid} {gid} 1')):\n"
+    "        with open('/proc/self/' + name, 'w') as handle:\n"
+    "            handle.write(text)\n"
+    "    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as control:   # the loopback interface is down\n"
+    "        asked = fcntl.ioctl(control, 0x8913, struct.pack('16sh', b'lo', 0) + bytes(22))       # SIOCGIFFLAGS\n"
+    "        flags = struct.unpack('16sh', asked[:18])[1]\n"
+    "        fcntl.ioctl(control, 0x8914, struct.pack('16sh', b'lo', flags | 1) + bytes(22))       # IFF_UP\n"
+    "    with socket.socket() as listener:   # the watch sees a listener, and nothing holds the UI port\n"
+    "        listener.bind((HOST, 0))\n"
+    "        listener.listen()\n"
+    "        if not is_open(listener.getsockname()[1]) or is_open(PORT):\n"
+    "            raise OSError('the port watch does not work')\n"
+    "except Exception as error:\n"
+    "    print(f'no namespace: {error!r}', file=sys.stderr)\n"
+    f"    sys.exit({NO_NAMESPACE_EXIT})\n"
+    "looks, stop = [0, 0], threading.Event()\n"
+    "def watch():\n"
+    "    while True:\n"
+    "        looks[0] += 1\n"
+    "        looks[1] += is_open(PORT)\n"
+    "        if stop.wait(0.02):\n"
+    "            return\n"
+    "thread = threading.Thread(target=watch)\n"
+    "thread.start()\n"
+    "try:\n"
+    "    done = subprocess.run(command).returncode\n"
+    "    time.sleep(linger)\n"
+    "finally:\n"
+    "    stop.set()\n"
+    "    thread.join()\n"
+    "with open(record, 'w') as handle:\n"
+    "    json.dump({'looks': looks[0], 'open': looks[1]}, handle)\n"
+    "sys.exit(done if 0 <= done < 256 else 1)\n"
+)
+
+
+def port_watched(record, linger=PORT_LINGER_S):
+    """The command to put in front of a child's so that the UI port is its own and is watched; see ``port_looks``."""
+    return (sys.executable, "-c", _PORT_WATCH, str(record), str(linger))
+
+
+def port_looks(record):
+    """``(times the UI port was open, times it was asked)`` of a command run behind ``port_watched(record)``."""
+    record = Path(record)
+    assert record.is_file(), f"the port watch left no record at {record}: the command did not run behind it"
+    seen = json.loads(record.read_text(encoding="utf-8"))
+    assert seen["looks"] > 0, f"the port watch never asked the port: {seen}"
+    return seen["open"], seen["looks"]
+
+
+def tool_config(home, sandbox, *args):
+    """``codebase-memory-mcp config <args>`` with ``home`` as the tool's home: what it prints. It starts no daemon."""
+    env = child_env(sandbox) | {"CBM_CACHE_DIR": str(home)}
+    env.pop("PYTHONPATH")
+    done = subprocess.run([TOOL, "config", *args], cwd=str(sandbox.elsewhere), env=env, capture_output=True,
+                          text=True, timeout=TIMEOUT_S, stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, \
+        f"{TOOL} config {' '.join(args)} (home {home})\nexit code: {done.returncode}\n{done.stdout}\n{done.stderr}"
+    return done.stdout.strip()
+
+
+def ui_setting(home, sandbox):
+    """What the tool itself says of ``ui_enabled`` in ``home``: ``true`` or ``false``."""
+    return tool_config(home, sandbox, "get", UI_SETTING)
+
+
+def daemon_log(home):
+    """The text of the daemon log of ``home``, or None when the home has none."""
+    path = Path(home) / DAEMON_LOG_REL
+    return path.read_text(encoding="utf-8", errors="replace") if path.is_file() else None
+
+
+def ui_served(home):
+    """How many lines of the daemon log of ``home`` say that a daemon served the UI."""
+    return sum(UI_SERVING in line for line in (daemon_log(home) or "").splitlines())
 
 
 # --------------------------------------------------------------------------
