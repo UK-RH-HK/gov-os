@@ -18,7 +18,7 @@ KNOWN_ROLES = frozenset({
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
 FREEZE_FLAG = ".gov-runtime/freeze"
-FREEZE_MARKER = b"FROZEN"  # DEC-402: the first word of a real flag's marker line
+FREEZE_MARKER = b"FROZEN"  # DEC-402: the word of a real flag's marker line
 _FREEZE_HEAD = 65536       # the most that is read of a flag
 ACCEPTANCE = "tests/acceptance"
 _GOV_RUNTIME = ".gov-runtime"
@@ -566,16 +566,25 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
 def freeze_state(project_root: str) -> str:
     """Read the freeze flag: ``"absent"``, ``"unmarked"`` or ``"frozen"``.
 
-    Frozen when a line of the flag starts with the marker word, or when
-    something is at the path that cannot be read as a file (DEC-179).  An
-    empty file, text without the marker and a character device (what the
-    sandbox puts at the path) are an unmarked presence, which the hook
-    records.  Only a regular file is opened, and only its head is read.
+    Frozen when the flag carries the marker word, in any letter case and
+    with its NUL bytes taken out (a near spelling of the marker line, or
+    the line in UTF-16 or UTF-32), or when something is at the path that
+    cannot be read as a file (DEC-179).  An empty file, text without the
+    word and a character device (what the sandbox puts at the path) are an
+    unmarked presence, which the hook records.  Only a regular file is
+    opened, and only its head is read.
     """
     path = os.path.join(project_root, FREEZE_FLAG)
     try:
         os.lstat(path)
-    except (FileNotFoundError, NotADirectoryError):
+    except FileNotFoundError:
+        # A dangling link where the runtime folder should be hides the
+        # folder that would hold the flag: the guard cannot tell.
+        runtime = os.path.dirname(path)
+        if os.path.islink(runtime) and not os.path.exists(runtime):
+            return "frozen"
+        return "absent"
+    except NotADirectoryError:
         return "absent"
     except OSError:
         return "frozen"
@@ -595,9 +604,8 @@ def freeze_state(project_root: str) -> str:
         return "frozen"
     if len(head) > _FREEZE_HEAD:
         return "frozen"  # too large to read whole: the guard cannot tell
-    for line in head.removeprefix(b"\xef\xbb\xbf").splitlines():
-        if line.upper().split()[:1] == [FREEZE_MARKER]:
-            return "frozen"
+    if FREEZE_MARKER in head.replace(b"\x00", b"").upper():
+        return "frozen"
     return "unmarked"
 
 
@@ -611,9 +619,14 @@ def decide(
     ticket_id: str | None,
     subagent_type: str | None = None,
     cwd: str | None = None,
+    flag: str | None = None,
 ) -> tuple[str, str]:
-    """Return ``("allow", "")`` or ``("deny", "<reason>")``."""
-    frozen = freeze_state(project_root) == "frozen"
+    """Return ``("allow", "")`` or ``("deny", "<reason>")``.
+
+    *flag* is the freeze flag's state when the caller has read it
+    (``freeze_state``); it is read here otherwise.
+    """
+    frozen = (flag or freeze_state(project_root)) == "frozen"
     erole = (role or "").strip() or ""
 
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.

@@ -19,6 +19,7 @@ from __future__ import annotations
 import json
 import os
 import select
+import stat
 import sys
 import time
 
@@ -41,11 +42,16 @@ def _record_unmarked_flag(project_root: str, data: dict, flag: str) -> None:
     """Record an unmarked presence at the freeze flag's path (DEC-402).
 
     One line in ``records.jsonl`` in DEC-177's form.  An observation:
-    it must not block or fail the call.
+    it must not block or fail the call.  The hook runs outside the
+    sandbox, so the line goes only to a regular file in a real
+    ``.gov-runtime/``: no link is followed and nothing is opened that
+    could hold the hook (a named pipe).
     """
     try:
         path = os.path.join(project_root, RECORDS_REL)
         os.makedirs(os.path.dirname(path), exist_ok=True)
+        if os.path.islink(os.path.dirname(path)):
+            return
         record = {
             "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "session_id": data.get("session_id", ""),
@@ -59,8 +65,14 @@ def _record_unmarked_flag(project_root: str, data: dict, flag: str) -> None:
             "reason": "something without the freeze marker is at the "
                       "freeze flag's path: no freeze",
         }
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(record, separators=(",", ":")) + "\n")
+        line = json.dumps(record, separators=(",", ":")) + "\n"
+        fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT
+                     | os.O_NOFOLLOW | os.O_NONBLOCK, 0o666)
+        try:
+            if stat.S_ISREG(os.fstat(fd).st_mode):
+                os.write(fd, line.encode("utf-8"))
+        finally:
+            os.close(fd)
     except Exception:
         pass
 
@@ -231,6 +243,9 @@ def main() -> None:
     subagent_type = data.get("agent_type")
 
     try:
+        # DEC-402: the flag is read once, for the decision and for the
+        # install rule.
+        flag = freeze_state(project_root)
         decision, reason = decide(
             tool_name=tool_name,
             tool_input=tool_input,
@@ -239,28 +254,22 @@ def main() -> None:
             ticket_id=ticket_id,
             subagent_type=subagent_type,
             cwd=cwd,
+            flag=flag,
         )
     except Exception as exc:
         session_id = data.get("session_id", "")
         _fail(project_root, "decide_error", f"decision failed: {exc}",
               session_id=session_id, tool_name=tool_name)
 
+    def _record() -> None:
+        # DEC-402: an unmarked presence is recorded for a call that may
+        # write, once the call is known not to be denied.
+        if flag == "unmarked":
+            _record_unmarked_flag(project_root, data, FREEZE_FLAG)
+
     if decision == "deny":
         _deny(reason)
     else:
-        # DEC-402: the flag is read as the decision read it.  An unmarked
-        # presence is recorded for a call that may write.
-        flag = "absent"
-        if tool_name in ("Bash", "Write", "Edit", "NotebookEdit"):
-            try:
-                flag = freeze_state(project_root)
-            except Exception as exc:
-                _fail(project_root, "decide_error",
-                      f"freeze flag not read: {exc}",
-                      session_id=data.get("session_id", ""),
-                      tool_name=tool_name)
-            if flag == "unmarked":
-                _record_unmarked_flag(project_root, data, FREEZE_FLAG)
         if tool_name == "Bash":
             # Install rule (W1-04, DEC-120): after the guard allows a
             # Bash call, check for sudo and install commands.
@@ -283,6 +292,7 @@ def main() -> None:
                 if ar == "orchestrator":
                     # The owner may approve; take the before-snapshot
                     # so containment can run if the command executes.
+                    _record()
                     _take_snapshot(project_root, data)
                     _ask(f"install command requires owner approval "
                          f"(tool registry record required): {command}")
@@ -290,6 +300,7 @@ def main() -> None:
                         command, cwd, project_root, ticket_id):
                     # DEC-163: the research role's one exception; the
                     # sandbox's write fence holds it to the folder.
+                    _record()
                     _take_snapshot(project_root, data)
                     _allow()
                 else:
@@ -301,9 +312,11 @@ def main() -> None:
             else:
                 # Non-install Bash: take the before-snapshot (DEC-126)
                 # and allow.
+                _record()
                 _take_snapshot(project_root, data)
                 _allow()
         elif tool_name in ("Write", "Edit", "NotebookEdit"):
+            _record()
             _note_write_tool(project_root)
             _allow()
         else:
