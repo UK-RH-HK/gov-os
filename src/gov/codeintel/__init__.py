@@ -9,7 +9,8 @@ cannot decide, there is no index. The answers are read from the graph the tool b
 The root must be the top level of a git repository whose ``.gov-runtime/`` is no link:
 any other root is refused before anything is written or deleted. The tool's daemon keeps
 its lock and socket files in ``daemon_dir(root)``, never in the tool's shared default
-(DEC-338).
+(DEC-338), and does not serve the tool's loopback UI: every call sets ``ui_enabled`` to
+``false`` in the home first (DEC-362).
 """
 
 from __future__ import annotations
@@ -37,7 +38,8 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects", "references"]
+__all__ = ["callees", "callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects",
+           "references"]
 
 
 def home(root: Path) -> Path:
@@ -75,11 +77,15 @@ def _tool(root: Path, tool: str, **args) -> dict:
     """Run one tool of the binary in the repository's home, with the repository's daemon directory.
 
     Both are set here whatever the caller's environment holds; the rest of that environment is passed on.
+    The tool's loopback UI is turned off in that home first (DEC-362).
     """
     root = _checked(root)
     env = {**os.environ, "CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
-    done = subprocess.run([TOOL, "cli", "--quiet", "--json", tool, json.dumps(args)], capture_output=True, text=True,
-                          stdin=subprocess.DEVNULL, env=env)
+    run = functools.partial(subprocess.run, capture_output=True, text=True, stdin=subprocess.DEVNULL, env=env)
+    # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every call.
+    if run([TOOL, "config", "set", "ui_enabled", "false"]).returncode != 0:
+        raise RuntimeError(f"{TOOL} config set ui_enabled false failed: {tool} is not run")
+    done = run([TOOL, "cli", "--quiet", "--json", tool, json.dumps(args)])
     try:
         envelope = json.loads(done.stdout)
         if done.returncode == 0 and envelope["isError"] is False:
@@ -162,6 +168,12 @@ def callers(root: Path, name: str) -> list[dict]:
     """The functions that call ``name``."""
     nodes, users, named = _named(root, name)
     return _entries(nodes, [source for key in named for source, kind in users[key] if kind == "CALLS"])
+
+
+def callees(root: Path, name: str) -> list[dict]:
+    """The functions that ``name`` calls."""
+    nodes, users, named = _named(root, name)
+    return _entries(nodes, [callee for key in named for callee, by in users.items() if (key, "CALLS") in by])
 
 
 def impact(root: Path, name: str) -> list[dict]:

@@ -84,7 +84,7 @@ AUDITOR = "independent-auditor"
 RESEARCH = "research"
 WORKER_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR, RESEARCH)
 EMPTY_ALLOWLIST_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR)
-NOT_LAUNCHED = ("orchestrator", "product-spec", "no-such-role")
+NOT_LAUNCHED = ("orchestrator", "no-such-role")   # owner decision, DEC-386: product-spec is launched (W1-28)
 
 RESEARCH_TICKET = "DAEO-zz97"
 EXPERIMENT_REL = "experiments/spikes/exp-901"

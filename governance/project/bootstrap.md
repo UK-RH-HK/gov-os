@@ -410,8 +410,9 @@ settle it.
   the older schemas under `schemas/records/` were not carried over.
 - **Closed and open maps.** `policies`, `systems`, `capabilities` and its two entries refuse unknown keys; namespaces,
   the path map's top level and record frontmatter accept extras. No test covers the open ones.
-- **The `systems` snapshot** (13 minimal, 9 absent, none implemented) needs updating as tickets land, W1-46 first
-  (research).
+- **The `systems` snapshot** needs updating as tickets land. Updated at W1-33's close (2026-10-05): the research
+  system is `minimal` (the launcher and the research role), and the agent organisation also names the kernel role
+  files and the roster.
 - **New top-level folders.** The root namespace uses `*`, and `.github/` and `.rulesync/` are pre-listed. Any other
   new top-level folder fails "every tracked path in exactly one namespace" until a namespace is added.
 - **The two committed ADRs** lack `state_class` and would not validate against the decision schema until they get it.
@@ -737,8 +738,7 @@ where that is known; the rest go to EXP-002 and the mid-wave audit.
 
 **Carried to other tickets**
 
-- **W1-08's `systems` snapshot** in the path map still shows the launcher and the research role as before this
-  ticket; it is updated when W1-33 lands the remaining role definitions.
+- **W1-08's `systems` snapshot** in the path map was updated at W1-33's close (2026-10-05).
 - **The experiments root is the fixed name `experiments/`** (DEC-333); a project key waits for a project that needs
   one.
 - **Size.** 819 lines added outside tests against an estimate of 220, about 200 of them the DEC-317 change that
@@ -862,3 +862,180 @@ settle it where that is known.
 - **Codes beyond the tests:** `TASKS_NOT_FOUND` and `TICKET_FAILED`.
 - **Size and process.** 180 lines against 120. The lead had the engineer build before the five packages were
   decided; they were then decided as built (DEC-355, DEC-356). Workers ran unsandboxed (interim, DEC-183).
+
+## W1-33 residuals (Wave 1 role definitions, 2026-10-05)
+
+Recorded at W1-33's close, from the closing ticket lead's summary. The first lead's own list was not in its returned
+result, so this list is the closing lead's; none is a defect of the ticket.
+
+- **The definitions under `.claude/agents/` were placed by the owner** (`0f8b0d29`, DEC-352 P-2), because a headless
+  session is refused writes there. They count as generated until W1-38 produces the same files from the same sources.
+- **Permission classes are mapped as families** (DEC-352 P-3): `NETWORK_*`, `DB_*`, `CLOUD_*` and `DEPLOY_*`, not each
+  member class of Framework §32. For the mid-wave audit to weigh.
+- **Orchestrator and product-spec grants** (DEC-352 P-4): the orchestrator has `NETWORK_*` allowed and the database,
+  cloud, CI-trigger and deploy classes denied; product-spec has all denied. In these two unsandboxed sessions no
+  mechanism holds the denials, and the role files say so.
+- **Model tier.** No decision assigns one. The files say "standard" for the four workers and "the model of the
+  session the owner starts" for the orchestrator; there is no `model:` frontmatter, so nothing enforces it.
+- **The product-spec session.** `gov launch` has no product-spec role, so such a worker still starts under DEC-183
+  (DEC-371). Its roster entry has no `session` or `network_profile`.
+- **Web tools against `NETWORK_*: denied`.** The worker role files keep WebSearch and WebFetch available outside the
+  sandbox (DEC-158) and read the class as the sandbox's network grant. No source settles whether the web tools count
+  as a `NETWORK_*` class.
+- **`SECRET_READ` and `SYSTEM_INSTALL`.** No guard rule stops a secret read; the denial rests on DEC-074 Q9. An
+  orchestrator system install without `sudo` gets the same `ask` as any install.
+- **An auditor on another role's ticket.** The launcher starts an auditor on any `in_progress` ticket, but the guard
+  gives it a write path only when the ticket's `role` is independent-auditor. The role file states this.
+- **The roster's header comment** still says the other roles' entries "come with their own tickets"; it was left
+  byte-identical so the research-unchanged test holds.
+- **Size.** 306 lines added and 25 removed outside tests, against 300; the tests are 1,079 lines.
+
+## Observations from launched worker sessions (2026-10-05, the first round under DEC-371)
+
+Reported by the W1-19 and W1-28 ticket leads; for W1-32, EXP-002 and the mid-wave audit.
+
+- **A worker copied the held-out file.** The W1-28 test designer bulk-copied the tracked files into its session
+  scratchpad for a throwaway stand-in, which took `governance/project/held-out.yaml` with it. It reports it never
+  read it; its deletes were refused. The owner removed that folder
+  (`/tmp/gov-launch-independent-test-designer-5e58yicw`, 3.4 GB) through the operator (DEC-376). Every worker brief
+  now forbids a bulk copy of the tree.
+- **Test fixtures copied the held-out file too.** The owner found and deleted 17 more copies, all inside pytest's
+  temporary test projects under one launched engineer session's temp folder (`/tmp/gov-launch-engineer-_foa_zpg/`):
+  fixtures that copy the working tree took the file with them. None remain. DEC-385 makes every copying fixture
+  leave the file out (W1-28). Until that is merged, each run of the copying suites by a launched worker makes new
+  copies in its session temp folder.
+- **Launcher temp folders pile up.** 78 other `gov-launch-*` folders remained in `/tmp` on 2026-10-05. DEC-386 makes
+  the launcher remove its folder at the session's end (W1-28); the operator clears the old ones when no lead is
+  running.
+- **A worker cannot delete its own scratchpad**: the sandbox refuses `rm -rf` there, so throwaway stand-ins and the
+  per-session temp directory stay (the W1-46 residual, seen again).
+- **The freeze flag's path is a placeholder inside the sandbox.** A launched session sees `.gov-runtime/freeze` as a
+  character device whether or not a flag exists, so code that reads the flag by existence sees the tree as paused
+  from inside a worker sandbox. W1-28's suite accepts only that placeholder; W1-32's `gov status` and any engineer's
+  own test runs must take it into account.
+- **Untracked placeholder files** (`.bashrc`, `.gitconfig`, `.idea`, `docs/source` and others) were seen at a
+  worktree's root during a launched session and were gone after it.
+- **A Python script fed by a here-document wrote a file inside the worker's paths** and the guard did not stop it
+  (the W1-15 residual, seen again).
+- **A read beyond DEC-370**: the W1-19 designer's search for G-20 also returned G-17's one row (package DP-7, with
+  the owner).
+
+## W1-16 residuals (codebase-memory wrapper, 2026-10-05)
+
+Recorded at W1-16's close, from the four ticket lead rounds' summaries. Fixed findings are left out.
+
+- **The 60 % line is measured on the test designer's own 26 questions** (DEC-377): no S0b2 C1 question set exists.
+  The designer's throwaway stand-in scored 26 of 26, so the line is easy to pass. The comparable measurement is
+  W1-42's (hit@5 on the dev query set's code classes).
+- **The W1-15 gaps apply to the wrapper unchanged:** a hard link to a product-data file is indexed, and a file
+  replaced between the filter's answer and the copy is indexed. The window is the whole filter run.
+- **A failed re-index leaves no index** until the next successful run (it fails closed; the index is rebuildable).
+  One file with a non-UTF-8 name makes the repository unindexable, with a traceback.
+- **A tracked file that `.gitignore` names** is staged but missing from the graph, without a message.
+- **The graph is cached per process:** a long-lived process does not see another process's re-index. Answers load
+  the whole graph into memory once per process, untested at the DEC-078 envelope.
+- **`dead_code` lists entry points and test functions;** the tool's similarity edges are not counted as a use.
+- **A rename is a symbol rename only** (DP-3); a file or folder move is not tested.
+- **Untested refusals:** a symbolic link below `.gov-runtime`; the query functions refuse the same roots as `index`,
+  and only `index` is tested.
+- **Token rule (DEC-325, DEC-339):** identifiers with one digit or one capital are still flagged; a lower-case-only
+  body, a lower-case run followed by `.` and digits, a rest of exactly 15 characters after a leading `_` or `-`, and
+  two leading separators (`sk___…`) are not flagged.
+- **gitleaks' built-in rules stay sheltered by its own global allowlist** (DEC-347): the second scan covers the
+  project's rules only. A project rule that only modifies a default rule keeps a single scan. The uuid stopword is
+  covered by the second scan in principle, and no test shows it.
+- **`stores_with_secrets` also gets the second scan**, which is stricter than the letter of DEC-347.
+- **The filter costs two gitleaks runs per file** (about +55 % on the W1-15 and W1-17 suites, measured under load);
+  batching stays the residual of DEC-339.
+- **The daemon directory is under shared `/tmp`** (`/tmp/gov-cbm-<uid>/<id>`, DEC-338, DEC-346). Nothing removes a
+  repository's lock and turn files there. The wrapper refuses a folder that is a link or not the user's; only a
+  builder test holds that check.
+- **The loopback UI (DEC-362, as built under DEC-389):** a daemon already running with the UI on keeps port 9749
+  open until it ends, about a second after its last call; not tested, by design. Any call, also `projects(root)` on a
+  never-indexed repository, now creates the home with `config.json` and `_config.db`; a refused root is still
+  refused before anything is written. Each wrapper call starts two processes; the added time was not measured.
+- **Cases that need namespaces:** the six DEC-338 cases and the nine UI cases run in a private user, mount or
+  network namespace and skip on a machine without them. All ran here.
+- **The suite is heavy:** 166 cases in about eleven and a half minutes. Run it alone;
+  `test_this_repository_is_not_indexed_by_the_run` failed once when other tool calls ran in the same tree.
+- **The suite's `__pycache__` holds planted strings whole** (untracked and git-ignored; a plain gitleaks run over
+  the folder reports them). No committed file holds one.
+- **The README's fifth-batch section still says its red run was not run;** the lead observed it (8 failed, 1
+  passed). Only a test designer may edit that file.
+- **Sandbox:** a launched worker cannot run this suite (`/tmp/w16-…` is read-only there, and the daemon's socket is
+  refused); the lead runs it. A headless engineer lost its turn to a background test run once; briefs now say to run
+  tests in the foreground.
+- **Guard gap, seen again:** here-document Bash writes inside a worker's paths were accepted several times and
+  refused at other times.
+- **Left under `/tmp`:** `/tmp/w16-c1_yis2q` (four empty folders) and possibly
+  `/tmp/gov-launch-engineer-9n8d84gs/rt`. `/tmp/cbm-daemon-1000` and `/tmp/gov-cbm-1000` stay by decision.
+  `~/.cache/codebase-memory-mcp` was never changed, and no worktree of this repository was indexed.
+- **Size.** Production code and rules +282 / −45 against an estimate of 50; 42 cases were added after
+  implementation, each by a delegated or owner decision.
+
+## W1-28 residuals (gov pause, copying fixtures and two launcher changes, 2026-10-05)
+
+Recorded at W1-28's close, from the closing ticket lead's summary and its reviewer's findings (none high).
+
+- **Two earlier residuals end with this merge:** the launcher's temp directory is no longer left behind on any exit
+  the launcher controls (W1-46), and a product-spec worker is launched sandboxed, with an empty network allowlist
+  and held to a ticket of its own role, so the DEC-183 form is ended (W1-33, DEC-371).
+- **The temp folder still stays** when the launcher is killed outright, on SIGTERM or SIGHUP (the session then lives
+  on), or when the removal fails; a failed removal is a traceback and the session's exit code is lost. DEC-392 fixes
+  the last three; W1-32 carries it.
+- **Removal is by name:** if the folder is renamed and another directory put at its path, that one is removed. It
+  needs write access to the parent, which the sandbox does not give. Not run: a launcher `TMPDIR` that does not
+  exist.
+- **A worker's scratchpad is gone at the session's end.** Briefs now tell workers to return results in their final
+  message or under `.gov-runtime/scratch/`.
+- **The DEC-385 exclusion is one exact path.** Another name, a hard link or an absolute symbolic link would be
+  copied. The check that fails when a fixture copies the file again does not see a helper called with the root,
+  `tarfile`, a copy of `governance/` by name, or `tests/unit/`. Only W1-05's and W1-07's fixtures copied the whole
+  tree (W1-25 uses W1-07's).
+- **The two whole-tree fixtures still copy `.claude/settings.json`** with its held-out deny line into every
+  temporary project; W1-46's and W1-47's fixtures strip it (package DP-15, with the owner).
+- **Copies made before the merge:** 1461 files of the held-out file's name were counted, by path only, under
+  `/tmp/pytest-of-usain` on 2026-10-05, from earlier runs of the copying fixtures in every tree. None was opened; the
+  owner has them removed.
+- **The product-spec role file and its agent definition** still say the launcher does not start that role (package
+  DP-12, with the owner). `gov launch` by WBS id sets `GOV_TICKET` to the WBS id, and a ticket key written twice
+  takes the last value; both are older launcher behaviour that now also holds for product-spec.
+- **Pause, as built and held by no test:** untracked files do not make a tree dirty; a conflicting revert is undone
+  with `git reset --hard` to the `HEAD` from before the rollback; an empty `GOV_ROLE` is refused, not read as the
+  owner; record commits also carry `Role:`.
+- **A launched test designer cannot run the live-session cases** (W1-46: 36, W1-25: 3): the sandbox refuses the API
+  host. The lead runs them.
+- **Latency (DEC-372):** two occurrences during this ticket's rounds, both `test_decision_p95_is_under_100_ms`
+  (W1-02) under load, one at 106 ms; each passed alone. None in the post-merge run.
+- **Size.** `gov pause` is 120 lines against 80 to 100; the launcher changed by +15 / −6.
+
+## W1-20 residuals (gov closure, 2026-10-05)
+
+Recorded at W1-20's close, from the ticket lead rounds' summaries.
+
+- **Depth numbers are placeholders:** radius R0 and R1 give 1, R2 gives 3, R3 and above give 8 (DEC-035's values,
+  read as hops, DEC-391).
+- **A start id that is no record depends on the machine:** the stopping reason is `FACET_UNAVAILABLE` without the
+  code tool and `UNRESOLVED_IDS` with it (DEC-396). Three cases therefore hold only "not `CLOSURE_COMPLETE`".
+- **The symbol side is tested only in the lead's run:** the ten `local_only` cases cannot run in a launched worker's
+  sandbox, and `test_a_repository_without_a_code_index_states_the_facet_unavailable` passes inside a sandbox for the
+  wrong reason (the sandbox's refusal, not a missing index).
+- **`callees` in the wrapper** (DEC-391) has one unit case; against the real tool it is held by two `local_only`
+  cases of this suite.
+- **`uncommitted` when git fails:** `git status` runs with `check=True`, so it ends in a traceback, not an envelope.
+  It fails closed.
+- **`HEAD` among the store's commits is not checked;** left to W1-27 (DEC-391 DP-7).
+- **Not tested:** two symbols of one name, methods, `referenced_by` on a gap. The reranker's own process is not
+  watched by the no-model test.
+- **W1-07's `closure` cases** run in a project without a store, so they exercise `STORE_MISSING` only.
+- **`S0a-G-03`**, one of the ticket's sources, is not in the tree; no test was derived from it.
+- **The two W1-17 residual lines that name W1-20** (`search` can raise; whole-token matching) are not settled here:
+  a closure never calls the lexical index. They move on to W1-21 or W1-41.
+- **Two branches that revise the same line of an acceptance test cannot be merged:** W1-28's and W1-20's planned
+  W1-07 revisions conflicted, a conflicted merge restores acceptance tests from `HEAD` in a lead's call, and nobody
+  but a test designer writes them. A designer moved this ticket's revision onto lines of its own before the merge.
+  Briefs now say so.
+- **Rule slips the guard did not refuse:** an engineer amended a commit of its own before its second (nothing
+  pushed; containment flagged it), and wrote files with a Python here-document and `sed -i`, all inside its paths.
+- **Run time:** the suite takes about four and a half minutes alone.
+- **Size.** Source +119 / −1 against an estimate of 100 (closure 111, wrapper 8).

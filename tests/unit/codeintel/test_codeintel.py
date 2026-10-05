@@ -3,7 +3,9 @@
 Regression evidence only (DEC-136). They cover what the acceptance tests leave
 to the builder: when the filter cannot decide, the earlier index is gone and
 none is built; the tool is given the staged folder, the repository's home and
-the repository's daemon directory, not the caller's (DEC-338); that directory
+the repository's daemon directory, not the caller's (DEC-338); before every call
+the tool is told, in the same home and daemon directory, to keep its UI off, and
+a refusal of that fails the call (DEC-362); that directory
 is short, and one that is not the user's own is refused; a file whose path
 holds a secret is not
 staged; a root that is no top level of a git repository, or whose
@@ -34,6 +36,8 @@ PLANTED = "_".join(["W116", "UNIT", "CAN" + "ARY", "6TR1"])
 STAND_IN = ("#!/bin/sh\n"
             "here=$(dirname \"$0\")\n"
             "printf '%s\\n' \"$@\" \"$CBM_CACHE_DIR\" \"$CBM_RUNTIME_DIR\" > \"$here/call.txt\"\n"
+            "echo \"$1 $2 $3 $4|$CBM_CACHE_DIR|$CBM_RUNTIME_DIR\" >> \"$here/calls.txt\"\n"  # every call, in order
+            "[ ! -e \"$here/refuse-$1\" ] || exit 1\n"
             "cat \"$here/answer.json\"\n")
 
 
@@ -87,6 +91,22 @@ def test_the_tool_is_given_the_staged_files_the_home_and_the_repositorys_daemon_
     assert codeintel.daemon_dir(root).is_dir() and not (tmp_path / "runtime").exists()
     files = sorted(path.relative_to(staged).as_posix() for path in staged.rglob("*") if path.is_file())
     assert files == [".gitignore", ".gitleaks.toml", "app/clean.py", "governance/project/path-map.yaml"]
+
+
+def test_the_ui_is_turned_off_in_the_home_before_every_call_and_a_refusal_fails_the_call(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    answer = {"isError": False, "content": [{"type": "text", "text": "{\"projects\": []}"}]}
+    call = _stand_in(tmp_path, monkeypatch, answer)
+    monkeypatch.setenv("CBM_RUNTIME_DIR", str(tmp_path / "runtime"))
+    places = f"|{codeintel.home(root)}|{codeintel.daemon_dir(root)}"
+    assert codeintel.projects(root) == [] and codeintel.projects(root) == []
+    first, second, third, fourth = call.with_name("calls.txt").read_text(encoding="utf-8").splitlines()
+    assert first == third == "config set ui_enabled false" + places  # in the repository's home, not the caller's
+    assert second == fourth == "cli --quiet --json list_projects" + places
+    call.with_name("refuse-config").touch()
+    with pytest.raises(RuntimeError):
+        codeintel.projects(root)
+    assert call.with_name("calls.txt").read_text(encoding="utf-8").splitlines()[4:] == [first]  # no cli call after it
 
 
 def test_the_daemon_directory_is_short_and_one_per_repository(tmp_path, monkeypatch):
@@ -154,3 +174,19 @@ def test_an_error_of_the_tool_is_not_an_empty_answer(tmp_path, monkeypatch):
         codeintel.definitions(root, "clean")
     with pytest.raises(RuntimeError):
         codeintel.projects(root)
+
+
+def test_callees_are_the_functions_a_symbol_calls_in_the_form_of_callers(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    staged = root / codeintel.BASE_REL / "files/app/flow.py"
+    staged.parent.mkdir(parents=True)
+    staged.touch()
+    key = "code.app.flow."
+    nodes = [[key + name, name, "Function", "app/flow.py"] for name in ("top", "mid", "leaf", "side")]
+    edges = [[key + "top", "CALLS", key + "mid"], [key + "top", "CALLS", key + "leaf"],
+             [key + "side", "CALLS", key + "leaf"], [key + "top", "USAGE", key + "side"]]
+    monkeypatch.setattr(codeintel, "_rows", lambda _root, query: edges if "type(r)" in query else nodes)
+    assert [entry["name"] for entry in codeintel.callees(root, "top")] == ["mid", "leaf"]  # a use is no call
+    assert codeintel.callees(root, "top")[0] == codeintel.callers(root, "leaf")[0] | {"name": "mid"}  # one entry shape
+    assert codeintel.callees(root, "leaf") == [] and codeintel.callees(root, "no_such_symbol") == []
+    assert [entry["name"] for entry in codeintel.callers(root, "leaf")] == ["top", "side"]

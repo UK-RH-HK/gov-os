@@ -21,8 +21,23 @@ allowed_paths:
 - template/governance/kernel/hooks/posttooluse*
 - template/governance/kernel/hooks/pretooluse*
 - tests/unit/containment/**
+- src/gov/guard/decide*
+- src/gov/pause/**
+- src/gov/launch/**
+- tests/unit/guard/**
+- tests/unit/pause/**
+- tests/unit/launch/**
+- tests/unit/install/**
 kpis:
   success:
+  - A freeze flag set by gov pause carries a marker line; the guard treats an empty file, or one without the marker, at the flag's path as no freeze and records its presence (DEC-402)
+  - gov launch does not deny the freeze flag's path when the flag does not exist at launch, so a launched session leaves no placeholder there (DEC-402)
+  - The containment check compares the freeze flag around every Bash call; a flag removed or emptied during the call is a finding and is restored with its marker line (DEC-407)
+  - gov pause --off refuses when any ancestor process is a Claude Code session, wherever it was started, the operator console included; the same holds for every owner-only action where the code reads an unset GOV_ROLE as the owner (DEC-409)
+  - gov pause --off requires an interactive terminal (stdin and stdout are TTYs) and a one-time random code LIFT-<4 digits> typed back; a wrong code, piped input or no TTY refuses and nothing changes (DEC-409)
+  - The guard refuses, for every role, any agent Bash command whose text contains the lift form of gov pause (the --off option), including a command that starts another Claude Code session with that text in its prompt (DEC-409)
+  - Setting a freeze stays open to the owner, from a terminal or the operator console, and to the orchestrator (DEC-409)
+  - Every test fixture that copies the whole tree strips the held-out deny line from the copied settings file (DEC-399)
   - 'A forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each commit''s paths against the allowed paths of its own Role and Task trailers, not against the caller (DEC-255) [CAP-58.h]'
   - A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h]
   - A worker's commit made during another actor's call is judged by its own trailers (DEC-255) [CAP-58.h]

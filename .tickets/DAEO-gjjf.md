@@ -36,6 +36,8 @@ kpis:
   - The exit run starts its engineer, test designer and auditor sessions as worker sessions through gov launch, sandboxed with their network profiles (DEC-161)
   - 'The exit report gives, per ticket, the three Wave 1 learning metrics: KPI disputes, acceptance tests rewritten after implementation began with their reasons, and governance share (DEC-106) [CAP-40.c]'
   - 'The exit report shows, from the orchestrator''s records, that Wave 1 ran tickets in parallel in the light form of DEC-235: each ticket in its own worktree with a ticket lead, merged into the integration branch only by the main orchestrator after green, with every suite re-run after each merge; git worktree list shows no ticket worktree left [CAP-23.c]'
+  - The exit run measures callers/impact hit@5 on the dev query set's code classes, the measurement comparable to the S0b2 code-intelligence baseline (DEC-377)
+  - The exit run re-measures the dev query set's mean hit@5 against the S0b2 R1 baseline of 85 and reports it (DEC-414)
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme

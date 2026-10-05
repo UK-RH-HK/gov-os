@@ -3770,3 +3770,683 @@ them are separate commits with the trailer `Task: <ticket id>`.
 | Version | Date | Change |
 |---|---|---|
 | 0.83 | 2026-10-05 | Owner answers: DEC-358, DEC-359 (W1-50 DP-8, DP-9), DEC-360 (W1-11 DP-2: the `Role: owner` trailer; W1-50 KPI line), DEC-361, DEC-362 (W1-16 DP-1 and the UI), DEC-363 (idle tickets and the six), DEC-364 to DEC-368 (W1-28 DP-1, DP-2, DP-3, DP-5, DP-6, DP-8), DEC-369 (second scan in pre-commit; W1-40 KPI line), DEC-370 (G-20 by exact path), DEC-371 (`gov launch` from now on), DEC-372 (latency cases re-run alone). |
+
+## 84. Delegated decisions on W1-19's and W1-28's packages (register v0.84, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on packages the W1-19 (`DAEO-t6hf`) and W1-28
+(`DAEO-9279`) ticket leads returned. For each the test designer's, the lead's and the orchestrator's recommendations
+agree, the confidence is medium or higher, and the choice is reversible. W1-19's DP-1, DP-2, DP-6, DP-7 and its four
+install packages, and W1-28's DP-10 (the freeze flag when a rollback fails), go to the owner.
+
+### DEC-373 — W1-19 DP-3: how warm p95 and the rerank process's peak RAM are measured
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 package DP-3, option (a) for both; confidence medium · **Under:** CAP-18.a, DEC-074 R1
+- **Decision:**
+  - Warm: one process per tier builds the index, asks three questions outside the set, then times each query of
+    the dev query set once; p95 by nearest rank, against 0.5 s.
+  - Peak RAM: the largest `VmHWM` of the calling process and every descendant, sampled every 50 ms, leaving out
+    `ollama` and its children, against 2.5 × 10⁹ bytes. A reranker that detaches from the process tree is not seen:
+    a residual.
+
+### DEC-374 — W1-19 DP-4 and DP-5: an absent reranker keeps the fused order, and the manifest is held in the shared store
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 packages DP-4 option (a) and DP-5 option (a); confidence medium · **Under:** CAP-10.a, CAP-18.a, DEC-257, DEC-340
+- **Decision:**
+  - When the default reranker cannot be loaded, the fused search keeps the fused order, reports that nothing was
+    reranked, and does not raise.
+  - The index manifest is held in the shared store and read through the semantic module. It names the embedder and
+    the reranker, each with its model and revision; the embedder's revision is the one observed from Ollama's model
+    list, not a constant.
+  - The names of the functions and keys follow the owner's answer to DP-1.
+
+### DEC-375 — W1-28 DP-9 and DP-11: one record commit per released ticket, and no record when nothing was reverted
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-9 option (a) and DP-11 option (a); confidence medium-high · **Under:** DEC-357, DEC-367, CAP-05.d
+- **Decision:**
+  - `gov pause --cancel-agents` writes one record commit per released ticket, each with that ticket's `Task:` and
+    `Reverts-Task:` trailers. A cancel that releases nothing makes no commit.
+  - A rollback that reverts nothing, on its first run as on a repeat, writes no record commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.84 | 2026-10-05 | Delegated under DEC-220: DEC-373 (W1-19 DP-3: warm p95 and peak RAM), DEC-374 (W1-19 DP-4, DP-5: absent reranker, manifest in the shared store), DEC-375 (W1-28 DP-9, DP-11: one record commit per released ticket; none when nothing was reverted). |
+
+## 85. Owner actions and answers of 2026-10-05 after the first launched sessions (register v0.85, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's actions through the operator and answers of 2026-10-05, on the held-out copy incident, W1-16 DP-1,
+W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as recorded.
+
+### DEC-376 — The held-out copies are removed, and no worker bulk-copies the tree
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the incident the W1-28 ticket lead reported · **Under:** DEC-213, DEC-218, MR-3
+- **Decision:**
+  - The owner removed `/tmp/gov-launch-independent-test-designer-5e58yicw` (3.4 GB, no process using it) through
+    the operator.
+  - 17 more copies of `governance/project/held-out.yaml` were found and deleted, all inside pytest's temporary test
+    projects under one launched engineer session's temp folder (`/tmp/gov-launch-engineer-_foa_zpg/`). None remain.
+  - 78 other `gov-launch-*` folders remain in `/tmp`. When no lead is running, the orchestrator tells the owner, so
+    the operator can clear them.
+  - The orchestrator's rule that a worker never bulk-copies the tree is confirmed. The incident is recorded in
+    `governance/project/bootstrap.md`.
+
+### DEC-377 — W1-16 DP-1: W1-16 closes with the designer's 26 questions, and the exit run measures the comparable hit@5
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-16 package DP-1 option (A) · **Settles:** DEC-361 · **Under:** CAP-12.a, DEC-362
+- **Decision:**
+  - No C1 question set exists under `~/gov-os-workbench/s0b2/out/`. S0b2's code-intelligence comparison scored
+    hit@5 on the dev query set's code classes, as `~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md` reports.
+  - W1-16 closes with the designer's 26 questions (option A).
+  - W1-42 gets a KPI line, in its own commit: the Wave 1 exit run measures callers/impact hit@5 on the dev query
+    set's code classes, the measurement comparable to S0b2's baseline. A worker may read that report by exact path.
+  - The `--ui=false` wrapper change (DEC-362) and its registry note go in the same round; then W1-16 closes.
+
+### DEC-378 — W1-28 DP-10: a rollback sets the freeze flag first, and it stays
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-10 option (a) · **Under:** DEC-365, DEC-368, CAP-05.c
+- **Decision:**
+  - `gov pause --rollback` sets the freeze flag first, once the caller is allowed, and the flag stays whatever the
+    rollback's result (a conflict, an unknown ticket, a dirty tree). Only the owner lifts it.
+  - The test designer's three pinned readings are confirmed: `Role:` on a revert commit is the caller's (`owner`
+    with `GOV_ROLE` unset, `orchestrator` otherwise); the refusal code is `PAUSE_REFUSED`; a cancel that releases
+    nothing makes no commit.
+
+### DEC-379 — W1-19 DP-1: the interface of the semantic route, the fusion and the rerank, as proposed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-1 option (a) · **Under:** CAP-10.a, CAP-18.a, DEC-340, DEC-260
+- **Decision:**
+  - `gov.retrieval.semantic.refresh(root)` returns `available`, `facet` (`"semantic"`), `state`, `reason`.
+  - `gov.retrieval.semantic.search(root, query, refresh=True)` returns the same plus `hits` (W1-17's chunk records,
+    nearest first); `refresh=False` never writes.
+  - `gov.retrieval.semantic.manifest(root)` returns `None` without an index, else
+    `{"embedder": {"model", "revision"}, "reranker": {"model", "revision"}}`.
+  - `gov.retrieval.fusion.rrf(routes, k=60)` returns one list, each chunk once, with `score` (the sum of
+    `1/(k+rank)`) and `routes`.
+  - `gov.retrieval.fusion.search(root, query, limit, refresh=True, reranker=None)` returns `hits`, `facets` and
+    `reranked`; a limit cuts after the rerank.
+  - `gov.retrieval.rerank.rerank(query, candidates, reranker=None)` returns the candidates in score order with
+    `rerank_score`.
+  - `reranker` is a loader: a no-argument function returning `score(query, texts)`. It is called at the first rerank
+    and not before, and one rerank calls `score` once with every candidate's text.
+  - No function raises because Ollama, `sqlite_vec` or the reranker is absent.
+
+### DEC-380 — W1-19 DP-2: mean hit@5 follows S0b2's own method where it is stated
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-2 · **Under:** CAP-18.a, DEC-074 R1, DEC-383
+- **Decision:** A test designer reads `~/gov-os-workbench/s0b2/out/RESULTS.md` by exact path (and the
+  code-intelligence report of DEC-377 if needed), and the scoring follows S0b2's own method where it is stated there.
+  If it is not stated, option (a): a hit when one `must_cite` path is in the first five; queries without a gold path
+  left out; a percentage per tier; the mean of the two tiers.
+
+### DEC-381 — W1-19 DP-6: a namespace that is not embedded never reaches the vectors
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-6 option (a) · **Settles:** the DEC-289 residual on `embedding_policy` · **Under:** CAP-10.a, CAP-03
+- **Decision:** A namespace whose `embedding_policy` is `not embedded` never reaches the vectors. This holds before
+  any live index is built.
+
+### DEC-382 — W1-19 DP-7: the G-17 read is accepted
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-7 option (a) · **Extends:** DEC-370
+- **Decision:** The test designer's read of G-17's row is accepted, and DEC-370 extends to G-17.
+
+### DEC-383 — The S0b2 files a worker may read, by exact path only
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-370
+- **Decision:** Workers may read these S0b2 files by exact path only:
+  `~/gov-os-workbench/s0b2/out/RESULTS.md`, `~/gov-os-workbench/s0b2/out/GLUE_REQUIREMENTS.md`,
+  `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml` and `~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md`.
+  Nobody lists folders there, and nobody touches `s0b2/probe/`.
+
+### DEC-384 — W1-19's installs: complete packages from the S0b2 registry, verifying what is on disk
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-083, DEC-195, DEC-198
+- **Decision:**
+  - The orchestrator fills the four install packages from `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml`.
+  - Verifying the artefacts already on disk (the Ollama executable, the embedding model, the reranker snapshot)
+    against their recorded hashes is preferred over downloading again.
+  - The package for sqlite-vec says which path is proposed in the Python that runs pytest.
+  - The complete packages come to the owner. Meanwhile the model-free part of W1-19 is built.
+
+### DEC-385 — No test fixture copies the held-out file
+- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Under:** DEC-213, DEC-376
+- **Decision:**
+  - Every test fixture that copies the repository leaves `governance/project/held-out.yaml` out, so it is never
+    copied into a temporary project.
+  - Ticket (orchestrator): W1-28 (`DAEO-9279`), whose round is about to start and whose first round met the
+    incident. Its test designer revises the copying fixtures of the earlier suites; the KPI line is added in its
+    own commit.
+
+### DEC-386 — The launcher removes its temp folder and starts product-spec workers sandboxed
+- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Amends:** DEC-371 · **Under:** DEC-159, DEC-311, CAP-58
+- **Decision:**
+  - `gov launch` removes its per-session temp folder when the session ends.
+  - The launcher gets a `product-spec` role with an empty network allowlist, so product-spec workers are sandboxed
+    too. When it is merged, the DEC-183 form ends for that role.
+  - Ticket (orchestrator): W1-28 (`DAEO-9279`), with `src/gov/launch/**` and `tests/unit/launch/**` added to its
+    `allowed_paths` and the two KPI lines added, in its own commit. The launcher lines get a reviewer pass
+    (brief A3) although the ticket's profile is STANDARD.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.85 | 2026-10-05 | Owner: DEC-376 (held-out copies removed; no bulk copy of the tree), DEC-377 (W1-16 closes with the designer's questions; W1-42 KPI line), DEC-378 (W1-28 DP-10 (a) and three readings), DEC-379 to DEC-382 (W1-19 DP-1, DP-2, DP-6, DP-7), DEC-383 (the four S0b2 files a worker may read), DEC-384 (W1-19 installs), DEC-385 (fixtures leave the held-out file out; W1-28), DEC-386 (the launcher removes its temp folder and gets a product-spec role; W1-28). |
+
+## 86. Delegated decisions on W1-11's packages DP-5 and DP-7 (register v0.86, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on two of the three packages
+the W1-11 (`DAEO-be7u`) ticket lead returned after three review rounds. Both options only make the checker report
+more; the lead's and the orchestrator's recommendations agree, the confidence is medium or higher, and both are
+reversible. DP-6 (how the approval rule reads merges) decides what counts as the owner's approval fact of DEC-360
+and goes to the owner.
+
+### DEC-387 — W1-11 DP-5 and DP-7: unreadable frontmatter is a finding, and the checker ignores replace refs
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-11 packages DP-5 option (a), confidence medium, and DP-7 option (a), confidence medium-high · **Under:** CAP-51.a, CAP-01.b, DEC-329, DEC-360
+- **Decision:**
+  - A Markdown file of `HEAD` whose head looks like frontmatter and cannot be read as the store reads it (a
+    byte-order mark or a blank line before `---`, a first line such as `--- # c`, CR-only line ends, UTF-16) is
+    reported as `FRONTMATTER_UNREADABLE`. A file with `type: decision` and no `id` is a decision that fails.
+  - Ids outside the grammar with no `type`, and the extensions `.MD` and `.markdown`, are residuals.
+  - The checker runs git with replace refs off. A loose object overwritten in place in the root's own `.git` is a
+    residual, left to W1-50 and the worker sandbox.
+  - Accepted as built, each failing closed: `FRONTMATTER_UNREADABLE` as an eighth finding code; a decision is
+    followed by its `id`, and "later" is by ancestry, not by date; `check` needs no loaded store; a history it cannot
+    read (a shallow or partial clone) is a `GovError`; every `GIT_*` variable is dropped when the checker runs git.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.86 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-387 (W1-11 DP-5: unreadable frontmatter is a finding; DP-7: replace refs off; the checker's interface as built). W1-11 DP-6 goes to the owner. |
+
+## 87. Delegated decisions on W1-19's packages DP-8 and DP-9, and W1-16's UI switch as built (register v0.87, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule. Each is reversible, the test
+designer's, the lead's and the orchestrator's recommendations agree, and the confidence is medium or higher. The
+owner was told of all three on 2026-10-05 and may reverse any of them.
+
+### DEC-388 — W1-19 DP-8 and DP-9: an unknown `embedding_policy` is not embedded; hit@5 follows S0b2's stated method
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-19 packages DP-8 option (a), confidence medium-high, and DP-9 option (a), confidence medium · **Under:** DEC-380, DEC-381, DEC-383, CAP-09
+- **Decision:**
+  - DP-8: the closed list of `embedding_policy` values is `embedded` and `not embedded`. Any other value is read as
+    not embedded (fail closed). This repository's path map gives `template/**` the value
+    `embedded, except vendored code`, so `template/**` is found by the lexical route only. Giving the vendored paths
+    their own namespace, so that the rest of `template/**` can say `embedded`, is a follow-up for whoever wants it
+    embedded; it is a path map edit outside W1-19's paths.
+  - DP-9: `~/gov-os-workbench/s0b2/out/RESULTS.md` states S0b2's method ("each candidate's top-5 distinct paths per
+    query against `must_cite` / `must_not_cite`", over "52 queries, ten classes", "Mean of ten classes | 85.0"), so
+    under DEC-380 mean hit@5 is scored per class, as the mean of the ten classes, over all 52 queries. The two
+    queries with no gold path (`DQ-A-21`, `DQ-A-24`) count as misses, which caps the mean at 96.3 and matches S0b2's
+    figures for their two classes. DEC-380's fallback (leave them out; per tier) does not apply, because the method
+    is stated.
+  - Also stricter than DEC-381 states, accepted as built: a path in several namespaces is embedded only if every
+    one says `embedded`; a path in no namespace is not embedded.
+
+### DEC-389 — W1-16: the wrapper turns the UI off with `config set ui_enabled false`, not `--ui=false`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05; the purpose of DEC-362 is unchanged) · **Basis:** the W1-16 ticket lead's fourth round; observed on codebase-memory-mcp 0.11.0 · **Amends:** DEC-362 (the mechanism only) · **Under:** DEC-083, CAP-09
+- **Decision:**
+  - `--ui=false` does nothing on the `cli` calls the wrapper makes, and the server form serves the UI once while it
+    persists the switch. The wrapper therefore runs `codebase-memory-mcp config set ui_enabled false` in the
+    repository's home before every `cli` call; if that fails, the call raises and the tool is not run.
+  - The acceptance tests assert the outcome (no `ui.serving` line, nothing listening on the UI port, the setting
+    `false`; a caller's environment or argument cannot turn it back on), not the argument.
+  - The tool persists `{"ui_enabled": false, "ui_port": 9749}` in
+    `<repository>/.gov-runtime/codeintel/home/config.json`. This is recorded in the tool registry's note for
+    codebase-memory-mcp. `~/.cache/codebase-memory-mcp` is not changed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.87 | 2026-10-05 | Delegated under DEC-220: DEC-388 (W1-19 DP-8: an unknown `embedding_policy` is not embedded; DP-9: hit@5 per class over 52 queries, as S0b2 states), DEC-389 (W1-16: the UI is turned off with `config set ui_enabled false`; amends the mechanism of DEC-362). |
+
+## 88. Delegated decisions on W1-50's packages DP-11 to DP-16 (register v0.88, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its implementation and two reviews. Every option taken only makes the
+containment check report more, each is reversible, and the lead's and the orchestrator's recommendations agree.
+DP-11 and DP-12 touch owner decisions (DEC-360, DEC-366, DEC-367): they are kept as built, which is the literal and
+stricter reading, and were told to the owner, who may choose otherwise.
+
+### DEC-390 — W1-50 DP-11 to DP-16: the stricter reading in each case
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-11 (a), DP-12 (a), DP-13 (a), DP-14 (c), DP-15 (a), DP-16 (a finding); confidence medium-low to medium-high · **Under:** CAP-58, DEC-254, DEC-269, DEC-358, DEC-359, DEC-360
+- **Decision:**
+  - DP-15: when a merge commit has a parent that is not among the commits new in the move, every path it changes
+    against its first parent is judged by the merge commit's own trailers, or against the caller without them. An
+    ordinary integration merge, whose other parent is new in the move, is read as before (DEC-269).
+  - DP-16: a change under `.tickets/**` in a commit that carries a worker's `Role:` trailer is a finding.
+  - DP-13: a ticket file whose first version is already `closed` is not a close commit; the close commit itself is
+    not "before" itself when it carries a worker's trailers; a close made by a merge commit does not count.
+  - DP-14: a ticket's state and `allowed_paths` are read from `HEAD` and from the working tree, and both must allow.
+  - DP-11, as built until the owner says otherwise: a commit carrying `Role: owner` that becomes new to `HEAD` in an
+    agent session's call is a finding, also when it was made earlier from the owner's console and arrives by a merge
+    or a fast-forward. Such a finding is a record of a permitted action (DEC-254).
+  - DP-12, as built until the owner says otherwise: the revert commits and the record commit of
+    `gov pause --rollback` are judged like any other commit; where they are findings, the findings are records.
+  - `.git/info/grafts` is closed off for the check's git calls; this needs no decision, only tests and a fix.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.88 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-390 (W1-50 DP-11 to DP-16: a merge commit with a parent not new in the move is judged on its own change; a worker-trailer commit under `.tickets/**` is a finding; close-commit edges fail closed; ticket state from HEAD and the working tree together; DP-11 and DP-12 as built, told to the owner). |
+
+## 89. Delegated decisions on W1-20's packages DP-1 to DP-7 (register v0.89, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on the packages the W1-20 (`DAEO-jozo`, P2, STANDARD)
+ticket lead returned with its acceptance tests. Each is reversible, the test designer's, the lead's and the
+orchestrator's recommendations agree, and the confidence is medium or higher. One part of DP-5 changes the fixed list
+of stopping reasons of ADR-0002 §4 and goes to the owner.
+
+### DEC-391 — W1-20 DP-1 to DP-7: the interface, the ids, the depth, the code facet and the gaps of `gov closure`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-20 packages DP-1 (a), DP-2 (a), DP-3 (a), DP-4 (a), DP-5 (gap reasons), DP-6 (a), DP-7 (b); confidence medium to high · **Under:** CAP-57.a, CAP-09, DEC-033, DEC-034, DEC-035, DEC-080, DEC-317, DEC-322, DEC-344
+- **Decision:**
+  - DP-1: both `gov closure (--depth N | --radius R) <id>...` and `gov.closure.closure(root, ids, depth=N)`, which
+    returns the envelope's `result`. Its keys: `start`, `depth`, `stopping_reason`, `closure` (`id`, `kind`), `gaps`
+    (`id`, `reason`), `facets`, `uncommitted`.
+  - DP-2: the start ids are the untyped ids on the command line. A record id is a record; anything else is asked of
+    the code index as a symbol name. The eight typed edges are followed both ways, and a symbol's callers and callees
+    are followed. No text scan, no trailer edges, no record-to-symbol edge.
+  - DP-3: `--depth N` is the plain input; `--radius R` gives R0 and R1 → 1, R2 → 3, R3 and above → 8, as constants
+    (DEC-035's placeholders, read as hops).
+  - DP-4: the code facet is asked only about a start id that is no record and about symbols reached from a symbol.
+    A record's edge to no record is `UNRESOLVED` without asking. When the facet cannot answer, `facets.code` is
+    `unavailable`, each such id is a gap with reason `FACET_UNAVAILABLE`, the stopping reason is `FACET_UNAVAILABLE`,
+    and the record side is returned as usual. A closure never builds the store or the code index.
+  - DP-5, the gap reasons: each gap carries `DEPTH_LIMIT_REACHED`, `UNRESOLVED` or `FACET_UNAVAILABLE`. **With the
+    owner:** the stopping reason when unresolved ids are the only gaps (recommended: a sixth value `UNRESOLVED_IDS`,
+    a change to ADR-0002 §4). Until the answer, the tests hold only that it is not `CLOSURE_COMPLETE`, the code keeps
+    the value in one constant, and the ticket is not merged.
+  - DP-6: `callees(root, name)` is added to `gov.codeintel` beside `callers`, in its own commit. The ticket's
+    `allowed_paths` get `src/gov/codeintel/**` and `tests/unit/codeintel/**` for it (the DEC-260 form), and W1-16's
+    suite is run again.
+  - DP-7: the result names, under `uncommitted`, the sorted paths `git status --porcelain` names. A check that
+    `HEAD` is among the store's commits is left to W1-27.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.89 | 2026-10-05 | Delegated under DEC-220: DEC-391 (W1-20 DP-1 to DP-7: command and function, untyped start ids and edges both ways, depth by radius 1/3/8, the code facet asked lazily and stated when unavailable, three gap reasons, `callees` added to `gov.codeintel`, `uncommitted` paths). The stopping reason for unresolved ids alone goes to the owner. |
+
+## 90. Delegated decision on W1-28's package DP-13 (register v0.90, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on one of the three packages the W1-28 (`DAEO-9279`) ticket
+lead returned with DONE. It is reversible, the lead's and the orchestrator's recommendations agree, and the
+confidence is medium. DP-12 (the product-spec role file and agent definition) and DP-15 (the copied settings file's
+held-out deny line) go to the owner.
+
+### DEC-392 — W1-28 DP-13: the launcher's temp folder when a signal arrives or the removal fails
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 package DP-13 options 1a, 2a and 3a, confidence medium; the reviewer's findings F1 and F2 · **Amends:** DEC-386 · **Under:** DEC-332, DEC-159, CAP-58
+- **Decision:**
+  - When the removal of the temp folder fails, `gov launch` still ends with the session's exit code (DEC-332) and
+    writes one line to stderr that names the folder that stayed.
+  - SIGTERM and SIGHUP to the launcher are handled as an interrupt is: the session is ended and the folder removed.
+  - After an interrupt the launcher's exit code is 130.
+  - Ticket (orchestrator): W1-32 (`DAEO-8goq`), which already depends on W1-28, with `src/gov/launch/**` and
+    `tests/unit/launch/**` added to its `allowed_paths` and one KPI line, in its own commit. W1-28 closes as built.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.90 | 2026-10-05 | Delegated under DEC-220: DEC-392 (W1-28 DP-13: a failed removal keeps the session's exit code and names the folder; SIGTERM and SIGHUP as an interrupt; exit code 130; carried by W1-32). W1-28 DP-12 and DP-15 go to the owner. |
+
+## 91. Delegated decisions on W1-20's packages DP-A and DP-B (register v0.91, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on two packages the W1-20 (`DAEO-jozo`) ticket lead
+returned after the implementation. Both are what is built, reversible in one line before W1-21 is written, and the
+lead's and the orchestrator's recommendations agree at medium confidence or higher. DP-8 (the tests' fixed list of
+stopping reasons) follows the owner's answer on DP-5 (DEC-391).
+
+### DEC-393 — W1-20 DP-A and DP-B: the depth cut wins over unresolved ids; an unasked code facet says `not_asked`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-20 packages DP-A option (a), confidence medium, and DP-B option (a), confidence medium-high · **Amends:** DEC-391 · **Under:** CAP-57.a, DEC-034
+- **Decision:**
+  - The stopping reason is chosen in this order: `FACET_UNAVAILABLE` when the code facet could not answer, then
+    `DEPTH_LIMIT_REACHED` when any gap lies beyond the depth, then the value for unresolved ids alone (with the
+    owner, DEC-391), then `CLOSURE_COMPLETE`. The reason on each gap carries the rest.
+  - `facets.code` is `not_asked` for a closure in which the code facet was never asked.
+  - Accepted as built: a repository without a store answers `STORE_MISSING` with exit code 1; a depth below zero is
+    refused with `CLOSURE_DEPTH_INVALID`; once the facet fails in a run it is not asked again; `start` is sorted and
+    de-duplicated.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.91 | 2026-10-05 | Delegated under DEC-220: DEC-393 (W1-20 DP-A: the order of stopping reasons; DP-B: `facets.code` is `not_asked` when the facet was not asked; four engineer choices as built). |
+
+## 92. Delegated decisions on W1-50's packages DP-17 and DP-18 (register v0.92, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule. The DP-15 rule of DEC-390 was the
+orchestrator's own and was wrong in two ways, which the closing round's reviewer showed by running them: it flags an
+ordinary merge-back of a ticket branch that earlier took the integration branch (a false finding, KPI failure line
+1), and one extra empty commit evades it. The rule below replaces it. Against DEC-269, which it refines, it only
+makes the check report more; it is reversible, and the lead's and the orchestrator's recommendations agree at
+medium-high confidence. The owner was told on 2026-10-05.
+
+### DEC-394 — W1-50 DP-18 and DP-17: a merge commit's own change by the three-way rule; a ticket-file commit in a worker's call
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-18 option (a) and DP-17 option (a), confidence medium-high; the third reviewer's findings F1 and F2 · **Amends:** DEC-390 (replaces its DP-15 rule), DEC-269 (refines "content a parent holds") · **Under:** CAP-58, DEC-254, DEC-359
+- **Decision:**
+  - DP-18: a path a merge commit changes against its first parent is brought by another parent only when that
+    parent's content of the path differs from the merge base of the parents; with several merge bases, it must differ
+    from every one. Otherwise the change is the merge commit's own, judged by the merge commit's trailers, or against
+    the caller without them. Whether a parent is new in the move no longer matters.
+  - Consequences accepted: a merge that drops the first parent's later changes in favour of another parent's
+    unchanged content (for example `-s ours` turned round, or by hand) is now the merge commit's own change. An
+    ordinary integration merge and an ordinary merge-back stay silent.
+  - DP-17: in a worker's call, any commit of the move that changes a path under `.tickets/**` is a finding, with or
+    without trailers.
+  - The check is not made the live one (the branch is not merged) before a reviewer has run the new rule against
+    ordinary merges, merge-backs, octopus merges and criss-cross histories.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.92 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-394 (W1-50 DP-18: a merge commit's own change is read by a three-way rule against the merge base, replacing DEC-390's DP-15 rule; DP-17: a `.tickets/**` commit in a worker's call is a finding). |
+
+## 93. Owner actions and answers of 2026-10-05, evening (register v0.93, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's actions through the operator and the owner's answers to the packages open on 2026-10-05, as given to the
+orchestrator. Where an answer leaves the ticket to the orchestrator, the choice is named in the entry.
+
+### DEC-395 — Temp folders cleared; temp hygiene delegated to the orchestrator
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-376 · **Under:** DEC-385, DEC-386
+- **Decision:**
+  - Done by the owner through the operator: `/tmp/pytest-of-usain` and all 113 `/tmp/gov-launch-*` folders are
+    removed (about 31 GB). `.git/config.lock` had already gone and no lock file remains. `w1/integrate` is pushed at
+    `6b20a0ad`.
+  - Delegated: at each checkpoint, when no lead, worker or regression is running, the orchestrator removes
+    `/tmp/pytest-of-usain` and any leftover `/tmp/gov-launch-*` folder. If the guard refuses, it tells the owner
+    instead. Each cleanup is recorded in the orchestrator's checkpoint. Nothing in those folders is opened.
+
+### DEC-396 — W1-20 DP-5: a sixth stopping reason, `UNRESOLVED_IDS`
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-20 package DP-5 option (a) · **Amends:** ADR-0002 §4, DEC-034, DEC-391 · **Under:** CAP-57.a
+- **Decision:** the stopping reason when unresolved ids are the only gaps is `UNRESOLVED_IDS`. The fixed list of
+  ADR-0002 §4 is amended under this decision, in its own commit. A test designer adds the value to the W1-20 tests'
+  list. W1-20 is then merged and closed.
+
+### DEC-397 — W1-19 installs: approved (DEC-083)
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-384 · **Under:** DEC-083, DEC-195, DEC-074
+- **Decision:**
+  - Ollama 0.35.0 and `qwen3-embedding:0.6b` are approved for use as verified on disk; the embedding model gets its
+    row in the tool registry.
+  - sqlite-vec 0.1.9 is approved, installed by
+    `/usr/bin/python3 -m pip install --user --break-system-packages sqlite-vec==0.1.9`; the sha256 of `vec0.so` is
+    verified afterwards and recorded.
+  - The reranker does not depend on the S0b2 virtual environment in the workbench. A fresh one is created at
+    `~/.local/share/gov-os/reranker-venv` with the exact pins S0b2 recorded (Python 3.12, sentence-transformers
+    6.1.0, torch 2.14.1+cu130, transformers 5.18.0), by S0b2's recorded install method; the existing Hugging Face
+    snapshot is reused. It enters the registry with its pins and its uninstall command. The default reranker process
+    starts from that environment.
+  - The orchestrator runs the installs; the guard's ask is the owner's approval. W1-19 is then finished.
+
+### DEC-398 — W1-11 DP-6: the approval rule reads merges by the merge base, with one helper shared with containment
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-11 package DP-6 option (b) · **Amends:** DEC-394 · **Under:** DEC-360, DEC-387, CAP-51.a
+- **Decision:**
+  - The approval rule judges a merge against the merge base. It shares one helper with W1-50's three-way rule
+    (DEC-394), so the approval check and containment read merges the same way.
+  - Where several merge bases exist (a criss-cross history), it fails closed.
+  - One design batch, then the engineer and a review.
+  - Orchestrator's reading, told to the owner: the shared helper is the one place that reads a merge, so it fails
+    closed for both callers. With several merge bases nothing counts as brought by another parent; in containment
+    every path such a merge commit changes against its first parent is its own change. This is stricter than
+    DEC-394's "must differ from every one" and replaces that clause. W1-50 builds the helper; W1-11 uses it after
+    W1-50 is merged.
+
+### DEC-399 — W1-28 DP-15: whole-tree fixtures strip the held-out deny line from copied settings files
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-28 package DP-15 option (a) · **Amends:** DEC-385 · **Under:** CAP-58
+- **Decision:** the fixtures that copy the whole tree strip the held-out deny line from the copied
+  `.claude/settings.json`, as W1-46's and W1-47's fixtures do. Nobody displays that line. Ticket (orchestrator):
+  W1-50 (`DAEO-xnbx`), in the second branch of DEC-402, as a test designer's revision.
+
+### DEC-400 — W1-28 DP-12: the product-spec role file and agent definition are rewritten
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, W1-28 package DP-12 option (a) · **Under:** DEC-386, DEC-312, DEC-352
+- **Decision:** the product-spec role file is rewritten to say that `gov launch` starts the role sandboxed. The
+  orchestrator drafts the text of `.claude/agents/product-spec.md` in its scratch folder and tells the owner, and the
+  operator places it.
+
+### DEC-401 — W1-50 DP-11 and DP-12 kept as built; DEC-394 accepted on a condition; DEC-388 and DEC-389 stand
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-254, DEC-390, DEC-394
+- **Decision:**
+  - W1-50 DP-11 and DP-12 stay as built; those findings are records (DEC-254).
+  - DEC-394 replacing DEC-390's DP-15 rule is accepted, provided the reviewer's criss-cross and replay tests pass
+    before the merge.
+  - No objection to DEC-388 and DEC-389.
+  - DEC-372 stands as recorded: an owner decision, its handling delegated.
+
+### DEC-402 — The freeze flag carries a marker; an empty placeholder is no freeze (high priority)
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-176, DEC-365, DEC-378 · **Under:** CAP-58, DEC-159, DEC-180
+- **Context:** launched sessions were refused with "frozen: all writes denied" although no freeze was set. Likely
+  cause: the launcher denies `.gov-runtime/freeze` also when it does not exist, so the sandbox creates an empty
+  placeholder at that path on the real filesystem while a worker's command runs, and the guard, outside the sandbox,
+  reads it as a freeze.
+- **Decision:**
+  - A real freeze flag carries a marker line written by `gov pause` (for example `FROZEN`, with who and when).
+  - The guard treats an empty file, or one without that marker, as no freeze, and records its presence as a
+    residual observation.
+  - The launcher stops denying the freeze path when it does not exist at launch.
+  - The cause is verified with one live launched session before anything is built.
+  - Ticket (orchestrator): W1-50 (`DAEO-xnbx`, P1, FULL, in progress), on a second branch and worktree of its own
+    (`w1/W1-50-freeze`), with `src/gov/guard/decide*`, `src/gov/pause/**`, `src/gov/launch/**`,
+    `tests/unit/guard/**`, `tests/unit/pause/**` and `tests/unit/launch/**` added to its `allowed_paths` and the KPI
+    lines added, in its own commit. W1-32, which holds the launcher paths, is not ready (W1-31 is open) and cannot
+    be run with priority. W1-50 closes when both branches are merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.93 | 2026-10-05 | Owner: DEC-395 (temp folders cleared; temp hygiene delegated), DEC-396 (W1-20 DP-5: `UNRESOLVED_IDS`; ADR-0002 §4 amended), DEC-397 (W1-19 installs approved; a fresh reranker environment), DEC-398 (W1-11 DP-6: merge-base rule, one helper shared with containment, criss-cross fails closed), DEC-399 (W1-28 DP-15), DEC-400 (W1-28 DP-12), DEC-401 (W1-50 DP-11 and DP-12 as built; DEC-394 accepted on a condition; DEC-388 and DEC-389 stand), DEC-402 (the freeze flag's marker; W1-50). |
+
+## 94. Delegated decision on W1-50's packages DP-19 and DP-20 (register v0.94, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the two packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its fifth round. The owner's two conditions of DEC-401 passed in that round
+(criss-cross histories fail closed; a replay of 174 real merges flags none by mistake). Both options only make the
+check report more, are reversible before W1-11 uses the helper, and the lead's and the orchestrator's recommendations
+agree at medium confidence or higher. The owner was told on 2026-10-05.
+
+### DEC-403 — W1-50 DP-20 and DP-19: the merge helper reads every parent; an octopus with a crossing parent fails closed
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-20 option (a), confidence medium-high, and DP-19 option (a), confidence medium; the fourth reviewer's finding F1 (seven merge shapes that undo acceptance tests silently) · **Amends:** DEC-394, DEC-398 ("against its first parent") · **Under:** CAP-58, DEC-269, DEC-401
+- **Decision:**
+  - DP-20: the one helper that reads a merge (`gov.guard.containment_merge.read_merge`) reads every parent the way
+    it reads the first. A path where the merge commit's content differs from any parent's is the merge commit's own
+    change, unless another parent brought it by the three-way rule: that parent's content differs from the merge
+    base and the merge commit has that parent's content. So a merge that keeps one parent's content and drops what
+    another parent changed is judged. With several merge bases, or none, every path that differs from any parent is
+    the merge commit's own change.
+  - DP-19: an octopus merge in which one other parent has several merge bases, or none, with the first parent fails
+    closed as a whole. An octopus whose other parents cross only each other is read parent by parent.
+  - The helper raises a public error, and refuses a `commit` argument that is not a commit id.
+  - The owner's conditions of DEC-401 are run again on this rule before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.94 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-403 (W1-50 DP-20: the merge helper reads every parent, so a merge that drops a parent's change is judged; DP-19: an octopus merge with a crossing parent fails closed as a whole). |
+
+## 95. Delegated decisions on the W1-50 freeze branch's packages DP-F1, DP-F3, DP-F4 and DP-F5 (register v0.95, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on four of the five packages the lead of W1-50's freeze
+branch (`w1/W1-50-freeze`) returned after its first round. That round confirmed the cause DEC-402 names with one live
+launched session: the flag's path was absent before, an empty read-only file stood there while the launched worker's
+command ran, the lead's own write was refused as frozen in that window, and the file was gone when the command ended.
+With the branch's launcher no file appeared over a 66-second command. All four are P3, reversible, and the lead's and
+the orchestrator's recommendations agree at medium confidence or higher. The fifth package, DP-F2 (what protects the
+flag's path in a session launched while no flag existed), lowers a protection and is the owner's. The owner was told
+on 2026-10-05.
+
+### DEC-404 — W1-50 freeze branch: the marker line's layout; an unmarked file at launch; `gov pause` over a linked runtime folder; one builder test
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** packages DP-F3 option (a), confidence medium-high; DP-F1 option (a), medium; DP-F4 option (a), medium; DP-F5 option (a), high · **Under:** DEC-402, DEC-311, DEC-365
+- **Decision:**
+  - DP-F3: the flag's first line, as `gov pause` writes it, is `FROZEN <who> <when>` with single spaces; who is
+    `owner` or `orchestrator` (the caller of DEC-365), when is UTC `YYYY-MM-DDTHH:MM:SSZ`.
+  - The guard's reading is wider than what `gov pause` writes, as built and reviewed: any file at the flag's path
+    that carries the word freezes, in any of the spellings the review probed; an empty file, or one without the
+    word, is no freeze and its presence is recorded (DEC-402). A flag the guard cannot read, or a dangling link at
+    the runtime folder, freezes.
+  - DP-F1: `gov launch` denies the flag's path by name whenever a file exists there at launch, marked or not, as
+    for any name that exists at launch (DEC-311). A placeholder renewed this way freezes nothing.
+  - DP-F4: when `.gov-runtime` is a symbolic link, `gov pause` refuses with an error that names the link and
+    writes nothing. The owner repairs the folder.
+  - DP-F5: `tests/unit/install/**` is added to the ticket's `allowed_paths`, in its own commit, so the engineer
+    updates the one builder test that sets an empty flag.
+  - `gov pause` writes the flag by a temporary file and a rename, never through a link at the flag's path, and
+    reads it back with the guard's own reader; `--off` over a directory is a clear refusal (the review's findings,
+    tests already written).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.95 | 2026-10-05 | Delegated under DEC-220: DEC-404 (W1-50 freeze branch: the marker line is `FROZEN <who> <when>`; an unmarked file at the flag's path is still denied by name at launch; `gov pause` refuses over a linked runtime folder; one builder test's path added). |
+
+## 96. Owner actions and answers of 2026-10-05, third round (register v0.96, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05, after the W1-19 lead's third round, the W1-50 freeze branch's first round, and
+DEC-400's drafts.
+
+### DEC-405 — The product-spec role file and agent definition are placed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner action through the operator · **Under:** DEC-400, DEC-254
+- **Decision:**
+  - `template/governance/kernel/roles/product-spec.md` and `.claude/agents/product-spec.md` are committed together
+    in the main tree as `5d1d9cffc796240a86eb021bc6a03a3da243b1df` (Task: decision-record, Role: owner), each
+    byte-identical to the orchestrator's draft.
+  - If containment flags that commit, the finding is a record of an owner action (DEC-254).
+  - W1-33's suite was run again at that commit: 113 passed, the field-by-field check among them.
+
+### DEC-406 — W1-19 DP-10: a worker reads S0b2's R1 prototype by exact path; tuning on the dev set is not the fix
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-19 package DP-10 option (a) · **Under:** DEC-397, DEC-388
+- **Decision:**
+  - A worker may read `/home/usain/gov-os-workbench/s0b2/sandbox/retrieval/r1/r1_retrieval.py` by that exact path.
+    Folders there are never listed, and `s0b2/probe/` is never touched.
+  - The reading finds how R1 ran the lexical query (ranked full-text or exact string), the candidate counts, the
+    chunking and the reranker call.
+  - If the difference lies outside W1-19's paths (for example W1-17's exact-string lexical route), it comes back as
+    a package with the measured effect, not as a workaround.
+  - Tuning on the dev set alone (option (c), a larger top-k) is not accepted as the fix.
+
+### DEC-407 — W1-50 DP-F2: accepted for the merge; before W1-50 closes, the flag is compared around every Bash call and owner identity follows process ancestry
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-50 freeze branch package DP-F2 option (a) now, option (b) and a new rule before the close · **Amends:** DEC-365 ("unset `GOV_ROLE` is the owner") · **Under:** DEC-402, DEC-404, DEC-311
+- **Decision:**
+  - Now, so the freeze branch can merge: W1-46's one live assertion is revised as a rewrite after implementation,
+    reason "owner decision: freeze marker".
+  - Before W1-50 closes, two things are built:
+    - the containment check compares the freeze flag around every Bash call; a removed or emptied flag is a
+      finding and is restored with its marker line;
+    - the ancestry rule (owner identity): an owner-only action, such as lifting a freeze, refuses whenever any
+      parent process of the command is a Claude Code session, whatever `GOV_ROLE` says. "`GOV_ROLE` unset" alone no
+      longer means the owner, which closes `env -u GOV_ROLE gov pause --off` from a worker. The same rule applies
+      wherever the code treats an unset `GOV_ROLE` as the owner.
+  - The KPI lines are added to W1-50 in their own commit.
+
+### DEC-408 — DEC-403 stands; three orchestrator choices are confirmed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner answer · **Under:** DEC-403, DEC-402, DEC-398, DEC-397
+- **Decision:**
+  - DEC-403 (the symmetric merge rule; an octopus merge with a crossing parent fails closed): no objection.
+  - Confirmed: the freeze work is carried by W1-50 and not by W1-32; the fail-closed reading of criss-cross merges
+    applies to containment too; the reranker environment's extra pin `huggingface-hub` 1.33.0.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.96 | 2026-10-05 | Owner: DEC-405 (product-spec role file and agent definition placed, `5d1d9cff`), DEC-406 (W1-19 DP-10: an exact-path read of S0b2's R1 prototype; dev-set tuning is not the fix), DEC-407 (W1-50 DP-F2: accepted for the merge; before the close, the flag is compared around every Bash call and owner-only actions refuse under a Claude Code parent process), DEC-408 (DEC-403 stands; three orchestrator choices confirmed). |
+
+## 97. Owner decision of 2026-10-05: lifting a freeze requires the owner in person (register v0.97, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05. It replaces the ancestry rule of DEC-407. The owner named DEC-367 and the W1-28
+DP-3 answer as amended; the W1-28 DP-3 answer is DEC-365 ("lifting a freeze works only with `GOV_ROLE` unset"), which
+this decision amends. DEC-367 (the record of a rollback or a cancel) says nothing about lifting and its text is not
+changed here; the orchestrator told the owner so.
+
+### DEC-409 — Lifting a freeze requires the owner in person: no Claude Code ancestor, an interactive terminal with a typed one-time code, and a guard rule on the lift form
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a
+- **Decision:**
+  1. `gov pause --off` refuses if any ancestor process is a Claude Code session, wherever that session was
+     started. The operator console cannot lift either; only a plain terminal can.
+  2. It requires an interactive terminal: stdin and stdout are TTYs, and it shows a one-time random code ("type
+     LIFT-<4 digits> to lift the freeze") that must be typed back. A wrong code, piped input, or no TTY refuses,
+     and nothing changes.
+  3. The guard refuses any agent Bash command whose text contains the lift form of `gov pause` (the `--off`
+     option), for every role, including a command that starts another Claude Code session with that text in its
+     prompt. Obfuscated forms are a residual.
+  4. The containment check, as DEC-407 decided: a removed or emptied freeze flag is a finding, and the flag is
+     restored with its marker line.
+  - Setting a freeze stays as decided: the owner (terminal or operator console) and the orchestrator may set it.
+  - Wherever else the code treats an unset `GOV_ROLE` as the owner, rule 1 applies to owner-only actions.
+  - All of this is built on the freeze branch before W1-50 closes, with acceptance tests for the refused cases (an
+    agent session, the operator console, piped input, a wrong code) and one manual check by the owner from a plain
+    terminal.
+  - The KPI lines are added to W1-50 in their own commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.97 | 2026-10-05 | Owner: DEC-409 (lifting a freeze requires the owner in person: no Claude Code ancestor process, an interactive terminal with a typed one-time code, a guard rule on the lift form; the flag comparison of DEC-407 stays; replaces DEC-407's ancestry rule, amends DEC-365). |
+
+## 98. Delegated decisions on W1-50's packages DP-21 to DP-28 (register v0.98, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the eight packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its sixth round. In that round the owner's two conditions of DEC-401 passed
+on the symmetric rule (criss-cross histories fail closed; a replay of 176 real merges flags none by mistake; a fuzz
+of 1,604 merges against an independent reading of DEC-403 gave no mismatch). Every choice below either keeps what is
+built or makes the check report more; none makes it report less. The findings of this check are records (DEC-254).
+The owner was told on 2026-10-05.
+
+### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401
+- **Decision:**
+  - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
+    is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
+  - DP-27: the same for `tests/acceptance/**`: a merge commit's own change there is a finding whatever its
+    trailers, test-designer trailers included.
+  - DP-24: under `tests/acceptance/**`, a path that more than one parent changed against the merge base is the
+    merge commit's own, whichever side's content it holds. Taking one side whole is a resolution, and a resolution
+    of an acceptance test is a finding (DEC-269).
+  - DP-26: git's own clean combination of two sides' edits of one acceptance test stays flagged, as built. Branches
+    are brought to a state where no acceptance test is changed on both sides before they are merged.
+  - DP-25: an octopus whose other parents cross only each other is read as built in round six: that pair brings
+    nothing against each other. DEC-403's words "read parent by parent" are amended to this stricter reading.
+  - DP-23: with several merge bases or none, every path that differs from any parent is the merge commit's own,
+    also where it keeps what its first parent holds. DEC-403's words stand.
+  - DP-22: `brought` is the complement of `own` over every parent: each path where the merge commit differs from
+    some parent and that is not its own.
+  - DP-28: the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a
+    whole.
+  - The owner's conditions of DEC-401 are run again on the final head before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.98 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-410 (W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a test both sides changed is the merge commit's own; 24 parents at most; `brought` is the complement of `own`). |
+
+## 99. Owner answers and decisions of 2026-10-06 (register v0.99, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-06, after the W1-50 freeze branch's second round, W1-50's sixth round and W1-19's
+fourth round.
+
+### DEC-411 — DEC-409 amends DEC-365, not DEC-367
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** owner answer · **Under:** DEC-409
+- **Decision:** DEC-409 amends DEC-365 (the W1-28 DP-3 answer). DEC-367 stays unchanged.
+
+### DEC-412 — W1-50 DP-F6: the freeze branch is rebuilt; rewriting an unpushed ticket branch is allowed
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-50 freeze branch package DP-F6 option (a) · **Under:** DEC-410, DEC-235
+- **Decision:**
+  - The freeze branch is rebuilt: a test designer aligns `tests/acceptance/W1-07/w1_07_support.py` first, then
+    `w1/integrate` is merged and the four commits are cherry-picked.
+  - Rewriting an unpushed ticket branch is allowed. "Never rebase" protects shared history: `main` and
+    `w1/integrate`.
+  - The old branch is kept until the new one verifies, then deleted.
+  - It is done once, after W1-50's main branch merges, in the round that builds DEC-409.
+  - The freeze branch's choices no decision pinned are fine as built: the error codes `PAUSE_RUNTIME_LINKED`,
+    `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
+
+### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220
+- **Decision:**
+  - A FULL ticket has at most two review rounds.
+  - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
+    files in shapes that ordinary work produces. Everything else becomes a residual.
+  - A fail-open that remains after the second round comes to the owner as a decision package, not as a third
+    round.
+  - W1-50 keeps its seventh round, whose stop rule (the same two kinds) is confirmed. If that round still finds a
+    fail-open, no eighth round starts: it comes to the owner as a decision package, with the option of accepting
+    it as a residual.
+
+### DEC-414 — W1-19 DP-12, DP-11 and DP-13: the pass line is 80 on the dev tiers; the parent-bounded chunks stay; no ranked lexical route in W1-19; the retrieval instruction stays
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-19 packages DP-12 option (b), DP-11, DP-13 option (a) · **Amends:** W1-19's second KPI line · **Under:** DEC-343, DEC-406, DEC-388
+- **Decision:**
+  - DP-12: the parent-bounded chunks stay (DEC-343). The KPI line is restated: mean hit@5 at or above 80 on the
+    dev tiers is the pass line; 85 (the S0b2 baseline) is re-measured at the Wave 1 exit run (W1-42) and at
+    qualification.
+  - The miss of query `DQ-B-03` and R1's whole-file chunking are recorded as residuals.
+  - A test designer revises the baseline case; then W1-19 is merged and closed.
+  - DP-11: not in W1-19. "A ranked lexical route for exact identifiers" is a backlog item for W1-17's area, for a
+    later wave.
+  - DP-13: the embedding model's retrieval instruction on the question stays.
+
+### DEC-415 — Early test design
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** the READY rule for test design only · **Under:** DEC-235, DEC-069
+- **Decision:**
+  - When every dependency of a ticket is built and green on its branch (merged or not, closed or not), the
+    orchestrator may claim that ticket, create its worktree and run its test design.
+  - Its engineer starts only after its dependencies are merged into `w1/integrate`.
+  - If a dependency changes its interface before merging, the test designer revises the tests, recorded as "owner
+    decision: early test design".
+
+### DEC-416 — Delegation widened for the rest of Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-220 · **Under:** DEC-220
+- **Decision:**
+  - The orchestrator may also decide P2 packages with medium-low confidence, when they are reversible and do not
+    touch the guard, containment, the launcher, scope, installs, the held-out path, merges into `main` or
+    releases.
+  - They are listed in the digest as before.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.99 | 2026-10-06 | Owner: DEC-411 (DEC-409 amends DEC-365, not DEC-367), DEC-412 (W1-50 DP-F6: the freeze branch is rebuilt; an unpushed ticket branch may be rewritten; unpinned choices fine as built), DEC-413 (at most two review rounds per FULL ticket; W1-50's round 7 stop rule), DEC-414 (W1-19: pass line 80 on the dev tiers, 85 re-measured at W1-42 and qualification; chunks stay; no ranked lexical route in W1-19; the instruction stays), DEC-415 (early test design), DEC-416 (delegation widened to P2 at medium-low confidence, with exclusions). |

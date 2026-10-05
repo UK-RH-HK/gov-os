@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 PYPROJECT_REL = "pyproject.toml"
 API_REL = "docs/interfaces/API-0002.yaml"
 PATH_MAP_REL = "governance/project/path-map.yaml"
+HELD_OUT_REL = "governance/project/held-out.yaml"   # DEC-385: no fixture copies it into a temporary project
 CHECKS_REL = "template/governance/kernel/checks"
 
 # The twelve Wave 1 governance operations the registry reserves (ticket KPI, CAP-28.b).
@@ -48,15 +49,32 @@ RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "conte
 # Every other reserved command, and ``check`` without ``--list``, is not built yet.
 # Planned revision (DEC-190, "planned: command implemented"): W1-25 builds ``checkpoint``; its cases are in
 # ``tests/acceptance/W1-25/``. The same for W1-13, which builds ``readiness``: ``tests/acceptance/W1-13/``.
-BUILT_LATER = ("checkpoint", "readiness")
+# The same for W1-28, which builds ``pause``: ``tests/acceptance/W1-28/``.
+BUILT_LATER = ("checkpoint", "readiness", "pause")
 NOT_BUILT = tuple(name for name in RESERVED_COMMANDS if name != "status" and name not in BUILT_LATER)
+
+# Planned revision (DEC-190, "planned: command implemented"): W1-20 builds ``closure``; its cases are in
+# ``tests/acceptance/W1-20/``. It joins the built commands and leaves ``NOT_BUILT`` in statements of its own.
+BUILT_LATER = BUILT_LATER + ("closure",)
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+
+# Planned revision (DEC-190, "planned: command implemented"): a built command may require arguments, and a call
+# without them is a usage error (exit code 2, API-0002), not an envelope. ``gov closure`` requires a depth and
+# at least one id (DEC-391), so the cases that run every command give it both. The id names nothing.
+REQUIRED_ARGUMENTS = {"closure": ("--depth", "1", "W1-07-NO-SUCH-ID")}
+
+
+def invocation(name):
+    """The reserved command as an argument list, with the arguments it requires: ``("closure", "--depth", ...)``."""
+    return (name, *REQUIRED_ARGUMENTS.get(name, ()))
+
 
 # The read commands of CAP-27's acceptance line, as argument lists, plus ``check --list`` (DEC-186).
 READ_COMMANDS = (("status",), ("check",), ("check", "--list"), ("readiness",), ("doctor",), ("context", "--dry-run"),
-                 ("closure",), ("retrieve",))
+                 invocation("closure"), ("retrieve",))
 
 # Every invocation these tests know: one per reserved command, and ``check --list``.
-EVERY_INVOCATION = tuple((name,) for name in RESERVED_COMMANDS) + (("check", "--list"),)
+EVERY_INVOCATION = tuple(invocation(name) for name in RESERVED_COMMANDS) + (("check", "--list"),)
 
 NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
 CONFIG_INVALID = "CONFIG_INVALID"
@@ -103,6 +121,8 @@ def copy_working_tree(destination, root=REPO_ROOT):
         capture_output=True, text=True, check=True,
     ).stdout
     for rel in sorted(set(item for item in listing.split("\0") if item)):
+        if rel == HELD_OUT_REL:   # DEC-385: left out by its path, never opened
+            continue
         source = Path(root) / rel
         target = destination / rel
         if not (source.is_file() or source.is_symlink()):
