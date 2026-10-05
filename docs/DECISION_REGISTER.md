@@ -3770,3 +3770,40 @@ them are separate commits with the trailer `Task: <ticket id>`.
 | Version | Date | Change |
 |---|---|---|
 | 0.83 | 2026-10-05 | Owner answers: DEC-358, DEC-359 (W1-50 DP-8, DP-9), DEC-360 (W1-11 DP-2: the `Role: owner` trailer; W1-50 KPI line), DEC-361, DEC-362 (W1-16 DP-1 and the UI), DEC-363 (idle tickets and the six), DEC-364 to DEC-368 (W1-28 DP-1, DP-2, DP-3, DP-5, DP-6, DP-8), DEC-369 (second scan in pre-commit; W1-40 KPI line), DEC-370 (G-20 by exact path), DEC-371 (`gov launch` from now on), DEC-372 (latency cases re-run alone). |
+
+## 84. Delegated decisions on W1-19's and W1-28's packages (register v0.84, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on packages the W1-19 (`DAEO-t6hf`) and W1-28
+(`DAEO-9279`) ticket leads returned. For each the test designer's, the lead's and the orchestrator's recommendations
+agree, the confidence is medium or higher, and the choice is reversible. W1-19's DP-1, DP-2, DP-6, DP-7 and its four
+install packages, and W1-28's DP-10 (the freeze flag when a rollback fails), go to the owner.
+
+### DEC-373 — W1-19 DP-3: how warm p95 and the rerank process's peak RAM are measured
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 package DP-3, option (a) for both; confidence medium · **Under:** CAP-18.a, DEC-074 R1
+- **Decision:**
+  - Warm: one process per tier builds the index, asks three questions outside the set, then times each query of
+    the dev query set once; p95 by nearest rank, against 0.5 s.
+  - Peak RAM: the largest `VmHWM` of the calling process and every descendant, sampled every 50 ms, leaving out
+    `ollama` and its children, against 2.5 × 10⁹ bytes. A reranker that detaches from the process tree is not seen:
+    a residual.
+
+### DEC-374 — W1-19 DP-4 and DP-5: an absent reranker keeps the fused order, and the manifest is held in the shared store
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 packages DP-4 option (a) and DP-5 option (a); confidence medium · **Under:** CAP-10.a, CAP-18.a, DEC-257, DEC-340
+- **Decision:**
+  - When the default reranker cannot be loaded, the fused search keeps the fused order, reports that nothing was
+    reranked, and does not raise.
+  - The index manifest is held in the shared store and read through the semantic module. It names the embedder and
+    the reranker, each with its model and revision; the embedder's revision is the one observed from Ollama's model
+    list, not a constant.
+  - The names of the functions and keys follow the owner's answer to DP-1.
+
+### DEC-375 — W1-28 DP-9 and DP-11: one record commit per released ticket, and no record when nothing was reverted
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-9 option (a) and DP-11 option (a); confidence medium-high · **Under:** DEC-357, DEC-367, CAP-05.d
+- **Decision:**
+  - `gov pause --cancel-agents` writes one record commit per released ticket, each with that ticket's `Task:` and
+    `Reverts-Task:` trailers. A cancel that releases nothing makes no commit.
+  - A rollback that reverts nothing, on its first run as on a repeat, writes no record commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.84 | 2026-10-05 | Delegated under DEC-220: DEC-373 (W1-19 DP-3: warm p95 and peak RAM), DEC-374 (W1-19 DP-4, DP-5: absent reranker, manifest in the shared store), DEC-375 (W1-28 DP-9, DP-11: one record commit per released ticket; none when nothing was reverted). |
