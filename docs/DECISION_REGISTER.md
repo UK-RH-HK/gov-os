@@ -4349,3 +4349,38 @@ changed here; the orchestrator told the owner so.
 | Version | Date | Change |
 |---|---|---|
 | 0.97 | 2026-10-05 | Owner: DEC-409 (lifting a freeze requires the owner in person: no Claude Code ancestor process, an interactive terminal with a typed one-time code, a guard rule on the lift form; the flag comparison of DEC-407 stays; replaces DEC-407's ancestry rule, amends DEC-365). |
+
+## 98. Delegated decisions on W1-50's packages DP-21 to DP-28 (register v0.98, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the eight packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its sixth round. In that round the owner's two conditions of DEC-401 passed
+on the symmetric rule (criss-cross histories fail closed; a replay of 176 real merges flags none by mistake; a fuzz
+of 1,604 merges against an independent reading of DEC-403 gave no mismatch). Every choice below either keeps what is
+built or makes the check report more; none makes it report less. The findings of this check are records (DEC-254).
+The owner was told on 2026-10-05.
+
+### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401
+- **Decision:**
+  - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
+    is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
+  - DP-27: the same for `tests/acceptance/**`: a merge commit's own change there is a finding whatever its
+    trailers, test-designer trailers included.
+  - DP-24: under `tests/acceptance/**`, a path that more than one parent changed against the merge base is the
+    merge commit's own, whichever side's content it holds. Taking one side whole is a resolution, and a resolution
+    of an acceptance test is a finding (DEC-269).
+  - DP-26: git's own clean combination of two sides' edits of one acceptance test stays flagged, as built. Branches
+    are brought to a state where no acceptance test is changed on both sides before they are merged.
+  - DP-25: an octopus whose other parents cross only each other is read as built in round six: that pair brings
+    nothing against each other. DEC-403's words "read parent by parent" are amended to this stricter reading.
+  - DP-23: with several merge bases or none, every path that differs from any parent is the merge commit's own,
+    also where it keeps what its first parent holds. DEC-403's words stand.
+  - DP-22: `brought` is the complement of `own` over every parent: each path where the merge commit differs from
+    some parent and that is not its own.
+  - DP-28: the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a
+    whole.
+  - The owner's conditions of DEC-401 are run again on the final head before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.98 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-410 (W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a test both sides changed is the merge commit's own; 24 parents at most; `brought` is the complement of `own`). |
