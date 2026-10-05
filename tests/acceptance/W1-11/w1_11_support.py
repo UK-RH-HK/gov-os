@@ -115,7 +115,7 @@ class Api:
         self.driver = self.workdir / "driver.py"
         self.driver.write_text(_DRIVER, encoding="utf-8")
 
-    def _batch(self, calls):
+    def _batch(self, calls, extra=None):
         request = [{"module": module, "function": function, "root": str(root)} for module, function, root in calls]
         environment = {
             "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
@@ -125,6 +125,7 @@ class Api:
             "GIT_CONFIG_NOSYSTEM": "1",
             "PYTHONPATH": str(SRC),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
+            **(extra or {}),  # batch 4: variables a test passes on purpose, such as GIT_DIR
         }
         what = ", ".join(f"{module}.{function}" for module, function, _ in calls)
         try:
@@ -146,9 +147,10 @@ class Api:
         assert "value" in answer, f"gov.store.load failed: {answer.get('error')}"
         return answer["value"]
 
-    def check_only(self, root):
-        """``gov.decisions.check(root)`` alone: the findings, each checked for the shape the interface fixes."""
-        answer = self._batch([(DECISIONS_MODULE, "check", root)])[0]
+    def check_only(self, root, environment=None):
+        """``gov.decisions.check(root)`` alone: the findings, each checked for the shape the interface fixes.
+        ``environment`` adds variables to the checker's process (batch 4)."""
+        answer = self._batch([(DECISIONS_MODULE, "check", root)], extra=environment)[0]
         if "error" in answer:
             raise Raised(answer["error"])
         return findings(answer["value"])
@@ -282,6 +284,100 @@ class Project:
         parents = git(self.root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
         assert len(parents) == 2, f"the merge of {branch} made no merge commit: parents {parents}"
         return commit
+
+
+    # ---- batch 4
+
+    def merge_with(self, branch, who=AGENT, strategy=None, take=None, files=None):
+        """Merge ``branch`` into the current branch with a merge commit by ``who`` that decides what a file holds.
+        ``strategy`` is git's merge strategy (``ours`` keeps the current branch's whole tree); ``take`` maps a path
+        to the revision whose file the merge commit holds; ``files`` maps a path to a text written by hand."""
+        git(self.root, "merge", "-q", "--no-ff", "--no-commit", *(["-s", strategy] if strategy else []), branch,
+            who=who, check=False)
+        for rel, revision in (take or {}).items():
+            git(self.root, "checkout", revision, "--", rel)
+        for rel, text in (files or {}).items():
+            self.write(rel, text)
+        commit = self.commit(f"Merge branch '{branch}'", who=who)
+        assert len(parents_of(self.root, commit)) == 2, f"the merge of {branch} made no merge commit"
+        return commit
+
+    def commit_by_hand(self, parents, message="a commit made by hand", who=AGENT):
+        """Commit everything as a commit whose parents are exactly ``parents``, in that order, and move the current
+        branch to it. The trailers of ``who`` are the message's final block."""
+        self.minute += 1
+        date = FIRST_DATE.format(minute=self.minute)
+        git(self.root, "add", "-A")
+        tree = git(self.root, "write-tree").strip()
+        text = message + "\n\n" + "\n".join(who["trailers"]) + "\n"
+        arguments = [argument for parent in parents for argument in ("-p", parent)]
+        commit = git(self.root, "commit-tree", tree, *arguments, "-m", text, who=who, date=date).strip()
+        git(self.root, "reset", "-q", "--hard", commit)
+        assert parents_of(self.root, commit) == list(parents), "the commit made by hand has other parents"
+        return commit
+
+
+def parents_of(root, commit):
+    return git(root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+
+
+def partial_clone(source, destination):
+    """A clone of ``source`` made with ``--filter=blob:none``: it holds every commit and tree, and only the files
+    of its checkout. ``source`` is a local repository, reached by a ``file://`` address: no network."""
+    git(source, "config", "uploadpack.allowFilter", "true")
+    git(Path(destination).parent, "clone", "-q", "--no-local", "--filter=blob:none", Path(source).as_uri(),
+        str(destination))
+    return Project(destination, init=False)
+
+
+def absent_objects(root):
+    """The ids of the objects ``HEAD``'s history names and the repository does not hold. Asking fetches nothing."""
+    listed = git(root, "rev-list", "--objects", "--missing=print", "HEAD")
+    return sorted(line[1:] for line in listed.splitlines() if line.startswith("?"))
+
+
+def remove_object(root, name):
+    """Take the object ``name`` (for example ``<commit>:<path>``) out of the repository's object store."""
+    object_id = git(root, "rev-parse", name).strip()
+    loose = Path(root) / ".git" / "objects" / object_id[:2] / object_id[2:]
+    assert loose.is_file(), f"the fixture's object {name} is not a loose object: {loose}"
+    loose.chmod(0o644)
+    loose.unlink()
+    assert object_id in absent_objects(root), f"the fixture's object {name} is still in the repository"
+    return object_id
+
+
+def everything_under(root):
+    """Every file under ``root``, ``.git/`` included, with the sha256 of its bytes (a link with its target). Read
+    from the file system alone: no git command runs, so taking it changes nothing."""
+    root = Path(root)
+    files = {}
+    for path in sorted(root.rglob("*")):
+        rel = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            files[rel] = "link:" + os.readlink(path)
+        elif path.is_file():
+            files[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            files[rel] = "dir"
+    return files
+
+
+def differences(before, after):
+    """What differs between two ``everything_under`` listings, in words."""
+    return [f"{rel}: " + ("added" if rel not in before else "removed" if rel not in after else "rewritten")
+            for rel in sorted(set(before) | set(after)) if before.get(rel) != after.get(rel)]
+
+
+def outcome(api, root, environment=None):
+    """What a check of ``root`` gives: ``("findings", list)`` or ``("error", Raised)``. For the cases where the
+    interface allows either and forbids only a pass."""
+    try:
+        return "findings", api.check_only(root, environment=environment)
+    except Raised as raised:
+        assert isinstance(raised.code, str) and raised.code, "the GovError has no code"
+        assert isinstance(raised.details, dict), "the GovError's details are not a map"
+        return "error", raised
 
 
 def assert_fails_naming(found, path, codes):

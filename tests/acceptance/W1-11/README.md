@@ -4,11 +4,11 @@ Written by the Independent Test Designer (MR-3, DEC-069) from the KPIs of ticket
 items its KPI lines name (CAP-51.a, CAP-01.b, CAP-21.a, CAP-34.d, with the acceptance lines of CAP-51, CAP-21 and
 CAP-34 and CAP-21's lite form), ADR-0001 ("Approval facts"), the "Rules for every ticket" of the Wave 1 plan, and
 DEC-012, DEC-039, DEC-046, DEC-074, DEC-136, DEC-182, DEC-221, DEC-227, DEC-274 to DEC-278, DEC-308, DEC-312, DEC-322,
-DEC-328 to DEC-331 and DEC-360. Batches 1 and 2 were written before implementation; batch 3 was added after it,
+DEC-328 to DEC-331 and DEC-360. Batches 1 and 2 were written before implementation; batches 3 and 4 were added after it,
 from behaviours a review described (DEC-135, DEC-136). Profile FULL. No earlier ticket's test was rewritten.
 
-**82 cases in 66 test functions.** The four decision packages of batch 1 are decided (below). One package of
-batch 3 is open (DP-5, "Open package"); it blocks no case that is written and no repair.
+**95 cases in 76 test functions.** The four decision packages of batch 1 are decided (below). Two packages are
+open ("Open packages"): DP-5 of batch 3 and DP-6 of batch 4. Neither blocks a case that is written or a repair.
 
 ## Run
 
@@ -16,18 +16,23 @@ batch 3 is open (DP-5, "Open package"); it blocks no case that is written and no
 python3 -m pytest tests/acceptance/W1-11 -q -p no:cacheprovider
 ```
 
-Standard library and `pytest` only. No network. Nothing is installed. About 9 seconds when green.
+Standard library and `pytest` only. No network. Nothing is installed. About 10 seconds when green.
 
 - **Every call runs in a new Python process**, through a small driver written to a temporary directory, with this
   worktree's `src/` on `PYTHONPATH`.
 - **Nothing is written in this worktree.** Every project is a temporary git repository, or a clone of the b-dev tier
   in a temporary directory. The store is built there, never in this repository (DEC-322).
 - **Environment, built from scratch:** `PATH`, an empty temporary `HOME`, `TMPDIR`, locale, `PYTHONPATH`,
-  `PYTHONPYCACHEPREFIX`. The session's `GOV_ROLE` and `GOV_TICKET` are not passed on.
+  `PYTHONPYCACHEPREFIX`. The session's `GOV_ROLE` and `GOV_TICKET` are not passed on. Batch 4: three cases add
+  `GIT_DIR` on purpose (`check_only(root, environment=...)`).
 - **Before a check, the project is committed and `gov.store.load` is run**, so the checker may read the record
   graph, git or the working tree: the three agree. One read-only test leaves uncommitted work in the tree on
   purpose and asserts only that nothing is touched. One batch 3 test runs the check without loading the store
-  (below, "It needs no loaded store").
+  (below, "It needs no loaded store"). The seven batch 4 cases of `test_w1_11_object_store.py` and
+  `test_w1_11_git_environment.py` do the same: what `gov.store.load` does in a partial clone, with an object
+  missing or under `GIT_DIR` is not this ticket's, and a load could fetch the very objects a case needs absent.
+- **Batch 4: a partial clone's remote is a local repository** in the same temporary directory, reached by a
+  `file://` address. That is not the network.
 - **Fixture commits have fixed dates, authors and trailers.** A commit is dated 2026-10-04 at 12:00 UTC or later;
   two tests make one commit on 2026-09-20, before the trailer rule of DEC-182. The author's and the committer's
   dates are the same, and each falls on the same side of 2026-10-03 in every time zone. No commit is signed.
@@ -45,11 +50,18 @@ one function, as `gov.store` and `gov.tasks` are called (DEC-275). The engineer 
 - `root` is a `pathlib.Path`: a project that is a git repository.
 - It returns a list of findings, plain JSON data. **An empty list passes; any finding fails.** The same tree gives
   the same list twice.
-- It only reads. It writes no file under `root`, stages nothing, commits nothing and moves no ref.
+- It only reads. It writes no file under `root`, stages nothing, commits nothing and moves no ref. Batch 4:
+  **`.git/` is under `root`.** No file there is added, removed or rewritten, and **nothing is fetched**: in a
+  clone made with a blob filter the check does not ask the remote for the versions it lacks.
+- Batch 4. **It checks `root`, whatever repository the environment names.** With `GIT_DIR` naming another
+  repository the result is the findings of `root` or a `GovError`, never the other repository's.
+- Batch 4. **A history it cannot read does not pass.** When a version of an `ACTIVE` decision's file in an
+  earlier commit is absent from the object store, the check gives `ACTIVE_UNAPPROVED` for the decision or raises
+  `GovError`. Which of the two is the engineer's.
 - It reads frontmatter and git, never a record's body (DEC-329). **It needs no loaded store** (batch 3): the
   store is neither. A commit message may hold any character git stores; none makes the check raise.
 - A `root` that is not a git repository raises `gov.cli.errors.GovError` with a non-empty `code` and `details` a
-  map. It is never an empty list. The code's name is the engineer's.
+  map. It is never an empty list. The code's name is the engineer's. Batch 4: this holds with `GIT_DIR` set.
 
 **A finding** is a map with four keys:
 
@@ -96,6 +108,16 @@ have no `type` and are therefore not records of the store (DEC-274). Supersessio
 - Batch 3. **The decision is its `id`, not its file's path.** A commit that only moves the file sets nothing.
 - An edit that leaves an approved decision `ACTIVE` needs no approval. Setting it `ACTIVE` again after another
   status is a new change and needs its own.
+- Batch 4. **A commit with two parents can be that new change.** The owner's commit set the decision `ACTIVE`
+  and a commit that descends from it gave it another status: the demotion is the later word. A commit that holds
+  the decision `ACTIVE` and has that demotion, or a descendant of it that keeps the other status, as a parent
+  sets the decision `ACTIVE` again, whether its file is its first parent's, its second parent's or written new,
+  and whether or not its other parent is an ancestor of the first. Its own `Role` trailer is the fact: an agent's
+  fails, the owner's passes. A merge that brings in a commit which itself set the decision `ACTIVE` after the
+  demotion still sets nothing. A decision one side sets `ACTIVE` and the other demotes, neither descending from
+  the other, is open (DP-6).
+- Batch 4. **An earlier version that cannot be read is not "the file did not exist then".** It makes no later
+  commit the one that set `ACTIVE`.
 - The author's name and email, the record's own frontmatter and body, and any other project file are no fact.
 
 **A gate authorises a citing record** (DEC-331, DEC-328) only when all of this holds; otherwise the check fails
@@ -116,21 +138,23 @@ choice, and names the file. A citing file whose frontmatter cannot be read gives
 
 ## KPI lines and their tests
 
-Covers ids: CAP-51.a (21 cases), CAP-01.b and CAP-21.a (23), CAP-34.d (30). The read-only KPI has 6 cases; the
-remaining 2 are the interface's own (the same findings twice, and the error case).
+Covers ids: CAP-51.a (21 cases), CAP-01.b and CAP-21.a (30), CAP-34.d (30). The read-only KPI has 9 cases; the
+remaining 5 are the interface's own (the same findings twice, the error case, and three on `GIT_DIR`).
 
 | KPI line | Covers | Tests | Decided by |
 |---|---|---|---|
 | Success 1: flags ACTIVE-while-superseded, duplicate or overlapping ids across directories, and supersession cycles on the b-dev fixtures | CAP-51.a | `test_w1_11_b_dev.py`: the first four tests (HZ-B-06 as planted; HZ-B-03, a cycle and a duplicate id written into the clone). `test_w1_11_hazards.py`: 12 functions, 14 cases, for each class in a register the test plants, and one that a supersession stated only in prose is not read | DEC-329 |
-| Success 2: a change that sets a decision ACTIVE without an owner approval fact from git fails | CAP-01.b, CAP-21.a | `test_w1_11_approval.py`: 15 functions, 16 cases. 8 on a change without the trailer (an agent's commit adds or sets ACTIVE; no trailer; the owner's name and email with an agent's role; the file claims its own approval, CAP-01.b; the owner named in the message body after 2026-10-03; PROPOSED passes; every one flagged). 6 on what the owner's commit approves (it passes; the whole register passes; a later agent edit; a later agent re-activation; a later owner commit, 2 cases). 2 on commits made before 2026-10-03. Batch 3, `test_w1_11_approval_history.py`: 6 functions, 7 cases (a message that imitates a log entry, 2; a control character in a message; a later owner commit on a merged branch; the control, an owner commit on a branch that sets ACTIVE; an agent's file kept by a merge; an owner commit that only renames) | DEC-360, DEC-182 |
-| Success 3: files stay byte-identical | none | `test_w1_11_read_only.py` (5), `test_the_tier_is_byte_identical_after_the_check` | nothing |
+| Success 2: a change that sets a decision ACTIVE without an owner approval fact from git fails | CAP-01.b, CAP-21.a | `test_w1_11_approval.py`: 15 functions, 16 cases. 8 on a change without the trailer (an agent's commit adds or sets ACTIVE; no trailer; the owner's name and email with an agent's role; the file claims its own approval, CAP-01.b; the owner named in the message body after 2026-10-03; PROPOSED passes; every one flagged). 6 on what the owner's commit approves (it passes; the whole register passes; a later agent edit; a later agent re-activation; a later owner commit, 2 cases). 2 on commits made before 2026-10-03. Batch 3, `test_w1_11_approval_history.py`: 6 functions, 7 cases (a message that imitates a log entry, 2; a control character in a message; a later owner commit on a merged branch; the control, an owner commit on a branch that sets ACTIVE; an agent's file kept by a merge; an owner commit that only renames). Batch 4, `test_w1_11_approval_merges.py`: 3 functions, 6 cases (an agent's commit with two parents that sets ACTIVE again a decision the owner demoted, 4; the controls: the owner's such merge, and an agent's merge that brings in the owner's later commit). `test_w1_11_object_store.py`: `test_a_missing_object_does_not_make_a_later_owner_commit_the_approval` | DEC-360, DEC-182 |
+| Success 3: files stay byte-identical | none | `test_w1_11_read_only.py` (5), `test_the_tier_is_byte_identical_after_the_check`. Batch 4, `test_w1_11_object_store.py`: 3 cases on `.git/` (the control in a whole repository; a partial clone whose remote can be asked; one whose remote is out of reach). The two partial clone cases also hold success 2: the result is no pass | nothing |
 | Success 4: a declined, revoked or stale gate, or a gate answered for another CIT, does not authorise execution | CAP-34.d | `test_w1_11_gates.py`: 6 functions, 13 cases, on a ticket and a change record that cite a gate; 6 functions, 6 cases, on the fail-closed points; 3 functions, 6 cases, on a ticket that waits on a package. Batch 3, `test_w1_11_citing_files.py`: 4 functions, 5 cases (a citing file with no `id`, 2, and its control; unreadable frontmatter; `approval` written twice) | DEC-331 (24 cases), DEC-330 (6) |
 | Failure 1: any planted decision hazard is missed | CAP-51.a | `test_every_hazard_planted_together_is_flagged`, `test_every_active_superseded_decision_is_flagged_not_only_the_first`, `test_every_unapproved_active_decision_is_flagged`, the b-dev tests. Batch 3, `test_w1_11_unreadable.py`: 2 functions, 3 cases (a second file of one id that is broken YAML or not closed; the control, a Markdown file with no frontmatter) | DEC-329 |
-| Failure 2: the checker rewrites a decision file | none | `test_w1_11_read_only.py`, the b-dev read-only test | nothing |
+| Failure 2: the checker rewrites a decision file | none | `test_w1_11_read_only.py`, the b-dev read-only test, the three batch 4 cases on `.git/` | nothing |
 
 The interface itself: `test_the_same_tree_gives_the_same_findings_twice`,
 `test_a_folder_that_is_no_git_repository_is_an_error_not_a_pass`, and the shape of every finding, which
-`w1_11_support.findings` checks on every call.
+`w1_11_support.findings` checks on every call. Batch 4, `test_w1_11_git_environment.py`: 3 functions, 3 cases
+(`GIT_DIR` names a clean repository; `root` holds an agent's ACTIVE decision, is no repository, or is a folder
+inside a repository).
 
 ## Red run
 
@@ -222,9 +246,82 @@ What the designer settled from the sources, each open to the lead's correction:
   the commit that sets it `ACTIVE`, not of a file path or a date.
 - **A citing file with no `id`** gives a finding whose `ids` hold the cited id; the file is in `paths`.
 
-## Open package
+## Batch 4 (2026-10-05, after implementation)
 
-**DP-5: what a Markdown file is whose `---` is not its first line.**
+**13 cases added, 82 to 95: "tests added after implementation". No existing case was changed**, in what it
+asserts or in its fixture. `w1_11_support.py` gained `Project.merge_with`, `Project.commit_by_hand`, `parents_of`,
+`partial_clone`, `absent_objects`, `remove_object`, `everything_under`, `differences` and `outcome`.
+`Api.check_only` and `Api._batch` take one more argument with a default (variables added to the checker's
+environment); a call without it runs as before.
+
+Run on `w1/W1-11` at `3f4aff31`, against the checker as built: **9 failed, 86 passed** (the 82 earlier cases and
+the 4 green cases below). No collection error.
+
+| Added | Red, with | From |
+|---|---|---|
+| `test_an_agent_merge_that_sets_active_again_a_decision_the_owner_demoted_fails` (4 cases: the branch keeps its own tree and main moves forward; the main line takes the branch's file; a commit by hand names the owner's old commit as a parent; the merge writes the file new) | `no ACTIVE_UNAPPROVED finding names ids ['ADR-0010'] and paths ['docs/adr/ADR-0010.md']`, findings `(none)` | DEC-360, KPI success 2 |
+| `test_an_owner_merge_that_sets_active_again_a_demoted_decision_passes` | green: the control | DEC-360 |
+| `test_an_agent_merge_that_brings_in_the_owner_commit_that_set_active_again_passes` | green: the control | DEC-360 |
+| `test_a_check_leaves_every_file_under_git_as_it_was` | green: the control | KPI success 3 |
+| `test_a_check_of_a_partial_clone_fetches_nothing_and_writes_nothing` | `assert ['.git/objects/pack/pack-….idx: added', ...] == []` (8 files added, new packs under `.git/objects/pack/`) | KPI success 3, failure 2 |
+| `test_a_check_of_a_partial_clone_whose_remote_is_out_of_reach_does_not_pass` | green today: the check raises `GovError` and writes nothing. It pins that a repair of the case above does not turn into a pass | KPI success 3, DEC-360 |
+| `test_a_missing_object_does_not_make_a_later_owner_commit_the_approval` | `no ACTIVE_UNAPPROVED finding names ...`, findings `(none)` | DEC-360 |
+| `test_git_dir_naming_another_repository_does_not_hide_the_findings_of_the_root` | `no ACTIVE_UNAPPROVED finding names ...`, findings `(none)` | the interface |
+| `test_git_dir_does_not_make_a_folder_that_is_no_repository_pass` | `a folder that is no git repository gave findings: (none)` | the interface |
+| `test_git_dir_does_not_make_a_subfolder_of_a_repository_pass` | `no ACTIVE_UNAPPROVED finding names ids ['ADR-0010'] and paths []`, findings `(none)` | the interface |
+
+What the designer settled from the sources, each open to the lead's correction:
+
+- **A commit with two parents can set `ACTIVE` again.** DEC-360 names "the commit that sets the decision
+  `ACTIVE`" and batch 3 read "later" as ancestry. Where the demotion descends from the owner's commit, a merge
+  that holds `ACTIVE` over it undoes the later word: the merge is the change. The batch 3 control
+  (`test_an_owner_commit_on_a_branch_that_sets_active_approves_after_the_merge`) stays as it is: there the main
+  line's `PROPOSED` is the earlier word and the branch's owner commit the later.
+- **The owner's merge that sets `ACTIVE` again passes.** A merge commit is a commit, and it carries the trailer.
+- **`.git/` is under `root`** for "files stay byte-identical" and "it only reads". A fetch is a write there and a
+  use of the remote, so the check does not fetch. The three cases compare every file under the root by its bytes,
+  read from the file system; no git command runs between the two listings except the check's own.
+- **A history that cannot be read gives a finding or a `GovError`**, the engineer's choice. A partial clone that
+  may not fetch is such a history, so the partial clone cases accept either and forbid a pass. Whether a partial
+  clone can ever pass (an owner's decision whose earlier versions are absent) is not asserted.
+- **Can it go green.** With git 2.43 as installed here, `GIT_NO_LAZY_FETCH=1` makes `git cat-file` fail on an
+  absent blob without fetching, and `git cat-file --batch-all-objects --batch-check` lists the objects held
+  without fetching; both left `.git/` as it was in a probe outside the repository. The engineer's means are their
+  own.
+- **A `root` that is a folder inside a repository** is not said by the interface to be an error or to be checked
+  as its repository; the checker as built raises `GovError`. The `GIT_DIR` case accepts either and forbids a pass.
+
+## Open packages
+
+**DP-6 (batch 4): a decision one side of a merge sets `ACTIVE` and the other side demotes, neither later.**
+
+- **Question.** Two lines of history part from a commit where the decision is `ACTIVE` (or `PROPOSED`). On one,
+  the owner's commit sets or keeps it `ACTIVE` with a change of its own (sets it `ACTIVE` again after a demotion
+  there, or edits the body). On the other, a commit demotes it or deletes its file. Neither commit descends from
+  the other. An agent's merge keeps the `ACTIVE` side. Is the merge the commit that sets `ACTIVE` (it fails), or
+  is the owner's commit on the kept side still the fact (it passes)? The same question for the residual batch 3
+  left: a merge that keeps the owner's file over an agent's at a path both added.
+- **Why now.** The review's four merges are all the simple form (the demotion descends from the approval) and
+  the sources decide them. A repair has to pick a rule for a merge, and whatever it picks answers this case too,
+  without a decision behind it.
+- **Options.** (a) Fail closed: a merge that holds a decision `ACTIVE` where a parent holds it with another
+  status, or without its file, sets it `ACTIVE` unless that parent's state is one the kept side's setting commit
+  descends from; the merge then needs `Role: owner`. (b) The owner's commit on the kept side stays the fact; the
+  agent's merge sets nothing unless the demotion descends from that commit. (c) Leave it a residual: the suite
+  asserts nothing, the engineer's rule stands and is recorded.
+- **Impact.** (a) an agent cannot resolve a disagreement about a decision's status in favour of `ACTIVE`; the
+  owner makes that merge. An integration merge by an agent fails the check when two branches disagree on a
+  status, which is rare and is a real disagreement. (b) an agent chooses between two owner statements, or between
+  the owner's `ACTIVE` and another agent's demotion. (c) the behaviour is whatever the repair yields.
+- **Reversibility.** High for each: one rule and two or three cases.
+- **Cost.** (a) or (b): about 10 lines in the walk and 2 to 3 cases. (c) none.
+- **Recommendation.** (a): CAP-01.b and DEC-360 want the owner's fact on the change that makes a decision
+  `ACTIVE`, and choosing `ACTIVE` over a concurrent demotion is such a change. **Confidence:** medium.
+- **Dependence.** No repair of the 9 red cases depends on it: every rule that flags the four merges and keeps
+  the three merge controls green passes the suite under (a), (b) and (c). Two or three cases wait on it and are
+  not written.
+
+**DP-5 (batch 3): what a Markdown file is whose `---` is not its first line.**
 
 - **Question.** A file has a byte-order mark, or blank lines, before the `---` that opens what looks like
   frontmatter; inside it stand `id: ADR-0010` and `status: ACTIVE`. The store reads it as a file with no
@@ -280,14 +377,33 @@ Approval facts, not fixed by a decision and not tested:
   (W1-10 residual). Every fixture commit has one date for author and committer, well away from the boundary.
 - **A commit with two `Role` trailers** (`Role: engineer` and `Role: owner`), another letter case (`role: Owner`),
   or `Role: owner` in a final block that also holds other trailers.
-- **A merge commit that itself sets the status** (its file differs from both parents'), and a merge that keeps
-  the owner's file over an agent's at a path both added. Batch 3 tests the merges that set nothing and the merge
-  that keeps the agent's file.
+- **A merge commit that itself sets the status** (its file differs from both parents'), other than over a
+  demotion that descends from the owner's approval (batch 4 tests that one), and a merge that keeps the owner's
+  file over an agent's at a path both added. Batch 3 tests the merges that set nothing and the merge that keeps
+  the agent's file. The concurrent forms are open package DP-6.
+- **A merge that brings back a decision whose file a later commit deleted**, a merge with more than two parents,
+  and an agent's merge over a demotion that an agent made. Batch 4's demotions are the owner's and set `PROPOSED`.
 - **An agent's commit that renames a decision the owner approved** is reported flagged by the checker as built
   (the review's note; not run here). By the rule above it sets nothing and would pass. The behaviour fails
   closed, so it is recorded here and not tested (DEC-135).
 - **A rename that also changes the `id` or the body**, and a decision whose file is deleted and added again.
 - **A decision that is `ACTIVE` only in the working tree.** Every checked fixture is committed.
+
+The repository and the environment (batch 4), not tested:
+
+- **A missing commit or tree object.** The checker as built raises `GovError` for each (a probe outside the
+  repository, 2026-10-05). It fails closed, so it is recorded and not tested (DEC-135). Batch 4 tests the missing
+  version of the file, which passed.
+- **A shallow clone**, whose earlier commits are absent by design, and a partial clone made with another filter
+  (`tree:0`). Whether a partial clone of an owner-approved register can pass without fetching is not asserted.
+- **Other git variables.** With `GIT_OBJECT_DIRECTORY` or `GIT_COMMON_DIR` naming a clean repository the checker
+  as built raises `GovError`; with `GIT_WORK_TREE`, `GIT_INDEX_FILE`, `GIT_CEILING_DIRECTORIES` or `GIT_NAMESPACE`
+  it returned the finding of `root` (the same probe). `GIT_ALTERNATE_OBJECT_DIRECTORIES`, and an object directory
+  that holds the root's commits with other files, were not tried. Only `GIT_DIR` is tested.
+- **`GIT_DIR` naming a repository with findings while `root` is clean**: the other repository's findings would be
+  reported for `root`. It fails closed and is not tested.
+- **A `root` that is a folder inside a repository, with no variable set**: `GovError` as built; no source says.
+- **Files written outside `root`** (the temporary directory, `HOME`) are not compared.
 
 Gates, not tested:
 
