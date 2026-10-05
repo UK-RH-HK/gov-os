@@ -4234,3 +4234,153 @@ agree at medium confidence or higher. The owner was told on 2026-10-05.
 | Version | Date | Change |
 |---|---|---|
 | 0.94 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-403 (W1-50 DP-20: the merge helper reads every parent, so a merge that drops a parent's change is judged; DP-19: an octopus merge with a crossing parent fails closed as a whole). |
+
+## 95. Delegated decisions on the W1-50 freeze branch's packages DP-F1, DP-F3, DP-F4 and DP-F5 (register v0.95, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on four of the five packages the lead of W1-50's freeze
+branch (`w1/W1-50-freeze`) returned after its first round. That round confirmed the cause DEC-402 names with one live
+launched session: the flag's path was absent before, an empty read-only file stood there while the launched worker's
+command ran, the lead's own write was refused as frozen in that window, and the file was gone when the command ended.
+With the branch's launcher no file appeared over a 66-second command. All four are P3, reversible, and the lead's and
+the orchestrator's recommendations agree at medium confidence or higher. The fifth package, DP-F2 (what protects the
+flag's path in a session launched while no flag existed), lowers a protection and is the owner's. The owner was told
+on 2026-10-05.
+
+### DEC-404 — W1-50 freeze branch: the marker line's layout; an unmarked file at launch; `gov pause` over a linked runtime folder; one builder test
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** packages DP-F3 option (a), confidence medium-high; DP-F1 option (a), medium; DP-F4 option (a), medium; DP-F5 option (a), high · **Under:** DEC-402, DEC-311, DEC-365
+- **Decision:**
+  - DP-F3: the flag's first line, as `gov pause` writes it, is `FROZEN <who> <when>` with single spaces; who is
+    `owner` or `orchestrator` (the caller of DEC-365), when is UTC `YYYY-MM-DDTHH:MM:SSZ`.
+  - The guard's reading is wider than what `gov pause` writes, as built and reviewed: any file at the flag's path
+    that carries the word freezes, in any of the spellings the review probed; an empty file, or one without the
+    word, is no freeze and its presence is recorded (DEC-402). A flag the guard cannot read, or a dangling link at
+    the runtime folder, freezes.
+  - DP-F1: `gov launch` denies the flag's path by name whenever a file exists there at launch, marked or not, as
+    for any name that exists at launch (DEC-311). A placeholder renewed this way freezes nothing.
+  - DP-F4: when `.gov-runtime` is a symbolic link, `gov pause` refuses with an error that names the link and
+    writes nothing. The owner repairs the folder.
+  - DP-F5: `tests/unit/install/**` is added to the ticket's `allowed_paths`, in its own commit, so the engineer
+    updates the one builder test that sets an empty flag.
+  - `gov pause` writes the flag by a temporary file and a rename, never through a link at the flag's path, and
+    reads it back with the guard's own reader; `--off` over a directory is a clear refusal (the review's findings,
+    tests already written).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.95 | 2026-10-05 | Delegated under DEC-220: DEC-404 (W1-50 freeze branch: the marker line is `FROZEN <who> <when>`; an unmarked file at the flag's path is still denied by name at launch; `gov pause` refuses over a linked runtime folder; one builder test's path added). |
+
+## 96. Owner actions and answers of 2026-10-05, third round (register v0.96, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05, after the W1-19 lead's third round, the W1-50 freeze branch's first round, and
+DEC-400's drafts.
+
+### DEC-405 — The product-spec role file and agent definition are placed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner action through the operator · **Under:** DEC-400, DEC-254
+- **Decision:**
+  - `template/governance/kernel/roles/product-spec.md` and `.claude/agents/product-spec.md` are committed together
+    in the main tree as `5d1d9cffc796240a86eb021bc6a03a3da243b1df` (Task: decision-record, Role: owner), each
+    byte-identical to the orchestrator's draft.
+  - If containment flags that commit, the finding is a record of an owner action (DEC-254).
+  - W1-33's suite was run again at that commit: 113 passed, the field-by-field check among them.
+
+### DEC-406 — W1-19 DP-10: a worker reads S0b2's R1 prototype by exact path; tuning on the dev set is not the fix
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-19 package DP-10 option (a) · **Under:** DEC-397, DEC-388
+- **Decision:**
+  - A worker may read `/home/usain/gov-os-workbench/s0b2/sandbox/retrieval/r1/r1_retrieval.py` by that exact path.
+    Folders there are never listed, and `s0b2/probe/` is never touched.
+  - The reading finds how R1 ran the lexical query (ranked full-text or exact string), the candidate counts, the
+    chunking and the reranker call.
+  - If the difference lies outside W1-19's paths (for example W1-17's exact-string lexical route), it comes back as
+    a package with the measured effect, not as a workaround.
+  - Tuning on the dev set alone (option (c), a larger top-k) is not accepted as the fix.
+
+### DEC-407 — W1-50 DP-F2: accepted for the merge; before W1-50 closes, the flag is compared around every Bash call and owner identity follows process ancestry
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-50 freeze branch package DP-F2 option (a) now, option (b) and a new rule before the close · **Amends:** DEC-365 ("unset `GOV_ROLE` is the owner") · **Under:** DEC-402, DEC-404, DEC-311
+- **Decision:**
+  - Now, so the freeze branch can merge: W1-46's one live assertion is revised as a rewrite after implementation,
+    reason "owner decision: freeze marker".
+  - Before W1-50 closes, two things are built:
+    - the containment check compares the freeze flag around every Bash call; a removed or emptied flag is a
+      finding and is restored with its marker line;
+    - the ancestry rule (owner identity): an owner-only action, such as lifting a freeze, refuses whenever any
+      parent process of the command is a Claude Code session, whatever `GOV_ROLE` says. "`GOV_ROLE` unset" alone no
+      longer means the owner, which closes `env -u GOV_ROLE gov pause --off` from a worker. The same rule applies
+      wherever the code treats an unset `GOV_ROLE` as the owner.
+  - The KPI lines are added to W1-50 in their own commit.
+
+### DEC-408 — DEC-403 stands; three orchestrator choices are confirmed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner answer · **Under:** DEC-403, DEC-402, DEC-398, DEC-397
+- **Decision:**
+  - DEC-403 (the symmetric merge rule; an octopus merge with a crossing parent fails closed): no objection.
+  - Confirmed: the freeze work is carried by W1-50 and not by W1-32; the fail-closed reading of criss-cross merges
+    applies to containment too; the reranker environment's extra pin `huggingface-hub` 1.33.0.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.96 | 2026-10-05 | Owner: DEC-405 (product-spec role file and agent definition placed, `5d1d9cff`), DEC-406 (W1-19 DP-10: an exact-path read of S0b2's R1 prototype; dev-set tuning is not the fix), DEC-407 (W1-50 DP-F2: accepted for the merge; before the close, the flag is compared around every Bash call and owner-only actions refuse under a Claude Code parent process), DEC-408 (DEC-403 stands; three orchestrator choices confirmed). |
+
+## 97. Owner decision of 2026-10-05: lifting a freeze requires the owner in person (register v0.97, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05. It replaces the ancestry rule of DEC-407. The owner named DEC-367 and the W1-28
+DP-3 answer as amended; the W1-28 DP-3 answer is DEC-365 ("lifting a freeze works only with `GOV_ROLE` unset"), which
+this decision amends. DEC-367 (the record of a rollback or a cancel) says nothing about lifting and its text is not
+changed here; the orchestrator told the owner so.
+
+### DEC-409 — Lifting a freeze requires the owner in person: no Claude Code ancestor, an interactive terminal with a typed one-time code, and a guard rule on the lift form
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a
+- **Decision:**
+  1. `gov pause --off` refuses if any ancestor process is a Claude Code session, wherever that session was
+     started. The operator console cannot lift either; only a plain terminal can.
+  2. It requires an interactive terminal: stdin and stdout are TTYs, and it shows a one-time random code ("type
+     LIFT-<4 digits> to lift the freeze") that must be typed back. A wrong code, piped input, or no TTY refuses,
+     and nothing changes.
+  3. The guard refuses any agent Bash command whose text contains the lift form of `gov pause` (the `--off`
+     option), for every role, including a command that starts another Claude Code session with that text in its
+     prompt. Obfuscated forms are a residual.
+  4. The containment check, as DEC-407 decided: a removed or emptied freeze flag is a finding, and the flag is
+     restored with its marker line.
+  - Setting a freeze stays as decided: the owner (terminal or operator console) and the orchestrator may set it.
+  - Wherever else the code treats an unset `GOV_ROLE` as the owner, rule 1 applies to owner-only actions.
+  - All of this is built on the freeze branch before W1-50 closes, with acceptance tests for the refused cases (an
+    agent session, the operator console, piped input, a wrong code) and one manual check by the owner from a plain
+    terminal.
+  - The KPI lines are added to W1-50 in their own commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.97 | 2026-10-05 | Owner: DEC-409 (lifting a freeze requires the owner in person: no Claude Code ancestor process, an interactive terminal with a typed one-time code, a guard rule on the lift form; the flag comparison of DEC-407 stays; replaces DEC-407's ancestry rule, amends DEC-365). |
+
+## 98. Delegated decisions on W1-50's packages DP-21 to DP-28 (register v0.98, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the eight packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its sixth round. In that round the owner's two conditions of DEC-401 passed
+on the symmetric rule (criss-cross histories fail closed; a replay of 176 real merges flags none by mistake; a fuzz
+of 1,604 merges against an independent reading of DEC-403 gave no mismatch). Every choice below either keeps what is
+built or makes the check report more; none makes it report less. The findings of this check are records (DEC-254).
+The owner was told on 2026-10-05.
+
+### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401
+- **Decision:**
+  - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
+    is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
+  - DP-27: the same for `tests/acceptance/**`: a merge commit's own change there is a finding whatever its
+    trailers, test-designer trailers included.
+  - DP-24: under `tests/acceptance/**`, a path that more than one parent changed against the merge base is the
+    merge commit's own, whichever side's content it holds. Taking one side whole is a resolution, and a resolution
+    of an acceptance test is a finding (DEC-269).
+  - DP-26: git's own clean combination of two sides' edits of one acceptance test stays flagged, as built. Branches
+    are brought to a state where no acceptance test is changed on both sides before they are merged.
+  - DP-25: an octopus whose other parents cross only each other is read as built in round six: that pair brings
+    nothing against each other. DEC-403's words "read parent by parent" are amended to this stricter reading.
+  - DP-23: with several merge bases or none, every path that differs from any parent is the merge commit's own,
+    also where it keeps what its first parent holds. DEC-403's words stand.
+  - DP-22: `brought` is the complement of `own` over every parent: each path where the merge commit differs from
+    some parent and that is not its own.
+  - DP-28: the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a
+    whole.
+  - The owner's conditions of DEC-401 are run again on the final head before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.98 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-410 (W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a test both sides changed is the merge commit's own; 24 parents at most; `brought` is the complement of `own`). |
