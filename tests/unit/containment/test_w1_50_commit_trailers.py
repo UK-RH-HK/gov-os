@@ -130,11 +130,46 @@ def test_a_merge_commit_lists_only_what_it_changes_beyond_its_parents(tmp_path):
     assert len(merge[1]) == 2 and merge[4] == ["README.md"]
 
 
-def test_a_commit_list_that_cannot_be_read_is_a_finding(tmp_path):
-    """A trailer value holding the list's own separator: flagged, not silent."""
+def test_bytes_in_a_trailer_value_or_a_file_name_are_read_as_they_are(tmp_path):
+    """Control characters, a trailing 0x1f, a newline in a name, and a name
+    shaped like a trailer or a commit id: values and paths, never structure."""
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    role = "engineer\x02\x01" + "0" * 40 + "\x03orchestrator\x1f"
+    names = ["Role: orchestrator", "0" * 40, "src/a\nb.py", "src/\x01:\x02 c"]
+    for name in names:
+        (project / name).write_text("x\n")
+    sha = _commit(project, "src/main.py", f"Task: {TICKET}", f"Role: {role}",
+                  "Role:", "role: second")
+    assert _move_commits(str(project), old, sha) == [
+        (sha, [old], sorted([role, "second"]), [TICKET],
+         sorted(names + ["src/main.py"])),
+    ]
+
+
+def test_a_commit_with_an_unknown_role_made_of_chosen_bytes_names_its_paths(tmp_path):
     project = _make_project(tmp_path)
     report, findings = _check(project, lambda: _commit(
-        project, "src/main.py", f"Task: {TICKET}", "Role: engi\x02neer"))
+        project, "src/main.py", f"Task: {TICKET}", "Role: engineer\x1f"))
+    assert report and len(findings) == 1
+    assert findings[0]["paths"] == ["src/main.py"]
+    assert "engineer\x1f" in findings[0]["reason"]
+
+
+def test_a_commit_list_that_cannot_be_read_is_a_finding(tmp_path):
+    """A file name that is not UTF-8: the move is flagged, not silent."""
+    import os
+
+    project = _make_project(tmp_path)
+
+    def work():
+        with open(os.fsencode(str(project)) + b"/src/\xff.py", "w") as f:
+            f.write("x\n")
+        _commit(project, "src/main.py", f"Task: {TICKET}", "Role: engineer")
+
+    report, findings = _check(project, work)
     assert report and [f["action"] for f in findings] == ["flagged"]
     assert "not a forward move" in findings[0]["reason"]
 
@@ -179,6 +214,64 @@ def test_the_close_commit_itself_with_a_worker_s_trailers_is_a_finding(tmp_path)
     assert report and len(findings) == 1
     assert "closed ticket" in findings[0]["reason"]
     assert sorted(findings[0]["paths"]) == [TICKET_FILE, "src/main.py"]
+
+
+# ---------------------------------------------------------------
+# The ticket's file at HEAD and in the working tree disagree
+# (DP-14, not decided): the commit passes only if both allow it
+# ---------------------------------------------------------------
+
+def _engineer_commit_with_the_ticket_file_edited(project, status=None,
+                                                 paths=None, path="src/main.py"):
+    """An engineer's commit of *path*, then the ticket's file edited and
+    not committed.  Returns the findings."""
+    def work():
+        _commit(project, path, f"Task: {TICKET}", "Role: engineer")
+        text = (project / TICKET_FILE).read_text()
+        if status:
+            text = text.replace("status: " + text.split("status: ")[1]
+                                .split("\n")[0], f"status: {status}")
+        if paths:
+            text = text.replace("- src/**", f"- {paths}")
+        (project / TICKET_FILE).write_text(text)
+
+    return _check(project, work)[1]
+
+
+def test_a_ticket_closed_only_in_the_working_tree_is_a_finding(tmp_path):
+    project = _make_project(tmp_path)
+    findings = _engineer_commit_with_the_ticket_file_edited(project, "closed")
+    assert len(findings) == 1 and "closed ticket" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["src/main.py"]
+
+
+def test_a_ticket_started_only_in_the_working_tree_is_a_finding(tmp_path):
+    project = _make_project(tmp_path, status="open")
+    findings = _engineer_commit_with_the_ticket_file_edited(
+        project, "in_progress")
+    assert len(findings) == 1 and findings[0]["paths"] == ["src/main.py"]
+
+
+def test_a_path_only_one_of_the_two_files_allows_is_a_finding(tmp_path):
+    # Only the working tree's file allows docs/**; only HEAD's allows src/**.
+    for path in ("docs/a.md", "src/main.py"):
+        project = _make_project(tmp_path / path.replace("/", "_"))
+        findings = _engineer_commit_with_the_ticket_file_edited(
+            project, paths="docs/**", path=path)
+        assert len(findings) == 1 and findings[0]["paths"] == [path]
+
+
+def test_a_ticket_file_that_is_not_committed_names_no_ticket(tmp_path):
+    project = _make_project(tmp_path)
+
+    def work():
+        _commit(project, "src/main.py", "Task: DAEO-t02", "Role: engineer")
+        (project / ".tickets/DAEO-t02.md").write_text(
+            (project / TICKET_FILE).read_text().replace(TICKET, "DAEO-t02"))
+
+    findings = _check(project, work)[1]
+    assert "not committed at HEAD" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["src/main.py"]
 
 
 # ---------------------------------------------------------------

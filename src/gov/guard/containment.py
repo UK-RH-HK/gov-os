@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import time
 
@@ -583,9 +584,9 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
 
 # ---- commits of a forward move (W1-50, DEC-255) -------------------
 
-_LOG_FORMAT = ("--format=%x01%H%x02%P"
-               "%x02%(trailers:key=Role,valueonly,separator=%x03)"
-               "%x02%(trailers:key=Task,valueonly,separator=%x03)%x02")
+_LOG_FORMAT = ("--format=%x00%H %P%x00"
+               "%(trailers:key=Role,key=Task,unfold,separator=%x00)%x00")
+_COMMIT_IDS = re.compile(r"([0-9a-f]{40,64} ?)+")
 
 
 def _move_commits(root: str, old: str, new: str) -> list:
@@ -596,24 +597,47 @@ def _move_commits(root: str, old: str, new: str) -> list:
     only, as git reads them (DEC-182, DEC-267).  Paths are listed
     without rename detection, so both ends of a rename appear
     (repair 7); a merge commit lists only what it changes beyond what
-    its parents hold (DEC-269).  Output that cannot be read raises, so
-    the move becomes a finding.
+    its parents hold (DEC-269).
+
+    Everything is separated by NUL, the one byte no trailer and no file
+    name can hold, and nothing is unquoted or trimmed.  A trailer begins
+    with its key, a raw entry with ``:`` and the token after it is its
+    path whatever it holds, so no byte a commit's author chooses is read
+    as structure.  Output that cannot be read raises, so the move
+    becomes a finding.
     """
-    out = _git(root, "log", "-z", "-c", "--no-renames", "--name-only",
-               _LOG_FORMAT, f"{old}..{new}")
-    head, *records = out.split("\x01")
-    if head or not records:
-        raise _GitError("the commits of the HEAD move cannot be read")
+    out = _git(root, "log", "-z", "-c", "--no-renames", "--raw",
+               "--no-abbrev", _LOG_FORMAT, f"{old}..{new}")
+    unreadable = _GitError("the commits of the HEAD move cannot be read")
     commits: list = []
-    for rec in records:
-        f = rec.split("\x02")
-        if len(f) != 5 or len(f[0]) < 40:
-            raise _GitError("the commits of the HEAD move cannot be read")
-        roles, tasks = (sorted({v.strip() for v in s.split("\x03")
-                                if v.strip()}) for s in f[2:4])
-        paths = [p.strip("\n") for p in f[4].split("\0") if p.strip("\n")]
-        commits.append((f[0], f[1].split(), roles, tasks, paths))
-    return commits
+    tokens = iter(out.split("\0"))
+    for tok in tokens:
+        if tok.lstrip("\n").startswith(":"):
+            path = next(tokens, "")
+            if not commits or not path:
+                raise unreadable
+            commits[-1][4].append(path)
+        elif _COMMIT_IDS.fullmatch(tok):
+            ids = tok.split()
+            commits.append((ids[0], ids[1:], set(), set(), []))
+        elif tok:
+            key, sep, value = tok.partition(": ")
+            if not commits or not sep or key.lower() not in ("role", "task"):
+                raise unreadable
+            if value:
+                commits[-1][2 if key.lower() == "role" else 3].add(value)
+    if not commits:
+        raise unreadable
+    return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
+
+
+def _ticket_at(root: str, rev: str, ticket_file: str):
+    """The ticket's frontmatter as committed at *rev*, or ``None``."""
+    from gov.guard.decide import _parse_frontmatter
+    try:
+        return _parse_frontmatter(_git(root, "show", f"{rev}:{ticket_file}"))
+    except (_GitError, _NotARepo, ValueError):
+        return None
 
 
 def _close_commit(root: str, head: str, ticket_file: str):
@@ -623,14 +647,8 @@ def _close_commit(root: str, head: str, ticket_file: str):
     The file's first version is no such commit, nor is a merge commit:
     what cannot be shown to be a close is not one.
     """
-    from gov.guard.decide import _parse_frontmatter
-
     def status(rev: str):
-        try:
-            fm = _parse_frontmatter(_git(root, "show", f"{rev}:{ticket_file}"))
-        except (_GitError, _NotARepo, ValueError):
-            return None
-        return (fm or {}).get("status")
+        return (_ticket_at(root, rev, ticket_file) or {}).get("status")
 
     try:
         revs = _git(root, "rev-list", "--topo-order", "--no-merges",
@@ -677,33 +695,50 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
         fn = decide_fn
         # DEC-359: the orchestrator's scope does not depend on the ticket.
         t = None if c_role == "orchestrator" else _load_ticket(root, c_task)
-        if t and t.get("status") == "closed":
-            # DEC-318: by the ticket only before its close commit.
+        if t:
+            # The ticket's file as committed at HEAD and as the working
+            # tree holds it: the commit passes only if both allow it.
             tfile = f".tickets/{t.get('id', '')}.md"
-            if tfile not in closes:
-                closes[tfile] = _close_commit(root, head, tfile)
-            close = closes[tfile]
-            try:
-                before = bool(close) and close != sha and _is_ancestor(
-                    root, sha, close)
-            except _GitError:
-                before = False
-            if not before:
-                return paths, "names a closed ticket, not before its close commit"
-            if c_role == "independent-test-designer":
-                pats = [ACCEPTANCE + "/**"]
-            elif t.get("role") != c_role:
-                pats = []
-            else:
-                pats = [p for p in t.get("allowed_paths", [])
+            if "at HEAD:" + tfile not in closes:
+                closes["at HEAD:" + tfile] = _ticket_at(root, head, tfile)
+            h = closes["at HEAD:" + tfile]
+            if not h or c_task not in (h.get("id"), h.get("wbs_id")):
+                return paths, "names a ticket whose file is not committed at HEAD"
+            closed = "closed" in (t.get("status"), h.get("status"))
+            if closed:
+                # DEC-318: by the ticket only before its close commit.
+                if tfile not in closes:
+                    closes[tfile] = _close_commit(root, head, tfile)
+                close = closes[tfile]
+                try:
+                    before = bool(close) and close != sha and _is_ancestor(
+                        root, sha, close)
+                except _GitError:
+                    before = False
+                if not before:
+                    return paths, ("names a closed ticket, "
+                                   "not before its close commit")
+
+            def pats(tk):
+                if not closed and tk.get("status") != "in_progress":
+                    return []
+                if c_role == "independent-test-designer":
+                    return [ACCEPTANCE + "/**"]
+                if tk.get("role") != c_role:
+                    return []
+                return [p for p in tk.get("allowed_paths", [])
                         if not _is_under_acceptance(p.rstrip("*/ "))]
+            both = pats(t), pats(h)
 
             def fn(tool, ti, r, c_r, c_t, c_s):
-                # The ticket's paths as they were; nothing while frozen,
-                # and no held-out path (decide refuses every tool there).
+                # A closed ticket's paths as they were: nothing while
+                # frozen, and no held-out path (decide refuses every
+                # tool there).  A ticket in progress: as decide allows.
                 ok = (not os.path.exists(os.path.join(r, FREEZE_FLAG))
-                      and decide_fn("Read", ti, r, c_r, c_t, c_s)[0] == "allow"
-                      and _path_allowed(ti["file_path"], r, pats, c_r))
+                      and decide_fn("Read" if closed else tool,
+                                    ti, r, c_r, c_t, c_s)[0] == "allow"
+                      and all(_path_allowed(ti["file_path"], r, p, c_r)
+                              for p in both))
                 return ("allow" if ok else "deny"), ""
         bad = outside(c_role, c_task, None, fn)
     return (bad, "committed path(s) outside allowed paths") if bad else None
