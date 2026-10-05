@@ -1,8 +1,8 @@
 """Builder tests for ``gov readiness`` (W1-13). Regression evidence only (DEC-136).
 
-They cover what the acceptance tests leave to the builder: the ten mandatory rows held in the code are the
-contract's, the checker does not fail open on what it cannot read or what is not declared, and a specification
-closed by hand still gets its one audit ticket. Every project is a temporary directory (DEC-322).
+They cover what the acceptance tests leave to the builder: the rows, the mandatory rows and the capability-type
+table held in the code are the contract's, the checker does not fail open on what it cannot read or what is not
+declared, and a specification closed by hand still gets its one audit ticket. Every project is a temporary directory (DEC-322).
 """
 from __future__ import annotations
 
@@ -42,6 +42,9 @@ def test_the_mandatory_rows_and_the_shipped_schema_are_the_contracts():
     contract = yaml.safe_load((REPO / "docs/contract/readiness-dimensions.yaml").read_text(encoding="utf-8"))
     schema = yaml.safe_load((TEMPLATE / "schemas/feature-readiness/schema.yaml").read_text(encoding="utf-8"))
     assert list(checker.MANDATORY) == contract["mandatory_rows"]
+    assert checker.KEYS == {row["n"]: row["key"] for row in contract["dimensions"]}
+    assert checker.EXTRA == {name: set(rows)
+                             for name, rows in contract["capability_types"]["extra_rows_for_standard"].items()}
     assert set(checker.STATES) == {state["state"] for state in contract["cell_states"]}
     assert set(checker.SATISFIED) == {state["state"] for state in contract["cell_states"] if state["satisfies"]}
     assert {row["n"]: row["key"] for row in schema["dimensions"]} \
@@ -55,6 +58,32 @@ def test_a_project_without_the_schema_does_not_pass(tmp_path):
     with pytest.raises(GovError) as caught:
         readiness.check(root, SPEC)
     assert caught.value.code == checker.INVALID
+
+
+def test_a_schema_that_adds_a_row_or_a_type_does_not_pass(tmp_path):
+    root = _project(tmp_path)
+    path = root / "openspec" / "schemas" / "feature-readiness" / "schema.yaml"
+    shipped = yaml.safe_load(path.read_text(encoding="utf-8"))
+    table = shipped["capability_types"]["extra_rows_for_standard"]
+    for edited in ({**shipped, "dimensions": [*shipped["dimensions"], {"n": 27, "key": "more"}]},
+                   {**shipped, "capability_types": {"extra_rows_for_standard": {**table, "blockchain": []}}}):
+        path.write_text(yaml.safe_dump(edited), encoding="utf-8")
+        with pytest.raises(GovError) as caught:
+            readiness.check(root, SPEC)
+        assert caught.value.code == checker.INVALID
+
+
+def test_a_change_with_no_specification_record_is_invalid_and_the_archive_is_not_a_change(tmp_path):
+    root = _project(tmp_path)
+    (root / "openspec" / "changes" / "archive" / "zq11-old").mkdir(parents=True)
+    assert readiness.check_all(root)["closed"] is True
+    (root / "openspec" / "changes" / "zq12-bare").mkdir()
+    with pytest.raises(GovError) as caught:
+        readiness.check_all(root)
+    assert (caught.value.code, caught.value.exit_code) == (checker.INVALID, 1)
+    assert "zq12-bare" in caught.value.message
+    assert [report.get("specification", report.get("change")) for report in caught.value.details["specifications"]] \
+        == [SPEC, "zq12-bare"]
 
 
 def test_a_standard_specification_with_no_capability_type_does_not_pass(tmp_path):

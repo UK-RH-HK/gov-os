@@ -1,13 +1,15 @@
 """The readiness checker (CAP-30.a, CAP-30.b, CAP-53.a) and the closing of a specification (CAP-47.d).
 
 A specification is the record in the frontmatter of ``openspec/changes/<change>/proposal.md``, with its
-``readiness.yaml`` beside it (DEC-350). Both are read from the working tree. The rows and the capability-type
-table come from the project's own ``feature-readiness`` schema; the ten mandatory rows are DEC-085's and are held
-here, because that schema does not carry them.
+``readiness.yaml`` beside it (DEC-350). Both are read from the working tree. The 26 rows, the ten mandatory rows
+and the capability-type table are the Contract's (``docs/contract/readiness-dimensions.yaml``, DEC-085) and are
+held here: an adopted project holds no Contract, and its own ``feature-readiness`` schema is a file it can edit.
+A project whose schema does not say the same rows and table is invalid.
 
 The checker is a gate and does not fail open: the verdict comes from the rows, never from the record's status
-(DEC-348), and whatever cannot be read or is not declared makes the record invalid. The output has no time in it
-and a fixed order: rows in row order, specifications by id.
+(DEC-348), and whatever cannot be read or is not declared makes the record invalid, a change that holds no
+specification record included. The output has no time in it and a fixed order: rows in row order, specifications
+by id, then the changes that hold no record by folder name.
 """
 
 from __future__ import annotations
@@ -18,7 +20,30 @@ from gov.cli.errors import GovError
 
 CHANGES_REL = "openspec/changes"
 SCHEMA_REL = "openspec/schemas/feature-readiness/schema.yaml"
+ARCHIVE = "archive"  # ``openspec/changes/archive/`` holds archived changes and is not a change
+KEYS = dict(enumerate((
+    "intent", "actor", "journey", "scenarios", "inputs", "data_model", "test_data", "processing", "outputs",
+    "functional", "nfr", "ux", "backend", "state", "interfaces", "security", "integrations", "devops",
+    "observability", "performance", "cost", "recovery", "success", "failure", "acceptance_tests", "docs_ops"), 1))
 MANDATORY = (1, 2, 4, 5, 6, 9, 16, 23, 24, 25)  # DEC-085
+EXTRA = {  # the rows a STANDARD specification adds for each capability type it declares (DEC-085)
+    "product-outcome": {3, 10, 26},
+    "ux": {3, 12},
+    "frontend": {12, 15},
+    "backend": {8, 10, 13, 15},
+    "database-storage": {14, 22},
+    "integration-api": {15, 17},
+    "devops-infrastructure": {18, 21, 22},
+    "security-privacy": {22},
+    "testing-quality": {7},
+    "data-engineering": {7, 14},
+    "ai-ml-model": {7, 8, 20, 21},
+    "evaluation": {7, 20},
+    "observability-sre": {19},
+    "performance-capacity": {11, 20},
+    "operations-recovery": {22, 26},
+    "scientific-rnd": {7, 8},
+}
 PROFILES = ("LITE", "STANDARD", "FULL")
 SATISFIED = ("PRESENT", "N/A_WITH_REASON")
 STATES = (*SATISFIED, "MISSING", "PROVISIONAL", "BLOCKED")
@@ -47,15 +72,22 @@ def _invalid(specification: str, message: str, rows=()) -> GovError:
                     {"specification": specification, "closed": False, "invalid": list(rows)})
 
 
-def specifications(root: Path) -> list[tuple[str, Path, dict]]:
-    """``(id, record path, frontmatter)`` of every specification record, by id."""
+def _changes(root: Path) -> list[tuple[str, Path, dict | None]]:
+    """``(folder name, record path, frontmatter)`` of every change; no frontmatter when it holds no record."""
     from gov.tasks.tickets import frontmatter
 
     found = []
-    for path in sorted((Path(root) / CHANGES_REL).glob("*/proposal.md")):
-        front = frontmatter(path) or {}
-        if front.get("type") == "specification" and _text(front.get("id")):
-            found.append((front["id"], path, front))
+    for folder in sorted((Path(root) / CHANGES_REL).glob("*")):
+        if folder.is_dir() and folder.name != ARCHIVE:
+            front = frontmatter(folder / "proposal.md") or {}
+            record = front.get("type") == "specification" and _text(front.get("id"))
+            found.append((folder.name, folder / "proposal.md", front if record else None))
+    return found
+
+
+def specifications(root: Path) -> list[tuple[str, Path, dict]]:
+    """``(id, record path, frontmatter)`` of every specification record, by id."""
+    found = [(front["id"], path, front) for _, path, front in _changes(root) if front is not None]
     return sorted(found, key=lambda entry: (entry[0], str(entry[1])))
 
 
@@ -89,13 +121,15 @@ def judge(root: Path, specification: str, path: Path, front: dict) -> dict:
     """The report of one specification record; ``READINESS_INVALID`` when the record cannot be judged."""
     schema = _yaml(Path(root) / SCHEMA_REL)
     try:
-        keys = {row["n"]: str(row["key"]) for row in schema["dimensions"]}
-        extra = {name: set(rows) for name, rows in schema["capability_types"]["extra_rows_for_standard"].items()}
-        numbers = sorted(keys)
+        table = schema["capability_types"]["extra_rows_for_standard"]
+        same = {row["n"]: row["key"] for row in schema["dimensions"]} == KEYS \
+            and {name: set(rows) for name, rows in table.items()} == EXTRA
     except (TypeError, KeyError, AttributeError):
-        raise _invalid(specification, f"{SCHEMA_REL} cannot be read") from None
-    if not set(MANDATORY) <= set(keys):
-        raise _invalid(specification, f"{SCHEMA_REL} lacks a mandatory row")
+        same = False
+    if not same:  # the project's schema cannot lower what a profile requires
+        raise _invalid(specification, f"{SCHEMA_REL} cannot be read, or its rows or its capability-type table "
+                                      "are not the Contract's")
+    keys, extra, numbers = KEYS, EXTRA, sorted(KEYS)
     profile, spine, types = front.get("profile"), front.get("spine"), front.get("capability_types")
     types = [] if types is None else types
     if not isinstance(profile, str) or profile not in PROFILES or not isinstance(spine, bool) \
@@ -150,7 +184,10 @@ def check(root: Path, specification: str) -> dict:
 
 
 def check_all(root: Path) -> dict:
-    """Every specification's report; a ``GovError`` when one of them does not pass, an invalid record first."""
+    """Every specification's report; a ``GovError`` when one of them does not pass, an invalid record first.
+
+    A change that holds no specification record cannot be judged, and is an invalid record.
+    """
     answers, errors = [], []
     for specification, path, front in specifications(root):
         try:
@@ -158,6 +195,12 @@ def check_all(root: Path) -> dict:
         except GovError as error:
             answers.append(error.details)
             errors.append(error)
+    for change, _, front in _changes(root):
+        if front is None:
+            errors.append(GovError(INVALID, f"{CHANGES_REL}/{change}: no specification record (a proposal.md whose "
+                                            "frontmatter has an id and type: specification)",
+                                   {"change": change, "closed": False, "invalid": []}))
+            answers.append(errors[-1].details)
     if errors:
         invalid = any(error.code == INVALID for error in errors)
         raise GovError(INVALID if invalid else NOT_CLOSED, "; ".join(error.message for error in errors),
