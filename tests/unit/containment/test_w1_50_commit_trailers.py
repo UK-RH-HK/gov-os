@@ -425,8 +425,63 @@ def test_read_merge_tells_a_parent_s_change_from_the_merge_commit_s_own(tmp_path
     (project / "src" / "main.py").unlink()
     _git(project, "add", "-A")
     _git(project, "commit", "-q", "-m", "merge")
-    reading = read_merge(str(project), "HEAD")
+    reading = read_merge(str(project), _git(project, "rev-parse", "HEAD").strip())
     assert (reading.own, reading.brought) == (["src/main.py"], ["src/side.py"])
+
+
+def test_read_merge_puts_a_parent_s_change_the_merge_commit_drops_in_own(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    earlier = _git(project, "rev-parse", "HEAD").strip()
+    later = _commit(project, "src/main.py")
+    # The parents turned round (DEC-403): nothing differs from the first.
+    merge = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", earlier,
+                 "-p", later, "-m", "drop").strip()
+    assert read_merge(str(project), merge) == (["src/main.py"], [])
+    # Each side's change of its own path is brought, whichever is first.
+    side = _branch_commit(project, "side", "src/side.py", start=earlier)
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    tree = _git(project, "rev-parse", "HEAD^{tree}").strip()
+    assert read_merge(str(project), _git(
+        project, "rev-parse", "HEAD").strip()) == ([], ["src/side.py"])
+    turned = _git(project, "commit-tree", tree, "-p", side, "-p", later,
+                  "-m", "turned").strip()
+    assert read_merge(str(project), turned) == ([], ["src/main.py"])
+
+
+def test_read_merge_reads_the_other_parents_of_an_octopus_against_each_other(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    head = _git(project, "rev-parse", "HEAD").strip()
+    _branch_commit(project, "q", "src/q.py")
+    one = _branch_commit(project, "one", "src/q.py", start="q")
+    other = _branch_commit(project, "other", "src/other.py", start="q")
+    # The tree is the third parent's: the second parent's later change
+    # of src/q.py is dropped, although the third brought the path
+    # against the first.
+    octopus = _git(project, "commit-tree", f"{other}^{{tree}}", "-p", head,
+                   "-p", one, "-p", other, "-m", "octopus").strip()
+    assert read_merge(str(project), octopus) == (
+        ["src/q.py"], ["src/other.py"])
+
+
+def test_read_merge_starts_six_git_processes_for_two_parents(tmp_path, monkeypatch):
+    from gov.guard import containment_merge
+
+    project = _make_project(tmp_path)
+    _branch_commit(project, "side", "src/side.py")
+    for n in range(20):
+        _commit(project, f"src/more{n}.py")
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    calls = []
+    real = containment_merge._git
+    monkeypatch.setattr(containment_merge, "_git",
+                        lambda *a, **k: calls.append(a) or real(*a, **k))
+    containment_merge.read_merge(
+        str(project), _git(project, "rev-parse", "HEAD").strip())
+    assert len(calls) == 6
 
 
 def test_read_merge_of_an_octopus_fails_closed_when_one_parent_has_no_merge_base(tmp_path):
@@ -460,21 +515,38 @@ def test_read_merge_fails_closed_with_several_merge_bases(tmp_path):
     _git(project, "checkout", "-q", "a")
     _git(project, "merge", "-q", "--no-ff", "-m", "criss-cross", "b")
     assert len(_git(project, "merge-base", "--all", "HEAD^1", "HEAD^2").split()) == 2
-    assert read_merge(str(project), "HEAD") == (["src/later.py"], [])
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == (["src/later.py"], [])
+    # Fail closed for every parent (DEC-403): with the parents turned
+    # round and the first parent's tree, what differs from the other
+    # parent is the merge commit's own.
+    turned = _git(project, "commit-tree", f"{head}^1^{{tree}}", "-p",
+                  f"{head}^1", "-p", "b", "-m", "turned").strip()
+    assert read_merge(str(project), turned) == (["src/later.py"], [])
 
 
-def test_read_merge_raises_for_a_commit_that_is_no_merge_and_for_one_it_cannot_read(tmp_path):
+def test_read_merge_raises_for_a_commit_that_is_no_merge_and_for_one_it_cannot_read(tmp_path, monkeypatch):
     import pytest
-    from gov.guard.containment import _GitError
-    from gov.guard.containment_merge import read_merge
+    from gov.guard import containment_merge
+    from gov.guard.containment_merge import MergeReadError, read_merge
 
     project = _make_project(tmp_path)
-    with pytest.raises(ValueError):
-        read_merge(str(project), "HEAD")  # a commit without a parent
-    with pytest.raises(ValueError):
+    assert issubclass(MergeReadError, ValueError)  # the check's finding
+    with pytest.raises(MergeReadError):
+        # a commit without a parent
+        read_merge(str(project), _git(project, "rev-parse", "HEAD").strip())
+    with pytest.raises(MergeReadError):
         read_merge(str(project), _commit(project, "README.md"))
-    with pytest.raises(_GitError):
+    with pytest.raises(MergeReadError):
         read_merge(str(project), "0" * 40)
+    with pytest.raises(MergeReadError):
+        read_merge(str(tmp_path), "0" * 40)  # no repository
+    # What is not a full commit id never reaches git (DEC-403, F3).
+    monkeypatch.setattr(containment_merge, "_git", None)
+    for commit in ("", "HEAD", "--all", "-1", "0" * 39, "A" * 40,
+                   "0" * 40 + "\n", None):
+        with pytest.raises(MergeReadError):
+            read_merge(str(project), commit)
 
 
 def test_a_move_without_a_merge_commit_starts_one_git_process(tmp_path, monkeypatch):

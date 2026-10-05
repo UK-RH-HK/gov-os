@@ -643,8 +643,8 @@ def _move_commits(root: str, old: str, new: str) -> list:
     of the repository renames or hides a ``Role`` or a ``Task``.  Paths
     are listed without rename detection, so both ends of a rename
     appear (repair 7); a merge commit lists only its own change, as
-    ``read_merge`` reads it (DEC-269; DEC-394, DP-18): what it changes
-    against its first parent and no other parent brought.
+    ``read_merge`` reads it (DEC-269; DEC-394, DP-18; DEC-403): the
+    paths where it differs from a parent and no other parent brought.
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
