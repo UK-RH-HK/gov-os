@@ -635,3 +635,230 @@ settle it.
   delegated answers under the orchestrator.
 - **The rules sit in an HTML comment inside the form**, which the author deletes from a filled package. W1-35's
   skills need to carry the routing, batching and state rules themselves.
+
+## W1-25 residuals (gov checkpoint, 2026-10-04)
+
+Recorded at W1-25's close, from the ticket lead's summary. None is a defect of the ticket; each names who should
+settle it.
+
+- **Nothing calls the command yet.** W1-25 builds `gov checkpoint` (write, `--watch`, `--resume`) and the
+  fresh-agent-reconstruction check declaration. The calls at a ticket transition, a compaction and a stop are
+  W1-29's, W1-49's successor hooks' and W1-30's (DEC-280).
+- **"Only orchestrator-role sessions run `gov checkpoint`" (DEC-320) is not enforced by the command.** It rests on
+  the guard's path rules: a worker's write to `docs/checkpoints/<ticket>/` is outside its `allowed_paths`.
+- **No acceptance case holds the DEC-321 defaults** (240 minutes, 20 commits); one builder test does. Thresholds are
+  not range-checked.
+- **Numbering and writing.** Two sessions writing the same ticket's checkpoint at once, or on two branches, can take
+  the same number: there is no lock, and the write is not atomic. Files in the folder that do not match
+  `CP-<ticket>-<NNNN>.md` are ignored.
+- **What the watchdog reads.** "Commits since" counts from the commit that added the checkpoint file, across the
+  whole history of HEAD; an uncommitted checkpoint, or one not reachable from HEAD, counts 0. It checks that each
+  input has an id, a version and a well-formed sha256 and does not re-hash the files, so input drift is not
+  detected. The `ticket-transition` reason compares the ticket's status only (`task_status`, DEC-336). `--watch` on
+  a ticket whose file is gone answers `TICKET_UNKNOWN` (exit 1).
+- **The family check passes when no ticket has a checkpoint.** W1-26 runs it; whether "no checkpoint at all" should
+  fail is W1-26's or W1-29's to settle.
+- **Without `--json` the `--resume` brief is indented JSON text**, because `main.py` prints every result that way
+  (DEC-317). W1-29's SessionStart hook injects that text.
+- **The W1-46 builder test `tests/unit/launch/test_command_modules.py` uses not-yet-built commands as stand-ins**
+  (`pause`, `close`). It broke when `checkpoint` was built and will break again when W1-28 builds `pause` or W1-30
+  builds `close`: that ticket's lead renames the stand-in, as W1-25's did (`9c8fec02`).
+- **Workers ran unsandboxed** (interim, DEC-183).
+
+## W1-46 residuals (worker session launcher, 2026-10-04)
+
+Recorded at W1-46's close, from the three ticket-lead summaries and the two reviewer passes. `gov launch` is built;
+leads and workers were still started unsandboxed during this ticket (DEC-183). Each item names who should settle it
+where that is known; the rest go to EXP-002 and the mid-wave audit.
+
+**What a launched session can still do**
+
+- **A new name under `.gov-runtime/` outside `scratch/`, made at the OS level after launch, is not denied**
+  (DEC-311): the sandbox skips glob deny paths on Linux, so only the names that exist at launch and the freeze flag
+  carry literal rules. Inferred, not run: a project root whose path contains `*`, `?` or `[` would turn those literal
+  rules into patterns the sandbox skips.
+- **The shared git directory is writable from a launched session in a linked worktree.** It can commit (tested), and
+  it can also create a new file directly in the main repository's `.git`, which includes other branches' refs;
+  `.git/hooks` and `.git/config` are refused.
+- **The held-out path travels in argv**: the built settings are an inline `--settings` argument, visible in the
+  process list, the worker's own Bash included.
+- **The per-session temp directory is left behind** after the session ends.
+- **A research session starts in the repository root**, so a bare `uv add` is denied until it does `cd <folder>`. A
+  new directory a research install creates inside the repository is stopped by neither the fence nor the guard, only
+  reported by containment, and not at all if it is gitignored.
+
+**What the launcher does not check**
+
+- `~/.claude/settings.json` is not checked for bypass mode, added directories, `disableAllHooks` or a weak `sandbox`
+  block (DEC-313 covers the command line and the project's settings).
+- Option prefixes, another letter case and `--dangerously-skip-permissions=true` pass the launcher; the reviewer
+  infers the real CLI rejects them, and nobody ran it.
+- In force and stricter than some callers expect: `--setting-sources` is refused with any value, and a guard
+  registered only in `.claude/settings.local.json` refuses the launch (DEC-314).
+- `gov launch` ends with the session's exit code (DEC-332), so a session's own 1 to 4 reads like an API-0002 code;
+  a refusal is told apart by its envelope.
+
+**What the guard alone lets through** (left to the sandbox of a launched session)
+
+- **Install spellings for non-research roles:** `env` and `command` prefixes (known from W1-04), `exec`, `nice`,
+  `time`, `xargs`, `bash -c`, `python3 -mpip`, `uv pip sync`, `uv tool run`, `npm ci`, `npx`, `yarn add`, `pnpm add`,
+  `pipx run`, `cargo add`, `go get`, a pipe into a shell. Stopped only by the empty allowlist and the write fence.
+  For research: `uv --directory` or `--project`, `pip install --target` or `--user`, and `cd` behind an assignment,
+  `builtin`, `command` or `eval`. An orchestrator subagent in a worker session gets "ask" for an install, not "deny".
+- **`ln` behind a wrapper** (`env`, `command`, `nice`, `xargs`, `find -exec`, `bash -c`, backticks).
+- **Links the guard does not see made:** a write through a hard link already on disk, or through a link made by an
+  interpreter one-liner; replacing a symbolic link that already sits inside the acceptance tests and points into the
+  role's paths; a link made by `cp -s` followed by a write in the same command.
+- **Other programs that take options after operands** (`touch -d`, `tee`, `rsync`, `dd`) are not read the way `cp`
+  and `install` now are.
+- **An opaque Bash write is not judged**: an engineer changed a guard file inside its own paths with a Python script
+  fed through a here-document, and the guard allowed it, while it refuses the orchestrator's here-documents. The
+  holder exception follows a symbolic link: if `.claude/settings.json` were a link into scratch, any role could
+  write the path there.
+- **On a ticket whose `allowed_paths` name `.tickets/` or `.claude/`**, the guard alone allows writes there; only a
+  launched session carries the deny rules. DEC-315 has no exception for such a ticket: in a launched session the
+  deny rule stays (fail closed), which is why no headless session could write `.claude/agents/research.md` and the
+  owner placed it (DEC-312).
+
+**Where the guard is stricter than needed**
+
+- `ln -t`, `ln --`, a destination that is exactly the top directory of an allowed pattern, `ln <own> <own> -S bak`,
+  and a hard link whose source is outside the role's paths even when the source is harmless (a file under `docs/`).
+- A link to a protected place plus any other write in the same command; `ln -s <relative name>` plus any other
+  write; `cp -t <dir>` with a glob operand that matches nothing; `cp a b dir -p` judges the later sources as write
+  targets too.
+
+**The generic command line (DEC-317)**
+
+- A stray command module that hard-exits at import makes `gov --help` and a misspelt command end with exit 0.
+- A stray `src/gov/status/command.py` takes over `gov status`; `status` and `check` have no precedence guard.
+- No acceptance test shows that a new module alone adds a command, its arguments and its act paths. W1-25 was the
+  first user and needed no change to `main.py`.
+
+**Carried to other tickets**
+
+- **W1-08's `systems` snapshot** in the path map still shows the launcher and the research role as before this
+  ticket; it is updated when W1-33 lands the remaining role definitions.
+- **The experiments root is the fixed name `experiments/`** (DEC-333); a project key waits for a project that needs
+  one.
+- **Size.** 819 lines added outside tests against an estimate of 220, about 200 of them the DEC-317 change that
+  W1-25's package moved here; 214 acceptance cases were added after implementation, almost all for owner and
+  delegated decisions.
+
+## W1-17 residuals (lexical index and shared store, 2026-10-04)
+
+Recorded at W1-17's close, from the ticket lead's two summaries. None is a defect of the ticket; each names who
+should settle it where that is known.
+
+- **The index-freshness check is red in this repository** until an orchestrator-role session builds the live index
+  (DEC-342, DEC-322). It is also not green on an index that holds no chunk (DEC-345), so a project with no
+  governance-class file can never be green. W1-26 and W1-27 take both into account.
+- **The index reads the working tree; the record graph reads `HEAD`** (DEC-344). The two can describe different
+  states of one file. W1-20 settles what a caller sees.
+- **A store without graph tables.** If the index is built before any `gov.store.load`, `store.db` exists without the
+  graph tables, and `gov.store.digest` and `connect` fail with a raw SQLite error, not `STORE_MISSING`. The fix is in
+  `src/gov/store/`: W1-27, which wires `gov rebuild`.
+- **`search` can raise.** A default `search` raises when the filter or git fails (no gitleaks binary, for example)
+  and does not return the unavailable mapping of DEC-260. W1-20 catches it or this module changes. A machine without
+  `gitleaks` on `PATH` skips the whole W1-17 suite.
+- **What a query finds.** A query that starts or ends inside a token (`floor_rules` in `partition_floor_rules`) is
+  not found, because FTS5 picks candidate chunks by whole tokens. Other letter case, stems, queries across lines,
+  ranking, limits and an empty query are unhandled and untested. CAP-11.a's "every occurrence" holds for whole
+  tokens only; W1-20 or W1-41 decides whether that is enough.
+- **"2.8 s scale"** is held as 10 s on the search after one edited file; G-20 was not read (DEC-341).
+- **No version pin in the store.** A change to the chunker or tokenizer needs `.gov-runtime/` deleted and rebuilt;
+  nothing detects it. An untracked path map or `.gitleaks.toml` does not trigger re-judging when it changes; a
+  committed map change does, and moves unchanged files in and out of the index.
+- **Parents are coarse** (DEC-343). Markdown sections are flat, a `#` line inside a code fence counts as a heading,
+  and only `.md` and `.markdown` are documents. A Python parent is the outermost function; a method counts as a
+  function, a class body and decorator lines belong to the module, and a file that does not parse is module-only.
+- **Line numbers** come from `str.splitlines`, so a form feed or a Unicode line separator shifts the reported line.
+  Non-UTF-8 and binary files are decoded with replacement and indexed if the filter lets them through; paths with a
+  newline and tracked non-regular files are skipped.
+- **Removed text stays in SQLite free pages.** This concerns text that passed the filter earlier, a file that later
+  gained a secret included. Concurrent refreshes, and a file replaced between the filter's answer and the read, are
+  not handled (the W1-15 residual, unchanged).
+- **`lexical.py` imports `gov.secrets.CONFIG_REL`**, which is not in `gov.secrets.__all__`; W1-16 keeps or exports
+  the name. The `export_policy`, `embedding_policy` and `permitted_roles` residuals that DEC-289 moved here are
+  untested.
+- **The carried code under `cli/govbridge/` is untouched**, since `cli/tests` still imports it; its query, store,
+  freshness, corpus and git-object modules were not ported.
+- **Size.** 370 lines against 240 plus 40 to 60 (DEC-343), docstrings and comments included.
+- **Workers ran unsandboxed** (interim, DEC-183). The test designer left a throwaway reference implementation in
+  its session scratch directory outside the repository.
+
+## W1-13 residuals (gov readiness, 2026-10-05)
+
+Recorded at W1-13's close, from the ticket lead's summaries and the reviewer's pass. The reviewer's two HIGH findings
+were fixed, tests first; the fix was not re-probed by a second reviewer. Each item names who should settle it where
+that is known.
+
+**What still lets work through** (DEC-348, DEC-350)
+
+- Nothing stops a direct `openspec archive`, and the READY rule of W1-09 trusts a specification status set by hand:
+  `gov readiness` only gives the verdict. W1-26 runs it as a check and fails a `CLOSED` record with a required row
+  open; W1-35's change skill runs it before apply and archive.
+- **Nothing writes the specification frontmatter yet.** Until W1-12's proposal template or W1-35 writes it, the bare
+  `gov readiness` answers `READINESS_INVALID` in any project that holds a change written from today's template
+  (every folder under `openspec/changes/` except `archive` counts as a change, even an empty one). W1-26 must know
+  this before it wires the bare form as a check. `--specification` and `--ticket` judge the named one alone.
+- `gap_ticket` is reported as written, even when it names no ticket or a closed one; that check is W1-26's.
+- Content is not judged: a reason of `.` or evidence of `['TBD']` passes. An N/A reason made only of a zero-width
+  space passes; empty, null, absent, spaces, tabs and a no-break space are rejected.
+
+**`gov.readiness.close`** (DEC-349; no command or skill calls it yet)
+
+- It accepts any file in `.tickets/` with `class: audit` and `audits: <id>` as the audit ticket: a closed one, one
+  with another role, a hand-written one. A specification closed again after its audit ticket was closed gets no new
+  one. For W1-26 or W1-35.
+- A record with no plain `status:` line passes the read command; `close` then creates the audit ticket and fails
+  with a raw error, leaving the record unclosed (a retry reuses the ticket). An interrupted `close` can leave an
+  orphan ticket; a read-only `proposal.md` fails after the ticket exists; a relative root other than `.` fails.
+- The specification id goes unchecked into the audit ticket's `allowed_paths` (`docs/audit/<id>/**`).
+- "Fresh" and "authored none of the audited files" (MR-4) rest on the orchestrator's session rules.
+
+**How records are read**
+
+- Duplicated YAML keys are read last-wins (`profile: FULL` then `profile: LITE` is judged at LITE). Row identity is
+  loose: `n: 3.0` counts as row 3, `n: true` as row 1, a row's `key` is never compared, and rows numbered outside 1
+  to 26 are ignored silently.
+- `--ticket` on a ticket with no `specification` key answers `SPECIFICATION_NOT_FOUND` (exit 1), although DEC-307
+  says such a ticket is not held: a caller that gates on this code would block it.
+
+**The taxonomy is held in code**
+
+- The 26 row keys, the ten mandatory rows of DEC-085 and the capability-type table are constants in
+  `src/gov/readiness/checker.py`, compared by a builder test with `docs/contract/readiness-dimensions.yaml`. A
+  project schema whose rows or table differ makes every specification in that project `READINESS_INVALID`. So a
+  governed taxonomy change (CAP-30.e) has to change the checker together with the schema and the Contract file.
+
+**Records**
+
+- 299 lines against 170 plus about 40 for `close`; 18 acceptance cases were added after implementation, from the
+  reviewer's findings. Workers ran unsandboxed (interim, DEC-183).
+
+## W1-14 residuals (proposal-to-ticket bridge, 2026-10-05)
+
+Recorded at W1-14's close, from the ticket lead's summary. None is a defect of the ticket; each names who should
+settle it where that is known.
+
+- **Nothing calls `gov.tasks.bridge.derive` yet**, and `gov.tasks` does not export it (that file is outside the
+  ticket's paths). W1-35's planning skill calls it.
+- **Nothing teaches authors the task block** (DEC-355). W1-12's `tasks.md` template as delivered is refused. For
+  W1-35 or a template change, together with the specification frontmatter (DEC-350).
+- **Re-run edges** (DEC-356). A `- [x]` task gets an open ticket; a task edited after derivation never updates its
+  ticket, and cycle detection then uses the ticket's `deps`; a removed task's ticket stays, unreported; indented
+  sub-task lines are ignored. A hand-written ticket with the same `specification` and `task` is taken as that
+  task's ticket.
+- **The acceptance-path rule** calls two private names of the guard (`gov.guard.decide._match_pattern` and
+  `_is_under_acceptance`), so a rename there breaks the bridge. A glob that reaches the acceptance tests without
+  naming the folder (`**/*.py`) is not refused by the bridge; the guard still denies the write.
+- **`role` is not checked against the roster**: an unknown role is derived and counts as an implementer for the
+  acceptance-path rule. A dependency on an existing ticket accepts any file in `.tickets/`, closed or unreadable.
+- **Failures part-way.** If `gov.tasks.create` fails after the ticket script wrote a file, that file is not cleaned
+  up; a description that starts with `-` triggers it. Two runs at once on one change can each create a ticket per
+  task. The ticket id prefix comes from the project folder name, so a name outside letters and digits gives ids the
+  ticket schema rejects (W1-09's `create`).
+- **Codes beyond the tests:** `TASKS_NOT_FOUND` and `TICKET_FAILED`.
+- **Size and process.** 180 lines against 120. The lead had the engineer build before the five packages were
+  decided; they were then decided as built (DEC-355, DEC-356). Workers ran unsandboxed (interim, DEC-183).

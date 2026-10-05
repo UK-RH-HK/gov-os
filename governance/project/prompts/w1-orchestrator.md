@@ -21,6 +21,7 @@ This prompt lives in the repository at governance/project/prompts/w1-orchestrato
 ## 3. Parallel tickets with ticket leads
 
 - In flight: as many tickets as are ready, up to 6, chosen so that each one's dependencies are closed and no two in flight have overlapping allowed_paths. Overlapping tickets wait.
+- A ticket that is idle waiting on an owner answer does not count against the 6; the resource gate still applies to every running lead.
 - Resource gate: start a new ticket only when free -g shows at least 4 GiB available and the 1-minute load average is below the number of CPU cores (nproc). Check before each start. Heavy tickets (retrieval, indexing, models) count double.
 - For each ticket: claim it in the main tree (tk start); create its worktree with git worktree add ~/gov-os-worktrees/<W1-id> -b w1/<W1-id> w1/integrate; start a ticket lead (brief A5) inside that worktree, in the background, with its identity in --settings (GOV_ROLE=orchestrator, GOV_TICKET=<id>). The guard confines the lead and its workers to that worktree.
 - Tickets, claims, the decision register and bootstrap.md are edited only by you, in the main tree, never in a worktree.
@@ -77,7 +78,7 @@ Archived sources. When a KPI's source is only in the archived docs/source/, a pr
 Stop, with one short block (the owner reads on a phone), only for:
 - DECISION_PACKAGES that need the owner, together with the digest of delegated decisions;
 - ESCALATION;
-- CONTEXT_CHECKPOINT, when you're above about 300k tokens after a merge or a close. Leads keep running in their worktrees. The owner resumes you with: "Read governance/project/prompts/w1-orchestrator.md and resume from .gov-runtime/scratch/orchestrator/CHECKPOINT.md";
+- CONTEXT_CHECKPOINT only if auto-compaction is unavailable. With the W1-49 hooks in place, let the session compact at about 300k tokens and continue from the injected checkpoint; don't stop for context.
 - WAVE_1_EXIT_READY, after W1-42 and before W1-43. The exit audit runs as a fresh session the owner starts.
 Don't stop just to deliver a digest.
 

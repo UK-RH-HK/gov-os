@@ -1,0 +1,8 @@
+# The fresh-agent-reconstruction family check (CAP-38.b, W1-25, DEC-282): the resume brief (ticket, inputs with
+# their hashes, next step) can be built from the latest checkpoint of every ticket that has one.
+# The command is run by `sh -c` in the project root; exit 0 is green (DEC-285).
+id: fresh-agent-reconstruction
+family: fresh-agent-reconstruction
+tier: G1
+severity: hard-block
+command: gov checkpoint --resume --json

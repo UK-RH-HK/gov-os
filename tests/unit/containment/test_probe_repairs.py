@@ -283,8 +283,11 @@ class TestRepair3Symlinks:
         proj = _make_project(tmp_path)
         link = "tests/acceptance/T01/test_link.py"
         before = len(_findings(proj))
+        # The guard refuses `ln -s` into the acceptance tests (DEC-311), so
+        # the link is made by a form the guard does not read (DEC-335).
         post, _ = _whole(proj,
-            f"ln -s ../../../src/main.py {link}")
+            "python3 -c \"import os; "
+            f"os.symlink('../../../src/main.py', '{link}')\"")
         text = _agent_text(post)
         assert link in text
         assert not (proj / link).exists()
