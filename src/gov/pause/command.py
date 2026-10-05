@@ -1,6 +1,7 @@
 """``gov pause`` as a command module (W1-28, CAP-05, DEC-317). The convention is in ``gov.cli.main``.
 
 - ``gov pause`` sets the freeze flag ``.gov-runtime/freeze``, which the guard reads; it writes no record (DEC-367).
+  The flag's first line is ``FROZEN <who> <when>`` (DEC-402, DEC-404): an empty file there is no freeze.
 - ``gov pause --off`` clears it.
 - ``gov pause --cancel-agents`` sets the flag and releases every claim lock, with one record commit per released
   ticket (DEC-357, DEC-368, DEC-375). It stops no process and changes no status.
@@ -16,6 +17,8 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import tempfile
+import time
 from pathlib import Path
 
 ACT_PATHS = (".gov-runtime/freeze", ".tickets/**")
@@ -34,6 +37,28 @@ def add_arguments(parser) -> None:
 
 def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+
+
+def _freeze(root: Path, flag: Path, caller: str) -> None:
+    """Write the marked flag (DEC-402, DEC-404): a temporary file renamed over the flag's path, never through a link
+    there, then read back with the guard's own reader."""
+    from gov.cli.errors import GovError
+    from gov.guard.decide import FREEZE_FLAG, FREEZE_MARKER, freeze_state
+
+    line, tmp = f"{FREEZE_MARKER.decode()} {caller} {time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\n", None
+    try:
+        flag.parent.mkdir(parents=True, exist_ok=True)
+        handle, tmp = tempfile.mkstemp(dir=flag.parent, prefix="freeze.")
+        with os.fdopen(handle, "w", encoding="utf-8") as file:
+            file.write(line)
+        os.replace(tmp, flag)
+    except OSError as error:
+        if tmp:
+            Path(tmp).unlink(missing_ok=True)
+        raise GovError("PAUSE_NOT_SET", f"{FREEZE_FLAG} was not written: {error}", {"path": FREEZE_FLAG})
+    if freeze_state(str(root)) != "frozen":
+        raise GovError("PAUSE_NOT_SET", f"{FREEZE_FLAG} was written and the guard does not read it as a freeze",
+                       {"path": FREEZE_FLAG})
 
 
 def _record(root: Path, ticket: str, caller: str, line: str) -> None:
@@ -110,11 +135,17 @@ def run(root: Path, args, config: dict) -> dict:
                        "unset) lifts a pause", {"caller": role})
     root, caller = Path(root), role or OWNER
     flag = root / FREEZE_FLAG
+    if flag.parent.is_symlink():  # DEC-404: nothing is written through it, and the owner repairs the folder
+        raise GovError("PAUSE_RUNTIME_LINKED", f"{flag.parent.name} is a symbolic link: nothing is written through "
+                       "it, and the pause is as it was", {"path": flag.parent.name})
     if args.off:
-        flag.unlink(missing_ok=True)
+        try:
+            flag.unlink(missing_ok=True)
+        except OSError as error:  # a directory at the path: the guard reads it as a freeze
+            raise GovError("PAUSE_NOT_LIFTED", f"{FREEZE_FLAG} cannot be removed, and the tree stays frozen: {error}",
+                           {"path": FREEZE_FLAG})
         return {"paused": False}
-    flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.touch()
+    _freeze(root, flag, caller)
     if args.cancel_agents:
         return {"paused": True, "cancelled": _cancel(root, caller)}
     return {"paused": True, **(_rollback(root, args.rollback, caller) if args.rollback else {})}
