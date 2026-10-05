@@ -79,8 +79,9 @@ def _git_env() -> dict:
     return env
 
 
-def _git(root: str, *args: str) -> str:
-    """Run a git command and return stdout.  Raises on failure."""
+def _git(root: str, *args: str, ok: tuple = (0,)) -> str:
+    """Run a git command and return stdout.  Raises on failure: an exit
+    code that is not among *ok*."""
     try:
         p = subprocess.run(
             [*_GIT, "-C", root, *args],
@@ -91,7 +92,7 @@ def _git(root: str, *args: str) -> str:
         raise _GitError(str(e)) from e
     if p.returncode == 128 and "not a git repository" in p.stderr.lower():
         raise _NotARepo(p.stderr.strip())
-    if p.returncode != 0:
+    if p.returncode not in ok:
         raise _GitError(p.stderr.strip())
     return p.stdout
 
@@ -641,11 +642,9 @@ def _move_commits(root: str, old: str, new: str) -> list:
     message holds it and its lines are read here, so no trailer setting
     of the repository renames or hides a ``Role`` or a ``Task``.  Paths
     are listed without rename detection, so both ends of a rename
-    appear (repair 7); a merge commit lists only what it changes beyond
-    what its parents hold (DEC-269).  A merge commit with a parent after
-    its first that is not among these commits brings no judged commit
-    for what it takes from that parent: it lists every path it changes
-    against its first parent (DEC-390, DP-15).
+    appear (repair 7); a merge commit lists only its own change, as
+    ``read_merge`` reads it (DEC-269; DEC-394, DP-18): what it changes
+    against its first parent and no other parent brought.
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
@@ -654,6 +653,7 @@ def _move_commits(root: str, old: str, new: str) -> list:
     is read as structure.  Output that cannot be read raises, so the
     move becomes a finding.
     """
+    from gov.guard.containment_merge import read_merge
     out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
                _LOG_FORMAT, f"{old}..{new}")
     unreadable = _GitError("the commits of the HEAD move cannot be read")
@@ -675,12 +675,9 @@ def _move_commits(root: str, old: str, new: str) -> list:
             raise unreadable
     if not commits:
         raise unreadable
-    new_ids = {c[0] for c in commits}
     for c in commits:
-        if any(p not in new_ids for p in c[1][1:]):
-            c[4][:] = [p for p in _git(
-                root, "diff-tree", "-r", "-z", "--name-only", "--no-renames",
-                c[1][0], c[0]).split("\0") if p]
+        if len(c[1]) > 1:
+            c[4][:] = read_merge(root, c[0]).own
     return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
 
 
@@ -746,9 +743,11 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
            == "owner" for r in roles):
         return paths, "a Role: owner commit made during an agent's call"
     # DEC-390, DP-16: a worker's commit changes no ticket file, whatever
-    # the ticket's paths say.
+    # the ticket's paths say.  DEC-394, DP-17: nor does any commit of a
+    # worker's call, with or without trailers.
     tickets = [p for p in paths if p.startswith(".tickets/")
-               ] if any(r != "orchestrator" for r in roles) else []
+               ] if not orch_own or any(
+                   r != "orchestrator" for r in roles) else []
     if not orch_own:
         if roles and roles != [sub or role]:
             return paths, "its Role trailer is not the caller's role"
@@ -810,7 +809,8 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
         bad = outside(c_role, c_task, None, fn)
     if tickets:
         return (bad + [p for p in tickets if p not in bad],
-                "a ticket file in a commit with a worker's Role trailer")
+                "a ticket file in a commit with a worker's Role trailer"
+                " or made in a worker's call")
     return (bad, "committed path(s) outside allowed paths") if bad else None
 
 
