@@ -652,9 +652,11 @@ def _move_commits(root: str, old: str, new: str) -> list:
     ids is its trailer block and the token after a raw entry (``:``) is
     its path, whatever they hold, so no byte a commit's author chooses
     is read as structure.  Output that cannot be read raises, so the
-    move becomes a finding.
+    move becomes a finding; so does a move whose merge commits need
+    more than ``MAX_MOVE_PROCESSES`` git processes, before any is read.
     """
-    from gov.guard.containment_merge import read_merge
+    from gov.guard.containment_merge import (
+        MAX_MOVE_PROCESSES, processes, read_merge)
     out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
                _LOG_FORMAT, f"{old}..{new}")
     unreadable = _GitError("the commits of the HEAD move cannot be read")
@@ -676,9 +678,12 @@ def _move_commits(root: str, old: str, new: str) -> list:
             raise unreadable
     if not commits:
         raise unreadable
-    for c in commits:
-        if len(c[1]) > 1:
-            c[4][:] = read_merge(root, c[0]).own
+    merges = [c for c in commits if len(c[1]) > 1]
+    if sum(processes(len(set(c[1]))) for c in merges) > MAX_MOVE_PROCESSES:
+        # Stopped at its time limit the check would judge nothing.
+        raise _GitError("the HEAD move has too many merge commits to read")
+    for c in merges:
+        c[4][:] = read_merge(root, c[0]).own
     return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
 
 

@@ -750,3 +750,47 @@ def test_grafts_a_shallow_file_and_inherited_variables_do_not_change_what_is_rea
         assert _move_commits(str(project), old, second) == expected
         assert _is_ancestor(str(project), first, second)
         target.unlink()
+
+
+# ---------------------------------------------------------------
+# A move whose merge commits need too many git processes
+# ---------------------------------------------------------------
+
+def _two_parent_merges(project, count):
+    """*count* ``--no-ff`` merges of one engineer commit each."""
+    for n in range(count):
+        _git(project, "checkout", "-q", "-b", f"side-{n}")
+        _commit(project, f"src/side_{n}.py", f"Task: {TICKET}",
+                "Role: engineer")
+        _git(project, "checkout", "-q", "main")
+        _git(project, "merge", "-q", "--no-ff", "-m", "merge", f"side-{n}")
+
+
+def test_the_bound_of_a_move_leaves_room_for_ordinary_integrations():
+    from gov.guard.containment_merge import (
+        MAX_MOVE_PROCESSES, MAX_PARENTS, processes)
+
+    assert (processes(2), processes(9), processes(MAX_PARENTS)) == (6, 118, 853)
+    assert 500 * processes(2) <= MAX_MOVE_PROCESSES < 4 * processes(MAX_PARENTS)
+
+
+def test_a_move_within_the_bound_is_read_and_one_beyond_it_is_a_finding_as_a_whole(tmp_path, monkeypatch):
+    """Two two-parent merges need 12 git processes, three need 18.  Beyond
+    the bound no merge commit is read: the move is flagged, not silent."""
+    from gov.guard import containment_merge
+
+    monkeypatch.setattr(containment_merge, "MAX_MOVE_PROCESSES", 12)
+    read = []
+    read_merge = containment_merge.read_merge
+    monkeypatch.setattr(containment_merge, "read_merge",
+                        lambda root, commit: read.append(commit)
+                        or read_merge(root, commit))
+    project = _make_project(tmp_path)
+    report, findings = _check(project, lambda: _two_parent_merges(project, 2))
+    assert report == "" and findings == [] and len(read) == 2
+
+    del read[:]
+    project = _make_project(tmp_path / "beyond")
+    report, findings = _check(project, lambda: _two_parent_merges(project, 3))
+    assert report and [f["action"] for f in findings] == ["flagged"]
+    assert "not a forward move" in findings[0]["reason"] and read == []

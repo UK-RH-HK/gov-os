@@ -21,6 +21,18 @@ _COMMIT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 # that is stopped at its time limit judges nothing.
 MAX_PARENTS = 24
 
+# The most git processes the merge commits of one HEAD move may need
+# together, counted from their parents before any is read: 500 merge
+# commits with two parents, or three with 24.  A move beyond it is not
+# read in part: it is a finding as a whole.
+MAX_MOVE_PROCESSES = 3000
+
+
+def processes(parents: int) -> int:
+    """The most git processes ``read_merge`` starts for a merge commit
+    with *parents* distinct parents."""
+    return 1 + parents + 3 * parents * (parents - 1) // 2
+
 
 class MergeReadError(ValueError):
     """``read_merge`` cannot read the merge: the ``commit`` argument is
