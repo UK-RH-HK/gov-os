@@ -39,6 +39,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SETTINGS_REL = ".claude/settings.json"
 BOOTSTRAP_REL = "governance/project/bootstrap.md"
+HELD_OUT_REL = "governance/project/held-out.yaml"   # DEC-385: no fixture copies it into a temporary project
 AGENTS_REL = ".claude/agents"
 ACCEPTANCE_REL = "tests/acceptance"
 SCRATCH_REL = ".gov-runtime/scratch"
@@ -268,6 +269,8 @@ def copy_working_tree(destination, root=REPO_ROOT):
         capture_output=True, text=True, check=True,
     ).stdout
     for rel in sorted(set(item for item in listing.split("\0") if item)):
+        if rel == HELD_OUT_REL:   # DEC-385: left out by its path, never opened
+            continue
         source = Path(root) / rel
         target = destination / rel
         if not (source.is_file() or source.is_symlink()):

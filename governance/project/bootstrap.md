@@ -972,3 +972,39 @@ Recorded at W1-16's close, from the four ticket lead rounds' summaries. Fixed fi
   `~/.cache/codebase-memory-mcp` was never changed, and no worktree of this repository was indexed.
 - **Size.** Production code and rules +282 / −45 against an estimate of 50; 42 cases were added after
   implementation, each by a delegated or owner decision.
+
+## W1-28 residuals (gov pause, copying fixtures and two launcher changes, 2026-10-05)
+
+Recorded at W1-28's close, from the closing ticket lead's summary and its reviewer's findings (none high).
+
+- **Two earlier residuals end with this merge:** the launcher's temp directory is no longer left behind on any exit
+  the launcher controls (W1-46), and a product-spec worker is launched sandboxed, with an empty network allowlist
+  and held to a ticket of its own role, so the DEC-183 form is ended (W1-33, DEC-371).
+- **The temp folder still stays** when the launcher is killed outright, on SIGTERM or SIGHUP (the session then lives
+  on), or when the removal fails; a failed removal is a traceback and the session's exit code is lost. DEC-392 fixes
+  the last three; W1-32 carries it.
+- **Removal is by name:** if the folder is renamed and another directory put at its path, that one is removed. It
+  needs write access to the parent, which the sandbox does not give. Not run: a launcher `TMPDIR` that does not
+  exist.
+- **A worker's scratchpad is gone at the session's end.** Briefs now tell workers to return results in their final
+  message or under `.gov-runtime/scratch/`.
+- **The DEC-385 exclusion is one exact path.** Another name, a hard link or an absolute symbolic link would be
+  copied. The check that fails when a fixture copies the file again does not see a helper called with the root,
+  `tarfile`, a copy of `governance/` by name, or `tests/unit/`. Only W1-05's and W1-07's fixtures copied the whole
+  tree (W1-25 uses W1-07's).
+- **The two whole-tree fixtures still copy `.claude/settings.json`** with its held-out deny line into every
+  temporary project; W1-46's and W1-47's fixtures strip it (package DP-15, with the owner).
+- **Copies made before the merge:** 1461 files of the held-out file's name were counted, by path only, under
+  `/tmp/pytest-of-usain` on 2026-10-05, from earlier runs of the copying fixtures in every tree. None was opened; the
+  owner has them removed.
+- **The product-spec role file and its agent definition** still say the launcher does not start that role (package
+  DP-12, with the owner). `gov launch` by WBS id sets `GOV_TICKET` to the WBS id, and a ticket key written twice
+  takes the last value; both are older launcher behaviour that now also holds for product-spec.
+- **Pause, as built and held by no test:** untracked files do not make a tree dirty; a conflicting revert is undone
+  with `git reset --hard` to the `HEAD` from before the rollback; an empty `GOV_ROLE` is refused, not read as the
+  owner; record commits also carry `Role:`.
+- **A launched test designer cannot run the live-session cases** (W1-46: 36, W1-25: 3): the sandbox refuses the API
+  host. The lead runs them.
+- **Latency (DEC-372):** two occurrences during this ticket's rounds, both `test_decision_p95_is_under_100_ms`
+  (W1-02) under load, one at 106 ms; each passed alone. None in the post-merge run.
+- **Size.** `gov pause` is 120 lines against 80 to 100; the launcher changed by +15 / −6.

@@ -7,13 +7,16 @@ roles:
     session: gov launch research <ticket>
     network_profile: research-allowlist
   # W1-33: the five Wave 1 roles (DEC-066). The launcher starts no session for
-  # the orchestrator or product-spec, so they name no session and no profile.
+  # the orchestrator, so it names no session and no profile. W1-28 (DEC-386):
+  # product-spec is launched, sandboxed, with an empty network allowlist.
   orchestrator:
     role_file: template/governance/kernel/roles/orchestrator.md
     agent: .claude/agents/orchestrator.md
   product-spec:
     role_file: template/governance/kernel/roles/product-spec.md
     agent: .claude/agents/product-spec.md
+    session: gov launch product-spec <ticket>
+    network_profile: empty
   independent-test-designer:
     role_file: template/governance/kernel/roles/independent-test-designer.md
     agent: .claude/agents/independent-test-designer.md

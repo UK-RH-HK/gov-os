@@ -114,7 +114,8 @@ Retrieval is a **skill with deterministic helpers**, not an engine (architecture
 - parent-child retrieval: chunk records carry `parent_id` (section for documents, function/module for code), and a child hit expands to its parent within the bundle budget, named in the bundle (DEC-091);
 - one rerank over the merged candidate set;
 - a cited evidence bundle: citations by id and sha256, and one stopping reason from `CLOSURE_COMPLETE`, `SATURATED`,
-  `DEPTH_LIMIT_REACHED`, `BUDGET_EXHAUSTED_WITH_GAPS`, `FACET_UNAVAILABLE`;
+  `DEPTH_LIMIT_REACHED`, `BUDGET_EXHAUSTED_WITH_GAPS`, `FACET_UNAVAILABLE`, `UNRESOLVED_IDS` (the sixth value, added
+  by DEC-396: everything within depth was reached and some referenced ids name nothing);
 - the citation validator;
 - zero-result canaries per index;
 - hierarchical synthesis notes (derived, cited, hash-checked) when evidence exceeds the packet budget.

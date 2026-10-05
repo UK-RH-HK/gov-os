@@ -17,7 +17,7 @@ CHILD_EXIT_CODE = True   # the session's exit code is the command's
 def add_arguments(parser) -> None:
     parser.usage = "gov launch <role> <ticket> [-- <CLI arguments>]"
     parser.add_argument("worker_role", metavar="<role>", help="engineer, independent-test-designer, "
-                        "independent-auditor or research")
+                        "independent-auditor, research or product-spec")
     parser.add_argument("ticket", metavar="<ticket>", help="an in_progress ticket")
 
 

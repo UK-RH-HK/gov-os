@@ -1,9 +1,9 @@
 """Builder tests for the command-module convention of ``gov.cli.main`` (DEC-317).
 
-Regression evidence only (DEC-136). A stand-in ``pause`` module is written
-to a temporary package directory; ``src/gov/pause/`` is not created. The
-stand-in was ``checkpoint`` until W1-25 built that command; it has to be a
-reserved command that is not built yet.
+Regression evidence only (DEC-136). A stand-in ``adopt`` module is written
+to a temporary package directory; ``src/gov/adopt/`` is not created. The
+stand-in was ``checkpoint`` until W1-25 built that command and ``pause`` until
+W1-28 did; it has to be a reserved command that is not built yet.
 """
 from __future__ import annotations
 
@@ -19,9 +19,9 @@ sys.path.insert(0, str(REPO / "src"))
 import gov  # noqa: E402
 from gov.cli import main as cli  # noqa: E402
 
-PAUSE = '''
+ADOPT = '''
 from gov.cli.errors import GovError
-ACT_PATHS = (".gov-runtime/pauses/**",)
+ACT_PATHS = (".gov-runtime/adopts/**",)
 EXIT_CODES = {3: "verification failed"}
 
 def add_arguments(parser):
@@ -30,9 +30,9 @@ def add_arguments(parser):
 
 def run(root, args, config):
     if args.resume == "error":
-        raise GovError("PAUSE_UNVERIFIED", "not verified", {"id": args.resume}, exit_code=3)
+        raise GovError("ADOPT_UNVERIFIED", "not verified", {"id": args.resume}, exit_code=3)
     if args.resume == "undeclared":
-        raise GovError("PAUSE_OTHER", "other", exit_code=4)
+        raise GovError("ADOPT_OTHER", "other", exit_code=4)
     if args.resume == "bare-int":
         return 3
     if args.watch:
@@ -50,14 +50,14 @@ def package(tmp_path, monkeypatch):
     monkeypatch.setattr(cli, "PACKAGE", tmp_path)
     monkeypatch.setattr(gov, "__path__", [*gov.__path__, str(tmp_path)])
     yield tmp_path
-    for name in [name for name in sys.modules if name.startswith("gov.pause")]:
+    for name in [name for name in sys.modules if name.startswith("gov.adopt")]:
         del sys.modules[name]
 
 
-def _pause(package, text):
-    (package / "pause").mkdir()
-    (package / "pause" / "__init__.py").write_text("", encoding="utf-8")
-    (package / "pause" / "command.py").write_text(text, encoding="utf-8")
+def _adopt(package, text):
+    (package / "adopt").mkdir()
+    (package / "adopt" / "__init__.py").write_text("", encoding="utf-8")
+    (package / "adopt" / "command.py").write_text(text, encoding="utf-8")
 
 
 def _run(capsys, root, *args):
@@ -66,35 +66,35 @@ def _run(capsys, root, *args):
 
 
 def test_a_module_alone_builds_a_reserved_command_with_its_arguments_and_exit_code(package, tmp_path, capsys):
-    _pause(package, PAUSE)
-    assert _run(capsys, tmp_path, "pause", "--resume", "c1") == (
-        0, {"ok": True, "command": "pause", "result": {"resume": "c1"}, "session": ""})
-    code, envelope = _run(capsys, tmp_path, "pause", "--watch")
+    _adopt(package, ADOPT)
+    assert _run(capsys, tmp_path, "adopt", "--resume", "c1") == (
+        0, {"ok": True, "command": "adopt", "result": {"resume": "c1"}, "session": ""})
+    code, envelope = _run(capsys, tmp_path, "adopt", "--watch")
     assert code == 3 and envelope["ok"] is True and envelope["result"] == {"watch": True}
-    code, envelope = _run(capsys, tmp_path, "pause", "--resume", "error")
-    assert code == 3 and envelope["error"]["code"] == "PAUSE_UNVERIFIED"
-    loaded = cli._load(cli._known()["pause"], True)
-    assert loaded.act_paths == (".gov-runtime/pauses/**",) and loaded.exit_codes == (3,) and loaded.cls == "act"
+    code, envelope = _run(capsys, tmp_path, "adopt", "--resume", "error")
+    assert code == 3 and envelope["error"]["code"] == "ADOPT_UNVERIFIED"
+    loaded = cli._load(cli._known()["adopt"], True)
+    assert loaded.act_paths == (".gov-runtime/adopts/**",) and loaded.exit_codes == (3,) and loaded.cls == "act"
 
 
 def test_an_exit_code_the_module_does_not_declare_ends_as_1(package, tmp_path, capsys):
-    _pause(package, PAUSE)
-    code, envelope = _run(capsys, tmp_path, "pause", "--resume", "undeclared")
-    assert code == 1 and envelope["error"]["code"] == "PAUSE_OTHER"
-    code, envelope = _run(capsys, tmp_path, "pause", "--resume", "bare-int")
+    _adopt(package, ADOPT)
+    code, envelope = _run(capsys, tmp_path, "adopt", "--resume", "undeclared")
+    assert code == 1 and envelope["error"]["code"] == "ADOPT_OTHER"
+    code, envelope = _run(capsys, tmp_path, "adopt", "--resume", "bare-int")
     assert code == 1 and envelope["error"]["code"] == cli.MODULE_INVALID
 
 
 def test_an_argument_the_module_does_not_declare_is_a_usage_error(package, tmp_path, capsys):
-    _pause(package, PAUSE)
-    for args in (["pause", "--no-such-option"], ["pause", "--", "x"]):
+    _adopt(package, ADOPT)
+    for args in (["adopt", "--no-such-option"], ["adopt", "--", "x"]):
         with pytest.raises(SystemExit) as stop:
             cli.main(args)
         assert stop.value.code == 2
 
 
 def test_without_a_module_the_command_stays_reserved(package, tmp_path, capsys):
-    code, envelope = _run(capsys, tmp_path, "pause", "--watch")
+    code, envelope = _run(capsys, tmp_path, "adopt", "--watch")
     assert code == 1 and envelope["error"]["code"] == "NOT_IMPLEMENTED"
 
 
@@ -111,8 +111,8 @@ def test_without_a_module_the_command_stays_reserved(package, tmp_path, capsys):
 ), ids=("raises", "exits", "import-error", "no-run", "declares-1", "declares-2", "codes-not-a-dict",
         "act-paths-not-a-tuple", "argument-conflict"))
 def test_a_faulty_module_fails_its_own_command_and_no_other(package, tmp_path, capsys, text):
-    _pause(package, text)
-    code, envelope = _run(capsys, tmp_path, "pause", "--watch")
+    _adopt(package, text)
+    code, envelope = _run(capsys, tmp_path, "adopt", "--watch")
     assert code == 1 and envelope["ok"] is False and envelope["error"]["code"] == cli.MODULE_INVALID
     code, envelope = _run(capsys, tmp_path, "status")
     assert code == 0 and envelope["ok"] is True
@@ -120,16 +120,16 @@ def test_a_faulty_module_fails_its_own_command_and_no_other(package, tmp_path, c
     assert code == 1 and envelope["error"]["code"] == "NOT_IMPLEMENTED"
     with pytest.raises(SystemExit) as stop:
         cli.main(["--help"])
-    assert stop.value.code == 0 and "pause" in capsys.readouterr().out
+    assert stop.value.code == 0 and "adopt" in capsys.readouterr().out
 
 
 def test_a_faulty_module_does_not_let_gov_launch_skip_a_refusal(package, tmp_path, capsys):
-    _pause(package, "import sys\nsys.exit(0)\n")
+    _adopt(package, "import sys\nsys.exit(0)\n")
     code = cli.main(["launch", "engineer", "DAEO-none", "--json", "--root", str(tmp_path), "--",
                      "--dangerously-skip-permissions"])
     envelope = json.loads(capsys.readouterr().out)
     assert code == 1 and envelope["error"]["code"] == "LAUNCH_REFUSED"
-    assert "gov.pause.command" not in sys.modules, "a command that was not named had its module imported"
+    assert "gov.adopt.command" not in sys.modules, "a command that was not named had its module imported"
 
 
 def test_a_read_command_may_not_declare_act_paths(package, tmp_path, capsys):
