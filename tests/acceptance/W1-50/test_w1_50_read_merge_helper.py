@@ -13,11 +13,17 @@ Its public name, fixed for this batch::
     from gov.guard.containment_merge import read_merge
     reading = read_merge(root, commit)   # root: the repository's path (str); commit: a merge commit's id
     reading.own       # sorted list of repository-relative paths the merge commit changed itself
-    reading.brought   # sorted list of paths another parent brought
+    reading.brought   # sorted list of paths a parent brought
 
 ``own`` and ``brought`` are disjoint (both ends of a rename appear as two
 paths; a deleted path is a path). The helper takes no caller, no role and no
 ticket.
+
+Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22).
+``brought`` is the complement of ``own`` over every parent: each path where the
+merge commit differs from some parent and that is not its own. The cases below
+compare it exactly; the cases written for the decision are in
+``test_w1_50_read_merge_brought.py``.
 
 Revised after implementation; reason: delegated decision, DEC-403 (DP-20). The
 helper reads every parent the way it reads the first, so ``own`` and
@@ -125,8 +131,9 @@ HISTORIES = {
 @pytest.mark.parametrize("case", sorted(HISTORIES), ids=sorted(HISTORIES))
 def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought(
         project, sandbox, read_merge, case):
-    """DEC-398, DEC-394. ``own`` and ``brought`` are the sorted lists the history's builder names; together
-    they are the paths the merge commit changes against its first parent. Reading changes nothing."""
+    """DEC-398, DEC-394, DEC-403, DEC-410 (DP-22). ``own`` is the sorted list the history's builder names;
+    ``brought`` is every other path where the merge commit differs from some parent. Reading changes
+    nothing."""
     shape = HISTORIES[case](project, sandbox)
     before = check_support.git(project, "rev-parse", "HEAD").strip()
     support.run(project, sandbox, shape.command)
@@ -141,8 +148,13 @@ def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_anothe
     # Revised after implementation; reason: delegated decision, DEC-403 (DP-20). `own` is read against every
     # parent. Of these histories only the merge of an unrelated history gives another `own`: with no merge base
     # every path that differs from any parent is the merge commit's own, and every path main holds differs from
-    # the other parent. `brought` holds at least the paths another parent brought against the first parent;
-    # what else it holds DEC-403 does not say (README, package DP-22).
+    # the other parent.
+    #
+    # Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then `brought` was
+    # compared only loosely: sorted, holding at least the paths the builder names, and no path of `own` or
+    # outside the differing paths. DEC-410: `brought` is the complement of `own` over every parent, each path
+    # where the merge commit differs from some parent and that is not its own. It is compared exactly. In the
+    # criss-cross merge and the merge of an unrelated history that complement is empty.
     own = sorted(shape.own)
     if case == "a-merge-of-an-unrelated-history":
         own = sorted(check_support.git(project, "ls-tree", "-r", "--name-only", merge_commit).split())
@@ -153,11 +165,14 @@ def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_anothe
     assert reading.own == own, (
         f"{what}: `own` is {reading.own!r}, not {own!r}"
     )
-    assert reading.brought == sorted(reading.brought) and set(shape.brought) <= set(reading.brought), (
-        f"{what}: `brought` is {reading.brought!r}; it is not sorted, or lacks one of {sorted(shape.brought)!r}"
+    brought = sorted(differs - set(own))
+    assert set(shape.brought) <= set(brought), (
+        f"the fixture is wrong: the builder names {sorted(shape.brought)!r} as brought; the merge commit differs "
+        f"from its parents in {sorted(differs)!r}"
     )
-    assert set(reading.brought) <= differs - set(own), (
-        f"{what}: `brought` is {reading.brought!r}; it holds a path of `own`, or one that differs from no parent"
+    assert reading.brought == brought, (
+        f"{what}: `brought` is {reading.brought!r}, not {brought!r}: every path where the merge commit differs "
+        f"from some parent and that is not its own (DEC-410, DP-22)"
     )
     check_support.assert_left_as_the_call_left_it(project, left, what)
     assert check_support.finding_lines(project) == findings, f"{what}: reading a merge added a finding"

@@ -267,7 +267,11 @@ def test_an_ordinary_octopus_merge_of_eight_branches_with_commits_inside_their_o
 
 
 def test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_branches(project, sandbox, helper):
-    """For the same merge commit ``read_merge`` returns a reading, and its ``own`` is empty."""
+    """For the same merge commit ``read_merge`` returns a reading; its ``own`` is empty, and its ``brought``
+    is every path where the merge commit differs from one of its nine parents.
+
+    Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then ``brought`` was
+    not compared."""
     shape = symmetric.octopus_of_eight_branches(project, sandbox)
     before = check_support.git(project, "rev-parse", "HEAD").strip()
     built = _built(project, sandbox, shape.command)
@@ -275,6 +279,12 @@ def test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_br
     merge_commit = check_support.git(project, "rev-parse", "HEAD").strip()
     reading = _checked(helper().read_merge(str(project), merge_commit), shape.what)
     assert reading.own == [], f"read_merge on {shape.what}: `own` is {reading.own!r}, not empty"
+    brought = symmetric.differing_from_any_parent(project)
+    assert len(brought) >= 8, f"the fixture is wrong: the merge commit differs from its parents in {brought}"
+    assert reading.brought == brought, (
+        f"read_merge on {shape.what}: `brought` is {reading.brought!r}, not {brought!r}: every path where the "
+        f"merge commit differs from some parent and that is not its own (DEC-410, DP-22)"
+    )
     _assert_left(project, built, shape.what)
 
 
@@ -350,12 +360,21 @@ def test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_no
 def test_read_merge_still_reads_the_merge_commit_s_own_full_id_beside_a_tag_and_a_hex_named_branch(project, sandbox,
                                                                                                  helper):
     """The other side. In the repository that holds the annotated tag and the hex-named branch, the merge
-    commit's own full id is read: ``own`` is empty, and ``brought`` holds the two paths the merged branch
-    brought."""
+    commit's own full id is read: ``own`` is empty, and ``brought`` is the two paths the merged branch
+    brought and the path ``main`` changed since the fork, which the first parent brought.
+
+    Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then ``brought`` only
+    had to hold the merged branch's two paths."""
     merge_commit, _, built = _a_merge_with_a_tag_and_a_hex_named_branch(project, sandbox)
     what = "the merge commit's own full id, beside an annotated tag and a hex-named branch that point at it"
     reading = _checked(helper().read_merge(str(project), merge_commit), what)
     assert reading.own == [], f"read_merge on {what}: `own` is {reading.own!r}, not empty"
-    missing = sorted({support.NEW_TEST, support.SOURCE} - set(reading.brought))
-    assert not missing, f"read_merge on {what}: `brought` lacks {missing}: {reading.brought!r}"
+    brought = symmetric.differing_from_any_parent(project, merge_commit)
+    assert {support.NEW_TEST, support.SOURCE} < set(brought), (
+        f"the fixture is wrong: the merge commit differs from its parents in {brought}"
+    )
+    assert reading.brought == brought, (
+        f"read_merge on {what}: `brought` is {reading.brought!r}, not {brought!r}: every path where the merge "
+        f"commit differs from some parent and that is not its own (DEC-410, DP-22)"
+    )
     _assert_left(project, built, what)

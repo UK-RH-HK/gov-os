@@ -27,11 +27,17 @@ holds under a name without a leading underscore, and that class is neither
 choose. "Documented" is read as: that name stands in the docstring of
 ``read_merge`` or of the module, or the class has a docstring of its own.
 
-**What is not pinned.** What ``brought`` holds beyond the paths that differ from
-the first parent (package DP-22); whether a branch name or an abbreviated id is
-accepted for ``commit``; what the helper does for a commit that is no merge;
-and, for an octopus whose other parents cross only each other, a path that only
-one of the crossing parents changed after the crossing.
+**Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22).**
+``brought`` is the complement of ``own`` over every parent: each path where the
+merge commit differs from some parent and that is not its own. Four cases here
+that compared ``brought`` only in part compare it exactly now; each says so.
+
+**What is not pinned.** Whether a branch name or an abbreviated id is accepted
+for ``commit``; what the helper does for a commit that is no merge; and, for an
+octopus whose other parents cross only each other, whether a path that only
+one of the crossing parents changed after the crossing is in ``own`` or in
+``brought`` (DEC-410, DP-25: read as built, "that pair brings nothing against
+each other"; this batch's brief leaves the DP-25 cases as they stand).
 
 As in ``test_w1_50_read_merge_helper.py``, the helper is imported when a test
 first needs it, after its history is built and guarded, in a process that says
@@ -113,6 +119,15 @@ def _assert_own(reading, own, what):
     assert reading.own == sorted(own), f"read_merge on {what}: `own` is {reading.own!r}, not {sorted(own)!r}"
 
 
+def _assert_brought(reading, brought, what):
+    """DEC-410, DP-22: ``brought`` is each path where the merge commit differs from some parent and that is not
+    its own."""
+    assert reading.brought == sorted(brought), (
+        f"read_merge on {what}: `brought` is {reading.brought!r}, not {sorted(brought)!r}: every path where the "
+        f"merge commit differs from some parent and that is not its own (DEC-410, DP-22)"
+    )
+
+
 # --------------------------------------------------------------------------
 # DP-20: a dropped change is the merge commit's own
 # --------------------------------------------------------------------------
@@ -136,9 +151,13 @@ def test_read_merge_puts_the_paths_a_turned_round_merge_commit_drops_in_own(proj
 def test_read_merge_puts_what_an_ours_merge_drops_in_its_own_and_not_in_the_ordinary_merge_s_after_it(
         project, sandbox, helper):
     """Shape N. The ``-s ours`` merge commit on the branch: ``own`` is the two paths ``main`` changed and the
-    branch dropped; ``brought`` holds neither. The ordinary merge of the branch after it: ``own`` is empty, and
-    ``brought`` holds the dropped paths and the branch's source file, each the second parent's content and
-    other than the merge base's."""
+    branch dropped; ``brought`` is the branch's source file, which its first parent brought against ``main``.
+    The ordinary merge of the branch after it: ``own`` is empty, and ``brought`` is the dropped paths and the
+    branch's source file, each the second parent's content and other than the merge base's.
+
+    Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then ``brought`` was
+    compared in part: of the first merge that it holds no dropped path, of the second that it lacks none of
+    the three. Both are compared exactly."""
     shape = symmetric.branch_that_took_main_with_ours(project, sandbox, TESTS, AS_ORCHESTRATOR,
                                                       take_in_the_call=True)
     built = _built(project, sandbox, shape)
@@ -151,14 +170,16 @@ def test_read_merge_puts_what_an_ours_merge_drops_in_its_own_and_not_in_the_ordi
     what = f"the `-s ours` merge commit of {shape.what}"
     dropping = _read(project, helper, "HEAD^2", what)
     _assert_own(dropping, TESTS.paths, what)
-    kept = sorted(set(dropping.brought) & set(TESTS.paths))
-    assert not kept, f"read_merge on {what}: `brought` holds the dropped {kept}"
+    assert symmetric.differing_from_any_parent(project, "HEAD^2") == sorted([*TESTS.paths, support.SOURCE]), (
+        f"the fixture is wrong: the `-s ours` merge commit differs from its parents in "
+        f"{symmetric.differing_from_any_parent(project, 'HEAD^2')}"
+    )
+    _assert_brought(dropping, [support.SOURCE], what)
 
     what = f"the final merge commit of {shape.what}"
     final = _read(project, helper, "HEAD", what)
     _assert_own(final, (), what)
-    missing = sorted({*TESTS.paths, support.SOURCE} - set(final.brought))
-    assert not missing, f"read_merge on {what}: `brought` lacks {missing}: {final.brought!r}"
+    _assert_brought(final, [*TESTS.paths, support.SOURCE], what)
     _assert_left(project, built, shape.what)
 
 
@@ -172,20 +193,22 @@ EACH_SIDE = {
 @pytest.mark.parametrize("case", sorted(EACH_SIDE), ids=sorted(EACH_SIDE))
 def test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change(project, sandbox, helper, case):
     """The branch changed a source file and ``main`` an acceptance test; the merge commit holds both. It
-    differs from each parent in one path, and the other parent brought it: ``own`` is empty. The path the
-    other parent brought against the first parent is in ``brought``."""
+    differs from each parent in one path, and the other parent brought it: ``own`` is empty, and ``brought``
+    is both paths, whichever parent comes first.
+
+    Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then only the path the
+    other parent brought against the first parent was required in ``brought``."""
     sides, turned_round = EACH_SIDE[case]
     shape = symmetric.each_side_changed_its_own_path(project, sandbox, sides, turned_round)
     built = _built(project, sandbox, shape)
     symmetric.assert_taking(project, shape)
     reading = _read(project, helper, "HEAD", shape.what)
     _assert_own(reading, (), shape.what)
-    against_the_first = symmetric.differing(project, "HEAD", "HEAD^1")
-    assert len(against_the_first) == 1 and against_the_first[0] in reading.brought, (
-        f"read_merge on {shape.what}: `brought` lacks {against_the_first}: {reading.brought!r}"
+    assert len(shape.differs) == 2 and all(
+        len(symmetric.differing(project, "HEAD", parent)) == 1 for parent in ("HEAD^1", "HEAD^2")), (
+        "the fixture is wrong: the merge commit does not differ from each parent in one path"
     )
-    extra = sorted(set(reading.brought) - set(shape.differs))
-    assert not extra, f"read_merge on {shape.what}: `brought` holds {extra}, where no parent differs"
+    _assert_brought(reading, shape.differs, shape.what)
     _assert_left(project, built, shape.what)
 
 
@@ -305,7 +328,11 @@ def test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_p
     Pinned, as it holds as built and under DP-20 alike: the test designer's new test and the engineer's source
     file, which both branches hold and which differ from the first parent only, are in ``brought``; the file
     ``main`` changed, which the first parent brought, is not in ``own``. Not pinned: the source file one
-    branch changed after the crossing, which may be in ``own`` or in ``brought``.
+    branch changed after the crossing, which may be in ``own`` or in ``brought`` (DEC-410, DP-25: as built).
+
+    Rewritten after implementation; reason: delegated decision, DEC-410 (DP-22). Until then ``brought`` only
+    had to hold the new test and the source file. Now it is exactly the paths where the merge commit differs
+    from a parent that are not in ``own``: the file ``main`` changed is in it too.
     """
     shape = symmetric.octopus_whose_other_parents_cross_each_other(project, sandbox)
     built = _built(project, sandbox, shape)
@@ -323,6 +350,7 @@ def test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_p
     assert not missing, f"read_merge on {shape.what}: `brought` lacks {missing}: {reading.brought!r}"
     unexpected = sorted(set(reading.own) - {support.SECOND_SOURCE})
     assert not unexpected, f"read_merge on {shape.what}: `own` holds {unexpected}"
+    _assert_brought(reading, set(symmetric.differing_from_any_parent(project)) - set(reading.own), shape.what)
     _assert_left(project, built, shape.what)
 
 

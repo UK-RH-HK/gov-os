@@ -8,6 +8,13 @@ under `tests/acceptance/**` is therefore a finding, and elsewhere it is not."
 Every merge here is made in an orchestrator session's own call (DEC-266), and
 every commit the merge brings stays inside the paths of its own trailers. What
 differs is the content the merge commit holds that none of its parents holds.
+
+Since DEC-410 two more rules stand beside DEC-269. A merge commit's own change
+under ``tests/acceptance/**`` or ``.tickets/**`` is a finding whatever its
+trailers (DP-27, DP-21): ``test_w1_50_merge_commit_own_change_of_an_acceptance_test.py``
+and ``test_w1_50_merge_commit_own_change_of_a_ticket_file.py``. And an
+acceptance test both sides changed is the merge commit's own change whichever
+side's content it holds (DP-24): the last case here was rewritten for it.
 """
 
 from __future__ import annotations
@@ -120,9 +127,16 @@ def test_an_orchestrator_s_conflict_resolution_outside_acceptance_tests_is_silen
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
-def test_a_conflict_resolved_to_the_merged_side_s_content_is_not_the_merge_commit_s_own_change(project, sandbox,
-                                                                                             call):
-    """ "Beyond what its parents hold": the merge commit holds the test designer's content from the merged side."""
+def test_a_conflict_in_an_acceptance_test_resolved_to_the_merged_side_s_content_is_flagged(project, sandbox, call):
+    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-24). Until then this case was
+    ``test_a_conflict_resolved_to_the_merged_side_s_content_is_not_the_merge_commit_s_own_change`` and pinned
+    silence: the merge commit holds the test designer's content from the merged side ("beyond what its
+    parents hold", DEC-269).
+
+    DEC-410, DP-24: under ``tests/acceptance/**`` a path more than one parent changed against the merge base
+    is the merge commit's own change whichever side's content it holds. The same history: a test designer's
+    commit on each side changed the test, and the merge commit takes the merged side's whole. The test is
+    named."""
     path = support.ACCEPTANCE_FILE
     _conflict(project, sandbox, path, AS_DESIGNER)
     command = support.merge_resolving(path, "theirs")
@@ -132,6 +146,7 @@ def test_a_conflict_resolved_to_the_merged_side_s_content_is_not_the_merge_commi
     assert merged == check_support.git(project, "show", f"HEAD^2:{path}"), (
         "the fixture is wrong: the merge commit does not hold the merged side's content"
     )
-    what = f"`{command}` by the orchestrator on {TICKET}"
-    check_support.assert_silent(result, what)
+    what = (f"`{command}` by the orchestrator on {TICKET}; a test designer's commit on each side changed {path} "
+            f"and the merge commit holds the merged side's content of it")
+    check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
     check_support.assert_left_as_the_call_left_it(project, left, what)

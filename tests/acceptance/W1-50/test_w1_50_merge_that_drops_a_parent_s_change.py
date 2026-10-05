@@ -32,9 +32,9 @@ and read against its first parent alone none of the named paths is its own.
   paths and a commit that closes another ticket. The dropping merge commit
   carries an engineer's trailers: a change under ``.tickets/**`` in a commit
   with a worker's ``Role`` trailer is a finding (DEC-390, DP-16). A dropping
-  merge commit with the orchestrator's trailers, or none, that undoes only
-  ticket files is not tested: by DEC-156 and DEC-359 the orchestrator may
-  write a ticket file (README, package DP-21).
+  merge commit with the orchestrator's trailers, or none, that undoes ticket
+  files is a finding since DEC-410 (DP-21):
+  ``test_w1_50_merge_commit_own_change_of_a_ticket_file.py``.
 
 **Which merge commit the finding is for, in shape N.** A ticket branch takes
 ``main`` with ``git merge -s ours`` and is then merged into ``main`` with an

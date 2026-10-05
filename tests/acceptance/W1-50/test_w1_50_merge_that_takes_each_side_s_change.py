@@ -34,10 +34,19 @@ by the words of DEC-403; none gives another answer):
 - a re-merge: ``test_a_second_merge_of_the_same_branch_is_silent``;
 - an octopus merge:
   ``test_an_octopus_merge_of_two_branches_with_commits_inside_their_own_paths_is_silent``;
-- a merge resolved to the merged side's content:
-  ``test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_silent``
-  and
-  ``test_a_conflict_resolved_to_the_merged_side_s_content_is_not_the_merge_commit_s_own_change``.
+- an ordinary merge that brings an orchestrator's ticket-file changes from one
+  side:
+  ``test_an_ordinary_merge_that_brings_an_orchestrator_s_ticket_file_changes_from_one_side_is_silent``
+  (3 cases).
+
+**No longer silent, since DEC-410 (DP-24).** Under ``tests/acceptance/**`` a
+path more than one parent changed against the merge base is the merge commit's
+own change whichever side's content it holds. Three cases that pinned silence
+for such a path were rewritten: the last case of this file (both sides made
+the same change),
+``test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_flagged_for_the_test_only``
+and
+``test_a_conflict_in_an_acceptance_test_resolved_to_the_merged_side_s_content_is_flagged``.
 """
 
 from __future__ import annotations
@@ -91,14 +100,28 @@ def test_a_merge_that_takes_each_parent_s_change_of_its_own_path_is_silent(proje
         )
 
 
-def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent(project, sandbox, call):
-    """A test designer made the same change of an acceptance test on the branch and on ``main``. The merge
-    commit holds that content, which is each parent's: the path differs from no parent, and it is not the
-    merge commit's change."""
+def test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_flagged(project, sandbox, call):
+    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-24). Until then this case was
+    ``test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent`` and pinned silence: the merge
+    commit holds content that is each parent's, the path differs from no parent, and by DEC-403 it is not the
+    merge commit's change (the guard ``assert_taking`` still checks the history by those words).
+
+    DEC-410, DP-24, read by its words: under ``tests/acceptance/**`` a path more than one parent changed
+    against the merge base is the merge commit's own change. Both parents changed the test against the merge
+    base, in the same way. The same history: the test is named; the engineer's source file the branch
+    brings is not."""
     shape = symmetric.both_sides_made_the_same_change(project, sandbox)
-    _assert_silent(project, call, shape)
+    result, left = call(project, shape.command, ORCHESTRATOR, TICKET)
+    symmetric.assert_taking(project, shape)
     path = support.ACCEPTANCE_FILE
-    assert (support.content_at(project, "HEAD", path) == support.content_at(project, "HEAD^1", path)
-            == support.content_at(project, "HEAD^2", path)), (
-        f"the fixture is wrong: the merge commit does not hold both parents' content of {path}"
+    base = support.merge_bases(project, "HEAD^1", "HEAD^2")
+    assert len(base) == 1 and (support.content_at(project, "HEAD", path) == support.content_at(
+        project, "HEAD^1", path) == support.content_at(project, "HEAD^2", path) != support.content_at(
+        project, base[0], path)), (
+        f"the fixture is wrong: the merge commit does not hold both parents' content of {path}, or it is the "
+        f"merge base's"
     )
+    what = f"{shape.what}, in the orchestrator's own call on {TICKET}"
+    check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+    check_support.assert_not_recorded(result, support.SOURCE, what=what)
+    check_support.assert_left_as_the_call_left_it(project, left, what)

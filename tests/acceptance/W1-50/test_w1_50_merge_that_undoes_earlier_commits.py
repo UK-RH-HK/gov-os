@@ -23,7 +23,10 @@ moves the branch forward to it (``git merge --ff-only <the new commit>``):
 What the merge commit changes against its first parent is exactly the paths of
 the undone commits. They are judged as any commit's paths are: by the merge
 commit's own ``Role`` and ``Task`` trailers, or against the caller (the
-orchestrator) when it has none.
+orchestrator) when it has none. Since DEC-410 (DP-27, DP-21) a path under
+``tests/acceptance/**`` or ``.tickets/**`` among them is a finding whatever
+those trailers: the two cases with a test designer's trailers were rewritten
+for it.
 
 The same merge commit with a hand edit that neither parent holds is
 ``test_w1_50_merge_with_an_earlier_parent.py``.
@@ -124,22 +127,32 @@ def test_a_merge_commit_that_undoes_test_designer_commits_through_an_earlier_par
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
-def test_the_same_merge_commit_with_a_test_designer_s_trailers_is_judged_by_those_trailers(project, sandbox, call):
-    """DEC-390, DP-15: "judged by the merge commit's own trailers". The trailers are a test designer's on a
-    ticket in progress, and every path the merge commit changes is under ``tests/acceptance/**``: no finding,
-    as for any test designer's commit in an orchestrator session's own call (DEC-319)."""
+def test_the_same_merge_commit_with_a_test_designer_s_trailers_is_flagged_all_the_same(project, sandbox, call):
+    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-27). Until then this case was
+    ``test_the_same_merge_commit_with_a_test_designer_s_trailers_is_judged_by_those_trailers`` and pinned
+    silence: the trailers are a test designer's on a ticket in progress and every path the merge commit
+    changes is under ``tests/acceptance/**``.
+
+    DEC-410, DP-27: a merge commit's own change under ``tests/acceptance/**`` is a finding whatever its
+    trailers, test-designer trailers included. The same history; both undone tests are named."""
     result, left, what = _undo_by_a_merge_commit(project, sandbox, call, DESIGNER_WORK, AS_DESIGNER)
-    check_support.assert_silent(result, what)
+    check_support.assert_caught(result, support.ACCEPTANCE_FILE, support.NEW_TEST, what=what,
+                                action=check_support.FLAGGED)
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
-def test_a_test_designer_s_merge_commit_that_also_undoes_a_source_file_is_flagged_for_that_file(project, sandbox,
-                                                                                               call):
-    """The test designer's trailers allow the acceptance tests and not the engineer's source file."""
+def test_a_test_designer_s_merge_commit_that_also_undoes_a_source_file_is_flagged_for_every_path_it_undoes(
+        project, sandbox, call):
+    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-27). Until then this case was
+    ``test_a_test_designer_s_merge_commit_that_also_undoes_a_source_file_is_flagged_for_that_file`` and pinned
+    that the two acceptance tests are not named.
+
+    The test designer's trailers do not allow the engineer's source file (DEC-390, DP-15), and the undone
+    acceptance tests are the merge commit's own change (DEC-410, DP-27): all three paths are named."""
     steps = (*DESIGNER_WORK, (support.SOURCE, AS_ENGINEER))
     result, left, what = _undo_by_a_merge_commit(project, sandbox, call, steps, AS_DESIGNER)
-    check_support.assert_caught(result, support.SOURCE, what=what, action=check_support.FLAGGED)
-    check_support.assert_not_recorded(result, support.ACCEPTANCE_FILE, support.NEW_TEST, what=what)
+    check_support.assert_caught(result, support.SOURCE, support.ACCEPTANCE_FILE, support.NEW_TEST, what=what,
+                                action=check_support.FLAGGED)
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 

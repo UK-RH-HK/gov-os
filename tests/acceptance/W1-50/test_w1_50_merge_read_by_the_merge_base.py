@@ -46,6 +46,12 @@ Cases other files already hold, unchanged:
   (2 cases);
 - a conflict resolved by hand to the merged side's content, or to content
   neither parent holds: ``test_w1_50_merge_commit_own_changes.py``.
+
+Since DEC-410 (DP-24) the three-way rule has one exception: under
+``tests/acceptance/**`` a path more than one parent changed against the merge
+base is the merge commit's own change whichever side's content it holds. The
+``-X theirs`` case below was rewritten for it; the cases of the rule are in
+``test_w1_50_acceptance_test_changed_on_both_sides.py``.
 """
 
 from __future__ import annotations
@@ -237,10 +243,19 @@ def test_an_octopus_merge_of_two_branches_with_commits_inside_their_own_paths_is
     _assert_silent(project, made)
 
 
-def test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_silent(project, sandbox, call):
-    """``-X theirs`` on an acceptance test (test designer's commits on both sides) and a source file
+def test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_flagged_for_the_test_only(
+        project, sandbox, call):
+    """Rewritten after implementation; reason: delegated decision, DEC-410 (DP-24). Until then this case was
+    ``test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_silent`` and pinned
+    silence for both paths.
+
+    ``-X theirs`` on an acceptance test (test designer's commits on both sides) and a source file
     (engineer's commits on both sides): the merge commit holds exactly the merged side's content of both, and
-    the merged side changed both against the merge base."""
+    the merged side changed both against the merge base. By the three-way rule both are brought (the guard
+    below checks the history by that rule, from git's own answers). DEC-410, DP-24: under
+    ``tests/acceptance/**`` a path more than one parent changed against the merge base is the merge commit's
+    own change. The acceptance test is named; the source file, outside ``tests/acceptance/**``, is read as
+    before and is not."""
     shape = support.merge_taking_theirs(project, sandbox)
     made = _make(project, call, shape)
     base = support.merge_bases(project, "HEAD^1", "HEAD^2")[0]
@@ -252,7 +267,10 @@ def test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_change
             held, support.content_at(project, "HEAD^1", path)), (
             f"the fixture is wrong: not both sides changed {path} against the merge base"
         )
-    _assert_silent(project, made)
+    result, left, what = made
+    check_support.assert_caught(result, support.ACCEPTANCE_FILE, what=what, action=check_support.FLAGGED)
+    check_support.assert_not_recorded(result, support.SOURCE, what=what)
+    check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
 # --------------------------------------------------------------------------

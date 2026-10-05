@@ -82,8 +82,8 @@ TESTS = Dropped(
 
 # The orchestrator narrows one ticket's allowed paths, then closes another ticket. The dropping merge commit
 # carries an engineer's trailers: a change under .tickets/** in a commit with a worker's Role trailer is a
-# finding (DEC-390, DP-16). With the orchestrator's trailers, or none, the orchestrator may write a ticket file
-# (DEC-156, DEC-359); that form is not pinned (README, package DP-21).
+# finding (DEC-390, DP-16). With the orchestrator's trailers, or none, the dropped ticket files are a finding
+# too since DEC-410 (DP-21): test_w1_50_merge_commit_own_change_of_a_ticket_file.py passes those trailers.
 TICKETS = Dropped(
     name="an-orchestrator-s-ticket-files",
     work=(f"sed -i 's|^- docs/audit/\\*\\*$|- docs/audit/reports/**|' {NARROWED_FILE} && "
