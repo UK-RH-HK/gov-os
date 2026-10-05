@@ -427,3 +427,119 @@ def commit_tree(tree, parents, trailers, subject="Merge"):
         message += f"\\nTask: {task}\\nRole: {role}\\n"
     parent_arguments = " ".join(f"-p {shlex.quote(parent)}" for parent in parents)
     return f"$(printf '{message}' | git commit-tree {parent_arguments} \"{tree}\")"
+
+
+# --------------------------------------------------------------------------
+# Sixth batch (DEC-390): ticket files in a commit, and `.git/info/grafts`
+# --------------------------------------------------------------------------
+
+EVERYTHING = '"**"'                # an ``allowed_paths`` entry that allows every path
+NEW_TICKET = "DAEO-zz99"           # no fixture has this ticket; a test creates its file
+NEW_TICKET_WBS = "W1-99"
+GRAFTS = ".git/info/grafts"
+
+
+def ticket_file(ticket):
+    return f".tickets/{ticket}.md"
+
+
+def widen_paths(ticket):
+    """Shell: add ``**`` to the ``allowed_paths`` of the ticket's file in the working tree. Nothing is committed."""
+    return f"sed -i 's/^allowed_paths:$/allowed_paths:\\n- {EVERYTHING}/' {ticket_file(ticket)}"
+
+
+def drop_path(ticket, entry):
+    """Shell: take the entry ``entry`` out of the ``allowed_paths`` of the ticket's file in the working tree."""
+    assert "/" not in entry and "*" not in entry, "the helper takes a plain file name"
+    return f"sed -i '/^- {entry}$/d' {ticket_file(ticket)}"
+
+
+def new_ticket_file(ticket=NEW_TICKET, wbs=NEW_TICKET_WBS, role=ENGINEER, status="in_progress",
+                    paths=(EVERYTHING,)):
+    """Shell: write a ticket file that no commit holds yet, by default in progress and allowing every path."""
+    text = check_support.ticket_text(ticket_id=ticket, wbs_id=wbs, status=status, role=role, allowed_paths=paths)
+    return f"printf %s {shlex.quote(text)} > {ticket_file(ticket)}"
+
+
+def change(path):
+    """Shell: change ``path`` in the working tree. Nothing is staged."""
+    directory = os.path.dirname(path) or "."
+    return f"mkdir -p {shlex.quote(directory)} && echo changed >> {shlex.quote(path)}"
+
+
+def commit_paths(paths, trailers, subject="work"):
+    """Shell: stage ``paths`` as the working tree holds them and commit them together, with ``trailers``."""
+    names = " ".join(shlex.quote(path) for path in paths)
+    command = f"git add -- {names} && git commit -q -m {shlex.quote(subject)}"
+    if trailers is not None:
+        role, task = trailers
+        command += f" --trailer {shlex.quote('Task: ' + task)} --trailer {shlex.quote('Role: ' + role)}"
+    return command
+
+
+def allowed_paths_at(project, ticket, revision="HEAD"):
+    """The ``allowed_paths`` entries of the ticket's file as committed at ``revision``."""
+    return _path_entries(check_support.git(project, "show", f"{revision}:{ticket_file(ticket)}"))
+
+
+def allowed_paths_in_tree(project, ticket):
+    """The ``allowed_paths`` entries of the ticket's file in the working tree."""
+    return _path_entries(check_support.read(project, ticket_file(ticket)))
+
+
+def _path_entries(text):
+    lines = text.split("allowed_paths:\n", 1)[1].splitlines()
+    entries = []
+    for line in lines:
+        if not line.startswith("- "):
+            break
+        entries.append(line[2:])
+    return entries
+
+
+def status_at(project, ticket, revision="HEAD"):
+    """The ``status`` lines of the ticket's file as committed at ``revision``."""
+    text = check_support.git(project, "show", f"{revision}:{ticket_file(ticket)}")
+    return [line for line in text.splitlines() if line.startswith("status:")]
+
+
+def status_in_tree(project, ticket):
+    """The ``status`` lines of the ticket's file in the working tree."""
+    text = check_support.read(project, ticket_file(ticket))
+    return [line for line in text.splitlines() if line.startswith("status:")]
+
+
+def is_tracked(project, path, revision="HEAD"):
+    """True when the tree of ``revision`` holds ``path``."""
+    return bool(check_support.git(project, "ls-tree", "-r", "--name-only", revision, "--", path).strip())
+
+
+def graft_newest_onto(parent):
+    """Shell: write ``.git/info/grafts`` so that git takes ``parent`` for the only parent of the newest commit.
+
+    ``parent`` is a commit id or a shell variable (``$old``).
+    """
+    return f"mkdir -p .git/info && echo \"$(git rev-parse HEAD) {parent}\" > {GRAFTS}"
+
+
+def ungrafted(project, *args):
+    """``git`` in the project reading the real objects: no grafts file and no replacement refs are applied."""
+    import subprocess
+    env = dict(os.environ, GIT_GRAFT_FILE=os.devnull)
+    proc = subprocess.run(["git", "-C", str(project), "--no-replace-objects", *args], env=env,
+                          capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, f"git {' '.join(args)} failed in the test project: {proc.stderr.strip()}"
+    return proc.stdout
+
+
+def new_commits(project, before, real=True):
+    """The ids of the commits in ``before..HEAD``, newest first: as the real objects give them, or as git reads
+    them with the project's grafts file applied."""
+    read = ungrafted if real else check_support.git
+    return read(project, "rev-list", f"{before}..HEAD").split()
+
+
+def grafts(project):
+    """The lines of the project's ``.git/info/grafts``; empty when there is no such file."""
+    path = Path(project) / GRAFTS
+    return path.read_text(encoding="utf-8").splitlines() if path.is_file() else []
