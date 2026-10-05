@@ -4,7 +4,9 @@ Regression evidence only (DEC-136). They cover what the acceptance tests leave
 to the builder: the checker reads ``HEAD`` and needs no store, a folder inside
 another repository is an error, the id grammar is the kernel's, and the points
 where the checker cannot tell are findings (two roles on one commit, two records
-with a cited id, a ticket whose frontmatter cannot be read).
+with a cited id, a ticket whose frontmatter cannot be read, a key written twice).
+Two cases pin what the walk by ancestry lets pass: an agent's move of a decision
+the owner approved, and a merge that keeps the owner's file over an agent's.
 """
 from __future__ import annotations
 
@@ -105,4 +107,31 @@ def test_a_ticket_whose_frontmatter_cannot_be_read_still_waits_on_a_dead_package
         ".tickets/PROJ-aaaa.md": "---\nid: PROJ-aaaa\nstatus: [closed\n---\n",
         "docs/packages/a.md": _record("DP-1", "decision-package", "STALE", cit="CIT-1", constrains=["PROJ-aaaa"]),
     })
-    assert _codes(project) == [("TICKET_WAITS_ON_DEAD_GATE", ["PROJ-aaaa", "DP-1"])]
+    assert _codes(project) == [("FRONTMATTER_UNREADABLE", []), ("TICKET_WAITS_ON_DEAD_GATE", ["PROJ-aaaa", "DP-1"])]
+
+
+def test_a_key_written_twice_cannot_be_read(project):
+    _commit(project, {"docs/adr/ADR-0002.md": "---\nid: ADR-0002\nstatus: ACTIVE\nstatus: PROPOSED\n---\n"})
+    assert _codes(project) == [("FRONTMATTER_UNREADABLE", [])]
+
+
+def test_an_agent_commit_that_only_moves_a_decision_the_owner_approved_sets_nothing(project):
+    _git(project, "mv", ADR, "docs/adr/moved.md")
+    _commit(project, {}, "engineer")
+    assert decisions.check(project) == []
+
+
+def test_a_merge_that_keeps_the_owner_s_file_over_an_agent_s_keeps_the_owner_s_approval(project):
+    path = "docs/adr/ADR-0002.md"
+    _git(project, "checkout", "-q", "-b", "agent")
+    _commit(project, {path: _record("ADR-0002", "decision", "ACTIVE", title="agent")}, "engineer")
+    _git(project, "checkout", "-q", "main")
+    _commit(project, {path: _record("ADR-0002", "decision", "ACTIVE", title="owner")}, "owner")
+    subprocess.run(["git", "-C", str(project), "merge", "-q", "--no-commit", "agent"], capture_output=True,
+                   env={**_ENV, "HOME": str(project)})
+    _git(project, "checkout", "--ours", "--", path)
+    _commit(project, {}, "engineer")
+    assert len(_git(project, "rev-list", "--parents", "-n", "1", "HEAD").split()) == 3
+    assert decisions.check(project) == []
+    _git(project, "checkout", "-q", "agent")
+    assert _codes(project) == [("ACTIVE_UNAPPROVED", ["ADR-0002"])]
