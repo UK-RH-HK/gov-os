@@ -10,6 +10,9 @@ list is ``NOT_BUILT`` in ``w1_07_support.py``.
 
 Planned revision (DEC-190, reason "planned: command implemented"): ``readiness``
 is built by W1-13 and leaves the same list.
+
+Planned revision (DEC-190, reason "planned: command implemented"): ``pause``
+is built by W1-28 and leaves the same list.
 """
 
 from __future__ import annotations
