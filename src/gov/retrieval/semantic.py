@@ -29,9 +29,10 @@ from gov.store import STORE_REL
 FACET = "semantic"
 MODEL = "qwen3-embedding:0.6b"
 EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-381)
-# A question is embedded with the model's retrieval instruction; a chunk is embedded as it stands.
+# A question is embedded with the model's retrieval instruction; a chunk is embedded without one.
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
-TOP_K = 20  # the nearest chunks the route returns: what it adds to the set that is reranked
+EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
+TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
 TIMEOUT_S = 120.0  # the first request loads the model
 NO_VECTORS = "sqlite_vec cannot be loaded: no vector can be stored or compared"
@@ -126,8 +127,8 @@ def _open(root: Path) -> sqlite3.Connection | None:
 
 
 def _build(root: Path) -> str | None:
-    """Bring the lexical index up to date, then embed the chunks that have no vector; why it cannot be done, or
-    None."""
+    """Bring the lexical index up to date, then embed the chunks that have no vector, each as its first
+    ``EMBED_CHARS`` characters; why it cannot be done, or None."""
     lexical.refresh(root)
     connection = sqlite3.connect(root / STORE_REL)
     try:
@@ -150,7 +151,8 @@ def _build(root: Path) -> str | None:
             missing = [chunk_id for chunk_id in wanted if chunk_id not in have]
             for start in range(0, len(missing), BATCH):
                 batch = missing[start:start + BATCH]
-                vectors = _embed([connection.execute(_TEXT, (chunk_id,)).fetchone()[0] for chunk_id in batch])
+                vectors = _embed([connection.execute(_TEXT, (chunk_id,)).fetchone()[0][:EMBED_CHARS]
+                                  for chunk_id in batch])
                 if vectors is None:
                     return NO_EMBEDDING
                 connection.executemany("INSERT INTO semantic_vector VALUES (?, ?)", zip(batch, vectors))
@@ -182,7 +184,7 @@ def refresh(root: Path) -> dict:
 
 
 def search(root: Path, query: str, refresh: bool = True) -> dict:
-    """The chunks nearest to ``query``, nearest first, as the chunk records of the lexical index.
+    """The ``TOP_K`` chunks nearest to ``query``, nearest first, as the chunk records of the lexical index.
 
     With ``refresh`` the vectors are brought up to date first. Without, nothing is written, and missing, empty or
     stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342).

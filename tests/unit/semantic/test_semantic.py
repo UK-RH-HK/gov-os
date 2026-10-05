@@ -82,6 +82,23 @@ def test_only_a_file_whose_every_namespace_says_embedded_is_sent_and_found(proje
     assert {key: answer["hits"][0][key] for key in record} == record
 
 
+def test_a_chunk_is_embedded_as_its_first_512_characters(project):
+    root, endpoint = project
+    _commit(root, {"open/long.md": "quince " * 200 + "\n"})
+    semantic.refresh(root)
+    assert semantic.EMBED_CHARS == 512
+    # the chunk is longer; no prefix is put before it
+    assert sorted(endpoint["sent"]) == ["pear trees\n", "plum trees\n", ("quince " * 200)[:512]]
+
+
+def test_the_30_nearest_chunks_are_returned(project):
+    root, _ = project
+    _commit(root, {f"open/many/{number:02}.md": f"tree {number}\n" for number in range(35)})
+    answer = semantic.search(root, "pear")
+    assert semantic.TOP_K == 30 and len(answer["hits"]) == 30
+    assert answer["hits"][0]["path"] == "open/pear.md"
+
+
 def test_a_refresh_embeds_only_what_has_no_vector_and_drops_what_is_no_longer_embedded(project):
     root, endpoint = project
     semantic.refresh(root)
