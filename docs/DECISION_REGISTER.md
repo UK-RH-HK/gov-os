@@ -4318,3 +4318,135 @@ DEC-400's drafts.
 | Version | Date | Change |
 |---|---|---|
 | 0.96 | 2026-10-05 | Owner: DEC-405 (product-spec role file and agent definition placed, `5d1d9cff`), DEC-406 (W1-19 DP-10: an exact-path read of S0b2's R1 prototype; dev-set tuning is not the fix), DEC-407 (W1-50 DP-F2: accepted for the merge; before the close, the flag is compared around every Bash call and owner-only actions refuse under a Claude Code parent process), DEC-408 (DEC-403 stands; three orchestrator choices confirmed). |
+
+## 97. Owner decision of 2026-10-05: lifting a freeze requires the owner in person (register v0.97, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05. It replaces the ancestry rule of DEC-407. The owner named DEC-367 and the W1-28
+DP-3 answer as amended; the W1-28 DP-3 answer is DEC-365 ("lifting a freeze works only with `GOV_ROLE` unset"), which
+this decision amends. DEC-367 (the record of a rollback or a cancel) says nothing about lifting and its text is not
+changed here; the orchestrator told the owner so.
+
+### DEC-409 — Lifting a freeze requires the owner in person: no Claude Code ancestor, an interactive terminal with a typed one-time code, and a guard rule on the lift form
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Amends:** DEC-365, DEC-407 (its ancestry rule is replaced), DEC-367 as the owner named it · **Under:** DEC-402, DEC-404, CAP-05.a
+- **Decision:**
+  1. `gov pause --off` refuses if any ancestor process is a Claude Code session, wherever that session was
+     started. The operator console cannot lift either; only a plain terminal can.
+  2. It requires an interactive terminal: stdin and stdout are TTYs, and it shows a one-time random code ("type
+     LIFT-<4 digits> to lift the freeze") that must be typed back. A wrong code, piped input, or no TTY refuses,
+     and nothing changes.
+  3. The guard refuses any agent Bash command whose text contains the lift form of `gov pause` (the `--off`
+     option), for every role, including a command that starts another Claude Code session with that text in its
+     prompt. Obfuscated forms are a residual.
+  4. The containment check, as DEC-407 decided: a removed or emptied freeze flag is a finding, and the flag is
+     restored with its marker line.
+  - Setting a freeze stays as decided: the owner (terminal or operator console) and the orchestrator may set it.
+  - Wherever else the code treats an unset `GOV_ROLE` as the owner, rule 1 applies to owner-only actions.
+  - All of this is built on the freeze branch before W1-50 closes, with acceptance tests for the refused cases (an
+    agent session, the operator console, piped input, a wrong code) and one manual check by the owner from a plain
+    terminal.
+  - The KPI lines are added to W1-50 in their own commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.97 | 2026-10-05 | Owner: DEC-409 (lifting a freeze requires the owner in person: no Claude Code ancestor process, an interactive terminal with a typed one-time code, a guard rule on the lift form; the flag comparison of DEC-407 stays; replaces DEC-407's ancestry rule, amends DEC-365). |
+
+## 98. Delegated decisions on W1-50's packages DP-21 to DP-28 (register v0.98, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the eight packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its sixth round. In that round the owner's two conditions of DEC-401 passed
+on the symmetric rule (criss-cross histories fail closed; a replay of 176 real merges flags none by mistake; a fuzz
+of 1,604 merges against an independent reading of DEC-403 gave no mismatch). Every choice below either keeps what is
+built or makes the check report more; none makes it report less. The findings of this check are records (DEC-254).
+The owner was told on 2026-10-05.
+
+### DEC-410 — W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a path both sides changed is the merge commit's own; 24 parents at most
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-21 (b), DP-22 (the complement), DP-23 (a), DP-24 (b), DP-25 (a), DP-26 (a), DP-27 (b), DP-28 (a); the fifth reviewer's findings F1 to F9 · **Amends:** DEC-403 (the octopus sentence; what `brought` holds) · **Under:** CAP-58, DEC-269, DEC-255, DEC-359, DEC-401
+- **Decision:**
+  - DP-21: a change to a file under `.tickets/**` that a merge commit itself makes (its own change, by the helper)
+    is a finding whatever the merge commit's trailers, also with orchestrator trailers or none.
+  - DP-27: the same for `tests/acceptance/**`: a merge commit's own change there is a finding whatever its
+    trailers, test-designer trailers included.
+  - DP-24: under `tests/acceptance/**`, a path that more than one parent changed against the merge base is the
+    merge commit's own, whichever side's content it holds. Taking one side whole is a resolution, and a resolution
+    of an acceptance test is a finding (DEC-269).
+  - DP-26: git's own clean combination of two sides' edits of one acceptance test stays flagged, as built. Branches
+    are brought to a state where no acceptance test is changed on both sides before they are merged.
+  - DP-25: an octopus whose other parents cross only each other is read as built in round six: that pair brings
+    nothing against each other. DEC-403's words "read parent by parent" are amended to this stricter reading.
+  - DP-23: with several merge bases or none, every path that differs from any parent is the merge commit's own,
+    also where it keeps what its first parent holds. DEC-403's words stand.
+  - DP-22: `brought` is the complement of `own` over every parent: each path where the merge commit differs from
+    some parent and that is not its own.
+  - DP-28: the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a
+    whole.
+  - The owner's conditions of DEC-401 are run again on the final head before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.98 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-410 (W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a test both sides changed is the merge commit's own; 24 parents at most; `brought` is the complement of `own`). |
+
+## 99. Owner answers and decisions of 2026-10-06 (register v0.99, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-06, after the W1-50 freeze branch's second round, W1-50's sixth round and W1-19's
+fourth round.
+
+### DEC-411 — DEC-409 amends DEC-365, not DEC-367
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** owner answer · **Under:** DEC-409
+- **Decision:** DEC-409 amends DEC-365 (the W1-28 DP-3 answer). DEC-367 stays unchanged.
+
+### DEC-412 — W1-50 DP-F6: the freeze branch is rebuilt; rewriting an unpushed ticket branch is allowed
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-50 freeze branch package DP-F6 option (a) · **Under:** DEC-410, DEC-235
+- **Decision:**
+  - The freeze branch is rebuilt: a test designer aligns `tests/acceptance/W1-07/w1_07_support.py` first, then
+    `w1/integrate` is merged and the four commits are cherry-picked.
+  - Rewriting an unpushed ticket branch is allowed. "Never rebase" protects shared history: `main` and
+    `w1/integrate`.
+  - The old branch is kept until the new one verifies, then deleted.
+  - It is done once, after W1-50's main branch merges, in the round that builds DEC-409.
+  - The freeze branch's choices no decision pinned are fine as built: the error codes `PAUSE_RUNTIME_LINKED`,
+    `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
+
+### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220
+- **Decision:**
+  - A FULL ticket has at most two review rounds.
+  - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
+    files in shapes that ordinary work produces. Everything else becomes a residual.
+  - A fail-open that remains after the second round comes to the owner as a decision package, not as a third
+    round.
+  - W1-50 keeps its seventh round, whose stop rule (the same two kinds) is confirmed. If that round still finds a
+    fail-open, no eighth round starts: it comes to the owner as a decision package, with the option of accepting
+    it as a residual.
+
+### DEC-414 — W1-19 DP-12, DP-11 and DP-13: the pass line is 80 on the dev tiers; the parent-bounded chunks stay; no ranked lexical route in W1-19; the retrieval instruction stays
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-19 packages DP-12 option (b), DP-11, DP-13 option (a) · **Amends:** W1-19's second KPI line · **Under:** DEC-343, DEC-406, DEC-388
+- **Decision:**
+  - DP-12: the parent-bounded chunks stay (DEC-343). The KPI line is restated: mean hit@5 at or above 80 on the
+    dev tiers is the pass line; 85 (the S0b2 baseline) is re-measured at the Wave 1 exit run (W1-42) and at
+    qualification.
+  - The miss of query `DQ-B-03` and R1's whole-file chunking are recorded as residuals.
+  - A test designer revises the baseline case; then W1-19 is merged and closed.
+  - DP-11: not in W1-19. "A ranked lexical route for exact identifiers" is a backlog item for W1-17's area, for a
+    later wave.
+  - DP-13: the embedding model's retrieval instruction on the question stays.
+
+### DEC-415 — Early test design
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** the READY rule for test design only · **Under:** DEC-235, DEC-069
+- **Decision:**
+  - When every dependency of a ticket is built and green on its branch (merged or not, closed or not), the
+    orchestrator may claim that ticket, create its worktree and run its test design.
+  - Its engineer starts only after its dependencies are merged into `w1/integrate`.
+  - If a dependency changes its interface before merging, the test designer revises the tests, recorded as "owner
+    decision: early test design".
+
+### DEC-416 — Delegation widened for the rest of Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-220 · **Under:** DEC-220
+- **Decision:**
+  - The orchestrator may also decide P2 packages with medium-low confidence, when they are reversible and do not
+    touch the guard, containment, the launcher, scope, installs, the held-out path, merges into `main` or
+    releases.
+  - They are listed in the digest as before.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.99 | 2026-10-06 | Owner: DEC-411 (DEC-409 amends DEC-365, not DEC-367), DEC-412 (W1-50 DP-F6: the freeze branch is rebuilt; an unpushed ticket branch may be rewritten; unpinned choices fine as built), DEC-413 (at most two review rounds per FULL ticket; W1-50's round 7 stop rule), DEC-414 (W1-19: pass line 80 on the dev tiers, 85 re-measured at W1-42 and qualification; chunks stay; no ranked lexical route in W1-19; the instruction stays), DEC-415 (early test design), DEC-416 (delegation widened to P2 at medium-low confidence, with exclusions). |

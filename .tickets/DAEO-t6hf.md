@@ -25,7 +25,7 @@ allowed_paths:
 kpis:
   success:
   - sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a]
-  - Dev query set mean hit@5 >= 85 (S0b2 R1 baseline); warm p95 <= 0.5 s
+  - Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1-42) and at qualification (DEC-414); warm p95 <= 0.5 s
   - Model ids and revisions are recorded in the index manifest [CAP-10.a]
   failure:
   - Mean hit@5 falls below 80
