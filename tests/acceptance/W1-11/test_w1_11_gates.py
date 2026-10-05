@@ -3,11 +3,14 @@ authorise execution: the checker fails a ticket or change that cites one as its 
 
 A gate is a decision package of W1-34: its state is its ``status`` alone and its CIT is its ``cit`` (DEC-328).
 
-- **How a record cites a gate** follows package DP-3's recommended option: the citing record names the gates in
-  its frontmatter key ``approval`` and its own CIT in ``cit``. Every test of the first group waits on DP-3.
-- **What a dead package does to the tickets that wait on it** (DEC-308 leaves it to W1-11) follows package DP-4's
-  recommended option: the checker fails every ticket that is not closed and is named in the ``constrains`` of a
-  declined, revoked or stale package. The second group waits on DP-4.
+- **How a record cites a gate** (DEC-331): the citing record names the gates in its frontmatter key ``approval``,
+  a list of gate ids, and its own CIT in ``cit``, a scalar. A gate authorises it only when the gate's ``status``
+  is ``ACCEPTED`` and the two ``cit`` values are the same string. The first group.
+- **The check fails closed** (DEC-331), with the same finding: a cited id that is no record or is not a decision
+  package; a citing record with ``approval`` and no ``cit``; a gate with no ``cit``. A record with no ``approval``
+  is not checked. The second group.
+- **What a dead package does to the tickets that wait on it** (DEC-330): the checker fails every ticket that is
+  not closed and is named in the ``constrains`` of a declined, revoked or stale package. The third group.
 """
 
 from __future__ import annotations
@@ -46,7 +49,7 @@ def checked(api, project, files):
     return api.check(project.root)
 
 
-# ---- a record that cites a gate as its approval (waits on DP-3)
+# ---- a record that cites a gate as its approval (DEC-331)
 
 @pytest.mark.parametrize("status", support.GATE_DEAD)
 @pytest.mark.parametrize("citer", sorted(CITERS))
@@ -97,7 +100,58 @@ def test_only_the_record_that_cites_the_dead_gate_fails(api, project):
     support.assert_not_flagged(found, support.GATE_NOT_AUTHORISING, [OTHER_TICKET])
 
 
-# ---- a ticket that waits on a dead package (waits on DP-4)
+# ---- the check fails closed (DEC-331)
+
+def test_a_cited_id_that_is_no_record_does_not_authorise(api, project):
+    """The finding names the id as the record cites it; there is no gate file to name."""
+    found = checked(api, project, citing_ticket())
+    support.assert_flagged(found, support.GATE_NOT_AUTHORISING, [TICKET, GATE], [ticket_path(TICKET)])
+
+
+def test_a_cited_record_that_is_no_decision_package_does_not_authorise(api, project):
+    """A decision record with the status and the CIT of an answered gate is still no gate."""
+    not_a_gate = "ADR-0010"
+    found = checked(api, project, {
+        ticket_path(TICKET): ticket(TICKET, approval=[not_a_gate], cit=CIT),
+        support.adr_path(not_a_gate): support.decision(not_a_gate, support.GATE_ANSWERED, cit=CIT),
+    })
+    support.assert_flagged(found, support.GATE_NOT_AUTHORISING, [TICKET, not_a_gate], [ticket_path(TICKET)])
+
+
+def test_a_citing_record_without_a_cit_is_not_authorised(api, project):
+    found = checked(api, project, {
+        ticket_path(TICKET): ticket(TICKET, approval=[GATE]),
+        package_path(GATE): package(GATE, support.GATE_ANSWERED, CIT),
+    })
+    support.assert_flagged(found, support.GATE_NOT_AUTHORISING, [TICKET, GATE], [ticket_path(TICKET)])
+
+
+def test_a_gate_without_a_cit_does_not_authorise(api, project):
+    found = checked(api, project, {**citing_ticket(), package_path(GATE): package(GATE, support.GATE_ANSWERED, None)})
+    support.assert_flagged(found, support.GATE_NOT_AUTHORISING, [TICKET, GATE], [ticket_path(TICKET)])
+
+
+def test_two_missing_cits_are_not_the_same_cit(api, project):
+    """Both fail-closed points at once: no `cit` on either side is not "the same string"."""
+    found = checked(api, project, {
+        ticket_path(TICKET): ticket(TICKET, approval=[GATE]),
+        package_path(GATE): package(GATE, support.GATE_ANSWERED, None),
+    })
+    support.assert_flagged(found, support.GATE_NOT_AUTHORISING, [TICKET, GATE], [ticket_path(TICKET)])
+
+
+def test_a_record_without_approval_is_not_checked(api, project):
+    """It carries a `cit` no gate was answered for, and stands beside dead, open and other-CIT gates: no finding."""
+    found = checked(api, project, {
+        ticket_path(TICKET): ticket(TICKET, cit=CIT),
+        package_path("DP-0001"): package("DP-0001", "DECLINED", CIT),
+        package_path("DP-0002"): package("DP-0002", support.GATE_OPEN, CIT),
+        package_path("DP-0003"): package("DP-0003", support.GATE_ANSWERED, OTHER_CIT),
+    })
+    support.assert_not_flagged(found, support.GATE_NOT_AUTHORISING)
+
+
+# ---- a ticket that waits on a dead package (DEC-330)
 
 @pytest.mark.parametrize("status", support.GATE_DEAD)
 def test_a_ticket_that_waits_on_a_declined_revoked_or_stale_package_fails(api, project, status):

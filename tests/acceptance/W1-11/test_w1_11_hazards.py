@@ -61,6 +61,16 @@ def test_every_active_superseded_decision_is_flagged_not_only_the_first(api, pro
         support.assert_flagged(found, support.ACTIVE_SUPERSEDED, [record_id], [adr_path(record_id)])
 
 
+def test_a_supersession_stated_only_in_prose_is_not_read(api, project):
+    """DEC-329: the checker reads frontmatter and git, never a decision's body."""
+    found = checked(api, project, {
+        adr_path("ADR-0010"): decision("ADR-0010", "ACTIVE", body="Superseded by ADR-0011. Overlaps with ADR-0001."),
+        adr_path("ADR-0011"): decision("ADR-0011", "ACTIVE", body="This decision supersedes ADR-0010."),
+    })
+    raised = [finding for finding in found if finding["code"] in support.HAZARD_CODES]
+    assert not raised, f"a hazard was read from prose:\n{support.show(raised)}"
+
+
 # ---- duplicate and overlapping ids
 
 def test_one_id_in_two_files_of_one_directory_is_flagged(api, project):

@@ -21,7 +21,8 @@ How the tests call it:
 - **Before a check, the project is committed and the store is loaded**
   (``gov.store.load``), so the checker may read the record graph, git or the
   working tree: the three agree.
-- **Fixture commits have fixed dates, authors and trailers.**
+- **Fixture commits have fixed dates, authors and trailers.** A commit is dated 2026-10-04, or 2026-09-20 where
+  a test needs one made before the trailer rule of DEC-182.
 """
 
 from __future__ import annotations
@@ -200,15 +201,19 @@ def show(found):
 # git and the temporary project
 # --------------------------------------------------------------------------
 
-# Who commits. The owner's commit carries `Role: owner` in its final trailer block (package DP-2, DEC-312);
-# an agent's commit differs in every respect a rule could read: name, email, role, no signature, no tag.
+# Who commits. The owner's approval fact is the `Role: owner` trailer on the commit that sets a decision ACTIVE
+# (DEC-360), in the final trailer block (DEC-182). An agent's commit differs in name, email and role;
+# AGENT_AS_OWNER differs in the role alone, as in a repository where agents commit under the owner's account.
 OWNER = {"name": "The Owner", "email": "owner@example.invalid", "trailers": ("Role: owner",)}
 AGENT = {"name": "An Agent", "email": "agent@example.invalid",
          "trailers": ("Task: PROJ-aaaa", "Role: engineer")}
 ANONYMOUS = {"name": "An Agent", "email": "agent@example.invalid", "trailers": ()}
+AGENT_AS_OWNER = {"name": OWNER["name"], "email": OWNER["email"], "trailers": AGENT["trailers"]}
 
-# From 2026-10-03, trailers are read from the final trailer block alone (DEC-182).
+# From 2026-10-03, trailers are read from the final trailer block alone (DEC-182). Both dates are the author's
+# and the committer's, and fall on the same side of 2026-10-03 in every time zone.
 FIRST_DATE = "2026-10-04T12:{minute:02d}:00+00:00"
+BEFORE_THE_TRAILER_RULE = "2026-09-20T12:00:00+00:00"
 
 
 def git(project, *args, who=AGENT, date=FIRST_DATE.format(minute=0), check=True):
@@ -244,10 +249,11 @@ class Project:
         path.write_bytes(text.encode("utf-8"))
         return path
 
-    def commit(self, message="records", who=OWNER, trailers=None):
-        """Commit everything; trailers go in the final trailer block with ``git commit --trailer`` (DEC-182)."""
+    def commit(self, message="records", who=OWNER, trailers=None, date=None):
+        """Commit everything; trailers go in the final trailer block with ``git commit --trailer`` (DEC-182).
+        ``date`` replaces the next fixture date, as the author's and the committer's."""
         self.minute += 1
-        date = FIRST_DATE.format(minute=self.minute)
+        date = date or FIRST_DATE.format(minute=self.minute)
         git(self.root, "add", "-A", who=who, date=date)
         arguments = ["commit", "-q", "--allow-empty", "--no-gpg-sign", "-m", message]
         for trailer in (who["trailers"] if trailers is None else trailers):
@@ -322,8 +328,12 @@ def decision(record_id, status, **keys):
 
 
 def package(record_id, status, cit, constrains=()):
-    """A decision package, as the template of W1-34 writes it: state in `status` alone, the CIT in `cit`."""
-    return record(record_id, "decision-package", status, rank="P2", cit=cit, constrains=list(constrains))
+    """A decision package, as the template of W1-34 writes it: state in `status` alone, the CIT in `cit`.
+    ``cit=None`` leaves the key out."""
+    keys = {"rank": "P2", "cit": cit, "constrains": list(constrains)}
+    if cit is None:
+        del keys["cit"]
+    return record(record_id, "decision-package", status, **keys)
 
 
 def ticket(ticket_id, status="open", **keys):
