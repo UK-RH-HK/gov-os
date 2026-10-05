@@ -1,6 +1,6 @@
 ---
 id: DAEO-jozo
-status: open
+status: in_progress
 deps: [DAEO-4yyl, DAEO-lkeb]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -20,6 +20,8 @@ depends_on:
 allowed_paths:
 - src/gov/closure/**
 - tests/unit/closure/**
+- src/gov/codeintel/**
+- tests/unit/codeintel/**
 kpis:
   success:
   - Resolves referenced ids through the record graph and codebase-memory callers/callees to a radius-scaled depth, with no model [CAP-57.a]

@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 PYPROJECT_REL = "pyproject.toml"
 API_REL = "docs/interfaces/API-0002.yaml"
 PATH_MAP_REL = "governance/project/path-map.yaml"
+HELD_OUT_REL = "governance/project/held-out.yaml"   # DEC-385: no fixture copies it into a temporary project
 CHECKS_REL = "template/governance/kernel/checks"
 
 # The twelve Wave 1 governance operations the registry reserves (ticket KPI, CAP-28.b).
@@ -48,7 +49,8 @@ RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "conte
 # Every other reserved command, and ``check`` without ``--list``, is not built yet.
 # Planned revision (DEC-190, "planned: command implemented"): W1-25 builds ``checkpoint``; its cases are in
 # ``tests/acceptance/W1-25/``. The same for W1-13, which builds ``readiness``: ``tests/acceptance/W1-13/``.
-BUILT_LATER = ("checkpoint", "readiness")
+# The same for W1-28, which builds ``pause``: ``tests/acceptance/W1-28/``.
+BUILT_LATER = ("checkpoint", "readiness", "pause")
 NOT_BUILT = tuple(name for name in RESERVED_COMMANDS if name != "status" and name not in BUILT_LATER)
 
 # The read commands of CAP-27's acceptance line, as argument lists, plus ``check --list`` (DEC-186).
@@ -103,6 +105,8 @@ def copy_working_tree(destination, root=REPO_ROOT):
         capture_output=True, text=True, check=True,
     ).stdout
     for rel in sorted(set(item for item in listing.split("\0") if item)):
+        if rel == HELD_OUT_REL:   # DEC-385: left out by its path, never opened
+            continue
         source = Path(root) / rel
         target = destination / rel
         if not (source.is_file() or source.is_symlink()):

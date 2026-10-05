@@ -919,3 +919,92 @@ Reported by the W1-19 and W1-28 ticket leads; for W1-32, EXP-002 and the mid-wav
   (the W1-15 residual, seen again).
 - **A read beyond DEC-370**: the W1-19 designer's search for G-20 also returned G-17's one row (package DP-7, with
   the owner).
+
+## W1-16 residuals (codebase-memory wrapper, 2026-10-05)
+
+Recorded at W1-16's close, from the four ticket lead rounds' summaries. Fixed findings are left out.
+
+- **The 60 % line is measured on the test designer's own 26 questions** (DEC-377): no S0b2 C1 question set exists.
+  The designer's throwaway stand-in scored 26 of 26, so the line is easy to pass. The comparable measurement is
+  W1-42's (hit@5 on the dev query set's code classes).
+- **The W1-15 gaps apply to the wrapper unchanged:** a hard link to a product-data file is indexed, and a file
+  replaced between the filter's answer and the copy is indexed. The window is the whole filter run.
+- **A failed re-index leaves no index** until the next successful run (it fails closed; the index is rebuildable).
+  One file with a non-UTF-8 name makes the repository unindexable, with a traceback.
+- **A tracked file that `.gitignore` names** is staged but missing from the graph, without a message.
+- **The graph is cached per process:** a long-lived process does not see another process's re-index. Answers load
+  the whole graph into memory once per process, untested at the DEC-078 envelope.
+- **`dead_code` lists entry points and test functions;** the tool's similarity edges are not counted as a use.
+- **A rename is a symbol rename only** (DP-3); a file or folder move is not tested.
+- **Untested refusals:** a symbolic link below `.gov-runtime`; the query functions refuse the same roots as `index`,
+  and only `index` is tested.
+- **Token rule (DEC-325, DEC-339):** identifiers with one digit or one capital are still flagged; a lower-case-only
+  body, a lower-case run followed by `.` and digits, a rest of exactly 15 characters after a leading `_` or `-`, and
+  two leading separators (`sk___…`) are not flagged.
+- **gitleaks' built-in rules stay sheltered by its own global allowlist** (DEC-347): the second scan covers the
+  project's rules only. A project rule that only modifies a default rule keeps a single scan. The uuid stopword is
+  covered by the second scan in principle, and no test shows it.
+- **`stores_with_secrets` also gets the second scan**, which is stricter than the letter of DEC-347.
+- **The filter costs two gitleaks runs per file** (about +55 % on the W1-15 and W1-17 suites, measured under load);
+  batching stays the residual of DEC-339.
+- **The daemon directory is under shared `/tmp`** (`/tmp/gov-cbm-<uid>/<id>`, DEC-338, DEC-346). Nothing removes a
+  repository's lock and turn files there. The wrapper refuses a folder that is a link or not the user's; only a
+  builder test holds that check.
+- **The loopback UI (DEC-362, as built under DEC-389):** a daemon already running with the UI on keeps port 9749
+  open until it ends, about a second after its last call; not tested, by design. Any call, also `projects(root)` on a
+  never-indexed repository, now creates the home with `config.json` and `_config.db`; a refused root is still
+  refused before anything is written. Each wrapper call starts two processes; the added time was not measured.
+- **Cases that need namespaces:** the six DEC-338 cases and the nine UI cases run in a private user, mount or
+  network namespace and skip on a machine without them. All ran here.
+- **The suite is heavy:** 166 cases in about eleven and a half minutes. Run it alone;
+  `test_this_repository_is_not_indexed_by_the_run` failed once when other tool calls ran in the same tree.
+- **The suite's `__pycache__` holds planted strings whole** (untracked and git-ignored; a plain gitleaks run over
+  the folder reports them). No committed file holds one.
+- **The README's fifth-batch section still says its red run was not run;** the lead observed it (8 failed, 1
+  passed). Only a test designer may edit that file.
+- **Sandbox:** a launched worker cannot run this suite (`/tmp/w16-…` is read-only there, and the daemon's socket is
+  refused); the lead runs it. A headless engineer lost its turn to a background test run once; briefs now say to run
+  tests in the foreground.
+- **Guard gap, seen again:** here-document Bash writes inside a worker's paths were accepted several times and
+  refused at other times.
+- **Left under `/tmp`:** `/tmp/w16-c1_yis2q` (four empty folders) and possibly
+  `/tmp/gov-launch-engineer-9n8d84gs/rt`. `/tmp/cbm-daemon-1000` and `/tmp/gov-cbm-1000` stay by decision.
+  `~/.cache/codebase-memory-mcp` was never changed, and no worktree of this repository was indexed.
+- **Size.** Production code and rules +282 / −45 against an estimate of 50; 42 cases were added after
+  implementation, each by a delegated or owner decision.
+
+## W1-28 residuals (gov pause, copying fixtures and two launcher changes, 2026-10-05)
+
+Recorded at W1-28's close, from the closing ticket lead's summary and its reviewer's findings (none high).
+
+- **Two earlier residuals end with this merge:** the launcher's temp directory is no longer left behind on any exit
+  the launcher controls (W1-46), and a product-spec worker is launched sandboxed, with an empty network allowlist
+  and held to a ticket of its own role, so the DEC-183 form is ended (W1-33, DEC-371).
+- **The temp folder still stays** when the launcher is killed outright, on SIGTERM or SIGHUP (the session then lives
+  on), or when the removal fails; a failed removal is a traceback and the session's exit code is lost. DEC-392 fixes
+  the last three; W1-32 carries it.
+- **Removal is by name:** if the folder is renamed and another directory put at its path, that one is removed. It
+  needs write access to the parent, which the sandbox does not give. Not run: a launcher `TMPDIR` that does not
+  exist.
+- **A worker's scratchpad is gone at the session's end.** Briefs now tell workers to return results in their final
+  message or under `.gov-runtime/scratch/`.
+- **The DEC-385 exclusion is one exact path.** Another name, a hard link or an absolute symbolic link would be
+  copied. The check that fails when a fixture copies the file again does not see a helper called with the root,
+  `tarfile`, a copy of `governance/` by name, or `tests/unit/`. Only W1-05's and W1-07's fixtures copied the whole
+  tree (W1-25 uses W1-07's).
+- **The two whole-tree fixtures still copy `.claude/settings.json`** with its held-out deny line into every
+  temporary project; W1-46's and W1-47's fixtures strip it (package DP-15, with the owner).
+- **Copies made before the merge:** 1461 files of the held-out file's name were counted, by path only, under
+  `/tmp/pytest-of-usain` on 2026-10-05, from earlier runs of the copying fixtures in every tree. None was opened; the
+  owner has them removed.
+- **The product-spec role file and its agent definition** still say the launcher does not start that role (package
+  DP-12, with the owner). `gov launch` by WBS id sets `GOV_TICKET` to the WBS id, and a ticket key written twice
+  takes the last value; both are older launcher behaviour that now also holds for product-spec.
+- **Pause, as built and held by no test:** untracked files do not make a tree dirty; a conflicting revert is undone
+  with `git reset --hard` to the `HEAD` from before the rollback; an empty `GOV_ROLE` is refused, not read as the
+  owner; record commits also carry `Role:`.
+- **A launched test designer cannot run the live-session cases** (W1-46: 36, W1-25: 3): the sandbox refuses the API
+  host. The lead runs them.
+- **Latency (DEC-372):** two occurrences during this ticket's rounds, both `test_decision_p95_is_under_100_ms`
+  (W1-02) under load, one at 106 ms; each passed alone. None in the post-merge run.
+- **Size.** `gov pause` is 120 lines against 80 to 100; the launcher changed by +15 / −6.
