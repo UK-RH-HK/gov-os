@@ -3497,3 +3497,276 @@ secret filter and only makes it refuse more (stricter-only).
 | Version | Date | Change |
 |---|---|---|
 | 0.77 | 2026-10-04 | Delegated under DEC-220: DEC-346 (W1-16 DP-5, DP-6: the floor counts the rest alone; the daemon directory is a residual with one test), DEC-347 (stricter-only: the secret filter also scans with the project's rules alone, so gitleaks' built-in global allowlist cannot shelter a canary or token). |
+
+## 78. Delegated decisions on W1-13's packages (register v0.78, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on the four packages the W1-13 (`DAEO-w616`) ticket lead
+returned. For each the test designer's, the lead's and the orchestrator's recommendations agree on option (a), the
+confidence is medium or higher, and the choice is reversible. The tests already encode these options.
+
+### DEC-348 — W1-13 DP-1: `gov readiness` blocks through its exit code, judged from the rows
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-13 package DP-1 option (a); confidence medium-high · **Under:** CAP-30.a, DEC-308
+- **Decision:**
+  - W1-13 delivers the verdict and its exit code, judged from the readiness rows and never from the record's
+    `status`. W1-26 runs it as a check and also fails a specification that is `CLOSED` with a required row open.
+    W1-35's change skill runs it before OpenSpec apply and archive.
+  - Until W1-26 and W1-35 exist nothing stops a direct `openspec archive`, and the READY rule (W1-09) still trusts
+    a status set by hand. Both are residuals of W1-13, for W1-26 and W1-35.
+
+### DEC-349 — W1-13 DP-2: a specification is closed by `gov.readiness.close`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-13 package DP-2 option (a); confidence medium · **Under:** CAP-47.d, DEC-088, CAP-27
+- **Decision:**
+  - `gov readiness` stays a read command. Closing is the public function `gov.readiness.close(root, id)`: it
+    refuses and writes nothing when a required row is open or the record is invalid; otherwise it creates the audit
+    ticket through `gov.tasks.create` (none for a LITE feature) and then sets the status. Closing twice gives one
+    ticket, and the record is not left `CLOSED` when the ticket cannot be created.
+  - The audit ticket has `role: independent-auditor`, `class: audit`, `status: open`, and a title that names the
+    specification. A later ticket gives closing a command or a skill step (W1-35 or W1-30).
+  - "Fresh" and "authored none of the audited files" (MR-4) are not testable here and stay with the orchestrator's
+    session rules.
+
+### DEC-350 — W1-13 DP-3: the specification record is the frontmatter of the change's `proposal.md`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-13 package DP-3 option (a); confidence medium · **Under:** DEC-307, DEC-302, DEC-305, DEC-085
+- **Decision:**
+  - A specification is the record in the frontmatter of `openspec/changes/<change>/proposal.md`: `id`,
+    `type: specification`, `status`, `state_class`, `profile`, `spine` and `capability_types`; `readiness.yaml`
+    sits beside it. A missing profile or an unknown capability type does not pass.
+  - Nothing writes that frontmatter yet. W1-14's bridge reads this form, and the proposal template of W1-12 or the
+    planning skill of W1-35 writes it: a residual of W1-13.
+
+### DEC-351 — W1-13 DP-4: arguments, report and exit codes of `gov readiness`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-13 package DP-4 option (a); confidence medium-high on the codes, medium on the names · **Under:** DEC-317, CAP-30.b, DEC-089
+- **Decision:**
+  - `--specification <record id>` or `--ticket <ticket id>` (through the ticket's `specification` key); with
+    neither, every specification.
+  - Passing: `ok: true`, exit 0, the report in `result`. A required row open: `ok: false`, `SPEC_NOT_CLOSED`, exit
+    code 3, the report in `error.details`, and the message names the open rows. An invalid record:
+    `READINESS_INVALID`, exit 1.
+  - The report has `specification`, `profile`, `closed` and `open`; each open row has `n`, `key`, `state` and
+    `gap_ticket` (the id or `UNLINKED`), in row order.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.78 | 2026-10-05 | Delegated under DEC-220: DEC-348 (W1-13 DP-1: the exit code blocks, judged from the rows; wiring is W1-26's and W1-35's), DEC-349 (DP-2: `gov.readiness.close` closes and creates the audit ticket), DEC-350 (DP-3: the specification record is the frontmatter of `proposal.md`), DEC-351 (DP-4: arguments, report, exit code 3). |
+
+## 79. Delegated decisions on W1-33's packages P-2 to P-4 (register v0.79, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on three of the four packages the W1-33 (`DAEO-xog0`)
+ticket lead returned. The test designer's, the lead's and the orchestrator's recommendations agree, the confidence
+is medium or higher, and each is reversible; none grants a role anything. P-1 (placing the five definitions under
+`.claude/agents/`) is an owner action.
+
+### DEC-352 — W1-33 P-2, P-3 and P-4: what "generated" means, the permission-class families, and the two unsandboxed roles' grants
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-33 packages P-2 option (a), confidence medium-high; P-3 option (a), confidence medium; P-4 as written, confidence medium · **Under:** CAP-22.a, CAP-58.b, DEC-066, DEC-158
+- **Decision:**
+  - P-2: until the rulesync adapters of W1-38 exist, a definition under `.claude/agents/` that is placed by hand
+    and agrees field by field with its kernel role file is a "generated definition" for W1-33. W1-38 later produces
+    the same files from the same sources.
+  - P-3: a role file maps the `NETWORK_*`, `DB_*`, `CLOUD_*` and `DEPLOY_*` families as CAP-58.b writes them; it
+    does not list each member class of the archived Framework §32. Listing them is a residual, for the mid-wave
+    audit to weigh.
+  - P-4: the definitions stand as written: the orchestrator has `NETWORK_*` allowed (DEC-158: it is unsandboxed)
+    and the database, cloud, CI-trigger and deploy classes denied; product-spec has all of them denied. The tests
+    require only that each class has a stated disposition.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.79 | 2026-10-05 | Delegated under DEC-220: DEC-352 (W1-33 P-2: a hand-placed definition that agrees with its kernel role file counts as generated until W1-38; P-3: permission-class families as CAP-58.b writes them; P-4: the orchestrator's and product-spec's grants as written). P-1 is an owner action. |
+
+## 80. Delegated decisions on what W1-13 and W1-16 built beyond the decisions' wording (register v0.80, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on the points the two ticket leads asked to have recorded.
+Each is a detail of built code, reversible, and none makes a check weaker; the leads' and the orchestrator's views
+agree; confidence medium-high.
+
+### DEC-353 — W1-13: the details of `gov readiness` as built are accepted
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** the W1-13 lead's list of choices no decision fixes, and its reviewer's two fixed findings · **Under:** DEC-348 to DEC-351, DEC-085, CAP-30.e
+- **Decision:**
+  - The bare command's result is `{closed, specifications: [...]}`. Both selectors together is a usage error
+    (exit 2). The error codes `SPECIFICATION_NOT_FOUND`, `TICKET_NOT_FOUND` and `AUDIT_TICKET_FAILED` end with 1.
+  - A STANDARD specification with no capability type is invalid. A PRESENT row with no evidence is invalid, not
+    open.
+  - The audit ticket also carries `audits`, `assignee: independent-auditor`,
+    `allowed_paths: [docs/audit/<id>/**]`, `profile` and `sources`.
+  - From the review: a change folder that holds no specification record makes the bare command answer
+    `READINESS_INVALID`, and a project readiness schema whose rows or capability-type table differ from the
+    Contract's makes every specification in that project `READINESS_INVALID`. The rows and the table are constants
+    in the checker, so a governed taxonomy change (CAP-30.e) changes the checker with the schema and the Contract.
+
+### DEC-354 — W1-16: `stores_with_secrets` also runs the second scan
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** the W1-16 lead's third return · **Under:** DEC-347, DEC-287
+- **Decision:** The secrets-indexing check's `stores_with_secrets` shares the filter's helper and therefore also
+  scans with the project's rules alone, which DEC-347 did not name. It is accepted: it only makes the check find
+  more. Where a project's rules have no expression of their own (they only modify a built-in rule), one scan stays;
+  that is a residual.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.80 | 2026-10-05 | Delegated under DEC-220: DEC-353 (W1-13: result shape, codes, the audit ticket's fields and the two review fixes are accepted as built), DEC-354 (W1-16, stricter-only: `stores_with_secrets` also runs the second scan). |
+
+## 81. Delegated decisions on W1-14's packages (register v0.81, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on the five packages the W1-14 (`DAEO-w9l3`) ticket lead
+returned. For each the test designer's, the lead's and the orchestrator's recommendations agree on option (a), the
+confidence is medium or higher, and the choice is reversible until W1-35 teaches the format. The lead had the
+engineer build to the recommended options before they were decided; the result is accepted, and later briefs say
+again that an engineer waits for the decision.
+
+### DEC-355 — W1-14 DP-1 and DP-2: the bridge is `gov.tasks.bridge.derive`, and a task carries its fields in a YAML block
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-14 packages DP-1 option (a) and DP-2 option (a); confidence medium · **Under:** CAP-31.a, DEC-307, DEC-350
+- **Decision:**
+  - `gov.tasks.bridge.derive(root, change)` takes the change's folder name under `openspec/changes/` and returns
+    `{"change", "specification", "tickets": [{"task", "ticket"}, ...]}`, one entry per task in file order. It
+    commits nothing. A faulty `tasks.md` is refused with `TASKS_INVALID`, whose details name each faulty task.
+  - A task carries `kpis`, `role`, `allowed_paths`, `profile` and `class` in a fenced `yaml` block indented under
+    its checkbox line. A task that lacks one, `profile` and `class` included, refuses the whole derivation and
+    nothing is written.
+  - W1-12's `tasks.md` template does not show the block yet, so a change written from it is refused: a residual,
+    for W1-35 or a template change.
+
+### DEC-356 — W1-14 DP-3, DP-4 and DP-5: a hand-set `CLOSED` is not trusted, dependencies form one DAG, and a second run adds only new tasks
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-14 packages DP-3 option (a), confidence medium-high; DP-4 option (a), confidence medium; DP-5 option (a), confidence medium-high · **Under:** MR-2, DEC-348, CAP-31.a
+- **Decision:**
+  - The bridge derives only when the specification's status is `CLOSED` and `gov.readiness.check` passes.
+  - `depends_on` holds quoted task numbers of the same file or ids of existing tickets, written to the ticket's
+    `deps` as ticket ids. A name that resolves to nothing, an unquoted number, a cycle among tasks, or a dependency
+    that reaches an existing cycle is `TASKS_INVALID`.
+  - On a second run a task that has a ticket keeps it byte for byte, only new tasks get tickets, and a refused
+    run changes nothing. A task is matched to its ticket by `specification` and the `task` key the bridge writes.
+    A task edited or removed after derivation is a residual.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.81 | 2026-10-05 | Delegated under DEC-220: DEC-355 (W1-14 DP-1, DP-2: `gov.tasks.bridge.derive`; a task's fields in a YAML block; a faulty task refuses the whole derivation), DEC-356 (DP-3 to DP-5: `CLOSED` and a passing readiness check; one DAG; a second run adds only new tasks). |
+
+## 82. Delegated decisions on W1-28's packages DP-4 and DP-7 (register v0.82, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on two of the eight packages the W1-28 (`DAEO-9279`)
+ticket lead returned. The test designer's, the lead's and the orchestrator's recommendations agree, the confidence
+is medium-high, and both are reversible. The other six (DP-1, DP-2, DP-3, DP-5, DP-6, DP-8) touch KPI lines, the
+freeze flag or what a rollback does to history, and go to the owner.
+
+### DEC-357 — W1-28 DP-4 and DP-7: `--cancel-agents` releases locks only, and "the same result on repeat" means the same state
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-4 option (a) and DP-7 option (a); confidence medium-high · **Under:** CAP-05.b, CAP-05.d, DEC-292
+- **Decision:**
+  - `gov pause --cancel-agents` releases the claim locks under `.tickets/.claims/` and records the sessions that
+    held them. It does not change a ticket's status: a ticket left `in_progress` is set back by hand, which is a
+    residual. The command cannot stop a process.
+  - "The same result on repeat" means the same state: a repeat succeeds and leaves the project as the first run
+    did. The two `result` objects need not be equal field for field.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.82 | 2026-10-05 | Delegated under DEC-220: DEC-357 (W1-28 DP-4: `--cancel-agents` releases locks only; DP-7: a repeat leaves the same state). Six W1-28 packages go to the owner. |
+
+## 83. Owner answers of 2026-10-05 on the parallel run's open packages (register v0.83, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's answers of 2026-10-05, given through the operator and confirmed by the owner in the orchestrator's
+session, on the packages the orchestrator's checkpoint listed as open: W1-50 DP-8 and DP-9, W1-11 DP-2, W1-16 DP-1
+and its loopback UI, the slot question, six W1-28 packages, and four standing points. Ticket edits that follow from
+them are separate commits with the trailer `Task: <ticket id>`.
+
+### DEC-358 — W1-50 DP-8: a ticket's close commit is the latest commit in HEAD's history where its status becomes closed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-8 option (a) · **Under:** DEC-255, DEC-318, CAP-58.h
+- **Decision:** A ticket's close commit is the latest commit in HEAD's history in which the ticket's status becomes
+  `closed`. When no such commit is found for a ticket whose status is `closed`, that is a finding.
+
+### DEC-359 — W1-50 DP-9: an orchestrator commit naming a closed, never-started or unknown ticket is allowed outside the acceptance tests
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-9 option (a) · **Amends:** DEC-318 · **Under:** DEC-255, CAP-58.h
+- **Decision:** A commit with `Role: orchestrator` whose `Task:` trailer names a closed ticket, a ticket never
+  started, or a name that is no ticket (such as `Task: decision-record`) is allowed for every path outside
+  `tests/acceptance/**`. Inside `tests/acceptance/**` it stays a finding (MR-3).
+
+### DEC-360 — W1-11 DP-2: the owner's approval fact is the `Role: owner` trailer on the commit that sets ACTIVE
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-11 package DP-2 option (a) · **Under:** CAP-01.b, CAP-21.a, DEC-182
+- **Decision:**
+  - The owner's approval fact for a decision is the `Role: owner` trailer on the commit that sets the decision
+    `ACTIVE`. A later owner commit approves nothing earlier.
+  - Safeguard: W1-50 gets a KPI line, in its own commit, so that a commit carrying `Role: owner` made during any
+    agent session's call is a finding.
+  - A signature as the stricter form of the fact stays a residual.
+
+### DEC-361 — W1-16 DP-1: the hit@5 question set is the S0b2 C1 set when it is in the S0b2 output, else the designer's set with harder questions
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-16 package DP-1 · **Under:** CAP-12.a, DEC-198, DEC-310
+- **Decision:**
+  - If the C1 question set is under `~/gov-os-workbench/s0b2/out/`, option (B): a test designer may read it there by
+    exact file path, never anything under `s0b2/probe/`, and `questions.yaml` is swapped for it.
+  - If it exists only under `s0b2/probe/`, option (A): the designer's set stays, with harder questions added.
+  - Then W1-16 is merged and closed.
+
+### DEC-362 — W1-16: the wrapper turns the tool's loopback UI off
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the question W1-16 package DP-4 left open · **Under:** DEC-338, DEC-346
+- **Decision:** The codebase-memory wrapper sets `--ui=false`. The change of the tool's configuration is recorded in
+  the notes of its entry in `governance/project/tool-registry.yaml`.
+
+### DEC-363 — A ticket idle on an owner answer does not count against the six
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 3 · **Amends:** DEC-235 · **Under:** DEC-236
+- **Decision:** A ticket in flight that is idle waiting on an owner answer no longer counts against the six. The
+  resource gate still applies to every running lead.
+
+### DEC-364 — W1-28 DP-1: the pause-state line moves to W1-32
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-1 option (a) · **Under:** CAP-05, CAP-28
+- **Decision:** The KPI line "Pause state appears in gov status" leaves W1-28. W1-32, which builds `gov status`
+  and already names the pause state in its first success line, carries it; the two status cases move to W1-32's
+  suite. W1-28 makes the state readable.
+
+### DEC-365 — W1-28 DP-2 and DP-3: the orchestrator may set the freeze, only the owner lifts it, and the caller is `GOV_ROLE`
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 packages DP-2 option (b) and DP-3 · **Amends:** DEC-176 · **Under:** CAP-05.a, CAP-05.d, DEC-179
+- **Decision:**
+  - The orchestrator may set the freeze. Only the owner lifts it.
+  - The caller is `GOV_ROLE` when it is set: `orchestrator` is allowed, and every worker role is refused. When
+    `GOV_ROLE` is unset, the caller is the owner.
+  - The `--role` flag is dropped for this command.
+  - Lifting a freeze works only with `GOV_ROLE` unset.
+
+### DEC-366 — W1-28 DP-5: what `--rollback` does
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-5 option (a) · **Under:** CAP-05.c, DEC-182
+- **Decision:**
+  - One `git revert --no-edit` per commit of the ticket, newest first.
+  - Merge commits are skipped and named in the result, which says that a merge's own conflict resolutions stay.
+  - Revert commits carry `Role:` and `Reverts-Task: <ticket>`, not `Task:`.
+  - A conflicting revert aborts everything with an error.
+  - An unknown ticket is an error; a ticket with no commit succeeds with an empty list.
+  - A dirty tree is refused.
+  - A repeat reverts nothing and succeeds.
+
+### DEC-367 — W1-28 DP-6: the record of a rollback or a cancel is a commit to the ticket file
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-6 · **Under:** CAP-05.d, DEC-366
+- **Decision:**
+  - The record for `--rollback` and `--cancel-agents` is a commit to the ticket file, made after the reverts, with
+    the trailers `Task: <ticket>` and `Reverts-Task: <ticket>`.
+  - A plain pause writes no record.
+  - KPI success 4 of W1-28 is reworded to match, in its own commit.
+
+### DEC-368 — W1-28 DP-8: cancel and rollback both set the freeze flag
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-8 option (a) · **Under:** CAP-05.a, CAP-05.b, CAP-05.c
+- **Decision:** `gov pause --cancel-agents` and `gov pause --rollback <ticket>` both also set the freeze flag.
+
+### DEC-369 — The pre-commit hook runs the second gitleaks scan
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the W1-16 residual · **Extends:** DEC-347 · **Under:** CAP-03.a, CAP-39.a
+- **Decision:** The pre-commit hook also runs the second gitleaks scan, with the project's rules alone (DEC-347).
+  W1-40 gets the KPI line, in its own commit.
+
+### DEC-370 — G-20 may be read from the S0b2 output, by exact file path
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-341
+- **Decision:** A worker may read the text of G-20 from the S0b2 output in `~/gov-os-workbench/s0b2/out/`, by exact
+  file path only, and never anything under `s0b2/probe/`.
+
+### DEC-371 — Leads start their workers with `gov launch`
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 4 · **Supersedes:** DEC-183 for the roles the launcher starts · **Under:** DEC-231, DEC-311
+- **Decision:**
+  - W1-46 is closed, so from now on a ticket lead starts its workers with `gov launch <role> <ticket>`, sandboxed.
+  - The W1-46 residuals stand as `governance/project/bootstrap.md` records them at its close.
+  - `gov` is not on the PATH. A lead runs it from its worktree as
+    `PYTHONPATH=src python3 -m gov.cli.main launch <role> <ticket> -- <CLI arguments>`.
+  - The launcher starts `engineer`, `independent-test-designer`, `independent-auditor` and `research`. It has no
+    `product-spec` role, so a product-spec worker still starts under DEC-183: a residual, told to the owner.
+
+### DEC-372 — A latency case that fails under parallel load is re-run alone
+- **Status:** ACCEPTED (owner, 2026-10-05; the handling is delegated to the orchestrator) · **Basis:** OWNER · **Under:** DEC-237
+- **Decision:** A latency acceptance case that fails during the post-merge regression under parallel load is re-run
+  alone, after the rest of the regression has ended. A pass alone counts, and each occurrence is recorded.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.83 | 2026-10-05 | Owner answers: DEC-358, DEC-359 (W1-50 DP-8, DP-9), DEC-360 (W1-11 DP-2: the `Role: owner` trailer; W1-50 KPI line), DEC-361, DEC-362 (W1-16 DP-1 and the UI), DEC-363 (idle tickets and the six), DEC-364 to DEC-368 (W1-28 DP-1, DP-2, DP-3, DP-5, DP-6, DP-8), DEC-369 (second scan in pre-commit; W1-40 KPI line), DEC-370 (G-20 by exact path), DEC-371 (`gov launch` from now on), DEC-372 (latency cases re-run alone). |

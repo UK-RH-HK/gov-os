@@ -10,10 +10,28 @@ description = "Planted canary identifier"
 regex = '''\b[A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*[_-]CANARY[_-][A-Za-z0-9]+(?:[_-][A-Za-z0-9]+)*'''
 keywords = ["canary"]
 
+# The token rule (DEC-324, DEC-325): a key prefix, then a body of 16 characters or more that holds a digit, or both
+# an upper-case and a lower-case letter. An ordinary identifier (tok_expiry_refresh_interval) holds neither. The
+# expression language has no look-ahead, so the rule is three rules, one per kind of the body's first character.
+# In the two long ones the body is: its first letter, a run of the same case, the first character of another kind
+# (the other case or a digit), and the rest; each alternative is one length of the run, so that the floor holds.
+# The body may begin with one more _ or - (DEC-339): the 16 characters are then counted after it.
 [[rules]]
-id = "gov-token"
-description = "Token-shaped string with a key prefix"
-regex = '''\b(?:sk|pk|rk|tok)[_-][A-Za-z0-9][A-Za-z0-9_-]{15,}'''
+id = "gov-token-digit"
+description = "Token-shaped string with a key prefix: the body begins with a digit"
+regex = '''\b(?:sk|pk|rk|tok)[_-][_-]?\d[\w-]{15,}'''
+keywords = ["sk-", "sk_", "pk-", "pk_", "rk-", "rk_", "tok-", "tok_"]
+
+[[rules]]
+id = "gov-token-upper"
+description = "Token-shaped string with a key prefix: the body begins in upper case and holds a lower-case letter or a digit"
+regex = '''\b(?:sk|pk|rk|tok)[_-][_-]?[A-Z](?:[a-z\d][\w-]{14,}|[A-Z_-]{1}[a-z\d][\w-]{13,}|[A-Z_-]{2}[a-z\d][\w-]{12,}|[A-Z_-]{3}[a-z\d][\w-]{11,}|[A-Z_-]{4}[a-z\d][\w-]{10,}|[A-Z_-]{5}[a-z\d][\w-]{9,}|[A-Z_-]{6}[a-z\d][\w-]{8,}|[A-Z_-]{7}[a-z\d][\w-]{7,}|[A-Z_-]{8}[a-z\d][\w-]{6,}|[A-Z_-]{9}[a-z\d][\w-]{5,}|[A-Z_-]{10}[a-z\d][\w-]{4,}|[A-Z_-]{11}[a-z\d][\w-]{3,}|[A-Z_-]{12}[a-z\d][\w-]{2,}|[A-Z_-]{13}[a-z\d][\w-]{1,}|[A-Z_-]{14,}[a-z\d][\w-]*)'''
+keywords = ["sk-", "sk_", "pk-", "pk_", "rk-", "rk_", "tok-", "tok_"]
+
+[[rules]]
+id = "gov-token-lower"
+description = "Token-shaped string with a key prefix: the body begins in lower case and holds an upper-case letter or a digit"
+regex = '''\b(?:sk|pk|rk|tok)[_-][_-]?[a-z](?:[A-Z\d][\w-]{14,}|[a-z_-]{1}[A-Z\d][\w-]{13,}|[a-z_-]{2}[A-Z\d][\w-]{12,}|[a-z_-]{3}[A-Z\d][\w-]{11,}|[a-z_-]{4}[A-Z\d][\w-]{10,}|[a-z_-]{5}[A-Z\d][\w-]{9,}|[a-z_-]{6}[A-Z\d][\w-]{8,}|[a-z_-]{7}[A-Z\d][\w-]{7,}|[a-z_-]{8}[A-Z\d][\w-]{6,}|[a-z_-]{9}[A-Z\d][\w-]{5,}|[a-z_-]{10}[A-Z\d][\w-]{4,}|[a-z_-]{11}[A-Z\d][\w-]{3,}|[a-z_-]{12}[A-Z\d][\w-]{2,}|[a-z_-]{13}[A-Z\d][\w-]{1,}|[a-z_-]{14,}[A-Z\d][\w-]*)'''
 keywords = ["sk-", "sk_", "pk-", "pk_", "rk-", "rk_", "tok-", "tok_"]
 
 # Only known synthetic fake secrets (INVENTORY.md section 7). Nothing else is allowlisted.
