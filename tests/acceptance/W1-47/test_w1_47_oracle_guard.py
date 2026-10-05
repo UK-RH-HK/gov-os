@@ -127,7 +127,7 @@ def test_a_read_of_the_oracle_path_is_denied_while_frozen(project, guard, temp_s
     """The freeze flag stops writes and leaves reading open (W1-02); the oracle stays hidden all the same."""
     flag = project / ".gov-runtime" / "freeze"
     flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.write_text("", encoding="utf-8")
+    flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")   # the marker line (DEC-402)
     result = guard(project, "Read", {"file_path": f"{temp_stand_in}/answers.md"}, ENGINEER)
     support.assert_denied_by_rule(result, "Read on the stand-in oracle path by the engineer while frozen")
 
