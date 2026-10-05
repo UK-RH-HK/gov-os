@@ -27,6 +27,7 @@ kpis:
   - A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h]
   - A worker's commit made during another actor's call is judged by its own trailers (DEC-255) [CAP-58.h]
   - A commit with no Role or Task trailer is judged against the caller, as today (DEC-255) [CAP-58.h]
+  - 'A commit carrying a Role: owner trailer that is made during any agent session''s call is a finding (DEC-360) [CAP-58.h]'
   failure:
   - An integration merge whose commits each stay inside the allowed paths of their own Role and Task trailers raises a finding
   - A commit that changes a path outside the allowed paths of its own Role and Task trailers raises no finding, whoever the caller is
