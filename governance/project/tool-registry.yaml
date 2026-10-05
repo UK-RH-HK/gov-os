@@ -170,14 +170,14 @@ tools:
     date: "2026-10-05"
     approved_by: "DEC-397"
     note: "Virtual environment for the reranker process only, Python 3.12.3, 5.6 GB (torch CUDA wheels), created fresh by S0b2's recorded method with its pins; it does not use the S0b2 environment in the workbench. sha256 of the output of 'uv pip freeze' for it (60 packages). The default reranker process starts from ~/.local/share/gov-os/reranker-venv/bin/python."
-  - name: qwen3-reranker
+  - name: reranker
     version: "Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473"
     sha256: "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b"
     install: "HF_HUB_DISABLE_TELEMETRY=1 ~/.local/share/gov-os/reranker-venv/bin/python -c \"from huggingface_hub import snapshot_download; snapshot_download('Qwen/Qwen3-Reranker-0.6B', revision='e61197ed45024b0ed8a2d74b80b4d909f1255473')\""
     uninstall: "rm -rf ~/.cache/huggingface/hub/models--Qwen--Qwen3-Reranker-0.6B"
     date: "2026-10-05"
     approved_by: "DEC-397"
-    note: "Hugging Face snapshot under ~/.cache/huggingface/hub (1.2 GB), downloaded by S0b2 and reused, not downloaded again; sha256 of its model.safetensors. It loads offline (HF_HUB_OFFLINE=1) from the reranker environment."
+    note: "The Qwen3 reranker model: Hugging Face snapshot under ~/.cache/huggingface/hub (1.2 GB), downloaded by S0b2 and reused, not downloaded again; sha256 of its model.safetensors. It loads offline (HF_HUB_OFFLINE=1) from the reranker environment."
   - name: socat
     version: "1.8.0.0"
     sha256: "46e854289b6b1c97e28be5d9293bea61e8633d00d6a65d9513f019c7232696fe"

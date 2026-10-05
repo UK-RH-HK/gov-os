@@ -1,6 +1,6 @@
 ---
 id: DAEO-jozo
-status: in_progress
+status: closed
 deps: [DAEO-4yyl, DAEO-lkeb]
 links: []
 created: 2026-09-30T22:49:58Z
