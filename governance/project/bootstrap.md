@@ -1008,3 +1008,34 @@ Recorded at W1-28's close, from the closing ticket lead's summary and its review
 - **Latency (DEC-372):** two occurrences during this ticket's rounds, both `test_decision_p95_is_under_100_ms`
   (W1-02) under load, one at 106 ms; each passed alone. None in the post-merge run.
 - **Size.** `gov pause` is 120 lines against 80 to 100; the launcher changed by +15 / −6.
+
+## W1-20 residuals (gov closure, 2026-10-05)
+
+Recorded at W1-20's close, from the ticket lead rounds' summaries.
+
+- **Depth numbers are placeholders:** radius R0 and R1 give 1, R2 gives 3, R3 and above give 8 (DEC-035's values,
+  read as hops, DEC-391).
+- **A start id that is no record depends on the machine:** the stopping reason is `FACET_UNAVAILABLE` without the
+  code tool and `UNRESOLVED_IDS` with it (DEC-396). Three cases therefore hold only "not `CLOSURE_COMPLETE`".
+- **The symbol side is tested only in the lead's run:** the ten `local_only` cases cannot run in a launched worker's
+  sandbox, and `test_a_repository_without_a_code_index_states_the_facet_unavailable` passes inside a sandbox for the
+  wrong reason (the sandbox's refusal, not a missing index).
+- **`callees` in the wrapper** (DEC-391) has one unit case; against the real tool it is held by two `local_only`
+  cases of this suite.
+- **`uncommitted` when git fails:** `git status` runs with `check=True`, so it ends in a traceback, not an envelope.
+  It fails closed.
+- **`HEAD` among the store's commits is not checked;** left to W1-27 (DEC-391 DP-7).
+- **Not tested:** two symbols of one name, methods, `referenced_by` on a gap. The reranker's own process is not
+  watched by the no-model test.
+- **W1-07's `closure` cases** run in a project without a store, so they exercise `STORE_MISSING` only.
+- **`S0a-G-03`**, one of the ticket's sources, is not in the tree; no test was derived from it.
+- **The two W1-17 residual lines that name W1-20** (`search` can raise; whole-token matching) are not settled here:
+  a closure never calls the lexical index. They move on to W1-21 or W1-41.
+- **Two branches that revise the same line of an acceptance test cannot be merged:** W1-28's and W1-20's planned
+  W1-07 revisions conflicted, a conflicted merge restores acceptance tests from `HEAD` in a lead's call, and nobody
+  but a test designer writes them. A designer moved this ticket's revision onto lines of its own before the merge.
+  Briefs now say so.
+- **Rule slips the guard did not refuse:** an engineer amended a commit of its own before its second (nothing
+  pushed; containment flagged it), and wrote files with a Python here-document and `sed -i`, all inside its paths.
+- **Run time:** the suite takes about four and a half minutes alone.
+- **Size.** Source +119 / −1 against an estimate of 100 (closure 111, wrapper 8).
