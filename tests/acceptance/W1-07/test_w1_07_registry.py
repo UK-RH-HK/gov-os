@@ -8,13 +8,16 @@ Planned revision (DEC-190, reason "planned: command implemented"): ``checkpoint`
 is built by W1-25 and is no longer expected to return ``NOT_IMPLEMENTED``; the
 list is ``NOT_BUILT`` in ``w1_07_support.py``.
 
-Planned revision (DEC-190, reason "planned: command implemented"): ``readiness``
-is built by W1-13 and leaves the same list.
-
 Planned revision (DEC-190, reason "planned: command implemented"): ``closure``
 is built by W1-20 and leaves the same list. It requires a depth and an id
 (DEC-391): the cases that run every command give it both
 (``support.invocation``), and a call without them is a usage error.
+
+Planned revision (DEC-190, reason "planned: command implemented"): ``readiness``
+is built by W1-13 and leaves the same list.
+
+Planned revision (DEC-190, reason "planned: command implemented"): ``pause``
+is built by W1-28 and leaves the same list.
 """
 
 from __future__ import annotations
