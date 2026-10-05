@@ -3658,3 +3658,115 @@ freeze flag or what a rollback does to history, and go to the owner.
 | Version | Date | Change |
 |---|---|---|
 | 0.82 | 2026-10-05 | Delegated under DEC-220: DEC-357 (W1-28 DP-4: `--cancel-agents` releases locks only; DP-7: a repeat leaves the same state). Six W1-28 packages go to the owner. |
+
+## 83. Owner answers of 2026-10-05 on the parallel run's open packages (register v0.83, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's answers of 2026-10-05, given through the operator and confirmed by the owner in the orchestrator's
+session, on the packages the orchestrator's checkpoint listed as open: W1-50 DP-8 and DP-9, W1-11 DP-2, W1-16 DP-1
+and its loopback UI, the slot question, six W1-28 packages, and four standing points. Ticket edits that follow from
+them are separate commits with the trailer `Task: <ticket id>`.
+
+### DEC-358 — W1-50 DP-8: a ticket's close commit is the latest commit in HEAD's history where its status becomes closed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-8 option (a) · **Under:** DEC-255, DEC-318, CAP-58.h
+- **Decision:** A ticket's close commit is the latest commit in HEAD's history in which the ticket's status becomes
+  `closed`. When no such commit is found for a ticket whose status is `closed`, that is a finding.
+
+### DEC-359 — W1-50 DP-9: an orchestrator commit naming a closed, never-started or unknown ticket is allowed outside the acceptance tests
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-50 package DP-9 option (a) · **Amends:** DEC-318 · **Under:** DEC-255, CAP-58.h
+- **Decision:** A commit with `Role: orchestrator` whose `Task:` trailer names a closed ticket, a ticket never
+  started, or a name that is no ticket (such as `Task: decision-record`) is allowed for every path outside
+  `tests/acceptance/**`. Inside `tests/acceptance/**` it stays a finding (MR-3).
+
+### DEC-360 — W1-11 DP-2: the owner's approval fact is the `Role: owner` trailer on the commit that sets ACTIVE
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-11 package DP-2 option (a) · **Under:** CAP-01.b, CAP-21.a, DEC-182
+- **Decision:**
+  - The owner's approval fact for a decision is the `Role: owner` trailer on the commit that sets the decision
+    `ACTIVE`. A later owner commit approves nothing earlier.
+  - Safeguard: W1-50 gets a KPI line, in its own commit, so that a commit carrying `Role: owner` made during any
+    agent session's call is a finding.
+  - A signature as the stricter form of the fact stays a residual.
+
+### DEC-361 — W1-16 DP-1: the hit@5 question set is the S0b2 C1 set when it is in the S0b2 output, else the designer's set with harder questions
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-16 package DP-1 · **Under:** CAP-12.a, DEC-198, DEC-310
+- **Decision:**
+  - If the C1 question set is under `~/gov-os-workbench/s0b2/out/`, option (B): a test designer may read it there by
+    exact file path, never anything under `s0b2/probe/`, and `questions.yaml` is swapped for it.
+  - If it exists only under `s0b2/probe/`, option (A): the designer's set stays, with harder questions added.
+  - Then W1-16 is merged and closed.
+
+### DEC-362 — W1-16: the wrapper turns the tool's loopback UI off
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the question W1-16 package DP-4 left open · **Under:** DEC-338, DEC-346
+- **Decision:** The codebase-memory wrapper sets `--ui=false`. The change of the tool's configuration is recorded in
+  the notes of its entry in `governance/project/tool-registry.yaml`.
+
+### DEC-363 — A ticket idle on an owner answer does not count against the six
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 3 · **Amends:** DEC-235 · **Under:** DEC-236
+- **Decision:** A ticket in flight that is idle waiting on an owner answer no longer counts against the six. The
+  resource gate still applies to every running lead.
+
+### DEC-364 — W1-28 DP-1: the pause-state line moves to W1-32
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-1 option (a) · **Under:** CAP-05, CAP-28
+- **Decision:** The KPI line "Pause state appears in gov status" leaves W1-28. W1-32, which builds `gov status`
+  and already names the pause state in its first success line, carries it; the two status cases move to W1-32's
+  suite. W1-28 makes the state readable.
+
+### DEC-365 — W1-28 DP-2 and DP-3: the orchestrator may set the freeze, only the owner lifts it, and the caller is `GOV_ROLE`
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 packages DP-2 option (b) and DP-3 · **Amends:** DEC-176 · **Under:** CAP-05.a, CAP-05.d, DEC-179
+- **Decision:**
+  - The orchestrator may set the freeze. Only the owner lifts it.
+  - The caller is `GOV_ROLE` when it is set: `orchestrator` is allowed, and every worker role is refused. When
+    `GOV_ROLE` is unset, the caller is the owner.
+  - The `--role` flag is dropped for this command.
+  - Lifting a freeze works only with `GOV_ROLE` unset.
+
+### DEC-366 — W1-28 DP-5: what `--rollback` does
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-5 option (a) · **Under:** CAP-05.c, DEC-182
+- **Decision:**
+  - One `git revert --no-edit` per commit of the ticket, newest first.
+  - Merge commits are skipped and named in the result, which says that a merge's own conflict resolutions stay.
+  - Revert commits carry `Role:` and `Reverts-Task: <ticket>`, not `Task:`.
+  - A conflicting revert aborts everything with an error.
+  - An unknown ticket is an error; a ticket with no commit succeeds with an empty list.
+  - A dirty tree is refused.
+  - A repeat reverts nothing and succeeds.
+
+### DEC-367 — W1-28 DP-6: the record of a rollback or a cancel is a commit to the ticket file
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-6 · **Under:** CAP-05.d, DEC-366
+- **Decision:**
+  - The record for `--rollback` and `--cancel-agents` is a commit to the ticket file, made after the reverts, with
+    the trailers `Task: <ticket>` and `Reverts-Task: <ticket>`.
+  - A plain pause writes no record.
+  - KPI success 4 of W1-28 is reworded to match, in its own commit.
+
+### DEC-368 — W1-28 DP-8: cancel and rollback both set the freeze flag
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-8 option (a) · **Under:** CAP-05.a, CAP-05.b, CAP-05.c
+- **Decision:** `gov pause --cancel-agents` and `gov pause --rollback <ticket>` both also set the freeze flag.
+
+### DEC-369 — The pre-commit hook runs the second gitleaks scan
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the W1-16 residual · **Extends:** DEC-347 · **Under:** CAP-03.a, CAP-39.a
+- **Decision:** The pre-commit hook also runs the second gitleaks scan, with the project's rules alone (DEC-347).
+  W1-40 gets the KPI line, in its own commit.
+
+### DEC-370 — G-20 may be read from the S0b2 output, by exact file path
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-341
+- **Decision:** A worker may read the text of G-20 from the S0b2 output in `~/gov-os-workbench/s0b2/out/`, by exact
+  file path only, and never anything under `s0b2/probe/`.
+
+### DEC-371 — Leads start their workers with `gov launch`
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER; orchestrator prompt v4.2, section 4 · **Supersedes:** DEC-183 for the roles the launcher starts · **Under:** DEC-231, DEC-311
+- **Decision:**
+  - W1-46 is closed, so from now on a ticket lead starts its workers with `gov launch <role> <ticket>`, sandboxed.
+  - The W1-46 residuals stand as `governance/project/bootstrap.md` records them at its close.
+  - `gov` is not on the PATH. A lead runs it from its worktree as
+    `PYTHONPATH=src python3 -m gov.cli.main launch <role> <ticket> -- <CLI arguments>`.
+  - The launcher starts `engineer`, `independent-test-designer`, `independent-auditor` and `research`. It has no
+    `product-spec` role, so a product-spec worker still starts under DEC-183: a residual, told to the owner.
+
+### DEC-372 — A latency case that fails under parallel load is re-run alone
+- **Status:** ACCEPTED (owner, 2026-10-05; the handling is delegated to the orchestrator) · **Basis:** OWNER · **Under:** DEC-237
+- **Decision:** A latency acceptance case that fails during the post-merge regression under parallel load is re-run
+  alone, after the rest of the regression has ended. A pass alone counts, and each occurrence is recorded.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.83 | 2026-10-05 | Owner answers: DEC-358, DEC-359 (W1-50 DP-8, DP-9), DEC-360 (W1-11 DP-2: the `Role: owner` trailer; W1-50 KPI line), DEC-361, DEC-362 (W1-16 DP-1 and the UI), DEC-363 (idle tickets and the six), DEC-364 to DEC-368 (W1-28 DP-1, DP-2, DP-3, DP-5, DP-6, DP-8), DEC-369 (second scan in pre-commit; W1-40 KPI line), DEC-370 (G-20 by exact path), DEC-371 (`gov launch` from now on), DEC-372 (latency cases re-run alone). |
