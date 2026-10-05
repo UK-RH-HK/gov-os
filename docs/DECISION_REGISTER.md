@@ -4234,3 +4234,37 @@ agree at medium confidence or higher. The owner was told on 2026-10-05.
 | Version | Date | Change |
 |---|---|---|
 | 0.94 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-403 (W1-50 DP-20: the merge helper reads every parent, so a merge that drops a parent's change is judged; DP-19: an octopus merge with a crossing parent fails closed as a whole). |
+
+## 95. Delegated decisions on the W1-50 freeze branch's packages DP-F1, DP-F3, DP-F4 and DP-F5 (register v0.95, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on four of the five packages the lead of W1-50's freeze
+branch (`w1/W1-50-freeze`) returned after its first round. That round confirmed the cause DEC-402 names with one live
+launched session: the flag's path was absent before, an empty read-only file stood there while the launched worker's
+command ran, the lead's own write was refused as frozen in that window, and the file was gone when the command ended.
+With the branch's launcher no file appeared over a 66-second command. All four are P3, reversible, and the lead's and
+the orchestrator's recommendations agree at medium confidence or higher. The fifth package, DP-F2 (what protects the
+flag's path in a session launched while no flag existed), lowers a protection and is the owner's. The owner was told
+on 2026-10-05.
+
+### DEC-404 — W1-50 freeze branch: the marker line's layout; an unmarked file at launch; `gov pause` over a linked runtime folder; one builder test
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** packages DP-F3 option (a), confidence medium-high; DP-F1 option (a), medium; DP-F4 option (a), medium; DP-F5 option (a), high · **Under:** DEC-402, DEC-311, DEC-365
+- **Decision:**
+  - DP-F3: the flag's first line, as `gov pause` writes it, is `FROZEN <who> <when>` with single spaces; who is
+    `owner` or `orchestrator` (the caller of DEC-365), when is UTC `YYYY-MM-DDTHH:MM:SSZ`.
+  - The guard's reading is wider than what `gov pause` writes, as built and reviewed: any file at the flag's path
+    that carries the word freezes, in any of the spellings the review probed; an empty file, or one without the
+    word, is no freeze and its presence is recorded (DEC-402). A flag the guard cannot read, or a dangling link at
+    the runtime folder, freezes.
+  - DP-F1: `gov launch` denies the flag's path by name whenever a file exists there at launch, marked or not, as
+    for any name that exists at launch (DEC-311). A placeholder renewed this way freezes nothing.
+  - DP-F4: when `.gov-runtime` is a symbolic link, `gov pause` refuses with an error that names the link and
+    writes nothing. The owner repairs the folder.
+  - DP-F5: `tests/unit/install/**` is added to the ticket's `allowed_paths`, in its own commit, so the engineer
+    updates the one builder test that sets an empty flag.
+  - `gov pause` writes the flag by a temporary file and a rename, never through a link at the flag's path, and
+    reads it back with the guard's own reader; `--off` over a directory is a clear refusal (the review's findings,
+    tests already written).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.95 | 2026-10-05 | Delegated under DEC-220: DEC-404 (W1-50 freeze branch: the marker line is `FROZEN <who> <when>`; an unmarked file at the flag's path is still denied by name at launch; `gov pause` refuses over a linked runtime folder; one builder test's path added). |
