@@ -4268,3 +4268,53 @@ on 2026-10-05.
 | Version | Date | Change |
 |---|---|---|
 | 0.95 | 2026-10-05 | Delegated under DEC-220: DEC-404 (W1-50 freeze branch: the marker line is `FROZEN <who> <when>`; an unmarked file at the flag's path is still denied by name at launch; `gov pause` refuses over a linked runtime folder; one builder test's path added). |
+
+## 96. Owner actions and answers of 2026-10-05, third round (register v0.96, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-05, after the W1-19 lead's third round, the W1-50 freeze branch's first round, and
+DEC-400's drafts.
+
+### DEC-405 — The product-spec role file and agent definition are placed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner action through the operator · **Under:** DEC-400, DEC-254
+- **Decision:**
+  - `template/governance/kernel/roles/product-spec.md` and `.claude/agents/product-spec.md` are committed together
+    in the main tree as `5d1d9cffc796240a86eb021bc6a03a3da243b1df` (Task: decision-record, Role: owner), each
+    byte-identical to the orchestrator's draft.
+  - If containment flags that commit, the finding is a record of an owner action (DEC-254).
+  - W1-33's suite was run again at that commit: 113 passed, the field-by-field check among them.
+
+### DEC-406 — W1-19 DP-10: a worker reads S0b2's R1 prototype by exact path; tuning on the dev set is not the fix
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-19 package DP-10 option (a) · **Under:** DEC-397, DEC-388
+- **Decision:**
+  - A worker may read `/home/usain/gov-os-workbench/s0b2/sandbox/retrieval/r1/r1_retrieval.py` by that exact path.
+    Folders there are never listed, and `s0b2/probe/` is never touched.
+  - The reading finds how R1 ran the lexical query (ranked full-text or exact string), the candidate counts, the
+    chunking and the reranker call.
+  - If the difference lies outside W1-19's paths (for example W1-17's exact-string lexical route), it comes back as
+    a package with the measured effect, not as a workaround.
+  - Tuning on the dev set alone (option (c), a larger top-k) is not accepted as the fix.
+
+### DEC-407 — W1-50 DP-F2: accepted for the merge; before W1-50 closes, the flag is compared around every Bash call and owner identity follows process ancestry
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** W1-50 freeze branch package DP-F2 option (a) now, option (b) and a new rule before the close · **Amends:** DEC-365 ("unset `GOV_ROLE` is the owner") · **Under:** DEC-402, DEC-404, DEC-311
+- **Decision:**
+  - Now, so the freeze branch can merge: W1-46's one live assertion is revised as a rewrite after implementation,
+    reason "owner decision: freeze marker".
+  - Before W1-50 closes, two things are built:
+    - the containment check compares the freeze flag around every Bash call; a removed or emptied flag is a
+      finding and is restored with its marker line;
+    - the ancestry rule (owner identity): an owner-only action, such as lifting a freeze, refuses whenever any
+      parent process of the command is a Claude Code session, whatever `GOV_ROLE` says. "`GOV_ROLE` unset" alone no
+      longer means the owner, which closes `env -u GOV_ROLE gov pause --off` from a worker. The same rule applies
+      wherever the code treats an unset `GOV_ROLE` as the owner.
+  - The KPI lines are added to W1-50 in their own commit.
+
+### DEC-408 — DEC-403 stands; three orchestrator choices are confirmed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** owner answer · **Under:** DEC-403, DEC-402, DEC-398, DEC-397
+- **Decision:**
+  - DEC-403 (the symmetric merge rule; an octopus merge with a crossing parent fails closed): no objection.
+  - Confirmed: the freeze work is carried by W1-50 and not by W1-32; the fail-closed reading of criss-cross merges
+    applies to containment too; the reranker environment's extra pin `huggingface-hub` 1.33.0.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.96 | 2026-10-05 | Owner: DEC-405 (product-spec role file and agent definition placed, `5d1d9cff`), DEC-406 (W1-19 DP-10: an exact-path read of S0b2's R1 prototype; dev-set tuning is not the fix), DEC-407 (W1-50 DP-F2: accepted for the merge; before the close, the flag is compared around every Bash call and owner-only actions refuse under a Claude Code parent process), DEC-408 (DEC-403 stands; three orchestrator choices confirmed). |
