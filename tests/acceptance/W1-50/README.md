@@ -65,13 +65,22 @@ existing test functions (20 cases) are rewritten after implementation, same reas
 decision is built. No package is open. See "Added after implementation, DEC-410". The suite now holds 338 cases: 295
 pass and 43 fail.
 
+Eleventh batch, **added after implementation**: the tenth batch's cases were implemented and the 338 cases passed. A
+review found one behaviour the suite did not hold: DP-28 bounds one merge commit, and nothing bounds the move, so a
+move of very many merge commits with 24 parents each is passed over in silence, because the post-command hook is
+stopped at the harness's time limit. It came to the test designer as a described behaviour, never as code. 4 cases are
+added in 3 test functions, reason "review finding, DEC-410"; 2 of them fail on the implementation as it stands. No
+existing case is changed, and no new package is open. See "Added after implementation, review of DEC-410". The suite
+now holds 342 cases: 340 pass and 2 fail.
+
 ## Run
 
 ```sh
 python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider
 ```
 
-Standard library and `pytest` only. No network. The suite takes about a minute and a half.
+Standard library and `pytest` only. No network. The suite takes about a minute and a half; while the two red cases
+of the eleventh batch are red, each of them adds about the harness's hook limit (30 s).
 
 ## How the tests drive the check
 
@@ -1045,6 +1054,58 @@ makes a merge commit with the orchestrator's trailers that closes a ticket by ha
 a finding too. The case asserts nothing about it either way, so it does not pin the opposite. The cases of DP-23,
 DP-25, DP-26 and DP-28 (as built) stand unchanged.
 
+## Added after implementation, review of DEC-410 (eleventh batch)
+
+These 4 cases are **tests added after implementation**; reason: "review finding, DEC-410". The behaviour came to the
+test designer as a described behaviour, never as code; no test reads the check's or the helper's code. They are in
+`test_w1_50_move_of_very_many_merge_commits.py`; the histories are built in `w1_50_many_merges_support.py` (new).
+Every history is a real git history built in the throw-away project with commits, `git merge` and `git commit-tree`.
+"Made in the call" is: between the PreToolUse and the PostToolUse hook of one Bash call. They are the twin of the
+ninth batch's cases about one merge commit with very many parents.
+
+Run when they were written: **2 failed, 2 passed**; the suite's run is 2 failed, 340 passed (342 cases). Both red
+cases fail on the behaviour (the hook's time limit), with the history built and the fixture's own guard passed. No
+existing case is changed.
+
+### A move of very many large merge commits is judged, never passed over in silence (4 cases)
+
+DEC-410 (DP-28): the helper refuses a merge commit with more than 24 distinct parents, so one merge commit cannot
+stop the hook. Nothing bounds the move as a whole. The history: before the call `main` gets 23 empty commits (the
+fork points) and then a test designer's change of an existing acceptance test. In an orchestrator session's own call
+a chain of 95 merge commits is made with `git commit-tree` and `main` is moved forward to its tip. Each merge commit
+has 24 parents: the merge commit before it (the first: `HEAD`) and 23 new side commits, one on each of the 23 fork
+points, each with the orchestrator's trailers and the tree from before the test designer's change (each changes
+nothing). The merge commits before the dropping one hold `HEAD`'s tree, so where they differ from a side commit their
+first parent brought it. The dropping merge commit and those after it hold the tree from before the change: by the
+words of DEC-403 the undone test is the dropping merge commit's own change and its only one, and the later merge
+commits differ from no parent. The fixture's guard (`assert_chain`) shows this from git's own answers in a handful of
+git calls; building the 2,280 commits takes about three seconds.
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| Through the check | `test_a_move_of_very_many_merge_commits_with_24_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit`: the post-command hook ends by itself within the harness's limit (`HOOK_TIMEOUT_S` of the W1-03 support module, 30 s; not raised here) and the call adds a finding. Either form is accepted: one that names the undone test, or one for the move as a whole, as the check records a move it cannot read. `orchestrator-trailers-dropped-near-the-newest`: the orchestrator's trailers on the merge commits, the dropping one is number 93 of 95 counted from the oldest. `no-trailers-dropped-near-the-oldest`: no trailers (the caller decides; the caller is the orchestrator), the dropping one is number 3 | 2 | **red**: the hook does not end within 30 s and is stopped; no finding was added. Each case takes about the limit |
+| The other side | `test_an_ordinary_move_of_sixty_two_parent_merges_of_commits_inside_their_own_paths_is_silent`: 60 `git merge --no-ff` in one orchestrator call, one branch each; every branch has one commit that adds a new file inside its own trailers' paths (20 are a test designer's new acceptance tests, each another file; 20 an engineer's source files; 20 documents of the docs ticket). Silent, the hook ends in time, nothing is moved | 1 | **green** |
+| The other side | `test_an_ordinary_move_of_three_octopus_merges_of_eight_branches_each_is_silent`: three `git merge` of eight branches each in one orchestrator call (three merge commits with nine parents), 24 branches of the same kind. Silent | 1 | **green** |
+
+The two green cases must stay green: a fix that flags a move for the number of its merge commits, or of its commits,
+fails them. Their branches are made by plumbing (a blob, a tree from a temporary index, `git commit-tree`); the
+merges are `git merge`'s own. Their guard (`assert_ordinary_merges`) shows that every merge commit adds, against its
+first parent, exactly its branches' paths, and that no path is changed on more than one side.
+
+**The order in which the check reads a move** is not known to the tests. The dropping merge commit is near the
+newest end of the chain in one red case and near the oldest in the other, so in either reading order one case has it
+early and one late.
+
+**95 merge commits.** The number is the review's. When these cases were written the hook took 3.1 s for a chain of
+5 such merge commits, 6.3 s for 10 and 13.0 s for 20 on this machine (about 0.65 s for each merge commit), so 95 is
+about twice the limit. On a machine where a merge commit of this kind is read in less than 0.3 s the red cases need
+a longer chain to be red; `VERY_MANY_MERGES` of the support module is the one place to raise it. Once the behaviour
+is built the number does not matter.
+
+**Not pinned:** a number of merge commits, of commits or of git processes at which anything changes; how the work is
+bounded or the time is kept; which form the finding has, its `action`, and whether the check leaves the move in
+place; anything `read_merge` returns for a merge commit of the chain (each has 24 parents and is within DP-28).
+
 ## What the suite takes as given
 
 - **Not changed by W1-50.** The KPIs speak of a forward `HEAD` move. A reset, a checkout of another branch or
@@ -1155,7 +1216,7 @@ DP-21 to DP-28 are decided by DEC-410 (orchestrator, delegated under DEC-220, st
 | DP-25 | An octopus whose other parents cross only each other | DEC-410, option (a): read as built; that pair brings nothing against each other (amends DEC-403's "read parent by parent"). Test, `own` unchanged: `test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_parent_by_parent` |
 | DP-26 | Git's own clean combination of two sides' edits of one acceptance test | DEC-410, option (a): stays flagged, as built. Tests: the two clean-combination cases of `test_w1_50_acceptance_test_changed_on_both_sides.py` |
 | DP-27 | A merge commit's own change under `tests/acceptance/**` with a test designer's trailers | DEC-410, option (b): a finding whatever its trailers. Tests: `test_w1_50_merge_commit_own_change_of_an_acceptance_test.py` and two rewritten cases |
-| DP-28 | A merge commit with very many parents | DEC-410, option (a): the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a whole. Tests, unchanged: the ninth batch's cases with 150 parents and with nine |
+| DP-28 | A merge commit with very many parents | DEC-410, option (a): the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a whole. Tests, unchanged: the ninth batch's cases with 150 parents and with nine. The move as a whole (review finding, eleventh batch): `test_w1_50_move_of_very_many_merge_commits.py` |
 
 ## Earlier suites
 
