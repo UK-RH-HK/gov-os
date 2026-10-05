@@ -25,6 +25,7 @@ from gov.guard.decide import (  # noqa: E402
     _match_pattern,
     _parse_frontmatter,
     decide,
+    freeze_state,
     KNOWN_ROLES,
 )
 
@@ -306,7 +307,7 @@ class TestDevPaths:
         project = _make_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Write",
             tool_input={"file_path": "/dev/null", "content": "x"},
@@ -599,7 +600,7 @@ class TestDevNullAcrossStates:
         project = _make_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "echo x > /dev/null"},
@@ -922,7 +923,7 @@ class TestProbe2Frozen:
         project = _probe_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "rm src/gov/guard/a.py 2>/dev/null"},
@@ -934,7 +935,7 @@ class TestProbe2Frozen:
         project = _probe_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "ls 2>/dev/null"},
@@ -1064,7 +1065,7 @@ class TestRoleSubagentGoverns:
         project = _make_project(tmp_path, _std_tickets())
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Write",
             tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
@@ -2042,3 +2043,62 @@ class TestOptionAfterTheDestination:
     def test_inside_the_paths_allowed(self, tmp_path, command):
         project = _make_project(tmp_path, _std_tickets())
         assert _bash(project, command) == "allow"
+
+
+# ---------------------------------------------------------------------------
+# W1-50: the freeze flag carries a marker (DEC-402)
+# ---------------------------------------------------------------------------
+
+class TestFreezeState:
+
+    def _flag(self, tmp_path):
+        flag = Path(tmp_path) / ".gov-runtime" / "freeze"
+        flag.parent.mkdir(parents=True, exist_ok=True)
+        return flag
+
+    def test_nothing_at_the_path_is_absent(self, tmp_path):
+        assert freeze_state(str(tmp_path)) == "absent"
+        self._flag(tmp_path)
+        assert freeze_state(str(tmp_path)) == "absent"
+
+    @pytest.mark.parametrize("content", [
+        b"", b"off\n", b"not FROZEN\n", b"FROZENX\n", b"\n\n",
+    ])
+    def test_a_file_without_the_marker_is_unmarked(self, tmp_path, content):
+        self._flag(tmp_path).write_bytes(content)
+        assert freeze_state(str(tmp_path)) == "unmarked"
+
+    def test_a_character_device_is_unmarked(self, tmp_path):
+        self._flag(tmp_path).symlink_to("/dev/null")
+        assert freeze_state(str(tmp_path)) == "unmarked"
+
+    @pytest.mark.parametrize("content", [
+        b"FROZEN\n", b"FROZEN owner 2026-10-05T00:00:00Z\n", b"frozen\n",
+        b"a note\n  FROZEN x\n", b"\xef\xbb\xbfFROZEN\r\nmore\r\n",
+        b"FROZEN",
+    ])
+    def test_a_marker_line_is_frozen(self, tmp_path, content):
+        self._flag(tmp_path).write_bytes(content)
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_file_too_large_to_read_whole_is_frozen(self, tmp_path):
+        # Stricter: the marker may be past what is read.
+        self._flag(tmp_path).write_bytes(b"filler line\n" * 10_000)
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_fifo_is_frozen_and_is_not_opened(self, tmp_path):
+        os.mkfifo(self._flag(tmp_path))
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_directory_and_a_dangling_link_are_frozen(self, tmp_path):
+        flag = self._flag(tmp_path)
+        flag.mkdir()
+        assert freeze_state(str(tmp_path)) == "frozen"
+        flag.rmdir()
+        flag.symlink_to(tmp_path / "no-such-file")
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_an_empty_flag_does_not_freeze_a_write(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        self._flag(project).write_text("")
+        assert _bash(project, "cd src && cp a.py b.py") == "allow"

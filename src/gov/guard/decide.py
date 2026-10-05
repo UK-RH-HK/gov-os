@@ -6,6 +6,7 @@ import glob
 import os
 import re
 import shlex
+import stat
 import tempfile
 from pathlib import Path
 
@@ -17,6 +18,8 @@ KNOWN_ROLES = frozenset({
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
 FREEZE_FLAG = ".gov-runtime/freeze"
+FREEZE_MARKER = b"FROZEN"  # DEC-402: the first word of a real flag's marker line
+_FREEZE_HEAD = 65536       # the most that is read of a flag
 ACCEPTANCE = "tests/acceptance"
 _GOV_RUNTIME = ".gov-runtime"
 _PUNCT = frozenset("();<>|&\n")
@@ -558,6 +561,46 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     return targets or None
 
 
+# -- the freeze flag (DEC-402) -------------------------------------------------
+
+def freeze_state(project_root: str) -> str:
+    """Read the freeze flag: ``"absent"``, ``"unmarked"`` or ``"frozen"``.
+
+    Frozen when a line of the flag starts with the marker word, or when
+    something is at the path that cannot be read as a file (DEC-179).  An
+    empty file, text without the marker and a character device (what the
+    sandbox puts at the path) are an unmarked presence, which the hook
+    records.  Only a regular file is opened, and only its head is read.
+    """
+    path = os.path.join(project_root, FREEZE_FLAG)
+    try:
+        os.lstat(path)
+    except (FileNotFoundError, NotADirectoryError):
+        return "absent"
+    except OSError:
+        return "frozen"
+    try:
+        st = os.stat(path)
+        if stat.S_ISCHR(st.st_mode) or (stat.S_ISREG(st.st_mode)
+                                        and st.st_size == 0):
+            return "unmarked"
+        if not stat.S_ISREG(st.st_mode):
+            return "frozen"
+        fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            head = os.read(fd, _FREEZE_HEAD + 1)
+        finally:
+            os.close(fd)
+    except OSError:
+        return "frozen"
+    if len(head) > _FREEZE_HEAD:
+        return "frozen"  # too large to read whole: the guard cannot tell
+    for line in head.removeprefix(b"\xef\xbb\xbf").splitlines():
+        if line.upper().split()[:1] == [FREEZE_MARKER]:
+            return "frozen"
+    return "unmarked"
+
+
 # -- main decision -------------------------------------------------------------
 
 def decide(
@@ -570,7 +613,7 @@ def decide(
     cwd: str | None = None,
 ) -> tuple[str, str]:
     """Return ``("allow", "")`` or ``("deny", "<reason>")``."""
-    frozen = os.path.exists(os.path.join(project_root, FREEZE_FLAG))
+    frozen = freeze_state(project_root) == "frozen"
     erole = (role or "").strip() or ""
 
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.

@@ -24,6 +24,7 @@ import time
 
 STDIN_DEADLINE_S = 3.0
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
+RECORDS_REL = ".gov-runtime/records.jsonl"
 
 
 def _append_finding(project_root: str, finding: dict) -> None:
@@ -32,6 +33,34 @@ def _append_finding(project_root: str, finding: dict) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(finding, separators=(",", ":")) + "\n")
+    except Exception:
+        pass
+
+
+def _record_unmarked_flag(project_root: str, data: dict, flag: str) -> None:
+    """Record an unmarked presence at the freeze flag's path (DEC-402).
+
+    One line in ``records.jsonl`` in DEC-177's form.  An observation:
+    it must not block or fail the call.
+    """
+    try:
+        path = os.path.join(project_root, RECORDS_REL)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        record = {
+            "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "session_id": data.get("session_id", ""),
+            "agent_type": data.get("agent_type") or "",
+            "role": os.environ.get("GOV_ROLE") or "",
+            "ticket": os.environ.get("GOV_TICKET") or "",
+            "tool": data.get("tool_name", ""),
+            "command": data["tool_input"].get("command", ""),
+            "paths": [flag],
+            "action": "recorded",
+            "reason": "something without the freeze marker is at the "
+                      "freeze flag's path: no freeze",
+        }
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, separators=(",", ":")) + "\n")
     except Exception:
         pass
 
@@ -190,7 +219,7 @@ def main() -> None:
               session_id=session_id, tool_name=tool_name)
 
     try:
-        from gov.guard.decide import decide, FREEZE_FLAG
+        from gov.guard.decide import decide, freeze_state, FREEZE_FLAG
     except Exception as exc:
         session_id = data.get("session_id", "")
         _fail(project_root, "import_error", f"cannot import guard logic: {exc}",
@@ -219,6 +248,19 @@ def main() -> None:
     if decision == "deny":
         _deny(reason)
     else:
+        # DEC-402: the flag is read as the decision read it.  An unmarked
+        # presence is recorded for a call that may write.
+        flag = "absent"
+        if tool_name in ("Bash", "Write", "Edit", "NotebookEdit"):
+            try:
+                flag = freeze_state(project_root)
+            except Exception as exc:
+                _fail(project_root, "decide_error",
+                      f"freeze flag not read: {exc}",
+                      session_id=data.get("session_id", ""),
+                      tool_name=tool_name)
+            if flag == "unmarked":
+                _record_unmarked_flag(project_root, data, FREEZE_FLAG)
         if tool_name == "Bash":
             # Install rule (W1-04, DEC-120): after the guard allows a
             # Bash call, check for sudo and install commands.
@@ -235,7 +277,7 @@ def main() -> None:
             if has_sudo(command):
                 _deny("sudo is denied to all agent roles (DEC-083)")
             elif has_install(command):
-                if os.path.exists(os.path.join(project_root, FREEZE_FLAG)):
+                if flag == "frozen":
                     _deny("frozen: install denied")
                 ar = acting_role(role, subagent_type)
                 if ar == "orchestrator":
