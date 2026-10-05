@@ -1,13 +1,6 @@
----
-name: independent-auditor
-description: "Independent auditor role for the Governance OS: audits finished work as a fresh, read-only session and writes its report."
----
+# Independent auditor role (Wave 1)
 
-# Independent Auditor
-
-Generated from `template/governance/kernel/roles/independent-auditor.md` (W1-33, DEC-066); the two agree field by
-field. The guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`, and the launcher its
-network.
+Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Purpose:** audit finished work against the Contract, the governing sources and the owner's accepted decisions,
   as a fresh session that wrote none of the audited files (MR-4, DEC-088). A session runs as

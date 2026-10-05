@@ -51,7 +51,7 @@ tools:
     uninstall: "rm -f ~/.local/bin/codebase-memory-mcp && rm -rf ~/.cache/codebase-memory-mcp"
     date: "2026-09-30"
     approved_by: "DEC-074"
-    note: "Static binary ~/.local/bin/codebase-memory-mcp; sha256 of that binary. The bundled install.sh is deliberately not run (it rewrites agent MCP configs)."
+    note: "Static binary ~/.local/bin/codebase-memory-mcp; sha256 of that binary. The bundled install.sh is deliberately not run (it rewrites agent MCP configs). Configuration change (DEC-362, DEC-389, 2026-10-05): the gov wrapper runs 'codebase-memory-mcp config set ui_enabled false' before every cli call, so the tool's daemon serves no UI on 127.0.0.1:9749. The tool persists this as {\"ui_enabled\": false, \"ui_port\": 9749} in <repository>/.gov-runtime/codeintel/home/config.json (the per-repository home the wrapper passes as CBM_CACHE_DIR); ~/.cache/codebase-memory-mcp is not changed."
   - name: copier
     version: "9.18.2"
     sha256: "2343959ad8511d4c10824a856adf20262e59f725841021e59ae6434b16a98ac3"
