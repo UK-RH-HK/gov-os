@@ -174,6 +174,52 @@ def test_a_commit_list_that_cannot_be_read_is_a_finding(tmp_path):
     assert "not a forward move" in findings[0]["reason"]
 
 
+def test_a_trailer_block_is_read_as_git_reads_one_with_default_settings():
+    from gov.guard.containment import _role_and_task
+
+    block = ("Implements: x\nrole : engineer\n  and more\nNot a trailer.\n"
+             " Task: no\nTask:T-1\n\nRole=owner\n#Role: owner\nRole:\n")
+    assert _role_and_task(block) == [
+        ("role", "engineer and more"), ("task", "T-1"), ("role", "")]
+
+
+def test_local_settings_and_replacement_refs_do_not_change_what_is_read(tmp_path):
+    """The commits of a move, a ticket's file and its close commit are the
+    real objects', whatever .git/config and refs/replace/ hold."""
+    from gov.guard.containment import (
+        _close_commit, _is_ancestor, _move_commits, _ticket_at)
+
+    project = _make_project(tmp_path)
+    root = str(project)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    first = _commit(project, "src/main.py", f"Task: {TICKET}", "Role: engineer")
+    _ticket(project, "closed")
+    close = _commit(project, "README.md", "Role: owner")
+    before = (_move_commits(root, old, close),
+              _ticket_at(root, close, TICKET_FILE),
+              _close_commit(root, close, TICKET_FILE))
+    assert before[0][0][2:] == (["owner"], [], [TICKET_FILE, "README.md"])
+    assert before[1]["status"] == "closed" and before[2] == close
+
+    for key, value in (
+            ("trailer.separators", "="), ("core.commentChar", "R"),
+            ("trailer.roleplay.key", "Reviewed-by"), ("trailer.tasking.key", "X"),
+            ("log.showRoot", "false"), ("diff.ignoreSubmodules", "all"),
+            ("diff.renames", "true"), ("i18n.logOutputEncoding", "UTF-16")):
+        _git(project, "config", "--local", key, value)
+    twin = _git(project, "commit-tree", f"{old}^{{tree}}", "-p", old,
+                "-m", "nothing").strip()
+    _git(project, "replace", first, twin)
+    _git(project, "replace", f"{close}:{TICKET_FILE}", f"{old}:{TICKET_FILE}")
+    _git(project, "replace", f"{close}^{{tree}}", f"{old}^{{tree}}")
+    assert "nothing" in _git(project, "cat-file", "commit", first)
+
+    assert (_move_commits(root, old, close),
+            _ticket_at(root, close, TICKET_FILE),
+            _close_commit(root, close, TICKET_FILE)) == before
+    assert _is_ancestor(root, first, close)
+
+
 # ---------------------------------------------------------------
 # The close commit (DEC-358)
 # ---------------------------------------------------------------
@@ -289,6 +335,35 @@ def test_a_role_owner_commit_brought_by_a_merge_is_a_finding(tmp_path):
     assert report and len(findings) == 1
     assert owner[:12] in findings[0]["reason"]
     assert findings[0]["paths"] == ["README.md"]
+
+
+def test_role_owner_with_characters_inside_the_word_that_do_not_show_is_a_finding(tmp_path):
+    """The behaviour names characters around the word; inside it is not said."""
+    project = _make_project(tmp_path)
+    report, findings = _check(project, lambda: _commit(
+        project, "README.md", "Role:  Ow​ner\x0c\x7f"))
+    assert report and len(findings) == 1
+    assert "Role: owner commit" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["README.md"]
+
+
+def test_a_committed_path_behind_a_linked_directory_is_a_finding(tmp_path):
+    """Inside the commit's own paths by its name, but a directory on the way
+    to it is a symbolic link in the working tree: not judged by where the
+    link leads, and not silent."""
+    import shutil
+
+    for role in ("orchestrator", "engineer"):
+        project = _make_project(tmp_path / role)
+
+        def work():
+            _commit(project, "src/deep/a.py", f"Task: {TICKET}",
+                    "Role: engineer")
+            shutil.rmtree(project / "src" / "deep")
+            (project / "src" / "deep").symlink_to(project / "src")
+
+        report, findings = _check(project, work, role=role)
+        assert report and "src/deep/a.py" in findings[0]["paths"]
 
 
 def test_in_a_worker_s_call_another_role_s_trailer_alone_is_a_finding(tmp_path):

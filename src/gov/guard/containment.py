@@ -63,11 +63,15 @@ class _GitError(Exception):
     pass
 
 
+# Every git call reads the real objects, whatever refs/replace/ holds.
+_GIT = ("git", "--no-replace-objects")
+
+
 def _git(root: str, *args: str) -> str:
     """Run a git command and return stdout.  Raises on failure."""
     try:
         p = subprocess.run(
-            ["git", "-C", root, *args],
+            [*_GIT, "-C", root, *args],
             capture_output=True, text=True,
             timeout=_GIT_TIMEOUT, check=False,
         )
@@ -574,7 +578,7 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
     """True when *old* is an ancestor of *new*.  Raises on failure."""
     try:
         p = subprocess.run(
-            ["git", "-C", root, "merge-base", "--is-ancestor", old, new],
+            [*_GIT, "-C", root, "merge-base", "--is-ancestor", old, new],
             capture_output=True, timeout=_GIT_TIMEOUT, check=False,
         )
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
@@ -584,9 +588,35 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
 
 # ---- commits of a forward move (W1-50, DEC-255) -------------------
 
-_LOG_FORMAT = ("--format=%x00%H %P%x00"
-               "%(trailers:key=Role,key=Task,unfold,separator=%x00)%x00")
+_LOG_FORMAT = "--format=%x00%H %P%x00%(trailers)%x00"
+# What the repository's local configuration could set otherwise: how a
+# trailer block is told from text, the message's encoding, a root
+# commit's changes, renames, and submodule entries.
+_LOG_DEFAULTS = ("-c", "trailer.separators=:", "-c", "core.commentChar=#",
+                 "log", "--encoding=UTF-8", "--root", "--no-renames",
+                 "--ignore-submodules=none")
 _COMMIT_IDS = re.compile(r"([0-9a-f]{40,64} ?)+")
+_TRAILER = re.compile(r"([A-Za-z0-9-]+)[ \t]*:(.*)", re.S)
+
+
+def _role_and_task(block: str) -> list:
+    """``(key, value)`` for each ``Role`` and ``Task`` trailer of a
+    trailer block, read as git reads one with default settings: a key
+    of letters, digits and ``-``, then ``:``; a line that begins with
+    whitespace goes on with the line before it."""
+    found: list = []
+    lines = None  # the value's lines of the Role or Task being read
+    for line in block.split("\n"):
+        if line[:1] in ("", " ", "\t", "\r"):
+            if lines is not None:
+                lines.append(line)
+            continue
+        m = _TRAILER.fullmatch(line)
+        lines = [m[2]] if m and m[1].lower() in ("role", "task") else None
+        if lines is not None:
+            found.append((m[1].lower(), lines))
+    return [(key, " ".join(filter(None, (v.strip(" \t\r") for v in ls))))
+            for key, ls in found]
 
 
 def _move_commits(root: str, old: str, new: str) -> list:
@@ -594,20 +624,22 @@ def _move_commits(root: str, old: str, new: str) -> list:
     ``(id, parents, Role values, Task values, paths)``.
 
     One git process.  Trailers are read from the final trailer block
-    only, as git reads them (DEC-182, DEC-267).  Paths are listed
-    without rename detection, so both ends of a rename appear
-    (repair 7); a merge commit lists only what it changes beyond what
-    its parents hold (DEC-269).
+    only, as git finds it (DEC-182, DEC-267); the block comes as the
+    message holds it and its lines are read here, so no trailer setting
+    of the repository renames or hides a ``Role`` or a ``Task``.  Paths
+    are listed without rename detection, so both ends of a rename
+    appear (repair 7); a merge commit lists only what it changes beyond
+    what its parents hold (DEC-269).
 
     Everything is separated by NUL, the one byte no trailer and no file
-    name can hold, and nothing is unquoted or trimmed.  A trailer begins
-    with its key, a raw entry with ``:`` and the token after it is its
-    path whatever it holds, so no byte a commit's author chooses is read
-    as structure.  Output that cannot be read raises, so the move
-    becomes a finding.
+    name can hold, and nothing is unquoted.  The token after a commit's
+    ids is its trailer block and the token after a raw entry (``:``) is
+    its path, whatever they hold, so no byte a commit's author chooses
+    is read as structure.  Output that cannot be read raises, so the
+    move becomes a finding.
     """
-    out = _git(root, "log", "-z", "-c", "--no-renames", "--raw",
-               "--no-abbrev", _LOG_FORMAT, f"{old}..{new}")
+    out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
+               _LOG_FORMAT, f"{old}..{new}")
     unreadable = _GitError("the commits of the HEAD move cannot be read")
     commits: list = []
     tokens = iter(out.split("\0"))
@@ -620,12 +652,11 @@ def _move_commits(root: str, old: str, new: str) -> list:
         elif _COMMIT_IDS.fullmatch(tok):
             ids = tok.split()
             commits.append((ids[0], ids[1:], set(), set(), []))
-        elif tok:
-            key, sep, value = tok.partition(": ")
-            if not commits or not sep or key.lower() not in ("role", "task"):
-                raise unreadable
-            if value:
-                commits[-1][2 if key.lower() == "role" else 3].add(value)
+            for key, value in _role_and_task(next(tokens, "")):
+                if value:
+                    commits[-1][2 if key == "role" else 3].add(value)
+        elif tok.strip("\n"):
+            raise unreadable
     if not commits:
         raise unreadable
     return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
@@ -635,7 +666,8 @@ def _ticket_at(root: str, rev: str, ticket_file: str):
     """The ticket's frontmatter as committed at *rev*, or ``None``."""
     from gov.guard.decide import _parse_frontmatter
     try:
-        return _parse_frontmatter(_git(root, "show", f"{rev}:{ticket_file}"))
+        return _parse_frontmatter(
+            _git(root, "cat-file", "blob", f"{rev}:{ticket_file}"))
     except (_GitError, _NotARepo, ValueError):
         return None
 
@@ -677,10 +709,19 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
     rr = os.path.realpath(root)
 
     def outside(c_role, c_tid, c_sub, fn=decide_fn):
-        return [p for p in paths if not _in_scope(
-            os.path.join(rr, p), root, c_role, c_tid, c_sub, fn)]
+        # A path is judged by its name in the commit: where a directory
+        # on the way to it is a symbolic link in the working tree, the
+        # name is not where a write would go, and the path is a finding.
+        return [p for p in paths
+                if os.path.realpath(os.path.dirname(os.path.join(rr, p)))
+                != os.path.dirname(os.path.join(rr, p))
+                or not _in_scope(
+                    os.path.join(rr, p), root, c_role, c_tid, c_sub, fn)]
 
-    if any(r.lower() == "owner" for r in roles):
+    # Role: owner, whatever whitespace and characters that do not show
+    # stand in or around the word.
+    if any("".join(c for c in r if c.isprintable() and c != " ").lower()
+           == "owner" for r in roles):
         return paths, "a Role: owner commit made during an agent's call"
     if not orch_own:
         if roles and roles != [sub or role]:
