@@ -4088,3 +4088,31 @@ stopping reasons) follows the owner's answer on DP-5 (DEC-391).
 | Version | Date | Change |
 |---|---|---|
 | 0.91 | 2026-10-05 | Delegated under DEC-220: DEC-393 (W1-20 DP-A: the order of stopping reasons; DP-B: `facets.code` is `not_asked` when the facet was not asked; four engineer choices as built). |
+
+## 92. Delegated decisions on W1-50's packages DP-17 and DP-18 (register v0.92, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule. The DP-15 rule of DEC-390 was the
+orchestrator's own and was wrong in two ways, which the closing round's reviewer showed by running them: it flags an
+ordinary merge-back of a ticket branch that earlier took the integration branch (a false finding, KPI failure line
+1), and one extra empty commit evades it. The rule below replaces it. Against DEC-269, which it refines, it only
+makes the check report more; it is reversible, and the lead's and the orchestrator's recommendations agree at
+medium-high confidence. The owner was told on 2026-10-05.
+
+### DEC-394 — W1-50 DP-18 and DP-17: a merge commit's own change by the three-way rule; a ticket-file commit in a worker's call
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-18 option (a) and DP-17 option (a), confidence medium-high; the third reviewer's findings F1 and F2 · **Amends:** DEC-390 (replaces its DP-15 rule), DEC-269 (refines "content a parent holds") · **Under:** CAP-58, DEC-254, DEC-359
+- **Decision:**
+  - DP-18: a path a merge commit changes against its first parent is brought by another parent only when that
+    parent's content of the path differs from the merge base of the parents; with several merge bases, it must differ
+    from every one. Otherwise the change is the merge commit's own, judged by the merge commit's trailers, or against
+    the caller without them. Whether a parent is new in the move no longer matters.
+  - Consequences accepted: a merge that drops the first parent's later changes in favour of another parent's
+    unchanged content (for example `-s ours` turned round, or by hand) is now the merge commit's own change. An
+    ordinary integration merge and an ordinary merge-back stay silent.
+  - DP-17: in a worker's call, any commit of the move that changes a path under `.tickets/**` is a finding, with or
+    without trailers.
+  - The check is not made the live one (the branch is not merged) before a reviewer has run the new rule against
+    ordinary merges, merge-backs, octopus merges and criss-cross histories.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.92 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-394 (W1-50 DP-18: a merge commit's own change is read by a three-way rule against the merge base, replacing DEC-390's DP-15 rule; DP-17: a `.tickets/**` commit in a worker's call is a finding). |
