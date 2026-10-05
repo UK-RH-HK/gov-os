@@ -533,3 +533,143 @@ def octopus_whose_other_parents_cross_each_other(project, sandbox):
     return ReadMerge(_move_to(merge_commit),
                      what=f"an octopus merge of HEAD, {TICKET_BRANCH} and {SECOND_BRANCH}; the two branches each "
                           f"have one merge base with HEAD and cross each other")
+
+
+# --------------------------------------------------------------------------
+# Ninth batch (review finding, DEC-403): a merge commit with very many parents, and an ordinary octopus of eight
+# --------------------------------------------------------------------------
+
+VERY_MANY_PARENTS = 150            # HEAD and 149 side commits. No test pins a number at which anything changes.
+
+
+@dataclass(frozen=True)
+class ManyParents:
+    """A history that ends with a move of ``main`` to a merge commit with very many parents, made by
+    ``command``; the merge commit undoes a test designer's change of ``undone``."""
+    command: str
+    undone: str
+    what: str
+
+
+def merge_commit_with_very_many_parents(project, sandbox, trailers):
+    """``main`` got a test designer's change of an existing acceptance test. The command makes 149 side commits
+    with ``git commit-tree``, each on top of the commit before that change, with its tree and the orchestrator's
+    trailers (so each changes nothing), then a merge commit with the parents ``HEAD`` and the 149 side commits
+    and that same tree, and moves ``main`` forward to it. The merge commit carries ``trailers``."""
+    path = support.ACCEPTANCE_FILE
+    support.run(project, sandbox, support.commit(path, AS_DESIGNER, subject="a test designer's change"))
+    assert support.changed_paths(project, "HEAD") == [path], (
+        f"the fixture is wrong: the test designer's commit changes {support.changed_paths(project, 'HEAD')}"
+    )
+    role, task = AS_ORCHESTRATOR
+    message = "Merge\\n" if trailers is None else f"Merge\\n\\nTask: {trailers[1]}\\nRole: {trailers[0]}\\n"
+    command = (
+        "earlier=$(git rev-parse HEAD~1) && tree=$(git rev-parse 'HEAD~1^{tree}') && parents='-p HEAD' && "
+        f"for n in $(seq 1 {VERY_MANY_PARENTS - 1}); do "
+        f"side=$(printf 'Side %s\\n\\nTask: {task}\\nRole: {role}\\n' \"$n\" "
+        "| git commit-tree -p \"$earlier\" \"$tree\") || exit 1; parents=\"$parents -p $side\"; done && "
+        f"merged=$(printf '{message}' | git commit-tree $parents \"$tree\") && " + _move_to('"$merged"')
+    )
+    return ManyParents(command, undone=path,
+                       what=f"a merge commit with trailers {trailers} and {VERY_MANY_PARENTS} parents (HEAD and "
+                            f"{VERY_MANY_PARENTS - 1} side commits made with `git commit-tree` on top of HEAD~1, "
+                            f"each with HEAD~1's tree) that holds HEAD~1's tree: it undoes a test designer's "
+                            f"change of {path}")
+
+
+def assert_very_many_parents(project, shape, before):
+    """Guard against an empty test, from git's own answers and in a handful of git calls.
+
+    ``HEAD`` is a merge commit on top of ``before`` with ``VERY_MANY_PARENTS`` distinct parents. Every parent
+    but the first is a commit whose only parent is the commit before the test designer's change and whose tree
+    is that commit's: its one merge base with ``before`` is that commit, and it holds the merge base's content
+    of every path. The merge commit holds that tree too. So by the words of DEC-403 the undone path, which
+    differs from the first parent, is brought by no parent: it is the merge commit's own change, and its only
+    one.
+    """
+    parents = support.parents_of(project)
+    assert len(parents) == len(set(parents)) == VERY_MANY_PARENTS and parents[0] == before, (
+        f"the fixture is wrong: HEAD has {len(parents)} parents ({len(set(parents))} distinct), the first "
+        f"{parents[:1]}; {VERY_MANY_PARENTS} are expected, the first {before}"
+    )
+    earlier = check_support.git(project, "rev-parse", f"{before}~1").strip()
+    tree = check_support.git(project, "rev-parse", f"{earlier}^{{tree}}").strip()
+    sides = check_support.git(project, "log", "--no-walk=unsorted", "--format=%H %P %T", *parents[1:]).splitlines()
+    wrong = [line for line in sides if line.split()[1:] != [earlier, tree]]
+    assert len(sides) == VERY_MANY_PARENTS - 1 and not wrong, (
+        f"the fixture is wrong: {len(wrong)} of {len(sides)} side commits are not on top of {earlier[:12]} with "
+        f"its tree: {wrong[:3]}"
+    )
+    assert check_support.git(project, "rev-parse", "HEAD^{tree}").strip() == tree, (
+        "the fixture is wrong: the merge commit does not hold the tree from before the test designer's change"
+    )
+    assert differing(project, "HEAD", before) == [shape.undone], (
+        f"the fixture is wrong: the merge commit differs from its first parent in "
+        f"{differing(project, 'HEAD', before)}, not in {shape.undone} alone"
+    )
+    new = check_support.git(project, "rev-list", f"{before}..HEAD").split()
+    assert len(new) == VERY_MANY_PARENTS, (
+        f"the fixture is wrong: the move holds {len(new)} new commits, not the merge commit and its "
+        f"{VERY_MANY_PARENTS - 1} side commits"
+    )
+
+
+# The eight branches of the ordinary octopus: (branch, path, trailers). Each path is inside the allowed paths
+# of the commit's own trailers (the test designer's under tests/acceptance/**), and no two branches share one.
+EIGHT_BRANCHES = (
+    ("w1/eight-1", support.NEW_TEST, AS_DESIGNER),
+    ("w1/eight-2", support.SOURCE, AS_ENGINEER),
+    ("w1/eight-3", support.SECOND_SOURCE, AS_ENGINEER),
+    ("w1/eight-4", "tests/unit/guard/test_decide.py", AS_ENGINEER),
+    ("w1/eight-5", support.NOTES, (support.ENGINEER, support.DOCS_TICKET)),
+    ("w1/eight-6", support.SPEC_FILE, (check_support.PRODUCT_SPEC, support.SPEC_TICKET)),
+    ("w1/eight-7", "tools/guard/tool.py", (support.ENGINEER, check_support.NEW_DIRECTORY_TICKET_ID)),
+    ("w1/eight-8", "src/app/main.py", (support.ENGINEER, check_support.ACCEPTANCE_NAMING_TICKET_ID)),
+)
+
+
+def octopus_of_eight_branches(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """Eight branches cut from the same commit, one commit each, each inside its own trailers' paths; ``main``
+    moved on. One ``git merge`` of all eight: a merge commit with nine parents that holds every side's change."""
+    for branch, path, step_trailers in EIGHT_BRANCHES:
+        check_support.git(project, "checkout", "-q", "-b", branch, "main")
+        support.run(project, sandbox, support.commit(path, step_trailers))
+    check_support.git(project, "checkout", "-q", "main")
+    support.run(project, sandbox, support.commit(support.BOOTSTRAP, ORCHESTRATOR_ON_MAIN, subject="main moves on"))
+    branches = " ".join(shlex.quote(branch) for branch, _, _ in EIGHT_BRANCHES)
+    command = (f"git merge -q --no-ff --no-commit {branches} && git commit -q -m 'Merge eight branches'"
+               + support._trailer_options(trailers))
+    return support.MergeShape(command, own=(), brought=tuple(path for _, path, _ in EIGHT_BRANCHES),
+                              parents=len(EIGHT_BRANCHES) + 1,
+                              what=f"an ordinary octopus merge (`git merge`) of eight branches, one commit each, "
+                                   f"each inside its own trailers' paths; one is a test designer's "
+                                   f"{support.NEW_TEST}")
+
+
+def assert_octopus_of_eight(project, shape, before):
+    """Guard: ``HEAD`` is the nine-parent merge commit on top of ``before``; all nine parents share one merge
+    base pairwise (the fork); each branch changed its one path against the fork and the merge commit holds that
+    branch's content of it, as it holds the first parent's content of the path ``main`` changed. So by the
+    words of DEC-403 every path that differs from a parent is brought by the parent that changed it: the merge
+    commit has no own change."""
+    support.assert_shape(project, shape, before)
+    parents = support.parents_of(project)
+    fork = support.merge_bases(project, parents[0], parents[1])
+    for index, one in enumerate(parents):
+        for other in parents[index + 1:]:
+            assert support.merge_bases(project, one, other) == fork and len(fork) == 1, (
+                f"the fixture is wrong: the parents {one[:12]} and {other[:12]} do not have the one merge base "
+                f"{fork}"
+            )
+    changed = {parents[0]: support.BOOTSTRAP}
+    for parent, (_, path, _) in zip(parents[1:], EIGHT_BRANCHES):
+        changed[parent] = path
+    for parent, path in changed.items():
+        assert differing(project, parent, fork[0]) == [path] and support.content_at(
+            project, "HEAD", path) == support.content_at(project, parent, path), (
+            f"the fixture is wrong: the parent {parent[:12]} changed {differing(project, parent, fork[0])} since "
+            f"the fork, not {path} alone, or the merge commit does not hold its content of {path}"
+        )
+    assert differing_from_any_parent(project) == sorted(changed.values()), (
+        f"the fixture is wrong: the merge commit differs from its parents in {differing_from_any_parent(project)}"
+    )

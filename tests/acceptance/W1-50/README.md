@@ -46,13 +46,23 @@ implementation, reason "delegated decision, DEC-403"; 3 of their 10 cases fail u
 packages are open (DP-21 to DP-23); no fix of this batch depends on them. See "Added after implementation, DEC-403".
 The suite now holds 288 cases: 251 pass and 37 fail.
 
+Ninth batch, **added after implementation**: the eighth batch's cases were implemented and the 288 cases passed. A
+review of the DEC-403 rule found two behaviours the suite did not hold: a move to a merge commit with very many
+parents is passed over in silence, because the post-command hook is stopped at the harness's time limit; and
+`read_merge` reads a `commit` argument that has a commit id's form and is not the id of a commit. They came to the
+test designer as described behaviours, never as code. 8 cases are added in 6 test functions, reason "review finding,
+DEC-403"; 5 of them fail on the implementation as it stands. No existing case is changed, and no new package is open.
+See "Added after implementation, review of the DEC-403 rule". The suite now holds 296 cases: 291 pass and 5 fail.
+
 ## Run
 
 ```sh
 python3 -m pytest tests/acceptance/W1-50 -q -p no:cacheprovider
 ```
 
-Standard library and `pytest` only. No network. The suite takes about a minute.
+Standard library and `pytest` only. No network. The suite takes about a minute once the ninth batch's cases pass;
+while its three red cases of a merge commit with very many parents fail, they add about 70 seconds (two wait for
+the harness's hook limit of 30 s, one for the helper's bound of 10 s).
 
 ## How the tests drive the check
 
@@ -828,6 +838,66 @@ single merge base for that pair).
 
 No other existing case gives another answer under DEC-403. The fixture guard `assert_shape` of the seventh batch
 still describes each history by its first parent; it reads git, not the check, and is unchanged.
+
+## Added after implementation, review of the DEC-403 rule (ninth batch)
+
+These 8 cases are **tests added after implementation**; reason: "review finding, DEC-403". The behaviours came to the
+test designer as described behaviours, never as code; no test reads the check's or the helper's code. They are in
+`test_w1_50_review_of_the_symmetric_rule.py`; the histories are built in `w1_50_symmetric_support.py`. Every history
+is a real git history built in the throw-away project with commits, `git merge` and `git commit-tree`. "Made in the
+call" is: between the PreToolUse and the PostToolUse hook of one Bash call.
+
+Run when they were written: **5 failed, 3 passed**; the suite's run is 5 failed, 291 passed. Every red case fails on
+its behaviour (the hook's time limit, the helper's bound, or the assertion that the argument is refused), with the
+history built and the fixture's own guards passed. No existing case is changed.
+
+### 1. A merge commit with very many parents is judged, never passed over in silence (5 cases)
+
+DEC-403: a merge that keeps one parent's content and drops what another parent changed is judged. The history: `main`
+got a test designer's change of an existing acceptance test. In an orchestrator session's own call, 149 side commits
+are made with `git commit-tree` on top of the commit before that change, each with that commit's tree and the
+orchestrator's trailers (each changes nothing); a merge commit with the parents `HEAD` and the 149 side commits holds
+that same tree; `main` is moved forward to it. By the rule's words the undone test is the merge commit's own change
+and its only one: it differs from the first parent, and every other parent holds the merge base's content of it. The
+fixture's guard (`assert_very_many_parents`) shows this from git's own answers in a handful of git calls; building
+the history takes about a second.
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| Through the check | `test_a_move_to_a_merge_commit_with_very_many_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit`: the post-command hook ends by itself within the harness's limit (`HOOK_TIMEOUT_S` of the W1-03 support module, 30 s; not raised here) and the call adds a finding. Either form is accepted: one that names the undone test, or one for the move as a whole, as the check records a move it cannot read. The merge commit with the orchestrator's trailers, and with none (the caller decides; the caller is the orchestrator) | 2 | **red**: the hook does not end within 30 s and is stopped; no finding was added. Each case takes about the limit |
+| Through the helper | `test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought`: `read_merge` answers within 10 s with a reading whose `own` holds the undone test and whose `brought` does not, or with its public error; never a reading with an empty `own`. Reading leaves `HEAD`, the tree and `findings.jsonl` as they were | 1 | **red**: no answer after 10 s; the call is interrupted |
+| The other side, through the check | `test_an_ordinary_octopus_merge_of_eight_branches_with_commits_inside_their_own_paths_is_silent`: one `git merge` of eight branches in the orchestrator's own call (nine parents). Each branch has one commit inside its own trailers' paths; one is a test designer's new acceptance test. Silent, and nothing is moved | 1 | **green** |
+| The other side, through the helper | `test_read_merge_finds_no_own_change_in_an_ordinary_octopus_merge_of_eight_branches`: `own` is empty | 1 | **green** |
+
+The two green cases must stay green: a fix that refuses or flags every merge commit with more than two or three
+parents fails them.
+
+**The helper's bound of 10 s** is a third of the harness's hook limit. It is safe on a loaded machine because the
+work asked for is small: the merge commit has 150 parents, and one git process for each of them, or a refusal before
+any, is a fraction of a second on an idle machine (the whole nine-parent case, history and reading, takes half a
+second). The bound leaves room for that to be many times slower, and leaves the hook two thirds of its limit for the
+rest of its work. The bound is kept in the test's own process with an interval timer that interrupts the call; the
+elapsed time is checked as well.
+
+**Not pinned:** a number of parents at which anything changes; a number of git processes; how the check or the helper
+keeps the time; which form the finding has, its `action`, and whether the check leaves the move in place; what
+`read_merge` puts in `brought` for either merge commit.
+
+### 2. A `commit` argument that has a commit id's form and is not the id of a commit (3 cases)
+
+DEC-403: the helper "refuses a `commit` argument that is not a commit id". The repository holds an ordinary
+integration merge on `main`, an annotated tag that points at the merge commit, and a branch at the merge commit whose
+name is 64 lower-case hexadecimal digits; it is an ordinary SHA-1 repository, so no object id has 64 digits. The
+error is found as in `test_w1_50_read_merge_every_parent.py`: a class `gov.guard.containment_merge` holds under a
+public name, shared with the error for an unknown commit id.
+
+| Test function | Cases | Run when written |
+|---|---|---|
+| `test_read_merge_refuses_a_commit_argument_with_a_commit_id_s_form_that_is_not_the_id_of_a_commit`: the object id of the annotated tag; the 64 hexadecimal digits that are the branch's name. The public error, no reading, the repository as it was | 2 | **red**: each returns the reading of the merge commit the argument resolves to |
+| `test_read_merge_still_reads_the_merge_commit_s_own_full_id_beside_a_tag_and_a_hex_named_branch`: the other side. `own` is empty and `brought` holds the two paths the merged branch brought | 1 | **green** |
+
+**Not pinned**, as before: whether a branch name of another form or an abbreviated id is accepted for `commit`, and
+what the helper does for the full id of a commit that is no merge.
 
 ## What the suite takes as given
 
