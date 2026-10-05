@@ -5,8 +5,11 @@ to the builder: the checker reads ``HEAD`` and needs no store, a folder inside
 another repository is an error, the id grammar is the kernel's, and the points
 where the checker cannot tell are findings (two roles on one commit, two records
 with a cited id, a ticket whose frontmatter cannot be read, a key written twice).
-Two cases pin what the walk by ancestry lets pass: an agent's move of a decision
-the owner approved, and a merge that keeps the owner's file over an agent's.
+One case pins what the walk by ancestry lets pass: an agent's move of a decision
+the owner approved. The merges that DP-6 leaves open fail closed: the merge is
+the commit that set the decision, and an ordinary merge of the owner's branch
+sets nothing. Git is run without the caller's ``GIT_*`` variables and fetches
+nothing; an object the repository does not hold is an error.
 """
 from __future__ import annotations
 
@@ -121,17 +124,78 @@ def test_an_agent_commit_that_only_moves_a_decision_the_owner_approved_sets_noth
     assert decisions.check(project) == []
 
 
-def test_a_merge_that_keeps_the_owner_s_file_over_an_agent_s_keeps_the_owner_s_approval(project):
+def _merge(root, branch, role, **take):
+    """Merge ``branch`` with a merge commit of ``role`` that holds each path of ``take`` as that revision has it."""
+    subprocess.run(["git", "-C", str(root), "merge", "-q", "--no-ff", "--no-commit", branch], capture_output=True,
+                   env={**_ENV, "HOME": str(root)})
+    for revision, path in take.items():
+        _git(root, "checkout", revision, "--", path)
+    _commit(root, {}, role)
+    assert len(_git(root, "rev-list", "--parents", "-n", "1", "HEAD").split()) == 3
+
+
+@pytest.mark.parametrize("role, codes", [("engineer", [("ACTIVE_UNAPPROVED", ["ADR-0002"])]), ("owner", [])])
+def test_a_merge_that_keeps_the_owner_s_file_over_an_agent_s_is_the_commit_that_set_it(project, role, codes):
+    """Open in DP-6: neither side is the earlier word, so the merge needs the owner's fact."""
     path = "docs/adr/ADR-0002.md"
     _git(project, "checkout", "-q", "-b", "agent")
     _commit(project, {path: _record("ADR-0002", "decision", "ACTIVE", title="agent")}, "engineer")
     _git(project, "checkout", "-q", "main")
     _commit(project, {path: _record("ADR-0002", "decision", "ACTIVE", title="owner")}, "owner")
-    subprocess.run(["git", "-C", str(project), "merge", "-q", "--no-commit", "agent"], capture_output=True,
-                   env={**_ENV, "HOME": str(project)})
-    _git(project, "checkout", "--ours", "--", path)
+    _merge(project, "agent", role, main=path)
+    assert _codes(project) == codes
+
+
+@pytest.mark.parametrize("role, codes", [("engineer", [("ACTIVE_UNAPPROVED", ["ADR-0001"])]), ("owner", [])])
+def test_a_merge_that_keeps_active_over_a_demotion_made_beside_it_is_the_commit_that_set_it(project, role, codes):
+    """Open in DP-6: the owner edits the ACTIVE decision on one side, the other side demotes it."""
+    _git(project, "checkout", "-q", "-b", "demotes")
+    _commit(project, {ADR: _record("ADR-0001", "decision", "PROPOSED")}, "owner")
+    _git(project, "checkout", "-q", "main")
+    _commit(project, {ADR: _record("ADR-0001", "decision", "ACTIVE", title="reworded")}, "owner")
+    _merge(project, "demotes", role, main=ADR)
+    assert _codes(project) == codes
+
+
+def test_an_agent_merge_of_a_decision_the_owner_edited_or_added_on_a_branch_sets_nothing(project):
+    added = "docs/adr/ADR-0002.md"
+    _git(project, "mv", ADR, "docs/adr/moved.md")
     _commit(project, {}, "engineer")
-    assert len(_git(project, "rev-list", "--parents", "-n", "1", "HEAD").split()) == 3
+    _git(project, "checkout", "-q", "-b", "owner")
+    _commit(project, {"docs/adr/moved.md": _record("ADR-0001", "decision", "ACTIVE", title="reworded"),
+                      added: _record("ADR-0002", "decision", "ACTIVE")}, "owner")
+    _git(project, "checkout", "-q", "main")
+    _commit(project, {"README.md": "# A project\n"}, "engineer")
+    _merge(project, "owner", "engineer")
     assert decisions.check(project) == []
-    _git(project, "checkout", "-q", "agent")
+
+
+def test_git_dir_of_the_caller_names_no_other_repository(project, tmp_path_factory, monkeypatch):
+    other = tmp_path_factory.mktemp("other")
+    _git(other, "init", "-q", "-b", "main")
+    _commit(other, {ADR: _record("ADR-0001", "decision", "ACTIVE")}, "owner")
+    _commit(project, {"docs/adr/ADR-0002.md": _record("ADR-0002", "decision", "ACTIVE")}, "engineer")
+    monkeypatch.setenv("GIT_DIR", str(other / ".git"))
     assert _codes(project) == [("ACTIVE_UNAPPROVED", ["ADR-0002"])]
+    with pytest.raises(GovError):
+        decisions.check(project / "docs")
+
+
+@pytest.mark.parametrize("name", [f"HEAD~1:{ADR}", f"HEAD:{ADR}", "HEAD~1^{tree}", "HEAD~1"])
+def test_an_object_the_repository_does_not_hold_is_an_error(project, name):
+    _commit(project, {ADR: _record("ADR-0001", "decision", "ACTIVE", title="reworded")}, "owner")
+    object_id = _git(project, "rev-parse", name)
+    (project / ".git" / "objects" / object_id[:2] / object_id[2:]).unlink()
+    with pytest.raises(GovError):
+        decisions.check(project)
+
+
+def test_a_partial_clone_is_read_as_it_is_and_nothing_is_fetched(project, tmp_path_factory):
+    _commit(project, {ADR: _record("ADR-0001", "decision", "ACTIVE", title="reworded")}, "owner")
+    _git(project, "config", "uploadpack.allowFilter", "true")
+    clone = tmp_path_factory.mktemp("partial") / "clone"
+    _git(project, "clone", "-q", "--no-local", "--filter=blob:none", project.as_uri(), str(clone))
+    before = sorted(str(path) for path in clone.rglob("*"))
+    with pytest.raises(GovError):
+        decisions.check(clone)
+    assert sorted(str(path) for path in clone.rglob("*")) == before
