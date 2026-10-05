@@ -64,7 +64,7 @@ NOT_TEST_DESIGNER = tuple(role for role in ROLES if role != TEST_DESIGNER)
 IMPLEMENTERS = (ENGINEER, PRODUCT_SPEC)                # KPI failure 2
 NOT_ORCHESTRATOR = tuple(role for role in ROLES if role != ORCHESTRATOR)
 EMPTY_PROFILE_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR)   # DEC-158: launched workers with an empty allowlist
-NOT_LAUNCHED = (ORCHESTRATOR, PRODUCT_SPEC)            # the launcher refuses them (W1-46)
+NOT_LAUNCHED = (ORCHESTRATOR,)   # the launcher refuses it (W1-46). Owner decision, DEC-386: product-spec is launched
 
 # The research role's files, as W1-46 and the owner (DEC-312) committed them. KPI success 5: W1-33 leaves them.
 RESEARCH_ROLE_FILE_SHA256 = "60f9092f37430a096eeb932907b5814661585afaf38c52a045c3d775c933e678"

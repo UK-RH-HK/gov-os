@@ -21,8 +21,17 @@ allowed_paths:
 - template/governance/kernel/hooks/posttooluse*
 - template/governance/kernel/hooks/pretooluse*
 - tests/unit/containment/**
+- src/gov/guard/decide*
+- src/gov/pause/**
+- src/gov/launch/**
+- tests/unit/guard/**
+- tests/unit/pause/**
+- tests/unit/launch/**
 kpis:
   success:
+  - A freeze flag set by gov pause carries a marker line; the guard treats an empty file, or one without the marker, at the flag's path as no freeze and records its presence (DEC-402)
+  - gov launch does not deny the freeze flag's path when the flag does not exist at launch, so a launched session leaves no placeholder there (DEC-402)
+  - Every test fixture that copies the whole tree strips the held-out deny line from the copied settings file (DEC-399)
   - 'A forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each commit''s paths against the allowed paths of its own Role and Task trailers, not against the caller (DEC-255) [CAP-58.h]'
   - A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h]
   - A worker's commit made during another actor's call is judged by its own trailers (DEC-255) [CAP-58.h]

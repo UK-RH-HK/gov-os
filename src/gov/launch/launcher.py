@@ -3,8 +3,9 @@
 Starts the CLI at ``~/.local/bin/claude`` (DEC-205) in the repository root with
 one ``--settings`` value built here: the strict sandbox block, the role's network
 profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
-``GOV_TICKET`` and a per-session temp directory. Nothing fails open: whatever
-cannot be read or is not of the stated shape refuses the launch.
+``GOV_TICKET`` and a per-session temp directory, removed when the session ends
+(DEC-386). Nothing fails open: whatever cannot be read or is not of the stated
+shape refuses the launch.
 
 No message of this module carries a held-out path.
 """
@@ -14,6 +15,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
@@ -25,10 +27,11 @@ from gov.guard.decide import ACCEPTANCE, FREEZE_FLAG, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 
-WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research")
+# DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
 # Open package DP-8: these roles need a ticket whose ``role`` is their own; the
 # two independent roles may be launched on any ``in_progress`` ticket.
-OWN_TICKET_ROLES = frozenset({"engineer", "research"})
+OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"
@@ -259,4 +262,10 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
     settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}"]}
     env = {**os.environ, **settings["env"]}
-    return subprocess.run([str(cli), "--settings", json.dumps(settings), *cli_args], cwd=root, env=env).returncode
+    try:
+        return subprocess.run([str(cli), "--settings", json.dumps(settings), *cli_args], cwd=root, env=env).returncode
+    except OSError:
+        raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+    finally:
+        # DEC-386: the folder goes when the session ends, whole; a link in it is removed as a link.
+        shutil.rmtree(tmpdir)
