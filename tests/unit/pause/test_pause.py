@@ -4,7 +4,9 @@ Regression evidence only (DEC-136). They cover what the acceptance tests leave
 to the builder: an empty ``GOV_ROLE`` is a role, not the owner, and a commit
 of the ticket made after a rollback is the only one a second rollback reverts.
 For W1-50 (DEC-402, DEC-404): the read-back with the guard's reader, a write
-that fails, the marker line, and a linked runtime folder for ``--off`` too.
+that fails, the marker line, and a linked runtime folder for ``--off`` too;
+a rollback whose reverts touch the flag's path ends frozen, with success or
+with an error (DEC-378), and never says paused over a flag that is no freeze.
 Every project is a temporary git repository made here.
 """
 from __future__ import annotations
@@ -112,3 +114,48 @@ def test_a_second_rollback_reverts_only_what_was_committed_since_the_first(proje
     assert _pause(project, rollback=TICKET)["reverted"] == [second]
     assert not (project / "a.txt").exists() and not (project / "b.txt").exists()
     assert _git(project, "status", "--porcelain") == "" and (project / ".gov-runtime" / "freeze").is_file()
+
+
+def _flag_added_and_removed_by_the_ticket(root):
+    """Two commits of the ticket: one force-adds an empty file at the flag's path, the next removes it."""
+    flag = root / ".gov-runtime" / "freeze"
+    flag.parent.mkdir()
+    flag.write_text("", encoding="utf-8")
+    _git(root, "add", "--force", "--", ".gov-runtime/freeze")
+    _git(root, "commit", "-q", "-m", "the flag added", "--trailer", f"Task: {TICKET}")
+    _git(root, "rm", "-q", "--", ".gov-runtime/freeze")
+    _git(root, "commit", "-q", "-m", "the flag removed", "--trailer", f"Task: {TICKET}")
+    assert not flag.exists()
+    return flag
+
+
+def _assert_frozen(root, flag):
+    assert flag.is_file() and not flag.is_symlink() and freeze_state(str(root)) == "frozen"
+    assert re.fullmatch(r"FROZEN owner \d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\n", flag.read_text(encoding="utf-8"))
+
+
+def test_a_rollback_whose_reverts_remove_the_flag_ends_frozen(project):
+    flag = _flag_added_and_removed_by_the_ticket(project)
+    result = _pause(project, rollback=TICKET)
+    assert result["paused"] is True and len(result["reverted"]) == 2
+    _assert_frozen(project, flag)
+
+
+def test_a_rollback_that_aborts_after_its_reverts_removed_the_flag_ends_frozen(project):
+    _commit(project, "a.txt", "a\n")  # of the ticket, and not revertible: the next commit changes the same line
+    (project / "a.txt").write_text("b\n", encoding="utf-8")
+    _git(project, "commit", "-q", "-m", "another change", "--", "a.txt")
+    flag, start = _flag_added_and_removed_by_the_ticket(project), _git(project, "rev-parse", "HEAD")
+    with pytest.raises(GovError) as refusal:
+        _pause(project, rollback=TICKET)
+    assert refusal.value.code == "PAUSE_ROLLBACK_ABORTED" and _git(project, "rev-parse", "HEAD") == start
+    _assert_frozen(project, flag)
+
+
+def test_a_rollback_whose_flag_is_no_freeze_at_its_end_ends_in_an_error_not_paused(project, monkeypatch):
+    states = iter(("frozen", "unmarked"))  # the read-back before the reverts, then the one after them
+    monkeypatch.setattr("gov.guard.decide.freeze_state", lambda root: next(states))
+    _commit(project, "a.txt", "a\n")
+    with pytest.raises(GovError) as refusal:
+        _pause(project, rollback=TICKET)
+    assert refusal.value.code == "PAUSE_NOT_SET"

@@ -6,7 +6,8 @@
 - ``gov pause --cancel-agents`` sets the flag and releases every claim lock, with one record commit per released
   ticket (DEC-357, DEC-368, DEC-375). It stops no process and changes no status.
 - ``gov pause --rollback <ticket>`` sets the flag first (DEC-378), then reverts the ticket's commits, newest first,
-  and records it by one commit to the ticket file (DEC-366, DEC-367). Its reverts write where those commits wrote.
+  and records it by one commit to the ticket file (DEC-366, DEC-367). Its reverts write where those commits wrote,
+  the flag's path included, so the flag is set again when the rollback has ended, with success or with an error.
 
 The caller is ``GOV_ROLE`` (DEC-365): the orchestrator may set the freeze, every other role is refused, and with
 ``GOV_ROLE`` unset the caller is the owner, who alone lifts it. ``--role`` is not read.
@@ -148,4 +149,9 @@ def run(root: Path, args, config: dict) -> dict:
     _freeze(root, flag, caller)
     if args.cancel_agents:
         return {"paused": True, "cancelled": _cancel(root, caller)}
-    return {"paused": True, **(_rollback(root, args.rollback, caller) if args.rollback else {})}
+    if not args.rollback:
+        return {"paused": True}
+    try:
+        return {"paused": True, **_rollback(root, args.rollback, caller)}
+    finally:  # DEC-378: a revert or the reset may have overwritten or removed the flag, so it is set again
+        _freeze(root, flag, caller)
