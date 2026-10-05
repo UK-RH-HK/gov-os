@@ -38,7 +38,8 @@ _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
 _FUNCTIONS = {"Function", "Method"}
 
-__all__ = ["callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects", "references"]
+__all__ = ["callees", "callers", "daemon_dir", "dead_code", "definitions", "home", "impact", "index", "projects",
+           "references"]
 
 
 def home(root: Path) -> Path:
@@ -167,6 +168,12 @@ def callers(root: Path, name: str) -> list[dict]:
     """The functions that call ``name``."""
     nodes, users, named = _named(root, name)
     return _entries(nodes, [source for key in named for source, kind in users[key] if kind == "CALLS"])
+
+
+def callees(root: Path, name: str) -> list[dict]:
+    """The functions that ``name`` calls."""
+    nodes, users, named = _named(root, name)
+    return _entries(nodes, [callee for key in named for callee, by in users.items() if (key, "CALLS") in by])
 
 
 def impact(root: Path, name: str) -> list[dict]:
