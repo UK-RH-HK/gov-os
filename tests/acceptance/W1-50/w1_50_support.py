@@ -372,3 +372,58 @@ def set_status_in_the_working_tree(ticket, status):
 
 def is_merge(project, commit_id="HEAD"):
     return len(check_support.git(project, "rev-list", "--parents", "-n", "1", commit_id).split()) > 2
+
+
+# --------------------------------------------------------------------------
+# The real objects, whatever the repository's own settings and replacement refs say (fifth batch)
+# --------------------------------------------------------------------------
+
+def real(project, *args):
+    """``git`` in the project with replacement refs switched off (``--no-replace-objects``)."""
+    return check_support.git(project, "--no-replace-objects", *args)
+
+
+def message_bytes(project, commit_id="HEAD"):
+    """The commit's message byte for byte, from the real object: no setting and no replacement ref is applied."""
+    import subprocess
+    proc = subprocess.run(["git", "-C", str(project), "--no-replace-objects", "cat-file", "commit", commit_id],
+                          capture_output=True, check=False)
+    assert proc.returncode == 0, f"git cat-file commit {commit_id} failed: {proc.stderr!r}"
+    return proc.stdout.split(b"\n\n", 1)[1]
+
+
+def final_block(project, commit_id="HEAD"):
+    """The lines of the last paragraph of the commit's message, as bytes: its final trailer block (DEC-182)."""
+    return message_bytes(project, commit_id).rstrip(b"\n").split(b"\n\n")[-1].split(b"\n")
+
+
+def local_setting(project, key):
+    """The value of ``key`` in the project's local git configuration; ``None`` when it is not set there."""
+    import subprocess
+    proc = subprocess.run(["git", "-C", str(project), "config", "--local", "--get", key],
+                          capture_output=True, text=True, check=False)
+    return proc.stdout.rstrip("\n") if proc.returncode == 0 else None
+
+
+def replacement_refs(project):
+    """The ids of the objects the project's ``refs/replace/`` replaces."""
+    listing = check_support.git(project, "for-each-ref", "--format=%(refname)", "refs/replace/")
+    return [name.rsplit("/", 1)[1] for name in listing.split()]
+
+
+def set_locally(key, value):
+    """Shell: write ``key`` into the repository's local git configuration (``.git/config``)."""
+    return f"git config --local {shlex.quote(key)} {shlex.quote(value)}"
+
+
+def commit_tree(tree, parents, trailers, subject="Merge"):
+    """Shell: the id of a new commit object made with ``git commit-tree``; the trailers are its final block.
+
+    ``tree`` is a revision or a shell variable (``$tree``); it is put in double quotes.
+    """
+    message = subject + "\\n"
+    if trailers is not None:
+        role, task = trailers
+        message += f"\\nTask: {task}\\nRole: {role}\\n"
+    parent_arguments = " ".join(f"-p {shlex.quote(parent)}" for parent in parents)
+    return f"$(printf '{message}' | git commit-tree {parent_arguments} \"{tree}\")"
