@@ -3916,3 +3916,28 @@ W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as r
 | Version | Date | Change |
 |---|---|---|
 | 0.85 | 2026-10-05 | Owner: DEC-376 (held-out copies removed; no bulk copy of the tree), DEC-377 (W1-16 closes with the designer's questions; W1-42 KPI line), DEC-378 (W1-28 DP-10 (a) and three readings), DEC-379 to DEC-382 (W1-19 DP-1, DP-2, DP-6, DP-7), DEC-383 (the four S0b2 files a worker may read), DEC-384 (W1-19 installs), DEC-385 (fixtures leave the held-out file out; W1-28), DEC-386 (the launcher removes its temp folder and gets a product-spec role; W1-28). |
+
+## 86. Delegated decisions on W1-11's packages DP-5 and DP-7 (register v0.86, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on two of the three packages
+the W1-11 (`DAEO-be7u`) ticket lead returned after three review rounds. Both options only make the checker report
+more; the lead's and the orchestrator's recommendations agree, the confidence is medium or higher, and both are
+reversible. DP-6 (how the approval rule reads merges) decides what counts as the owner's approval fact of DEC-360
+and goes to the owner.
+
+### DEC-387 — W1-11 DP-5 and DP-7: unreadable frontmatter is a finding, and the checker ignores replace refs
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-11 packages DP-5 option (a), confidence medium, and DP-7 option (a), confidence medium-high · **Under:** CAP-51.a, CAP-01.b, DEC-329, DEC-360
+- **Decision:**
+  - A Markdown file of `HEAD` whose head looks like frontmatter and cannot be read as the store reads it (a
+    byte-order mark or a blank line before `---`, a first line such as `--- # c`, CR-only line ends, UTF-16) is
+    reported as `FRONTMATTER_UNREADABLE`. A file with `type: decision` and no `id` is a decision that fails.
+  - Ids outside the grammar with no `type`, and the extensions `.MD` and `.markdown`, are residuals.
+  - The checker runs git with replace refs off. A loose object overwritten in place in the root's own `.git` is a
+    residual, left to W1-50 and the worker sandbox.
+  - Accepted as built, each failing closed: `FRONTMATTER_UNREADABLE` as an eighth finding code; a decision is
+    followed by its `id`, and "later" is by ancestry, not by date; `check` needs no loaded store; a history it cannot
+    read (a shallow or partial clone) is a `GovError`; every `GIT_*` variable is dropped when the checker runs git.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.86 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-387 (W1-11 DP-5: unreadable frontmatter is a finding; DP-7: replace refs off; the checker's interface as built). W1-11 DP-6 goes to the owner. |
