@@ -310,5 +310,65 @@ def ticket_branch(project, sandbox, *steps, main_moves_on=True):
         run(project, sandbox, commit(BOOTSTRAP, (ORCHESTRATOR, ORCHESTRATOR_TICKET), subject="main moves on"))
 
 
+# --------------------------------------------------------------------------
+# Bytes a commit's author chooses: trailer values and file names (batch after the post-green review)
+# --------------------------------------------------------------------------
+
+def shell_word(text):
+    """Shell: one word that is exactly ``text``, every byte written as an octal escape of ``printf``.
+
+    The fixture scripts stay plain ASCII, whatever control character or
+    non-ASCII letter ``text`` holds. ``text`` must not end with a newline.
+    """
+    escapes = "".join("\\%03o" % byte for byte in text.encode("utf-8"))
+    return "\"$(printf '" + escapes + "')\""
+
+
+def commit_changes(paths, trailer_lines=(), subject="work"):
+    """Shell: change every one of ``paths`` and commit them together, with ``trailer_lines`` in the final block.
+
+    Paths and trailer lines may hold any byte git accepts there.
+    """
+    steps = []
+    for path in paths:
+        directory = os.path.dirname(path) or "."
+        steps.append(f"mkdir -p {shell_word(directory)} && echo changed >> {shell_word(path)} "
+                     f"&& git add -- {shell_word(path)}")
+    command = " && ".join(steps) + f" && git commit -q -m {shlex.quote(subject)}"
+    for line in trailer_lines:
+        command += f" --trailer {shell_word(line)}"
+    return command
+
+
+def ticket_branch_of(project, sandbox, *commands, main_moves_on=True):
+    """A branch ``w1/W1-90`` built by ``commands``, one after the other. With ``main_moves_on``, ``main`` gets a
+    commit too."""
+    check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
+    for command in commands:
+        run(project, sandbox, command)
+    check_support.git(project, "checkout", "-q", "main")
+    if main_moves_on:
+        run(project, sandbox, commit(BOOTSTRAP, (ORCHESTRATOR, ORCHESTRATOR_TICKET), subject="main moves on"))
+
+
+def changed_paths(project, commit_id):
+    """The paths ``commit_id`` changes against its first parent, as git names them byte for byte (``-z``)."""
+    listing = check_support.git(project, "diff-tree", "-r", "-z", "--no-commit-id", "--name-only",
+                                "--root", commit_id)
+    return [name for name in listing.split("\0") if name]
+
+
+def trailer_values(project, commit_id, key):
+    """The values git itself reads for the trailer ``key`` from the commit's final trailer block."""
+    listing = check_support.git(project, "log", "-1", f"--format=%(trailers:key={key},valueonly,separator=%x00)",
+                                commit_id)
+    return [value for value in listing.rstrip("\n").split("\0") if value]
+
+
+def set_status_in_the_working_tree(ticket, status):
+    """Shell: rewrite the ``status`` line of the ticket's file in the working tree. Nothing is committed."""
+    return f"sed -i 's/^status: .*$/status: {status}/' .tickets/{ticket}.md"
+
+
 def is_merge(project, commit_id="HEAD"):
     return len(check_support.git(project, "rev-list", "--parents", "-n", "1", commit_id).split()) > 2

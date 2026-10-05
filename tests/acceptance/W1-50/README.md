@@ -11,6 +11,11 @@ Third batch, also before implementation: the three packages of the second batch 
 DEC-359) and the ticket has a fifth success line (DEC-360). One existing case is revised and 25 cases are added. Three
 new packages are open (DP-11 to DP-13). W1-50 can be implemented on decided ground; no package blocks it.
 
+Fourth batch, **added after implementation**: the ticket was implemented and the 113 cases passed. The independent
+review after green (DEC-137) found two behaviours the suite did not hold. They came to the test designer as described
+behaviours, never as code (DEC-136). 25 cases are added in 8 test functions; no existing case is changed. 15 of them
+fail on the implementation as it stands. One new package is open (DP-14). See "Added after implementation".
+
 ## Run
 
 ```sh
@@ -55,6 +60,9 @@ Two fixtures in `conftest.py`:
 - `call`: one whole Bash call that moves `HEAD` on the same branch and leaves a clean tree.
 - `during_a_call`: a Bash call of one actor that changes nothing itself (`true`), with another actor's work between
   its PreToolUse hook and its end. This is a ticket lead's call that waits for its worker (DEC-254).
+
+A third fixture, for the fourth batch: `call_leaving_changes` is `call` for a Bash call that moves `HEAD` and leaves
+named paths changed in the working tree and not committed.
 
 "Silent" is: exit code 0, nothing reaches the agent, no line is added to `findings.jsonl`. "Flagged" is: reported to
 the agent with the path named, and recorded with action `flagged` and that path. In every test the check leaves
@@ -110,7 +118,8 @@ commit it judges comes after that first version: with a close commit it is no an
 The case that tells the readings apart is package DP-13.
 
 Every status change in the fixtures is committed, and the status in the working tree and at `HEAD` agree. "In HEAD's
-history" is the history of `HEAD` as the PostToolUse hook finds it, after the move.
+history" is the history of `HEAD` as the PostToolUse hook finds it, after the move. The one exception is
+`test_w1_50_uncommitted_ticket_state.py` (fourth batch), where the two disagree on purpose.
 
 ## "Made during an agent session's call" (KPI success 5, DEC-360)
 
@@ -180,7 +189,12 @@ package DP-12.
 
 ## KPI and decision → tests → red reason
 
-113 test cases in 53 test functions. Red run on `w1/W1-50`: **74 failed, 39 passed, 0 skipped**.
+This section and the next describe the first three batches, written before implementation: 113 test cases in 53
+test functions. Red run on `w1/W1-50` before implementation: **74 failed, 39 passed, 0 skipped**. After
+implementation all 113 pass.
+
+The suite now holds **138 test cases in 61 test functions**. The 25 cases of the fourth batch are in "Added after
+implementation". Run on the implementation as it stood when they were written: **15 failed, 123 passed, 0 skipped**.
 
 The red reason is the same throughout: the check still judges a `HEAD` move against the caller
 (`src/gov/guard/containment.py`), compares only the two ends of the move, reads no trailer and no ticket state, and
@@ -233,6 +247,66 @@ case that tells the two rules apart.
 | `test_an_orchestrator_commit_with_such_a_task_is_flagged_inside_the_acceptance_tests` | all 3 | The orchestrator may not write an acceptance test. After W1-50 they fail if DEC-359 is built without its MR-3 limit. `test_a_merge_that_brings_such_an_orchestrator_commit_of_an_acceptance_test_is_flagged` is the red case |
 | `test_a_role_owner_commit_already_in_the_history_before_the_call_is_no_finding` | `engineer-call-with-its-own-commit` | The engineer may write the source file. After W1-50 it fails if the check reads `Role: owner` from commits outside the move. The orchestrator's case is red |
 
+## Added after implementation (fourth batch; DEC-136, DEC-137)
+
+These 25 cases are **tests added after implementation**. The review after green found two behaviours the 113 cases
+did not hold; each came to the test designer as a described behaviour. The cases go through the same public interface
+as the rest of the suite. The payloads were chosen by running candidate commits through the hooks and reading the
+result from outside; no test reads the check's code.
+
+Run when they were written: 15 failed, 10 passed.
+
+### Behaviour 1: bytes a commit's author chooses (`test_w1_50_author_chosen_bytes.py`, 20 cases)
+
+The check judges each commit of a forward move by that commit's own id, parents, `Role` and `Task` trailer values
+and changed paths. Trailer values and file names are chosen by whoever makes the commit. Git accepts control
+characters in both (not 0x00, and no newline inside a trailer's line).
+
+**What a commit's author puts in a trailer value or a file name never makes the check see another commit, another
+role, another ticket or other paths than the commit really has. A commit whose trailer values or paths the check
+cannot read unambiguously is a finding, never silence.** This holds for every byte git lets a commit's author put
+there. The suite tests four pairs of characters, so that no case rests on one way of separating values and commits:
+0x02 with 0x01, 0x01 with 0x03, 0x03 with 0x02, and 0x1f with 0x1e. Git refused none of these bytes, in a trailer
+value or in a file name.
+
+Each commit carries, after an ordinary beginning, the two characters and between them text shaped like the record
+of a commit that does not exist: a 40-character hexadecimal id, a role and a ticket id. The suite reads "flagged" as
+everywhere else: the finding and the report name the path. With the bytes in a trailer value the commit names no
+known role or ticket, and every path it changes is a finding (DEC-268). With the bytes in a file name the
+acceptance test's own name is an ordinary path of an engineer's commit.
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| KPI failure 2, KPI success 1; DEC-268 | `test_a_commit_of_an_acceptance_test_is_flagged_whatever_bytes_its_trailers_or_file_names_hold`: an orchestrator's integration merge, or fast-forward, brings a commit that changes an existing acceptance test with `Role: engineer`-style trailers; the bytes are in the `Role` value, the `Task` value, or the name of a second file inside the engineer ticket's paths | 12 | **10 red, 2 green.** The five cases with 0x02 and 0x01 (`Role` value by merge and by fast-forward, `Task` value by merge, file name by merge and by fast-forward) are **silent**: nothing reported, nothing recorded. The five cases with 0x01 and 0x03, and with 0x03 and 0x02, are reported as "HEAD moved (not a forward move, flagged)" with no path: the move is forward, and the acceptance test is not named. The two cases with 0x1f and 0x1e pass: the acceptance test is named |
+| KPI success 5 (DEC-360); DEC-268 | `test_a_role_value_that_begins_with_owner_is_a_finding_whatever_bytes_follow`: a commit of `README.md` made in the orchestrator's own call, `Role` value `owner` followed by the bytes and a record that names the orchestrator's role | 2 | **2 red.** With 0x02 and 0x01 the finding says "a Role: owner commit made during an agent's call: no path": `README.md` is not named. With 0x03 and 0x02 the call is reported as not a forward move, with no path |
+| The other side: a path like any other | `test_a_file_with_an_unusual_name_inside_the_commit_s_own_paths_is_silent` and `test_a_file_with_an_unusual_name_outside_the_commit_s_own_paths_is_flagged_by_its_name`: an engineer's commit with ordinary trailers adds a file whose name holds a space, a non-ASCII letter or a tab | 3 + 3 | **6 green.** The behaviour holds today and must hold after the fix: a fix that turns every unusual name into a finding, or that names the path in another spelling, fails them. For the tab the report may write the character as it is or as `\t`; the record's `paths` hold the name as it is |
+
+The two green cases with 0x1f and 0x1e hold now and after the fix for the same reason as the red ones: they fail
+if a fix moves the weakness to other bytes.
+
+Not tested: whether a commit that stays inside its own paths and adds a file whose name holds a control character is
+silent or a finding. The behaviour allows both ("cannot read unambiguously is a finding").
+
+### Behaviour 2: a ticket's state when the working tree and `HEAD` disagree (`test_w1_50_uncommitted_ticket_state.py`, 5 cases)
+
+DEC-318 and DEC-358 judge a commit that names a closed ticket by the ticket's close commit in `HEAD`'s history.
+**An uncommitted edit of a ticket's file does not reopen a closed ticket for the check.** The ticket is `closed` in
+the committed file at `HEAD`, with its close commit in `HEAD`'s history; its file is set to `status: in_progress` in
+the working tree only; a commit with a worker's trailers that names the ticket is made after the close commit. That
+commit names a closed ticket and is no ancestor of its close commit: a finding (DEC-318, DEC-358). The edit of the
+ticket's file is the orchestrator's own uncommitted change outside `tests/acceptance/**`; it is no finding and stays
+in the working tree.
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| DEC-318, DEC-358 | `test_a_ticket_reopened_only_in_the_working_tree_stays_closed_for_a_commit_of_the_same_call`: one call edits the ticket's file and makes the commit; an engineer's commit inside the ticket's paths, and a test designer's commit of an acceptance test | 2 | **2 red.** Silent: the commit is judged as a commit of a ticket in progress |
+| DEC-318, DEC-358 | `test_a_ticket_reopened_only_in_the_working_tree_before_the_call_stays_closed`: the file was already edited when the call began | 1 | **1 red.** Silent, for the same reason |
+| DEC-318 (a ticket in progress is no closed ticket) | `test_commits_made_after_a_committed_reopening_pass_inside_the_ticket_s_paths` · `test_a_commit_made_after_a_committed_reopening_is_flagged_outside_the_ticket_s_paths`: the reopening is a commit, so the ticket is in progress at `HEAD` and in the working tree | 1 + 1 | **2 green.** The behaviour holds today and must hold after the fix: a fix that treats every ticket with a close commit in its history as closed fails the first; the second guards the ticket's paths |
+
+Not tested, because no decision settles them (package DP-14): a ticket in progress at `HEAD` and `closed` only in
+the working tree; a ticket `open` at `HEAD` and `in_progress` only in the working tree; `allowed_paths` that differ
+between the two; a ticket file that exists only in the working tree.
+
 ## What the suite takes as given
 
 - **Not changed by W1-50.** The KPIs speak of a forward `HEAD` move. A reset, a checkout of another branch or
@@ -268,7 +342,8 @@ case that tells the two rules apart.
   at least seven characters, and the values of its `Role` and `Task` trailers. One finding per commit and one
   finding for several commits both pass.
 - **Ticket state (DEC-318).** A ticket's state is its file's `status` as committed and in the working tree, which
-  agree in every fixture. "Never started" is `status: open` on a ticket whose file never held another status. The
+  agree in every fixture of the first three batches. Where a closed ticket is reopened only in the working tree, it
+  stays closed (fourth batch); the other disagreements are package DP-14. "Never started" is `status: open` on a ticket whose file never held another status. The
   DEC-318 cases judge commits with a worker's `Role` trailer; the orchestrator's are DEC-359's. The move that brings
   a close commit is silent, the close commit included (DEC-359).
 - **Callers and a closed ticket.** The DEC-318, DEC-358 and DEC-359 cases are all an orchestrator session's own
@@ -291,14 +366,16 @@ The ten packages of the first two batches are decided:
 | DP-9 | A commit with `Role: orchestrator` whose `Task` names a closed ticket, one never started, or no ticket | DEC-359 (owner, amends DEC-318): allowed outside `tests/acceptance/**`, a finding inside |
 | DP-10 | In a worker's call, is a forward move judged commit by commit against the caller, or by its two ends | DEC-327: commit by commit; an undone commit outside the caller's paths is a finding |
 
-Three packages are open. No test fixes an answer to them. Each is returned to the orchestrator with the batch, in
+Four packages are open. No test fixes an answer to them. Each is returned to the orchestrator with the batch, in
 full. None blocks the implementation of W1-50: it can be built now on decided ground, and each package's cases wait.
+DP-14 comes from the fourth batch; the fix of Behaviour 2 does not depend on it.
 
 | Id | Question | Recommendation | Cases that wait |
 |---|---|---|---|
 | DP-11 | A `Role: owner` commit that existed before the call and arrives in the call's move by a merge or a fast-forward (as `0f8b0d29` did): a finding or not | The fail-closed reading: a finding, in every caller's call. It marks every lead's merge of the integration branch, and every fast-forward, that brings an owner commit; those findings are then records of a permitted action, as under DEC-254 | An owner commit brought by an orchestrator's merge; by a lead's merge of the integration branch; by a fast-forward in an orchestrator's and in a worker's call |
 | DP-12 | A permitted `gov pause --rollback` in an orchestrator's call: its revert commits (`Role` and `Reverts-Task`, no `Task`) are judged against the caller, so each revert of an acceptance-test commit is a finding | Leave W1-50 as decided: the reverts are judged against the caller, and the findings of a permitted rollback are records, noted with the rollback's record commit | A revert commit of a source file and of an acceptance test in an orchestrator's call; the record commit with and without a `Role` trailer |
 | DP-13 | Two edges of the close commit: a ticket file whose first version already holds `status: closed`; and whether the close commit itself, when it carries a worker's trailers, counts as "an ancestor of the close commit" | Fail-closed in both: the file's first version is no close commit, so every commit that names the ticket is a finding; the close commit is not its own ancestor | A commit that names the ticket and is older than the ticket's file; the work paths of a close commit with a worker's trailers |
+| DP-14 | Which version of a ticket's file gives the ticket's state and `allowed_paths` for a commit judged by its trailers, when the file committed at `HEAD` and the file in the working tree differ, in the cases the decisions do not settle: in progress at `HEAD` and `closed` only in the working tree; `open` at `HEAD` and `in_progress` only in the working tree; different `allowed_paths`; a ticket file only in the working tree | The fail-closed reading: a commit passes only when both the file committed at `HEAD` and the file in the working tree allow it; a ticket file that is not committed names no ticket | A worker's commit that names a ticket closed only in the working tree; one that names a ticket started only in the working tree; a commit inside paths only the working tree's file allows, and inside paths only the committed file allows |
 
 ## Earlier suites
 
