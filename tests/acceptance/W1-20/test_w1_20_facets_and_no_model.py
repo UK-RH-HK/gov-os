@@ -55,6 +55,16 @@ def test_a_closure_of_records_alone_does_not_run_the_code_tool(graph, box, tmp_p
     assert support.code_facet(found) != "unavailable" and support.code_facet(dangling) != "unavailable"
 
 
+def test_a_closure_of_records_alone_says_the_code_facet_was_not_asked(graph, box):
+    """DEC-393: ``facets.code`` is ``not_asked`` for a closure in which the code facet was never asked.
+
+    Every id here is a record or the target of a record's edge, so nothing is asked of the code facet (DEC-391
+    DP-4): a complete closure, one cut at the depth, and one whose edges name no record.
+    """
+    for ids, depth in (([support.HUB, support.CYCLE[0]], 3), ([support.CHAIN[0]], 1), ([support.DANGLING_START], 3)):
+        assert support.code_facet(support.ask(graph, ids, box, depth=depth)) == "not_asked", f"{ids} at depth {depth}"
+
+
 # --------------------------------------------------------------------------
 # No model
 # --------------------------------------------------------------------------

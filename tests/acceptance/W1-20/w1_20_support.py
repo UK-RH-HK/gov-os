@@ -49,9 +49,12 @@ GITLEAKS_TEMPLATE_REL = "template/.gitleaks.toml"
 TOOL = "codebase-memory-mcp"
 TIMEOUT_S = 300.0
 
-# The fixed list of stopping reasons (DEC-034, ADR-0002 section 4).
-REASONS = ("CLOSURE_COMPLETE", "SATURATED", "DEPTH_LIMIT_REACHED", "BUDGET_EXHAUSTED_WITH_GAPS", "FACET_UNAVAILABLE")
+# The fixed list of stopping reasons (DEC-034, ADR-0002 section 4; the sixth value by the owner's DEC-396).
+REASONS = ("CLOSURE_COMPLETE", "SATURATED", "DEPTH_LIMIT_REACHED", "BUDGET_EXHAUSTED_WITH_GAPS", "FACET_UNAVAILABLE",
+           "UNRESOLVED_IDS")
 COMPLETE, DEPTH_LIMIT, FACET_UNAVAILABLE = "CLOSURE_COMPLETE", "DEPTH_LIMIT_REACHED", "FACET_UNAVAILABLE"
+# Everything within the depth was reached, the facets answered or were not asked, and some ids name nothing (DEC-396).
+UNRESOLVED_IDS = "UNRESOLVED_IDS"
 # The reasons of a gap (package DP-5): beyond the depth, no such record or symbol, or the facet could not be asked.
 GAP_DEPTH, GAP_UNRESOLVED, GAP_FACET = "DEPTH_LIMIT_REACHED", "UNRESOLVED", "FACET_UNAVAILABLE"
 KINDS = ("record", "symbol")

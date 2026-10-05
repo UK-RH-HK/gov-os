@@ -67,7 +67,8 @@ def test_an_id_that_is_no_record_and_no_symbol_is_an_unresolved_gap(indexed, box
     assert support.gap_ids(found) == sorted([support.UNKNOWN, support.MISSING_NEAR, support.MISSING_FAR])
     for missing in (support.UNKNOWN, support.MISSING_NEAR, support.MISSING_FAR):
         assert support.gap_reasons(found, missing) == [support.GAP_UNRESOLVED]
-    assert found["stopping_reason"] != support.COMPLETE
+    # The code facet answered and nothing lies beyond the depth: unresolved ids are the only gaps (DEC-396).
+    assert found["stopping_reason"] == support.UNRESOLVED_IDS
 
 
 def test_repeated_runs_and_a_rebuilt_index_print_the_same_bytes(indexed, box, tmp_path):

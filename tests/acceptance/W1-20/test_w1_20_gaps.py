@@ -3,7 +3,9 @@
 Every test here runs with ``git`` alone on ``PATH``: the code tool is not there.
 
 - The target of a record's edge is a record id (CAP-09.b). When no record has it, it is unresolved, and the code
-  facet is not asked (package DP-4): these tests hold its gap to the reason UNRESOLVED on any machine.
+  facet is not asked (package DP-4): these tests hold its gap to the reason UNRESOLVED on any machine, and the
+  stopping reason to UNRESOLVED_IDS when such ids are the only gaps (DEC-396) and to DEPTH_LIMIT_REACHED when a
+  gap also lies beyond the depth (DEC-393).
 - An id given on the command line that is no record could still be a symbol, and the tool is not there to say:
   these tests hold that gap to its id and to "not CLOSURE_COMPLETE". Its reason with both facets answering is
   held by ``test_w1_20_code.py``, without the code facet by ``test_w1_20_facets_and_no_model.py``.
@@ -41,7 +43,8 @@ def test_an_edge_to_no_record_is_in_the_gap_list(graph, box):
     assert support.gap_ids(found) == [support.MISSING_NEAR, support.MISSING_FAR]
     for missing in (support.MISSING_NEAR, support.MISSING_FAR):
         assert support.gap_reasons(found, missing) == [support.GAP_UNRESOLVED]
-    assert found["stopping_reason"] != support.COMPLETE, "a closure with an unresolved id is not complete (DEC-034)"
+    # Unresolved ids are the only gaps and the code facet is not asked for a record's edge: DEC-396.
+    assert found["stopping_reason"] == support.UNRESOLVED_IDS
 
 
 def test_a_start_id_that_names_nothing_is_in_the_gap_list(graph, box):
@@ -70,3 +73,15 @@ def test_an_unresolved_id_is_told_from_one_beyond_the_depth(graph, box):
     assert support.gap_reasons(found, support.MISSING_NEAR) == [support.GAP_UNRESOLVED]
     assert support.gap_reasons(found, support.MISSING_FAR) == [support.GAP_DEPTH]
     assert found["stopping_reason"] != support.COMPLETE
+
+
+def test_a_depth_cut_together_with_an_unresolved_id_stops_on_the_depth(graph, box):
+    """DEC-393: a gap beyond the depth decides the stopping reason before an unresolved id does.
+
+    A closure of records, so the code facet is not asked and cannot decide it. The reason on each gap carries
+    the rest: the unresolved id is still told from the one that was not reached.
+    """
+    found = support.ask(graph, [support.DANGLING_START], box, depth=1)
+    assert found["stopping_reason"] == support.DEPTH_LIMIT
+    assert {entry["id"]: entry["reason"] for entry in found["gaps"]} == \
+        {support.MISSING_NEAR: support.GAP_UNRESOLVED, support.MISSING_FAR: support.GAP_DEPTH}
