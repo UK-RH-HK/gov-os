@@ -896,8 +896,17 @@ Reported by the W1-19 and W1-28 ticket leads; for W1-32, EXP-002 and the mid-wav
 
 - **A worker copied the held-out file.** The W1-28 test designer bulk-copied the tracked files into its session
   scratchpad for a throwaway stand-in, which took `governance/project/held-out.yaml` with it. It reports it never
-  read it; its deletes were refused; the owner was told and removes the folder. Every worker brief now forbids a
-  bulk copy of the tree.
+  read it; its deletes were refused. The owner removed that folder
+  (`/tmp/gov-launch-independent-test-designer-5e58yicw`, 3.4 GB) through the operator (DEC-376). Every worker brief
+  now forbids a bulk copy of the tree.
+- **Test fixtures copied the held-out file too.** The owner found and deleted 17 more copies, all inside pytest's
+  temporary test projects under one launched engineer session's temp folder (`/tmp/gov-launch-engineer-_foa_zpg/`):
+  fixtures that copy the working tree took the file with them. None remain. DEC-385 makes every copying fixture
+  leave the file out (W1-28). Until that is merged, each run of the copying suites by a launched worker makes new
+  copies in its session temp folder.
+- **Launcher temp folders pile up.** 78 other `gov-launch-*` folders remained in `/tmp` on 2026-10-05. DEC-386 makes
+  the launcher remove its folder at the session's end (W1-28); the operator clears the old ones when no lead is
+  running.
 - **A worker cannot delete its own scratchpad**: the sandbox refuses `rm -rf` there, so throwaway stand-ins and the
   per-session temp directory stay (the W1-46 residual, seen again).
 - **The freeze flag's path is a placeholder inside the sandbox.** A launched session sees `.gov-runtime/freeze` as a
