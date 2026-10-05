@@ -24,6 +24,7 @@ allowed_paths:
 kpis:
   success:
   - gov status --json reports ready/blocked/claimed tickets, open decision packages, readiness per specification, governance share, pause state and doctor summary
+  - Pause state appears in gov status (moved from W1-28, DEC-364)
   - 'Read-only: git status --porcelain unchanged [CAP-27.a]'
   - A status question asked in natural language is answered from gov status --json, and the command set stays at the Wave 1 list (no command without a contract item) [CAP-28.a]
   failure:

@@ -59,7 +59,7 @@ def test_the_role_file_states_the_six_parts_the_kpi_names():
     missing = {}
     for path in files:
         text = path.read_text(encoding="utf-8")
-        missing[path.name] = [part for part, pattern in ROLE_FILE_PARTS.items()
+        missing[path.relative_to(support.REPO_ROOT).as_posix()] = [part for part, pattern in ROLE_FILE_PARTS.items()
                               if not re.search(pattern, text, re.IGNORECASE)]
     assert any(not parts for parts in missing.values()), f"no research role file states all six parts: {missing}"
 

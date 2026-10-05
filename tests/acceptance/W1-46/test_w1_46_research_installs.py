@@ -12,7 +12,8 @@ folder is stopped by a settings ask rule". Failure 7: "A role other than
 research and the orchestrator gets an install command through".
 
 DEC-219: the research role's exception is tested here, with the four ``uv``
-forms of DEC-174 and the value options of DEC-216; the same commands stay denied
+forms of DEC-174 and value options of DEC-216 (not ``--directory`` and
+``--project``, see DEC-240 below); the same commands stay denied
 for engineer, independent test designer and independent auditor, and outside the
 experiment folder.
 
@@ -20,10 +21,11 @@ Each command is text in the hook's input. None is run: nothing is installed and
 no network is used. The decision is the one of the project's committed settings:
 their deny and ask rules, then the PreToolUse commands they register.
 
-"Inside its experiment folder" is read as: the session's working directory, as
-the hook input gives it (``cwd``), is the experiment folder or below it. One
-test covers a command that starts with ``cd <folder> &&`` from the repository
-root; see DP-4 in the README for that reading.
+DEC-240: "a research install is inside its experiment folder when the session's
+working directory is the folder or below it, or the command first changes into
+it with ``cd``". The working directory is the hook input's ``cwd``. ``uv
+--directory`` and ``uv --project`` "are not followed by the rule": no test here
+uses them; a reviewer probes them (DEC-136).
 
 The install that really runs, and the system-wide one that fails at the
 sandbox's write fence, are in ``test_w1_46_live_sessions.py``.
@@ -46,10 +48,9 @@ UV_FORMS = {
     "uv-run-with": "uv run --with requests python script.py",
     "uvx": "uvx ruff check .",
 }
-# DEC-216: the four value options, and ``uv run -w``. Every value stays inside the folder.
+# DEC-216: value options whose value the rule skips, and ``uv run -w``. ``--directory`` and ``--project`` are
+# left out on purpose: the rule does not follow them, and DEC-240 leaves them to the reviewer's probe.
 VALUE_OPTIONS = {
-    "directory-add": "uv --directory sub add requests",
-    "project-sync": "uv --project sub sync",
     "cache-dir-sync": "uv --cache-dir .uv-cache sync",
     "config-file-add": "uv --config-file uv.toml add requests",
     "run-w": "uv run -w requests script.py",
@@ -89,9 +90,17 @@ def test_a_research_install_below_the_experiment_folder_is_let_through(guard, fo
 
 
 def test_a_research_install_after_cd_into_the_experiment_folder_is_let_through(guard, project):
-    """The reading of DP-4: ``cd <folder> && <install>`` from the repository root is inside the folder."""
+    """DEC-240: ``cd <folder> && <install>`` from the repository root is inside the folder."""
     command = f"cd {FOLDER} && uv add requests"
     w47.assert_allowed(guard("Bash", w47.bash_input(command), RESEARCH, cwd=project), f"`{command}` by research")
+
+
+def test_a_research_install_after_cd_into_another_folder_is_denied(guard, project):
+    """DEC-240: the ``cd`` must be into the experiment folder. Holds before implementation (the role is unknown)."""
+    for target in ("experiments/spikes/exp-900", "src"):
+        command = f"cd {target} && uv add requests"
+        result = guard("Bash", w47.bash_input(command), RESEARCH, cwd=project)
+        w47.assert_denied_by_rule(result, f"`{command}` by research from the repository root")
 
 
 @pytest.mark.parametrize("mode", w47.PERMISSION_MODES)

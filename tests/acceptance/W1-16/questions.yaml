@@ -1,0 +1,206 @@
+# The code questions of the W1-16 acceptance tests, over the two public dev tiers (a-dev, b-dev).
+#
+# PROVISIONAL (README, package DP-1). The question set of the S0b2 C1 baseline is not in this repository and not
+# in the dev tiers. This set was written by the test designer from the source of the tiers: every expected answer
+# was read from the code (a whole-word search of the tier), never taken from the tool. Where the public dev query
+# set (dev-queryset.yaml in the tiers' folder) names a code file for a code question, its id is given.
+#
+# - callers: the functions that call the symbol directly, as [path, name]. A question is a hit when one of them is
+#   among the first five answers.
+# - impact: what a change to the symbol reaches: its callers and their callers, as [path, name]. Same rule.
+# - definitions: every file that defines the symbol. All of them must be answered.
+# - references: every file with a call site of the function (CAP-12 acceptance). All of them must be answered.
+# - dead: functions nothing in the tier refers to. live: functions that non-test code calls.
+# - renames: applied to the clone between the two phases, one per language where the tier has a call site.
+#   After the rename the same questions are asked with the new name.
+tiers:
+  a-dev:
+    renames:
+      eval_rhs: evaluate_rhs                    # Rust
+      read_trajectory_csv: load_trajectory_csv  # Python
+      validateIr: checkIrDocument               # TypeScript
+    symbols:
+      - symbol: eval_rhs
+        language: rust
+        callers:
+          - [crates/orion-runtime/src/integrators.rs, rk4_step]
+        impact:
+          - [crates/orion-runtime/src/integrators.rs, rk4_step]
+      - symbol: lower_expr
+        language: rust
+        callers:
+          - [crates/orion-ir/src/lib.rs, lower_system]
+          - [crates/orion-ir/src/lib.rs, lower_expr]
+        impact:
+          - [crates/orion-ir/src/lib.rs, lower_system]
+          - [crates/orion-ir/src/lib.rs, lower_expr]
+      - symbol: tokenise_all
+        language: rust
+        callers:
+          - [crates/orion-parser/src/lib.rs, parse]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_keywords]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_number_literal]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_operators]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_line_comment]
+        impact:
+          - [crates/orion-parser/src/lib.rs, parse]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_keywords]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_number_literal]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_operators]
+          - [crates/orion-lexer/tests/lexer_tests.rs, test_line_comment]
+          - [crates/orion-parser/tests/parser_tests.rs, test_empty_program]
+          - [crates/orion-parser/tests/parser_tests.rs, test_simple_system]
+          - [crates/orion-parser/tests/parser_tests.rs, test_const_declaration]
+      - symbol: read_trajectory_csv
+        language: python
+        callers:
+          - [python/orion_ref/tests/test_io_utils.py, test_csv_roundtrip]
+        impact:
+          - [python/orion_ref/tests/test_io_utils.py, test_csv_roundtrip]
+      - symbol: loadIr
+        language: typescript
+        callers:
+          - [tools/src/cli.ts, main]
+        impact:
+          - [tools/src/cli.ts, main]
+      - symbol: printSummary
+        language: typescript
+        callers:
+          - [tools/src/cli.ts, main]
+        impact:
+          - [tools/src/cli.ts, main]
+      - symbol: validateIr
+        language: typescript
+        callers:
+          - [tools/src/schema-validator.ts, validateAll]
+        impact:
+          - [tools/src/schema-validator.ts, validateAll]
+    definitions:
+      - symbol: leapfrog_step                   # DQ-A-17: defined in Rust and in Python
+        paths:
+          - crates/orion-runtime/src/integrators.rs
+          - python/orion_ref/integrators.py
+      - symbol: KeplerTwoBody                   # DQ-A-19: defined in Rust and in Python
+        paths:
+          - crates/orion-runtime/src/physics_kernel.rs
+          - python/orion_ref/kernels.py
+      - symbol: validateIr
+        paths:
+          - tools/src/schema-validator.ts
+      - symbol: eval_rhs
+        paths:
+          - crates/orion-runtime/src/integrators.rs
+      - symbol: read_trajectory_csv
+        paths:
+          - python/orion_ref/io_utils.py
+    references:
+      - symbol: validateIr
+        language: typescript
+        paths:
+          - tools/src/schema-validator.ts
+      - symbol: eval_rhs
+        language: rust
+        paths:
+          - crates/orion-runtime/src/integrators.rs
+      - symbol: read_trajectory_csv
+        language: python
+        paths:
+          - python/orion_ref/tests/test_io_utils.py
+    dead:
+      - [tools/src/utils.ts, formatSigFigs]
+      - [tools/src/diff.ts, diffIr]
+    live:
+      - [crates/orion-runtime/src/integrators.rs, eval_rhs]
+      - [tools/src/cli.ts, loadIr]
+      - [tools/src/schema-validator.ts, validateIr]
+  b-dev:
+    renames:
+      apply_hamming: apply_hamming_window       # Rust
+      solve_gains: solve_antenna_gains          # Python
+    symbols:
+      - symbol: process_block
+        language: rust
+        callers:
+          - [argus-core/crates/ffi/src/lib.rs, argus_process_signal]
+          - [argus-core/crates/signal/src/lib.rs, test_process_block_length]
+        impact:
+          - [argus-core/crates/ffi/src/lib.rs, argus_process_signal]
+          - [argus-core/crates/signal/src/lib.rs, test_process_block_length]
+      - symbol: apply_hamming
+        language: rust
+        callers:
+          - [argus-core/crates/signal/src/lib.rs, process_block]
+          - [argus-core/crates/signal/src/window.rs, test_hamming_endpoints]
+        impact:
+          - [argus-core/crates/signal/src/lib.rs, process_block]
+          - [argus-core/crates/signal/src/window.rs, test_hamming_endpoints]
+          - [argus-core/crates/ffi/src/lib.rs, argus_process_signal]
+          - [argus-core/crates/signal/src/lib.rs, test_process_block_length]
+      - symbol: solve_gains                     # DQ-B-16
+        language: python
+        callers:
+          - [pyargus/src/pyargus/pipeline/calibrate.py, calibrate_visibilities]
+          - [pyargus/tests/test_calibration.py, test_identity_gains]
+          - [pyargus/tests/test_calibration.py, test_empty_data]
+        impact:
+          - [pyargus/src/pyargus/pipeline/calibrate.py, calibrate_visibilities]
+          - [pyargus/tests/test_calibration.py, test_identity_gains]
+          - [pyargus/tests/test_calibration.py, test_empty_data]
+      - symbol: median
+        language: python
+        callers:
+          - [pyargus/src/pyargus/analysis/stats.py, mad]
+          - [pyargus/tests/test_stats.py, test_median_odd]
+          - [pyargus/tests/test_stats.py, test_median_even]
+        impact:
+          - [pyargus/src/pyargus/analysis/stats.py, mad]
+          - [pyargus/tests/test_stats.py, test_median_odd]
+          - [pyargus/tests/test_stats.py, test_median_even]
+          - [pyargus/tests/test_stats.py, test_mad]
+      - symbol: _find_peak
+        language: python
+        callers:
+          - [pyargus/src/pyargus/imaging/deconvolver.py, clean_deconvolve]
+        impact:
+          - [pyargus/src/pyargus/imaging/deconvolver.py, clean_deconvolve]
+          - [pyargus/tests/test_imaging.py, test_empty_image]
+      - symbol: wavelength
+        language: python
+        callers:
+          - [pyargus/src/pyargus/utils/constants.py, primary_beam_fwhm]
+        impact:
+          - [pyargus/src/pyargus/utils/constants.py, primary_beam_fwhm]
+    definitions:
+      - symbol: apply_hamming                   # DQ-B-18
+        paths:
+          - argus-core/crates/signal/src/window.rs
+      - symbol: Gridder                         # DQ-B-19
+        paths:
+          - pyargus/src/pyargus/imaging/gridder.py
+      - symbol: solve_gains
+        paths:
+          - pyargus/src/pyargus/calibration/solver.py
+      - symbol: formatFrequency
+        paths:
+          - dashboard/packages/ui/src/utils/helpers.ts
+    references:
+      - symbol: apply_hamming
+        language: rust
+        paths:
+          - argus-core/crates/signal/src/lib.rs
+          - argus-core/crates/signal/src/window.rs
+      - symbol: solve_gains
+        language: python
+        paths:
+          - pyargus/src/pyargus/pipeline/calibrate.py
+          - pyargus/tests/test_calibration.py
+    dead:
+      - [argus-core/crates/signal/src/window.rs, apply_hanning]                    # DQ-B-18: exists, unused
+      - [pyargus/src/pyargus/imaging/old_gridder.py, grid_visibilities_natural]   # DQ-B-15: deprecated dead code
+      - [pyargus/src/pyargus/pipeline/transform.py, compute_power_spectrum]
+      - [dashboard/packages/ui/src/utils/helpers.ts, clamp]
+      - [dashboard/packages/ui/src/utils/helpers.ts, formatBytes]
+    live:
+      - [argus-core/crates/signal/src/lib.rs, process_block]
+      - [argus-core/crates/signal/src/window.rs, apply_hamming]
+      - [pyargus/src/pyargus/calibration/solver.py, solve_gains]

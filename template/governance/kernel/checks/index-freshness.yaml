@@ -1,0 +1,8 @@
+# The index-freshness family check (CAP-38.b, W1-17, DEC-342): the lexical index in .gov-runtime/store.db holds
+# every tracked blob as it stands. Not green when the index is stale, empty or missing; each stale path is printed.
+# The command is run by `sh -c` in the project root; exit 0 is green (DEC-285). It never writes.
+id: index-freshness
+family: index-freshness
+tier: G1
+severity: hard-block
+command: python3 -m gov.retrieval.lexical

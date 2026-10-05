@@ -1,6 +1,6 @@
 ---
 id: DAEO-32n6
-status: in_progress
+status: closed
 deps: [DAEO-m7u4]
 links: []
 created: 2026-10-04T12:15:35Z
