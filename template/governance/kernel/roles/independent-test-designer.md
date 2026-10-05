@@ -1,13 +1,6 @@
----
-name: independent-test-designer
-description: "Independent test designer role for the Governance OS: writes a ticket's acceptance tests from its KPIs before implementation."
----
+# Independent test designer role (Wave 1)
 
-# Independent Test Designer
-
-Generated from `template/governance/kernel/roles/independent-test-designer.md` (W1-33, DEC-066); the two agree field
-by field. The guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`, and the launcher its
-network.
+Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Purpose:** write a ticket's acceptance tests from its KPIs and the Contract before implementation starts, and
   show them red for the stated reason (MR-3, DEC-069). A session runs as `GOV_ROLE=independent-test-designer`,
