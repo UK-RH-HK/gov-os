@@ -15,10 +15,16 @@ Its public name, fixed for this batch::
     reading.own       # sorted list of repository-relative paths the merge commit changed itself
     reading.brought   # sorted list of paths another parent brought
 
-``own`` and ``brought`` are disjoint and together are exactly the paths the
-merge commit changes against its first parent (both ends of a rename appear as
-two paths; a deleted path is a path). The helper takes no caller, no role and
-no ticket.
+``own`` and ``brought`` are disjoint (both ends of a rename appear as two
+paths; a deleted path is a path). The helper takes no caller, no role and no
+ticket.
+
+Revised after implementation; reason: delegated decision, DEC-403 (DP-20). The
+helper reads every parent the way it reads the first, so ``own`` and
+``brought`` together are no longer exactly the paths the merge commit changes
+against its first parent: ``own`` also holds a path where the merge commit
+differs from another parent and no parent brought its content. The cases of
+DEC-403 are in ``test_w1_50_read_merge_every_parent.py``.
 
 These are the only cases of the suite that import from ``src``. The helper is
 imported through the fixture ``read_merge``, so its absence fails these cases
@@ -132,11 +138,26 @@ def test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_anothe
     reading = read_merge(str(project), merge_commit)
 
     what = f"read_merge on {shape.what}"
-    assert reading.own == sorted(shape.own), (
-        f"{what}: `own` is {reading.own!r}, not {sorted(shape.own)!r}"
+    # Revised after implementation; reason: delegated decision, DEC-403 (DP-20). `own` is read against every
+    # parent. Of these histories only the merge of an unrelated history gives another `own`: with no merge base
+    # every path that differs from any parent is the merge commit's own, and every path main holds differs from
+    # the other parent. `brought` holds at least the paths another parent brought against the first parent;
+    # what else it holds DEC-403 does not say (README, package DP-22).
+    own = sorted(shape.own)
+    if case == "a-merge-of-an-unrelated-history":
+        own = sorted(check_support.git(project, "ls-tree", "-r", "--name-only", merge_commit).split())
+    differs = set()
+    for parent in support.parents_of(project, merge_commit):
+        differs.update(check_support.git(project, "diff", "--no-renames", "--name-only", parent,
+                                         merge_commit).split())
+    assert reading.own == own, (
+        f"{what}: `own` is {reading.own!r}, not {own!r}"
     )
-    assert reading.brought == sorted(shape.brought), (
-        f"{what}: `brought` is {reading.brought!r}, not {sorted(shape.brought)!r}"
+    assert reading.brought == sorted(reading.brought) and set(shape.brought) <= set(reading.brought), (
+        f"{what}: `brought` is {reading.brought!r}; it is not sorted, or lacks one of {sorted(shape.brought)!r}"
+    )
+    assert set(reading.brought) <= differs - set(own), (
+        f"{what}: `brought` is {reading.brought!r}; it holds a path of `own`, or one that differs from no parent"
     )
     check_support.assert_left_as_the_call_left_it(project, left, what)
     assert check_support.finding_lines(project) == findings, f"{what}: reading a merge added a finding"

@@ -310,11 +310,28 @@ def test_a_merge_of_an_unrelated_history_that_adds_an_acceptance_test_is_flagged
 
 
 @pytest.mark.parametrize("case", sorted(ORCHESTRATOR_S), ids=sorted(ORCHESTRATOR_S))
-def test_a_merge_of_an_unrelated_history_that_adds_a_path_the_orchestrator_may_write_is_silent(project, sandbox,
-                                                                                              call, case):
+def test_a_merge_of_an_unrelated_history_is_flagged_for_the_acceptance_tests_its_first_parent_holds(project,
+                                                                                                  sandbox, call,
+                                                                                                  case):
     """The same merge; the merged history's one commit carries the orchestrator's trailers and adds a file
-    under ``docs/``. The merge commit's own change is that file, which the orchestrator may write."""
+    under ``docs/``, which the orchestrator may write.
+
+    Rewritten after implementation; reason: delegated decision, DEC-403 (DP-20). Until then this case was
+    ``..._that_adds_a_path_the_orchestrator_may_write_is_silent``: read against its first parent alone, the
+    merge commit's own change was that one file. DEC-403: "with several merge bases, or none, every path that
+    differs from any parent is the merge commit's own change". The merge commit keeps everything ``main``
+    holds, and all of it differs from the other parent, which holds one file: the acceptance test ``main``
+    holds is the merge commit's own change, the orchestrator may not write it, and it is named. The file the
+    merge adds is not."""
     shape = support.unrelated_merge(project, sandbox, (support.ISLAND_NOTES, AS_ORCHESTRATOR), ORCHESTRATOR_S[case])
-    made = _make(project, call, shape)
+    result, left, what = _make(project, call, shape)
     _assert_holds_the_other_parent_s_content(project, support.ISLAND_NOTES)
-    _assert_silent(project, made)
+    path = support.ACCEPTANCE_FILE
+    assert (support.content_at(project, "HEAD", path) == support.content_at(project, "HEAD^1", path) is not None
+            and support.content_at(project, "HEAD^2", path) is None), (
+        f"the fixture is wrong: the merge commit does not hold its first parent's {path}, or the other parent "
+        f"holds the path too"
+    )
+    check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+    check_support.assert_not_recorded(result, support.ISLAND_NOTES, what=what)
+    check_support.assert_left_as_the_call_left_it(project, left, what)

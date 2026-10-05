@@ -37,6 +37,15 @@ functions; no existing case is changed, and the new rule makes no existing case 
 implementation as it stands. One new package is open (DP-19); no fix of this batch depends on it. See "Added after
 implementation, DEC-394 and DEC-398".
 
+Eighth batch, **added after implementation**: the seventh batch's cases were implemented and the 245 cases passed. A
+review found that a merge commit which keeps its first parent's content of a path, and so drops what another parent
+changed, is never judged. DEC-403 (delegated) closes it with the symmetric rule (DP-20) and decides DP-19; the
+review's F3 makes the helper's error public and its `commit` argument checked. 43 cases are added in 21 test
+functions, and 34 of them fail on the implementation as it stands. Three existing test functions are rewritten after
+implementation, reason "delegated decision, DEC-403"; 3 of their 10 cases fail until the rule is built. Three new
+packages are open (DP-21 to DP-23); no fix of this batch depends on them. See "Added after implementation, DEC-403".
+The suite now holds 288 cases: 251 pass and 37 fail.
+
 ## Run
 
 ```sh
@@ -57,8 +66,9 @@ The tests use the public interface the W1-03 suite uses, and its support module
   `.gov-runtime/findings.jsonl` (DEC-122).
 
 No test imports `gov.guard.containment` or reads a snapshot file. The one exception to "no import from `src`" is
-`test_w1_50_read_merge_helper.py` (seventh batch): DEC-398 makes `gov.guard.containment_merge.read_merge` a public
-name that a second ticket uses, and those 8 cases call it by that name.
+`test_w1_50_read_merge_helper.py` (seventh batch) with `test_w1_50_read_merge_every_parent.py` (eighth batch):
+DEC-398 makes `gov.guard.containment_merge.read_merge` a public name that a second ticket uses, and those 8 and 18
+cases call it by that name.
 
 The fixture project:
 
@@ -637,9 +647,10 @@ reading.own       # sorted list of repository-relative paths the merge commit ch
 reading.brought   # sorted list of paths another parent brought
 ```
 
-`own` and `brought` are disjoint and together are exactly the paths the merge commit changes against its first
-parent; both ends of a rename appear as two paths, and a deleted path is a path. The helper takes no caller, role or
-ticket. These are the only cases that import from `src`. The helper is imported when the test first calls it, after
+`own` and `brought` are disjoint; both ends of a rename appear as two paths, and a deleted path is a path. When
+these cases were written the two lists together were exactly the paths the merge commit changes against its first
+parent; DEC-403 widens that, and the test is rewritten (eighth batch). The helper takes no caller, role or
+ticket. With the eighth batch's helper cases these are the only cases that import from `src`. The helper is imported when the test first calls it, after
 the history is built and guarded, so its absence fails these 8 cases and not the collection of the others. The
 process holds no `GOV_ROLE`, `GOV_TICKET` or `CLAUDE_PROJECT_DIR`, and no hook runs around any command. What the
 helper does for a commit that is no merge is not tested.
@@ -679,6 +690,145 @@ trailers in an engineer's call it is a finding
 that changes a ticket file and does not widen the caller's paths was a finding in a worker's call before DP-17, as a
 path outside the caller's paths; no case is added for it.
 
+## Added after implementation, DEC-403 (eighth batch)
+
+These 43 cases are **tests added after implementation**; reason: "delegated decision, DEC-403". The behaviours came
+to the test designer as described behaviours, never as code. Apart from the helper's cases, every case goes through
+the same public interface as the rest of the suite and is read from outside; no test reads the check's code. Every
+history is a real git history built in the throw-away project with commits, `git merge` and, where a shape needs it,
+`git commit-tree`. "Made in the call" is: between the PreToolUse and the PostToolUse hook of one Bash call.
+
+Run when they were written: **34 failed, 9 passed**. Every red case fails on its behaviour assertion, with the
+fixture's own guards passed. With the three rewritten cases that fail (below) the suite's run is 37 failed, 251
+passed.
+
+**DEC-403, DP-20 (a): the symmetric rule, in the one helper.** `read_merge` reads every parent the way it reads the
+first. A path where the merge commit's content differs from any parent's is the merge commit's own change, unless
+another parent brought it by the three-way rule (that parent's content differs from the merge base, and the merge
+commit has that parent's content). So `own` also holds the paths where the merge drops a parent's change. With
+several merge bases, or none, every path that differs from any parent is the merge commit's own change. This widens
+"against its first parent" in DEC-394 and DEC-398; the helper stays the one place that reads a merge.
+
+**DEC-403, DP-19 (a): as built.** An octopus merge in which one other parent has several merge bases, or none, with
+the first parent fails closed as a whole. An octopus whose other parents cross only each other is read parent by
+parent, as built.
+
+**F3.** `read_merge` raises a public, documented error; a `commit` argument that is not a commit id (for example one
+that begins with `-`) is refused, never passed to git as an option; the docstring says exactly what `own` and
+`brought` hold.
+
+**How the suite reads the rule for one path**, with the parents P1..Pn: for each parent Pi whose content of the path
+differs from the merge commit's, the path is the merge commit's own unless some other parent Pj holds the merge
+commit's content of it and that content differs from the one merge base of Pi and Pj. The histories are built in
+`w1_50_symmetric_support.py`. Each builder names the dropping merge commit's own changes as a literal list;
+`own_by_the_words` works the rule out from git's own answers, as a guard for the fixtures, and
+`assert_dropping` also checks that, read against its first parent alone, none of the paths a finding is to name is
+the merge commit's own. A tree a merge commit made by plumbing is to hold is prepared before the call, as the tree
+of a commit on a branch `prepared` that is never an ancestor of `HEAD`.
+
+### DP-20: a dropped change, through the check (`test_w1_50_merge_that_drops_a_parent_s_change.py`, 20 cases)
+
+Every call is an orchestrator session's own call. `HEAD` is the branch tip before the call and `HEAD~2` the commit
+before the two changes that are dropped. Each shape has one case for each of:
+
+- **a test designer's tests**: a commit that edits an existing acceptance test and a commit that adds a new one. The
+  dropping merge commit carries the orchestrator's trailers unless the table says otherwise; neither they nor the
+  caller allow a path under `tests/acceptance/**`;
+- **an orchestrator's ticket files**: a commit that narrows `DAEO-zz94`'s allowed paths and a commit that closes
+  `DAEO-zz96`. The dropping merge commit carries an engineer's trailers: a change under `.tickets/**` in a commit
+  with a worker's `Role` trailer is a finding (DP-16). With the orchestrator's trailers, or none, the form is not
+  tested (package DP-21).
+
+All 20 cases are **red**. Unless the table says otherwise the check is silent today: against its first parent the
+dropping merge commit changes nothing, or only paths its other parent brought.
+
+| Shape | Test function | Cases |
+|---|---|---|
+| B, the parents turned round: a merge commit with the parents `HEAD~2` and `HEAD` in that order and the tree of `HEAD~2`; `main` moved to it | `test_a_merge_commit_with_its_parents_turned_round_is_flagged_for_what_it_drops`: both dropped paths are named. The tests with orchestrator trailers, engineer trailers, none; the ticket files | 4 |
+| C: the same, the first parent a new empty commit on top of `HEAD~2` | `test_a_turned_round_merge_commit_whose_first_parent_is_a_new_empty_commit_is_flagged` | 2 |
+| D, plain porcelain: `git checkout -b tmp HEAD~2`, an orchestrator's commit of `README.md`, `git merge -s ours main`, `main` fast-forwarded to it | `test_a_branch_cut_before_the_changes_that_takes_main_with_ours_and_is_fast_forwarded_to_is_flagged`: the dropped paths are named, `README.md` is not. The tests with the merge commit as `git merge -s ours main` makes it, without trailers; the ticket files | 2 |
+| E: turned round like B, the tree `HEAD`'s with only the first of the two changes set back | `test_a_turned_round_merge_commit_that_sets_back_one_of_two_changes_is_flagged_for_that_one`: the path set back is named; the path that was kept, which the second parent brought, is not | 2 |
+| J2, an octopus turned round: the parents `side`, `HEAD`, `HEAD~1` and the tree of `side`, which forked before the changes and has an orchestrator's commit of `README.md` | `test_an_octopus_merge_commit_that_holds_the_tree_of_a_side_forked_before_the_changes_is_flagged`: both dropped paths are named, `README.md` is not | 2 |
+| NB2, no merge base: the first parent a new commit without a parent and with an empty tree, the second `HEAD`; the tree is `HEAD`'s without `tests/acceptance/` (the tests) or without the two ticket files | `test_a_merge_commit_on_an_unrelated_first_parent_is_flagged_for_the_paths_it_deletes`: the deleted paths are named. The ticket case is not silent today: the engineer's merge commit is flagged for the ticket files its tree holds, and the two it deletes are not named | 2 |
+| N: a ticket branch takes `main` with `git merge -s ours`, then an ordinary `git merge --no-ff` of the branch into `main` | `test_a_branch_that_took_main_with_ours_and_is_then_merged_ordinarily_is_flagged_for_what_it_dropped`: the dropped paths are named, by a finding whose `reason` names the `-s ours` merge commit; the branch's source file is not named. N1, both merges in the call: the tests with orchestrator trailers on the `-s ours` merge and with none, the ticket files. N2, the `-s ours` merge made before the call: the tests, the ticket files | 5 |
+| The review's F2: a turned-round merge commit undoes two tests and a second merge commit on top of it (second parent `HEAD`) holds the second test again, both in one call | `test_a_test_that_stays_undone_is_named_when_a_second_merge_commit_restores_the_other`: the test that stays undone is named. Today the finding names only the restored test, the second merge commit's own change against its first parent. The test says nothing of the restored test | 1 |
+
+**Which merge commit the finding is for in shape N.** By the rule's words it is the `-s ours` merge commit, in N1
+and in N2. That commit differs from its second parent (`main`) in the dropped paths, and its first parent, whose
+content it holds, never changed them: they are its own change. The final merge commit holds its second parent's
+content of those paths, and that content differs from the merge base (`main` as it was): they are brought, and the
+final merge commit has no own change. In N2 the `-s ours` merge commit was made before the call, but it is not in
+`HEAD`'s history until the call's merge: it is a commit of the move, judged like every commit the merge brings, as
+the branch's earlier merge is in the seventh batch's merge-back cases. So N2 is pinned, with the same expectation as
+N1.
+
+### DP-20: the other side, through the check (`test_w1_50_merge_that_takes_each_side_s_change.py`, 5 cases)
+
+All 5 cases are **green** and must stay green: a fix that takes every path where the merge commit differs from a
+parent for the merge commit's own fails them.
+
+| Test function | Cases |
+|---|---|
+| `test_a_merge_that_takes_each_parent_s_change_of_its_own_path_is_silent`: the branch changed one path and `main` another since the fork, one of the two a test designer's under `tests/acceptance/**`; the merge commit holds both. The test designer's commit on `main`, and on the branch; as `git merge --no-ff` makes it, and with the same tree and the branch for the first parent | 4 |
+| `test_a_merge_of_two_sides_that_made_the_same_change_of_a_test_is_silent`: a test designer made the same change of an acceptance test on both sides; the branch also brings an engineer's commit | 1 |
+
+Shapes the seventh batch and earlier batches hold silent. Each was worked out again by the words of DEC-403; none
+gives another answer, and none is changed:
+
+- an ordinary `--no-ff` integration merge: `test_an_integration_merge_of_commits_inside_their_own_paths_is_silent`
+  (4 cases), `test_an_integration_merge_stays_silent_when_main_got_a_test_designer_s_commit_since_the_fork` (2 cases);
+- a merge-back: `test_a_merge_back_of_a_ticket_branch_that_earlier_merged_main_into_itself_is_silent` (2 cases);
+- a re-merge: `test_a_second_merge_of_the_same_branch_is_silent`;
+- an octopus merge: `test_an_octopus_merge_of_two_branches_with_commits_inside_their_own_paths_is_silent`;
+- a merge resolved to the merged side's content:
+  `test_a_merge_that_takes_the_merged_side_s_content_of_paths_both_sides_changed_is_silent` and
+  `test_a_conflict_resolved_to_the_merged_side_s_content_is_not_the_merge_commit_s_own_change`;
+- a criss-cross merge whose first parent got no commit after the crossing:
+  `test_a_criss_cross_merge_that_changes_only_paths_its_trailers_or_the_caller_may_write_is_silent` (2 cases).
+
+### DP-20, DP-19 and F3: the helper (`test_w1_50_read_merge_every_parent.py`, 18 cases)
+
+Through `from gov.guard.containment_merge import read_merge`, imported inside the test when the history is built, as
+in the seventh batch. In every case `own` and `brought` are sorted lists of distinct paths with no path in both, and
+reading leaves `HEAD`, the tree and `findings.jsonl` as they were.
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| DP-20 | `test_read_merge_puts_the_paths_a_turned_round_merge_commit_drops_in_own`: shape B; `own` is the two dropped tests, `brought` is empty | 1 | **red**: `own` is empty |
+| DP-20 | `test_read_merge_puts_what_an_ours_merge_drops_in_its_own_and_not_in_the_ordinary_merge_s_after_it`: shape N; for the `-s ours` merge commit `own` is the two dropped tests and `brought` holds neither; for the final merge commit `own` is empty and `brought` holds the two tests and the branch's source file | 1 | **red**: `own` of the `-s ours` merge commit is empty |
+| DP-20: the other side | `test_read_merge_finds_no_own_change_in_a_merge_that_takes_each_side_s_change`: each side changed its own path; an ordinary merge, and the parents turned round. `own` is empty; `brought` holds the path the other parent brought against the first parent, and no path where no parent differs | 2 | **green** |
+| DP-20, several merge bases | `test_read_merge_with_several_merge_bases_puts_every_path_that_differs_from_any_parent_in_own`: a criss-cross history with the parents turned round and the first parent's tree; `own` is the engineer's file and the test designer's test, both of which differ from the second parent only; `brought` is empty | 1 | **red**: `own` is empty |
+| DP-20, no merge base | `test_read_merge_with_no_merge_base_puts_every_path_that_differs_from_any_parent_in_own`: shape NB2; `own` is every path the tree holds and every path it deletes; `brought` is empty | 1 | **red**: `own` lacks the three deleted paths |
+| DP-19 | `test_read_merge_fails_closed_for_a_whole_octopus_merge_when_one_parent_has_several_merge_bases_or_none`: an octopus of `HEAD`, an ordinary ticket branch with a test designer's new test, and a branch with two merge bases with `HEAD`, or a history with none. `brought` is empty, the ordinary branch's test included; `own` is every path that differs from any of the three parents | 2 | **red**: `brought` is empty already (as built); `own` holds only the paths that differ from the first parent |
+| DP-19 | `test_read_merge_reads_an_octopus_whose_other_parents_cross_only_each_other_parent_by_parent`: each branch has one merge base with `HEAD`, the two cross each other. Pinned: the two paths both branches hold are in `brought`; `own` holds nothing but, at most, the file one branch changed after the crossing | 1 | **green** |
+| F3 | `test_read_merge_raises_a_public_error_for_an_unknown_commit_id`: forty hex digits that name no object; forty zeros | 2 | **red**: raises `gov.guard.containment._GitError` |
+| F3 | `test_read_merge_raises_a_public_error_for_a_path_that_is_no_repository`: an existing directory outside every repository | 1 | **red**: raises `gov.guard.containment._NotARepo` |
+| F3 | `test_the_error_read_merge_raises_is_documented` | 1 | **red**: there is no public error yet |
+| F3 | `test_the_docstring_of_read_merge_speaks_of_own_and_brought` | 1 | **green** |
+| F3 | `test_read_merge_refuses_a_commit_argument_that_is_no_commit_id`: `--all`, `-1`, `--output=<file>`, the empty string. The public error, the same as for an unknown commit id; no reading; no file written; the repository as it was | 4 | **red**: `--all` returns a reading of `HEAD`; the other three raise `_GitError` with git's own message, after git was given the argument |
+
+**What the cases require of the error**, and no more: the exception `read_merge` raises is an instance of a class
+that `gov.guard.containment_merge` holds under a name without a leading underscore, and that class is neither
+`Exception` nor `BaseException`. Its name is the engineer's. "Documented": one of those names stands in the
+docstring of `read_merge` or of the module, or the class has a docstring of its own. "Refused with that public
+error": the error for a refused argument and the error for an unknown commit id share at least one such class.
+
+**Not pinned:** whether a branch name or an abbreviated id is accepted for `commit`; what the helper does for a
+commit that is no merge; what `brought` holds beyond the paths another parent brought against the first parent
+(package DP-22); for an octopus whose other parents cross only each other, whether the file one of them changed
+after the crossing is in `own` or in `brought` ("as built" puts it in `brought`; read pair by pair, DP-20 has no
+single merge base for that pair).
+
+### Existing cases rewritten after implementation (reason: delegated decision, DEC-403)
+
+| Test | Change | Run when rewritten |
+|---|---|---|
+| `test_read_merge_says_which_paths_are_the_merge_commit_s_own_and_which_another_parent_brought` (`test_w1_50_read_merge_helper.py`, 8 cases) | It pinned "`own` and `brought` together are exactly the paths changed against the first parent". `own` stays the literal list for seven histories; for the merge of an unrelated history it is now every path the merge commit's tree holds (no merge base: every path `main` holds differs from the other parent). `brought` must hold at least the listed paths, be sorted, hold no path of `own` and no path where no parent differs; it is no longer compared for equality (package DP-22) | 7 green; **1 red** (`a-merge-of-an-unrelated-history`: `own` is only the new test) |
+| `test_a_merge_of_an_unrelated_history_that_adds_a_path_the_orchestrator_may_write_is_silent` (`test_w1_50_merge_read_by_the_merge_base.py`, 2 cases), now `test_a_merge_of_an_unrelated_history_is_flagged_for_the_acceptance_tests_its_first_parent_holds` | It expected silence. By DEC-403's words the merge commit, which keeps everything `main` holds, differs from its other parent in all of it, and with no merge base all of it is the merge commit's own: the acceptance test `main` holds is named. The file the merge adds is not named. The history is unchanged. See package DP-23 | **2 red**: silent |
+
+No other existing case gives another answer under DEC-403. The fixture guard `assert_shape` of the seventh batch
+still describes each history by its first parent; it reads git, not the check, and is unchanged.
+
 ## What the suite takes as given
 
 - **Not changed by W1-50.** The KPIs speak of a forward `HEAD` move. A reset, a checkout of another branch or
@@ -710,7 +860,10 @@ path outside the caller's paths; no case is added for it.
   amended by DEC-398; it replaces DEC-390's DP-15 rule): a path is brought by another parent only when the merge
   commit holds that parent's content of it and that content differs from the merge base of the first parent and that
   parent; with several merge bases, or none, nothing is brought. "Content" is the file's content with its mode, and
-  a path a tree does not hold is content too.
+  a path a tree does not hold is content too. By DEC-403 the merge commit is read against every parent in this way,
+  not against the first alone: a path where it differs from any parent is its own change unless another parent
+  brought it, and with several merge bases, or none, every path that differs from any parent is its own (eighth
+  batch).
 - **A commit a merge brings and the merge commit's own change are two judgements.** A commit new in the move is
   judged by its own trailers whatever the merge commit holds. In the fail-closed cases the other parent's test
   designer commit passes, and the merge commit's change of the same path is a finding of its own.
@@ -720,7 +873,9 @@ path outside the caller's paths; no case is added for it.
   is a finding, with or without trailers. The orchestrator's own commits of ticket files, in its own call, pass
   (DEC-156, DEC-359).
 - **The helper (DEC-398).** `gov.guard.containment_merge.read_merge(root, commit)` is a public name; `own` and
-  `brought` are sorted lists. The suite does not say what it does for a commit that is no merge.
+  `brought` are sorted lists. The suite does not say what it does for a commit that is no merge. By DEC-403 it
+  raises a public error for a commit id or a repository it cannot read and for a `commit` argument that is no commit
+  id; the error's name is the engineer's.
 - **Repository-local files.** The check reads the real objects: the local git configuration, `refs/replace/` and
   `.git/info/grafts` change nothing of what a commit is (fifth and sixth batch).
 - **Callers (DEC-319).** A commit is judged by its own trailers only in an orchestrator session's own call. In a
@@ -739,9 +894,10 @@ path outside the caller's paths; no case is added for it.
 
 ## Decision packages
 
-Eighteen packages are decided: the ten of the first two batches, DP-11 to DP-16 by DEC-390 (orchestrator, delegated
-under DEC-220, stricter-only), and DP-17 and DP-18 by DEC-394 (the same), which also replaces DEC-390's DP-15 rule.
-The owner's DEC-398 amends DEC-394, and DEC-401 keeps DP-11 and DP-12 as built and accepts DEC-394.
+Twenty packages are decided: the ten of the first two batches, DP-11 to DP-16 by DEC-390 (orchestrator, delegated
+under DEC-220, stricter-only), DP-17 and DP-18 by DEC-394 (the same), which also replaces DEC-390's DP-15 rule, and
+DP-19 and DP-20 by DEC-403 (delegated), which widens "against its first parent" in DEC-394 and DEC-398. The owner's
+DEC-398 amends DEC-394, and DEC-401 keeps DP-11 and DP-12 as built and accepts DEC-394.
 
 | Id | Question | Decision |
 |---|---|---|
@@ -764,12 +920,18 @@ The owner's DEC-398 amends DEC-394, and DEC-401 keeps DP-11 and DP-12 as built a
 | DP-17 | A commit without a worker's `Role` trailer that changes a ticket file in a worker's call | DEC-394: in a worker's call, any commit of the move that changes a path under `.tickets/**` is a finding, with or without trailers. Tests: `test_w1_50_ticket_file_commit_in_a_worker_s_call.py` |
 | DP-18 | Which paths of a merge commit are its own change, now that "a parent not new in the move" is shown wrong | DEC-394, amended by DEC-398 (owner), accepted by DEC-401 (owner): brought by another parent only when the merge commit holds that parent's content and it differs from the merge base of the first parent and that parent; otherwise the merge commit's own. Several merge bases, or none: nothing is brought. One helper reads a merge, `gov.guard.containment_merge.read_merge`. Tests: `test_w1_50_merge_read_by_the_merge_base.py`, `test_w1_50_read_merge_helper.py` |
 
-One package is open. No test fixes an answer to it. It is returned to the orchestrator with the batch, in full. No
-fix of the seventh batch depends on it.
+| DP-19 | An octopus merge in which the first parent has one merge base with one of the other parents and several, or none, with another | DEC-403 (delegated), option (a), as built: it fails closed as a whole. An octopus whose other parents cross only each other is read parent by parent, as built. Tests: `test_w1_50_read_merge_every_parent.py` |
+| DP-20 | A merge commit that keeps its first parent's content of a path and so drops what another parent changed (review finding) | DEC-403 (delegated), option (a): the symmetric rule, in the one helper. A path where the merge commit differs from any parent is its own change unless another parent brought it; with several merge bases, or none, every path that differs from any parent is its own. Tests: `test_w1_50_merge_that_drops_a_parent_s_change.py`, `test_w1_50_merge_that_takes_each_side_s_change.py`, `test_w1_50_read_merge_every_parent.py` |
+
+Three packages are open. No test fixes an answer to DP-21 or DP-22. DP-23 asks for a consequence of DEC-403's words
+to be confirmed; the tests follow the words. They are returned to the orchestrator with the batch, in full. No fix of
+the eighth batch depends on them.
 
 | Id | Question | Recommendation | Cases that wait |
 |---|---|---|---|
-| DP-19 | An octopus merge in which the first parent has one merge base with one of the other parents and several, or none, with another. DEC-398 says "with several merge bases nothing counts as brought by another parent" of a merge with two parents. For three or more it can be read per parent (only that parent brings nothing) or for the whole merge commit (no parent brings anything) | The stricter reading: when any other parent has several merge bases with the first parent, or none, nothing counts as brought by any parent. It is the simpler rule, such a merge is rare, and it only makes the check report more | An octopus merge of one ordinary branch with a test designer's commit and one branch that crosses the first parent's history, through the check and through the helper |
+| DP-21 | A merge commit with the orchestrator's trailers, or none, made in the orchestrator's own call, that drops only an orchestrator's change of a ticket file (a narrowing, a close). DEC-403 makes the path the merge commit's own change; DEC-269 judges it by the merge commit's trailers; by DEC-156 and DEC-359 the orchestrator may write a ticket file, so the check stays silent. The batch's brief expected a finding that names the path | Keep it silent, as every other orchestrator's commit of a ticket file in its own call is. A finding there would be a new rule about ticket files, not a reading of a merge | The seven shapes with a dropped ticket-file change and the orchestrator's trailers, or none, on the dropping merge commit. With an engineer's trailers they are tested and are findings (DP-16) |
+| DP-22 | What `brought` holds under the symmetric rule: only the paths that differ from the first parent and that another parent brought (as built), or every path that differs from any parent and is not the merge commit's own (so also what the first parent brought against another parent) | The second: `own` and `brought` together are then exactly the paths where the merge commit differs from a parent, which is the symmetric form of the seventh batch's contract. W1-11 should say which it needs before it uses the helper | Equality of `brought` in the helper's cases; today each case asks that it holds at least the paths another parent brought against the first parent, and nothing of `own` |
+| DP-23 | DEC-403: "with several merge bases, or none, every path that differs from any parent is the merge commit's own change." A merge of an unrelated history that keeps everything its first parent holds differs from the other parent in all of it. So every such merge is a finding whenever the first parent holds an acceptance test, and so is a criss-cross merge whose first parent got a test designer's commit after the crossing. Until DEC-403 a merge of an unrelated history that added only a path the orchestrator may write was silent | Accept it: such merges are rare, the finding is a record (DEC-254), and it only makes the check report more. If it is not wanted, the fail-closed sentence needs other words, and three cases change back | None waits: `test_a_merge_of_an_unrelated_history_is_flagged_for_the_acceptance_tests_its_first_parent_holds` (2 cases) and the helper's two cases without a merge base follow the words |
 
 ## Earlier suites
 
