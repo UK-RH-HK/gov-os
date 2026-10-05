@@ -543,3 +543,304 @@ def grafts(project):
     """The lines of the project's ``.git/info/grafts``; empty when there is no such file."""
     path = Path(project) / GRAFTS
     return path.read_text(encoding="utf-8").splitlines() if path.is_file() else []
+
+
+# --------------------------------------------------------------------------
+# Seventh batch (DEC-394 as amended by DEC-398): a merge commit read by the merge base
+# --------------------------------------------------------------------------
+
+from dataclasses import dataclass  # noqa: E402
+
+ORCHESTRATOR_ON_MAIN = (ORCHESTRATOR, ORCHESTRATOR_TICKET)   # the trailers of ``main``'s own commits
+SECOND_BRANCH = "w1/W1-95"         # a second branch to merge
+CROSSING = "crossing"              # the other side of a criss-cross history
+ISLAND = "island"                  # a branch whose only commit has no parent
+OTHER_TEST = f"{ACCEPTANCE}/W1-95/test_other.py"             # another ticket's acceptance test; does not exist yet
+AS_OTHER_DESIGNER = (DESIGNER, DOCS_TICKET)                  # the test designer on that other ticket
+ISLAND_NOTES = "docs/island.md"                              # does not exist yet; the orchestrator may write it
+
+
+def _trailer_options(trailers):
+    if trailers is None:
+        return ""
+    role, task = trailers
+    return f" --trailer {shlex.quote('Task: ' + task)} --trailer {shlex.quote('Role: ' + role)}"
+
+
+def commit_object(tree, parents, trailers, subject="Merge"):
+    """Shell: the id of a new commit object made with ``git commit-tree``; the trailers are its final block.
+
+    ``tree`` and every parent are a revision or a shell variable (``$empty``); each is put in double quotes.
+    """
+    message = subject + "\\n"
+    if trailers is not None:
+        role, task = trailers
+        message += f"\\nTask: {task}\\nRole: {role}\\n"
+    parent_arguments = " ".join(f"-p \"{parent}\"" for parent in parents)
+    return f"$(printf '{message}' | git commit-tree {parent_arguments} \"{tree}\")"
+
+
+def parents_of(project, commit_id="HEAD"):
+    """The ids of the commit's parents, in order."""
+    return check_support.git(project, "rev-list", "--parents", "-n", "1", commit_id).split()[1:]
+
+
+def merge_bases(project, one, other):
+    """Every merge base of the two commits (``git merge-base --all``): none, one or several."""
+    import subprocess
+    proc = subprocess.run(["git", "-C", str(project), "merge-base", "--all", one, other],
+                          capture_output=True, text=True, check=False)
+    assert proc.returncode in (0, 1), f"git merge-base --all failed: {proc.stderr!r}"
+    return proc.stdout.split()
+
+
+def content_at(project, revision, path):
+    """The id of the content ``revision`` holds at ``path``, with its mode; ``None`` when it holds no such path."""
+    listing = check_support.git(project, "ls-tree", revision, "--", path).strip()
+    return listing.split("\t", 1)[0] if listing else None
+
+
+def changes_against_first_parent(project, commit_id="HEAD"):
+    """The sorted paths the commit changes against its first parent; a rename is two paths."""
+    listing = check_support.git(project, "diff", "--no-renames", "--name-only", f"{commit_id}^1", commit_id)
+    return sorted(listing.split())
+
+
+def read_by_the_words(project, commit_id="HEAD"):
+    """(own, brought) of a merge commit, worked out from git's own answers by the words of DEC-394 and DEC-398.
+
+    A guard for the fixtures only: it shows that the history a test built is the one its literal expectation
+    describes. A path is brought by another parent when the merge commit holds that parent's content of it and
+    that content differs from the one merge base of the first parent and that parent. With several merge bases,
+    or none, nothing is brought.
+    """
+    first, *others = parents_of(project, commit_id)
+    assert others, f"the fixture is wrong: {commit_id} is no merge commit"
+    bases = {other: merge_bases(project, first, other) for other in others}
+    fail_closed = [other for other in others if len(bases[other]) != 1]
+    assert not fail_closed or len(others) == 1, (
+        "the fixture is wrong: an octopus merge with several merge bases, or none, is no case of this suite"
+    )
+    own, brought = [], []
+    for path in changes_against_first_parent(project, commit_id):
+        held = content_at(project, commit_id, path)
+        from_a_parent = not fail_closed and any(
+            content_at(project, other, path) == held and held != content_at(project, bases[other][0], path)
+            for other in others
+        )
+        (brought if from_a_parent else own).append(path)
+    return own, brought
+
+
+@dataclass(frozen=True)
+class MergeShape:
+    """One history that ends with a merge commit made by ``command``, and how DEC-394 and DEC-398 read it."""
+    command: str              # shell: makes the merge commit on ``main`` and moves ``main`` forward to it
+    own: tuple                # the paths the merge commit changed itself
+    brought: tuple            # the paths another parent brought
+    what: str                 # the history, in words
+    parents: int = 2
+    bases: int = 1            # merge bases of the first parent and each other parent
+
+
+def assert_shape(project, shape, before):
+    """Guard against an empty test: ``HEAD`` is the merge commit ``shape`` describes, made on top of ``before``."""
+    parents = parents_of(project)
+    assert len(parents) == shape.parents and parents[0] == before, (
+        f"the fixture is wrong: HEAD has the parents {parents}; {shape.parents} are expected, the first {before}"
+    )
+    for other in parents[1:]:
+        found = merge_bases(project, before, other)
+        assert len(found) == shape.bases, (
+            f"the fixture is wrong: the first parent and {other[:12]} have the merge bases {found}, "
+            f"not {shape.bases} of them"
+        )
+    changed = changes_against_first_parent(project)
+    assert changed == sorted(shape.own + shape.brought), (
+        f"the fixture is wrong: against its first parent the merge commit changes {changed}"
+    )
+    assert read_by_the_words(project) == (sorted(shape.own), sorted(shape.brought)), (
+        f"the fixture is wrong: by the words of DEC-394 and DEC-398 the merge commit's own changes and the "
+        f"paths brought are {read_by_the_words(project)}"
+    )
+
+
+def ordinary_integration_merge(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """A ticket branch with a test designer's new test and an engineer's source file; ``main`` moved on."""
+    ticket_branch(project, sandbox, (NEW_TEST, AS_DESIGNER), (SOURCE, AS_ENGINEER))
+    return MergeShape(merge(trailers=trailers), own=(), brought=(NEW_TEST, SOURCE),
+                      what=f"an ordinary --no-ff merge of {TICKET_BRANCH}, which brings a test designer's "
+                           f"{NEW_TEST} and an engineer's {SOURCE}")
+
+
+def merge_through_a_new_empty_commit(project, sandbox, trailers):
+    """The third review's F1: two test designer's commits are undone through a parent that is new in the move.
+
+    ``main`` holds a test designer's edit of an existing acceptance test and a test designer's new test. The
+    command makes an empty commit on top of the commit before those two (the same tree, orchestrator trailers),
+    then a merge commit with the parents ``HEAD`` and that empty commit and the earlier commit's tree.
+    """
+    run(project, sandbox, commits((ACCEPTANCE_FILE, AS_DESIGNER), (NEW_TEST, AS_DESIGNER)))
+    empty = commit_object("HEAD~2^{tree}", ["HEAD~2"], AS_ORCHESTRATOR, subject="An empty commit")
+    merge_commit = commit_object("HEAD~2^{tree}", ["HEAD", "$empty"], trailers)
+    return MergeShape(f"empty={empty} && git merge -q --ff-only {merge_commit}",
+                      own=(ACCEPTANCE_FILE, NEW_TEST), brought=(),
+                      what=f"a merge commit with trailers {trailers} whose parents are HEAD and a new empty commit "
+                           f"on top of HEAD~2, and whose tree is that of HEAD~2: it undoes the test designer's "
+                           f"commits of {ACCEPTANCE_FILE} and {NEW_TEST}")
+
+
+def merge_setting_a_test_back_by_hand(project, sandbox, trailers):
+    """A real merge in which an acceptance test is set back to the merged branch's content, which is the merge
+    base's: the branch changed a source file only, and ``main`` got a test designer's change of the test."""
+    ticket_branch(project, sandbox, (SOURCE, AS_ENGINEER), main_moves_on=False)
+    run(project, sandbox, commit(ACCEPTANCE_FILE, AS_DESIGNER, subject="main's test designer commit"))
+    command = (f"git merge -q --no-ff --no-commit {shlex.quote(TICKET_BRANCH)} "
+               f"&& git checkout -q {shlex.quote(TICKET_BRANCH)} -- {shlex.quote(ACCEPTANCE_FILE)} "
+               f"&& git commit -q -m {shlex.quote('Merge ' + TICKET_BRANCH)}" + _trailer_options(trailers))
+    return MergeShape(command, own=(ACCEPTANCE_FILE,), brought=(SOURCE,),
+                      what=f"a merge of {TICKET_BRANCH} (an engineer's {SOURCE}) with trailers {trailers}, in which "
+                           f"{ACCEPTANCE_FILE} is set back to the branch's content; the branch never changed it and "
+                           f"main's test designer commit did")
+
+
+def merge_holding_the_branch_s_whole_tree(project, sandbox, trailers):
+    """``-s ours`` turned round: the merge commit's tree is the merged branch's tree. The branch changed a source
+    file only; ``main`` got a test designer's edit of an existing test and a test designer's new test."""
+    ticket_branch(project, sandbox, (SOURCE, AS_ENGINEER), main_moves_on=False)
+    run(project, sandbox, commits((ACCEPTANCE_FILE, AS_DESIGNER), (NEW_TEST, AS_DESIGNER)))
+    merge_commit = commit_object(TICKET_BRANCH + "^{tree}", ["HEAD", TICKET_BRANCH], trailers)
+    return MergeShape(f"git merge -q --ff-only {merge_commit}",
+                      own=(ACCEPTANCE_FILE, NEW_TEST), brought=(SOURCE,),
+                      what=f"a merge commit with trailers {trailers}, the parents HEAD and {TICKET_BRANCH} and the "
+                           f"tree of {TICKET_BRANCH} (an engineer's {SOURCE}): it drops main's test designer "
+                           f"commits of {ACCEPTANCE_FILE} and {NEW_TEST}")
+
+
+def merge_resolved_by_hand(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """Both sides changed an acceptance test by test designer's commits; the conflict is resolved to content
+    neither parent holds. The branch also brings a test designer's new test."""
+    check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
+    run(project, sandbox, commits((ACCEPTANCE_FILE, AS_DESIGNER), (NEW_TEST, AS_DESIGNER)))
+    check_support.git(project, "checkout", "-q", "main")
+    run(project, sandbox, f"echo main-side >> {ACCEPTANCE_FILE} && "
+        + commit_paths([ACCEPTANCE_FILE], AS_DESIGNER, subject="main side"))
+    return MergeShape(merge_resolving(ACCEPTANCE_FILE, "new", trailers=trailers),
+                      own=(ACCEPTANCE_FILE,), brought=(NEW_TEST,),
+                      what=f"a merge of {TICKET_BRANCH} whose conflict in {ACCEPTANCE_FILE} is resolved to content "
+                           f"neither parent holds; the branch also brings {NEW_TEST}")
+
+
+def octopus_merge(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """Two branches merged by one commit with three parents: a test designer's new test on one, an engineer's
+    source file on the other; ``main`` moved on."""
+    for branch, step in ((TICKET_BRANCH, (NEW_TEST, AS_DESIGNER)), (SECOND_BRANCH, (SOURCE, AS_ENGINEER))):
+        check_support.git(project, "checkout", "-q", "-b", branch)
+        run(project, sandbox, commit(*step))
+        check_support.git(project, "checkout", "-q", "main")
+    run(project, sandbox, commit(BOOTSTRAP, ORCHESTRATOR_ON_MAIN, subject="main moves on"))
+    command = (f"git merge -q --no-ff --no-commit {shlex.quote(TICKET_BRANCH)} {shlex.quote(SECOND_BRANCH)} "
+               f"&& git commit -q -m 'Merge two branches'" + _trailer_options(trailers))
+    return MergeShape(command, own=(), brought=(NEW_TEST, SOURCE), parents=3,
+                      what=f"an octopus merge of {TICKET_BRANCH} (a test designer's {NEW_TEST}) and "
+                           f"{SECOND_BRANCH} (an engineer's {SOURCE})")
+
+
+def criss_cross_merge(project, sandbox, last, trailers):
+    """A criss-cross history: ``main`` and ``crossing`` each made a commit, then each merged the other's.
+
+    The two merges are made before the call and hold the same tree. ``crossing`` then gets one more commit,
+    ``last`` (a path and its trailers). The command merges ``crossing`` into ``main``: the merge commit's
+    parents have two merge bases, and against its first parent it changes exactly ``last``'s path, holding the
+    other parent's content of it.
+    """
+    path, _ = last
+    check_support.git(project, "checkout", "-q", "-b", CROSSING)
+    run(project, sandbox, commit(NOTES, ORCHESTRATOR_ON_MAIN, subject="the crossing side's own commit"))
+    check_support.git(project, "checkout", "-q", "main")
+    run(project, sandbox, commit(README, ORCHESTRATOR_ON_MAIN, subject="main's own commit"))
+    main_s_own = check_support.git(project, "rev-parse", "HEAD").strip()
+    run(project, sandbox, merge(branch=CROSSING, trailers=ORCHESTRATOR_ON_MAIN))
+    check_support.git(project, "checkout", "-q", CROSSING)
+    run(project, sandbox, merge(branch=main_s_own, trailers=ORCHESTRATOR_ON_MAIN))
+    assert (check_support.git(project, "rev-parse", "HEAD^{tree}")
+            == check_support.git(project, "rev-parse", "main^{tree}")), (
+        "the fixture is wrong: the two crossing merges hold different trees"
+    )
+    run(project, sandbox, commit(*last, subject="after the crossing"))
+    check_support.git(project, "checkout", "-q", "main")
+    return MergeShape(merge(branch=CROSSING, trailers=trailers), own=(path,), brought=(), bases=2,
+                      what=f"a --no-ff merge with trailers {trailers} of {CROSSING}, whose history crosses main's "
+                           f"(two merge bases) and whose last commit changes {path} with trailers {last[1]}")
+
+
+def unrelated_merge(project, sandbox, root, trailers):
+    """A branch ``island`` whose only commit has no parent and adds one file, ``root`` (a path and its
+    trailers). The command merges it into ``main`` with ``--allow-unrelated-histories``: no merge base."""
+    path, root_trailers = root
+    directory = os.path.dirname(path)
+    run(project, sandbox,
+        f"git checkout -q --orphan {ISLAND} && git rm -rfq . && mkdir -p {shlex.quote(directory)} "
+        f"&& echo island > {shlex.quote(path)} && git add -- {shlex.quote(path)} && git commit -q -m 'a root commit'"
+        + _trailer_options(root_trailers) + " && git checkout -q main")
+    held = check_support.git(project, "ls-tree", "-r", "--name-only", ISLAND).split()
+    assert parents_of(project, ISLAND) == [] and held == [path], (
+        f"the fixture is wrong: the commit on {ISLAND} has the parents {parents_of(project, ISLAND)} and holds {held}"
+    )
+    command = (f"git merge -q --no-ff --no-commit --allow-unrelated-histories {ISLAND} "
+               f"&& git commit -q -m 'Merge {ISLAND}'" + _trailer_options(trailers))
+    return MergeShape(command, own=(path,), brought=(), bases=0,
+                      what=f"a --no-ff merge with trailers {trailers} of {ISLAND}, a history with nothing in common "
+                           f"with main's, whose one commit adds {path} with trailers {root_trailers}")
+
+
+def merge_back_after_taking_main(project, sandbox, main_moves_on, trailers=AS_ORCHESTRATOR):
+    """The third review's F2: a ticket branch that earlier merged ``main`` into itself is merged back.
+
+    The branch gets an engineer's commit; ``main`` gets a test designer's commit of another ticket's acceptance
+    test; the lead merges ``main`` into the branch (orchestrator trailers); the branch then gets an engineer's
+    commit and a test designer's. With ``main_moves_on``, ``main`` gets one more commit before the merge-back.
+    """
+    check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
+    run(project, sandbox, commit(SOURCE, AS_ENGINEER, subject="the ticket's first work"))
+    check_support.git(project, "checkout", "-q", "main")
+    run(project, sandbox, commit(OTHER_TEST, AS_OTHER_DESIGNER, subject="another ticket's acceptance test"))
+    check_support.git(project, "checkout", "-q", TICKET_BRANCH)
+    run(project, sandbox, merge(branch="main", trailers=AS_ORCHESTRATOR))
+    run(project, sandbox, commits((SECOND_SOURCE, AS_ENGINEER), (NEW_TEST, AS_DESIGNER)))
+    check_support.git(project, "checkout", "-q", "main")
+    if main_moves_on:
+        run(project, sandbox, commit(BOOTSTRAP, ORCHESTRATOR_ON_MAIN, subject="main moves on"))
+    return MergeShape(merge(trailers=trailers), own=(), brought=(NEW_TEST, SECOND_SOURCE, SOURCE),
+                      what=f"a --no-ff merge-back of {TICKET_BRANCH}, which earlier merged main into itself (that "
+                           f"merge brought the test designer's {OTHER_TEST}) and then did its own work; main "
+                           f"{'moved on' if main_moves_on else 'did not move'} meanwhile")
+
+
+def second_merge_of_the_same_branch(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """The ticket branch is merged once before the call, gets an engineer's commit and a test designer's, and
+    is merged again."""
+    ticket_branch(project, sandbox, (NEW_TEST, AS_DESIGNER), (SOURCE, AS_ENGINEER))
+    run(project, sandbox, merge())
+    check_support.git(project, "checkout", "-q", TICKET_BRANCH)
+    run(project, sandbox, commits((SECOND_SOURCE, AS_ENGINEER), (SECOND_NEW_TEST, AS_DESIGNER)))
+    check_support.git(project, "checkout", "-q", "main")
+    return MergeShape(merge(trailers=trailers), own=(), brought=(SECOND_SOURCE, SECOND_NEW_TEST),
+                      what=f"a second --no-ff merge of {TICKET_BRANCH}, after two more commits on it")
+
+
+def merge_taking_theirs(project, sandbox, trailers=AS_ORCHESTRATOR):
+    """Both sides changed an acceptance test (test designer's commits) and a source file (engineer's commits);
+    the merge takes the merged side's content of both (``-X theirs``)."""
+    steps = ((ACCEPTANCE_FILE, AS_DESIGNER), (SOURCE, AS_ENGINEER))
+    check_support.git(project, "checkout", "-q", "-b", TICKET_BRANCH)
+    run(project, sandbox, commits(*steps))
+    check_support.git(project, "checkout", "-q", "main")
+    for path, step_trailers in steps:
+        run(project, sandbox, f"echo main-side >> {path} && "
+            + commit_paths([path], step_trailers, subject="main side"))
+    command = (f"git merge -q --no-ff --no-commit -X theirs {shlex.quote(TICKET_BRANCH)} "
+               f"&& git commit -q -m {shlex.quote('Merge ' + TICKET_BRANCH)}" + _trailer_options(trailers))
+    return MergeShape(command, own=(), brought=(ACCEPTANCE_FILE, SOURCE),
+                      what=f"a merge of {TICKET_BRANCH} with -X theirs: both sides changed {ACCEPTANCE_FILE} and "
+                           f"{SOURCE}, and the merge commit holds the merged side's content of both")
