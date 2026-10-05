@@ -63,8 +63,20 @@ class _GitError(Exception):
     pass
 
 
-# Every git call reads the real objects, whatever refs/replace/ holds.
-_GIT = ("git", "--no-replace-objects")
+# Every git call reads the real objects of the repository at its root,
+# whatever refs/replace/, .git/info/grafts, .git/shallow or a commit-graph
+# file holds, and whatever repository an inherited variable names.
+_GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false")
+_GIT_ELSEWHERE = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_NAMESPACE")
+
+
+def _git_env() -> dict:
+    env = {k: v for k, v in os.environ.items() if k not in _GIT_ELSEWHERE}
+    env.update(GIT_GRAFT_FILE=os.devnull, GIT_SHALLOW_FILE=os.devnull)
+    return env
 
 
 def _git(root: str, *args: str) -> str:
@@ -73,7 +85,7 @@ def _git(root: str, *args: str) -> str:
         p = subprocess.run(
             [*_GIT, "-C", root, *args],
             capture_output=True, text=True,
-            timeout=_GIT_TIMEOUT, check=False,
+            timeout=_GIT_TIMEOUT, check=False, env=_git_env(),
         )
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
         raise _GitError(str(e)) from e
@@ -580,6 +592,7 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
         p = subprocess.run(
             [*_GIT, "-C", root, "merge-base", "--is-ancestor", old, new],
             capture_output=True, timeout=_GIT_TIMEOUT, check=False,
+            env=_git_env(),
         )
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
         raise _GitError(str(e)) from e
@@ -629,7 +642,10 @@ def _move_commits(root: str, old: str, new: str) -> list:
     of the repository renames or hides a ``Role`` or a ``Task``.  Paths
     are listed without rename detection, so both ends of a rename
     appear (repair 7); a merge commit lists only what it changes beyond
-    what its parents hold (DEC-269).
+    what its parents hold (DEC-269).  A merge commit with a parent after
+    its first that is not among these commits brings no judged commit
+    for what it takes from that parent: it lists every path it changes
+    against its first parent (DEC-390, DP-15).
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
@@ -659,6 +675,12 @@ def _move_commits(root: str, old: str, new: str) -> list:
             raise unreadable
     if not commits:
         raise unreadable
+    new_ids = {c[0] for c in commits}
+    for c in commits:
+        if any(p not in new_ids for p in c[1][1:]):
+            c[4][:] = [p for p in _git(
+                root, "diff-tree", "-r", "-z", "--name-only", "--no-renames",
+                c[1][0], c[0]).split("\0") if p]
     return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
 
 
@@ -723,6 +745,10 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
     if any("".join(c for c in r if c.isprintable() and c != " ").lower()
            == "owner" for r in roles):
         return paths, "a Role: owner commit made during an agent's call"
+    # DEC-390, DP-16: a worker's commit changes no ticket file, whatever
+    # the ticket's paths say.
+    tickets = [p for p in paths if p.startswith(".tickets/")
+               ] if any(r != "orchestrator" for r in roles) else []
     if not orch_own:
         if roles and roles != [sub or role]:
             return paths, "its Role trailer is not the caller's role"
@@ -782,6 +808,9 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
                               for p in both))
                 return ("allow" if ok else "deny"), ""
         bad = outside(c_role, c_task, None, fn)
+    if tickets:
+        return (bad + [p for p in tickets if p not in bad],
+                "a ticket file in a commit with a worker's Role trailer")
     return (bad, "committed path(s) outside allowed paths") if bad else None
 
 

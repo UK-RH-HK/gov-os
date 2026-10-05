@@ -384,3 +384,58 @@ def test_a_commit_inside_the_caller_s_paths_stays_silent(tmp_path):
                                  "Role: engineer"),
         role="engineer")
     assert report == "" and findings == []
+
+
+# ---------------------------------------------------------------
+# DEC-390: DP-15, DP-16, and what the check's git calls read
+# ---------------------------------------------------------------
+
+def test_a_merge_commit_with_an_earlier_other_parent_lists_its_change_against_its_first_parent(tmp_path):
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    earlier = _git(project, "rev-parse", "HEAD").strip()
+    old = _commit(project, "src/main.py")
+    merge = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", old,
+                 "-p", earlier, "-m", "undo").strip()
+    assert _move_commits(str(project), old, merge) == [
+        (merge, [old, earlier], [], [], ["src/main.py"])]
+
+
+def test_a_worker_s_commit_of_a_ticket_file_is_a_finding_and_an_orchestrator_s_is_not(tmp_path):
+    for role, expected in (("engineer", [TICKET_FILE]), ("orchestrator", None)):
+        project = _make_project(tmp_path / role)
+
+        def work():
+            (project / "src" / "main.py").write_text("VALUE = 2\n")
+            _commit(project, TICKET_FILE, f"Task: {TICKET}", f"Role: {role}")
+
+        report, findings = _check(project, work)
+        if expected is None:
+            assert report == "" and findings == []
+        else:
+            assert report and [f["paths"] for f in findings] == [expected]
+
+
+def test_grafts_a_shallow_file_and_inherited_variables_do_not_change_what_is_read(tmp_path, monkeypatch):
+    from gov.guard.containment import _is_ancestor, _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    first = _commit(project, "README.md", "Role: owner")
+    second = _commit(project, "src/main.py")
+    expected = [(second, [first], [], [], ["src/main.py"]),
+                (first, [old], ["owner"], [], ["README.md"])]
+    other = tmp_path / "other"
+    other.mkdir()
+    _git(other, "init", "-q")
+    for name in ("GIT_DIR", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY"):
+        monkeypatch.setenv(name, str(other / ".git"))
+    monkeypatch.setenv("GIT_GRAFT_FILE", str(project / ".git" / "info" / "grafts"))
+    for hiding in ("info/grafts", "shallow"):
+        target = project / ".git" / hiding
+        target.write_text(f"{second} {old}\n" if hiding == "info/grafts"
+                          else f"{second}\n")
+        assert _move_commits(str(project), old, second) == expected
+        assert _is_ancestor(str(project), first, second)
+        target.unlink()
