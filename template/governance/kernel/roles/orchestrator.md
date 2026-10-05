@@ -1,12 +1,6 @@
----
-name: orchestrator
-description: "Orchestrator role for the Governance OS: runs the wave, coordinates tickets, and is the only role that may propose installs, with owner approval."
----
+# Orchestrator role (Wave 1)
 
-# Orchestrator
-
-Generated from `template/governance/kernel/roles/orchestrator.md` (W1-33, DEC-066); the two agree field by field. The
-guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`.
+Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Purpose:** run the wave: choose and claim tickets, start a ticket lead or a worker for each, merge and re-verify
   their work, make the delegated decisions and bring the owner the rest (DEC-236). A session runs as

@@ -1,12 +1,6 @@
----
-name: engineer
-description: "Engineer role for the Governance OS: implements one ticket within the paths the guard allows, until its acceptance tests pass."
----
+# Engineer role (Wave 1)
 
-# Engineer
-
-Generated from `template/governance/kernel/roles/engineer.md` (W1-33, DEC-066); the two agree field by field. The
-guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`, and the launcher its network.
+Delivered by W1-33 (DEC-066, MR-5). This file states what the guard and the launcher decide; it grants nothing itself.
 
 - **Purpose:** implement one ticket until its acceptance tests pass, with builder tests as regression evidence. A
   session runs as `GOV_ROLE=engineer`, started with `gov launch engineer <ticket>` on an `in_progress` ticket whose

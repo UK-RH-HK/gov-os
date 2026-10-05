@@ -3770,3 +3770,149 @@ them are separate commits with the trailer `Task: <ticket id>`.
 | Version | Date | Change |
 |---|---|---|
 | 0.83 | 2026-10-05 | Owner answers: DEC-358, DEC-359 (W1-50 DP-8, DP-9), DEC-360 (W1-11 DP-2: the `Role: owner` trailer; W1-50 KPI line), DEC-361, DEC-362 (W1-16 DP-1 and the UI), DEC-363 (idle tickets and the six), DEC-364 to DEC-368 (W1-28 DP-1, DP-2, DP-3, DP-5, DP-6, DP-8), DEC-369 (second scan in pre-commit; W1-40 KPI line), DEC-370 (G-20 by exact path), DEC-371 (`gov launch` from now on), DEC-372 (latency cases re-run alone). |
+
+## 84. Delegated decisions on W1-19's and W1-28's packages (register v0.84, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220, on packages the W1-19 (`DAEO-t6hf`) and W1-28
+(`DAEO-9279`) ticket leads returned. For each the test designer's, the lead's and the orchestrator's recommendations
+agree, the confidence is medium or higher, and the choice is reversible. W1-19's DP-1, DP-2, DP-6, DP-7 and its four
+install packages, and W1-28's DP-10 (the freeze flag when a rollback fails), go to the owner.
+
+### DEC-373 — W1-19 DP-3: how warm p95 and the rerank process's peak RAM are measured
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 package DP-3, option (a) for both; confidence medium · **Under:** CAP-18.a, DEC-074 R1
+- **Decision:**
+  - Warm: one process per tier builds the index, asks three questions outside the set, then times each query of
+    the dev query set once; p95 by nearest rank, against 0.5 s.
+  - Peak RAM: the largest `VmHWM` of the calling process and every descendant, sampled every 50 ms, leaving out
+    `ollama` and its children, against 2.5 × 10⁹ bytes. A reranker that detaches from the process tree is not seen:
+    a residual.
+
+### DEC-374 — W1-19 DP-4 and DP-5: an absent reranker keeps the fused order, and the manifest is held in the shared store
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-19 packages DP-4 option (a) and DP-5 option (a); confidence medium · **Under:** CAP-10.a, CAP-18.a, DEC-257, DEC-340
+- **Decision:**
+  - When the default reranker cannot be loaded, the fused search keeps the fused order, reports that nothing was
+    reranked, and does not raise.
+  - The index manifest is held in the shared store and read through the semantic module. It names the embedder and
+    the reranker, each with its model and revision; the embedder's revision is the one observed from Ollama's model
+    list, not a constant.
+  - The names of the functions and keys follow the owner's answer to DP-1.
+
+### DEC-375 — W1-28 DP-9 and DP-11: one record commit per released ticket, and no record when nothing was reverted
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05) · **Basis:** W1-28 packages DP-9 option (a) and DP-11 option (a); confidence medium-high · **Under:** DEC-357, DEC-367, CAP-05.d
+- **Decision:**
+  - `gov pause --cancel-agents` writes one record commit per released ticket, each with that ticket's `Task:` and
+    `Reverts-Task:` trailers. A cancel that releases nothing makes no commit.
+  - A rollback that reverts nothing, on its first run as on a repeat, writes no record commit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.84 | 2026-10-05 | Delegated under DEC-220: DEC-373 (W1-19 DP-3: warm p95 and peak RAM), DEC-374 (W1-19 DP-4, DP-5: absent reranker, manifest in the shared store), DEC-375 (W1-28 DP-9, DP-11: one record commit per released ticket; none when nothing was reverted). |
+
+## 85. Owner actions and answers of 2026-10-05 after the first launched sessions (register v0.85, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's actions through the operator and answers of 2026-10-05, on the held-out copy incident, W1-16 DP-1,
+W1-28 DP-10, W1-19's packages and installs, and the launcher. DEC-372 stays as recorded.
+
+### DEC-376 — The held-out copies are removed, and no worker bulk-copies the tree
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on the incident the W1-28 ticket lead reported · **Under:** DEC-213, DEC-218, MR-3
+- **Decision:**
+  - The owner removed `/tmp/gov-launch-independent-test-designer-5e58yicw` (3.4 GB, no process using it) through
+    the operator.
+  - 17 more copies of `governance/project/held-out.yaml` were found and deleted, all inside pytest's temporary test
+    projects under one launched engineer session's temp folder (`/tmp/gov-launch-engineer-_foa_zpg/`). None remain.
+  - 78 other `gov-launch-*` folders remain in `/tmp`. When no lead is running, the orchestrator tells the owner, so
+    the operator can clear them.
+  - The orchestrator's rule that a worker never bulk-copies the tree is confirmed. The incident is recorded in
+    `governance/project/bootstrap.md`.
+
+### DEC-377 — W1-16 DP-1: W1-16 closes with the designer's 26 questions, and the exit run measures the comparable hit@5
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-16 package DP-1 option (A) · **Settles:** DEC-361 · **Under:** CAP-12.a, DEC-362
+- **Decision:**
+  - No C1 question set exists under `~/gov-os-workbench/s0b2/out/`. S0b2's code-intelligence comparison scored
+    hit@5 on the dev query set's code classes, as `~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md` reports.
+  - W1-16 closes with the designer's 26 questions (option A).
+  - W1-42 gets a KPI line, in its own commit: the Wave 1 exit run measures callers/impact hit@5 on the dev query
+    set's code classes, the measurement comparable to S0b2's baseline. A worker may read that report by exact path.
+  - The `--ui=false` wrapper change (DEC-362) and its registry note go in the same round; then W1-16 closes.
+
+### DEC-378 — W1-28 DP-10: a rollback sets the freeze flag first, and it stays
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-28 package DP-10 option (a) · **Under:** DEC-365, DEC-368, CAP-05.c
+- **Decision:**
+  - `gov pause --rollback` sets the freeze flag first, once the caller is allowed, and the flag stays whatever the
+    rollback's result (a conflict, an unknown ticket, a dirty tree). Only the owner lifts it.
+  - The test designer's three pinned readings are confirmed: `Role:` on a revert commit is the caller's (`owner`
+    with `GOV_ROLE` unset, `orchestrator` otherwise); the refusal code is `PAUSE_REFUSED`; a cancel that releases
+    nothing makes no commit.
+
+### DEC-379 — W1-19 DP-1: the interface of the semantic route, the fusion and the rerank, as proposed
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-1 option (a) · **Under:** CAP-10.a, CAP-18.a, DEC-340, DEC-260
+- **Decision:**
+  - `gov.retrieval.semantic.refresh(root)` returns `available`, `facet` (`"semantic"`), `state`, `reason`.
+  - `gov.retrieval.semantic.search(root, query, refresh=True)` returns the same plus `hits` (W1-17's chunk records,
+    nearest first); `refresh=False` never writes.
+  - `gov.retrieval.semantic.manifest(root)` returns `None` without an index, else
+    `{"embedder": {"model", "revision"}, "reranker": {"model", "revision"}}`.
+  - `gov.retrieval.fusion.rrf(routes, k=60)` returns one list, each chunk once, with `score` (the sum of
+    `1/(k+rank)`) and `routes`.
+  - `gov.retrieval.fusion.search(root, query, limit, refresh=True, reranker=None)` returns `hits`, `facets` and
+    `reranked`; a limit cuts after the rerank.
+  - `gov.retrieval.rerank.rerank(query, candidates, reranker=None)` returns the candidates in score order with
+    `rerank_score`.
+  - `reranker` is a loader: a no-argument function returning `score(query, texts)`. It is called at the first rerank
+    and not before, and one rerank calls `score` once with every candidate's text.
+  - No function raises because Ollama, `sqlite_vec` or the reranker is absent.
+
+### DEC-380 — W1-19 DP-2: mean hit@5 follows S0b2's own method where it is stated
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-2 · **Under:** CAP-18.a, DEC-074 R1, DEC-383
+- **Decision:** A test designer reads `~/gov-os-workbench/s0b2/out/RESULTS.md` by exact path (and the
+  code-intelligence report of DEC-377 if needed), and the scoring follows S0b2's own method where it is stated there.
+  If it is not stated, option (a): a hit when one `must_cite` path is in the first five; queries without a gold path
+  left out; a percentage per tier; the mean of the two tiers.
+
+### DEC-381 — W1-19 DP-6: a namespace that is not embedded never reaches the vectors
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-6 option (a) · **Settles:** the DEC-289 residual on `embedding_policy` · **Under:** CAP-10.a, CAP-03
+- **Decision:** A namespace whose `embedding_policy` is `not embedded` never reaches the vectors. This holds before
+  any live index is built.
+
+### DEC-382 — W1-19 DP-7: the G-17 read is accepted
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER, on W1-19 package DP-7 option (a) · **Extends:** DEC-370
+- **Decision:** The test designer's read of G-17's row is accepted, and DEC-370 extends to G-17.
+
+### DEC-383 — The S0b2 files a worker may read, by exact path only
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-198, DEC-310, DEC-370
+- **Decision:** Workers may read these S0b2 files by exact path only:
+  `~/gov-os-workbench/s0b2/out/RESULTS.md`, `~/gov-os-workbench/s0b2/out/GLUE_REQUIREMENTS.md`,
+  `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml` and `~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md`.
+  Nobody lists folders there, and nobody touches `s0b2/probe/`.
+
+### DEC-384 — W1-19's installs: complete packages from the S0b2 registry, verifying what is on disk
+- **Status:** ACCEPTED (owner, 2026-10-05) · **Basis:** OWNER · **Under:** DEC-083, DEC-195, DEC-198
+- **Decision:**
+  - The orchestrator fills the four install packages from `~/gov-os-workbench/s0b2/out/TOOL_REGISTRY.yaml`.
+  - Verifying the artefacts already on disk (the Ollama executable, the embedding model, the reranker snapshot)
+    against their recorded hashes is preferred over downloading again.
+  - The package for sqlite-vec says which path is proposed in the Python that runs pytest.
+  - The complete packages come to the owner. Meanwhile the model-free part of W1-19 is built.
+
+### DEC-385 — No test fixture copies the held-out file
+- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Under:** DEC-213, DEC-376
+- **Decision:**
+  - Every test fixture that copies the repository leaves `governance/project/held-out.yaml` out, so it is never
+    copied into a temporary project.
+  - Ticket (orchestrator): W1-28 (`DAEO-9279`), whose round is about to start and whose first round met the
+    incident. Its test designer revises the copying fixtures of the earlier suites; the KPI line is added in its
+    own commit.
+
+### DEC-386 — The launcher removes its temp folder and starts product-spec workers sandboxed
+- **Status:** ACCEPTED (owner, 2026-10-05; stricter-only, the ticket is the orchestrator's choice) · **Basis:** OWNER · **Amends:** DEC-371 · **Under:** DEC-159, DEC-311, CAP-58
+- **Decision:**
+  - `gov launch` removes its per-session temp folder when the session ends.
+  - The launcher gets a `product-spec` role with an empty network allowlist, so product-spec workers are sandboxed
+    too. When it is merged, the DEC-183 form ends for that role.
+  - Ticket (orchestrator): W1-28 (`DAEO-9279`), with `src/gov/launch/**` and `tests/unit/launch/**` added to its
+    `allowed_paths` and the two KPI lines added, in its own commit. The launcher lines get a reviewer pass
+    (brief A3) although the ticket's profile is STANDARD.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.85 | 2026-10-05 | Owner: DEC-376 (held-out copies removed; no bulk copy of the tree), DEC-377 (W1-16 closes with the designer's questions; W1-42 KPI line), DEC-378 (W1-28 DP-10 (a) and three readings), DEC-379 to DEC-382 (W1-19 DP-1, DP-2, DP-6, DP-7), DEC-383 (the four S0b2 files a worker may read), DEC-384 (W1-19 installs), DEC-385 (fixtures leave the held-out file out; W1-28), DEC-386 (the launcher removes its temp folder and gets a product-spec role; W1-28). |
