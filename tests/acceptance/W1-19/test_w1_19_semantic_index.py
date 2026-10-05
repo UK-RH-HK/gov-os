@@ -67,8 +67,10 @@ def test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent(ap
 
 
 @INDEX
-def test_the_vectors_are_in_the_shared_store_beside_the_lexical_index(api, indexed):
-    root, endpoint, _ = indexed
+def test_the_vectors_are_in_the_shared_store_beside_the_lexical_index(api, indexed, base, tmp_path):
+    root, endpoint, report = indexed
+    # The premise, which this case did not hold before: without it the lexical index alone satisfies what follows.
+    assert report["available"] is True, f"the vectors were not built: {report!r}"
     files = support.runtime_files(root)
     assert "store.db" in files and all(name.startswith("store.db") for name in files), \
         f"the vectors are not in the one shared store (G-20): .gov-runtime/ holds {files}"
@@ -76,6 +78,17 @@ def test_the_vectors_are_in_the_shared_store_beside_the_lexical_index(api, index
     assert api.call(support.LEXICAL, "freshness", ROOT(root), env=env)["status"] == "fresh", \
         "building the vectors left the lexical index of the same store missing or stale"
     assert support.git(root, "status", "--porcelain") == "", "building the vectors changed a tracked file"
+    # The vectors are in that store and nowhere else: a second clone of the same commit, given the store's files and
+    # nothing more, answers from them without writing.
+    other = support.clone(base, tmp_path / "other")
+    (other / support.RUNTIME_REL).mkdir()
+    for name in files:
+        shutil.copy2(root / support.RUNTIME_REL / name, other / support.RUNTIME_REL / name)
+    answer = support.check_semantic(
+        api.call(support.SEMANTIC, "search", ROOT(other), support.BAKERY_QUESTION, refresh=False, env=env))
+    assert answer["available"] is True, \
+        f"a clone given only {files} has no vectors to answer from: they are not in {support.STORE_REL}: {answer!r}"
+    assert support.paths(answer["hits"])[:1] == [support.BAKERY]
 
 
 @INDEX

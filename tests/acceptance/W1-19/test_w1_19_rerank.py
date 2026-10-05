@@ -81,8 +81,8 @@ def test_no_candidate_means_no_load_and_no_pass(api):
 
 def test_reranking_with_no_reranker_that_can_be_loaded_keeps_the_order_given_and_does_not_raise(api):
     # DEC-379: no function raises because the reranker is absent. DEC-374: nothing is reranked and the order is
-    # kept. No `reranker` is given, and the default cannot be loaded: this machine has no reranker process today
-    # (DEC-384), and the scratch environment has an empty HOME and no Hugging Face cache.
+    # kept. No `reranker` is given, and the default cannot be loaded: its process starts from the environment under
+    # the home folder (DEC-397), and the scratch environment's HOME is empty: no environment and no snapshot.
     outcome = api.run([(support.RERANK, "rerank", (QUERY, CANDIDATES), {})], favour=[support.FAVOURED])
     assert outcome.calls[0]["error"] is None, \
         f"rerank raised when the default reranker could not be loaded: {outcome.calls[0]['error']}"
@@ -95,6 +95,21 @@ def test_reranking_with_no_reranker_that_can_be_loaded_keeps_the_order_given_and
         assert not isinstance(entry.get("rerank_score"), (int, float)), \
             f"a candidate carries a reranker's score although nothing was reranked: {entry!r}"
     assert outcome.loads == 0 and outcome.passes == [], "the tests' stand-in reranker was used: it was not given"
+
+
+def test_with_no_reranker_environment_no_other_interpreter_is_started_and_nothing_heavy_is_loaded(api):
+    # DEC-397: the default reranker's process starts from the environment under the home folder and from nowhere
+    # else. Here that folder is empty, so there is no reranker process: not the calling interpreter, not another
+    # environment, and the calling process does not load the reranker's libraries itself instead.
+    outcome = api.run([(support.RERANK, "rerank", (QUERY, CANDIDATES), {})], watch=True)
+    call = outcome.calls[0]
+    assert call["error"] is None, f"rerank raised when the reranker environment is absent: {call['error']}"
+    assert [entry.get("chunk_id") for entry in outcome.value()] == [entry["chunk_id"] for entry in CANDIDATES]
+    assert call["heavy_after"] == [], \
+        f"the calling process loaded {call['heavy_after']}: the reranker is a process of its own (ADR-0002 §2)"
+    started = [peak["argv"] for peak in outcome.peaks if not peak["self"] and support.is_python(peak)]
+    assert started == [], \
+        f"with no reranker environment under the home folder a Python process was started all the same: {started}"
 
 
 def test_candidates_the_reranker_scores_alike_keep_the_order_they_came_in(api):

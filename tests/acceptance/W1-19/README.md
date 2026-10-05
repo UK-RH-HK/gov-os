@@ -2,10 +2,13 @@
 
 Ticket `DAEO-t6hf` (`W1-19`), profile STANDARD (DEC-221). Written by the Independent Test Designer before
 implementation (MR-3, DEC-069), from the ticket's five KPI lines, Contract v4 (CAP-10, CAP-18) and the decisions
-named below. Two batches: the first returned seven decision packages; the second, after they were decided
-(DEC-373, DEC-374, DEC-379 to DEC-384), revised the suite to the answers.
+named below. Three batches: the first returned seven decision packages; the second, after they were decided
+(DEC-373, DEC-374, DEC-379 to DEC-384), revised the suite to the answers; the third, after the installs (DEC-397)
+and the suite's first run with them, put right the scratch environment and added the cases for how the default
+reranker starts.
 
-**39 test functions, 39 cases** in six files, with a support module and a conftest (33 after the first batch). Run:
+**42 test functions, 42 cases** in six files, with a support module and a conftest (33 after the first batch, 39
+after the second). Run:
 
 ```
 python3 -m pytest tests/acceptance/W1-19 -q -p no:cacheprovider
@@ -14,7 +17,52 @@ python3 -m pytest tests/acceptance/W1-19 -q -p no:cacheprovider
 Run `test_w1_19_real_models.py` alone, never beside another suite: it is heavy and one of its cases is a latency
 case (DEC-372).
 
-## Red before implementation
+## The state after the third batch
+
+The model-free part of the ticket is built; `rerank.default_reranker()` still returns `None`. Observed by the
+designer on `w1/W1-19` at `1805a2a7` plus this batch, in a sandboxed session:
+
+```
+python3 -m pytest tests/acceptance/W1-19 -q -p no:cacheprovider -rs --deselect tests/acceptance/W1-19/test_w1_19_real_models.py
+35 passed, 7 deselected
+```
+
+- **The 35 cases outside `test_w1_19_real_models.py` pass**, none skipped: this machine has `gitleaks`,
+  `sqlite_vec` and the reranker environment.
+- **Two of the 35 pass before what they hold is written.** The two new cases for an absent default
+  (`test_with_no_reranker_environment_…`, `test_with_the_environment_and_no_snapshot_…`) are met by a default that
+  is always absent. They are guards for the engineer's `default_reranker()`, not evidence of it. The premise of the
+  second was checked apart, with a throwaway script outside the repository (see "How the tests decide").
+- **`test_w1_19_real_models.py` (7 cases) was not run as a file.** One of its cases, the new
+  `test_the_default_reranker_is_a_process_of_its_own_…`, was run alone and is red for the reason it should be: no
+  candidate is scored, because there is no default yet. It loads no model while that is so. The other six were not
+  run by the designer: they start `ollama serve` and load the models, which a sandboxed session is told not to
+  reach. The ticket lead ran them once before this batch: the embedder case passed; the five dev-tier cases wait for
+  the default reranker.
+
+### What the first run with the installs showed, and what was put right
+
+With `sqlite_vec` installed the `needs` marker stopped skipping the ten stand-in cases, and nine failed with
+`sqlite_vec cannot be loaded`. The designer checked the lead's reading and it holds:
+
+- DEC-397 installed the package with `pip install --user`, into the user site folder under the home folder.
+- The marker asks the Python that runs pytest, which has the real `HOME` and finds the package.
+- The process under test ran in the scratch environment, whose `HOME` is an empty folder. Python derives the user
+  site folder from `HOME`, so that process had none: `find_spec("sqlite_vec")` is `None` there.
+
+So the marker and the process under test disagreed about the same machine. **The fault was in the suite, not in
+the implementation.** The scratch environment now carries a folder that holds one link, to the one package the
+marker found, and that folder follows `src` on `PYTHONPATH`. The `HOME` stays empty. `env_without_sqlite_vec` still
+puts its blocking module first and does not carry the link. All ten cases pass now.
+
+**The tenth case had passed for the wrong reason.** `test_the_vectors_are_in_the_shared_store_beside_the_lexical_index`
+never asked whether vectors were built: the store file, a fresh lexical index and a clean tree are all there when
+only the lexical index was built. It now holds its premise (the build reports `available`), and that the vectors are
+in the store: a second clone given only the store's files answers a question from them without writing. That is a
+**rewrite after implementation**, since the case had passed once; the reason is that it held nothing about vectors.
+The nine others were revised by nothing but the environment, and had never passed.
+
+## Red before implementation (the first two batches)
 
 Observed on `w1/W1-19` at `1a6f9a45` plus this suite: **1 passed, 16 skipped, 22 errors**.
 
@@ -54,8 +102,44 @@ reranker is absent.**
 
 Route and facet names are `lexical` and `semantic`.
 
-**Not fixed by any test: how the default reranker's process is started** (which interpreter, which command). It is
-not decided; the engineer keeps it behind the loader. The tests only use the default where it is absent.
+## How the default reranker starts (DEC-397)
+
+Decided by the owner: the default reranker's process starts from the environment
+`~/.local/share/gov-os/reranker-venv`, with its interpreter `~/.local/share/gov-os/reranker-venv/bin/python`, as a
+process of its own (ADR-0002 §2), never from the S0b2 environment in the workbench, and offline
+(`HF_HUB_OFFLINE=1`; nothing is downloaded). With the environment or the snapshot absent, DEC-374 holds.
+
+| What is held | Case | How it is seen from outside |
+|---|---|---|
+| The process is that environment's interpreter, and never the workbench's | `test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` (real reranker) | The process watcher records every descendant's `argv`. One descendant's first argument is a `python` in that environment's `bin`; no Python descendant has another interpreter; no descendant's first argument is in the workbench. The path is compared as written: the environment's interpreter is a link to the system's. |
+| It is a process of its own | the same case, and the two below | `torch`, `transformers` and `sentence_transformers` are not in the calling process's `sys.modules` after the call (the driver now reports them after each call, as it did before each). |
+| It scores | the same case | Every candidate carries a number as `rerank_score`, the order is the order of the scores, and of three texts the one that answers the question is first. |
+| It runs offline; an absent snapshot is not fetched | `test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises` | The caller's environment does not hold the libraries offline and names a recording stand-in as the only hub. The stand-in must be asked nothing. |
+| Snapshot absent: DEC-374 | the same case | The fused order, `reranked` false, no exception. |
+| Environment absent: DEC-374, and no process from elsewhere | `test_with_no_reranker_environment_no_other_interpreter_is_started_and_nothing_heavy_is_loaded`, with the two older cases | The order given, no exception, no Python descendant, nothing heavy in the calling process. |
+
+**Not fixed by any test:** how the calling process and the reranker's process talk to each other, the command
+after the interpreter, whether the process stays between retrievals, and how the environment is told to be
+offline (a variable given to the process, or set inside it). No public name and no environment variable was
+invented for any of it.
+
+**Two readings the designer made.**
+
+- **`~` is the folder `HOME` names.** The two older cases and the two new absent cases rest on it: they make the
+  default absent, or half present, by giving the process another `HOME`. `gov.retrieval.ollama` finds its
+  executable the same way. An implementation that finds the home folder another way (the password database) would
+  find the real environment under an empty `HOME`, and the two older cases would go red. That would be a matter to
+  decide, not a test to bend.
+- **The reranker's process is a descendant of the calling process.** DEC-373 already records that a reranker that
+  detaches from the process tree is not seen by the memory measure. The same holds here: a detached process fails
+  the first row of the table.
+
+**What the offline observation can and cannot show.** It is made where the snapshot is absent, because only there
+is it certain that a process which is not offline asks the hub: checked with a throwaway script, the environment's
+`CrossEncoder` asked the stand-in three times without `HF_HUB_OFFLINE`, and nothing with it. Where the snapshot is
+complete, no observation was made of whether the libraries ask anything. One residual: an implementation that both
+discards its caller's environment and does not set `HF_HUB_OFFLINE` would pass the stand-in by and reach the real
+hub. The engineer is told.
 
 ## The seven packages of the first batch, and what settled each
 
@@ -70,7 +154,15 @@ not decided; the engineer keeps it behind the loader. The tests only use the def
 | **DP-7** the read of G-17's row | **DEC-382** (owner): accepted; DEC-370 extends to G-17 | Nothing. |
 
 Also read: DEC-383 (the four S0b2 files a worker may read by exact path) and DEC-384 (nothing is installed in
-this round).
+that round).
+
+## The two packages of the second batch, and the installs
+
+| Package | Settled by | What the answer changed in the suite |
+|---|---|---|
+| **DP-8** how `embedded, except vendored code` is read | **DEC-388** (delegated): the closed list is `embedded` and `not embedded`; any other value is not embedded | Nothing: the policy cases already read it closed, with `embedded on request` as the unknown value. |
+| **DP-9** the two queries with no gold path | **DEC-388** (delegated): hit@5 per class over all 52 queries; the two count as misses | Nothing: the rule in the tests is the one decided. It is not changed. |
+| The installs, and how the default reranker starts | **DEC-397** (owner) | The scratch environment was put right, the `needs` marker sees the reranker environment, and three cases were added (the section above). |
 
 ## hit@5: S0b2 states its method, and the cases follow it (DEC-380)
 
@@ -128,76 +220,84 @@ route, alone or in the fused list. The lexical index is W1-17's and is not chang
 files are still found by the lexical route.
 
 - `test_no_text_of_a_namespace_that_is_not_embedded_is_sent_to_be_embedded_or_returned` needs no `sqlite_vec`. It
-  runs today. **What it can show today is limited:** without `sqlite_vec` nothing can be embedded, so it holds for
-  an implementation that sends nothing at all. It catches an implementation that sends text to the endpoint before
+  passes. **What it can show on a machine without `sqlite_vec` is limited:** there nothing can be embedded, so it
+  holds for an implementation that sends nothing at all. It catches an implementation that sends text to the endpoint before
   it knows it can store a vector, and one that drops the files from the lexical route.
-- `test_only_the_namespace_that_says_embedded_reaches_the_vectors` needs `sqlite_vec` and skips today. It is the
-  whole rule, with its premise (the `embedded` namespace's text is sent and its file is a semantic hit) and one edge:
+- `test_only_the_namespace_that_says_embedded_reaches_the_vectors` needs `sqlite_vec`; it passes since the third
+  batch. It is the whole rule, with its premise (the `embedded` namespace's text is sent and its file is a semantic hit) and one edge:
   files without a vector do not make the index stale.
 
 The sources give no model-free way to see the positive half through the interface of DEC-379: without
 `sqlite_vec` the facet is unavailable and the manifest is `None`.
 
 **Not tested: the third value in use.** This repository's own map gives `template/**` the value
-`embedded, except vendored code`. No source says which paths are vendored code. Under the closed reading it is an
-unknown value, so not embedded. No case uses that value: decision package DP-8 in the designer's report.
+`embedded, except vendored code`. No source says which paths are vendored code. DEC-388 decides it as the cases
+read it: an unknown value, so not embedded, and `template/**` is found by the lexical route only. No case uses that
+value itself; `embedded on request` stands for every unknown value.
 
 ## KPI lines and their tests
 
 | KPI line | File | Tests | Today |
 |---|---|---|---|
-| **Success 1.** sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_fusion.py` · `test_w1_19_rerank.py` · `test_w1_19_unavailable.py` · `test_w1_19_embedding_policy.py` · `test_w1_19_semantic_index.py` · `test_w1_19_real_models.py` | all 7 of `test_w1_19_fusion.py` · all 6 of `test_w1_19_rerank.py` · 7 of `test_w1_19_unavailable.py` (all but `test_there_is_no_manifest_before_there_is_an_index`) · both of `test_w1_19_embedding_policy.py` · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector` · `test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent` · `test_the_vectors_are_in_the_shared_store_beside_the_lexical_index` · `test_no_text_the_secret_filter_refuses_is_embedded_or_returned` · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` · `test_a_changed_file_is_embedded_before_the_next_retrieval_and_stale_vectors_are_reported` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` · `test_every_answer_is_one_fused_list_from_both_routes_reranked` | 21 red (the module does not exist); 9 skipped |
-| **Success 2.** Dev query set mean hit@5 >= 85 (S0b2 R1 baseline); warm p95 <= 0.5 s | `test_w1_19_real_models.py` | `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` · `test_a_warm_query_answers_within_half_a_second_at_p95` | skipped |
-| **Success 3.** Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py` · `test_w1_19_unavailable.py` · `test_w1_19_real_models.py` | `test_the_manifest_records_the_model_ids_and_their_revisions` · `test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant` · `test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama` · `test_there_is_no_manifest_before_there_is_an_index` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` | 1 red; 4 skipped |
-| **Failure 1.** Mean hit@5 falls below 80 | `test_w1_19_real_models.py` | `test_mean_hit_at_5_is_not_below_the_failure_line` | skipped |
-| **Failure 2.** Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py` | `test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | skipped |
+| **Success 1.** sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_fusion.py` · `test_w1_19_rerank.py` · `test_w1_19_unavailable.py` · `test_w1_19_embedding_policy.py` · `test_w1_19_semantic_index.py` · `test_w1_19_real_models.py` | all 7 of `test_w1_19_fusion.py` · all 7 of `test_w1_19_rerank.py` · 8 of `test_w1_19_unavailable.py` (all but `test_there_is_no_manifest_before_there_is_an_index`) · both of `test_w1_19_embedding_policy.py` · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector` · `test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent` · `test_the_vectors_are_in_the_shared_store_beside_the_lexical_index` · `test_no_text_the_secret_filter_refuses_is_embedded_or_returned` · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` · `test_a_changed_file_is_embedded_before_the_next_retrieval_and_stale_vectors_are_reported` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` · `test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` · `test_every_answer_is_one_fused_list_from_both_routes_reranked` | the 30 outside the real-model file pass; of the 3 in it, the embedder case passed in the lead's run, the default-reranker case is red (no default yet), the third waits for the reranker |
+| **Success 2.** Dev query set mean hit@5 >= 85 (S0b2 R1 baseline); warm p95 <= 0.5 s | `test_w1_19_real_models.py` | `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` · `test_a_warm_query_answers_within_half_a_second_at_p95` | wait for the default reranker; not run by the designer |
+| **Success 3.** Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py` · `test_w1_19_unavailable.py` · `test_w1_19_real_models.py` | `test_the_manifest_records_the_model_ids_and_their_revisions` · `test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant` · `test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama` · `test_there_is_no_manifest_before_there_is_an_index` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` | the 4 stand-in and model-free cases pass; the real-embedder case passed in the lead's run |
+| **Failure 1.** Mean hit@5 falls below 80 | `test_w1_19_real_models.py` | `test_mean_hit_at_5_is_not_below_the_failure_line` | waits for the default reranker; not run by the designer |
+| **Failure 2.** Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py` | `test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | waits for the default reranker; not run by the designer |
 
-**Count.** KPI lines with tests: 5 of 5 (3 success, 2 failure). Success 2 and both failure lines have no test
-that can run on this machine today; success 1 and 3 have model-free tests that can. Of success 3, the only
-model-free case is "no manifest before there is an index": that a revision is recorded has never been observed.
+**Count.** KPI lines with tests: 5 of 5 (3 success, 2 failure). Success 2 and both failure lines have been
+observed by nobody yet: they need the default reranker. Success 1 and 3 are observed on the stand-in endpoint and,
+for the embedder, once with the real model.
 
 | Covers id | Tests |
 |---|---|
 | **CAP-10.a** paraphrase retrieval with the pinned embedder | `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` (real model) · `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` (real models) · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector`, the three manifest cases and `test_only_the_namespace_that_says_embedded_reaches_the_vectors` (stand-in endpoint) · `test_the_semantic_route_says_unavailable_when_ollama_is_absent`, `test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises` and `test_no_text_of_a_namespace_that_is_not_embedded_is_sent_to_be_embedded_or_returned` (run now) |
-| **CAP-18.a** fusion (RRF), dedup by chunk hash, one rerank | all of `test_w1_19_fusion.py` and `test_w1_19_rerank.py` · `test_without_ollama_the_fused_list_is_the_lexical_routes_reranked_in_one_pass` · `test_a_limit_cuts_the_list_after_the_rerank_not_before` · `test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so` (all run now) · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` (stand-in endpoint). The multi-route router with the graph route, and the bundle, are W1-21. |
+| **CAP-18.a** fusion (RRF), dedup by chunk hash, one rerank | all of `test_w1_19_fusion.py` and `test_w1_19_rerank.py` · `test_without_ollama_the_fused_list_is_the_lexical_routes_reranked_in_one_pass` · `test_a_limit_cuts_the_list_after_the_rerank_not_before` · `test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so` · `test_with_the_environment_and_no_snapshot_…` · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` (stand-in endpoint) · `test_the_default_reranker_is_a_process_of_its_own_…` (real reranker). The multi-route router with the graph route, and the bundle, are W1-21. |
 
-## Which tests wait for which install
+## Which tests need which install
 
 A `needs` marker names what a case needs; the case skips, with the reason, when this machine lacks it. Nothing is
-installed, started or downloaded to decide a skip: it is `shutil.which`, `importlib.util.find_spec` and three
-exact paths. Nothing is installed in this round (DEC-384).
+installed, started or downloaded to decide a skip: it is `shutil.which`, `importlib.util.find_spec` and four
+exact paths. Everything below is installed on this machine since DEC-397, so nothing skips here.
 
 | Needs | Decided by | Cases | Today |
 |---|---|---|---|
-| nothing | — | 7 fusion, 6 rerank, `test_a_search_that_may_not_write_…`, `test_there_is_no_manifest_…` (15) | red |
-| `gitleaks` | on `PATH` (present here) | the other 6 of `test_w1_19_unavailable.py`, `test_no_text_of_a_namespace_that_is_not_embedded_…`, the premise (8) | 7 red, the premise passes |
-| `gitleaks`, `sqlite_vec` (IP-1) | `sqlite_vec` importable by the Python that runs pytest | the 9 stand-in cases of `test_w1_19_semantic_index.py`, `test_only_the_namespace_that_says_embedded_…` (10) | skipped |
-| the above and `ollama` (IP-2, IP-3) | an executable at `GOV_OLLAMA_BIN`, on `PATH` or at `~/.local/ollama/bin/ollama`, and the file `manifests/registry.ollama.ai/library/qwen3-embedding/0.6b` under `$OLLAMA_MODELS` or `~/.ollama/models` | `test_the_pinned_embedder_reaches_a_section_…` (1), marked `local_only` | skipped |
-| the above and `reranker` (IP-4) | the folder `models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed…5473` in the Hugging Face cache (`HF_HUB_CACHE`, `HF_HOME` or `~/.cache/huggingface/hub`) | the 5 dev-tier cases, marked `local_only`; they also skip when the dev tiers or the query set are absent | skipped |
+| nothing | — | 7 fusion, 7 rerank, `test_a_search_that_may_not_write_…`, `test_there_is_no_manifest_…` (16) | pass |
+| `gitleaks` | on `PATH` | 6 of `test_w1_19_unavailable.py`, `test_no_text_of_a_namespace_that_is_not_embedded_…`, the premise (8) | pass |
+| `gitleaks`, `reranker_env` | an executable file at `~/.local/share/gov-os/reranker-venv/bin/python` | `test_with_the_environment_and_no_snapshot_…` (1) | passes, as a guard (no default yet) |
+| `gitleaks`, `sqlite_vec` | `sqlite_vec` importable by the Python that runs pytest | the 9 stand-in cases of `test_w1_19_semantic_index.py`, `test_only_the_namespace_that_says_embedded_…` (10) | pass |
+| the above and `ollama` | an executable at `GOV_OLLAMA_BIN`, on `PATH` or at `~/.local/ollama/bin/ollama`, and the file `manifests/registry.ollama.ai/library/qwen3-embedding/0.6b` under `$OLLAMA_MODELS` or `~/.ollama/models` | `test_the_pinned_embedder_reaches_a_section_…` (1), marked `local_only` | passed in the lead's run; not run by the designer |
+| `reranker` | `reranker_env`, and the folder `models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed…5473` in the Hugging Face cache (`HF_HUB_CACHE`, `HF_HOME` or `~/.cache/huggingface/hub`) | `test_the_default_reranker_is_a_process_of_its_own_…` (1), marked `local_only` | red: no default yet |
+| `gitleaks`, `sqlite_vec`, `ollama`, `reranker` | all of the above | the 5 dev-tier cases, marked `local_only`; they also skip when the dev tiers or the query set are absent | wait for the default reranker; not run by the designer |
 
-So **22 cases need no install** (15 + 7), and **16 wait**: 10 for `sqlite_vec` alone, 1 more for Ollama with the
-embedding model, 5 more for the reranker as well.
+16 + 8 + 1 + 10 + 1 + 1 + 5 = 42.
 
-The `needs` marker sees the reranker's snapshot folder and not its process: where the pinned process and its
-libraries live is not decided. If the folder is there and the process cannot be started, the five cases fail and
-do not skip.
+**The `reranker` entry now sees the environment's interpreter as well as the snapshot.** Before DEC-397 the
+place of the process was not decided, so the marker could not look for it. Now it is one exact path. A machine
+that has the snapshot and not the environment lacks an install, and the six cases that use the real reranker skip
+there with that reason. Without the change they would fail, and a failure reads as a fault of the ticket. The
+entry looks at the file only and starts nothing: an environment that is there and broken makes the cases fail, as
+it should. `reranker_env` is the interpreter alone, for the case that holds the snapshot absent.
 
-**Three cases use an absent thing on purpose, and are built to stay valid after the installs:**
+**Five cases use an absent thing on purpose:**
 
 - `test_without_sqlite_vec_…` puts a module named `sqlite_vec` that raises `ImportError` first on `PYTHONPATH`, so
-  the import fails whatever the machine has.
-- `test_a_reranker_that_cannot_be_loaded_…` and `test_reranking_with_no_reranker_that_can_be_loaded_…` pass no
-  `reranker` and run in the scratch environment: an empty `HOME`, no Hugging Face cache, the libraries held
-  offline. Today the default reranker is absent on this machine in any environment. **After IP-4 their premise must
-  be checked again:** if the decided way to start the reranker's process finds it without `HOME` and without the
-  Hugging Face cache, the default is no longer absent there and the two cases need another way to make it so. That
-  belongs to the open decision on how the process is started.
+  the import fails whatever the machine has. Its environment does not carry the link to the installed package.
+- `test_a_reranker_that_cannot_be_loaded_…`, `test_reranking_with_no_reranker_that_can_be_loaded_…` and the new
+  `test_with_no_reranker_environment_…` pass no `reranker` and run in the scratch environment. **Their premise was
+  checked again after the installs, as this file asked.** It now rests on one thing: the default reranker's
+  environment is found under the home folder (DEC-397), and the scratch environment's `HOME` is an empty folder, so
+  it holds neither the environment nor a Hugging Face cache. The S0b2 environment is in the workbench, which is
+  under the real home folder too, and DEC-397 rules it out in any case. That the libraries are held offline there
+  no longer carries the premise. See the reading "`~` is the folder `HOME` names" above.
+- `test_with_the_environment_and_no_snapshot_…` gives the process a `HOME` that holds one link, to the reranker
+  environment, and no Hugging Face cache.
 
-**What this machine has.** `ollama` is not on `PATH` and `sqlite_vec`, `sentence_transformers`, `torch` and
-`transformers` cannot be imported by `/usr/bin/python3`. The first batch found, by exact path only,
-`~/.local/ollama/bin/ollama`, the model file for `qwen3-embedding:0.6b` under `~/.ollama/models`, and the
-reranker's pinned snapshot folder in `~/.cache/huggingface/hub`. Nothing was run, so their versions and digests are
-unverified (DEC-384 has the orchestrator verify them against the recorded hashes).
+**What this machine has** (DEC-397; the rows of `governance/project/tool-registry.yaml`): `sqlite_vec` 0.1.9 in
+the user site folder of `/usr/bin/python3`; Ollama 0.35.0 at `~/.local/ollama/bin/ollama`, off the `PATH`, with
+`qwen3-embedding:0.6b`; the reranker environment at `~/.local/share/gov-os/reranker-venv`; and the pinned snapshot
+in `~/.cache/huggingface/hub`. `sentence_transformers`, `torch` and `transformers` cannot be imported by
+`/usr/bin/python3`, which is as it should be.
 
 ## How the tests decide
 
@@ -207,6 +307,15 @@ unverified (DEC-384 has the orchestrator verify them against the recorded hashes
 - **Two environments.** Model-free cases get an environment built from scratch: an empty `HOME`, `PATH` without
   `ollama`, `OLLAMA_HOST` on a loopback port nothing listens on, and the Hugging Face libraries held offline.
   That is "Ollama absent". The real-model cases get this machine's own environment, also held offline.
+- **The scratch environment imports `sqlite_vec` exactly when the `needs` marker says the machine has it.** The
+  package the Python that runs pytest finds is linked, alone, into a folder that follows `src` on `PYTHONPATH`.
+  Nothing else of the real home folder is reachable from the scratch environment, and nothing is copied.
+- **The snapshot-absent premise was checked apart.** A throwaway script outside the repository started the
+  reranker environment's interpreter through the linked `HOME` and asked `sentence_transformers` for the pinned
+  model: the environment starts through the link, the load fails for want of the snapshot, and the stand-in hub is
+  asked three times without `HF_HUB_OFFLINE` and never with it. No model was loaded and nothing was downloaded.
+- **The process watcher** records, for the calling process and every descendant, the first four arguments and the
+  peak resident memory. The cases for the default reranker read the first argument.
 - **The stand-in reranker** lives in the driver process. Its loader counts each load; its scorer records each
   pass and scores a text by how often it holds the word `quartz`. Only the file the lexical route lists last holds
   that word, so a list that is not reranked, or reranked before the routes are merged, has another first entry.
@@ -225,7 +334,8 @@ unverified (DEC-384 has the orchestrator verify them against the recorded hashes
   hold the phrase `pewter whistle signal`.
 - **Lazily loaded** is read three ways: the loader is not called before the first rerank; `torch`, `transformers`
   and `sentence_transformers` are not in `sys.modules` after the three modules are imported or after a fusion;
-  and reranking nothing loads nothing.
+  and reranking nothing loads nothing. Since DEC-397 a fourth: with the default reranker the calling process holds
+  none of the three after the rerank either, because the model is loaded in the reranker's own process.
 - **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own hits; the case compares
   the chunk ids of `fusion.search` with it, one after the other.
 - **hit@5**: the section above.
@@ -273,17 +383,31 @@ Each is the stricter or the plainer reading; none is a new public name.
 - `$GOV_DEV_TIERS/dev-queryset.yaml`, by exact path: the classes, their sizes per tier, and the two queries
   without a `must_cite` path. No folder of the workbench was listed.
 
-## Open after the second batch
+- Third batch: this folder in full, the ticket, ADR-0002 §2, the reranker and `sqlite_vec` rows of the tool
+  registry, DEC-397, DEC-388, DEC-374, DEC-379, DEC-373, DEC-384, DEC-322 and DEC-372 (each in full), and
+  `rerank.py`, `fusion.py`, `semantic.py` and the head of `ollama.py` as they stand. No S0b2 file was read. Four
+  exact paths under the home folder were looked at, to see that they exist: the two the `needs` marker reads for
+  the reranker, the Ollama executable, and the user site folder (listed once, which was more than was needed).
 
-- **DP-8** (new, in the designer's report in full): how `embedded, except vendored code` is read. No case depends
-  on it and it does not affect the model-free build.
-- **How the default reranker's process is started**: not decided, fixed by no test (see above).
+## Open after the third batch
+
+Nothing is returned for decision. DP-8 and DP-9 are decided (DEC-388), and how the default reranker starts is
+decided (DEC-397). Three things stay with the ticket lead and the engineer:
+
+- **The six cases of `test_w1_19_real_models.py` the designer did not run**, and the seventh, which is red until
+  `default_reranker()` exists.
+- **The two guards pass today against a default that is always absent.** They show something only once the
+  default exists. `test_with_the_environment_and_no_snapshot_…` then starts the reranker environment's
+  interpreter, which takes some seconds.
+- **The reading "`~` is the folder `HOME` names"** (above). If the engineer needs another rule, it is a decision.
 
 ## Not tested, on purpose
 
 - The quality of the stand-in vectors; anything about the graph route, the bundle, paging or `gov retrieve` (W1-21).
 - The embedding model's registry row (DEC-195; the registry is outside the ticket's paths).
 - Whether the reranker stays loaded between retrievals, and the idle unload (DEC-261).
+- How the calling process and the reranker's process talk to each other, and the command after the interpreter.
+- That the reranker's process runs offline where the snapshot is complete (see "How the default reranker starts").
 - A mismatched or unpinned model failing closed (CAP-19, Wave 2).
 - The RRF constant's default: the cases that compare scores pass `k=60`.
 - Spellings of `embedding_policy` that differ from the two known values only by case or spacing, and a path that

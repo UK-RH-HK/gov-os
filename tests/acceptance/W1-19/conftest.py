@@ -16,7 +16,8 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "local_only: clones a dev tier (GOV_DEV_TIERS) and indexes it; not for CI")
     config.addinivalue_line(
         "markers", "needs(*names): what the case needs installed on this machine (gitleaks, sqlite_vec, ollama, "
-                   "reranker); it skips, with the reason, when one is absent. Nothing is installed by a test.")
+                   "reranker_env, reranker); it skips, with the reason, when one is absent. Nothing is installed by "
+                   "a test.")
 
 
 @pytest.hookimpl(tryfirst=True)

@@ -15,6 +15,13 @@ How the tests call it:
   ``PATH`` without ``ollama``, and ``OLLAMA_HOST`` pointing at a loopback port that is either dead (Ollama absent) or
   served by the stand-in endpoint of this module. The cases that measure the real models get the machine's own
   ``HOME`` and ``PATH``, with the Hugging Face libraries held offline.
+- **The scratch environment imports ``sqlite_vec`` exactly when this machine has it.** An empty ``HOME`` has no
+  user site folder, which is where DEC-397 installed the package. So the one package the Python that runs pytest
+  finds is linked into a folder of its own, and that folder is put on ``PYTHONPATH``: the ``needs`` marker and the
+  process under test then agree, and nothing else of the real ``HOME`` is reachable.
+- **The default reranker** starts from ``~/.local/share/gov-os/reranker-venv`` (DEC-397). In the scratch environment
+  ``~`` is the empty ``HOME``, so the default is absent there; the cases that use the real one get the machine's
+  own environment.
 - **Nothing is installed and nothing is downloaded.** What a case needs and this machine lacks makes it skip, with
   the reason (``Needs``).
 - **No secret is committed.** The planted string is built at run time from parts.
@@ -69,6 +76,13 @@ EMBED_MODEL = "qwen3-embedding:0.6b"
 EMBED_REVISION = "ac6da0dfba84"
 RERANK_MODEL = "Qwen/Qwen3-Reranker-0.6B"
 RERANK_REVISION = "e61197ed45024b0ed8a2d74b80b4d909f1255473"
+# Where the default reranker's process starts from, under the home folder (DEC-397; the tool registry's row).
+RERANK_ENV_REL = ".local/share/gov-os/reranker-venv"
+RERANK_PYTHON_REL = RERANK_ENV_REL + "/bin/python"
+# The Hugging Face cache under the home folder, when no variable names another.
+HF_CACHE_REL = ".cache/huggingface"
+# The S0b2 environment lives in the workbench; the default reranker never starts from there (DEC-397).
+WORKBENCH_NAME = "gov-os-workbench"
 # The libraries the reranker runs on (ADR-0002 §2): none may be loaded before the first rerank.
 HEAVY_MODULES = ("torch", "transformers", "sentence_transformers")
 # The standard constant of reciprocal rank fusion; the tests that compare scores pass it by name.
@@ -204,6 +218,7 @@ for call in request["calls"]:
     except Exception as exc:  # reported, so a test can say "never raises"
         record["error"] = {"type": type(exc).__name__, "message": str(exc)}
     record["seconds"] = time.perf_counter() - started
+    record["heavy_after"] = heavy()
     out["calls"].append(record)
 if watcher:
     stop.set()
@@ -248,16 +263,34 @@ class Api:
 
     def __init__(self, workdir):
         self.workdir = Path(workdir)
-        for name in ("home", "tmp", "pycache", "elsewhere"):
+        for name in ("home", "tmp", "pycache", "elsewhere", "site"):
             (self.workdir / name).mkdir(parents=True, exist_ok=True)
+        self.site = self._link_sqlite_vec()
         self.driver = self.workdir / "driver.py"
         self.driver.write_text(_DRIVER, encoding="utf-8")
         self.dead_host = f"127.0.0.1:{free_port()}"
 
     # ---- environments
 
+    def _link_sqlite_vec(self):
+        """A folder that holds a link to the ``sqlite_vec`` this machine's Python imports, and nothing else; None
+        when it imports none. The link is to the one installed package (DEC-397), found the way the ``needs`` marker
+        finds it, so the scratch environment has the package exactly when the marker says the machine has it."""
+        spec = importlib.util.find_spec("sqlite_vec")
+        if spec is None or not spec.origin:
+            return None
+        origin = Path(spec.origin)
+        source = origin.parent if spec.submodule_search_locations else origin
+        link = self.workdir / "site" / source.name
+        if not link.is_symlink():
+            link.symlink_to(source, target_is_directory=source.is_dir())
+        return self.workdir / "site"
+
     def scratch_env(self, ollama_host=None, **extra):
-        """Built from scratch: an empty HOME, no ``ollama`` on PATH, and an endpoint that is dead unless given."""
+        """Built from scratch: an empty HOME, no ``ollama`` on PATH, and an endpoint that is dead unless given.
+
+        ``PYTHONPATH`` is this worktree's ``src`` and, when this machine has ``sqlite_vec``, the folder that links
+        that one package: the empty HOME has no user site folder to find it in."""
         path = os.pathsep.join(folder for folder in os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)
                                if folder and not (Path(folder) / "ollama").exists())
         return {
@@ -266,7 +299,7 @@ class Api:
             "TMPDIR": str(self.workdir / "tmp"),
             "LC_ALL": "C.UTF-8",
             "GIT_CONFIG_NOSYSTEM": "1",
-            "PYTHONPATH": str(SRC),
+            "PYTHONPATH": os.pathsep.join([str(SRC), *([str(self.site)] if self.site else [])]),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "OLLAMA_HOST": ollama_host or self.dead_host,
             "HF_HUB_OFFLINE": "1",
@@ -282,6 +315,29 @@ class Api:
         (blocked / "sqlite_vec.py").write_text(
             'raise ImportError("sqlite_vec is held absent by the W1-19 tests")\n', encoding="utf-8")
         return self.scratch_env(ollama_host=ollama_host, PYTHONPATH=os.pathsep.join([str(blocked), str(SRC)]))
+
+    def env_with_the_reranker_environment_and_no_snapshot(self, hub):
+        """The scratch environment with one thing more under its HOME: a link to this machine's reranker
+        environment, at the path DEC-397 gives. That HOME holds no Hugging Face cache, so the pinned snapshot is
+        absent.
+
+        ``hub`` is the address of a recording stand-in. It is the only Hugging Face endpoint this environment names,
+        and every proxy variable points at a dead loopback port, so nothing can be downloaded through this
+        environment whatever the process under test does. The two variables that hold the libraries offline are
+        left out on purpose: the default reranker runs offline by itself (DEC-397), not because its caller did."""
+        home = self.workdir / "home-with-reranker-environment"
+        link = home / RERANK_ENV_REL
+        if not link.is_symlink():
+            link.parent.mkdir(parents=True, exist_ok=True)
+            link.symlink_to(Path.home() / RERANK_ENV_REL, target_is_directory=True)
+        dead = f"http://{self.dead_host}"
+        env = self.scratch_env(HOME=str(home), HF_ENDPOINT=f"http://{hub}", HF_HUB_DISABLE_TELEMETRY="1",
+                               NO_PROXY="127.0.0.1,localhost", no_proxy="127.0.0.1,localhost",
+                               HTTP_PROXY=dead, HTTPS_PROXY=dead, ALL_PROXY=dead,
+                               http_proxy=dead, https_proxy=dead, all_proxy=dead)
+        for name in ("HF_HUB_OFFLINE", "TRANSFORMERS_OFFLINE"):
+            del env[name]
+        return env
 
     def real_env(self):
         """This machine's own environment, for the cases that measure the real models; nothing may be downloaded."""
@@ -352,8 +408,19 @@ def _ollama_model():
 
 def _reranker_snapshot():
     cache = os.environ.get("HF_HUB_CACHE") or (
-        Path(os.environ.get("HF_HOME") or Path.home() / ".cache/huggingface") / "hub")
+        Path(os.environ.get("HF_HOME") or Path.home() / HF_CACHE_REL) / "hub")
     return (Path(cache) / ("models--" + RERANK_MODEL.replace("/", "--")) / "snapshots" / RERANK_REVISION).is_dir()
+
+
+def reranker_python(home=None):
+    """The interpreter the default reranker's process starts from (DEC-397), under ``home`` (default: this
+    machine's home folder)."""
+    return Path(home or Path.home()) / RERANK_PYTHON_REL
+
+
+def _reranker_environment():
+    interpreter = reranker_python()
+    return interpreter.is_file() and os.access(interpreter, os.X_OK)
 
 
 def _needs():
@@ -368,7 +435,13 @@ def _needs():
         lacking["ollama"] = "no ollama executable (GOV_OLLAMA_BIN, PATH, ~/.local/ollama/bin/ollama): package IP-2"
     elif not _ollama_model():
         lacking["ollama"] = f"the model {EMBED_MODEL} is not in Ollama's model folder (install package IP-3)"
-    if not _reranker_snapshot():
+    # The reranker is two things (DEC-397): the environment its process starts from, seen by its interpreter at the
+    # exact path, and the pinned snapshot. `reranker_env` is the first alone; `reranker` is both.
+    if not _reranker_environment():
+        lacking["reranker_env"] = (f"no interpreter at ~/{RERANK_PYTHON_REL}: the reranker environment is not "
+                                   "installed (DEC-397)")
+        lacking["reranker"] = lacking["reranker_env"]
+    elif not _reranker_snapshot():
         lacking["reranker"] = (f"{RERANK_MODEL}@{RERANK_REVISION[:12]} is not in the Hugging Face cache "
                                "(install package IP-4)")
     return lacking
@@ -784,6 +857,48 @@ class OllamaStandIn:
     def close(self):
         self.server.shutdown()
         self.server.server_close()
+
+
+class HubStandIn:
+    """A loopback address that stands where the Hugging Face hub would be. It serves nothing (every answer is 404)
+    and records every request it receives: a process that runs offline asks it nothing."""
+
+    def __init__(self):
+        self.requests = []
+        requests = self.requests
+
+        class Handler(BaseHTTPRequestHandler):
+            def answer(self):
+                requests.append(f"{self.command} {self.path}")
+                self.send_response(404)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+
+            do_GET = do_POST = do_HEAD = answer
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.server.daemon_threads = True
+        self.host = f"127.0.0.1:{self.server.server_address[1]}"
+        threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True).start()
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+def is_python(peak):
+    """Whether the watched process ``peak`` was started as a Python interpreter, by the name of its first argument."""
+    return bool(peak["argv"]) and Path(peak["argv"][0]).name.startswith("python")
+
+
+def started_from(peak, interpreter):
+    """Whether the watched process ``peak`` was started with an interpreter of the environment ``interpreter``
+    belongs to: its first argument is a ``python`` in that environment's ``bin``. The path is compared as written,
+    not resolved: the environment's interpreter is a link to the system's."""
+    return is_python(peak) and Path(os.path.normpath(peak["argv"][0])).parent == Path(interpreter).parent
 
 
 def free_port():

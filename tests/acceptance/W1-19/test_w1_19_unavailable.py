@@ -92,9 +92,9 @@ def test_a_limit_cuts_the_list_after_the_rerank_not_before(api, repo):
 
 @pytest.mark.needs("gitleaks")
 def test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so(api, repo):
-    # DEC-374. No `reranker` is given, so the default is used, and the default cannot be loaded: this machine has
-    # no reranker process today (DEC-384), and the scratch environment has an empty HOME, no Hugging Face cache and
-    # the libraries held offline.
+    # DEC-374. No `reranker` is given, so the default is used, and the default cannot be loaded: its process starts
+    # from the environment under the home folder (DEC-397), and the scratch environment has an empty HOME (no
+    # environment, no Hugging Face cache) and the libraries held offline.
     lexical = api.call(support.LEXICAL, "search", ROOT(repo), support.PHRASE)
     routes = {support.LEXICAL_FACET: lexical["hits"], support.SEMANTIC_FACET: []}
     outcome = api.run([(support.FUSION, "rrf", (routes,), {}),
@@ -107,6 +107,37 @@ def test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so(api,
     assert set(support.PHRASE_FILES) <= set(support.paths(answer["hits"])), "the fused list was dropped"
     assert [hit["chunk_id"] for hit in answer["hits"]] == [hit["chunk_id"] for hit in fused], \
         "the list is not in the fused order: with no reranker the order of the fusion is kept (DEC-374)"
+
+
+@pytest.mark.needs("gitleaks", "reranker_env")
+def test_with_the_environment_and_no_snapshot_nothing_is_reranked_nothing_is_fetched_and_nothing_raises(api, repo):
+    # DEC-397 and DEC-374. The reranker environment is where the default looks for it (a link under this case's
+    # HOME), and the pinned snapshot is not: that HOME has no Hugging Face cache. The caller's environment does not
+    # hold the libraries offline, and the only hub it names is a stand-in that records what it is asked. So the
+    # default must leave the fused order, say that nothing was reranked, raise nothing, and ask the hub nothing:
+    # an absent snapshot is never fetched.
+    hub = support.HubStandIn()
+    try:
+        env = api.env_with_the_reranker_environment_and_no_snapshot(hub.host)
+        lexical = api.call(support.LEXICAL, "search", ROOT(repo), support.PHRASE, env=env)
+        routes = {support.LEXICAL_FACET: lexical["hits"], support.SEMANTIC_FACET: []}
+        outcome = api.run([(support.FUSION, "rrf", (routes,), {}),
+                           (support.FUSION, "search", (ROOT(repo), support.PHRASE), {"limit": None})], env=env)
+    finally:
+        hub.close()
+    searching = outcome.calls[1]
+    assert searching["error"] is None, \
+        f"fusion.search raised when the reranker's snapshot is absent: {searching['error']}"
+    fused, answer = outcome.value(0), support.check_fused(outcome.value(1))
+    assert answer["reranked"] is False, "the list is given as reranked although the pinned snapshot is absent"
+    assert [hit["chunk_id"] for hit in answer["hits"]] == [hit["chunk_id"] for hit in fused], \
+        "the list is not in the fused order: with no reranker the order of the fusion is kept (DEC-374)"
+    assert set(support.PHRASE_FILES) <= set(support.paths(answer["hits"])), "the fused list was dropped"
+    assert hub.requests == [], \
+        f"the hub was asked for what the cache lacks: the default reranker does not run offline (DEC-397): " \
+        f"{hub.requests[:5]}"
+    assert searching["heavy_after"] == [], \
+        f"the calling process loaded {searching['heavy_after']}: the reranker is a process of its own (ADR-0002 §2)"
 
 
 @pytest.mark.needs("gitleaks")

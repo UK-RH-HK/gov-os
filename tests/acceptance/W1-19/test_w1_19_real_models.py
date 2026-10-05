@@ -7,6 +7,9 @@ the reason, when one is absent; nothing is installed or downloaded by a test (th
 offline). The calls run in this machine's own environment, so ``gov`` starts the real ``ollama serve`` and, as
 DEC-261 decides, leaves it running.
 
+The default reranker is a process of its own, started from ``~/.local/share/gov-os/reranker-venv`` (DEC-397). One
+case holds that with the real reranker and no index; it needs neither Ollama nor ``sqlite_vec``.
+
 **Run this file alone**, never beside another suite: the ticket is heavy, and the timed case is a latency case
 (DEC-372).
 
@@ -49,6 +52,50 @@ def test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifes
         f"the manifest does not record the pinned revision {support.EMBED_REVISION}: {manifest['embedder']!r}"
     assert (manifest["reranker"]["model"], manifest["reranker"]["revision"]) == \
         (support.RERANK_MODEL, support.RERANK_REVISION)
+
+
+RERANK_QUERY = "where is the quartz seam"
+RERANK_CANDIDATES = [
+    {"chunk_id": name, "path": f"notes/{name}.md", "start_line": 1, "end_line": 3, "parent_id": f"parent-of-{name}",
+     "text": text}
+    for name, text in (("plain", "Nothing of interest stands here."),
+                       ("seam", "The quartz seam runs under the yard, east of the old kiln."),
+                       ("tides", "The harbour pilot reads the tide tables at dawn."))
+]
+
+
+@pytest.mark.needs("reranker")
+def test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment(api):
+    # DEC-397 and ADR-0002 §2. No `reranker` is given, in this machine's own environment: the default scores the
+    # candidates in a process started with the interpreter of ~/.local/share/gov-os/reranker-venv, never one of the
+    # workbench, and the calling process loads none of the reranker's libraries. How the two processes talk to each
+    # other is not looked at.
+    outcome = api.run([(support.RERANK, "rerank", (RERANK_QUERY, RERANK_CANDIDATES), {})], env=api.real_env(),
+                      watch=True, timeout=support.MEASURE_TIMEOUT_S)
+    call = outcome.calls[0]
+    assert call["error"] is None, f"rerank raised with the default reranker: {call['error']}"
+    ordered = outcome.value()
+    assert sorted(entry["chunk_id"] for entry in ordered) == sorted(entry["chunk_id"] for entry in RERANK_CANDIDATES)
+    scores = [entry.get("rerank_score") for entry in ordered]
+    assert all(isinstance(score, float) for score in scores), \
+        f"the default reranker scored nothing although its environment and its snapshot are here: {ordered!r}"
+    assert scores == sorted(scores, reverse=True), f"the candidates are not in the order of their scores: {scores}"
+    assert ordered[0]["chunk_id"] == "seam", \
+        f"the pinned reranker does not put the one text that answers the question first: {ordered!r}"
+    assert outcome.loads == 0, "the tests' stand-in reranker was used: it was not given"
+    assert outcome.heavy_after_import == [] and call["heavy_after"] == [], \
+        f"the calling process loaded {call['heavy_after'] or outcome.heavy_after_import}: the reranker is a " \
+        "process of its own (ADR-0002 §2)"
+    started = [peak["argv"] for peak in outcome.peaks if not peak["self"]]
+    interpreter = support.reranker_python()
+    assert any(support.started_from(peak, interpreter) for peak in outcome.peaks if not peak["self"]), \
+        f"no process started with {interpreter} was seen under the calling process (DEC-397): {started}"
+    for peak in outcome.peaks:
+        if not peak["self"] and support.is_python(peak):
+            assert support.started_from(peak, interpreter), \
+                f"a Python process was started from another interpreter than {interpreter}: {peak['argv']}"
+        assert not any(support.WORKBENCH_NAME in part for part in peak["argv"][:1]), \
+            f"a process was started from the workbench, where the S0b2 environment lives (DEC-397): {peak['argv']}"
 
 
 @pytest.fixture(scope="module")
