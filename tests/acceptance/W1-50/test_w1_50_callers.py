@@ -9,6 +9,10 @@ made in an orchestrator session's own call (the main orchestrator's integration
 merge, or a lead taking `w1/integrate` into its ticket branch). A merge in any
 other caller's call stays flagged, as W1-03 tests it."
 
+DEC-327: "In a worker's call, a forward HEAD move is judged commit by commit
+against the caller, not by its two ends. A worker's commit outside its paths
+is a finding even when a later commit of the same call undoes it."
+
 An orchestrator session's own call has ``GOV_ROLE=orchestrator`` and no
 subagent. A worker's call is a session of another role, or a subagent of
 another role inside an orchestrator session (DEC-117).
@@ -81,6 +85,31 @@ def test_a_worker_s_commit_with_its_own_role_s_trailer_is_judged_against_the_cal
     what = f"`{command}` in a call of the engineer on {TICKET}"
     check_support.assert_caught(result, support.README, what=what, action=check_support.FLAGGED)
     check_support.assert_not_recorded(result, support.SOURCE, what=what)
+    check_support.assert_left_as_the_call_left_it(project, left, what)
+
+
+# --------------------------------------------------------------------------
+# DEC-327: a worker's call is judged commit by commit against the caller
+# --------------------------------------------------------------------------
+
+# name: the trailers of both commits. The engineer on DAEO-zz90 may not write README.md.
+UNDONE_BY_THE_WORKER = {
+    "commits-with-the-worker-s-own-trailers": AS_ENGINEER,
+    "commits-without-trailers": support.NO_TRAILERS,
+}
+
+
+@pytest.mark.parametrize("case", sorted(UNDONE_BY_THE_WORKER), ids=sorted(UNDONE_BY_THE_WORKER))
+def test_a_worker_s_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it(project, call, case):
+    """DEC-327: "A worker's commit outside its paths is a finding even when a later commit of the same call
+    undoes it." The two ends of the move hold the same files."""
+    command = support.undone(support.README, UNDONE_BY_THE_WORKER[case])
+    result, left = call(project, command, ENGINEER, TICKET)
+    assert check_support.git(project, "diff", "--name-only", "HEAD~2", "HEAD") == "", (
+        "the fixture is wrong: the two commits together change a file"
+    )
+    what = f"`{command}` in a call of the engineer on {TICKET}"
+    check_support.assert_caught(result, support.README, what=what, action=check_support.FLAGGED)
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 

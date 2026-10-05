@@ -126,8 +126,8 @@ def test_a_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it
     """ "Commit by commit": the two revisions of ``HEAD`` hold the same files, and one commit still left its paths.
 
     The caller is the orchestrator: a commit is judged by its own trailers
-    only in an orchestrator session's own call (DEC-319). Whether a worker's
-    call is judged commit by commit or by its two ends is package DP-10.
+    only in an orchestrator session's own call (DEC-319). The worker's form
+    (DEC-327) is in ``test_w1_50_callers.py``.
     """
     command = (
         support.commit(support.README, AS_ENGINEER, subject="outside")

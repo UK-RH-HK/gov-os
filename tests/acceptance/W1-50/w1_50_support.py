@@ -9,8 +9,8 @@ for the project, the hook runs and the assertions.
 
 This module adds only what the W1-50 cases need: shell fragments that make
 commits with or without trailers, a ticket branch to merge, a closed ticket
-with its close commit (DEC-318), and what a finding says about a commit
-(DEC-270).
+with its close commit (DEC-318, DEC-358), and what a finding says about a
+commit (DEC-270).
 """
 
 from __future__ import annotations
@@ -54,6 +54,21 @@ AS_DESIGNER = (DESIGNER, TICKET)
 AS_ENGINEER = (ENGINEER, TICKET)
 AS_ORCHESTRATOR = (ORCHESTRATOR, TICKET)
 NO_TRAILERS = None
+
+OWNER = "owner"                    # no agent role: the owner's commits carry ``Role: owner`` (DEC-360)
+NO_TICKET = "decision-record"      # a ``Task`` value that is no ticket (DEC-359)
+
+
+def undone(path, trailers):
+    """Shell: a commit that changes ``path``, then a commit that puts ``path`` back; both carry ``trailers``."""
+    command = (
+        commit(path, trailers, subject="outside")
+        + f" && git checkout -q HEAD~1 -- {shlex.quote(path)} && git commit -q -m undo"
+    )
+    if trailers is not None:
+        role, task = trailers
+        command += f" --trailer {shlex.quote('Task: ' + task)} --trailer {shlex.quote('Role: ' + role)}"
+    return command
 
 
 def commit(path, trailers, subject="work"):
@@ -173,6 +188,41 @@ def _write_ticket(project, ticket, wbs, status, paths):
     (project / ".tickets" / f"{ticket}.md").write_text(text, encoding="utf-8")
 
 
+def two_more_tickets(project, sandbox, closed_status="in_progress"):
+    """One commit adds ``DAEO-zz97`` (with ``closed_status``) and ``DAEO-zz98`` (open); ``lead`` and ``late`` are cut."""
+    _write_ticket(project, CLOSED_TICKET, CLOSED_WBS, closed_status, _CLOSED_PATHS)
+    _write_ticket(project, OPEN_TICKET, OPEN_WBS, "open", _OPEN_PATHS)
+    run(project, sandbox,
+        "git add -- .tickets && git commit -q -m 'two more tickets'"
+        f" --trailer 'Task: {ORCHESTRATOR_TICKET}' --trailer 'Role: {ORCHESTRATOR}'")
+    check_support.git(project, "branch", LEAD_BRANCH)
+    check_support.git(project, "branch", LATE_BRANCH)
+
+
+def set_status(project, sandbox, status, subject, also=None):
+    """Commit ``status`` to ``DAEO-zz97``'s file, as the orchestrator naming that ticket. Returns the commit's id.
+
+    With ``also``, the same commit changes that path too: a status change
+    inside a larger commit.
+    """
+    _write_ticket(project, CLOSED_TICKET, CLOSED_WBS, status, _CLOSED_PATHS)
+    paths = f".tickets/{CLOSED_TICKET}.md"
+    change = ""
+    if also is not None:
+        directory = os.path.dirname(also) or "."
+        change = f"mkdir -p {shlex.quote(directory)} && echo changed >> {shlex.quote(also)} && "
+        paths += " " + shlex.quote(also)
+    run(project, sandbox,
+        f"{change}git add -- {paths} && git commit -q -m {shlex.quote(subject)}"
+        f" --trailer 'Task: {CLOSED_TICKET}' --trailer 'Role: {ORCHESTRATOR}'")
+    return check_support.git(project, "rev-parse", "HEAD").strip()
+
+
+def status_changes(project, ticket=CLOSED_TICKET, revision="HEAD"):
+    """The ids of the commits in the history of ``revision`` that change the ticket's file, newest first."""
+    return check_support.git(project, "rev-list", revision, "--", f".tickets/{ticket}.md").split()
+
+
 def closed_ticket(project, sandbox, *steps, late_steps=()):
     """Give the project a closed ticket ``DAEO-zz97`` and an open one ``DAEO-zz98``. Returns the close commit's id.
 
@@ -190,13 +240,7 @@ def closed_ticket(project, sandbox, *steps, late_steps=()):
     ``late_steps`` are committed on ``late``: work that names the ticket and is
     not in the close commit's history. ``main`` is checked out at the end.
     """
-    _write_ticket(project, CLOSED_TICKET, CLOSED_WBS, "in_progress", _CLOSED_PATHS)
-    _write_ticket(project, OPEN_TICKET, OPEN_WBS, "open", _OPEN_PATHS)
-    run(project, sandbox,
-        "git add -- .tickets && git commit -q -m 'two more tickets'"
-        f" --trailer 'Task: {ORCHESTRATOR_TICKET}' --trailer 'Role: {ORCHESTRATOR}'")
-    check_support.git(project, "branch", LEAD_BRANCH)
-    check_support.git(project, "branch", LATE_BRANCH)
+    two_more_tickets(project, sandbox)
     if steps:
         run(project, sandbox, commits(*steps))
     if late_steps:

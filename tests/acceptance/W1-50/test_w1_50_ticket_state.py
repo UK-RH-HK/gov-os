@@ -10,10 +10,12 @@ in the form the repository's closes have (README, "The ticket's close
 commit"), and adds ``DAEO-zz98`` with ``status: open``. Every call is an
 orchestrator session's own call (DEC-319).
 
-Only commits with a worker's ``Role`` trailer are asserted on. What holds for
-a commit with ``Role: orchestrator`` that names a closed or an open ticket (the
-close commit itself is one) is package DP-9; how the check finds the close
-commit when a ticket's history holds none or several is package DP-8.
+The commits judged here carry a worker's ``Role`` trailer. A commit with
+``Role: orchestrator`` that names a closed or an open ticket (the close commit
+itself is one) is allowed outside ``tests/acceptance/**`` (DEC-359):
+``test_w1_50_orchestrator_task_names.py``. How the check finds the close
+commit when a ticket's history holds none or several is DEC-358:
+``test_w1_50_close_commit.py``.
 """
 
 from __future__ import annotations
@@ -46,9 +48,10 @@ def _status(project, ticket):
 def test_a_closed_ticket_s_commits_before_its_close_commit_pass_inside_that_ticket_s_paths(project, sandbox, call):
     """A branch that is behind takes in ``main``: the closed ticket's work and, after it, the close commit.
 
-    Asserted: no finding names the test designer's or the engineer's path.
-    Not asserted: that the call is silent, because the move also brings the
-    close commit itself (DP-9).
+    The call is silent. The two work commits are ancestors of the close commit
+    (DEC-318). The close commit itself carries ``Role: orchestrator`` and names
+    the ticket it closes; it changes only the ticket's file, outside
+    ``tests/acceptance/**``, and is allowed (DEC-359).
     """
     close_commit = support.closed_ticket(project, sandbox, *CLOSED_WORK)
     check_support.git(project, "checkout", "-q", support.LEAD_BRANCH)
@@ -60,11 +63,7 @@ def test_a_closed_ticket_s_commits_before_its_close_commit_pass_inside_that_tick
             f"the fixture is wrong: the commit of {path} is not an ancestor of the close commit"
         )
     what = f"`{command}` by the orchestrator on {TICKET}, bringing {CLOSED}'s work and its close commit"
-    check_support.assert_not_recorded(result, support.CLOSED_TEST, support.CLOSED_SOURCE, what=what)
-    for path in (support.CLOSED_TEST, support.CLOSED_SOURCE):
-        assert path not in result.report, (
-            f"{what}: the report names {path}, a commit inside the closed ticket's paths: {result.report!r}"
-        )
+    check_support.assert_silent(result, what)
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 
