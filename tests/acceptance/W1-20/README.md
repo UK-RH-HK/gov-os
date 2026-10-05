@@ -269,6 +269,10 @@ which tests change with another answer.
 
 ## Notes for the lead
 
+- **The planned revision of W1-07's suite** (DEC-190, "planned: command implemented") is made with the command
+  built: `closure` left `NOT_BUILT`, and the cases that run every command call it with a depth and an id. It is
+  described in `tests/acceptance/W1-07/README.md`, "Planned revisions".
+
 - **`S0a-G-03`** is among the ticket's sources and its text is not in the tree. No test of this suite was derived
   from it, and none needs it as far as the other sources say. Whether it asks for something these tests do not
   hold cannot be said from the tree.
