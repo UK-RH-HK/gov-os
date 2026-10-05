@@ -1,5 +1,5 @@
 """The one place that reads a merge commit (W1-50; DEC-394, DEC-398,
-DEC-403).
+DEC-403, DEC-410).
 
 The containment check uses ``read_merge`` for a merge commit's own
 change, and the approval check reads merges the same way.  What cannot
@@ -12,7 +12,7 @@ import re
 from itertools import combinations
 from typing import NamedTuple
 
-from gov.guard.containment import _GitError, _NotARepo, _git
+from gov.guard.containment import ACCEPTANCE, _GitError, _NotARepo, _git
 
 _COMMIT_ID = re.compile(r"[0-9a-f]{40}|[0-9a-f]{64}")
 
@@ -68,12 +68,14 @@ def read_merge(root: str, commit: str) -> MergeReading:
     from a parent's, the first or any other, and no other parent brought
     it against that parent.  So it holds what the merge commit changes
     beyond its parents and also the paths where it drops a parent's
-    change.
+    change.  Under ``tests/acceptance/**`` it also holds every path that
+    two parents both changed against their one merge base, whichever
+    side's content the merge commit holds, also when both made the same
+    change and the path differs from no parent (DEC-410, DP-24).
 
-    ``brought`` holds the paths where the merge commit's content differs
-    from its first parent's and another parent brought it against the
-    first parent, less the paths in ``own``.  It does not hold what the
-    first parent brought against another parent.
+    ``brought`` is the complement of ``own`` over every parent (DEC-410,
+    DP-22): every path where the merge commit's content differs from
+    some parent's, the first or any other, and that is not in ``own``.
 
     Fail closed: when the first parent and any one of the other parents
     have several merge bases (a criss-cross history) or none (unrelated
@@ -121,8 +123,11 @@ def read_merge(root: str, commit: str) -> MergeReading:
         return seen[a, b]
 
     differs = {p: changed(p, ids[0]) for p in parents}
+    every = set().union(*differs.values())
     # For each parent, the paths another parent brought against it.
     brought = {p: set() for p in parents}
+    # DEC-410, DP-24: the acceptance tests two parents both changed.
+    own: set = set()
     # The pairs with the first parent come first.
     for a, b in combinations(parents, 2):
         # Exit code 1 with no output: no merge base.
@@ -130,8 +135,9 @@ def read_merge(root: str, commit: str) -> MergeReading:
         if len(bases) == 1:
             brought[a] |= changed(bases[0], b) - differs[b]
             brought[b] |= changed(bases[0], a) - differs[a]
+            own |= {p for p in changed(bases[0], a) & changed(bases[0], b)
+                    if p.startswith(ACCEPTANCE + "/")}
         elif a == first:
-            return MergeReading(sorted(set().union(*differs.values())), [])
-    own = set().union(*(differs[p] - brought[p] for p in parents))
-    return MergeReading(
-        sorted(own), sorted(differs[first] & brought[first] - own))
+            return MergeReading(sorted(every), [])
+    own = own.union(*(differs[p] - brought[p] for p in parents))
+    return MergeReading(sorted(own), sorted(every - own))

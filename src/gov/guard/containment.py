@@ -644,7 +644,8 @@ def _move_commits(root: str, old: str, new: str) -> list:
     are listed without rename detection, so both ends of a rename
     appear (repair 7); a merge commit lists only its own change, as
     ``read_merge`` reads it (DEC-269; DEC-394, DP-18; DEC-403): the
-    paths where it differs from a parent and no other parent brought.
+    paths where it differs from a parent and no other parent brought,
+    and the acceptance tests two parents both changed (DEC-410, DP-24).
 
     Everything is separated by NUL, the one byte no trailer and no file
     name can hold, and nothing is unquoted.  The token after a commit's
@@ -710,6 +711,13 @@ def _close_commit(root: str, head: str, ticket_file: str):
         if status(rev) == "closed" and status(rev + "^") not in (None, "closed"):
             return rev
     return None
+
+
+def _merge_own(commit) -> list:
+    """A merge commit's own paths under ``.tickets/**`` and
+    ``tests/acceptance/**`` (DEC-410, DP-21 and DP-27)."""
+    return [p for p in commit[4] if len(commit[1]) > 1
+            and p.startswith((".tickets/", ACCEPTANCE + "/"))]
 
 
 def _judge_commit(root, commit, role, tid, sub, orch_own, head,
@@ -807,6 +815,12 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
                               for p in both))
                 return ("allow" if ok else "deny"), ""
         bad = outside(c_role, c_task, None, fn)
+    # DEC-410, DP-21 and DP-27: whatever the merge commit's trailers.
+    merged = _merge_own(commit)
+    if merged:
+        return (bad + [p for p in merged if p not in bad],
+                "a merge commit's own change to a ticket file or an"
+                " acceptance test")
     if tickets:
         return (bad + [p for p in tickets if p not in bad],
                 "a ticket file in a commit with a worker's Role trailer"
@@ -1020,12 +1034,18 @@ def check_containment(
                 head_msg = "Flagged, left in place: " + " ".join(msgs)
 
         if not fwd:
+            # DEC-410: the finding names the merge commits' own ticket
+            # files and acceptance tests, where the move could be read.
+            merged = sorted({p for c in commits for p in _merge_own(c)})
             head_findings.append(_make_finding(
                 session_id, agent_type, role, ticket_id, command,
-                [], "flagged",
+                merged, "flagged",
                 "HEAD moved (not a forward move on the same branch)"))
             non_fwd = True
             head_msg = "HEAD moved (not a forward move, flagged)."
+            if merged:
+                head_msg += (" A merge commit's own change: "
+                             + ", ".join(merged) + ".")
 
     # ---- classify by scope (repair 9: also after non-forward) ----
     rr = os.path.realpath(project_root)

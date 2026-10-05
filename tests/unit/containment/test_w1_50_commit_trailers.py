@@ -426,7 +426,9 @@ def test_read_merge_tells_a_parent_s_change_from_the_merge_commit_s_own(tmp_path
     _git(project, "add", "-A")
     _git(project, "commit", "-q", "-m", "merge")
     reading = read_merge(str(project), _git(project, "rev-parse", "HEAD").strip())
-    assert (reading.own, reading.brought) == (["src/main.py"], ["src/side.py"])
+    # DEC-410, DP-22: what the first parent brought is in brought too.
+    assert (reading.own, reading.brought) == (
+        ["src/main.py"], ["README.md", "src/side.py"])
 
 
 def test_read_merge_puts_a_parent_s_change_the_merge_commit_drops_in_own(tmp_path):
@@ -439,15 +441,85 @@ def test_read_merge_puts_a_parent_s_change_the_merge_commit_drops_in_own(tmp_pat
     merge = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", earlier,
                  "-p", later, "-m", "drop").strip()
     assert read_merge(str(project), merge) == (["src/main.py"], [])
-    # Each side's change of its own path is brought, whichever is first.
+    # Each side's change of its own path is brought, whichever is first
+    # (DEC-410, DP-22: brought is the complement of own).
     side = _branch_commit(project, "side", "src/side.py", start=earlier)
     _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
     tree = _git(project, "rev-parse", "HEAD^{tree}").strip()
+    both = ["src/main.py", "src/side.py"]
     assert read_merge(str(project), _git(
-        project, "rev-parse", "HEAD").strip()) == ([], ["src/side.py"])
+        project, "rev-parse", "HEAD").strip()) == ([], both)
     turned = _git(project, "commit-tree", tree, "-p", side, "-p", later,
                   "-m", "turned").strip()
-    assert read_merge(str(project), turned) == ([], ["src/main.py"])
+    assert read_merge(str(project), turned) == ([], both)
+
+
+def test_read_merge_puts_an_acceptance_test_both_sides_changed_in_own(tmp_path):
+    """DEC-410, DP-24: whichever side's content the merge commit holds,
+    also when both sides made the same change; a source file is read as
+    before."""
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    test, source = "tests/acceptance/T-01/test_a.py", "src/main.py"
+    side = _branch_commit(project, "side", test)
+    _git(project, "checkout", "-q", "side")
+    _commit(project, source)
+    _git(project, "checkout", "-q", "main")
+    # The same change of the test on main, another of the source file.
+    _git(project, "checkout", "-q", side, "--", test)
+    _git(project, "commit", "-q", "-m", "the same change")
+    (project / source).write_text("VALUE = 2\n")
+    _git(project, "commit", "-q", "-a", "-m", "main's")
+    _git(project, "merge", "-q", "--no-ff", "-X", "theirs", "-m", "merge", "side")
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == ([test], [source])
+    # Another change of the test on main: the merge takes the side's.
+    _git(project, "reset", "-q", "--hard", "HEAD^")
+    _commit(project, test)
+    _git(project, "merge", "-q", "--no-ff", "-X", "theirs", "-m", "merge", "side")
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == ([test], [source])
+
+
+def test_a_merge_commit_s_own_change_of_a_ticket_file_or_a_test_is_a_finding_whatever_its_trailers(tmp_path):
+    """DEC-410, DP-21 and DP-27; in a worker's call the whole-move
+    finding names the paths."""
+    test = "tests/acceptance/T-01/test_a.py"
+    for n, (role, trailers) in enumerate((
+            ("orchestrator", ("Role: orchestrator", f"Task: {TICKET}")),
+            ("orchestrator", ("Role: independent-test-designer",
+                              f"Task: {TICKET}")),
+            ("orchestrator", ()),
+            ("independent-test-designer", ()))):
+        project = _make_project(tmp_path / str(n))
+        _commit(project, test)
+        _branch_commit(project, "side", "src/side.py")
+        _commit(project, "README.md", "Role: orchestrator", f"Task: {TICKET}")
+
+        def work():
+            _git(project, "merge", "-q", "--no-ff", "--no-commit", "side")
+            for path in (test, TICKET_FILE):
+                with open(project / path, "a") as f:
+                    f.write("by the merge\n")
+            _git(project, "add", "-A")
+            _git(project, "commit", "-q", "-m", "merge",
+                 *(a for t in trailers for a in ("--trailer", t)))
+
+        report, findings = _check(project, work, role=role)
+        assert test in report and TICKET_FILE in report
+        assert [sorted(f["paths"]) for f in findings] == [[TICKET_FILE, test]]
+        if role != "orchestrator":
+            assert "not a forward move" in findings[0]["reason"]
+        # An ordinary merge that brings such changes stays silent.
+        _git(project, "checkout", "-q", "-b", "more")
+        _commit(project, TICKET_FILE, "Role: orchestrator", f"Task: {TICKET}")
+        _git(project, "checkout", "-q", "main")
+        _commit(project, "README.md", "Role: orchestrator", f"Task: {TICKET}")
+        if role == "orchestrator":
+            assert _check(project, lambda: _git(
+                project, "merge", "-q", "--no-ff", "-m", "merge", "more"),
+                role=role) == ("", findings)
 
 
 def test_read_merge_reads_the_other_parents_of_an_octopus_against_each_other(tmp_path):
