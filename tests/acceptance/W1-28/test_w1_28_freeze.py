@@ -1,4 +1,4 @@
-"""KPI success 1 [CAP-05.a] and both failure lines.
+"""KPI success 1 [CAP-05.a] and both failure lines; "a plain pause writes no record" of KPI success 3 [CAP-05.d].
 
 "gov pause sets the freeze flag and the next write by any role is denied; gov
 pause --off clears it." Failure: "A write succeeds while paused", "The flag
@@ -10,7 +10,8 @@ asked, as W1-02's suite asks it, before the pause, while paused and after
 ``--off``. CAP-05's acceptance line adds that ``git status --porcelain`` is
 unchanged by the denied writes.
 
-Every pause here is the owner's (``w1_28_support.pause``, DP-3).
+Every pause and every ``--off`` here is the owner's: a call with no
+``GOV_ROLE`` (DEC-365).
 """
 
 from __future__ import annotations
@@ -72,8 +73,11 @@ def test_git_status_is_unchanged_by_the_denied_writes(paused, sandbox):
 
 def test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else(project, sandbox, pause,
                                                                                  interface):
-    """Failure 2. The command runs from another directory: the flag follows ``--root``, not the caller."""
-    skip = (".git", support.RUNTIME_REL, support.TICKETS_REL)  # a record may be written in a ticket (DP-6)
+    """Failure 2. The command runs from another directory: the flag follows ``--root``, not the caller.
+
+    A plain pause writes nothing but the flag: the ticket files are compared too (DEC-367).
+    """
+    skip = (".git", support.RUNTIME_REL)
     before = {"project": cli_support.snapshot(project, skip=skip),
               "home": cli_support.snapshot(sandbox.home, skip=()),
               "elsewhere": cli_support.snapshot(sandbox.elsewhere, skip=())}
@@ -97,3 +101,13 @@ def test_the_flag_is_not_seen_by_git(paused):
     """The runtime directory is derived state, ignored by git: a pause adds no flag to ``git status``."""
     assert support.FREEZE_FLAG_REL not in support.porcelain(paused), support.porcelain(paused)
     assert support.RUNTIME_REL + "/" not in support.porcelain(paused), support.porcelain(paused)
+
+
+def test_a_plain_pause_writes_no_record(project, pause, interface, claims):
+    """DEC-367: no commit and no change to a ticket file, even with claims held. The claims stay held."""
+    before, tickets = support.head(project), support.ticket_files(project)
+    support.succeeded(pause(), interface)
+    assert support.head(project) == before, "a plain gov pause made a commit"
+    assert support.ticket_files(project) == tickets, "a plain gov pause changed a ticket file"
+    assert support.porcelain(project) == "", f"a plain gov pause left changes:\n{support.porcelain(project)}"
+    assert support.locks(project) == sorted(claims), "a plain gov pause released a claim"

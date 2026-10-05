@@ -1,6 +1,6 @@
 """``gov pause`` is a built command with the three options the KPI lines name.
 
-KPI success 1 and 3 name the forms: ``gov pause``, ``gov pause --off``,
+KPI success 1 and 2 name the forms: ``gov pause``, ``gov pause --off``,
 ``gov pause --cancel-agents`` and ``gov pause --rollback <ticket>``. The
 command is the module ``src/gov/pause/command.py`` (DEC-317), which declares
 its arguments, so a missing ticket is argparse's usage error (exit code 2,
@@ -8,7 +8,8 @@ its arguments, so a missing ticket is argparse's usage error (exit code 2,
 
 These cases do not need the ``built`` fixture: they are the ones that fail
 with the command's own answer while it is not built. None can pause anything:
-the first is a worker's call, the others never reach the handler.
+the first is a worker's call (``GOV_ROLE=engineer``, DEC-365), the others
+never reach the handler.
 """
 
 from __future__ import annotations
@@ -24,6 +25,7 @@ def test_gov_pause_is_no_longer_answered_as_not_implemented(raw_project, sandbox
     code = (envelope.get("error") or {}).get("code")
     assert code not in (support.NOT_IMPLEMENTED, support.MODULE_INVALID), \
         f"gov pause is not built: it answers {code}\n{run.describe()}"
+    assert not support.is_paused(raw_project), "a worker's gov pause paused the project"
 
 
 @pytest.mark.parametrize("option", ["--off", "--cancel-agents", "--rollback"])

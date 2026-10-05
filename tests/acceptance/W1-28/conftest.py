@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import stat
 import sys
 from pathlib import Path
 
@@ -21,12 +22,31 @@ def pytest_configure(config):
 
 @pytest.fixture(autouse=True)
 def this_repository_is_never_paused():
-    """The freeze flag of this worktree is the owner's: no test sets it, and none clears it."""
+    """The freeze flag of this worktree is the owner's: no test sets it, and none clears it.
+
+    In a launched worker session the OS sandbox shows the flag's path as a
+    character device (its deny rule on the flag, DEC-311, binds ``/dev/null``
+    there) whether or not a flag exists. That placeholder is not a flag and
+    nothing can be written through it; anything else at the path is one.
+    """
     real = support.REPO_ROOT / support.FREEZE_FLAG_REL
-    assert not os.path.lexists(real), f"{real} exists: this worktree is frozen; the tests do not run on it"
+    before = _flag_state(real)
+    assert before in (None, "sandbox placeholder"), \
+        f"{real} exists: this worktree is frozen; the tests do not run on it"
     yield
-    assert not os.path.lexists(real), \
-        f"{real} exists after the test: gov pause wrote outside its --root. The owner removes the flag, not a test."
+    assert _flag_state(real) == before, \
+        f"{real} changed during the test: gov pause wrote outside its --root. The owner removes the flag, not a test."
+
+
+def _flag_state(path):
+    """None when nothing is at ``path``; "sandbox placeholder" for a character device; else what is there."""
+    try:
+        status = os.lstat(path)
+    except FileNotFoundError:
+        return None
+    if stat.S_ISCHR(status.st_mode):
+        return "sandbox placeholder"
+    return (status.st_mode, status.st_ino, status.st_size, status.st_mtime_ns)
 
 
 @pytest.fixture(scope="session")
@@ -57,8 +77,8 @@ def raw_project(hook, tmp_path):
 def built(hook, tmp_path_factory):
     """``gov pause`` is built. Until then every test of its behaviour fails here.
 
-    The probe is a worker's call on a throw-away project: a built command
-    refuses it, so it pauses nothing.
+    The probe is a worker's call (``GOV_ROLE=engineer``) on a throw-away
+    project: a built command refuses it, so it pauses nothing.
     """
     base = tmp_path_factory.mktemp("w1-28-built")
     run = support.pause(support.make_project(base / "project"), cli_support.make_sandbox(base / "sandbox"),
@@ -76,10 +96,13 @@ def project(built, raw_project):
 
 @pytest.fixture()
 def pause(project, sandbox):
-    """``pause(*args, role="owner", cwd=None)`` runs ``gov pause <args> --json`` on this test's project."""
+    """``pause(*args, role=None, flag_role=None, cwd=None)`` runs ``gov pause <args> --json`` on this test's project.
 
-    def _pause(*args, role=support.OWNER, cwd=None):
-        return support.pause(project, sandbox, *args, role=role, cwd=cwd)
+    ``role`` is the command's ``GOV_ROLE``; None is the owner, who has none (DEC-365).
+    """
+
+    def _pause(*args, role=support.OWNER, flag_role=None, cwd=None):
+        return support.pause(project, sandbox, *args, role=role, flag_role=flag_role, cwd=cwd)
 
     return _pause
 

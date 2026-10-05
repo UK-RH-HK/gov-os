@@ -1,11 +1,11 @@
-"""KPI success 4, second clause [CAP-05.d, "deterministic"]: "give the same result on repeat".
+"""KPI success 3, "give the same result on repeat" [CAP-05.d, "deterministic"].
 
-Read as a statement about state (decision package DP-7): a repeat succeeds as
-the first run did, and leaves the project as the first run left it. Whether
-the two ``result`` objects are equal field by field is not asserted.
+DEC-357: the same state. A repeat succeeds and leaves the project as the first
+run left it; the two ``result`` objects need not be equal field for field.
 
 The repeats of ``--cancel-agents`` and ``--rollback`` are with their own
-cases, in ``test_w1_28_cancel.py`` and ``test_w1_28_rollback.py``.
+cases, in ``test_w1_28_cancel.py`` and ``test_w1_28_rollback.py``. Every call
+here is the owner's (no ``GOV_ROLE``, DEC-365).
 """
 
 from __future__ import annotations

@@ -1,18 +1,26 @@
-"""KPI success 3, first half [CAP-05.b], with the record of KPI success 4 [CAP-05.d].
+"""KPI success 2, first half [CAP-05.b], with the record and the repeat of KPI success 3 [CAP-05.d].
 
 "gov pause --cancel-agents releases every claim and records the cancelled
 sessions" (CANCEL_AGENTS).
 
 A claim is the lock ``.tickets/.claims/<ticket id>`` naming its holder, by
 convention ``<role>:<session>`` (DEC-292, ``gov.tasks``). The claims are made
-and read through ``gov.tasks``. The command cannot stop a process: what it
-leaves is that no lock is held, and a record of who held each.
+and read through ``gov.tasks``.
 
-Decision packages: where the record is written and its shape are DP-6. These
-cases follow its recommended option in the weakest form: the holder of a
-released claim is named in the command's result and in that ticket's file.
-Whether a ticket's ``status`` changes (DP-4) and whether ``--cancel-agents``
-also sets the flag (DP-8) are asserted nowhere.
+- **DEC-357.** The command releases the locks and nothing else: no ticket's
+  ``status`` changes. It cannot stop a process.
+- **DEC-368.** It also sets the freeze flag.
+- **DEC-367.** The record is a commit to the ticket file, with the trailers
+  ``Task: <ticket>`` and ``Reverts-Task: <ticket>``. For each ticket whose
+  claim was released, the command makes a commit that changes that ticket's
+  file and carries both trailers with that ticket's id; the file then names
+  the session that held the claim. Whether two released tickets share one
+  commit is decision package DP-9: these cases hold either way.
+- **The result** lists what was released as ``cancelled``, each entry with the
+  ``ticket`` and its ``holder`` (the shape ``gov.tasks.release`` returns).
+- **On repeat** (DEC-357) nothing is held any more: the repeat succeeds and
+  leaves the project as the first run did, so it makes no commit. A first run
+  that finds no claim is in the same position.
 """
 
 from __future__ import annotations
@@ -20,48 +28,97 @@ from __future__ import annotations
 import w1_28_support as support
 
 
+def _cancel(pause, interface):
+    return support.succeeded(pause("--cancel-agents"), interface)
+
+
 def test_cancel_agents_releases_every_claim(project, sandbox, pause, interface, claims):
     assert support.locks(project) == sorted(claims), "the fixture claims were not made"
-    support.succeeded(pause("--cancel-agents"), interface)
+    _cancel(pause, interface)
     for ticket in claims:
         assert support.tasks(project, sandbox, "holder", ticket) is None, f"{ticket} is still claimed"
     assert support.locks(project) == [], f"locks are left in {support.CLAIMS_REL}: {support.locks(project)}"
 
 
 def test_a_released_ticket_can_be_claimed_again(project, sandbox, pause, interface, claims):
-    support.succeeded(pause("--cancel-agents"), interface)
+    _cancel(pause, interface)
     again = support.tasks(project, sandbox, "claim", support.TICKET, "engineer:w1-28-session-c")
     assert again == {"ticket": support.TICKET, "holder": "engineer:w1-28-session-c"}, again
 
 
 def test_the_result_names_each_cancelled_session(pause, interface, claims):
-    said = support.text_of(support.succeeded(pause("--cancel-agents"), interface))
-    for ticket, holder in claims.items():
-        assert ticket in said, f"the result does not name the ticket {ticket}: {said}"
-        assert holder in said, f"the result does not name the cancelled session {holder}: {said}"
+    result = _cancel(pause, interface)
+    cancelled = support.listed(result, "cancelled")
+    found = sorted((entry.get("ticket"), entry.get("holder")) for entry in cancelled if isinstance(entry, dict))
+    assert found == sorted(claims.items()), f"`cancelled` is not the released claims, each once: {cancelled}"
+
+
+def test_cancel_agents_sets_the_freeze_flag(project, sandbox, pause, interface, claims):
+    """DEC-368. A session whose claim was released keeps running: the guard now denies its writes."""
+    assert not support.is_paused(project)
+    _cancel(pause, interface)
+    assert support.flag(project).is_file(), f"gov pause --cancel-agents did not set {support.FREEZE_FLAG_REL}"
+    support.assert_denied(support.guard_write(project, sandbox, support.ENGINEER), "after --cancel-agents, the write")
+
+
+def test_the_cancel_is_recorded_by_a_commit_to_each_ticket_file(project, pause, interface, claims):
+    """DEC-367. The commit is made while the freeze the same call set is in force (DEC-368)."""
+    before = support.head(project)
+    _cancel(pause, interface)
+    made = support.new_commits(project, before)
+    assert made, "gov pause --cancel-agents made no commit: the cancel is not recorded"
+    for ticket in claims:
+        rel = support.ticket_rel(ticket)
+        records = [commit for commit in made if rel in support.changed_paths(project, commit)]
+        assert records, f"no commit of the cancel changes {rel}"
+        for commit in records:
+            for key in ("Task", "Reverts-Task"):
+                assert ticket in support.trailers(project, commit, key), \
+                    f"the commit {commit[:support.SHORT]} to {rel} has no trailer `{key}: {ticket}`:\n" \
+                    f"{support.message(project, commit)}"
+    allowed = {support.ticket_rel(ticket) for ticket in claims}
+    for commit in made:
+        outside = sorted(set(support.changed_paths(project, commit)) - allowed)
+        assert not outside, f"the commit {commit[:support.SHORT]} of the cancel changes {outside}"
+    assert support.porcelain(project) == "", f"the cancel left uncommitted changes:\n{support.porcelain(project)}"
+    assert support.is_paused(project)
 
 
 def test_each_cancelled_session_is_recorded_in_its_ticket(project, pause, interface, claims):
-    """DP-6, recommended option: the record is in the ticket's file."""
+    """KPI: "records the cancelled sessions". DEC-357: the ticket's status is not changed."""
     before = {ticket: support.ticket_file(project, ticket) for ticket in claims}
-    support.succeeded(pause("--cancel-agents"), interface)
+    _cancel(pause, interface)
     for ticket, holder in claims.items():
-        text = support.ticket_file(project, ticket)
-        assert text != before[ticket], f".tickets/{ticket}.md is unchanged: nothing was recorded in the ticket"
-        assert holder in text, f".tickets/{ticket}.md does not name the cancelled session {holder}"
+        text = support.committed(project, support.ticket_rel(ticket))
+        assert text != before[ticket], f"{support.ticket_rel(ticket)} is unchanged in HEAD: nothing was recorded"
+        assert holder in text, f"{support.ticket_rel(ticket)} does not name the cancelled session {holder}"
         other = next(name for name in claims.values() if name != holder)
-        assert other not in text, f".tickets/{ticket}.md names {other}, which held another ticket"
+        assert other not in text, f"{support.ticket_rel(ticket)} names {other}, which held another ticket"
+        assert support.status_line(text) == support.status_line(before[ticket]), \
+            f"the cancel changed the status of {ticket}: {support.status_line(text)}"
 
 
 def test_cancel_agents_with_no_claim_succeeds_and_releases_nothing(project, pause, interface):
-    support.succeeded(pause("--cancel-agents"), interface)
+    """Nothing is released, so nothing is recorded; the freeze is set all the same (DEC-368)."""
+    before, tickets = support.head(project), support.ticket_files(project)
+    result = _cancel(pause, interface)
+    assert support.listed(result, "cancelled") == []
     assert support.locks(project) == []
+    assert support.head(project) == before, "a cancel that released nothing made a commit"
+    assert support.ticket_files(project) == tickets, "a cancel that released nothing changed a ticket file"
+    assert support.is_paused(project), f"gov pause --cancel-agents did not set {support.FREEZE_FLAG_REL}"
 
 
 def test_cancel_agents_gives_the_same_result_on_repeat(project, sandbox, pause, interface, claims):
-    """KPI success 4, "the same result on repeat" (DP-7: the state after the repeat is the state after the first)."""
-    support.succeeded(pause("--cancel-agents"), interface)
-    support.succeeded(pause("--cancel-agents"), interface)
+    """DEC-357: the repeat succeeds and leaves the project as the first run did."""
+    _cancel(pause, interface)
+    after, tickets = support.head(project), support.ticket_files(project)
+    result = _cancel(pause, interface)
+    assert support.listed(result, "cancelled") == [], f"the repeat released something: {result}"
     assert support.locks(project) == [], f"claims after the repeat: {support.locks(project)}"
     for ticket in claims:
         assert support.tasks(project, sandbox, "holder", ticket) is None, f"{ticket} is claimed after the repeat"
+    assert support.head(project) == after, "the repeat made a commit"
+    assert support.ticket_files(project) == tickets, "the repeat changed a ticket file"
+    assert support.porcelain(project) == "", f"the repeat left changes:\n{support.porcelain(project)}"
+    assert support.is_paused(project), "the repeat cleared the flag"
