@@ -27,6 +27,7 @@ allowed_paths:
 - tests/unit/guard/**
 - tests/unit/pause/**
 - tests/unit/launch/**
+- tests/unit/install/**
 kpis:
   success:
   - A freeze flag set by gov pause carries a marker line; the guard treats an empty file, or one without the marker, at the flag's path as no freeze and records its presence (DEC-402)
