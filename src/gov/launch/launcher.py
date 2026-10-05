@@ -27,10 +27,11 @@ from gov.guard.decide import ACCEPTANCE, FREEZE_FLAG, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 
-WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research")
+# DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
+WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
 # Open package DP-8: these roles need a ticket whose ``role`` is their own; the
 # two independent roles may be launched on any ``in_progress`` ticket.
-OWN_TICKET_ROLES = frozenset({"engineer", "research"})
+OWN_TICKET_ROLES = frozenset({"engineer", "research", "product-spec"})
 CLI_REL = ".local/bin/claude"
 REPO_SETTINGS = (".claude/settings.json", ".claude/settings.local.json")
 RUNTIME, SCRATCH = ".gov-runtime", "scratch"

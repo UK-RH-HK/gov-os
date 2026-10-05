@@ -44,6 +44,22 @@ def session(tmp_path, monkeypatch):
     return _session
 
 
+def test_the_product_spec_settings_are_strict_with_no_host_and_the_workers_deny_rules(tmp_path):
+    built = launcher.build_settings(tmp_path, "product-spec", "TST-a001")
+    assert launcher.sandbox_faults(built) == [] and built["sandbox"]["network"]["allowedDomains"] == []
+    assert built["permissions"]["deny"] == launcher.build_settings(tmp_path, "engineer", "TST-a001")["permissions"]["deny"]
+
+
+@pytest.mark.parametrize("ticket_role, refused", (("product-spec", False), ("engineer", True), (None, True)))
+def test_product_spec_is_held_to_a_ticket_of_its_own(monkeypatch, tmp_path, ticket_role, refused):
+    monkeypatch.setattr(launcher, "_load_ticket", lambda root, tid: {"status": "in_progress", "role": ticket_role})
+    if refused:
+        with pytest.raises(GovError):
+            launcher._check_ticket(tmp_path, "product-spec", "TST-a001")
+    else:
+        launcher._check_ticket(tmp_path, "product-spec", "TST-a001")
+
+
 def _interrupted(folder):
     raise KeyboardInterrupt
 
