@@ -4384,3 +4384,69 @@ The owner was told on 2026-10-05.
 | Version | Date | Change |
 |---|---|---|
 | 0.98 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-410 (W1-50 DP-21 to DP-28: a merge commit's own change to a ticket file or an acceptance test is a finding whatever its trailers; a test both sides changed is the merge commit's own; 24 parents at most; `brought` is the complement of `own`). |
+
+## 99. Owner answers and decisions of 2026-10-06 (register v0.99, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-06, after the W1-50 freeze branch's second round, W1-50's sixth round and W1-19's
+fourth round.
+
+### DEC-411 — DEC-409 amends DEC-365, not DEC-367
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** owner answer · **Under:** DEC-409
+- **Decision:** DEC-409 amends DEC-365 (the W1-28 DP-3 answer). DEC-367 stays unchanged.
+
+### DEC-412 — W1-50 DP-F6: the freeze branch is rebuilt; rewriting an unpushed ticket branch is allowed
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-50 freeze branch package DP-F6 option (a) · **Under:** DEC-410, DEC-235
+- **Decision:**
+  - The freeze branch is rebuilt: a test designer aligns `tests/acceptance/W1-07/w1_07_support.py` first, then
+    `w1/integrate` is merged and the four commits are cherry-picked.
+  - Rewriting an unpushed ticket branch is allowed. "Never rebase" protects shared history: `main` and
+    `w1/integrate`.
+  - The old branch is kept until the new one verifies, then deleted.
+  - It is done once, after W1-50's main branch merges, in the round that builds DEC-409.
+  - The freeze branch's choices no decision pinned are fine as built: the error codes `PAUSE_RUNTIME_LINKED`,
+    `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
+
+### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220
+- **Decision:**
+  - A FULL ticket has at most two review rounds.
+  - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
+    files in shapes that ordinary work produces. Everything else becomes a residual.
+  - A fail-open that remains after the second round comes to the owner as a decision package, not as a third
+    round.
+  - W1-50 keeps its seventh round, whose stop rule (the same two kinds) is confirmed. If that round still finds a
+    fail-open, no eighth round starts: it comes to the owner as a decision package, with the option of accepting
+    it as a residual.
+
+### DEC-414 — W1-19 DP-12, DP-11 and DP-13: the pass line is 80 on the dev tiers; the parent-bounded chunks stay; no ranked lexical route in W1-19; the retrieval instruction stays
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-19 packages DP-12 option (b), DP-11, DP-13 option (a) · **Amends:** W1-19's second KPI line · **Under:** DEC-343, DEC-406, DEC-388
+- **Decision:**
+  - DP-12: the parent-bounded chunks stay (DEC-343). The KPI line is restated: mean hit@5 at or above 80 on the
+    dev tiers is the pass line; 85 (the S0b2 baseline) is re-measured at the Wave 1 exit run (W1-42) and at
+    qualification.
+  - The miss of query `DQ-B-03` and R1's whole-file chunking are recorded as residuals.
+  - A test designer revises the baseline case; then W1-19 is merged and closed.
+  - DP-11: not in W1-19. "A ranked lexical route for exact identifiers" is a backlog item for W1-17's area, for a
+    later wave.
+  - DP-13: the embedding model's retrieval instruction on the question stays.
+
+### DEC-415 — Early test design
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** the READY rule for test design only · **Under:** DEC-235, DEC-069
+- **Decision:**
+  - When every dependency of a ticket is built and green on its branch (merged or not, closed or not), the
+    orchestrator may claim that ticket, create its worktree and run its test design.
+  - Its engineer starts only after its dependencies are merged into `w1/integrate`.
+  - If a dependency changes its interface before merging, the test designer revises the tests, recorded as "owner
+    decision: early test design".
+
+### DEC-416 — Delegation widened for the rest of Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-220 · **Under:** DEC-220
+- **Decision:**
+  - The orchestrator may also decide P2 packages with medium-low confidence, when they are reversible and do not
+    touch the guard, containment, the launcher, scope, installs, the held-out path, merges into `main` or
+    releases.
+  - They are listed in the digest as before.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.99 | 2026-10-06 | Owner: DEC-411 (DEC-409 amends DEC-365, not DEC-367), DEC-412 (W1-50 DP-F6: the freeze branch is rebuilt; an unpushed ticket branch may be rewritten; unpinned choices fine as built), DEC-413 (at most two review rounds per FULL ticket; W1-50's round 7 stop rule), DEC-414 (W1-19: pass line 80 on the dev tiers, 85 re-measured at W1-42 and qualification; chunks stay; no ranked lexical route in W1-19; the instruction stays), DEC-415 (early test design), DEC-416 (delegation widened to P2 at medium-low confidence, with exclusions). |
