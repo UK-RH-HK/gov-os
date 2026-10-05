@@ -4208,3 +4208,29 @@ orchestrator. Where an answer leaves the ticket to the orchestrator, the choice 
 | Version | Date | Change |
 |---|---|---|
 | 0.93 | 2026-10-05 | Owner: DEC-395 (temp folders cleared; temp hygiene delegated), DEC-396 (W1-20 DP-5: `UNRESOLVED_IDS`; ADR-0002 §4 amended), DEC-397 (W1-19 installs approved; a fresh reranker environment), DEC-398 (W1-11 DP-6: merge-base rule, one helper shared with containment, criss-cross fails closed), DEC-399 (W1-28 DP-15), DEC-400 (W1-28 DP-12), DEC-401 (W1-50 DP-11 and DP-12 as built; DEC-394 accepted on a condition; DEC-388 and DEC-389 stand), DEC-402 (the freeze flag's marker; W1-50). |
+
+## 94. Delegated decision on W1-50's packages DP-19 and DP-20 (register v0.94, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule, on the two packages the W1-50
+(`DAEO-xnbx`) ticket lead returned after its fifth round. The owner's two conditions of DEC-401 passed in that round
+(criss-cross histories fail closed; a replay of 174 real merges flags none by mistake). Both options only make the
+check report more, are reversible before W1-11 uses the helper, and the lead's and the orchestrator's recommendations
+agree at medium confidence or higher. The owner was told on 2026-10-05.
+
+### DEC-403 — W1-50 DP-20 and DP-19: the merge helper reads every parent; an octopus with a crossing parent fails closed
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-50 packages DP-20 option (a), confidence medium-high, and DP-19 option (a), confidence medium; the fourth reviewer's finding F1 (seven merge shapes that undo acceptance tests silently) · **Amends:** DEC-394, DEC-398 ("against its first parent") · **Under:** CAP-58, DEC-269, DEC-401
+- **Decision:**
+  - DP-20: the one helper that reads a merge (`gov.guard.containment_merge.read_merge`) reads every parent the way
+    it reads the first. A path where the merge commit's content differs from any parent's is the merge commit's own
+    change, unless another parent brought it by the three-way rule: that parent's content differs from the merge
+    base and the merge commit has that parent's content. So a merge that keeps one parent's content and drops what
+    another parent changed is judged. With several merge bases, or none, every path that differs from any parent is
+    the merge commit's own change.
+  - DP-19: an octopus merge in which one other parent has several merge bases, or none, with the first parent fails
+    closed as a whole. An octopus whose other parents cross only each other is read parent by parent.
+  - The helper raises a public error, and refuses a `commit` argument that is not a commit id.
+  - The owner's conditions of DEC-401 are run again on this rule before the branch is merged.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.94 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-403 (W1-50 DP-20: the merge helper reads every parent, so a merge that drops a parent's change is judged; DP-19: an octopus merge with a crossing parent fails closed as a whole). |
