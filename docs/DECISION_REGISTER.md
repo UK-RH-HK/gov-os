@@ -3941,3 +3941,42 @@ and goes to the owner.
 | Version | Date | Change |
 |---|---|---|
 | 0.86 | 2026-10-05 | Delegated under DEC-220 (stricter-only): DEC-387 (W1-11 DP-5: unreadable frontmatter is a finding; DP-7: replace refs off; the checker's interface as built). W1-11 DP-6 goes to the owner. |
+
+## 87. Delegated decisions on W1-19's packages DP-8 and DP-9, and W1-16's UI switch as built (register v0.87, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-05 under DEC-220 and its stricter-only rule. Each is reversible, the test
+designer's, the lead's and the orchestrator's recommendations agree, and the confidence is medium or higher. The
+owner was told of all three on 2026-10-05 and may reverse any of them.
+
+### DEC-388 — W1-19 DP-8 and DP-9: an unknown `embedding_policy` is not embedded; hit@5 follows S0b2's stated method
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-05) · **Basis:** W1-19 packages DP-8 option (a), confidence medium-high, and DP-9 option (a), confidence medium · **Under:** DEC-380, DEC-381, DEC-383, CAP-09
+- **Decision:**
+  - DP-8: the closed list of `embedding_policy` values is `embedded` and `not embedded`. Any other value is read as
+    not embedded (fail closed). This repository's path map gives `template/**` the value
+    `embedded, except vendored code`, so `template/**` is found by the lexical route only. Giving the vendored paths
+    their own namespace, so that the rest of `template/**` can say `embedded`, is a follow-up for whoever wants it
+    embedded; it is a path map edit outside W1-19's paths.
+  - DP-9: `~/gov-os-workbench/s0b2/out/RESULTS.md` states S0b2's method ("each candidate's top-5 distinct paths per
+    query against `must_cite` / `must_not_cite`", over "52 queries, ten classes", "Mean of ten classes | 85.0"), so
+    under DEC-380 mean hit@5 is scored per class, as the mean of the ten classes, over all 52 queries. The two
+    queries with no gold path (`DQ-A-21`, `DQ-A-24`) count as misses, which caps the mean at 96.3 and matches S0b2's
+    figures for their two classes. DEC-380's fallback (leave them out; per tier) does not apply, because the method
+    is stated.
+  - Also stricter than DEC-381 states, accepted as built: a path in several namespaces is embedded only if every
+    one says `embedded`; a path in no namespace is not embedded.
+
+### DEC-389 — W1-16: the wrapper turns the UI off with `config set ui_enabled false`, not `--ui=false`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-05; the purpose of DEC-362 is unchanged) · **Basis:** the W1-16 ticket lead's fourth round; observed on codebase-memory-mcp 0.11.0 · **Amends:** DEC-362 (the mechanism only) · **Under:** DEC-083, CAP-09
+- **Decision:**
+  - `--ui=false` does nothing on the `cli` calls the wrapper makes, and the server form serves the UI once while it
+    persists the switch. The wrapper therefore runs `codebase-memory-mcp config set ui_enabled false` in the
+    repository's home before every `cli` call; if that fails, the call raises and the tool is not run.
+  - The acceptance tests assert the outcome (no `ui.serving` line, nothing listening on the UI port, the setting
+    `false`; a caller's environment or argument cannot turn it back on), not the argument.
+  - The tool persists `{"ui_enabled": false, "ui_port": 9749}` in
+    `<repository>/.gov-runtime/codeintel/home/config.json`. This is recorded in the tool registry's note for
+    codebase-memory-mcp. `~/.cache/codebase-memory-mcp` is not changed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.87 | 2026-10-05 | Delegated under DEC-220: DEC-388 (W1-19 DP-8: an unknown `embedding_policy` is not embedded; DP-9: hit@5 per class over 52 queries, as S0b2 states), DEC-389 (W1-16: the UI is turned off with `config set ui_enabled false`; amends the mechanism of DEC-362). |
