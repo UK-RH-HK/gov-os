@@ -112,8 +112,28 @@ def git(project, *args, check=True):
     return done.stdout
 
 
+def strip_held_out_rules(project):
+    """Leave the ``Read`` deny rules with an absolute path out of the copied settings file (owner decision, DEC-399).
+
+    As W1-46's and W1-47's fixtures do it: no temporary project carries a
+    held-out path. Nothing else of the file changes, and no rule is shown.
+    """
+    path = Path(project) / ".claude" / "settings.json"
+    if not path.is_file() or path.is_symlink():
+        return
+    copied = json.loads(path.read_text(encoding="utf-8"))
+    permissions = copied.get("permissions") if isinstance(copied, dict) else None
+    if isinstance(permissions, dict) and isinstance(permissions.get("deny"), list):
+        permissions["deny"] = [rule for rule in permissions["deny"]
+                               if not (isinstance(rule, str) and rule.replace(" ", "").startswith("Read(//"))]
+        path.write_text(json.dumps(copied, indent=2) + "\n", encoding="utf-8")
+
+
 def copy_working_tree(destination, root=REPO_ROOT):
-    """Copy the repository's working tree (tracked files and untracked, unignored ones) and commit it."""
+    """Copy the repository's working tree (tracked files and untracked, unignored ones) and commit it.
+
+    The settings file is copied without the held-out deny rules (DEC-399).
+    """
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     listing = subprocess.run(
@@ -132,6 +152,7 @@ def copy_working_tree(destination, root=REPO_ROOT):
             target.symlink_to(os.readlink(source))
         else:
             shutil.copy2(source, target)
+    strip_held_out_rules(destination)
     git(destination, "init", "-q", "-b", "main")
     git(destination, "add", "-A")
     git(destination, "commit", "-q", "-m", "copy of the working tree")

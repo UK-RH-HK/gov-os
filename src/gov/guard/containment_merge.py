@@ -80,10 +80,11 @@ def read_merge(root: str, commit: str) -> MergeReading:
     from a parent's, the first or any other, and no other parent brought
     it against that parent.  So it holds what the merge commit changes
     beyond its parents and also the paths where it drops a parent's
-    change.  Under ``tests/acceptance/**`` it also holds every path that
-    two parents both changed against their one merge base, whichever
-    side's content the merge commit holds, also when both made the same
-    change and the path differs from no parent (DEC-410, DP-24).
+    change.  Under ``tests/acceptance/**`` and ``.tickets/**`` it also
+    holds every path that two parents both changed against their one merge
+    base, whichever side's content the merge commit holds, also when both
+    made the same change and the path differs from no parent (DEC-410,
+    DP-24; DEC-421).
 
     ``brought`` is the complement of ``own`` over every parent (DEC-410,
     DP-22): every path where the merge commit's content differs from
@@ -138,7 +139,7 @@ def read_merge(root: str, commit: str) -> MergeReading:
     every = set().union(*differs.values())
     # For each parent, the paths another parent brought against it.
     brought = {p: set() for p in parents}
-    # DEC-410, DP-24: the acceptance tests two parents both changed.
+    # DEC-410, DP-24; DEC-421: the acceptance tests and ticket files two parents both changed.
     own: set = set()
     # The pairs with the first parent come first.
     for a, b in combinations(parents, 2):
@@ -148,7 +149,7 @@ def read_merge(root: str, commit: str) -> MergeReading:
             brought[a] |= changed(bases[0], b) - differs[b]
             brought[b] |= changed(bases[0], a) - differs[a]
             own |= {p for p in changed(bases[0], a) & changed(bases[0], b)
-                    if p.startswith(ACCEPTANCE + "/")}
+                    if p.startswith(ACCEPTANCE + "/") or p.startswith(".tickets/")}
         elif a == first:
             return MergeReading(sorted(every), [])
     own = own.union(*(differs[p] - brought[p] for p in parents))

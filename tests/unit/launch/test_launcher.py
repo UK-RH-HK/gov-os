@@ -56,7 +56,16 @@ def test_the_runtime_rules_name_the_entries_that_exist_at_launch(tmp_path):
     for name in ("records.jsonl", "snapshots", "scratch"):
         (tmp_path / ".gov-runtime" / name).mkdir(parents=True)
     names = _names(tmp_path)
-    assert {"records.jsonl", "snapshots", "freeze"} <= set(names) and "scratch" not in names
+    assert {"records.jsonl", "snapshots"} <= set(names) and "scratch" not in names
+
+
+def test_the_runtime_rules_name_the_freeze_flag_only_when_it_exists_at_launch(tmp_path):
+    """DEC-402: a denied name that does not exist gets a placeholder from the sandbox."""
+    assert "freeze" not in _names(tmp_path)
+    (tmp_path / ".gov-runtime").mkdir()
+    assert "freeze" not in _names(tmp_path)
+    (tmp_path / ".gov-runtime" / "freeze").write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
+    assert "freeze" in _names(tmp_path)
 
 
 @pytest.mark.parametrize("entry, valid", (

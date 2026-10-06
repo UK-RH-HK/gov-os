@@ -19,11 +19,13 @@ from __future__ import annotations
 import json
 import os
 import select
+import stat
 import sys
 import time
 
 STDIN_DEADLINE_S = 3.0
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
+RECORDS_REL = ".gov-runtime/records.jsonl"
 
 
 def _append_finding(project_root: str, finding: dict) -> None:
@@ -32,6 +34,45 @@ def _append_finding(project_root: str, finding: dict) -> None:
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "a", encoding="utf-8") as f:
             f.write(json.dumps(finding, separators=(",", ":")) + "\n")
+    except Exception:
+        pass
+
+
+def _record_unmarked_flag(project_root: str, data: dict, flag: str) -> None:
+    """Record an unmarked presence at the freeze flag's path (DEC-402).
+
+    One line in ``records.jsonl`` in DEC-177's form.  An observation:
+    it must not block or fail the call.  The hook runs outside the
+    sandbox, so the line goes only to a regular file in a real
+    ``.gov-runtime/``: no link is followed and nothing is opened that
+    could hold the hook (a named pipe).
+    """
+    try:
+        path = os.path.join(project_root, RECORDS_REL)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        if os.path.islink(os.path.dirname(path)):
+            return
+        record = {
+            "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "session_id": data.get("session_id", ""),
+            "agent_type": data.get("agent_type") or "",
+            "role": os.environ.get("GOV_ROLE") or "",
+            "ticket": os.environ.get("GOV_TICKET") or "",
+            "tool": data.get("tool_name", ""),
+            "command": data["tool_input"].get("command", ""),
+            "paths": [flag],
+            "action": "recorded",
+            "reason": "something without the freeze marker is at the "
+                      "freeze flag's path: no freeze",
+        }
+        line = json.dumps(record, separators=(",", ":")) + "\n"
+        fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT
+                     | os.O_NOFOLLOW | os.O_NONBLOCK, 0o666)
+        try:
+            if stat.S_ISREG(os.fstat(fd).st_mode):
+                os.write(fd, line.encode("utf-8"))
+        finally:
+            os.close(fd)
     except Exception:
         pass
 
@@ -97,8 +138,11 @@ def _allow() -> None:
     sys.exit(0)
 
 
-def _take_snapshot(project_root: str, data: dict) -> None:
+def _take_snapshot(project_root: str, data: dict, flag: str) -> None:
     """Take a before-snapshot for the containment check (DEC-126).
+
+    *flag* is the one reading of the freeze flag (DEC-402): the
+    snapshot remembers a freeze from it (DEC-407).
 
     Called when the guard lets a Bash call through.  Snapshot failure
     in a non-git directory does not block the call.  Any other failure
@@ -111,7 +155,7 @@ def _take_snapshot(project_root: str, data: dict) -> None:
         from gov.guard.containment import take_snapshot
         take_snapshot(project_root, tool_use_id,
                       session_id=data.get("session_id", ""),
-                      agent_id=data.get("agent_id", ""))
+                      agent_id=data.get("agent_id", ""), flag=flag)
     except Exception as exc:
         # Snapshot failure must not go unnoticed (but does not block).
         _append_finding(project_root, {
@@ -190,7 +234,7 @@ def main() -> None:
               session_id=session_id, tool_name=tool_name)
 
     try:
-        from gov.guard.decide import decide, FREEZE_FLAG
+        from gov.guard.decide import decide, freeze_state, FREEZE_FLAG
     except Exception as exc:
         session_id = data.get("session_id", "")
         _fail(project_root, "import_error", f"cannot import guard logic: {exc}",
@@ -202,6 +246,9 @@ def main() -> None:
     subagent_type = data.get("agent_type")
 
     try:
+        # DEC-402: the flag is read once, for the decision and for the
+        # install rule.
+        flag = freeze_state(project_root)
         decision, reason = decide(
             tool_name=tool_name,
             tool_input=tool_input,
@@ -210,11 +257,18 @@ def main() -> None:
             ticket_id=ticket_id,
             subagent_type=subagent_type,
             cwd=cwd,
+            flag=flag,
         )
     except Exception as exc:
         session_id = data.get("session_id", "")
         _fail(project_root, "decide_error", f"decision failed: {exc}",
               session_id=session_id, tool_name=tool_name)
+
+    def _record() -> None:
+        # DEC-402: an unmarked presence is recorded for a call that may
+        # write, once the call is known not to be denied.
+        if flag == "unmarked":
+            _record_unmarked_flag(project_root, data, FREEZE_FLAG)
 
     if decision == "deny":
         _deny(reason)
@@ -235,20 +289,22 @@ def main() -> None:
             if has_sudo(command):
                 _deny("sudo is denied to all agent roles (DEC-083)")
             elif has_install(command):
-                if os.path.exists(os.path.join(project_root, FREEZE_FLAG)):
+                if flag == "frozen":
                     _deny("frozen: install denied")
                 ar = acting_role(role, subagent_type)
                 if ar == "orchestrator":
                     # The owner may approve; take the before-snapshot
                     # so containment can run if the command executes.
-                    _take_snapshot(project_root, data)
+                    _record()
+                    _take_snapshot(project_root, data, flag)
                     _ask(f"install command requires owner approval "
                          f"(tool registry record required): {command}")
                 elif ar == "research" and install_in_experiment_folder(
                         command, cwd, project_root, ticket_id):
                     # DEC-163: the research role's one exception; the
                     # sandbox's write fence holds it to the folder.
-                    _take_snapshot(project_root, data)
+                    _record()
+                    _take_snapshot(project_root, data, flag)
                     _allow()
                 else:
                     _deny(
@@ -259,9 +315,11 @@ def main() -> None:
             else:
                 # Non-install Bash: take the before-snapshot (DEC-126)
                 # and allow.
-                _take_snapshot(project_root, data)
+                _record()
+                _take_snapshot(project_root, data, flag)
                 _allow()
         elif tool_name in ("Write", "Edit", "NotebookEdit"):
+            _record()
             _note_write_tool(project_root)
             _allow()
         else:

@@ -318,11 +318,11 @@ def test_rollback_on_a_dirty_tree_is_refused(project, pause, interface, history)
         f"a rollback refused for a dirty tree left no {support.FREEZE_FLAG_REL} (DEC-378)\n{run.describe()}"
 
 
-def test_a_failed_rollback_keeps_a_freeze_that_was_already_set(paused, pause, interface):
-    """DEC-378: "the flag stays whatever the rollback's result". Only the owner lifts it, with ``--off``."""
+def test_a_failed_rollback_keeps_a_freeze_that_was_already_set(paused, pause, lift, interface):
+    """DEC-378: "the flag stays whatever the rollback's result". Only the owner lifts it, in person (DEC-409)."""
     support.failed(pause("--rollback", support.UNKNOWN_TICKET), interface)
     assert support.is_paused(paused), "a failed rollback cleared a freeze that was set before it"
-    support.succeeded(pause("--off"), interface)
+    lift()
     assert not support.is_paused(paused), "the owner could not lift the freeze a failed rollback left"
 
 

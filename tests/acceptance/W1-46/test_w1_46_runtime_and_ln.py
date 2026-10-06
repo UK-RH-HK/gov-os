@@ -81,11 +81,15 @@ def test_each_name_under_gov_runtime_at_launch_has_a_literal_edit_deny_rule(laun
 
 
 @pytest.mark.parametrize("role", support.WORKER_ROLES)
-def test_the_freeze_flag_has_a_literal_rule_also_when_it_does_not_exist_at_launch(launch, project, sandbox, role):
+def test_the_freeze_flag_has_no_literal_rule_when_it_does_not_exist_at_launch(launch, project, sandbox, role):
+    """Owner decision DEC-402, amending DEC-311: the sandbox puts a placeholder at a denied name that does not exist.
+
+    A flag that exists at launch keeps its rule, as every name does: ``tests/acceptance/W1-50/``.
+    """
     assert not os.path.lexists(project / FREEZE), "the fixture project is frozen"
     result = launch(role)
-    assert _missing_literal_rules(result, project, sandbox, ["freeze"]) == [], (
-        f"no literal Edit deny rule names the freeze flag for a launched {role}; rules: "
+    assert _missing_literal_rules(result, project, sandbox, ["freeze"]) == ["freeze"], (
+        f"a literal Edit deny rule names the freeze flag, which does not exist, for a launched {role}; rules: "
         f"{support.deny_rules(result.settings(), 'Edit')}"
     )
 

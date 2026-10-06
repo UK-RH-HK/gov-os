@@ -187,7 +187,13 @@ def test_a_file_tool_write_outside_the_repository_is_refused(engineer):
 def test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable(engineer):
     """Success 10 (DEC-180): the freeze flag, the findings, the records, the snapshots; then scratch."""
     runtime = engineer.project / ".gov-runtime"
-    assert not (runtime / "freeze").exists(), "the session's Bash created the freeze flag"
+    # DEC-402, DEC-407 (package DP-F2, option a): what must not be there is a freeze the session's Bash made, a
+    # file the guard reads as frozen. An unmarked file there is no freeze. Read as ``freeze_state`` of
+    # ``src/gov/guard/decide.py`` reads it: the word, in any letter case, with the NUL bytes taken out; anything
+    # that is not a file counts as a freeze.
+    flag = runtime / "freeze"
+    made = flag.read_bytes() if flag.is_file() else (b"FROZEN" if os.path.lexists(flag) else b"")
+    assert b"FROZEN" not in made.replace(b"\x00", b"").upper(), "the session's Bash made a freeze"
     assert not (runtime / "snapshots" / f"{MARK}.json").exists(), "the session's Bash wrote into the snapshots"
     for name in ("findings.jsonl", "records.jsonl"):
         assert MARK not in (runtime / name).read_text(encoding="utf-8").splitlines(), (
