@@ -4487,3 +4487,40 @@ passed, `tests/unit` 760 passed, every other suite passed). The owner was told o
 | Version | Date | Change |
 |---|---|---|
 | 0.100 | 2026-10-06 | Delegated under DEC-220: DEC-417 (W1-50 DP-29, DP-30 and the bound of 3000 git processes per move, as built), DEC-418 (W1-11 DP-8: the checker reads the merge base itself where the helper found exactly one; fails closed where the helper does). |
+
+## 101. Delegated decisions on W1-21's packages DP-0, DP-1, DP-3, DP-6, DP-8 and DP-9 (register v0.101, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06 under DEC-220 and DEC-416, on six of the ten packages the W1-21
+(`DAEO-5x4l`) ticket lead returned after the test design (119 cases, all red, no engineer started). Each is
+reversible at low cost before W1-22 starts, and the designer's, the lead's and the orchestrator's recommendations
+agree. DP-2 (what a batch, a round and a continuation are, with the numbers), DP-4 (what marks a record superseded
+or must-not-cite), DP-5 (when a failure or lesson record matches a ticket's scope) and DP-7 (the retrieval-regression
+check's baselines) are the owner's. The owner was told on 2026-10-06, including that the lead ranked DP-0 and DP-1 as
+P1.
+
+### DEC-419 — W1-21: the command's path, the public interface, the bundle budget, the order of stopping reasons, facets as routes, one rerank over the merged set
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220 and DEC-416, 2026-10-06) · **Basis:** W1-21 packages DP-0 option (a), confidence high; DP-1 (a), medium-high; DP-3 (a), medium; DP-6 (a), medium; DP-8 (a), medium; DP-9 (a), high on one pass · **Under:** DEC-317, DEC-080, DEC-091, DEC-374, DEC-396, CAP-16, CAP-18, CAP-55
+- **Decision:**
+  - DP-0: `src/gov/retrieve/**` is added to W1-21's `allowed_paths`, in its own commit. It follows DEC-317: a `gov`
+    command is built by `src/gov/<name>/command.py`. The module is thin and calls `gov.retrieval.retrieve`.
+  - DP-1: the public interface is the one the test design fixes:
+    `gov.retrieval.retrieve.retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None,
+    bundle_budget=None, continuation=None, reranker=None)`, read-only, returning the bundle as a plain map with
+    the keys `stopping_reason`, `evidence`, `batches`, `merge`, `expansions`, `gaps`, `facets`, `budget` and
+    `continuation`; and `gov retrieve` with `--json`, `--root`, `--ticket`, `--id`, `--radius`, `--batch-size`,
+    `--bundle-budget`, `--continue` and the query. Exit 0 for any bundle, 1 for a bad token, 2 for a usage error.
+    A bundle with a continuation token never says `CLOSURE_COMPLETE` or `SATURATED`.
+  - DP-3: the bundle budget is counted in tokens of four characters and bounds parent expansion only; a child hit
+    is never dropped for it. Its default is DEC-004's packet ceiling until a decision gives another number.
+  - DP-6: when several stopping reasons apply the bundle carries the first of `FACET_UNAVAILABLE`,
+    `BUDGET_EXHAUSTED_WITH_GAPS`, `DEPTH_LIMIT_REACHED`, `UNRESOLVED_IDS`, then `SATURATED` or `CLOSURE_COMPLETE`.
+    An unavailable semantic route still returns the lexical evidence. A reranker that dies leaves `reranked:
+    false` and raises nothing.
+  - DP-8: "facets" in the first KPI line are the routes (lexical, semantic, closure), reported with their state.
+    Content facets stay with W1-36.
+  - DP-9: retrieval calls the reranker once, over all candidates gathered for the bundle, after deduplication and
+    the authority filter. The latency of a set above 30 is measured and reported.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.101 | 2026-10-06 | Delegated under DEC-220 and DEC-416: DEC-419 (W1-21 DP-0: the command's path; DP-1: the public interface; DP-3: the bundle budget bounds expansion only; DP-6: the order of stopping reasons; DP-8: facets are the routes; DP-9: one rerank over the merged set). DP-2, DP-4, DP-5 and DP-7 go to the owner. |
