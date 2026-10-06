@@ -72,3 +72,30 @@ def test_the_supplementary_block_is_separate_from_the_authority_block(api, proje
     assert S.K_SUPPLEMENTARY in packet, "the packet has no supplementary field"
     assert isinstance(packet[S.K_SUPPLEMENTARY], list), \
         f"supplementary is not a list: {type(packet[S.K_SUPPLEMENTARY]).__name__}"
+
+
+def test_the_token_count_is_consistent_with_the_four_character_rule(api, project):
+    """The packet's token count matches ceil(len(text)/4) for each mandatory input (DEC-083)."""
+    packet = api.context(project, S.TK_NORMAL)
+    S.check_packet(packet)
+    for item in packet[S.K_MANDATORY]:
+        if "text" in item:
+            expected = S.tokens(item["text"])
+            actual = item.get(S.K_TOKENS, item.get("token_count"))
+            assert actual == expected, \
+                f"token count for {item[S.M_ID]}: expected {expected}, got {actual}"
+    budget = packet[S.K_BUDGET]
+    assert isinstance(budget[S.B_USED], int), \
+        f"budget.used should be an integer (ceil rule): {budget[S.B_USED]!r}"
+
+
+def test_a_custom_budget_overrides_the_default_ceiling(api, project):
+    """Passing ``budget=N`` sets the packet's budget limit to N instead of the default (DEC-004)."""
+    custom = 500
+    packet = api.context(project, S.TK_BUDGET_CUSTOM, budget=custom)
+    S.check_packet(packet)
+    budget = packet[S.K_BUDGET]
+    assert budget[S.B_LIMIT] == custom, \
+        f"the budget limit is {budget[S.B_LIMIT]}, not the custom ceiling {custom}"
+    assert budget[S.B_USED] <= budget[S.B_LIMIT], \
+        f"the packet uses {budget[S.B_USED]} tokens, above the custom limit {custom}"

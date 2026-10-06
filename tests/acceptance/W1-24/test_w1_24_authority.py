@@ -55,3 +55,25 @@ def test_the_full_precedence_order(api, project):
             assert positions[higher] <= positions[lower], \
                 f"{higher} (at {positions[higher]}) should come before {lower} (at {positions[lower]}) " \
                 f"in the authority block"
+
+
+def test_all_five_store_representable_levels_in_precedence_order(api, project):
+    """With TK_FULL_PREC (sources at charter, contract, decision, specification and ticket level),
+    the mandatory list contains all five tiers and they appear in CAP-01.a order."""
+    packet = api.context(project, S.TK_FULL_PREC)
+    S.check_packet(packet)
+    mandatory = packet[S.K_MANDATORY]
+    tiers_seen = []
+    for item in mandatory:
+        tier = item.get(S.M_AUTHORITY, "").lower().strip()
+        for kind in S.PRECEDENCE:
+            if kind in tier or tier in kind:
+                if kind not in tiers_seen:
+                    tiers_seen.append(kind)
+                break
+    assert len(tiers_seen) == len(S.PRECEDENCE), \
+        f"expected all 5 precedence levels {list(S.PRECEDENCE)}, but only saw {tiers_seen}"
+    for i, kind in enumerate(S.PRECEDENCE):
+        assert tiers_seen[i] == kind, \
+            f"at position {i} expected {kind!r} but got {tiers_seen[i]!r} — " \
+            f"the five levels are not in CAP-01.a order: {tiers_seen}"

@@ -31,10 +31,42 @@ def test_a_superseded_record_cannot_satisfy_a_requirement(api, project):
 
 
 def test_conflicting_inputs_at_the_same_level_raise_a_contradiction(api, project):
-    """The ticket TK_CONFLICT declares two decisions where one supersedes the other. Both are at the decision
-    level, so precedence cannot resolve the conflict — the call raises CONTRADICTION."""
+    """The ticket TK_CONFLICT declares two decisions where one supersedes the other. ADR_CONFLICT_2
+    supersedes ADR_CONFLICT_1, so ADR_CONFLICT_1 is superseded — the call raises BLOCKED (not CONTRADICTION,
+    because the supersession edge resolves which record is stale)."""
     outcome = api.context_outcome(project, S.TK_CONFLICT)
     error = outcome.error()
-    assert error is not None, "the call did not raise — conflicting mandatory inputs must raise a contradiction"
-    assert error["code"] in (S.CONTRADICTION, S.BLOCKED), \
-        f"expected {S.CONTRADICTION!r} or {S.BLOCKED!r}, got {error['code']!r}: {error['message']}"
+    assert error is not None, "the call did not raise — a superseded mandatory input must refuse"
+    assert error["code"] == S.BLOCKED, \
+        f"expected {S.BLOCKED!r} (superseded record), got {error['code']!r}: {error['message']}"
+
+
+def test_the_blocked_error_names_the_superseded_record(api, project):
+    """When a mandatory input is superseded, the BLOCKED error names the id of the record that could not
+    satisfy the requirement."""
+    outcome = api.context_outcome(project, S.TK_SUPERSEDED)
+    error = outcome.error()
+    assert error is not None, "the call did not raise for a superseded record"
+    combined = error["message"] + " " + str(error.get("details", ""))
+    assert S.ADR_SUPERSEDED in combined, \
+        f"the BLOCKED error does not name the superseded record {S.ADR_SUPERSEDED!r}: {error['message']}"
+
+
+def test_a_record_superseded_by_several_records_cannot_satisfy(api, project):
+    """A record that has been superseded by more than one successor is still SUPERSEDED; requiring it raises
+    BLOCKED. This tests multi-superseder depth (ADR_MULTI_OLD is superseded by both ADR_A and ADR_B)."""
+    outcome = api.context_outcome(project, S.TK_MULTI_SUP)
+    error = outcome.error()
+    assert error is not None, "the call did not raise — a record superseded by multiple successors must refuse"
+    assert error["code"] == S.BLOCKED, \
+        f"expected {S.BLOCKED!r}, got {error['code']!r}: {error['message']}"
+
+
+def test_two_active_records_at_the_same_level_without_supersession_raise_contradiction(api, project):
+    """Two ACTIVE decisions at the same level with no supersession edge between them are a genuine
+    contradiction — the call raises CONTRADICTION (not BLOCKED)."""
+    outcome = api.context_outcome(project, S.TK_PURE_CONFLICT)
+    error = outcome.error()
+    assert error is not None, "the call did not raise — two active records at the same level must raise"
+    assert error["code"] == S.CONTRADICTION, \
+        f"expected {S.CONTRADICTION!r} (pure contradiction), got {error['code']!r}: {error['message']}"

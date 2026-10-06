@@ -29,3 +29,25 @@ def test_the_same_ticket_and_commit_give_the_same_packet_hash(api, project):
     h1 = api.context(project, S.TK_NORMAL)[S.K_HASH]
     h2 = api.context(project, S.TK_NORMAL)[S.K_HASH]
     assert h1 == h2, f"same ticket, same commit, different hash: {h1} vs {h2}"
+
+
+def test_the_check_command_is_runnable(family_check):
+    """The declared command in the check YAML is a runnable Python module invocation."""
+    command = family_check.get("command", "")
+    assert command.startswith("python3 -m ") or command.startswith("python -m "), \
+        f"the check command is not a Python module invocation: {command!r}"
+    module_name = command.split("-m", 1)[-1].strip().split()[0]
+    assert module_name, "the check command has no module name"
+
+
+def test_the_same_hash_across_separate_processes_and_directories(api, base, tmp_path_factory):
+    """The family invariant holds across two completely separate clones in different directories:
+    same commit, same ticket, same packet hash. This tests cross-process reproducibility (CAP-38.b)."""
+    clone_a = S.clone(base, tmp_path_factory.mktemp("fam-a") / "repo")
+    clone_b = S.clone(base, tmp_path_factory.mktemp("fam-b") / "repo")
+    api.build_store(clone_a)
+    api.build_store(clone_b)
+    h_a = api.context(clone_a, S.TK_NORMAL)[S.K_HASH]
+    h_b = api.context(clone_b, S.TK_NORMAL)[S.K_HASH]
+    assert h_a == h_b, \
+        f"the packet hash differs across two clones of the same commit: {h_a} vs {h_b}"

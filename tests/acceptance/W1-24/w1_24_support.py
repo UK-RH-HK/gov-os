@@ -222,6 +222,21 @@ class Api:
     def context_outcome(self, root, ticket, **kwargs):
         return self.run([(CONTEXT, FUNCTION, [path_arg(root), ticket], kwargs)])
 
+    def build_all(self, root):
+        """Build the store and the lexical index. Requires ``gitleaks`` on the system PATH."""
+        gitleaks = shutil.which("gitleaks")
+        if gitleaks is None:
+            raise Missing("gitleaks is not on PATH; the supplementary context tests need it")
+        wrapper = self.workdir / "bin" / "gitleaks"
+        if not wrapper.exists():
+            wrapper.write_text(f'#!/bin/sh\nexec "{gitleaks}" "$@"\n', encoding="utf-8")
+            wrapper.chmod(0o755)
+        self.run([("gov.retrieval.lexical", "refresh", [path_arg(root)], {}),
+                  (STORE, "load", [path_arg(root)], {})])
+
+    def has_gitleaks(self):
+        return shutil.which("gitleaks") is not None
+
     def command_exists(self):
         if not (REPO_ROOT / COMMAND_REL).is_file():
             raise Missing(f"gov context is not built: there is no {COMMAND_REL} (DEC-317)")
@@ -387,6 +402,42 @@ ADR_C2_TEXT = "The maximum token pressure threshold is one thousand tokens."
 
 ALL_NORMAL_SOURCES = [CHARTER_ID, CONTRACT_ID, ADR_A]
 
+# ---- deepening: new records for fuller coverage
+
+# Full 5-level precedence (charter, contract, decision, specification, ticket)
+SPEC_ACTIVE = "SPEC-W24-ACT"
+SPEC_ACTIVE_TEXT = "The interface defines the return fields of the context packet."
+TASK_RECORD_ID = "TASK-W24-REC"
+TASK_RECORD_TEXT = "A task that validates the context output under pressure."
+
+# depends_on as a source of mandatory ids
+TK_DEPENDS = "TK-W24-DEP"
+
+# Full precedence ticket (all five store-representable levels)
+TK_FULL_PREC = "TK-W24-FPREC"
+
+# Multi-superseder: a record superseded by more than one record
+ADR_MULTI_OLD = "ADR-W24-MOLD"
+ADR_MULTI_OLD_TEXT = "The old method for counting governance share."
+TK_MULTI_SUP = "TK-W24-MSUP"
+
+# Pure contradiction: two active records at the same level with no supersession edge
+ADR_PURE_C1 = "ADR-W24-PC1"
+ADR_PURE_C2 = "ADR-W24-PC2"
+ADR_PC1_TEXT = "The default ceiling is five thousand tokens."
+ADR_PC2_TEXT = "The default ceiling is eight thousand tokens."
+TK_PURE_CONFLICT = "TK-W24-PCONF"
+
+# Path traversal: hostile ticket id
+HOSTILE_ID = "../../tmp/hostile-w24"
+TK_HOSTILE_FILE = "hostile-w24.md"
+
+# Supplementary context: a ticket whose title matches indexed content
+TK_SUPP = "TK-W24-SUPP"
+
+# Custom budget
+TK_BUDGET_CUSTOM = "TK-W24-BUDG"
+
 
 def corpus():
     """The fixture's files: records at each precedence level and tickets that declare them."""
@@ -412,6 +463,39 @@ def corpus():
         ".tickets/" + TK_SUPERSEDED + ".md": ticket_file(TK_SUPERSEDED, sources=[ADR_SUPERSEDED]),
         ".tickets/" + TK_CONFLICT + ".md": ticket_file(TK_CONFLICT, sources=[ADR_CONFLICT_1, ADR_CONFLICT_2]),
         ".tickets/" + TK_PRECEDENCE + ".md": ticket_file(TK_PRECEDENCE, sources=[ADR_B, SPEC_A]),
+
+        # ---- deepening: new records and tickets
+
+        # Active specification and task-level record for full precedence
+        "docs/specs/spec-act.md": record(SPEC_ACTIVE, "specification", "CLOSED", SPEC_ACTIVE_TEXT),
+        ".tickets/" + TASK_RECORD_ID + ".md": ticket_file(TASK_RECORD_ID, sources=[CHARTER_ID]),
+
+        # Full 5-level precedence ticket (charter, contract, decision, specification, ticket)
+        ".tickets/" + TK_FULL_PREC + ".md": ticket_file(
+            TK_FULL_PREC, sources=[CHARTER_ID, CONTRACT_ID, ADR_A, SPEC_ACTIVE, TASK_RECORD_ID]),
+
+        # depends_on ticket (mandatory ids come from depends_on, not sources)
+        ".tickets/" + TK_DEPENDS + ".md": ticket_file(TK_DEPENDS, depends_on=[ADR_A, CONTRACT_ID]),
+
+        # Multi-superseder: old record superseded by two records (ADR_A and ADR_B both supersede it)
+        "docs/adr/adr-mold.md": record(ADR_MULTI_OLD, "decision", "SUPERSEDED", ADR_MULTI_OLD_TEXT,
+                                        superseded_by=[ADR_A, ADR_B]),
+        ".tickets/" + TK_MULTI_SUP + ".md": ticket_file(TK_MULTI_SUP, sources=[ADR_MULTI_OLD]),
+
+        # Pure contradiction: two active decisions at the same level, no supersession edge
+        "docs/adr/adr-pc1.md": record(ADR_PURE_C1, "decision", "ACTIVE", ADR_PC1_TEXT),
+        "docs/adr/adr-pc2.md": record(ADR_PURE_C2, "decision", "ACTIVE", ADR_PC2_TEXT),
+        ".tickets/" + TK_PURE_CONFLICT + ".md": ticket_file(TK_PURE_CONFLICT, sources=[ADR_PURE_C1, ADR_PURE_C2]),
+
+        # Path traversal: hostile ticket id stored in a normal file
+        ".tickets/" + TK_HOSTILE_FILE: ticket_file(HOSTILE_ID, sources=[ADR_A]),
+
+        # Supplementary context: ticket with a title that matches indexed content
+        ".tickets/" + TK_SUPP + ".md": ticket_file(TK_SUPP, sources=[CHARTER_ID],
+                                                     title="token counting and the ceiling"),
+
+        # Custom budget
+        ".tickets/" + TK_BUDGET_CUSTOM + ".md": ticket_file(TK_BUDGET_CUSTOM, sources=[ADR_A]),
     }
 
 

@@ -1,17 +1,17 @@
 # W1-24 acceptance tests: `gov context`
 
 Written before the implementation by the independent test designer (MR-3) from the ticket's KPI lines, its
-`covers` ids and its sources. 34 cases in seven files. Behaviour is reached through public interfaces only: the
-function `gov.context.context`, the command `gov context`, and the check declaration that
-`gov check --list --json` lists. Every case builds its own project in a temporary directory; nothing reads or
-writes this repository's `.gov-runtime/`.
+`covers` ids and its sources. **51 cases** (34 original + 1 revision + 16 new) in **eight files**. Behaviour is
+reached through public interfaces only: the function `gov.context.context`, the command `gov context`, and the
+check declaration that `gov check --list --json` lists. Every case builds its own project in a temporary
+directory; nothing reads or writes this repository's `.gov-runtime/`.
 
 Run: `python3 -m pytest tests/acceptance/W1-24 -q -p no:cacheprovider`
 
 ## The interface the tests fix
 
 Several points are not in the sources. They are written against the recommended option of a decision
-package (DP-1 to DP-2, in the designer's return) and marked below; a different decision changes the named
+package (DP-1 to DP-5, in the designer's return) and marked below; a different decision changes the named
 constant in `w1_24_support.py` or the named cases, not the rest.
 
 ### Python
@@ -59,16 +59,19 @@ inputs at the same precedence level). `--dry-run` computes the packet without wr
 
 | KPI line | covers | cases |
 |---|---|---|
-| S1 packet form, ceiling, hash | CAP-15.a, CAP-15.e | `test_w1_24_packet.py`: mandatory inputs by id and sha256, authority block first, ceiling, hash, supplementary separate, two runs same hash |
-| S2 --brief | CAP-15.g | `test_w1_24_brief.py`: file path + summary, file under `.gov-runtime/scratch/`, summary ≤ 2.5k tokens |
-| S3 token pressure, index down | CAP-15.d | `test_w1_24_pressure.py`: supplementary dropped before mandatory, records what was dropped, mandatory without lexical index, mandatory without semantic store |
-| S4 mandatory resolution | CAP-15.b, CAP-01.d | `test_w1_24_mandatory.py`: resolved from declared ids, not ranked by retrieval, each lists authority/lifecycle/constraint/reason, deterministic |
-| S5 BLOCKED, superseded, contradiction | CAP-15.c | `test_w1_24_blocked.py`: missing → BLOCKED, superseded → can't satisfy, conflicting at same level → contradiction |
-| S6 family check | CAP-38.b | `test_w1_24_family_check.py`: check registered, required fields, same ticket+commit → same hash |
-| S7 authority precedence | CAP-01.a | `test_w1_24_authority.py`: higher precedence in authority block, lower marked superseded, full order |
-| command | — | `test_w1_24_command.py`: API-0002 envelope, result is the packet, BLOCKED error, deterministic, --brief |
+| S1 packet form, ceiling, hash | CAP-15.a, CAP-15.e | `test_w1_24_packet.py` (8): mandatory inputs by id and sha256, authority block first, ceiling, hash, hash stability, supplementary separate, **token count consistent with ceil(len/4)**, **custom budget overrides default** |
+| S2 --brief | CAP-15.g | `test_w1_24_brief.py` (5): file path + summary, file under `.gov-runtime/scratch/`, summary ≤ 2.5k tokens, **hostile ticket id cannot escape scratch**, **brief writes nothing outside the brief file** |
+| S3 token pressure, index down | CAP-15.d | `test_w1_24_pressure.py` (4): supplementary dropped before mandatory, records what was dropped, mandatory without lexical index, mandatory without semantic store |
+| S4 mandatory resolution | CAP-15.b, CAP-01.d | `test_w1_24_mandatory.py` (9): resolved from declared ids, not ranked by retrieval, each lists authority/lifecycle/constraint/reason, deterministic, **depends_on ids are resolved**, **precedence not overridden by retrieval rank (all 5 levels)** |
+| S5 BLOCKED, superseded, contradiction | CAP-15.c | `test_w1_24_blocked.py` (6): missing → BLOCKED, superseded → can't satisfy, **R1: conflicting with supersession → BLOCKED** (revised from BLOCKED|CONTRADICTION), **BLOCKED error names the superseded record**, **multi-superseder → BLOCKED**, **pure contradiction without supersession → CONTRADICTION** |
+| S6 family check | CAP-38.b | `test_w1_24_family_check.py` (5): check registered, required fields, same ticket+commit → same hash, **check command is runnable**, **same hash across separate processes and directories** |
+| S7 authority precedence | CAP-01.a | `test_w1_24_authority.py` (4): higher precedence in authority block, lower marked superseded, full order (3 levels), **all five store-representable levels in order** |
+| supplementary | CAP-15.d | `test_w1_24_supplementary.py` (3): **supplementary non-empty with a built index**, **supplementary dropped before mandatory under pressure**, **packet indicates supplementary unavailable without index** |
+| command | — | `test_w1_24_command.py` (7): API-0002 envelope, result is the packet, BLOCKED error, deterministic, --brief, **--dry-run computes without writing**, **--budget sets the limit** |
 | F1 a mandatory input is missing | — | `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` (detects missing inputs); `test_w1_24_blocked.py::test_a_missing_mandatory_input_refuses_with_blocked` |
 | F2 lower-precedence in authority | — | `test_w1_24_authority.py::test_the_authority_block_holds_only_the_higher_precedence_record` |
+
+Items in **bold** are new or revised in this deepening round.
 
 ## Decision packages
 
@@ -88,11 +91,56 @@ error). API-0002 defines exit code 4 as "blocked by control state (pause/freeze)
 missing mandatory input should use exit code 4 instead, the test assertions in `test_w1_24_blocked.py` and
 `test_w1_24_command.py` need to be updated.
 
+**Recommendation**: exit code 1 (governance error). Exit 4 is for control-plane blocking (pause/freeze), not for
+a data-plane missing record. Confidence: high (the code in `src/gov/cli/main.py` line 226 already gates exit
+codes through `command.exit_codes`; unless the `context` command declares `4` in its `EXIT_CODES`, it will map
+to 1).
+
+### DP-3: supplementary context integration
+
+How `gov.context` queries `gov.retrieval.retrieve.retrieve` for supplementary context is not fully specified. The
+tests in `test_w1_24_supplementary.py` verify that supplementary context appears when the index is built, that it
+is dropped first under pressure, and that its absence is indicated — but the query text and the mapping from
+retrieval bundles to supplementary entries are not tested.
+
+**Recommendation**: the implementation decides the query (likely the ticket title or its sources' text). The tests
+will pass as long as the contract (non-empty with index, dropped before mandatory, indicated when absent) holds.
+
+### DP-4: index unavailable indication
+
+When the lexical index is not built, the packet's supplementary list is empty. The tests check that the packet
+indicates why (via a `dropped` entry, a `facets` field, or some other mechanism). The exact indicator is not
+specified.
+
+**Recommendation**: a `dropped` entry with a reason like `"index unavailable"`. The test is flexible enough to
+pass with any of several indicators.
+
+### DP-5: --dry-run semantics
+
+`--dry-run` is listed in the command signature (CAP-27, W1-07's `READ_COMMANDS`) but its semantics for `context`
+are not fully specified beyond "compute without writing." The test verifies that `--dry-run --brief` produces a
+valid envelope with a summary but does not write the brief file.
+
+**Recommendation**: `--dry-run` computes the packet (or brief summary) and returns it without writing any files.
+Confidence: high.
+
+## Rewrites
+
+### R1: `test_conflicting_inputs_at_the_same_level_raise_a_contradiction`
+
+**File**: `test_w1_24_blocked.py`
+**Change**: assert `BLOCKED` only (was `BLOCKED` or `CONTRADICTION`).
+**Reason**: the fixture's `ADR_CONFLICT_2` has `supersedes: [ADR_CONFLICT_1]`, which makes `ADR_CONFLICT_1`
+superseded. This is a supersession, not a contradiction — the error should be `BLOCKED`. The new test
+`test_two_active_records_at_the_same_level_without_supersession_raise_contradiction` covers the genuine
+contradiction case with two ACTIVE records and no supersession edge.
+
 ## Red reasons
 
 Every test fails on import because `gov.context` does not exist (`src/gov/context/` is not built). The family
 check tests fail because nothing matches `template/governance/kernel/checks/context-reproducibility*`. The command
-tests fail because `src/gov/context/command.py` does not exist.
+tests fail because `src/gov/context/command.py` does not exist. The supplementary context tests that need an
+index skip when `gitleaks` is not on PATH.
 
 ## S0a-G-07 note
 

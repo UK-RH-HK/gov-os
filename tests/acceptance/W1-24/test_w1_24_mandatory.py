@@ -80,3 +80,35 @@ def test_the_resolution_is_deterministic(api, project):
     shas1 = [item[S.M_SHA] for item in m1]
     shas2 = [item[S.M_SHA] for item in m2]
     assert shas1 == shas2, "the sha256 values changed across two runs"
+
+
+def test_mandatory_ids_from_depends_on_are_resolved(api, project):
+    """A ticket's ``depends_on`` field is a source of mandatory ids: the records it names appear in the packet."""
+    packet = api.context(project, S.TK_DEPENDS)
+    S.check_packet(packet)
+    found_ids = {item[S.M_ID] for item in packet[S.K_MANDATORY]}
+    for dep_id in (S.ADR_A, S.CONTRACT_ID):
+        assert dep_id in found_ids, \
+            f"{dep_id} is declared in depends_on but missing from the mandatory list"
+
+
+def test_precedence_is_not_overridden_by_retrieval_rank(api, project):
+    """The mandatory list is ordered by precedence tier, not by any retrieval score. With a ticket that spans
+    all five store-representable levels, the charter comes before the contract, the contract before decisions,
+    decisions before specifications, specifications before tasks."""
+    packet = api.context(project, S.TK_FULL_PREC)
+    S.check_packet(packet)
+    mandatory = packet[S.K_MANDATORY]
+    ids = [item[S.M_ID] for item in mandatory]
+    tiers = [item.get(S.M_AUTHORITY, "").lower() for item in mandatory]
+    tier_positions = {}
+    for i, tier in enumerate(tiers):
+        for kind in S.PRECEDENCE:
+            if kind in tier or tier in kind:
+                if kind not in tier_positions:
+                    tier_positions[kind] = i
+    for higher, lower in zip(S.PRECEDENCE, S.PRECEDENCE[1:]):
+        if higher in tier_positions and lower in tier_positions:
+            assert tier_positions[higher] <= tier_positions[lower], \
+                f"{higher} (at {tier_positions[higher]}) should come before {lower} " \
+                f"(at {tier_positions[lower]}) — mandatory is ordered by precedence, not retrieval rank"

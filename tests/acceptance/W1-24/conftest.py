@@ -64,6 +64,17 @@ def repo(base, tmp_path):
 
 
 @pytest.fixture(scope="session")
+def indexed_project(box, base, tmp_path_factory):
+    """A clone of the fixture with store and lexical index. Supplementary context tests use it.
+    Skips when gitleaks is not available."""
+    if not box.has_gitleaks():
+        pytest.skip("gitleaks is not on PATH")
+    root = support.clone(base, tmp_path_factory.mktemp("w1-24-indexed") / "repo")
+    _built(lambda: box.build_all(root))
+    return root
+
+
+@pytest.fixture(scope="session")
 def family_check(box):
     """The context-reproducibility check, as ``gov check --list --json`` lists it."""
     return _built(lambda: support.family_check(box))
