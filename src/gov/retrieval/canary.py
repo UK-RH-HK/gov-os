@@ -17,10 +17,22 @@ def run_canaries(root: Path) -> dict:
     root = Path(root)
     results = {}
     for index, searcher in _SEARCHERS.items():
-        decl = yaml.safe_load((_TEMPLATE / f"{index}.yaml").read_text(encoding="utf-8"))
+        try:
+            decl = yaml.safe_load((_TEMPLATE / f"{index}.yaml").read_text(encoding="utf-8"))
+            if not isinstance(decl, dict):
+                raise ValueError("malformed canary declaration")
+        except Exception:
+            results[index] = {"passed": False,
+                              "status": FACET_UNAVAILABLE,
+                              "misses": []}
+            continue
         misses = []
         for canary in decl.get("canaries", []):
-            answer = searcher(root, canary["query"], refresh=False)
+            try:
+                answer = searcher(root, canary["query"], refresh=False)
+            except Exception:
+                misses.append(canary["query"])
+                continue
             if not answer.get("available") or not answer.get("hits"):
                 misses.append(canary["query"])
         passed = not misses
