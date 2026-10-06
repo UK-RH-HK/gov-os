@@ -24,6 +24,7 @@ kpis:
     as decision packages, agreed fixes become tickets
   - The audit→repair loop runs to convergence or to three consecutive non-converging iterations, then an escalation package goes to the owner; the orchestrator holds the count and never discloses it to
     the auditor or repair sessions (DEC-096) [CAP-59.a, CAP-59.b]
+  - The auditor's brief states the owner's reading of MR-3: core tests for every KPI line before implementation, review-found cases afterwards by the test designer only, red before their fix (DEC-430, DEC-136)
   failure:
   - The auditor authored any audited file
   - A W1 contract item has no finding row
