@@ -388,6 +388,62 @@ def merge_bases(root, one, other):
     return git(root, "merge-base", "--all", one, other, check=False).split()
 
 
+# ---- batch 6: files under `.git/` and git settings that change what git reports
+
+def real_parents(root, commit):
+    """The parents the commit object itself names, read from its own bytes: no grafts file, shallow file or
+    commit-graph changes them."""
+    lines = git(root, "--no-replace-objects", "cat-file", "commit", commit).split("\n\n", 1)[0].splitlines()
+    return [line.split()[1] for line in lines if line.startswith("parent ")]
+
+
+def write_grafts(root, commit, parents):
+    """Write `.git/info/grafts` with one line that gives ``commit`` the parents ``parents``."""
+    path = Path(root) / ".git" / "info" / "grafts"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(" ".join([commit, *parents]) + "\n", encoding="ascii")
+    return path
+
+
+def write_shallow(root, commit):
+    """Write `.git/shallow` by hand with the one line ``commit``: git then reports that commit with no parent.
+    Every object stays in the repository."""
+    path = Path(root) / ".git" / "shallow"
+    path.write_text(commit + "\n", encoding="ascii")
+    return path
+
+
+def write_commit_graph(root, commit=None, parent=None):
+    """Have git write `.git/objects/info/commit-graph` for every reachable commit. With ``commit`` and ``parent``,
+    the file's entry for ``commit`` is then rewritten to name ``parent`` as its first parent: git reads the
+    parents of a commit it walks through from this file, not from the commit."""
+    git(root, "commit-graph", "write", "--reachable")
+    path = Path(root) / ".git" / "objects" / "info" / "commit-graph"
+    if commit is None:
+        return path
+    data = bytearray(path.read_bytes())
+    assert bytes(data[:4]) == b"CGPH" and data[5] == 1, "the fixture's commit-graph is not a SHA-1 commit-graph file"
+    chunks = {bytes(data[8 + 12 * number: 12 + 12 * number]):
+              int.from_bytes(data[12 + 12 * number: 20 + 12 * number], "big") for number in range(data[6] + 1)}
+    names, entries = chunks[b"OIDL"], chunks[b"CDAT"]  # the sorted commit ids; tree, two parents, date for each
+    ids = [bytes(data[names + 20 * number: names + 20 * number + 20]).hex() for number in range((entries - names) // 20)]
+    at = entries + 36 * ids.index(commit) + 20
+    data[at: at + 4] = ids.index(parent).to_bytes(4, "big")
+    path.chmod(0o644)
+    path.write_bytes(bytes(data))
+    return path
+
+
+def git_as_user(root, home, *args):
+    """Run git in ``root`` as a user whose home is ``home``: the user's configuration there is read, the
+    system's is not. For asserting what a setting in a `.gitconfig` makes git print."""
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C",
+           "GIT_CONFIG_NOSYSTEM": "1"}
+    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=env)
+    assert done.returncode == 0, f"git {' '.join(args)} failed in {root}:\n{done.stderr}"
+    return done.stdout
+
+
 def partial_clone(source, destination):
     """A clone of ``source`` made with ``--filter=blob:none``: it holds every commit and tree, and only the files
     of its checkout. ``source`` is a local repository, reached by a ``file://`` address: no network."""

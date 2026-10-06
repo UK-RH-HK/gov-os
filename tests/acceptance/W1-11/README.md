@@ -8,7 +8,7 @@ DEC-328 to DEC-331 and DEC-360. Batches 1 and 2 were written before implementati
 after it, from behaviours a review described (DEC-135, DEC-136) and, in batch 5, from DEC-387 and DEC-398 (with
 DEC-403, DEC-410, DEC-413 and DEC-415). Profile FULL. No earlier ticket's test was rewritten.
 
-**132 cases in 97 test functions.** The four decision packages of batch 1 are decided, and so are DP-5 (DEC-387),
+**142 cases in 103 test functions** (batch 6 added 10 cases in 6 functions; see "Batch 6"). The four decision packages of batch 1 are decided, and so are DP-5 (DEC-387),
 DP-6 (DEC-398) and DP-7 (DEC-387). One package is open ("Open package"): DP-8 of batch 5, on how the checker learns
 what a merge's dropped parent changed. It blocks no case; the engineer's repair of the merge rule depends on it.
 
@@ -136,6 +136,17 @@ line goes.
   commit the one that set `ACTIVE`.
 - Batch 5 (DEC-387). **A replace ref changes nothing.** The fact is the trailer of the commit the history names,
   not of a commit a ref under `refs/replace/` puts in its place.
+- Batch 6 (DEC-387, DEC-398). **A file under `.git/` that changes the parents git reports changes nothing.** A
+  commit's parents, and so the merge base the merge rule judges by, are those the commit itself names. A grafts
+  file (`.git/info/grafts`) is neither a finding nor an error: the result is the one the same commits give
+  without it. A shallow file written by hand (`.git/shallow`) and a commit-graph file that names another parent
+  than the commit does (`.git/objects/info/commit-graph`) never turn a finding into a pass: the check gives the
+  finding or raises `GovError`. A commit-graph file as git writes it is neither a finding nor an error.
+- Batch 6 (DEC-360, DEC-182). **A git setting changes nothing.** The fact is the text `Role: owner` in the final
+  trailer block of the commit's own message, read the same way whatever git's configuration says, in the
+  repository's `.git/config` or in the `.gitconfig` of the `HOME` the check runs with. A line such as
+  `Role# owner` under `trailer.separators ":#"`, or `Approved: owner` under `trailer.approved.key Role`, is no
+  fact. Such a setting is neither a finding nor an error: the owner's real trailer approves with it in place.
 - The author's name and email, the record's own frontmatter and body, and any other project file are no fact.
 
 **The merge rule** (batch 5; DEC-398, the owner's answer to the lead's package DP-6 on how the approval rule reads
@@ -422,6 +433,84 @@ What the designer settled from the sources, each open to the lead's correction:
 | the owner's file over an agent's | no file | the owner's branch: added | the main line: added by an agent | M is the change, and an `ACTIVE` parent lacks the fact |
 | an old branch merged late; a merge back; an integration merge | the state before the approval | the approved line | unchanged since the base | M sets nothing; the owner's commit is the fact |
 | two crossed lines; unrelated histories | several, or none | any | differs, or does not hold the file | M is the change |
+
+## Batch 6 (2026-10-06, after implementation)
+
+The one batch after the ticket's last review (DEC-413): the acceptance cases for two behaviours in which the check
+fails open, as the review described them (DEC-136), and their controls. **10 cases added in 6 functions, 132 to
+142: "tests added after implementation". No existing case was changed, in what it asserts, in its fixture or in
+its text.** One new file, `test_w1_11_git_files_and_settings.py`. `w1_11_support.py` gained `real_parents`,
+`write_grafts`, `write_shallow`, `write_commit_graph` and `git_as_user`; nothing that was there changed. No
+interface change: `gov.decisions.check(root)` and the eight codes stand. Every case runs the check without loading
+the store, as the replace ref case does.
+
+Run on `w1/W1-11` at `6be9088b`, against the checker as built: **6 failed, 136 passed** (the 132 earlier cases and
+the 4 controls). No collection error. All ten cases hold KPI success 2 [CAP-01.b, CAP-21.a], which now has 70.
+
+| Added | Today | From |
+|---|---|---|
+| `test_a_grafts_file_does_not_turn_a_flagged_agent_merge_into_a_pass` | red: `no ACTIVE_UNAPPROVED finding names ids ['ADR-0010'] and paths ['docs/adr/ADR-0010.md']`, findings `(none)`, at the check made after the file is written. The check made before it, in the same test, gives the finding | the review's first behaviour; DEC-387, DEC-398, DEC-360 |
+| `test_a_file_that_hides_a_parent_does_not_turn_a_flagged_agent_merge_into_a_pass` (2 cases: `a shallow file written by hand`; `a commit-graph that names another parent`) | red, both, with the same message at the same place | the same family, each reproduced by the designer; DEC-387, DEC-398 |
+| `test_an_owner_merge_passes_with_a_grafts_file_in_place` | green: the control | DEC-360 |
+| `test_an_owner_merge_passes_with_a_commit_graph_git_wrote` | green: the control | DEC-360 |
+| `test_a_git_setting_does_not_make_another_line_the_owner_trailer` (3 cases: `trailer.separators in the repository`; `trailer.separators in the user's configuration`; `trailer.<name>.key in the repository`) | red, all three, with the same message, at the check made after the setting. The check made before it gives the finding | the review's second behaviour (the first case); the other two the brief asked to be tried; DEC-360, DEC-182 |
+| `test_the_owner_trailer_still_approves_with_the_setting_in_place` (2 cases: `trailer.separators`; `trailer.<name>.key`) | green: the controls | DEC-360 |
+
+**The fixtures, each asserted in its test.**
+
+- *Two children* (the grafts case and its control). The owner's `A` adds `ADR-0010` `ACTIVE`; `D`, a child of `A`,
+  demotes it to `PROPOSED`; `K`, another child of `A`, by an agent, edits the body and keeps `ACTIVE`; `M`, with
+  the parents `D` and `K`, keeps `K`'s file and is `HEAD`. The merge base of `D` and `K` is `A`, so `D` changed
+  the status since and `M` is the change: an agent's fails, the owner's passes. The line `<K> <D>` in
+  `.git/info/grafts` makes git report `D` as `K`'s parent and as the merge base. Asserted: the file's text, what
+  git reports with it, that the commit object `K` still names `A`, and that `M` is `HEAD`.
+- *Through a side line* (the shallow and commit-graph cases and the second control). A grafts file can give a
+  commit any parents; a shallow file can only take all of a commit's parents away, and git reads a commit-graph
+  only for the commits it walks through, not for the two it is asked about. So the history has a second way down:
+  the owner's first commit `P` holds the decision `PROPOSED` and the owner's `A` sets it `ACTIVE`; `S` is a child
+  of `P` and `N` a child of `A`, each an agent's note; `D` is an agent's merge of `N` and `S` that demotes; `K` and
+  `M` are as above. The merge base of `D` and `K` is `A`. With `N` cut off from `A` (the shallow file names `N`;
+  the commit-graph entry of `N` names `P` as its parent) git reports `P` as the merge base, and `P` holds the
+  decision `PROPOSED` as `D` does. Asserted: the merge base git reports before and after, that the commit object
+  `N` still names `A`, that no object is missing, and that `M` is `HEAD`.
+- *An agent adds the decision* (the settings cases). The message ends with the block `Task: PROJ-aaaa` and then
+  `Role# owner` or `Approved: owner`. Asserted: the message's last line, that it holds no `role:` in any case of
+  letters, that git prints no `Role` trailer for it before the setting and prints `owner` after, and that the
+  setting lies where the case says (`.git/config`, or the `.gitconfig` of the check's `HOME` alone). The case of
+  the user's configuration has its own `HOME` for the check, a temporary directory; nobody's real configuration
+  is read or written.
+
+**A finding or a `GovError`: which case accepts which.**
+
+- **The grafts case accepts the finding alone.** The expected result is the one the real commits give, as with a
+  replace ref (DEC-387), and the control asks that the owner's history passes with the grafts file in place. A
+  checker that refused every repository holding a grafts file would fail that control, so `GovError` is no way
+  out here and the case does not offer it.
+- **The shallow and commit-graph cases accept the finding or a `GovError`, and forbid a pass.** DEC-387 accepted
+  as built that a history the checker cannot read (a shallow clone) is a `GovError`; a repository whose
+  `.git/shallow` names a commit, or whose commit-graph disagrees with its commits, may be refused in the same
+  way. For that reason the shallow case has no control that passes. The commit-graph has one, with the file as
+  git writes it, because `git gc` leaves such a file in an ordinary repository: refusing every repository that
+  holds one would be an over-reach.
+
+**Can it go green.** No reference checker was run. In each red case the same test first runs the check on the
+same commits without the file or the setting and gets the finding, so the expected result is the checker's own
+answer for those commits. The shared merge reader already states that its answer depends on "no replacement ref,
+graft, shallow file, commit-graph": what remains is the checker's own questions to git.
+
+**Seen while reproducing, and not made a case** (each for the lead; none is in this batch's scope):
+
+- `trailer.separators` in `$HOME/.config/git/config` does what it does in `.gitconfig`: no finding today. One
+  rule (the message is read the same way whatever git's configuration says) covers both.
+- The system's configuration (`/etc/gitconfig`) could not be tried: no test writes there. The suite gives the
+  check `GIT_CONFIG_NOSYSTEM=1`, and the checker drops every `GIT_*` variable (DEC-387), so the system's file is
+  read when the checker runs git.
+- Settings that fail closed today, a false alarm and no hole: with `trailer.separators "#"` (no colon), or with
+  `trailer.role.key` set to another word, the owner's real `Role: owner` is no longer read and every decision
+  the owner approved is reported. The controls here use settings that leave `Role: owner` readable today; a
+  checker that reads the message itself would end these false alarms too.
+- A shallow file that names `D` or `K` in the two-children history already gives a `GovError` today (git finds no
+  merge base); one that names `A` gives the finding.
 
 ## The decided packages of batches 3 and 4
 
