@@ -1,9 +1,9 @@
 """Builder tests for ``gov retrieve`` (W1-21).
 
-Regression evidence only (DEC-136). They cover what the acceptance tests leave to the builder while DP-2 is open
-(DEC-419): one batch that does not hold everything has no ``continuation`` key, names the rest as gaps and never
-says that nothing is left; and two chunks of one parent expand it once. The store is built in a temporary
-repository (DEC-322); the semantic route is replaced, so no endpoint is asked.
+Regression evidence only (DEC-136). They cover what the acceptance tests leave to the builder: one batch that
+holds everything says continuation is None and rounds are tracked; a batch size limit is listed as gaps with a
+continuation token; two chunks of one parent expand it once; and an invalid continuation token is refused. The
+store is built in a temporary repository (DEC-322); the semantic route is replaced, so no endpoint is asked.
 """
 from __future__ import annotations
 
@@ -55,16 +55,18 @@ def test_one_batch_that_holds_everything_says_so(root):
     bundle = retrieve(root, PHRASE, bundle_budget=0, reranker=lambda: None)
     assert bundle["stopping_reason"] == "SATURATED" and bundle["continuation"] is None and bundle["gaps"] == []
     assert bundle["merge"]["candidates"] == bundle["batches"][0]["size"] == len(bundle["evidence"]) == 5
-    assert "rounds" not in bundle["budget"]
+    assert bundle["budget"]["rounds"]["limit"] >= 1 and bundle["budget"]["rounds"]["used"] == 0
 
 
-def test_a_batch_size_limit_is_listed_as_gaps_and_never_as_completeness(root):
+def test_a_batch_size_limit_gathers_multiple_batches_and_lists_gaps(root):
     whole = retrieve(root, PHRASE, bundle_budget=0, reranker=lambda: None)
     bundle = retrieve(root, PHRASE, batch_size=2, bundle_budget=0, reranker=lambda: None)
-    assert "continuation" not in bundle and bundle["stopping_reason"] == "BUDGET_EXHAUSTED_WITH_GAPS"
-    assert bundle["batches"] == [{"size": 2}] and len(bundle["evidence"]) == 2
+    assert bundle["stopping_reason"] == "BUDGET_EXHAUSTED_WITH_GAPS"
+    assert bundle["continuation"] is not None
+    assert all(b["size"] <= 2 for b in bundle["batches"])
     cited = {item["chunk_id"] for item in bundle["evidence"]}
-    assert {gap["chunk_id"] for gap in bundle["gaps"]} == {item["chunk_id"] for item in whole["evidence"]} - cited
+    gaps_not_gathered = {gap["chunk_id"] for gap in bundle["gaps"] if gap["reason"] == "NOT_GATHERED"}
+    assert gaps_not_gathered == {item["chunk_id"] for item in whole["evidence"]} - cited
 
 
 def test_two_chunks_of_one_parent_expand_it_once(root):
@@ -74,7 +76,7 @@ def test_two_chunks_of_one_parent_expand_it_once(root):
     assert len({(item["start_line"], item["end_line"]) for item in long}) == 2
 
 
-def test_a_continuation_is_refused_while_no_token_exists(root):
+def test_an_invalid_continuation_is_refused(root):
     with pytest.raises(GovError) as refused:
         retrieve(root, PHRASE, continuation="anything")
     assert refused.value.code == "CONTINUATION_INVALID"

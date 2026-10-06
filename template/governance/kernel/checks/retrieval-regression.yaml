@@ -1,0 +1,8 @@
+# The retrieval-regression family check (CAP-38.b, W1-21, DEC-425): the dev query set meets its recorded
+# hit@5 and forbidden-citation baselines. Not green when GOV_DEV_TIERS is not configured. Severity: hard-block
+# where the query set is configured. The command is run by `sh -c` in the project root; exit 0 is green (DEC-285).
+id: retrieval-regression
+family: retrieval-regression
+tier: G1
+severity: hard-block
+command: python3 -m gov.retrieval.retrieve_check
