@@ -4709,3 +4709,33 @@ Decided by the orchestrator on 2026-10-06.
 | Version | Date | Change |
 |---|---|---|
 | 0.105 | 2026-10-06 | Delegated: DEC-435 (the lead's role is built on W1-50 with the freeze mirror; `L-0077` also constrains W1-30; W1-22 DP-1 to DP-4, the validator's and the canary runner's interface). |
+
+## 106. Delegated decisions on W1-26's second round (register v0.106, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-436 — W1-26: the second round's merge is not accepted and the branch is rebuilt; a declaration of an unknown family is never green
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416 and DEC-412, 2026-10-06) · **Basis:** the return of W1-26's second round and the orchestrator's check of the branch against `w1/integrate` · **Under:** DEC-413, DEC-425, DEC-427, DEC-254
+- **Decision:**
+  - The branch's merge of `w1/integrate` (`2cb1924e`) was made without committing in the same command, and the
+    containment check restored the incoming acceptance tests before the commit: the merged tree lacks W1-21's
+    tests and holds older versions of other tickets' tests. That merge is not a record under DEC-254 and is not
+    merged. The branch is rebuilt from `w1/integrate` (DEC-412); the old branch is kept as `w1/W1-26-run2` until
+    the ticket closes.
+  - On the new base a launched test designer restores this ticket's tests and its lines in the W1-07 files in one
+    commit with its role trailer, and a launched engineer restores the source in one commit with its role trailer.
+    The untrailered commits `93c96e49` and `5b1109ec` do not return to the history.
+  - A lead merges `w1/integrate` into its branch in one command that commits. After it, the acceptance tests of
+    the branch differ from those of `w1/integrate` only in the ticket's own files; a difference in another
+    ticket's tests is a defect of the merge, never a record.
+  - A check declaration's family is compared with the seventeen families by a normalised name (lower case, every
+    run of characters that are not letters or digits read as one hyphen), so `retrieval-regression` is the
+    Contract's "retrieval regression". A declaration whose family matches none is reported by name and makes the
+    result not green; it is never dropped from the result (DEC-425).
+  - Both review rounds are spent (DEC-413). The third round fixes only this fail-open case, the failure line
+    "the scope of a check is a hand-maintained list", and the readiness check that ignores its result; no
+    reviewer runs.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.106 | 2026-10-06 | Delegated: DEC-436 (W1-26's second-round merge not accepted, the branch rebuilt; a lead's merge commits in one command; a check declaration of an unknown family is never green; family names compared normalised). |
