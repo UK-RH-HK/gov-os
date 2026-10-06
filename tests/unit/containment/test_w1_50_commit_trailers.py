@@ -1,0 +1,796 @@
+"""Builder tests for W1-50: a forward HEAD move is judged commit by commit.
+
+Regression evidence only; the acceptance suite is
+``tests/acceptance/W1-50/``.  These cover what that suite leaves to the
+builder: how the commits of a move are read, how the close commit is
+found, and that what cannot be read or is not decided is a finding.
+
+Each test creates a small git repository in a temporary directory and
+exercises ``take_snapshot`` and ``check_containment`` directly, without
+running the kernel hooks.
+"""
+
+from __future__ import annotations
+
+import json
+import subprocess
+
+_GIT_IDENTITY = (
+    "-c", "user.name=W1-50 test",
+    "-c", "user.email=w1-50@test.invalid",
+    "-c", "commit.gpgsign=false",
+    "-c", "core.hooksPath=/dev/null",
+)
+
+FINDINGS_REL = ".gov-runtime/findings.jsonl"
+TICKET = "DAEO-t01"
+TICKET_FILE = f".tickets/{TICKET}.md"
+
+
+def _git(project, *args):
+    proc = subprocess.run(
+        ["git", "-C", str(project), *_GIT_IDENTITY, *args],
+        capture_output=True, text=True, check=False,
+    )
+    assert proc.returncode == 0, (
+        f"git {' '.join(args)} failed: {proc.stderr.strip()}"
+    )
+    return proc.stdout
+
+
+def _ticket(project, status):
+    (project / TICKET_FILE).write_text(
+        f"---\nid: {TICKET}\nstatus: {status}\nwbs_id: T-01\n"
+        "role: engineer\nallowed_paths:\n- src/**\n---\n# T-01 Test\n")
+
+
+def _make_project(tmp_path, status="in_progress"):
+    """A minimal committed project with one engineer ticket."""
+    project = tmp_path / "project"
+    (project / ".tickets").mkdir(parents=True)
+    (project / "src").mkdir()
+    (project / ".gitignore").write_text(".gov-runtime/\n")
+    (project / "README.md").write_text("# Test\n")
+    (project / "src" / "main.py").write_text("VALUE = 1\n")
+    _ticket(project, status)
+    _git(project, "init", "-q", "-b", "main")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "initial")
+    return project
+
+
+def _commit(project, path, *trailers, message=("-m", "work")):
+    target = project / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with open(target, "a") as f:
+        f.write("changed\n")
+    args = []
+    for line in trailers:
+        args += ["--trailer", line]
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", *message, *args)
+    return _git(project, "rev-parse", "HEAD").strip()
+
+
+def _findings(project):
+    path = project / FINDINGS_REL
+    if not path.is_file():
+        return []
+    lines = path.read_text("utf-8").splitlines()
+    return [json.loads(line) for line in lines if line.strip()]
+
+
+def _check(project, work, role="orchestrator", subagent=None):
+    """One call: the snapshot, *work*, the check.  Returns (report, findings)."""
+    from gov.guard.containment import take_snapshot, check_containment
+
+    take_snapshot(str(project), "toolu_w1_50")
+    work()
+    report = check_containment(
+        project_root=str(project), role=role, ticket_id=TICKET,
+        subagent_type=subagent, session_id="test-session",
+        agent_type=subagent, command="work", tool_use_id="toolu_w1_50",
+    )
+    return report, _findings(project)
+
+
+# ---------------------------------------------------------------
+# Reading the commits of a move
+# ---------------------------------------------------------------
+
+def test_move_commits_reads_the_final_trailer_block_and_the_paths(tmp_path):
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    first = _commit(project, "src/a b.py", f"Task: {TICKET}",
+                    "Role: engineer", "Implements: CAP-58.h")
+    second = _commit(project, "README.md", message=(
+        "-m", "body only", "-m", "Role: engineer", "-m", "Not a trailer."))
+    commits = _move_commits(str(project), old, second)
+    assert commits == [
+        (second, [first], [], [], ["README.md"]),
+        (first, [old], ["engineer"], [TICKET], ["src/a b.py"]),
+    ]
+
+
+def test_a_merge_commit_lists_only_what_it_changes_beyond_its_parents(tmp_path):
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    _git(project, "checkout", "-q", "-b", "side")
+    _commit(project, "src/side.py")
+    _git(project, "checkout", "-q", "main")
+    _git(project, "merge", "-q", "--no-ff", "--no-commit", "side")
+    (project / "README.md").write_text("# By the merge\n")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "merge")
+    merge = _move_commits(str(project), old, "HEAD")[0]
+    assert len(merge[1]) == 2 and merge[4] == ["README.md"]
+
+
+def test_bytes_in_a_trailer_value_or_a_file_name_are_read_as_they_are(tmp_path):
+    """Control characters, a trailing 0x1f, a newline in a name, and a name
+    shaped like a trailer or a commit id: values and paths, never structure."""
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    role = "engineer\x02\x01" + "0" * 40 + "\x03orchestrator\x1f"
+    names = ["Role: orchestrator", "0" * 40, "src/a\nb.py", "src/\x01:\x02 c"]
+    for name in names:
+        (project / name).write_text("x\n")
+    sha = _commit(project, "src/main.py", f"Task: {TICKET}", f"Role: {role}",
+                  "Role:", "role: second")
+    assert _move_commits(str(project), old, sha) == [
+        (sha, [old], sorted([role, "second"]), [TICKET],
+         sorted(names + ["src/main.py"])),
+    ]
+
+
+def test_a_commit_with_an_unknown_role_made_of_chosen_bytes_names_its_paths(tmp_path):
+    project = _make_project(tmp_path)
+    report, findings = _check(project, lambda: _commit(
+        project, "src/main.py", f"Task: {TICKET}", "Role: engineer\x1f"))
+    assert report and len(findings) == 1
+    assert findings[0]["paths"] == ["src/main.py"]
+    assert "engineer\x1f" in findings[0]["reason"]
+
+
+def test_a_commit_list_that_cannot_be_read_is_a_finding(tmp_path):
+    """A file name that is not UTF-8: the move is flagged, not silent."""
+    import os
+
+    project = _make_project(tmp_path)
+
+    def work():
+        with open(os.fsencode(str(project)) + b"/src/\xff.py", "w") as f:
+            f.write("x\n")
+        _commit(project, "src/main.py", f"Task: {TICKET}", "Role: engineer")
+
+    report, findings = _check(project, work)
+    assert report and [f["action"] for f in findings] == ["flagged"]
+    assert "not a forward move" in findings[0]["reason"]
+
+
+def test_a_trailer_block_is_read_as_git_reads_one_with_default_settings():
+    from gov.guard.containment import _role_and_task
+
+    block = ("Implements: x\nrole : engineer\n  and more\nNot a trailer.\n"
+             " Task: no\nTask:T-1\n\nRole=owner\n#Role: owner\nRole:\n")
+    assert _role_and_task(block) == [
+        ("role", "engineer and more"), ("task", "T-1"), ("role", "")]
+
+
+def test_local_settings_and_replacement_refs_do_not_change_what_is_read(tmp_path):
+    """The commits of a move, a ticket's file and its close commit are the
+    real objects', whatever .git/config and refs/replace/ hold."""
+    from gov.guard.containment import (
+        _close_commit, _is_ancestor, _move_commits, _ticket_at)
+
+    project = _make_project(tmp_path)
+    root = str(project)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    first = _commit(project, "src/main.py", f"Task: {TICKET}", "Role: engineer")
+    _ticket(project, "closed")
+    close = _commit(project, "README.md", "Role: owner")
+    before = (_move_commits(root, old, close),
+              _ticket_at(root, close, TICKET_FILE),
+              _close_commit(root, close, TICKET_FILE))
+    assert before[0][0][2:] == (["owner"], [], [TICKET_FILE, "README.md"])
+    assert before[1]["status"] == "closed" and before[2] == close
+
+    for key, value in (
+            ("trailer.separators", "="), ("core.commentChar", "R"),
+            ("trailer.roleplay.key", "Reviewed-by"), ("trailer.tasking.key", "X"),
+            ("log.showRoot", "false"), ("diff.ignoreSubmodules", "all"),
+            ("diff.renames", "true"), ("i18n.logOutputEncoding", "UTF-16")):
+        _git(project, "config", "--local", key, value)
+    twin = _git(project, "commit-tree", f"{old}^{{tree}}", "-p", old,
+                "-m", "nothing").strip()
+    _git(project, "replace", first, twin)
+    _git(project, "replace", f"{close}:{TICKET_FILE}", f"{old}:{TICKET_FILE}")
+    _git(project, "replace", f"{close}^{{tree}}", f"{old}^{{tree}}")
+    assert "nothing" in _git(project, "cat-file", "commit", first)
+
+    assert (_move_commits(root, old, close),
+            _ticket_at(root, close, TICKET_FILE),
+            _close_commit(root, close, TICKET_FILE)) == before
+    assert _is_ancestor(root, first, close)
+
+
+# ---------------------------------------------------------------
+# The close commit (DEC-358)
+# ---------------------------------------------------------------
+
+def test_close_commit_is_the_latest_commit_where_the_status_becomes_closed(tmp_path):
+    from gov.guard.containment import _close_commit
+
+    project = _make_project(tmp_path)
+    closes = []
+    for status in ("closed", "in_progress", "closed"):
+        _ticket(project, status)
+        _git(project, "commit", "-q", "-am", status)
+        closes.append(_git(project, "rev-parse", "HEAD").strip())
+    # A later change of the file that leaves the status closed is no close.
+    with open(project / TICKET_FILE, "a") as f:
+        f.write("A note after the close.\n")
+    _git(project, "commit", "-q", "-am", "note")
+    assert _close_commit(str(project), "HEAD", TICKET_FILE) == closes[2]
+
+
+def test_a_first_version_that_is_already_closed_is_no_close_commit(tmp_path):
+    from gov.guard.containment import _close_commit
+
+    project = _make_project(tmp_path, status="closed")
+    assert _close_commit(str(project), "HEAD", TICKET_FILE) is None
+    assert _close_commit(str(project), "HEAD", ".tickets/none.md") is None
+
+
+def test_the_close_commit_itself_with_a_worker_s_trailers_is_a_finding(tmp_path):
+    """Not decided (DP-13): the close commit is not before itself."""
+    project = _make_project(tmp_path)
+
+    def work():
+        _ticket(project, "closed")
+        _commit(project, "src/main.py", f"Task: {TICKET}", "Role: engineer")
+
+    report, findings = _check(project, work)
+    assert report and len(findings) == 1
+    assert "closed ticket" in findings[0]["reason"]
+    assert sorted(findings[0]["paths"]) == [TICKET_FILE, "src/main.py"]
+
+
+# ---------------------------------------------------------------
+# The ticket's file at HEAD and in the working tree disagree
+# (DP-14, not decided): the commit passes only if both allow it
+# ---------------------------------------------------------------
+
+def _engineer_commit_with_the_ticket_file_edited(project, status=None,
+                                                 paths=None, path="src/main.py"):
+    """An engineer's commit of *path*, then the ticket's file edited and
+    not committed.  Returns the findings."""
+    def work():
+        _commit(project, path, f"Task: {TICKET}", "Role: engineer")
+        text = (project / TICKET_FILE).read_text()
+        if status:
+            text = text.replace("status: " + text.split("status: ")[1]
+                                .split("\n")[0], f"status: {status}")
+        if paths:
+            text = text.replace("- src/**", f"- {paths}")
+        (project / TICKET_FILE).write_text(text)
+
+    return _check(project, work)[1]
+
+
+def test_a_ticket_closed_only_in_the_working_tree_is_a_finding(tmp_path):
+    project = _make_project(tmp_path)
+    findings = _engineer_commit_with_the_ticket_file_edited(project, "closed")
+    assert len(findings) == 1 and "closed ticket" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["src/main.py"]
+
+
+def test_a_ticket_started_only_in_the_working_tree_is_a_finding(tmp_path):
+    project = _make_project(tmp_path, status="open")
+    findings = _engineer_commit_with_the_ticket_file_edited(
+        project, "in_progress")
+    assert len(findings) == 1 and findings[0]["paths"] == ["src/main.py"]
+
+
+def test_a_path_only_one_of_the_two_files_allows_is_a_finding(tmp_path):
+    # Only the working tree's file allows docs/**; only HEAD's allows src/**.
+    for path in ("docs/a.md", "src/main.py"):
+        project = _make_project(tmp_path / path.replace("/", "_"))
+        findings = _engineer_commit_with_the_ticket_file_edited(
+            project, paths="docs/**", path=path)
+        assert len(findings) == 1 and findings[0]["paths"] == [path]
+
+
+def test_a_ticket_file_that_is_not_committed_names_no_ticket(tmp_path):
+    project = _make_project(tmp_path)
+
+    def work():
+        _commit(project, "src/main.py", "Task: DAEO-t02", "Role: engineer")
+        (project / ".tickets/DAEO-t02.md").write_text(
+            (project / TICKET_FILE).read_text().replace(TICKET, "DAEO-t02"))
+
+    findings = _check(project, work)[1]
+    assert "not committed at HEAD" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["src/main.py"]
+
+
+# ---------------------------------------------------------------
+# Cases the decisions leave unsaid: a finding
+# ---------------------------------------------------------------
+
+def test_a_role_owner_commit_brought_by_a_merge_is_a_finding(tmp_path):
+    """Not decided (DP-11): the commit is new to HEAD's history in the call."""
+    project = _make_project(tmp_path)
+    _git(project, "checkout", "-q", "-b", "side")
+    owner = _commit(project, "README.md", "Role: owner")
+    _git(project, "checkout", "-q", "main")
+    report, findings = _check(project, lambda: _git(
+        project, "merge", "-q", "--no-ff", "-m", "merge", "side"))
+    assert report and len(findings) == 1
+    assert owner[:12] in findings[0]["reason"]
+    assert findings[0]["paths"] == ["README.md"]
+
+
+def test_role_owner_with_characters_inside_the_word_that_do_not_show_is_a_finding(tmp_path):
+    """The behaviour names characters around the word; inside it is not said."""
+    project = _make_project(tmp_path)
+    report, findings = _check(project, lambda: _commit(
+        project, "README.md", "Role:  Ow​ner\x0c\x7f"))
+    assert report and len(findings) == 1
+    assert "Role: owner commit" in findings[0]["reason"]
+    assert findings[0]["paths"] == ["README.md"]
+
+
+def test_a_committed_path_behind_a_linked_directory_is_a_finding(tmp_path):
+    """Inside the commit's own paths by its name, but a directory on the way
+    to it is a symbolic link in the working tree: not judged by where the
+    link leads, and not silent."""
+    import shutil
+
+    for role in ("orchestrator", "engineer"):
+        project = _make_project(tmp_path / role)
+
+        def work():
+            _commit(project, "src/deep/a.py", f"Task: {TICKET}",
+                    "Role: engineer")
+            shutil.rmtree(project / "src" / "deep")
+            (project / "src" / "deep").symlink_to(project / "src")
+
+        report, findings = _check(project, work, role=role)
+        assert report and "src/deep/a.py" in findings[0]["paths"]
+
+
+def test_in_a_worker_s_call_another_role_s_trailer_alone_is_a_finding(tmp_path):
+    """DEC-319 names the Role trailer; no Task trailer stands next to it."""
+    project = _make_project(tmp_path)
+    report, findings = _check(
+        project, lambda: _commit(project, "src/main.py", "Role: orchestrator"),
+        role="engineer")
+    assert report and len(findings) == 1
+    assert findings[0]["paths"] == ["src/main.py"]
+    assert findings[0]["role"] == "engineer"
+
+
+def test_a_commit_inside_the_caller_s_paths_stays_silent(tmp_path):
+    project = _make_project(tmp_path)
+    report, findings = _check(
+        project, lambda: _commit(project, "src/main.py", f"Task: {TICKET}",
+                                 "Role: engineer"),
+        role="engineer")
+    assert report == "" and findings == []
+
+
+# ---------------------------------------------------------------
+# DEC-394, DEC-398: a merge read by the merge base; DP-16, DP-17,
+# and what the check's git calls read
+# ---------------------------------------------------------------
+
+def test_a_merge_commit_that_takes_a_parent_s_unchanged_content_lists_it_as_its_own_change(tmp_path):
+    from gov.guard.containment import _move_commits
+
+    project = _make_project(tmp_path)
+    earlier = _git(project, "rev-parse", "HEAD").strip()
+    old = _commit(project, "src/main.py")
+    # The other parent is the earlier commit itself, then a new empty
+    # commit on top of it: its content is the merge base's either way.
+    empty = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", earlier,
+                 "-m", "empty").strip()
+    for other in (earlier, empty):
+        merge = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", old,
+                     "-p", other, "-m", "undo").strip()
+        assert _move_commits(str(project), old, merge)[0] == (
+            merge, [old, other], [], [], ["src/main.py"])
+
+
+def _branch_commit(project, branch, path, start="main"):
+    _git(project, "checkout", "-q", "-B", branch, start)
+    sha = _commit(project, path)
+    _git(project, "checkout", "-q", "main")
+    return sha
+
+
+def test_read_merge_tells_a_parent_s_change_from_the_merge_commit_s_own(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    _branch_commit(project, "side", "src/side.py")
+    _commit(project, "README.md")
+    _git(project, "merge", "-q", "--no-ff", "--no-commit", "side")
+    (project / "src" / "main.py").unlink()
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "merge")
+    reading = read_merge(str(project), _git(project, "rev-parse", "HEAD").strip())
+    # DEC-410, DP-22: what the first parent brought is in brought too.
+    assert (reading.own, reading.brought) == (
+        ["src/main.py"], ["README.md", "src/side.py"])
+
+
+def test_read_merge_puts_a_parent_s_change_the_merge_commit_drops_in_own(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    earlier = _git(project, "rev-parse", "HEAD").strip()
+    later = _commit(project, "src/main.py")
+    # The parents turned round (DEC-403): nothing differs from the first.
+    merge = _git(project, "commit-tree", f"{earlier}^{{tree}}", "-p", earlier,
+                 "-p", later, "-m", "drop").strip()
+    assert read_merge(str(project), merge) == (["src/main.py"], [])
+    # Each side's change of its own path is brought, whichever is first
+    # (DEC-410, DP-22: brought is the complement of own).
+    side = _branch_commit(project, "side", "src/side.py", start=earlier)
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    tree = _git(project, "rev-parse", "HEAD^{tree}").strip()
+    both = ["src/main.py", "src/side.py"]
+    assert read_merge(str(project), _git(
+        project, "rev-parse", "HEAD").strip()) == ([], both)
+    turned = _git(project, "commit-tree", tree, "-p", side, "-p", later,
+                  "-m", "turned").strip()
+    assert read_merge(str(project), turned) == ([], both)
+
+
+def test_read_merge_puts_an_acceptance_test_both_sides_changed_in_own(tmp_path):
+    """DEC-410, DP-24: whichever side's content the merge commit holds,
+    also when both sides made the same change; a source file is read as
+    before."""
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    test, source = "tests/acceptance/T-01/test_a.py", "src/main.py"
+    side = _branch_commit(project, "side", test)
+    _git(project, "checkout", "-q", "side")
+    _commit(project, source)
+    _git(project, "checkout", "-q", "main")
+    # The same change of the test on main, another of the source file.
+    _git(project, "checkout", "-q", side, "--", test)
+    _git(project, "commit", "-q", "-m", "the same change")
+    (project / source).write_text("VALUE = 2\n")
+    _git(project, "commit", "-q", "-a", "-m", "main's")
+    _git(project, "merge", "-q", "--no-ff", "-X", "theirs", "-m", "merge", "side")
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == ([test], [source])
+    # Another change of the test on main: the merge takes the side's.
+    _git(project, "reset", "-q", "--hard", "HEAD^")
+    _commit(project, test)
+    _git(project, "merge", "-q", "--no-ff", "-X", "theirs", "-m", "merge", "side")
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == ([test], [source])
+
+
+def test_a_merge_commit_s_own_change_of_a_ticket_file_or_a_test_is_a_finding_whatever_its_trailers(tmp_path):
+    """DEC-410, DP-21 and DP-27; in a worker's call the whole-move
+    finding names the paths."""
+    test = "tests/acceptance/T-01/test_a.py"
+    for n, (role, trailers) in enumerate((
+            ("orchestrator", ("Role: orchestrator", f"Task: {TICKET}")),
+            ("orchestrator", ("Role: independent-test-designer",
+                              f"Task: {TICKET}")),
+            ("orchestrator", ()),
+            ("independent-test-designer", ()))):
+        project = _make_project(tmp_path / str(n))
+        _commit(project, test)
+        _branch_commit(project, "side", "src/side.py")
+        _commit(project, "README.md", "Role: orchestrator", f"Task: {TICKET}")
+
+        def work():
+            _git(project, "merge", "-q", "--no-ff", "--no-commit", "side")
+            for path in (test, TICKET_FILE):
+                with open(project / path, "a") as f:
+                    f.write("by the merge\n")
+            _git(project, "add", "-A")
+            _git(project, "commit", "-q", "-m", "merge",
+                 *(a for t in trailers for a in ("--trailer", t)))
+
+        report, findings = _check(project, work, role=role)
+        assert test in report and TICKET_FILE in report
+        assert [sorted(f["paths"]) for f in findings] == [[TICKET_FILE, test]]
+        if role != "orchestrator":
+            assert "not a forward move" in findings[0]["reason"]
+        # An ordinary merge that brings such changes stays silent.
+        _git(project, "checkout", "-q", "-b", "more")
+        _commit(project, TICKET_FILE, "Role: orchestrator", f"Task: {TICKET}")
+        _git(project, "checkout", "-q", "main")
+        _commit(project, "README.md", "Role: orchestrator", f"Task: {TICKET}")
+        if role == "orchestrator":
+            assert _check(project, lambda: _git(
+                project, "merge", "-q", "--no-ff", "-m", "merge", "more"),
+                role=role) == ("", findings)
+
+
+def test_read_merge_reads_the_other_parents_of_an_octopus_against_each_other(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    head = _git(project, "rev-parse", "HEAD").strip()
+    _branch_commit(project, "q", "src/q.py")
+    one = _branch_commit(project, "one", "src/q.py", start="q")
+    other = _branch_commit(project, "other", "src/other.py", start="q")
+    # The tree is the third parent's: the second parent's later change
+    # of src/q.py is dropped, although the third brought the path
+    # against the first.
+    octopus = _git(project, "commit-tree", f"{other}^{{tree}}", "-p", head,
+                   "-p", one, "-p", other, "-m", "octopus").strip()
+    assert read_merge(str(project), octopus) == (
+        ["src/q.py"], ["src/other.py"])
+
+
+def test_read_merge_starts_six_git_processes_for_two_parents(tmp_path, monkeypatch):
+    from gov.guard import containment_merge
+
+    project = _make_project(tmp_path)
+    _branch_commit(project, "side", "src/side.py")
+    for n in range(20):
+        _commit(project, f"src/more{n}.py")
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    calls = []
+    real = containment_merge._git
+    monkeypatch.setattr(containment_merge, "_git",
+                        lambda *a, **k: calls.append(a) or real(*a, **k))
+    containment_merge.read_merge(
+        str(project), _git(project, "rev-parse", "HEAD").strip())
+    assert len(calls) == 6
+
+
+def test_read_merge_bounds_its_git_processes_by_the_number_of_parents(tmp_path, monkeypatch):
+    import pytest
+    from gov.guard import containment_merge
+    from gov.guard.containment_merge import MAX_PARENTS, MergeReadError
+
+    project = _make_project(tmp_path)
+    head = _git(project, "rev-parse", "HEAD").strip()
+    sides = [_branch_commit(project, f"s{n}", f"src/s{n}.py")
+             for n in range(MAX_PARENTS)]
+    calls = []
+    real = containment_merge._git
+    monkeypatch.setattr(containment_merge, "_git",
+                        lambda *a, **k: calls.append(a) or real(*a, **k))
+
+    def octopus(others, tree):
+        parents = [a for p in (head, *others) for a in ("-p", p)]
+        return _git(project, "commit-tree", tree, *parents, "-m",
+                    "octopus").strip()
+
+    # Nine parents, each side on top of the first: the commit, a diff
+    # for each parent, a merge base for each of the 36 pairs and one
+    # diff from the first parent to each side.
+    _git(project, "merge", "-q", "--no-ff", "-m", "octopus",
+         *(f"s{n}" for n in range(8)))
+    merged = _git(project, "rev-parse", "HEAD").strip()
+    assert containment_merge.read_merge(str(project), merged) == (
+        [], [f"src/s{n}.py" for n in range(8)])
+    assert len(calls) == 1 + 9 + 36 + 8
+    # The most parents that are read; the tree drops every side's change.
+    most = octopus(sides[:MAX_PARENTS - 1], f"{head}^{{tree}}")
+    assert containment_merge.read_merge(str(project), most) == (
+        sorted(f"src/s{n}.py" for n in range(MAX_PARENTS - 1)), [])
+    # One parent more is refused after the one process that lists them.
+    del calls[:]
+    with pytest.raises(MergeReadError):
+        containment_merge.read_merge(
+            str(project), octopus(sides, f"{head}^{{tree}}"))
+    assert len(calls) == 1
+
+
+def test_read_merge_refuses_a_commit_argument_that_is_not_the_commit_s_own_id(tmp_path):
+    import pytest
+    from gov.guard.containment_merge import MergeReadError, read_merge
+
+    project = _make_project(tmp_path)
+    _branch_commit(project, "side", "src/side.py")
+    _git(project, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    merge = _git(project, "rev-parse", "HEAD").strip()
+    _git(project, "tag", "-a", "-m", "tag", "merged", merge)
+    _git(project, "branch", "0123456789abcdef" * 4, merge)
+    for commit in (_git(project, "rev-parse", "refs/tags/merged").strip(),
+                   "0123456789abcdef" * 4):
+        with pytest.raises(MergeReadError):
+            read_merge(str(project), commit)
+    assert read_merge(str(project), merge) == ([], ["src/side.py"])
+
+
+def test_read_merge_of_an_octopus_fails_closed_when_one_parent_has_no_merge_base(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    side = _branch_commit(project, "side", "src/side.py")
+    head = _git(project, "rev-parse", "HEAD").strip()
+    tree = _git(project, "rev-parse", "side^{tree}").strip()
+    ordinary = _git(project, "commit-tree", tree, "-p", head, "-p", side,
+                    "-m", "merge").strip()
+    assert read_merge(str(project), ordinary) == ([], ["src/side.py"])
+    island = _git(project, "commit-tree", tree, "-m", "island").strip()
+    for parents in ((side, island), (island, side)):
+        octopus = _git(project, "commit-tree", tree, "-p", head, "-p",
+                       parents[0], "-p", parents[1], "-m", "octopus").strip()
+        assert read_merge(str(project), octopus) == (["src/side.py"], [])
+
+
+def test_read_merge_fails_closed_with_several_merge_bases(tmp_path):
+    from gov.guard.containment_merge import read_merge
+
+    project = _make_project(tmp_path)
+    a = _branch_commit(project, "a", "src/a.py")
+    b = _branch_commit(project, "b", "src/b.py")
+    _git(project, "checkout", "-q", "a")
+    _git(project, "merge", "-q", "--no-ff", "-m", "a takes b", b)
+    _git(project, "checkout", "-q", "b")
+    _git(project, "merge", "-q", "--no-ff", "-m", "b takes a", a)
+    _commit(project, "src/later.py")
+    _git(project, "checkout", "-q", "a")
+    _git(project, "merge", "-q", "--no-ff", "-m", "criss-cross", "b")
+    assert len(_git(project, "merge-base", "--all", "HEAD^1", "HEAD^2").split()) == 2
+    head = _git(project, "rev-parse", "HEAD").strip()
+    assert read_merge(str(project), head) == (["src/later.py"], [])
+    # Fail closed for every parent (DEC-403): with the parents turned
+    # round and the first parent's tree, what differs from the other
+    # parent is the merge commit's own.
+    turned = _git(project, "commit-tree", f"{head}^1^{{tree}}", "-p",
+                  f"{head}^1", "-p", "b", "-m", "turned").strip()
+    assert read_merge(str(project), turned) == (["src/later.py"], [])
+
+
+def test_read_merge_raises_for_a_commit_that_is_no_merge_and_for_one_it_cannot_read(tmp_path, monkeypatch):
+    import pytest
+    from gov.guard import containment_merge
+    from gov.guard.containment_merge import MergeReadError, read_merge
+
+    project = _make_project(tmp_path)
+    assert issubclass(MergeReadError, ValueError)  # the check's finding
+    with pytest.raises(MergeReadError):
+        # a commit without a parent
+        read_merge(str(project), _git(project, "rev-parse", "HEAD").strip())
+    with pytest.raises(MergeReadError):
+        read_merge(str(project), _commit(project, "README.md"))
+    with pytest.raises(MergeReadError):
+        read_merge(str(project), "0" * 40)
+    with pytest.raises(MergeReadError):
+        read_merge(str(tmp_path), "0" * 40)  # no repository
+    # What is not a full commit id never reaches git (DEC-403, F3).
+    monkeypatch.setattr(containment_merge, "_git", None)
+    for commit in ("", "HEAD", "--all", "-1", "0" * 39, "A" * 40,
+                   "0" * 40 + "\n", None):
+        with pytest.raises(MergeReadError):
+            read_merge(str(project), commit)
+
+
+def test_a_move_without_a_merge_commit_starts_one_git_process(tmp_path, monkeypatch):
+    from gov.guard import containment
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    new = _commit(project, "src/main.py")
+    calls = []
+    real = containment._git
+    monkeypatch.setattr(containment, "_git",
+                        lambda *a, **k: calls.append(a) or real(*a, **k))
+    containment._move_commits(str(project), old, new)
+    assert len(calls) == 1
+
+
+def test_a_commit_of_a_ticket_file_without_trailers_in_a_worker_s_call_is_a_finding(tmp_path):
+    for role, subagent, flagged in (("engineer", None, True),
+                                    ("orchestrator", "engineer", True),
+                                    ("orchestrator", None, False)):
+        project = _make_project(tmp_path / f"{role}-{subagent}")
+
+        def work():
+            # The commit widens the caller's own ticket.
+            text = (project / TICKET_FILE).read_text()
+            (project / TICKET_FILE).write_text(
+                text.replace("- src/**\n", "- src/**\n- '**'\n"))
+            _commit(project, "src/main.py")
+
+        report, findings = _check(project, work, role=role, subagent=subagent)
+        if flagged:
+            assert TICKET_FILE in report
+            assert [f["paths"] for f in findings] == [[TICKET_FILE]]
+        else:
+            assert report == "" and findings == []
+
+
+def test_a_worker_s_commit_of_a_ticket_file_is_a_finding_and_an_orchestrator_s_is_not(tmp_path):
+    for role, expected in (("engineer", [TICKET_FILE]), ("orchestrator", None)):
+        project = _make_project(tmp_path / role)
+
+        def work():
+            (project / "src" / "main.py").write_text("VALUE = 2\n")
+            _commit(project, TICKET_FILE, f"Task: {TICKET}", f"Role: {role}")
+
+        report, findings = _check(project, work)
+        if expected is None:
+            assert report == "" and findings == []
+        else:
+            assert report and [f["paths"] for f in findings] == [expected]
+
+
+def test_grafts_a_shallow_file_and_inherited_variables_do_not_change_what_is_read(tmp_path, monkeypatch):
+    from gov.guard.containment import _is_ancestor, _move_commits
+
+    project = _make_project(tmp_path)
+    old = _git(project, "rev-parse", "HEAD").strip()
+    first = _commit(project, "README.md", "Role: owner")
+    second = _commit(project, "src/main.py")
+    expected = [(second, [first], [], [], ["src/main.py"]),
+                (first, [old], ["owner"], [], ["README.md"])]
+    other = tmp_path / "other"
+    other.mkdir()
+    _git(other, "init", "-q")
+    for name in ("GIT_DIR", "GIT_COMMON_DIR", "GIT_OBJECT_DIRECTORY"):
+        monkeypatch.setenv(name, str(other / ".git"))
+    monkeypatch.setenv("GIT_GRAFT_FILE", str(project / ".git" / "info" / "grafts"))
+    for hiding in ("info/grafts", "shallow"):
+        target = project / ".git" / hiding
+        target.write_text(f"{second} {old}\n" if hiding == "info/grafts"
+                          else f"{second}\n")
+        assert _move_commits(str(project), old, second) == expected
+        assert _is_ancestor(str(project), first, second)
+        target.unlink()
+
+
+# ---------------------------------------------------------------
+# A move whose merge commits need too many git processes
+# ---------------------------------------------------------------
+
+def _two_parent_merges(project, count):
+    """*count* ``--no-ff`` merges of one engineer commit each."""
+    for n in range(count):
+        _git(project, "checkout", "-q", "-b", f"side-{n}")
+        _commit(project, f"src/side_{n}.py", f"Task: {TICKET}",
+                "Role: engineer")
+        _git(project, "checkout", "-q", "main")
+        _git(project, "merge", "-q", "--no-ff", "-m", "merge", f"side-{n}")
+
+
+def test_the_bound_of_a_move_leaves_room_for_ordinary_integrations():
+    from gov.guard.containment_merge import (
+        MAX_MOVE_PROCESSES, MAX_PARENTS, processes)
+
+    assert (processes(2), processes(9), processes(MAX_PARENTS)) == (6, 118, 853)
+    assert 500 * processes(2) <= MAX_MOVE_PROCESSES < 4 * processes(MAX_PARENTS)
+
+
+def test_a_move_within_the_bound_is_read_and_one_beyond_it_is_a_finding_as_a_whole(tmp_path, monkeypatch):
+    """Two two-parent merges need 12 git processes, three need 18.  Beyond
+    the bound no merge commit is read: the move is flagged, not silent."""
+    from gov.guard import containment_merge
+
+    monkeypatch.setattr(containment_merge, "MAX_MOVE_PROCESSES", 12)
+    read = []
+    read_merge = containment_merge.read_merge
+    monkeypatch.setattr(containment_merge, "read_merge",
+                        lambda root, commit: read.append(commit)
+                        or read_merge(root, commit))
+    project = _make_project(tmp_path)
+    report, findings = _check(project, lambda: _two_parent_merges(project, 2))
+    assert report == "" and findings == [] and len(read) == 2
+
+    del read[:]
+    project = _make_project(tmp_path / "beyond")
+    report, findings = _check(project, lambda: _two_parent_merges(project, 3))
+    assert report and [f["action"] for f in findings] == ["flagged"]
+    assert "not a forward move" in findings[0]["reason"] and read == []

@@ -8,6 +8,11 @@ Planned revision (DEC-190, reason "planned: command implemented"): ``checkpoint`
 is built by W1-25 and is no longer expected to return ``NOT_IMPLEMENTED``; the
 list is ``NOT_BUILT`` in ``w1_07_support.py``.
 
+Planned revision (DEC-190, reason "planned: command implemented"): ``closure``
+is built by W1-20 and leaves the same list. It requires a depth and an id
+(DEC-391): the cases that run every command give it both
+(``support.invocation``), and a call without them is a usage error.
+
 Planned revision (DEC-190, reason "planned: command implemented"): ``readiness``
 is built by W1-13 and leaves the same list.
 
@@ -35,9 +40,20 @@ def test_help_names_every_reserved_command(gov):
 @pytest.mark.parametrize("name", support.RESERVED_COMMANDS)
 def test_each_wave_1_operation_is_a_gov_command(gov, interface, name):
     """The name is known: no usage error, and the envelope names the command."""
-    run = gov(name, "--json")
+    run = gov(*support.invocation(name), "--json")
     assert run.returncode != 2, f"gov {name} is a usage error: the command is not reserved\n{run.describe()}"
     support.assert_envelope(run, interface, command=name)
+
+
+def test_closure_without_its_arguments_is_a_usage_error(gov, interface):
+    """A built command that requires arguments answers a call without them as a usage error (exit code 2), and no
+    longer as ``NOT_IMPLEMENTED``. Standard output is empty or an envelope with ``ok: false`` (README, reading 8)."""
+    run = gov("closure", "--json")
+    assert run.returncode == 2, f"gov closure without a depth and an id must end with exit code 2\n{run.describe()}"
+    assert support.NOT_IMPLEMENTED not in run.stdout, run.describe()
+    if run.stdout.strip():
+        envelope = support.assert_envelope(run, interface, command="closure")
+        assert envelope["ok"] is False
 
 
 @pytest.mark.parametrize("name", support.NOT_BUILT)

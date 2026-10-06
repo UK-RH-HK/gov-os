@@ -123,14 +123,19 @@ def test_one_commit_outside_its_paths_among_commits_inside_theirs_is_the_only_fi
 
 
 def test_a_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it(project, call):
-    """ "Commit by commit": the two revisions of ``HEAD`` hold the same files, and one commit still left its paths."""
+    """ "Commit by commit": the two revisions of ``HEAD`` hold the same files, and one commit still left its paths.
+
+    The caller is the orchestrator: a commit is judged by its own trailers
+    only in an orchestrator session's own call (DEC-319). The worker's form
+    (DEC-327) is in ``test_w1_50_callers.py``.
+    """
     command = (
         support.commit(support.README, AS_ENGINEER, subject="outside")
         + f" && git checkout -q HEAD~1 -- {support.README}"
         + " && git commit -q -m undo --trailer 'Task: " + TICKET + "' --trailer 'Role: engineer'"
     )
-    result, left = call(project, command, ENGINEER, TICKET)
-    what = f"`{command}` in a call of the engineer on {TICKET}"
+    result, left = call(project, command, ORCHESTRATOR, TICKET)
+    what = f"`{command}` in a call of the orchestrator on {TICKET}"
     assert check_support.git(project, "diff", "--name-only", "HEAD~2", "HEAD") == "", (
         "the fixture is wrong: the two commits together change a file"
     )

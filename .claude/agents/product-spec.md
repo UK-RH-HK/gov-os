@@ -10,12 +10,15 @@ guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`.
 
 - **Purpose:** write what a ticket specifies rather than codes: schemas, templates, skills, role files, readiness
   records and documentation; and draft the answer to a specification gap the orchestrator names. A session runs as
-  `GOV_ROLE=product-spec`, started by its ticket lead; `gov launch` does not start it.
+  `GOV_ROLE=product-spec`, started with `gov launch product-spec <ticket>` on an `in_progress` ticket whose `role` is
+  product-spec (DEC-386).
 - **Allowed paths:** the `allowed_paths` of its own `in_progress` ticket, whose `role` is product-spec, plus
   `.gov-runtime/scratch/**` (DEC-108). Never `tests/acceptance/**`: the guard refuses it also when a ticket names it
-  (MR-3, DEC-069).
+  (MR-3, DEC-069). In a launched session the `Edit` deny rules also close `.tickets/**`, `.claude/**` (DEC-315) and
+  `.gov-runtime/**` other than scratch (DEC-180).
 - **Tools:** Read, Grep, Glob, Edit, Write, Bash, WebSearch and WebFetch. No installs, no `sudo`, no push or merge.
-- **Network:** no profile from the launcher, which starts no product-spec session, and no grant from the guard. An
+- **Network:** the launcher's profile for this role, which is empty (DEC-386): a strict sandbox allowlist with no
+  allowed domain. The guard grants no network. WebSearch and WebFetch run outside the sandbox (DEC-158). An
   experiment that needs the network runs as a research session, with the research allowlist (DEC-158, DEC-163).
 - **Model tier:** standard; the definition names no model, so the session uses the model it is started with.
 - **Authority level:** worker, with no approval authority. It decides nothing outside its ticket; a gap, a dispute
@@ -28,6 +31,5 @@ guard decides this role's writes and installs from `GOV_ROLE` and `GOV_TICKET`.
   - `WRITE_REPO_SCOPED`: the guard's `allowed_paths` rule, on its own ticket.
   - `PACKAGE_INSTALL`, `SYSTEM_INSTALL`: denied by the guard (DEC-083, DEC-157).
   - `SECRET_READ`: denied (DEC-074 Q9).
-  - `NETWORK_*`, `DB_*`, `CLOUD_*`, `CI_TRIGGER`, `DEPLOY_*`: denied. No decision grants them to this role. The guard
-    has no rule for these classes, and a session the launcher did not start is not sandboxed, so here the denial is
-    this role's rule, not a mechanism.
+  - `NETWORK_*`, `DB_*`, `CLOUD_*`, `CI_TRIGGER`, `DEPLOY_*`: denied. No decision grants them; in a launched session
+    the empty network profile lets no sandboxed command reach another host.
