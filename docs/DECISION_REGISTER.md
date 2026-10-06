@@ -4524,3 +4524,66 @@ P1.
 | Version | Date | Change |
 |---|---|---|
 | 0.101 | 2026-10-06 | Delegated under DEC-220 and DEC-416: DEC-419 (W1-21 DP-0: the command's path; DP-1: the public interface; DP-3: the bundle budget bounds expansion only; DP-6: the order of stopping reasons; DP-8: facets are the routes; DP-9: one rerank over the merged set). DP-2, DP-4, DP-5 and DP-7 go to the owner. |
+
+## 102. Owner answers and a standing rule of 2026-10-06, second round (register v0.102, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-06. During the night every ticket lead stopped with "403 Access to this model requires
+an access grant your request does not have"; the cause was an expired Claude login, not a model. The owner signed in
+again; no model or settings change was made. A one-line headless probe answered before any lead was restarted.
+
+### DEC-420 — An authentication or access error stops the launching of leads: `AUTH_REQUIRED`
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-250 (one more stop) · **Under:** DEC-235, DEC-250
+- **Decision:**
+  - If a session or a lead fails with an authentication or access error (401, 403, "Failed to authenticate",
+    "access grant"), the orchestrator does not retry in a loop.
+  - It stops launching leads, writes its checkpoint, and stops with `AUTH_REQUIRED`, so that the owner knows to
+    sign in again.
+  - After the owner restores access: a one-line headless probe first; if it works, one lead as a test, then the
+    others, each from its branch's last commit.
+
+### DEC-421 — W1-50: the both-sides rule is extended to ticket files
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the residual of W1-50's seventh round (the sixth reviewer's finding F1) · **Amends:** DEC-410 (DP-24), DEC-417 (its residual) · **Under:** DEC-413
+- **Decision:**
+  - Under `.tickets/**` too, a path that more than one parent changed against the merge base is the merge commit's
+    own, whichever side's content it holds. Stricter-only.
+  - It is built on the freeze branch's round, with its cases.
+
+### DEC-422 — W1-21 DP-2: a round is one more batch; the round limits; the default batch size
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-2 option (a) · **Under:** DEC-035, DEC-080, CAP-04.c, CAP-16.c
+- **Decision:**
+  - A round is one more batch of candidates.
+  - The round limits are 1, 1, 3, 8 and 8 for radius 0 to 4.
+  - Reaching the limit gives `BUDGET_EXHAUSTED_WITH_GAPS`, with the ungathered candidates as gaps and a stateless
+    continuation token.
+  - The default batch size is 10.
+
+### DEC-423 — W1-21 DP-4: superseded from the store; must-not-cite is a closed status list; a file the store could not load is read by its frontmatter
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-4 option (a) · **Under:** DEC-329, CAP-51.b
+- **Decision:**
+  - Superseded comes from the store: status `SUPERSEDED`, or being the target of a supersedes edge.
+  - Must-not-cite is a closed status list: `DEPRECATED`, `REJECTED` and `WITHDRAWN`.
+  - A cited file the store could not load is read by its frontmatter.
+  - Dropped records are listed in the bundle.
+
+### DEC-424 — W1-21 DP-5: a failure or lesson record is in scope through a typed edge within the closure
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-5 option (a) · **Under:** CAP-14.a, CAP-41
+- **Decision:** records of the types `failure` and `lesson` are in scope when a typed edge (for example
+  `constrains: [<ticket id>]`) joins the record and the ticket within the closure. No schema work.
+
+### DEC-425 — W1-21 DP-7: the retrieval-regression check's baselines and severity
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-7 option (a) · **Under:** DEC-414, CAP-38.b
+- **Decision:**
+  - The check needs a mean hit@5 of at least 80 (DEC-414) and at most 2 forbidden citations.
+  - The query set is found through `GOV_DEV_TIERS`.
+  - Severity: hard-block where the query set is configured. Where it is not (an adopter without dev tiers), the
+    check reports "unmeasured" as a warning and is never shown as green.
+
+### DEC-426 — `S0a-G-06`: where a worker may look for its text
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-383
+- **Decision:** a product-spec worker may look for the text of `S0a-G-06` in the archived `docs/source/` through
+  `docs/SOURCES.md` (rule C), or ask the owner for an exact workbench path. Never `qualification-oracle/` or
+  `s0b2/probe/`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.102 | 2026-10-06 | Owner: DEC-420 (an authentication or access error stops the launching of leads, `AUTH_REQUIRED`), DEC-421 (W1-50: the both-sides rule extended to ticket files), DEC-422 to DEC-425 (W1-21 DP-2, DP-4, DP-5, DP-7), DEC-426 (`S0a-G-06`: where its text may be looked for). |
