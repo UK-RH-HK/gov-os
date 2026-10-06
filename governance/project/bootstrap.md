@@ -1246,3 +1246,20 @@ run. The report is kept in the orchestrator's log folder.
   W1-07's shared test files, W1-28 the roster).
 - **MWA-08, low: W1-01's "denied in every session settings file" is shown by the file's presence,** not by parsing
   its rule against what the guard enforces.
+
+The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the freeze outside the repository
+(DEC-429); MWA-02 is how MR-3 is met, and the exit auditor is told so (DEC-430); **backlog, a later wave: the
+`owner` and `links` filters of CAP-08.a, a known partial of W1-10 (DEC-431).**
+
+## W1-44 residuals (Phase-2 lessons as lesson records, 2026-10-06)
+
+- **Each lesson constrains only its own ticket** (`DAEO-wqd6`), which is what makes `gov retrieve` return it there;
+  `L-0077` (the anti-snowball rule) also constrains W1-30 (DEC-435). Which other tickets each lesson constrains
+  is not decided.
+- **The records are `state_class: HISTORICAL`:** a lesson is not authority (CAP-41.b). A ticket that needs the
+  rule as authority cites the owner record, not the lesson.
+- **Severities and lifecycles were chosen by the product-spec worker** and stand as written (DEC-433).
+- **`L-0074` was written from DEC-041 and DEC-046 in the register,** not from an original lesson text; the three
+  owner records were read in the archived `docs/source/` (DEC-426, rule C).
+- **"A lesson restates policy as authority" (failure line 2)** is checked by the record's fields, not by reading
+  its prose.
