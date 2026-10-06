@@ -4616,3 +4616,174 @@ itself; and its verification stopped at the first failure. The owner was told on
 | Version | Date | Change |
 |---|---|---|
 | 0.103 | 2026-10-06 | Delegated under DEC-220, DEC-412 and DEC-416: DEC-427 (W1-24's first round is not accepted, since its engineer was not a launched worker and the lead wrote source; the branch is rebuilt from the test design; DP-1: the public interface). |
+
+## 104. Owner answers of 2026-10-06, third round: the mid-wave audit's findings, the freeze mirror, the lead's role (register v0.104, appended by the W1 orchestrator on branch `w1/integrate`)
+
+The owner's answers to the mid-wave audit (DEC-249; findings MWA-01, MWA-02, MWA-05), to W1-50's remaining
+fail-open, to the open sources `S0a-G-06` and `S0a-G-07`, to W1-44's residuals, and to the report that W1-24's lead
+wrote source (DEC-427). Ticket edits are in their own commits.
+
+### DEC-428 — The owner's manual check of freeze, pause and lift moves to the Wave 1 exit
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-409 (the one manual check before W1-50 closes)
+- **Decision:**
+  - The owner's manual check moves to the Wave 1 exit run. W1-42 gets the KPI line: "The owner freezes, pauses and
+    lifts from a plain terminal, on a throwaway repository and on this one, and the results are recorded."
+  - W1-50 no longer waits for it: W1-50 closes when DEC-429 is built, green and reviewed.
+
+### DEC-429 — W1-50: the freeze is also written to a mirror outside the repository (MWA-01)
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the last freeze review's findings F2, F3 and F8 and the mid-wave audit's MWA-01; options (a) and (b) combined · **Extends:** DEC-404, DEC-407, DEC-409 · **Under:** DEC-413, DEC-415, CAP-05
+- **Decision:**
+  - `gov pause` writes the freeze to `.gov-runtime/freeze` and to a mirror outside the repository, under
+    `~/.local/state/gov-os/`, keyed by the repository.
+  - The guard treats the project as frozen if either exists (fail closed).
+  - If the flag in the repository is removed or emptied while the mirror remains, that is a finding, and the flag
+    is restored with its marker line.
+  - Lifting in person (DEC-409) removes both.
+  - Sandboxed workers cannot reach the mirror. An opaque write by the orchestrator's own unsandboxed session stays
+    a recorded residual.
+  - It is built as a follow-up on W1-50, in one build round and one review; then W1-50 closes.
+
+### DEC-430 — The owner's reading of MR-3 (MWA-02)
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, option (a) on the mid-wave audit's MWA-02 · **Under:** MR-3, DEC-069, DEC-136
+- **Decision:**
+  - The core tests for every KPI line are written by the independent test designer before implementation. Cases
+    found in review may be added afterwards, by the test designer only, red before their fix (DEC-136).
+  - This is how MR-3 is met, not an exception to it.
+  - The exit auditor is told so in W1-43's brief.
+
+### DEC-431 — CAP-08.a's `owner` and `links` filters go to the backlog (MWA-05)
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, option (a) on the mid-wave audit's MWA-05 · **Under:** CAP-08
+- **Decision:** the `owner` and `links` filters of CAP-08.a are not built in Wave 1. They go to the backlog for a
+  later wave, recorded as a known partial of W1-10.
+
+### DEC-432 — `S0a-G-06` and `S0a-G-07` are residuals; two files may be read by exact path
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Extends:** DEC-426 · **Under:** DEC-383
+- **Decision:**
+  - `S0a-G-06` (W1-21) and `S0a-G-07` (W1-24) are residuals for now; neither ticket waits on them. The S0a output
+    names gaps by bare id (`G-06`, `G-07`); the `S0a-` prefix was added in the Contract.
+  - The orchestrator may read two files by exact path: `/home/usain/gov-os-workbench/s0a/out/STACK_OPTIONS.md`
+    (G-06 and G-07) and `/home/usain/gov-os-workbench/s0a/out/BAKEOFF_PLAN.md` (G-06 only). Nobody lists folders
+    there, and nobody touches `qualification-oracle/` or `s0b2/probe/`.
+  - If they confirm the gap texts, the orchestrator passes any needed lines to a worker in its brief; if they do
+    not, the residual stands.
+- **Read on 2026-10-06:** both texts are in `STACK_OPTIONS.md`. G-06: "`gov retrieve`: facets, batches, follow-up
+  rounds, dedup, stopping reasons, NOT_FOUND ≠ absent" (CAP-16, CAP-17, CAP-55). G-07: "`gov context`: authority
+  block first, supplementary block, token ceiling, sha256, file-path delivery + ≤ 2.5k-token summary" (CAP-01,
+  CAP-15). Neither contradicts a case of W1-21. `BAKEOFF_PLAN.md` adds no requirement.
+
+### DEC-433 — W1-44: the lessons' severities and lifecycles stand; the anti-snowball lesson's link to W1-30
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-168, DEC-424
+- **Decision:** the lesson records' severities and lifecycles stand as written. Linking the anti-snowball lesson
+  to W1-30 is delegated to the orchestrator.
+
+### DEC-434 — Ticket leads get their own role
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on DEC-427 · **Amends:** DEC-156 (as far as a ticket lead is concerned) · **Under:** DEC-371, MR-3
+- **Decision:**
+  - Leads run as `GOV_ROLE=orchestrator`, which has wide write rights (DEC-156); that is why the guard did not
+    stop W1-24's lead from writing source.
+  - Delegated to the orchestrator, stricter-only: ticket leads get their own role, allowed to write only their
+    checkpoint, their scratch and merge-backs (judged by the three-way rule), so that a lead cannot write source
+    or tests. The orchestrator chooses the ticket.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.104 | 2026-10-06 | Owner: DEC-428 (the manual freeze check moves to W1-42), DEC-429 (W1-50: the freeze mirror outside the repository), DEC-430 (the reading of MR-3), DEC-431 (CAP-08.a's `owner` and `links` filters to the backlog), DEC-432 (`S0a-G-06`, `S0a-G-07`: residuals, two files by exact path), DEC-433 (W1-44's lessons stand), DEC-434 (ticket leads get their own role). |
+
+## 105. Delegated decisions under DEC-433, DEC-434 and DEC-416 (register v0.105, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-435 — The lead's role is built on W1-50; L-0077 constrains W1-30; W1-22's interface packages
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-434, DEC-433 and DEC-416, 2026-10-06) · **Basis:** W1-50 already holds the paths (`src/gov/guard/decide*`, `src/gov/guard/containment*`, `src/gov/launch/**`) and the three-way merge reading; W1-22 packages DP-1 to DP-4, the designer's confidence high or medium-high · **Under:** DEC-429, DEC-410, DEC-317
+- **Decision:**
+  - The ticket lead's role (DEC-434) is built on W1-50, in the same follow-up round as the freeze mirror
+    (DEC-429): one build round and one review cover both. W1-50 gets the KPI lines in its own commit. The lead
+    start command in the orchestrator prompt is the owner's to change once the role is built.
+  - The anti-snowball lesson `L-0077` also constrains W1-30 (`DAEO-2lwj`), the ticket that builds `gov close`.
+  - W1-22 DP-1 to DP-4, as its design encodes them: `gov.retrieval.validate.validate(root, bundle)` returning
+    `valid` and `errors`; `gov.retrieval.canary.run_canaries(root)` returning, per index, `passed`, `status` and
+    `misses`; canary declarations as YAML under `template/governance/kernel/canaries/`, one per index; the
+    validator checks a citation's `sha256` against the cited span only. Which indexes "each index" covers is open
+    with the ticket's closing round.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.105 | 2026-10-06 | Delegated: DEC-435 (the lead's role is built on W1-50 with the freeze mirror; `L-0077` also constrains W1-30; W1-22 DP-1 to DP-4, the validator's and the canary runner's interface). |
+
+## 106. Delegated decisions on W1-26's second round (register v0.106, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-436 — W1-26: the second round's merge is not accepted and the branch is rebuilt; a declaration of an unknown family is never green
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416 and DEC-412, 2026-10-06) · **Basis:** the return of W1-26's second round and the orchestrator's check of the branch against `w1/integrate` · **Under:** DEC-413, DEC-425, DEC-427, DEC-254
+- **Decision:**
+  - The branch's merge of `w1/integrate` (`2cb1924e`) was made without committing in the same command, and the
+    containment check restored the incoming acceptance tests before the commit: the merged tree lacks W1-21's
+    tests and holds older versions of other tickets' tests. That merge is not a record under DEC-254 and is not
+    merged. The branch is rebuilt from `w1/integrate` (DEC-412); the old branch is kept as `w1/W1-26-run2` until
+    the ticket closes.
+  - On the new base a launched test designer restores this ticket's tests and its lines in the W1-07 files in one
+    commit with its role trailer, and a launched engineer restores the source in one commit with its role trailer.
+    The untrailered commits `93c96e49` and `5b1109ec` do not return to the history.
+  - A lead merges `w1/integrate` into its branch in one command that commits. After it, the acceptance tests of
+    the branch differ from those of `w1/integrate` only in the ticket's own files; a difference in another
+    ticket's tests is a defect of the merge, never a record.
+  - A check declaration's family is compared with the seventeen families by a normalised name (lower case, every
+    run of characters that are not letters or digits read as one hyphen), so `retrieval-regression` is the
+    Contract's "retrieval regression". A declaration whose family matches none is reported by name and makes the
+    result not green; it is never dropped from the result (DEC-425).
+  - Both review rounds are spent (DEC-413). The third round fixes only this fail-open case, the failure line
+    "the scope of a check is a hand-maintained list", and the readiness check that ignores its result; no
+    reviewer runs.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.106 | 2026-10-06 | Delegated: DEC-436 (W1-26's second-round merge not accepted, the branch rebuilt; a lead's merge commits in one command; a check declaration of an unknown family is never green; family names compared normalised). |
+
+## 107. Delegated decisions on the W1-50 follow-up's packages and on W1-24's packages (register v0.107, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06. The owner was told the same day that DP-M2 to DP-M4 touch the guard and may be overturned.
+
+### DEC-437 — W1-50 follow-up DP-M1 to DP-M4, DP-L1, DP-L2; W1-24 DP-2 to DP-5
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-434 and DEC-416, and as the strictest reading of DEC-429, 2026-10-06) · **Basis:** the test designers' packages, each with a recommendation · **Under:** DEC-429, DEC-409, DEC-402, DEC-425
+- **Decision:**
+  - DP-M1: the mirror entry is named by the SHA-256, in hex, of the real path of the repository's git common
+    directory. The main tree and every worktree share one entry; two clones differ; a moved repository has a new
+    key, which is a residual.
+  - DP-M2: an empty or unmarked file at the mirror's path means frozen (DEC-429: "frozen if either exists").
+    `gov pause` writes the marker line into the mirror.
+  - DP-M3: a lift that cannot remove the mirror refuses and nothing changes; the project stays frozen and the
+    message names the mirror's path. The owner's answer did not cover this case.
+  - DP-M4: the mirror is at `~/.local/state/gov-os/` under the home directory the process sees;
+    `XDG_STATE_HOME` is not followed. A session that changes a child's home directory makes that child read
+    another mirror: a residual to be named with the sessions that can do it.
+  - DP-L1: the lead's role is named `ticket-lead`.
+  - DP-L2: the role has no allowed paths; it writes its scratch through the existing scratch rule.
+  - W1-24 DP-2: `gov context` exits 1 for BLOCKED and CONTRADICTION. DP-3: the supplementary query as built.
+    DP-4: an entry dropped because an index is unavailable carries that reason. DP-5: `--dry-run` computes
+    without writing the brief file.
+  - W1-24's family check that ends green after measuring nothing is a fail-open under DEC-413 and DEC-425 and is
+    fixed, test first, before the ticket's merge.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.107 | 2026-10-06 | Delegated: DEC-437 (the freeze mirror's key, content, lift failure and place; the lead's role name and paths; W1-24 DP-2 to DP-5; W1-24's check that measured nothing is not green). |
+
+## 108. A delegated decision on W1-26's third round (register v0.108, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-438 — W1-26: a family with no registered check is never green
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** `gov check --json` run by the orchestrator on W1-26's branch at `be229cdd`: four of the seventeen families had no registered check and were reported green · **Under:** DEC-425, DEC-413, DEC-436
+- **Decision:**
+  - A family with no registered check has the status YELLOW, with the reason "no registered check" and a count
+    of 0 in its entry. It is never green, and it is not a hard-block by itself.
+  - Every family's entry carries the count of its registered checks, so the wave's exit run (W1-42) can count
+    the families that have at least one executable check.
+  - This is a fail-open under DEC-413 and is fixed test first in a short fourth start of the ticket; no review
+    round follows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.108 | 2026-10-06 | Delegated: DEC-438 (W1-26: a family with no registered check is YELLOW with its reason and a count, never green). |
+

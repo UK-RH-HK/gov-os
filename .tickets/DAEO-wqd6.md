@@ -1,6 +1,6 @@
 ---
 id: DAEO-wqd6
-status: in_progress
+status: closed
 deps: [DAEO-uudf, DAEO-5x4l]
 links: []
 created: 2026-10-01T00:47:37Z
