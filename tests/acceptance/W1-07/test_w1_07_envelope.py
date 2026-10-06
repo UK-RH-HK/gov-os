@@ -39,9 +39,9 @@ def test_status_succeeds_with_exit_code_0(gov, interface):
 
 
 def test_a_governance_error_has_exit_code_1_and_its_code_in_the_json(gov, interface):
-    """Exit code 1 is "governance error (GovError code in JSON)"; running checks is one today (DEC-186)."""
-    run = gov("doctor", "--json")
-    error = support.assert_error(run, interface, support.NOT_IMPLEMENTED, exit_code=1, command="doctor")
+    """Exit code 1 is "governance error (GovError code in JSON)"; a NOT_IMPLEMENTED command is one (DEC-186, DEC-190)."""
+    run = gov("close", "--json")
+    error = support.assert_error(run, interface, support.NOT_IMPLEMENTED, exit_code=1, command="close")
     assert "details" in error
 
 
