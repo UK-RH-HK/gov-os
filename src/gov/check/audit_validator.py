@@ -10,6 +10,7 @@ Usage::
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -21,6 +22,8 @@ _VALID_CLASSES = frozenset({
     "UNJUSTIFIED_DROP", "SCOPE_CREEP",
 })
 _REQUIRED_FM = ("milestone", "commit", "pack_sha256")
+_HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
+_SHA256_RE = re.compile(r"^(?:sha256:)?[0-9a-fA-F]{64}$")
 
 
 def _parse_frontmatter(content: str) -> tuple[dict | None, str]:
@@ -113,10 +116,24 @@ def validate_file(path: Path, repo_root: str) -> list[dict]:
     commit = fm.get("commit")
     if commit is not None:
         commit = str(commit)
-        if not _commit_resolves(commit, repo_root):
+        if not _HEX_RE.match(commit):
+            findings.append({
+                "code": "AUDIT_BAD_COMMIT",
+                "message": f"commit '{commit}' is not a hexadecimal commit id",
+            })
+        elif not _commit_resolves(commit, repo_root):
             findings.append({
                 "code": "AUDIT_BAD_COMMIT",
                 "message": f"commit '{commit}' does not resolve in the repository",
+            })
+
+    pack_sha = fm.get("pack_sha256")
+    if pack_sha is not None:
+        pack_sha = str(pack_sha)
+        if not _SHA256_RE.match(pack_sha):
+            findings.append({
+                "code": "AUDIT_BAD_PACK_SHA256",
+                "message": f"pack_sha256 '{pack_sha}' is not a valid SHA-256 hash",
             })
 
     rows = _parse_table_rows(body)
@@ -142,12 +159,18 @@ def validate_file(path: Path, repo_root: str) -> list[dict]:
                 "message": f"invalid class '{cls}' for item '{item}'",
             })
         paths = [p.strip() for p in evidence.split(",")]
+        if any(p == "" for p in paths):
+            findings.append({
+                "code": "AUDIT_EMPTY_EVIDENCE",
+                "message": f"evidence cell for '{item}' has empty entries (use '-' for none)",
+            })
+            continue
         if cls == "OK" and all(p == "-" for p in paths):
             findings.append({
                 "code": "AUDIT_OK_NO_EVIDENCE",
                 "message": f"OK row '{item}' must cite at least one path",
             })
-        if commit and _commit_resolves(commit, repo_root):
+        if commit and _HEX_RE.match(commit) and _commit_resolves(commit, repo_root):
             for p in paths:
                 if p == "-":
                     continue
@@ -160,21 +183,20 @@ def validate_file(path: Path, repo_root: str) -> list[dict]:
     return findings
 
 
-def _is_audit_report(path: Path) -> bool:
-    try:
-        content = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
+def _has_frontmatter_markers(content: str) -> bool:
+    if not content.startswith("---"):
         return False
-    fm, _ = _parse_frontmatter(content)
-    if fm is None:
-        return False
-    return "milestone" in fm and "commit" in fm
+    return content.find("\n---", 3) >= 0
 
 
 def _find_report_files(folder: Path) -> list[Path]:
     found = []
     for md in folder.rglob("*.md"):
-        if _is_audit_report(md):
+        try:
+            content = md.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        if _has_frontmatter_markers(content):
             found.append(md)
     return sorted(found)
 
