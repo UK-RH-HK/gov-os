@@ -17,10 +17,12 @@ one-time code typed back. Nothing outside the process reaches those checks: ``ru
 
 from __future__ import annotations
 
+import hashlib
 import os
 import random
 import re
 import subprocess
+import sys
 import tempfile
 import time
 from pathlib import Path
@@ -45,6 +47,42 @@ def _git(root: Path, *args: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
 
 
+def _mirror_path(root: Path) -> Path:
+    """The mirror file: ``~/.local/state/gov-os/<key>/freeze`` where ``<key>``
+    is ``sha256(realpath(git-common-dir))`` (DEC-429)."""
+    try:
+        raw = subprocess.run(["git", "-C", str(root), "rev-parse", "--git-common-dir"],
+                             capture_output=True, text=True, check=True).stdout.strip()
+        if not os.path.isabs(raw):
+            raw = os.path.join(str(root), raw)
+        common = os.path.realpath(raw)
+    except Exception:
+        common = os.path.realpath(str(root))
+    key = hashlib.sha256(common.encode()).hexdigest()
+    return Path.home() / ".local" / "state" / "gov-os" / key / "freeze"
+
+
+def _write_mirror(root: Path, line: str) -> str | None:
+    """Write the mirror file with the same marker line as the flag (DEC-429).
+    Returns None on success, or an error message on failure."""
+    tmp = None
+    try:
+        mirror = _mirror_path(root)
+        mirror.parent.mkdir(parents=True, exist_ok=True)
+        handle, tmp = tempfile.mkstemp(dir=mirror.parent, prefix="freeze.")
+        with os.fdopen(handle, "w", encoding="utf-8") as f:
+            f.write(line)
+        os.replace(tmp, mirror)
+        return None
+    except OSError as error:
+        if tmp:
+            try:
+                Path(tmp).unlink(missing_ok=True)
+            except OSError:
+                pass
+        return str(error)
+
+
 def _freeze(root: Path, flag: Path, caller: str) -> None:
     """Write the marked flag (DEC-402, DEC-404): a temporary file renamed over the flag's path, never through a link
     there, then read back with the guard's own reader."""
@@ -62,6 +100,9 @@ def _freeze(root: Path, flag: Path, caller: str) -> None:
         if tmp:
             Path(tmp).unlink(missing_ok=True)
         raise GovError("PAUSE_NOT_SET", f"{FREEZE_FLAG} was not written: {error}", {"path": FREEZE_FLAG})
+    mirror_error = _write_mirror(root, line)
+    if mirror_error:
+        sys.stderr.write(f"mirror: {mirror_error}\n")
     if freeze_state(str(root)) != "frozen":
         raise GovError("PAUSE_NOT_SET", f"{FREEZE_FLAG} was written and the guard does not read it as a freeze",
                        {"path": FREEZE_FLAG})
@@ -224,6 +265,14 @@ def _lift_test(root: Path, ancestry: list[dict] | None = None, terminal: tuple[i
     flag = Path(root) / FREEZE_FLAG
     if flag.parent.is_symlink():  # DEC-404: nothing is removed through it, and the owner repairs the folder
         raise _linked(flag)
+    mirror = _mirror_path(Path(root))
+    if mirror.exists():
+        try:
+            mirror.unlink()
+        except OSError as error:
+            raise GovError("PAUSE_NOT_LIFTED",
+                           f"the mirror {mirror} cannot be removed, and the tree stays frozen: {error}",
+                           {"path": str(mirror)})
     try:
         flag.unlink(missing_ok=True)
     except OSError as error:  # a directory at the path: the guard reads it as a freeze
