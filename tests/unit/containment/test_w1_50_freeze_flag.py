@@ -39,8 +39,11 @@ def _git(project, *args):
 
 
 @pytest.fixture()
-def project(tmp_path):
+def project(tmp_path, monkeypatch):
     """A minimal committed project that ignores ``.gov-runtime/``."""
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+    monkeypatch.setenv("HOME", str(fake_home))
     project = tmp_path / "project"
     project.mkdir()
     (project / ".gitignore").write_text(".gov-runtime/\n")

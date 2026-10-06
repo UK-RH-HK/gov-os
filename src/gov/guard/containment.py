@@ -540,17 +540,76 @@ def _restore_flag(root: str, content: str) -> str:
     return ""
 
 
+def _mirror_content(root: str) -> str | None:
+    """The mirror file's content as a string, or None if it doesn't exist or can't be read."""
+    try:
+        from gov.guard.decide import _mirror_path
+        mirror = _mirror_path(root)
+        if mirror.is_file():
+            return mirror.read_text(encoding="utf-8")
+    except Exception:
+        pass
+    return None
+
+
+def _flag_alone_frozen(root: str) -> bool:
+    """Whether the in-repo flag alone says frozen, ignoring the mirror."""
+    from gov.guard.decide import FREEZE_FLAG, FREEZE_MARKER, _FREEZE_HEAD
+    import stat as _stat
+    path = os.path.join(root, FREEZE_FLAG)
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        runtime = os.path.dirname(path)
+        if os.path.islink(runtime) and not os.path.exists(runtime):
+            return True
+        return False
+    except NotADirectoryError:
+        return False
+    except OSError:
+        return True
+    try:
+        st = os.stat(path)
+        if _stat.S_ISCHR(st.st_mode) or (_stat.S_ISREG(st.st_mode) and st.st_size == 0):
+            return False
+        if not _stat.S_ISREG(st.st_mode):
+            return True
+        fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            head = os.read(fd, _FREEZE_HEAD + 1)
+        finally:
+            os.close(fd)
+    except OSError:
+        return True
+    if len(head) > _FREEZE_HEAD:
+        return True
+    return FREEZE_MARKER in head.replace(b"\x00", b"").upper()
+
+
 def _compare_flag(root: str, snap, who: tuple) -> str:
     """A freeze the snapshot remembers and the guard's reader no longer
     reads was removed or emptied during the call: a finding for every
     role, recorded at once, and the flag is restored.  Returns the
     report text (empty = nothing).  A failed restore is said in both.
+
+    DEC-429: also checks the mirror — if the mirror says frozen but the
+    in-repo flag is gone/emptied, that is a finding and the flag is
+    restored from the mirror's content.
     """
-    from gov.guard.decide import FREEZE_FLAG, freeze_state
+    from gov.guard.decide import FREEZE_FLAG
     remembered = (snap or {}).get("freeze")
-    if remembered is None or freeze_state(root) == "frozen":
-        return ""
-    failure = _restore_flag(root, remembered)
+    if remembered is not None:
+        if _flag_alone_frozen(root):
+            return ""
+        content = remembered or _mirror_content(root) or remembered
+    else:
+        mirror = _mirror_content(root)
+        if mirror is None:
+            return ""
+        if _flag_alone_frozen(root):
+            return ""
+        content = mirror
+    failure = _restore_flag(root, content)
     reason = "freeze flag removed or emptied during the call, " + (
         f"restore failed, the tree is not frozen: {failure}" if failure
         else "restored with its marker line")

@@ -2053,6 +2053,12 @@ class TestOptionAfterTheDestination:
 
 class TestFreezeState:
 
+    @pytest.fixture(autouse=True)
+    def _isolate_home(self, tmp_path, monkeypatch):
+        fake_home = tmp_path / "home"
+        fake_home.mkdir(exist_ok=True)
+        monkeypatch.setenv("HOME", str(fake_home))
+
     def _flag(self, tmp_path):
         flag = Path(tmp_path) / ".gov-runtime" / "freeze"
         flag.parent.mkdir(parents=True, exist_ok=True)
