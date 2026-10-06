@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""PreCompact hook (W1-29, CAP-37.b, DEC-264).
+"""Stop hook (W1-29, CAP-37.b).
 
-Writes a checkpoint via gov.checkpoint.record.write with trigger "compaction".
-Never blocks a compaction (always exits 0).
+Writes a checkpoint via gov.checkpoint.record.write with trigger "stop".
+When stop_hook_active is present and truthy, exits 0 immediately with no
+side effects to prevent re-entrancy loops.
+
+Always exits 0.
 """
 from __future__ import annotations
 
@@ -14,6 +17,10 @@ from pathlib import Path
 
 def main() -> None:
     data = json.loads(sys.stdin.read())
+
+    if data.get("stop_hook_active"):
+        return
+
     root = Path(os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
     ticket = os.environ.get("GOV_TICKET", "")
     if not ticket:
@@ -21,11 +28,9 @@ def main() -> None:
 
     try:
         from gov.checkpoint.record import write
-        write(root, ticket, "compaction", "Resume after compaction", [])
-    except Exception as exc:
-        sys.stdout.write(json.dumps({
-            "systemMessage": f"PreCompact: checkpoint not written ({exc}). The compaction proceeds.",
-        }))
+        write(root, ticket, "stop", "Resume after stop", [])
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
