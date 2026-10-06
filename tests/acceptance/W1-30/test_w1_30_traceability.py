@@ -90,9 +90,12 @@ def test_check_green_when_trailers_present_and_resolve(project, sandbox, interfa
     run = support.run_check(project, sandbox)
     envelope = support.check_envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
-    assert status == "GREEN", \
-        f"product-traceability should be GREEN with valid trailers; got {status}"
+    checks = support.checks_of(result)
+    trailer_check = [c for c in checks if c.get("id") == "product-traceability-trailers"]
+    assert trailer_check, \
+        f"product-traceability-trailers check should be registered; checks: {[c.get('id') for c in checks]}"
+    assert trailer_check[0]["status"] == "GREEN", \
+        f"product-traceability-trailers should be GREEN with valid trailers; got {trailer_check[0]}"
 
 
 def test_check_red_when_implements_does_not_resolve(project, sandbox, interface):
