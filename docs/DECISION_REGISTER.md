@@ -4739,3 +4739,51 @@ Decided by the orchestrator on 2026-10-06.
 | Version | Date | Change |
 |---|---|---|
 | 0.106 | 2026-10-06 | Delegated: DEC-436 (W1-26's second-round merge not accepted, the branch rebuilt; a lead's merge commits in one command; a check declaration of an unknown family is never green; family names compared normalised). |
+
+## 107. Delegated decisions on the W1-50 follow-up's packages and on W1-24's packages (register v0.107, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06. The owner was told the same day that DP-M2 to DP-M4 touch the guard and may be overturned.
+
+### DEC-437 — W1-50 follow-up DP-M1 to DP-M4, DP-L1, DP-L2; W1-24 DP-2 to DP-5
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-434 and DEC-416, and as the strictest reading of DEC-429, 2026-10-06) · **Basis:** the test designers' packages, each with a recommendation · **Under:** DEC-429, DEC-409, DEC-402, DEC-425
+- **Decision:**
+  - DP-M1: the mirror entry is named by the SHA-256, in hex, of the real path of the repository's git common
+    directory. The main tree and every worktree share one entry; two clones differ; a moved repository has a new
+    key, which is a residual.
+  - DP-M2: an empty or unmarked file at the mirror's path means frozen (DEC-429: "frozen if either exists").
+    `gov pause` writes the marker line into the mirror.
+  - DP-M3: a lift that cannot remove the mirror refuses and nothing changes; the project stays frozen and the
+    message names the mirror's path. The owner's answer did not cover this case.
+  - DP-M4: the mirror is at `~/.local/state/gov-os/` under the home directory the process sees;
+    `XDG_STATE_HOME` is not followed. A session that changes a child's home directory makes that child read
+    another mirror: a residual to be named with the sessions that can do it.
+  - DP-L1: the lead's role is named `ticket-lead`.
+  - DP-L2: the role has no allowed paths; it writes its scratch through the existing scratch rule.
+  - W1-24 DP-2: `gov context` exits 1 for BLOCKED and CONTRADICTION. DP-3: the supplementary query as built.
+    DP-4: an entry dropped because an index is unavailable carries that reason. DP-5: `--dry-run` computes
+    without writing the brief file.
+  - W1-24's family check that ends green after measuring nothing is a fail-open under DEC-413 and DEC-425 and is
+    fixed, test first, before the ticket's merge.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.107 | 2026-10-06 | Delegated: DEC-437 (the freeze mirror's key, content, lift failure and place; the lead's role name and paths; W1-24 DP-2 to DP-5; W1-24's check that measured nothing is not green). |
+
+## 108. A delegated decision on W1-26's third round (register v0.108, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-438 — W1-26: a family with no registered check is never green
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** `gov check --json` run by the orchestrator on W1-26's branch at `be229cdd`: four of the seventeen families had no registered check and were reported green · **Under:** DEC-425, DEC-413, DEC-436
+- **Decision:**
+  - A family with no registered check has the status YELLOW, with the reason "no registered check" and a count
+    of 0 in its entry. It is never green, and it is not a hard-block by itself.
+  - Every family's entry carries the count of its registered checks, so the wave's exit run (W1-42) can count
+    the families that have at least one executable check.
+  - This is a fail-open under DEC-413 and is fixed test first in a short fourth start of the ticket; no review
+    round follows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.108 | 2026-10-06 | Delegated: DEC-438 (W1-26: a family with no registered check is YELLOW with its reason and a count, never green). |
+

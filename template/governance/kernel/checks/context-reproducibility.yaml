@@ -1,0 +1,5 @@
+id: context-reproducibility
+family: context-reproducibility
+tier: G1
+severity: hard-block
+command: python3 -m gov.context.context_check
