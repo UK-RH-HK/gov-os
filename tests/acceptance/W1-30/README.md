@@ -1,7 +1,7 @@
 # W1-30 acceptance tests: `gov close`
 
 Ticket `DAEO-2lwj`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-49 cases in 7 files.
+75 cases in 8 files (49 first-start + 2 fail-open probe-gate + 24 second-start).
 
 ```
 python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider
@@ -28,13 +28,13 @@ Expected: `1 skipped, 48 errors`.
 
 | KPI line | Tests | Red reason |
 |---|---|---|
-| **S1** "Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions" [CAP-13.a, CAP-24.a, CAP-38.a, CAP-38.c] | `test_w1_30_close.py` (13) | `NOT_IMPLEMENTED` |
-| **S2** "Holds the iteration count … after three consecutive non-converging iterations it stops the loop and puts an escalation package in chat … a failure opens a dependent repair ticket" [CAP-31.b, CAP-59.a] | `test_w1_30_iteration.py` (10) | `NOT_IMPLEMENTED` |
+| **S1** "Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions" [CAP-13.a, CAP-24.a, CAP-38.a, CAP-38.c] | `test_w1_30_close.py` (18), `test_w1_30_watchdog.py` (3) | `NOT_IMPLEMENTED` |
+| **S2** "Holds the iteration count … after three consecutive non-converging iterations it stops the loop and puts an escalation package in chat … a failure opens a dependent repair ticket" [CAP-31.b, CAP-59.a] | `test_w1_30_iteration.py` (14) | `NOT_IMPLEMENTED` |
 | **S3** "Registers the product-traceability family check: the commits of every closed ticket carry Implements: and Task: trailers that resolve" [CAP-38.b] | `test_w1_30_traceability.py` (5) | Product-traceability trailer check not registered |
-| **S4** "A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash" [CAP-38.d] | `test_w1_30_stale.py` (4) | `NOT_IMPLEMENTED` |
-| **S5** "The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented, decisions applied, tests produced, and deviations" [CAP-50.c] | `test_w1_30_receipt.py` (6) | `NOT_IMPLEMENTED` |
-| **S6** "A finding raised at close is classed into exactly one disposition … with whole-system context from gov context before any code change, and the repair ticket records it" [CAP-59.c] | `test_w1_30_disposition.py` (5) | `NOT_IMPLEMENTED` |
-| **S7** "A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer" [CAP-38.f] | `test_w1_30_probe.py` (5) | `NOT_IMPLEMENTED` |
+| **S4** "A ticket that changes governance files cannot close on check results recorded for another commit or inputs hash" [CAP-38.d] | `test_w1_30_stale.py` (5) | `NOT_IMPLEMENTED` |
+| **S5** "The close record is a consumption receipt: the input ids and hashes supplied (packet hash) and used, outputs produced, requirements implemented, decisions applied, tests produced, and deviations" [CAP-50.c] | `test_w1_30_receipt.py` (9) | `NOT_IMPLEMENTED` |
+| **S6** "A finding raised at close is classed into exactly one disposition … with whole-system context from gov context before any code change, and the repair ticket records it" [CAP-59.c] | `test_w1_30_disposition.py` (9) | `NOT_IMPLEMENTED` |
+| **S7** "A FULL-profile ticket closes only with a post-green probe record made by a fresh reviewer session other than the implementer" [CAP-38.f] | `test_w1_30_probe.py` (12) | `NOT_IMPLEMENTED` |
 | **F1** "A ticket closes with a failing acceptance test" | `test_w1_30_close.py::test_close_refuses_when_acceptance_tests_fail` | `NOT_IMPLEMENTED` |
 | **F2** "A fourth consecutive non-converging iteration starts without an owner decision" | `test_w1_30_iteration.py::test_fourth_non_converging_blocked_without_owner` | `NOT_IMPLEMENTED` |
 | **F3** "The iteration count or budget appears in any output seen by the looping session" [CAP-59.b] | `test_w1_30_iteration.py` (3 tests) | `NOT_IMPLEMENTED` |
@@ -50,24 +50,26 @@ Expected: `1 skipped, 48 errors`.
 | CAP-38.a (runs acceptance tests) | `test_w1_30_close.py` (runs tests, refuses on failure) |
 | CAP-38.b (product-traceability check) | `test_w1_30_traceability.py` (5 tests) |
 | CAP-38.c (trailers required) | `test_w1_30_close.py` (Implements:, Task:) |
-| CAP-38.d (stale evidence) | `test_w1_30_stale.py` (4 tests) |
-| CAP-38.f (probe record) | `test_w1_30_probe.py` (5 tests) |
-| CAP-50.c (consumption receipt) | `test_w1_30_receipt.py` (6 tests) |
-| CAP-59.a (escalation) | `test_w1_30_iteration.py` (escalation, options, repair ticket) |
+| CAP-38.d (stale evidence) | `test_w1_30_stale.py` (5 tests) |
+| CAP-38.f (probe record) | `test_w1_30_probe.py` (12 tests) |
+| CAP-50.c (consumption receipt) | `test_w1_30_receipt.py` (9 tests) |
+| CAP-59.a (escalation) | `test_w1_30_iteration.py` (escalation, options, repair ticket, distinct outcomes) |
 | CAP-59.b (count hidden) | `test_w1_30_iteration.py` (count/budget not in output) |
-| CAP-59.c (disposition) | `test_w1_30_disposition.py` (5 tests) |
+| CAP-59.c (disposition) | `test_w1_30_disposition.py` (9 tests) |
+| DEC-416 (checkpoint watchdog) | `test_w1_30_watchdog.py` (3 tests) |
 
 ## Files
 
 | File | Cases | KPI |
 |---|---|---|
-| `test_w1_30_close.py` | 13 | S1, F1, MWA-04 |
-| `test_w1_30_iteration.py` | 10 | S2, F2, F3 |
+| `test_w1_30_close.py` | 18 | S1, F1, MWA-04 |
+| `test_w1_30_iteration.py` | 14 | S2, F2, F3 |
 | `test_w1_30_traceability.py` | 5 | S3 |
-| `test_w1_30_stale.py` | 4 | S4 |
-| `test_w1_30_receipt.py` | 6 | S5 |
-| `test_w1_30_disposition.py` | 5 | S6 |
-| `test_w1_30_probe.py` | 5 | S7 |
+| `test_w1_30_stale.py` | 5 | S4 |
+| `test_w1_30_receipt.py` | 9 | S5 |
+| `test_w1_30_disposition.py` | 9 | S6 |
+| `test_w1_30_probe.py` | 12 | S7 |
+| `test_w1_30_watchdog.py` | 3 | S1 (DEC-416) |
 
 ## The interface the tests fix
 
@@ -123,6 +125,29 @@ to records in the store.
 `rebuild` as the not-yet-built stand-in in `test_a_faulty_module_fails_its_own_command_and_no_other`.
 **The test designer's paths do not cover `tests/unit/`; this edit belongs to the engineer
 or orchestrator** (following the pattern of commit `9c8fec02`, which was `Role: orchestrator`).
+
+## Second-start tests (24 new cases)
+
+Added by a second Independent Test Designer pass (11 points).
+
+| Point | File | New cases | Red reason |
+|---|---|---|---|
+| 2 | `test_w1_30_close.py` | 2 (no acceptance dir, empty dir) | Missing acceptance tests not checked |
+| 3 | `test_w1_30_close.py` | 1 (regression test failure) | Regression test failure not checked |
+| 4 | `test_w1_30_probe.py` | 5 (commissioned_by, judged_by, judgement, malformed YAML, unreadable) | Probe validation fields not checked |
+| 5 | `test_w1_30_receipt.py` | 3 (packet_hash matches, context failure, input hash of content) | Hash is invented fallback, not from context |
+| 6 | `test_w1_30_disposition.py` | 4 (no class, two classes, six valid names, repair records class) | Code assigns DISPOSITIONS[0] to everything |
+| 7 | `test_w1_30_iteration.py` | 2 (distinct outcomes, reason not converging) | Outcomes are duplicated copies |
+| 8 | `test_w1_30_close.py` | 2 (trailer exact match, ticket tool interface) | Substring match bug; string replacement |
+| 9 | `test_w1_30_stale.py` | 1 (stale evidence without prior close) | Existing test closes first, masking stale check |
+| 10 | `test_w1_30_watchdog.py` | 3 (stale checkpoint, missing checkpoint, closing checkpoint written) | No call to gov.checkpoint.record.watch() |
+| 11 | `test_w1_30_iteration.py` | 1 (outcomes list reveals count to looping session) | Outcomes list length IS the count (CAP-59.b) |
+
+### Packages (not testable without new code)
+
+- **Point 1** (containment commit-range check): `check_containment` in `src/gov/guard/containment.py` is snapshot-based. Checking that a ticket's commits stay within `allowed_paths` requires a commit-range function that does not exist yet. **Package**: add `check_commit_range(root, ticket, allowed_paths)` to containment.py.
+- **Point 4 sub-item** (reviewer "wrote nothing" verification): `reviewer_wrote_nothing` in the probe record is a claim by the reviewer session. Verifying it against the repository (no commits with `Role: independent-test-designer` trailers for this ticket) requires comparing commit trailers, which `_check_probe` does not do. **Package**: add verification of `reviewer_wrote_nothing` against commit history.
+- **Point 6 sub-item** (disposition source): Who provides the disposition is unclear — the code assigns `DISPOSITIONS[0]` unconditionally. The tests check that each finding has exactly one valid disposition, but the mechanism (argument, file, or orchestrator-provided) is a design decision. **Package**: decide and implement the disposition assignment mechanism.
 
 ## Residuals
 

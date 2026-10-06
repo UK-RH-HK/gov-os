@@ -195,3 +195,79 @@ def test_iteration_count_hidden_across_multiple_failures(project, sandbox, inter
         for field in ITERATION_FIELDS + BUDGET_FIELDS:
             assert field not in serialised, \
                 f"iteration {i + 1}: output exposes '{field}' (CAP-59.b)"
+
+
+# --------------------------------------------------------------------------
+# Point 7 (WEAK): Escalation outcomes are distinct per iteration (S2, CAP-59.a)
+# --------------------------------------------------------------------------
+
+def test_escalation_outcomes_are_distinct_per_iteration(project, sandbox, interface):
+    """KPI S2, CAP-59.a: each of the 3 outcomes in the escalation package must identify its iteration.
+
+    The outcomes must not be identical copies of a single failure set.
+    """
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    outcomes = details.get("outcomes") or details.get("iterations") or []
+    assert isinstance(outcomes, list) and len(outcomes) >= 3, \
+        f"the escalation package must list at least 3 outcomes (one per iteration): {details}"
+
+
+def test_escalation_includes_reason_not_converging(project, sandbox, interface):
+    """KPI S2, CAP-59.a: the escalation package includes a reason why failures are not converging."""
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    reason = details.get("reason") or details.get("why") or error.get("message", "")
+    assert reason, "the escalation package must include a reason why failures are not converging"
+    serialised = json.dumps(details).lower()
+    assert "converg" in serialised or "repeat" in serialised or "same" in serialised or reason, \
+        "the escalation should explain why the iterations are not converging"
+
+
+# --------------------------------------------------------------------------
+# Point 11: F3 — does the looping session's error output contain the outcomes list?
+#
+# Settlement: CAP-59.b says "the iteration count or budget appears in any output
+# seen by the looping session". The looping session is the one that calls gov close
+# repeatedly. The escalation package (with the outcomes list) is for the owner,
+# delivered through the orchestrator in chat — the looping session does NOT see it.
+#
+# The looping session sees only the 4th attempt's error envelope (ok: false, exit 4).
+# If that envelope contains the outcomes list, its length reveals the iteration count.
+#
+# From the code: the escalation error is raised with the outcomes in details, and the
+# looping session receives that JSON envelope. The test checks that the looping
+# session's output does not contain an outcomes list whose length reveals the count.
+# --------------------------------------------------------------------------
+
+def test_escalation_output_to_looping_session_has_no_count(project, sandbox, interface):
+    """KPI F3, CAP-59.b: the error envelope returned to the looping session must not
+    contain iteration-count-revealing information (no outcomes list, no count field).
+
+    The outcomes list has one entry per iteration, so len(outcomes) IS the count.
+    The looping session must not see it.
+    """
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    outcomes = details.get("outcomes") or details.get("iterations")
+    if isinstance(outcomes, list) and len(outcomes) > 1:
+        pytest.fail(
+            f"the looping session's error envelope contains {len(outcomes)} outcomes, "
+            "which reveals the iteration count (CAP-59.b); the outcomes list must go "
+            "to the orchestrator/owner, not to the looping session"
+        )

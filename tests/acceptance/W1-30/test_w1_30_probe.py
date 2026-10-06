@@ -187,3 +187,79 @@ def test_probe_missing_implementer_session_field(project, sandbox, interface):
         "a probe that omits implementer_session must be rejected"
     assert run.returncode in (support.EXIT_GOV_ERROR, support.EXIT_BLOCKED), \
         f"expected exit 1 or 4, got {run.returncode}"
+
+
+# --------------------------------------------------------------------------
+# Point 4 (MISSING): commissioned_by / judged_by validation (S7, CAP-38.f)
+# --------------------------------------------------------------------------
+
+def test_probe_requires_commissioned_by_orchestrator(project, sandbox, interface):
+    """KPI S7, CAP-38.f: commissioned_by must be 'orchestrator'; another value is refused."""
+    _full_project_without_probe(project)
+    project.add_probe(TICKET, commissioned_by="engineer")
+    project.commit("add probe bad commissioned_by", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe with commissioned_by != 'orchestrator' must be rejected"
+
+
+def test_probe_requires_judged_by_orchestrator(project, sandbox, interface):
+    """KPI S7, CAP-38.f: judged_by must be 'orchestrator'; another value is refused."""
+    _full_project_without_probe(project)
+    project.add_probe(TICKET, judged_by="engineer")
+    project.commit("add probe bad judged_by", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe with judged_by != 'orchestrator' must be rejected"
+
+
+def test_probe_requires_judgement_present(project, sandbox, interface):
+    """KPI S7, CAP-38.f: 'judged by the orchestrator' means a judgement must exist.
+
+    A probe that has judged_by but no judgement field (or empty) is refused.
+    """
+    _full_project_without_probe(project)
+    import yaml
+    probe_id = f"PR-{TICKET}"
+    front = {
+        "id": probe_id, "type": "probe", "status": "ACTIVE",
+        "state_class": "NARRATIVE", "task": TICKET,
+        "reviewer_session": "reviewer-001", "implementer_session": "impl-001",
+        "reviewer_wrote_nothing": True,
+        "commissioned_by": "orchestrator", "judged_by": "orchestrator",
+    }
+    text = "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n\n"
+    text += f"# {probe_id} — Probe record for {TICKET}\n\nPost-green probe.\n"
+    probe_path = f"docs/probes/{TICKET}/{probe_id}.md"
+    project.write(probe_path, text)
+    project.commit("add probe without judgement", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe with judged_by but no judgement field must be rejected"
+
+
+def test_probe_malformed_yaml_is_refused_by_name(project, sandbox, interface):
+    """KPI S7, CAP-38.f: a probe file with invalid YAML is refused, naming the file."""
+    _full_project_without_probe(project)
+    probe_path = f"docs/probes/{TICKET}/PR-{TICKET}.md"
+    project.write(probe_path, "---\ninvalid: yaml: [broken\n---\n\nBad probe.\n")
+    project.commit("add malformed probe", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe file with invalid YAML must be refused, not skipped"
+
+
+def test_probe_unreadable_file_is_refused(project, sandbox, interface):
+    """KPI S7, CAP-38.f: a probe directory with an unparseable file is refused."""
+    _full_project_without_probe(project)
+    probe_path = f"docs/probes/{TICKET}/PR-{TICKET}.md"
+    project.write(probe_path, "not a yaml frontmatter file at all\n")
+    project.commit("add unparseable probe", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe directory with unparseable files must be refused, not skipped"

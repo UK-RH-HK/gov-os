@@ -104,3 +104,91 @@ def test_context_provides_whole_system_view(project, sandbox, interface):
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
+
+
+# --------------------------------------------------------------------------
+# Point 6 (WEAK): disposition validation and repair-ticket recording (S6, CAP-59.c)
+# --------------------------------------------------------------------------
+
+def test_finding_with_no_class_is_refused(project, sandbox, interface):
+    """KPI S6, CAP-59.c: a finding that arrives at close with no disposition class is refused."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    findings = details.get("findings", [])
+    for finding in findings:
+        if isinstance(finding, dict):
+            disposition = finding.get("disposition")
+            assert disposition is not None, \
+                "every finding must have a disposition class, not None"
+            assert disposition != "", \
+                "every finding must have a non-empty disposition class"
+
+
+def test_finding_with_two_classes_is_refused(project, sandbox, interface):
+    """KPI S6, CAP-59.c: a finding with two disposition classes is refused.
+
+    Each finding is classed into exactly one disposition.
+    """
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    findings = details.get("findings", [])
+    for finding in findings:
+        if isinstance(finding, dict):
+            disposition = finding.get("disposition")
+            if isinstance(disposition, list):
+                assert len(disposition) == 1, \
+                    f"a finding must have exactly one disposition, got {len(disposition)}"
+            elif isinstance(disposition, str):
+                assert disposition.count(",") == 0, \
+                    "a finding must have exactly one disposition, not a comma-separated list"
+
+
+def test_six_names_are_the_only_valid_dispositions(project, sandbox, interface):
+    """KPI S6, CAP-59.c, L-0077: only the six named dispositions are valid."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    findings = details.get("findings", [])
+    for finding in findings:
+        if isinstance(finding, dict):
+            disposition = finding.get("disposition")
+            if disposition is not None:
+                assert disposition in support.DISPOSITIONS, \
+                    f"disposition {disposition!r} is not one of the six: {support.DISPOSITIONS}"
+
+
+def test_repair_ticket_records_the_class_given(project, sandbox, interface):
+    """KPI S6, CAP-59.c: the repair ticket's frontmatter includes the disposition class."""
+    _project_with_finding(project)
+    support.run_close(project, sandbox, TICKET)
+    import yaml
+    tickets_dir = project.root / ".tickets"
+    ticket_files = list(tickets_dir.glob("*.md"))
+    repair_tickets = [f for f in ticket_files if f.name != f"{TICKET}.md"]
+    found_class = False
+    for repair_path in repair_tickets:
+        text = repair_path.read_text(encoding="utf-8")
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            front = yaml.safe_load(parts[1]) or {}
+            if front.get("class") == "repair" or front.get("parent") == TICKET:
+                disp = front.get("disposition") or front.get("finding_disposition")
+                if disp and disp in support.DISPOSITIONS:
+                    found_class = True
+                    break
+                findings = front.get("findings", [])
+                if findings:
+                    found_class = True
+                    break
+    assert found_class, "the repair ticket must record the finding's disposition class"

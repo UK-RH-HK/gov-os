@@ -223,3 +223,97 @@ def test_containment_blocks_close_for_out_of_scope_commit(project, sandbox, inte
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
         "gov close must refuse when a commit changes files outside allowed_paths"
+
+
+# --------------------------------------------------------------------------
+# Point 2 (MISSING): No acceptance tests closes green (S1, F1)
+# DEC-425: nothing measured is never a pass.
+# --------------------------------------------------------------------------
+
+def test_close_refuses_when_no_acceptance_tests_exist(project, sandbox, interface):
+    """KPI S1, DEC-425: a ticket with no tests/acceptance/<wbs>/ directory cannot close."""
+    ticket_id = "PROJ-noat"
+    wbs = "W1-noat"
+    project.add_ticket(ticket_id, wbs)
+    import shutil
+    acc_dir = project.root / "tests" / "acceptance" / wbs
+    if acc_dir.is_dir():
+        shutil.rmtree(acc_dir)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement without acceptance tests", who=IMPL,
+                   trailers=("Task: PROJ-noat", "Role: engineer", "Implements: CAP-01"))
+    run = support.run_close(project, sandbox, ticket_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "gov close must refuse when no acceptance test directory exists (DEC-425)"
+
+
+def test_close_refuses_when_acceptance_dir_is_empty(project, sandbox, interface):
+    """KPI S1, DEC-425: a ticket whose acceptance dir has only README.md (no test files) cannot close."""
+    ticket_id = "PROJ-empt"
+    wbs = "W1-empt"
+    project.add_ticket(ticket_id, wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement with empty acceptance dir", who=IMPL,
+                   trailers=("Task: PROJ-empt", "Role: engineer", "Implements: CAP-01"))
+    run = support.run_close(project, sandbox, ticket_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "gov close must refuse when the acceptance dir has no test files (DEC-425)"
+
+
+# --------------------------------------------------------------------------
+# Point 3 (WEAK): Regression test failure blocks close (S1, CAP-38.a)
+# --------------------------------------------------------------------------
+
+def test_close_refuses_when_regression_test_fails(project, sandbox, interface):
+    """KPI S1, CAP-38.a, CAP-13.a: a failing regression test under tests/unit/ blocks close."""
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    support.write(project.root, "tests/unit/close/test_regression_fail.py",
+                  "def test_regression_fail():\n    assert False, 'regression broke'\n")
+    project.commit("implement with broken regression", who=IMPL, trailers=TRAILERS_GOOD)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "gov close must refuse when a regression test under tests/unit/ fails"
+
+
+# --------------------------------------------------------------------------
+# Point 8 (MISSING): Task trailer exact match, not substring (S1)
+# --------------------------------------------------------------------------
+
+def test_task_trailer_exact_match_not_substring(project, sandbox, interface):
+    """KPI S1, CAP-38.c: Task: AB must not count as a commit of ticket A."""
+    ticket_a = "PROJ-a"
+    ticket_ab = "PROJ-ab"
+    wbs_a = "W1-tka"
+    wbs_ab = "W1-tkab"
+    project.add_ticket(ticket_a, wbs_a)
+    project.add_ticket(ticket_ab, wbs_ab)
+    project.add_passing_test(wbs_a)
+    project.add_passing_test(wbs_ab)
+    project.write("src/example/feature_ab.py", "# feature for AB\n")
+    project.commit("implement AB only", who=IMPL,
+                   trailers=("Task: PROJ-ab", "Role: engineer", "Implements: CAP-01"))
+    run = support.run_close(project, sandbox, ticket_a)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a commit with Task: PROJ-ab must not match ticket PROJ-a (substring match bug)"
+
+
+def test_ticket_closed_through_ticket_tool_interface(project, sandbox, interface):
+    """KPI S1: after close, the ticket file has valid YAML frontmatter with status: closed."""
+    _green_project(project)
+    support.run_close(project, sandbox, TICKET)
+    front = support.read_ticket_frontmatter(project.root, TICKET)
+    assert front.get("status") == "closed", "ticket status must be 'closed' after gov close"
+    import yaml
+    ticket_path = project.root / support.ticket_path(TICKET)
+    text = ticket_path.read_text(encoding="utf-8")
+    parts = text.split("---", 2)
+    assert len(parts) >= 3, "ticket file must have valid YAML frontmatter after close"
+    parsed = yaml.safe_load(parts[1])
+    assert isinstance(parsed, dict), "ticket frontmatter must be valid YAML after close"
+    assert parsed.get("status") == "closed"

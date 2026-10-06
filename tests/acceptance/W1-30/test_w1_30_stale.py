@@ -80,3 +80,48 @@ def test_non_governance_change_does_not_require_rerun(project, sandbox, interfac
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True
+
+
+# --------------------------------------------------------------------------
+# Point 9 (WEAK): Stale evidence after governance change, no prior close
+# The existing test_close_rejects_stale_check_results_after_governance_change
+# first closes the ticket (run1 succeeds), then the second attempt hits
+# "already closed", not the stale-evidence check. This new case does NOT
+# close first: it records green evidence (passing checks), then changes
+# governance, then tries to close. Close must refuse because the evidence
+# is stale.
+# --------------------------------------------------------------------------
+
+def test_stale_evidence_after_governance_change_without_prior_close(project, sandbox, interface):
+    """KPI S4, CAP-38.d: stale evidence after a governance change blocks close (no prior close).
+
+    Set up: ticket has passing tests and a governance file in its commits.
+    Run gov check (evidence recorded). Then change a governance file and
+    commit. Then run gov close. The close must refuse because the check
+    evidence is stale (recorded at an old commit / old inputs hash).
+    """
+    ticket_id = "PROJ-stl2"
+    wbs = "W1-stale2"
+    trailers = ("Task: PROJ-stl2", "Role: engineer", "Implements: CAP-01")
+    project.add_ticket(ticket_id, wbs,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/checks/**"])
+    project.add_passing_test(wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("template/governance/kernel/checks/stale-test.yaml",
+                  'id: "stale-test"\nfamily: "schema/invariants"\ntier: "G1"\n'
+                  'severity: "warning"\ncommand: "true"\n')
+    project.commit("implement with governance", who=IMPL, trailers=trailers)
+
+    run_check = support.run_check(project, sandbox)
+    support.check_envelope_of(run_check, interface)
+
+    project.write("template/governance/kernel/checks/stale-test.yaml",
+                  'id: "stale-test"\nfamily: "schema/invariants"\ntier: "G1"\n'
+                  'severity: "hard-block"\ncommand: "true"\n')
+    project.commit("change governance check severity", who=IMPL, trailers=trailers)
+
+    run = support.run_close(project, sandbox, ticket_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False or run.returncode != support.EXIT_OK, \
+        "gov close must refuse stale evidence after a governance change (no prior close)"
