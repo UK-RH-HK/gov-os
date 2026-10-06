@@ -1075,3 +1075,41 @@ Recorded at W1-19's close, from the ticket lead rounds' summaries. Measured on t
 - **Latency occurrence (DEC-372):** in the regression after the merge, W1-02's
   `test_decision_p95_is_under_100_ms[frozen-deny]` failed under load and passed alone.
 - **`ollama serve` is left running** by the code under test (DEC-261).
+
+## W1-11 residuals (decision checker and owner-approval facts, 2026-10-06)
+
+- **Speed, for W1-26:** 200 `ACTIVE` decisions under 20,000 commits take 5 to 6 minutes and about 1 GB (341 s,
+  1.07 GB measured; linear in decisions times commits, one `cat-file --batch` round trip per decision per commit).
+  On this repository the checker takes 0.24 s. Too slow at that size for every `gov check`: a cache, a skip list or
+  an early stop is needed.
+- **A `tree:0` partial clone fetches through the merge helper:** its `diff-tree` runs without `GIT_NO_LAZY_FETCH`.
+  It fails closed (`GovError`), but it is a network read. The fix is in W1-50's helper module
+  (`gov.guard.containment_merge`), outside this ticket's paths.
+- **`GIT_TRACE` reaches the helper's git** and writes a trace file; no answer changes. Same module.
+- **Exact comparisons of status and ids:** `ACTIVE` is case-sensitive; `status: active` passes silently.
+- **`type: decision` with an empty `id:`** is followed as `"None"` or `""`, not reported as a decision without id.
+  Only an owner-set `ACTIVE` one with a deliberately empty id passes.
+- **Heads that look like frontmatter but are not read as such:** a zero-width space, word joiner, form feed or
+  vertical tab before `---`; UTF-16 without BOM, UTF-32, spaces only before `---`. DEC-387 names five heads and the
+  suite tests those five; the others pass silently and need a deliberate author.
+- **Edits that keep `ACTIVE` pass:** an agent that edits the body of an approved decision and keeps its status is
+  not flagged. By design (DEC-360).
+- **Backdating:** the author date is not compared with the committer date.
+- **A signature as the stricter approval fact** (DEC-360) is not built or tested.
+- **False alarms on merges, all flagged where a reader would pass them:** two branches edit the body of an approved
+  `ACTIVE` decision and git combines them cleanly; an agent resolves a conflict in an `ACTIVE` body; an agent's
+  squash merge of an owner-approved branch; the owner approved on both sides with two texts and an agent keeps
+  one; a non-UTF-8 file name (every brought decision is flagged); the owner's `ACTIVE` at a non-UTF-8 path; the
+  owner's merge with 25 parents. A shallow clone gives `GovError`.
+- **Raw exceptions that fail closed:** deeply nested YAML raises a bare `RecursionError`, not `GovError`.
+- **Tickets waiting on a dead package are matched by file stem:** a ticket under `.tickets/sub/` is not found.
+- **A dead package without `id` fails no ticket;** the schema requires `id`.
+- **Gates:** only the key `approval` is read (DEC-331). `Approval:`, `approvals:`, `approved_by:`, an empty
+  `approval:`, and `.yaml` or `.MD` files are silent.
+- **Overlapping ids** are tested only for identical digit strings; `ADR-0001` beside `DEC-001` is not.
+- **The checker imports private helpers from the store's loader** (`_frontmatter`, `_ids`, `TRAILER_RULE_DATE`).
+  The loader's `_frontmatter` uses `\x1f` as a marker; a file holding that byte is the loader's matter.
+- **On this repository the approval rule judged nothing:** 3 decision files, all `PROPOSED`, and no `Role: owner`
+  commit that sets one `ACTIVE`. 181 real merges were replayed through the helper; none raised.
+- **W1-16's `test_this_repository_is_not_indexed_by_the_run`** was killed once under load in the lead's run and
+  passed alone (166 passed).
