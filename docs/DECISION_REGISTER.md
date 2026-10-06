@@ -4787,3 +4787,25 @@ Decided by the orchestrator on 2026-10-06.
 |---|---|---|
 | 0.108 | 2026-10-06 | Delegated: DEC-438 (W1-26: a family with no registered check is YELLOW with its reason and a count, never green). |
 
+## 109. A delegated decision: W1-26 is reopened for the generic validators it did not build (register v0.109, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-439 — W1-26 reopened: the generic validators for skill files and audit reports
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** W1-35's return: its check `skill-regression-a` had no validator to call and was declared with a command that always succeeds; W1-26's KPI line "provides the generic validators for skill files and audit reports" was met by no code and by no case, and the ticket was closed by the orchestrator without noticing · **Under:** DEC-413, DEC-425, DEC-438
+- **Decision:**
+  - W1-26 (`DAEO-fygv`) is reopened for one follow-up round in its own paths: a validator for skill files
+    (frontmatter, version, description and body size, every referenced `gov` command exists) and a validator
+    for audit reports (the cited commit, the rows and the evidence paths resolve), each callable as a check
+    command with the files or folders to validate as arguments, test first.
+  - A validator that is given nothing to validate, or that cannot read what it is given, is unmeasured and
+    never green (DEC-425).
+  - W1-35 and W1-36 declare their checks with these validators. A check declared with a command that always
+    succeeds is not merged.
+  - No new ticket is made and no KPI line changes: the line was already W1-26's.
+  - The close of W1-26 on 2026-10-06 was the orchestrator's error: a KPI clause with no case. From now on the
+    orchestrator reads every clause of every KPI line against the designer's case table before a close.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.109 | 2026-10-06 | Delegated: DEC-439 (W1-26 reopened for the generic validators for skill files and audit reports; a check declared with a command that always succeeds is not merged). |
