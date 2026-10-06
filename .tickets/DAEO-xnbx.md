@@ -1,6 +1,6 @@
 ---
 id: DAEO-xnbx
-status: in_progress
+status: closed
 deps: [DAEO-8qvp]
 links: []
 created: 2026-10-04T12:38:05Z

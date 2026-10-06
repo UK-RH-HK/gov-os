@@ -75,7 +75,8 @@ def test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else
                                                                                  interface):
     """Failure 2. The command runs from another directory: the flag follows ``--root``, not the caller.
 
-    A plain pause writes nothing but the flag: the ticket files are compared too (DEC-367).
+    A plain pause writes nothing but the flag and the freeze mirror (DEC-429): the ticket files are compared
+    too (DEC-367).
     """
     skip = (".git", support.RUNTIME_REL)
     before = {"project": cli_support.snapshot(project, skip=skip),
@@ -92,9 +93,16 @@ def test_the_flag_lives_in_the_runtime_directory_of_the_project_and_nowhere_else
     after = {"project": cli_support.snapshot(project, skip=skip),
              "home": cli_support.snapshot(sandbox.home, skip=()),
              "elsewhere": cli_support.snapshot(sandbox.elsewhere, skip=())}
-    for place in before:
+    for place in ("project", "elsewhere"):
         changed = cli_support.snapshot_difference(before[place], after[place])
         assert not changed, f"gov pause wrote outside {support.RUNTIME_REL}/ ({place}): {changed}\n{run.describe()}"
+    # DEC-429: gov pause writes a freeze mirror under ~/.local/state/gov-os/<key>/freeze.
+    home_changed = cli_support.snapshot_difference(before["home"], after["home"])
+    non_mirror = [d for d in home_changed if not cli_support.is_freeze_mirror_entry(d)]
+    assert not non_mirror, \
+        f"gov pause wrote to home outside .local/state/gov-os/: {non_mirror}\n{run.describe()}"
+    assert any("/freeze" in d for d in home_changed), \
+        f"gov pause did not create the freeze mirror (DEC-429)\n{run.describe()}"
 
 
 def test_the_flag_is_not_seen_by_git(paused):

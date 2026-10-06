@@ -21,7 +21,10 @@ project only.
 
 from __future__ import annotations
 
+import hashlib
 import os
+import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -65,15 +68,41 @@ def test_a_refused_caller_writes_no_flag(freeze_project, freeze_pause, freeze_in
     assert not os.path.lexists(support.flag(freeze_project)), "a refused gov pause left something at the flag's path"
 
 
+def _mirror_for(project, home):
+    """The mirror file ``gov pause`` writes for *project* under *home* (DEC-429)."""
+    proc = subprocess.run(
+        ["git", "-C", str(project), "rev-parse", "--git-common-dir"],
+        capture_output=True, text=True, check=True,
+    )
+    raw = proc.stdout.strip()
+    if not os.path.isabs(raw):
+        raw = os.path.join(str(project), raw)
+    key = hashlib.sha256(os.path.realpath(raw).encode()).hexdigest()
+    return Path(home) / ".local/state/gov-os" / key / "freeze"
+
+
 def test_the_flag_pause_writes_is_the_freeze_the_guard_reads(freeze_project, freeze_sandbox, freeze_pause,
                                                              freeze_interface):
-    """The writer and the reader agree: the guard denies on the flag as written, and allows once it is emptied."""
+    """The writer and the reader agree: the guard denies on the flag as written;
+    the mirror keeps it frozen after the flag is emptied (DEC-429); and allows
+    once both the flag and the mirror are removed.
+
+    Revised after implementation: DEC-429 (the freeze mirror) means emptying the
+    flag alone does not unfreeze — the mirror still holds the marker.
+    """
     pause_support.succeeded(freeze_pause(), freeze_interface)
     support.assert_marker(support.flag(freeze_project), support.OWNER_NAME, "after gov pause")
     support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "after gov pause")
+
     support.put_text(freeze_project, "")
+    support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox),
+                          "after the flag was emptied: the mirror keeps it frozen (DEC-429)")
+
+    mirror = _mirror_for(freeze_project, freeze_sandbox.home)
+    if mirror.exists():
+        mirror.unlink()
     support.assert_not_frozen(support.guard_write(freeze_project, freeze_sandbox),
-                              "after the flag gov pause wrote was emptied")
+                              "after both the flag and the mirror are removed")
 
 
 @pytest.mark.parametrize("already_there", ("an-empty-file-0444", "text-without-the-marker"))
