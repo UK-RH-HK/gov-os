@@ -138,8 +138,11 @@ def _allow() -> None:
     sys.exit(0)
 
 
-def _take_snapshot(project_root: str, data: dict) -> None:
+def _take_snapshot(project_root: str, data: dict, flag: str) -> None:
     """Take a before-snapshot for the containment check (DEC-126).
+
+    *flag* is the one reading of the freeze flag (DEC-402): the
+    snapshot remembers a freeze from it (DEC-407).
 
     Called when the guard lets a Bash call through.  Snapshot failure
     in a non-git directory does not block the call.  Any other failure
@@ -152,7 +155,7 @@ def _take_snapshot(project_root: str, data: dict) -> None:
         from gov.guard.containment import take_snapshot
         take_snapshot(project_root, tool_use_id,
                       session_id=data.get("session_id", ""),
-                      agent_id=data.get("agent_id", ""))
+                      agent_id=data.get("agent_id", ""), flag=flag)
     except Exception as exc:
         # Snapshot failure must not go unnoticed (but does not block).
         _append_finding(project_root, {
@@ -293,7 +296,7 @@ def main() -> None:
                     # The owner may approve; take the before-snapshot
                     # so containment can run if the command executes.
                     _record()
-                    _take_snapshot(project_root, data)
+                    _take_snapshot(project_root, data, flag)
                     _ask(f"install command requires owner approval "
                          f"(tool registry record required): {command}")
                 elif ar == "research" and install_in_experiment_folder(
@@ -301,7 +304,7 @@ def main() -> None:
                     # DEC-163: the research role's one exception; the
                     # sandbox's write fence holds it to the folder.
                     _record()
-                    _take_snapshot(project_root, data)
+                    _take_snapshot(project_root, data, flag)
                     _allow()
                 else:
                     _deny(
@@ -313,7 +316,7 @@ def main() -> None:
                 # Non-install Bash: take the before-snapshot (DEC-126)
                 # and allow.
                 _record()
-                _take_snapshot(project_root, data)
+                _take_snapshot(project_root, data, flag)
                 _allow()
         elif tool_name in ("Write", "Edit", "NotebookEdit"):
             _record()
