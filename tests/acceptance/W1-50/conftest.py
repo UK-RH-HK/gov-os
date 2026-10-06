@@ -78,6 +78,43 @@ def call(sandbox):
 
 
 @pytest.fixture()
+def call_leaving_changes(sandbox):
+    """``call_leaving_changes(project, command, role, ticket, uncommitted)`` -> (result, state after).
+
+    One whole Bash call that moves ``HEAD`` on the same branch and leaves
+    exactly the paths ``uncommitted`` changed in the working tree and not
+    committed. With ``dirty_before``, those paths were already changed when
+    the call began.
+    """
+
+    def _call(project, command, role, ticket, uncommitted, dirty_before=False):
+        seen = len(check_support.finding_lines(project))
+        before = check_support.head(project)
+        status_before = check_support.porcelain_all(project)
+        assert bool(status_before) == dirty_before, (
+            f"the fixture is wrong: before the call git status --porcelain is:\n{status_before}"
+        )
+        the_call = check_support.script_call(sandbox, command)
+        guard = check_support.run_guard(project, the_call, sandbox, role=role, ticket=ticket)
+        check_support.assert_let_through(guard, the_call)
+        bash = check_support.run_bash(project, the_call.command, sandbox)
+        assert bash.returncode == 0, (
+            f"the fixture command `{command}` failed: {bash.stdout.strip()!r} {bash.stderr.strip()!r}"
+        )
+        left = check_support.state(project, support.WATCHED)
+        assert left[0][0] != before[0], f"the fixture command `{command}` did not move HEAD"
+        assert left[0][1] == before[1], f"the fixture command `{command}` left the branch {before[1]!r}"
+        changed = sorted(line[3:] for line in left[1].splitlines())
+        assert changed == sorted(uncommitted), (
+            f"the fixture command `{command}` left other uncommitted changes than {sorted(uncommitted)}:\n{left[1]}"
+        )
+        result = check_support.run_check(project, the_call, sandbox, role=role, ticket=ticket, bash=bash, seen=seen)
+        return result, left
+
+    return _call
+
+
+@pytest.fixture()
 def during_a_call(sandbox):
     """``during_a_call(project, role, ticket, work)`` -> (result, state after).
 

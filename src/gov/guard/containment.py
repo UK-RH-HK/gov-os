@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import time
 
@@ -62,19 +63,36 @@ class _GitError(Exception):
     pass
 
 
-def _git(root: str, *args: str) -> str:
-    """Run a git command and return stdout.  Raises on failure."""
+# Every git call reads the real objects of the repository at its root,
+# whatever refs/replace/, .git/info/grafts, .git/shallow or a commit-graph
+# file holds, and whatever repository an inherited variable names.
+_GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false")
+_GIT_ELSEWHERE = (
+    "GIT_DIR", "GIT_WORK_TREE", "GIT_COMMON_DIR", "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_NAMESPACE")
+
+
+def _git_env() -> dict:
+    env = {k: v for k, v in os.environ.items() if k not in _GIT_ELSEWHERE}
+    env.update(GIT_GRAFT_FILE=os.devnull, GIT_SHALLOW_FILE=os.devnull)
+    return env
+
+
+def _git(root: str, *args: str, ok: tuple = (0,)) -> str:
+    """Run a git command and return stdout.  Raises on failure: an exit
+    code that is not among *ok*."""
     try:
         p = subprocess.run(
-            ["git", "-C", root, *args],
+            [*_GIT, "-C", root, *args],
             capture_output=True, text=True,
-            timeout=_GIT_TIMEOUT, check=False,
+            timeout=_GIT_TIMEOUT, check=False, env=_git_env(),
         )
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
         raise _GitError(str(e)) from e
     if p.returncode == 128 and "not a git repository" in p.stderr.lower():
         raise _NotARepo(p.stderr.strip())
-    if p.returncode != 0:
+    if p.returncode not in ok:
         raise _GitError(p.stderr.strip())
     return p.stdout
 
@@ -573,19 +591,246 @@ def _is_ancestor(root: str, old: str, new: str) -> bool:
     """True when *old* is an ancestor of *new*.  Raises on failure."""
     try:
         p = subprocess.run(
-            ["git", "-C", root, "merge-base", "--is-ancestor", old, new],
+            [*_GIT, "-C", root, "merge-base", "--is-ancestor", old, new],
             capture_output=True, timeout=_GIT_TIMEOUT, check=False,
+            env=_git_env(),
         )
     except (subprocess.TimeoutExpired, FileNotFoundError) as e:
         raise _GitError(str(e)) from e
     return p.returncode == 0
 
 
-def _committed_files(root: str, old: str, new: str) -> list:
-    """Paths changed between two commits, without rename detection
-    so that both ends of a rename are listed (repair 7)."""
-    out = _git(root, "diff", "--name-only", "--no-renames", old, new)
-    return [f for f in out.strip().splitlines() if f.strip()]
+# ---- commits of a forward move (W1-50, DEC-255) -------------------
+
+_LOG_FORMAT = "--format=%x00%H %P%x00%(trailers)%x00"
+# What the repository's local configuration could set otherwise: how a
+# trailer block is told from text, the message's encoding, a root
+# commit's changes, renames, and submodule entries.
+_LOG_DEFAULTS = ("-c", "trailer.separators=:", "-c", "core.commentChar=#",
+                 "log", "--encoding=UTF-8", "--root", "--no-renames",
+                 "--ignore-submodules=none")
+_COMMIT_IDS = re.compile(r"([0-9a-f]{40,64} ?)+")
+_TRAILER = re.compile(r"([A-Za-z0-9-]+)[ \t]*:(.*)", re.S)
+
+
+def _role_and_task(block: str) -> list:
+    """``(key, value)`` for each ``Role`` and ``Task`` trailer of a
+    trailer block, read as git reads one with default settings: a key
+    of letters, digits and ``-``, then ``:``; a line that begins with
+    whitespace goes on with the line before it."""
+    found: list = []
+    lines = None  # the value's lines of the Role or Task being read
+    for line in block.split("\n"):
+        if line[:1] in ("", " ", "\t", "\r"):
+            if lines is not None:
+                lines.append(line)
+            continue
+        m = _TRAILER.fullmatch(line)
+        lines = [m[2]] if m and m[1].lower() in ("role", "task") else None
+        if lines is not None:
+            found.append((m[1].lower(), lines))
+    return [(key, " ".join(filter(None, (v.strip(" \t\r") for v in ls))))
+            for key, ls in found]
+
+
+def _move_commits(root: str, old: str, new: str) -> list:
+    """The commits of ``old..new``, newest first, each as
+    ``(id, parents, Role values, Task values, paths)``.
+
+    One git process.  Trailers are read from the final trailer block
+    only, as git finds it (DEC-182, DEC-267); the block comes as the
+    message holds it and its lines are read here, so no trailer setting
+    of the repository renames or hides a ``Role`` or a ``Task``.  Paths
+    are listed without rename detection, so both ends of a rename
+    appear (repair 7); a merge commit lists only its own change, as
+    ``read_merge`` reads it (DEC-269; DEC-394, DP-18; DEC-403): the
+    paths where it differs from a parent and no other parent brought,
+    and the acceptance tests two parents both changed (DEC-410, DP-24).
+
+    Everything is separated by NUL, the one byte no trailer and no file
+    name can hold, and nothing is unquoted.  The token after a commit's
+    ids is its trailer block and the token after a raw entry (``:``) is
+    its path, whatever they hold, so no byte a commit's author chooses
+    is read as structure.  Output that cannot be read raises, so the
+    move becomes a finding; so does a move whose merge commits need
+    more than ``MAX_MOVE_PROCESSES`` git processes, before any is read.
+    """
+    from gov.guard.containment_merge import (
+        MAX_MOVE_PROCESSES, processes, read_merge)
+    out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
+               _LOG_FORMAT, f"{old}..{new}")
+    unreadable = _GitError("the commits of the HEAD move cannot be read")
+    commits: list = []
+    tokens = iter(out.split("\0"))
+    for tok in tokens:
+        if tok.lstrip("\n").startswith(":"):
+            path = next(tokens, "")
+            if not commits or not path:
+                raise unreadable
+            commits[-1][4].append(path)
+        elif _COMMIT_IDS.fullmatch(tok):
+            ids = tok.split()
+            commits.append((ids[0], ids[1:], set(), set(), []))
+            for key, value in _role_and_task(next(tokens, "")):
+                if value:
+                    commits[-1][2 if key == "role" else 3].add(value)
+        elif tok.strip("\n"):
+            raise unreadable
+    if not commits:
+        raise unreadable
+    merges = [c for c in commits if len(c[1]) > 1]
+    if sum(processes(len(set(c[1]))) for c in merges) > MAX_MOVE_PROCESSES:
+        # Stopped at its time limit the check would judge nothing.
+        raise _GitError("the HEAD move has too many merge commits to read")
+    for c in merges:
+        c[4][:] = read_merge(root, c[0]).own
+    return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
+
+
+def _ticket_at(root: str, rev: str, ticket_file: str):
+    """The ticket's frontmatter as committed at *rev*, or ``None``."""
+    from gov.guard.decide import _parse_frontmatter
+    try:
+        return _parse_frontmatter(
+            _git(root, "cat-file", "blob", f"{rev}:{ticket_file}"))
+    except (_GitError, _NotARepo, ValueError):
+        return None
+
+
+def _close_commit(root: str, head: str, ticket_file: str):
+    """The latest commit in *head*'s history in which the ticket's
+    status becomes ``closed`` (DEC-358), or ``None``.
+
+    The file's first version is no such commit, nor is a merge commit:
+    what cannot be shown to be a close is not one.
+    """
+    def status(rev: str):
+        return (_ticket_at(root, rev, ticket_file) or {}).get("status")
+
+    try:
+        revs = _git(root, "rev-list", "--topo-order", "--no-merges",
+                    head, "--", ticket_file).split()
+    except (_GitError, _NotARepo, ValueError):
+        return None
+    for rev in revs:
+        if status(rev) == "closed" and status(rev + "^") not in (None, "closed"):
+            return rev
+    return None
+
+
+def _merge_own(commit) -> list:
+    """A merge commit's own paths under ``.tickets/**`` and
+    ``tests/acceptance/**`` (DEC-410, DP-21 and DP-27)."""
+    return [p for p in commit[4] if len(commit[1]) > 1
+            and p.startswith((".tickets/", ACCEPTANCE + "/"))]
+
+
+def _judge_commit(root, commit, role, tid, sub, orch_own, head,
+                  decide_fn, closes):
+    """``(paths, why)`` when *commit* of a forward move is a finding,
+    else ``None`` (W1-50).
+
+    Only in an orchestrator session's own call is a commit judged by its
+    own ``Role`` and ``Task`` trailers; in any other call it is judged
+    against the caller, and another role's trailer is a finding
+    (DEC-319, DEC-327).
+    """
+    from gov.guard.decide import (
+        FREEZE_FLAG, _load_ticket, _path_allowed)
+    sha, _, roles, tasks, paths = commit
+    rr = os.path.realpath(root)
+
+    def outside(c_role, c_tid, c_sub, fn=decide_fn):
+        # A path is judged by its name in the commit: where a directory
+        # on the way to it is a symbolic link in the working tree, the
+        # name is not where a write would go, and the path is a finding.
+        return [p for p in paths
+                if os.path.realpath(os.path.dirname(os.path.join(rr, p)))
+                != os.path.dirname(os.path.join(rr, p))
+                or not _in_scope(
+                    os.path.join(rr, p), root, c_role, c_tid, c_sub, fn)]
+
+    # Role: owner, whatever whitespace and characters that do not show
+    # stand in or around the word.
+    if any("".join(c for c in r if c.isprintable() and c != " ").lower()
+           == "owner" for r in roles):
+        return paths, "a Role: owner commit made during an agent's call"
+    # DEC-390, DP-16: a worker's commit changes no ticket file, whatever
+    # the ticket's paths say.  DEC-394, DP-17: nor does any commit of a
+    # worker's call, with or without trailers.
+    tickets = [p for p in paths if p.startswith(".tickets/")
+               ] if not orch_own or any(
+                   r != "orchestrator" for r in roles) else []
+    if not orch_own:
+        if roles and roles != [sub or role]:
+            return paths, "its Role trailer is not the caller's role"
+        bad = outside(role, tid, sub)
+    elif not (roles and tasks):
+        bad = outside(role, tid, sub)  # DEC-267: against the caller
+    elif len(roles) > 1 or len(tasks) > 1:
+        bad = paths  # DEC-268: several different values allow nothing
+    else:
+        c_role, c_task = roles[0], tasks[0]
+        fn = decide_fn
+        # DEC-359: the orchestrator's scope does not depend on the ticket.
+        t = None if c_role == "orchestrator" else _load_ticket(root, c_task)
+        if t:
+            # The ticket's file as committed at HEAD and as the working
+            # tree holds it: the commit passes only if both allow it.
+            tfile = f".tickets/{t.get('id', '')}.md"
+            if "at HEAD:" + tfile not in closes:
+                closes["at HEAD:" + tfile] = _ticket_at(root, head, tfile)
+            h = closes["at HEAD:" + tfile]
+            if not h or c_task not in (h.get("id"), h.get("wbs_id")):
+                return paths, "names a ticket whose file is not committed at HEAD"
+            closed = "closed" in (t.get("status"), h.get("status"))
+            if closed:
+                # DEC-318: by the ticket only before its close commit.
+                if tfile not in closes:
+                    closes[tfile] = _close_commit(root, head, tfile)
+                close = closes[tfile]
+                try:
+                    before = bool(close) and close != sha and _is_ancestor(
+                        root, sha, close)
+                except _GitError:
+                    before = False
+                if not before:
+                    return paths, ("names a closed ticket, "
+                                   "not before its close commit")
+
+            def pats(tk):
+                if not closed and tk.get("status") != "in_progress":
+                    return []
+                if c_role == "independent-test-designer":
+                    return [ACCEPTANCE + "/**"]
+                if tk.get("role") != c_role:
+                    return []
+                return [p for p in tk.get("allowed_paths", [])
+                        if not _is_under_acceptance(p.rstrip("*/ "))]
+            both = pats(t), pats(h)
+
+            def fn(tool, ti, r, c_r, c_t, c_s):
+                # A closed ticket's paths as they were: nothing while
+                # frozen, and no held-out path (decide refuses every
+                # tool there).  A ticket in progress: as decide allows.
+                ok = (not os.path.exists(os.path.join(r, FREEZE_FLAG))
+                      and decide_fn("Read" if closed else tool,
+                                    ti, r, c_r, c_t, c_s)[0] == "allow"
+                      and all(_path_allowed(ti["file_path"], r, p, c_r)
+                              for p in both))
+                return ("allow" if ok else "deny"), ""
+        bad = outside(c_role, c_task, None, fn)
+    # DEC-410, DP-21 and DP-27: whatever the merge commit's trailers.
+    merged = _merge_own(commit)
+    if merged:
+        return (bad + [p for p in merged if p not in bad],
+                "a merge commit's own change to a ticket file or an"
+                " acceptance test")
+    if tickets:
+        return (bad + [p for p in tickets if p not in bad],
+                "a ticket file in a commit with a worker's Role trailer"
+                " or made in a worker's call")
+    return (bad, "committed path(s) outside allowed paths") if bad else None
 
 
 # ---- scope check (handles symlinks -- repair 3) -------------------
@@ -751,50 +996,61 @@ def check_containment(
             head_msg = "HEAD moved with no before-snapshot (flagged)."
 
     if has_snap and cur_head and old_head and cur_head != old_head:
-        # Determine whether the move is a clean forward on the same
-        # branch.  Any git failure => treat as non-forward (repair 8).
+        # Determine whether the move is a forward move on the same
+        # branch.  Any git failure, and a commit list that cannot be
+        # read => treat as non-forward (repair 8).  A merge is judged
+        # commit by commit only in an orchestrator session's own call
+        # (DEC-266); in any other call it stays non-forward.
+        orch_own = ((role or "").strip() == "orchestrator"
+                    and not subagent_type)
+        commits: list = []
         try:
-            is_anc = _is_ancestor(project_root, old_head, cur_head)
-            has_merge = bool(_git(
-                project_root, "rev-list", "--merges",
-                f"{old_head}..{cur_head}").strip())
             fwd = (bool(cur_branch) and cur_branch == old_branch
-                   and is_anc and not has_merge)
-        except _GitError:
+                   and _is_ancestor(project_root, old_head, cur_head))
+            if fwd:
+                commits = _move_commits(project_root, old_head, cur_head)
+                fwd = orch_own or all(len(c[1]) < 2 for c in commits)
+        except (_GitError, ValueError):
             fwd = False
 
         if fwd:
-            try:
-                committed = _committed_files(
-                    project_root, old_head, cur_head)
-            except _GitError:
-                committed = []
-                fwd = False
-
-        if fwd:
-            rr = os.path.realpath(project_root)
-            out_c: list = []
-            for f in committed:
-                if not _in_scope(os.path.join(rr, f), project_root,
-                                 role, ticket_id, subagent_type, decide):
-                    out_c.append(f)
-                    committed_out.add(f)
-            if out_c:
+            # Commit by commit, oldest first (DEC-255, DEC-327).  The
+            # record keeps the caller's role and ticket; the reason
+            # names the commit and its trailers (DEC-270).
+            closes: dict = {}
+            msgs: list = []
+            for c in reversed(commits):
+                res = _judge_commit(
+                    project_root, c, role, ticket_id, subagent_type,
+                    orch_own, cur_head, decide, closes)
+                if res is None:
+                    continue
+                bad, why = res
+                committed_out.update(bad)
+                named = (f"commit {c[0][:12]} (Role: "
+                         f"{', '.join(c[2]) or 'none'}; Task: "
+                         f"{', '.join(c[3]) or 'none'})")
                 head_findings.append(_make_finding(
                     session_id, agent_type, role, ticket_id, command,
-                    out_c, "flagged",
-                    "committed path(s) outside allowed paths"))
-                head_msg = (
-                    "Committed paths outside allowed paths: "
-                    + ", ".join(sorted(out_c)) + ".")
+                    bad, "flagged", f"{named}: {why}"))
+                msgs.append(f"{named}: {why}: "
+                            + (", ".join(sorted(bad)) or "no path") + ".")
+            if msgs:
+                head_msg = "Flagged, left in place: " + " ".join(msgs)
 
         if not fwd:
+            # DEC-410: the finding names the merge commits' own ticket
+            # files and acceptance tests, where the move could be read.
+            merged = sorted({p for c in commits for p in _merge_own(c)})
             head_findings.append(_make_finding(
                 session_id, agent_type, role, ticket_id, command,
-                [], "flagged",
+                merged, "flagged",
                 "HEAD moved (not a forward move on the same branch)"))
             non_fwd = True
             head_msg = "HEAD moved (not a forward move, flagged)."
+            if merged:
+                head_msg += (" A merge commit's own change: "
+                             + ", ".join(merged) + ".")
 
     # ---- classify by scope (repair 9: also after non-forward) ----
     rr = os.path.realpath(project_root)
