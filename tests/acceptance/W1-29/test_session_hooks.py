@@ -11,11 +11,16 @@ function (``gov.checkpoint.record.watch``) test W1-25 code directly because
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 
 import pytest
 
 from conftest import (
     BRIEF_TOKEN_LIMIT,
+    HOOKS_DIR,
+    REPO_ROOT,
     TWELVE_FIELDS,
     _tokens,
     run_hook,
@@ -181,6 +186,34 @@ class TestSubagentStop:
         text = json.dumps(output)
         missing_mentioned = any(f in text for f in TWELVE_FIELDS)
         assert missing_mentioned, "the block reason must name at least one missing field"
+
+    @pytest.mark.parametrize("raw_input,label", [
+        ("", "empty stdin"),
+        ("NOT VALID JSON{{{", "invalid JSON"),
+        (json.dumps({"last_assistant_message": None}), "null last_assistant_message"),
+    ])
+    def test_malformed_input_fails_closed(self, project, raw_input, label):
+        """SubagentStop must fail closed (exit 2) on malformed input, not
+        silently pass (exit 0).  [DEC-136]"""
+        script = HOOKS_DIR / "subagentstop.py"
+        assert script.is_file(), f"hook not built: {script}"
+        result = subprocess.run(
+            [sys.executable, str(script)],
+            input=raw_input,
+            capture_output=True, text=True,
+            cwd=str(project),
+            env={
+                "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+                "PYTHONPATH": str(REPO_ROOT / "src"),
+                "PYTHONDONTWRITEBYTECODE": "1",
+                "CLAUDE_PROJECT_DIR": str(project),
+            },
+            timeout=30,
+        )
+        assert result.returncode == 2, (
+            f"SubagentStop must fail closed (exit 2) on {label}, "
+            f"got exit {result.returncode} — fail-open vulnerability"
+        )
 
 
 # ======================================================================
