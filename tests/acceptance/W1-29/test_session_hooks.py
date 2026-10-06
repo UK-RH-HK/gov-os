@@ -1,11 +1,18 @@
 """Acceptance tests for W1-29: Session hooks.
 
-SessionStart, PreCompact, Stop and SubagentStop hook scripts.
+The combined PreCompact and SessionStart hooks live at
+``template/governance/kernel/hooks/`` and are shared with W1-49.  Tests for
+these two events run the registered shell commands via ``CombinedHooks``
+(the ``run`` fixture), in a temporary project built by
+``w1_49_support.make_project()`` and extended with W1-29 fixture data
+(the ``w49_project`` fixture).
 
-Tests that run a hook from ``src/gov/hooks/`` fail while the module is not
-built (red reason: ``src/gov/hooks/`` is empty).  Tests that call the watchdog
-function (``gov.checkpoint.record.watch``) test W1-25 code directly because
-``gov close`` (W1-30) is not built.
+Stop and SubagentStop are W1-29-only hooks in ``src/gov/hooks/``.  They
+are run as Python scripts directly (``run_w29_hook``), in a simpler
+throwaway project (the ``project`` fixture).
+
+Tests that call the watchdog function (``gov.checkpoint.record.watch``)
+test W1-25 code directly because ``gov close`` (W1-30) is not built.
 """
 
 from __future__ import annotations
@@ -14,17 +21,22 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
 from conftest import (
     BRIEF_TOKEN_LIMIT,
     HOOKS_DIR,
+    ORCH,
     REPO_ROOT,
+    SIZE_CAP_CHARS,
     TWELVE_FIELDS,
     _tokens,
-    run_hook,
+    run_w29_hook,
 )
+
+import w1_49_support
 
 
 # ======================================================================
@@ -38,55 +50,108 @@ from conftest import (
 class TestSessionStart:
     """SessionStart injects context and tk ready within the token cap."""
 
-    def test_injects_context_brief_on_startup(self, project):
+    def test_injects_context_brief_on_startup(self, w49_project, run):
         """On startup, SessionStart injects gov context --brief output and tk
         ready, within the 2.5k-token cap.  [CAP-15.g]"""
-        rc, output, _ = run_hook(
-            "sessionstart",
-            {"hook_event_name": "SessionStart", "source": "startup",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        result = run.sessionstart(
+            w49_project, "startup", role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0, f"SessionStart must exit 0, got {rc}"
-        ctx = output["hookSpecificOutput"]["additionalContext"]
+        assert result.returncode == 0, (
+            f"SessionStart must exit 0, got {result.returncode}: "
+            f"{result.describe()}"
+        )
+        ctx = result.injection
         assert _tokens(ctx) <= BRIEF_TOKEN_LIMIT, (
             f"injection is {_tokens(ctx)} tokens, cap is {BRIEF_TOKEN_LIMIT}"
         )
 
     @pytest.mark.parametrize("source", ["compact", "clear", "resume"])
-    def test_reinjects_on_compact_clear_resume(self, project, source):
+    def test_reinjects_on_compact_clear_resume(self, w49_project, run, source):
         """On compact/clear/resume, SessionStart re-injects the context packet
         and the checkpoint.  [CAP-37.b, DEC-208]"""
-        rc, output, _ = run_hook(
-            "sessionstart",
-            {"hook_event_name": "SessionStart", "source": source,
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        result = run.sessionstart(
+            w49_project, source, role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0
-        ctx = output["hookSpecificOutput"]["additionalContext"]
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
         assert ctx, "additionalContext must not be empty on re-injection"
         assert _tokens(ctx) <= BRIEF_TOKEN_LIMIT
+
+    def test_orchestrator_compact_carries_prompt_path(self, w49_project, run):
+        """When the orchestrator resumes after a compaction, the combined
+        injection carries the prompt path (W1-49 content preserved)."""
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(
+                w1_49_support.resume_section("TST"),
+            ),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        result = run.sessionstart(
+            w49_project, "compact", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert w1_49_support.PROMPT_REL in ctx, (
+            f"orchestrator injection must carry the prompt path "
+            f"{w1_49_support.PROMPT_REL}: {ctx[:400]!r}"
+        )
+
+    def test_orchestrator_compact_carries_resume_section(self, w49_project, run):
+        """When the orchestrator resumes after a compaction, the combined
+        injection carries the RESUME HERE section from the checkpoint
+        (W1-49 content preserved)."""
+        body = w1_49_support.resume_section("TST")
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(body),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        result = run.sessionstart(
+            w49_project, "compact", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "TST-71" in ctx or "RESUME" in ctx.upper(), (
+            f"orchestrator injection must carry the RESUME HERE section "
+            f"content from the checkpoint: {ctx[:400]!r}"
+        )
+
+    def test_orchestrator_compact_combined_within_cap(self, w49_project, run):
+        """The combined orchestrator injection (W1-49 prompt path and RESUME
+        HERE plus W1-29 context brief and tk ready) stays within the
+        10,000-character cap."""
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(
+                w1_49_support.resume_section("TST"),
+            ),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        result = run.sessionstart(
+            w49_project, "compact", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        w1_49_support.assert_within_cap(result)
 
 
 class TestPreCompact:
     """PreCompact writes a checkpoint at the compaction trigger."""
 
-    def test_writes_checkpoint(self, project):
+    def test_writes_checkpoint(self, w49_project, run):
         """PreCompact calls gov checkpoint --trigger compaction.  [CAP-37.b]"""
-        cp_before = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
-        rc, output, _ = run_hook(
-            "precompact",
-            {"hook_event_name": "PreCompact", "trigger": "auto",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        cp_dir = w49_project / "docs" / "checkpoints" / "TEST-abcd"
+        cp_before = list(cp_dir.glob("CP-*.md"))
+        result = run.precompact(
+            w49_project, "auto", role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0, "PreCompact must never block (exit 0)"
-        cp_after = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
-        assert len(cp_after) > len(cp_before), "PreCompact must write a new checkpoint"
+        assert result.returncode == 0, (
+            f"PreCompact must never block (exit 0): {result.describe()}"
+        )
+        cp_after = list(cp_dir.glob("CP-*.md"))
+        assert len(cp_after) > len(cp_before), (
+            "PreCompact must write a new checkpoint record"
+        )
 
 
 class TestStop:
@@ -94,8 +159,10 @@ class TestStop:
 
     def test_writes_checkpoint(self, project):
         """Stop calls gov checkpoint --trigger stop.  [CAP-37.b]"""
-        cp_before = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
-        rc, output, _ = run_hook(
+        cp_before = list(
+            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        )
+        rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
              "cwd": str(project), "last_assistant_message": "Done."},
@@ -103,14 +170,20 @@ class TestStop:
             env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
         )
         assert rc == 0
-        cp_after = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
-        assert len(cp_after) > len(cp_before), "Stop must write a new checkpoint"
+        cp_after = list(
+            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        )
+        assert len(cp_after) > len(cp_before), (
+            "Stop must write a new checkpoint"
+        )
 
     def test_respects_stop_hook_active(self, project):
         """When stop_hook_active is present, Stop exits 0 without writing a
         checkpoint or blocking — this prevents re-entrancy loops.  [FL1]"""
-        cp_before = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
-        rc, output, _ = run_hook(
+        cp_before = list(
+            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        )
+        rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
              "cwd": str(project), "last_assistant_message": "Done.",
@@ -125,7 +198,9 @@ class TestStop:
             hso = output.get("hookSpecificOutput", {})
             assert hso.get("permissionDecision") != "block", \
                 "Stop must not block when stop_hook_active is set"
-        cp_after = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
+        cp_after = list(
+            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        )
         assert len(cp_after) == len(cp_before), \
             "Stop must not write a checkpoint when stop_hook_active is set"
 
@@ -147,7 +222,7 @@ class TestSubagentStop:
 
     def test_accepts_all_twelve_fields(self, project):
         """When all 12 fields are present, SubagentStop passes.  [CAP-37.d]"""
-        rc, output, _ = run_hook(
+        rc, output, _ = run_w29_hook(
             "subagentstop",
             {"hook_event_name": "SubagentStop", "session_id": "s1",
              "agent_id": "a1", "agent_type": "engineer",
@@ -155,12 +230,14 @@ class TestSubagentStop:
              "last_assistant_message": self._return_message(TWELVE_FIELDS)},
             project,
         )
-        assert rc == 0, f"SubagentStop must pass (exit 0) with all 12 fields, got {rc}"
+        assert rc == 0, (
+            f"SubagentStop must pass (exit 0) with all 12 fields, got {rc}"
+        )
 
     def test_blocks_missing_fields(self, project):
         """When fields are missing, SubagentStop blocks (exit 2).  [CAP-37.d]"""
         present = TWELVE_FIELDS[:6]  # only 6 of 12
-        rc, output, _ = run_hook(
+        rc, output, _ = run_w29_hook(
             "subagentstop",
             {"hook_event_name": "SubagentStop", "session_id": "s1",
              "agent_id": "a1", "agent_type": "engineer",
@@ -168,12 +245,15 @@ class TestSubagentStop:
              "last_assistant_message": self._return_message(present)},
             project,
         )
-        assert rc == 2, f"SubagentStop must block (exit 2) when fields are missing, got {rc}"
+        assert rc == 2, (
+            f"SubagentStop must block (exit 2) when fields are missing, "
+            f"got {rc}"
+        )
 
     def test_block_includes_reason_and_is_once(self, project):
         """The block names the missing fields and fires once, never a loop.
         [CAP-37.d]"""
-        rc, output, _ = run_hook(
+        rc, output, _ = run_w29_hook(
             "subagentstop",
             {"hook_event_name": "SubagentStop", "session_id": "s1",
              "agent_id": "a1", "agent_type": "engineer",
@@ -185,12 +265,15 @@ class TestSubagentStop:
         assert output is not None, "block must produce output with a reason"
         text = json.dumps(output)
         missing_mentioned = any(f in text for f in TWELVE_FIELDS)
-        assert missing_mentioned, "the block reason must name at least one missing field"
+        assert missing_mentioned, (
+            "the block reason must name at least one missing field"
+        )
 
     @pytest.mark.parametrize("raw_input,label", [
         ("", "empty stdin"),
         ("NOT VALID JSON{{{", "invalid JSON"),
-        (json.dumps({"last_assistant_message": None}), "null last_assistant_message"),
+        (json.dumps({"last_assistant_message": None}),
+         "null last_assistant_message"),
     ])
     def test_malformed_input_fails_closed(self, project, raw_input, label):
         """SubagentStop must fail closed (exit 2) on malformed input, not
@@ -215,11 +298,31 @@ class TestSubagentStop:
             f"got exit {result.returncode} — fail-open vulnerability"
         )
 
+    def test_empty_and_null_values_do_not_satisfy_contract(self, project):
+        """Empty string and null values for the 12-field contract do not
+        count as present.  The contract requires meaningful values.
+        [DEC-136, Finding 2]"""
+        fields = {f: "meaningful" for f in TWELVE_FIELDS}
+        fields["work_completed"] = ""
+        fields["evidence"] = None
+        rc, output, _ = run_w29_hook(
+            "subagentstop",
+            {"hook_event_name": "SubagentStop", "session_id": "s1",
+             "agent_id": "a1", "agent_type": "engineer",
+             "cwd": str(project),
+             "last_assistant_message": json.dumps(fields)},
+            project,
+        )
+        assert rc == 2, (
+            f"SubagentStop must block (exit 2) when fields contain empty "
+            f"string or null — got {rc}: empty/null passes as present"
+        )
+
 
 # ======================================================================
 # SUCCESS LINE 3
-# A checkpoint is written when the session's context utilisation passes
-# the configured threshold, not only at PreCompact  [CAP-37.c]
+# A checkpoint is written when context utilisation passes the threshold,
+# not only at PreCompact  [CAP-37.c]
 # ======================================================================
 
 
@@ -229,7 +332,7 @@ class TestCheckpointOnContextUtilisation:
     def test_stop_writes_checkpoint_not_only_precompact(self, project):
         """The Stop hook writes a checkpoint (trigger: stop), proving that
         checkpoints are not limited to PreCompact events.  [CAP-37.c]"""
-        rc, output, _ = run_hook(
+        rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
              "cwd": str(project), "last_assistant_message": "Done."},
@@ -237,7 +340,9 @@ class TestCheckpointOnContextUtilisation:
             env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
         )
         assert rc == 0
-        cps = list((project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"))
+        cps = list(
+            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        )
         assert len(cps) >= 2, "Stop must have written a new checkpoint"
 
     def test_watchdog_marks_stale_on_context_utilisation(self, project):
@@ -272,30 +377,24 @@ class TestCheckpointOnContextUtilisation:
 class TestCompactionPreservesState:
     """A compaction preserves critical session state (DEC-208)."""
 
-    def test_precompact_then_sessionstart_preserves_ticket(self, project):
+    def test_precompact_then_sessionstart_preserves_ticket(
+        self, w49_project, run,
+    ):
         """PreCompact writes a checkpoint that includes the active ticket;
         SessionStart on compact re-injects it."""
-        run_hook(
-            "precompact",
-            {"hook_event_name": "PreCompact", "trigger": "auto",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        run.precompact(
+            w49_project, "auto", role="engineer", ticket="TEST-abcd",
         )
-        rc, output, _ = run_hook(
-            "sessionstart",
-            {"hook_event_name": "SessionStart", "source": "compact",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0
-        ctx = output["hookSpecificOutput"]["additionalContext"]
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
         assert "TEST-abcd" in ctx, (
             "re-injection must include the active ticket"
         )
 
-    def test_auto_compact_threshold(self, project):
+    def test_auto_compact_threshold(self, w49_project, run):
         """Claude Code 2.1.288 supports autoCompactWindow; the hooks set it
         to about 300k tokens, or the CONTEXT_CHECKPOINT stop stays.
 
@@ -303,16 +402,10 @@ class TestCompactionPreservesState:
         cannot be configured (which does not apply to the pinned version),
         the fallback is the orchestrator's CONTEXT_CHECKPOINT stop (DEC-208).
         """
-        # The mechanism lives in the hooks module.  If the module is not
-        # built the assertion inside run_hook fails, which is the red reason.
-        rc, _, _ = run_hook(
-            "sessionstart",
-            {"hook_event_name": "SessionStart", "source": "startup",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        result = run.sessionstart(
+            w49_project, "startup", role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0
+        assert result.returncode == 0, result.describe()
 
 
 # ======================================================================
@@ -329,9 +422,12 @@ class TestNoStopLoop:
         write and no block decision.  This is the single mechanism that
         prevents the Stop hook from looping."""
         cp_before = set(
-            p.name for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md")
+            p.name
+            for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob(
+                "CP-*.md",
+            )
         )
-        rc, output, _ = run_hook(
+        rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
              "cwd": str(project), "last_assistant_message": "Done.",
@@ -343,9 +439,14 @@ class TestNoStopLoop:
         )
         assert rc == 0
         cp_after = set(
-            p.name for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md")
+            p.name
+            for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob(
+                "CP-*.md",
+            )
         )
-        assert cp_after == cp_before, "no checkpoint written during re-entrant stop"
+        assert cp_after == cp_before, (
+            "no checkpoint written during re-entrant stop"
+        )
 
 
 # ======================================================================
@@ -357,23 +458,14 @@ class TestNoStopLoop:
 class TestInjectionCap:
     """The injection must stay within the 2.5k-token cap.  [CAP-15.g]"""
 
-    def test_large_context_within_cap(self, project):
+    def test_large_context_within_cap(self, w49_project, run):
         """Even when the project has a large context, the additionalContext
         output stays within 2500 tokens (10 000 characters)."""
-        rc, output, _ = run_hook(
-            "sessionstart",
-            {"hook_event_name": "SessionStart", "source": "startup",
-             "session_id": "s1", "cwd": str(project)},
-            project,
-            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        result = run.sessionstart(
+            w49_project, "startup", role="engineer", ticket="TEST-abcd",
         )
-        assert rc == 0
-        ctx = output["hookSpecificOutput"]["additionalContext"]
-        tokens = _tokens(ctx)
-        assert tokens <= BRIEF_TOKEN_LIMIT, (
-            f"injection is {tokens} tokens ({len(ctx)} chars), "
-            f"cap is {BRIEF_TOKEN_LIMIT} tokens ({BRIEF_TOKEN_LIMIT * 4} chars)"
-        )
+        assert result.returncode == 0, result.describe()
+        w1_49_support.assert_within_cap(result)
 
 
 # ======================================================================
@@ -438,4 +530,41 @@ class TestWatchdogBlocksStale:
                   max_age_minutes=99999, max_commits=99999,
                   max_context=1.0, context_utilisation=None)
         assert exc_info.value.code == "CHECKPOINT_STALE"
-        assert "ticket-transition" in exc_info.value.details.get("reasons", [])
+        assert "ticket-transition" in exc_info.value.details.get(
+            "reasons", [],
+        )
+
+
+# ======================================================================
+# CUT ORDER
+# When the combined injection exceeds the cap, context brief and tk
+# ready are cut first; instruction to read the prompt and checkpoint,
+# and the staleness warning, are last.  [Finding 3]
+# ======================================================================
+
+
+class TestCutOrder:
+    """Under the cap, instruction and warning survive while context brief
+    and tk ready are cut first."""
+
+    def test_instruction_preserved_when_cap_tight(self, w49_project, run):
+        """With a very large checkpoint the combined injection would exceed
+        the 10,000-character cap.  The instruction to read the prompt and
+        checkpoint must survive (last to be cut); context brief and tk ready
+        are trimmed first.  [Finding 3]"""
+        large_body = "x" * 9500
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(large_body),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="orchestrator", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        w1_49_support.assert_within_cap(result)
+        ctx = result.injection
+        assert w1_49_support.PROMPT_REL in ctx, (
+            "the instruction to read the prompt must survive even when the "
+            "cap is tight — it is the last thing to be cut"
+        )

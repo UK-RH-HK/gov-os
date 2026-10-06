@@ -1,33 +1,51 @@
 """Fixtures for the W1-29 acceptance tests (session hooks).
 
-The hooks under test are scripts in ``src/gov/hooks/``.  They receive JSON on
-stdin and produce JSON on stdout.  Every test that runs a hook asserts the
-script exists first; while ``src/gov/hooks/`` is empty, the assertion fails and
-that is the stated red reason.
+The combined PreCompact and SessionStart hooks are the same files the W1-49
+suite exercises: ``template/governance/kernel/hooks/precompact.py`` and
+``sessionstart.py``.  For these two events, W1-29 tests run the registered
+shell commands (read from ``.claude/settings.json``) in a temporary project
+built by ``w1_49_support.make_project()``, extended with W1-29 fixture data.
+Every case of ``tests/acceptance/W1-49/`` passes unchanged: W1-29 adds to
+W1-49's hooks, it does not replace them.
 
-The watchdog tests (failure line 3, CAP-37.c) call ``gov.checkpoint.record``
-directly because ``gov close`` (W1-30) is not built.
+Stop and SubagentStop are W1-29-only hooks in ``src/gov/hooks/``.  They are
+run as Python scripts directly because they may not yet be registered.
+
+The watchdog tests (failure line 3, CAP-37.c) call
+``gov.checkpoint.record.watch`` directly because ``gov close`` (W1-30) is
+not built.
 """
 
 from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+
+_W1_49_DIR = str(REPO_ROOT / "tests" / "acceptance" / "W1-49")
+if _W1_49_DIR not in sys.path:
+    sys.path.insert(0, _W1_49_DIR)
+import w1_49_support  # noqa: E402
+
+_SRC_DIR = str(REPO_ROOT / "src")
+if _SRC_DIR not in sys.path:
+    sys.path.insert(0, _SRC_DIR)
+
 HOOKS_DIR = REPO_ROOT / "src" / "gov" / "hooks"
 
-# Add src/ so the watchdog tests can import gov.checkpoint.record.
-sys.path.insert(0, str(REPO_ROOT / "src"))
-
-# Token counter from W1-24 (src/gov/context/__init__.py).
+ORCH = w1_49_support.ORCHESTRATOR_CHECKPOINT_REL
+LEAD = w1_49_support.LEAD_CHECKPOINT_REL
 TOKEN_CHARS = 4
-BRIEF_TOKEN_LIMIT = 2500  # tokens, per CAP-15.g / DEC-025
+BRIEF_TOKEN_LIMIT = 2500
+SIZE_CAP_CHARS = w1_49_support.SIZE_CAP_CHARS
 
 TWELVE_FIELDS = (
     "task", "status", "work_completed", "files_changed",
@@ -36,42 +54,187 @@ TWELVE_FIELDS = (
     "recommended_next_action",
 )
 
+TICKET_TEXT = (
+    "---\n"
+    "id: TEST-abcd\n"
+    "status: in_progress\n"
+    "title: Test ticket\n"
+    "sources: []\n"
+    "depends_on: []\n"
+    "---\n"
+    "# TEST-abcd Test ticket\n"
+)
+
+CHECKPOINT_RECORD_TEXT = (
+    "---\n"
+    "id: CP-TEST-abcd-0001\n"
+    "type: checkpoint\n"
+    "status: ACTIVE\n"
+    "state_class: NARRATIVE\n"
+    "title: TEST-abcd at compaction\n"
+    "task: TEST-abcd\n"
+    "task_status: in_progress\n"
+    "trigger: compaction\n"
+    "next_action: Continue implementation\n"
+    "created: 2026-10-05T00:00:00Z\n"
+    "inputs:\n"
+    "  - id: TEST-abcd\n"
+    "    version: abc1234\n"
+    "    hash: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'\n"
+    "---\n\n"
+    "# CP-TEST-abcd-0001 — TEST-abcd at compaction\n\n"
+    "## Next action\n\n"
+    "Continue implementation\n"
+)
+
 
 def _tokens(text: str) -> int:
     """ceil(len(text) / 4), the counter W1-24 uses."""
     return -(-len(text) // TOKEN_CHARS)
 
 
-# ---------------------------------------------------------------------------
-# git helpers (isolated environment, no user config)
-# ---------------------------------------------------------------------------
-
-_GIT_ENV = {
-    "GIT_CONFIG_NOSYSTEM": "1",
-    "GIT_AUTHOR_NAME": "W1-29 test",
-    "GIT_AUTHOR_EMAIL": "test@example.invalid",
-    "GIT_COMMITTER_NAME": "W1-29 test",
-    "GIT_COMMITTER_EMAIL": "test@example.invalid",
-    "LC_ALL": "C",
-}
-
-
-def _git(root, *args):
-    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-           "HOME": str(root), **_GIT_ENV}
-    return subprocess.run(["git", "-C", str(root), *args],
-                          capture_output=True, text=True, env=env, check=True)
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers",
+        "local_only: needs dev tiers (GOV_DEV_TIERS) or a real session; not for CI",
+    )
 
 
 # ---------------------------------------------------------------------------
-# Hook runner
+# Registration: read from the real repository's .claude/settings.json
 # ---------------------------------------------------------------------------
 
-def run_hook(name, input_data, project_root, env_extra=None):
-    """Run a W1-29 hook script from ``src/gov/hooks/``.
+@pytest.fixture(scope="session")
+def registration():
+    """``(hooks, env)`` of ``.claude/settings.json``; no other key is read."""
+    return w1_49_support.load_hooks_and_env()
 
-    Asserts the script exists.  While the module is not built, every call
-    fails with ``AssertionError`` naming the missing file.
+
+@pytest.fixture(scope="session")
+def hooks(registration):
+    return registration[0]
+
+
+def _registered(hooks, event, values, rel):
+    if not (REPO_ROOT / rel).is_file():
+        pytest.fail(f"the hook {rel} does not exist yet", pytrace=False)
+    commands = {v: w1_49_support.command_for(hooks, event, v, rel) for v in values}
+    missing = [v for v, c in commands.items() if c is None]
+    if missing:
+        pytest.fail(
+            f"no {event} hook registered that runs {rel} for {missing}",
+            pytrace=False,
+        )
+    return commands
+
+
+@pytest.fixture(scope="session")
+def precompact_commands(hooks):
+    """The registered PreCompact command by trigger."""
+    return _registered(
+        hooks, "PreCompact", ("manual", "auto"), w1_49_support.PRECOMPACT_REL,
+    )
+
+
+@pytest.fixture(scope="session")
+def sessionstart_commands(hooks):
+    """The registered SessionStart command by source."""
+    return _registered(
+        hooks, "SessionStart", ("compact", "clear", "resume"),
+        w1_49_support.SESSIONSTART_REL,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Combined temporary project (W1-49 layout + W1-29 fixture data)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture(scope="session")
+def combined_base(tmp_path_factory):
+    """A git repository with the kernel hooks, ``src/gov``, a stand-in
+    prompt, a ticket and a checkpoint record, committed."""
+    project = w1_49_support.make_project(
+        tmp_path_factory.mktemp("w29-base") / "repo",
+    )
+    w1_49_support.write(project, ".tickets/TEST-abcd.md", TICKET_TEXT)
+    (project / "docs" / "checkpoints" / "TEST-abcd").mkdir(
+        parents=True, exist_ok=True,
+    )
+    w1_49_support.write(
+        project,
+        "docs/checkpoints/TEST-abcd/CP-TEST-abcd-0001.md",
+        CHECKPOINT_RECORD_TEXT,
+    )
+    w1_49_support.git(project, "add", "-A")
+    w1_49_support.git(project, "commit", "-q", "-m", "add W1-29 fixture data")
+    return project
+
+
+@pytest.fixture()
+def w49_project(combined_base, tmp_path):
+    """This test's own copy of the combined project (main tree)."""
+    target = tmp_path / "repo"
+    shutil.copytree(combined_base, target, symlinks=True)
+    return target
+
+
+@pytest.fixture()
+def worktree(w49_project, tmp_path):
+    """A linked worktree of the combined project."""
+    return w1_49_support.add_worktree(
+        w49_project, tmp_path / "worktrees" / "lead-fixture",
+    )
+
+
+@pytest.fixture()
+def sandbox(tmp_path):
+    return w1_49_support.make_sandbox(tmp_path / "sandbox")
+
+
+@dataclass(frozen=True)
+class CombinedHooks:
+    """Run the registered PreCompact and SessionStart commands."""
+    precompact_commands: dict
+    sessionstart_commands: dict
+    sandbox: object
+
+    def precompact(self, tree, trigger, role=w1_49_support.ORCHESTRATOR,
+                   transcript_age_s=600.0, ticket=None, path=None):
+        data = w1_49_support.precompact_input(
+            tree, self.sandbox, trigger, transcript_age_s,
+        )
+        return w1_49_support.run_hook(
+            self.precompact_commands[trigger], tree, self.sandbox,
+            data, role=role, ticket=ticket, path=path,
+        )
+
+    def sessionstart(self, tree, source, role=w1_49_support.ORCHESTRATOR,
+                     ticket=None, stdin=None):
+        data = (
+            stdin if stdin is not None
+            else w1_49_support.sessionstart_input(tree, self.sandbox, source)
+        )
+        command = (
+            self.sessionstart_commands.get(source)
+            or self.sessionstart_commands["resume"]
+        )
+        return w1_49_support.run_hook(
+            command, tree, self.sandbox, data, role=role, ticket=ticket,
+        )
+
+
+@pytest.fixture()
+def run(precompact_commands, sessionstart_commands, sandbox):
+    """``run.precompact(tree, trigger)`` and ``run.sessionstart(tree, source)``."""
+    return CombinedHooks(precompact_commands, sessionstart_commands, sandbox)
+
+
+# ---------------------------------------------------------------------------
+# W1-29-only hook runner (Stop, SubagentStop from src/gov/hooks/)
+# ---------------------------------------------------------------------------
+
+def run_w29_hook(name, input_data, project_root, env_extra=None):
+    """Run a W1-29-only hook script from ``src/gov/hooks/``.
 
     Returns ``(exit_code, parsed_stdout_or_None, stderr)``.
     """
@@ -106,67 +269,44 @@ def run_hook(name, input_data, project_root, env_extra=None):
 
 
 # ---------------------------------------------------------------------------
-# Fixtures
+# Simple project for Stop, SubagentStop and watchdog tests
 # ---------------------------------------------------------------------------
 
-def pytest_configure(config):
-    config.addinivalue_line(
-        "markers",
-        "local_only: needs dev tiers (GOV_DEV_TIERS) or a real session; not for CI",
+_GIT_ENV = {
+    "GIT_CONFIG_NOSYSTEM": "1",
+    "GIT_AUTHOR_NAME": "W1-29 test",
+    "GIT_AUTHOR_EMAIL": "test@example.invalid",
+    "GIT_COMMITTER_NAME": "W1-29 test",
+    "GIT_COMMITTER_EMAIL": "test@example.invalid",
+    "LC_ALL": "C",
+}
+
+
+def _simple_git(root, *args):
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(root),
+        **_GIT_ENV,
+    }
+    return subprocess.run(
+        ["git", "-C", str(root), *args],
+        capture_output=True, text=True, env=env, check=True,
     )
 
 
 @pytest.fixture()
 def project(tmp_path):
-    """A throwaway temporary project with a ticket, a checkpoint and git history.
-
-    Good enough for both hook tests (which fail at the hook-existence check)
-    and watchdog tests (which exercise ``gov.checkpoint.record.watch``).
-    """
-    _git(tmp_path, "init", "-q", "-b", "main")
-
-    # A ticket.
-    tickets = tmp_path / ".tickets"
-    tickets.mkdir()
-    (tickets / "TEST-abcd.md").write_text(
-        "---\n"
-        "id: TEST-abcd\n"
-        "status: in_progress\n"
-        "title: Test ticket\n"
-        "sources: []\n"
-        "depends_on: []\n"
-        "---\n"
-        "# TEST-abcd Test ticket\n",
-        encoding="utf-8",
+    """A throwaway project for Stop, SubagentStop and watchdog tests."""
+    _simple_git(tmp_path, "init", "-q", "-b", "main")
+    (tmp_path / ".tickets").mkdir()
+    (tmp_path / ".tickets" / "TEST-abcd.md").write_text(
+        TICKET_TEXT, encoding="utf-8",
     )
-
-    # A checkpoint (created in the past so the watchdog can judge age).
     cp_dir = tmp_path / "docs" / "checkpoints" / "TEST-abcd"
     cp_dir.mkdir(parents=True)
     (cp_dir / "CP-TEST-abcd-0001.md").write_text(
-        "---\n"
-        "id: CP-TEST-abcd-0001\n"
-        "type: checkpoint\n"
-        "status: ACTIVE\n"
-        "state_class: NARRATIVE\n"
-        "title: TEST-abcd at compaction\n"
-        "task: TEST-abcd\n"
-        "task_status: in_progress\n"
-        "trigger: compaction\n"
-        "next_action: Continue implementation\n"
-        "created: 2026-10-05T00:00:00Z\n"
-        "inputs:\n"
-        "  - id: TEST-abcd\n"
-        "    version: abc1234\n"
-        "    hash: 'sha256:0000000000000000000000000000000000000000000000000000000000000000'\n"
-        "---\n\n"
-        "# CP-TEST-abcd-0001 — TEST-abcd at compaction\n\n"
-        "## Next action\n\n"
-        "Continue implementation\n",
-        encoding="utf-8",
+        CHECKPOINT_RECORD_TEXT, encoding="utf-8",
     )
-
-    _git(tmp_path, "add", "-A")
-    _git(tmp_path, "commit", "-q", "-m", "init")
-
+    _simple_git(tmp_path, "add", "-A")
+    _simple_git(tmp_path, "commit", "-q", "-m", "init")
     return tmp_path

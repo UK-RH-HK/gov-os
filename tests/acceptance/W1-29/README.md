@@ -4,6 +4,22 @@ Ticket: `DAEO-zsvl` (W1-29), profile STANDARD (DEC-221).
 Tests written by the Independent Test Designer (MR-3, DEC-069) before
 implementation.
 
+## Test infrastructure
+
+The combined PreCompact and SessionStart hooks are the same files the W1-49
+suite exercises: `template/governance/kernel/hooks/precompact.py` and
+`sessionstart.py`.  For these two events, W1-29 tests run the registered
+shell commands (read from `.claude/settings.json`) in a temporary project
+built by `w1_49_support.make_project()`, extended with W1-29 fixture data
+(ticket, checkpoint record).  Every case of `tests/acceptance/W1-49/` passes
+unchanged: W1-29 adds to W1-49's hooks, it does not replace them.
+
+Stop and SubagentStop are W1-29-only hooks in `src/gov/hooks/`.  They are
+run as Python scripts directly because they may not yet be registered.
+
+The watchdog tests call `gov.checkpoint.record.watch` directly because
+`gov close` (W1-30) is not built.
+
 ## KPI-to-test map
 
 ### Success line 1 — SessionStart injects gov context --brief plus tk ready within the 2.5k-token cap; PreCompact and Stop write checkpoints and respect stop_hook_active [CAP-15.g, CAP-37.b]
@@ -14,6 +30,9 @@ implementation.
 | `TestSessionStart::test_reinjects_on_compact_clear_resume[compact]` | CAP-37.b, DEC-208 | hook not built |
 | `TestSessionStart::test_reinjects_on_compact_clear_resume[clear]` | CAP-37.b, DEC-208 | hook not built |
 | `TestSessionStart::test_reinjects_on_compact_clear_resume[resume]` | CAP-37.b, DEC-208 | hook not built |
+| `TestSessionStart::test_orchestrator_compact_carries_prompt_path` | CAP-15.g, DEC-259 | hook not built |
+| `TestSessionStart::test_orchestrator_compact_carries_resume_section` | CAP-37.b, DEC-259 | hook not built |
+| `TestSessionStart::test_orchestrator_compact_combined_within_cap` | CAP-15.g, DEC-259 | hook not built |
 | `TestPreCompact::test_writes_checkpoint` | CAP-37.b | hook not built |
 | `TestStop::test_writes_checkpoint` | CAP-37.b | hook not built |
 | `TestStop::test_respects_stop_hook_active` | CAP-37.b | hook not built |
@@ -25,6 +44,10 @@ implementation.
 | `TestSubagentStop::test_accepts_all_twelve_fields` | CAP-37.d | hook not built |
 | `TestSubagentStop::test_blocks_missing_fields` | CAP-37.d | hook not built |
 | `TestSubagentStop::test_block_includes_reason_and_is_once` | CAP-37.d | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed[empty stdin]` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed[invalid JSON]` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_malformed_input_fails_closed[null last_assistant_message]` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_empty_and_null_values_do_not_satisfy_contract` | CAP-37.d, DEC-136 | hook not built |
 
 ### Success line 3 — A checkpoint is written when context utilisation passes the threshold, not only at PreCompact [CAP-37.c]
 
@@ -60,26 +83,36 @@ implementation.
 | `TestWatchdogBlocksStale::test_missing_checkpoint` | CAP-37.c | GREEN (tests W1-25 `record.watch`) |
 | `TestWatchdogBlocksStale::test_stale_on_ticket_transition` | CAP-37.c | GREEN (tests W1-25 `record.watch`) |
 
+### Cut order (DEC-136, Finding 3)
+
+| Test | Covers | Red reason |
+|------|--------|------------|
+| `TestCutOrder::test_instruction_preserved_when_cap_tight` | CAP-15.g, DEC-136 | hook not built |
+
 ## Covers coverage
 
 | Covers id | Item | Tests |
 |-----------|------|-------|
-| CAP-15.g | File path + summary ≤ ~2.5k tokens (harness output caps) | `test_injects_context_brief_on_startup`, `test_large_context_within_cap` |
-| CAP-37.b | Mandatory triggers incl. ticket transition, compaction, stop | `test_writes_checkpoint` (PreCompact), `test_writes_checkpoint` (Stop), `test_reinjects_on_compact_clear_resume`, `test_respects_stop_hook_active` |
+| CAP-15.g | File path + summary ≤ ~2.5k tokens (harness output caps) | `test_injects_context_brief_on_startup`, `test_large_context_within_cap`, `test_orchestrator_compact_carries_prompt_path`, `test_orchestrator_compact_combined_within_cap`, `test_instruction_preserved_when_cap_tight` |
+| CAP-37.b | Mandatory triggers incl. ticket transition, compaction, stop | `test_writes_checkpoint` (PreCompact), `test_writes_checkpoint` (Stop), `test_reinjects_on_compact_clear_resume`, `test_respects_stop_hook_active`, `test_orchestrator_compact_carries_resume_section` |
 | CAP-37.c | Provider-independent watchdog: marks stale; checkpoints on context utilisation; blocks handoff/close when freshness violates policy | `test_stop_writes_checkpoint_not_only_precompact`, `test_watchdog_marks_stale_on_context_utilisation`, `test_stale_by_age`, `test_missing_checkpoint`, `test_stale_on_ticket_transition` |
-| CAP-37.d | Worker return contract: the 12 fields | `test_accepts_all_twelve_fields`, `test_blocks_missing_fields`, `test_block_includes_reason_and_is_once` |
+| CAP-37.d | Worker return contract: the 12 fields | `test_accepts_all_twelve_fields`, `test_blocks_missing_fields`, `test_block_includes_reason_and_is_once`, `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract` |
+| DEC-136 | Review findings feed the independent suite as described behaviour | `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract`, `test_instruction_preserved_when_cap_tight` |
+| DEC-259 | Hooks act only for GOV_ROLE=orchestrator (W1-49 behaviour); W1-29 extends so non-orchestrator roles get W1-29 content | `test_orchestrator_compact_carries_prompt_path`, `test_orchestrator_compact_carries_resume_section`, `test_orchestrator_compact_combined_within_cap` |
 
 ## Red/green summary
 
-- **15 hook tests** fail because `src/gov/hooks/` is empty (the module under
-  test does not exist yet).
+- **23 hook tests** fail because the hooks are not built yet (`src/gov/hooks/`
+  is empty for Stop/SubagentStop; the combined PreCompact and SessionStart
+  hooks at `template/governance/kernel/hooks/` do not yet include W1-29
+  behaviour).
 - **4 watchdog tests** pass because they test `gov.checkpoint.record.watch`
   (W1-25), which is already built.  Since `gov close` (W1-30) is not built,
   these test the function directly per the instruction: "if the watchdog can
   only be a function that W1-30 calls, the case tests the function."
 
-Total: **19 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
-counts as 3).
+Total: **27 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
+counts as 3; the parametrized `test_malformed_input_fails_closed` counts as 3).
 
 ## Determined from sources
 
@@ -109,7 +142,8 @@ task, status, work_completed, files_changed, evidence, tests, discoveries,
 risks, lessons, proposed_decisions, unresolved, recommended_next_action.
 
 "Enforces" = SubagentStop exit 2 with a reason naming missing fields.  The
-block is once — it does not loop.
+block is once — it does not loop.  Empty string `""` and `null` values do
+not satisfy the contract (DEC-136, Finding 2).
 
 ### 3. Where a checkpoint is written
 
@@ -144,6 +178,31 @@ concern (not a hook concern), the test verifies the hooks exist and handle
 compaction correctly; the threshold value is verified by the orchestrator.
 The fallback (CONTEXT_CHECKPOINT stop) applies only when the setting is
 unavailable, which does not apply to the pinned version.
+
+### 7. Combined hook behaviour (W1-49 + W1-29)
+
+The PreCompact and SessionStart hooks at `template/governance/kernel/hooks/`
+combine W1-49 and W1-29 behaviour:
+
+- **Combined PreCompact**: for orchestrator, appends a generated state block
+  to `CHECKPOINT.md` (W1-49, DEC-264) AND writes a checkpoint record via
+  `gov.checkpoint.record.write` (W1-29).  For non-orchestrator, writes the
+  checkpoint record only (DEC-259).  Never blocks.
+
+- **Combined SessionStart**: for orchestrator on compact/clear/resume, injects
+  prompt path, RESUME HERE section, staleness warning (W1-49) AND
+  `gov context --brief` + `tk ready` (W1-29), all within the 10 000-character
+  cap.  For non-orchestrator, W1-29 content only.
+
+- **Cut order** (Finding 3): when the combined injection exceeds the cap,
+  context brief and tk ready are cut first.  The instruction to read the prompt
+  and checkpoint and the staleness warning are last to be cut.
+
+### 8. Empty/null values (Finding 2)
+
+Empty string `""` and `null` values in the SubagentStop 12-field return
+contract do not count as "present".  The contract requires meaningful values.
+SubagentStop must block (exit 2) when any field is empty or null.
 
 ## Residual: S0a-G-09
 
