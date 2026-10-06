@@ -1039,3 +1039,39 @@ Recorded at W1-20's close, from the ticket lead rounds' summaries.
   pushed; containment flagged it), and wrote files with a Python here-document and `sed -i`, all inside its paths.
 - **Run time:** the suite takes about four and a half minutes alone.
 - **Size.** Source +119 / −1 against an estimate of 100 (closure 111, wrapper 8).
+
+## W1-19 residuals (semantic retrieval, RRF and rerank, 2026-10-06)
+
+Recorded at W1-19's close, from the ticket lead rounds' summaries. Measured on the dev tiers at the close: mean hit@5
+83.33 (pass line 80, DEC-414), warm p95 0.317 s (limit 0.5), the rerank process's peak RAM 2.29 GB (limit 2.5).
+
+- **The 85 baseline is not reached:** query `DQ-B-03` (class decisions) is missed, the one query between 83.3 and
+  S0b2's 85. R1's whole-file chunking gives 85.0 on the dev tiers and was not built; the parent-bounded chunks stay
+  (DEC-343, DEC-414). 85 is re-measured at the Wave 1 exit run (W1-42) and at qualification.
+- **Backlog, W1-17's area, a later wave:** a ranked lexical route for exact identifiers (DEC-414). Today the lexical
+  route is an exact-string search and contributes nothing on natural-language questions, so the fusion joins one
+  route in practice.
+- **One case holds both hit@5 lines** (success 2 and failure 1): since DEC-414 they are the same line.
+- **Vectors built before the 512-character cut are not detected as stale:** the manifest records the model and its
+  revision, not the cut. Only stores built by the ticket's branch before that change are affected; a rebuild clears
+  it.
+- **`template/**` is not embedded:** its path-map value `embedded, except vendored code` is read as not embedded
+  (DEC-388), so it is found by the lexical route only. Splitting the vendored paths is a path-map edit.
+- **Vectors are in a plain table with a brute-force cosine scan per query,** not a `vec0` virtual table, so that the
+  store stays readable without the extension. Not measured beyond the dev tiers.
+- **`fusion.search` returns at most 30 hits,** whatever `limit` says.
+- **A reranker process that dies after loading** (for example out of GPU memory) makes `score` raise; it is not
+  handled as "absent" (DEC-374 covers only an absent environment or snapshot).
+- **The reranker worker writes a progress bar and one prompt line** to the caller's standard error at first load.
+- **Offline loading of the reranker is checked only where the snapshot is absent.**
+- **The rerank process's RAM margin is about 0.2 GB** (2.24 to 2.29 GB measured against 2.5).
+- **Two dev queries have no gold path,** which caps the mean at 96.3 (DEC-388). The `deletable` class stays at 40 in
+  R1 and here: its gold files are secret-like and filtered.
+- **`semantic.py` imports the private `_matches` from `gov.secrets`.**
+- **The model-dependent cases cannot run in a launched worker's sandbox** (no network profile, no GPU, no model
+  cache): the ticket lead ran them.
+- **W1-16's `test_this_repository_is_not_indexed_by_the_run` fails when any session's hook writes a snapshot** under
+  the tree's `.gov-runtime/snapshots/` during the run; it passes with nothing else calling tools in that tree.
+- **Latency occurrence (DEC-372):** in the regression after the merge, W1-02's
+  `test_decision_p95_is_under_100_ms[frozen-deny]` failed under load and passed alone.
+- **`ollama serve` is left running** by the code under test (DEC-261).
