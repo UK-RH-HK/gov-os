@@ -606,3 +606,22 @@ fifth batch".
   readers need the same three-way answer: nothing, unmarked, frozen.
 - **Unit tests** under `tests/unit/` that write an empty flag are the engineer's to update: `tests/unit/guard`,
   `tests/unit/pause`, `tests/unit/launch`, `tests/unit/install` mention the flag.
+
+## A sixth case: the seam in ``lift()`` (reviewer finding, DEC-136)
+
+A reviewer found that `gov.pause.command.lift` takes `ancestry` and `terminal` as public keyword arguments and uses
+them as given. An agent can write a Python script that imports the function and calls it with a forged ancestry (no
+Claude Code session, a readable chain to the system's first process) and a real pseudo-terminal pair, bypassing all
+four rules of DEC-409 and lifting the freeze without being the owner in person.
+
+| File | Test | Cases | Red now, and why |
+|---|---|---|---|
+| `test_w1_50_freeze_seam.py` | `test_an_agent_script_that_calls_lift_with_planted_parameters_does_not_lift` | 1 | 1 red: `lift()` accepts the planted `ancestry` and `terminal`, every rule passes, and the freeze is lifted. |
+
+**What closes the seam.** `lift()` must either stop accepting `ancestry` and `terminal` as parameters (so the call
+gets TypeError) or ignore them and read the real ancestry from `/proc` and the real terminal from `(0, 1)`. In either
+case, the driver's subprocess — which has a Claude Code session among its real ancestors, or an unreadable chain — is
+refused, and the freeze stays.
+
+**Expected green after the fix:** the freeze flag is still present, the guard still denies, and no name under
+`.gov-runtime/` has changed.
