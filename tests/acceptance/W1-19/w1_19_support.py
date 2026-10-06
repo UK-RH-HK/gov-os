@@ -89,8 +89,10 @@ HEAVY_MODULES = ("torch", "transformers", "sentence_transformers")
 RRF_K = 60
 
 # The KPI's figures.
-HIT_AT_5_BASELINE = 85.0   # success 2: mean hit@5 >= 85 (the S0b2 R1 baseline)
-HIT_AT_5_FAILURE = 80.0    # failure 1: mean hit@5 below 80
+HIT_AT_5_PASS_LINE = 80.0  # success 2 and failure 1: mean hit@5 >= 80 on the dev tiers passes, below 80 fails (DEC-414)
+# The S0b2 R1 baseline. Not a pass line since DEC-414: the measured mean is reported against it, and it is
+# re-measured at the Wave 1 exit run (W1-42) and at qualification.
+HIT_AT_5_BASELINE = 85.0
 WARM_P95_LIMIT_S = 0.5     # success 2
 RERANK_RSS_LIMIT_BYTES = 2_500_000_000  # failure 2: 2.5 GB, read as 2.5 x 10^9 bytes (the stricter reading)
 
@@ -953,6 +955,25 @@ def mean_hit_at_5(scored):
     classes' percentages of hits (S0b2: "Mean of ten classes"), and the percentage of each class."""
     per_class = {name: 100.0 * sum(hits) / len(hits) for name, hits in scored.items()}
     return sum(per_class.values()) / len(per_class), {name: round(value, 1) for name, value in per_class.items()}
+
+
+# What the hit@5 case measured, for the terminal summary of the conftest: shown whether the case passes or fails.
+HIT_AT_5_REPORT = []
+
+
+def hit_at_5_report(mean, per_class, missed):
+    """The measured figure as lines to show: the mean against the pass line and against the S0b2 baseline, the
+    percentage of each class, and the queries missed (DEC-414: W1-42's exit run reads them)."""
+    against_pass = "at or above" if mean >= HIT_AT_5_PASS_LINE else "below"
+    against_baseline = "at or above" if mean >= HIT_AT_5_BASELINE else "below"
+    return [
+        f"W1-19 hit@5: mean of the {len(per_class)} classes = {mean:.2f}",
+        f"W1-19 hit@5: {against_pass} the pass line of {HIT_AT_5_PASS_LINE:.0f} on the dev tiers (DEC-414)",
+        f"W1-19 hit@5: {against_baseline} the S0b2 R1 baseline of {HIT_AT_5_BASELINE:.0f} "
+        f"({mean - HIT_AT_5_BASELINE:+.2f}); the baseline is not a pass line here",
+        "W1-19 hit@5: per class: " + ", ".join(f"{name}={value}" for name, value in sorted(per_class.items())),
+        f"W1-19 hit@5: missed ({len(missed)}): " + (", ".join(sorted(missed)) or "none"),
+    ]
 
 
 def p95(seconds):

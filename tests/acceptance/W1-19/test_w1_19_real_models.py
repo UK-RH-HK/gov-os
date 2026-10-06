@@ -18,7 +18,9 @@ asks three warm-up questions, then asks each question of the dev query set once,
 memory of that process and of every process it starts (the Ollama daemon left out) is watched.
 
 Mean hit@5 follows S0b2's own method (DEC-380): the first five distinct paths of each query against its
-``must_cite``, a percentage per class, and the mean of the ten classes.
+``must_cite``, a percentage per class, and the mean of the ten classes. The pass line is 80 on the dev tiers
+(DEC-414); the measured mean, and where it stands against the S0b2 R1 baseline of 85, is shown in the terminal
+summary whether the case passes or fails.
 """
 
 from __future__ import annotations
@@ -149,21 +151,26 @@ def _scored(measured):
 
 
 @FULL
-def test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5(measured):
+def test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80(measured, record_property):
+    # Success 2 and failure 1 are one line since DEC-414: at or above 80 on the dev tiers passes, below 80 fails.
+    # The S0b2 R1 baseline of 85 is not a pass line here; where the mean stands against it is reported, not
+    # asserted, for the Wave 1 exit run (W1-42) and for qualification, which re-measure it.
     scored, missed = _scored(measured)
     mean, per_class = support.mean_hit_at_5(scored)
-    assert mean >= support.HIT_AT_5_BASELINE, \
-        f"mean hit@5 over the ten classes is {mean:.1f}, below the S0b2 R1 baseline of " \
-        f"{support.HIT_AT_5_BASELINE:.0f} (per class: {per_class}; missed: {missed})"
-
-
-@FULL
-def test_mean_hit_at_5_is_not_below_the_failure_line(measured):
-    scored, missed = _scored(measured)
-    mean, per_class = support.mean_hit_at_5(scored)
-    assert not mean < support.HIT_AT_5_FAILURE, \
-        f"mean hit@5 over the ten classes is {mean:.1f}, below {support.HIT_AT_5_FAILURE:.0f} " \
-        f"(per class: {per_class}; missed: {missed})"
+    report = support.hit_at_5_report(mean, per_class, missed)
+    support.HIT_AT_5_REPORT[:] = report   # the terminal summary, pass or fail
+    print("\n".join(report))              # the case's own captured output (-rP, -s)
+    record_property("w1_19_mean_hit_at_5", round(mean, 2))
+    record_property("w1_19_hit_at_5_pass_line", support.HIT_AT_5_PASS_LINE)
+    record_property("w1_19_hit_at_5_baseline", support.HIT_AT_5_BASELINE)
+    record_property("w1_19_hit_at_5_against_baseline", round(mean - support.HIT_AT_5_BASELINE, 2))
+    record_property("w1_19_hit_at_5_per_class", repr(per_class))
+    record_property("w1_19_hit_at_5_missed", ", ".join(sorted(missed)))
+    assert mean >= support.HIT_AT_5_PASS_LINE, \
+        f"mean hit@5 over the ten classes is {mean:.2f}, below the pass line of " \
+        f"{support.HIT_AT_5_PASS_LINE:.0f} on the dev tiers (DEC-414); against the S0b2 R1 baseline of " \
+        f"{support.HIT_AT_5_BASELINE:.0f}: {mean - support.HIT_AT_5_BASELINE:+.2f} " \
+        f"(per class: {per_class}; missed: {sorted(missed)})"
 
 
 @FULL

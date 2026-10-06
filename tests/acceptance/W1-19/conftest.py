@@ -29,6 +29,14 @@ def pytest_runtest_setup(item):
         pytest.skip("; ".join(reasons))
 
 
+def pytest_terminal_summary(terminalreporter):
+    """The measured mean hit@5, when the dev-tier case ran: shown whether it passed or failed (DEC-414)."""
+    if support.HIT_AT_5_REPORT:
+        terminalreporter.write_sep("=", "W1-19 measured mean hit@5 (DEC-414)")
+        for line in support.HIT_AT_5_REPORT:
+            terminalreporter.write_line(line)
+
+
 def _built(make):
     """What ``make`` returns, or a plain failure with its reason when the ticket has not built it yet."""
     reason = None

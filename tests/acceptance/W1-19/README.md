@@ -5,10 +5,11 @@ implementation (MR-3, DEC-069), from the ticket's five KPI lines, Contract v4 (C
 named below. Three batches: the first returned seven decision packages; the second, after they were decided
 (DEC-373, DEC-374, DEC-379 to DEC-384), revised the suite to the answers; the third, after the installs (DEC-397)
 and the suite's first run with them, put right the scratch environment and added the cases for how the default
-reranker starts.
+reranker starts; the fourth, after implementation, revised the hit@5 case to the owner's restated KPI line
+(DEC-414).
 
-**42 test functions, 42 cases** in six files, with a support module and a conftest (33 after the first batch, 39
-after the second). Run:
+**41 test functions, 41 cases** in six files, with a support module and a conftest (33 after the first batch, 39
+after the second, 42 after the third). Run:
 
 ```
 python3 -m pytest tests/acceptance/W1-19 -q -p no:cacheprovider
@@ -17,7 +18,46 @@ python3 -m pytest tests/acceptance/W1-19 -q -p no:cacheprovider
 Run `test_w1_19_real_models.py` alone, never beside another suite: it is heavy and one of its cases is a latency
 case (DEC-372).
 
+## The fourth batch: the hit@5 pass line is 80 on the dev tiers (DEC-414)
+
+A **rewrite after implementation**; its reason is the owner's decision DEC-414, which restates the ticket's second
+success line: "Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is
+re-measured at the Wave 1 exit run (W1-42) and at qualification (DEC-414); warm p95 <= 0.5 s". The failure line
+"Mean hit@5 falls below 80" is unchanged. The method (DEC-380, DEC-388), the query set and every other case are as
+they were.
+
+| Case | What happened | Reason |
+|---|---|---|
+| `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` | Rewritten and renamed `test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`: it fails below 80, no longer below 85 | DEC-414. The old name would say that 85 is reached. |
+| `test_mean_hit_at_5_is_not_below_the_failure_line` | Removed | Since DEC-414 it asserted the same thing as the case above, on the same measurement: "at or above 80" is "not below 80". Two cases that cannot differ would count one observation twice. |
+
+**One case now holds both hit@5 lines.** Success 2 (at or above 80 passes) and failure 1 (below 80 fails) are the
+two sides of one comparison of one measured mean, so the case passes exactly when the success line holds and fails
+exactly when the failure line holds. Each KPI line still has its test; it is the same test.
+
+**The measured figure is shown whether the case passes or fails**, and 85 is reported, never asserted. Nothing
+fails, is expected to fail or skips under 85. Three places, the first needs no option:
+
+1. **The terminal summary.** A section `W1-19 measured mean hit@5 (DEC-414)` at the end of the run, written by the
+   conftest. Five lines, each beginning `W1-19 hit@5:`: the mean of the ten classes (two decimals); at or above, or
+   below, the pass line of 80; at or above, or below, the S0b2 R1 baseline of 85, with the signed difference; the
+   percentage of each class; the queries missed, by id. `grep "W1-19 hit@5:"` over a saved run returns them.
+2. **The case's own output**: the same five lines, printed, shown with `-rP` or `-s`.
+3. **Recorded properties**, in a `--junitxml` report: `w1_19_mean_hit_at_5`, `w1_19_hit_at_5_pass_line`,
+   `w1_19_hit_at_5_baseline`, `w1_19_hit_at_5_against_baseline`, `w1_19_hit_at_5_per_class`, `w1_19_hit_at_5_missed`.
+
+When the case fails, its message carries the same figures. In the support module `HIT_AT_5_PASS_LINE` is 80 and
+`HIT_AT_5_BASELINE` is 85, the second named as a reported figure and not a pass line.
+
+**What was run.** The designer's sandbox reaches neither Ollama nor the reranker, so **the revised case was not run
+by the designer**; the ticket lead runs it. The collection was run (41 cases). The case's function was called apart,
+in a throwaway folder outside the repository, with made-up measurements and no model: it passes at 100, 82 and
+exactly 80, fails at 78, and shows the five lines and the properties each time. The lead's last run before this
+batch measured 83.3, which the old case refused and this one accepts; that figure is the lead's, not the designer's.
+
 ## The state after the third batch
+
+*As written at the third batch, when the suite had 42 cases and the real-model file seven.*
 
 The model-free part of the ticket is built; `rerank.default_reranker()` still returns `None`. Observed by the
 designer on `w1/W1-19` at `1805a2a7` plus this batch, in a sandboxed session:
@@ -163,6 +203,7 @@ that round).
 | **DP-8** how `embedded, except vendored code` is read | **DEC-388** (delegated): the closed list is `embedded` and `not embedded`; any other value is not embedded | Nothing: the policy cases already read it closed, with `embedded on request` as the unknown value. |
 | **DP-9** the two queries with no gold path | **DEC-388** (delegated): hit@5 per class over all 52 queries; the two count as misses | Nothing: the rule in the tests is the one decided. It is not changed. |
 | The installs, and how the default reranker starts | **DEC-397** (owner) | The scratch environment was put right, the `needs` marker sees the reranker environment, and three cases were added (the section above). |
+| **DP-12** the pass line of mean hit@5 | **DEC-414** (owner): at or above 80 on the dev tiers is the pass line; 85 is re-measured at the Wave 1 exit run (W1-42) and at qualification | The baseline case was rewritten to the pass line of 80 and renamed; the failure-line case, now the same assertion, was removed; the measured figure and where it stands against 85 are always shown (the fourth batch, above). 42 cases became 41. |
 
 ## hit@5: S0b2 states its method, and the cases follow it (DEC-380)
 
@@ -179,7 +220,9 @@ and whose last row is
 
 > | **Mean of ten classes** | **85.0** | **76.0** | **0.711** | **0.584** |
 
-So the 85 of the KPI line is the mean of ten per-class percentages. It is not a mean of two tiers.
+So S0b2's 85 is the mean of ten per-class percentages. It is not a mean of two tiers. Since DEC-414 it is the
+baseline the measured mean is reported against, not the pass line: the pass line on the dev tiers is 80, by the
+same method.
 
 **The rule in the tests.**
 
@@ -187,7 +230,8 @@ So the 85 of the KPI line is the mean of ten per-class percentages. It is not a 
    reranked list and take the first five distinct paths in rank order).
 2. Stated by S0b2: a **percentage per class**, both tiers together, over every query of the class. The sizes in
    S0b2's table add up to 52, so **all 52 queries count**.
-3. Stated by S0b2: the **mean of the ten classes' percentages**, against 85 (success 2) and 80 (failure 1).
+3. Stated by S0b2: the **mean of the ten classes' percentages**, against 80 (the pass line of success 2 and the
+   failure line of failure 1, DEC-414). Where it stands against 85 is reported and not asserted.
 4. Not stated by S0b2, so DEC-380's option (a): a query is a **hit when one of its `must_cite` paths** is among
    those five paths, by equal path. The matcher itself (`eval_r*.py`) is not one of the four files a worker may
    read. `must_not_cite` does not enter hit@5: S0b2 reports it apart ("Forbidden citations (top-5)").
@@ -240,18 +284,18 @@ value itself; `embedded on request` stands for every unknown value.
 | KPI line | File | Tests | Today |
 |---|---|---|---|
 | **Success 1.** sqlite-vec with qwen3-embedding:0.6b, RRF, and one lazily loaded Qwen3-Reranker pass over the merged set [CAP-10.a, CAP-18.a] | `test_w1_19_fusion.py` · `test_w1_19_rerank.py` · `test_w1_19_unavailable.py` · `test_w1_19_embedding_policy.py` · `test_w1_19_semantic_index.py` · `test_w1_19_real_models.py` | all 7 of `test_w1_19_fusion.py` · all 7 of `test_w1_19_rerank.py` · 8 of `test_w1_19_unavailable.py` (all but `test_there_is_no_manifest_before_there_is_an_index`) · both of `test_w1_19_embedding_policy.py` · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector` · `test_a_semantic_hit_is_a_chunk_record_of_the_shared_store_with_its_parent` · `test_the_vectors_are_in_the_shared_store_beside_the_lexical_index` · `test_no_text_the_secret_filter_refuses_is_embedded_or_returned` · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` · `test_a_changed_file_is_embedded_before_the_next_retrieval_and_stale_vectors_are_reported` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` · `test_the_default_reranker_is_a_process_of_its_own_started_from_the_reranker_environment` · `test_every_answer_is_one_fused_list_from_both_routes_reranked` | the 30 outside the real-model file pass; of the 3 in it, the embedder case passed in the lead's run, the default-reranker case is red (no default yet), the third waits for the reranker |
-| **Success 2.** Dev query set mean hit@5 >= 85 (S0b2 R1 baseline); warm p95 <= 0.5 s | `test_w1_19_real_models.py` | `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` · `test_a_warm_query_answers_within_half_a_second_at_p95` | wait for the default reranker; not run by the designer |
+| **Success 2.** Dev query set mean hit@5 >= 80 on the dev tiers is the pass line; 85 (the S0b2 R1 baseline) is re-measured at the Wave 1 exit run (W1-42) and at qualification (DEC-414); warm p95 <= 0.5 s | `test_w1_19_real_models.py` | `test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80` (it reports the mean against 85 and asserts nothing about 85) · `test_a_warm_query_answers_within_half_a_second_at_p95` | the hit@5 case is revised in the fourth batch and not run by the designer; the latency case is unchanged and not run by the designer |
 | **Success 3.** Model ids and revisions are recorded in the index manifest [CAP-10.a] | `test_w1_19_semantic_index.py` · `test_w1_19_unavailable.py` · `test_w1_19_real_models.py` | `test_the_manifest_records_the_model_ids_and_their_revisions` · `test_the_embedders_revision_is_the_one_the_model_list_reports_not_a_constant` · `test_the_manifest_is_held_in_the_shared_store_and_read_without_ollama` · `test_there_is_no_manifest_before_there_is_an_index` · `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` | the 4 stand-in and model-free cases pass; the real-embedder case passed in the lead's run |
-| **Failure 1.** Mean hit@5 falls below 80 | `test_w1_19_real_models.py` | `test_mean_hit_at_5_is_not_below_the_failure_line` | waits for the default reranker; not run by the designer |
-| **Failure 2.** Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py` | `test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | waits for the default reranker; not run by the designer |
+| **Failure 1.** Mean hit@5 falls below 80 | `test_w1_19_real_models.py` | `test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80`: the same case as success 2, which fails exactly when the mean is below 80 | revised in the fourth batch; not run by the designer |
+| **Failure 2.** Peak RAM of the rerank process exceeds 2.5 GB | `test_w1_19_real_models.py` | `test_the_rerank_process_stays_within_two_and_a_half_gigabytes` | unchanged; not run by the designer |
 
-**Count.** KPI lines with tests: 5 of 5 (3 success, 2 failure). Success 2 and both failure lines have been
-observed by nobody yet: they need the default reranker. Success 1 and 3 are observed on the stand-in endpoint and,
-for the embedder, once with the real model.
+**Count.** KPI lines with tests: 5 of 5 (3 success, 2 failure). Since the fourth batch the hit@5 half of success 2
+and failure 1 are held by one case, because DEC-414 made them one comparison. The "Today" column of success 1 and 3
+is as written at the third batch; the dev-tier cases are the ticket lead's to run.
 
 | Covers id | Tests |
 |---|---|
-| **CAP-10.a** paraphrase retrieval with the pinned embedder | `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` (real model) · `test_the_dev_query_set_reaches_the_baseline_mean_hit_at_5` (real models) · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector`, the three manifest cases and `test_only_the_namespace_that_says_embedded_reaches_the_vectors` (stand-in endpoint) · `test_the_semantic_route_says_unavailable_when_ollama_is_absent`, `test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises` and `test_no_text_of_a_namespace_that_is_not_embedded_is_sent_to_be_embedded_or_returned` (run now) |
+| **CAP-10.a** paraphrase retrieval with the pinned embedder | `test_the_pinned_embedder_reaches_a_section_from_a_paraphrase_and_the_manifest_names_it` (real model) · `test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80` (real models) · `test_a_question_no_line_holds_reaches_its_chunk_by_its_vector`, the three manifest cases and `test_only_the_namespace_that_says_embedded_reaches_the_vectors` (stand-in endpoint) · `test_the_semantic_route_says_unavailable_when_ollama_is_absent`, `test_without_sqlite_vec_the_semantic_facet_is_unavailable_and_nothing_raises` and `test_no_text_of_a_namespace_that_is_not_embedded_is_sent_to_be_embedded_or_returned` (run now) |
 | **CAP-18.a** fusion (RRF), dedup by chunk hash, one rerank | all of `test_w1_19_fusion.py` and `test_w1_19_rerank.py` · `test_without_ollama_the_fused_list_is_the_lexical_routes_reranked_in_one_pass` · `test_a_limit_cuts_the_list_after_the_rerank_not_before` · `test_a_reranker_that_cannot_be_loaded_leaves_the_fused_list_and_says_so` · `test_with_the_environment_and_no_snapshot_…` · `test_both_routes_are_fused_into_one_list_and_reranked_in_one_pass` (stand-in endpoint) · `test_the_default_reranker_is_a_process_of_its_own_…` (real reranker). The multi-route router with the graph route, and the bundle, are W1-21. |
 
 ## Which tests need which install
@@ -268,13 +312,13 @@ exact paths. Everything below is installed on this machine since DEC-397, so not
 | `gitleaks`, `sqlite_vec` | `sqlite_vec` importable by the Python that runs pytest | the 9 stand-in cases of `test_w1_19_semantic_index.py`, `test_only_the_namespace_that_says_embedded_…` (10) | pass |
 | the above and `ollama` | an executable at `GOV_OLLAMA_BIN`, on `PATH` or at `~/.local/ollama/bin/ollama`, and the file `manifests/registry.ollama.ai/library/qwen3-embedding/0.6b` under `$OLLAMA_MODELS` or `~/.ollama/models` | `test_the_pinned_embedder_reaches_a_section_…` (1), marked `local_only` | passed in the lead's run; not run by the designer |
 | `reranker` | `reranker_env`, and the folder `models--Qwen--Qwen3-Reranker-0.6B/snapshots/e61197ed…5473` in the Hugging Face cache (`HF_HUB_CACHE`, `HF_HOME` or `~/.cache/huggingface/hub`) | `test_the_default_reranker_is_a_process_of_its_own_…` (1), marked `local_only` | red: no default yet |
-| `gitleaks`, `sqlite_vec`, `ollama`, `reranker` | all of the above | the 5 dev-tier cases, marked `local_only`; they also skip when the dev tiers or the query set are absent | wait for the default reranker; not run by the designer |
+| `gitleaks`, `sqlite_vec`, `ollama`, `reranker` | all of the above | the 4 dev-tier cases (5 before the fourth batch), marked `local_only`; they also skip when the dev tiers or the query set are absent | not run by the designer |
 
-16 + 8 + 1 + 10 + 1 + 1 + 5 = 42.
+16 + 8 + 1 + 10 + 1 + 1 + 4 = 41.
 
 **The `reranker` entry now sees the environment's interpreter as well as the snapshot.** Before DEC-397 the
 place of the process was not decided, so the marker could not look for it. Now it is one exact path. A machine
-that has the snapshot and not the environment lacks an install, and the six cases that use the real reranker skip
+that has the snapshot and not the environment lacks an install, and the five cases that use the real reranker (six before the fourth batch) skip
 there with that reason. Without the change they would fail, and a failure reads as a fault of the ticket. The
 entry looks at the file only and starts nothing: an environment that is there and broken makes the cases fail, as
 it should. `reranker_env` is the interpreter alone, for the case that holds the snapshot absent.
@@ -338,7 +382,8 @@ in `~/.cache/huggingface/hub`. `sentence_transformers`, `torch` and `transformer
   none of the three after the rerank either, because the model is loaded in the reranker's own process.
 - **The fused order** (DEC-374) is what `fusion.rrf` returns for the lexical route's own hits; the case compares
   the chunk ids of `fusion.search` with it, one after the other.
-- **hit@5**: the section above.
+- **hit@5**: the section above. The pass line is 80 (DEC-414); the measured mean is always shown, against 80 and
+  against 85 (the fourth batch, at the head of this file).
 - **Warm p95** (DEC-373): per tier, one process builds the index, asks three warm-up questions that are not
   in the set, then asks each dev query once. Each call is timed inside that process. p95 is the nearest-rank 95th
   percentile over the 52 timed calls, against 0.5 s.
@@ -389,7 +434,18 @@ Each is the stricter or the plainer reading; none is a new public name.
   exact paths under the home folder were looked at, to see that they exist: the two the `needs` marker reads for
   the reranker, the Ollama executable, and the user site folder (listed once, which was more than was needed).
 
+- Fourth batch: the ticket, DEC-414, DEC-380 and DEC-388 (each in full), this file, `test_w1_19_real_models.py`,
+  the conftest and the hit@5 parts of the support module, and the hit@5 lines of the lead's last run log under
+  `.gov-runtime/scratch/`. Nothing under the workbench was read or listed.
+
+## Open after the fourth batch
+
+Nothing is returned for decision: the restated line is read as it is written. The four dev-tier cases, the revised
+one among them, are the ticket lead's to run.
+
 ## Open after the third batch
+
+*As written at the third batch.*
 
 Nothing is returned for decision. DP-8 and DP-9 are decided (DEC-388), and how the default reranker starts is
 decided (DEC-397). Three things stay with the ticket lead and the engineer:
