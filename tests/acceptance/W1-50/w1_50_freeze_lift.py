@@ -3,9 +3,15 @@
 ``gov pause --off`` refuses under a Claude Code session and without a terminal,
 and every suite runs under an agent session with pipes. So a test that needs a
 lifted freeze, or that asks how the lift judges an ancestry or a terminal,
-calls the internal function the command itself calls:
+calls the private test function:
 
-    gov.pause.command.lift(root, ancestry=None, terminal=None) -> dict
+    gov.pause.command._lift_test(root, ancestry=None, terminal=None) -> dict
+
+This is NOT the public ``lift(root)`` function. The public function always reads
+the real ancestry from ``/proc`` and uses ``(0, 1)`` as its terminal — it has no
+``ancestry`` or ``terminal`` parameters, so an agent cannot import it and bypass
+the rules with forged values. ``_lift_test`` holds the old behavior with the
+seam open, for tests only.
 
 - ``ancestry``: the process chain as the product's own reading returns it, the
   command's own process first and the system's first process last. Each
@@ -44,7 +50,8 @@ import pytest
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SRC = REPO_ROOT / "src"
-MODULE, FUNCTION = "gov.pause.command", "lift"
+MODULE, FUNCTION = "gov.pause.command", "_lift_test"
+SEAM_FUNCTION = "lift"
 CODE = re.compile(r"LIFT-\d{4}")           # DEC-409: "type LIFT-<4 digits> to lift the freeze"
 DRIVER_TIMEOUT_S = 120.0
 
@@ -345,7 +352,8 @@ def _environment(sandbox, role):
     return env
 
 
-def drive(project, sandbox, ancestry=None, terminal=PTY, reply=RIGHT, role=None, runs=1, seed=None, limit=10.0):
+def drive(project, sandbox, ancestry=None, terminal=PTY, reply=RIGHT, role=None, runs=1, seed=None, limit=10.0,
+          function=None):
     """Call the internal function ``runs`` times in one new process; a list of ``Lift``.
 
     ``ancestry`` None is ``PLAIN_TERMINAL``: the function is always handed a
@@ -353,10 +361,13 @@ def drive(project, sandbox, ancestry=None, terminal=PTY, reply=RIGHT, role=None,
     before each call. A function that is not built, or does not take the
     contract's parameters, gives ``status == "missing"``: the test fails, the
     file is still collected.
+
+    ``function`` overrides ``FUNCTION``: pass ``SEAM_FUNCTION`` to call
+    ``lift`` (the public function) instead of ``_lift_test``.
     """
     project = Path(project)
     assert REPO_ROOT not in (project, *project.parents), f"refusing to lift in {project}: it is this repository"
-    job = {"module": MODULE, "function": FUNCTION, "root": str(project),
+    job = {"module": MODULE, "function": function or FUNCTION, "root": str(project),
            "ancestry": PLAIN_TERMINAL if ancestry is None else ancestry, "terminal": terminal, "reply": reply,
            "runs": runs, "seed": seed, "limit": limit}
     try:
@@ -377,7 +388,8 @@ def drive(project, sandbox, ancestry=None, terminal=PTY, reply=RIGHT, role=None,
 def built(run):
     """The contract function exists and takes the contract's parameters; the test fails here until it does."""
     if run.status == MISSING:
-        pytest.fail(f"DEC-409 is not built: {MODULE}.{FUNCTION}(root, ancestry=None, terminal=None) is missing "
+        pytest.fail(f"DEC-409 is not built: {MODULE}.{FUNCTION}(root, ancestry=None, terminal=None) is missing — "
+                    f"the private test function must accept ancestry and terminal kwargs "
                     f"({run.detail}). The contract is in tests/acceptance/W1-50/w1_50_freeze_README.md.",
                     pytrace=False)
     assert run.status not in (HANG, CRASH), f"the lift did not end as a result or a refusal: {run.describe()}"

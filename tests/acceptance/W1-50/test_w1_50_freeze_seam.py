@@ -7,19 +7,18 @@ session, a readable chain to the system's first process) and a real
 pseudo-terminal pair, passing all four rules and lifting the freeze without
 being the owner in person.
 
-This test asserts the seam is closed: calling ``lift(root, ancestry=[...],
-terminal=(master_fd, slave_fd))`` in a project that has a freeze set does NOT
-lift the freeze. The freeze flag is still present after the call. After the fix,
-either:
+After the fix ``lift(root)`` takes no ``ancestry`` or ``terminal`` parameters.
+A private function ``_lift_test(root, ancestry=None, terminal=None)`` keeps the
+seam open for the test suite only. This test calls the public ``lift`` function
+with planted keyword arguments and asserts the call fails: a TypeError because
+the parameters are not accepted (the seam is closed).
 
-- ``lift()`` no longer accepts those parameters (TypeError), or
-- it ignores them and reads the real ancestry from ``/proc`` (which, inside the
-  test runner's subprocess, includes a Claude Code session or an unreadable
-  chain), so it refuses.
+**Expected red while ``lift()`` still takes kwargs:** the forged ancestry passes
+rule 1, the pty passes rule 2, the shown code typed back passes rule 3, and the
+freeze is lifted.
 
-**Expected red:** ``lift()`` accepts the kwargs and uses them, so the forged
-ancestry passes rule 1, the pty passes rule 2, the shown code typed back passes
-rule 3, and the freeze is lifted: the flag is gone.
+**Expected green after the fix:** ``lift()`` rejects the kwargs with TypeError
+(the driver reports ``status == "missing"``), and the freeze flag stays.
 """
 
 from __future__ import annotations
@@ -37,18 +36,20 @@ lift = support.lift_support
 def test_an_agent_script_that_calls_lift_with_planted_parameters_does_not_lift(freeze_frozen, freeze_sandbox):
     """A forged ancestry and a real pty, with the shown code typed back: every rule would pass.
 
-    The call uses ``drive()``, which spawns a subprocess that imports
-    ``gov.pause.command.lift`` and calls it with a planted ancestry (a plain
-    terminal's chain, no Claude Code session, readable to the system's first
-    process) and a real pseudo-terminal (the driver's default). The shown code
-    is typed back correctly. This is exactly what an agent could do by writing
-    a Python script and running it via a Bash tool call.
+    The call uses ``drive()`` with ``function=SEAM_FUNCTION`` (``"lift"``),
+    which spawns a subprocess that imports the public ``gov.pause.command.lift``
+    and calls it with a planted ancestry and a real pseudo-terminal. After the
+    fix, ``lift()`` does not accept ``ancestry`` or ``terminal`` kwargs, so the
+    call raises TypeError. The driver reports this as ``status == "missing"``
+    (the function does not take the contract's parameters).
 
-    After the fix the call must fail and the freeze must stay.
+    Before the fix (expected red): ``lift()`` accepts the kwargs, uses them,
+    and lifts the freeze.
     """
     before = support.flag_state(freeze_frozen)
 
-    runs = lift.drive(freeze_frozen, freeze_sandbox, ancestry=lift.PLAIN_TERMINAL)
+    runs = lift.drive(freeze_frozen, freeze_sandbox, ancestry=lift.PLAIN_TERMINAL,
+                      function=lift.SEAM_FUNCTION)
     run = runs[0]
 
     assert run.status != lift.LIFTED, (
