@@ -182,8 +182,81 @@ None. All KPI lines are settled from the ticket sources.
 | DEC-228 (schema replacement) | All tests in test_w1_27_schema.py, revised W1-07 cases |
 | DEC-265 (languages conditional) | `test_code_intelligence_enabled_without_languages_is_invalid`, `test_code_intelligence_disabled_languages_optional` |
 
+## Round 3 — rebuild recreates lexical index properly (DEC-416)
+
+> KPI success 2: "rebuild recreates every derived store" [CAP-07.a, CAP-20.a, CAP-46.a]
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_rebuild_lexical_index_is_fresh` | test_w1_27_rebuild_r3.py | rebuild creates empty tables via `_LEXICAL_SCHEMA`; `freshness()` returns "empty" not "fresh" |
+| `test_rebuild_lexical_search_finds_tracked_text` | test_w1_27_rebuild_r3.py | empty tables return no search hits; FACET_UNAVAILABLE reason "stale" |
+| `test_rebuild_result_names_derived_stores_with_measured_status` | test_w1_27_rebuild_r3.py | result has a "skipped" list with constant reasons instead of per-store recreated/not_recreated status |
+| `test_rebuild_does_not_hold_lexical_schema_copy` | test_w1_27_rebuild_r3.py | `_LEXICAL_SCHEMA` and hardcoded DDL are present in `src/gov/rebuild/command.py` |
+
+## Round 3 — doctor unmeasured vs error (DEC-416, DEC-425)
+
+> KPI success 1: "non-zero on any failure" [CAP-02.a, CAP-06.a, CAP-25.a]
+> KPI success 5: "adoption level" [CAP-54.a]
+
+Section-by-section classification of unmeasured states:
+
+| # | Section | Unmeasured condition | Classification |
+|---|---------|---------------------|----------------|
+| 1 | tools | "no tool-registry.yaml" | absence (OK) |
+| 2 | hooks | no `lefthook.yml` | absence (OK) |
+| 3 | path_map | "no path-map.yaml" | absence (OK) |
+| 4 | path_compliance | (no unmeasured state) | — |
+| 5 | index_freshness | `freshness()` exception: "cannot check index freshness" | **ERROR → should be fail** |
+| 5 | index_freshness | status "missing"/"empty" | absence (OK) |
+| 6 | canaries | `run_canaries()` exception: "canary runner failed" | **ERROR → should be fail** |
+| 6 | canaries | "no canary results" | absence (OK) |
+| 6 | canaries | all FACET_UNAVAILABLE | absence (OK) |
+| 7 | framework_lock | "no framework.lock" | absence (OK) |
+| 8 | isolation | no `.gov-runtime` | absence (OK) |
+| 8 | isolation | "cannot determine git root" (`.gov-runtime` exists, git broken) | **ERROR → should be fail** |
+| 9 | adoption_level | (no unmeasured state) | — |
+| 10 | claude_code | (no unmeasured state) | — |
+| 11 | held_out | (no unmeasured state; uses "report") | — |
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_doctor_index_freshness_error_is_fail` | test_w1_27_doctor_unmeasured_r3.py | `_check_index_freshness` returns "unmeasured" on exception, not "fail"; doctor exits 0 |
+| `test_doctor_canary_error_is_fail` | test_w1_27_doctor_unmeasured_r3.py | `_check_canaries` returns "unmeasured" on exception, not "fail"; doctor exits 0 |
+| `test_doctor_isolation_broken_git_is_fail` | test_w1_27_doctor_unmeasured_r3.py | `_check_isolation` returns "unmeasured" when `.gov-runtime` exists but git root fails, not "fail" |
+| `test_unmeasured_absence_prevents_adopted_healthy` | test_w1_27_doctor_unmeasured_r3.py | `_check_adoption_level` returns ADOPTED_HEALTHY despite unmeasured sections (only checks path-map systems) |
+| `test_healthy_false_when_measurement_error` | test_w1_27_doctor_unmeasured_r3.py | `healthy` considers only "fail"/"drift", ignoring "unmeasured" from errors; healthy=true with corrupt store |
+
+## Residuals
+
+- **S0a-G-04**: listed as a source in the ticket; its text is not in the tree.
+  Noted as a residual.
+
+## Decision packages
+
+None. All KPI lines are settled from the ticket sources.
+
+## Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-02.a (framework.lock) | `test_doctor_report_mentions_framework_lock` |
+| CAP-06.a (path classification) | `test_doctor_report_mentions_path_map_coverage`, `test_full_coverage_is_healthy` |
+| CAP-06.d (path-map compliance) | `test_unclassified_path_is_reported`, `test_moved_path_reference_is_reported` |
+| CAP-07.a (derived state) | `test_rebuild_recreates_derived_stores`, `test_rebuild_digest_matches_store_loader`, `test_rebuild_lexical_index_is_fresh`, `test_rebuild_lexical_search_finds_tracked_text`, `test_rebuild_result_names_derived_stores_with_measured_status`, `test_rebuild_does_not_hold_lexical_schema_copy` |
+| CAP-20.a (rebuild idempotent) | `test_two_rebuilds_give_the_same_digest` |
+| CAP-25.a (tool registry) | `test_doctor_report_mentions_tool_versions`, `test_doctor_does_not_pass_with_wrong_tool_version` |
+| CAP-38.b (recovery/rebuild check) | `test_recovery_rebuild_check_*`, `test_derived_state_deleted_and_rebuilt_gives_same_digest` |
+| CAP-46.a (clone+doctor+rebuild) | `test_fresh_clone_doctor_rebuild` |
+| CAP-54.a (adoption level) | `test_*_adoption_*`, `test_unmeasured_absence_prevents_adopted_healthy` |
+| DEC-210/214 (Claude Code drift) | `test_*_drift*`, `test_*_failure*` in test_w1_27_drift.py |
+| DEC-223 (held-out.yaml) | `test_missing_held_out_yaml_is_reported`, `test_present_held_out_yaml_is_not_reported` |
+| DEC-228 (schema replacement) | All tests in test_w1_27_schema.py, revised W1-07 cases |
+| DEC-265 (languages conditional) | `test_code_intelligence_enabled_without_languages_is_invalid`, `test_code_intelligence_disabled_languages_optional` |
+| DEC-416 (rebuild lexical + unmeasured vs error) | All tests in test_w1_27_rebuild_r3.py, all tests in test_w1_27_doctor_unmeasured_r3.py |
+| DEC-425 (unmeasured is never green) | `test_doctor_index_freshness_error_is_fail`, `test_doctor_canary_error_is_fail`, `test_doctor_isolation_broken_git_is_fail`, `test_healthy_false_when_measurement_error` |
+
 ## Test count
 
-- **W1-27 new tests**: 49
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) = 58
 - **W1-07 revised cases**: 6
-- **Total**: 54
+- **Total**: 64
