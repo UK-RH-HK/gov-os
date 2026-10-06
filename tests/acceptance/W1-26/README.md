@@ -1,7 +1,7 @@
 # W1-26 acceptance tests: `gov check` G0-G2
 
 Ticket `DAEO-fygv`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-91 cases in 13 files.
+126 cases in 15 files.
 
 ```
 python3 -m pytest tests/acceptance/W1-26 -q -p no:cacheprovider
@@ -68,6 +68,8 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_openspec.py` | 5 | S1 |
 | `test_w1_26_readiness.py` | 4 | S1 |
 | `test_w1_26_decisions.py` | 6 | S1 |
+| `test_w1_26_skill_validator.py` | 36 | S7 (DEC-439) |
+| `test_w1_26_audit_validator.py` | 26 | S7 (DEC-441) |
 
 ## The interface the tests fix
 
@@ -95,6 +97,65 @@ before and after.
 ## Revised cases
 
 - `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
+
+## Generic validators (DEC-439, DEC-441) — follow-up round
+
+Added by the Independent Test Designer (MR-3) for the follow-up round (DEC-439).
+
+### Skill-file validator (`test_w1_26_skill_validator.py`)
+
+The first start created 17 cases (10 test methods + 1 parametrized ×4). The follow-up adds 19 cases for the six fixes:
+
+| Fix | Cases | What |
+|---|---|---|
+| Fix 1: folder search at every depth | 2 | Deep SKILL.md discovery, broken nested skill |
+| Fix 2: SKILL.md without frontmatter is a finding | 1 | SKILL_NO_FRONTMATTER, not silently skipped |
+| Fix 3: command refs with args after the name | 4 | Misspelt with args, valid with args, fenced block, bare still works |
+| Fix 4: name/description/version not text | 5 | Integer version, integer name, list description, empty name, empty description |
+| Fix 5: token count matches gov context formula | 1 | 10001 chars = ceil(10001/4) = 2501 tokens > 2500 |
+| Fix 6: unreadable file is unmeasured, not traceback | 2 | Valid folder + missing path, binary file |
+
+Total skill validator: 36 cases.
+
+### Audit-report validator (`test_w1_26_audit_validator.py`)
+
+26 cases testing `python3 -m gov.check.audit_validator` (DEC-441):
+
+| Case | What |
+|---|---|
+| 1. Valid report passes | Well-formed report, resolvable commit, valid paths |
+| 2. Missing frontmatter | No `---` delimiters |
+| 3. Missing `commit` | Frontmatter without `commit` |
+| 4. Missing `milestone` | Frontmatter without `milestone` |
+| 5. Missing `pack_sha256` | Frontmatter without `pack_sha256` |
+| 6. Unresolvable commit | Commit hash not in the repository |
+| 7. No table rows | Valid frontmatter, empty table |
+| 8. Invalid class | Class not in DEC-070's six |
+| 9. OK row with `-` evidence | OK row must cite a path |
+| 10. Non-OK row with `-` (×5) | MISSING, WEAKENED, CONTRADICTS, UNJUSTIFIED_DROP, SCOPE_CREEP |
+| 11. Evidence path not at commit | `git show <commit>:<path>` fails |
+| 12. Evidence path at commit (×2) | Single path, comma-separated paths |
+| 13. Multiple rows, one bad | One non-existent path fails the report |
+| 14. No arguments | Unmeasured (DEC-425) |
+| 15. Empty folder | Unmeasured |
+| 16. Unreadable file | Nonexistent path, unmeasured |
+| 17. Outside git repo | Unmeasured |
+| 18. Folder search | Finds .md files with milestone+commit frontmatter |
+| 19. Valid folder + missing path | Not green |
+| 20. Malformed row (×2) | Two columns (missing evidence), four columns (extra) |
+
+### KPI and covers for the generic validators
+
+| KPI line | Tests | Red reason |
+|---|---|---|
+| **S7** "provides the generic validators for skill files and audit reports" [CAP-38.b] | `test_w1_26_skill_validator.py` (36), `test_w1_26_audit_validator.py` (26) | `ModuleNotFoundError` (audit_validator not built yet); skill_validator exits non-zero on the new fix cases |
+| **S1** "Runs schema … and the rule that no implementer allowed_paths covers tests/acceptance/**" | Indirectly: the validators are check commands called by the check runner | As above |
+
+| Covers id | Tests |
+|---|---|
+| DEC-439 (generic validators for skill files and audit reports) | `test_w1_26_skill_validator.py`, `test_w1_26_audit_validator.py` |
+| DEC-441 (minimal form of an audit report) | `test_w1_26_audit_validator.py` |
+| DEC-425 (unmeasured, never green) | `test_w1_26_audit_validator.py` (cases 14–17), `test_w1_26_skill_validator.py` (Fix 6) |
 
 ## Not tested
 

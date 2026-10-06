@@ -8,6 +8,7 @@ gov-command references.
 from __future__ import annotations
 
 import json
+import math
 import os
 import subprocess
 import sys
@@ -454,4 +455,279 @@ class TestUnreadableFile:
         assert "unmeasured" in combined or output.get("unmeasured") is True, (
             f"nonexistent folder should report 'unmeasured'\n"
             f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+
+
+# ==========================================================================
+# Fix 1: Folder search at every depth for SKILL.md files
+# ==========================================================================
+
+class TestDeepFolderSearch:
+
+    def test_deep_folder_all_valid(self, tmp_path):
+        """A skills folder with SKILL.md files at multiple depths: all valid
+        -> exit 0."""
+        make_skill(tmp_path, name="discovery")
+        make_skill(tmp_path, name="planning")
+        result = run_skill_validator(str(tmp_path))
+        assert result.returncode == 0, (
+            f"folder with valid skills at depth should pass (exit 0) "
+            f"but got exit {result.returncode}\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+
+    def test_deep_folder_one_broken(self, tmp_path):
+        """A skills folder where one nested SKILL.md is broken -> exit 1
+        with a finding for the broken one."""
+        make_skill(tmp_path, name="good-skill")
+        make_skill(tmp_path, name="broken-skill", raw="---\nname: broken-skill\n---\n\nNo version.\n")
+        result = run_skill_validator(str(tmp_path))
+        assert result.returncode != 0, (
+            f"folder with one broken nested skill should fail "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("broken-skill" in json.dumps(f) for f in findings), (
+            f"expected a finding for the broken skill\nfindings: {findings}"
+        )
+
+
+# ==========================================================================
+# Fix 2: SKILL.md without valid frontmatter is a finding, not skipped
+# ==========================================================================
+
+class TestNoFrontmatterIsFinding:
+
+    def test_skill_with_no_frontmatter_is_finding(self, tmp_path):
+        """A SKILL.md file found by folder search that has no frontmatter is
+        reported as a finding (SKILL_NO_FRONTMATTER), not silently skipped."""
+        make_skill(tmp_path, name="good-skill")
+        make_skill(tmp_path, name="bad-skill", raw="# No frontmatter at all\n\nJust text.\n")
+        result = run_skill_validator(str(tmp_path))
+        assert result.returncode != 0, (
+            f"folder with a no-frontmatter SKILL.md should fail "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("bad-skill" in json.dumps(f) for f in findings), (
+            f"expected a finding for the no-frontmatter skill\nfindings: {findings}"
+        )
+
+
+# ==========================================================================
+# Fix 3: Command references with args after the command name are seen
+# ==========================================================================
+
+class TestCommandRefsWithArgs:
+
+    def test_misspelt_command_with_args(self, tmp_path):
+        """A body containing ``gov retreive --json`` (misspelt with args)
+        produces a finding for the misspelt command."""
+        path = make_skill(
+            tmp_path,
+            name="bad-cmd-args",
+            body="Run `gov retreive --json` for output.\n",
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"misspelt gov command with args should fail "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("retreive" in json.dumps(f).lower() for f in findings), (
+            f"expected a finding for 'retreive'\nfindings: {findings}"
+        )
+
+    def test_valid_command_with_args_passes(self, tmp_path):
+        """A body containing ``gov check --list`` (valid command with args)
+        does not produce a command finding."""
+        path = make_skill(
+            tmp_path,
+            name="ok-cmd-args",
+            body="Run `gov check --list` to see checks.\n",
+        )
+        result = run_skill_validator(str(path))
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        cmd_findings = [f for f in findings if "command" in json.dumps(f).lower()
+                        and "check" in json.dumps(f).lower()]
+        assert not cmd_findings, (
+            f"valid 'gov check --list' should not produce a command finding\n"
+            f"findings: {cmd_findings}"
+        )
+
+    def test_fenced_code_block_misspelt_command(self, tmp_path):
+        """A fenced code block containing ``gov chek --list`` produces a
+        finding for the misspelt command."""
+        body = "Example:\n\n```bash\ngov chek --list\n```\n"
+        path = make_skill(
+            tmp_path,
+            name="fenced-bad",
+            body=body,
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"misspelt gov command in fenced block should fail "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("chek" in json.dumps(f).lower() for f in findings), (
+            f"expected a finding for 'chek'\nfindings: {findings}"
+        )
+
+    def test_bare_gov_command_still_works(self, tmp_path):
+        """The existing test for bare ``gov frobnicate`` still works."""
+        path = make_skill(
+            tmp_path,
+            name="bare-bad",
+            body="Run `gov frobnicate` to do the thing.\n",
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"bare misspelt gov command should fail "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("frobnicate" in json.dumps(f).lower() for f in findings), (
+            f"expected a finding for 'frobnicate'\nfindings: {findings}"
+        )
+
+
+# ==========================================================================
+# Fix 4: name/description/version that is not text is a finding
+# ==========================================================================
+
+class TestNonTextFields:
+
+    def test_version_integer_is_finding(self, tmp_path):
+        """``version: 1`` (integer, not string) is a finding."""
+        path = make_skill(
+            tmp_path,
+            name="int-ver",
+            raw="---\nname: int-ver\nversion: 1\ndescription: A skill\n---\n\nBody.\n",
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"integer version should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_name_integer_is_finding(self, tmp_path):
+        """``name: 42`` (integer) is a finding."""
+        path = make_skill(
+            tmp_path,
+            name="int-name",
+            raw="---\nname: 42\nversion: 1.0.0\ndescription: A skill\n---\n\nBody.\n",
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"integer name should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_description_list_is_finding(self, tmp_path):
+        """``description: [a, b]`` (list) is a finding."""
+        path = make_skill(
+            tmp_path,
+            name="list-desc",
+            raw="---\nname: list-desc\nversion: 1.0.0\ndescription: [a, b]\n---\n\nBody.\n",
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"list description should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_name_empty_string_is_finding(self, tmp_path):
+        """``name: ""`` (empty string) is a finding."""
+        path = make_skill(
+            tmp_path,
+            name="empty-name",
+            raw='---\nname: ""\nversion: 1.0.0\ndescription: A skill\n---\n\nBody.\n',
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"empty name should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_description_empty_string_is_finding(self, tmp_path):
+        """``description: ""`` (empty string) is a finding."""
+        path = make_skill(
+            tmp_path,
+            name="empty-desc",
+            raw='---\nname: empty-desc\nversion: 1.0.0\ndescription: ""\n---\n\nBody.\n',
+        )
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"empty description should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+
+# ==========================================================================
+# Fix 5: Token count uses the same formula as gov context
+# ==========================================================================
+
+class TestTokenCountFormula:
+
+    def test_body_10001_chars_is_2501_tokens(self, tmp_path):
+        """A body of exactly 10001 chars is ceil(10001/4) = 2501 tokens,
+        which exceeds the 2500 limit and is a finding. This verifies the
+        validator uses the same ceil(len/TOKEN_CHARS) arithmetic as
+        ``gov context``."""
+        body = "Z" * 10001
+        expected_tokens = math.ceil(10001 / 4)
+        assert expected_tokens == 2501
+        path = make_skill(tmp_path, name="token-math", body=body)
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"body of 10001 chars ({expected_tokens} tokens) should fail "
+            f"but got exit 0\nstdout: {result.stdout[:200]}"
+        )
+        output = parse_output(result)
+        findings = output.get("findings", [])
+        assert any("body" in json.dumps(f).lower() or "token" in json.dumps(f).lower()
+                    for f in findings), (
+            f"expected a finding about body/tokens\nfindings: {findings}"
+        )
+
+
+# ==========================================================================
+# Fix 6: Unreadable file is "unmeasured", not a traceback;
+#         valid folder plus missing path -> not green
+# ==========================================================================
+
+class TestUnmeasuredEdgeCases:
+
+    def test_valid_folder_plus_missing_path(self, tmp_path):
+        """A valid skill folder plus a nonexistent path as two arguments
+        -> exit non-zero."""
+        make_skill(tmp_path / "skills", name="good-skill")
+        bad_path = str(tmp_path / "nonexistent" / "SKILL.md")
+        result = run_skill_validator(str(tmp_path / "skills"), bad_path)
+        assert result.returncode != 0, (
+            f"valid folder + nonexistent path should exit non-zero "
+            f"but got exit 0\nstdout: {result.stdout}"
+        )
+
+    def test_binary_file_unmeasured(self, tmp_path):
+        """A file that cannot be decoded (binary content) is unmeasured,
+        not a traceback."""
+        path = tmp_path / "binary-skill" / "SKILL.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"\x80\x81\x82\x00\xff\xfe" * 100)
+        result = run_skill_validator(str(path))
+        assert result.returncode != 0, (
+            f"binary file should exit non-zero but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+        assert "Traceback" not in result.stderr, (
+            f"binary file should not produce a traceback\n"
+            f"stderr: {result.stderr}"
         )
