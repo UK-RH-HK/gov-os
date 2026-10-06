@@ -1,17 +1,9 @@
-"""Ensure ``src/`` is on the import path for the containment builder tests.
+"""Session-wide tripwire: fail if any test writes to the real mirror folder (DEC-429)."""
 
-Also: session-wide tripwire that fails if any test writes to the real
-``~/.local/state/gov-os/`` mirror folder (DEC-429).
-"""
+from __future__ import annotations
 
 import os
 import pwd
-import sys
-from pathlib import Path
-
-_SRC = str(Path(__file__).resolve().parents[3] / "src")
-if _SRC not in sys.path:
-    sys.path.insert(0, _SRC)
 
 
 def _real_home():
@@ -78,4 +70,4 @@ def pytest_configure(config):
         def _real_mirror_folder_unchanged(self, request):
             yield from _real_mirror_folder_unchanged(request)
 
-    config.pluginmanager.register(TripwirePlugin(), "containment_real_mirror_tripwire")
+    config.pluginmanager.register(TripwirePlugin(), "pause_real_mirror_tripwire")
