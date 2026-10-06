@@ -25,7 +25,7 @@ Ticket: **DAEO-8nue** (W1-22).  Profile: **FULL**.
 |------|-------|
 | `test_w1_22_validator.py` | 15 |
 | `test_w1_22_canaries.py` | 10 |
-| `test_w1_22_canary_unit.py` | 5 |
+| `tests/unit/validate/test_canary.py` | 5 |
 | **Total** | **30** |
 
 ## Expected red reasons
@@ -100,7 +100,7 @@ Four tests added for fail-open findings from the post-green review (DEC-136):
 | `TestValidatorRejects::test_validator_rejects_missing_line_range` | Missing `start_line`/`end_line` default to whole file; the whole-file hash is accepted |
 | `TestCanaryMiss::test_corrupted_store_reports_facet_unavailable` | A corrupted `store.db` causes the searcher to raise; `run_canaries` does not catch it and crashes |
 
-**Not tested through the public interface (DEC-136 finding 5):** missing or malformed canary YAML crashes `run_canaries`. The template path is a module-level constant (`_TEMPLATE`) in `gov.retrieval.canary`, not a parameter of `run_canaries(root)`. This cannot be exercised through the public interface without modifying the template directory. Covered by unit tests in `test_w1_22_canary_unit.py` (patching `_TEMPLATE` and `_SEARCHERS`). The engineer should move this file to `tests/unit/validate/test_canary.py` (the ticket's `allowed_paths` include `tests/unit/validate/**`; the ITD guard restricts writes to `tests/acceptance/**`).
+**Not tested through the public interface (DEC-136 finding 5):** missing or malformed canary YAML crashes `run_canaries`. The template path is a module-level constant (`_TEMPLATE`) in `gov.retrieval.canary`, not a parameter of `run_canaries(root)`. This cannot be exercised through the public interface without modifying the template directory. Covered by unit tests in `tests/unit/validate/test_canary.py` (patching `_TEMPLATE` and `_SEARCHERS`).
 
 ### Unit tests for empty and malformed canary declarations
 
