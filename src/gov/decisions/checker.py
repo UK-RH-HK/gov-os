@@ -5,8 +5,9 @@ It only reads, and only frontmatter and git (DEC-329): every file is read from
 it runs writes or fetches. An empty list passes; the check does not fail open.
 
 - It checks the repository at ``root``: git runs without the caller's ``GIT_*``
-  variables (``GIT_DIR`` is set in a hook). An object git names and the
-  repository does not hold is a ``GovError``, never "no such file".
+  variables (``GIT_DIR`` is set in a hook) and with replace refs off
+  (DEC-387). An object git names and the repository does not hold is a
+  ``GovError``, never "no such file".
 
 - A decision file is a Markdown file whose frontmatter has ``type: decision`` or
   an ``id`` of the ``decision_id`` grammar; it need not be a record of the store.
@@ -17,18 +18,25 @@ it runs writes or fetches. An empty list passes; the check does not fail open.
   a commit made before 2026-10-03 is read from the whole message (DEC-182). A
   commit that also carries another role is no approval. That commit is found
   by ancestry from ``HEAD``, not by date, and the decision is followed by its
-  ``id``: a commit that only moves the file sets nothing. A merge that keeps
-  one parent's decision sets nothing only where what each other parent holds
-  is the earlier word: the commits that set the kept decision descend from it.
-  Otherwise the merge is the commit that set it (a demotion undone, DEC-360;
-  two sides that disagree, which no decision settles, fail closed).
+  ``id``: a commit that only moves the file sets nothing.
+- A merge is read only through ``read_merge``, the helper shared with
+  containment (DEC-398, DEC-418). A merge that holds the file every parent
+  holds sets nothing. Otherwise it sets nothing only where a parent brought
+  the file, a parent holds the decision ``ACTIVE``, no other parent changed
+  its id, status or presence since the one merge base of the two, and the
+  commits that set it in every parent that holds it ``ACTIVE`` carry the
+  fact. In every other case the merge is the change and its own trailer the
+  fact: also with several merge bases or none, where the helper brings
+  nothing. A merge the helper cannot read approves nothing.
 - A gate authorises a file that cites it in ``approval`` only when it is a
   decision package, its ``status`` is ``ACCEPTED`` and both carry the same
   ``cit`` (DEC-331); the citing file need not have an ``id``. A ticket that is
   not closed and is named in the ``constrains`` of a dead package fails
   (DEC-330).
 - Frontmatter that is not closed, is not valid YAML or writes a key twice
-  cannot be read: the file is a finding, whatever kind of file it is.
+  cannot be read: the file is a finding, whatever kind of file it is. So is a
+  head that looks like frontmatter and that the store does not read as such
+  (DEC-387), and a file with ``type: decision`` and no ``id``.
 """
 
 from __future__ import annotations
@@ -40,6 +48,7 @@ import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.guard.containment_merge import read_merge
 from gov.store.loader import TRAILER_RULE_DATE, _frontmatter, _ids
 from gov.tasks.tickets import TICKETS_REL
 
@@ -49,7 +58,8 @@ GATE_DEAD = ("DECLINED", "REVOKED", "STALE")  # DEC-328
 
 _ROLE = re.compile(r"^Role:[ \t]*(.*)$", re.IGNORECASE | re.MULTILINE)
 _ROLE_FORMAT = "--format=%cs%n%(trailers:key=Role,unfold)%x00%B"  # no date and no trailer holds a NUL
-_GIT = ("git", "-c", "protocol.allow=never")  # with GIT_NO_LAZY_FETCH: a partial clone is read as it is
+_GIT = ("git", "--no-replace-objects", "-c", "protocol.allow=never")  # with GIT_NO_LAZY_FETCH: nothing is fetched
+_HEAD = re.compile(r"---(\s.*)?")  # a first line that opens frontmatter for a reader, as `--- # c` does
 
 
 def _environment() -> dict:
@@ -75,11 +85,15 @@ def _finding(code: str, ids, paths, message: str) -> dict:
 def _front(text: str) -> dict:
     """The frontmatter map of ``text``, empty when it has none; ValueError when it cannot be read.
 
-    Read as the store reads it, and a key written twice cannot be read: YAML would keep the last in silence."""
+    Read as the store reads it. A key written twice cannot be read (YAML would keep the last in silence), nor can
+    a head that looks like frontmatter and that the store takes for none."""
     import yaml
 
     front = _frontmatter(text)
-    if front is None:
+    if front is None:  # DEC-387: after a byte-order mark or blank lines, with CR line ends or in UTF-16
+        head = text.lstrip("\ufeff\ufffd\0 \t\r\n")[:99].replace("\0", "").splitlines()[:1]
+        if head and _HEAD.fullmatch(head[0].strip()):
+            raise ValueError("the head looks like frontmatter and the store does not read it as frontmatter")
         return {}
     lines = [line.rstrip() for line in text.split("\n")]
     node = yaml.compose("\n".join(lines[1:lines.index("---", 1)]))
@@ -159,7 +173,7 @@ class _Objects:
     """One ``git cat-file --batch`` process: the commits of the repository and the files of their trees."""
 
     def __init__(self, root: Path):
-        self.root, self.fronts = root, {}
+        self.root, self.fronts, self.known = root, {}, {}
         self.process = subprocess.Popen([*_GIT, "-C", str(root), "cat-file", "--batch"], stdin=subprocess.PIPE,
                                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, env=_environment())
 
@@ -188,8 +202,9 @@ class _Objects:
                         "hold it", {"root": str(self.root), "object": name})
 
     def parents(self, commit: str) -> list[str]:
-        header = self.read(commit)[1].split(b"\n\n")[0]
-        return [line.split()[1].decode("ascii") for line in header.split(b"\n") if line.startswith(b"parent ")]
+        return _once(self, ("parents", commit), lambda: [
+            line.split()[1].decode("ascii") for line in self.read(commit)[1].split(b"\n\n")[0].split(b"\n")
+            if line.startswith(b"parent ")])
 
     def names(self, commit: str, path: str) -> bool:
         """Whether the trees of ``commit`` name ``path``, read without the object they name it by."""
@@ -209,6 +224,9 @@ class _Objects:
     def file(self, commit: str, path: str) -> tuple:
         """``(blob, id, status)`` of ``path`` in ``commit``: no blob where it has no such file, no id and no
         status where the file has no frontmatter that can be read. A file whose object is absent is an error."""
+        return _once(self, (commit, path), lambda: self._file(commit, path))
+
+    def _file(self, commit: str, path: str) -> tuple:
         entry = self.read(f"{commit}:{path}")
         if entry is None:
             if self.names(commit, path):
@@ -223,70 +241,102 @@ class _Objects:
         return (entry[0], *self.fronts[entry[0]])
 
 
-def _setters(root: Path, objects: _Objects, path: str, record_id: str) -> set[str]:
-    """The commits that set ACTIVE the decision ``record_id`` that ``HEAD`` holds at ``path``.
+def _once(objects: _Objects, key: tuple, make):
+    """What ``make`` gives, asked once in a check: one read or one git process serves every decision that needs it."""
+    if key not in objects.known:
+        objects.known[key] = make()
+    return objects.known[key]
 
-    Walked by ancestry from ``HEAD``. A commit whose file is a parent's file sets nothing; one that writes the
-    file sets nothing where a parent held the decision ACTIVE, at this path or in a Markdown file the commit
-    removes (a move). The commits that set it are then those of the parents it continues, unless it has another
-    parent whose word is not the earlier one (``_earlier``): then, as where it continues no parent, it set it."""
+
+def _approved(root: Path, objects: _Objects, path: str, record_id: str) -> bool:
+    """Whether the decision ``record_id`` that ``HEAD`` holds ACTIVE at ``path`` carries the owner's fact.
+
+    Walked by ancestry from ``HEAD``. A commit that continues the ACTIVE decision of its parents (``_held``) is
+    approved as they are; the commit that is the change is approved by its own trailer."""
     start = (objects.read("HEAD")[0], path)
     if objects.file(*start)[0] is None:  # a path the batch cannot ask for
-        return set()
-    held, sets, todo = {}, {}, [start]
-    while todo:  # a commit is settled after the parents it continues or is compared with
-        at = commit, path = todo[-1]
-        if at in sets:
-            todo.pop()
-            continue
+        return False
+    held, passes, todo = {}, {}, [start]
+    while todo:  # a commit is settled after the parents it continues
+        at = todo[-1]
         if at not in held:
-            held[at] = _held(root, objects, commit, path, record_id)
-        before, others = held[at]
-        todo += [older for older in before + [(other, path) for other in others
-                                              if objects.file(other, path)[1:] == (record_id, "ACTIVE")]
-                 if older not in sets]
+            held[at] = _held(root, objects, *at, record_id)
+        before, change = held[at]
+        todo += [older for older in before if older not in passes]
         if todo[-1] != at:
             continue
-        found = set().union(*(sets[older] for older in before))
-        if not found or not all(_earlier(root, objects, other, path, record_id, sets, found) for other in others):
-            found = {commit}
-        sets[at] = found
-    return sets[start]
+        todo.pop()
+        passes[at] = (bool(before) and all(passes[older] for older in before)
+                      or change and _once(objects, ("fact", at[0]), lambda: _approves(root, at[0])))
+    return passes[start]
 
 
-def _held(root: Path, objects: _Objects, commit: str, path: str, record_id: str) -> tuple[list, list]:
-    """``(parent, path)`` wherever a parent of ``commit`` holds the decision its file continues, and the parents
-    that hold none such."""
-    blob, parents = objects.file(commit, path)[0], objects.parents(commit)
-    before = [(parent, path) for parent in parents if objects.file(parent, path)[0] == blob]
-    for parent in () if before else parents:
-        olds = [path]
-        if objects.file(parent, path)[1] != record_id:
-            removed = _git(root, "diff-tree", "-r", "-z", "--no-renames", "--name-only", "--diff-filter=D",
-                           parent, commit).decode("utf-8", "replace").split("\0")
-            olds = [old for old in removed if old.endswith(".md")]
-        before += [(parent, old) for old in olds if objects.file(parent, old)[1:] == (record_id, "ACTIVE")]
-    return before, [parent for parent in parents if parent not in {kept for kept, _ in before}]
+def _removed(root: Path, objects: _Objects, older: str, newer: str) -> list[str]:
+    """The Markdown files of ``older`` that ``newer`` does not hold, without rename detection."""
+    return _once(objects, ("removed", older, newer), lambda: [
+        old for old in _git(root, "diff-tree", "-r", "-z", "--no-renames", "--name-only", "--diff-filter=D",
+                            older, newer).decode("utf-8", "replace").split("\0") if old.endswith(".md")])
 
 
-def _earlier(root: Path, objects: _Objects, other: str, path: str, record_id: str, sets: dict, found: set) -> bool:
-    """Whether what ``other`` holds at ``path`` is the earlier word: every commit of ``found`` descends from it.
+def _state(objects: _Objects, commit: str, paths: list, record_id: str) -> tuple:
+    """``(path, status)`` of the decision in ``commit``, looked for by its id at ``paths``; no path where none of
+    them holds it."""
+    for path in paths:
+        if objects.file(commit, path)[1] == record_id:
+            return path, objects.file(commit, path)[2]
+    return None, None
 
-    Its word is the commits that set its own ACTIVE decision, or else the commits it descends from that hold the
-    same id and status (or no file) without a break. A demotion made after the approval is no earlier word."""
-    older = [set(_git(root, "rev-list", setter).decode("ascii").split()) for setter in sorted(found)]
-    state = objects.file(other, path)[1:]
-    if state == (record_id, "ACTIVE"):
-        return all(sets[(other, path)] & ancestors for ancestors in older)
-    seen, todo = set(), [other]
-    while todo and older:
-        commit = todo.pop()
-        if commit in seen or objects.file(commit, path)[1:] != state:
+
+def _held(root: Path, objects: _Objects, commit: str, path: str, record_id: str) -> tuple[list, bool]:
+    """``(before, change)``: the ``(parent, path)`` whose ACTIVE decision the file of ``commit`` continues, and
+    whether the commit may itself be the change that set it ACTIVE, with its own trailer as the fact.
+
+    A commit with one parent continues it where the parent held the decision ACTIVE, at this path or in a
+    Markdown file the commit removes (a move); otherwise it is the change."""
+    parents = list(dict.fromkeys(objects.parents(commit)))
+    if len(parents) > 1:
+        return _merged(root, objects, commit, parents, path, record_id)
+    before = [(parent, old) for parent in parents
+              for old in ([path] if objects.file(parent, path)[1] == record_id
+                          else _removed(root, objects, parent, commit))
+              if objects.file(parent, old)[1:] == (record_id, "ACTIVE")]
+    return before, not before
+
+
+def _merged(root: Path, objects: _Objects, commit: str, parents: list, path: str, record_id: str) -> tuple[list, bool]:
+    """``_held`` for a commit with several parents: the merge rule (DEC-398), read through ``read_merge``.
+
+    The file every parent holds continues them all, and the merge is no change. A path the helper does not list
+    as brought is the merge's own change: so is every path where the parents have several merge bases or none.
+    For a brought path the decision is looked for by its id, in each parent at the paths the merge changed and in
+    the one merge base also among the files the kept parent removed (DEC-418); the merge continues the parents
+    that hold it ACTIVE only where every other parent holds it as the merge base does."""
+    blob = objects.file(commit, path)[0]
+    if all(objects.file(parent, path)[0] == blob for parent in parents):
+        return [(parent, path) for parent in parents], False
+    try:
+        reading = _once(objects, ("merge", commit), lambda: read_merge(str(root), commit))
+    except ValueError:  # MergeReadError, or a path that is no text: a merge that cannot be read approves nothing
+        return [], False
+    paths = [path] + [other for other in reading.own + reading.brought if other.endswith(".md")]
+    held = {parent: _state(objects, parent, paths, record_id) for parent in parents}
+    kept = next((parent for parent in parents if held[parent][1] == "ACTIVE"), None)
+    if path not in reading.brought or kept is None:
+        return [], True
+    for parent in parents:
+        if parent == kept:
             continue
-        seen.add(commit)
-        older = [ancestors for ancestors in older if commit not in ancestors]
-        todo += reversed(objects.parents(commit))
-    return not older
+        bases = _once(objects, ("bases", kept, parent), lambda: _git(
+            root, "merge-base", "--all", kept, parent).decode("ascii").split())
+        if len(bases) != 1:
+            return [], True
+        at, was = _state(objects, bases[0], paths, record_id)
+        if at is None:
+            at, was = _state(objects, bases[0], _removed(root, objects, bases[0], kept), record_id)
+        held[parent] = _state(objects, parent, paths + [at or path], record_id)
+        if (held[parent][0] is None, held[parent][1]) != (at is None, was):
+            return [], True
+    return [(parent, old) for parent, (old, status) in held.items() if status == "ACTIVE"], True
 
 
 def _approves(root: Path, commit: str) -> bool:
@@ -300,15 +350,10 @@ def _approves(root: Path, commit: str) -> bool:
 
 def _unapproved(root: Path, objects: _Objects, decisions: list[tuple[str, str, dict]]) -> list[dict]:
     """Every ACTIVE decision that a commit without the owner's approval fact set ACTIVE (DEC-360)."""
-    found = []
-    for path, record_id, front in decisions:
-        if front.get("status") != "ACTIVE":
-            continue
-        setters = _setters(root, objects, path, record_id)
-        if not setters or not all(_approves(root, commit) for commit in sorted(setters)):
-            found.append(_finding("ACTIVE_UNAPPROVED", [record_id], [path],
-                                  f"{record_id} was set ACTIVE by a commit without the trailer `Role: owner`"))
-    return found
+    return [_finding("ACTIVE_UNAPPROVED", [record_id], [path],
+                     f"{record_id} was set ACTIVE by a commit without the trailer `Role: owner`")
+            for path, record_id, front in decisions
+            if front.get("status") == "ACTIVE" and not _approved(root, objects, path, record_id)]
 
 
 def _gates(files: list[tuple[str, dict]]) -> list[dict]:
@@ -354,6 +399,8 @@ def check(root: Path) -> list[dict]:
         files, found = _read(root, objects)
         decisions = [(path, str(front["id"]), front) for path, front in files if "id" in front
                      and (front.get("type") == "decision" or DECISION_ID.fullmatch(str(front["id"])))]
+        found += [_finding("DECISION_WITHOUT_ID", [], [path], f"{path}: a decision without an id cannot be followed")
+                  for path, front in files if front.get("type") == "decision" and "id" not in front]
         found += _hazards(decisions) + _unapproved(root, objects, decisions) + _gates(files)
     finally:
         objects.close()

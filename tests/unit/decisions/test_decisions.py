@@ -6,10 +6,12 @@ another repository is an error, the id grammar is the kernel's, and the points
 where the checker cannot tell are findings (two roles on one commit, two records
 with a cited id, a ticket whose frontmatter cannot be read, a key written twice).
 One case pins what the walk by ancestry lets pass: an agent's move of a decision
-the owner approved. The merges that DP-6 leaves open fail closed: the merge is
-the commit that set the decision, and an ordinary merge of the owner's branch
-sets nothing. Git is run without the caller's ``GIT_*`` variables and fetches
-nothing; an object the repository does not hold is an error.
+the owner approved. Merges are read through ``read_merge`` (DEC-398, DEC-418):
+where another parent changed the decision since the merge base the merge is
+the commit that set it, an ordinary merge of the owner's branch sets nothing,
+and a merge the helper cannot read approves nothing. Git is run without the
+caller's ``GIT_*`` variables and with replace refs off, and fetches nothing;
+an object the repository does not hold is an error.
 """
 from __future__ import annotations
 
@@ -26,6 +28,7 @@ sys.path.insert(0, str(REPO / "src"))
 from gov import decisions  # noqa: E402
 from gov.cli.errors import GovError  # noqa: E402
 from gov.decisions import checker  # noqa: E402
+from gov.guard.containment_merge import MergeReadError  # noqa: E402
 
 ADR = "docs/adr/ADR-0001.md"
 _ENV = {"PATH": "/usr/bin:/bin", "GIT_CONFIG_NOSYSTEM": "1", "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t.invalid",
@@ -168,6 +171,72 @@ def test_an_agent_merge_of_a_decision_the_owner_edited_or_added_on_a_branch_sets
     _commit(project, {"README.md": "# A project\n"}, "engineer")
     _merge(project, "owner", "engineer")
     assert decisions.check(project) == []
+
+
+@pytest.mark.parametrize("role, codes", [("engineer", [("ACTIVE_UNAPPROVED", ["ADR-0001"])]), ("owner", [])])
+def test_a_merge_that_keeps_a_moved_file_over_a_removal_at_the_old_path_is_the_commit_that_set_it(project, role, codes):
+    """The merge base holds the decision at a path that neither parent and not the merge holds."""
+    _git(project, "checkout", "-q", "-b", "moves")
+    _git(project, "mv", ADR, "docs/adr/moved.md")
+    _commit(project, {}, "engineer")
+    _git(project, "checkout", "-q", "main")
+    _git(project, "rm", "-q", ADR)
+    _commit(project, {}, "owner")
+    _merge(project, "moves", role)
+    assert _codes(project) == codes
+
+
+def test_a_merge_the_helper_cannot_read_approves_nothing_and_the_check_writes_nothing(project, monkeypatch):
+    """Also for the owner's merge: the refusal is a finding, never a pass and never a raw exception."""
+    _git(project, "checkout", "-q", "-b", "owner")
+    _commit(project, {ADR: _record("ADR-0001", "decision", "ACTIVE", title="reworded")}, "owner")
+    _git(project, "checkout", "-q", "main")
+    _commit(project, {"README.md": "# A project\n"}, "engineer")
+    _merge(project, "owner", "owner")
+    before = {path: path.read_bytes() for path in project.rglob("*") if path.is_file()}
+    assert decisions.check(project) == []
+
+    def refuses(root, commit):
+        raise MergeReadError("refused")
+
+    monkeypatch.setattr(checker, "read_merge", refuses)
+    assert _codes(project) == [("ACTIVE_UNAPPROVED", ["ADR-0001"])]
+    assert {path: path.read_bytes() for path in project.rglob("*") if path.is_file()} == before
+
+
+def test_a_merge_that_holds_the_file_of_every_parent_is_not_read_at_all(project, monkeypatch):
+    _git(project, "checkout", "-q", "-b", "other")
+    _commit(project, {"notes.md": "# Notes\n"}, "engineer")
+    _git(project, "checkout", "-q", "main")
+    _commit(project, {"README.md": "# A project\n"}, "engineer")
+    _merge(project, "other", "engineer")
+    monkeypatch.setattr(checker, "read_merge", None)
+    assert decisions.check(project) == []
+
+
+def test_a_replace_ref_is_not_read(project):
+    _commit(project, {"docs/adr/ADR-0002.md": _record("ADR-0002", "decision", "ACTIVE")}, "engineer")
+    agents = _git(project, "rev-parse", "HEAD")
+    _git(project, "commit", "-q", "--amend", "-m", "records", "--trailer", "Role: owner")
+    owners = _git(project, "rev-parse", "HEAD")
+    _git(project, "reset", "-q", "--hard", agents)
+    _git(project, "replace", agents, owners)
+    assert _codes(project) == [("ACTIVE_UNAPPROVED", ["ADR-0002"])]
+
+
+@pytest.mark.parametrize("text, codes", [
+    ("\n\n---\nid: ADR-0001\n---\n", ["FRONTMATTER_UNREADABLE"]),
+    ("--- \t# c\nid: ADR-0001\n---\n", ["FRONTMATTER_UNREADABLE"]),
+    ("---\nid: ADR-0001\n---\n".encode("utf-16-be").decode("latin-1"), ["FRONTMATTER_UNREADABLE"]),
+    ("----\nid: ADR-0001\n", []),
+    ("---x\nid: ADR-0001\n", []),
+    ("---\ntype: decision\nstatus: PROPOSED\n---\n", ["DECISION_WITHOUT_ID"]),
+])
+def test_a_head_that_looks_like_frontmatter_and_a_decision_without_an_id_are_findings(project, text, codes):
+    _commit(project, {"docs/notes.md": text}, "owner")
+    found = decisions.check(project)
+    assert [finding["code"] for finding in found] == codes
+    assert all(finding["paths"] == ["docs/notes.md"] for finding in found)
 
 
 def test_git_dir_of_the_caller_names_no_other_repository(project, tmp_path_factory, monkeypatch):
