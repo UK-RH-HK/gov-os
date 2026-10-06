@@ -116,6 +116,16 @@ def pause(project, sandbox):
 
 
 @pytest.fixture()
+def lift(project, sandbox):
+    """``lift()`` lifts this test's project as the owner in person does (DEC-409): ``support.lift``."""
+
+    def _lift():
+        return support.lift(project, sandbox)
+
+    return _lift
+
+
+@pytest.fixture()
 def paused(project, pause, interface):
     """The project, paused by its owner."""
     support.succeeded(pause(), interface)

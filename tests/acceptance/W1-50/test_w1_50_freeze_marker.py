@@ -98,6 +98,6 @@ def test_a_second_pause_on_a_frozen_project_succeeds_and_keeps_a_marker(freeze_p
     line = support.first_line(support.flag(freeze_project))
     assert support.MARKER_LINE.fullmatch(line or ""), f"after two pauses the flag's first line is {line!r}"
     support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "after two pauses")
-    pause_support.succeeded(freeze_pause("--off"), freeze_interface)
+    support.lift_support.lift_as_the_owner(freeze_project, freeze_sandbox)  # DEC-409: the owner in person
     assert not os.path.lexists(support.flag(freeze_project)), "gov pause --off left the flag"
     support.assert_not_frozen(support.guard_write(freeze_project, freeze_sandbox), "after --off")

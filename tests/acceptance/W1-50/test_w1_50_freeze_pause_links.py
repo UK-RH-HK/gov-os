@@ -160,9 +160,12 @@ def test_lifting_a_pause_over_a_directory_is_refused_in_the_envelope(freeze_proj
     support.put_directory(freeze_project)
     support.assert_frozen(support.guard_write(freeze_project, freeze_sandbox), "with a directory at the flag's path")
 
-    run = freeze_pause("--off")
+    # DEC-409: the owner in person, through the function the command calls. Under the session that runs this suite
+    # the command line refuses before it looks at the path.
+    run = support.lift_support.lift(freeze_project, freeze_sandbox)
 
-    error = pause_support.failed(run, freeze_interface)
+    assert run.status == support.lift_support.REFUSED, f"the lift over a directory was not refused: {run.describe()}"
+    error = run.error
     assert support.FLAG_REL in json.dumps(error), \
         f"the refusal does not name {support.FLAG_REL}: {error}"
     assert support.flag(freeze_project).is_dir(), "gov pause --off ended with an error and removed the directory"

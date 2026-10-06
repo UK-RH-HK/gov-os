@@ -34,7 +34,7 @@ def test_pause_sets_the_flag_in_the_runtime_directory(project, pause, interface)
 
 
 @pytest.mark.parametrize("role", support.GUARD_ROLES)
-def test_the_next_write_by_each_role_is_denied_until_pause_is_lifted(project, sandbox, pause, interface, role):
+def test_the_next_write_by_each_role_is_denied_until_pause_is_lifted(project, sandbox, pause, lift, interface, role):
     _, rel = support.NORMAL_WRITE[role]
     support.assert_allowed(support.guard_write(project, sandbox, role), f"before the pause, Write on {rel} by {role}")
 
@@ -43,7 +43,7 @@ def test_the_next_write_by_each_role_is_denied_until_pause_is_lifted(project, sa
         support.assert_denied(support.guard_write(project, sandbox, role, tool_name),
                               f"while paused, {tool_name} on {rel} by {role}")
 
-    support.succeeded(pause("--off"), interface)
+    lift()  # DEC-409: the owner in person; the command line refuses under the session that runs this suite
     assert not support.is_paused(project), f"gov pause --off left {support.FREEZE_FLAG_REL}"
     support.assert_allowed(support.guard_write(project, sandbox, role), f"after --off, Write on {rel} by {role}")
 

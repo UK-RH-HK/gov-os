@@ -35,7 +35,7 @@ from pathlib import Path
 import pytest
 
 _TESTS = Path(__file__).resolve().parent.parent
-for _suite in ("W1-02", "W1-28", "W1-46"):
+for _suite in ("W1-02", "W1-28", "W1-46", "W1-50"):
     _directory = str(_TESTS / _suite)
     if _directory not in sys.path:
         sys.path.insert(0, _directory)
@@ -242,6 +242,86 @@ def freeze_launch(freeze_launch_project, freeze_sandbox):
         return launch_support.launch(freeze_launch_project, freeze_sandbox, cli, role, launch_support.TICKET_OF[role])
 
     return _launch
+
+
+# --------------------------------------------------------------------------
+# Lifting a freeze (DEC-409): the batch of 2026-10-06
+# --------------------------------------------------------------------------
+
+import subprocess  # noqa: E402
+
+import w1_50_freeze_lift as lift_support  # noqa: E402  the one seam below the command line, and what is planted
+
+COMMAND_TIMEOUT_S = pause_support.COMMAND_TIMEOUT_S
+
+
+def put_flag(project, line=A_MARKER_LINE):
+    """A flag as ``gov pause`` leaves it: a regular file, mode 0600 (DEC-412), holding the marker line."""
+    return put_text(project, line, mode=0o600)
+
+
+def flag_state(project):
+    """What a refusal must leave as it was: the flag's kind, bytes, mode and modification time, and every name
+    under ``.gov-runtime/``."""
+    path, runtime = flag(project), Path(project) / RUNTIME_REL
+    if not os.path.lexists(path):
+        here = None
+    else:
+        status = os.lstat(path)
+        content = path.read_bytes() if path.is_file() and not path.is_symlink() else None
+        here = (status.st_mode, status.st_mtime_ns, content)
+    names = sorted(os.path.relpath(os.path.join(folder, name), runtime)
+                   for folder, folders, files in os.walk(runtime) for name in (*folders, *files))
+    return here, names
+
+
+def assert_nothing_changed(project, before, what):
+    here, names = flag_state(project)
+    assert here == before[0], (
+        f"{what}: the flag is not as it was (kind and mode, modification time, bytes): {before[0]!r} -> {here!r}"
+    )
+    assert names == before[1], f"{what}: the names under {RUNTIME_REL}/ changed: {before[1]} -> {names}"
+
+
+def files_holding(project, text):
+    """Every file under the project, ``.git`` and ``.gov-runtime`` included, whose bytes hold ``text``."""
+    wanted, found = text.encode(), []
+    for folder, _, files in os.walk(project):
+        for name in files:
+            path = os.path.join(folder, name)
+            if os.path.isfile(path) and not os.path.islink(path):
+                try:
+                    if wanted in Path(path).read_bytes():
+                        found.append(os.path.relpath(path, project))
+                except OSError:
+                    pass
+    return sorted(found)
+
+
+def run_cli(project, sandbox, *args, role=None, extra_env=None):
+    """``python3 -m gov.cli.main <args> --root <project>``: the real command line, the real ancestry, pipes.
+
+    The environment is ``w1_28_support``'s, built from scratch; ``extra_env`` adds to it.
+    """
+    project = Path(project)
+    assert REPO_ROOT not in (project, *project.parents), f"refusing to run gov in {project}: it is this repository"
+    env = pause_support._environment(sandbox, role)
+    env.update(extra_env or {})
+    argv = [*args, "--root", str(project)]
+    started = time.perf_counter()
+    try:
+        done = subprocess.run([sys.executable, "-m", "gov.cli.main", *argv], cwd=str(project), env=env,
+                              capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"gov {' '.join(argv)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+    return cli_support.Run(tuple(argv), done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
+
+
+@pytest.fixture()
+def freeze_frozen(freeze_project):
+    """The project, frozen by a flag as ``gov pause`` leaves it. No command is run to set it."""
+    put_flag(freeze_project)
+    return freeze_project
 
 
 def literal_runtime_names(result, project, sandbox):

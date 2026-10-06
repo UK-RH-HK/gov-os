@@ -13,9 +13,14 @@ A third batch brought the cases to DEC-404 and repaired the second live case: se
 
 A fourth batch added two cases on `gov pause --rollback` and the flag: see "The fourth batch" below.
 
-The whole half now: 113 cases, 111 run without a session and 2 are live. Run on 2026-10-05 with `gov pause` built
-(DEC-404): 2 red and 109 green. The 2 red cases are the fourth batch's, in `test_w1_50_freeze_rollback_flag.py`, and
-wait for `gov pause --rollback`. The table below is the third batch's, run with `gov pause` unchanged (16 red and 93
+A fifth batch, on 2026-10-06, covers KPI success lines 3 to 7 (DEC-409, DEC-407): who lifts a freeze. It added
+`w1_50_freeze_lift.py`, `test_w1_50_freeze_lift_ancestry.py`, `test_w1_50_freeze_lift_terminal.py`,
+`test_w1_50_freeze_lift_guard_rule.py` and `test_w1_50_freeze_flag_comparison.py`: see "The fifth batch" below.
+
+The whole half now: 245 cases, 243 run without a session and 2 are live. Run on 2026-10-06 before the fifth batch's
+implementation: 106 red and 137 green. The red cases are 104 of the fifth batch's 132 and the 2 earlier cases of this
+half that lift a freeze (revised, see the fifth batch). The fourth batch's 2 cases are green since `gov pause
+--rollback` sets the flag again. The table below is the third batch's, run with `gov pause` unchanged (16 red and 93
 green; every red case waited for `gov pause`); those 16 are green now.
 
 | File | Cases | Red now | Green now |
@@ -282,6 +287,185 @@ path: the reverts before the conflict removed the flag, and the reset to the sta
 ignored file. Run once as a throwaway case, not committed. It is the abort path of the command, which a repair made
 only at the end of a successful rollback does not reach.
 
+## The fifth batch: who lifts a freeze (DEC-409, DEC-407; KPI success lines 3 to 7)
+
+Written on 2026-10-06, before implementation. 132 new cases, all run without a session: 104 red, 28 green. Every red
+case fails on an assertion about behaviour or on the missing contract function; no file fails to collect.
+
+| KPI line | Rule | File | Cases | Red now, and why |
+|---|---|---|---|---|
+| 3 | 1: no Claude Code session among the ancestors | `test_w1_50_freeze_lift_ancestry.py` | 29 | 23 red. 20: the contract function `gov.pause.command.lift` is missing (8 session shapes, 6 unreadable ancestries, 4 values of `GOV_ROLE`, 2 owner ancestries that lift). 3: the real command line, run by this suite under a session with pipes, lifts (`ok: true`, `paused: false`): plainly, with the session's own marks cleared from the environment, and with every switch name set. 6 green and must stay: `GOV_ROLE` empty or `owner` is refused today (as a role that is not the owner); no option is accepted beside the command's own; the help shows exactly the eight options; setting a freeze under a session works with `GOV_ROLE` unset and as orchestrator. |
+| 4 | 2: a terminal and a one-time code | `test_w1_50_freeze_lift_terminal.py` | 12 | 12 red: the contract function is missing. |
+| 5 | 3: the guard refuses the lift form | `test_w1_50_freeze_lift_guard_rule.py` | 77 | 59 red: the guard allows the command (a Bash call that writes nothing is allowed before the role is read): 48 spellings, 10 callers, 1 while frozen. 18 green and must stay: `sudo gov pause --off` is refused already by the sudo rule, and the 17 ordinary commands are allowed. |
+| 6 | 4: the flag compared around every Bash call | `test_w1_50_freeze_flag_comparison.py` | 14 | 10 red: no finding names the flag and it is not put back (removed, 5 callers; emptied, 4 ways; removed in a call that failed). 4 green and must stay: still frozen with another line, set during the call, nothing before and after, a placeholder that goes. |
+| 7 | setting stays open; unset `GOV_ROLE` is not the owner for the lift | `test_w1_50_freeze_lift_ancestry.py`: `test_setting_a_freeze_stays_open_under_a_session` (2), `test_gov_role_does_not_turn_a_session_into_the_owner` (4), counted in line 3 | | see line 3 |
+
+Success and failure sides: the owner in person lifts (plain terminal, editor terminal; the shown code typed back);
+every other caller, terminal and reply is refused and **nothing changes** (the flag's bytes, mode and kind; no new
+name in the project). The rule leaves ordinary work alone; a freeze that still holds, or was set, is no finding.
+
+### The contract: one internal function
+
+`gov.pause.command.lift(root, ancestry=None, terminal=None) -> dict`
+
+| Parameter | Meaning |
+|---|---|
+| `root` | the project |
+| `ancestry` | `None`: the function reads the real chain from `/proc`. Otherwise a list of dicts, the calling process first and the system's first process last: `{"pid": int, "ppid": int, "comm": str, "exe": str or None, "cmdline": [words]}`. `exe` is `None` when it could not be read. |
+| `terminal` | `None`: `(0, 1)`. Otherwise a pair of file descriptors `(input, output)`. The function calls `os.isatty` on both itself; it is never told that they are terminals. The code is written to `output` and one line is read from `input`. |
+| returns | `{"paused": False}`, also when nothing was frozen |
+| refuses | by raising `GovError`; the command gives it back in the API-0002 envelope |
+
+Order: the ancestry, the terminal, the code, then the removal of the flag. The first three come first also when
+nothing is frozen (DEC-409 speaks of the command, not of its effect).
+
+**How the seam is closed.** `run()` calls `lift(root)` and nothing else: no parameter of the function is reachable
+from the command line or from the environment. Tested: the command line refuses where this suite runs (under a
+session, with pipes); nine made-up options (`--force`, `--yes`, `--no-tty`, `--ancestry`, ...) are usage errors; the
+help shows `--help --off --cancel-agents --rollback --json --root --session --role` and no other; no environment
+variable changes the answer (`GOV_ROLE` empty or `owner`; the session's marks such as `CLAUDECODE` cleared; a list of
+switch names all set to 1). A test reaches the function only by importing it in a process of its own
+(`w1_50_freeze_lift.drive`), with an environment built from scratch.
+
+**How a session is recognised.** A process is a Claude Code session when one sign holds: its `comm` is `claude`; or
+the last part of its `exe`, of the first word of its command line, or of the first word after it that is not an
+option (the script an interpreter runs) is `claude`; or one of those three holds `claude/versions/<name>`; or one of
+their path parts holds `claude-code` or is `@anthropic-ai`. One session anywhere in the chain refuses. Signs are read
+by path parts of those three words, never as a loose search of the whole command line: a project folder named after
+Claude in `--root` must not refuse the owner. Planted shapes: headless `-p` and the operator console as the lead saw
+them, `gov launch`, a session several levels up, a session inside a session, the npm install, the version file run
+by its own name (`comm` is then the version), and a process whose command line alone says it.
+
+**What was seen from inside a launched session's sandbox (2026-10-06).** The sandbox has its own process-number
+space. `/proc` lists process 1, process 2 and the command's own children. The chain is: the command, `bash` (process
+2, `/usr/bin/bash`, `/bin/bash -c ...`), then process 1 with `comm` `3`, command line `/proc/self/fd/3 /bin/bash -c
+...`, parent 0 and an `exe` that cannot be read. **No Claude process is visible.** So "no session among the
+ancestors" is true there, and rule 1 holds only through "cannot be read".
+
+**"Cannot be read" refuses, and means:** an empty chain; a last entry that is not process 1 with parent 0; an entry
+whose parent is not the next entry; an entry without `comm` or with an empty command line; and a process 1 that is
+not a system's first process. The last is this suite's choice and is not pinned by a decision: process 1 is accepted
+when its `comm` is `init` or `systemd` (its `exe` cannot be read by a user on a plain host either, so `exe` cannot be
+the test). The sandbox's own first process (`comm` `3`) and a shell as first process are planted and must refuse.
+
+**Refusal reasons.** The message is tested by its words only: a session says `claude`; an unreadable ancestry says
+one of `ancest`, `process`, `cannot be read`, `unreadable`, `not readable`; no terminal says `terminal` or `tty`; a wrong, empty or
+ended reply says `code`. Error codes are pinned by no decision and are not tested, with one exception that already
+stands: W1-28 holds `PAUSE_REFUSED` for a `GOV_ROLE` that is set, so a refusal for who the caller is should keep it.
+`PAUSE_RUNTIME_LINKED`, `PAUSE_NOT_SET`, `PAUSE_NOT_LIFTED` and mode 0600 stay as built (DEC-412).
+
+**The code.** `LIFT-` and four digits, from the system's random source: 12 runs in one process with Python's
+`random` seeded to 0 before each must show more than one code. It is shown on the terminal only: it is not in the
+result, not in the error, and in no file of the project. One attempt: after a wrong line, an empty line or the end of
+input the function refuses at once, and a function that still waits after 10 s fails the case.
+
+### Rule 3: the border
+
+The **lift form** is a gov word (a word whose last part is `gov`, the module `gov.cli.main`, or the file
+`gov/cli/main.py`) followed, among the words after it, by `pause` and `--off`.
+
+Refused, for every role, a subagent, an unknown role and no role, frozen or not:
+
+1. the form as words of a command that is run, whatever stands before it in that command (`env`, `env -u GOV_ROLE`,
+   an assignment, `command`, `exec`, `nohup`, `setsid`, `time`, `timeout`, `python3 -m`, `PYTHONPATH=`) and wherever
+   the command stands (after `&&`, `||`, `;`, a pipe or a newline, in a subshell, in a command substitution, in
+   backticks, in a substitution inside a quoted word), with other options between or around the words;
+2. the form anywhere in the text of a command or pipeline that starts a shell, an interpreter or a Claude Code
+   session: `bash -c`, `sh -c`, `eval`, `python3 -c`, text piped or given as a here-string to `bash`, `sh` or
+   `claude`, a prompt of `claude` (with or without `-p`, by name or by path), a prompt of `gov launch`.
+
+Not refused: the form as one quoted word of a command that only reads or stores it (`grep`, `rg`, `git log --grep`,
+a commit message, `echo` to a file or into `grep`); a file that holds it being read (`cat`, `git show`, `pytest` on
+these suites); `gov pause`, `gov pause --json`, `--cancel-agents`, `--rollback`; another program with both words or
+with its own `--off`; a session started without the words.
+
+### Rule 4: the choices made on the open points
+
+| Point | Reading | Why |
+|---|---|---|
+| "Removed or emptied" | the guard's reader said frozen before the call and does not say frozen after it | one reader for every question about the flag (first batch) |
+| What follows | a finding whose `paths` hold `.gov-runtime/freeze`, with the caller's role and ticket and DEC-122's fields; and the flag put back: a regular file, mode 0600, the first line it had, no temporary name left, read as frozen by the guard | DEC-407 |
+| Not pinned in the finding | its `action` word; a field for the tool call; whether the agent is told | no source |
+| Still frozen with another line | no finding | the stricter reading would flag the orchestrator's own second `gov pause` |
+| A freeze set during the call | no finding, and it stays | setting is open (DEC-409) |
+| Nothing before, nothing after; a placeholder that goes | nothing | the sandbox's own shapes are not events |
+| A call that failed | as a call that succeeded (PostToolUseFailure) | a failed command may have removed the flag |
+| A call without a tool call id | no case | no snapshot is taken for it today, so nothing is remembered; unpinned |
+| After the call the path holds a directory, a dangling link, or a link to a marked file | no case | it still freezes; whether it is "the same" is not pinned |
+| Latency | no case added | W1-02 and W1-05 time the file tools and read-only calls, not the snapshot of a Bash call |
+
+### Where an unset `GOV_ROLE` is read as the owner
+
+| Place | What it does with an unset `GOV_ROLE` | Inside the ticket's paths |
+|---|---|---|
+| `src/gov/pause/command.py:133` | **the owner.** The only place. Behind it: setting (stays allowed, `<who>` is `owner`) and the lift (now the four rules) | yes |
+| `src/gov/launch/launcher.py:140` | sets it for the session it starts; does not read it | |
+| `template/governance/kernel/hooks/pretooluse.py:59`, `:240` | a field of the record; the role given to the guard, where no role is no known role and writes are denied | yes |
+| `template/governance/kernel/hooks/posttooluse.py:104`, `:190` | passed to the containment check as no role | yes |
+| `sessionstart.py:55`, `precompact.py:100` | act only when it is exactly `orchestrator` | no; no owner reading |
+| `src/gov/guard/containment.py:756` | reads a commit's `Role: owner` trailer, not `GOV_ROLE` | yes |
+
+No place other than `gov pause` reads an unset `GOV_ROLE` as the owner, so there is no package on this point. Cases:
+`test_gov_role_does_not_turn_a_session_into_the_owner` and `test_setting_a_freeze_stays_open_under_a_session`.
+
+### Earlier cases revised in this batch
+
+Each is a rewrite after implementation in the sense of DEC-106. 9 functions, 13 cases, reason **owner decision,
+DEC-409**: `gov pause --off` on the command line refuses under the session that runs the suites, so the lift is made
+through the contract function as the owner in person (`w1_50_freeze_lift.lift_as_the_owner`: a plain terminal's
+ancestry, a pseudo-terminal, the shown code typed back). All 13 are red until the function exists, then green.
+
+| Suite | Test | Cases |
+|---|---|---|
+| W1-28 | `test_w1_28_freeze.py::test_the_next_write_by_each_role_is_denied_until_pause_is_lifted` | 5 |
+| W1-28 | `test_w1_28_repeat.py::test_one_off_lifts_however_many_pauses` | 1 |
+| W1-28 | `test_w1_28_repeat.py::test_off_on_a_project_that_is_not_paused_succeeds_and_changes_nothing` | 1 |
+| W1-28 | `test_w1_28_repeat.py::test_off_twice_gives_the_same_result` | 1 |
+| W1-28 | `test_w1_28_roles.py::test_the_owner_lifts_a_pause_the_orchestrator_set` | 1 |
+| W1-28 | `test_w1_28_roles.py::test_the_owner_is_the_call_without_gov_role_whatever_the_session_that_runs_the_tests_has` | 1 |
+| W1-28 | `test_w1_28_rollback.py::test_a_failed_rollback_keeps_a_freeze_that_was_already_set` | 1 |
+| W1-50 | `test_w1_50_freeze_marker.py::test_a_second_pause_on_a_frozen_project_succeeds_and_keeps_a_marker` | 1 |
+| W1-50 | `test_w1_50_freeze_pause_links.py::test_lifting_a_pause_over_a_directory_is_refused_in_the_envelope` (the refusal is now the function's `GovError`, which the command puts in the envelope) | 1 |
+
+Added for them: `lift` in `w1_28_support.py` and the fixture `lift` in W1-28's `conftest.py`. W1-28's cases that
+refuse a lift for a set role, and its help case, are unchanged and green.
+
+One more, reason **owner decision: freeze marker** (DEC-402, DEC-407): W1-46's live case
+`test_w1_46_live_sessions.py::test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable`, one assertion.
+It asked that nothing exists at the flag's path; it asks that no freeze exists there (what the guard's reader reads
+as frozen). Live, not run here. W1-46's README does not state the old reading and is unchanged.
+
+**Builder tests that lift, the engineer's to update** (`tests/unit/pause/test_pause.py`):
+`test_the_flag_is_one_marker_line_and_a_lifted_pause_removes_it`,
+`test_a_linked_runtime_folder_is_refused_and_nothing_is_written_or_removed[off]`,
+`test_an_empty_gov_role_is_refused_and_sets_nothing[off]`.
+
+### DP-F7 (open): the owner lifts while an agent's Bash call is running
+
+- **Question.** When the owner lifts in person while a Bash call of any session is between its two hooks, does that
+  call's flag comparison put the freeze back?
+- **Why now.** Rule 4 as written compares before and after and cannot tell the owner's lift from an agent's removal.
+  A long call (a test run) makes the overlap likely exactly when the owner lifts with sessions alive.
+- **Options.** (a) Accept it: the freeze comes back with a finding; the owner lifts again when the sessions are idle.
+  (b) `gov pause --off` leaves a lift record that the comparison honours. (c) Another rule.
+- **Impact.** (a) A lift can seem not to work; the finding says why. (b) The record is a file an agent's opaque
+  write can forge, which reopens what rule 4 closes, unless it sits where no session writes.
+- **Reversibility.** Full for each: hook code.
+- **Cost.** (a) one residual line in `bootstrap.md`. (b) new code in the command and the hook, and its tests.
+- **Recommendation.** (a). **Confidence:** medium.
+- **Does the implementation depend on it?** No. No case is written for the overlap; the 14 cases of rule 4 hold
+  under (a) and (b).
+
+Two choices of this batch are unpinned by a decision and are the lead's to confirm or return: the rule for process
+1, and which error codes the new refusals carry.
+
+### Residuals
+
+Not held by the four rules, and not tested: the Write tool writing a script that is then run by name; a variable
+that holds `--off`; an encoded command (base64); `xargs`; a renamed or copied `gov`; a process-number space an agent
+makes itself with a first process dressed as `init`; an agent that reaches a real terminal of the owner. The flag
+comparison acts after the call: between the removal and the PostToolUse hook the tree is not frozen.
+
 ## Earlier suites revised in the first batch
 
 Each is a rewrite after implementation in the sense of DEC-106.
@@ -300,21 +484,23 @@ Each is a rewrite after implementation in the sense of DEC-106.
 Not changed, and stale in words only: the READMEs of W1-02, W1-28 and W1-46 still say the flag freezes by existing and
 that the launcher names the flag when it does not exist.
 
-**One earlier case will go red after the implementation and is not revised here:** W1-46's live case
-`test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable` asserts that an interpreter one-liner in a
-launched session cannot create `.gov-runtime/freeze`. Without the literal rule nothing stops that write. It is package
-DP-F2.
+**One earlier case was left for package DP-F2 and is revised in the fifth batch:** W1-46's live case
+`test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable` asserted that an interpreter one-liner in a
+launched session cannot create `.gov-runtime/freeze`. Without the literal rule nothing stops that write. DEC-407
+decided the package; the assertion now asks that the session's Bash made no *freeze*.
 
 ## Decision packages
 
 DP-F1, DP-F3, DP-F4 and DP-F5 are decided by **DEC-404** (orchestrator, delegated under DEC-220, 2026-10-05). **DP-F2
-stays open with the owner**; nothing of this half depends on it. DP-F1 to DP-F4 are kept below as they were
-returned; DP-F5 was the lead's package and is not written out here.
+is decided by the owner: DEC-407, and DEC-409 on who lifts.** DP-F1 to DP-F4 are kept below as they were
+returned; DP-F5 was the lead's package and is not written out here. **DP-F7 is open**: it is written out in "The
+fifth batch".
 
 | Package | State | How it was decided |
 |---|---|---|
 | DP-F1 | decided, DEC-404 | Option (a): `gov launch` denies the flag's path by name whenever a file exists there at launch, marked or not (DEC-311). A placeholder renewed this way freezes nothing. |
-| DP-F2 | **open, the owner's** | It lowers a protection. W1-46's live case `test_a_bash_write_under_gov_runtime_fails_and_scratch_stays_writable` is left as it is until the answer. |
+| DP-F2 | decided, DEC-407 and DEC-409 | The flag's path has no literal rule when no flag exists at launch, and what held it is replaced: the flag is compared around every Bash call (a freeze that a call removed or emptied is a finding and is put back), and only the owner in person lifts (no Claude Code session among the ancestors, a terminal, a one-time code; the guard refuses the lift form). W1-46's live case is revised: what must not exist is a freeze the session's Bash made. The cases are the fifth batch's. |
+| DP-F7 | **open** | An owner's lift while an agent's Bash call is running is undone by the flag comparison. See "The fifth batch". |
 | DP-F3 | decided, DEC-404 | Option (a): the first line is `FROZEN <who> <when>` with single spaces; who is `owner` or `orchestrator`, when is UTC `YYYY-MM-DDTHH:MM:SSZ`. The guard's wider reading stays as built. |
 | DP-F4 | decided, DEC-404 | Option (a): when `.gov-runtime` is a symbolic link, `gov pause` refuses with an error that names the link and writes nothing. The owner repairs the folder. |
 | DP-F5 | decided, DEC-404 | Option (a): `tests/unit/install/**` is added to the ticket's `allowed_paths`, so the engineer updates the one builder test that sets an empty flag. No acceptance test follows from it. |

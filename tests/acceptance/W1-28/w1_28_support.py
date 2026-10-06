@@ -370,6 +370,25 @@ def pause(project, sandbox, *args, role=OWNER, flag_role=None, cwd=None):
     return gov(project, sandbox, "pause", *args, "--json", *named, role=role, cwd=cwd)
 
 
+def lift(project, sandbox):
+    """The owner lifts the freeze in person (DEC-409); returns the result, ``{"paused": False}``.
+
+    ``gov pause --off`` refuses under a Claude Code session and without a
+    terminal, and this suite runs under an agent session with pipes. So the
+    lift is made through the function the command calls,
+    ``gov.pause.command.lift``, with the ancestry of a plain terminal and a
+    pseudo-terminal on which the shown code is typed back: W1-50's helper
+    (``tests/acceptance/W1-50/w1_50_freeze_lift.py``), imported here so that
+    no module imports the other at load time.
+    """
+    folder = str(Path(__file__).resolve().parents[1] / "W1-50")
+    if folder not in sys.path:
+        sys.path.insert(0, folder)
+    import w1_50_freeze_lift
+
+    return w1_50_freeze_lift.lift_as_the_owner(project, sandbox)
+
+
 def succeeded(run, interface):
     """The run succeeded with the API-0002 envelope; returns its ``result``."""
     envelope = cli_support.assert_envelope(run, interface, command="pause")
