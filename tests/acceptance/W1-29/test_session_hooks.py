@@ -177,6 +177,25 @@ class TestStop:
             "Stop must write a new checkpoint"
         )
 
+    def test_no_checkpoint_without_ticket(self, project):
+        """When GOV_TICKET is not set, the Stop hook writes no checkpoint.
+        Sessions without a ticket must not pollute the checkpoint
+        directory.  [Point 4]"""
+        cp_dir = project / "docs" / "checkpoints"
+        cp_before = set(cp_dir.rglob("CP-*.md")) if cp_dir.exists() else set()
+        rc, output, _ = run_w29_hook(
+            "stop",
+            {"hook_event_name": "Stop", "session_id": "s1",
+             "cwd": str(project), "last_assistant_message": "Done."},
+            project,
+            env_extra={"GOV_ROLE": "engineer"},
+        )
+        assert rc == 0, f"Stop must exit 0 even without GOV_TICKET, got {rc}"
+        cp_after = set(cp_dir.rglob("CP-*.md")) if cp_dir.exists() else set()
+        assert cp_after == cp_before, (
+            "Stop must not write any checkpoint when GOV_TICKET is not set"
+        )
+
     def test_respects_stop_hook_active(self, project):
         """When stop_hook_active is present, Stop exits 0 without writing a
         checkpoint or blocking — this prevents re-entrancy loops.  [FL1]"""
@@ -298,6 +317,26 @@ class TestSubagentStop:
             f"got exit {result.returncode} — fail-open vulnerability"
         )
 
+    def test_text_labels_without_content_do_not_satisfy_contract(self, project):
+        """When all twelve field labels are present as text (not JSON) but
+        have no content after the colon, SubagentStop must block (exit 2).
+        The text-path regex must verify content exists after the label,
+        not just the label itself.  [DEC-413, Point 5]"""
+        empty_text = "\n".join(f"{field}:" for field in TWELVE_FIELDS)
+        rc, output, _ = run_w29_hook(
+            "subagentstop",
+            {"hook_event_name": "SubagentStop", "session_id": "s1",
+             "agent_id": "a1", "agent_type": "engineer",
+             "cwd": str(project),
+             "last_assistant_message": empty_text},
+            project,
+        )
+        assert rc == 2, (
+            f"SubagentStop must block (exit 2) when text labels have no "
+            f"content after the colon — got {rc}: fail-open vulnerability "
+            f"in the text-path regex"
+        )
+
     def test_empty_and_null_values_do_not_satisfy_contract(self, project):
         """Empty string and null values for the 12-field contract do not
         count as present.  The contract requires meaningful values.
@@ -394,18 +433,94 @@ class TestCompactionPreservesState:
             "re-injection must include the active ticket"
         )
 
-    def test_auto_compact_threshold(self, w49_project, run):
-        """Claude Code 2.1.288 supports autoCompactWindow; the hooks set it
-        to about 300k tokens, or the CONTEXT_CHECKPOINT stop stays.
-
-        This test verifies the hook module exposes the threshold.  When it
-        cannot be configured (which does not apply to the pinned version),
-        the fallback is the orchestrator's CONTEXT_CHECKPOINT stop (DEC-208).
-        """
+    def test_precompact_then_sessionstart_preserves_decisions(
+        self, w49_project, run,
+    ):
+        """PreCompact preserves the written part of CHECKPOINT.md, which
+        contains open decision IDs; SessionStart on compact re-injects
+        that content for the orchestrator.  [DEC-208, KPI line 4]"""
+        body = (
+            "- Active tickets: TST-71 (engineer implementing)\n"
+            "- Open owner decisions: DEC-999 pending owner answer\n"
+            "\n"
+            "Next action: wait for DEC-999 resolution.\n"
+        )
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(body),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        run.precompact(
+            w49_project, "auto", role="orchestrator", ticket="TEST-abcd",
+        )
         result = run.sessionstart(
-            w49_project, "startup", role="engineer", ticket="TEST-abcd",
+            w49_project, "compact", ticket="TEST-abcd",
         )
         assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "DEC-999" in ctx, (
+            "re-injection must include the open decision ID DEC-999 "
+            f"from the written part of CHECKPOINT.md: {ctx[:400]!r}"
+        )
+
+    def test_precompact_then_sessionstart_preserves_loop_counts(
+        self, w49_project, run,
+    ):
+        """PreCompact preserves the written part of CHECKPOINT.md, which
+        contains loop counts; SessionStart on compact re-injects that
+        content for the orchestrator.  [DEC-208, DEC-096, KPI line 4]"""
+        body = w1_49_support.resume_section("LPC")
+        w1_49_support.write_checkpoint(
+            w49_project, ORCH,
+            w1_49_support.checkpoint_text(body),
+            age_s=w1_49_support.RECENT_AGE_S,
+        )
+        run.precompact(
+            w49_project, "auto", role="orchestrator", ticket="TEST-abcd",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "Loop" in ctx or "loop" in ctx, (
+            "re-injection must include the loop count text "
+            f"from the written part of CHECKPOINT.md: {ctx[:400]!r}"
+        )
+        assert "17" in ctx or "LPC" in ctx, (
+            "re-injection must carry identifiable loop count content: "
+            f"{ctx[:400]!r}"
+        )
+
+    def test_auto_compact_threshold(self, w49_project, run):
+        """The ``autocompact`` setting (approximately 300 000 tokens) is
+        configured in ``.claude/settings.json`` by the owner.  That file
+        is outside this ticket's allowed_paths, so this test verifies
+        what IS in the ticket's reach: PreCompact writes a checkpoint and
+        SessionStart re-injects it on compact — the hooks handle
+        compaction correctly.
+
+        Rewrite after implementation, reason: owner correction — the
+        original test was vacuous (asserted only exit 0) and the setting
+        lives in the owner's file, not reachable by this ticket's paths.
+        The correct setting name is ``autocompact`` (not
+        ``autoCompactWindow``).  [DEC-208]"""
+        run.precompact(
+            w49_project, "auto", role="engineer", ticket="TEST-abcd",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert ctx, (
+            "SessionStart on compact must produce non-empty injection "
+            "after PreCompact wrote a checkpoint"
+        )
+        assert "TEST-abcd" in ctx, (
+            "re-injection must include the active ticket after a "
+            "compaction cycle"
+        )
 
 
 # ======================================================================
@@ -567,4 +682,32 @@ class TestCutOrder:
         assert w1_49_support.PROMPT_REL in ctx, (
             "the instruction to read the prompt must survive even when the "
             "cap is tight — it is the last thing to be cut"
+        )
+
+
+# ======================================================================
+# HOOK COPIES
+# src/gov/hooks/ must be byte-for-byte identical to
+# template/governance/kernel/hooks/ for stop.py and subagentstop.py
+# [Point 6]
+# ======================================================================
+
+
+class TestHookCopiesIdentical:
+    """The src/gov/hooks/ copies (used by tests) must match the canonical
+    template/governance/kernel/hooks/ copies (installed into projects)."""
+
+    @pytest.mark.parametrize("name", ["stop.py", "subagentstop.py"])
+    def test_hook_copies_identical(self, name):
+        """src/gov/hooks/<name> and template/governance/kernel/hooks/<name>
+        must have identical content.  If the template is the canonical
+        source, src/ must match so tests exercise the same code that
+        gets installed.  [Point 6]"""
+        src_copy = HOOKS_DIR / name
+        template_copy = REPO_ROOT / "template" / "governance" / "kernel" / "hooks" / name
+        assert src_copy.is_file(), f"src copy missing: {src_copy}"
+        assert template_copy.is_file(), f"template copy missing: {template_copy}"
+        assert src_copy.read_bytes() == template_copy.read_bytes(), (
+            f"src/gov/hooks/{name} and template/governance/kernel/hooks/{name} "
+            f"differ — the canonical source is the template and src/ must match"
         )

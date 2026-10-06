@@ -35,6 +35,7 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | `TestSessionStart::test_orchestrator_compact_combined_within_cap` | CAP-15.g, DEC-259 | hook not built |
 | `TestPreCompact::test_writes_checkpoint` | CAP-37.b | hook not built |
 | `TestStop::test_writes_checkpoint` | CAP-37.b | hook not built |
+| `TestStop::test_no_checkpoint_without_ticket` | CAP-37.b, Point 4 | GREEN (Stop already skips when GOV_TICKET is empty) |
 | `TestStop::test_respects_stop_hook_active` | CAP-37.b | hook not built |
 
 ### Success line 2 — SubagentStop enforces the 12-field return contract of Framework §61 [CAP-37.d]
@@ -47,6 +48,7 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | `TestSubagentStop::test_malformed_input_fails_closed[empty stdin]` | CAP-37.d, DEC-136 | hook not built |
 | `TestSubagentStop::test_malformed_input_fails_closed[invalid JSON]` | CAP-37.d, DEC-136 | hook not built |
 | `TestSubagentStop::test_malformed_input_fails_closed[null last_assistant_message]` | CAP-37.d, DEC-136 | hook not built |
+| `TestSubagentStop::test_text_labels_without_content_do_not_satisfy_contract` | CAP-37.d, DEC-413, Point 5 | RED (text-path regex accepts labels without content — fail-open) |
 | `TestSubagentStop::test_empty_and_null_values_do_not_satisfy_contract` | CAP-37.d, DEC-136 | hook not built |
 
 ### Success line 3 — A checkpoint is written when context utilisation passes the threshold, not only at PreCompact [CAP-37.c]
@@ -61,7 +63,9 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | Test | Covers | Red reason |
 |------|--------|------------|
 | `TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_ticket` | DEC-208 | hook not built |
-| `TestCompactionPreservesState::test_auto_compact_threshold` | DEC-208 | hook not built |
+| `TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_decisions` | DEC-208, KPI line 4 | GREEN (preservation already works: PreCompact's `split()` keeps the written part) |
+| `TestCompactionPreservesState::test_precompact_then_sessionstart_preserves_loop_counts` | DEC-208, DEC-096, KPI line 4 | GREEN (preservation already works) |
+| `TestCompactionPreservesState::test_auto_compact_threshold` | DEC-208 | GREEN (rewrite: owner correction — see §9 below) |
 
 ### Failure line 1 — A Stop hook loops
 
@@ -89,16 +93,26 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 |------|--------|------------|
 | `TestCutOrder::test_instruction_preserved_when_cap_tight` | CAP-15.g, DEC-136 | hook not built |
 
+### Hook copies — src/gov/hooks/ matches template/governance/kernel/hooks/ (Point 6)
+
+| Test | Covers | Red reason |
+|------|--------|------------|
+| `TestHookCopiesIdentical::test_hook_copies_identical[stop.py]` | Point 6 | GREEN (files are currently identical) |
+| `TestHookCopiesIdentical::test_hook_copies_identical[subagentstop.py]` | Point 6 | GREEN (files are currently identical) |
+
 ## Covers coverage
 
 | Covers id | Item | Tests |
 |-----------|------|-------|
 | CAP-15.g | File path + summary ≤ ~2.5k tokens (harness output caps) | `test_injects_context_brief_on_startup`, `test_large_context_within_cap`, `test_orchestrator_compact_carries_prompt_path`, `test_orchestrator_compact_combined_within_cap`, `test_instruction_preserved_when_cap_tight` |
-| CAP-37.b | Mandatory triggers incl. ticket transition, compaction, stop | `test_writes_checkpoint` (PreCompact), `test_writes_checkpoint` (Stop), `test_reinjects_on_compact_clear_resume`, `test_respects_stop_hook_active`, `test_orchestrator_compact_carries_resume_section` |
+| CAP-37.b | Mandatory triggers incl. ticket transition, compaction, stop | `test_writes_checkpoint` (PreCompact), `test_writes_checkpoint` (Stop), `test_no_checkpoint_without_ticket`, `test_reinjects_on_compact_clear_resume`, `test_respects_stop_hook_active`, `test_orchestrator_compact_carries_resume_section` |
 | CAP-37.c | Provider-independent watchdog: marks stale; checkpoints on context utilisation; blocks handoff/close when freshness violates policy | `test_stop_writes_checkpoint_not_only_precompact`, `test_watchdog_marks_stale_on_context_utilisation`, `test_stale_by_age`, `test_missing_checkpoint`, `test_stale_on_ticket_transition` |
-| CAP-37.d | Worker return contract: the 12 fields | `test_accepts_all_twelve_fields`, `test_blocks_missing_fields`, `test_block_includes_reason_and_is_once`, `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract` |
-| DEC-136 | Review findings feed the independent suite as described behaviour | `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract`, `test_instruction_preserved_when_cap_tight` |
+| CAP-37.d | Worker return contract: the 12 fields | `test_accepts_all_twelve_fields`, `test_blocks_missing_fields`, `test_block_includes_reason_and_is_once`, `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract`, `test_text_labels_without_content_do_not_satisfy_contract` |
+| DEC-096 | Loop counts held by the orchestrator, never disclosed to sessions inside the loop | `test_precompact_then_sessionstart_preserves_loop_counts` |
+| DEC-136 | Review findings feed the independent suite as described behaviour | `test_malformed_input_fails_closed`, `test_empty_and_null_values_do_not_satisfy_contract`, `test_instruction_preserved_when_cap_tight`, `test_text_labels_without_content_do_not_satisfy_contract` |
+| DEC-208 | Compaction preserves decisions, ticket and loop counts; auto-compact threshold | `test_precompact_then_sessionstart_preserves_ticket`, `test_precompact_then_sessionstart_preserves_decisions`, `test_precompact_then_sessionstart_preserves_loop_counts`, `test_auto_compact_threshold` |
 | DEC-259 | Hooks act only for GOV_ROLE=orchestrator (W1-49 behaviour); W1-29 extends so non-orchestrator roles get W1-29 content | `test_orchestrator_compact_carries_prompt_path`, `test_orchestrator_compact_carries_resume_section`, `test_orchestrator_compact_combined_within_cap` |
+| DEC-413 | SubagentStop text-path fail-open on labels without content | `test_text_labels_without_content_do_not_satisfy_contract` |
 
 ## Red/green summary
 
@@ -106,13 +120,28 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
   is empty for Stop/SubagentStop; the combined PreCompact and SessionStart
   hooks at `template/governance/kernel/hooks/` do not yet include W1-29
   behaviour).
+- **1 test is RED because it exposes a bug**: `test_text_labels_without_content_do_not_satisfy_contract`
+  — the text-path regex in `_find_fields` accepts labels without content
+  (DEC-413 fail-open).
 - **4 watchdog tests** pass because they test `gov.checkpoint.record.watch`
   (W1-25), which is already built.  Since `gov close` (W1-30) is not built,
   these test the function directly per the instruction: "if the watchdog can
   only be a function that W1-30 calls, the case tests the function."
+- **5 new tests are GREEN** because they test existing behaviour:
+  - `test_precompact_then_sessionstart_preserves_decisions` — PreCompact's
+    `split()` already preserves the written part containing decision IDs.
+  - `test_precompact_then_sessionstart_preserves_loop_counts` — same
+    preservation mechanism for loop count content.
+  - `test_auto_compact_threshold` (rewritten) — tests the compaction cycle
+    that is already built, not the owner's settings file.
+  - `test_no_checkpoint_without_ticket` — Stop already skips when
+    `GOV_TICKET` is empty.
+  - `test_hook_copies_identical[stop.py]` and `[subagentstop.py]` — files are
+    currently byte-for-byte identical.
 
-Total: **27 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
-counts as 3; the parametrized `test_malformed_input_fails_closed` counts as 3).
+Total: **33 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
+counts as 3; the parametrized `test_malformed_input_fails_closed` counts as 3;
+the parametrized `test_hook_copies_identical` counts as 2).
 
 ## Determined from sources
 
@@ -170,14 +199,23 @@ transitions.  Exit 3 = `CHECKPOINT_STALE` or `CHECKPOINT_MISSING`.
   sessions inside the loop (DEC-096).  The checkpoint records them for the
   session's own use on resume.
 
-### 6. Auto-compact threshold
+### 6. Auto-compact threshold (revised — owner correction)
 
-Claude Code 2.1.288 supports `autoCompactWindow` in settings.json.  The
-project sets it to approximately 300 000 tokens.  Since this is a configuration
-concern (not a hook concern), the test verifies the hooks exist and handle
-compaction correctly; the threshold value is verified by the orchestrator.
-The fallback (CONTEXT_CHECKPOINT stop) applies only when the setting is
-unavailable, which does not apply to the pinned version.
+The correct Claude Code setting is `autocompact` (not `autoCompactWindow`).
+It lives in `.claude/settings.json`, which is the owner's file and is NOT in
+this ticket's `allowed_paths`.  The pinned Claude Code version (2.1.288)
+supports this setting.  The project sets it to approximately 300 000 tokens;
+the exact line is `"autocompact": 300000`.  Since the setting is in the owner's
+file, the test verifies what IS in this ticket's reach: the hooks handle
+compaction correctly (PreCompact writes a checkpoint and SessionStart
+re-injects it on compact).  The KPI's fallback ("if it can't be configured the
+orchestrator's CONTEXT_CHECKPOINT stop stays") does not apply because the
+pinned version supports it.
+
+The original `test_auto_compact_threshold` was vacuous (asserted only that
+SessionStart exits 0 — a case that cannot fail is not a case).  It has been
+rewritten to verify the compaction cycle, with reason: "owner correction — the
+setting is in the owner's file, not reachable by this ticket's paths."
 
 ### 7. Combined hook behaviour (W1-49 + W1-29)
 
@@ -203,6 +241,77 @@ combine W1-49 and W1-29 behaviour:
 Empty string `""` and `null` values in the SubagentStop 12-field return
 contract do not count as "present".  The contract requires meaningful values.
 SubagentStop must block (exit 2) when any field is empty or null.
+
+### 9. Context utilisation and checkpoints (Point 3)
+
+KPI line 3 says "a checkpoint is written when the session's context utilisation
+passes the configured threshold, not only at PreCompact."  No Claude Code hook
+input carries context utilisation.  The hook inputs are:
+
+- **Stop**: `hook_event_name`, `session_id`, `cwd`, `last_assistant_message`,
+  optionally `stop_hook_active`.
+- **PreCompact**: `trigger` (manual/auto).
+- **SessionStart**: `source`.
+
+No hook can read context utilisation at call time.  The clause is met only as:
+
+1. **A checkpoint at every stop** — the Stop hook writes a checkpoint at every
+   stop (tested by `test_stop_writes_checkpoint_not_only_precompact`).
+2. **The watchdog marks stale on utilisation** — W1-25's `record.watch` marks
+   the checkpoint stale when context utilisation exceeds the threshold (tested
+   by `test_watchdog_marks_stale_on_context_utilisation`).
+
+No hook can write a checkpoint triggered BY utilisation passing a threshold
+because no hook input carries utilisation.  This is a residual for the owner:
+the KPI line's literal reading is not met by any hook mechanism.  The existing
+tests cover what IS possible.
+
+### 10. Checkpoint files under docs/checkpoints/ (Point 4)
+
+Stop writes a checkpoint record at every stop, and PreCompact at every
+compaction, as untracked files under `docs/checkpoints/<ticket>/`.
+
+1. **Who commits them?**  W1-25 writes them as files via
+   `gov.checkpoint.record.write`.  No code in W1-25, W1-29 or W1-49 commits
+   them.  W1-30 (`gov close`) is not built.  They stay untracked until
+   something commits them.
+
+2. **What does a session with no GOV_TICKET write?**  Nothing.  The Stop hook
+   checks `ticket = os.environ.get("GOV_TICKET", "")` and returns if empty.
+   PreCompact does the same.  So a session without GOV_TICKET writes no
+   checkpoint.  Tested by `test_no_checkpoint_without_ticket`.
+
+3. **Can a worker's hook write docs/checkpoints/ even if the guard restricts
+   that path?**  Yes.  A hook is a subprocess (`python3 script.py`) that writes
+   directly to the filesystem.  The guard mediates tool calls (Read, Write,
+   Edit, Bash targets), not subprocess writes.  So a worker whose
+   `allowed_paths` exclude `docs/` still has its hook write checkpoint files
+   there.
+
+### 11. SubagentStop text-path fail-open (DEC-413, Point 5)
+
+The `_find_fields` function in `subagentstop.py` has two parsing paths:
+
+1. **JSON path**: checks `obj[k] is not None and obj[k] != ""` — correct,
+   blocks empty/null.
+2. **Text path**: regex `(?:^|\n)\s*(?:#+\s*)?[\*_]*{field}[\*_]*\s*[:=\n]` —
+   matches a label like `task:` with NOTHING after it.  A message like
+   `task:\nstatus:\nwork_completed:\n...` passes all 12 fields through the
+   text path with no actual content.  This is a fail-open.
+
+Every one of the twelve fields needs content in both forms.  The text path
+must verify content exists after the label, not just the label itself.  Tested
+by `test_text_labels_without_content_do_not_satisfy_contract`.
+
+### 12. Hook copies: src/gov/hooks/ vs template/governance/kernel/hooks/ (Point 6)
+
+`src/gov/hooks/stop.py` and `src/gov/hooks/subagentstop.py` are byte-for-byte
+copies of `template/governance/kernel/hooks/stop.py` and
+`template/governance/kernel/hooks/subagentstop.py`.  The template hooks are
+installed into projects by the kernel installer.  The `src/` copies are used
+by tests (`conftest.py`'s `HOOKS_DIR = REPO_ROOT / "src" / "gov" / "hooks"`
+and `run_w29_hook`).  The test `test_hook_copies_identical` pins that they are
+identical so a divergence is caught immediately.
 
 ## Residual: S0a-G-09
 
