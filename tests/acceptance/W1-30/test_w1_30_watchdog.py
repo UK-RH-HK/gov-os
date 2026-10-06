@@ -45,7 +45,7 @@ def _write_stale_checkpoint(project, ticket_id):
         "title": f"{ticket_id} at task-start",
         "task": ticket_id,
         "task_status": "open",
-        "trigger": "task-start",
+        "trigger": "stop",
         "next_action": "implement the feature",
         "created": "2026-09-01T00:00:00Z",
         "inputs": [{"id": ticket_id, "version": "abc1234", "hash": "sha256:" + "a" * 64}],
@@ -84,7 +84,7 @@ def test_closing_checkpoint_written_after_checks_pass(project, sandbox, interfac
     _green_project(project)
     from gov.checkpoint.record import write as cp_write
     import yaml
-    cp_info = cp_write(project.root, TICKET, "task-start", "begin", [])
+    cp_info = cp_write(project.root, TICKET, "stop", "begin", [])
     project.commit("add fresh checkpoint", who=support.ORCHESTRATOR)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
