@@ -7,7 +7,7 @@ For W1-50 (DEC-402, DEC-404): the read-back with the guard's reader, a write
 that fails, the marker line, and a linked runtime folder for ``--off`` too;
 a rollback whose reverts touch the flag's path ends frozen, with success or
 with an error (DEC-378), and never says paused over a flag that is no freeze.
-For DEC-409: the lift goes through ``command.lift`` with a planted ancestry and a pseudo-terminal; the command
+For DEC-409: the lift goes through ``command._lift_test`` with a planted ancestry and a pseudo-terminal; the command
 itself refuses under the session that runs these tests; the chain read from ``/proc`` starts at this process.
 Every project is a temporary git repository made here.
 """
@@ -71,7 +71,7 @@ SESSION = {"pid": 30, "ppid": 40, "comm": "claude", "exe": None, "cmdline": ["cl
 
 
 def _lift(root, ancestry=(SHELL, FIRST), reply=lambda code: code):
-    """``command.lift`` on a pseudo-terminal; what is typed back is ``reply`` of the shown code."""
+    """``command._lift_test`` on a pseudo-terminal; what is typed back is ``reply`` of the shown code."""
     master, slave = os.openpty()
 
     def typist():
@@ -85,7 +85,7 @@ def _lift(root, ancestry=(SHELL, FIRST), reply=lambda code: code):
 
     threading.Thread(target=typist, daemon=True).start()
     try:
-        return command.lift(root, ancestry=list(ancestry), terminal=(slave, slave))
+        return command._lift_test(root, ancestry=list(ancestry), terminal=(slave, slave))
     finally:
         os.close(slave)
         os.close(master)
@@ -184,7 +184,7 @@ def test_a_chain_as_a_plain_terminal_of_this_machine_shows_it_lifts(project):
 def test_a_pipe_is_no_terminal_and_no_code_is_shown(project):
     flag, (source, shown) = _frozen(project), os.pipe()
     with pytest.raises(GovError) as refusal:
-        command.lift(project, ancestry=[SHELL, FIRST], terminal=(source, shown))
+        command._lift_test(project, ancestry=[SHELL, FIRST], terminal=(source, shown))
     os.close(shown)
     assert refusal.value.details == {"reason": "terminal"} and os.read(source, 64) == b"" and flag.is_file()
     os.close(source)
