@@ -31,7 +31,7 @@ def _find_fields(message: str) -> set[str]:
         if field in found:
             continue
         pattern = re.compile(
-            rf'(?:^|\n)\s*(?:#+\s*)?[\*_]*{re.escape(field)}[\*_]*\s*[:=\n]',
+            rf'(?:^|\n)\s*(?:#+\s*)?[\*_]*{re.escape(field)}[\*_]*\s*[:=][ \t]*\S',
             re.IGNORECASE,
         )
         if pattern.search(message):
