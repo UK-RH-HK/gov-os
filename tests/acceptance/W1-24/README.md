@@ -1,7 +1,7 @@
 # W1-24 acceptance tests: `gov context`
 
 Written before the implementation by the independent test designer (MR-3) from the ticket's KPI lines, its
-`covers` ids and its sources. **51 cases** (34 original + 1 revision + 16 new) in **eight files**. Behaviour is
+`covers` ids and its sources. **54 cases** (34 original + 1 revision + 19 new) in **eight files**. Behaviour is
 reached through public interfaces only: the function `gov.context.context`, the command `gov context`, and the
 check declaration that `gov check --list --json` lists. Every case builds its own project in a temporary
 directory; nothing reads or writes this repository's `.gov-runtime/`.
@@ -64,7 +64,7 @@ inputs at the same precedence level). `--dry-run` computes the packet without wr
 | S3 token pressure, index down | CAP-15.d | `test_w1_24_pressure.py` (4): supplementary dropped before mandatory, records what was dropped, mandatory without lexical index, mandatory without semantic store |
 | S4 mandatory resolution | CAP-15.b, CAP-01.d | `test_w1_24_mandatory.py` (9): resolved from declared ids, not ranked by retrieval, each lists authority/lifecycle/constraint/reason, deterministic, **depends_on ids are resolved**, **precedence not overridden by retrieval rank (all 5 levels)** |
 | S5 BLOCKED, superseded, contradiction | CAP-15.c | `test_w1_24_blocked.py` (6): missing → BLOCKED, superseded → can't satisfy, **R1: conflicting with supersession → BLOCKED** (revised from BLOCKED|CONTRADICTION), **BLOCKED error names the superseded record**, **multi-superseder → BLOCKED**, **pure contradiction without supersession → CONTRADICTION** |
-| S6 family check | CAP-38.b | `test_w1_24_family_check.py` (5): check registered, required fields, same ticket+commit → same hash, **check command is runnable**, **same hash across separate processes and directories** |
+| S6 family check | CAP-38.b | `test_w1_24_family_check.py` (8): check registered, required fields, same ticket+commit → same hash, **check command is runnable**, **same hash across separate processes and directories**, **all computations fail → unmeasured and not green**, **some computations fail → each failure named and not green**, **no tickets → unmeasured and not green** |
 | S7 authority precedence | CAP-01.a | `test_w1_24_authority.py` (4): higher precedence in authority block, lower marked superseded, full order (3 levels), **all five store-representable levels in order** |
 | supplementary | CAP-15.d | `test_w1_24_supplementary.py` (3): **supplementary non-empty with a built index**, **supplementary dropped before mandatory under pressure**, **packet indicates supplementary unavailable without index** |
 | command | — | `test_w1_24_command.py` (7): API-0002 envelope, result is the packet, BLOCKED error, deterministic, --brief, **--dry-run computes without writing**, **--budget sets the limit** |
@@ -152,3 +152,14 @@ to the test designer (Read deny rules). No test case is derived from a text nobo
 `tests/acceptance/W1-07/w1_07_support.py` is revised: `context` joins `BUILT_LATER`, leaves `NOT_BUILT`, its
 ticket argument is added to `REQUIRED_ARGUMENTS`, and `READ_COMMANDS` is updated so that
 `("context", "--dry-run")` includes the ticket argument.
+
+## G-07 coverage
+
+Source S0a-G-07 text: "`gov context`: authority block first, supplementary block, token ceiling, sha256, file-path delivery + ≤ 2.5k-token summary". Six parts:
+
+1. **authority block first** — `test_w1_24_packet.py::test_the_authority_block_is_first_in_the_packet` (S1)
+2. **supplementary block** — `test_w1_24_supplementary.py::test_supplementary_context_is_non_empty_with_a_built_index` and `test_w1_24_packet.py::test_the_supplementary_block_is_separate_from_the_authority_block` (S1, supplementary)
+3. **token ceiling** — `test_w1_24_packet.py::test_the_packet_stays_under_the_default_ceiling` (S1)
+4. **sha256** — `test_w1_24_packet.py::test_the_packet_carries_its_own_hash` and `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` (S1)
+5. **file-path delivery** — `test_w1_24_brief.py::test_brief_delivers_a_file_path_and_a_summary` (S2)
+6. **≤ 2.5k-token summary** — `test_w1_24_brief.py::test_the_brief_summary_is_at_most_2500_tokens` (S2)
