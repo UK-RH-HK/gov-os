@@ -58,6 +58,11 @@ NOT_BUILT = tuple(name for name in RESERVED_COMMANDS if name != "status" and nam
 BUILT_LATER = BUILT_LATER + ("closure",)
 NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 
+# Planned revision (DEC-190, "planned: command implemented"): W1-26 builds ``check``; its cases are in
+# ``tests/acceptance/W1-26/``.
+BUILT_LATER = BUILT_LATER + ("check",)
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+
 # Planned revision (DEC-190, "planned: command implemented"): a built command may require arguments, and a call
 # without them is a usage error (exit code 2, API-0002), not an envelope. ``gov closure`` requires a depth and
 # at least one id (DEC-391), so the cases that run every command give it both. The id names nothing.
@@ -79,6 +84,15 @@ BUILT_LATER = BUILT_LATER + ("retrieve",)
 NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 REQUIRED_ARGUMENTS["retrieve"] = ("no line of the W1-07 fixture holds this text",)
 READ_COMMANDS = tuple(invocation("retrieve") if args == ("retrieve",) else args for args in READ_COMMANDS)
+
+# Planned revision (DEC-190, "planned: command implemented"): W1-24 builds ``context``; its cases are in
+# ``tests/acceptance/W1-24/``. It requires a ticket argument, and its ``--dry-run`` form is in the read commands
+# list. Add to ``REQUIRED_ARGUMENTS`` and revise ``READ_COMMANDS``.
+BUILT_LATER = BUILT_LATER + ("context",)
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+REQUIRED_ARGUMENTS["context"] = ("W1-07-NO-SUCH-TICKET",)
+READ_COMMANDS = tuple(("context", "--dry-run", *REQUIRED_ARGUMENTS["context"]) if args == ("context", "--dry-run")
+                      else args for args in READ_COMMANDS)
 
 # Every invocation these tests know: one per reserved command, and ``check --list``.
 EVERY_INVOCATION = tuple(invocation(name) for name in RESERVED_COMMANDS) + (("check", "--list"),)
