@@ -37,6 +37,7 @@ kpis:
   - gov pause --off requires an interactive terminal (stdin and stdout are TTYs) and a one-time random code LIFT-<4 digits> typed back; a wrong code, piped input or no TTY refuses and nothing changes (DEC-409)
   - The guard refuses, for every role, any agent Bash command whose text contains the lift form of gov pause (the --off option), including a command that starts another Claude Code session with that text in its prompt (DEC-409)
   - Setting a freeze stays open to the owner, from a terminal or the operator console, and to the orchestrator (DEC-409)
+  - A ticket file that more than one parent of a merge changed against the merge base is the merge commit's own change, whichever side's content it holds, as for acceptance tests (DEC-421)
   - Every test fixture that copies the whole tree strips the held-out deny line from the copied settings file (DEC-399)
   - 'A forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each commit''s paths against the allowed paths of its own Role and Task trailers, not against the caller (DEC-255) [CAP-58.h]'
   - A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h]
