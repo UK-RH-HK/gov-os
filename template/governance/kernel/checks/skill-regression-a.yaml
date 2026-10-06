@@ -1,0 +1,5 @@
+id: "skill-regression-a"
+family: "skill regression"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.check.skill_regression"
