@@ -1,6 +1,6 @@
 ---
 id: DAEO-skiy
-status: open
+status: in_progress
 deps: [DAEO-5x4l, DAEO-rrxp, DAEO-xog0, DAEO-wk2v, DAEO-fygv]
 links: []
 created: 2026-09-30T22:49:59Z
