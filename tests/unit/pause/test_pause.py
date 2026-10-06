@@ -7,6 +7,8 @@ For W1-50 (DEC-402, DEC-404): the read-back with the guard's reader, a write
 that fails, the marker line, and a linked runtime folder for ``--off`` too;
 a rollback whose reverts touch the flag's path ends frozen, with success or
 with an error (DEC-378), and never says paused over a flag that is no freeze.
+For DEC-409: the lift goes through ``command.lift`` with a planted ancestry and a pseudo-terminal; the command
+itself refuses under the session that runs these tests; the chain read from ``/proc`` starts at this process.
 Every project is a temporary git repository made here.
 """
 from __future__ import annotations
@@ -15,6 +17,7 @@ import os
 import re
 import subprocess
 import sys
+import threading
 from argparse import Namespace
 from pathlib import Path
 
@@ -62,6 +65,32 @@ def _pause(root, **options):
     return command.run(root, Namespace(**{"off": False, "cancel_agents": False, "rollback": None, **options}), {})
 
 
+SHELL = {"pid": 40, "ppid": 1, "comm": "bash", "exe": "/usr/bin/bash", "cmdline": ["-bash"]}
+FIRST = {"pid": 1, "ppid": 0, "comm": "systemd", "exe": None, "cmdline": ["/sbin/init"]}
+SESSION = {"pid": 30, "ppid": 40, "comm": "claude", "exe": None, "cmdline": ["claude", "-p", "x"]}
+
+
+def _lift(root, ancestry=(SHELL, FIRST), reply=lambda code: code):
+    """``command.lift`` on a pseudo-terminal; what is typed back is ``reply`` of the shown code."""
+    master, slave = os.openpty()
+
+    def typist():
+        shown = b""
+        try:
+            while not (found := re.search(rb"LIFT-\d{4}", shown)):
+                shown += os.read(master, 1024)
+            os.write(master, reply(found.group(0)) + b"\n")
+        except OSError:  # the lift ended before it showed a code
+            pass
+
+    threading.Thread(target=typist, daemon=True).start()
+    try:
+        return command.lift(root, ancestry=list(ancestry), terminal=(slave, slave))
+    finally:
+        os.close(slave)
+        os.close(master)
+
+
 @pytest.mark.parametrize("options", ({}, {"off": True}, {"cancel_agents": True}, {"rollback": TICKET}))
 def test_an_empty_gov_role_is_refused_and_sets_nothing(project, monkeypatch, options):
     monkeypatch.setenv("GOV_ROLE", "")
@@ -93,18 +122,80 @@ def test_the_flag_is_one_marker_line_and_a_lifted_pause_removes_it(project, monk
     assert re.fullmatch(r"FROZEN orchestrator \d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ\n", flag.read_text(encoding="utf-8"))
     assert freeze_state(str(project)) == "frozen" and os.listdir(flag.parent) == ["freeze"]
     monkeypatch.delenv("GOV_ROLE")
-    assert _pause(project, off=True) == {"paused": False} and freeze_state(str(project)) == "absent"
+    assert _lift(project) == {"paused": False} and freeze_state(str(project)) == "absent"
 
 
-@pytest.mark.parametrize("options", ({}, {"off": True}))
-def test_a_linked_runtime_folder_is_refused_and_nothing_is_written_or_removed(project, tmp_path_factory, options):
+@pytest.mark.parametrize("off", (False, True), ids=("set", "off"))
+def test_a_linked_runtime_folder_is_refused_and_nothing_is_written_or_removed(project, tmp_path_factory, off):
     elsewhere = tmp_path_factory.mktemp("elsewhere")
     (elsewhere / "freeze").write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")
     (project / ".gov-runtime").symlink_to(elsewhere, target_is_directory=True)
     with pytest.raises(GovError) as refusal:
-        _pause(project, **options)
+        _lift(project) if off else _pause(project)
     assert refusal.value.code == "PAUSE_RUNTIME_LINKED" and ".gov-runtime" in refusal.value.message
     assert os.listdir(elsewhere) == ["freeze"] and (project / ".gov-runtime").is_symlink()
+
+
+def _frozen(project):
+    flag = project / ".gov-runtime" / "freeze"
+    flag.parent.mkdir()
+    flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")
+    return flag
+
+
+def test_the_command_refuses_the_lift_under_the_session_that_runs_these_tests(project):
+    """``run`` hands ``lift`` the project alone: the real chain (a session, or a sandbox's own first process) and
+    the real descriptors refuse."""
+    flag = _frozen(project)
+    with pytest.raises(GovError) as refusal:
+        _pause(project, off=True)
+    assert refusal.value.code == "PAUSE_REFUSED" and flag.is_file()
+
+
+@pytest.mark.parametrize("ancestry, reply, reason", [
+    ((SHELL, SESSION | {"pid": 1, "ppid": 0}), bytes, "session"),
+    ((SHELL,), bytes, "ancestry"),
+    ((SHELL | {"cmdline": []}, FIRST), bytes, "ancestry"),      # a kernel thread, or a process that ended
+    ((SHELL, FIRST | {"comm": "3"}), bytes, "ancestry"),        # a sandbox's own first process
+    (("bash", FIRST), bytes, "ancestry"),
+    ((SHELL, FIRST), lambda code: b"LIFT-" + code[:4], "code"),
+], ids=("session", "short", "no-command-line", "sandbox", "malformed", "wrong-code"))
+def test_a_lift_that_is_not_the_owner_in_person_is_refused_and_the_flag_stays(project, ancestry, reply, reason):
+    flag = _frozen(project)
+    with pytest.raises(GovError) as refusal:
+        _lift(project, ancestry, reply)
+    assert (refusal.value.code, refusal.value.details) == ("PAUSE_REFUSED", {"reason": reason})
+    assert flag.read_text(encoding="utf-8").startswith("FROZEN owner") and os.listdir(flag.parent) == ["freeze"]
+
+
+def test_a_chain_as_a_plain_terminal_of_this_machine_shows_it_lifts(project):
+    """Processes whose ``exe`` cannot be read and whose command line is ``/init``, and an editor's ``node`` and
+    ``sh``, are no session; a project folder named after Claude in the command's own options is none either."""
+    names = ("python3", "bash", "node", "sh", "Relay(963)", "SessionLeader", "init-systemd(Ub", "systemd")
+    chain = [{"pid": 100 - number, "ppid": 99 - number, "comm": name, "exe": None, "cmdline": ["/init"]}
+             for number, name in enumerate(names)]
+    chain[0]["cmdline"] = ["python3", "-m", "gov.cli.main", "pause", "--off", "--root", "/home/owner/claude-code"]
+    chain[-1].update(pid=1, ppid=0)
+    chain[-2]["ppid"] = 1
+    _frozen(project)
+    assert _lift(project, chain) == {"paused": False} and freeze_state(str(project)) == "absent"
+
+
+def test_a_pipe_is_no_terminal_and_no_code_is_shown(project):
+    flag, (source, shown) = _frozen(project), os.pipe()
+    with pytest.raises(GovError) as refusal:
+        command.lift(project, ancestry=[SHELL, FIRST], terminal=(source, shown))
+    os.close(shown)
+    assert refusal.value.details == {"reason": "terminal"} and os.read(source, 64) == b"" and flag.is_file()
+    os.close(source)
+
+
+def test_the_chain_read_from_proc_is_this_process_first_and_each_next_one_its_parent():
+    chain = command.read_ancestry()
+    assert chain[0]["pid"] == os.getpid() and chain[0]["ppid"] == os.getppid()
+    assert chain[0]["exe"] == os.path.realpath(sys.executable) and "pytest" in " ".join(chain[0]["cmdline"])
+    assert all(process["ppid"] == parent["pid"] for process, parent in zip(chain, chain[1:]))
+    assert (chain[-1]["pid"], chain[-1]["ppid"]) == (1, 0) and all(process["comm"] for process in chain)
 
 
 def test_a_second_rollback_reverts_only_what_was_committed_since_the_first(project):

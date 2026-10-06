@@ -26,7 +26,9 @@ from gov.guard.decide import (  # noqa: E402
     _parse_frontmatter,
     decide,
     freeze_state,
+    lift_refusal,
     KNOWN_ROLES,
+    LIFT_REFUSAL,
 )
 
 TID = "DAEO-test"
@@ -2189,3 +2191,43 @@ class TestUnmarkedFlagRecord:
         (project / ".gov-runtime").symlink_to(elsewhere)
         assert self._write(project) == "allow"
         assert not (elsewhere / "records.jsonl").exists()
+
+
+# ---------------------------------------------------------------------------
+# The lift form of gov pause (DEC-409)
+# ---------------------------------------------------------------------------
+
+class TestLiftForm:
+    """What the acceptance cases leave to the builder: a command the rule
+    cannot read is refused, and a substitution is read by its own text."""
+
+    @pytest.mark.parametrize("command", [
+        "echo 'gov pause --off",             # an open quote
+        None, 7, ["gov", "pause", "--off"],  # not a text
+    ])
+    def test_a_command_that_cannot_be_read_is_refused(self, command):
+        assert "cannot be read" in lift_refusal(command)
+        decision, reason = decide("Bash", {"command": command},
+                                  "/nonexistent", "orchestrator", None)
+        assert decision == "deny" and "--off" in reason
+
+    @pytest.mark.parametrize("command", [
+        "gov pause 2>/dev/null --off",
+        'git commit -m "see $(echo x; gov pause --json --off) here"',
+        "git commit -m 'see `env gov pause --off` here'",
+        'echo "gov pause --off"|(bash)',
+        "find . -name x -exec sh -c 'gov pause --off' \\;",
+    ])
+    def test_the_form_is_refused(self, command):
+        assert lift_refusal(command) == LIFT_REFUSAL
+
+    @pytest.mark.parametrize("command", [
+        "gov pause; some-tool --off",
+        'git commit -m "gov pause --off is refused, see `date` and $(date)"',
+        'grep -rn "gov pause --off" . | head -5',
+        "python3 -m gov.cli.main pause --rollback DAEO-off",
+        "bash -c 'my-gov pause --off; gov.pause --offline'",
+        "",
+    ])
+    def test_what_is_not_the_form_is_left_alone(self, command):
+        assert lift_refusal(command) == ""
