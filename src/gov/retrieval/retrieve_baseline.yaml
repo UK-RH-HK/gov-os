@@ -1,0 +1,5 @@
+# Retrieval-regression baselines (DEC-425, CAP-38.b).
+# hit@5: mean percentage of dev-query classes where a must-cite path is in the first five cited paths.
+# forbidden_citations: maximum number of must-not-cite paths found in the first five cited paths across all queries.
+hit_at_5: 80
+forbidden_citations: 2
