@@ -36,12 +36,15 @@ def test_where_nothing_is_indexed_the_check_is_not_green_and_builds_nothing(box,
 # ---- green, red and "unmeasured" runs (DEC-425)
 
 
-@pytest.mark.needs("gitleaks", "sqlite_vec")
-def test_the_check_is_green_when_the_dev_tiers_meet_the_baselines(box, family_check, repo, ollama):
+@pytest.mark.local_only
+@pytest.mark.needs("gitleaks", "sqlite_vec", "ollama", "reranker")
+def test_the_check_is_green_when_the_dev_tiers_meet_the_baselines(box, family_check, repo):
     """DEC-425: hit@5 >= 80 and forbidden citations <= 2. A project with dev tiers that meet the baselines reports
-    green (exit 0)."""
-    box.build(repo, ollama.host)
-    env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(support.DEV_TIERS))
+    green (exit 0). Needs the real Ollama endpoint and the reranker to produce hit@5 above the pass line; the
+    stand-in vectors score only 73.2."""
+    box.build(repo, env=box.real_env())
+    env = box.real_env()
+    env["GOV_DEV_TIERS"] = str(support.DEV_TIERS)
     run = support.run_check(family_check, repo, env)
     assert run.returncode == 0, f"the baselines are met and the check is not green\n{run.describe()}"
 
