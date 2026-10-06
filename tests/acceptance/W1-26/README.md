@@ -1,0 +1,104 @@
+# W1-26 acceptance tests: `gov check` G0-G2
+
+Ticket `DAEO-fygv`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
+91 cases in 13 files.
+
+```
+python3 -m pytest tests/acceptance/W1-26 -q -p no:cacheprovider
+```
+
+## How the tests run
+
+- Through public interfaces only: the `gov check` command line (W1-07's console-script stand-in), its API-0002
+  envelope and exit code.
+- Every project is a temporary git repository (DEC-322): its own `.tickets/`, its own `openspec/` (a copy of
+  `template/openspec/`, as an adopted project holds it), its own check declarations and records. No test creates a
+  file in this repository. The code under test is this worktree's `src/`.
+- Before `gov check` runs, the project is committed.
+- Deterministic, no network. External tools (`openspec`, `gitleaks`) are never on PATH unless a test provides a
+  stand-in script.
+
+## Red before implementation
+
+Observed 2026-10-06: `1 skipped, 90 errors`.
+
+- The 90 errors stop at the `built` fixture: `gov check is not built yet: it returns NOT_IMPLEMENTED`.
+- The 1 skip, in `test_w1_26_command.py::test_gov_check_json_returns_the_api_0002_envelope`: uses the
+  `raw_project` fixture (no `built` gate) and skips because `NOT_IMPLEMENTED` is in the output.
+
+## KPI lines and covers ids
+
+| KPI line | Tests | Red reason |
+|---|---|---|
+| **S1** "Runs schema, id grammar, orphans, path map, adapter drift, openspec validate --strict, decision checker, readiness, ticket DAG acyclicity and field completeness, and the rule that no implementer allowed_paths covers tests/acceptance/**" | `test_w1_26_planted_defects.py` (13), `test_w1_26_openspec.py` (5), `test_w1_26_readiness.py` (4), `test_w1_26_decisions.py` (6) | `NOT_IMPLEMENTED` |
+| **S2** "Every policy key maps to a check or is declared informational; each family RED/YELLOW/GREEN" [CAP-39.d] | `test_w1_26_command.py` (4 family-status cases), `test_w1_26_policy.py` (3) | `NOT_IMPLEMENTED` |
+| **S3** "Fails a specification with a required open readiness row that has no linked gap ticket" [CAP-30.b] | `test_w1_26_gap_tickets.py` (6) | `NOT_IMPLEMENTED` |
+| **S4** "Fails a change to the capability taxonomy or readiness-dimensions.yaml that has no linked CIT-E record" [CAP-30.e] | `test_w1_26_taxonomy.py` (4) | `NOT_IMPLEMENTED` |
+| **S5** "Each check declares hard-block or warning; every result records provenance" [CAP-39.d] | `test_w1_26_provenance.py` (4), `test_w1_26_command.py::test_each_check_result_declares_severity` | `NOT_IMPLEMENTED` |
+| **S6** "Fails a skill file whose content changed without a version change and a linked decision" [CAP-24.c] | `test_w1_26_skill.py` (4) | `NOT_IMPLEMENTED` |
+| **S7** "The check registry names all 17 families; registered checks run; absent reported" [CAP-38.b] | `test_w1_26_registry.py` (13) | `NOT_IMPLEMENTED` |
+| **S8** "Fails a record that changes authority class without a decision" [CAP-01.c] | `test_w1_26_authority.py` (5) | `NOT_IMPLEMENTED` |
+| **F-1** "A planted defect of any listed family passes" | `test_w1_26_planted_defects.py` (13) | `NOT_IMPLEMENTED` |
+| **F-2** "The scope of a check is a hand-maintained list" [CAP-58.a] | `test_w1_26_derived.py` (6) | `NOT_IMPLEMENTED` |
+
+| Covers id | Tests |
+|---|---|
+| CAP-39.d (RED/YELLOW/GREEN; hard-block vs warning; provenance) | `test_w1_26_command.py`, `test_w1_26_provenance.py` |
+| CAP-30.b (readiness gaps generate linked tickets) | `test_w1_26_gap_tickets.py` |
+| CAP-30.e (capability taxonomy extended only through a governed change) | `test_w1_26_taxonomy.py` |
+| CAP-38.b (17 families named, registered checks run, absent reported) | `test_w1_26_registry.py` |
+| CAP-01.c (authority semantics preserved across stages) | `test_w1_26_authority.py` |
+| CAP-24.c (skill changes follow versioned promotion) | `test_w1_26_skill.py` |
+| CAP-58.a (checks derived, not enumerated) | `test_w1_26_derived.py` |
+
+## Files
+
+| File | Cases | KPI |
+|---|---|---|
+| `test_w1_26_command.py` | 10 | S1, S2, S5 |
+| `test_w1_26_planted_defects.py` | 13 | F-1, S1 |
+| `test_w1_26_registry.py` | 21 | S7 |
+| `test_w1_26_provenance.py` | 4 | S5 |
+| `test_w1_26_gap_tickets.py` | 6 | S3 |
+| `test_w1_26_taxonomy.py` | 4 | S4 |
+| `test_w1_26_skill.py` | 4 | S6 |
+| `test_w1_26_authority.py` | 5 | S8 |
+| `test_w1_26_policy.py` | 3 | S2 |
+| `test_w1_26_derived.py` | 6 | F-2 |
+| `test_w1_26_openspec.py` | 5 | S1 |
+| `test_w1_26_readiness.py` | 4 | S1 |
+| `test_w1_26_decisions.py` | 6 | S1 |
+
+## The interface the tests fix
+
+| What | Value | From |
+|---|---|---|
+| Module | `src/gov/cli/commands/check.py` (stub) delegating to `src/gov/check/` | DEC-317, `gov.cli.main` |
+| Class | read (CAP-27: `git status --porcelain` empty after the command) | DEC-317 |
+| Arguments | `--list` (existing, W1-07); `--json` (standard) | DEC-186 |
+| Passes | `ok: true`, exit 0, `result` includes per-family status and per-check results | API-0002 |
+| Hard-block RED | `ok: false`, exit 3, `error.details` includes the failing checks | API-0002 code 3 |
+| Warning YELLOW | `ok: true` or exit 0 (warnings alone do not block) | CAP-39.d |
+| Per-family status | RED, YELLOW, or GREEN | CAP-39.d |
+| Per-check provenance | `commit` (HEAD), `check_version`, `inputs_hash` | CAP-39.d |
+| Severity | `hard-block` or `warning` per check result | CAP-39.d |
+| 17 families | All named; absent families reported by name, never silently missing | CAP-38.b |
+
+## Earlier test revised
+
+`tests/acceptance/W1-07/`: `check` joins `BUILT_LATER` in `w1_07_support.py`. The case
+`test_running_checks_stays_not_implemented_with_declarations_present` leaves the list. Reason:
+"planned: command implemented" (DEC-190), the same change W1-13 made for `readiness` and W1-25 for
+`checkpoint`. W1-07's other cases keep `check` (envelope, read-only, configuration) and stay green
+before and after.
+
+## Not tested
+
+- Latency under load (DEC-372): a latency case re-run alone when failing under parallel load is not tested;
+  the tests run sequentially.
+- The cache or early-stop inside the decision checker (W1-11's responsibility).
+- What `gov.store.load` does in a partial clone (W1-10's, W1-11 batch 4's).
+- Whether `gap_ticket` exists as a ticket vs merely as a string: only the string is checked.
+- Running `openspec validate --strict` with the real `openspec` binary.
+- Whether gitleaks is installed (the secrets-indexing check, W1-15).
+- The seven families not yet registered: their checks are built by other tickets.

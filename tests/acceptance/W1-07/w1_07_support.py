@@ -58,6 +58,11 @@ NOT_BUILT = tuple(name for name in RESERVED_COMMANDS if name != "status" and nam
 BUILT_LATER = BUILT_LATER + ("closure",)
 NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 
+# Planned revision (DEC-190, "planned: command implemented"): W1-26 builds ``check``; its cases are in
+# ``tests/acceptance/W1-26/``.
+BUILT_LATER = BUILT_LATER + ("check",)
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+
 # Planned revision (DEC-190, "planned: command implemented"): a built command may require arguments, and a call
 # without them is a usage error (exit code 2, API-0002), not an envelope. ``gov closure`` requires a depth and
 # at least one id (DEC-391), so the cases that run every command give it both. The id names nothing.
