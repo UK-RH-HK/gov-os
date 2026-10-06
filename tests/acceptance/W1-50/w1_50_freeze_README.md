@@ -252,7 +252,9 @@ the guard's wider reading (`test_w1_50_freeze_near_spellings.py`, `test_w1_50_fr
 
 **No case for the read-back by the guard's own reader as a step of its own.** What can be seen of it from outside is
 that the flag `gov pause` leaves is one the guard reads as a freeze, which
-`test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask. A read-back that fails cannot be
+`test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask (revised after implementation for
+DEC-429: the test now also verifies that the mirror keeps the project frozen after the flag is emptied, and that
+removing both the flag and the mirror unfreezes). A read-back that fails cannot be
 brought about through the command line without a fault put into the command, so it is the engineer's unit test.
 
 ## The fourth batch: `--rollback` ends frozen (DEC-136)
@@ -721,6 +723,18 @@ Confidence: high.
 returns `[]` for ticket-lead. Scratch access is via `_is_in_scratch`. The lead's checkpoint is under
 `.gov-runtime/scratch/lead/CHECKPOINT.md` (inside scratch), not under `.gov-runtime/checkpoints/`. The
 three-way merge-back rule is checked in `_judge_commit`, not in path patterns.
+
+### Earlier case revised in batch 7
+
+A rewrite after implementation, reason **owner decision: freeze mirror (DEC-429)**. 1 function, 1 case.
+
+| Suite | Test | Cases |
+|---|---|---|
+| W1-50 | `test_w1_50_freeze_marker.py::test_the_flag_pause_writes_is_the_freeze_the_guard_reads` | 1 |
+
+The old test emptied the flag and asserted "not frozen". With DEC-429 the mirror keeps the project frozen after the
+flag is emptied. The revised test asserts "frozen" after emptying the flag (the mirror holds), then removes the
+mirror and asserts "not frozen" (both gone).
 
 ### Summary
 
