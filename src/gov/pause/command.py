@@ -187,12 +187,12 @@ def _caller_refusal(ancestry: list[dict]) -> tuple[str, str] | None:
     return None if whole else unreadable
 
 
-def lift(root: Path, ancestry: list[dict] | None = None, terminal: tuple[int, int] | None = None) -> dict:
-    """Lift the freeze as the owner in person (DEC-409): the ancestry, the terminal, the code, then the flag.
+def _lift_test(root: Path, ancestry: list[dict] | None = None, terminal: tuple[int, int] | None = None) -> dict:
+    """Test seam for ``lift``: accepts planted ``ancestry`` and ``terminal`` so the driver can exercise every rule.
 
-    ``ancestry`` and ``terminal`` are the seam of the tests: ``run`` passes neither, so the chain is read from
-    ``/proc`` and the terminal is ``(0, 1)``. Both descriptors are asked ``os.isatty`` here whatever is passed. The
-    code comes from the system's random source and goes to the terminal only; one line is read, once.
+    Production code never calls this directly — ``lift(root)`` does, with no extras, so ``/proc`` is read and the
+    terminal is ``(0, 1)``. Both descriptors are asked ``os.isatty`` here whatever is passed. The code comes from the
+    system's random source and goes to the terminal only; one line is read, once.
     """
     from gov.cli.errors import GovError
     from gov.guard.decide import FREEZE_FLAG
@@ -230,6 +230,13 @@ def lift(root: Path, ancestry: list[dict] | None = None, terminal: tuple[int, in
         raise GovError("PAUSE_NOT_LIFTED", f"{FREEZE_FLAG} cannot be removed, and the tree stays frozen: {error}",
                        {"path": FREEZE_FLAG})
     return {"paused": False}
+
+
+def lift(root: Path) -> dict:
+    """Lift the freeze as the owner in person (DEC-409): always reads ancestry from ``/proc`` and uses terminal
+    ``(0, 1)``. Does not accept planted ``ancestry`` or ``terminal`` parameters — an agent cannot bypass the checks.
+    """
+    return _lift_test(root)
 
 
 def _linked(flag: Path):
