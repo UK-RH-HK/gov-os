@@ -22,21 +22,31 @@ def run_canaries(root: Path) -> dict:
             if not isinstance(decl, dict):
                 raise ValueError("malformed canary declaration")
         except Exception:
-            results[index] = {"passed": False,
-                              "status": FACET_UNAVAILABLE,
-                              "misses": []}
+            results[index] = {"passed": False, "status": FACET_UNAVAILABLE,
+                              "misses": [], "reason": "unreadable canary declaration"}
+            continue
+        canaries = decl.get("canaries") or []
+        if not canaries:
+            results[index] = {"passed": False, "status": FACET_UNAVAILABLE,
+                              "misses": [], "reason": "empty canary declaration"}
             continue
         misses = []
-        for canary in decl.get("canaries", []):
+        for canary in canaries:
+            query = canary.get("query") if isinstance(canary, dict) else None
+            if query is None:
+                results[index] = {"passed": False, "status": FACET_UNAVAILABLE,
+                                  "misses": misses, "reason": "canary entry has no query"}
+                break
             try:
-                answer = searcher(root, canary["query"], refresh=False)
+                answer = searcher(root, query, refresh=False)
             except Exception:
-                misses.append(canary["query"])
+                misses.append(query)
                 continue
             if not answer.get("available") or not answer.get("hits"):
-                misses.append(canary["query"])
-        passed = not misses
-        results[index] = {"passed": passed,
-                          "status": AVAILABLE if passed else FACET_UNAVAILABLE,
-                          "misses": misses}
+                misses.append(query)
+        else:
+            passed = not misses
+            results[index] = {"passed": passed,
+                              "status": AVAILABLE if passed else FACET_UNAVAILABLE,
+                              "misses": misses}
     return results
