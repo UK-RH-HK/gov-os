@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -20,6 +21,13 @@ def run(root: Path, args, config: dict) -> dict:
 
     from gov.check.runner import run_checks
     result, has_hard_block_red = run_checks(root)
+
+    uncovered = [
+        name for name, fam in result.get("families", {}).items()
+        if fam.get("reason") == "no registered check"
+    ]
+    if uncovered:
+        print("families with no registered check: " + ", ".join(uncovered), file=sys.stderr)
 
     if has_hard_block_red:
         red_families = [

@@ -362,6 +362,17 @@ def run_checks(root: Path) -> tuple[dict, bool]:
                 families[fam]["status"] = YELLOW
     check_results.extend(policy_results)
 
+    for family in families:
+        norm = _normalise_family(family)
+        count = sum(
+            1 for cr in check_results
+            if _normalise_family(cr.get("family", "")) == norm
+        )
+        families[family]["check_count"] = count
+        if count == 0 and families[family]["status"] == GREEN:
+            families[family]["status"] = YELLOW
+            families[family]["reason"] = "no registered check"
+
     has_hard_block_red = any(
         fam.get("status") == RED
         for fam in families.values()
