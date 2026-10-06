@@ -1113,3 +1113,83 @@ Recorded at W1-19's close, from the ticket lead rounds' summaries. Measured on t
   commit that sets one `ACTIVE`. 181 real merges were replayed through the helper; none raised.
 - **W1-16's `test_this_repository_is_not_indexed_by_the_run`** was killed once under load in the lead's run and
   passed alone (166 passed).
+
+## W1-50 residuals (containment by commit trailers, merges, and the freeze, 2026-10-06)
+
+Both branches are merged (`6a978dbc`, `ad392210`). The regression after each was green on every suite.
+
+### Containment by trailers and merges
+
+- **Trailers are self-declared:** the whole check rests on them being truthful. In an orchestrator's own call an
+  ordinary commit with test designer trailers passes under `tests/acceptance/**` (DEC-255, DEC-319); only the
+  merge-commit route is closed (DEC-410 DP-27). With several `Role` values on one commit, one worker value is
+  enough.
+- **Findings that are records (DEC-254, DEC-401):** an owner commit that arrives in a move; the commits of
+  `gov pause --rollback`; a worker's commit on the lead's waiting call, attributed to the lead; the lead's
+  `Role: orchestrator` ticket commit arriving in a worker's call (DEC-319). No decision says whether these stay
+  records after this ticket closes.
+- **Real merges the rules flag (records):** `5922e24e` (W1-20's merge-back, two W1-07 test files changed on both
+  sides), `135ed94e` (the first freeze branch, never merged) and `c90de3b0` (the rebuilt freeze branch's aligning
+  merge). Aligning a file does not clear the both-sides rule: only one side back at the merge base's content, or a
+  merge-back first (flagged once), gives a silent merge.
+- **Noise:** git's clean combination of two orchestrator edits of one ticket file is flagged.
+- **An uncommitted edit of an acceptance test is not restored** when a merge commit of the same orchestrator call
+  is flagged for that path; the finding names the path.
+- **A test both sides changed in the same way** is the merge's own with one merge base (DEC-417); with several
+  bases the whole merge fails closed instead.
+- **Whole-move findings that name no path (fail closed, nothing attributed):** a non-UTF-8 file name or trailer
+  value, a signed commit with `log.showSignature`, a git call over its 10 s limit, a shallow clone, a merge commit
+  over 24 parents, a move needing more than 3000 git processes for its merges (DEC-417; recorded as "not a forward
+  move" without the reason). A merge in a worker's call names only the merge commits' own ticket files and tests.
+- **`read_merge` gives no bound for a whole move;** a caller that reads many merges bounds itself. It takes only a
+  full lower-case commit id.
+- **Git settings not pinned in the check's calls:** the `GIT_CONFIG_*` family (not writable by an agent's Bash
+  call into the hook's environment), `core.commentString`, `trailer.<name>.key` (can add a `Role` or `Task`
+  reading, never remove one); `GIT_TRACE` and a `tree:0` partial clone's lazy fetch reach the helper's git (found
+  by W1-11's review). W1-03's git calls still obey local configuration. git's grafts hint is prepended to git
+  error texts.
+- **Two committed ticket files with the same `wbs_id`:** the first in file-name order wins; not a finding.
+- **A late commit on a closed ticket passes** when reopen and re-close commits follow it in the same move; a close
+  made only by a merge commit flags legitimate work from before the close.
+- **The names `tests/acceptance` and `.tickets` themselves** (a link or gitlink at exactly that name) are not
+  matched.
+- **DEC-182's message-body fallback** for commits before 2026-10-03 is not used by this check.
+- **Unseen characters inside the word** (`ow ner`, a zero-width space) are read as `Role: owner`: stricter than
+  the decision's words.
+- **KPI wording:** success line 2 and failure line 1 of the ticket are not amended for DEC-410 DP-24 and DP-26: a
+  merge whose commits each pass is a finding when a test or ticket file was changed on both sides.
+- **Stale docstrings** in several W1-50 test files still call decided packages open; the README carries the
+  update. Stale text in the READMEs of W1-02, W1-28 and W1-46.
+- **`.claude/settings.json` holds no `timeout` key for the hooks;** the 30 s is the test harness's figure.
+- **A launched test designer cannot `rm`,** and the orchestrator cannot delete under `tests/acceptance/`: a
+  leftover there needs the owner.
+- **Here-documents that write nothing** were run by several workers and let through by the guard.
+
+### The freeze
+
+- **With the owner (2026-10-06), a fail-open:** an opaque command (`python3 -c`, `perl -e`, a heredoc-fed script)
+  can remove, empty or forge the freeze flag, and remove the snapshots the flag comparison needs, with no finding.
+  The guard reads no write target out of such a command, and the comparison answers nothing without a snapshot.
+- **The lift-form rule (DEC-409 rule 3) is passed by** a line continuation, ANSI-C quoting, `env -S`, a
+  heredoc-fed script, and a script written with the Write tool. Obfuscated forms are a residual by the decision.
+- **A real freeze stops only what the guard reads as a write.**
+- **A forged snapshot can conjure a freeze** (theoretical).
+- **Things at the flag's path:** a directory there blocks pause, `--cancel-agents` and `--rollback` although the
+  tree reads frozen (the owner removes it by hand); a regular file at `.gov-runtime` reads as no freeze and makes
+  a pause impossible; the link check on `.gov-runtime` runs once, before the write.
+- **A killed pause leaves a `freeze.<random>` file** that nothing removes and that `gov launch` then denies by
+  name. The flag is not synced to disk before the rename.
+- **`gov pause --root <missing path>`** creates the path and reports "paused".
+- **A refusal text says "stays frozen"** without asking the guard's reader.
+- **After a rollback that reverts a commit touching the flag's path** the tree is dirty there, and a later
+  `--rollback` refuses until the owner sorts it out.
+- **A pause from inside a sandboxed session** whose flag path is a mount fails (inferred); the orchestrator pauses
+  from outside a sandbox. The sandbox's clean-up was observed with one session, not with two overlapping.
+- **A long `TMPDIR` makes a launched session's sandbox fail to start** ("bridge sockets"), and the session still
+  exits 0.
+- **The record is one unbounded line per allowed call;** `_append_finding` and containment's two writers follow
+  links and block on a pipe; the hook is slow on huge commands; an install answered "ask" is still recorded.
+- **A session's guard is its own tree's code.**
+- **Unpinned choices, fine as built (DEC-412):** the error codes `PAUSE_RUNTIME_LINKED`, `PAUSE_NOT_SET`,
+  `PAUSE_NOT_LIFTED`; flag mode 0600.
+- **The `local_only` mark is not registered for the W1-50 folder** (2 warnings in the suite).
