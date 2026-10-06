@@ -16,7 +16,9 @@ fact.
   the owner's own later commit that set the decision ``ACTIVE`` again.
 
 The demotion and the commit that keeps ``ACTIVE`` are never side by side here: a decision that one side sets
-``ACTIVE`` and the other demotes, neither descending from the other, is the open package DP-6.
+``ACTIVE`` and the other demotes, neither descending from the other, was package DP-6 and is decided (DEC-398); its
+cases are in ``test_w1_11_approval_merge_base.py``. Under DEC-398 every case here stands as written: in each, the
+merge base of the two parents holds the decision ``ACTIVE`` and the demoting parent changed its status since.
 """
 
 from __future__ import annotations

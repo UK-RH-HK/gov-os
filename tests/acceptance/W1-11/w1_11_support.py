@@ -247,9 +247,10 @@ class Project:
             git(self.root, "init", "-q", "-b", "main")
 
     def write(self, rel, text):
+        """Write ``text`` as UTF-8; batch 5: bytes are written as they are."""
         path = self.root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(text.encode("utf-8"))
+        path.write_bytes(text if isinstance(text, bytes) else text.encode("utf-8"))
         return path
 
     def commit(self, message="records", who=OWNER, trailers=None, date=None):
@@ -288,19 +289,80 @@ class Project:
 
     # ---- batch 4
 
-    def merge_with(self, branch, who=AGENT, strategy=None, take=None, files=None):
+    def merge_with(self, branch, who=AGENT, strategy=None, take=None, files=None, drop=(), unrelated=False,
+                   under=None):
         """Merge ``branch`` into the current branch with a merge commit by ``who`` that decides what a file holds.
         ``strategy`` is git's merge strategy (``ours`` keeps the current branch's whole tree); ``take`` maps a path
-        to the revision whose file the merge commit holds; ``files`` maps a path to a text written by hand."""
-        git(self.root, "merge", "-q", "--no-ff", "--no-commit", *(["-s", strategy] if strategy else []), branch,
-            who=who, check=False)
+        to the revision whose file the merge commit holds; ``files`` maps a path to a text written by hand.
+        Batch 5: ``drop`` lists paths the merge commit does not hold; ``unrelated`` allows a branch that shares no
+        commit with the current one; ``under`` puts the branch's whole tree below that folder and keeps the
+        current branch's own files as they are (a subtree import)."""
+        if under:
+            strategy, unrelated = "ours", True
+        git(self.root, "merge", "-q", "--no-ff", "--no-commit", *(["-s", strategy] if strategy else []),
+            *(["--allow-unrelated-histories"] if unrelated else []), branch, who=who, check=False)
+        if under:
+            git(self.root, "read-tree", f"--prefix={under.rstrip('/')}/", "-u", branch)
         for rel, revision in (take or {}).items():
             git(self.root, "checkout", revision, "--", rel)
         for rel, text in (files or {}).items():
             self.write(rel, text)
+        for rel in drop:
+            git(self.root, "rm", "-q", "-f", "--ignore-unmatch", "--", rel)
+            (self.root / rel).unlink(missing_ok=True)
         commit = self.commit(f"Merge branch '{branch}'", who=who)
         assert len(parents_of(self.root, commit)) == 2, f"the merge of {branch} made no merge commit"
         return commit
+
+    # ---- batch 5
+
+    def remove(self, rel, who=OWNER, message="remove a file"):
+        """Remove the file ``rel`` and commit that."""
+        git(self.root, "rm", "-q", "--", rel)
+        return self.commit(message, who=who)
+
+    def move(self, old, new, who=AGENT, message="move a file"):
+        """Move the file ``old`` to ``new``, no byte of it changed, and commit that."""
+        (self.root / new).parent.mkdir(parents=True, exist_ok=True)
+        git(self.root, "mv", old, new)
+        return self.commit(message, who=who)
+
+    def orphan(self, branch, files, who=AGENT):
+        """Start ``branch`` as a history of its own, sharing no commit with any other, holding ``files`` alone."""
+        git(self.root, "checkout", "-q", "--orphan", branch)
+        git(self.root, "rm", "-q", "-r", "-f", "--ignore-unmatch", ".")
+        return self.put(files, who=who, message="the first commit of another history")
+
+    def bare_commits(self, parent, count, who=AGENT):
+        """``count`` distinct commits, each with the tree and the one parent ``parent``, on no branch."""
+        tree = git(self.root, "rev-parse", f"{parent}^{{tree}}").strip()
+        text = "a side commit {number}\n\n" + "\n".join(who["trailers"]) + "\n"
+        return [git(self.root, "commit-tree", tree, "-p", parent, "-m", text.format(number=number), who=who,
+                    date=FIRST_DATE.format(minute=59)).strip() for number in range(count)]
+
+    def copy_of_commit(self, commit, who):
+        """A commit with the tree, the parents and the dates of ``commit`` and the trailers of ``who``, on no
+        branch: what a replace ref can put in the place of ``commit``."""
+        tree = git(self.root, "rev-parse", f"{commit}^{{tree}}").strip()
+        date = git(self.root, "show", "-s", "--format=%cI", commit).strip()
+        arguments = [argument for parent in parents_of(self.root, commit) for argument in ("-p", parent)]
+        text = "records\n\n" + "\n".join(who["trailers"]) + "\n"
+        return git(self.root, "commit-tree", tree, *arguments, "-m", text, who=who, date=date).strip()
+
+    def criss_cross(self, other="right", who=AGENT):
+        """Make the current branch and a new branch ``other`` cross: each gets a commit of its own, then each
+        merges the other's commit. The two tips then have two merge bases. Leaves the current branch checked
+        out; no decision file is touched."""
+        here = git(self.root, "rev-parse", "--abbrev-ref", "HEAD").strip()
+        self.switch(other, new=True)
+        theirs = self.put({f"notes/{other}.md": "# Notes of the other line\n\nNo frontmatter here.\n"}, who=who)
+        self.switch(here)
+        ours = self.put({f"notes/{here}.md": "# Notes of this line\n\nNo frontmatter here.\n"}, who=who)
+        self.merge_with(theirs, who=who)
+        self.switch(other)
+        self.merge_with(ours, who=who)
+        self.switch(here)
+        assert len(merge_bases(self.root, here, other)) == 2, "the fixture's two lines do not cross"
 
     def commit_by_hand(self, parents, message="a commit made by hand", who=AGENT):
         """Commit everything as a commit whose parents are exactly ``parents``, in that order, and move the current
@@ -319,6 +381,11 @@ class Project:
 
 def parents_of(root, commit):
     return git(root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+
+
+def merge_bases(root, one, other):
+    """The merge bases of two commits: none for unrelated histories, several for lines that cross (batch 5)."""
+    return git(root, "merge-base", "--all", one, other, check=False).split()
 
 
 def partial_clone(source, destination):
@@ -385,6 +452,12 @@ def assert_fails_naming(found, path, codes):
     hits = [finding for finding in found if finding["code"] in codes and path in finding["paths"]]
     assert hits, (f"no {' or '.join(sorted(codes))} finding names the file {path}; the findings were:\n"
                   f"{show(found)}")
+
+
+def assert_some_finding_names(found, path):
+    """A finding names the file ``path``, whatever its code (batch 5: the code is the engineer's)."""
+    assert [finding for finding in found if path in finding["paths"]], (
+        f"no finding names the file {path}; the findings were:\n{show(found)}")
 
 
 def clone(source, destination):
