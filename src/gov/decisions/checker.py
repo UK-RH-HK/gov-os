@@ -45,6 +45,7 @@ import os
 import posixpath
 import re
 import subprocess
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -57,15 +58,14 @@ GATE_TYPE = "decision-package"
 GATE_DEAD = ("DECLINED", "REVOKED", "STALE")  # DEC-328
 
 _ROLE = re.compile(r"^Role:[ \t]*(.*)$", re.IGNORECASE | re.MULTILINE)
-_ROLE_FORMAT = "--format=%cs%n%(trailers:key=Role,unfold)%x00%B"  # no date and no trailer holds a NUL
-_GIT = ("git", "--no-replace-objects", "-c", "protocol.allow=never")  # with GIT_NO_LAZY_FETCH: nothing is fetched
+_GIT = ("git", "--no-replace-objects", "-c", "core.commitGraph=false", "-c", "protocol.allow=never")
 _HEAD = re.compile(r"---(\s.*)?")  # a first line that opens frontmatter for a reader, as `--- # c` does
 
 
 def _environment() -> dict:
     """The caller's environment without its git variables, which may name another repository, and no fetching."""
     return {**{key: value for key, value in os.environ.items() if not key.startswith("GIT_")},
-            "GIT_NO_LAZY_FETCH": "1"}
+            "GIT_NO_LAZY_FETCH": "1", "GIT_GRAFT_FILE": os.devnull, "GIT_SHALLOW_FILE": os.devnull}
 
 
 def _git(root: Path, *args: str) -> bytes:
@@ -267,7 +267,7 @@ def _approved(root: Path, objects: _Objects, path: str, record_id: str) -> bool:
             continue
         todo.pop()
         passes[at] = (bool(before) and all(passes[older] for older in before)
-                      or change and _once(objects, ("fact", at[0]), lambda: _approves(root, at[0])))
+                      or change and _once(objects, ("fact", at[0]), lambda: _approves(objects, at[0])))
     return passes[start]
 
 
@@ -339,11 +339,22 @@ def _merged(root: Path, objects: _Objects, commit: str, parents: list, path: str
     return [(parent, old) for parent, (old, status) in held.items() if status == "ACTIVE"], True
 
 
-def _approves(root: Path, commit: str) -> bool:
+def _approves(objects: _Objects, commit: str) -> bool:
     """Whether ``commit`` carries the owner's approval fact: `Role: owner`, and no other role."""
-    shown = _git(root, "show", "-s", _ROLE_FORMAT, commit).decode("utf-8", "replace")
-    head, _, message = shown.partition("\0")
-    date, _, final_block = head.partition("\n")
+    raw = objects.read(commit)
+    if raw is None:
+        raise objects.unreadable(commit)
+    header, _, message = raw[1].decode("utf-8", "replace").partition("\n\n")
+    date = ""
+    for line in header.split("\n"):
+        if line.startswith("committer "):
+            parts = line.rsplit(" ", 2)
+            if len(parts) >= 3:
+                ts, tz_str = int(parts[-2]), parts[-1]
+                sign = 1 if tz_str.startswith("+") else -1
+                tz = timezone(timedelta(hours=sign * int(tz_str[1:3]), minutes=sign * int(tz_str[3:5])))
+                date = datetime.fromtimestamp(ts, tz).strftime("%Y-%m-%d")
+    final_block = message.rsplit("\n\n", 1)[-1] if "\n\n" in message else message
     roles = {role.strip() for role in _ROLE.findall(message if date < TRAILER_RULE_DATE else final_block)}
     return roles == {"owner"}
 
