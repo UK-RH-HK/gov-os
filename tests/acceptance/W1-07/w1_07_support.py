@@ -426,3 +426,18 @@ def find_records(value, key="id"):
         for item in value:
             found.extend(find_records(item, key))
     return found
+
+
+# --------------------------------------------------------------------------
+# DEC-429: freeze mirror outside the repository
+# --------------------------------------------------------------------------
+
+_FREEZE_MIRROR_RE = re.compile(
+    r"^\.local(/state(/gov-os(/[^/]+(/freeze)?)?)?)?$"
+)
+
+
+def is_freeze_mirror_entry(diff_entry):
+    """Whether a ``snapshot_difference`` entry is part of the DEC-429 freeze mirror tree."""
+    path = diff_entry.split(": ", 1)[1]
+    return bool(_FREEZE_MIRROR_RE.match(path))
