@@ -744,3 +744,41 @@ mirror and asserts "not frozen" (both gone).
 | KPI 10 | `test_w1_50_freeze_mirror_restore.py` | 12 | 3 | 9 |
 | KPI 11 | `test_w1_50_ticket_lead_role.py` | 19 | 4 | 15 |
 | **Total** | | **44** | **16** | **28** |
+
+---
+
+## Session-wide tripwire for the real mirror folder (DEC-429)
+
+`tests/acceptance/conftest.py` — a session-scoped autouse fixture `_real_mirror_folder_unchanged`. At session start
+it records the listing and modification time of the real `~/.local/state/gov-os/` directory (located via the password
+database, not `$HOME`). At session end it checks again. If any entry was added, removed, or the mtime changed, the
+session fails with a message naming the change. The fixture never creates, removes or writes the folder.
+
+### Why
+
+The freeze mirror (DEC-429) lives under `~/.local/state/gov-os/`. Tests that run `gov pause` or the guard as
+subprocesses pass `HOME=<sandbox.home>`, so the subprocesses write to a throwaway directory. The tripwire catches a
+regression where a test or code change breaks this isolation.
+
+### Tripwire self-test
+
+`test_w1_50_mirror_tripwire.py` — 4 cases that exercise the snapshot/detection logic on a stand-in folder in
+`tmp_path`, never the real one.
+
+### Audit of existing acceptance suites (DEC-429)
+
+Every acceptance test that runs `gov pause`, the guard's freeze reading, or the containment check does so as a
+subprocess with `HOME` set to a throwaway sandbox directory. No acceptance test calls `freeze_state()`,
+`_mirror_path()`, `_mirror_frozen()`, or `_write_mirror()` in-process.
+
+| Suite | How HOME is set | In-process mirror calls |
+|---|---|---|
+| W1-02 | `w1_02_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-04 | `w1_04_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-07 | `w1_07_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-28 | `w1_28_support.pause()`: `"HOME": str(sandbox.home)` | None |
+| W1-46 | `w1_46_support.gov_environment`: `"HOME": str(home or sandbox.home)` | None (one comment references `freeze_state` in a docstring, not a call) |
+| W1-47 | via `w1_03_support._base_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-50 | via `w1_02_support.hook_environment` (guard) and `w1_28_support.pause()` (pause); lift via `w1_50_freeze_lift.py`: `"HOME": str(sandbox.home)` | None (test helpers like `_put_mirror` and `_find_mirror_files` write to `sandbox.home`, not the real home) |
+
+No case in another ticket's suite was revised for this batch.
