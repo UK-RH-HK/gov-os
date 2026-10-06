@@ -1,0 +1,5 @@
+id: audit-reproducibility
+family: audit reproducibility
+tier: G1
+severity: hard-block
+command: python3 -m gov.check.audit_reproducibility
