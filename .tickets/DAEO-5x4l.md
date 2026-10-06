@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/retrieval/retrieve*
 - src/gov/retrieval/bundle*
+- src/gov/retrieve/**
 - tests/unit/retrieve/**
 - template/governance/kernel/checks/retrieval-regression*
 kpis:
