@@ -260,11 +260,15 @@ def _check_probe(root: Path, ticket: str) -> None:
 
         reviewer = pf.get("reviewer_session", "")
         implementer = pf.get("implementer_session", "")
+        if not reviewer or not implementer:
+            raise GovError("PROBE_INVALID",
+                            "probe record missing session identifiers",
+                            {"ticket": ticket})
         if reviewer == implementer:
             raise GovError("PROBE_INVALID",
                             "the probe reviewer is the implementer",
                             {"ticket": ticket})
-        if not pf.get("reviewer_wrote_nothing", True):
+        if pf.get("reviewer_wrote_nothing") is not True:
             raise GovError("PROBE_INVALID",
                             "the probe reviewer wrote to the repository",
                             {"ticket": ticket})
