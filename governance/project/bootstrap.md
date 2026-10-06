@@ -1263,3 +1263,29 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
   owner records were read in the archived `docs/source/` (DEC-426, rule C).
 - **"A lesson restates policy as authority" (failure line 2)** is checked by the record's fields, not by reading
   its prose.
+
+## W1-22 residuals (evidence validator and zero-result canaries, 2026-10-06)
+
+- **Canaries exist for the lexical and the semantic index only.** DEC-037 also names the code index
+  (codebase-memory); it is queried by symbol, not by text, and needs another query type in the runner. Left to
+  W1-27 (`gov doctor`) or a later ticket.
+- **Nothing runs the canaries after a reindex yet.** `run_canaries(root)` stands alone; the reindex of W1-17 and
+  W1-19 does not call it. `gov doctor` (W1-27) is its first caller.
+- **The canary runner reads its declarations from a module-level path,** not from a parameter; a test of other
+  declarations patches it.
+- **The canary result has a `reason` field** where a declaration is empty, null or malformed (reported as
+  `FACET_UNAVAILABLE`, never as available). W1-27 is the first consumer.
+- **The validator checks a citation's `sha256` against the cited span only** (DEC-435).
+- **Two engineer commits (`7fbfae18`, `f6d88832`) and the lead's merge of the integration branch (`613b8f9e`)
+  carry no `Role:` trailer.** They change no acceptance test; the containment check judged them against the
+  caller. Records.
+- **Review rounds:** two; the fail-open found after them (an empty canary declaration counted as available) was
+  fixed test-first without a third round (DEC-413).
+- **Learning metrics:** 0 KPI disputes; 0 acceptance tests rewritten after implementation began; 9 cases added
+  after it (4 fail-open cases, 5 unit cases); source 349 lines against an estimate of 120.
+- **Interface:** `gov.retrieval.validate.validate(root, bundle)` returns `valid` and `errors`;
+  `gov.retrieval.canary.run_canaries(root)` returns, per index, `passed`, `status`, `misses` and, where it
+  applies, `reason`.
+- **Regression at `85e9b580`:** every suite green; W1-46 showed 23 errors in its live-session cases beside the
+  other suites and 493 passed alone (DEC-372).
+
