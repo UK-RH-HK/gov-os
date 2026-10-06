@@ -1,0 +1,5 @@
+id: "core-commands"
+family: "command-contract consistency"
+tier: "G2"
+severity: "warning"
+command: "python3 -m gov.check.commands"
