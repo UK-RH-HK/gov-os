@@ -668,11 +668,12 @@ denies the mirror path. Projects frozen before this change (flag only, no mirror
 | | `test_lift_removes_both_flag_and_mirror` | 1 | red: `gov pause` does not write a mirror (DEC-429, KPI 1), so the precondition fails. |
 | | `test_after_lift_guard_reads_not_frozen` | 1 | green: lift succeeds and removes the flag; no mirror was written to persist. |
 | | `test_sandbox_denies_mirror_path_for_engineer` | 1 | green: the mirror path is outside the project; the guard already denies writes outside the project root. |
+| | `test_lift_refuses_when_mirror_cannot_be_removed` | 1 | red: the current lift has no mirror support and succeeds (DP-M3 option b, DEC-437). |
 | | `test_old_project_flag_only_stays_frozen` | 1 | green: existing `freeze_state()` reads the flag. |
 | | `test_old_project_flag_removed_during_call_is_still_found_via_snapshot` | 1 | green: `_compare_flag` via snapshot. |
 | | `test_old_project_lift_works_without_mirror` | 1 | green: lift removes the flag; no mirror to fail on. |
 
-**11 tests** (2 red, 9 green).
+**12 tests** (3 red, 9 green).
 
 ### KPI 11 — the ticket lead's own role (DEC-434, DEC-435)
 
@@ -706,9 +707,9 @@ derivation as long as it satisfies the two keying tests.
 (DEC-402). If the flag is empty or unmarked, the mirror may be absent or hold the empty/unmarked content; tests
 do not mandate which. Confidence: medium.
 
-**DP-M3 — lift fails to remove mirror.** If the mirror cannot be removed (permission denied, absent directory),
-the lift should still remove the in-repo flag and report the mirror failure. The project is no longer frozen by
-the flag; a stale mirror is a finding for containment to handle. Confidence: medium.
+**DP-M3 — lift fails to remove mirror.** Decided: **(b), the lift refuses and nothing changes** (DEC-437). The
+flag stays, the project stays frozen, and the message names the mirror's path. The designer proposed option (a):
+remove the flag anyway; the decision chose the stricter option.
 
 **DP-M4 — XDG_STATE_HOME.** The mirror lives under `$XDG_STATE_HOME/gov-os/` when set, else `~/.local/state/gov-os/`.
 Tests redirect via the sandbox's `HOME`. Confidence: medium.
@@ -716,15 +717,16 @@ Tests redirect via the sandbox's `HOME`. Confidence: medium.
 **DP-L1 — role name.** `ticket-lead`, hyphenated, matching the ticket's `role: ticket-lead` field and DEC-236.
 Confidence: high.
 
-**DP-L2 — `_get_allowed_paths` for ticket-lead.** The function returns `[]` for ticket-lead (no path patterns);
-scratch access is via `_is_in_scratch`, and checkpoint access needs a new pattern or a new code path. The
-three-way merge-back rule is checked in `_judge_commit`, not in path patterns. Confidence: medium.
+**DP-L2 — `_get_allowed_paths` for ticket-lead.** Decided: **(a), no allowed paths** (DEC-437). The function
+returns `[]` for ticket-lead. Scratch access is via `_is_in_scratch`. The lead's checkpoint is under
+`.gov-runtime/scratch/lead/CHECKPOINT.md` (inside scratch), not under `.gov-runtime/checkpoints/`. The
+three-way merge-back rule is checked in `_judge_commit`, not in path patterns.
 
 ### Summary
 
 | Batch | File | Tests | Red | Green |
 |---|---|---|---|---|
 | KPI 9 | `test_w1_50_freeze_mirror.py` | 13 | 9 | 4 |
-| KPI 10 | `test_w1_50_freeze_mirror_restore.py` | 11 | 2 | 9 |
+| KPI 10 | `test_w1_50_freeze_mirror_restore.py` | 12 | 3 | 9 |
 | KPI 11 | `test_w1_50_ticket_lead_role.py` | 19 | 4 | 15 |
-| **Total** | | **43** | **15** | **28** |
+| **Total** | | **44** | **16** | **28** |

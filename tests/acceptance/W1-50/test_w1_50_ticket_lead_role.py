@@ -35,7 +35,7 @@ TICKET_LEAD = "ticket-lead"
 TICKET = guard_support.TICKET_ID
 
 SCRATCH_REL = ".gov-runtime/scratch/notes.md"
-CHECKPOINT_REL = ".gov-runtime/checkpoints/checkpoint.json"
+CHECKPOINT_REL = ".gov-runtime/scratch/lead/CHECKPOINT.md"
 SRC_REL = "src/gov/guard/decide.py"
 TESTS_REL = "tests/acceptance/W1-50/test_example.py"
 TICKET_REL = ".tickets/DAEO-xnbx.md"
@@ -130,10 +130,10 @@ def test_ticket_lead_may_write_scratch_via_bash(project, sandbox):
 # ---------------------------------------------------------------------------
 
 def test_ticket_lead_may_write_checkpoint(project, sandbox):
-    """The lead may write its checkpoint file (DEC-434).
+    """The lead's checkpoint is under scratch (DP-L2, DEC-434): no
+    ``_get_allowed_paths`` patterns, the ``_is_in_scratch`` rule covers it.
 
-    Red because ticket-lead is not yet in KNOWN_ROLES, and no
-    ``_get_allowed_paths`` case returns checkpoint patterns for it.
+    Red because ticket-lead is not yet in KNOWN_ROLES.
     """
     result = _guard(project, sandbox, "Write", CHECKPOINT_REL)
     _assert_allowed(result, "ticket-lead writing checkpoint")

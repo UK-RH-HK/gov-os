@@ -4,7 +4,7 @@
 restored.  Lifting removes both.  Sandbox denies the mirror path.  Projects
 frozen before this change (flag only, no mirror) stay frozen by the flag alone."
 
-11 tests (3 parametrized × 3 = 3 items + 8 = 11 collected).  Before
+12 tests (3 parametrized × 3 = 3 items + 9 = 12 collected).  Before
 implementation every test that reads the mirror in containment or lift is
 red: mirror support does not exist.
 """
@@ -284,6 +284,48 @@ def test_old_project_flag_removed_during_call_is_still_found_via_snapshot(projec
     result = _call(project, sandbox, lambda p: fs.flag(p).unlink())
     _assert_found_and_restored(project, sandbox, result,
                                "flag-only project, flag removed during call")
+
+
+def test_lift_refuses_when_mirror_cannot_be_removed(do_pause_project, do_pause_sandbox, do_pause):
+    """DP-M3, option (b): when the mirror cannot be removed the lift refuses
+    and nothing changes — flag stays, project stays frozen (DEC-437).
+
+    Red before implementation: the current lift has no mirror support and
+    will succeed (removing the flag and ignoring the mirror).
+    """
+    result = do_pause()
+    assert result.returncode == 0, f"gov pause failed: {result.stderr}"
+    mirror = _expected_mirror(do_pause_project, do_pause_sandbox.home)
+    assert mirror.is_file(), "no mirror written by gov pause"
+    assert fs.flag(do_pause_project).is_file(), "no flag written by gov pause"
+
+    parent = mirror.parent
+    original_mode = stat.S_IMODE(os.lstat(parent).st_mode)
+    try:
+        parent.chmod(0o500)
+
+        lifts = fs.lift_support.drive(do_pause_project, do_pause_sandbox)
+        run = lifts[0]
+
+        assert run.status != fs.lift_support.LIFTED, (
+            f"the lift succeeded when the mirror cannot be removed — "
+            f"DP-M3(b) says the lift must refuse: {run.describe()}"
+        )
+        assert fs.flag(do_pause_project).is_file(), (
+            "the in-repo flag was removed even though the mirror could not be"
+        )
+        guard_result = fs.guard_write(do_pause_project, do_pause_sandbox)
+        fs.assert_frozen(guard_result, "after refused lift the guard must still deny")
+
+        msg = run.message.lower() if run.message else ""
+        shown = run.shown.lower() if run.shown else ""
+        mirror_mentioned = "mirror" in msg or str(mirror).lower() in msg or "mirror" in shown
+        assert mirror_mentioned, (
+            f"the refusal does not mention 'mirror' or the mirror path: "
+            f"message={run.message!r} shown={run.shown[:200]!r}"
+        )
+    finally:
+        parent.chmod(original_mode)
 
 
 def test_old_project_lift_works_without_mirror(do_pause_project, do_pause_sandbox, do_pause):
