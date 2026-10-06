@@ -4587,3 +4587,32 @@ again; no model or settings change was made. A one-line headless probe answered 
 | Version | Date | Change |
 |---|---|---|
 | 0.102 | 2026-10-06 | Owner: DEC-420 (an authentication or access error stops the launching of leads, `AUTH_REQUIRED`), DEC-421 (W1-50: the both-sides rule extended to ticket files), DEC-422 to DEC-425 (W1-21 DP-2, DP-4, DP-5, DP-7), DEC-426 (`S0a-G-06`: where its text may be looked for). |
+
+## 103. A delegated decision on W1-24's first round and its package DP-1 (register v0.103, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06 under DEC-220, DEC-412 and DEC-416. The W1-24 (`DAEO-wk2v`) ticket lead
+returned DONE after one hour. Its test designer was a launched worker (`1f6b9e30`, 34 cases). Its engineer was an
+in-session subagent started with the Agent tool, not a launched worker (DEC-371); the lead then wrote the review
+fixes into `src/gov/context/` itself and committed them without a role; it decided the designer's two packages
+itself; and its verification stopped at the first failure. The owner was told on 2026-10-06.
+
+### DEC-427 — W1-24: the first round is not accepted and the branch is rebuilt from the test design; the public interface
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220 and DEC-416, 2026-10-06) · **Basis:** DEC-371 (workers are started by the launcher), MR-3, DEC-412 (an unpushed ticket branch may be rewritten); W1-24 package DP-1 option (a), confidence medium-high · **Under:** DEC-317, CAP-15
+- **Decision:**
+  - The first round's implementation (`f03c0283`, `5375ba84`) is not accepted. `w1/W1-24` is set back to the test
+    designer's commit `1f6b9e30`; the discarded commits are kept on `w1/W1-24-run1` until the ticket closes, and
+    no worker is given them. A second test designer deepens the design, a launched engineer builds, every suite
+    is run to its end, and a read-only reviewer follows (DEC-413).
+  - DP-1: the public interface is the one the test design fixes: `gov.context.context(root, ticket, *, brief,
+    budget)`, returning the packet as a plain map with the keys `authority`, `mandatory`, `supplementary`,
+    `dropped`, `hash`, `tokens` and `budget`; a mandatory input has `id`, `sha256`, `authority`, `lifecycle`,
+    `constraint` and `reason`.
+  - DP-2 (the exit code of a `BLOCKED` state) stays open until the second designer names the source that fixes
+    the envelope's exit codes.
+  - Every lead brief now opens with four rules: writing workers are started by `gov launch` only; a lead writes
+    no file under `src/`, `template/`, `tests/` or `docs/`; a lead decides no package; a lead never ends its
+    turn while its worker or its test run is running, and never verifies with a stop at the first failure.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.103 | 2026-10-06 | Delegated under DEC-220, DEC-412 and DEC-416: DEC-427 (W1-24's first round is not accepted, since its engineer was not a launched worker and the lead wrote source; the branch is rebuilt from the test design; DP-1: the public interface). |
