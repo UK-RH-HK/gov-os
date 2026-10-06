@@ -255,8 +255,8 @@ def _check_index_freshness(root: Path) -> dict:
     from gov.retrieval.lexical import freshness
     try:
         state = freshness(root)
-    except Exception:
-        return {"status": "unmeasured", "reason": "cannot check index freshness"}
+    except Exception as exc:
+        return {"status": "fail", "reason": str(exc)}
     s = state.get("status", "unknown")
     if s in ("missing", "empty"):
         return {"status": "unmeasured", "index_status": s, "stale": []}
@@ -265,11 +265,11 @@ def _check_index_freshness(root: Path) -> dict:
 
 
 def _check_canaries(root: Path) -> dict:
-    from gov.retrieval.canary import run_canaries
     try:
+        from gov.retrieval.canary import run_canaries
         results = run_canaries(root)
-    except Exception:
-        return {"status": "unmeasured", "reason": "canary runner failed"}
+    except Exception as exc:
+        return {"status": "fail", "reason": str(exc)}
     if not results:
         return {"status": "unmeasured", "reason": "no canary results", "indices": {}}
     all_passed = all(r.get("passed") for r in results.values())
@@ -315,7 +315,7 @@ def _check_isolation(root: Path) -> dict:
                 "reason": "no .gov-runtime directory"}
     git_root = _git(root, "rev-parse", "--show-toplevel").strip()
     if not git_root:
-        return {"status": "unmeasured", "isolated": None,
+        return {"status": "fail", "isolated": None,
                 "method": "runtime_parent_matches_git_root",
                 "reason": "cannot determine git root"}
     runtime_parent = runtime.resolve().parent
@@ -329,7 +329,7 @@ def _check_isolation(root: Path) -> dict:
     }
 
 
-def _check_adoption_level(root: Path, config: dict) -> dict:
+def _check_adoption_level(root: Path, config: dict, sections: dict | None = None) -> dict:
     path_map = config.get("path-map.yaml")
     if not path_map or not isinstance(path_map, dict):
         return {"status": "pass", "level": "MINIMAL"}
@@ -349,6 +349,13 @@ def _check_adoption_level(root: Path, config: dict) -> dict:
         level = "INTERMEDIATE"
     else:
         level = "MINIMAL"
+    if level == "ADOPTED_HEALTHY" and sections:
+        has_unmeasured = any(
+            isinstance(v, dict) and v.get("status") == "unmeasured"
+            for k, v in sections.items() if k != "adoption_level"
+        )
+        if has_unmeasured:
+            level = "INTERMEDIATE"
     return {"status": "pass", "level": level, "systems_identified": implemented_count, "systems_total": total}
 
 
@@ -502,10 +509,10 @@ def run(root: Path, args, config: dict) -> dict | tuple:
         "canaries": _check_canaries(root),
         "framework_lock": _check_framework_lock(root),
         "isolation": _check_isolation(root),
-        "adoption_level": _check_adoption_level(root, config),
         "claude_code": _check_claude_code(root),
         "held_out": _check_held_out(root),
     }
+    sections["adoption_level"] = _check_adoption_level(root, config, sections)
 
     healthy = all(
         s.get("status") not in ("fail", "drift")
