@@ -1,11 +1,13 @@
-"""KPI success 3, first half, as DEC-189 states it: what ``CONFIG_INVALID`` carries, and the minimal path-map shape.
+"""KPI success 3, first half, as DEC-189 states it: what ``CONFIG_INVALID`` carries, and the path-map shape.
 
 - **Stable contract.** An invalid ``governance/project/`` file gives exit code 1
   with ``CONFIG_INVALID``, and ``error.details`` carries ``file`` and ``key``.
-- **Provisional shape.** The top level of ``path-map.yaml`` is a map;
-  ``namespaces`` is required and maps a name to a map. This holds until W1-08
-  replaces the minimal schema; if W1-08 changes the keys, the cases marked
-  *provisional* below are revised with it.
+- **Revised by W1-27 (DEC-228).** The W1-08 schema requires five top-level keys:
+  ``state_class``, ``namespaces``, ``capabilities``, ``policies``, ``systems``.
+  Each namespace has nine required fields. The cases below marked *Revised by
+  W1-27* were originally provisional (DEC-189) under a minimal schema that
+  required only ``namespaces``; they now use documents valid (or invalid) under
+  the W1-08 schema.
 
 The documents are written from DEC-189's sentence alone, not from the schema
 under ``src/gov/config/``.
@@ -19,21 +21,72 @@ import pytest
 
 import w1_07_support as support
 
-# Provisional (DEC-189): valid under "the top level is a map; namespaces maps a name to a map".
-VALID_PATH_MAP = "namespaces:\n  core: {}\n"
+# --------------------------------------------------------------------------
+# Valid path-map helpers: the W1-08 schema (DEC-228)
+# --------------------------------------------------------------------------
 
-# Provisional (DEC-189): ``namespaces`` is there, and is not a map.
+_ALL_SYSTEMS = (
+    "constitution-and-policies", "knowledge-fabric", "repository-contract",
+    "agent-organisation", "skills", "tools-and-capabilities", "command-surface",
+    "model-adapters", "orchestration-and-handoffs", "specification-and-planning",
+    "research-and-experiments", "task-system", "product-delivery",
+    "verification-and-governance-tests", "change-impact-control",
+    "checkpoint-and-recovery", "observability-and-cost", "organisational-learning",
+    "independent-audit", "security-and-permissions", "budget-governance",
+    "emergency-stop-and-rollback",
+)
+
+_POLICIES_YAML = (
+    "  security: hard-block\n  authority: hard-block\n  test: hard-block\n"
+    "  change: hard-block\n  human_gate: hard-block\n  tool: hard-block\n"
+    "  memory: warning\n  context: warning\n  checkpoint: warning\n"
+    "  model_routing: informational\n  budget: informational\n"
+    "  learning: informational\n  archive: informational\n"
+)
+
+_SYSTEMS_YAML = "".join(f"  {s}:\n    status: absent\n    reason: f\n" for s in _ALL_SYSTEMS)
+
+_VALID_NAMESPACE = (
+    "  core:\n"
+    "    paths: [\"**\"]\n"
+    "    memory_class: governance\n"
+    "    sensitivity: internal\n"
+    "    permitted_roles: [engineer]\n"
+    "    retention: kept\n"
+    "    export_policy: allowed\n"
+    "    embedding_policy: not embedded\n"
+    "    provenance: written\n"
+    "    deletion_rebuild: authoritative\n"
+)
+
+
+def _floor():
+    """The four non-namespaces top-level keys valid under the W1-08 schema."""
+    return (
+        "state_class: AUTHORITATIVE\n"
+        "capabilities:\n  code_intelligence:\n    enabled: false\n  research_corpus:\n    enabled: false\n"
+        f"policies:\n{_POLICIES_YAML}"
+        f"systems:\n{_SYSTEMS_YAML}"
+    )
+
+
+# Revised by W1-27 (DEC-228): valid under the W1-08 schema (five top-level keys, nine namespace fields).
+VALID_PATH_MAP = f"namespaces:\n{_VALID_NAMESPACE}{_floor()}"
+
+# Revised by W1-27 (DEC-228): ``namespaces`` is there but has the wrong type;
+# the rest of the document is valid under the W1-08 schema.
 NAMESPACES_OF_THE_WRONG_TYPE = {
-    "a-number": "namespaces: 42\n",
-    "a-list": "namespaces:\n  - core\n  - docs\n",
-    "a-string": "namespaces: core\n",
+    "a-number": f"namespaces: 42\n{_floor()}",
+    "a-list": f"namespaces:\n  - core\n  - docs\n{_floor()}",
+    "a-string": f"namespaces: core\n{_floor()}",
 }
 
-# Provisional (DEC-189): the top level is a map, and ``namespaces`` is not in it.
-NAMESPACES_MISSING = "{}\n"
+# Revised by W1-27 (DEC-228): all keys except ``namespaces`` are present and valid.
+NAMESPACES_MISSING = _floor()
 
-# Provisional (DEC-189): ``namespaces`` is a map, and one name does not map to a map.
-A_NAMESPACE_THAT_IS_NOT_A_MAP = "namespaces:\n  core: 42\n"
+# Revised by W1-27 (DEC-228): ``namespaces`` is a map but one name does not map to a map;
+# all other top-level keys are valid.
+A_NAMESPACE_THAT_IS_NOT_A_MAP = f"namespaces:\n  core: 42\n{_floor()}"
 
 # Invalid under any schema (the cases of test_w1_07_config.py): no key is at fault, the file is.
 INVALID_FILES = {
@@ -90,7 +143,7 @@ def test_details_file_names_the_path_map_of_the_root_given(gov, project, interfa
 
 
 # --------------------------------------------------------------------------
-# Provisional shape (until W1-08): namespaces is required and maps a name to a map
+# Revised by W1-27 (DEC-228): the W1-08 schema shape
 # --------------------------------------------------------------------------
 
 def test_a_valid_path_map_loads(gov, project, interface):
