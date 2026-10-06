@@ -1,202 +1,123 @@
-"""Builder tests for the W1-29 hooks (regression evidence)."""
+"""Builder tests for the W1-49 hooks (regression evidence only; the acceptance tests are in tests/acceptance/W1-49)."""
 
 from __future__ import annotations
 
-import io
 import json
+import os
 import subprocess
 import sys
-import types
+import time
 from pathlib import Path
 
 HOOKS = Path(__file__).resolve().parents[3] / "template/governance/kernel/hooks"
+ORCH = ".gov-runtime/scratch/orchestrator/CHECKPOINT.md"
+WRITTEN = "# C\n\n## RESUME HERE\n\n- SECRET-71\n"
 
-sys.dont_write_bytecode = True
+sys.dont_write_bytecode = True  # no bytecode beside the hooks
 sys.path.insert(0, str(HOOKS))
 import precompact  # noqa: E402
 import sessionstart  # noqa: E402
 
+BEGIN, END = precompact.BEGIN.decode(), precompact.END.decode()
 
-def _run(name, root, role="orchestrator", ticket=None, stdin_data="{}"):
-    env = {
-        "PATH": str(root / "no-bin"),
-        "CLAUDE_PROJECT_DIR": str(root),
-        "PYTHONDONTWRITEBYTECODE": "1",
-    }
+
+def _run(name, root, role="orchestrator"):
+    """The hook as a command; its PATH holds neither git nor tk, so the block's lines say `unavailable`."""
+    env = {"PATH": str(root / "no-bin"), "CLAUDE_PROJECT_DIR": str(root), "PYTHONDONTWRITEBYTECODE": "1"}
     if role is not None:
         env["GOV_ROLE"] = role
-    if ticket is not None:
-        env["GOV_TICKET"] = ticket
-    return subprocess.run(
-        [sys.executable, str(HOOKS / name)],
-        input=stdin_data,
-        capture_output=True,
-        text=True,
-        cwd=str(root),
-        env=env,
-        timeout=30,
-        check=False,
-    )
+    return subprocess.run([sys.executable, str(HOOKS / name)], input="{}", capture_output=True,
+                          text=True, cwd=str(root), env=env, timeout=30, check=False)
+
+
+def _checkpoint(root, age_s, text=WRITTEN):
+    path = root / ORCH
+    path.parent.mkdir(parents=True)
+    path.write_text(text, encoding="utf-8")
+    stamp = time.time() - age_s
+    os.utime(path, (stamp, stamp))
+    return path
 
 
 def _injection(run):
     return json.loads(run.stdout)["hookSpecificOutput"]["additionalContext"]
 
 
-def _mock_gov(monkeypatch, *, write_fn=None, context_fn=None, brief_fn=None):
-    gov = types.ModuleType("gov")
-    gov_cp = types.ModuleType("gov.checkpoint")
-    gov_rec = types.ModuleType("gov.checkpoint.record")
-    gov_ctx = types.ModuleType("gov.context")
-    if write_fn is not None:
-        gov_rec.write = write_fn
-    if brief_fn is not None:
-        gov_rec.brief = brief_fn
-    if context_fn is not None:
-        gov_ctx.context = context_fn
-    gov.checkpoint = gov_cp
-    gov.context = gov_ctx
-    gov_cp.record = gov_rec
-    for name, mod in [("gov", gov), ("gov.checkpoint", gov_cp),
-                      ("gov.checkpoint.record", gov_rec), ("gov.context", gov_ctx)]:
-        monkeypatch.setitem(sys.modules, name, mod)
+def test_resume_section_ends_at_a_heading_of_the_same_or_a_higher_level():
+    text = "# Top\n\n## Before\nx\n## RESUME HERE now\na\n### Sub\nb\n## After\nc\n"
+    assert sessionstart.resume_section(text) == "## RESUME HERE now\na\n### Sub\nb"
+    assert sessionstart.resume_section("# Top\n\nRESUME HERE in prose\n") == ""
 
 
-# --- PreCompact ---
+def _block(rest="git head: h\n"):
+    rest = rest.encode() + precompact.END + b"\n"
+    return precompact.BEGIN + b"\ngenerated: g " + precompact.digest(b"g", rest) + b"\n" + rest
 
 
-def test_precompact_no_ticket_exits_silently(tmp_path):
+def test_split_takes_only_the_hooks_own_block_at_the_end_of_the_file():
+    quoted = f"a\n{BEGIN}\nx\n{END}\nb\n".encode()
+    assert precompact.split(quoted) == (quoted, b"")
+    assert precompact.split(quoted + _block() + b"\n \n") == (quoted, _block() + b"\n \n")
+    assert precompact.split(b"") == (b"", b"")
+    for changed in (_block().replace(b"git head: h\n", b"git head: h\n  added\n"), b"  " + _block(),
+                    _block().replace(b"-->\n", b"--> \n"), _block().replace(b"generated: g ", b"generated: h ")):
+        assert precompact.split(quoted + changed) == (quoted + changed, b"")
+
+
+def test_an_unset_role_is_not_the_orchestrator(tmp_path):
+    """DEC-259: PreCompact appends nothing and SessionStart injects nothing."""
+    path = _checkpoint(tmp_path, age_s=3 * 24 * 3600)
+    before = _run("precompact.py", tmp_path, role=None)
+    after = _run("sessionstart.py", tmp_path, role=None)
+    assert (before.returncode, before.stdout, before.stderr) == (0, "", "")
+    assert (after.returncode, after.stdout) == (0, "")
+    assert path.read_text(encoding="utf-8") == WRITTEN
+
+
+def test_precompact_appends_one_block_and_sessionstart_warns(tmp_path):
+    """DEC-264: exit 0, the written part first and unchanged, one block, the file's time kept, the warning."""
+    path = _checkpoint(tmp_path, age_s=3 * 24 * 3600, text=WRITTEN.rstrip("\n"))
+    was = path.stat().st_mtime_ns
+    for _ in range(2):
+        run = _run("precompact.py", tmp_path)
+        assert (run.returncode, run.stdout, run.stderr) == (0, "", "")
+    text = path.read_text(encoding="utf-8")
+    assert text.startswith(WRITTEN + BEGIN) and text.endswith(END + "\n") and text.count(BEGIN) == 1
+    assert text.count("unavailable (FileNotFoundError)") == 3 and "not known to the hook" in text
+    assert path.stat().st_mtime_ns == was
+    assert sorted(p.name for p in path.parent.iterdir()) == ["CHECKPOINT.md"]
+    injection = _injection(_run("sessionstart.py", tmp_path))
+    assert "CHECKPOINT OLDER THAN STATE BLOCK" in injection and "SECRET-71" in injection and BEGIN not in injection
+    os.utime(path)
+    assert "CHECKPOINT OLDER THAN STATE BLOCK" not in _injection(_run("sessionstart.py", tmp_path))
+
+
+def test_a_checkpoint_precompact_cannot_write_is_left_as_it_was(tmp_path):
+    path = _checkpoint(tmp_path, age_s=60)
+    path.chmod(0o444)
     run = _run("precompact.py", tmp_path)
-    assert (run.returncode, run.stdout, run.stderr) == (0, "", "")
+    assert run.returncode == 0 and ORCH in json.loads(run.stdout)["systemMessage"]
+    assert path.read_text(encoding="utf-8") == WRITTEN
+    assert sorted(p.name for p in path.parent.iterdir()) == ["CHECKPOINT.md"]
 
 
-def test_precompact_gov_unavailable_reports_gracefully(tmp_path):
-    run = _run("precompact.py", tmp_path, ticket="T-0001")
-    assert run.returncode == 0
-    msg = json.loads(run.stdout)
-    assert "PreCompact" in msg["systemMessage"]
-    assert "checkpoint not written" in msg["systemMessage"]
+def test_a_write_that_fails_part_way_leaves_the_checkpoint_as_it_was(tmp_path, monkeypatch, capsys):
+    path = _checkpoint(tmp_path, age_s=60, text=WRITTEN + "old tail\n")
+    monkeypatch.setenv("GOV_ROLE", "orchestrator")
+    monkeypatch.setenv("CLAUDE_PROJECT_DIR", str(tmp_path))
+    monkeypatch.setattr(precompact, "split", lambda data: (WRITTEN.encode(), b""))
+    monkeypatch.setattr(precompact, "state_block", lambda root: b"new block\n")
+    real, calls = precompact.put, []
 
+    def failing(f, offset, data):
+        calls.append(data)
+        if len(calls) == 1:
+            real(f, offset, data[:4])
+            raise OSError(28, "No space left on device")
+        real(f, offset, data)
 
-def test_precompact_calls_write_with_correct_args(monkeypatch, capsys):
-    calls = []
-
-    def mock_write(root, ticket, trigger, next_action, inputs):
-        calls.append((str(root), ticket, trigger, next_action, inputs))
-        return {"path": "p", "id": "i"}
-
-    _mock_gov(monkeypatch, write_fn=mock_write)
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO("{}"))
+    monkeypatch.setattr(precompact, "put", failing)
+    was = path.stat().st_mtime_ns
     precompact.main()
-    assert capsys.readouterr().out == ""
-    assert calls == [("/proj", "W1-29", "compaction", "Resume after compaction", [])]
-
-
-def test_precompact_write_failure_emits_system_message(monkeypatch, capsys):
-    def failing(*a):
-        raise RuntimeError("disk full")
-
-    _mock_gov(monkeypatch, write_fn=failing)
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO("{}"))
-    precompact.main()
-    msg = json.loads(capsys.readouterr().out)
-    assert "disk full" in msg["systemMessage"]
-    assert "compaction proceeds" in msg["systemMessage"]
-
-
-def test_precompact_always_exits_zero(tmp_path):
-    run = _run("precompact.py", tmp_path, ticket="T-0001", stdin_data="not json")
-    assert run.returncode == 0
-
-
-# --- SessionStart ---
-
-
-def test_sessionstart_fork_returns_empty_context(tmp_path):
-    run = _run("sessionstart.py", tmp_path, stdin_data='{"source": "fork"}')
-    assert run.returncode == 0
-    assert _injection(run) == ""
-
-
-def test_sessionstart_no_ticket_no_gov_content(tmp_path):
-    run = _run("sessionstart.py", tmp_path, stdin_data='{"source": "startup"}')
-    assert run.returncode == 0
-    assert _injection(run) == ""
-
-
-def test_sessionstart_injects_context_summary(monkeypatch, capsys):
-    _mock_gov(monkeypatch,
-              context_fn=lambda root, ticket, brief=False: {"summary": "Gov summary here"})
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO('{"source": "startup"}'))
-    monkeypatch.setattr(subprocess, "run",
-                        lambda *a, **kw: types.SimpleNamespace(returncode=1, stdout="", stderr=""))
-    sessionstart.main()
-    result = json.loads(capsys.readouterr().out)
-    assert "Gov summary here" in result["hookSpecificOutput"]["additionalContext"]
-
-
-def test_sessionstart_compact_includes_checkpoint_brief(monkeypatch, capsys):
-    _mock_gov(monkeypatch,
-              context_fn=lambda root, ticket, brief=False: {"summary": ""},
-              brief_fn=lambda root, ticket: {
-                  "ticket": ticket, "next_action": "run tests", "path": "docs/cp/001.md",
-              })
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO('{"source": "compact"}'))
-    monkeypatch.setattr(subprocess, "run",
-                        lambda *a, **kw: types.SimpleNamespace(returncode=1, stdout="", stderr=""))
-    sessionstart.main()
-    ctx = _injection(types.SimpleNamespace(stdout=capsys.readouterr().out))
-    assert "run tests" in ctx and "W1-29" in ctx and "docs/cp/001.md" in ctx
-
-
-def test_sessionstart_startup_does_not_call_brief(monkeypatch, capsys):
-    brief_called = []
-    _mock_gov(monkeypatch,
-              context_fn=lambda root, ticket, brief=False: {"summary": "ctx"},
-              brief_fn=lambda root, ticket: brief_called.append(1) or {})
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO('{"source": "startup"}'))
-    monkeypatch.setattr(subprocess, "run",
-                        lambda *a, **kw: types.SimpleNamespace(returncode=1, stdout="", stderr=""))
-    sessionstart.main()
-    assert brief_called == []
-
-
-def test_sessionstart_includes_tk_ready_output(monkeypatch, capsys):
-    _mock_gov(monkeypatch,
-              context_fn=lambda root, ticket, brief=False: {"summary": ""})
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO('{"source": "startup"}'))
-    monkeypatch.setattr(subprocess, "run",
-                        lambda *a, **kw: types.SimpleNamespace(returncode=0, stdout="tk is ready\n", stderr=""))
-    sessionstart.main()
-    result = json.loads(capsys.readouterr().out)
-    assert "tk is ready" in result["hookSpecificOutput"]["additionalContext"]
-
-
-def test_sessionstart_caps_at_10k_chars(monkeypatch, capsys):
-    _mock_gov(monkeypatch,
-              context_fn=lambda root, ticket, brief=False: {"summary": "x" * 15_000})
-    monkeypatch.setenv("GOV_TICKET", "W1-29")
-    monkeypatch.setenv("CLAUDE_PROJECT_DIR", "/proj")
-    monkeypatch.setattr("sys.stdin", io.StringIO('{"source": "startup"}'))
-    monkeypatch.setattr(subprocess, "run",
-                        lambda *a, **kw: types.SimpleNamespace(returncode=1, stdout="", stderr=""))
-    sessionstart.main()
-    result = json.loads(capsys.readouterr().out)
-    assert len(result["hookSpecificOutput"]["additionalContext"]) == 10_000
-
-
-def test_sessionstart_always_exits_zero(tmp_path):
-    run = _run("sessionstart.py", tmp_path, stdin_data="not json")
-    assert run.returncode == 0
+    assert path.read_text(encoding="utf-8") == WRITTEN + "old tail\n" and path.stat().st_mtime_ns == was
+    assert ORCH in json.loads(capsys.readouterr().out)["systemMessage"]

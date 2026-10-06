@@ -24,7 +24,7 @@ def _find_fields(message: str) -> set[str]:
     try:
         obj = json.loads(message)
         if isinstance(obj, dict):
-            found.update(k for k in obj if k in TWELVE_FIELDS)
+            found.update(k for k in obj if k in TWELVE_FIELDS and obj[k] is not None and obj[k] != "")
     except (json.JSONDecodeError, TypeError, ValueError):
         pass
     for field in TWELVE_FIELDS:
