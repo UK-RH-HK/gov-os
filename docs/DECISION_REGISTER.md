@@ -4450,3 +4450,40 @@ fourth round.
 | Version | Date | Change |
 |---|---|---|
 | 0.99 | 2026-10-06 | Owner: DEC-411 (DEC-409 amends DEC-365, not DEC-367), DEC-412 (W1-50 DP-F6: the freeze branch is rebuilt; an unpushed ticket branch may be rewritten; unpinned choices fine as built), DEC-413 (at most two review rounds per FULL ticket; W1-50's round 7 stop rule), DEC-414 (W1-19: pass line 80 on the dev tiers, 85 re-measured at W1-42 and qualification; chunks stay; no ranked lexical route in W1-19; the instruction stays), DEC-415 (early test design), DEC-416 (delegation widened to P2 at medium-low confidence, with exclusions). |
+
+## 100. Delegated decisions on W1-50's packages DP-29 and DP-30 and on W1-11's package DP-8 (register v0.100, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06 under DEC-220. W1-50's seventh round returned DONE with both of the
+owner's conditions of DEC-401 passing on the final rules (criss-cross histories fail closed over 37 shapes; a replay
+of 189 real merges flags two, neither by mistake: W1-20's merge-back `5922e24e` and the old freeze branch's merge
+`135ed94e`, both records). The branch was merged as `6a978dbc`; the full regression there is green (W1-50 342
+passed, `tests/unit` 760 passed, every other suite passed). The owner was told on 2026-10-06.
+
+### DEC-417 — W1-50 DP-29, DP-30 and the bound on a move: as built
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-06) · **Basis:** W1-50 packages DP-29 and DP-30, the stricter option of each, as the lead built them; the sixth reviewer's finding F3 · **Under:** DEC-410, DEC-413, DEC-401
+- **Decision:**
+  - DP-29: under `tests/acceptance/**`, a path two parents both changed against their one merge base in the same
+    way is the merge commit's own change too, although it differs from no parent.
+  - DP-30: in a worker's call, the whole-move finding also names the merge commits' own ticket files and
+    acceptance tests.
+  - A move whose merge commits would need more than 3000 git processes to read is a finding as a whole
+    (`MAX_MOVE_PROCESSES`). The commit that built it was not reviewed (DEC-413: no further round).
+  - Not built, a residual with the reviewer's recommendation, brought to the owner: a ticket file both sides
+    changed, where the merge takes one side whole, raises no finding in an orchestrator's own call.
+
+### DEC-418 — W1-11 DP-8: the checker reads the merge base itself where the helper found exactly one
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-06) · **Basis:** W1-11 package DP-8 option (a), confidence medium; P2, reversible; the designer's, the lead's and the orchestrator's recommendations agree · **Under:** DEC-398, DEC-410, DEC-415
+- **Decision:**
+  - The checker reads merges through `gov.guard.containment_merge.read_merge`. Only for a parent pair where the
+    helper listed the decision's path as brought (so exactly one merge base exists for that pair), the checker
+    itself asks git for that merge base and reads the decision there by its `id`, to learn whether the other parent
+    changed the decision's id, status or presence since the base.
+  - Where the helper fails closed (several merge bases, none, or an error), the checker asks for no base and
+    fails closed too. Crossed or unrelated histories are therefore findings for decision files unless the merge
+    carries the owner's fact.
+  - The checker's own ancestry rule for merges goes; no second merge reader is written, and the helper is not
+    changed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.100 | 2026-10-06 | Delegated under DEC-220: DEC-417 (W1-50 DP-29, DP-30 and the bound of 3000 git processes per move, as built), DEC-418 (W1-11 DP-8: the checker reads the merge base itself where the helper found exactly one; fails closed where the helper does). |
