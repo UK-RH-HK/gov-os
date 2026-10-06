@@ -255,8 +255,78 @@ None. All KPI lines are settled from the ticket sources.
 | DEC-416 (rebuild lexical + unmeasured vs error) | All tests in test_w1_27_rebuild_r3.py, all tests in test_w1_27_doctor_unmeasured_r3.py |
 | DEC-425 (unmeasured is never green) | `test_doctor_index_freshness_error_is_fail`, `test_doctor_canary_error_is_fail`, `test_doctor_isolation_broken_git_is_fail`, `test_healthy_false_when_measurement_error` |
 
+## Round 4 — rebuild goes through the lexical index's owner and its secrets filter; the code index's outcome is measured (DEC-440)
+
+> KPI success 2: "rebuild recreates every derived store" [CAP-07.a, CAP-20.a, CAP-46.a]
+
+Two things are wrong in `src/gov/rebuild/command.py` at `7b424f2b`, and the
+present cases let both through:
+
+1. `_preseed_lexical` inserts the text of every tracked file into the lexical
+   tables directly and only then calls `lexical.refresh`, which finds the files
+   already indexed (blob hashes match) and does not re-run the secret filter.
+   A file holding a secret ends up in the index.
+
+2. The code index entry is hardcoded as `"not_recreated"` with the constant
+   reason `"no code index module exists"`, but `src/gov/codeintel/` is W1-16's
+   module and has `index(root)`.
+
+### Lexical secrets (W1-17/W1-21 own the index and its secret rule)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_rebuild_secret_file_not_in_lexical_index` | test_w1_27_rebuild_r4.py | `_preseed_lexical` inserts the secret file directly; `search(root, secret, refresh=False)` finds the secret text (1 hit from `secret_holder.py`) |
+| `test_rebuild_lexical_digest_matches_owner_refresh` | test_w1_27_rebuild_r4.py | digest after rebuild differs from digest after the owner's `refresh` alone: rebuild indexes the secret file, refresh filters it out |
+| `test_rebuild_stores_hold_no_secret` | test_w1_27_rebuild_r4.py | `stores_with_secrets(root)` finds the secret in `.gov-runtime/store.db` after rebuild — the secrets-indexing backstop (W1-15) fails |
+
+### Code index (W1-16 owns the module; DEC-440)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_rebuild_codeintel_reason_is_measured` | test_w1_27_rebuild_r4.py | the reason is the hardcoded constant `"no code index module exists"` but `src/gov/codeintel/__init__.py` exists and has `index(root)` |
+| `test_rebuild_codeintel_is_recreated_when_tool_answers` | test_w1_27_rebuild_r4.py | `status` is `"not_recreated"` despite `codebase-memory-mcp` being on PATH; rebuild never calls `codeintel.index(root)` |
+
+### What each case needs
+
+- The three lexical-secrets cases need `gitleaks` on PATH (the secret filter
+  uses it); they skip when it is absent.
+- `test_rebuild_codeintel_is_recreated_when_tool_answers` needs
+  `codebase-memory-mcp` and `gitleaks` on PATH (`local_only`); it skips when
+  either is absent.
+- `test_rebuild_codeintel_reason_is_measured` needs nothing beyond the project
+  copy.
+
+### W1-16's public interface for the code index
+
+`gov.codeintel.index(root)` builds or refreshes the code index (W1-16 README,
+`src/gov/codeintel/__init__.py:98`). The tool is present when
+`codebase-memory-mcp` is on PATH (W1-16 README: "The functions need the
+`codebase-memory-mcp` and `gitleaks` binaries on PATH"). W1-16 cases that need
+the tool are marked `local_only` and skip when it is absent.
+
+## Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-02.a (framework.lock) | `test_doctor_report_mentions_framework_lock` |
+| CAP-06.a (path classification) | `test_doctor_report_mentions_path_map_coverage`, `test_full_coverage_is_healthy` |
+| CAP-06.d (path-map compliance) | `test_unclassified_path_is_reported`, `test_moved_path_reference_is_reported` |
+| CAP-07.a (derived state) | `test_rebuild_recreates_derived_stores`, `test_rebuild_digest_matches_store_loader`, `test_rebuild_lexical_index_is_fresh`, `test_rebuild_lexical_search_finds_tracked_text`, `test_rebuild_result_names_derived_stores_with_measured_status`, `test_rebuild_does_not_hold_lexical_schema_copy`, `test_rebuild_secret_file_not_in_lexical_index`, `test_rebuild_lexical_digest_matches_owner_refresh`, `test_rebuild_stores_hold_no_secret`, `test_rebuild_codeintel_reason_is_measured`, `test_rebuild_codeintel_is_recreated_when_tool_answers` |
+| CAP-20.a (rebuild idempotent) | `test_two_rebuilds_give_the_same_digest` |
+| CAP-25.a (tool registry) | `test_doctor_report_mentions_tool_versions`, `test_doctor_does_not_pass_with_wrong_tool_version` |
+| CAP-38.b (recovery/rebuild check) | `test_recovery_rebuild_check_*`, `test_derived_state_deleted_and_rebuilt_gives_same_digest` |
+| CAP-46.a (clone+doctor+rebuild) | `test_fresh_clone_doctor_rebuild` |
+| CAP-54.a (adoption level) | `test_*_adoption_*`, `test_unmeasured_absence_prevents_adopted_healthy` |
+| DEC-210/214 (Claude Code drift) | `test_*_drift*`, `test_*_failure*` in test_w1_27_drift.py |
+| DEC-223 (held-out.yaml) | `test_missing_held_out_yaml_is_reported`, `test_present_held_out_yaml_is_not_reported` |
+| DEC-228 (schema replacement) | All tests in test_w1_27_schema.py, revised W1-07 cases |
+| DEC-265 (languages conditional) | `test_code_intelligence_enabled_without_languages_is_invalid`, `test_code_intelligence_disabled_languages_optional` |
+| DEC-416 (rebuild lexical + unmeasured vs error) | All tests in test_w1_27_rebuild_r3.py, all tests in test_w1_27_doctor_unmeasured_r3.py |
+| DEC-425 (unmeasured is never green) | `test_doctor_index_freshness_error_is_fail`, `test_doctor_canary_error_is_fail`, `test_doctor_isolation_broken_git_is_fail`, `test_healthy_false_when_measurement_error` |
+| DEC-440 (rebuild through owner + measured code index) | All tests in test_w1_27_rebuild_r4.py |
+
 ## Test count
 
-- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) = 58
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) = 63
 - **W1-07 revised cases**: 6
-- **Total**: 64
+- **Total**: 69
