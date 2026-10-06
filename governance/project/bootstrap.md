@@ -1289,3 +1289,29 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
 - **Regression at `85e9b580`:** every suite green; W1-46 showed 23 errors in its live-session cases beside the
   other suites and 493 passed alone (DEC-372).
 
+## W1-24 residuals (gov context, 2026-10-06)
+
+- **The first round's work was discarded** (DEC-427): its engineer was not a launched worker and its lead wrote
+  source. The branch was rebuilt from the test design; one rewrite round.
+- **The cross-process hash case exercises the path without an index only;** the ordering of the supplementary
+  block across processes is not tested (reviewer F-3).
+- **A missing record file gives a default content or hash silently** inside the packet builder (F-4); the store
+  has verified the records before, so it is not reachable in a loaded store.
+- **The supplementary query is the first long word of the ticket's title** (F-5, DEC-437 DP-3).
+- **`gov context` exits 1 for BLOCKED and CONTRADICTION** (DEC-437 DP-2); an entry dropped because an index is
+  unavailable carries that reason; `--dry-run` computes without writing the brief file.
+- **`S0a-G-07`** is not in the tree. Its text, read by the orchestrator by exact path (DEC-432), has six parts
+  (authority block first, supplementary block, token ceiling, sha256, file-path delivery, a summary of at most
+  2,500 tokens); each is covered by a KPI-derived case; no case was derived from the text itself.
+- **The context-reproducibility check is red on a tree with no loaded store** ("cannot read the store"), and
+  unmeasured, never green, where no ticket can be measured (fixed test-first after the review, DEC-437).
+- **The engineer's commit `d454ee7a` and the branch's first merge of the integration branch (`ee69d2ef`) carry
+  no `Role:` trailer.** They change no acceptance test. Records.
+- **Review rounds:** one. **Learning metrics:** 0 KPI disputes; 1 acceptance case revised after implementation
+  began ("planned: command implemented"); 3 cases added after it (the fail-open fix); source 387 lines against
+  an estimate of 350.
+- **Interface:** `gov.context.context(root, ticket, *, brief=False, budget=None, dry_run=False)`; packet keys
+  `ticket, authority, mandatory, supplementary, dropped, hash, tokens, budget`;
+  `gov context [--json] [--brief] [--dry-run] [--budget N] <ticket>`.
+- **Regression at `c01e6058`:** every suite green, no latency occurrence.
+
