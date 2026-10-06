@@ -25,7 +25,8 @@ Ticket: **DAEO-8nue** (W1-22).  Profile: **FULL**.
 |------|-------|
 | `test_w1_22_validator.py` | 15 |
 | `test_w1_22_canaries.py` | 10 |
-| **Total** | **25** |
+| `test_w1_22_canary_unit.py` | 5 |
+| **Total** | **30** |
 
 ## Expected red reasons
 
@@ -99,7 +100,36 @@ Four tests added for fail-open findings from the post-green review (DEC-136):
 | `TestValidatorRejects::test_validator_rejects_missing_line_range` | Missing `start_line`/`end_line` default to whole file; the whole-file hash is accepted |
 | `TestCanaryMiss::test_corrupted_store_reports_facet_unavailable` | A corrupted `store.db` causes the searcher to raise; `run_canaries` does not catch it and crashes |
 
-**Not tested through the public interface (DEC-136 finding 5):** missing or malformed canary YAML crashes `run_canaries`. The template path is a module-level constant (`_TEMPLATE`) in `gov.retrieval.canary`, not a parameter of `run_canaries(root)`. This cannot be exercised through the public interface without modifying the template directory. Covered by unit tests.
+**Not tested through the public interface (DEC-136 finding 5):** missing or malformed canary YAML crashes `run_canaries`. The template path is a module-level constant (`_TEMPLATE`) in `gov.retrieval.canary`, not a parameter of `run_canaries(root)`. This cannot be exercised through the public interface without modifying the template directory. Covered by unit tests in `test_w1_22_canary_unit.py` (patching `_TEMPLATE` and `_SEARCHERS`). The engineer should move this file to `tests/unit/validate/test_canary.py` (the ticket's `allowed_paths` include `tests/unit/validate/**`; the ITD guard restricts writes to `tests/acceptance/**`).
+
+### Unit tests for empty and malformed canary declarations
+
+| Test | Red reason |
+|------|------------|
+| `TestEmptyCanaryDeclarations::test_empty_canaries_list_reports_facet_unavailable` | `canaries: []` — the loop never runs, `misses` stays empty, `passed` is True, runner returns `AVAILABLE` |
+| `TestEmptyCanaryDeclarations::test_null_canaries_reports_facet_unavailable` | `canaries: null` — `decl.get("canaries", [])` returns `None` (key exists), `for canary in None` raises `TypeError` — the runner crashes |
+| `TestEmptyCanaryDeclarations::test_entry_without_query_reports_facet_unavailable` | `canaries: [{}]` — `canary["query"]` raises `KeyError` in the `try` block; the `except` handler also accesses `canary["query"]`, raising a second `KeyError` that propagates uncaught |
+| `TestMalformedDeclarations::test_missing_yaml_reports_facet_unavailable` | Already handled (green): `read_text` raises `FileNotFoundError`, caught by the outer `except` |
+| `TestMalformedDeclarations::test_non_dict_yaml_reports_facet_unavailable` | Already handled (green): `isinstance(decl, dict)` check raises `ValueError`, caught by the outer `except` |
+
+## Who calls canaries
+
+`run_canaries(root)` is a standalone function in `gov.retrieval.canary`. It is not called by reindex (`lexical.refresh()` in W1-17, `semantic.refresh()` in W1-19) — those live in `src/gov/retrieval/lexical.py` and `src/gov/retrieval/semantic.py`, outside this ticket's paths. DEC-037 says canaries are "run at G1 after reindex and at G4/G5"; `gov doctor` (W1-27, which depends on W1-22) is the G4 implementation and is responsible for calling canaries after reindex and as a health check. Adding a canary call to the reindex itself would be a change to `src/gov/retrieval/lexical.py` or `src/gov/retrieval/semantic.py`; no source requires it.
+
+## "Each index has canaries" — scope analysis
+
+CAP-17.c and DEC-037 say "each derived index (FTS/vector, codebase-memory, RAGFlow if adopted)" has canaries. The current canary runner (`_SEARCHERS`) covers:
+
+- **Lexical** (FTS, W1-17): has `search(root, query, refresh=False)`. Canary declaration exists (`lexical.yaml`).
+- **Semantic** (vector, W1-19): has `search(root, query, refresh=False)`. Canary declaration exists (`semantic.yaml`).
+
+Not covered, and not coverable by the current runner API:
+
+- **Code index** (codebase-memory, W1-16): has `definitions()`, `callers()`, `callees()` — queried by symbol name through `gov.closure` (W1-20), not by text query. It has no `search(root, query)` function and no canary declaration. Adding canaries for it would require a different query type (symbol-based, not text-based) and a different runner shape. This is a concern for W1-27 (`gov doctor`) or a later ticket.
+- **Closure** (`src/gov/closure/`): computed from the record graph + code index. Not a stored index. Has no store to canary.
+- **RAGFlow**: not adopted (DEC-019 path is default until the adoption trigger fires).
+
+**Package recommendation:** the "each index" KPI (CAP-17.c) is satisfied for the text-search indexes (lexical, semantic). Code-index canaries need a different query type and runner shape; this should be tracked as a concern for W1-27 or a subsequent ticket, not a gap in W1-22.
 
 ## W1-07 revision
 
