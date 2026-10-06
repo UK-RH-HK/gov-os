@@ -1193,3 +1193,28 @@ Both branches are merged (`6a978dbc`, `ad392210`). The regression after each was
 - **Unpinned choices, fine as built (DEC-412):** the error codes `PAUSE_RUNTIME_LINKED`, `PAUSE_NOT_SET`,
   `PAUSE_NOT_LIFTED`; flag mode 0600.
 - **The `local_only` mark is not registered for the W1-50 folder** (2 warnings in the suite).
+
+## W1-21 residuals (gov retrieve with completeness, 2026-10-06)
+
+- **Measured on the dev tiers:** mean hit@5 81.67 against the pass line of 80 (DEC-425); 10 queries missed
+  (DQ-A-07, DQ-A-09, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28). Forbidden citations 2,
+  at the baseline of 2 with no margin: DQ-B-12 cites `docs/adr/adr-003.md`, DQ-B-13 cites
+  `pyargus/src/pyargus/imaging/old_gridder.py`. One more is a red check.
+- **`batch_size` of zero or less gives a zero-progress continuation:** empty bundles with the same token, for as
+  long as the caller continues. No evidence, no completeness claimed, no forbidden citation.
+- **A citation's `sha256` is the hash of the cited span.** The suite's own helper accepts the whole file's hash
+  too; W1-22's validator must not.
+- **`batch_size=None` and an explicit 10 give equal bundles and different continuation tokens.**
+- **`S0a-G-06` was read by nobody:** its text is in none of the places a worker may read, and the launcher refuses
+  a product-spec worker for an engineer's ticket. No case is derived from it. With the owner.
+- **The model-dependent cases cannot run in a launched worker's sandbox;** the lead ran them. In the regression
+  they run beside other suites and passed there (126 passed).
+- **The ticket was built far above its estimate:** 453 source lines against 300, and 2,400 lines of tests.
+- **Acceptance tests revised after implementation:** the green family-check case (it needs the real models,
+  `2165b706`); `tests/acceptance/W1-07/w1_07_support.py` aligned before the merge (owner decision, DEC-412,
+  `500089fe`). The merge-back `df16fde6` is flagged by containment for that path: a record (DEC-254).
+- **Every command ticket adds lines to `tests/acceptance/W1-07/w1_07_support.py`,** so each one that merges after
+  another needs that alignment and leaves one flagged merge.
+- **W1-46's live sessions:** 23 errors in the regression after the merge, run beside the other suites (a launched
+  session did not finish its probe); 493 passed alone.
+- **`ollama serve` is left running** by the code under test (DEC-261).
