@@ -1,12 +1,55 @@
-"""The minimal path-map schema (DEC-185), until W1-08 supplies the real one and replaces this file.
+"""The W1-08 path-map schema (DEC-228), replacing the minimal W1-07 schema.
 
-The top level of ``governance/project/path-map.yaml`` is a map. Each entry below
-is one top-level key: whether it is required, its type, and the type of each of
-its values. Keys not listed here are left alone.
+Validates ``governance/project/path-map.yaml`` against the kernel's schema at
+``template/governance/kernel/schemas/path-map.schema.json``.
+
+Required top-level keys: state_class, namespaces, capabilities, policies, systems.
 """
 
 from __future__ import annotations
 
+REQUIRED_TOP_LEVEL = ("state_class", "namespaces", "capabilities", "policies", "systems")
+
+NAMESPACE_FIELDS = (
+    "paths", "memory_class", "sensitivity", "permitted_roles", "retention",
+    "export_policy", "embedding_policy", "provenance", "deletion_rebuild",
+)
+
+MEMORY_CLASSES = ("governance", "product")
+
+CAPABILITIES = ("code_intelligence", "research_corpus")
+
+POLICY_KEYS = (
+    "security", "authority", "test", "change", "human_gate", "tool",
+    "memory", "context", "checkpoint",
+    "model_routing", "budget", "learning", "archive",
+)
+
+HARD_BLOCK_ONLY = ("security", "authority", "test", "change", "human_gate", "tool")
+WARNING_OR_STRONGER = ("memory", "context", "checkpoint")
+ANY_STRENGTH = ("model_routing", "budget", "learning", "archive")
+
+STRENGTHS = {"informational", "warning", "hard-block"}
+WARNING_STRENGTHS = {"warning", "hard-block"}
+HARD_BLOCK_STRENGTHS = {"hard-block"}
+
+SYSTEM_KEYS = (
+    "constitution-and-policies", "knowledge-fabric", "repository-contract",
+    "agent-organisation", "skills", "tools-and-capabilities", "command-surface",
+    "model-adapters", "orchestration-and-handoffs", "specification-and-planning",
+    "research-and-experiments", "task-system", "product-delivery",
+    "verification-and-governance-tests", "change-impact-control",
+    "checkpoint-and-recovery", "observability-and-cost", "organisational-learning",
+    "independent-audit", "security-and-permissions", "budget-governance",
+    "emergency-stop-and-rollback",
+)
+
+SYSTEM_STATUSES = ("implemented", "minimal", "absent")
+
 PATH_MAP_SCHEMA = {
+    "state_class": {"required": True, "type": str},
     "namespaces": {"required": True, "type": dict, "values": dict},
+    "capabilities": {"required": True, "type": dict},
+    "policies": {"required": True, "type": dict},
+    "systems": {"required": True, "type": dict},
 }

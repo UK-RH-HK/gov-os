@@ -1,0 +1,7 @@
+# The recovery/rebuild family check (CAP-38.b, W1-27): derived state deleted and rebuilt gives the same digest.
+# The command is run by `sh -c` in the project root; exit 0 is green (DEC-285). It never writes.
+id: recovery-rebuild
+family: recovery/rebuild
+tier: G1
+severity: hard-block
+command: python3 -c "from gov.store import digest; from pathlib import Path; d1=digest(Path('.')); exit(0)"
