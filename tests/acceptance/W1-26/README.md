@@ -1,7 +1,7 @@
 # W1-26 acceptance tests: `gov check` G0-G2
 
 Ticket `DAEO-fygv`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-126 cases in 15 files.
+136 cases in 15 files.
 
 ```
 python3 -m pytest tests/acceptance/W1-26 -q -p no:cacheprovider
@@ -69,7 +69,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_readiness.py` | 4 | S1 |
 | `test_w1_26_decisions.py` | 6 | S1 |
 | `test_w1_26_skill_validator.py` | 36 | S7 (DEC-439) |
-| `test_w1_26_audit_validator.py` | 26 | S7 (DEC-441) |
+| `test_w1_26_audit_validator.py` | 36 | S7 (DEC-441) |
 
 ## The interface the tests fix
 
@@ -119,7 +119,7 @@ Total skill validator: 36 cases.
 
 ### Audit-report validator (`test_w1_26_audit_validator.py`)
 
-26 cases testing `python3 -m gov.check.audit_validator` (DEC-441):
+36 cases testing `python3 -m gov.check.audit_validator` (DEC-441):
 
 | Case | What |
 |---|---|
@@ -143,6 +143,10 @@ Total skill validator: 36 cases.
 | 18. Folder search | Finds .md files with milestone+commit frontmatter |
 | 19. Valid folder + missing path | Not green |
 | 20. Malformed row (×2) | Two columns (missing evidence), four columns (extra) |
+| 21. OK row empty evidence (×4) | Empty cell, empty entry among real, trailing comma, non-OK empty cell |
+| 22. Folder broken frontmatter (×2) | Broken YAML not skipped, missing `commit` not skipped |
+| 23. commit must be hex id (×2) | HEAD and branch name are findings |
+| 24. pack_sha256 format (×2) | Too short and non-hex values are findings |
 
 ### KPI and covers for the generic validators
 

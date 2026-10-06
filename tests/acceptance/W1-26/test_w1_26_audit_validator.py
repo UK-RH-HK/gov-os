@@ -641,3 +641,232 @@ class TestMalformedRow:
             f"malformed row (four columns) should fail but got exit 0\n"
             f"stdout: {result.stdout}"
         )
+
+
+# --------------------------------------------------------------------------
+# 21. OK row with empty evidence cell is red (DEC-441)
+# --------------------------------------------------------------------------
+
+class TestOKRowEmptyEvidence:
+
+    def test_ok_row_empty_evidence_cell(self, tmp_path):
+        """An OK row whose evidence cell is empty (nothing or only spaces
+        between the bars) is red.
+
+        DEC-441: "A row of class OK cites at least one path."
+        The empty string is not a path."""
+        repo, commit = make_git_repo(tmp_path)
+        text = make_report(
+            commit=commit,
+            rows=[("CAP-24", "OK", "")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"OK row with empty evidence should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_ok_row_evidence_empty_entry_among_real(self, tmp_path):
+        """An evidence cell with an empty entry among real ones is not
+        well-formed: ``src/main.py, , README.md`` has a blank between
+        two commas."""
+        repo, commit = make_git_repo(tmp_path, extra_files={
+            "src/main.py": "print('hello')\n",
+        })
+        text = make_report(
+            commit=commit,
+            rows=[("CAP-24", "OK", "src/main.py, , README.md")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"evidence cell with empty entry among real ones should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_ok_row_evidence_trailing_comma(self, tmp_path):
+        """A trailing comma in the evidence cell creates an empty entry,
+        which is not well-formed."""
+        repo, commit = make_git_repo(tmp_path, extra_files={
+            "src/main.py": "print('hello')\n",
+        })
+        text = make_report(
+            commit=commit,
+            rows=[("CAP-24", "OK", "src/main.py,")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"evidence cell with trailing comma should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_non_ok_row_empty_evidence_cell(self, tmp_path):
+        """A non-OK row with an empty evidence cell is not well-formed.
+
+        DEC-441 writes 'none' as ``-``, so an empty cell is not the same
+        as ``-`` and is not well-formed for any class."""
+        repo, commit = make_git_repo(tmp_path)
+        text = make_report(
+            commit=commit,
+            rows=[
+                ("CAP-24", "OK", "README.md"),
+                ("DEC-070", "MISSING", ""),
+            ],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"non-OK row with empty evidence should fail (should be '-') but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+
+# --------------------------------------------------------------------------
+# 22. Folder: broken/incomplete frontmatter is not silently skipped
+# --------------------------------------------------------------------------
+
+class TestFolderBrokenFrontmatterNotSkipped:
+
+    def test_folder_broken_yaml_frontmatter_not_skipped(self, tmp_path):
+        """A Markdown file in a folder whose frontmatter delimiters are present
+        but whose YAML is broken must not be silently skipped.  It is a finding
+        or unmeasured by name.
+
+        A file with no frontmatter at all (no ``---`` delimiters), such as a
+        README, may be ignored."""
+        repo, commit = make_git_repo(tmp_path, extra_files={
+            "src/main.py": "print('hello')\n",
+        })
+        reports_dir = repo / "reports"
+        reports_dir.mkdir()
+        valid_text = make_report(
+            commit=commit,
+            rows=[("CAP-24", "OK", "src/main.py")],
+        )
+        (reports_dir / "audit-valid.md").write_text(valid_text, encoding="utf-8")
+        broken_text = textwrap.dedent("""\
+            ---
+            milestone: W1
+            commit: [broken yaml
+            ---
+
+            # Audit Report
+
+            | item | class | evidence |
+            |---|---|---|
+            | CAP-24 | OK | src/main.py |
+        """)
+        (reports_dir / "audit-broken.md").write_text(broken_text, encoding="utf-8")
+        result = run_audit_validator(str(reports_dir), cwd=repo)
+        assert result.returncode != 0, (
+            f"folder with broken-frontmatter report should not be green but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_folder_missing_commit_in_frontmatter_not_skipped(self, tmp_path):
+        """A Markdown file with valid frontmatter that lacks ``commit`` must not
+        be silently skipped when validating a folder.  DEC-441 requires
+        ``commit``; its absence is a finding.
+
+        A file with no frontmatter at all may be ignored."""
+        repo, commit = make_git_repo(tmp_path, extra_files={
+            "src/main.py": "print('hello')\n",
+        })
+        reports_dir = repo / "reports"
+        reports_dir.mkdir()
+        valid_text = make_report(
+            commit=commit,
+            rows=[("CAP-24", "OK", "src/main.py")],
+        )
+        (reports_dir / "audit-valid.md").write_text(valid_text, encoding="utf-8")
+        no_commit_text = make_report(
+            include_commit=False,
+            rows=[("CAP-24", "OK", "src/main.py")],
+        )
+        (reports_dir / "audit-no-commit.md").write_text(no_commit_text, encoding="utf-8")
+        result = run_audit_validator(str(reports_dir), cwd=repo)
+        assert result.returncode != 0, (
+            f"folder with report missing commit should not be green but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+
+# --------------------------------------------------------------------------
+# 23. commit must be a hexadecimal commit id (DEC-441)
+# --------------------------------------------------------------------------
+
+class TestCommitMustBeHexId:
+
+    def test_commit_is_head(self, tmp_path):
+        """``commit: HEAD`` resolves to the current commit but names a moving
+        reference, not a hexadecimal commit id.  DEC-441 says 'the audited
+        commit', meaning a fixed hex id."""
+        repo, _ = make_git_repo(tmp_path)
+        text = make_report(
+            commit="HEAD",
+            rows=[("CAP-24", "OK", "README.md")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"commit=HEAD should fail (not a hex commit id) but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_commit_is_branch_name(self, tmp_path):
+        """``commit: main`` resolves to a commit but is a branch name, not a
+        hexadecimal commit id.  DEC-441 requires a fixed hex id."""
+        repo, _ = make_git_repo(tmp_path)
+        text = make_report(
+            commit="main",
+            rows=[("CAP-24", "OK", "README.md")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"commit=main should fail (not a hex commit id) but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+
+# --------------------------------------------------------------------------
+# 24. pack_sha256 must be a valid SHA-256 hex string (DEC-441)
+# --------------------------------------------------------------------------
+
+class TestPackSha256Format:
+
+    def test_pack_sha256_too_short(self, tmp_path):
+        """A ``pack_sha256`` value shorter than 64 hex characters is a finding.
+
+        DEC-441: the pack hash is a SHA-256, which is 64 hexadecimal
+        characters (with or without a ``sha256:`` prefix)."""
+        repo, commit = make_git_repo(tmp_path)
+        text = make_report(
+            commit=commit,
+            pack_sha256="deadbeef",
+            rows=[("CAP-24", "OK", "README.md")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"short pack_sha256 should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
+
+    def test_pack_sha256_non_hex(self, tmp_path):
+        """A ``pack_sha256`` value with non-hexadecimal characters is a
+        finding."""
+        repo, commit = make_git_repo(tmp_path)
+        text = make_report(
+            commit=commit,
+            pack_sha256="not-a-sha256-value-at-all!!!",
+            rows=[("CAP-24", "OK", "README.md")],
+        )
+        report = write_report(repo, "audit.md", text)
+        result = run_audit_validator(str(report), cwd=repo)
+        assert result.returncode != 0, (
+            f"non-hex pack_sha256 should fail but got exit 0\n"
+            f"stdout: {result.stdout}"
+        )
