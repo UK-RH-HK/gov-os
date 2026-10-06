@@ -58,10 +58,6 @@ def _supersedes_edges(root: Path) -> set:
     return {(r[0], r[1]) for r in rows}
 
 
-def _superseded_targets(root: Path) -> set:
-    rows = _store_query(root, "SELECT target FROM edges WHERE type = 'SUPERSEDES'")
-    return {r[0] for r in rows}
-
 
 def _ticket_mandatory_ids(root: Path, ticket: str) -> list:
     from gov.tasks.tickets import frontmatter
@@ -143,8 +139,6 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
 
     records = _record_map(root)
     sup_edges = _supersedes_edges(root)
-    sup_targets = _superseded_targets(root)
-
     # Step 3: resolve mandatory inputs
     resolved = []
     for rid in declared_ids:
