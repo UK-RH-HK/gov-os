@@ -1,6 +1,6 @@
 ---
 id: DAEO-wk2v
-status: in_progress
+status: closed
 deps: [DAEO-4yyl, DAEO-5x4l, DAEO-topz, DAEO-egm9]
 links: []
 created: 2026-09-30T22:49:59Z

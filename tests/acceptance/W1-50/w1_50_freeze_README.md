@@ -252,7 +252,9 @@ the guard's wider reading (`test_w1_50_freeze_near_spellings.py`, `test_w1_50_fr
 
 **No case for the read-back by the guard's own reader as a step of its own.** What can be seen of it from outside is
 that the flag `gov pause` leaves is one the guard reads as a freeze, which
-`test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask. A read-back that fails cannot be
+`test_the_flag_pause_writes_is_the_freeze_the_guard_reads` and the link cases ask (revised after implementation for
+DEC-429: the test now also verifies that the mirror keeps the project frozen after the flag is emptied, and that
+removing both the flag and the mirror unfreezes). A read-back that fails cannot be
 brought about through the command line without a fault put into the command, so it is the engineer's unit test.
 
 ## The fourth batch: `--rollback` ends frozen (DEC-136)
@@ -625,3 +627,158 @@ refused, and the freeze stays.
 
 **Expected green after the fix:** the freeze flag is still present, the guard still denies, and no name under
 `.gov-runtime/` has changed.
+
+---
+
+## Batch 7 — closing follow-up: KPIs 9, 10, 11
+
+Three KPI lines from the ticket, added as a closing follow-up after the first five batches and the seam fix.
+
+### KPI 9 — the freeze mirror (DEC-429)
+
+`gov pause` writes the freeze to `.gov-runtime/freeze` and to a mirror outside the repository, under
+`~/.local/state/gov-os/`, keyed by the repository; the guard treats the project as frozen if either exists.
+
+| File | Test | Cases | Red now, and why |
+|---|---|---|---|
+| `test_w1_50_freeze_mirror.py` | `test_gov_pause_writes_both_flag_and_mirror_as_owner` | 1 | red: `gov pause` does not write the mirror (mirror code not built). |
+| | `test_gov_pause_writes_both_flag_and_mirror_as_orchestrator` | 1 | red: same reason. |
+| | `test_mirror_keyed_same_for_worktrees_of_the_same_repo` | 1 | red: no mirror written by `gov pause`. |
+| | `test_mirror_keyed_differently_for_different_repos` | 1 | green: tests only the key derivation helper, which is in test code. |
+| | `test_guard_frozen_when_only_mirror_exists` | 1 | red: `freeze_state()` does not read the mirror. |
+| | `test_guard_frozen_when_only_flag_exists` | 1 | green: existing behaviour. |
+| | `test_guard_frozen_when_both_exist` | 1 | green: frozen by the flag (existing behaviour). |
+| | `test_not_frozen_when_neither_exists` | 1 | green: existing behaviour. |
+| | `test_cancel_agents_writes_mirror` | 1 | red: no mirror written. |
+| | `test_rollback_writes_mirror` | 1 | red: no mirror written. |
+| | `test_mirror_failure_is_reported` | 1 | red: no mirror write attempted, so no failure to report. |
+| | `test_mirror_content_is_the_same_marker_line_as_the_flag` | 1 | red: no mirror written. |
+| | `test_guard_fails_closed_on_unreadable_mirror_folder` | 1 | red: the guard does not read the mirror folder. |
+
+**13 tests** (9 red, 4 green).
+
+### KPI 10 — flag restoration from the mirror (DEC-429)
+
+A flag removed or emptied while the mirror remains is a finding; flag is restored. Lifting removes both. Sandbox
+denies the mirror path. Projects frozen before this change (flag only, no mirror) stay frozen by the flag alone.
+
+| File | Test | Cases | Red now, and why |
+|---|---|---|---|
+| `test_w1_50_freeze_mirror_restore.py` | `test_flag_removed_while_mirror_remains_is_a_finding` (×3 roles) | 3 | green: the snapshot-based `_compare_flag` detects the removal; the mirror is planted but not read. |
+| | `test_flag_emptied_while_mirror_remains_is_a_finding` | 1 | green: snapshot detects the emptied flag. |
+| | `test_flag_restored_from_mirror_content_not_snapshot` | 1 | red: no mirror-based detection exists in containment; the snapshot did not remember a freeze. |
+| | `test_lift_removes_both_flag_and_mirror` | 1 | red: `gov pause` does not write a mirror (DEC-429, KPI 1), so the precondition fails. |
+| | `test_after_lift_guard_reads_not_frozen` | 1 | green: lift succeeds and removes the flag; no mirror was written to persist. |
+| | `test_sandbox_denies_mirror_path_for_engineer` | 1 | green: the mirror path is outside the project; the guard already denies writes outside the project root. |
+| | `test_lift_refuses_when_mirror_cannot_be_removed` | 1 | red: the current lift has no mirror support and succeeds (DP-M3 option b, DEC-437). |
+| | `test_old_project_flag_only_stays_frozen` | 1 | green: existing `freeze_state()` reads the flag. |
+| | `test_old_project_flag_removed_during_call_is_still_found_via_snapshot` | 1 | green: `_compare_flag` via snapshot. |
+| | `test_old_project_lift_works_without_mirror` | 1 | green: lift removes the flag; no mirror to fail on. |
+
+**12 tests** (3 red, 9 green).
+
+### KPI 11 — the ticket lead's own role (DEC-434, DEC-435)
+
+A ticket lead runs under its own role (`ticket-lead`), may write only its checkpoint, scratch and merge-backs
+judged by the three-way rule. Writes to source, tests, tickets, or documents are refused.
+
+| File | Test | Cases | Red now, and why |
+|---|---|---|---|
+| `test_w1_50_ticket_lead_role.py` | `test_ticket_lead_in_known_roles` | 1 | red: `ticket-lead` not in `KNOWN_ROLES`. |
+| | `test_ticket_lead_may_write_scratch` | 1 | red: denied as "not a known role" before scratch check. |
+| | `test_ticket_lead_may_write_scratch_via_bash` | 1 | red: same. |
+| | `test_ticket_lead_may_write_checkpoint` | 1 | red: not in `KNOWN_ROLES`, no `_get_allowed_paths` case. |
+| | `test_ticket_lead_may_read` (×3 tools) | 3 | green: `READ_TOOLS` allowed before role check. |
+| | `test_ticket_lead_may_run_read_only_bash` | 1 | green: no write targets → allow. |
+| | `test_ticket_lead_denied_write_to` (×6 paths) | 6 | green (as deny): denied as "not a known role" now; after fix, denied by path rules — denial stays, reason changes. |
+| | `test_ticket_lead_denied_bash_write_to_source` | 1 | green (as deny): same. |
+| | `test_ticket_lead_not_in_worker_roles` | 1 | green: true now and must stay. |
+| | `test_gov_launch_refuses_ticket_lead` | 1 | green: not in `WORKER_ROLES`; `assert_refused` confirms. |
+| | `test_ticket_lead_cannot_set_freeze` | 1 | green: `gov pause` checks for orchestrator. |
+| | `test_ticket_lead_stricter_than_orchestrator` | 1 | green (as deny): denied now. |
+
+**19 tests** (4 red, 15 green).
+
+### Decision packages
+
+**DP-M1 — mirror key derivation.** Proposed: `sha256(os.path.realpath(git rev-parse --git-common-dir))` as hex.
+This makes worktrees of the same clone share one mirror. Confidence: medium. The engineer may choose a different
+derivation as long as it satisfies the two keying tests.
+
+**DP-M2 — mirror content for an empty or unmarked flag.** The mirror holds the same marker line as the flag
+(DEC-402). If the flag is empty or unmarked, the mirror may be absent or hold the empty/unmarked content; tests
+do not mandate which. Confidence: medium.
+
+**DP-M3 — lift fails to remove mirror.** Decided: **(b), the lift refuses and nothing changes** (DEC-437). The
+flag stays, the project stays frozen, and the message names the mirror's path. The designer proposed option (a):
+remove the flag anyway; the decision chose the stricter option.
+
+**DP-M4 — XDG_STATE_HOME.** The mirror lives under `$XDG_STATE_HOME/gov-os/` when set, else `~/.local/state/gov-os/`.
+Tests redirect via the sandbox's `HOME`. Confidence: medium.
+
+**DP-L1 — role name.** `ticket-lead`, hyphenated, matching the ticket's `role: ticket-lead` field and DEC-236.
+Confidence: high.
+
+**DP-L2 — `_get_allowed_paths` for ticket-lead.** Decided: **(a), no allowed paths** (DEC-437). The function
+returns `[]` for ticket-lead. Scratch access is via `_is_in_scratch`. The lead's checkpoint is under
+`.gov-runtime/scratch/lead/CHECKPOINT.md` (inside scratch), not under `.gov-runtime/checkpoints/`. The
+three-way merge-back rule is checked in `_judge_commit`, not in path patterns.
+
+### Earlier case revised in batch 7
+
+A rewrite after implementation, reason **owner decision: freeze mirror (DEC-429)**. 1 function, 1 case.
+
+| Suite | Test | Cases |
+|---|---|---|
+| W1-50 | `test_w1_50_freeze_marker.py::test_the_flag_pause_writes_is_the_freeze_the_guard_reads` | 1 |
+
+The old test emptied the flag and asserted "not frozen". With DEC-429 the mirror keeps the project frozen after the
+flag is emptied. The revised test asserts "frozen" after emptying the flag (the mirror holds), then removes the
+mirror and asserts "not frozen" (both gone).
+
+### Summary
+
+| Batch | File | Tests | Red | Green |
+|---|---|---|---|---|
+| KPI 9 | `test_w1_50_freeze_mirror.py` | 13 | 9 | 4 |
+| KPI 10 | `test_w1_50_freeze_mirror_restore.py` | 12 | 3 | 9 |
+| KPI 11 | `test_w1_50_ticket_lead_role.py` | 19 | 4 | 15 |
+| **Total** | | **44** | **16** | **28** |
+
+---
+
+## Session-wide tripwire for the real mirror folder (DEC-429)
+
+`tests/acceptance/conftest.py` — a session-scoped autouse fixture `_real_mirror_folder_unchanged`. At session start
+it records the listing and modification time of the real `~/.local/state/gov-os/` directory (located via the password
+database, not `$HOME`). At session end it checks again. If any entry was added, removed, or the mtime changed, the
+session fails with a message naming the change. The fixture never creates, removes or writes the folder.
+
+### Why
+
+The freeze mirror (DEC-429) lives under `~/.local/state/gov-os/`. Tests that run `gov pause` or the guard as
+subprocesses pass `HOME=<sandbox.home>`, so the subprocesses write to a throwaway directory. The tripwire catches a
+regression where a test or code change breaks this isolation.
+
+### Tripwire self-test
+
+`test_w1_50_mirror_tripwire.py` — 4 cases that exercise the snapshot/detection logic on a stand-in folder in
+`tmp_path`, never the real one.
+
+### Audit of existing acceptance suites (DEC-429)
+
+Every acceptance test that runs `gov pause`, the guard's freeze reading, or the containment check does so as a
+subprocess with `HOME` set to a throwaway sandbox directory. No acceptance test calls `freeze_state()`,
+`_mirror_path()`, `_mirror_frozen()`, or `_write_mirror()` in-process.
+
+| Suite | How HOME is set | In-process mirror calls |
+|---|---|---|
+| W1-02 | `w1_02_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-04 | `w1_04_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-07 | `w1_07_support.hook_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-28 | `w1_28_support.pause()`: `"HOME": str(sandbox.home)` | None |
+| W1-46 | `w1_46_support.gov_environment`: `"HOME": str(home or sandbox.home)` | None (one comment references `freeze_state` in a docstring, not a call) |
+| W1-47 | via `w1_03_support._base_environment`: `"HOME": str(sandbox.home)` | None |
+| W1-50 | via `w1_02_support.hook_environment` (guard) and `w1_28_support.pause()` (pause); lift via `w1_50_freeze_lift.py`: `"HOME": str(sandbox.home)` | None (test helpers like `_put_mirror` and `_find_mirror_files` write to `sandbox.home`, not the real home) |
+
+No case in another ticket's suite was revised for this batch.

@@ -1,0 +1,5 @@
+id: "core-graph"
+family: "graph integrity"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.check.graph"

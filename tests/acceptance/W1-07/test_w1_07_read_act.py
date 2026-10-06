@@ -83,7 +83,25 @@ def test_no_command_writes_outside_its_act_paths(gov, project, sandbox, interfac
     before = _state(project, sandbox)
     run = gov(*args) if args == ("--help",) else gov(*args, "--json")
     assert run.returncode in interface.exit_codes, run.describe()
-    _assert_unchanged(before, _state(project, sandbox), run)
+    after = _state(project, sandbox)
+    assert after["porcelain"] == before["porcelain"], \
+        f"git status --porcelain changed:\n{after['porcelain']}\n{run.describe()}"
+    assert after["git"] == before["git"], f"HEAD or a ref moved\n{run.describe()}"
+    changed = support.snapshot_difference(before["tree"], after["tree"])
+    assert not changed, f"files changed in the project: {changed}\n{run.describe()}"
+    changed = support.snapshot_difference(before["elsewhere"], after["elsewhere"])
+    assert not changed, f"files changed outside the project (elsewhere): {changed}\n{run.describe()}"
+    # DEC-429: gov pause writes a freeze mirror under ~/.local/state/gov-os/<key>/freeze.
+    home_changed = support.snapshot_difference(before["home"], after["home"])
+    if args[0] == "pause":
+        non_mirror = [d for d in home_changed if not support.is_freeze_mirror_entry(d)]
+        assert not non_mirror, \
+            f"gov pause wrote to home outside .local/state/gov-os/: {non_mirror}\n{run.describe()}"
+        assert any("/freeze" in d for d in home_changed), \
+            f"gov pause did not create the freeze mirror (DEC-429)\n{run.describe()}"
+    else:
+        assert not home_changed, \
+            f"files changed outside the project (home): {home_changed}\n{run.describe()}"
 
 
 @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)

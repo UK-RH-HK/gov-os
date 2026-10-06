@@ -4769,3 +4769,21 @@ Decided by the orchestrator on 2026-10-06. The owner was told the same day that 
 |---|---|---|
 | 0.107 | 2026-10-06 | Delegated: DEC-437 (the freeze mirror's key, content, lift failure and place; the lead's role name and paths; W1-24 DP-2 to DP-5; W1-24's check that measured nothing is not green). |
 
+## 108. A delegated decision on W1-26's third round (register v0.108, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-438 — W1-26: a family with no registered check is never green
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** `gov check --json` run by the orchestrator on W1-26's branch at `be229cdd`: four of the seventeen families had no registered check and were reported green · **Under:** DEC-425, DEC-413, DEC-436
+- **Decision:**
+  - A family with no registered check has the status YELLOW, with the reason "no registered check" and a count
+    of 0 in its entry. It is never green, and it is not a hard-block by itself.
+  - Every family's entry carries the count of its registered checks, so the wave's exit run (W1-42) can count
+    the families that have at least one executable check.
+  - This is a fail-open under DEC-413 and is fixed test first in a short fourth start of the ticket; no review
+    round follows.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.108 | 2026-10-06 | Delegated: DEC-438 (W1-26: a family with no registered check is YELLOW with its reason and a count, never green). |
+

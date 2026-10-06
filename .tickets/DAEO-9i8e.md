@@ -1,6 +1,6 @@
 ---
 id: DAEO-9i8e
-status: in_progress
+status: closed
 deps: [DAEO-8nue]
 links: []
 created: 2026-09-30T22:49:58Z
