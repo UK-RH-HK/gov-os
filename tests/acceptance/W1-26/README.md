@@ -92,6 +92,10 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 `checkpoint`. W1-07's other cases keep `check` (envelope, read-only, configuration) and stay green
 before and after.
 
+## Revised cases
+
+- `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
+
 ## Not tested
 
 - Latency under load (DEC-372): a latency case re-run alone when failing under parallel load is not tested;
