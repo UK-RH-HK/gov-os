@@ -1,0 +1,5 @@
+id: "core-pathmap"
+family: "path-map compliance"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.check.pathmap"

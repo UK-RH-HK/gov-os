@@ -1263,3 +1263,94 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
   owner records were read in the archived `docs/source/` (DEC-426, rule C).
 - **"A lesson restates policy as authority" (failure line 2)** is checked by the record's fields, not by reading
   its prose.
+
+## W1-22 residuals (evidence validator and zero-result canaries, 2026-10-06)
+
+- **Canaries exist for the lexical and the semantic index only.** DEC-037 also names the code index
+  (codebase-memory); it is queried by symbol, not by text, and needs another query type in the runner. Left to
+  W1-27 (`gov doctor`) or a later ticket.
+- **Nothing runs the canaries after a reindex yet.** `run_canaries(root)` stands alone; the reindex of W1-17 and
+  W1-19 does not call it. `gov doctor` (W1-27) is its first caller.
+- **The canary runner reads its declarations from a module-level path,** not from a parameter; a test of other
+  declarations patches it.
+- **The canary result has a `reason` field** where a declaration is empty, null or malformed (reported as
+  `FACET_UNAVAILABLE`, never as available). W1-27 is the first consumer.
+- **The validator checks a citation's `sha256` against the cited span only** (DEC-435).
+- **Two engineer commits (`7fbfae18`, `f6d88832`) and the lead's merge of the integration branch (`613b8f9e`)
+  carry no `Role:` trailer.** They change no acceptance test; the containment check judged them against the
+  caller. Records.
+- **Review rounds:** two; the fail-open found after them (an empty canary declaration counted as available) was
+  fixed test-first without a third round (DEC-413).
+- **Learning metrics:** 0 KPI disputes; 0 acceptance tests rewritten after implementation began; 9 cases added
+  after it (4 fail-open cases, 5 unit cases); source 349 lines against an estimate of 120.
+- **Interface:** `gov.retrieval.validate.validate(root, bundle)` returns `valid` and `errors`;
+  `gov.retrieval.canary.run_canaries(root)` returns, per index, `passed`, `status`, `misses` and, where it
+  applies, `reason`.
+- **Regression at `85e9b580`:** every suite green; W1-46 showed 23 errors in its live-session cases beside the
+  other suites and 493 passed alone (DEC-372).
+
+## W1-24 residuals (gov context, 2026-10-06)
+
+- **The first round's work was discarded** (DEC-427): its engineer was not a launched worker and its lead wrote
+  source. The branch was rebuilt from the test design; one rewrite round.
+- **The cross-process hash case exercises the path without an index only;** the ordering of the supplementary
+  block across processes is not tested (reviewer F-3).
+- **A missing record file gives a default content or hash silently** inside the packet builder (F-4); the store
+  has verified the records before, so it is not reachable in a loaded store.
+- **The supplementary query is the first long word of the ticket's title** (F-5, DEC-437 DP-3).
+- **`gov context` exits 1 for BLOCKED and CONTRADICTION** (DEC-437 DP-2); an entry dropped because an index is
+  unavailable carries that reason; `--dry-run` computes without writing the brief file.
+- **`S0a-G-07`** is not in the tree. Its text, read by the orchestrator by exact path (DEC-432), has six parts
+  (authority block first, supplementary block, token ceiling, sha256, file-path delivery, a summary of at most
+  2,500 tokens); each is covered by a KPI-derived case; no case was derived from the text itself.
+- **The context-reproducibility check is red on a tree with no loaded store** ("cannot read the store"), and
+  unmeasured, never green, where no ticket can be measured (fixed test-first after the review, DEC-437).
+- **The engineer's commit `d454ee7a` and the branch's first merge of the integration branch (`ee69d2ef`) carry
+  no `Role:` trailer.** They change no acceptance test. Records.
+- **Review rounds:** one. **Learning metrics:** 0 KPI disputes; 1 acceptance case revised after implementation
+  began ("planned: command implemented"); 3 cases added after it (the fail-open fix); source 387 lines against
+  an estimate of 350.
+- **Interface:** `gov.context.context(root, ticket, *, brief=False, budget=None, dry_run=False)`; packet keys
+  `ticket, authority, mandatory, supplementary, dropped, hash, tokens, budget`;
+  `gov context [--json] [--brief] [--dry-run] [--budget N] <ticket>`.
+- **Regression at `c01e6058`:** every suite green, no latency occurrence.
+
+## W1-26 residuals (gov check G0-G2, 2026-10-06)
+
+- **`gov check` on this repository exits 3.** Red from real findings: schema/invariants (legacy records without
+  `state_class`), graph integrity (dangling `depends_on` references). Red because nothing is measured or built
+  here: index freshness (no lexical index in this tree), retrieval regression (unmeasured, no dev tiers
+  configured), context reproducibility (no loaded store), and the policy keys change, human_gate, security, test
+  and tool (no check registered for them yet). Yellow with "no registered check" (DEC-438): adapter/model
+  portability, recovery/rebuild (W1-27), audit reproducibility.
+- **The fresh-agent-reconstruction check is red here because `gov` is not on the `PATH` of the check's shell**
+  (exit 127). Its declaration is W1-25's.
+- **The result lists 24 families:** the Contract's seventeen and the seven policy keys, each as its own entry.
+- **The schema check validates the presence of fields,** not their types, enumerations or patterns (reviewer R1).
+- **A check's command that exits 0 is green whatever it prints** (DEC-285); a non-JSON output is not a finding.
+- **A hard-block check whose tool is absent (`openspec`) is YELLOW, not RED** (reviewer F10).
+- **Check commands are run through a shell from their YAML declaration,** with the caller's write access to the
+  working directory, and are not validated (F11, F12).
+- **Policy coverage matches a key to a check by substring** (F13); the skill-version check accepts any `ACTIVE`
+  decision (F14).
+- **The provenance `inputs_hash` is the hash of the check's id and the commit,** not of the input files.
+- **Four lists remain constants in the code** because the Contract fixes them (the families, the reserved
+  commands, the non-authoritative types, the implementer roles); record paths and schema types are derived, and
+  an unknown record type is a finding (DEC-436).
+- **`wbs_to_id` in `claims.py` is built and never used.**
+- **History:** the second round's merge of the integration branch was made without committing in the same
+  command and lost other tickets' tests; it was never merged, and the branch was rebuilt (DEC-436). The rebuilt
+  branch's merge `b7e75958` was flagged once by the containment check for the shared W1-07 support file,
+  byte-identical to the branch's aligned version: a record.
+- **Review rounds:** two (the limit). After them, fixed test-first without a further review: an unknown family
+  never green, derived record paths, the readiness result (DEC-436); a family with no registered check never
+  green (DEC-438, found by the orchestrator's own run).
+- **Learning metrics:** 0 KPI disputes; 4 acceptance cases revised after implementation began (2 for DEC-425
+  "unmeasured is never green", 2 that named uncovered families by a fixed list); 27 cases added after it;
+  source 1,245 lines against an estimate of 290. Every module maps to a KPI line; the estimate was wrong, not
+  the scope.
+- **Interface:** `gov check [--json] [--list]`; exit 0 all green, 3 `CHECK_FAILED` on any hard-block red;
+  `gov.check.runner.run_checks(root)` returns the result and whether a hard-block is red; each family entry has
+  `status`, `check_count` and, where it applies, `reason`; each check has `id`, `family`, `severity`, `status`,
+  `findings`, `provenance`. Family names are compared normalised (DEC-436).
+- **Regression at `6d1848cd`:** every suite green, no latency occurrence.
