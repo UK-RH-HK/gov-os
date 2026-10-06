@@ -23,7 +23,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.errors import GovError
-from gov.guard.decide import ACCEPTANCE, FREEZE_FLAG, _load_ticket
+from gov.guard.decide import ACCEPTANCE, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
 
@@ -81,12 +81,13 @@ def _runtime_rules(root: Path) -> list[str]:
     """``Edit`` deny rules for ``.gov-runtime/**`` except ``.gov-runtime/scratch/**`` (DEC-180).
 
     The patterns match every name but ``scratch``; they bind the file tools. The
-    Linux sandbox skips a pattern, so the entries that exist at launch and the
-    freeze flag are also listed by name.
+    Linux sandbox skips a pattern, so the entries that exist at launch are also
+    listed by name: the freeze flag only when it is there, since the sandbox
+    puts a placeholder at a denied name that does not exist (DEC-402).
     """
     base = f"/{root}/{RUNTIME}"
     names = {f"{SCRATCH[:i]}[!{c}]*" for i, c in enumerate(SCRATCH)} | {SCRATCH[:i] for i in range(1, len(SCRATCH))}
-    names |= {f"{SCRATCH}?*", os.path.basename(FREEZE_FLAG)}
+    names |= {f"{SCRATCH}?*"}
     if (root / RUNTIME).is_dir():
         names |= {n for n in os.listdir(root / RUNTIME) if n != SCRATCH and not any(c in n for c in "*?[")}
     return [f"Edit({base}/{name})" for name in sorted(names)]

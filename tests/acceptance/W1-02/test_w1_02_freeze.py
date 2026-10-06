@@ -6,9 +6,12 @@ is denied by the guard, and git status --porcelain is unchanged; gov pause --off
 restores writes."
 
 Owner answer to KD-3: until ``gov pause`` (W1-28) exists, the flag is the file
-``.gov-runtime/freeze``. It exists: frozen. Its content is not read. While it
-exists every write is denied for every role, the test designer and the scratch
-set included; reads stay open; removing the file restores writes.
+``.gov-runtime/freeze``. Owner decision DEC-402: a real flag carries the marker
+line ``gov pause`` writes, and ``support.set_freeze`` writes it. Nothing after
+that line is read: a flag that goes on with ``false`` or ``off`` still freezes.
+While it is set every write is denied for every role, the test designer and the
+scratch set included; reads stay open; removing the file restores writes. A
+file without the marker is W1-50's (``tests/acceptance/W1-50/``).
 """
 
 from __future__ import annotations

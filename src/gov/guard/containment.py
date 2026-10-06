@@ -374,8 +374,15 @@ def _check_pending_snapshots(root: str, own_id: str,
 # ---- before-snapshot (PreToolUse) ---------------------------------
 
 def take_snapshot(root: str, tool_use_id: str,
-                  session_id: str = "", agent_id: str = "") -> bool:
-    """Capture git status + fingerprints + HEAD.  False = not a repo."""
+                  session_id: str = "", agent_id: str = "",
+                  flag: str | None = None) -> bool:
+    """Capture git status + fingerprints + HEAD, and the freeze flag
+    (DEC-407).  False = not a repo.
+
+    *flag* is the guard's reading of the freeze flag for this call,
+    when the hook has it; otherwise the flag is read here.
+    """
+    frozen = _remember_flag(root, flag)
     sdir = os.path.join(root, SNAPSHOT_DIR_REL)
     os.makedirs(sdir, exist_ok=True)
     _cleanup_old(sdir)
@@ -410,6 +417,7 @@ def take_snapshot(root: str, tool_use_id: str,
         "ts": time.time(),
         "session_id": session_id,
         "agent_id": agent_id,
+        "freeze": frozen,
     }
     with open(os.path.join(sdir, f"{tool_use_id}.json"), "w",
               encoding="utf-8") as f:
@@ -475,6 +483,80 @@ def _write_records(root: str, records: list) -> None:
     with open(p, "a", encoding="utf-8") as f:
         for rec in records:
             f.write(json.dumps(rec, separators=(",", ":")) + "\n")
+
+
+# ---- the freeze flag around the call (DEC-407, DEC-409 rule 4) ----
+
+def _remember_flag(root: str, flag: str | None = None):
+    """What the snapshot keeps of the freeze flag: ``None`` when the
+    guard's reader reads no freeze there, else the flag's content (its
+    marker line), one character per byte.  Empty when the freeze is not
+    a file that can be read (DEC-179)."""
+    from gov.guard.decide import FREEZE_FLAG, _FREEZE_HEAD, freeze_state
+    if (flag or freeze_state(root)) != "frozen":
+        return None
+    try:
+        fd = os.open(os.path.join(root, FREEZE_FLAG),
+                     os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            return os.read(fd, _FREEZE_HEAD).decode("latin-1")
+        finally:
+            os.close(fd)
+    except OSError:
+        return ""
+
+
+def _restore_flag(root: str, content: str) -> str:
+    """Put the freeze flag back with the content it had, as ``gov
+    pause`` writes it: a temporary file in ``.gov-runtime/`` (mode
+    0600) renamed over the flag's path, never through a link there.
+    Returns ``""``, or why the guard's reader reads no freeze after it.
+    """
+    import tempfile
+    from gov.guard.decide import FREEZE_FLAG, FREEZE_MARKER, freeze_state
+    path = os.path.join(root, FREEZE_FLAG)
+    runtime = os.path.dirname(path)
+    if os.path.islink(runtime):  # DEC-404: nothing is written through it
+        return f"{os.path.basename(runtime)} is a symbolic link"
+    data = content.encode("latin-1") or (
+        FREEZE_MARKER + time.strftime(
+            " containment %Y-%m-%dT%H:%M:%SZ\n", time.gmtime()).encode())
+    tmp = None
+    try:
+        os.makedirs(runtime, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=runtime, prefix="freeze.")
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+        os.replace(tmp, path)
+    except OSError as e:
+        try:
+            if tmp:
+                os.unlink(tmp)
+        except OSError:
+            pass
+        return str(e)
+    if freeze_state(root) != "frozen":
+        return "the guard does not read the written flag as a freeze"
+    return ""
+
+
+def _compare_flag(root: str, snap, who: tuple) -> str:
+    """A freeze the snapshot remembers and the guard's reader no longer
+    reads was removed or emptied during the call: a finding for every
+    role, recorded at once, and the flag is restored.  Returns the
+    report text (empty = nothing).  A failed restore is said in both.
+    """
+    from gov.guard.decide import FREEZE_FLAG, freeze_state
+    remembered = (snap or {}).get("freeze")
+    if remembered is None or freeze_state(root) == "frozen":
+        return ""
+    failure = _restore_flag(root, remembered)
+    reason = "freeze flag removed or emptied during the call, " + (
+        f"restore failed, the tree is not frozen: {failure}" if failure
+        else "restored with its marker line")
+    _record_findings(root, [_make_finding(
+        *who, [FREEZE_FLAG], "flagged" if failure else "reverted", reason)])
+    return f"{FREEZE_FLAG}: {reason}."
 
 
 # ---- acceptance-test restoration ----------------------------------
@@ -901,6 +983,10 @@ def check_containment(
     snap = _load_snapshot(project_root, tool_use_id)
     has_snap = snap is not None
 
+    # DEC-407: the freeze flag first, before anything of git can fail.
+    flag_msg = _compare_flag(project_root, snap, (
+        session_id, agent_type, role, ticket_id, command))
+
     # Overlap detection (DEC-124 reading 4).
     overlapping = False
     if has_snap:
@@ -919,7 +1005,7 @@ def check_containment(
                        "--untracked-files=all")
     except _NotARepo:
         _increment_seq(project_root)
-        return ""
+        return _format_report([], [], [], flag_msg)
     # _GitError propagates intentionally (repair 8).
 
     cur_head = cur_branch = ""
@@ -1196,4 +1282,4 @@ def check_containment(
     _increment_seq(project_root)
 
     return _format_report(all_flagged, all_reverted, all_failed,
-                          head_msg)
+                          " ".join(filter(None, (flag_msg, head_msg))))

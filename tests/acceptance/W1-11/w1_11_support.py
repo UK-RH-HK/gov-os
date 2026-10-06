@@ -1,0 +1,614 @@
+"""Support code for the W1-11 acceptance tests (standard library only).
+
+W1-11 builds the decision checker. No ``gov`` command belongs to this ticket
+(``src/gov/cli/**`` is outside its paths; W1-26 runs the checker from
+``gov check``), so the tests use the Python interface of ``gov.decisions``,
+stated in the README:
+
+- ``gov.decisions.check(root)``: the list of findings; an empty list passes.
+
+How the tests call it:
+
+- **Every call runs in a new Python process**, through a small driver written to
+  a temporary directory, with this worktree's ``src/`` on ``PYTHONPATH``.
+- **Nothing is written in this worktree.** Every project is a temporary git
+  repository, or a clone of the b-dev tier in a temporary directory. The store
+  is built there (DEC-322), never in this repository.
+- **The environment is built from scratch:** ``PATH``, an empty temporary
+  ``HOME``, ``TMPDIR``, locale, ``PYTHONPATH`` and ``PYTHONPYCACHEPREFIX``.
+  ``GOV_ROLE`` and ``GOV_TICKET`` of the session that runs the tests are not
+  passed on.
+- **Before a check, the project is committed and the store is loaded**
+  (``gov.store.load``), so the checker may read the record graph, git or the
+  working tree: the three agree.
+- **Fixture commits have fixed dates, authors and trailers.** A commit is dated 2026-10-04, or 2026-09-20 where
+  a test needs one made before the trailer rule of DEC-182.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+SRC = REPO_ROOT / "src"
+DECISIONS_MODULE = "gov.decisions"
+STORE_MODULE = "gov.store"
+STORE_REL = ".gov-runtime/store.db"
+CALL_TIMEOUT_S = 120.0
+MISSING_EXIT = 3
+
+DEV_TIERS = Path(os.environ.get("GOV_DEV_TIERS") or Path.home() / "gov-os-workbench" / "synthetic")
+B_DEV = "b-dev"
+
+# The codes of a finding (README, "The public interface").
+ACTIVE_SUPERSEDED = "ACTIVE_SUPERSEDED"
+DUPLICATE_ID = "DUPLICATE_ID"
+OVERLAPPING_ID = "OVERLAPPING_ID"
+SUPERSESSION_CYCLE = "SUPERSESSION_CYCLE"
+ACTIVE_UNAPPROVED = "ACTIVE_UNAPPROVED"
+GATE_NOT_AUTHORISING = "GATE_NOT_AUTHORISING"
+TICKET_WAITS_ON_DEAD_GATE = "TICKET_WAITS_ON_DEAD_GATE"
+FRONTMATTER_UNREADABLE = "FRONTMATTER_UNREADABLE"
+HAZARD_CODES = (ACTIVE_SUPERSEDED, DUPLICATE_ID, OVERLAPPING_ID, SUPERSESSION_CYCLE)
+
+# DEC-328: the five values of a gate record's `status`; only ACCEPTED is an answered gate.
+GATE_OPEN = "PROPOSED"
+GATE_ANSWERED = "ACCEPTED"
+GATE_DEAD = ("DECLINED", "REVOKED", "STALE")
+
+_DRIVER = '''\
+import importlib, json, sys
+from pathlib import Path
+
+out = []
+for call in json.loads(sys.stdin.read()):
+    try:
+        function = getattr(importlib.import_module(call["module"]), call["function"])
+    except ModuleNotFoundError as exc:
+        if exc.name != "gov.decisions":
+            raise
+        print(f"No module named {exc.name!r}", file=sys.stderr)
+        sys.exit(3)
+    except AttributeError:
+        print(f"{call['module']} has no function {call['function']}", file=sys.stderr)
+        sys.exit(3)
+    try:
+        out.append({"value": function(Path(call["root"]))})
+    except Exception as exc:
+        if type(exc).__name__ != "GovError":
+            raise
+        out.append({"error": {"code": exc.code, "message": exc.message, "details": exc.details}})
+print(json.dumps(out))
+'''
+
+
+class CheckerMissing(AssertionError):
+    """The decision checker does not exist yet."""
+
+
+class Raised(Exception):
+    """A call raised ``GovError``."""
+
+    def __init__(self, error):
+        super().__init__(f"GovError {error.get('code')}: {error.get('message')}")
+        self.code = error.get("code")
+        self.message = error.get("message")
+        self.details = error.get("details")
+
+
+# --------------------------------------------------------------------------
+# Calling the public interface
+# --------------------------------------------------------------------------
+
+class Api:
+    """Calls ``gov.decisions`` (and ``gov.store.load``) of this worktree, each batch in a new process."""
+
+    def __init__(self, workdir):
+        self.workdir = Path(workdir)
+        for name in ("home", "tmp", "pycache"):
+            (self.workdir / name).mkdir(parents=True, exist_ok=True)
+        self.driver = self.workdir / "driver.py"
+        self.driver.write_text(_DRIVER, encoding="utf-8")
+
+    def _batch(self, calls, extra=None):
+        request = [{"module": module, "function": function, "root": str(root)} for module, function, root in calls]
+        environment = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(self.workdir / "home"),
+            "TMPDIR": str(self.workdir / "tmp"),
+            "LC_ALL": "C.UTF-8",
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "PYTHONPATH": str(SRC),
+            "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
+            **(extra or {}),  # batch 4: variables a test passes on purpose, such as GIT_DIR
+        }
+        what = ", ".join(f"{module}.{function}" for module, function, _ in calls)
+        try:
+            done = subprocess.run([sys.executable, str(self.driver)], input=json.dumps(request), env=environment,
+                                  cwd=str(self.workdir), capture_output=True, text=True, timeout=CALL_TIMEOUT_S)
+        except subprocess.TimeoutExpired:
+            raise AssertionError(f"{what} did not end within {CALL_TIMEOUT_S:.0f} s") from None
+        if done.returncode == MISSING_EXIT:
+            raise CheckerMissing(f"the decision checker does not exist: {done.stderr.strip()} under src/")
+        assert done.returncode == 0, f"{what} failed (exit code {done.returncode}):\n{done.stderr}"
+        try:
+            return json.loads(done.stdout)
+        except ValueError:
+            raise AssertionError(f"{what} did not return JSON values:\n{done.stdout}\n{done.stderr}") from None
+
+    def load(self, root):
+        """``gov.store.load(root)``: build the store of the temporary project."""
+        answer = self._batch([(STORE_MODULE, "load", root)])[0]
+        assert "value" in answer, f"gov.store.load failed: {answer.get('error')}"
+        return answer["value"]
+
+    def check_only(self, root, environment=None):
+        """``gov.decisions.check(root)`` alone: the findings, each checked for the shape the interface fixes.
+        ``environment`` adds variables to the checker's process (batch 4)."""
+        answer = self._batch([(DECISIONS_MODULE, "check", root)], extra=environment)[0]
+        if "error" in answer:
+            raise Raised(answer["error"])
+        return findings(answer["value"])
+
+    def check(self, root):
+        """Load the store of ``root``, then check it."""
+        self.load(root)
+        return self.check_only(root)
+
+
+def findings(value):
+    """``value`` when it is a list of findings in the shape the interface fixes."""
+    assert isinstance(value, list), f"check did not return a list of findings: {value!r}"
+    for finding in value:
+        assert isinstance(finding, dict), f"a finding is not a map: {finding!r}"
+        assert isinstance(finding.get("code"), str) and finding["code"], f"a finding has no `code`: {finding!r}"
+        for key in ("ids", "paths"):
+            assert isinstance(finding.get(key), list) and all(isinstance(item, str) for item in finding[key]), \
+                f"a finding's `{key}` is not a list of strings: {finding!r}"
+        assert isinstance(finding.get("message"), str) and finding["message"].strip(), \
+            f"a finding has no `message`: {finding!r}"
+    return value
+
+
+def with_code(found, code):
+    return [finding for finding in found if finding["code"] == code]
+
+
+def matching(found, code, ids=(), paths=()):
+    """The findings with ``code`` that name every one of ``ids`` and every one of ``paths``."""
+    return [finding for finding in with_code(found, code)
+            if set(ids) <= set(finding["ids"]) and set(paths) <= set(finding["paths"])]
+
+
+def assert_flagged(found, code, ids=(), paths=()):
+    assert matching(found, code, ids, paths), (
+        f"no {code} finding names ids {sorted(ids)} and paths {sorted(paths)}; the findings were:\n{show(found)}")
+
+
+def assert_not_flagged(found, code, ids=()):
+    hits = matching(found, code, ids)
+    assert not hits, f"{code} was raised for {sorted(ids) or 'this tree'}, which is no such case:\n{show(hits)}"
+
+
+def show(found):
+    return "\n".join(f"  {finding['code']} ids={finding['ids']} paths={finding['paths']}: {finding['message']}"
+                     for finding in found) or "  (none)"
+
+
+# --------------------------------------------------------------------------
+# git and the temporary project
+# --------------------------------------------------------------------------
+
+# Who commits. The owner's approval fact is the `Role: owner` trailer on the commit that sets a decision ACTIVE
+# (DEC-360), in the final trailer block (DEC-182). An agent's commit differs in name, email and role;
+# AGENT_AS_OWNER differs in the role alone, as in a repository where agents commit under the owner's account.
+OWNER = {"name": "The Owner", "email": "owner@example.invalid", "trailers": ("Role: owner",)}
+AGENT = {"name": "An Agent", "email": "agent@example.invalid",
+         "trailers": ("Task: PROJ-aaaa", "Role: engineer")}
+ANONYMOUS = {"name": "An Agent", "email": "agent@example.invalid", "trailers": ()}
+AGENT_AS_OWNER = {"name": OWNER["name"], "email": OWNER["email"], "trailers": AGENT["trailers"]}
+
+# From 2026-10-03, trailers are read from the final trailer block alone (DEC-182). Both dates are the author's
+# and the committer's, and fall on the same side of 2026-10-03 in every time zone.
+FIRST_DATE = "2026-10-04T12:{minute:02d}:00+00:00"
+BEFORE_THE_TRAILER_RULE = "2026-09-20T12:00:00+00:00"
+
+
+def git(project, *args, who=AGENT, date=FIRST_DATE.format(minute=0), check=True):
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(Path(project).parent),
+        "LC_ALL": "C",
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_AUTHOR_NAME": who["name"], "GIT_AUTHOR_EMAIL": who["email"],
+        "GIT_COMMITTER_NAME": who["name"], "GIT_COMMITTER_EMAIL": who["email"],
+        "GIT_AUTHOR_DATE": date, "GIT_COMMITTER_DATE": date,
+    }
+    done = subprocess.run(["git", "-C", str(project), *args], capture_output=True, text=True, env=env)
+    if check and done.returncode != 0:
+        raise AssertionError(f"git {' '.join(args)} failed in {project}:\n{done.stderr}")
+    return done.stdout
+
+
+class Project:
+    """A temporary git repository: files are written, then committed by the owner or by an agent."""
+
+    def __init__(self, root, init=True):
+        self.root = Path(root)
+        self.minute = 0
+        if init:
+            self.root.mkdir(parents=True, exist_ok=True)
+            git(self.root, "init", "-q", "-b", "main")
+
+    def write(self, rel, text):
+        """Write ``text`` as UTF-8; batch 5: bytes are written as they are."""
+        path = self.root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(text if isinstance(text, bytes) else text.encode("utf-8"))
+        return path
+
+    def commit(self, message="records", who=OWNER, trailers=None, date=None):
+        """Commit everything; trailers go in the final trailer block with ``git commit --trailer`` (DEC-182).
+        ``date`` replaces the next fixture date, as the author's and the committer's."""
+        self.minute += 1
+        date = date or FIRST_DATE.format(minute=self.minute)
+        git(self.root, "add", "-A", who=who, date=date)
+        arguments = ["commit", "-q", "--allow-empty", "--no-gpg-sign", "-m", message]
+        for trailer in (who["trailers"] if trailers is None else trailers):
+            arguments += ["--trailer", trailer]
+        git(self.root, *arguments, who=who, date=date)
+        return git(self.root, "rev-parse", "HEAD").strip()
+
+    def put(self, files, who=OWNER, message="records"):
+        """Write ``path -> text`` and commit it."""
+        for rel, text in files.items():
+            self.write(rel, text)
+        return self.commit(message, who=who)
+
+    def switch(self, branch, new=False):
+        """Check out ``branch``; ``new`` cuts it from the current commit."""
+        git(self.root, "checkout", "-q", *(["-b"] if new else []), branch)
+
+    def merge(self, branch, who=AGENT, keep=None, date=None):
+        """Merge ``branch`` into the current branch with a merge commit by ``who``. ``keep`` maps a path both
+        sides wrote to the side whose file the merge keeps: ``ours`` (the current branch) or ``theirs``."""
+        git(self.root, "merge", "-q", "--no-ff", "--no-commit", branch, who=who, check=False)
+        for rel, side in (keep or {}).items():
+            git(self.root, "checkout", f"--{side}", "--", rel)
+        commit = self.commit(f"Merge branch '{branch}'", who=who, date=date)
+        parents = git(self.root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+        assert len(parents) == 2, f"the merge of {branch} made no merge commit: parents {parents}"
+        return commit
+
+
+    # ---- batch 4
+
+    def merge_with(self, branch, who=AGENT, strategy=None, take=None, files=None, drop=(), unrelated=False,
+                   under=None):
+        """Merge ``branch`` into the current branch with a merge commit by ``who`` that decides what a file holds.
+        ``strategy`` is git's merge strategy (``ours`` keeps the current branch's whole tree); ``take`` maps a path
+        to the revision whose file the merge commit holds; ``files`` maps a path to a text written by hand.
+        Batch 5: ``drop`` lists paths the merge commit does not hold; ``unrelated`` allows a branch that shares no
+        commit with the current one; ``under`` puts the branch's whole tree below that folder and keeps the
+        current branch's own files as they are (a subtree import)."""
+        if under:
+            strategy, unrelated = "ours", True
+        git(self.root, "merge", "-q", "--no-ff", "--no-commit", *(["-s", strategy] if strategy else []),
+            *(["--allow-unrelated-histories"] if unrelated else []), branch, who=who, check=False)
+        if under:
+            git(self.root, "read-tree", f"--prefix={under.rstrip('/')}/", "-u", branch)
+        for rel, revision in (take or {}).items():
+            git(self.root, "checkout", revision, "--", rel)
+        for rel, text in (files or {}).items():
+            self.write(rel, text)
+        for rel in drop:
+            git(self.root, "rm", "-q", "-f", "--ignore-unmatch", "--", rel)
+            (self.root / rel).unlink(missing_ok=True)
+        commit = self.commit(f"Merge branch '{branch}'", who=who)
+        assert len(parents_of(self.root, commit)) == 2, f"the merge of {branch} made no merge commit"
+        return commit
+
+    # ---- batch 5
+
+    def remove(self, rel, who=OWNER, message="remove a file"):
+        """Remove the file ``rel`` and commit that."""
+        git(self.root, "rm", "-q", "--", rel)
+        return self.commit(message, who=who)
+
+    def move(self, old, new, who=AGENT, message="move a file"):
+        """Move the file ``old`` to ``new``, no byte of it changed, and commit that."""
+        (self.root / new).parent.mkdir(parents=True, exist_ok=True)
+        git(self.root, "mv", old, new)
+        return self.commit(message, who=who)
+
+    def orphan(self, branch, files, who=AGENT):
+        """Start ``branch`` as a history of its own, sharing no commit with any other, holding ``files`` alone."""
+        git(self.root, "checkout", "-q", "--orphan", branch)
+        git(self.root, "rm", "-q", "-r", "-f", "--ignore-unmatch", ".")
+        return self.put(files, who=who, message="the first commit of another history")
+
+    def bare_commits(self, parent, count, who=AGENT):
+        """``count`` distinct commits, each with the tree and the one parent ``parent``, on no branch."""
+        tree = git(self.root, "rev-parse", f"{parent}^{{tree}}").strip()
+        text = "a side commit {number}\n\n" + "\n".join(who["trailers"]) + "\n"
+        return [git(self.root, "commit-tree", tree, "-p", parent, "-m", text.format(number=number), who=who,
+                    date=FIRST_DATE.format(minute=59)).strip() for number in range(count)]
+
+    def copy_of_commit(self, commit, who):
+        """A commit with the tree, the parents and the dates of ``commit`` and the trailers of ``who``, on no
+        branch: what a replace ref can put in the place of ``commit``."""
+        tree = git(self.root, "rev-parse", f"{commit}^{{tree}}").strip()
+        date = git(self.root, "show", "-s", "--format=%cI", commit).strip()
+        arguments = [argument for parent in parents_of(self.root, commit) for argument in ("-p", parent)]
+        text = "records\n\n" + "\n".join(who["trailers"]) + "\n"
+        return git(self.root, "commit-tree", tree, *arguments, "-m", text, who=who, date=date).strip()
+
+    def criss_cross(self, other="right", who=AGENT):
+        """Make the current branch and a new branch ``other`` cross: each gets a commit of its own, then each
+        merges the other's commit. The two tips then have two merge bases. Leaves the current branch checked
+        out; no decision file is touched."""
+        here = git(self.root, "rev-parse", "--abbrev-ref", "HEAD").strip()
+        self.switch(other, new=True)
+        theirs = self.put({f"notes/{other}.md": "# Notes of the other line\n\nNo frontmatter here.\n"}, who=who)
+        self.switch(here)
+        ours = self.put({f"notes/{here}.md": "# Notes of this line\n\nNo frontmatter here.\n"}, who=who)
+        self.merge_with(theirs, who=who)
+        self.switch(other)
+        self.merge_with(ours, who=who)
+        self.switch(here)
+        assert len(merge_bases(self.root, here, other)) == 2, "the fixture's two lines do not cross"
+
+    def commit_by_hand(self, parents, message="a commit made by hand", who=AGENT):
+        """Commit everything as a commit whose parents are exactly ``parents``, in that order, and move the current
+        branch to it. The trailers of ``who`` are the message's final block."""
+        self.minute += 1
+        date = FIRST_DATE.format(minute=self.minute)
+        git(self.root, "add", "-A")
+        tree = git(self.root, "write-tree").strip()
+        text = message + "\n\n" + "\n".join(who["trailers"]) + "\n"
+        arguments = [argument for parent in parents for argument in ("-p", parent)]
+        commit = git(self.root, "commit-tree", tree, *arguments, "-m", text, who=who, date=date).strip()
+        git(self.root, "reset", "-q", "--hard", commit)
+        assert parents_of(self.root, commit) == list(parents), "the commit made by hand has other parents"
+        return commit
+
+
+def parents_of(root, commit):
+    return git(root, "rev-list", "--parents", "-n", "1", commit).split()[1:]
+
+
+def merge_bases(root, one, other):
+    """The merge bases of two commits: none for unrelated histories, several for lines that cross (batch 5)."""
+    return git(root, "merge-base", "--all", one, other, check=False).split()
+
+
+# ---- batch 6: files under `.git/` and git settings that change what git reports
+
+def real_parents(root, commit):
+    """The parents the commit object itself names, read from its own bytes: no grafts file, shallow file or
+    commit-graph changes them."""
+    lines = git(root, "--no-replace-objects", "cat-file", "commit", commit).split("\n\n", 1)[0].splitlines()
+    return [line.split()[1] for line in lines if line.startswith("parent ")]
+
+
+def write_grafts(root, commit, parents):
+    """Write `.git/info/grafts` with one line that gives ``commit`` the parents ``parents``."""
+    path = Path(root) / ".git" / "info" / "grafts"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(" ".join([commit, *parents]) + "\n", encoding="ascii")
+    return path
+
+
+def write_shallow(root, commit):
+    """Write `.git/shallow` by hand with the one line ``commit``: git then reports that commit with no parent.
+    Every object stays in the repository."""
+    path = Path(root) / ".git" / "shallow"
+    path.write_text(commit + "\n", encoding="ascii")
+    return path
+
+
+def write_commit_graph(root, commit=None, parent=None):
+    """Have git write `.git/objects/info/commit-graph` for every reachable commit. With ``commit`` and ``parent``,
+    the file's entry for ``commit`` is then rewritten to name ``parent`` as its first parent: git reads the
+    parents of a commit it walks through from this file, not from the commit."""
+    git(root, "commit-graph", "write", "--reachable")
+    path = Path(root) / ".git" / "objects" / "info" / "commit-graph"
+    if commit is None:
+        return path
+    data = bytearray(path.read_bytes())
+    assert bytes(data[:4]) == b"CGPH" and data[5] == 1, "the fixture's commit-graph is not a SHA-1 commit-graph file"
+    chunks = {bytes(data[8 + 12 * number: 12 + 12 * number]):
+              int.from_bytes(data[12 + 12 * number: 20 + 12 * number], "big") for number in range(data[6] + 1)}
+    names, entries = chunks[b"OIDL"], chunks[b"CDAT"]  # the sorted commit ids; tree, two parents, date for each
+    ids = [bytes(data[names + 20 * number: names + 20 * number + 20]).hex() for number in range((entries - names) // 20)]
+    at = entries + 36 * ids.index(commit) + 20
+    data[at: at + 4] = ids.index(parent).to_bytes(4, "big")
+    path.chmod(0o644)
+    path.write_bytes(bytes(data))
+    return path
+
+
+def git_as_user(root, home, *args):
+    """Run git in ``root`` as a user whose home is ``home``: the user's configuration there is read, the
+    system's is not. For asserting what a setting in a `.gitconfig` makes git print."""
+    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(home), "LC_ALL": "C",
+           "GIT_CONFIG_NOSYSTEM": "1"}
+    done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=env)
+    assert done.returncode == 0, f"git {' '.join(args)} failed in {root}:\n{done.stderr}"
+    return done.stdout
+
+
+def partial_clone(source, destination):
+    """A clone of ``source`` made with ``--filter=blob:none``: it holds every commit and tree, and only the files
+    of its checkout. ``source`` is a local repository, reached by a ``file://`` address: no network."""
+    git(source, "config", "uploadpack.allowFilter", "true")
+    git(Path(destination).parent, "clone", "-q", "--no-local", "--filter=blob:none", Path(source).as_uri(),
+        str(destination))
+    return Project(destination, init=False)
+
+
+def absent_objects(root):
+    """The ids of the objects ``HEAD``'s history names and the repository does not hold. Asking fetches nothing."""
+    listed = git(root, "rev-list", "--objects", "--missing=print", "HEAD")
+    return sorted(line[1:] for line in listed.splitlines() if line.startswith("?"))
+
+
+def remove_object(root, name):
+    """Take the object ``name`` (for example ``<commit>:<path>``) out of the repository's object store."""
+    object_id = git(root, "rev-parse", name).strip()
+    loose = Path(root) / ".git" / "objects" / object_id[:2] / object_id[2:]
+    assert loose.is_file(), f"the fixture's object {name} is not a loose object: {loose}"
+    loose.chmod(0o644)
+    loose.unlink()
+    assert object_id in absent_objects(root), f"the fixture's object {name} is still in the repository"
+    return object_id
+
+
+def everything_under(root):
+    """Every file under ``root``, ``.git/`` included, with the sha256 of its bytes (a link with its target). Read
+    from the file system alone: no git command runs, so taking it changes nothing."""
+    root = Path(root)
+    files = {}
+    for path in sorted(root.rglob("*")):
+        rel = path.relative_to(root).as_posix()
+        if path.is_symlink():
+            files[rel] = "link:" + os.readlink(path)
+        elif path.is_file():
+            files[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            files[rel] = "dir"
+    return files
+
+
+def differences(before, after):
+    """What differs between two ``everything_under`` listings, in words."""
+    return [f"{rel}: " + ("added" if rel not in before else "removed" if rel not in after else "rewritten")
+            for rel in sorted(set(before) | set(after)) if before.get(rel) != after.get(rel)]
+
+
+def outcome(api, root, environment=None):
+    """What a check of ``root`` gives: ``("findings", list)`` or ``("error", Raised)``. For the cases where the
+    interface allows either and forbids only a pass."""
+    try:
+        return "findings", api.check_only(root, environment=environment)
+    except Raised as raised:
+        assert isinstance(raised.code, str) and raised.code, "the GovError has no code"
+        assert isinstance(raised.details, dict), "the GovError's details are not a map"
+        return "error", raised
+
+
+def assert_fails_naming(found, path, codes):
+    """A finding with one of ``codes`` names the file ``path``."""
+    hits = [finding for finding in found if finding["code"] in codes and path in finding["paths"]]
+    assert hits, (f"no {' or '.join(sorted(codes))} finding names the file {path}; the findings were:\n"
+                  f"{show(found)}")
+
+
+def assert_some_finding_names(found, path):
+    """A finding names the file ``path``, whatever its code (batch 5: the code is the engineer's)."""
+    assert [finding for finding in found if path in finding["paths"]], (
+        f"no finding names the file {path}; the findings were:\n{show(found)}")
+
+
+def clone(source, destination):
+    subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(source), str(destination)], check=True,
+                   capture_output=True)
+    return Project(destination, init=False)
+
+
+def snapshot(root):
+    """Everything a checker that only reads leaves as it was: every file of the tree outside ``.git/`` with the
+    sha256 of its bytes (a link with its target), the commit, the refs, the index and the git status."""
+    root = Path(root)
+    files = {}
+    for path in sorted(root.rglob("*")):
+        rel = path.relative_to(root).as_posix()
+        if rel == ".git" or rel.startswith(".git/"):
+            continue
+        if path.is_symlink():
+            files[rel] = "link:" + os.readlink(path)
+        elif path.is_file():
+            files[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+        else:
+            files[rel] = "dir"
+    return {
+        "files": files,
+        "head": git(root, "rev-parse", "HEAD"),
+        "refs": git(root, "for-each-ref"),
+        "index": git(root, "ls-files", "--stage"),
+        "status": git(root, "status", "--porcelain", "--untracked-files=all", "--ignored"),
+    }
+
+
+def changed(before, after):
+    """What differs between two snapshots, in words."""
+    out = []
+    for rel in sorted(set(before["files"]) | set(after["files"])):
+        if before["files"].get(rel) != after["files"].get(rel):
+            state = "added" if rel not in before["files"] else "removed" if rel not in after["files"] else "rewritten"
+            out.append(f"{rel}: {state}")
+    out += [f"git {key} changed" for key in ("head", "refs", "index", "status") if before[key] != after[key]]
+    return out
+
+
+# --------------------------------------------------------------------------
+# Records
+# --------------------------------------------------------------------------
+
+def record(record_id, record_type, status, title="A record", body="Body text.", **keys):
+    """A record file: frontmatter (``id``, ``type``, ``status``, ``state_class``, the given keys) and a body."""
+    lines = [f"id: {record_id}", f"type: {record_type}", f"status: {status}", "state_class: AUTHORITATIVE",
+             f"title: {title}"]
+    for key, value in keys.items():
+        lines.append(f"{key}: {json.dumps(value)}")  # a JSON list or string is a YAML flow value
+    return "---\n" + "\n".join(lines) + f"\n---\n\n# {record_id} — {title}\n\n{body}\n"
+
+
+def decision(record_id, status, **keys):
+    """A MADR decision record, as the decision-record template of W1-08 and W1-34 writes it."""
+    return record(record_id, "decision", status, **keys)
+
+
+def package(record_id, status, cit, constrains=()):
+    """A decision package, as the template of W1-34 writes it: state in `status` alone, the CIT in `cit`.
+    ``cit=None`` leaves the key out."""
+    keys = {"rank": "P2", "cit": cit, "constrains": list(constrains)}
+    if cit is None:
+        del keys["cit"]
+    return record(record_id, "decision-package", status, **keys)
+
+
+def ticket(ticket_id, status="open", **keys):
+    """A ticket as tk and the task contract write it."""
+    return record(ticket_id, "task", status, deps=[], role="engineer", allowed_paths=["src/**"],
+                  kpis={"success": ["works"], "failure": []}, **keys)
+
+
+def adr_path(record_id):
+    return f"docs/adr/{record_id}.md"
+
+
+def ticket_path(ticket_id):
+    return f".tickets/{ticket_id}.md"
+
+
+def package_path(record_id):
+    return f"docs/decisions/packages/{record_id}.md"
+
+
+# A decision register with no hazard: one directory, distinct ids, a supersession recorded on both sides and a
+# chain of three that ends.
+CLEAN = {
+    adr_path("ADR-0001"): decision("ADR-0001", "ACTIVE"),
+    adr_path("ADR-0002"): decision("ADR-0002", "SUPERSEDED", superseded_by="ADR-0003"),
+    adr_path("ADR-0003"): decision("ADR-0003", "SUPERSEDED", supersedes=["ADR-0002"], superseded_by="ADR-0004"),
+    adr_path("ADR-0004"): decision("ADR-0004", "ACTIVE", supersedes=["ADR-0003"], depends_on=["ADR-0001"]),
+    adr_path("ADR-0005"): decision("ADR-0005", "PROPOSED"),
+    "README.md": "# A project\n\nNo frontmatter here.\n",
+}

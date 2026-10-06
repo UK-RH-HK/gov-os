@@ -39,13 +39,21 @@ def this_repository_is_never_paused():
 
 
 def _flag_state(path):
-    """None when nothing is at ``path``; "sandbox placeholder" for a character device; else what is there."""
+    """None when nothing is at ``path``; "sandbox placeholder" for a character device; else what is there.
+
+    Owner decision DEC-402: an empty regular file is no flag either. It is the
+    placeholder as it shows outside the sandbox while a launched session's
+    command runs, and it comes and goes with that command, so it reads as
+    nothing here. It is never opened: its size says it.
+    """
     try:
         status = os.lstat(path)
     except FileNotFoundError:
         return None
     if stat.S_ISCHR(status.st_mode):
         return "sandbox placeholder"
+    if stat.S_ISREG(status.st_mode) and status.st_size == 0:
+        return None
     return (status.st_mode, status.st_ino, status.st_size, status.st_mtime_ns)
 
 
@@ -105,6 +113,16 @@ def pause(project, sandbox):
         return support.pause(project, sandbox, *args, role=role, flag_role=flag_role, cwd=cwd)
 
     return _pause
+
+
+@pytest.fixture()
+def lift(project, sandbox):
+    """``lift()`` lifts this test's project as the owner in person does (DEC-409): ``support.lift``."""
+
+    def _lift():
+        return support.lift(project, sandbox)
+
+    return _lift
 
 
 @pytest.fixture()

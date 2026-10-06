@@ -245,10 +245,10 @@ def make_project(directory):
 
 
 def set_freeze(project):
-    """Set the freeze flag (DEC-109)."""
+    """Set the freeze flag (DEC-109), with the marker line ``gov pause`` writes (DEC-402)."""
     flag = Path(project) / FREEZE_FLAG_REL
     flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.write_text("", encoding="utf-8")
+    flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")
 
 
 # --------------------------------------------------------------------------

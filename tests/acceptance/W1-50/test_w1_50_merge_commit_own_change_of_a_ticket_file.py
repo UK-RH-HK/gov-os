@@ -28,9 +28,10 @@ and
 ``test_a_commit_without_trailers_of_a_ticket_file_made_in_the_orchestrator_s_own_call_is_silent``,
 unchanged.
 
-**Not pinned:** a ticket file that both sides changed and that the merge commit
-holds as one side has it. DEC-410 names ``tests/acceptance/**`` only for that
-rule (DP-24).
+**Now pinned:** a ticket file that both sides changed is the merge commit's own
+change, whichever side's content it holds. DEC-421 extends the both-sides
+rule of DP-24 to ``.tickets/**``. Tests:
+``test_w1_50_ticket_file_changed_on_both_sides.py``.
 
 The same dropped changes with an engineer's trailers on the merge commit are
 findings since DEC-403 (DP-16):

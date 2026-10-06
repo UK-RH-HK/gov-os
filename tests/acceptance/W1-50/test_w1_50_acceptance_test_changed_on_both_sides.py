@@ -50,8 +50,8 @@ unchanged, through the check). With several merge bases, or none, nothing
 changes: every path that differs from any parent is the merge commit's own
 already (DP-23).
 
-**Not pinned:** the same rule for a path under ``.tickets/**``; DEC-410 names
-``tests/acceptance/**`` only.
+**Now pinned:** DEC-421 extends the both-sides rule to ``.tickets/**`` too.
+The tests for that are in ``test_w1_50_ticket_file_changed_on_both_sides.py``.
 """
 
 from __future__ import annotations

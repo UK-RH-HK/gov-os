@@ -516,7 +516,7 @@ def test_frozen_repo_denies_install_for_orchestrator(tmp_path):
     project = _make_project(tmp_path)
     freeze = project / ".gov-runtime" / "freeze"
     freeze.parent.mkdir(parents=True, exist_ok=True)
-    freeze.touch()
+    freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")  # DEC-402: a marked flag
     proc = _run_hook(project, "pip install requests",
                      role="orchestrator", ticket="T-01", tmp_path=tmp_path)
     assert _decision(proc) == "deny"

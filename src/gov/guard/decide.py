@@ -6,6 +6,7 @@ import glob
 import os
 import re
 import shlex
+import stat
 import tempfile
 from pathlib import Path
 
@@ -17,6 +18,8 @@ KNOWN_ROLES = frozenset({
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
 FREEZE_FLAG = ".gov-runtime/freeze"
+FREEZE_MARKER = b"FROZEN"  # DEC-402: the word of a real flag's marker line
+_FREEZE_HEAD = 65536       # the most that is read of a flag
 ACCEPTANCE = "tests/acceptance"
 _GOV_RUNTIME = ".gov-runtime"
 _PUNCT = frozenset("();<>|&\n")
@@ -558,6 +561,147 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     return targets or None
 
 
+# -- the freeze flag (DEC-402) -------------------------------------------------
+
+def freeze_state(project_root: str) -> str:
+    """Read the freeze flag: ``"absent"``, ``"unmarked"`` or ``"frozen"``.
+
+    Frozen when the flag carries the marker word, in any letter case and
+    with its NUL bytes taken out (a near spelling of the marker line, or
+    the line in UTF-16 or UTF-32), or when something is at the path that
+    cannot be read as a file (DEC-179).  An empty file, text without the
+    word and a character device (what the sandbox puts at the path) are an
+    unmarked presence, which the hook records.  Only a regular file is
+    opened, and only its head is read.
+    """
+    path = os.path.join(project_root, FREEZE_FLAG)
+    try:
+        os.lstat(path)
+    except FileNotFoundError:
+        # A dangling link where the runtime folder should be hides the
+        # folder that would hold the flag: the guard cannot tell.
+        runtime = os.path.dirname(path)
+        if os.path.islink(runtime) and not os.path.exists(runtime):
+            return "frozen"
+        return "absent"
+    except NotADirectoryError:
+        return "absent"
+    except OSError:
+        return "frozen"
+    try:
+        st = os.stat(path)
+        if stat.S_ISCHR(st.st_mode) or (stat.S_ISREG(st.st_mode)
+                                        and st.st_size == 0):
+            return "unmarked"
+        if not stat.S_ISREG(st.st_mode):
+            return "frozen"
+        fd = os.open(path, os.O_RDONLY | os.O_NONBLOCK)
+        try:
+            head = os.read(fd, _FREEZE_HEAD + 1)
+        finally:
+            os.close(fd)
+    except OSError:
+        return "frozen"
+    if len(head) > _FREEZE_HEAD:
+        return "frozen"  # too large to read whole: the guard cannot tell
+    if FREEZE_MARKER in head.replace(b"\x00", b"").upper():
+        return "frozen"
+    return "unmarked"
+
+
+# -- the lift form of gov pause (DEC-409) --------------------------------------
+
+LIFT_REFUSAL = ("the lift form of gov pause (--off) is refused to every agent "
+                "session: only the owner lifts a freeze, in person (DEC-409)")
+_LIFT_PUNCT = frozenset("();<>|&\n`")
+# What starts a shell, an interpreter or a Claude Code session: the lift
+# form anywhere in the text of its pipeline is refused.
+_STARTERS = frozenset({"bash", "sh", "dash", "zsh", "ksh", "eval", "claude",
+                       "node", "perl", "ruby"})
+_PYTHON_RE = re.compile(r"python[\d.]*$")
+_GOV_RE = re.compile(r"(?<![\w.-])gov(?![\w-])")
+_PAUSE_RE = re.compile(r"(?<![\w-])pause(?![\w-])")
+_OFF_RE = re.compile(r"(?<![\w-])--off(?![\w-])")
+
+
+def _is_gov_word(word: str) -> bool:
+    return (os.path.basename(word) == "gov" or word == "gov.cli.main"
+            or word.endswith("gov/cli/main.py"))
+
+
+def _substitutions(word: str) -> list[str]:
+    """The command substitutions a quoted word holds: between backticks,
+    and from ``$(`` to its closing parenthesis."""
+    bodies = word.split("`")[1::2]
+    start = word.find("$(")
+    while start >= 0:
+        depth, end = 1, start + 2
+        while end < len(word) and depth:
+            depth += {"(": 1, ")": -1}.get(word[end], 0)
+            end += 1
+        bodies.append(word[start + 2:end])
+        start = word.find("$(", end)
+    return bodies
+
+
+def _pipeline_lifts(pipeline: list[list[str]]) -> bool:
+    for words in pipeline:
+        for i, word in enumerate(words):
+            if _is_gov_word(word) and "pause" in words[i + 1:]:
+                rest = words[i + 1:]
+                if "--off" in rest[rest.index("pause"):]:
+                    return True
+            if any(_lift_in(body) for body in _substitutions(word)):
+                return True
+    words = [word for command in pipeline for word in command]
+    if not any(os.path.basename(w) in _STARTERS
+               or _PYTHON_RE.match(os.path.basename(w)) for w in words) and not (
+            "launch" in words and any(_is_gov_word(w) for w in words)):
+        return False
+    text = " ".join(words)
+    gov = _GOV_RE.search(text)
+    pause = gov and _PAUSE_RE.search(text, gov.end())
+    return bool(pause and _OFF_RE.search(text, pause.end()))
+
+
+def _lift_in(command: str) -> bool:
+    lex = shlex.shlex(command, posix=True, punctuation_chars="();<>|&\n`")
+    lex.whitespace_split = True
+    lex.whitespace = " \t\r"
+    lex.commenters = ""
+    pipeline: list[list[str]] = [[]]
+    for tok in [*lex, ";"]:
+        if (not tok or not all(c in _LIFT_PUNCT for c in tok)
+                or "<" in tok or ">" in tok):
+            pipeline[-1].append(tok)  # a redirect stays inside its command
+        elif "|" in tok and "||" not in tok:
+            pipeline.append([])
+        else:
+            if _pipeline_lifts(pipeline):
+                return True
+            pipeline = [[]]
+    return False
+
+
+def lift_refusal(command) -> str:
+    """Why a Bash command is refused for the lift form of ``gov pause``,
+    or ``""`` when it does not hold it.
+
+    The form is a gov word (a word whose last part is ``gov``, the module
+    ``gov.cli.main``, the file ``gov/cli/main.py``) followed by ``pause``
+    and ``--off``: as words of one command that is run, also inside a
+    command substitution, or anywhere in the text of a pipeline that starts
+    a shell, an interpreter, a Claude Code session or ``gov launch``.  One
+    quoted word that a command only reads or stores is not the form.  A
+    command that cannot be read is refused.
+    """
+    try:
+        return LIFT_REFUSAL if _lift_in(command) else ""
+    except Exception:
+        return ("the command cannot be read, so it is not known to be free "
+                "of the lift form of gov pause (--off): refused (DEC-409)")
+
+
 # -- main decision -------------------------------------------------------------
 
 def decide(
@@ -568,14 +712,25 @@ def decide(
     ticket_id: str | None,
     subagent_type: str | None = None,
     cwd: str | None = None,
+    flag: str | None = None,
 ) -> tuple[str, str]:
-    """Return ``("allow", "")`` or ``("deny", "<reason>")``."""
-    frozen = os.path.exists(os.path.join(project_root, FREEZE_FLAG))
+    """Return ``("allow", "")`` or ``("deny", "<reason>")``.
+
+    *flag* is the freeze flag's state when the caller has read it
+    (``freeze_state``); it is read here otherwise.
+    """
+    frozen = (flag or freeze_state(project_root)) == "frozen"
     erole = (role or "").strip() or ""
 
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.
     if tool_name == "Bash" and tool_input.get("dangerouslyDisableSandbox"):
         return "deny", "dangerouslyDisableSandbox is denied to every role"
+
+    # DEC-409: no agent Bash call holds the lift form, whatever the role.
+    if tool_name == "Bash":
+        refusal = lift_refusal(tool_input.get("command", ""))
+        if refusal:
+            return "deny", refusal
 
     # DEC-162, DEC-215: no call names a held-out path, whatever the tool
     # and the role.  A broken held-out.yaml stops every call (DEC-218).

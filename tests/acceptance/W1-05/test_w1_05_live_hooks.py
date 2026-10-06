@@ -164,7 +164,7 @@ def test_a_read_only_tool_is_allowed_while_frozen(scratch_copy, decide, tool_nam
     """The freeze flag stops writes. Reading goes on."""
     flag = scratch_copy / ".gov-runtime" / "freeze"
     flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.write_text("", encoding="utf-8")
+    flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")   # the marker line (DEC-402)
     result = decide(scratch_copy, tool_name, support.read_input(tool_name, scratch_copy), ENGINEER, TICKET)
     assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
     assert result.decision == "allow", f"{tool_name} by the engineer while frozen: {result.describe()}"
@@ -214,7 +214,7 @@ def test_the_freeze_flag_stops_every_write(scratch_copy, decide):
     assert result.decision == "allow", f"Write on {SOURCE} before the freeze: {result.describe()}"
     flag = scratch_copy / ".gov-runtime" / "freeze"
     flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.write_text("", encoding="utf-8")
+    flag.write_text("FROZEN owner 2026-10-05T00:00:00Z\n", encoding="utf-8")   # the marker line (DEC-402)
     result = decide(scratch_copy, "Write", support.write_input("Write", scratch_copy / SOURCE), ENGINEER, TICKET)
     assert result.decision == "deny", f"Write on {SOURCE} while frozen: {result.describe()}"
 

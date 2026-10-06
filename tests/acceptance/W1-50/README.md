@@ -1007,7 +1007,8 @@ parents turned round.
 merge base, so it is the merge commit's own, although the merge commit differs from no parent in it. `own` then holds
 a path outside "the paths where the merge commit differs from a parent"; `brought` stays inside them (DP-22).
 With several merge bases, or none, nothing changes: every differing path is the merge commit's own already (DP-23).
-DP-24 is not pinned for `.tickets/**`.
+DEC-421 extends DP-24 to `.tickets/**`; tested in
+`test_w1_50_ticket_file_changed_on_both_sides.py`.
 
 ### DP-22: what `brought` holds (`test_w1_50_read_merge_brought.py`, 4 cases)
 
@@ -1105,6 +1106,20 @@ is built the number does not matter.
 **Not pinned:** a number of merge commits, of commits or of git processes at which anything changes; how the work is
 bounded or the time is kept; which form the finding has, its `action`, and whether the check leaves the move in
 place; anything `read_merge` returns for a merge commit of the chain (each has 24 parents and is within DP-28).
+
+## Added after implementation, DEC-421 (twelfth batch)
+
+These 6 cases are **tests added after implementation**; reason: "owner decision, DEC-421". DEC-421 extends the
+both-sides rule of DEC-410 DP-24 to `.tickets/**`: a ticket file that more than one parent changed against the merge
+base is the merge commit's own change, whichever side's content it holds. The tests are in
+`test_w1_50_ticket_file_changed_on_both_sides.py`; the builders are those of `w1_50_own_change_support.py`.
+
+| Holds | Test function | Cases | Expected red reason |
+|---|---|---|---|
+| DEC-421, through the check | `test_a_merge_that_takes_one_side_s_content_of_a_ticket_file_both_sides_changed_is_flagged`: first or second parent's content | 2 | **red**: `read_merge` applies the both-sides rule only to `tests/acceptance/`; a ticket file both sides changed is in `brought` (second parent's content) or absent from both (first parent's) |
+| DEC-421, through the helper | `test_read_merge_puts_a_ticket_file_both_sides_changed_in_own`: the same two histories; the ticket file is in `own` and not in `brought` | 2 | **red**: `own` lacks the ticket file |
+| DEC-421, identical change, through the helper | `test_read_merge_puts_a_ticket_file_both_sides_changed_in_the_same_way_in_own`: `own` is the ticket file | 1 | **red**: `own` is empty |
+| The other side | `test_a_merge_where_each_side_changed_a_different_ticket_file_is_silent`: each side changed a different ticket file; `own` is empty, the merge is silent | 1 | **green**: must stay green; a fix that flags every merge commit that differs from a parent in a ticket file fails it |
 
 ## What the suite takes as given
 

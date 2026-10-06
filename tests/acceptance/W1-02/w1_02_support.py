@@ -53,6 +53,8 @@ GOV_PACKAGE_PARENT_REL = "src"
 ROLE_ENV = "GOV_ROLE"
 TICKET_ENV = "GOV_TICKET"
 FREEZE_FLAG_REL = ".gov-runtime/freeze"
+# DEC-402: a real flag carries the marker line ``gov pause`` writes; a made-up caller and time.
+FREEZE_MARKER_LINE = "FROZEN owner 2026-10-05T00:00:00Z\n"
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
 SCRATCH_REL = ".gov-runtime/scratch"
 
@@ -280,10 +282,13 @@ def porcelain(project):
 
 
 def set_freeze(project, content=""):
-    """Set the freeze flag the way ``gov pause`` will (owner answer to KD-3)."""
+    """Set the freeze flag the way ``gov pause`` does (owner answer to KD-3; the marker line, DEC-402).
+
+    ``content`` follows the marker line.
+    """
     flag = Path(project) / FREEZE_FLAG_REL
     flag.parent.mkdir(parents=True, exist_ok=True)
-    flag.write_text(content, encoding="utf-8")
+    flag.write_text(FREEZE_MARKER_LINE + content, encoding="utf-8")
     return flag
 
 

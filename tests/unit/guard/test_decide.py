@@ -25,7 +25,10 @@ from gov.guard.decide import (  # noqa: E402
     _match_pattern,
     _parse_frontmatter,
     decide,
+    freeze_state,
+    lift_refusal,
     KNOWN_ROLES,
+    LIFT_REFUSAL,
 )
 
 TID = "DAEO-test"
@@ -306,7 +309,7 @@ class TestDevPaths:
         project = _make_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Write",
             tool_input={"file_path": "/dev/null", "content": "x"},
@@ -599,7 +602,7 @@ class TestDevNullAcrossStates:
         project = _make_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "echo x > /dev/null"},
@@ -922,7 +925,7 @@ class TestProbe2Frozen:
         project = _probe_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "rm src/gov/guard/a.py 2>/dev/null"},
@@ -934,7 +937,7 @@ class TestProbe2Frozen:
         project = _probe_project(tmp_path)
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Bash",
             tool_input={"command": "ls 2>/dev/null"},
@@ -1064,7 +1067,7 @@ class TestRoleSubagentGoverns:
         project = _make_project(tmp_path, _std_tickets())
         freeze = Path(project) / ".gov-runtime" / "freeze"
         freeze.parent.mkdir(parents=True, exist_ok=True)
-        freeze.write_text("")
+        freeze.write_text("FROZEN owner 2026-10-05T00:00:00Z\n")
         d, _ = decide(
             tool_name="Write",
             tool_input={"file_path": os.path.join(project, "src/foo.py"), "content": "x"},
@@ -2042,3 +2045,189 @@ class TestOptionAfterTheDestination:
     def test_inside_the_paths_allowed(self, tmp_path, command):
         project = _make_project(tmp_path, _std_tickets())
         assert _bash(project, command) == "allow"
+
+
+# ---------------------------------------------------------------------------
+# W1-50: the freeze flag carries a marker (DEC-402)
+# ---------------------------------------------------------------------------
+
+class TestFreezeState:
+
+    def _flag(self, tmp_path):
+        flag = Path(tmp_path) / ".gov-runtime" / "freeze"
+        flag.parent.mkdir(parents=True, exist_ok=True)
+        return flag
+
+    def test_nothing_at_the_path_is_absent(self, tmp_path):
+        assert freeze_state(str(tmp_path)) == "absent"
+        self._flag(tmp_path)
+        assert freeze_state(str(tmp_path)) == "absent"
+
+    @pytest.mark.parametrize("content", [
+        b"", b"off\n", b"FROZE N\n", b"\n\n", b"\xef\xbb\xbf",
+        b"\xff\xfeo\x00f\x00f\x00\n\x00",
+    ])
+    def test_a_file_without_the_marker_is_unmarked(self, tmp_path, content):
+        self._flag(tmp_path).write_bytes(content)
+        assert freeze_state(str(tmp_path)) == "unmarked"
+
+    def test_a_character_device_is_unmarked(self, tmp_path):
+        self._flag(tmp_path).symlink_to("/dev/null")
+        assert freeze_state(str(tmp_path)) == "unmarked"
+
+    @pytest.mark.parametrize("content", [
+        b"FROZEN\n", b"FROZEN owner 2026-10-05T00:00:00Z\n", b"frozen\n",
+        b"a note\n  FROZEN x\n", b"\xef\xbb\xbfFROZEN\r\nmore\r\n",
+        b"FROZEN",
+    ])
+    def test_a_marker_line_is_frozen(self, tmp_path, content):
+        self._flag(tmp_path).write_bytes(content)
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    @pytest.mark.parametrize("content", [
+        "FROZEN owner\n".encode("utf-16"), "FROZEN owner\n".encode("utf-32-be"),
+        b"\x00FROZEN\n", b"FROZEN\x00 owner\n", "​FROZEN\n".encode(),
+        b"FROZEN: owner\n", b'"FROZEN"\n', b"# FROZEN owner\n",
+        b"state: frozen\n", b"FROZEN_BY: owner\n",
+        # The word is not told apart from a longer word or a negation.
+        b"not FROZEN\n", b"FROZENX\n",
+    ])
+    def test_a_file_that_carries_the_word_is_frozen(self, tmp_path, content):
+        self._flag(tmp_path).write_bytes(content)
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_dangling_link_as_runtime_folder_is_frozen(self, tmp_path):
+        target = tmp_path / "no-such-folder"
+        (tmp_path / ".gov-runtime").symlink_to(target)
+        assert freeze_state(str(tmp_path)) == "frozen"
+        assert not os.path.lexists(target)
+
+    def test_a_regular_file_as_runtime_folder_is_absent(self, tmp_path):
+        (tmp_path / ".gov-runtime").write_bytes(b"")
+        assert freeze_state(str(tmp_path)) == "absent"
+
+    def test_decide_takes_the_state_its_caller_read(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        target = {"file_path": os.path.join(project, "src/a.py"), "content": "x"}
+        args = ("Write", target, project, "engineer", TID)
+        assert decide(*args)[0] == "allow"
+        assert decide(*args, flag="frozen") == ("deny", "frozen: all writes denied")
+        self._flag(project).write_text("FROZEN\n")
+        assert decide(*args)[0] == "deny"
+
+    def test_a_file_too_large_to_read_whole_is_frozen(self, tmp_path):
+        # Stricter: the marker may be past what is read.
+        self._flag(tmp_path).write_bytes(b"filler line\n" * 10_000)
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_fifo_is_frozen_and_is_not_opened(self, tmp_path):
+        os.mkfifo(self._flag(tmp_path))
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_a_directory_and_a_dangling_link_are_frozen(self, tmp_path):
+        flag = self._flag(tmp_path)
+        flag.mkdir()
+        assert freeze_state(str(tmp_path)) == "frozen"
+        flag.rmdir()
+        flag.symlink_to(tmp_path / "no-such-file")
+        assert freeze_state(str(tmp_path)) == "frozen"
+
+    def test_an_empty_flag_does_not_freeze_a_write(self, tmp_path):
+        project = _make_project(tmp_path, _std_tickets())
+        self._flag(project).write_text("")
+        assert _bash(project, "cd src && cp a.py b.py") == "allow"
+
+
+RECORDS = ".gov-runtime/records.jsonl"
+
+
+class TestUnmarkedFlagRecord:
+    """The hook's record of an unmarked presence (DEC-402, DEC-177)."""
+
+    def _project(self, tmp_path):
+        project = Path(_make_project(tmp_path, _std_tickets()))
+        (project / ".gov-runtime").mkdir()
+        (project / ".gov-runtime" / "freeze").write_bytes(b"")
+        return project
+
+    def _write(self, project):
+        return _run_hook(
+            project, "Write",
+            {"file_path": str(project / "src" / "a.py"), "content": "x"},
+            role="engineer", ticket=TID)[0]
+
+    def test_an_allowed_write_is_recorded(self, tmp_path):
+        project = self._project(tmp_path)
+        assert self._write(project) == "allow"
+        lines = (project / RECORDS).read_text().splitlines()
+        assert len(lines) == 1
+        assert json.loads(lines[0])["paths"] == [".gov-runtime/freeze"]
+
+    @pytest.mark.parametrize("command", ["sudo ls", "pip install requests"])
+    def test_a_call_a_later_rule_denies_is_not_recorded(self, tmp_path, command):
+        project = self._project(tmp_path)
+        decision, out, rc = _run_hook(project, "Bash", {"command": command},
+                                      role="engineer", ticket=TID)
+        assert (decision, rc) == ("deny", 0) and "frozen" not in out
+        assert not (project / RECORDS).exists()
+
+    def test_nothing_is_written_through_a_link(self, tmp_path):
+        project = self._project(tmp_path)
+        target = tmp_path / "elsewhere.txt"
+        target.write_text("kept\n")
+        (project / RECORDS).symlink_to(target)
+        assert self._write(project) == "allow"
+        assert target.read_text() == "kept\n"
+        (project / RECORDS).unlink()
+        (project / RECORDS).symlink_to(tmp_path / "missing.jsonl")
+        assert self._write(project) == "allow"
+        assert not (tmp_path / "missing.jsonl").exists()
+
+    def test_nothing_is_written_in_a_linked_runtime_folder(self, tmp_path):
+        project = Path(_make_project(tmp_path, _std_tickets()))
+        elsewhere = tmp_path / "elsewhere"
+        elsewhere.mkdir()
+        (elsewhere / "freeze").write_bytes(b"")
+        (project / ".gov-runtime").symlink_to(elsewhere)
+        assert self._write(project) == "allow"
+        assert not (elsewhere / "records.jsonl").exists()
+
+
+# ---------------------------------------------------------------------------
+# The lift form of gov pause (DEC-409)
+# ---------------------------------------------------------------------------
+
+class TestLiftForm:
+    """What the acceptance cases leave to the builder: a command the rule
+    cannot read is refused, and a substitution is read by its own text."""
+
+    @pytest.mark.parametrize("command", [
+        "echo 'gov pause --off",             # an open quote
+        None, 7, ["gov", "pause", "--off"],  # not a text
+    ])
+    def test_a_command_that_cannot_be_read_is_refused(self, command):
+        assert "cannot be read" in lift_refusal(command)
+        decision, reason = decide("Bash", {"command": command},
+                                  "/nonexistent", "orchestrator", None)
+        assert decision == "deny" and "--off" in reason
+
+    @pytest.mark.parametrize("command", [
+        "gov pause 2>/dev/null --off",
+        'git commit -m "see $(echo x; gov pause --json --off) here"',
+        "git commit -m 'see `env gov pause --off` here'",
+        'echo "gov pause --off"|(bash)',
+        "find . -name x -exec sh -c 'gov pause --off' \\;",
+    ])
+    def test_the_form_is_refused(self, command):
+        assert lift_refusal(command) == LIFT_REFUSAL
+
+    @pytest.mark.parametrize("command", [
+        "gov pause; some-tool --off",
+        'git commit -m "gov pause --off is refused, see `date` and $(date)"',
+        'grep -rn "gov pause --off" . | head -5',
+        "python3 -m gov.cli.main pause --rollback DAEO-off",
+        "bash -c 'my-gov pause --off; gov.pause --offline'",
+        "",
+    ])
+    def test_what_is_not_the_form_is_left_alone(self, command):
+        assert lift_refusal(command) == ""
