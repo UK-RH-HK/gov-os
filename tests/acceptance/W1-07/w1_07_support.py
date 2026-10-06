@@ -80,6 +80,11 @@ NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 REQUIRED_ARGUMENTS["retrieve"] = ("no line of the W1-07 fixture holds this text",)
 READ_COMMANDS = tuple(invocation("retrieve") if args == ("retrieve",) else args for args in READ_COMMANDS)
 
+# Planned revision (DEC-190, "planned: command implemented"): W1-27 builds ``doctor`` and ``rebuild``; their cases are
+# in ``tests/acceptance/W1-27/``.
+BUILT_LATER = BUILT_LATER + ("doctor", "rebuild")
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+
 # Every invocation these tests know: one per reserved command, and ``check --list``.
 EVERY_INVOCATION = tuple(invocation(name) for name in RESERVED_COMMANDS) + (("check", "--list"),)
 
