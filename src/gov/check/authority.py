@@ -8,7 +8,7 @@ import yaml
 
 VERSION = "1.0.0"
 
-RECORD_PATHS = (".tickets", "docs/adr", "docs/research", "docs/lessons", "docs/changes")
+RECORD_PATHS = (".tickets", "docs")
 NON_AUTHORITATIVE_TYPES = ("research", "lesson")
 
 

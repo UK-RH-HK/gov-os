@@ -22,6 +22,13 @@ def run(root: Path, args, config: dict) -> dict:
     result, has_hard_block_red = run_checks(root)
 
     if has_hard_block_red:
-        raise GovError("CHECK_FAILED", "one or more hard-block checks failed",
+        red_families = [
+            name for name, fam in result.get("families", {}).items()
+            if fam.get("status") == "RED"
+        ]
+        msg = "one or more hard-block checks failed"
+        if red_families:
+            msg += ": " + ", ".join(red_families)
+        raise GovError("CHECK_FAILED", msg,
                         details=result, exit_code=3)
     return result

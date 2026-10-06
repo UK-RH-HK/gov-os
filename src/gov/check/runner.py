@@ -4,6 +4,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -36,6 +37,10 @@ FAMILIES = (
 )
 
 RED, YELLOW, GREEN = "RED", "YELLOW", "GREEN"
+
+
+def _normalise_family(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 HARD_BLOCK, WARNING = "hard-block", "warning"
 PATH_MAP_REL = "governance/project/path-map.yaml"
 SKILL_DIR = "template/governance/kernel/vendor"
@@ -246,7 +251,17 @@ def _check_readiness(root: Path, commit: str) -> dict:
     findings = []
     try:
         from gov.readiness.checker import check_all
-        check_all(root)
+        result = check_all(root)
+        if isinstance(result, dict) and not result.get("closed", True):
+            specs = result.get("specifications", [])
+            if specs:
+                for spec in specs:
+                    if isinstance(spec, dict) and not spec.get("closed", True):
+                        findings.append({"code": "READINESS_NOT_CLOSED",
+                                         "message": f"specification {spec.get('specification', '?')} not closed"})
+            if not findings:
+                findings.append({"code": "READINESS_NOT_CLOSED",
+                                 "message": "readiness check_all returned closed=False"})
     except Exception as exc:
         code = getattr(exc, "code", "READINESS_ERROR")
         msg = getattr(exc, "message", str(exc))
@@ -312,18 +327,25 @@ def run_checks(root: Path) -> tuple[dict, bool]:
     check_results.append(_check_readiness(root, commit))
 
     families: dict[str, dict] = {}
+    normalised_to_canonical: dict[str, str] = {}
     for family in FAMILIES:
         families[family] = {"status": GREEN, "family": family}
+        normalised_to_canonical[_normalise_family(family)] = family
 
     for entry in check_results:
         fam = entry.get("family", "")
-        if fam in families:
-            current = families[fam]["status"]
-            entry_status = entry.get("status", GREEN)
-            if entry_status == RED:
-                families[fam]["status"] = RED
-            elif entry_status == YELLOW and current != RED:
-                families[fam]["status"] = YELLOW
+        norm = _normalise_family(fam)
+        canonical = normalised_to_canonical.get(norm)
+        if canonical is None:
+            if fam not in families:
+                families[fam] = {"status": RED, "family": fam}
+            canonical = fam
+        current = families[canonical]["status"]
+        entry_status = entry.get("status", GREEN)
+        if entry_status == RED:
+            families[canonical]["status"] = RED
+        elif entry_status == YELLOW and current != RED:
+            families[canonical]["status"] = YELLOW
 
     check_families = set(families.keys())
     policy_results = _check_policy_enforcement(root, commit, check_families)

@@ -8,7 +8,7 @@ import yaml
 
 VERSION = "1.0.0"
 
-RECORD_PATHS = (".tickets", "docs/adr", "docs/research", "docs/lessons", "docs/changes")
+RECORD_PATHS = (".tickets", "docs")
 SCHEMA_DIR = "template/governance/kernel/schemas"
 
 SCHEMA_MAP = {
@@ -98,6 +98,10 @@ def check(root: Path) -> list[dict]:
                 schema = _load_schema(root, schema_file)
                 if schema:
                     findings.extend(_validate(front, schema, common, rel))
+            else:
+                findings.append({"code": "SCHEMA_UNKNOWN_TYPE", "path": rel,
+                                 "type": record_type,
+                                 "message": f"{rel}: unknown record type '{record_type}'"})
     return findings
 
 

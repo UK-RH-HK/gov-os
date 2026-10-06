@@ -9,7 +9,7 @@ import yaml
 
 VERSION = "1.0.0"
 
-RECORD_PATHS = (".tickets", "docs/adr", "docs/research", "docs/lessons", "docs/changes")
+RECORD_PATHS = (".tickets", "docs")
 GENERAL_ID = re.compile(r"^[A-Za-z0-9]+-[A-Za-z0-9._-]+$")
 
 
