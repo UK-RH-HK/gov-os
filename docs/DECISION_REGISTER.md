@@ -4450,3 +4450,140 @@ fourth round.
 | Version | Date | Change |
 |---|---|---|
 | 0.99 | 2026-10-06 | Owner: DEC-411 (DEC-409 amends DEC-365, not DEC-367), DEC-412 (W1-50 DP-F6: the freeze branch is rebuilt; an unpushed ticket branch may be rewritten; unpinned choices fine as built), DEC-413 (at most two review rounds per FULL ticket; W1-50's round 7 stop rule), DEC-414 (W1-19: pass line 80 on the dev tiers, 85 re-measured at W1-42 and qualification; chunks stay; no ranked lexical route in W1-19; the instruction stays), DEC-415 (early test design), DEC-416 (delegation widened to P2 at medium-low confidence, with exclusions). |
+
+## 100. Delegated decisions on W1-50's packages DP-29 and DP-30 and on W1-11's package DP-8 (register v0.100, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06 under DEC-220. W1-50's seventh round returned DONE with both of the
+owner's conditions of DEC-401 passing on the final rules (criss-cross histories fail closed over 37 shapes; a replay
+of 189 real merges flags two, neither by mistake: W1-20's merge-back `5922e24e` and the old freeze branch's merge
+`135ed94e`, both records). The branch was merged as `6a978dbc`; the full regression there is green (W1-50 342
+passed, `tests/unit` 760 passed, every other suite passed). The owner was told on 2026-10-06.
+
+### DEC-417 — W1-50 DP-29, DP-30 and the bound on a move: as built
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, stricter-only, 2026-10-06) · **Basis:** W1-50 packages DP-29 and DP-30, the stricter option of each, as the lead built them; the sixth reviewer's finding F3 · **Under:** DEC-410, DEC-413, DEC-401
+- **Decision:**
+  - DP-29: under `tests/acceptance/**`, a path two parents both changed against their one merge base in the same
+    way is the merge commit's own change too, although it differs from no parent.
+  - DP-30: in a worker's call, the whole-move finding also names the merge commits' own ticket files and
+    acceptance tests.
+  - A move whose merge commits would need more than 3000 git processes to read is a finding as a whole
+    (`MAX_MOVE_PROCESSES`). The commit that built it was not reviewed (DEC-413: no further round).
+  - Not built, a residual with the reviewer's recommendation, brought to the owner: a ticket file both sides
+    changed, where the merge takes one side whole, raises no finding in an orchestrator's own call.
+
+### DEC-418 — W1-11 DP-8: the checker reads the merge base itself where the helper found exactly one
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220, 2026-10-06) · **Basis:** W1-11 package DP-8 option (a), confidence medium; P2, reversible; the designer's, the lead's and the orchestrator's recommendations agree · **Under:** DEC-398, DEC-410, DEC-415
+- **Decision:**
+  - The checker reads merges through `gov.guard.containment_merge.read_merge`. Only for a parent pair where the
+    helper listed the decision's path as brought (so exactly one merge base exists for that pair), the checker
+    itself asks git for that merge base and reads the decision there by its `id`, to learn whether the other parent
+    changed the decision's id, status or presence since the base.
+  - Where the helper fails closed (several merge bases, none, or an error), the checker asks for no base and
+    fails closed too. Crossed or unrelated histories are therefore findings for decision files unless the merge
+    carries the owner's fact.
+  - The checker's own ancestry rule for merges goes; no second merge reader is written, and the helper is not
+    changed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.100 | 2026-10-06 | Delegated under DEC-220: DEC-417 (W1-50 DP-29, DP-30 and the bound of 3000 git processes per move, as built), DEC-418 (W1-11 DP-8: the checker reads the merge base itself where the helper found exactly one; fails closed where the helper does). |
+
+## 101. Delegated decisions on W1-21's packages DP-0, DP-1, DP-3, DP-6, DP-8 and DP-9 (register v0.101, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06 under DEC-220 and DEC-416, on six of the ten packages the W1-21
+(`DAEO-5x4l`) ticket lead returned after the test design (119 cases, all red, no engineer started). Each is
+reversible at low cost before W1-22 starts, and the designer's, the lead's and the orchestrator's recommendations
+agree. DP-2 (what a batch, a round and a continuation are, with the numbers), DP-4 (what marks a record superseded
+or must-not-cite), DP-5 (when a failure or lesson record matches a ticket's scope) and DP-7 (the retrieval-regression
+check's baselines) are the owner's. The owner was told on 2026-10-06, including that the lead ranked DP-0 and DP-1 as
+P1.
+
+### DEC-419 — W1-21: the command's path, the public interface, the bundle budget, the order of stopping reasons, facets as routes, one rerank over the merged set
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-220 and DEC-416, 2026-10-06) · **Basis:** W1-21 packages DP-0 option (a), confidence high; DP-1 (a), medium-high; DP-3 (a), medium; DP-6 (a), medium; DP-8 (a), medium; DP-9 (a), high on one pass · **Under:** DEC-317, DEC-080, DEC-091, DEC-374, DEC-396, CAP-16, CAP-18, CAP-55
+- **Decision:**
+  - DP-0: `src/gov/retrieve/**` is added to W1-21's `allowed_paths`, in its own commit. It follows DEC-317: a `gov`
+    command is built by `src/gov/<name>/command.py`. The module is thin and calls `gov.retrieval.retrieve`.
+  - DP-1: the public interface is the one the test design fixes:
+    `gov.retrieval.retrieve.retrieve(root, query, *, ids=(), ticket=None, radius=0, batch_size=None,
+    bundle_budget=None, continuation=None, reranker=None)`, read-only, returning the bundle as a plain map with
+    the keys `stopping_reason`, `evidence`, `batches`, `merge`, `expansions`, `gaps`, `facets`, `budget` and
+    `continuation`; and `gov retrieve` with `--json`, `--root`, `--ticket`, `--id`, `--radius`, `--batch-size`,
+    `--bundle-budget`, `--continue` and the query. Exit 0 for any bundle, 1 for a bad token, 2 for a usage error.
+    A bundle with a continuation token never says `CLOSURE_COMPLETE` or `SATURATED`.
+  - DP-3: the bundle budget is counted in tokens of four characters and bounds parent expansion only; a child hit
+    is never dropped for it. Its default is DEC-004's packet ceiling until a decision gives another number.
+  - DP-6: when several stopping reasons apply the bundle carries the first of `FACET_UNAVAILABLE`,
+    `BUDGET_EXHAUSTED_WITH_GAPS`, `DEPTH_LIMIT_REACHED`, `UNRESOLVED_IDS`, then `SATURATED` or `CLOSURE_COMPLETE`.
+    An unavailable semantic route still returns the lexical evidence. A reranker that dies leaves `reranked:
+    false` and raises nothing.
+  - DP-8: "facets" in the first KPI line are the routes (lexical, semantic, closure), reported with their state.
+    Content facets stay with W1-36.
+  - DP-9: retrieval calls the reranker once, over all candidates gathered for the bundle, after deduplication and
+    the authority filter. The latency of a set above 30 is measured and reported.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.101 | 2026-10-06 | Delegated under DEC-220 and DEC-416: DEC-419 (W1-21 DP-0: the command's path; DP-1: the public interface; DP-3: the bundle budget bounds expansion only; DP-6: the order of stopping reasons; DP-8: facets are the routes; DP-9: one rerank over the merged set). DP-2, DP-4, DP-5 and DP-7 go to the owner. |
+
+## 102. Owner answers and a standing rule of 2026-10-06, second round (register v0.102, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Given by the owner on 2026-10-06. During the night every ticket lead stopped with "403 Access to this model requires
+an access grant your request does not have"; the cause was an expired Claude login, not a model. The owner signed in
+again; no model or settings change was made. A one-line headless probe answered before any lead was restarted.
+
+### DEC-420 — An authentication or access error stops the launching of leads: `AUTH_REQUIRED`
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Amends:** DEC-250 (one more stop) · **Under:** DEC-235, DEC-250
+- **Decision:**
+  - If a session or a lead fails with an authentication or access error (401, 403, "Failed to authenticate",
+    "access grant"), the orchestrator does not retry in a loop.
+  - It stops launching leads, writes its checkpoint, and stops with `AUTH_REQUIRED`, so that the owner knows to
+    sign in again.
+  - After the owner restores access: a one-line headless probe first; if it works, one lead as a test, then the
+    others, each from its branch's last commit.
+
+### DEC-421 — W1-50: the both-sides rule is extended to ticket files
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER, on the residual of W1-50's seventh round (the sixth reviewer's finding F1) · **Amends:** DEC-410 (DP-24), DEC-417 (its residual) · **Under:** DEC-413
+- **Decision:**
+  - Under `.tickets/**` too, a path that more than one parent changed against the merge base is the merge commit's
+    own, whichever side's content it holds. Stricter-only.
+  - It is built on the freeze branch's round, with its cases.
+
+### DEC-422 — W1-21 DP-2: a round is one more batch; the round limits; the default batch size
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-2 option (a) · **Under:** DEC-035, DEC-080, CAP-04.c, CAP-16.c
+- **Decision:**
+  - A round is one more batch of candidates.
+  - The round limits are 1, 1, 3, 8 and 8 for radius 0 to 4.
+  - Reaching the limit gives `BUDGET_EXHAUSTED_WITH_GAPS`, with the ungathered candidates as gaps and a stateless
+    continuation token.
+  - The default batch size is 10.
+
+### DEC-423 — W1-21 DP-4: superseded from the store; must-not-cite is a closed status list; a file the store could not load is read by its frontmatter
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-4 option (a) · **Under:** DEC-329, CAP-51.b
+- **Decision:**
+  - Superseded comes from the store: status `SUPERSEDED`, or being the target of a supersedes edge.
+  - Must-not-cite is a closed status list: `DEPRECATED`, `REJECTED` and `WITHDRAWN`.
+  - A cited file the store could not load is read by its frontmatter.
+  - Dropped records are listed in the bundle.
+
+### DEC-424 — W1-21 DP-5: a failure or lesson record is in scope through a typed edge within the closure
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-5 option (a) · **Under:** CAP-14.a, CAP-41
+- **Decision:** records of the types `failure` and `lesson` are in scope when a typed edge (for example
+  `constrains: [<ticket id>]`) joins the record and the ticket within the closure. No schema work.
+
+### DEC-425 — W1-21 DP-7: the retrieval-regression check's baselines and severity
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** W1-21 package DP-7 option (a) · **Under:** DEC-414, CAP-38.b
+- **Decision:**
+  - The check needs a mean hit@5 of at least 80 (DEC-414) and at most 2 forbidden citations.
+  - The query set is found through `GOV_DEV_TIERS`.
+  - Severity: hard-block where the query set is configured. Where it is not (an adopter without dev tiers), the
+    check reports "unmeasured" as a warning and is never shown as green.
+
+### DEC-426 — `S0a-G-06`: where a worker may look for its text
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-383
+- **Decision:** a product-spec worker may look for the text of `S0a-G-06` in the archived `docs/source/` through
+  `docs/SOURCES.md` (rule C), or ask the owner for an exact workbench path. Never `qualification-oracle/` or
+  `s0b2/probe/`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.102 | 2026-10-06 | Owner: DEC-420 (an authentication or access error stops the launching of leads, `AUTH_REQUIRED`), DEC-421 (W1-50: the both-sides rule extended to ticket files), DEC-422 to DEC-425 (W1-21 DP-2, DP-4, DP-5, DP-7), DEC-426 (`S0a-G-06`: where its text may be looked for). |

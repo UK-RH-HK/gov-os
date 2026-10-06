@@ -1,6 +1,6 @@
 ---
 id: DAEO-5x4l
-status: open
+status: in_progress
 deps: [DAEO-t6hf, DAEO-jozo]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/retrieval/retrieve*
 - src/gov/retrieval/bundle*
+- src/gov/retrieve/**
 - tests/unit/retrieve/**
 - template/governance/kernel/checks/retrieval-regression*
 kpis:
