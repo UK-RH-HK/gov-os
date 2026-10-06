@@ -1,0 +1,5 @@
+id: "core-claims"
+family: "concurrency/claims"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.check.claims"
