@@ -16,11 +16,13 @@ from gov.config.path_map_schema import (
     HARD_BLOCK_STRENGTHS,
     MEMORY_CLASSES,
     NAMESPACE_FIELDS,
+    NAMESPACE_OPTIONAL_FIELDS,
     PATH_MAP_SCHEMA,
     POLICY_KEYS,
     STRENGTHS,
     SYSTEM_KEYS,
     SYSTEM_STATUSES,
+    W1_08_EXTENDED_KEYS,
     WARNING_OR_STRONGER,
     WARNING_STRENGTHS,
 )
@@ -48,6 +50,18 @@ def _invalid(rel: str, key: str | None, reason: str) -> GovError:
     return GovError("CONFIG_INVALID", f"{where}: {reason}", {"file": rel, "key": key})
 
 
+def _validate_namespace_field(ns_name, field, val, rel):
+    if field == "permitted_roles":
+        if not isinstance(val, list) or not val:
+            raise _invalid(rel, f"namespaces.{ns_name}.{field}", "must be a non-empty list")
+        for item in val:
+            if not isinstance(item, str) or not item:
+                raise _invalid(rel, f"namespaces.{ns_name}.{field}", "each item must be a non-empty string")
+    else:
+        if not isinstance(val, str) or not val:
+            raise _invalid(rel, f"namespaces.{ns_name}.{field}", "must be a non-empty string")
+
+
 def _validate_namespace(ns_name, ns_value, rel):
     if not isinstance(ns_value, dict):
         raise _invalid(rel, f"namespaces.{ns_name}", "must be a map")
@@ -66,16 +80,10 @@ def _validate_namespace(ns_name, ns_value, rel):
     for field in NAMESPACE_FIELDS:
         if field in ("paths", "memory_class"):
             continue
-        val = ns_value[field]
-        if field == "permitted_roles":
-            if not isinstance(val, list) or not val:
-                raise _invalid(rel, f"namespaces.{ns_name}.{field}", "must be a non-empty list")
-            for item in val:
-                if not isinstance(item, str) or not item:
-                    raise _invalid(rel, f"namespaces.{ns_name}.{field}", "each item must be a non-empty string")
-        else:
-            if not isinstance(val, str) or not val:
-                raise _invalid(rel, f"namespaces.{ns_name}.{field}", "must be a non-empty string")
+        _validate_namespace_field(ns_name, field, ns_value[field], rel)
+    for field in NAMESPACE_OPTIONAL_FIELDS:
+        if field in ns_value:
+            _validate_namespace_field(ns_name, field, ns_value[field], rel)
 
 
 def _validate_capabilities(caps, rel):
@@ -182,10 +190,26 @@ def validate(document, schema: dict, rel: str) -> None:
         _validate_path_map(document, rel)
 
 
+def _validate_namespace_minimal(ns_name, ns_value, rel):
+    if not isinstance(ns_value, dict):
+        raise _invalid(rel, f"namespaces.{ns_name}", "must be a map")
+    paths = ns_value.get("paths")
+    if paths is not None and (not isinstance(paths, list) or not paths):
+        raise _invalid(rel, f"namespaces.{ns_name}.paths", "must be a non-empty list")
+
+
 def _validate_path_map(document, rel):
+    present = [k for k in W1_08_EXTENDED_KEYS if k in document]
+    w1_08 = len(present) > 0
+    if w1_08 and len(present) < len(W1_08_EXTENDED_KEYS):
+        missing = [k for k in W1_08_EXTENDED_KEYS if k not in document]
+        raise _invalid(rel, missing[0], "required key is missing")
     if "namespaces" in document and isinstance(document["namespaces"], dict):
         for ns_name, ns_value in document["namespaces"].items():
-            _validate_namespace(ns_name, ns_value, rel)
+            if w1_08:
+                _validate_namespace(ns_name, ns_value, rel)
+            else:
+                _validate_namespace_minimal(ns_name, ns_value, rel)
     if "capabilities" in document:
         _validate_capabilities(document["capabilities"], rel)
     if "policies" in document:

@@ -12,8 +12,10 @@ REQUIRED_TOP_LEVEL = ("state_class", "namespaces", "capabilities", "policies", "
 
 NAMESPACE_FIELDS = (
     "paths", "memory_class", "sensitivity", "permitted_roles", "retention",
-    "export_policy", "embedding_policy", "provenance", "deletion_rebuild",
+    "export_policy", "provenance", "deletion_rebuild",
 )
+
+NAMESPACE_OPTIONAL_FIELDS = ("embedding_policy",)
 
 MEMORY_CLASSES = ("governance", "product")
 
@@ -47,9 +49,11 @@ SYSTEM_KEYS = (
 SYSTEM_STATUSES = ("implemented", "minimal", "absent")
 
 PATH_MAP_SCHEMA = {
-    "state_class": {"required": True, "type": str},
+    "state_class": {"required": False, "type": str},
     "namespaces": {"required": True, "type": dict, "values": dict},
-    "capabilities": {"required": True, "type": dict},
-    "policies": {"required": True, "type": dict},
-    "systems": {"required": True, "type": dict},
+    "capabilities": {"required": False, "type": dict},
+    "policies": {"required": False, "type": dict},
+    "systems": {"required": False, "type": dict},
 }
+
+W1_08_EXTENDED_KEYS = ("state_class", "capabilities", "policies", "systems")

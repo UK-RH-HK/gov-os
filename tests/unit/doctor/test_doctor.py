@@ -75,7 +75,8 @@ def test_check_hooks_no_config(tmp_path):
 def test_check_isolation(tmp_path):
     from gov.doctor.command import _check_isolation
     result = _check_isolation(tmp_path)
-    assert result["isolated"] is True
+    assert result["status"] == "unmeasured"
+    assert "method" in result
 
 
 def test_check_adoption_level_minimal(tmp_path):

@@ -4,4 +4,4 @@ id: recovery-rebuild
 family: recovery/rebuild
 tier: G1
 severity: hard-block
-command: python3 -c "from gov.store import digest; from pathlib import Path; d1=digest(Path('.')); exit(0)"
+command: python3 -m gov.rebuild.check

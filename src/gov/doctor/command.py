@@ -308,7 +308,25 @@ def _check_framework_lock(root: Path) -> dict:
 
 
 def _check_isolation(root: Path) -> dict:
-    return {"status": "pass", "isolated": True}
+    runtime = root / ".gov-runtime"
+    if not runtime.is_dir():
+        return {"status": "unmeasured", "isolated": None,
+                "method": "runtime_parent_matches_git_root",
+                "reason": "no .gov-runtime directory"}
+    git_root = _git(root, "rev-parse", "--show-toplevel").strip()
+    if not git_root:
+        return {"status": "unmeasured", "isolated": None,
+                "method": "runtime_parent_matches_git_root",
+                "reason": "cannot determine git root"}
+    runtime_parent = runtime.resolve().parent
+    expected = Path(git_root).resolve()
+    isolated = runtime_parent == expected
+    return {
+        "status": "pass" if isolated else "fail",
+        "isolated": isolated,
+        "method": "runtime_parent_matches_git_root",
+        "git_root": str(expected),
+    }
 
 
 def _check_adoption_level(root: Path, config: dict) -> dict:
