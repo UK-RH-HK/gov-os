@@ -97,3 +97,93 @@ def test_standard_profile_closes_without_probe(project, sandbox, interface):
     run = support.run_close(project, sandbox, ticket_id)
     result = support.result_of(run, interface)
     assert result is not None
+
+
+# --------------------------------------------------------------------------
+# Probe-gate fail-open: missing fields must be rejected (reviewer findings)
+# --------------------------------------------------------------------------
+
+def _probe_yaml_missing_reviewer_wrote_nothing(ticket_id):
+    """A probe record that omits the reviewer_wrote_nothing field entirely."""
+    probe_id = f"PR-{ticket_id}"
+    lines = [
+        "---",
+        f"id: {probe_id}",
+        "type: probe",
+        "status: ACTIVE",
+        "state_class: NARRATIVE",
+        f"task: {ticket_id}",
+        "reviewer_session: reviewer-001",
+        "implementer_session: impl-001",
+        "commissioned_by: orchestrator",
+        "judged_by: orchestrator",
+        "---",
+        "",
+        f"# {probe_id} — Probe record for {ticket_id}",
+        "",
+        "Post-green probe.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _probe_yaml_missing_implementer_session(ticket_id):
+    """A probe record that omits the implementer_session field entirely."""
+    probe_id = f"PR-{ticket_id}"
+    lines = [
+        "---",
+        f"id: {probe_id}",
+        "type: probe",
+        "status: ACTIVE",
+        "state_class: NARRATIVE",
+        f"task: {ticket_id}",
+        "reviewer_session: reviewer-001",
+        "reviewer_wrote_nothing: true",
+        "commissioned_by: orchestrator",
+        "judged_by: orchestrator",
+        "---",
+        "",
+        f"# {probe_id} — Probe record for {ticket_id}",
+        "",
+        "Post-green probe.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def test_probe_missing_reviewer_wrote_nothing_field(project, sandbox, interface):
+    """KPI S7, CAP-38.f: a probe that omits reviewer_wrote_nothing must be rejected.
+
+    Bug: pf.get("reviewer_wrote_nothing", True) defaults to True when absent,
+    so `not True` is False and the validation error is never raised.
+    """
+    _full_project_without_probe(project)
+    probe_path = f"docs/probes/{TICKET}/PR-{TICKET}.md"
+    project.write(probe_path, _probe_yaml_missing_reviewer_wrote_nothing(TICKET))
+    project.commit("add probe missing reviewer_wrote_nothing",
+                   who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe that omits reviewer_wrote_nothing must be rejected"
+    assert run.returncode in (support.EXIT_GOV_ERROR, support.EXIT_BLOCKED), \
+        f"expected exit 1 or 4, got {run.returncode}"
+
+
+def test_probe_missing_implementer_session_field(project, sandbox, interface):
+    """KPI S7, CAP-38.f: a probe that omits implementer_session must be rejected.
+
+    Bug: pf.get("implementer_session", "") defaults to "", which differs from
+    the reviewer_session value, so the independence check passes vacuously.
+    """
+    _full_project_without_probe(project)
+    probe_path = f"docs/probes/{TICKET}/PR-{TICKET}.md"
+    project.write(probe_path, _probe_yaml_missing_implementer_session(TICKET))
+    project.commit("add probe missing implementer_session",
+                   who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a probe that omits implementer_session must be rejected"
+    assert run.returncode in (support.EXIT_GOV_ERROR, support.EXIT_BLOCKED), \
+        f"expected exit 1 or 4, got {run.returncode}"
