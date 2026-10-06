@@ -132,6 +132,50 @@ class TestValidatorRejects:
         result = validator_api.validate(root, bundle)
         assert result[V_VALID] is False, "a bundle with out-of-range line numbers was accepted"
 
+    def test_validator_rejects_path_traversal_outside_root(self, validator_api, base, tmp_path):
+        """A citation whose path resolves outside root must be rejected (DEC-136)."""
+        root = _project(base, tmp_path)
+        outside = tmp_path / "secret.md"
+        outside.write_text("secret content\n", encoding="utf-8")
+        bundle = valid_bundle(root)
+        item = bundle[K_EVIDENCE][0]
+        item[E_PATH] = "../secret.md"
+        item[E_START] = 1
+        item[E_END] = 1
+        item[E_SHA] = sha256(outside.read_bytes())
+        item[E_TEXT] = "secret content"
+        result = validator_api.validate(root, bundle)
+        assert result[V_VALID] is False, \
+            "a citation whose path traverses outside root was accepted"
+
+    def test_validator_rejects_out_of_range_lines_with_empty_bytes_hash(self, validator_api, base, tmp_path):
+        """Out-of-range lines with sha256(b'') must be rejected, not silently pass (DEC-136)."""
+        root = _project(base, tmp_path)
+        bundle = valid_bundle(root)
+        item = bundle[K_EVIDENCE][0]
+        item[E_START] = 0
+        item[E_END] = 1
+        item[E_SHA] = sha256(b"")
+        item[E_TEXT] = ""
+        result = validator_api.validate(root, bundle)
+        assert result[V_VALID] is False, \
+            "out-of-range lines passed because the empty-bytes hash matched the empty span"
+
+    def test_validator_rejects_missing_line_range(self, validator_api, base, tmp_path):
+        """A citation missing start_line/end_line must be rejected, not default to whole-file (DEC-136)."""
+        root = _project(base, tmp_path)
+        bundle = valid_bundle(root)
+        item = bundle[K_EVIDENCE][0]
+        rel = item[E_PATH]
+        whole_bytes = (root / rel).read_bytes()
+        del item[E_START]
+        del item[E_END]
+        item[E_SHA] = sha256(whole_bytes)
+        item[E_TEXT] = whole_bytes.decode("utf-8", "replace")
+        result = validator_api.validate(root, bundle)
+        assert result[V_VALID] is False, \
+            "a citation with no line range was accepted using the whole-file hash"
+
     def test_validator_reports_multiple_errors(self, validator_api, base, tmp_path):
         """When a bundle has several defects, all are reported."""
         root = _project(base, tmp_path)

@@ -122,6 +122,19 @@ class TestCanaryMiss:
             assert result[index]["passed"] is False, \
                 f"{index} canaries passed after deleting the store"
 
+    @pytest.mark.needs("gitleaks", "sqlite_vec")
+    def test_corrupted_store_reports_facet_unavailable(self, canary_api, base, ollama, tmp_path):
+        """A corrupted store must report FACET_UNAVAILABLE, not crash (DEC-136)."""
+        root = _indexed(base, canary_api, ollama, tmp_path)
+        store = root / RUNTIME_REL / "store.db"
+        store.parent.mkdir(parents=True, exist_ok=True)
+        store.write_bytes(b"this is not a valid sqlite database")
+        result = canary_api.run_canaries(root, env=canary_api.scratch_env(ollama.host))
+        for index in INDEXES:
+            assert index in result, f"canary runner crashed — no result for {index}"
+            assert result[index]["status"] == FACET_UNAVAILABLE, \
+                f"{index} status is {result[index]['status']!r}, expected FACET_UNAVAILABLE"
+
 
 # ---------------------------------------------------------------------------
 # F2: an empty index must NOT answer NOT_FOUND as absence [CAP-55.a]

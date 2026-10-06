@@ -23,9 +23,9 @@ Ticket: **DAEO-8nue** (W1-22).  Profile: **FULL**.
 
 | File | Tests |
 |------|-------|
-| `test_w1_22_validator.py` | 12 |
-| `test_w1_22_canaries.py` | 9 |
-| **Total** | **21** |
+| `test_w1_22_validator.py` | 15 |
+| `test_w1_22_canaries.py` | 10 |
+| **Total** | **25** |
 
 ## Expected red reasons
 
@@ -87,6 +87,19 @@ The validator checks sha256 against the cited span only (the bytes of lines `sta
 - **Validator tests** (`test_w1_22_validator.py`): no machine dependencies. They build a temporary project (git init, files, commit), construct bundles manually, and call `validate(root, bundle)`.
 - **Canary declaration test** (`TestDeclarations`): no machine dependencies. Checks files under `template/governance/kernel/canaries/`.
 - **Canary runner tests** (all other `test_w1_22_canaries.py`): need `gitleaks` and `sqlite_vec` (marked `@pytest.mark.needs`). They index a temporary project through the Ollama stand-in endpoint, then call `run_canaries(root)`.
+
+## DEC-136 fail-open additions
+
+Four tests added for fail-open findings from the post-green review (DEC-136):
+
+| Test | Red reason |
+|------|------------|
+| `TestValidatorRejects::test_validator_rejects_path_traversal_outside_root` | The validator does not check that the resolved path stays under root; `Path(root) / "../secret.md"` escapes and the file is accepted |
+| `TestValidatorRejects::test_validator_rejects_out_of_range_lines_with_empty_bytes_hash` | Out-of-range lines set span to `b""`; supplying `sha256(b"")` matches and the validator accepts |
+| `TestValidatorRejects::test_validator_rejects_missing_line_range` | Missing `start_line`/`end_line` default to whole file; the whole-file hash is accepted |
+| `TestCanaryMiss::test_corrupted_store_reports_facet_unavailable` | A corrupted `store.db` causes the searcher to raise; `run_canaries` does not catch it and crashes |
+
+**Not tested through the public interface (DEC-136 finding 5):** missing or malformed canary YAML crashes `run_canaries`. The template path is a module-level constant (`_TEMPLATE`) in `gov.retrieval.canary`, not a parameter of `run_canaries(root)`. This cannot be exercised through the public interface without modifying the template directory. Covered by unit tests.
 
 ## W1-07 revision
 
