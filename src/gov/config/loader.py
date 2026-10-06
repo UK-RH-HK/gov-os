@@ -200,8 +200,8 @@ def _validate_namespace_minimal(ns_name, ns_value, rel):
 
 def _validate_path_map(document, rel):
     present = [k for k in W1_08_EXTENDED_KEYS if k in document]
-    w1_08 = len(present) > 0
-    if w1_08 and len(present) < len(W1_08_EXTENDED_KEYS):
+    w1_08 = len(present) == len(W1_08_EXTENDED_KEYS)
+    if not w1_08 and len(present) > 1:
         missing = [k for k in W1_08_EXTENDED_KEYS if k not in document]
         raise _invalid(rel, missing[0], "required key is missing")
     if "namespaces" in document and isinstance(document["namespaces"], dict):
@@ -210,12 +210,13 @@ def _validate_path_map(document, rel):
                 _validate_namespace(ns_name, ns_value, rel)
             else:
                 _validate_namespace_minimal(ns_name, ns_value, rel)
-    if "capabilities" in document:
-        _validate_capabilities(document["capabilities"], rel)
-    if "policies" in document:
-        _validate_policies(document["policies"], rel)
-    if "systems" in document:
-        _validate_systems(document["systems"], rel)
+    if w1_08:
+        if "capabilities" in document:
+            _validate_capabilities(document["capabilities"], rel)
+        if "policies" in document:
+            _validate_policies(document["policies"], rel)
+        if "systems" in document:
+            _validate_systems(document["systems"], rel)
 
 
 def load_config(root: Path) -> dict:
