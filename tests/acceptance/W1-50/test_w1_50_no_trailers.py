@@ -7,7 +7,8 @@ KPI failure 3: "A commit with no Role or Task trailer is judged by anything
 other than the caller".
 
 Every commit here that is "without trailers" carries neither trailer. A commit
-that carries only one of the two is an open question (README, package DP-2).
+that carries only one of the two is judged the same way (DEC-267,
+``test_w1_50_trailer_forms.py``).
 
 The first two tests hold before W1-50 and after it: they are green in the red
 run and guard against a regression.
