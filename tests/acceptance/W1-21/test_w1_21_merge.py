@@ -100,3 +100,33 @@ def test_a_reranker_that_dies_after_loading_does_not_end_the_retrieval(api, proj
     bundle = support.check_bundle(outcome.value(), root=project)
     assert bundle[support.K_MERGE].get(support.M_RERANKED) is False
     assert set(support.PAGING) <= set(support.paths(bundle))
+
+
+# ---- a merged set above 30 in one rerank (DEC-419 DP-9, DEC-422)
+
+WIDE_PHRASE = "tungsten lighthouse protocol"
+
+
+def test_a_rerank_over_more_than_thirty_candidates(api, ollama, tmp_path):
+    """DEC-419 DP-9: one rerank call over all candidates. At radius 2, three rounds of batch_size=10 gather up to
+    30 from one route, plus more from the other. The merged set exceeds the semantic route's TOP_K=30 and the
+    reranker sees them all in one pass."""
+    root = tmp_path / "wide"
+    root.mkdir()
+    support.git(root, "init", "-q", "-b", "main")
+    support.adopt(root, {"all": (["**"], support.NOT_EMBEDDED)})
+    for number in range(1, 45):
+        support.write(root, f"pages/p{number:03d}.md",
+                      f"# Page {number}\n\nThe {WIDE_PHRASE} is logged at station {number}.\n")
+    support.commit(root, "44 pages", support.BASE_DATE)
+    api.build(root, ollama.host)
+    outcome = api.outcome(root, WIDE_PHRASE, host=ollama.host, favour=["tungsten"],
+                          reranker=support.RERANKER, batch_size=10, radius=2, bundle_budget=0)
+    bundle = support.check_bundle(outcome.value(), root=root)
+    merge = bundle[support.K_MERGE]
+    assert merge.get(support.M_RERANKED) is True, f"the bundle was not reranked: {merge!r}"
+    assert type(merge.get(support.M_CANDIDATES)) is int and merge[support.M_CANDIDATES] > 30, \
+        f"the merged candidate set is at most 30: {merge.get(support.M_CANDIDATES)!r}"
+    assert len(outcome.passes) == 1, f"the reranker made {len(outcome.passes)} passes, not one"
+    assert len(outcome.passes[0]["texts"]) > 30, \
+        f"the one rerank pass scored {len(outcome.passes[0]['texts'])} texts, not more than 30"

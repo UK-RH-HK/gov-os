@@ -31,3 +31,39 @@ def test_where_nothing_is_indexed_the_check_is_not_green_and_builds_nothing(box,
     assert run.returncode != 0, f"nothing was measured and the check is green\n{run.describe()}"
     assert run.output.strip(), "the check ended red without a line that says why"
     assert support.tree(repo) == before, "the check built or changed a file of the project"
+
+
+# ---- green, red and "unmeasured" runs (DEC-425)
+
+
+@pytest.mark.needs("gitleaks", "sqlite_vec")
+def test_the_check_is_green_when_the_dev_tiers_meet_the_baselines(box, family_check, repo, ollama):
+    """DEC-425: hit@5 >= 80 and forbidden citations <= 2. A project with dev tiers that meet the baselines reports
+    green (exit 0)."""
+    box.build(repo, ollama.host)
+    env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(support.DEV_TIERS))
+    run = support.run_check(family_check, repo, env)
+    assert run.returncode == 0, f"the baselines are met and the check is not green\n{run.describe()}"
+
+
+@pytest.mark.needs("gitleaks", "sqlite_vec")
+def test_the_check_is_red_when_the_dev_tiers_fail_the_baselines(box, family_check, repo, ollama):
+    """DEC-425: hit@5 < 80 or forbidden > 2. A project with dev tiers that fail the baselines reports red
+    (exit != 0)."""
+    box.build(repo, ollama.host)
+    env = box.scratch_env(ollama.host, GOV_DEV_TIERS=str(support.DEV_TIERS))
+    run = support.run_check(family_check, repo, env)
+    assert run.returncode != 0, f"the baselines are not met and the check is green\n{run.describe()}"
+
+
+@pytest.mark.needs("gitleaks", "sqlite_vec")
+def test_without_dev_tiers_the_check_reports_unmeasured_and_is_not_green(box, family_check, repo, ollama):
+    """DEC-425: where GOV_DEV_TIERS is not configured, the check reports "unmeasured" as a warning and is never
+    shown as green. Severity: hard-block where the query set is configured."""
+    box.build(repo, ollama.host)
+    env = box.scratch_env(ollama.host)
+    env.pop("GOV_DEV_TIERS", None)
+    run = support.run_check(family_check, repo, env)
+    assert run.returncode != 0, f"no dev tiers are configured and the check is green\n{run.describe()}"
+    assert "unmeasured" in run.output.lower(), \
+        f"no dev tiers are configured and the output does not say 'unmeasured'\n{run.describe()}"

@@ -618,6 +618,7 @@ POOL_FUNCTION = "def drain(pool):"
 # ---- the authority filter: every decision below holds the phrase, so the exact-string route returns them all
 AUTHORITY_PHRASE = "cobalt ledger rule"
 MUST_NOT_CITE_STATUS = "DEPRECATED"   # package DP-4: what marks a record must-not-cite
+MUST_NOT_CITE_STATUSES = ("DEPRECATED", "REJECTED", "WITHDRAWN")  # DEC-423: the closed status list
 DECISIONS = "records/decisions/"
 CURRENT = [DECISIONS + "adr-0010.md", DECISIONS + "adr-0012.md"]
 # ``path -> why it is not current``; the store reads each of these from the frontmatter (DEC-329, G-19).
@@ -627,6 +628,8 @@ SUPERSEDED = {
     DECISIONS + "adr-0005.md": "it names its successor under `superseded_by`, and no record has that id",
 }
 MUST_NOT_CITE = DECISIONS + "adr-0006.md"
+MUST_NOT_CITE_REJECTED = DECISIONS + "adr-0008.md"   # DEC-423: status REJECTED
+MUST_NOT_CITE_WITHDRAWN = DECISIONS + "adr-0009.md"  # DEC-423: status WITHDRAWN
 UNTYPED_SUPERSEDED = DECISIONS + "adr-0007.md"   # status SUPERSEDED and no `type`: not a record of the store
 # ---- the same by the semantic route: two decisions that reach the vectors
 SEMANTIC_SUPERSEDED, SEMANTIC_CURRENT = "docs/decisions/adr-0020.md", "docs/decisions/adr-0021.md"
@@ -686,6 +689,8 @@ def corpus():
         DECISIONS + "adr-0004.md": record("ADR-0004", "decision", "SUPERSEDED", _long(rule)),
         DECISIONS + "adr-0005.md": record("ADR-0005", "decision", "ACCEPTED", rule, superseded_by="ADR-0011"),
         MUST_NOT_CITE: record("ADR-0006", "decision", MUST_NOT_CITE_STATUS, rule),
+        MUST_NOT_CITE_REJECTED: record("ADR-0008", "decision", "REJECTED", rule),
+        MUST_NOT_CITE_WITHDRAWN: record("ADR-0009", "decision", "WITHDRAWN", rule),
         UNTYPED_SUPERSEDED: record("ADR-0007", None, "SUPERSEDED", rule),
         SEMANTIC_SUPERSEDED: record("ADR-0020", "decision", "SUPERSEDED",
                                     "The saffron register lists every folded sail of the loft."),

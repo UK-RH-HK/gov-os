@@ -44,6 +44,15 @@ def test_a_small_batch_size_gives_several_batches_and_everything_is_gathered(api
         "every cited chunk is said to come from the first batch"
 
 
+def test_the_default_batch_size_is_ten(api, project, ollama):
+    """DEC-422: ``batch_size=None`` uses 10. The fixture has more than 10 lexical chunks, so the first batch is
+    full and the size is exactly 10."""
+    bundle = ask(api, project, ollama, radius=support.RADIUS_FULL)
+    batches = bundle[support.K_BATCHES]
+    assert batches[0].get("size") == 10, \
+        f"the default batch size is not 10: the first batch says {batches[0].get('size')!r}"
+
+
 def test_the_batch_size_does_not_change_what_is_gathered(api, project, ollama):
     """The same evidence in batches of three as in one batch: the batch size is no completeness limit."""
     small = ask(api, project, ollama, batch_size=3, radius=support.RADIUS_FULL)

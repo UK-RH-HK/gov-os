@@ -60,6 +60,24 @@ def test_a_must_not_cite_record_is_not_cited(api, project, ollama):
     assert support.MUST_NOT_CITE in support.dropped(bundle)
 
 
+def test_a_rejected_record_is_not_cited(api, project, ollama):
+    """DEC-423: REJECTED is a must-not-cite status. The record holds the phrase and is not cited."""
+    bundle, paths = cited(api, project, ollama, support.AUTHORITY_PHRASE)
+    assert support.MUST_NOT_CITE_REJECTED not in paths, \
+        f"{support.MUST_NOT_CITE_REJECTED} (REJECTED) is cited"
+    assert support.MUST_NOT_CITE_REJECTED in support.dropped(bundle), \
+        f"{support.MUST_NOT_CITE_REJECTED} (REJECTED) is not listed in merge.dropped"
+
+
+def test_a_withdrawn_record_is_not_cited(api, project, ollama):
+    """DEC-423: WITHDRAWN is a must-not-cite status. The record holds the phrase and is not cited."""
+    bundle, paths = cited(api, project, ollama, support.AUTHORITY_PHRASE)
+    assert support.MUST_NOT_CITE_WITHDRAWN not in paths, \
+        f"{support.MUST_NOT_CITE_WITHDRAWN} (WITHDRAWN) is cited"
+    assert support.MUST_NOT_CITE_WITHDRAWN in support.dropped(bundle), \
+        f"{support.MUST_NOT_CITE_WITHDRAWN} (WITHDRAWN) is not listed in merge.dropped"
+
+
 def test_a_superseded_file_the_store_could_not_load_is_not_cited(api, project, ollama):
     """Package DP-4: its frontmatter says SUPERSEDED and has no ``type``, so the store holds no record of it
     (DEC-274). The dev tiers' decisions are of this kind."""
