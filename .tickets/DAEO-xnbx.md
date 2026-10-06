@@ -38,6 +38,9 @@ kpis:
   - The guard refuses, for every role, any agent Bash command whose text contains the lift form of gov pause (the --off option), including a command that starts another Claude Code session with that text in its prompt (DEC-409)
   - Setting a freeze stays open to the owner, from a terminal or the operator console, and to the orchestrator (DEC-409)
   - A ticket file that more than one parent of a merge changed against the merge base is the merge commit's own change, whichever side's content it holds, as for acceptance tests (DEC-421)
+  - gov pause writes the freeze to .gov-runtime/freeze and to a mirror outside the repository, under ~/.local/state/gov-os/, keyed by the repository; the guard treats the project as frozen if either exists (DEC-429)
+  - A flag in the repository that is removed or emptied while the mirror remains is a finding, and the flag is restored with its marker line; lifting in person removes both; a sandboxed worker cannot reach the mirror (DEC-429)
+  - A ticket lead runs under its own role, which may write only its checkpoint, its scratch and merge-backs judged by the three-way rule; a lead's write to source, tests, tickets or documents is refused (DEC-434, DEC-435)
   - Every test fixture that copies the whole tree strips the held-out deny line from the copied settings file (DEC-399)
   - 'A forward HEAD move, including an integration merge by the orchestrator, is judged commit by commit: each commit''s paths against the allowed paths of its own Role and Task trailers, not against the caller (DEC-255) [CAP-58.h]'
   - A merge commit itself is not a finding when every commit it brings passes that check (DEC-255) [CAP-58.h]
