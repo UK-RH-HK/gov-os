@@ -60,4 +60,4 @@ if __name__ == "__main__":
     try:
         main()
     except Exception:
-        sys.exit(0)
+        sys.exit(2)
