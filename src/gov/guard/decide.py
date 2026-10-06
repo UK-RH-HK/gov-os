@@ -14,6 +14,7 @@ KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
     "engineer", "independent-auditor",
     "research",  # DEC-163: held to its ticket's allowed_paths, like engineer
+    "ticket-lead",  # DEC-434: may write only scratch/checkpoint; no path patterns
 })
 WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
@@ -113,6 +114,8 @@ def _get_allowed_paths(role: str, tid: str | None, root: str,
         # Fall through: use the ticket's allowed_paths when the ticket's
         # role is orchestrator; otherwise the orchestrator subagent gets
         # nothing beyond the scratch set.
+    if role == "ticket-lead":
+        return []
     if role not in KNOWN_ROLES or not tid:
         return []
     t = _load_ticket(root, tid)
@@ -561,6 +564,44 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     return targets or None
 
 
+# -- the freeze mirror (DEC-429) -----------------------------------------------
+
+def _mirror_path(project_root: str) -> Path:
+    """The mirror file for this project: ``~/.local/state/gov-os/<key>/freeze``
+    where ``<key>`` is ``sha256(realpath(git-common-dir))``."""
+    import hashlib
+    import subprocess as _sp
+    try:
+        raw = _sp.run(["git", "-C", project_root, "rev-parse", "--git-common-dir"],
+                       capture_output=True, text=True, check=True).stdout.strip()
+        if not os.path.isabs(raw):
+            raw = os.path.join(project_root, raw)
+        common = os.path.realpath(raw)
+    except Exception:
+        common = os.path.realpath(project_root)
+    key = hashlib.sha256(common.encode()).hexdigest()
+    return Path.home() / ".local" / "state" / "gov-os" / key / "freeze"
+
+
+def _mirror_frozen(project_root: str) -> bool:
+    """True when the mirror says frozen or the mirror folder is unreadable (fail closed, DEC-429)."""
+    try:
+        mirror = _mirror_path(project_root)
+    except Exception:
+        return True
+    try:
+        if not mirror.parent.exists():
+            return False
+        if not os.access(str(mirror.parent), os.R_OK):
+            return True
+        if not mirror.exists():
+            return False
+        head = mirror.read_bytes()[:_FREEZE_HEAD]
+        return FREEZE_MARKER in head.replace(b"\x00", b"").upper()
+    except OSError:
+        return True
+
+
 # -- the freeze flag (DEC-402) -------------------------------------------------
 
 def freeze_state(project_root: str) -> str:
@@ -720,6 +761,8 @@ def decide(
     (``freeze_state``); it is read here otherwise.
     """
     frozen = (flag or freeze_state(project_root)) == "frozen"
+    if not frozen and _mirror_frozen(project_root):
+        frozen = True
     erole = (role or "").strip() or ""
 
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.

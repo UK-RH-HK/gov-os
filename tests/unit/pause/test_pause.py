@@ -48,12 +48,15 @@ def _commit(root, rel, text):
 def project(tmp_path, monkeypatch):
     assert REPO not in (tmp_path, *tmp_path.parents)
     monkeypatch.delenv("GOV_ROLE", raising=False)
+    fake_home = tmp_path / "home"
+    fake_home.mkdir()
+    monkeypatch.setenv("HOME", str(fake_home))
     _git(tmp_path, "init", "-q")
     for key, value in (("user.name", "builder test"), ("user.email", "builder@example.invalid"),
                        ("commit.gpgsign", "false")):
         _git(tmp_path, "config", key, value)
     (tmp_path / ".tickets").mkdir()
-    (tmp_path / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
+    (tmp_path / ".gitignore").write_text(".gov-runtime/\nhome/\n", encoding="utf-8")
     (tmp_path / ".tickets" / f"{TICKET}.md").write_text(f"---\nid: {TICKET}\nstatus: in_progress\n---\n# A ticket\n",
                                                         encoding="utf-8")
     _git(tmp_path, "add", "--", ".gitignore", ".tickets")

@@ -107,14 +107,6 @@ def test_listing_does_not_run_a_check(gov, project, interface, sandbox):
     assert not marker.exists(), f"gov check --list ran the declared command\n{run.describe()}"
 
 
-def test_running_checks_stays_not_implemented_with_declarations_present(gov, project, interface, sandbox):
-    marker = sandbox.elsewhere / "the-check-ran"
-    _declare(project, dict(WARNING, command=f"touch {marker}"))
-    run = gov("check", "--json")
-    support.assert_error(run, interface, support.NOT_IMPLEMENTED, exit_code=1, command="check")
-    assert not marker.exists(), f"gov check ran a declared command\n{run.describe()}"
-
-
 def test_an_uncommitted_declaration_is_listed_and_left_alone(gov, project, interface):
     """Listing reads the working tree, and changes nothing in it."""
     _declare(project, HARD_BLOCK, commit=False)

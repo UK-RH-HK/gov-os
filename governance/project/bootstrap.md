@@ -1315,3 +1315,101 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
   `gov context [--json] [--brief] [--dry-run] [--budget N] <ticket>`.
 - **Regression at `c01e6058`:** every suite green, no latency occurrence.
 
+## W1-26 residuals (gov check G0-G2, 2026-10-06)
+
+- **`gov check` on this repository exits 3.** Red from real findings: schema/invariants (legacy records without
+  `state_class`), graph integrity (dangling `depends_on` references). Red because nothing is measured or built
+  here: index freshness (no lexical index in this tree), retrieval regression (unmeasured, no dev tiers
+  configured), context reproducibility (no loaded store), and the policy keys change, human_gate, security, test
+  and tool (no check registered for them yet). Yellow with "no registered check" (DEC-438): adapter/model
+  portability, recovery/rebuild (W1-27), audit reproducibility.
+- **The fresh-agent-reconstruction check is red here because `gov` is not on the `PATH` of the check's shell**
+  (exit 127). Its declaration is W1-25's.
+- **The result lists 24 families:** the Contract's seventeen and the seven policy keys, each as its own entry.
+- **The schema check validates the presence of fields,** not their types, enumerations or patterns (reviewer R1).
+- **A check's command that exits 0 is green whatever it prints** (DEC-285); a non-JSON output is not a finding.
+- **A hard-block check whose tool is absent (`openspec`) is YELLOW, not RED** (reviewer F10).
+- **Check commands are run through a shell from their YAML declaration,** with the caller's write access to the
+  working directory, and are not validated (F11, F12).
+- **Policy coverage matches a key to a check by substring** (F13); the skill-version check accepts any `ACTIVE`
+  decision (F14).
+- **The provenance `inputs_hash` is the hash of the check's id and the commit,** not of the input files.
+- **Four lists remain constants in the code** because the Contract fixes them (the families, the reserved
+  commands, the non-authoritative types, the implementer roles); record paths and schema types are derived, and
+  an unknown record type is a finding (DEC-436).
+- **`wbs_to_id` in `claims.py` is built and never used.**
+- **History:** the second round's merge of the integration branch was made without committing in the same
+  command and lost other tickets' tests; it was never merged, and the branch was rebuilt (DEC-436). The rebuilt
+  branch's merge `b7e75958` was flagged once by the containment check for the shared W1-07 support file,
+  byte-identical to the branch's aligned version: a record.
+- **Review rounds:** two (the limit). After them, fixed test-first without a further review: an unknown family
+  never green, derived record paths, the readiness result (DEC-436); a family with no registered check never
+  green (DEC-438, found by the orchestrator's own run).
+- **Learning metrics:** 0 KPI disputes; 4 acceptance cases revised after implementation began (2 for DEC-425
+  "unmeasured is never green", 2 that named uncovered families by a fixed list); 27 cases added after it;
+  source 1,245 lines against an estimate of 290. Every module maps to a KPI line; the estimate was wrong, not
+  the scope.
+- **Interface:** `gov check [--json] [--list]`; exit 0 all green, 3 `CHECK_FAILED` on any hard-block red;
+  `gov.check.runner.run_checks(root)` returns the result and whether a hard-block is red; each family entry has
+  `status`, `check_count` and, where it applies, `reason`; each check has `id`, `family`, `severity`, `status`,
+  `findings`, `provenance`. Family names are compared normalised (DEC-436).
+- **Regression at `6d1848cd`:** every suite green, no latency occurrence.
+
+## W1-23 residuals (hierarchical synthesis notes, 2026-10-06)
+
+- **A note is deterministic and written by no model:** grouped citations with source ids, the hash of each cited
+  span and of its file, the path and the lines, and the list of unresolved evidence. A model-written summary is
+  not built and no source asked for one.
+- **Notes are stored in one file,** `.gov-runtime/synthesis/notes.json`, per project; a second synthesis replaces
+  the first.
+- **Invalidation is found when `validate_notes(root)` is called,** by hashing the cited files and spans again;
+  nothing calls it yet. `gov context` (W1-24) does not import this module; the wave's exit run (W1-42) is the
+  first place where notes are derived for evidence above the packet budget.
+- **No review round** (STANDARD); the lead read the diff against the two failure lines.
+- **Learning metrics:** 0 KPI disputes; 0 acceptance tests rewritten after implementation began; source 114
+  lines against an estimate of 100.
+- **Interface:** `gov.retrieval.synthesis.synthesize(root, evidence, budget, *, gaps=None)` returns `notes`
+  (each with `group` and `citations`) and `unresolved`; `gov.retrieval.synthesis.validate_notes(root)` returns
+  `valid` and `errors`.
+- **Regression at `c8080e16`:** every suite green, no latency occurrence.
+
+## W1-50 closing follow-up residuals (the freeze mirror and the ticket lead's role, 2026-10-06)
+
+- **The mirror** is the file `freeze` in a folder under `~/.local/state/gov-os/` named by the SHA-256, in hex, of
+  the real path of the repository's git common directory (DEC-437). The main tree and every worktree share one
+  entry. A moved repository has a new key: its old mirror no longer freezes it, and the in-repository flag
+  alone does.
+- **The mirror's place follows the home directory the process sees.** A session that starts a child with
+  another home makes that child's guard read another mirror. The orchestrator's own unsandboxed session can do
+  that; it is inside the residual the owner accepted (DEC-429: an opaque write by that session).
+- **A launched worker's sandbox gives it a redirected home,** so it cannot reach the real mirror; its guard
+  therefore reads the in-repository flag only. A worker cannot write under `.gov-runtime/` outside its scratch,
+  and the containment check around the caller's Bash calls restores a removed flag from the mirror.
+- **An empty or unmarked mirror file means frozen;** a lift that cannot remove the mirror refuses and changes
+  nothing (DEC-437; the owner may overturn).
+- **The role `ticket-lead` exists in the guard** with no allowed paths; it writes its scratch through the
+  existing scratch rule. It is not a worker role: `gov launch` does not start it. **No lead runs under it yet:**
+  the lead start line in the orchestrator prompt is the owner's to change (`"GOV_ROLE":"ticket-lead"` in place
+  of `"GOV_ROLE":"orchestrator"` in the `--settings` of appendix A5). Until then leads keep the orchestrator's
+  write rights (DEC-156), and the four rules at the top of the leads' common brief are the only bar.
+- **Tests and the real mirror.** In the second start, unit tests wrote six entries into the real
+  `~/.local/state/gov-os/` (keys of temporary projects, none of this repository; nothing was frozen). They are
+  the owner's to remove. Since then every test that runs the pause command or the guard uses a throwaway home,
+  and a tripwire fails the test session if the real folder's listing or modification time changes
+  (`tests/acceptance/conftest.py` and the conftest files of `tests/unit/pause`, `guard` and `containment`); it
+  finds the real folder from the password database, so a changed `HOME` does not blind it. A new suite that
+  runs `gov pause` without a throwaway home is caught by it, not prevented.
+- **Cases of other tickets revised for the mirror** (reason "owner decision DEC-429"): W1-07's read-act
+  snapshot cases and W1-28's freeze cases; one W1-50 freeze-marker case.
+- **The engineer's commit `9f294a9e` carries no `Role:` trailer;** the second start's lead wrote a unit test
+  itself, which was removed from the branch and redone by an engineer. The merge `94bb68d7` was flagged once by
+  the containment check for the aligned W1-07 support file: a record.
+- **The owner's manual check of freeze, pause and lift from a plain terminal** is run at the wave's exit
+  (W1-42, DEC-428), now including: after `gov pause`, both the flag and the mirror exist; removing the flag by
+  hand leaves the project frozen and the next Bash call of a session restores it with a finding; the lift
+  removes both.
+- **Learning metrics of the follow-up:** 6 packages (all decided by the orchestrator, DEC-437); 0 KPI disputes;
+  5 cases of earlier suites revised after implementation began, each for the mirror; source 159 lines against
+  an estimate of 150; three starts (one ended on a running reviewer, one for the packages).
+- **Regression at `5d830d3e`:** every suite green (W1-50 642 passed), no latency occurrence; the real mirror
+  folder unchanged by it.

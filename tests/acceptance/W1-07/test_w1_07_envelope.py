@@ -40,8 +40,8 @@ def test_status_succeeds_with_exit_code_0(gov, interface):
 
 def test_a_governance_error_has_exit_code_1_and_its_code_in_the_json(gov, interface):
     """Exit code 1 is "governance error (GovError code in JSON)"; running checks is one today (DEC-186)."""
-    run = gov("check", "--json")
-    error = support.assert_error(run, interface, support.NOT_IMPLEMENTED, exit_code=1, command="check")
+    run = gov("doctor", "--json")
+    error = support.assert_error(run, interface, support.NOT_IMPLEMENTED, exit_code=1, command="doctor")
     assert "details" in error
 
 
@@ -61,7 +61,7 @@ def test_an_unknown_option_is_a_usage_error(gov, interface):
         assert envelope["ok"] is False
 
 
-@pytest.mark.parametrize("args, expected", [(("status",), 0), (("check",), 1), (("no-such-command",), 2)],
+@pytest.mark.parametrize("args, expected", [(("status",), 0), (("check",), 3), (("no-such-command",), 2)],
                          ids=["status", "check", "unknown"])
 def test_the_exit_code_is_the_same_without_json(gov, args, expected):
     run = gov(*args)
