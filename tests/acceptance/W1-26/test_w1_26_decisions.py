@@ -44,7 +44,12 @@ def test_decision_checker_finding_makes_authority_family_red(project, sandbox, i
 # --------------------------------------------------------------------------
 
 def test_clean_decisions_authority_green(project, sandbox, interface):
-    """A clean decision register makes the authority/role limits family GREEN."""
+    """A clean decision register makes the authority/role limits family GREEN.
+
+    Revised (DEC-438): add_core_declarations() so the authority check is
+    registered — owner rule DEC-425: unmeasured is never green.
+    """
+    project.add_core_declarations()
     project.add_decision("ADR-0001", "ACTIVE")
     project.add_decision("ADR-0002", "PROPOSED")
     project.commit()
@@ -64,7 +69,12 @@ def test_clean_decisions_authority_green(project, sandbox, interface):
 # --------------------------------------------------------------------------
 
 def test_no_decisions_authority_green(project, sandbox, interface):
-    """A project with no decision records has no authority findings."""
+    """A project with no decision records has no authority findings.
+
+    Revised (DEC-438): add_core_declarations() so the authority check is
+    registered — owner rule DEC-425: unmeasured is never green.
+    """
+    project.add_core_declarations()
     project.commit()
     run = support.run_check(project, sandbox)
     envelope = support.envelope_of(run, interface)
