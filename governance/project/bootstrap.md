@@ -1218,3 +1218,31 @@ Both branches are merged (`6a978dbc`, `ad392210`). The regression after each was
 - **W1-46's live sessions:** 23 errors in the regression after the merge, run beside the other suites (a launched
   session did not finish its probe); 493 passed alone.
 - **`ollama serve` is left running** by the code under test (DEC-261).
+
+## Mid-wave audit (DEC-249, 2026-10-06)
+
+A fresh read-only independent auditor, in its own worktree at `734d7dfd`, checked the 31 closed tickets against
+Contract v4.1. Verdict: 31 pass (21 clean, 10 with notes), none failed, no covers item claimed and missing, no
+contradiction between tickets. Depth: it ran 12 suites itself (the guard, containment, installs, the launcher, the
+decision checker, the secrets filter among them) and read the others' tests and source through read-only
+sub-agents; the model-dependent and live-session cases, and W1-16's and W1-21's whole suites, were read and not
+run. The report is kept in the orchestrator's log folder.
+
+- **MWA-01, high: opaque commands defeat the freeze.** The same fail-open that W1-50's last review found (see
+  W1-50's residuals). The auditor names it the first risk to the exit audit (CAP-05.a). With the owner.
+- **MWA-02, medium: acceptance tests added after implementation are systematic** (W1-09 15 cases, W1-11 about 44%
+  of its suite, W1-20, W1-21), each batch by the test designer and red before its fix (DEC-136). MR-3's words are
+  "before implementation": the exit auditor may read this as a standing exception to a master rule. With the
+  owner.
+- **MWA-03, medium: retrieval passes with thin margins** (hit@5 81.67 against 80; 2 forbidden citations against
+  2). Known (DEC-414, DEC-425); re-measured at W1-42 and at qualification.
+- **MWA-04, low: W1-03's "and at gov close" is untested.** `gov close` is W1-30, whose KPI line already has it run
+  the containment check; the test belongs there.
+- **MWA-05, low: CAP-08.a's `owner` and `links` filters are not built** (W1-10; no KPI line names them, no record
+  carries an `owner` field). No open ticket picks them up. With the owner.
+- **MWA-06, low: W1-10's load-time line runs only where the dev tiers are configured** (`local_only`); it runs in
+  this machine's regression.
+- **MWA-07, low: four changes outside a ticket's paths, each explained** (W1-16 the tool registry, W1-20 and W1-21
+  W1-07's shared test files, W1-28 the roster).
+- **MWA-08, low: W1-01's "denied in every session settings file" is shown by the file's presence,** not by parsing
+  its rule against what the guard enforces.
