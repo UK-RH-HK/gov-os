@@ -209,13 +209,85 @@ def test_a_file_the_project_adds_outside_the_kernel_is_not_drift(project, sandbo
         f"gov doctor reports the project's own file {rel} against the lock\n{result.describe()}"
 
 
-def test_a_missing_lock_is_not_a_match(project, sandbox):
-    """A project installed by Copier whose lock was removed: nothing was hashed, so nothing matches.
+# --------------------------------------------------------------------------
+# A missing lock (DEC-499): a failure in an installed project, unmeasured in one never installed
+# --------------------------------------------------------------------------
 
-    Whether doctor must also fail there is not decided by a source, and is not asserted.
-    """
+_LOCK_NAME = support.LOCK_REL.rsplit("/", 1)[-1]
+
+
+def _delete_the_lock(project):
+    """The project keeps Copier's answers file (it was installed from the template) and loses its lock."""
+    assert (project / support.ANSWERS_REL).is_file(), f"this case needs the project's {support.ANSWERS_REL}"
+    support.lock_text(project)
     support.lock_path(project).unlink()
-    support.assert_not_a_match(support.doctor(project, sandbox), f"{support.LOCK_REL} was removed")
+    assert not support.lock_path(project).exists()
+
+
+def _assert_the_lock_part_failed(result, why):
+    """Failed, not unmeasured and not a match; the lock named; doctor unhealthy (DEC-499)."""
+    support.assert_not_a_match(result, why)
+    assert result.section.get("status") == "fail", (
+        f"the lock part of gov doctor has the status {result.section.get('status')!r}, not 'fail', although {why} "
+        f"(DEC-499)\n{result.describe()}")
+    assert _LOCK_NAME in result.text, \
+        f"the lock part of gov doctor does not name {_LOCK_NAME} although {why}\n{result.describe()}"
+    assert result.run.returncode != 0 and result.run.envelope().get("ok") is False, \
+        f"gov doctor exits {result.run.returncode} although {why} (DEC-499)\n{result.describe()}"
+
+
+def test_an_installed_project_whose_lock_was_deleted_fails_the_lock_part(project, sandbox):
+    """The answers file is there and the lock is not: the lock is missing from an installed project.
+
+    DEC-499: the comparison says so, and doctor reports that part as failed, not as "unmeasured", and exits
+    non-zero. Nothing was hashed, so nothing matches (DEC-488).
+    """
+    _delete_the_lock(project)
+    _assert_the_lock_part_failed(
+        support.doctor(project, sandbox),
+        f"{support.LOCK_REL} was deleted from a project that holds {support.ANSWERS_REL}")
+
+
+def test_doctor_without_json_exits_non_zero_and_names_the_lock_when_it_was_deleted(project, sandbox):
+    """The command a person or a pipeline runs, ``gov doctor``: its exit code and what it prints (DEC-499)."""
+    _delete_the_lock(project)
+    run = support.base.run_gov_with_code(support.REPO_ROOT, project, sandbox, "doctor")
+    printed = run.stdout + run.stderr
+    assert "Traceback (most recent call last)" not in printed, \
+        f"gov doctor ends with a traceback where {support.LOCK_REL} was deleted\n{run.describe()}"
+    assert run.returncode != 0, (
+        f"gov doctor exits 0 although {support.LOCK_REL} was deleted from a project that holds "
+        f"{support.ANSWERS_REL} (DEC-499)\n{run.describe()}")
+    assert _LOCK_NAME in printed, f"gov doctor does not name {_LOCK_NAME} in what it prints\n{run.describe()}"
+
+
+def test_deleting_the_lock_does_not_silence_an_edited_kernel_file(project, sandbox):
+    """DEC-499's reason: a kernel file edited and the lock deleted with it is not a healthy project."""
+    rel = _a_kernel_file(project, "hooks")
+    _append_one_byte(project / rel)
+    _delete_the_lock(project)
+    _assert_the_lock_part_failed(
+        support.doctor(project, sandbox),
+        f"one byte was appended to {rel} and {support.LOCK_REL} was deleted")
+
+
+def test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured(project, sandbox):
+    """Neither file: a project never installed from the template. The lock part is unmeasured and no failure.
+
+    DEC-499: as W1-27's cases hold, and as this repository is before its adoption. Not a match either: nothing
+    was hashed (DEC-488). That an installed project can delete both files is a residual of DEC-499 (the lock is
+    not signed before Wave 3).
+    """
+    _delete_the_lock(project)
+    (project / support.ANSWERS_REL).unlink()
+    result = support.doctor(project, sandbox)
+    support.assert_not_a_match(result, f"the project holds neither {support.LOCK_REL} nor {support.ANSWERS_REL}")
+    assert result.section.get("status") == "unmeasured" and not result.reports_drift, (
+        f"the lock part of gov doctor is not 'unmeasured' in a project with neither {support.LOCK_REL} nor "
+        f"{support.ANSWERS_REL} (DEC-499)\n{result.describe()}")
+    assert result.run.returncode == 0 and result.run.envelope().get("ok") is True, (
+        f"gov doctor fails a project that was never installed from the template for its missing lock "
+        f"(DEC-499)\n{result.describe()}")
 
 
 @pytest.mark.parametrize("how", ("empty", "absent"))

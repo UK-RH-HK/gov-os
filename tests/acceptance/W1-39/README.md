@@ -2,7 +2,7 @@
 
 Ticket `DAEO-5ylr`, profile STANDARD. Written by the Independent Test Designer before implementation (MR-3),
 and brought to DEC-488 and DEC-493 before any implementer commit: 61 cases. Three cases were added after
-implementation began (no existing case rewritten): 64 cases in five files.
+implementation began, then DEC-499's (one case rewritten, three added): 67 cases in five files.
 
 Run, without `PYTHONPATH`:
 
@@ -100,7 +100,7 @@ belongs to W1-40 (hooks), W1-41 (registry) and the exit run.
 
 ### Success 2 [CAP-02.a]: one edited kernel file is DRIFT naming it; the update procedure is documented
 
-`test_w1_39_drift.py` (20 cases), and four cases of `test_w1_39_update.py`
+`test_w1_39_drift.py` (23 cases), and four cases of `test_w1_39_update.py`
 
 | Case | Clause |
 |---|---|
@@ -116,7 +116,10 @@ belongs to W1-40 (hooks), W1-41 (registry) and the exit run.
 | `test_a_project_without_any_installed_kernel_file_is_not_a_match` | measured or refused: no kernel file, a manifest of one file outside the kernel with its true hash, is not a match |
 | `test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it` | DEC-488: unlisted is drift, from the lock's side |
 | `test_a_file_the_project_adds_outside_the_kernel_is_not_drift` (3) | a project's file is not drift |
-| `test_a_missing_lock_is_not_a_match` | measured or refused (not a match; no more is asserted) |
+| `test_an_installed_project_whose_lock_was_deleted_fails_the_lock_part` | DEC-499: the answers file there, the lock not: the part fails, names the lock, doctor exits non-zero |
+| `test_doctor_without_json_exits_non_zero_and_names_the_lock_when_it_was_deleted` | DEC-499: the same through `gov doctor`'s exit code and what it prints |
+| `test_deleting_the_lock_does_not_silence_an_edited_kernel_file` | DEC-499's reason: an edited kernel file with the lock deleted is a failure |
+| `test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured` | DEC-499: never installed from the template: unmeasured, not a match, no failure |
 | `test_a_lock_without_manifest_entries_is_not_a_match` (2) | DEC-488: an absent or empty manifest is not a match |
 | `test_a_lock_that_is_not_readable_as_a_map_is_not_a_match` | measured or refused |
 | `test_copier_prints_the_update_procedure_after_a_copy` | the procedure, in the template's message after copy (DEC-488) |
@@ -210,6 +213,31 @@ assertion against the implementation as it stood when they were written; the oth
 - `test_a_project_without_any_installed_kernel_file_is_not_a_match`: doctor answered MATCH, exit 0. The case
   holds "not a match, not passed"; whether the part fails or is reported unmeasured is not asserted.
 
+## A missing lock (DEC-499)
+
+Where `.copier-answers.yml` exists and `governance/framework.lock` does not, the lock is missing from an
+installed project: the lock part of `gov doctor` has the status `fail` (not `unmeasured`, not a match), its
+section names `framework.lock`, and the command exits non-zero with `ok: false`. Where neither file exists the
+part stays `unmeasured`, is not a match, and doctor exits 0. The section's wording is not fixed beyond the
+lock's name; the comparison is held through what doctor reports of it (no module of `src/gov/lock/` is
+imported).
+
+- **Rewritten:** `test_a_missing_lock_is_not_a_match` became
+  `test_an_installed_project_whose_lock_was_deleted_fails_the_lock_part`. It held "not a match" and left the
+  failure open, with the sentence that no source decided it; DEC-499 decides it. What it held is still held.
+- **Added:** the three other cases of the table above.
+
+Red when written, against the implementation as it stood (the other 64 green): the rewritten case and
+`test_deleting_the_lock_does_not_silence_an_edited_kernel_file` on the status (doctor answered
+`{"match": "MISSING", "reason": "no framework.lock", "status": "unmeasured"}`, exit 0, `ok: true`);
+`test_doctor_without_json_exits_non_zero_and_names_the_lock_when_it_was_deleted` on the exit code (0,
+`"healthy": true`). `test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured` was green: it holds
+what must not change.
+
+Not closed, as DEC-499 records: a project that deletes both files, or edits the manifest together with a kernel
+file (the lock is not signed before Wave 3). An answers file that exists and cannot be read as a map, with no
+lock, is decided by no source: no case.
+
 ## The decisions the cases follow
 
 The packages of the first run are decided; no case waits on one.
@@ -224,11 +252,12 @@ The packages of the first run are decided; no case waits on one.
   The copy creates `governance/project/` with a minimal path map that an update never overwrites. The answers
   file is Copier's standard `.copier-answers.yml`. A created project has an ignore file for `.gov-runtime/`
   and `__pycache__/`.
+- **DEC-499.** An installed project without its lock is a failure in `gov doctor`; a project with neither the
+  lock nor the answers file stays unmeasured. Each Copier message states the whole procedure, and a fresh
+  project is at MINIMAL (both as the cases already held).
 
 ## Not covered here, and why
 
-- **Whether doctor must fail on a missing lock once an answers file exists.** Not decided by a source. The
-  case holds "not a match" and nothing more.
 - **The command of the adapter generation step.** DEC-488 has the procedure name the step; no source fixes
   its command. The cases hold the word `rulesync`. Running the step in a created project is W1-41's.
 - **Whether the shipped path map is valid against the kernel's `path-map.schema.json`** (which requires all
