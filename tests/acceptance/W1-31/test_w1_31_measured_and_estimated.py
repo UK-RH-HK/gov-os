@@ -1,8 +1,9 @@
 """W1-31 after DEC-491 and DEC-495: what the counter reads from the session logs, the labelled estimate, the
 three share figures, and the learning metrics read from the commits and from the orchestrator's record.
+The forms the second specimen adds (DEC-501) are in ``test_w1_31_second_specimen.py``.
 
 A result is measured or it is refused (DEC-449, DEC-454): no case here accepts a figure whose source was
-absent, unreadable or of a form the specimen does not show. The README maps every case to its KPI line and
+absent, unreadable or of a form neither specimen shows. The README maps every case to its KPI line and
 says which are red against the counter as built, and why.
 """
 
@@ -92,10 +93,10 @@ def test_a_log_that_was_read_and_holds_none_counts_zero(project, sandbox, logs, 
 
 
 # --------------------------------------------------------------------------
-# What the specimen does not show is "not measured", by name, never guessed (DEC-495)
+# What neither specimen shows is "not measured", by name, never guessed (DEC-495, DEC-501)
 # --------------------------------------------------------------------------
 
-def _failing_hook(log):
+def _success_run_with_another_exit_code(log):
     log.bash("ls", support.OTHER_OUT)
     log.hook("PostToolUse", TEXT, name="PostToolUse:Bash", exit_code=2, context=False)
 
@@ -104,20 +105,28 @@ def _unknown_hook_run(log):
     log.hook("PostToolUse", TEXT, name="PostToolUse:Bash", run_type="hook_blocking_error", context=False)
 
 
-def _unseen_event(log):
-    log.hook("UserPromptSubmit", TEXT)
-
-
 def _context_in_another_form(log):
     log.hook("PostToolUse", TEXT, name="PostToolUse:Bash", content=TEXT)
 
 
-def _failing_sessionstart(log):
+def _failing_hook_line_in_another_form(log):
+    log.bash("ls", support.OTHER_OUT)
+    log.failing("PostToolUse", [support.failing_text(TEXT)], name="PostToolUse:Bash", tool_use_id="toolu_unseen")
+
+
+def _stop_summary_with_added_context(log):
+    log.stop(support.STOP_TEXT, added=[TEXT])
+
+
+def _sessionstart_run_with_another_exit_code(log):
     log.session_start(TEXT, exit_code=2, context=False)
 
 
-def _gov_in_a_subagent(log):
-    log.bash(gov_command("status"), OUT, sidechain=True)
+def _unknown_hook_run_in_a_subagents_file(log):
+    sub = log.subagent(support.AGENT_A)
+    log.launch(sub)
+    sub.task().say((30, 4, 300, 0), thinking=False)
+    sub.hook("SubagentStop", TEXT, run_type="hook_blocking_error", context=False)
 
 
 def _gov_without_its_result(log):
@@ -128,25 +137,26 @@ def _gov_result_in_another_form(log):
     log.bash(gov_command("status"), OUT, result_content=[{"type": "text", "text": OUT}])
 
 
-def _gov_in_a_compound_command(log):
-    log.bash("ls src && " + gov_command("status") + " | head -5", OUT)
-
-
 @pytest.mark.parametrize("variant, source, named", [
-    pytest.param(_failing_hook, "hook_output", None, id="a hook that fails"),
+    pytest.param(_success_run_with_another_exit_code, "hook_output", None,
+                 id="a successful run line with another exit code"),
     pytest.param(_unknown_hook_run, "hook_output", None, id="a hook run of another type"),
-    pytest.param(_unseen_event, "hook_output", "UserPromptSubmit", id="context added under another hook event"),
     pytest.param(_context_in_another_form, "hook_output", None, id="added context in another form"),
-    pytest.param(_failing_sessionstart, "sessionstart_packet", None, id="a SessionStart hook that fails"),
-    pytest.param(_gov_in_a_subagent, "gov_output", None, id="gov in a sub-agent's lines"),
+    pytest.param(_failing_hook_line_in_another_form, "hook_output", None,
+                 id="a failing hook's line in another form"),
+    pytest.param(_stop_summary_with_added_context, "hook_output", None,
+                 id="a line after a Stop run that carries added context"),
+    pytest.param(_sessionstart_run_with_another_exit_code, "sessionstart_packet", None,
+                 id="a SessionStart run line with another exit code"),
+    pytest.param(_unknown_hook_run_in_a_subagents_file, "hook_output", None,
+                 id="a hook run of another type in a sub-agent's file"),
     pytest.param(_gov_without_its_result, "gov_output", None, id="gov without its result"),
     pytest.param(_gov_result_in_another_form, "gov_output", None, id="a gov result in another form"),
-    pytest.param(_gov_in_a_compound_command, "gov_output", None, id="gov inside a compound command"),
 ])
 def test_a_form_the_specimen_does_not_show_is_not_measured(project, sandbox, logs, tmp_path, ccusage,
                                                            variant, source, named):
-    """The same ticket twice: with logs in the specimen's form the source is a count; with one thing more that
-    the specimen does not show, it is never a number. Either the record says "not measured" for it, for the
+    """The same ticket twice: with logs in the specimens' forms the source is a count; with one thing more
+    that neither specimen shows, it is never a number. Either the record says "not measured" for it, for the
     measured total and for the measured share and the sum (exit code 3) and names the reason, or the command
     refuses. The reason holds no text of the log."""
     expected, run = run_full(project, sandbox, logs)
@@ -193,22 +203,40 @@ def test_a_log_of_another_claude_code_version_is_refused_by_its_version(project,
 # --------------------------------------------------------------------------
 
 def test_the_counter_prints_counts_only_never_content(project, sandbox, logs, tmp_path, ccusage):
-    """No text of a log (a packet, a hook's text or command, a command line, a tool result, a prompt, an
-    answer) is in anything the command prints: with and without ``--json``, where it succeeds, where a
-    source is not measured and where it refuses."""
-    _expected, run = run_full(project, sandbox, logs)
+    """No text of a log is in anything the command prints: with and without ``--json``, where it succeeds,
+    where a source is not measured and where it refuses. The fixture holds every form of the second specimen:
+    the packets, the hooks' texts and commands, the blocking hook's text, the failing hooks' texts, the
+    commands (the pipe's, the blocked one, the one behind ``cd``), their results (the error result among
+    them), the sub-agent's lines, the prompts and answers, the summary and the local command's output after
+    the compaction."""
+    expected = support.second_fixture(project, logs)
+    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
     plain = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B, as_json=False)
-    varied = tmp_path / "varied-config"
-    first, second, other = support.full_logs()
-    _unseen_event(first)
-    _gov_in_a_compound_command(second)
-    for log in (first, second, other):
-        log.write(varied)
-    not_measured = support.run_telemetry(project, sandbox, varied, SESSION_A, SESSION_B)
+
+    def varied(name, change):
+        folder = tmp_path / name
+        first, second, other = support.second_logs()
+        change(first, second)
+        for log in (first, second, other):
+            log.write(folder)
+        return support.run_telemetry(project, sandbox, folder, SESSION_A, SESSION_B)
+
+    def unseen(first, second):
+        _stop_summary_with_added_context(first)
+        _gov_result_in_another_form(second)
+        first.subagents[0].hook("SubagentStop", TEXT, run_type="hook_blocking_error", context=False)
+
+    def passed_over(first, _second):
+        sub = first.subagents[0]
+        sub.spaced = {number for number, line in enumerate(sub.lines) if line.get("type") == "assistant"}
+
+    not_measured = varied("unseen-config", unseen)
+    disagreeing = varied("passed-over-config", passed_over)
     refused = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_NOWHERE)
-    assert run.returncode == EXIT_OK, f"the full fixture is measured\n{run.describe()}"
-    assert not_measured.returncode != EXIT_OK and refused.returncode != EXIT_OK
-    for each in (run, plain, not_measured, refused):
+    assert run.returncode == EXIT_OK and support.record(run)["governance_tokens"]["total"] == sum(
+        expected["counts"].values()), f"the second fixture is measured\n{run.describe()}"
+    assert EXIT_OK not in (not_measured.returncode, disagreeing.returncode, refused.returncode)
+    for each in (run, plain, not_measured, disagreeing, refused):
         assert support.MARK not in printed(each), f"text of the log is printed\n{each.describe()}"
 
 
@@ -427,7 +455,7 @@ def test_commits_that_cannot_be_read_are_not_measured(project, sandbox, logs, cc
 
 def test_kpi_disputes_are_read_from_the_orchestrators_record(project, sandbox, logs, ccusage):
     """One entry per line of the ticket's disputes record, each with the decision that settled it; a record
-    that is there and empty is no dispute. (The place and the form of the record are proposed: README, PR-1.)"""
+    that is there and empty is no dispute. (The place and the form of the record: DEC-501.)"""
     support.write_session(logs, SESSION_A, [(1000, 200, 0, 0)])
     project.add_disputes("DEC-900: whether the bound counts the header", "DEC-901: what fresh input means")
     project.add_disputes("DEC-902: another ticket's dispute", ticket=OTHER_TICKET)
