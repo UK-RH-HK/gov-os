@@ -207,3 +207,7 @@ systems:
   emergency-stop-and-rollback:
     status: absent
     reason: gov pause is not built yet.
+# The decision-citations check (DEC-473, DEC-474, DEC-479): this project's register file, and the commit
+# after which commits are judged (the commit that records DEC-463).
+decision_register: docs/DECISION_REGISTER.md
+decision_citations_base: "46ec8da3"
