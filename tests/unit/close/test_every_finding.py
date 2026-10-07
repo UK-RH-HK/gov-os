@@ -58,7 +58,7 @@ def test_a_ticket_without_a_commit_says_that_its_containment_was_not_measured():
 def test_every_commit_without_a_task_on_the_tickets_work_is_a_finding():
     others = [{"sha": letter * 40, "trailers": {}, "paths": [f"src/{letter}.py", "README.md"]} for letter in "ab"]
     with pytest.raises(_Finding) as raised:
-        _check_unmeasured(TICKET, others, lambda path: path.startswith("src/"))
+        _check_unmeasured(TICKET, others, lambda path: path.startswith("src/"), frozenset({TICKET}))
     assert len(raised.value.findings) == 2 and all("names no task" in line for line in raised.value.findings)
     assert raised.value.details["work_without_task"] == [{"commit": "a" * 12, "paths": ["src/a.py"]},
                                                          {"commit": "b" * 12, "paths": ["src/b.py"]}]
@@ -96,7 +96,8 @@ def test_the_probe_gate_ends_at_its_first_finding_and_says_what_it_did_not_ask(r
     repo.commit("work", f"Task: {TICKET}", "Role: engineer", "Implements: CAP-01",
                 files={f"docs/probes/{TICKET}/PR.md": "---\nnot valid yaml: [[[broken\n---\n"})
     with pytest.raises(_Finding) as raised:
-        command._check_probe(repo.root, TICKET, command._ticket_commits(repo.root, TICKET), [], lambda path: True)
+        command._check_probe(repo.root, TICKET, command._ticket_commits(repo.root, TICKET), [], lambda path: True,
+                             frozenset({TICKET}))
     assert raised.value.code == "PROBE_INVALID"
     [said] = raised.value.not_measured
     assert said.startswith(f"what the probe gate of {TICKET} asks after this finding: not measured")

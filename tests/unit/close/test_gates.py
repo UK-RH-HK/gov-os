@@ -113,7 +113,7 @@ def _inside(path):
 
 def _gate(repo):
     commits = _ticket_commits(repo.root, TICKET)
-    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside)
+    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, frozenset({TICKET}))
 
 
 def _refused(repo):
@@ -206,6 +206,6 @@ def test_a_git_failure_while_the_probes_commits_are_read_is_an_error_not_a_findi
         monkeypatch.setattr(command, "_git", counting)
         monkeypatch.setattr(close_repo, "git", counting)
         with pytest.raises(GovError) as raised:
-            _check_probe(repo.root, TICKET, commits, [], _inside)
+            _check_probe(repo.root, TICKET, commits, [], _inside, frozenset({TICKET}))
         assert raised.value.code == "GIT_FAILURE"
         assert sum(seen) == calls_before_the_failure + 1

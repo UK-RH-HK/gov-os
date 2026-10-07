@@ -20,6 +20,7 @@ from gov.store import load
 from gov.tasks.tickets import frontmatter
 
 TICKET = "T-0001"
+TICKETS = frozenset({TICKET, "T-0002"})
 WBS = "W1-01"
 TRAILERS = (f"Task: {TICKET}", "Role: engineer", "Implements: CAP-01")
 TICKET_FILE = f".tickets/{TICKET}.md"
@@ -160,7 +161,8 @@ def _other(sha, *paths, **trailers):
 @pytest.mark.parametrize("trailers", [{}, {"Role": "engineer"}, {"Role": "orchestrator"}, {"Role": "owner"}])
 def test_a_commit_that_names_no_task_and_changes_the_tickets_work_refuses_whatever_its_role(path, trailers):
     with pytest.raises(_Finding) as raised:
-        _check_unmeasured(TICKET, [_other("a", "docs/notes.md"), _other("b", "README.md", path, **trailers)], _ways()[1])
+        _check_unmeasured(TICKET, [_other("a", "docs/notes.md"), _other("b", "README.md", path, **trailers)],
+                          _ways()[1], TICKETS)
     assert raised.value.code == "WORK_WITHOUT_TASK"
     assert "b" * 12 in raised.value.message and "task" in raised.value.message and path in raised.value.message
     assert raised.value.details["paths"] == [path]
@@ -171,8 +173,8 @@ def test_any_other_commit_refuses_nothing():
         _other("a", "docs/adr/DEC-1.md", "docs/checkpoints/T-0001/CP.md", "docs/probes/T-0001/PR.md", "src/other/x.py",
                "notes/meeting.txt", ".tickets/T-0002.md", "governance/project/n.yaml"),
         _other("b", "src/example/theirs.py", TICKET_FILE, Task="T-0002", Role="engineer"),   # that ticket's
-    ], _ways()[1])
-    _check_unmeasured(TICKET, [], _ways()[1])
+    ], _ways()[1], TICKETS)
+    _check_unmeasured(TICKET, [], _ways()[1], TICKETS)
 
 
 def test_a_commit_of_the_ticket_without_a_role_refuses_like_one_without_implements():
@@ -202,6 +204,7 @@ def test_a_commit_without_a_task_that_changes_a_governance_file_has_the_checks_r
         raise GovError("STOP", "enough")
 
     with patch.object(command, "_ticket_commits", return_value=[mine]), patch.object(command, "_check_tree"), \
+            patch.object(command, "_tickets_of_head", return_value=TICKETS), \
             patch.object(command, "_commits_since", return_value=others), patch.object(command, "_check_trailers"), \
             patch.object(command, "_check_containment"), patch.object(command, "_check_governance", judged), \
             patch.object(command, "_run_tests", return_value=([], {"passed": 1, "failed": 0, "errors": 0})):
@@ -230,7 +233,7 @@ def _probe(repo, probed, *trailers, commit=True, **keys):
 
 def _gate(repo):
     commits = _ticket_commits(repo.root, TICKET)
-    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside)
+    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, TICKETS)
 
 
 def _refused(repo):
@@ -255,6 +258,84 @@ def test_a_judgement_of_pass_or_passed_is_accepted(repo, judgement):
 def test_any_other_judgement_refuses_and_is_named(repo, judgement):
     _probe(repo, _work(repo), judgement=judgement)
     assert "judgement" in _refused(repo)
+
+
+def _records(repo, probed, **judgements):
+    """One commit of the orchestrator with a probe record of the probed commit per file name, each with its
+    judgement."""
+    files = {}
+    for name, judgement in judgements.items():
+        front = {"id": name, "type": "probe", "task": TICKET, "reviewer_session": "reviewer-001",
+                 "implementer_session": "impl-001", "reviewer_wrote_nothing": True, "judgement": judgement,
+                 "commissioned_by": "orchestrator", "judged_by": "orchestrator", "probed_commit": probed}
+        files[f"docs/probes/{TICKET}/{name}.md"] = "---\n" + yaml.safe_dump(front) + "---\n\n# Probe\n"
+    return repo.commit("the probe records", "Role: orchestrator", files=files)
+
+
+@pytest.mark.parametrize("judgements", [{"PR": "pass", "PR-2": "fail"}, {"PR": "fail", "PR-2": "pass"},
+                                        {"A": "passed", "B": "pass", "C": "fail"}, {"PR": "fail", "PR-2": "fail"}])
+def test_a_failing_probe_record_refuses_whatever_another_says(repo, judgements):
+    """Every record of the ticket is read (DEC-500): neither the first file nor the last decides."""
+    _records(repo, _work(repo), **judgements)
+    assert "judgement is 'fail'" in _refused(repo)
+
+
+def test_every_probe_record_of_the_ticket_is_asked_everything(repo):
+    probed = _work(repo)
+    _records(repo, probed, **{"PR": "pass", "PR-2": "passed"})
+    _gate(repo)
+    later = repo.commit("more work", *TRAILERS, files={"src/b.py": "b\n"})
+    _records(repo, later, **{"PR-2": "pass"})  # the first record is now of an earlier round
+    assert "after the probed commit" in _refused(repo)
+
+
+def test_a_record_of_another_ticket_or_another_type_in_the_folder_is_none_of_the_tickets(repo):
+    probed = _work(repo)
+    repo.commit("other records", "Role: engineer", files={
+        f"docs/probes/{TICKET}/other.md": f"---\ntype: probe\ntask: T-0002\njudgement: fail\n---\n",
+        f"docs/probes/{TICKET}/note.md": f"---\ntype: note\ntask: {TICKET}\njudgement: fail\n---\n"})
+    with pytest.raises(_Finding) as raised:
+        _gate(repo)
+    assert raised.value.code == "PROBE_MISSING"
+    _records(repo, probed, **{"PR-2": "pass"})
+    _gate(repo)
+
+
+@pytest.mark.parametrize("named", ["T-0009", "DEC-000", "T-000"])
+def test_a_commit_whose_task_names_no_ticket_is_judged_as_one_without_a_task(repo, named):
+    """DEC-500: on the ticket's work it refuses, and after the probed commit it makes the probe stale."""
+    other = _other("b", "README.md", "src/example/more.py", Task=named, Role="engineer", Implements="CAP-01")
+    with pytest.raises(_Finding) as raised:
+        _check_unmeasured(TICKET, [other], _ways()[1], TICKETS)
+    assert raised.value.code == "WORK_WITHOUT_TASK" and "b" * 12 in raised.value.message
+    _check_unmeasured(TICKET, [_other("c", "notes/meeting.txt", Task=named)], _ways()[1], TICKETS)
+
+    _probe(repo, _work(repo))
+    _gate(repo)
+    after = repo.commit("under a task that is none", f"Task: {named}", "Role: engineer", files={"src/c.py": "c\n"})
+    assert "the probe is stale" in _refused(repo) and after[:12] in _refused(repo)
+
+
+def test_a_commit_whose_task_names_no_ticket_and_changes_a_governance_file_has_the_checks_run(root):
+    """``run`` asks the commit being closed for the project's tickets: ``T-0002`` is none of them here."""
+    mine = {"sha": "a" * 40, "parents": [], "trailers": {}, "paths": ["src/example/a.py"]}
+    others = [_other("b", "docs/notes.md", Task="T-0002"), _other("c", "governance/project/n.yaml", Task="T-0002"),
+              _other("d", "governance/project/m.yaml", Task=TICKET)]
+    (root / "tests" / "acceptance" / TICKET).mkdir(parents=True)
+    (root / "tests" / "acceptance" / TICKET / "test_a.py").write_text("", encoding="utf-8")
+    seen = []
+
+    def judged(root, commits):
+        seen.extend(commits)
+        raise GovError("STOP", "enough")
+
+    with patch.object(command, "_ticket_commits", return_value=[mine]), patch.object(command, "_check_tree"), \
+            patch.object(command, "_commits_since", return_value=others), patch.object(command, "_check_trailers"), \
+            patch.object(command, "_check_containment"), patch.object(command, "_check_governance", judged), \
+            patch.object(command, "_run_tests", return_value=([], {"passed": 1, "failed": 0, "errors": 0})):
+        with pytest.raises(GovError):
+            run(root, _args(), {})
+    assert [c["sha"][0] for c in seen] == ["a", "b", "c"]
 
 
 def test_a_probe_record_no_commit_holds_refuses(repo):
@@ -333,7 +414,8 @@ def _tests(root, **files):
 
 
 FAILS = "def test_fail():\n    assert False\n"
-SKIPPED = "import pytest\n\n\n@pytest.mark.skip(reason='not now')\ndef test_skipped():\n    assert False\n"
+PLACES = ("PYTHONUSERBASE", "PYTHONPYCACHEPREFIX", "PYTHONDONTWRITEBYTECODE")  # no switches: where things are
+SKIPPED ="import pytest\n\n\n@pytest.mark.skip(reason='not now')\ndef test_skipped():\n    assert False\n"
 
 
 @pytest.mark.parametrize("options", ["--collect-only", "--deselect tests/acceptance/W1-01/test_a.py::test_fail",
@@ -356,7 +438,8 @@ def test_nothing_else_of_the_callers_environment_is_taken_away(tmp_path, monkeyp
     monkeypatch.setenv("PYTEST_ADDOPTS", "--collect-only")
     monkeypatch.setenv("PYTHONPATH", "/elsewhere")
     monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
-    before = {key: value for key, value in os.environ.items() if key != "PYTEST_ADDOPTS"}
+    before = {key: value for key, value in os.environ.items()
+              if key != "PYTEST_ADDOPTS" and (not key.startswith("PYTHON") or key in PLACES)}
     _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
     assert seen == before | {"PYTHONPATH": str(tmp_path / "src")}
 
@@ -370,7 +453,7 @@ def test_an_acceptance_run_in_which_no_test_passed_is_a_finding(tmp_path, files)
 
 def test_one_passing_test_beside_a_skipped_one_is_measured_and_a_regression_run_may_pass_none(tmp_path):
     tests = _tests(tmp_path, test_a=SKIPPED, test_b="def test_b():\n    assert True\n")
-    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0})
+    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0, "skipped": 1})
     skipped = _tests(tmp_path / "other", test_a=SKIPPED)
     assert _run_tests(tmp_path / "other", skipped, 60, none_collected_ok=True)[0] == []
 

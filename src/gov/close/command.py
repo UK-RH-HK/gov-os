@@ -32,7 +32,8 @@ from gov.cli.errors import GovError
 from gov.close import state as _state, tool as _tool
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
-                            ticket_commits as _ticket_commits, tree_differences as _tree_differences)
+                            ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
+                            tree_differences as _tree_differences)
 from gov.close.state import (ESCALATION_AT, ESCALATION_OPTIONS as _ESCALATION_OPTIONS,
                              ESCALATION_REASON as _ESCALATION_REASON, count_path as _count_path,
                              read_count as _read_count, write_count as _write_count)
@@ -45,6 +46,11 @@ REVIEWER_ROLE = "independent-auditor"
 PROBE_ROLE = "orchestrator"
 PROBE_PASSED = ("pass", "passed")
 _TEST_RUNNER_VARIABLES = ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")
+# The caller's environment gives the test runs no interpreter switch (DEC-500): no variable that speaks to
+# Python is passed on but these, which say where installed packages are and where compiled files go, and
+# change nothing of how a test runs.
+_INTERPRETER_VARIABLES = "PYTHON"
+_INTERPRETER_PLACES = ("PYTHONUSERBASE", "PYTHONPYCACHEPREFIX", "PYTHONDONTWRITEBYTECODE")
 
 ACT_PATHS = (
     "docs/close/**",
@@ -142,6 +148,7 @@ def run(root: Path, args, config: dict):
 
     commits = _ticket_commits(root, ticket)
     others = _commits_since(root, commits)
+    tickets = _tickets_of_head(root)  # a Task: that names none of them names no task (DEC-500)
     inside, own = _work_of(front, ticket, wbs)
     ticket_input = {"id": ticket, "hash":
                     "sha256:" + hashlib.sha256(ticket_path.read_bytes()).hexdigest()}
@@ -156,16 +163,17 @@ def run(root: Path, args, config: dict):
             found.append(f)
 
     if profile == "FULL":
-        gate(_check_probe, root, ticket, commits, others, inside)
+        gate(_check_probe, root, ticket, commits, others, inside, tickets)
     gate(_check_trailers, commits, ticket)
-    gate(_check_unmeasured, ticket, others, own)
+    gate(_check_unmeasured, ticket, others, own, tickets)
     gate(_check_containment, root, commits)
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end.
     test_counts = gate(_check_acceptance, root, ticket, wbs, timeout)
     counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs)
     # A commit of the range that names no task and changes a governance file has the checks run too (DEC-490)
-    checked = gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c)])
+    checked = gate(_check_governance_blocks, root,
+                   commits + [c for c in others if _names_no_task(c, tickets)])
     gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
     packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
@@ -436,13 +444,14 @@ def _check_trailers(commits: list[dict], ticket: str) -> None:
                        lines)
 
 
-def _check_unmeasured(ticket: str, others: list[dict], own) -> None:
+def _check_unmeasured(ticket: str, others: list[dict], own, tickets: frozenset[str]) -> None:
     """A commit in the ticket's range that names no task and changes the ticket's work (its acceptance
     tests, a path inside its allowed paths, its own file) refuses: no ticket measured it. What a commit
-    that names another ticket changes is that ticket's, and any other path refuses nothing (DEC-490)."""
+    that names another ticket changes is that ticket's, and any other path refuses nothing (DEC-490).
+    ``tickets`` are the project's: a ``Task:`` that names none of them names no task (DEC-500)."""
     found = []
     for c in others:
-        changed = [p for p in c["paths"] if own(p)] if _names_no_task(c) else []
+        changed = [p for p in c["paths"] if own(p)] if _names_no_task(c, tickets) else []
         if changed:
             found.append({"commit": c["sha"][:12], "paths": changed})
     if found:
@@ -479,10 +488,14 @@ def _check_containment(root: Path, commits: list[dict]) -> None:
 # Probe gate (FULL-profile tickets, A5)
 # ---------------------------------------------------------------------------
 
-def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside) -> None:
+def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside,
+                 tickets: frozenset[str]) -> None:
     """The probe record of a FULL-profile ticket is evidence only if the implementer could not have written
     it (DEC-137, DEC-487). ``others`` are the other commits of the ticket's range, ``inside`` says whether a
-    path is inside the ticket's allowed paths."""
+    path is inside the ticket's allowed paths, ``tickets`` are the project's.
+
+    Every probe record of the ticket is read (DEC-500): each is asked everything, so one that does not say
+    that the probe of the final code passed refuses whatever another says, and the close needs one."""
     from gov.tasks.tickets import frontmatter
 
     def invalid(message: str, **details):
@@ -502,6 +515,7 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             raise invalid(f"commit {c['sha'][:12]} in the range of the ticket carries the "
                           f"reviewer's role ({REVIEWER_ROLE})", commit=c["sha"][:12])
 
+    records = 0
     for path in sorted(probe_dir.glob("*.md")):
         pf = frontmatter(path)
         if pf is None:
@@ -558,7 +572,7 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             if REVIEWER_ROLE in c["trailers"].get("Role", []):
                 raise invalid("a commit between the probed commit and HEAD "
                               "carries the reviewer's role", commit=sha[:12])
-            changed = [p for p in c["paths"] if inside(p)] if _names_no_task(c) else []
+            changed = [p for p in c["paths"] if inside(p)] if _names_no_task(c, tickets) else []
             if changed:  # DEC-490: work on the ticket's paths the probe did not see
                 raise invalid(f"commit {sha[:12]} names no task and changes {', '.join(changed)} "
                               "after the probed commit: the probe is stale", commit=sha[:12])
@@ -573,11 +587,12 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                     if not p.startswith(("tests/", "docs/probes/")):
                         raise invalid(f"ticket commit {sha} changes {p} "
                                       "after the probed commit", commit=sha, path=p)
-        return
+        records += 1
 
-    raise _Finding("PROBE_MISSING",
-                   f"FULL-profile ticket {ticket} has no valid probe record",
-                   {"ticket": ticket})
+    if not records:
+        raise _Finding("PROBE_MISSING",
+                       f"FULL-profile ticket {ticket} has no valid probe record",
+                       {"ticket": ticket})
 
 
 # ---------------------------------------------------------------------------
@@ -617,7 +632,7 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     import os
     import re
 
-    counts = {"passed": 0, "failed": 0, "errors": 0}
+    counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}  # a skip is counted, not refused (DEC-500)
     if not test_path.is_dir():
         if none_collected_ok:
             return [], counts
@@ -630,8 +645,11 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 
     rel = str(test_path.relative_to(root))
     # The run is the suite's own (DEC-487): what the caller's environment would add to the test runner
-    # (options, plugins) or put before the project's own code (the caller's PYTHONPATH) is not passed on.
-    env = {key: value for key, value in os.environ.items() if key not in _TEST_RUNNER_VARIABLES}
+    # (options, plugins), put before the project's own code (the caller's PYTHONPATH) or switch in the
+    # interpreter (DEC-500: for one, PYTHONOPTIMIZE, which removes assertions) is not passed on.
+    env = {key: value for key, value in os.environ.items()
+           if key not in _TEST_RUNNER_VARIABLES
+           and (not key.startswith(_INTERPRETER_VARIABLES) or key in _INTERPRETER_PLACES)}
     env["PYTHONPATH"] = str(root / "src")
     cmd = [sys.executable, "-m", "pytest", str(test_path), "-q",
            "-p", "no:cacheprovider", "--tb=line", "--no-header"]
@@ -646,7 +664,7 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 
     for line in reversed(result.stdout.split("\n")):
         found = {key: re.search(rf"(\d+)\s+{word}", line) for key, word in
-                 (("passed", "passed"), ("failed", "failed"), ("errors", "error"))}
+                 (("passed", "passed"), ("failed", "failed"), ("errors", "error"), ("skipped", "skipped"))}
         if any(found.values()):
             counts.update({key: int(m.group(1)) for key, m in found.items() if m})
             break
