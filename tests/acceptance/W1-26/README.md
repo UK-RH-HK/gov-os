@@ -98,6 +98,7 @@ before and after.
 ## Revised cases
 
 - `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
+- `test_lifecycle`, `test_opted_in_family_is_yellow`, `test_not_applicable_never_green_json`, `test_not_applicable_never_green_text`, `test_family_only_red_check_not_green`: each case removes the kernel's `audit-reproducibility` declaration from the temporary project so the family status reflects only the case's own check; revised after implementation: W1-36's kernel declaration of the audit-reproducibility check is now in every project built from the template (DEC-447).
 
 ## Generic validators (DEC-439, DEC-441) — follow-up round
 

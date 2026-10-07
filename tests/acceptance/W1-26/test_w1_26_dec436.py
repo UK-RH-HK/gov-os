@@ -163,6 +163,10 @@ def test_family_name_normalisation_mixed_case_and_punctuation(project, sandbox, 
 
 def test_family_only_red_check_not_green(project, sandbox, interface):
     """A family whose only registered check is RED must not be shown GREEN."""
+    # revised after implementation: W1-36's kernel declaration of the
+    # audit-reproducibility check is now in every project built from the
+    # template (DEC-447)
+    project.remove_check_declaration("audit-reproducibility")
     project.add_check_declaration("always-red", "audit reproducibility",
                                   severity="hard-block", command="false")
     project.commit()
