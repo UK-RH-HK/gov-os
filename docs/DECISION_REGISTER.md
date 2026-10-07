@@ -5328,3 +5328,53 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.124 | 2026-10-07 | One delegated decision on W1-30: DEC-487 (the review's thirteen findings; ten settled behaviours for a follow-up, cases first; four residuals). Next free id: DEC-488. |
+
+## 125. One delegated decision on W1-39: the lock comparison, the update procedure, the adapter generation step (register v0.125, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-488 — W1-39: one comparison of a project with its lock, owned by W1-39; the update procedure is in the template's messages and the lock's header; adapter generation is a documented step after `copier copy`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-1 (in part), P-3 and P-4 (`log/W1-39-lead-run1.json`), each with the lead's recommendation. The parts of its packages that change a ticket's allowed paths (P-1's call site in `gov doctor`, P-2, P-5) are the owner's and are not decided here.
+- **Decision:**
+  - **The comparison of a project with its lock is built once, by W1-39, as a public function of its own code:** given a project, it answers match or drift, the drifted files, and the reason where it could not compare. It never answers match without having hashed: an absent or empty manifest is not a match; a kernel file that the manifest does not list is drift, named; the lock's template tag and commit are compared with the answers file. `gov doctor` is to call it (where and under which ticket: with the owner).
+  - **Only `__pycache__/` folders are left out of "a kernel file the manifest does not list".** Git-ignored files in general are not left out: an ignore rule is the project's to write, and a file hidden by one would escape the comparison.
+  - **The update procedure is documented in two places that reach a product repository:** the template's messages after copy and after update, and a comment header of the generated lock.
+  - **`copier copy` does not run the adapter generation.** Generating `.claude/`, `CLAUDE.md` and `AGENTS.md` from `.rulesync/` is a documented step after the copy, named in the procedure; an install does not fail where rulesync or Node is absent. W1-41's adoption runs or names the step.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.125 | 2026-10-07 | One delegated decision on W1-39: DEC-488 (the lock comparison is W1-39's and never matches unhashed; only `__pycache__/` is left out; the update procedure in the template's messages and the lock's header; adapter generation a documented step). Next free id: DEC-489. |
+
+## 126. One delegated decision on W1-40: the hook files' author, what pre-push runs, the evidence record (register v0.126, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-489 — W1-40: the engineer writes the hook and workflow files through its template files; pre-push runs the declared G3 checks; the evidence record is a git note on the head commit
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-40 lead's packages P-A, P-1, P-2, P-3, P-5, P-B and P-C (`log/W1-40-lead-run1.json`), each with its recommendation. Its P-4 (whether the CI workflow may install registered tools on the hosted runner) is an install and the owner's; it is not decided here.
+- **Decision:**
+  - **Who writes `lefthook.yml` and the workflow files.** A launched engineer's Write tool refuses these file names. The files stay the implementer's: the engineer writes the template file with its tools and produces the repository's own file from it with a command (a copy, or a rendering where the two differ). Only if that is refused too does the orchestrator place the engineer's content word for word, with a commit that says so.
+  - **What pre-push runs.** The declared checks of tier G3; a model-dependent test belongs there when its ticket declares it as a check. Where a project declares no G3 check, the push is not refused for that alone: the evidence record states that no G3 check is declared, in those words and never as a pass, and CI reports it.
+  - **A tier named to the hook's command that has no declaration is never passed over silently** when another named tier has one, except G3 as above; a mistyped tier refuses.
+  - **The evidence record is a git note on the head commit, under a ref of its own,** written by the pre-push hook after G3 has run, and pushed by the hook; CI fetches that ref and reads the note of the commit it builds. It holds at least the commit id, the result and the checks that ran. A record for another commit, or none, fails CI. The choice is documented in the hook file and the workflow.
+  - **A record edited by hand is not detected in Wave 1** (a deliberate bypass, like skipping the hook): residual; a hash or signature is a Wave 2 item.
+  - **The template files use no Copier answers**; they render to this repository's own files, with GitHub's expressions escaped.
+  - **Tier selection stays as built** (the hook command calls the check runner's internals): residual, unit tests hold the join; a public tier argument of the runner, and whether its tier-less built-in checks belong to G1 and G2, go on the Wave 2 list. CI runs the whole of the deterministic checks, so no check runs nowhere.
+  - **The second gitleaks scan stays strict** (it does not carry the project's path allowlist): residual; in this repository it will refuse commits that touch the canary fixtures once the hooks are activated, which is named in the exit package.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.126 | 2026-10-07 | One delegated decision on W1-40: DEC-489 (hook and workflow files written by the engineer through their templates; pre-push runs declared G3 checks, none declared is recorded as such; the evidence record is a git note under its own ref; three residuals). Next free id: DEC-490. |
+
+## 127. One delegated decision on W1-30: the test designer's seven points on DEC-487 (register v0.127, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-490 — DEC-487 made exact: which task-less commits refuse, the judgement words, what a refusal's own files do to the tree rule, the exit codes
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer wrote the cases for DEC-487 (commit `ed52a286`: 43 new cases, 39 red for the reviewer's reasons) and returned seven points no source settles (`log/W1-30-r8-cases.json`). Recorded before the engineer's change (DEC-463).
+- **Decision:**
+  - **A commit that names no task** (DEC-487 said: refuses). Made exact: among the commits after the ticket's first, one that names no task refuses the close when it changes the ticket's acceptance tests, a path inside the ticket's allowed paths, or the ticket's own file: that is work on this ticket which no ticket measured. One that changes a governance file has the governance checks run, as a ticket commit would. After the probed commit, one that changes a path inside the ticket's allowed paths makes the probe stale. Any other task-less commit (a decision record, a checkpoint, a probe record, another folder) refuses nothing. A commit that names another ticket is that ticket's.
+  - **The judgement of a probe record** is `pass` or `passed` to be accepted; `fail`, `failed` or any other value refuses.
+  - **Store freshness:** the cases hold the behaviour only (refused, the rebuild named, nothing closed). The engineer uses a mark the store or the runtime already keeps of the commit it was built from; if none exists inside what `gov close` may read, that case is returned, not guessed.
+  - **The tree rule and a refusal's own files.** A refused close leaves its repair ticket as an untracked ticket file. An untracked ticket file whose parent is the ticket being closed does not refuse the next close. Every other untracked, not ignored file and every change to a tracked file does, the ticket's own file included.
+  - **Exit codes.** A tree that is not its commit, a record store older than the commit, and a counter that is not a count (the file named in the answer) are "could not measure": exit code 1, not counted, no repair ticket. An owner's decision that does not qualify lifts nothing: the close stays blocked, with the blocked exit code. A time limit that is not a positive number is refused like any other invalid argument, before anything runs.
+  - **"Written whole or not at all"** is held by the unit tests and by reading (write beside, then rename); no acceptance case with timing.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.127 | 2026-10-07 | One delegated decision on W1-30: DEC-490 (which task-less commits refuse; judgement words; a refusal's own repair ticket does not dirty the tree; exit codes for "could not measure"). Next free id: DEC-491. |
