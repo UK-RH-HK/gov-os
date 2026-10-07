@@ -5378,3 +5378,62 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.127 | 2026-10-07 | One delegated decision on W1-30: DEC-490 (which task-less commits refuse; judgement words; a refusal's own repair ticket does not dirty the tree; exit codes for "could not measure"). Next free id: DEC-491. |
+
+## 128. One delegated decision on W1-31: session attribution, the sandbox figure, the learning metrics' sources (register v0.128, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-491 — W1-31: the caller names a ticket's sessions; the sandbox's added tokens are measured once at the exit run; rewrites are read from designer commits and disputes from a record the orchestrator writes
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-2, P-5, P-6 and P-7 (`log/W1-31-lead-run1.json`), each with its recommendation. Its P-3 (cache creation in the denominator) and P-4 (how five of the seven governance sources are counted) define the figure the Wave 1 exit is judged by, and its P-1 (the call from `gov close`) depends on them: these are with the owner and are not decided here.
+- **Decision:**
+  - **Attribution.** The caller names the sessions of a ticket (as built). A launch record per session, from which attribution would be automatic, stays on the Wave 2 list (DEC-470).
+  - **The sandbox's added system-prompt tokens (DEC-170)** are measured once, by a paired run in W1-42's exit run (the same prompt in a launched and in a plain session), recorded with its date and the Claude Code version; the counter reports that recorded figure per launched session as its separate line, and "not measured" until the record exists.
+  - **Acceptance tests rewritten after implementation began** are read from the test designer's commits after the ticket's first engineer commit; the reason for each is a trailer `Rewrite-Reason:` on that commit, and a rewrite without one is reported as "reason not recorded", never left out. From this entry on, every designer brief for a ticket that already has an engineer commit asks for the trailer.
+  - **KPI disputes** are read from a per-ticket record the orchestrator writes at the merge (one line per dispute with the decision that settled it); without the record the figure is "not measured".
+  - **Smaller points.** A ticket without a profile is "not measured" for the per-profile report (the counter does not assume STANDARD). The aggregate by profile across tickets is W1-42's. A ticket whose record folders were read and hold nothing counts 0 for them; a folder that is absent is "not measured". The close record's own tokens are counted by a re-measure after the close. A session's model is reported from both places, each named: the session log's and the commits' co-author lines.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.128 | 2026-10-07 | One delegated decision on W1-31: DEC-491 (sessions named by the caller; the sandbox figure measured once in W1-42; rewrites from designer commits with a `Rewrite-Reason:` trailer; disputes from an orchestrator record; smaller points). Next free id: DEC-492. |
+
+## 129. Owner answers: closing before adoption, W1-39's paths, CI installs, how the governance share is measured (register v0.129, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-492 — How tickets close until W1-41: `gov close` reports every finding and finds the ticket tool on PATH; a refusal for adoption gaps alone closes with `tk close`
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-6. `gov close` refused W1-30 and W1-38 at its first finding (`log/close-W1-30.json`, `log/close-W1-38.json`), and cannot close any ticket here before adoption (it looks for the ticket tool only at the kernel path).
+- **Decision:**
+  - **In the W1-30 follow-up already running:** `gov close` reports every finding in one run instead of stopping at the first, and finds the ticket tool on PATH as well as at the kernel path.
+  - **Until W1-41:** the orchestrator runs `gov close` once per ticket and saves its output. It closes with `tk close`, and lists the ticket for the exit auditor, only if all of these hold: every finding `gov close` reports is an adoption gap (baseline reds; commits before DEC-476 without `Implements:`; the orchestrator's merge commits before 2026-10-07 without it; the ticket tool not at the kernel path); the orchestrator has checked the rest itself (Role trailers, containment, the full regression, the pre-merge `gov check`); and a FULL ticket has its probe record of the final code.
+  - **Refusals for adoption gaps alone do not count toward escalation.**
+  - **Three containment findings in history are accepted as recorded history:** `148f7584` and `29af0646` on W1-30 (merge commits' own change to the shared W1-07 support file), and `a95e54a3` on W1-38 (eight kernel skill files, restored in `deead8f9`).
+- **Orchestrator's reading, recorded as such:** DEC-476 keeps `gov close` without a baseline inside it, so "do not count toward escalation" is applied outside the tool: where the tool's own counter is raised by such a refusal, the orchestrator does not treat it as an iteration, and a block reached only by such refusals is brought to the owner as that, not as a looping ticket.
+
+### DEC-493 — W1-39's allowed paths gain the doctor call site, the overlay's path map, Copier's standard answers file and an ignore file
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-7, from the W1-39 lead's packages P-1, P-2 and P-5 and two residuals of earlier tickets.
+- **Decision:** W1-39's `allowed_paths` gain, each in its own commit with `Task: DAEO-5ylr`:
+  - `src/gov/doctor/command.py` and `tests/unit/doctor/**`, for the lock-comparison call only;
+  - `template/governance/project/**`, shipping a minimal path map that an update never overwrites;
+  - Copier's standard `.copier-answers.yml` (DEC-023), in place of `template/copier-answers*`;
+  - `template/.gitignore`, ignoring `.gov-runtime/` and `__pycache__/`.
+
+### DEC-494 — The CI workflow installs gitleaks and the `gov` package only, each verified against its archive's checksum; steps that need the dev tiers report "unmeasured"
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-8 (the W1-40 lead's P-4): the hosted runner has none of the tools the job needs.
+- **Decision:**
+  - The CI workflow installs only gitleaks and the `gov` package now; rulesync when the adapter comparison step is added.
+  - Each at its registered version, in its own step, and each download verified against the checksum of its archive: a new field of `governance/project/tool-registry.yaml`, which the orchestrator adds and fills.
+  - CI steps that need the dev tiers report "unmeasured", never green.
+
+### DEC-495 — How the governance share is measured: session logs for hook output, the SessionStart packet and `gov` output; a labelled estimate for instruction files and MCP definitions; cache creation in the denominator
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-9 (the W1-31 lead's P-1, P-3 and P-4): five of the seven governance sources leave no trace today, so the share is always "not measured".
+- **Decision:**
+  - **Hook output, the SessionStart packet and `gov` output** are read from the harness's session logs by the counter's code, which outputs counts only and never content. The log format is learnt from a specimen made in a throwaway project in `/tmp` (one short headless session with one hook and one `gov` command), not from a real log of this machine; no worker reads a real session log.
+  - **Instruction files and governance MCP definitions** are a static estimate on its own line, labelled "estimated".
+  - **Cache creation is included in the denominator and shown separately; cache reads stay out.**
+  - **The share reaches the close record through a small W1-30 follow-up once W1-31 is merged;** until then the orchestrator runs `gov telemetry` beside each close.
+  - W1-42 reports the share with its measured and estimated parts separate; the 15% verdict is the owner's at the exit.
+
+### DEC-496 — DEC-487 to DEC-491 are accepted; the reviewer looks at the fixed `gov close` before W1-30 closes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the five delegated decisions told to the owner (the review of `gov close` and its exact form; W1-39's lock comparison; W1-40's hook files and evidence record; W1-31's attribution and metric sources).
+- **Decision:** DEC-487, DEC-488, DEC-489, DEC-490 and DEC-491 stand as written. A fresh reviewer probes the fixed `gov close` before W1-30 closes; its probe record is of the final code.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.129 | 2026-10-07 | Owner answers: DEC-492 (`gov close` reports every finding and finds the ticket tool on PATH; closes for adoption gaps alone go through `tk close` until W1-41; three containment findings accepted as history), DEC-493 (four additions to W1-39's allowed paths), DEC-494 (CI installs gitleaks and the `gov` package, verified by archive checksum; dev-tier steps report "unmeasured"), DEC-495 (the governance share: session logs, a labelled estimate, cache creation in the denominator; the call from `gov close` after W1-31), DEC-496 (DEC-487 to DEC-491 accepted; second review of `gov close`). Next free id: DEC-497. |

@@ -8,6 +8,12 @@
 # recorded on 2026-09-30: the binary for a single-file tool, and the installed entry script for openspec,
 # check-jsonschema and copier (DEC-200). A vendored folder carries the digest of its committed files (DEC-199).
 #
+# archive, archive_sha256 (DEC-494): for a tool the CI workflow installs on a hosted runner, the download it
+# fetches and the sha256 of that archive, as the release's own checksum list publishes it. The workflow verifies
+# the download against it before unpacking. Filled for gitleaks (the release's checksum list, read 2026-10-07);
+# rulesync gets them when the adapter comparison step is added to CI. The `gov` package is installed from the
+# checked-out repository itself and has no archive.
+#
 # Tools under Node v22.23.3 are not on the default PATH (the nvm default stays v18.20.8). Run them with
 # PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH.
 tools:
@@ -97,6 +103,8 @@ tools:
   - name: gitleaks
     version: "8.30.1"
     sha256: "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509"
+    archive: "https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz"
+    archive_sha256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
     install: "gh release download v8.30.1 -R gitleaks/gitleaks -p gitleaks_8.30.1_linux_x64.tar.gz -p gitleaks_8.30.1_checksums.txt && sha256sum -c gitleaks_8.30.1_checksums.txt --ignore-missing && tar -xzf gitleaks_8.30.1_linux_x64.tar.gz gitleaks && install -m755 gitleaks ~/.local/bin/gitleaks"
     uninstall: "rm -f ~/.local/bin/gitleaks"
     date: "2026-10-03"
