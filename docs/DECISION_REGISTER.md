@@ -5235,3 +5235,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.120 | 2026-10-07 | Owner answers: DEC-472 (DEC-467 confirmed; the baseline empty at W1-42's exit run), DEC-473 (both register forms; heading grammar), DEC-474 (base commit, here `46ec8da3`), DEC-475 (severity warning, family authority/role limits, citation in the message only), DEC-476 (`gov close` strict; closes until W1-41), DEC-477 (`gov rebuild` before the exit run and when a measurement needs it; replaces DEC-448's one-off limit), DEC-478 (DEC-468 to DEC-471 accepted). Next free id: DEC-479. |
+
+## 121. One delegated decision on W1-26: where a project records its register file and its base commit (register v0.121, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-479 — The register file and the base commit of the decision-citations check are two optional keys of the project's path map
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-473 and DEC-474 order "one line of configuration under `governance/project/`" without naming the file. W1-26's test designer (commit `ac952490`) found no source that names it and settled on the path map: DEC-185 refuses a new overlay file and has commands load the `governance/project/` files they know, the path map first; DEC-224 and DEC-230 already put project data there under top-level keys.
+- **Decision:**
+  - `governance/project/path-map.yaml` holds two optional top-level keys: `decision_register` (the register file's path from the project root) and `decision_citations_base` (a commit id, full or abbreviated).
+  - The configuration read is the project's present one, not each judged commit's: a base can only be recorded after it exists.
+  - With a base recorded and no commit after it, the check gives the unmeasured answer, never green.
+  - A named register that cannot be read at a judged commit is never green and its path is reported, also when the cited decision is recorded as a decision file.
+  - In this repository the two keys are `docs/DECISION_REGISTER.md` and `46ec8da3` (DEC-474); the orchestrator adds them when the check is merged.
+  - Recorded before the change (DEC-463): the engineer's code follows this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.121 | 2026-10-07 | One delegated decision on W1-26: DEC-479 (the register file and the base commit are two optional keys of the project's path map). Next free id: DEC-480. |
