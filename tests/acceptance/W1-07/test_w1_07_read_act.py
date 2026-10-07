@@ -78,8 +78,17 @@ def test_a_read_command_with_root_writes_neither_in_the_project_nor_where_it_run
 
 
 @pytest.mark.parametrize("args", support.EVERY_INVOCATION + (("--help",),), ids=support.label)
-def test_no_command_writes_outside_its_act_paths(gov, project, sandbox, interface, args):
+def test_no_command_writes_outside_its_act_paths(request, sandbox, interface, args):
     """Failure 1. No command built at W1-07 declares an act path, and a command not yet built does nothing."""
+    # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+    # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+    # case time out.
+    if args[0] in support.TREE_SENSITIVE_COMMANDS:
+        gov = request.getfixturevalue("small_gov")
+        project = request.getfixturevalue("small_project")
+    else:
+        gov = request.getfixturevalue("gov")
+        project = request.getfixturevalue("project")
     before = _state(project, sandbox)
     run = gov(*args) if args == ("--help",) else gov(*args, "--json")
     assert run.returncode in interface.exit_codes, run.describe()

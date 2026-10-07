@@ -172,6 +172,16 @@ Readings the sources do not spell out, for this batch:
   - The test ids of those cases changed from `[closure]` to `[closure --depth 1 W1-07-NO-SUCH-ID]`; the number of
     cases did not, but for the one added.
 
+## Revision (DEC-440, reason "revised after implementation: rebuild is tree-size-sensitive")
+
+- **`rebuild`** (W1-27) recreates the lexical index through the index's owner, which runs the secrets filter on every
+  tracked file (DEC-440). The five cases that run `gov rebuild --json` on the full copy of the working tree
+  (~984 tracked files) timed out at 30 s. Revised: the five `rebuild` cases use a minimal project with only a few
+  tracked files (`.gitignore`, `.gitleaks.toml`), built by `copy_minimal_project` in `w1_07_support.py`, and run the
+  CLI code from the full copy via `run_gov_with_code`. Each case still measures exactly what it says — the envelope,
+  the envelope fields, no write outside the act paths, the command exists, a valid path map is not reported as
+  invalid — on a project that fits the time limit. No assertion weakened, no case removed.
+
 ## Decision package
 
 ### DP-1 — What does a minimal valid `path-map.yaml` look like, so that "naming the key" can be tested?

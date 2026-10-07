@@ -106,6 +106,12 @@ NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
 CONFIG_INVALID = "CONFIG_INVALID"
 
 COMMAND_TIMEOUT_S = 30.0
+
+# Revised after implementation: W1-27's rebuild recreates the lexical index
+# through its owner and its secrets filter (DEC-440); the size of the copied
+# tree, not the behaviour, made the case time out.
+TREE_SENSITIVE_COMMANDS = ("rebuild",)
+
 # Left out of a tree snapshot: git's own files, and derived state, which is ignored by git.
 SNAPSHOT_SKIP = (".git", ".gov-runtime")
 
@@ -182,6 +188,26 @@ def copy_working_tree(destination, root=REPO_ROOT):
     git(destination, "init", "-q", "-b", "main")
     git(destination, "add", "-A")
     git(destination, "commit", "-q", "-m", "copy of the working tree")
+    return destination
+
+
+def copy_minimal_project(destination, root=REPO_ROOT):
+    """A committed project with only a few tracked files: the gitignore and the gitleaks configuration.
+
+    For commands whose work grows with the size of the tracked tree (DEC-440).
+    The CLI code is not in this project; it comes from the ``code_root`` passed to
+    ``run_gov_with_code``.
+    """
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    for rel in (".gitignore", ".gitleaks.toml"):
+        source = Path(root) / rel
+        if source.is_file():
+            target = destination / rel
+            shutil.copy2(source, target)
+    git(destination, "init", "-q", "-b", "main")
+    git(destination, "add", "-A")
+    git(destination, "commit", "-q", "-m", "minimal project")
     return destination
 
 

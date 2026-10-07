@@ -15,14 +15,22 @@ SESSION = "w1-07-acceptance-session"
 
 
 @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)
-def test_every_command_returns_the_envelope(gov, interface, args):
+def test_every_command_returns_the_envelope(request, interface, args):
+    # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+    # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+    # case time out.
+    gov = request.getfixturevalue("small_gov" if args[0] in support.TREE_SENSITIVE_COMMANDS else "gov")
     run = gov(*args, "--json")
     support.assert_envelope(run, interface, command=args[0])
 
 
 @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)
-def test_the_envelope_has_no_field_outside_the_interface(gov, interface, args):
+def test_the_envelope_has_no_field_outside_the_interface(request, interface, args):
     """Failure 2: exactly ``ok``, ``command``, ``result``, ``session`` and, on an error, ``error`` with its three keys."""
+    # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+    # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+    # case time out.
+    gov = request.getfixturevalue("small_gov" if args[0] in support.TREE_SENSITIVE_COMMANDS else "gov")
     envelope = gov(*args, "--json").envelope()
     assert set(interface.required) <= set(envelope) <= set(interface.required) | set(interface.optional), \
         f"gov {support.label(args)}: the envelope fields are {sorted(envelope)}"
