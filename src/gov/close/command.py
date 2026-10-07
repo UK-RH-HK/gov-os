@@ -34,7 +34,7 @@ ACT_PATHS = (
 EXIT_CHECK_FAILED = 3
 EXIT_BLOCKED = 4
 EXIT_CODES = {
-    EXIT_CHECK_FAILED: "verification failed (tests, stale evidence, containment)",
+    EXIT_CHECK_FAILED: "verification failed (tests, governance checks, containment)",
     EXIT_BLOCKED: "blocked by escalation or human gate",
 }
 
@@ -132,15 +132,14 @@ def run(root: Path, args, config: dict):
             _check_probe(root, ticket, commits)
         _check_trailers(commits, ticket)
         _check_containment(root, commits)
+        # The acceptance tests are part of the ticket's work (DEC-480)
+        acceptance_dir = root / "tests" / "acceptance" / wbs
+        if not acceptance_dir.is_dir() or not any(acceptance_dir.rglob("test_*.py")):
+            raise _Finding("NO_ACCEPTANCE_TESTS",
+                           f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
+                           {"ticket": ticket, "wbs": wbs})
     except _Finding as f:
         _refuse(root, ticket, f.code, f.message, f.findings, f.details)
-
-    acceptance_dir = root / "tests" / "acceptance" / wbs
-    if not acceptance_dir.is_dir() or not list(acceptance_dir.glob("test_*.py")):
-        raise GovError("NO_ACCEPTANCE_TESTS",
-                        f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
-                        {"ticket": ticket, "wbs": wbs},
-                        exit_code=EXIT_CHECK_FAILED)
 
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end.
@@ -151,17 +150,15 @@ def run(root: Path, args, config: dict):
     for key in test_counts:
         test_counts[key] += counts[key]
 
-    # Governance checks (A7)
-    gov_check_result = None
-    try:
-        gov_check_result = _check_governance(root, commits)
-    except GovError as e:
-        if e.exit_code != EXIT_CHECK_FAILED:
-            raise
-        findings.append(e.message)
+    # Governance checks (A7, DEC-480): a red hard-block check is a finding like a failing test
+    checked, red_checks = _check_governance(root, commits)
+    findings += [f"governance check {check['id']} is RED at commit {checked['check_commit'][:12]}: "
+                 f"{json.dumps(check.get('findings'), ensure_ascii=False)}" for check in red_checks]
 
     if findings:
         details = {"findings": findings, "disposition": disposition or "unclassed"}
+        if red_checks:
+            details.update(check_commit=checked["check_commit"], red_checks=red_checks)
         packet, context_reason = None, None
         if disposition:  # DEC-454: with a class, the context is built first
             try:
@@ -209,9 +206,7 @@ def run(root: Path, args, config: dict):
         "skill_versions": _read_skill_versions(root),
         "commits": _commit_models(commits),
     }
-    if gov_check_result is not None:
-        record["governance_checks"] = gov_check_result
-        record["check_commit"] = _git(root, "rev-parse", "HEAD").strip()
+    record.update(checked)
 
     checkpoint_info = _write_checkpoint(root, ticket)
     try:
@@ -527,54 +522,40 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 # Governance checks (A7)
 # ---------------------------------------------------------------------------
 
-def _check_governance(root: Path, commits: list[dict]) -> dict | None:
-    changed_gov_paths = []
-    for c in commits:
-        for p in c["paths"]:
-            if any(p.startswith(prefix) for prefix in _GOVERNANCE_PREFIXES):
-                changed_gov_paths.append(p)
+def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, list[dict]]:
+    """W1-26's judgement of the project at the commit being closed, when the
+    ticket's commits change a governance file (DEC-454, DEC-480).
 
-    if not changed_gov_paths:
-        return None
+    Returns what the close record states of it (``check_commit`` and the
+    runner's result under ``governance_checks``; nothing when no governance
+    file changed) and the checks the runner reports red at hard-block, as it
+    gave them. This command has no rule of its own about checks and stands on
+    no result but this run's: ``CHECKS_NOT_MEASURED`` when the runner's answer
+    is not one of the commit being closed.
+    """
+    if not any(p.startswith(_GOVERNANCE_PREFIXES) for c in commits for p in c["paths"]):
+        return {}, []
 
-    checks_prefix = "template/governance/kernel/checks/"
-    check_commit_map: dict[str, list[str]] = {}
-    for c in commits:
-        for p in c["paths"]:
-            if p.startswith(checks_prefix) and p.endswith(".yaml"):
-                cid = p[len(checks_prefix):-len(".yaml")]
-                check_commit_map.setdefault(cid, []).append(c["sha"])
+    from gov.check.runner import HARD_BLOCK, RED, run_checks
 
-    stale = sorted(cid for cid, shas in check_commit_map.items()
-                   if len(shas) > 1)
-    if stale:
-        raise GovError("STALE_EVIDENCE",
-                        f"governance evidence is stale: "
-                        f"{', '.join(stale)} changed after evidence was collected",
-                        {"stale_checks": stale},
-                        exit_code=EXIT_CHECK_FAILED)
+    def not_measured(why: str, **details):
+        return GovError("CHECKS_NOT_MEASURED",
+                        f"the governance checks were not measured: {why}", details)
 
-    changed_check_ids = set(check_commit_map.keys())
-
-    from gov.check.runner import run_checks
-    result, _has_hard_block = run_checks(root)
-
-    if changed_check_ids:
-        failing = []
-        for check in result.get("checks", []):
-            cid = check.get("id", "")
-            if (cid in changed_check_ids
-                    and check.get("severity") == "hard-block"
-                    and check.get("status") == "RED"):
-                failing.append(cid)
-
-        if failing:
-            raise GovError("CHECK_FAILED",
-                            f"governance checks failed: {', '.join(failing)}",
-                            {"failing_checks": failing, "result": result},
-                            exit_code=EXIT_CHECK_FAILED)
-
-    return result
+    head = _git(root, "rev-parse", "HEAD").strip()
+    result, _ = run_checks(root)
+    try:
+        checks = result["checks"]
+        ran_at = sorted({check["provenance"]["commit"] for check in checks})
+        red = [check for check in checks
+               if (check["id"], check["severity"], check["status"])[1:] == (HARD_BLOCK, RED)]
+    except (KeyError, TypeError) as e:
+        raise not_measured(f"the runner's result has another shape ({e!r})")
+    if ran_at != [head]:
+        raise not_measured(f"the runner's result is of {', '.join(ran_at) or 'no check'}, "
+                           f"not of the commit being closed ({head})",
+                           commit=head, checked=ran_at)
+    return {"check_commit": head, "governance_checks": result}, red
 
 
 # ---------------------------------------------------------------------------
