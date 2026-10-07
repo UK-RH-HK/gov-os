@@ -26,6 +26,12 @@ verify the tables contain data (freshness), nor that a lexical search
 works, nor that the result uses a measured reason instead of constants,
 nor that rebuild holds no copy of another module's DDL.  The predecessor
 was **weak**: it verified table existence, not a functioning index.
+
+Revised after implementation: rebuild goes through the lexical index's
+owner and its secrets filter (DEC-440); the fixture's size, not the
+behaviour, made it time out.  The three rebuild cases now use a tiny
+project with ``run_gov_with_code`` for the code root.
+The DDL copy case does not run rebuild and keeps the full project.
 """
 
 from __future__ import annotations
@@ -43,25 +49,28 @@ import w1_27_support as support
 # Case 1: After rebuild, the lexical index is fresh
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_lexical_index_is_fresh(gov, project, interface):
+def test_rebuild_lexical_index_is_fresh(rebuild_gov, rebuild_project, interface):
     """After rebuild on a project with tracked files, ``freshness(root)``
     returns status ``"fresh"`` — not ``"empty"`` or ``"missing"``.
 
     KPI: "rebuild recreates every derived store" [CAP-07.a].
     Currently fails: rebuild creates empty tables via ``_LEXICAL_SCHEMA``
     so ``freshness()`` returns ``"empty"``.
-    """
-    support.write_path_map(project, support.minimal_valid_path_map())
-    py_file = project / "hello.py"
-    py_file.write_text("def greet():\n    return 'hello world'\n", encoding="utf-8")
-    support.commit_all(project, "add a tracked python file")
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    py_file = rebuild_project / "hello.py"
+    py_file.write_text("def greet():\n    return 'hello world'\n", encoding="utf-8")
+    support.commit_all(rebuild_project, "add a tracked python file")
+
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     from gov.retrieval.lexical import freshness
-    state = freshness(project)
+    state = freshness(rebuild_project)
     assert state["status"] == "fresh", (
         f"after rebuild the lexical index should be 'fresh' but is "
         f"'{state['status']}' — rebuild did not populate the index\n"
@@ -73,25 +82,28 @@ def test_rebuild_lexical_index_is_fresh(gov, project, interface):
 # Case 2: After rebuild, a lexical search finds tracked file text
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_lexical_search_finds_tracked_text(gov, project, interface):
+def test_rebuild_lexical_search_finds_tracked_text(rebuild_gov, rebuild_project, interface):
     """After rebuild on a project with tracked files, a lexical search
     finds text from the tracked file.
 
     KPI: "rebuild recreates every derived store" [CAP-07.a].
     Currently fails: rebuild creates empty tables so search returns no hits.
-    """
-    support.write_path_map(project, support.minimal_valid_path_map())
-    marker = "UNIQUE_MARKER_FOR_REBUILD_TEST_xk7q"
-    py_file = project / "marker_file.py"
-    py_file.write_text(f"# {marker}\ndef marker():\n    pass\n", encoding="utf-8")
-    support.commit_all(project, "add a tracked file with a unique marker")
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    marker = "UNIQUE_MARKER_FOR_REBUILD_TEST_xk7q"
+    py_file = rebuild_project / "marker_file.py"
+    py_file.write_text(f"# {marker}\ndef marker():\n    pass\n", encoding="utf-8")
+    support.commit_all(rebuild_project, "add a tracked file with a unique marker")
+
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     from gov.retrieval.lexical import search
-    result = search(project, marker, refresh=False)
+    result = search(rebuild_project, marker, refresh=False)
     assert result.get("available"), (
         f"lexical search is not available after rebuild: "
         f"state={result.get('state')}, reason={result.get('reason')}\n{run.describe()}"
@@ -106,7 +118,7 @@ def test_rebuild_lexical_search_finds_tracked_text(gov, project, interface):
 # Case 3: Rebuild result names every derived store with measured status
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_result_names_derived_stores_with_measured_status(gov, project, interface):
+def test_rebuild_result_names_derived_stores_with_measured_status(rebuild_gov, rebuild_project, interface):
     """The rebuild result names every derived store with a status:
     ``"recreated"`` or ``"not_recreated"`` with a reason that is not a
     constant sentence.
@@ -114,13 +126,16 @@ def test_rebuild_result_names_derived_stores_with_measured_status(gov, project, 
     KPI: "rebuild recreates every derived store" [CAP-07.a].
     Currently fails: the result has only a ``"skipped"`` list with constant
     reason strings like ``"requires ollama and qwen3-embedding model"``.
-    """
-    support.write_path_map(project, support.minimal_valid_path_map())
-    py_file = project / "sample.py"
-    py_file.write_text("x = 1\n", encoding="utf-8")
-    support.commit_all(project, "add a tracked file")
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    py_file = rebuild_project / "sample.py"
+    py_file.write_text("x = 1\n", encoding="utf-8")
+    support.commit_all(rebuild_project, "add a tracked file")
+
+    run = rebuild_gov("rebuild", "--json")
     envelope = support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 

@@ -47,15 +47,21 @@ def _check_command_text(project):
     return match.group(1).strip()
 
 
-def _run_check_command(project, sandbox):
-    """Run the recovery-rebuild check command in *project* via ``sh -c``."""
-    cmd = _check_command_text(project)
+def _run_check_command(project, sandbox, code_root=None):
+    """Run the recovery-rebuild check command in *project* via ``sh -c``.
+
+    When *code_root* is given, PYTHONPATH points to its ``src/`` instead
+    of the project's — the same split ``run_gov_with_code`` uses — and
+    the check declaration is read from *code_root* (where the template
+    lives) rather than from *project*.
+    """
+    cmd = _check_command_text(code_root or project)
     env = {
         "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
         "HOME": str(sandbox.home),
         "TMPDIR": str(sandbox.tmpdir),
         "LC_ALL": "C.UTF-8",
-        "PYTHONPATH": str(Path(project) / "src"),
+        "PYTHONPATH": str(Path(code_root or project) / "src"),
         "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
     }
     return subprocess.run(
@@ -86,18 +92,22 @@ def test_recovery_rebuild_command_not_unconditionally_exit_zero(project):
 # The check must detect a tampered store
 # --------------------------------------------------------------------------- #
 
-def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(gov, project, sandbox, interface):
+def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(cli, rebuild_gov, rebuild_project, sandbox, interface):
     """After tampering with store.db, the check must exit non-zero.
 
     A correct implementation deletes derived state (in a throwaway copy),
     rebuilds, and compares digests.  A tampered store has a different
     digest from a clean rebuild.
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
     """
-    run = gov("rebuild", "--json")
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    store_path = project / ".gov-runtime" / "store.db"
+    store_path = rebuild_project / ".gov-runtime" / "store.db"
     assert store_path.is_file(), "store.db does not exist after rebuild"
     conn = sqlite3.connect(str(store_path))
     conn.execute(
@@ -107,7 +117,7 @@ def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(gov, project, 
     conn.commit()
     conn.close()
 
-    result = _run_check_command(project, sandbox)
+    result = _run_check_command(rebuild_project, sandbox, code_root=cli)
 
     assert result.returncode != 0, (
         f"the recovery-rebuild check exits 0 on a tampered store — "

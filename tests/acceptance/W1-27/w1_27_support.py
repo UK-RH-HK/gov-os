@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import shutil
 import stat
 import sys
 from pathlib import Path
@@ -253,3 +254,33 @@ def rebuild_result(run):
     """Parse the rebuild's JSON output and return the ``result`` object from the envelope."""
     envelope = run.envelope()
     return envelope.get("result", {})
+
+
+def make_rebuild_project(cli, destination):
+    """A tiny project for rebuild tests: ``.gitleaks.toml``, a path-map, and a test file.
+
+    Rebuild goes through the lexical index's owner, which runs the secrets
+    filter on every tracked file (DEC-440).  On the full tree (~955 files)
+    this takes about 160 s; on a 3-file project it takes about 2–3 s.
+    The code under test lives in ``cli`` (the session-scope copy) and is
+    passed to ``run_gov_with_code`` as the code root.
+    """
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    gitleaks = Path(cli) / ".gitleaks.toml"
+    if gitleaks.is_file():
+        shutil.copy2(gitleaks, destination / ".gitleaks.toml")
+    git(destination, "init", "-q", "-b", "main")
+    git(destination, "add", "-A")
+    git(destination, "commit", "-q", "--allow-empty", "-m", "init")
+    write_path_map(destination, minimal_valid_path_map())
+    return destination
+
+
+# Paths of the four kinds of historical records named in DEC-448.
+HISTORICAL_RECORD_PATHS = [
+    "docs/DECISION_REGISTER.md",
+    "docs/changes/",
+    "governance/project/bootstrap.md",
+    "docs/source/",
+]

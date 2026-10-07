@@ -23,6 +23,11 @@ index and uses measured status strings.  It does not plant a secret file
 nor verify that the secrets filter runs during rebuild, and it does not
 check that ``gov.codeintel.index`` is called or that the code-index reason
 is measured against the real module.  Both gaps let the two bugs through.
+
+Revised after implementation: rebuild goes through the lexical index's
+owner and its secrets filter (DEC-440); the fixture's size, not the
+behaviour, made it time out.  Every case now uses a tiny project with
+``run_gov_with_code`` for the code root.
 """
 
 from __future__ import annotations
@@ -54,8 +59,7 @@ needs_gitleaks = pytest.mark.skipif(
 
 
 def _project_with_secret(project):
-    """Add a path map, a file with a planted secret and a clean file, commit."""
-    support.write_path_map(project, support.minimal_valid_path_map())
+    """Add a file with a planted secret and a clean file, commit."""
     secret_file = project / "secret_holder.py"
     secret_file.write_text(
         f'SECRET = "{SECRET_TEXT}"\n',
@@ -72,7 +76,7 @@ def _project_with_secret(project):
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_secret_file_not_in_lexical_index(gov, project, interface):
+def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, interface):
     """After rebuild on a project with a tracked file holding a secret,
     ``search(root, secret_text, refresh=False)`` returns no hits and the
     file is not marked as indexed in ``lexical_file`` — exactly as after
@@ -85,15 +89,19 @@ def test_rebuild_secret_file_not_in_lexical_index(gov, project, interface):
     tables directly, bypassing the secret filter; ``refresh`` then finds the
     file already indexed (blob hash matches) and does not re-run the filter.
     A search for the secret text returns hits from the indexed file.
-    """
-    _project_with_secret(project)
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    _project_with_secret(rebuild_project)
+
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     from gov.retrieval.lexical import search
-    result = search(project, SECRET_TEXT, refresh=False)
+    result = search(rebuild_project, SECRET_TEXT, refresh=False)
     hits = result.get("hits", [])
     assert not hits, (
         f"after rebuild, a search for the secret text returned {len(hits)} "
@@ -102,7 +110,7 @@ def test_rebuild_secret_file_not_in_lexical_index(gov, project, interface):
     )
 
     from gov.store import STORE_REL
-    store = project / STORE_REL
+    store = rebuild_project / STORE_REL
     if store.is_file():
         conn = sqlite3.connect(store.resolve().as_uri() + "?mode=ro", uri=True)
         try:
@@ -125,7 +133,7 @@ def test_rebuild_secret_file_not_in_lexical_index(gov, project, interface):
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_lexical_digest_matches_owner_refresh(gov, project, interface, cli, tmp_path):
+def test_rebuild_lexical_digest_matches_owner_refresh(rebuild_gov, rebuild_project, interface, cli, tmp_path):
     """The lexical index after ``gov rebuild`` on a fresh project is the same
     as after the owner's ``refresh`` alone on an identical fresh project,
     compared through ``digest(root)``.
@@ -136,19 +144,22 @@ def test_rebuild_lexical_digest_matches_owner_refresh(gov, project, interface, c
     Currently fails: ``_preseed_lexical`` indexes every file including ones
     the filter would reject; ``refresh`` alone filters them out.  The two
     digests differ.
-    """
-    _project_with_secret(project)
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    _project_with_secret(rebuild_project)
+
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     from gov.retrieval.lexical import digest, refresh
 
-    digest_rebuild = digest(project)
+    digest_rebuild = digest(rebuild_project)
 
-    project_b = tmp_path / "repo_b"
-    shutil.copytree(cli, project_b, symlinks=True)
+    project_b = support.make_rebuild_project(cli, tmp_path / "repo_b")
     _project_with_secret(project_b)
     refresh(project_b)
     digest_refresh = digest(project_b)
@@ -167,7 +178,7 @@ def test_rebuild_lexical_digest_matches_owner_refresh(gov, project, interface, c
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_stores_hold_no_secret(gov, project, interface):
+def test_rebuild_stores_hold_no_secret(rebuild_gov, rebuild_project, interface):
     """``stores_with_secrets(root)`` returns nothing for a project after
     ``gov rebuild`` — the same as after a plain refresh.  This is the
     backstop the secrets-indexing family check of W1-15 uses.
@@ -178,15 +189,19 @@ def test_rebuild_stores_hold_no_secret(gov, project, interface):
     Currently fails: ``_preseed_lexical`` inserts the secret text into the
     SQLite store's ``lexical_fts`` table; ``stores_with_secrets`` reads
     the table rows and finds the secret there.
-    """
-    _project_with_secret(project)
 
-    run = gov("rebuild", "--json")
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    _project_with_secret(rebuild_project)
+
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     from gov.secrets import stores_with_secrets
-    tainted = stores_with_secrets(project)
+    tainted = stores_with_secrets(rebuild_project)
     assert not tainted, (
         f"after rebuild, {len(tainted)} store(s) hold a secret: {tainted}\n"
         f"the secret bypassed the filter during rebuild\n{run.describe()}"
@@ -197,7 +212,7 @@ def test_rebuild_stores_hold_no_secret(gov, project, interface):
 # Code index: the reason is measured, not a constant sentence (tool absent)
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_codeintel_reason_is_measured(gov, project, interface):
+def test_rebuild_codeintel_reason_is_measured(cli, rebuild_gov, rebuild_project, interface):
     """The code index entry in the rebuild result names what was tried and
     what answered, not the constant sentence ``"no code index module exists"``
     — because the module ``src/gov/codeintel/`` does exist (W1-16) and it
@@ -209,18 +224,22 @@ def test_rebuild_codeintel_reason_is_measured(gov, project, interface):
 
     Currently fails: the reason is the hardcoded constant
     ``"no code index module exists"``.
-    """
-    support.write_path_map(project, support.minimal_valid_path_map())
-    py_file = project / "sample.py"
-    py_file.write_text("x = 1\n", encoding="utf-8")
-    support.commit_all(project, "add a tracked file")
 
-    codeintel_init = project / "src" / "gov" / "codeintel" / "__init__.py"
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.  The codeintel existence check reads ``cli``
+    (the session-scope code root).
+    """
+    py_file = rebuild_project / "sample.py"
+    py_file.write_text("x = 1\n", encoding="utf-8")
+    support.commit_all(rebuild_project, "add a tracked file")
+
+    codeintel_init = cli / "src" / "gov" / "codeintel" / "__init__.py"
     assert codeintel_init.is_file(), (
         "src/gov/codeintel/__init__.py does not exist; W1-16's module is missing"
     )
 
-    run = gov("rebuild", "--json")
+    run = rebuild_gov("rebuild", "--json")
     envelope = support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
@@ -242,7 +261,7 @@ def test_rebuild_codeintel_reason_is_measured(gov, project, interface):
 # --------------------------------------------------------------------------- #
 
 @pytest.mark.local_only
-def test_rebuild_codeintel_is_recreated_when_tool_answers(gov, project, interface):
+def test_rebuild_codeintel_is_recreated_when_tool_answers(rebuild_gov, rebuild_project, interface):
     """When ``codebase-memory-mcp`` is on PATH, ``gov rebuild`` recreates the
     code index through ``gov.codeintel.index(root)`` (W1-16) and reports
     ``status: "recreated"``.
@@ -252,6 +271,10 @@ def test_rebuild_codeintel_is_recreated_when_tool_answers(gov, project, interfac
 
     Currently fails: rebuild hardcodes ``"not_recreated"`` with a constant
     reason and never calls ``codeintel.index``.
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
     """
     if shutil.which("codebase-memory-mcp") is None:
         pytest.skip(
@@ -264,12 +287,11 @@ def test_rebuild_codeintel_is_recreated_when_tool_answers(gov, project, interfac
             "the code index tool's filter needs it"
         )
 
-    support.write_path_map(project, support.minimal_valid_path_map())
-    py_file = project / "sample.py"
+    py_file = rebuild_project / "sample.py"
     py_file.write_text("def example():\n    return 42\n", encoding="utf-8")
-    support.commit_all(project, "add a tracked file")
+    support.commit_all(rebuild_project, "add a tracked file")
 
-    run = gov("rebuild", "--json")
+    run = rebuild_gov("rebuild", "--json")
     envelope = support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 

@@ -325,8 +325,106 @@ the tool are marked `local_only` and skip when it is absent.
 | DEC-425 (unmeasured is never green) | `test_doctor_index_freshness_error_is_fail`, `test_doctor_canary_error_is_fail`, `test_doctor_isolation_broken_git_is_fail`, `test_healthy_false_when_measurement_error` |
 | DEC-440 (rebuild through owner + measured code index) | All tests in test_w1_27_rebuild_r4.py |
 
+## Round 5 — doctor finds tools at their registered locations and excludes historical records from the stale-path check (DEC-448)
+
+> KPI success 1: "doctor reports pinned vs found tool versions" [CAP-25.a]
+> KPI success 3: "path-map compliance checked by doctor" [CAP-06.d]
+
+DEC-448 (owner, 2026-10-07) adds two things:
+
+1. Each tool is checked at its registered location (the PATH prefix of DEC-202
+   and the registry's paths), not only on PATH.
+2. Historical records (the register, CIT records, bootstrap.md, archived
+   sources) are excluded from the stale-path check.
+
+### Measured rebuild times (DEC-440 motivation)
+
+| Fixture | Tracked files | Rebuild time |
+|---------|--------------|--------------|
+| Full working tree | ~955 | 157.4 s |
+| Tiny project (`make_rebuild_project`) | 3 | 2.5 s |
+
+The 30 s timeout made 18 cases fail; they are revised to use tiny projects
+with `run_gov_with_code` (code root separated from the project directory).
+
+### Revised cases (18 rebuild/recovery cases use tiny projects)
+
+| Test | File | Revision reason |
+|------|------|-----------------|
+| `test_rebuild_is_an_act_command` | test_w1_27_rebuild.py | revised after implementation: rebuild goes through the lexical index's owner and its secrets filter (DEC-440); the fixture's size, not the behaviour, made it time out |
+| `test_rebuild_recreates_derived_stores` | test_w1_27_rebuild.py | (same) |
+| `test_two_rebuilds_give_the_same_digest` | test_w1_27_rebuild.py | (same) |
+| `test_fresh_clone_doctor_rebuild` | test_w1_27_rebuild.py | (same) |
+| `test_rebuild_needs_only_git` | test_w1_27_rebuild.py | (same) |
+| `test_rebuild_digest_matches_store_loader` | test_w1_27_rebuild.py | (same) |
+| `test_rebuild_lexical_tables_exist_after_rebuild` | test_w1_27_rebuild_r2.py | (same) |
+| `test_rebuild_names_unreconstructed_stores` | test_w1_27_rebuild_r2.py | (same) |
+| `test_rebuild_envelope_has_digest` | test_w1_27_rebuild_r2.py | (same) |
+| `test_rebuild_lexical_index_is_fresh` | test_w1_27_rebuild_r3.py | (same) |
+| `test_rebuild_lexical_search_finds_tracked_text` | test_w1_27_rebuild_r3.py | (same) |
+| `test_rebuild_result_names_derived_stores_with_measured_status` | test_w1_27_rebuild_r3.py | (same) |
+| `test_rebuild_secret_file_not_in_lexical_index` | test_w1_27_rebuild_r4.py | (same) |
+| `test_rebuild_lexical_digest_matches_owner_refresh` | test_w1_27_rebuild_r4.py | (same) |
+| `test_rebuild_stores_hold_no_secret` | test_w1_27_rebuild_r4.py | (same) |
+| `test_rebuild_codeintel_reason_is_measured` | test_w1_27_rebuild_r4.py | (same) |
+| `test_rebuild_codeintel_is_recreated_when_tool_answers` | test_w1_27_rebuild_r4.py | (same) |
+| `test_derived_state_deleted_and_rebuilt_gives_same_digest` | test_w1_27_recovery_check.py | (same) |
+| `test_recovery_rebuild_command_exits_nonzero_on_tampered_store` | test_w1_27_recovery_check_r2.py | (same) |
+
+### New cases — tools at registered locations (DEC-448, DEC-202)
+
+Doctor already runs each tool's `install` command, which may contain a PATH
+prefix (e.g. `PATH=~/.nvm/.../bin:$PATH node --version`).  That mechanism
+already finds tools at their registered location.  All five cases are green
+on the current implementation.
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_tool_at_registered_location_passes` | test_w1_27_doctor_r5.py | (green: doctor runs the install command whose PATH prefix finds the tool at its registered location) |
+| `test_tool_at_registered_location_wrong_version_fails` | test_w1_27_doctor_r5.py | (green: doctor runs the install command, gets the wrong version, fails correctly) |
+| `test_tool_at_empty_registered_location_fails` | test_w1_27_doctor_r5.py | (green: doctor runs the install command which fails because nothing is at the location, then fails correctly) |
+| `test_tool_without_registered_location_found_on_path` | test_w1_27_doctor_r5.py | (green: the PATH lookup already works; this case confirms the fallback) |
+| `test_doctor_does_not_modify_path` | test_w1_27_doctor_r5.py | (green: doctor is a read command and does not alter PATH or the project) |
+
+### New cases — historical records excluded from stale-path check (DEC-448)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_stale_path_in_historical_record_is_not_reported[register]` | test_w1_27_doctor_r5.py | doctor checks all tracked files including `docs/DECISION_REGISTER.md`; historical records are not excluded |
+| `test_stale_path_in_historical_record_is_not_reported[cit-records]` | test_w1_27_doctor_r5.py | doctor checks all tracked files including `docs/changes/`; historical records are not excluded |
+| `test_stale_path_in_historical_record_is_not_reported[bootstrap]` | test_w1_27_doctor_r5.py | doctor checks all tracked files including `governance/project/bootstrap.md`; historical records are not excluded |
+| `test_stale_path_in_historical_record_is_not_reported[archived-sources]` | test_w1_27_doctor_r5.py | doctor checks all tracked files including `docs/source/`; historical records are not excluded |
+| `test_stale_path_in_live_document_is_reported` | test_w1_27_doctor_r5.py | (should pass: the stale-path check already reports moved paths in live documents) |
+| `test_stale_path_section_counts_excluded_historical` | test_w1_27_doctor_r5.py | doctor does not report how many files were excluded as historical |
+
+### Path-map and historical marking — what couldn't be settled
+
+The path-map schema has a top-level `state_class` whose enum includes
+`HISTORICAL` (in `common.schema.json`), but **no per-namespace or per-file
+state class**.  Namespace fields are: `paths`, `memory_class`, `sensitivity`,
+`permitted_roles`, `retention`, `export_policy`, `embedding_policy`,
+`provenance`, `deletion_rebuild` — none marks a file as historical.
+
+The `HISTORICAL` state class is used in individual record frontmatter, but
+DEC-448's four kinds are not all records with YAML frontmatter (the register
+and bootstrap.md are plain Markdown, `docs/source/` is a directory tree).
+
+**The path-map has no field or entry kind that marks a file as historical.**
+The cases identify the four kinds by the paths the decision names.
+
+### Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-25.a (tool registry) | `test_tool_at_registered_location_passes`, `test_tool_at_registered_location_wrong_version_fails`, `test_tool_at_empty_registered_location_fails`, `test_tool_without_registered_location_found_on_path`, `test_doctor_does_not_modify_path` |
+| CAP-06.d (path-map compliance) | `test_stale_path_in_historical_record_is_not_reported[*]`, `test_stale_path_in_live_document_is_reported`, `test_stale_path_section_counts_excluded_historical` |
+| DEC-448 (tools at registered locations + historical exclusion) | All tests in test_w1_27_doctor_r5.py |
+| DEC-202 (PATH prefix for Node 22 tools) | `test_tool_at_registered_location_passes` |
+| DEC-440 (rebuild through lexical owner) | All 18 revised rebuild/recovery cases |
+
 ## Test count
 
-- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) = 63
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) = 74
+- **W1-27 revised cases (round 5)**: 18 (rebuild/recovery using tiny projects)
 - **W1-07 revised cases**: 6
-- **Total**: 69
+- **Total**: 80

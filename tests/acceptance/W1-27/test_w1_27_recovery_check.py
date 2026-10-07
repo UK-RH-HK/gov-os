@@ -69,19 +69,24 @@ def test_recovery_rebuild_check_is_listed(gov, project, interface):
 # The actual check: delete and rebuild gives the same digest
 # --------------------------------------------------------------------------
 
-def test_derived_state_deleted_and_rebuilt_gives_same_digest(gov, project, interface):
-    """Deleting all derived state and rebuilding gives the same digest as the first build (the check's scenario)."""
-    run1 = gov("rebuild", "--json")
+def test_derived_state_deleted_and_rebuilt_gives_same_digest(rebuild_gov, rebuild_project, interface):
+    """Deleting all derived state and rebuilding gives the same digest as the first build (the check's scenario).
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
+    """
+    run1 = rebuild_gov("rebuild", "--json")
     env1 = support.assert_envelope(run1, interface, command="rebuild")
     assert env1["ok"] is True, f"first rebuild failed\n{run1.describe()}"
     digest1 = (env1.get("result") or {}).get("digest")
     assert digest1 is not None, f"first rebuild has no digest\n{run1.describe()}"
 
-    runtime = project / ".gov-runtime"
+    runtime = rebuild_project / ".gov-runtime"
     if runtime.exists():
         shutil.rmtree(runtime)
 
-    run2 = gov("rebuild", "--json")
+    run2 = rebuild_gov("rebuild", "--json")
     env2 = support.assert_envelope(run2, interface, command="rebuild")
     assert env2["ok"] is True, f"second rebuild (after delete) failed\n{run2.describe()}"
     digest2 = (env2.get("result") or {}).get("digest")

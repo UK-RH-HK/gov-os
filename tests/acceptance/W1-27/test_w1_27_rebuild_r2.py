@@ -14,6 +14,11 @@ is ``test_rebuild_recreates_derived_stores``, which only asserts that
 ``.gov-runtime/`` **exists** — it never opens ``store.db`` to check
 which tables are present.  The predecessor's case was **weak**: it
 verified the directory, not the table set.
+
+Revised after implementation: rebuild goes through the lexical index's
+owner and its secrets filter (DEC-440); the fixture's size, not the
+behaviour, made it time out.  Every case now uses a tiny project with
+``run_gov_with_code`` for the code root.
 """
 
 from __future__ import annotations
@@ -49,18 +54,22 @@ def _tables_in_store(project):
 # Rebuild must recreate the lexical index
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_recreates_lexical_index(gov, project, interface):
+def test_rebuild_recreates_lexical_index(rebuild_gov, rebuild_project, interface):
     """After rebuild, the lexical index tables exist in ``store.db``.
 
     KPI: "rebuild recreates every derived store" [CAP-07.a].
     The lexical index (W1-17) is a derived store; rebuild must create its
     tables (lexical_file, lexical_parent, lexical_chunk).
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
     """
-    run = gov("rebuild", "--json")
+    run = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    tables = _tables_in_store(project)
+    tables = _tables_in_store(rebuild_project)
     missing = LEXICAL_TABLES - tables
     assert not missing, (
         f"rebuild does not create the lexical index tables: "
@@ -73,17 +82,21 @@ def test_rebuild_recreates_lexical_index(gov, project, interface):
 # Rebuild must not silently drop existing lexical tables
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_does_not_silently_drop_lexical_tables(gov, project, interface):
+def test_rebuild_does_not_silently_drop_lexical_tables(rebuild_gov, rebuild_project, interface):
     """Existing lexical index tables must not be silently deleted by rebuild.
 
     The current implementation deletes ``store.db`` entirely and rebuilds
     only the record graph, silently losing the lexical (and semantic) tables.
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
     """
-    run1 = gov("rebuild", "--json")
+    run1 = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run1, interface, command="rebuild")
     assert run1.returncode == 0, f"first rebuild failed\n{run1.describe()}"
 
-    store_path = project / ".gov-runtime" / "store.db"
+    store_path = rebuild_project / ".gov-runtime" / "store.db"
     conn = sqlite3.connect(str(store_path))
     conn.execute(
         "CREATE TABLE IF NOT EXISTS lexical_file "
@@ -93,11 +106,11 @@ def test_rebuild_does_not_silently_drop_lexical_tables(gov, project, interface):
     conn.commit()
     conn.close()
 
-    run2 = gov("rebuild", "--json")
+    run2 = rebuild_gov("rebuild", "--json")
     support.assert_envelope(run2, interface, command="rebuild")
     assert run2.returncode == 0, f"second rebuild failed\n{run2.describe()}"
 
-    tables = _tables_in_store(project)
+    tables = _tables_in_store(rebuild_project)
     assert "lexical_file" in tables, (
         f"rebuild silently dropped lexical_file; tables after rebuild: "
         f"{sorted(tables)}\n{run2.describe()}"
@@ -108,7 +121,7 @@ def test_rebuild_does_not_silently_drop_lexical_tables(gov, project, interface):
 # Rebuild must report stores it could not recreate
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_result_names_unreconstructed_stores(gov, project, interface):
+def test_rebuild_result_names_unreconstructed_stores(rebuild_gov, rebuild_project, interface):
     """If rebuild cannot recreate a derived store it must name it in the result.
 
     The semantic index requires a model (Ollama + qwen3-embedding).  If
@@ -116,13 +129,17 @@ def test_rebuild_result_names_unreconstructed_stores(gov, project, interface):
     the tables.  "Semantic needs a model that may be absent" is answered
     by the sources or returned as a package, never by silently dropping
     the tables.
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the fixture's size, not the
+    behaviour, made it time out.
     """
-    run = gov("rebuild", "--json")
+    run = rebuild_gov("rebuild", "--json")
     envelope = support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
     result = envelope.get("result") or {}
-    tables = _tables_in_store(project)
+    tables = _tables_in_store(rebuild_project)
     result_text = json.dumps(result).lower()
 
     if not SEMANTIC_TABLES.issubset(tables):

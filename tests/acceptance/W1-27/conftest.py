@@ -65,3 +65,25 @@ def gov(project, sandbox):
         return support.run_gov(project, sandbox, *args, cwd=cwd)
 
     return _gov
+
+
+@pytest.fixture()
+def rebuild_project(cli, tmp_path):
+    """A tiny project for rebuild tests (~3 tracked files, ~2–3 s per rebuild).
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the full fixture's ~955 tracked
+    files made it time out at 30 s.  The ``gov`` code comes from the
+    session-scope ``cli`` fixture via ``run_gov_with_code``.
+    """
+    return support.make_rebuild_project(cli, tmp_path / "repo")
+
+
+@pytest.fixture()
+def rebuild_gov(cli, rebuild_project, sandbox):
+    """``rebuild_gov(*args)`` runs gov with code from ``cli`` and project from ``rebuild_project``."""
+
+    def _gov(*args, cwd=None):
+        return support.run_gov_with_code(cli, rebuild_project, sandbox, *args, cwd=cwd)
+
+    return _gov
