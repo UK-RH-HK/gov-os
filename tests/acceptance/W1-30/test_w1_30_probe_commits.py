@@ -10,8 +10,8 @@ commit of it. The same project without that commit closes (``test_full_ticket_cl
 A git failure while the probe's commits are read is a refusal, never "no such commits": in the last case ``git``
 fails for every call that names the probed commit, in a project that otherwise closes.
 
-The exit code of a refusal by the probe gate is not a subject here: no source read for this suite gives it
-(README, packages).
+A refusal by the probe gate ends with exit code 3 (DEC-470: it is a finding about the ticket's work). The git
+failure of the last case is not such a finding: the tool could not do its work, exit code 1 (API-0002; B6).
 """
 
 import os
@@ -51,9 +51,7 @@ def _refused_for_the_reviewers_commit(project, sandbox, interface, commit):
     assert support.judged_by_w1_50(project, sandbox, support.ticket_commits(project.root, TICKET)) == [], \
         "the fixture is wrong: W1-50's judgement has a finding, so the probe gate is not the only reason"
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
-    text = support.error_text(envelope["error"])
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
     assert NAMES_THE_REVIEWER.search(text), \
         f"the refusal does not say a commit of the ticket carries the reviewer's role\n{run.describe()}"
     assert commit[:7] in text, f"the refusal does not name the commit {commit[:7]}\n{run.describe()}"

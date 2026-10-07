@@ -18,6 +18,12 @@ The decision checker (W1-11) being unable to run is the fifth reason. ``tests/ac
 history the checker cannot read raises ``GovError`` (a shallow clone, DEC-387). The case holds first that the
 checker raises in its project.
 
+No record store is the sixth (DEC-470): ``gov context`` answers ``STORE_MISSING`` in a project whose store was
+never loaded. The close is refused with that reason and counted, and it does not build the store itself:
+after the refusal ``gov context`` still answers ``STORE_MISSING``. So every other project of this suite is
+given its store by its fixture (``support.run_close`` loads it before the close, or the case does and passes
+``store=False``); the cases here are the only ones that close without one.
+
 Last, a failing close that is given a class (DEC-454: "with it, the context is built first and its hash is
 recorded"): when that context cannot be built, the answer and the repair ticket say so and carry no hash.
 """
@@ -113,6 +119,61 @@ def test_a_decision_checker_that_cannot_run_refuses_the_close(project, sandbox, 
     assert "decision" in text.lower(), f"the refusal does not say the decisions could not be checked\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
     assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+
+
+# --------------------------------------------------------------------------
+# No record store (DEC-470)
+# --------------------------------------------------------------------------
+
+STORE_MISSING = "STORE_MISSING"
+
+
+def _close_without_a_store(project, sandbox, interface):
+    """An otherwise green ticket in a project whose record store was never loaded."""
+    support.build_ticket(project, TICKET, WBS)
+    error = support.context_error(project, sandbox, TICKET)
+    assert error["code"] == STORE_MISSING, f"the fixture is wrong: gov context gives {error}"
+    run = support.run_close(project, sandbox, TICKET, store=False)
+    return run, support.refused(run, interface, support.EXIT_CHECK_FAILED), error
+
+
+def test_a_project_without_a_record_store_refuses_the_close(project, sandbox, interface):
+    """Refused with the context's reason: the answer says the context failed and carries the code
+    ``gov context`` gives; no close record, the ticket in progress."""
+    run, error, of_context = _close_without_a_store(project, sandbox, interface)
+    text = support.error_text(error)
+    assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+    assert STORE_MISSING in text or of_context["message"] in text, \
+        f"the refusal does not give the context's reason ({of_context})\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
+
+
+def test_a_refusal_for_no_record_store_is_counted(project, sandbox, interface):
+    """DEC-455: the refusal is one iteration."""
+    _close_without_a_store(project, sandbox, interface)
+    assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+
+
+def test_a_refusal_for_no_record_store_carries_no_hash(project, sandbox, interface):
+    """Nothing is recorded that was not measured: the answer carries no packet hash."""
+    run, _, _ = _close_without_a_store(project, sandbox, interface)
+    assert not SHA256.search(run.stdout), f"the answer carries a hash although no context was built\n{run.describe()}"
+
+
+def test_the_close_does_not_build_the_record_store(project, sandbox, interface):
+    """Building the store is ``gov rebuild``'s work: after the refused close the project still has none."""
+    run, _, _ = _close_without_a_store(project, sandbox, interface)
+    after = support.context_error(project, sandbox, TICKET)
+    assert after["code"] == STORE_MISSING, \
+        f"after the refused close gov context gives {after}: the close built the store\n{run.describe()}"
+
+
+def test_the_same_project_closes_once_it_has_a_record_store(project, sandbox, interface):
+    """The store is the only reason: the same ticket closes after the store is loaded."""
+    support.build_ticket(project, TICKET, WBS)
+    assert support.context_error(project, sandbox, TICKET)["code"] == STORE_MISSING
+    support.load_store(project, sandbox)
+    support.result_of(support.run_close(project, sandbox, TICKET, store=False), interface)
 
 
 # --------------------------------------------------------------------------

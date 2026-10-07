@@ -248,14 +248,11 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
 class Project:
     """A temporary git repository that gov close can run in."""
 
-    def __init__(self, root, copy_tree=False):
+    def __init__(self, root):
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self._minute = 0
-        if copy_tree:
-            cli_support.copy_working_tree(self.root)
-        else:
-            self._init_minimal()
+        self._init_minimal()
 
     def _init_minimal(self):
         git(self.root, "init", "-q", "-b", "main")
@@ -396,31 +393,6 @@ class Project:
         ]) + "\n"
         write(self.root, f"{CHECKS_REL}/{check_id}.yaml", text)
         return check_id
-
-    def gov(self, sandbox, *args):
-        return cli_support.run_gov_with_code(REPO_ROOT, self.root, sandbox, *args)
-
-
-class FullProject:
-    """A copy of the working tree, committed, with its own store."""
-
-    def __init__(self, root):
-        self.root = Path(root)
-        cli_support.copy_working_tree(self.root)
-        self._minute = 0
-
-    def write(self, rel, text):
-        return write(self.root, rel, text)
-
-    def commit(self, message="fixture", who=OWNER, trailers=None):
-        self._minute += 1
-        date = FIRST_DATE.format(minute=self._minute)
-        git(self.root, "add", "-A", who=who, date=date)
-        args = ["commit", "-q", "--allow-empty", "--no-gpg-sign", "-m", message]
-        for t in (who["trailers"] if trailers is None else trailers):
-            args += ["--trailer", t]
-        git(self.root, *args, who=who, date=date)
-        return git(self.root, "rev-parse", "HEAD", who=who).strip()
 
     def gov(self, sandbox, *args):
         return cli_support.run_gov_with_code(REPO_ROOT, self.root, sandbox, *args)

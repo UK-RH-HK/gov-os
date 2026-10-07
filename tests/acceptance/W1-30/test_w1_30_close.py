@@ -630,9 +630,11 @@ def test_ticket_tool_close_is_what_tk_produces(project, sandbox, interface):
         f"tk show must succeed on the closed ticket: {result.stderr}"
 
 
-def test_close_fails_when_ticket_tool_absent(project, sandbox, interface):
-    """B2: when the ticket tool is absent or fails, gov close reports an error
-    and not success.
+def test_close_fails_when_ticket_tool_absent(project, sandbox, interface, monkeypatch, tmp_path):
+    """B2: when the ticket tool is absent, gov close reports an error and not success.
+
+    The tool is absent everywhere: the project's script is removed and ``PATH`` holds no ``tk`` (as in
+    ``test_w1_30_repair_ticket.py``). The ticket is closed through the tool only, so it stays in progress.
     """
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -640,14 +642,17 @@ def test_close_fails_when_ticket_tool_absent(project, sandbox, interface):
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    tk = project.root / "governance" / "kernel" / "bin" / "tk"
-    if tk.is_file():
-        tk.unlink()
-        project.commit("remove tk", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, TICKET)
+    (project.root / "governance" / "kernel" / "bin" / "tk").unlink()
+    project.commit("remove tk", who=support.ORCHESTRATOR)
+    monkeypatch.setenv("PATH", support.path_without("tk", tmp_path / "path"))
+    assert shutil.which("tk") is None, "the fixture is wrong: a ticket tool is still on PATH"
+    support.load_store(project, sandbox)
+    run = support.run_close(project, sandbox, TICKET, store=False)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
-        "gov close must report error when the ticket tool is absent"
+        f"gov close must report error when the ticket tool is absent\n{run.describe()}"
+    assert support.ticket_status(project.root, TICKET) == "in_progress", \
+        f"the ticket's status changed although no ticket tool is reachable\n{run.describe()}"
 
 
 def test_close_record_unwritable_ticket_stays_open(project, sandbox, interface, tmp_path):

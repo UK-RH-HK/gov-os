@@ -8,8 +8,9 @@ A4: When gov context cannot be built, the close refuses (no fallback hash, no
 B5: "Outputs produced" lists files from the ticket's commits. "Deviations" says
     "not measured" when not measured, never "none". Unmeasurable inputs listed
     with the reason.
-B7: Sources resolve through a defined lookup. Unresolvable sources listed with
-    no hash and a reason. The ticket file is always an input.
+B7: Sources resolve through a defined lookup. A ticket naming a source that does
+    not resolve is refused and gets no close record (DEC-470, replacing "listed
+    with no hash and a reason"). The ticket file is always an input.
 """
 
 import hashlib
@@ -273,29 +274,27 @@ def test_ticket_file_is_always_an_input(project, sandbox, interface):
         f"the ticket file must always be listed as an input: {ids}"
 
 
-def test_unresolvable_source_listed_with_reason(project, sandbox, interface):
-    """B7: a source that cannot be resolved is listed with no hash and a reason."""
-    project.add_ticket(TICKET, WBS, sources=["NO-SUCH-SOURCE-999"])
+def test_unresolvable_source_refuses_the_close(project, sandbox, interface):
+    """B7 as DEC-470 settles it: a ticket naming a source that does not resolve is refused. No close record
+    lists the missing source with a reason, because no close record is written.
+
+    The case holds first that ``gov context`` gives ``BLOCKED`` for this ticket, which is otherwise green.
+    """
+    missing = "NO-SUCH-SOURCE-999"
+    project.add_ticket(TICKET, WBS, sources=[missing])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    created = support.new_files(project.root, before, after)
-    _, front = support.find_close_record(project.root, created)
-    if front is not None:
-        inputs = front.get("inputs", [])
-        unresolved = [inp for inp in inputs if isinstance(inp, dict)
-                      and inp.get("id") == "NO-SUCH-SOURCE-999"]
-        if unresolved:
-            assert unresolved[0].get("hash") is None or "not" in str(unresolved[0].get("hash", "")).lower(), \
-                f"unresolvable source must have no hash: {unresolved[0]}"
-            reason = unresolved[0].get("reason") or unresolved[0].get("note")
-            assert reason is not None, \
-                f"unresolvable source must have a reason: {unresolved[0]}"
+    support.load_store(project, sandbox)
+    error = support.context_error(project, sandbox, TICKET)
+    assert error["code"] == "BLOCKED", f"the fixture is wrong: gov context gives {error}"
+
+    run = support.run_close(project, sandbox, TICKET, store=False)
+    text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+    assert missing in text, f"the refusal does not name the source that does not resolve\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
 def test_sources_resolve_through_defined_lookup(project, sandbox, interface):

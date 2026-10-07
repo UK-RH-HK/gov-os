@@ -24,7 +24,7 @@ def interface():
 def built(tmp_path_factory):
     """``gov close`` is built. Until then every test of its behaviour fails here."""
     base = tmp_path_factory.mktemp("w1-30-built")
-    project = support.FullProject(base / "project")
+    project = support.Project(base / "project")
     sandbox = cli_support.make_sandbox(base / "sandbox")
     run = project.gov(sandbox, support.COMMAND, "NO-SUCH-TICKET", "--json")
     if support.NOT_IMPLEMENTED in run.stdout:
@@ -48,8 +48,3 @@ def project(built, tmp_path):
     """A minimal temporary project, with ``gov close`` built."""
     return support.Project(tmp_path / "project")
 
-
-@pytest.fixture()
-def full_project(built, tmp_path):
-    """A copy of the real working tree, with ``gov close`` built."""
-    return support.FullProject(tmp_path / "project")

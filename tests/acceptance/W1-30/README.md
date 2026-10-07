@@ -2,8 +2,9 @@
 
 Ticket: DAEO-2lwj (W1-30, "gov close"), profile FULL.
 Round 5 (see "Round 5" below): containment without exemption, context failures, the repair ticket,
-the probe, the time limit. The rule for all of it: nothing is closed, and nothing is recorded, that
-was not measured. The counts of the last run are in "Round 5".
+the probe, the time limit. Round 5b (see "Round 5b"): the four points DEC-470 decides. The rule for
+all of it: nothing is closed, and nothing is recorded, that was not measured. The counts of the
+last run are in "Round 5b".
 
 ```
 python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider
@@ -383,77 +384,89 @@ holds no check result. With the skills committed by the engineer inside the tick
 the record holds `check_commit` = HEAD and `governance_checks` with six families RED, and
 the close still succeeds.
 
-The fixture `full_project` in `conftest.py` copies the working tree; no case uses it.
+### Packages of round 5
 
-### Session models (DEC-460): no case
+Eight points were returned with round 5. DEC-470 decides four (the store, a missing source,
+the probe gate's exit code, session models); two were tightenings of this suite (the ticket
+tool on `PATH`, the unused fixture). All six are in "Round 5b". Two stay as they were:
 
-DEC-460 ("Each session's model is recorded in close records") is in the register of
-`w1/integrate`, not yet in this branch's. The sources do not say where a session's model is
-recorded:
+- **The decision checker being unable to run** is not an error of `gov context` (W1-24's
+  README): in a shallow clone the context still builds. The case is written from the brief
+  and W1-11's README: the close is refused and the answer says the decisions could not be
+  checked.
+- **Which red checks refuse a close** is with the owner: no case. The facts are in "Stale
+  evidence".
 
-- `tests/acceptance/W1-50/README.md` has neither "launch" nor "model";
-- the launch suite's README (W1-46) describes no launch record that holds a model;
-- commits carry `Task`, `Role` and `Co-Authored-By: Claude <model>`, and no session trailer,
-  so a commit names a model but no session, and one commit may carry two co-author lines.
+## Round 5b (DEC-470)
 
-No case was written. Recommendation: the launcher writes one launch record per session
-(session id, role, ticket, model as given to `--model`), and each commit carries a
-`Session:` trailer; `gov close` then lists, for every session among the ticket's commits,
-the model from its launch record, and "not measured" where there is none. Until a source
-says so, a close record should carry `session_models: not measured` rather than a model
-read from `Co-Authored-By`.
+DEC-470 is in the register of the main tree (section 118), not yet in this branch's. New file:
+`test_w1_30_commit_models.py`.
 
-### Packages
+| Point of DEC-470 | Cases | What they hold |
+|------------------|-------|----------------|
+| No record store | context_failures: `test_a_project_without_a_record_store_refuses_the_close`, `test_a_refusal_for_no_record_store_is_counted`, `test_a_refusal_for_no_record_store_carries_no_hash`, `test_the_close_does_not_build_the_record_store`, `test_the_same_project_closes_once_it_has_a_record_store` | each first holds that `gov context` answers `STORE_MISSING`; the close is refused with exit code 3, the answer says the context failed and gives that reason, no close record, the ticket in progress, one iteration counted, no hash in the answer; afterwards `gov context` still answers `STORE_MISSING`; with the store loaded the same ticket closes |
+| A missing source | receipt: `test_unresolvable_source_refuses_the_close` (was `test_unresolvable_source_listed_with_reason`) | holds first that `gov context` answers `BLOCKED`; refused with exit code 3, the answer names the source, no close record, the ticket in progress |
+| The probe gate's exit code | probe: the 14 refusal cases; probe_commits: the three cases of the reviewer's commit | exit code 3. `test_full_ticket_requires_probe_record` no longer accepts 1 or 4 |
+| Session models | commit_models: `test_commits_of_two_roles_are_listed_with_their_roles_and_models`, `test_no_commit_of_the_ticket_is_left_out_and_no_other_is_listed`, `test_a_commit_without_a_co_author_line_is_listed_as_not_measured`, `test_a_commit_with_a_co_author_line_beside_one_without_keeps_its_model` | the close record lists each of the ticket's commits once with its role and the model its `Co-Authored-By` line names; "not measured" for a commit without the line |
 
-1. **Session models** (above): where a session's model is recorded.
-2. **The store**: `gov context` answers `STORE_MISSING` in a project whose store was never
-   loaded (not among the errors W1-24's README lists), and `gov close` closed such a
-   project, writing a `packet_hash`. Must `gov close` build the store itself or refuse?
-   The suite now loads the store before each close, so no case stands on the answer.
-3. **The decision checker being unable to run** is not an error of `gov context` (W1-24's
-   README): in a shallow clone the context still builds. The case is written from the brief
-   and W1-11's README: the close is refused and the answer says the decisions could not be
-   checked.
-4. **Exit codes of refusals**: 3 is asserted where the finding is about the ticket's work
-   (tests, containment, context, time limit), 1 where the tool could not do its work (the
-   close record cannot be written, git fails). For a refusal by the probe gate no source
-   gives the code (the implementation answers 1; `test_full_ticket_requires_probe_record`
-   accepts 1 or 4); the new probe cases do not assert it.
-5. **"Another ticket's file"** is read both ways: the other ticket's file under `.tickets/`
-   and a file inside the other ticket's paths. One case each.
-6. **B7** ("an unresolvable source is listed with its reason") against DEC-454 and W1-24
-   (a missing mandatory input is `BLOCKED`, so the close is refused):
-   `test_unresolvable_source_listed_with_reason` (receipt) asserts only if a close record
-   exists, and under DEC-454 none may. One of the two has to give way.
-7. **Which red checks refuse a close** (with the owner): the facts are in "Stale evidence".
-8. **The ticket tool on `PATH`**: `test_close_fails_when_ticket_tool_absent` (close) removes
-   the project's script only; a `tk` on the caller's `PATH` is still there. The new cases
-   remove both.
+**Must the fixtures give the projects a store? Yes.** Under DEC-470 a project without a
+record store cannot close, and `gov close` does not build one. Every case that expects a
+close, or a refusal for another reason, therefore needs the store before the close. The suite
+already does it in one place: `support.run_close` calls `gov.store.load` on the project before
+each close (round 5), and no case reaches `gov close` by another way. The cases that load the
+store themselves pass `store=False`. Only the four no-store cases close without one. Nothing
+else had to change.
+
+**The git failure in the probe gate keeps exit code 1**
+(`test_a_git_failure_while_the_probes_commits_are_read_refuses`): DEC-470 gives 3 to a
+refusal that is a finding about the ticket's work; git failing is the tool unable to work
+(API-0002, B6).
+
+**A malformed probe file** (`test_probe_malformed_yaml_is_refused`) is read as a refusal by
+the probe gate: the ticket has no valid probe record. Exit code 3.
+
+**Session models: what is settled here** (settlement 11). DEC-470 names the content, not the
+shape. The cases read one list in the close record's frontmatter whose entries each hold
+`commit`, `role` and `model`; the list's name is the implementation's. "Exactly as read" is
+the name written in the line (`Claude Opus 4.6 (1M context)`), unchanged; the whole value of
+the line with the address is accepted too. A commit with two co-author lines has no case:
+DEC-470 does not say which is read.
+
+**Tightened or removed:**
+
+- `test_close_fails_when_ticket_tool_absent` (close): the project's script is removed and
+  `PATH` holds no `tk`; the ticket stays in progress.
+- The fixture `full_project` and the class `FullProject` are removed, with the `copy_tree`
+  argument of `Project`. The fixture `built` asks its question in a minimal project, so the
+  suite no longer copies the working tree anywhere.
 
 ### The last run
 
 `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`:
-175 cases in 13 files; 159 passed, 16 failed, none skipped. The figures under "Red before
+184 cases in 14 files; 144 passed, 40 failed, none skipped. The figures under "Red before
 implementation" above are those of an earlier round.
+
+Red since round 5, unchanged (16): the four of containment_places, five of context_failures
+(missing input, missing `depends_on` id, decision checker, the answer and the repair ticket of
+a failing close with a class), the two of repair_ticket, the four of time_limit, and
+`test_a_reviewer_commit_before_the_probed_commit_that_names_no_session_refuses`
+(probe_commits; it closes the ticket).
+
+Red from this round (24):
 
 | Red case | File | What `gov close` did |
 |----------|------|----------------------|
-| `test_an_engineer_commit_under_the_projects_governance_folder_refuses` | containment_places | closed the ticket; W1-50 flags the commit |
-| `test_an_engineer_commit_of_a_kernel_file_under_template_refuses` | containment_places | closed the ticket; W1-50 flags the commit |
-| `test_an_engineer_commit_of_a_test_outside_its_acceptance_folder_and_paths_refuses` | containment_places | closed the ticket; W1-50 flags the commit |
-| `test_an_engineer_commit_of_another_tickets_file_refuses` | containment_places | closed the ticket; W1-50 flags the commit |
-| `test_a_missing_mandatory_input_refuses_the_close` | context_failures | closed although `gov context` answers `BLOCKED` |
-| `test_a_missing_depends_on_id_refuses_the_close` | context_failures | closed although `gov context` answers `BLOCKED` |
-| `test_a_decision_checker_that_cannot_run_refuses_the_close` | context_failures | closed in a shallow clone where W1-11's checker raises |
-| `test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed` | context_failures | the answer says "context could not be built" and does not name the record |
-| `test_the_repair_ticket_of_a_failing_close_with_a_class_says_the_context_failed` | context_failures | the repair ticket says nothing about the context |
-| `test_a_reviewer_commit_before_the_probed_commit_that_names_no_session_refuses` | probe_commits | closed the ticket |
-| `test_the_answer_names_the_absent_ticket_tool_beside_the_finding` | repair_ticket | the answer does not say that no repair ticket was opened |
-| `test_the_answer_names_the_failing_ticket_tool_beside_the_finding` | repair_ticket | the answer does not say that no repair ticket was opened |
-| `test_a_close_over_its_time_limit_is_counted` | time_limit | refused with `TIMEOUT`, count stays 0 |
-| `test_a_close_over_its_time_limit_opens_a_dependent_repair_ticket` | time_limit | no repair ticket |
-| `test_the_third_close_over_its_time_limit_writes_the_escalation` | time_limit | no escalation |
-| `test_after_three_closes_over_their_time_limit_the_next_is_blocked` | time_limit | the fourth is refused with exit code 3, not blocked |
+| `test_a_project_without_a_record_store_refuses_the_close` | context_failures | closed the ticket without a store |
+| `test_a_refusal_for_no_record_store_is_counted` | context_failures | closed the ticket without a store |
+| `test_a_refusal_for_no_record_store_carries_no_hash` | context_failures | closed the ticket without a store |
+| `test_the_close_does_not_build_the_record_store` | context_failures | closed the ticket without a store |
+| `test_unresolvable_source_refuses_the_close` | receipt | closed although `gov context` answers `BLOCKED` |
+| 13 refusal cases (all but `test_reviewer_commit_in_ticket_commits_refused`) | probe | refused with `PROBE_INVALID` and exit code 1, not 3 |
+| `test_a_reviewer_commit_before_the_probed_commit_refuses`, `test_a_reviewer_commit_after_the_probed_commit_that_names_no_session_refuses` | probe_commits | refused with `PROBE_INVALID` and exit code 1, not 3 |
+| the four cases | commit_models | closed; the close record holds no list of commits with role and model |
+
+Green from this round: `test_the_same_project_closes_once_it_has_a_record_store`,
+`test_close_fails_when_ticket_tool_absent`.
 
 ## Covers ids
 
@@ -468,6 +481,7 @@ implementation" above are those of an earlier round.
 | CAP-38.d | stale: 10 tests |
 | CAP-38.f | probe: 16 tests |
 | CAP-50.c | receipt: 16 tests |
+| DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
 | CAP-59.b | iteration: count/budget hidden (5 tests) |
 | CAP-59.c | disposition: 13 tests |
@@ -485,6 +499,7 @@ implementation" above are those of an earlier round.
 8. **Time limit argument**: `--timeout` (seconds)
 9. **Escalation file**: `.gov-runtime/escalations/<ticket>.json`
 10. **Probe record probed_commit**: required field naming the commit the probe covers
+11. **Models of the commits** (DEC-470): one list in the close record's frontmatter; each entry has `commit`, `role`, `model`; `model` is `not measured` for a commit without a `Co-Authored-By` line
 
 ## Residuals
 
