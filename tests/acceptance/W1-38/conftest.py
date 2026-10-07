@@ -12,28 +12,32 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import w1_38_support as support  # noqa: E402
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "needs_rulesync: test requires the rulesync binary"
+    )
+
+
 @pytest.fixture(scope="session")
-def rulesync_version():
-    """The installed rulesync version string, or skip if not found."""
+def rulesync_bin():
+    """The rulesync binary path, or skip if not installed."""
     ver = support.rulesync_version()
     if ver is None:
         pytest.skip("rulesync is not installed")
-    return ver
+    return support.RULESYNC_BIN
 
 
 @pytest.fixture()
-def project(tmp_path):
-    """A temporary project with a .rulesync/ source tree and git init."""
+def project(tmp_path, rulesync_bin):
+    """A temporary project built from the template's .rulesync/ sources."""
     support.init_git(tmp_path)
-    support.build_minimal_rulesync_tree(tmp_path)
+    support.build_project_from_template(tmp_path)
     return tmp_path
 
 
 @pytest.fixture()
-def project_with_openspec_and_vendored(tmp_path):
-    """A temporary project with OpenSpec commands and vendored skills in .rulesync/."""
-    support.init_git(tmp_path)
-    support.build_minimal_rulesync_tree(tmp_path)
-    support.add_openspec_commands(tmp_path)
-    support.add_vendored_skills(tmp_path)
-    return tmp_path
+def generated_project(project):
+    """A temporary project with ``rulesync generate`` already run."""
+    result = support.run_rulesync_generate(project)
+    assert result.returncode == 0, f"rulesync generate failed: {result.stderr}"
+    return project

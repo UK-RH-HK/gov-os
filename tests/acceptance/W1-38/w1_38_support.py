@@ -1,17 +1,23 @@
 """Helpers for the W1-38 acceptance tests (rulesync adapters and .claude ownership).
 
-Every test builds a temporary project under pytest's ``tmp_path``, populates a
-``.rulesync/`` source tree, and runs ``rulesync generate`` there. Nothing is
-written in this worktree, the main repository, or any other worktree.
+Every test builds a temporary project under pytest's ``tmp_path``, copies
+sources from the kernel template, and checks the generated output. Nothing is
+written in this worktree.
 """
 
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
+import shutil
 import subprocess
 from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
@@ -20,13 +26,13 @@ RULESYNC_VERSION = "24.0.0"
 TOKEN_CHARS = 4
 AGENTS_MD_TOKEN_LIMIT = 1500
 
-ALL_FEATURES = "rules,hooks,permissions,subagents,commands,skills"
-
+TEMPLATE_RULESYNC_REL = "template/.rulesync"
 KERNEL_ROLES_REL = "template/governance/kernel/roles"
 KERNEL_HOOKS_REL = "template/governance/kernel/hooks"
 KERNEL_SKILLS_REL = "template/governance/kernel/skills"
 KERNEL_CHECKS_REL = "template/governance/kernel/checks"
 SUPERPOWERS_REL = "template/governance/kernel/skills/superpowers"
+CHECK_DECL_REL = "template/governance/kernel/checks/adapter-portability.yaml"
 
 ROLE_NAMES = (
     "engineer",
@@ -37,13 +43,24 @@ ROLE_NAMES = (
     "research",
 )
 
-HOOK_NAMES = (
-    "posttooluse",
-    "precompact",
-    "pretooluse",
-    "sessionstart",
-    "stop",
-    "subagentstop",
+HOOK_SCRIPTS = (
+    "posttooluse.py",
+    "precompact.py",
+    "pretooluse.py",
+    "sessionstart.py",
+    "stop.py",
+    "subagentstop.py",
+)
+
+KERNEL_METHOD_SKILLS = (
+    "adopt",
+    "audit",
+    "change",
+    "checkpoint",
+    "discovery",
+    "planning",
+    "retrieval",
+    "test-design",
 )
 
 SUPERPOWERS_SKILLS = (
@@ -52,214 +69,101 @@ SUPERPOWERS_SKILLS = (
     "verification-before-completion",
 )
 
-CHECK_DECL_PATTERN = re.compile(r"^adapter-portability")
 PORTABILITY_FAMILY = "adapter/model portability"
 PORTABILITY_FAMILY_NORMALISED = "adapter-model-portability"
+ALL_FEATURES = "rules,hooks,permissions,subagents,commands,skills"
+
+# W1-33 labelled-field regex
+_LABELLED = re.compile(r"^[-*]\s+\*\*(?P<label>[^*]+?):?\*\*:?\s*(?P<rest>.*)$")
 
 
-class Missing(AssertionError):
-    """A required file or directory is missing."""
+# ---------------------------------------------------------------------------
+# Text helpers
+# ---------------------------------------------------------------------------
+
+def tokens(text: str) -> int:
+    return math.ceil(len(text) / TOKEN_CHARS)
 
 
-def _tokens(text: str) -> int:
-    """Ceiling division: ceil(len(text) / TOKEN_CHARS)."""
-    return -(-len(text) // TOKEN_CHARS)
+def body(text: str) -> str:
+    if text.startswith("---"):
+        end = text.find("\n---", 3)
+        if end >= 0:
+            rest = text[end + 4:]
+            return rest.split("\n", 1)[1] if "\n" in rest else ""
+    return text
 
+
+def normalise(text: str) -> str:
+    return " ".join(text.split())
+
+
+def parse_fields(text: str) -> dict[str, str]:
+    """Parse labelled fields from markdown (W1-33 whitespace-collapsed comparison).
+
+    Returns ``{label_lower: whitespace_collapsed_value}``.
+    """
+    lines = body(text).splitlines()
+    spans: list[tuple[str, str]] = []
+    start: int | None = None
+    label: str | None = None
+
+    def close(end: int) -> None:
+        nonlocal start, label
+        if start is not None:
+            first = _LABELLED.match(lines[start]).group("rest")
+            value = normalise("\n".join([first, *lines[start + 1:end]]))
+            spans.append((label, value))
+
+    for index, line in enumerate(lines):
+        match = _LABELLED.match(line)
+        ends = False
+        if match or line.startswith("#"):
+            ends = True
+        elif start is not None and line.strip() and not line[0].isspace():
+            ends = index > 0 and not lines[index - 1].strip()
+        if ends:
+            end = index
+            while end > 0 and start is not None and end - 1 > start and not lines[end - 1].strip():
+                end -= 1
+            close(end)
+            start, label = (index, match.group("label").strip()) if match else (None, None)
+
+    end = len(lines)
+    while start is not None and end - 1 > start and not lines[end - 1].strip():
+        end -= 1
+    close(end)
+    return {lab.lower(): val for lab, val in spans}
+
+
+def normalise_family(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+
+
+# ---------------------------------------------------------------------------
+# Rulesync binary
+# ---------------------------------------------------------------------------
 
 def rulesync_version() -> str | None:
-    """Return the installed rulesync version string, or None if not found."""
     if not RULESYNC_BIN.is_file():
         return None
-    result = subprocess.run(
-        [str(RULESYNC_BIN), "--version"],
-        capture_output=True, text=True, timeout=10,
-    )
+    try:
+        result = subprocess.run(
+            [str(RULESYNC_BIN), "--version"],
+            capture_output=True, text=True, timeout=10,
+        )
+    except (subprocess.TimeoutExpired, OSError):
+        return None
     if result.returncode != 0:
         return None
     return result.stdout.strip()
 
 
-def run_rulesync_generate(
-    project_dir: Path,
-    *,
-    targets: str = "claudecode",
-    features: str = ALL_FEATURES,
-    extra_args: tuple[str, ...] = (),
-    input_roots: tuple[str, ...] | None = None,
-) -> subprocess.CompletedProcess:
-    """Run ``rulesync generate`` inside *project_dir*, return the result."""
-    cmd = [str(RULESYNC_BIN), "generate",
-           "--targets", targets, "--features", features]
-    if input_roots is not None:
-        cmd.extend(["--input-roots", *input_roots])
-    cmd.extend(extra_args)
-    return subprocess.run(
-        cmd, capture_output=True, text=True, timeout=30, cwd=str(project_dir),
-    )
-
-
-def run_rulesync_generate_check(
-    project_dir: Path,
-    *,
-    targets: str = "claudecode",
-    features: str = ALL_FEATURES,
-    input_roots: tuple[str, ...] | None = None,
-) -> subprocess.CompletedProcess:
-    """Run ``rulesync generate --check`` and return the result."""
-    return run_rulesync_generate(
-        project_dir, targets=targets, features=features,
-        extra_args=("--check",), input_roots=input_roots,
-    )
-
-
-def run_rulesync_generate_delete(
-    project_dir: Path,
-    *,
-    targets: str = "claudecode",
-    features: str = ALL_FEATURES,
-    input_roots: tuple[str, ...] | None = None,
-) -> subprocess.CompletedProcess:
-    """Run ``rulesync generate --delete`` and return the result."""
-    return run_rulesync_generate(
-        project_dir, targets=targets, features=features,
-        extra_args=("--delete",), input_roots=input_roots,
-    )
-
-
-def build_minimal_rulesync_tree(project_dir: Path) -> None:
-    """Create a minimal ``.rulesync/`` tree in *project_dir*.
-
-    The tree has:
-    - A root rule file
-    - A non-root rule file (simulating a kernel role)
-    - hooks.jsonc with hooks pointing to scripts under governance/kernel/hooks/
-    - permissions.jsonc with deny rules
-    - A skill with a SKILL.md (with valid frontmatter)
-    - A subagent definition
-    """
-    rs = project_dir / ".rulesync"
-    rs.mkdir(parents=True, exist_ok=True)
-
-    # Root rule
-    rules = rs / "rules"
-    rules.mkdir(exist_ok=True)
-    (rules / "overview.md").write_text(
-        '---\nroot: true\ntargets: ["claudecode", "agentsmd"]\n'
-        'description: "Gov OS project"\n---\n\n# Gov OS\n\nMinimal test project.\n',
-        encoding="utf-8",
-    )
-    (rules / "guard.md").write_text(
-        '---\nroot: false\ntargets: ["claudecode", "agentsmd"]\n'
-        'description: "Guard rules"\n---\n\n## Guard\n\nThe guard checks every tool call.\n',
-        encoding="utf-8",
-    )
-
-    # Hooks
-    hook_script_dir = project_dir / "governance" / "kernel" / "hooks"
-    hook_script_dir.mkdir(parents=True, exist_ok=True)
-    hooks_map = {}
-    for event, script_name in [
-        ("preToolUse", "pretooluse.py"),
-        ("postToolUse", "posttooluse.py"),
-        ("sessionStart", "sessionstart.py"),
-        ("stop", "stop.py"),
-        ("preCompact", "precompact.py"),
-        ("subagentStop", "subagentstop.py"),
-    ]:
-        script_path = hook_script_dir / script_name
-        script_path.write_text(
-            f"#!/usr/bin/env python3\n# stub for {event}\n",
-            encoding="utf-8",
-        )
-        script_path.chmod(0o755)
-        hooks_map[event] = [
-            {"type": "command",
-             "command": f"./governance/kernel/hooks/{script_name}"}
-        ]
-
-    (rs / "hooks.jsonc").write_text(
-        json.dumps({"version": 1, "hooks": hooks_map}, indent=2),
-        encoding="utf-8",
-    )
-
-    # Permissions (deny rules)
-    (rs / "permissions.jsonc").write_text(
-        json.dumps({
-            "permission": {
-                "edit": {
-                    ".tickets/**": "deny",
-                    "tests/acceptance/**": "deny",
-                },
-                "bash": {
-                    "npm install*": "deny",
-                    "pip install*": "deny",
-                },
-            },
-        }, indent=2),
-        encoding="utf-8",
-    )
-
-    # Skill (with required name in frontmatter)
-    skill_dir = rs / "skills" / "planning"
-    skill_dir.mkdir(parents=True, exist_ok=True)
-    (skill_dir / "SKILL.md").write_text(
-        '---\nname: planning\ntargets: ["claudecode"]\n'
-        'description: "Planning skill"\n---\n\n# Planning\n\nHelps plan implementations.\n',
-        encoding="utf-8",
-    )
-
-    # Subagent
-    subagents = rs / "subagents"
-    subagents.mkdir(exist_ok=True)
-    (subagents / "engineer.md").write_text(
-        '---\nname: engineer\ntargets: ["claudecode"]\n'
-        'description: "Engineer role"\n'
-        "claudecode:\n  model: sonnet\n"
-        '  tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]\n'
-        "---\n\nYou are an engineer.\n",
-        encoding="utf-8",
-    )
-
-
-def add_openspec_commands(project_dir: Path) -> list[str]:
-    """Add OpenSpec command files to ``.rulesync/commands/`` and return their names."""
-    commands_dir = project_dir / ".rulesync" / "commands"
-    commands_dir.mkdir(parents=True, exist_ok=True)
-    names = []
-    for name in ("propose.md", "close.md"):
-        (commands_dir / name).write_text(
-            f'---\ndescription: "OpenSpec {name.replace(".md", "")} command"\n'
-            f'targets: ["claudecode"]\n---\n\n'
-            f'Run the openspec {name.replace(".md", "")} workflow.\n',
-            encoding="utf-8",
-        )
-        names.append(name)
-    return names
-
-
-def add_vendored_skills(project_dir: Path) -> list[str]:
-    """Add the three vendored superpowers skills to ``.rulesync/skills/``.
-
-    Returns folder names.
-    """
-    skills_dir = project_dir / ".rulesync" / "skills"
-    skills_dir.mkdir(parents=True, exist_ok=True)
-    folders = []
-    for skill_name in SUPERPOWERS_SKILLS:
-        skill_dir = skills_dir / skill_name
-        skill_dir.mkdir(parents=True, exist_ok=True)
-        (skill_dir / "SKILL.md").write_text(
-            f'---\nname: {skill_name}\ntargets: ["claudecode"]\n'
-            f'description: "{skill_name} skill"\n---\n\n'
-            f"# {skill_name}\n\nVendored superpowers skill.\n",
-            encoding="utf-8",
-        )
-        folders.append(skill_name)
-    return folders
-
+# ---------------------------------------------------------------------------
+# Project building
+# ---------------------------------------------------------------------------
 
 def init_git(project_dir: Path) -> None:
-    """Initialize a git repo in *project_dir* for rulesync to work."""
     subprocess.run(
         ["git", "init", "--initial-branch=main"],
         cwd=str(project_dir), capture_output=True, check=True,
@@ -274,98 +178,204 @@ def init_git(project_dir: Path) -> None:
     )
 
 
-def load_generated_settings(project_dir: Path) -> dict:
-    """Load ``.claude/settings.json`` from the generated project."""
-    settings_path = project_dir / ".claude" / "settings.json"
-    if not settings_path.is_file():
-        raise Missing(f".claude/settings.json does not exist in {project_dir}")
-    return json.loads(settings_path.read_text(encoding="utf-8"))
+def _copy_file(src: Path, dst: Path) -> None:
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dst)
 
 
-def extract_hook_commands(settings: dict) -> list[str]:
-    """Extract all hook command paths from a Claude Code settings dict.
+def build_project_from_template(project_dir: Path) -> None:
+    """Copy template/.rulesync/ sources and kernel hooks into a temp project.
 
-    Claude Code hooks use a nested structure:
-    ``{event: [{hooks: [{type, command}]}]}``
+    Each file is copied individually (never a folder as a unit).
     """
-    commands = []
-    hooks = settings.get("hooks", {})
-    for _event, matchers in hooks.items():
-        if not isinstance(matchers, list):
-            continue
-        for matcher in matchers:
-            if not isinstance(matcher, dict):
-                continue
-            inner = matcher.get("hooks", [])
-            if not isinstance(inner, list):
-                continue
-            for entry in inner:
-                if isinstance(entry, dict) and "command" in entry:
-                    cmd = entry["command"]
-                    cmd = cmd.replace('"$CLAUDE_PROJECT_DIR"/', "./")
-                    cmd = cmd.replace("$CLAUDE_PROJECT_DIR/", "./")
-                    parts = cmd.split()
-                    if parts:
-                        path_part = parts[0]
-                        if path_part.startswith(("./", "../")):
-                            commands.append(path_part)
+    src_root = REPO_ROOT / TEMPLATE_RULESYNC_REL
+    dst_root = project_dir / ".rulesync"
+    for src_file in sorted(src_root.rglob("*")):
+        if src_file.is_file():
+            rel = src_file.relative_to(src_root)
+            _copy_file(src_file, dst_root / rel)
+
+    hooks_src = REPO_ROOT / KERNEL_HOOKS_REL
+    hooks_dst = project_dir / "governance" / "kernel" / "hooks"
+    for script_name in HOOK_SCRIPTS:
+        src_file = hooks_src / script_name
+        if src_file.is_file():
+            _copy_file(src_file, hooks_dst / script_name)
+
+
+def place_openspec_commands(project_dir: Path) -> list[str]:
+    """Simulate ``openspec init``: place commands in .claude/commands/opsx/.
+
+    These are NOT rulesync source files (DEC-074 Q7).
+    """
+    opsx_dir = project_dir / ".claude" / "commands" / "opsx"
+    opsx_dir.mkdir(parents=True, exist_ok=True)
+    names = []
+    for cmd_name in ("propose", "close", "status"):
+        fname = f"{cmd_name}.md"
+        (opsx_dir / fname).write_text(
+            f'---\ndescription: "OpenSpec {cmd_name} command"\n---\n\n'
+            f"Run the openspec {cmd_name} workflow.\n",
+            encoding="utf-8",
+        )
+        names.append(fname)
+    return names
+
+
+def write_rulesync_config(project_dir: Path, *, version: str = RULESYNC_VERSION) -> Path:
+    path = project_dir / "rulesync.jsonc"
+    path.write_text(json.dumps({"version": version}, indent=2), encoding="utf-8")
+    return path
+
+
+# ---------------------------------------------------------------------------
+# Rulesync commands
+# ---------------------------------------------------------------------------
+
+def run_rulesync_generate(
+    project_dir: Path,
+    *,
+    targets: str = "claudecode,agentsmd",
+    features: str = ALL_FEATURES,
+    extra_args: tuple[str, ...] = (),
+    input_roots: tuple[str, ...] | None = None,
+) -> subprocess.CompletedProcess:
+    cmd = [str(RULESYNC_BIN), "generate",
+           "--targets", targets, "--features", features]
+    if input_roots is not None:
+        cmd.extend(["--input-roots", *input_roots])
+    cmd.extend(extra_args)
+    return subprocess.run(
+        cmd, capture_output=True, text=True, timeout=30, cwd=str(project_dir),
+    )
+
+
+def run_rulesync_check(
+    project_dir: Path,
+    *,
+    targets: str = "claudecode,agentsmd",
+    features: str = ALL_FEATURES,
+    input_roots: tuple[str, ...] | None = None,
+) -> subprocess.CompletedProcess:
+    return run_rulesync_generate(
+        project_dir, targets=targets, features=features,
+        extra_args=("--check",), input_roots=input_roots,
+    )
+
+
+def run_rulesync_delete(
+    project_dir: Path,
+    *,
+    targets: str = "claudecode,agentsmd",
+    features: str = ALL_FEATURES,
+    input_roots: tuple[str, ...] | None = None,
+) -> subprocess.CompletedProcess:
+    return run_rulesync_generate(
+        project_dir, targets=targets, features=features,
+        extra_args=("--delete",), input_roots=input_roots,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Settings inspection
+# ---------------------------------------------------------------------------
+
+def load_settings(project_dir: Path) -> dict:
+    path = project_dir / ".claude" / "settings.json"
+    assert path.is_file(), f".claude/settings.json does not exist in {project_dir}"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _find_commands_recursive(obj: object) -> list[str]:
+    commands: list[str] = []
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            if key == "command" and isinstance(value, str):
+                commands.append(value)
+            else:
+                commands.extend(_find_commands_recursive(value))
+    elif isinstance(obj, list):
+        for item in obj:
+            commands.extend(_find_commands_recursive(item))
     return commands
 
 
-def normalise_family(name: str) -> str:
-    """Normalise a check family name the way gov.check.runner does."""
-    return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+def extract_hook_script_paths(settings: dict) -> list[str]:
+    """Extract script file paths from hook commands in settings.
+
+    Returns relative paths (e.g. ``governance/kernel/hooks/pretooluse.py``).
+    """
+    hooks = settings.get("hooks", {})
+    commands = _find_commands_recursive(hooks)
+    paths: list[str] = []
+    for cmd in commands:
+        normalized = cmd.replace('"$CLAUDE_PROJECT_DIR"/', "")
+        normalized = normalized.replace("$CLAUDE_PROJECT_DIR/", "")
+        for token in normalized.split():
+            token = token.strip("'\"")
+            if token.endswith(".py") and "/" in token and not token.startswith("-"):
+                paths.append(token.lstrip("./"))
+    return paths
 
 
-def load_check_declarations(checks_dir: Path) -> list[dict]:
-    """Load all YAML check declarations from *checks_dir*."""
+# ---------------------------------------------------------------------------
+# Check declaration
+# ---------------------------------------------------------------------------
+
+def load_check_declaration() -> dict | None:
     import yaml
-    declarations = []
-    if not checks_dir.is_dir():
-        return declarations
-    for path in sorted(checks_dir.glob("*.yaml")):
-        data = yaml.safe_load(path.read_text(encoding="utf-8"))
-        if isinstance(data, dict):
-            declarations.append(data)
-    return declarations
+    path = REPO_ROOT / CHECK_DECL_REL
+    if not path.is_file():
+        return None
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def find_adapter_portability_check(checks_dir: Path) -> dict | None:
-    """Find the adapter-portability check declaration, if any."""
-    for decl in load_check_declarations(checks_dir):
-        if decl.get("id", "").startswith("adapter-portability"):
-            return decl
-        family = decl.get("family", "")
-        if normalise_family(family) == PORTABILITY_FAMILY_NORMALISED:
-            return decl
-    return None
-
+# ---------------------------------------------------------------------------
+# Portability check
+# ---------------------------------------------------------------------------
 
 def portability_module_exists() -> bool:
-    """Return True if ``src/gov/adapters/portability`` is importable."""
-    adapters_dir = REPO_ROOT / "src" / "gov" / "adapters"
-    if not adapters_dir.is_dir():
+    adapters = REPO_ROOT / "src" / "gov" / "adapters"
+    if not adapters.is_dir():
         return False
-    init_file = adapters_dir / "__init__.py"
-    if not init_file.is_file():
-        return False
-    portability = adapters_dir / "portability.py"
-    main = adapters_dir / "__main__.py"
-    return portability.is_file() or main.is_file()
+    return (adapters / "portability.py").is_file() or (adapters / "__main__.py").is_file()
 
 
 def run_portability_check(
     project_dir: Path,
     *,
     env_override: dict[str, str] | None = None,
+    timeout: int = 30,
 ) -> subprocess.CompletedProcess:
-    """Run the portability check command from the project directory."""
     env = {**os.environ}
     env["PYTHONPATH"] = str(REPO_ROOT / "src")
     if env_override:
         env.update(env_override)
     return subprocess.run(
         ["python3", "-m", "gov.adapters.portability"],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True, text=True, timeout=timeout,
         cwd=str(project_dir), env=env,
     )
+
+
+# ---------------------------------------------------------------------------
+# Kernel file readers
+# ---------------------------------------------------------------------------
+
+def read_kernel_role(role: str) -> str:
+    path = REPO_ROOT / KERNEL_ROLES_REL / f"{role}.md"
+    assert path.is_file(), f"{KERNEL_ROLES_REL}/{role}.md does not exist"
+    return path.read_text(encoding="utf-8")
+
+
+def read_kernel_skill_body(skill: str) -> str:
+    path = REPO_ROOT / KERNEL_SKILLS_REL / skill / "SKILL.md"
+    assert path.is_file(), f"{KERNEL_SKILLS_REL}/{skill}/SKILL.md does not exist"
+    return body(path.read_text(encoding="utf-8"))
+
+
+def write_mock_rulesync(project_dir: Path, script_body: str) -> Path:
+    mock = project_dir / "mock-rulesync.sh"
+    mock.write_text(f"#!/bin/bash\n{script_body}\n", encoding="utf-8")
+    mock.chmod(0o755)
+    return mock
