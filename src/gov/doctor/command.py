@@ -118,12 +118,14 @@ def _tool_version(binary: Path, name: str) -> str | None:
         "node": [str(binary), "--version"],
         "uv": [str(binary), "--version"],
         "lefthook": [str(binary), "version"],
+        "socat": [str(binary), "-V"],
     }
     if name in version_cmds:
         try:
-            out = subprocess.run(version_cmds[name], capture_output=True, text=True, timeout=5).stdout.strip()
+            result = subprocess.run(version_cmds[name], capture_output=True, text=True, timeout=5)
+            out = result.stdout.strip() or result.stderr.strip()
             m = re.search(r"v?(\d+[\d.]*\S*)", out)
-            return m.group(0) if m else out
+            return m.group(0) if m else None
         except Exception:
             return None
     try:
@@ -136,7 +138,7 @@ def _tool_version(binary: Path, name: str) -> str | None:
                     return m.group(0)
     except Exception:
         pass
-    return "present"
+    return None
 
 
 def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -> dict:
@@ -197,6 +199,17 @@ def _check_tools(root: Path) -> dict:
     except Exception:
         return {"status": "fail", "reason": "cannot read tool-registry.yaml", "tools": []}
     tools_list = (data.get("tools") or []) if isinstance(data, dict) else []
+
+    all_prefixes: list[str] = []
+    seen_prefixes: set[str] = set()
+    for entry in tools_list:
+        if not isinstance(entry, dict):
+            continue
+        pfx = _extract_path_prefix(entry.get("install", ""))
+        if pfx and pfx not in seen_prefixes:
+            all_prefixes.append(pfx)
+            seen_prefixes.add(pfx)
+
     results = []
     all_ok = True
     for entry in tools_list:
@@ -214,40 +227,59 @@ def _check_tools(root: Path) -> dict:
                 all_ok = False
             continue
         install_cmd = entry.get("install", "")
-        path_prefix = _extract_path_prefix(install_cmd)
+        own_prefix = _extract_path_prefix(install_cmd)
+        binary_name = TOOL_BINARIES.get(name, name)
         binary = None
         registered_location = None
-        if path_prefix:
-            binary_name = TOOL_BINARIES.get(name, name)
-            candidate = Path(path_prefix) / binary_name
+
+        if own_prefix:
+            candidate = Path(own_prefix) / binary_name
             if candidate.is_file():
                 binary = candidate
-                registered_location = path_prefix
+                registered_location = own_prefix
+
+        if binary is None:
+            for pfx in all_prefixes:
+                if pfx == own_prefix:
+                    continue
+                candidate = Path(pfx) / binary_name
+                if candidate.is_file():
+                    binary = candidate
+                    registered_location = pfx
+                    break
+
         if binary is None:
             binary = _find_binary(name)
+
         if binary is None:
             detail = {"name": name, "pinned_version": pinned, "found_version": None,
                       "sha256_match": False, "ok": False}
-            if registered_location:
-                detail["location"] = registered_location
-            elif path_prefix:
-                detail["location"] = path_prefix
+            if own_prefix:
+                detail["location"] = own_prefix
             results.append(detail)
             all_ok = False
             continue
+
         found_sha = _sha256_file(binary)
         sha_match = bool(pinned_sha and found_sha and pinned_sha == found_sha)
         found_version = _tool_version(binary, name)
-        ok = True
-        if found_version and found_version != "present":
+
+        if found_version is not None:
             clean_found = found_version.lstrip("v")
             clean_pinned = pinned.lstrip("v")
-            if clean_found != clean_pinned:
-                ok = False
+            ok = clean_found == clean_pinned
+        elif sha_match:
+            ok = True
+        else:
+            ok = False
+
         if not ok:
             all_ok = False
+
         detail = {"name": name, "pinned_version": pinned, "found_version": found_version,
                   "sha256_match": sha_match, "ok": ok}
+        if not ok and found_version is None and not sha_match:
+            detail["reason"] = "unverified: no version read and hash does not match"
         if registered_location:
             detail["location"] = registered_location
         results.append(detail)
