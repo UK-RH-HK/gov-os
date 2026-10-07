@@ -4985,3 +4985,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.112 | 2026-10-07 | Three delegated decisions: DEC-452 (doctor looks under every registered PATH prefix before PATH; a tool it cannot verify fails), DEC-453 (W1-50 reopened for a public read-only judgement of commits, which `gov close` calls), DEC-454 (what `gov close` measures: regression tests, disposition, context, the reviewer's writes, iterations and the owner's decision, stale evidence). Next free id: DEC-455. |
+
+## 113. One delegated decision: where the owner's choice after an escalation is recorded (register v0.113, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-455 — The owner's choice after an escalation is the register entry; `gov close` records its id, and every refusal for a finding counts
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a
+- **Decision:**
+  - The owner's choice is recorded where the owner records decisions: in the register entry itself, in its text.
+    `gov close` takes that entry's id as an argument, accepts it only when the ticket is escalated and W1-11's
+    checker finds the entry active with the owner's approval fact, and records the id with the ticket's count.
+    It does not parse the entry for one of the six words.
+  - A close refused for a finding about the ticket's work (trailers, containment, the probe record, a failing or
+    timed-out test run, the governance checks, the checkpoint watchdog, a context that cannot be built) is one
+    iteration and opens a repair ticket. A close refused because the ticket is unknown, the arguments are
+    invalid, the ticket is already closed, the escalation is in force or the count file is corrupt is not.
+  - W1-30 is finished by designer and engineer turns the orchestrator starts itself; no fourth lead start.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.113 | 2026-10-07 | One delegated decision: DEC-455 (the owner's choice after an escalation is the register entry and `gov close` records its id; every refusal for a finding about the ticket's work counts as an iteration). |
