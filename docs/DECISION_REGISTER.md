@@ -5136,3 +5136,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.116 | 2026-10-07 | One delegated decision, provisional: DEC-467 (until this repository is adopted, `gov check` blocks a merge on any red the recorded baseline at `46ec8da3` does not hold). |
+
+## 117. Two delegated decisions on W1-38: the OpenSpec skills are registered sources too; who refreshes the registered OpenSpec sources (register v0.117, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-468 — The six skills OpenSpec writes beside its commands are registered rulesync sources, like its commands
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer measured with rulesync 24.0.0 that `generate --delete` removes every file under `.claude/commands/` and `.claude/skills/` that is not a registered source, and that `openspec init --tools claude` (OpenSpec 1.13.2) writes six commands and six `openspec-*` skills. The ticket's failure line reads "generate --delete removes OpenSpec or vendored skills"; DEC-074 (question 7) makes rulesync the holder of what OpenSpec writes. Registering the commands alone would let `--delete` remove the six skills.
+- **Decision:**
+  - The registered rulesync sources hold what the registered OpenSpec version ships, unchanged: its six commands and its six skills. A text written for the ticket in their place is not a source.
+  - The acceptance cases compare the generated files with what the installed, registered OpenSpec writes; an OpenSpec that is absent or of another version fails those cases with that reason.
+  - Recorded before the change (DEC-463): the designer's cases for the six skills and the engineer's sources follow this entry.
+
+### DEC-469 — The change that moves the registered OpenSpec or rulesync version refreshes the registered sources in the same change
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the cases of DEC-468 turn red when the tool registry names a new OpenSpec version and the sources still hold the old texts; no source named who refreshes them.
+- **Decision:**
+  - The ticket that changes the `openspec` or `rulesync` entry of the tool registry refreshes the registered sources from that version in the same change, in a temporary folder outside the repository (nobody runs a writing rulesync command in the repository), and copies the result in.
+  - Where a project keeps its check declarations once adopted (`template/governance/kernel/checks/` today, `governance/kernel/` after adoption) is not decided here: W1-39 settles it.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.117 | 2026-10-07 | Two delegated decisions on W1-38: DEC-468 (OpenSpec's six skills are registered rulesync sources, like its six commands), DEC-469 (the change that moves the registered version refreshes the sources). Next free id: DEC-470. |
