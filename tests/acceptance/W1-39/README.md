@@ -1,7 +1,8 @@
 # W1-39 acceptance tests: the Copier kernel template and the lock
 
 Ticket `DAEO-5ylr`, profile STANDARD. Written by the Independent Test Designer before implementation (MR-3),
-and brought to DEC-488 and DEC-493 before any implementer commit. 61 cases in five files.
+and brought to DEC-488 and DEC-493 before any implementer commit: 61 cases. Three cases were added after
+implementation began (no existing case rewritten): 64 cases in five files.
 
 Run, without `PYTHONPATH`:
 
@@ -99,7 +100,7 @@ belongs to W1-40 (hooks), W1-41 (registry) and the exit run.
 
 ### Success 2 [CAP-02.a]: one edited kernel file is DRIFT naming it; the update procedure is documented
 
-`test_w1_39_drift.py` (17 cases), and four cases of `test_w1_39_update.py`
+`test_w1_39_drift.py` (20 cases), and four cases of `test_w1_39_update.py`
 
 | Case | Clause |
 |---|---|
@@ -111,6 +112,8 @@ belongs to W1-40 (hooks), W1-41 (registry) and the exit run.
 | `test_a_kernel_file_the_manifest_does_not_list_is_drift_naming_it` | DEC-488: unlisted is drift, named |
 | `test_a_kernel_file_hidden_from_git_by_an_ignore_rule_is_still_drift_naming_it` | DEC-488: git-ignored files are not left out |
 | `test_a_file_in_a_bytecode_folder_inside_the_kernel_is_not_drift` | DEC-488: only `__pycache__/` folders are left out |
+| `test_a_kernel_folder_that_cannot_be_listed_is_not_passed_over` (2) | measured or refused: a kernel folder without permissions, or enter-only, is said (folder or reason), the lock part fails, no traceback |
+| `test_a_project_without_any_installed_kernel_file_is_not_a_match` | measured or refused: no kernel file, a manifest of one file outside the kernel with its true hash, is not a match |
 | `test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it` | DEC-488: unlisted is drift, from the lock's side |
 | `test_a_file_the_project_adds_outside_the_kernel_is_not_drift` (3) | a project's file is not drift |
 | `test_a_missing_lock_is_not_a_match` | measured or refused (not a match; no more is asserted) |
@@ -194,6 +197,18 @@ template source only.
   `node` and one that writes `CLAUDE.md`): every case changed or added for DEC-488 and DEC-493 went red on its
   own assertion, save the bytecode-folder case, which only a comparison that reports unlisted files can turn
   red.
+
+## Added after implementation began
+
+Three cases of `test_w1_39_drift.py` (DEC-488: never a match without having hashed), red on their own
+assertion against the implementation as it stood when they were written; the other 61 were green:
+
+- `test_a_kernel_folder_that_cannot_be_listed_is_not_passed_over` (2: no permissions at all; enter-only without
+  list): doctor answered `{"match": "MATCH", "status": "pass"}`, exit 0. The case needs a user whom permissions
+  bind: where the folder can still be listed it fails with that sentence, it never skips. It restores the
+  folder's permissions before it ends.
+- `test_a_project_without_any_installed_kernel_file_is_not_a_match`: doctor answered MATCH, exit 0. The case
+  holds "not a match, not passed"; whether the part fails or is reported unmeasured is not asserted.
 
 ## The decisions the cases follow
 

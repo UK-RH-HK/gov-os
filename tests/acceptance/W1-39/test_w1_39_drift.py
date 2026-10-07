@@ -15,6 +15,8 @@ and runs ``gov doctor --json`` there.
 from __future__ import annotations
 
 import os
+import re
+import shutil
 
 import pytest
 
@@ -133,6 +135,59 @@ def test_a_file_in_a_bytecode_folder_inside_the_kernel_is_not_drift(project, san
     named = [rel for rel in rels if result.names(rel)]
     assert result.claims_match and result.section.get("status") == "pass" and not result.reports_drift and not named, \
         f"gov doctor reports files of a {support.PYCACHE}/ folder inside the kernel against the lock\n{result.describe()}"
+
+
+@pytest.mark.parametrize("how, mode", (("no permissions at all", 0), ("enter-only, without list", 0o100)))
+def test_a_kernel_folder_that_cannot_be_listed_is_not_passed_over(project, sandbox, how, mode):
+    """A folder inside the installed kernel whose content cannot be listed: the comparison could not look, and says so.
+
+    DEC-488: the comparison never answers match without having hashed, and gives the reason where it could not
+    compare. The folder holds a file the manifest does not list; a comparison that passes over the folder
+    would call the kernel a match. The command ends with its ordinary report, not with a traceback.
+    """
+    folder_rel = f"{support.KERNEL_REL}/w1_39_folder_that_cannot_be_listed"
+    folder = project / folder_rel
+    folder.mkdir()
+    (folder / "w1_39_added_by_hand.py").write_text("print('not part of any release')\n", encoding="utf-8")
+    folder.chmod(mode)
+    try:
+        try:
+            os.listdir(folder)
+            listed = True
+        except OSError:
+            listed = False
+        assert not listed, ("this case needs a user whom permissions bind: here a folder with "
+                            f"{how} can still be listed")
+        run = support.base.run_gov_with_code(support.REPO_ROOT, project, sandbox, "doctor", "--json")
+    finally:
+        folder.chmod(0o755)
+    assert "Traceback (most recent call last)" not in run.stderr + run.stdout, \
+        f"gov doctor ends with a traceback where {folder_rel} cannot be listed ({how})\n{run.describe()}"
+    result = support.doctor_of(run)
+    support.assert_not_a_match(result, f"{folder_rel} is in the kernel and cannot be listed ({how})")
+    said = result.names(folder_rel) or re.search(r"permission|unreadable|not readable|cannot|could not",
+                                                 result.text, re.IGNORECASE)
+    assert said, (f"the lock part of gov doctor names neither the folder {folder_rel} nor a reason why it could "
+                  f"not look ({how})\n{result.describe()}")
+    assert result.run.returncode != 0 and result.run.envelope().get("ok") is False, \
+        f"gov doctor exits 0 although {folder_rel} could not be listed ({how})\n{result.describe()}"
+
+
+def test_a_project_without_any_installed_kernel_file_is_not_a_match(project, sandbox):
+    """No kernel left, and a manifest that lists one file outside it with its true hash: nothing of the kernel was hashed.
+
+    DEC-488: never a match without having hashed. The lock's tag, commit and the rest stay as written.
+    """
+    listed = support.IGNORE_REL
+    assert (project / listed).is_file(), f"this case needs the project's {listed}"
+    shutil.rmtree(project / support.KERNEL_REL)
+    support.rewrite_lock(project, lambda lock: lock.__setitem__(support.MANIFEST_KEY,
+                                                                {listed: support.sha256(project / listed)}))
+    assert not (project / support.KERNEL_REL).exists() and support.manifest_of(project) == \
+        {listed: support.sha256(project / listed)}
+    result = support.doctor(project, sandbox)
+    support.assert_not_a_match(
+        result, f"the project holds no file under {support.KERNEL_REL}/ and the manifest lists only {listed}")
 
 
 def test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it(project, sandbox):

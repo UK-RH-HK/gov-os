@@ -568,7 +568,11 @@ class Doctor:
 
 def doctor(project, sandbox):
     """Run ``gov doctor --json`` in the project with this worktree's code; the report and its framework-lock section."""
-    run = base.run_gov_with_code(REPO_ROOT, project, sandbox, "doctor", "--json")
+    return doctor_of(base.run_gov_with_code(REPO_ROOT, project, sandbox, "doctor", "--json"))
+
+
+def doctor_of(run):
+    """The report and its framework-lock section of a finished run of ``gov doctor --json``."""
     envelope = run.envelope()
     report = envelope.get("result") or (envelope.get("error") or {}).get("details") or {}
     assert isinstance(report, dict) and report, f"gov doctor gave no report\n{run.describe()}"
