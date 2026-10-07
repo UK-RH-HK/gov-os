@@ -21,6 +21,7 @@ def _make_probe(root: Path, ticket: str, **overrides) -> Path:
         "reviewer_wrote_nothing": True,
         "commissioned_by": "orchestrator",
         "judged_by": "orchestrator",
+        "judgement": "pass",
     }
     defaults.update(overrides)
     probe_dir = root / "docs" / "probes" / ticket
