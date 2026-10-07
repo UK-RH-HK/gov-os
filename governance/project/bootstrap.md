@@ -1579,3 +1579,24 @@ utilisation-triggered checkpoint is an accepted residual).
   107 lines added and 19 removed in the module, 237 lines of unit tests.
 - **Regression at `3d715a35`:** every suite green except W1-46's 23 live-session cases, which errored while
   three other test runs were going (DEC-372); W1-46 alone: 493 passed.
+
+## W1-29 and W1-25 follow-up residuals (automatic checkpoints in the ignored scratch folder, DEC-444, 2026-10-07)
+
+- **Built:** PreCompact and Stop write their checkpoint record under
+  `.gov-runtime/scratch/checkpoints/(ticket)/`; a deliberate `gov checkpoint` still writes under
+  `docs/checkpoints/(ticket)/`. `gov.checkpoint.record.write` takes `dest="automatic"` or `"deliberate"` (the
+  default). Record numbers are unique per ticket across both places. `brief`, `briefs` and `watch` read the
+  newer of the two by creation time (on a tie the deliberate one) and return its path. W1-25 was reopened for
+  its module's part.
+- **An automatic record carries `head_commit`,** the HEAD when it was written, and the watchdog counts commits
+  from it (an ignored file is never committed, so the earlier count from "the commit that added the record"
+  would always be zero). A record in the scratch folder **without** that field counts zero commits: the
+  product's writer always sets it, so only a hand-placed record can lack it.
+- **Automatic records written before this change stay under `docs/checkpoints/`** in the trees where hooks ran
+  (untracked); nothing moves them. In this repository and its worktrees they are the orchestrator's to remove.
+- **An installed project must ignore `.gov-runtime/`** for the tree to stay clean after a hook: for the
+  adoption tickets (W1-39, W1-41).
+- **Records:** the designer's commit `3f09f660` names "Claude Opus 4.6" as co-author.
+- **Learning metrics:** one designer turn and two engineer turns started by the orchestrator; 12 cases added
+  and 6 revised (owner decision); about 95 lines of source.
+- **Regression at `b89ba5ce`:** every suite green except one W1-16 case (`test_this_repository_is_not_indexed_by_the_run`), which saw a snapshot file the guard wrote for the orchestrator's own command during the run; W1-16 alone afterwards: 166 passed.
