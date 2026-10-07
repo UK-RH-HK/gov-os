@@ -1004,6 +1004,93 @@ untracked ticket file in 2 forms, and two more judgement words: `fail`, `inconcl
 green (the second close, the other folder in 2 forms, the judgement `pass`). No case that was
 green in round 8 is red, and none that was red is green.
 
+## Round 9: every finding in one run; the ticket tool on PATH (DEC-492)
+
+DEC-492 (owner, 2026-10-07; register v0.129), first point: "`gov close` reports every finding in
+one run instead of stopping at the first, and finds the ticket tool on PATH as well as at the
+kernel path." The round's order makes it exact: one refusal names every finding the run can
+establish, is counted once and opens one repair ticket that lists them all; what an earlier part
+made unmeasurable is said as not measured, by name, never left out and never reported as passed;
+the "could not measure" states of DEC-490 still end the run before anything is measured. The
+ticket tool is the installed kernel's and, where that is not there, the one on `PATH`; where both
+exist the kernel's is used; with neither the answer says so.
+
+Two new files, 15 cases, and three additions to the support code (`tk` and
+`assert_dependent_repair_ticket` take another tool than the kernel's; `path_with_tool`;
+`says_not_measured`).
+
+### 1. Every finding in one run (`test_w1_30_r9_every_finding.py`, 10 cases)
+
+The combined ticket holds four findings, each planted by its own commit and each held by the
+fixture before the close: a commit of the ticket, by its engineer, inside its paths, without
+`Implements:`; an engineer's commit of `NOTES.md` at the project's root (W1-50's judgement is
+asked and gives that commit and that path alone); a failing acceptance test (`test_fail`); a red
+hard-block check (`license-present`, red by W1-26's runner at the commit being closed; the ticket
+changes `governance/project/notes.yaml`, so the checks run).
+
+| Case | Holds | Red reason, as observed at `18c9c34b` |
+|------|-------|---------------------------------------|
+| `test_one_refusal_names_every_finding_of_the_ticket` | exit code 3; the answer names the commit and `Implements`, the commit and `NOTES.md`, `test_fail`, `license-present`; nothing closed | the answer is `TRAILER_MISSING` alone: it does not name the containment finding, the failing test, the red check |
+| `test_the_refusal_for_several_findings_is_counted_once` | the same answer; the count is 1 | the same: the answer names one finding of four |
+| `test_the_refusal_for_several_findings_opens_one_repair_ticket_that_lists_them_all` | one repair ticket, dependent on the ticket by the ticket tool; its file lists all four | one dependent repair ticket is opened; its file lists the commit without `Implements:` and none of the other three |
+| `test_an_early_finding_does_not_hide_the_failing_acceptance_test` (3 forms: no probe record on a FULL ticket, a commit without `Implements:`, a containment finding) | exit code 3; the answer names the early finding and `test_fail`; the count is 1; one dependent repair ticket | the answer is `PROBE_MISSING`, `TRAILER_MISSING`, `CONTAINMENT_FINDING` alone: `test_fail` is not in it |
+| `test_without_acceptance_tests_the_acceptance_run_is_said_as_not_measured` | a ticket without acceptance tests and with the red check: exit code 3; the answer names the missing tests and says of the acceptance run that it was not measured (settlement 14); nothing closed | the answer is `NO_ACCEPTANCE_TESTS` alone and says of nothing that it was not measured |
+| `test_without_acceptance_tests_the_governance_checks_are_still_reported` | the same ticket: the answer names the missing tests and `license-present`; the count is 1 | the answer does not name `license-present`: the checks were not reached |
+| `test_a_measured_part_is_not_said_as_not_measured` | the other side, on the combined ticket: the answer names `test_fail` and does not say of the acceptance run that it was not measured | the answer is `TRAILER_MISSING` alone: `test_fail` is not in it |
+| `test_a_tree_that_is_not_its_commit_still_ends_the_run_before_any_finding` | the combined ticket with an untracked `stray.txt`: exit code 1, the file named, none of the four findings reported, not counted, no repair ticket (DEC-490) | green: the behaviour of round 8, held so that "every finding" does not reach past it |
+
+Not held, and why. "Never reported as passed" has no form of its own in any source: the cases hold
+that the refusal says "not measured" of the acceptance run and that the ticket is not closed, and
+the other side holds that the words are not said of a run that ran. Only the DEC's own instance of
+a part that cannot be measured is written (no acceptance tests, so no acceptance run); which other
+parts depend on which is the engineer's to state in the answer. The order of the findings in the
+answer and in the repair ticket, and the error code of a refusal with several findings, are held
+nowhere: no case of the suite holds the code of an early finding.
+
+### 2. Where the ticket tool is found (`test_w1_30_r9_ticket_tool.py`, 5 cases)
+
+This machine has a `tk` on `PATH`, so every case builds its own `PATH`: the caller's without any
+`tk` (`support.path_without`), and before it, where the case wants one, a folder of its own that
+holds the tool (`support.path_with_tool`: a copy of the kernel's, or a planted script). A project
+without the tool at the kernel's place has it removed by the owner before the ticket's first
+commit, so the removal is no commit of the ticket's range. Where a case is about which tool was
+used, the one on `PATH` writes a line to a file outside the project whenever it is started.
+
+| The kernel's place | `PATH` | Case | Holds | As observed at `18c9c34b` |
+|--------------------|--------|------|-------|---------------------------|
+| no tool | the tool | `test_a_clean_ticket_closes_where_the_ticket_tool_is_on_path_only` | the ticket closes: status `closed`, one close record | red: `TICKET_TOOL_ABSENT`, exit code 1 ("not available at governance/kernel/bin/tk") |
+| no tool | the tool | `test_a_refused_close_opens_its_repair_ticket_where_the_ticket_tool_is_on_path_only` | a failing acceptance test: exit code 3, `test_fail` named, one repair ticket that depends on the ticket (read back with the tool on `PATH`), the count is 1 | red: no repair ticket; the answer says "not opened: the ticket tool (tk) is not available at governance/kernel/bin/tk" |
+| the tool | a tool that fails and records | `test_the_kernels_ticket_tool_is_used_where_path_holds_another` | the ticket closes; the tool on `PATH` was never started | green |
+| a tool that fails | the tool, recording | `test_a_failing_kernel_ticket_tool_is_not_replaced_by_the_one_on_path` | the close fails; nothing says the ticket closed; the tool on `PATH` was never started | green |
+| no tool | no tool | `test_the_answer_says_so_where_the_ticket_tool_is_at_neither_place` | the close fails; the answer names the ticket tool; nothing says the ticket closed | green |
+
+The three green cases hold today's behaviour against the change: a search of `PATH` that comes
+first, or that follows a failure of the kernel's tool, turns the two middle ones red.
+
+### Existing cases against DEC-492
+
+None was rewritten. Looked for, in every file of the suite:
+
+- **"The first finding only".** No case holds the error code of an early finding, the number of
+  findings in an answer, or that a later part did not run after an early finding (no assertion on
+  `error["code"]` for a refusal of the ticket's work, none of the form "not in" the answer). The
+  cases with an early finding hold what the answer names and that the refusal is counted and
+  opens a repair ticket, and each of their tickets is otherwise clean and green, so a run that
+  goes on finds nothing more there.
+- **"The tool only at the kernel path".** Every case with the kernel's tool removed or failing
+  (`test_close_fails_when_ticket_tool_absent`; the four of `test_w1_30_repair_ticket.py`;
+  `test_a_ticket_tool_that_fails_on_closing_leaves_nothing_that_says_the_ticket_closed`) runs on a
+  `PATH` without `tk`. Those are the row "no tool, no tool" and the kernel's tool failing with no
+  other: unchanged by the decision.
+
+### The run of round 9
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`, at
+`18c9c34b` (the engineer's round 8, `308bad42`, and the merge of `w1/integrate`): 274 cases in 26
+files; 263 passed, 11 failed, none skipped. The 259 cases of round 8b are green. Of the 15 new
+cases 11 are red for the reasons above and four are green: the tree that is not its commit, the
+two cases of precedence, the tool at neither place.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1017,6 +1104,7 @@ green in round 8 is red, and none that was red is green.
 | CAP-38.d | governance_checks: 20 tests; stale: 5 tests |
 | CAP-38.f | probe: 16 tests; probe_record (round 8): 10 tests |
 | DEC-487, DEC-490 | the six `test_w1_30_r8_*.py` files: 54 tests; governance_checks: the `governance/kernel/` form |
+| DEC-492 | the two `test_w1_30_r9_*.py` files: 15 tests (every finding: 10; the ticket tool: 5) |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1039,6 +1127,8 @@ green in round 8 is red, and none that was red is green.
 11. **Models of the commits** (DEC-470): one list in the close record's frontmatter; each entry has `commit`, `role`, `model`; `model` is `not measured` for a commit without a `Co-Authored-By` line
 12. **The governance checks in the close record** (round 6): `check_commit` holds the full id of the commit being closed; under `governance_checks`, every check that ran is an object with `id` and `status`, at any depth; a ticket that changed no governance file has neither key, or both empty
 13. **The time limit of a governance check** (round 6b, DEC-480): the runner's own; `gov close` adds none, and `--timeout` (settlement 8) is the limit of the close's test runs only. Round 6's settlement (the close's `--timeout` as the limit of each check) is withdrawn
+14. **How an answer says "not measured, by name"** (round 9, DEC-492): no source gives the form. Taken, in the refusal's `error` object: one sentence of one string holds both "not measured" and the part's name (for the acceptance run: "acceptance"), or one of the two is in a key and the other is under that key; `_` and `-` read as blanks, case is not held (`support.says_not_measured`). So `"the acceptance run was not measured: ..."`, `{"not_measured": ["acceptance tests"]}` and `{"acceptance": "not measured"}` all say it; the finding "no acceptance tests for ..." alone does not
+15. **Where the ticket tool is found** (round 9, DEC-492): `governance/kernel/bin/tk`, else `tk` on `PATH`; the kernel's wherever it exists, also when it fails
 
 ## Residuals
 

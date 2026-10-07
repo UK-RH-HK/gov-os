@@ -585,9 +585,10 @@ def context_error(project, sandbox, ticket):
     return envelope["error"]
 
 
-def tk(project, *args):
-    """Run the project's own ticket tool (``governance/kernel/bin/tk``) and return its output."""
-    script = Path(project.root) / "governance" / "kernel" / "bin" / "tk"
+def tk(project, *args, script=None):
+    """Run the project's own ticket tool (``governance/kernel/bin/tk``) and return its output. ``script`` is
+    another ticket tool than the project's (round 9: the one on ``PATH``)."""
+    script = Path(script or Path(project.root) / "governance" / "kernel" / "bin" / "tk")
     done = subprocess.run([str(script), *args], cwd=str(project.root), capture_output=True, text=True,
                           stdin=subprocess.DEVNULL)
     assert done.returncode == 0, f"tk {' '.join(args)} failed:\n{done.stdout}\n{done.stderr}"
@@ -901,13 +902,15 @@ def checkpointed(project, ticket):
     return project.commit("checkpoint", who=ORCHESTRATOR)
 
 
-def assert_dependent_repair_ticket(project, ticket, run):
-    """The refused close opened exactly one other ticket, and by the ticket tool it depends on ``ticket``."""
+def assert_dependent_repair_ticket(project, ticket, run, script=None):
+    """The refused close opened exactly one other ticket, and by the ticket tool it depends on ``ticket``.
+    Returns the repair ticket's file. ``script`` as in ``tk``."""
     repairs = other_tickets(project.root, ticket)
     assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
-    tree = tk(project, "dep", "tree", repairs[0].stem).splitlines()
+    tree = tk(project, "dep", "tree", repairs[0].stem, script=script).splitlines()
     assert any(ticket in line for line in tree[1:]), \
         f"by the ticket tool the repair ticket does not depend on {ticket}: {tree}"
+    return repairs[0]
 
 
 # --------------------------------------------------------------------------
@@ -1024,3 +1027,66 @@ def assert_escalation_in_force(project, sandbox, interface, ticket, why):
     envelope = envelope_of(run, interface)
     assert envelope["ok"] is False and run.returncode == EXIT_BLOCKED, \
         f"{why}: the escalation is no longer in force, the next close ran\n{run.describe()}"
+
+
+# --------------------------------------------------------------------------
+# Round 9 (DEC-492): every finding in one run; the ticket tool on PATH
+# --------------------------------------------------------------------------
+
+TOOL_REL = "governance/kernel/bin/tk"
+TOOL_NAME = "tk"
+KERNEL_TOOL = REPO_ROOT / "template" / "governance" / "kernel" / "bin" / "tk"
+
+
+def path_with_tool(folder, links, script=None):
+    """A ``PATH`` whose only ticket tool is ``folder/tk``: the caller's ``PATH`` without ``tk``
+    (``path_without``), and ``folder`` before it. ``script`` is the text of that tool; without it the tool is a
+    copy of the kernel's. Returns ``(path, tool)``."""
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    tool = folder / TOOL_NAME
+    if script is None:
+        shutil.copy2(KERNEL_TOOL, tool)
+    else:
+        tool.write_text(script, encoding="utf-8")
+    tool.chmod(0o755)
+    path = str(folder) + os.pathsep + path_without(TOOL_NAME, links)
+    assert shutil.which(TOOL_NAME, path=path) == str(tool), "the fixture is wrong: another ticket tool is on PATH"
+    return path, tool
+
+
+def _plain(text):
+    """Lower case, with ``_``, ``-`` and runs of blanks as one blank: ``not_measured`` reads "not measured"."""
+    return re.sub(r"[_\-\s]+", " ", str(text)).lower()
+
+
+def says_not_measured(error, what):
+    """Whether the answer says of ``what`` (a word, as "acceptance") that it was not measured, by name
+    (DEC-492). No source gives the form, so any of these is taken (README, round 9, settlement 14): one
+    sentence of one string holds both "not measured" and ``what``; or one of the two is in a key and the other
+    is under that key. ``_`` and ``-`` read as blanks. A string that only names ``what`` elsewhere (the finding
+    "no acceptance tests") says nothing of the kind."""
+    what = _plain(what)
+
+    def under(node, word):
+        return word in _plain(json.dumps(node, ensure_ascii=False))
+
+    def walk(node):
+        if isinstance(node, str):
+            return any(NOT_MEASURED_WORDS in part and what in part
+                       for part in map(_plain, re.split(r"[;\n]|\.\s", node)))
+        if isinstance(node, dict):
+            for key, value in node.items():
+                key = _plain(key)
+                if (NOT_MEASURED_WORDS in key and under(value, what)) or \
+                        (what in key and under(value, NOT_MEASURED_WORDS)):
+                    return True
+            return any(walk(value) for value in node.values())
+        if isinstance(node, list):
+            return any(walk(value) for value in node)
+        return False
+
+    return walk(error)
+
+
+NOT_MEASURED_WORDS = "not measured"
