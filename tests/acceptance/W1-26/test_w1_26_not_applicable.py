@@ -275,6 +275,10 @@ class TestRunnerOptedIn:
             f"entry: {json.dumps(entry, indent=2)}")
 
     def test_opted_in_family_is_yellow(self, project, sandbox, interface, tmp_path):
+        # revised after implementation: W1-36's kernel declaration of the
+        # audit-reproducibility check is now in every project built from the
+        # template (DEC-447)
+        project.remove_check_declaration("audit-reproducibility")
         cmd = _na_cmd(tmp_path)
         _write_na_declaration(project, "audit-na-f", "audit reproducibility",
                               cmd, allows_na=True)
@@ -396,6 +400,10 @@ class TestLifecycle:
     """No report → YELLOW → valid → GREEN → broken → RED → removed → YELLOW."""
 
     def test_lifecycle(self, project, sandbox, interface):
+        # revised after implementation: W1-36's kernel declaration of the
+        # audit-reproducibility check is now in every project built from the
+        # template (DEC-447)
+        project.remove_check_declaration("audit-reproducibility")
         report_dir = "audit-reports"
         (project.root / report_dir).mkdir(parents=True, exist_ok=True)
         cmd = f"python3 -m gov.check.audit_validator {report_dir}"
@@ -451,6 +459,10 @@ class TestNeverGreen:
 
     def test_not_applicable_never_green_json(self, project, sandbox, interface,
                                              tmp_path):
+        # revised after implementation: W1-36's kernel declaration of the
+        # audit-reproducibility check is now in every project built from the
+        # template (DEC-447)
+        project.remove_check_declaration("audit-reproducibility")
         cmd = _na_cmd(tmp_path)
         _write_na_declaration(project, "audit-ng", "audit reproducibility",
                               cmd, allows_na=True)
@@ -464,6 +476,10 @@ class TestNeverGreen:
 
     def test_not_applicable_never_green_text(self, project, sandbox, interface,
                                              tmp_path):
+        # revised after implementation: W1-36's kernel declaration of the
+        # audit-reproducibility check is now in every project built from the
+        # template (DEC-447)
+        project.remove_check_declaration("audit-reproducibility")
         cmd = _na_cmd(tmp_path)
         _write_na_declaration(project, "audit-ngt", "audit reproducibility",
                               cmd, allows_na=True)

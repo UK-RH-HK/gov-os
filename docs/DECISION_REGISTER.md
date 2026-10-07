@@ -4937,3 +4937,70 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.111 | 2026-10-07 | Owner answers: DEC-442 (Stop and SubagentStop activated at the exit run), DEC-443 (auto-compact threshold verified from the official documentation), DEC-444 (automatic checkpoints to the ignored scratch folder), DEC-445 (utilisation-triggered checkpoint accepted as a residual), DEC-446 (DEC-441 accepted), DEC-447 (audit reproducibility: a warning before the first audit, a hard block after), DEC-448 (`gov doctor`: registered tool locations, historical records, one rebuild, drift), DEC-449 (KPI clauses read against tests and code before every close). DEC-451 (the auto-compact threshold is already set by environment variable; the CONTEXT_CHECKPOINT fallback is dropped). Delegated: DEC-450 (`gov close` calls the checkpoint watchdog). |
+
+## 112. Three delegated decisions: where `gov doctor` looks for a tool, and what `gov close` must measure (register v0.112, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-452 — Doctor looks under every registered PATH prefix before PATH, and a tool it cannot verify fails
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07) · **Basis:** the orchestrator's reading of W1-27's code and of `gov doctor` run on this repository after DEC-448 was built: `openspec` and `ccusage` are found under the prefix their registry entries carry, Node is not (its entry's install command is the `nvm install` line and carries no prefix; the place is only in a free-text note), `socat` passes with no version read and no hash match, and one case asserted a key name · **Under:** DEC-202, DEC-425, DEC-440, DEC-448
+- **Decision:**
+  - Doctor looks for a tool first under its own registry entry's PATH prefix, then under every PATH prefix that
+    any entry of the registry carries, in the registry's order, and only then on PATH. This is the reading of
+    DEC-448's "the PATH prefix of DEC-202" for a tool whose own entry carries none; with it Node 22 is found
+    where it is installed, and the registry is not changed.
+  - A tool passes only when the version read equals the pin, or, where no version can be read, when the file's
+    hash equals the pinned hash. A tool for which neither can be established fails, with the reason; so does a
+    version command that errors or times out (DEC-440: an error in a measurement is a failure).
+  - Both are fixed test-first (DEC-136) inside W1-27, without a further review round (DEC-413).
+
+### DEC-453 — W1-50 is reopened for a public, read-only judgement of commits; `gov close` calls it
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07) · **Basis:** W1-30's second return: its containment check is a private rule set that exempts `tests/`, `docs/`, `governance/`, `template/` and `openspec/`, so an engineer's commit that changes an acceptance test closes clean; the lead's package says W1-50's module has no public function that judges a ticket's commits (the judgement by `Role` and `Task` trailers exists there, but only inside the post-command check) · **Under:** DEC-319, DEC-410, DEC-425, DEC-439
+- **Decision:**
+  - W1-50 is reopened for a follow-up: `gov.guard.containment` gets a public function that judges a list of
+    commits by their trailers exactly as the post-command check judges an orchestrator's own commits, and
+    returns the findings. It only reads: it restores nothing and writes no record.
+  - `gov close` calls it for the ticket's commits and refuses on any finding. Its private rule set is removed.
+    No second rule set is written anywhere.
+
+### DEC-454 — What `gov close` measures where its KPI lines left the mechanism open
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn any point) · **Basis:** W1-30's second return (six packages for the owner) and the orchestrator's reading of the code against each KPI clause (DEC-449): the disposition of every finding was a constant, a context that could not be built was replaced by a hash of the ticket file, "the regression tests" were two folders of unit tests, the reviewer's "wrote nothing" was the record's own word, a fourth iteration had no owner's decision to wait for, and the stale-evidence rule measured nothing · **Under:** DEC-096, DEC-136, DEC-137, DEC-413, DEC-425
+- **Decision:**
+  - **The regression tests** of a close are every test under the project's `tests/` outside the ticket's own
+    acceptance folder. All run to their end. A failure, a collection error or a time limit reached refuses the
+    close. The time limit is a setting with a default.
+  - **The disposition** of a finding is given by the caller as an argument, one of the six names. Without it
+    the finding is recorded as unclassed, the output says so, and the repair ticket records "unclassed":
+    `gov close` never invents a class. With it, the context is built first and its hash is recorded.
+  - **A context that cannot be built** refuses the close.
+  - **"The reviewer wrote nothing"** is checked against the commits' `Role` trailers, and the probe record
+    names the commit it probed; a ticket commit outside tests and probe records after that commit makes the
+    probe stale.
+  - **Iterations:** every consecutive failed close of a ticket counts. The count resets on a successful close
+    or on an owner's decision, given as an argument that names a register entry which W1-11's checker confirms
+    as the owner's. Without it a fourth attempt is refused before anything runs. A count file that cannot be
+    read refuses.
+  - **Stale evidence:** when a ticket's commits change governance files, `gov close` re-runs the checks at HEAD
+    through W1-26's runner and refuses on any hard-block red. It trusts no recorded result.
+  - All are built test-first in W1-30's third start, without a further review round (DEC-413).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.112 | 2026-10-07 | Three delegated decisions: DEC-452 (doctor looks under every registered PATH prefix before PATH; a tool it cannot verify fails), DEC-453 (W1-50 reopened for a public read-only judgement of commits, which `gov close` calls), DEC-454 (what `gov close` measures: regression tests, disposition, context, the reviewer's writes, iterations and the owner's decision, stale evidence). Next free id: DEC-455. |
+
+## 113. One delegated decision: where the owner's choice after an escalation is recorded (register v0.113, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-455 — The owner's choice after an escalation is the register entry; `gov close` records its id, and every refusal for a finding counts
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; the owner may overturn it) · **Basis:** W1-30's test designer (round 4): DEC-096 and CAP-59.a name six options for the owner (fix differently, narrow, split, defer, delete, continue) but no field that records which was chosen; and the orchestrator's reading of `gov close` (DEC-449) after its lead's third start ended unfinished: only failing tests were counted as an iteration · **Under:** DEC-096, DEC-454, CAP-59.a
+- **Decision:**
+  - The owner's choice is recorded where the owner records decisions: in the register entry itself, in its text.
+    `gov close` takes that entry's id as an argument, accepts it only when the ticket is escalated and W1-11's
+    checker finds the entry active with the owner's approval fact, and records the id with the ticket's count.
+    It does not parse the entry for one of the six words.
+  - A close refused for a finding about the ticket's work (trailers, containment, the probe record, a failing or
+    timed-out test run, the governance checks, the checkpoint watchdog, a context that cannot be built) is one
+    iteration and opens a repair ticket. A close refused because the ticket is unknown, the arguments are
+    invalid, the ticket is already closed, the escalation is in force or the count file is corrupt is not.
+  - W1-30 is finished by designer and engineer turns the orchestrator starts itself; no fourth lead start.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.113 | 2026-10-07 | One delegated decision: DEC-455 (the owner's choice after an escalation is the register entry and `gov close` records its id; every refusal for a finding about the ticket's work counts as an iteration). |

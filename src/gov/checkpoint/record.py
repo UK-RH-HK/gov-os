@@ -1,8 +1,9 @@
 """The checkpoint record: writing one, the resume brief of the latest one, and the watchdog's verdict (W1-25).
 
-A checkpoint is ``docs/checkpoints/<ticket>/CP-<ticket>-<number>.md`` (DEC-320): a markdown record whose
-frontmatter conforms to the kernel checkpoint schema (DEC-279). The highest number is the latest. The brief and
-the watchdog read that one file and refuse it when a key, an input's version or an input's hash is missing.
+A deliberate checkpoint is ``docs/checkpoints/<ticket>/CP-<ticket>-<number>.md`` (DEC-320).  An automatic
+checkpoint is ``.gov-runtime/scratch/checkpoints/<ticket>/CP-<ticket>-<number>.md`` (DEC-444).  Both conform to
+the kernel checkpoint schema (DEC-279).  The readers take the newer of the two (by ``created``; the deliberate
+checkpoint wins on a tie).
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ from gov.cli.errors import GovError
 from gov.tasks.tickets import TICKETS_REL, frontmatter
 
 CHECKPOINTS_REL = "docs/checkpoints"
+SCRATCH_CHECKPOINTS_REL = ".gov-runtime/scratch/checkpoints"
 STALE, MISSING, INVALID = "CHECKPOINT_STALE", "CHECKPOINT_MISSING", "CHECKPOINT_INVALID"
 TICKET_ID = re.compile(r"[A-Za-z0-9]+-[a-z0-9]{4}")  # the kernel's ticket_id grammar (common.schema.json)
 NAME = re.compile(r"CP-.+-(\d+)\.md")
@@ -53,12 +55,32 @@ def _input(root: Path, named: str, ident: str | None = None) -> dict:
 
 def _numbered(folder: Path) -> list[tuple[int, Path]]:
     """The checkpoints of a ticket's folder, by number; the last is the latest."""
+    if not folder.is_dir():
+        return []
     return sorted((int(match.group(1)), path) for path in folder.glob("CP-*.md")
                   if (match := NAME.fullmatch(path.name)))
 
 
-def write(root: Path, ticket: str | None, trigger: str | None, next_action: str | None, inputs: list[str]) -> dict:
-    """Write a checkpoint of ``ticket``; everything is checked before anything is written."""
+def _parse_created(front: dict) -> datetime:
+    """The ``created`` field as a timezone-aware datetime; the epoch when unparseable."""
+    c = front.get("created")
+    if isinstance(c, datetime):
+        return c if c.tzinfo else c.replace(tzinfo=timezone.utc)
+    try:
+        dt = datetime.fromisoformat(str(c).replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    except (TypeError, ValueError):
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
+def write(root: Path, ticket: str | None, trigger: str | None, next_action: str | None, inputs: list[str],
+          *, dest: str = "deliberate") -> dict:
+    """Write a checkpoint of ``ticket``; everything is checked before anything is written.
+
+    ``dest`` is ``"deliberate"`` (the default: ``docs/checkpoints/``, committed) or ``"automatic"``
+    (``.gov-runtime/scratch/checkpoints/``, ignored).  Automatic records carry ``head_commit`` so that the
+    watchdog can measure commit distance without the file being committed.
+    """
     import yaml
 
     missing = [name for name, value in (("--ticket", ticket), ("--trigger", trigger), ("--next", next_action))
@@ -71,26 +93,49 @@ def write(root: Path, ticket: str | None, trigger: str | None, next_action: str 
                        {"trigger": trigger})
     status = _ticket_status(root, ticket)
     recorded = [_input(root, f"{TICKETS_REL}/{ticket}.md", ticket), *(_input(root, named) for named in inputs)]
-    folder = root / CHECKPOINTS_REL / ticket
-    ident = f"CP-{ticket}-{max((number for number, _ in _numbered(folder)), default=0) + 1:04d}"
+    base_rel = SCRATCH_CHECKPOINTS_REL if dest == "automatic" else CHECKPOINTS_REL
+    max_num = max((n for base in (CHECKPOINTS_REL, SCRATCH_CHECKPOINTS_REL)
+                   for n, _ in _numbered(root / base / ticket)), default=0)
+    ident = f"CP-{ticket}-{max_num + 1:04d}"
     front = {"id": ident, "type": "checkpoint", "status": "ACTIVE", "state_class": "NARRATIVE",
              "title": f"{ticket} at {trigger}", "task": ticket, "task_status": status, "trigger": trigger,
              "next_action": next_action, "created": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
              "inputs": recorded}
+    if dest == "automatic":
+        front["head_commit"] = _git(root, "rev-parse", "HEAD")
+    folder = root / base_rel / ticket
     folder.mkdir(parents=True, exist_ok=True)
     (folder / f"{ident}.md").write_text(
         "---\n" + yaml.safe_dump(front, sort_keys=False, allow_unicode=True) + "---\n\n"
         f"# {ident} — {ticket} at {trigger}\n\n## Next action\n\n{next_action}\n", encoding="utf-8")
-    return {"path": f"{CHECKPOINTS_REL}/{ticket}/{ident}.md", "id": ident}
+    return {"path": f"{base_rel}/{ticket}/{ident}.md", "id": ident}
 
 
 def _latest(root: Path, ticket: str) -> tuple[str, dict]:
-    """``(path, frontmatter)`` of the ticket's latest checkpoint; a GovError when there is none or it is incomplete."""
-    found = _numbered(root / CHECKPOINTS_REL / ticket) if TICKET_ID.fullmatch(ticket) else []
-    if not found:
+    """``(path, frontmatter)`` of the ticket's latest checkpoint across both locations (DEC-444).
+
+    Picks the newer by ``created``; the deliberate checkpoint wins on a tie.
+    """
+    if not TICKET_ID.fullmatch(ticket):
         raise GovError(MISSING, f"{ticket} has no checkpoint", {"ticket": ticket}, exit_code=EXIT_UNHEALTHY)
-    rel = f"{CHECKPOINTS_REL}/{ticket}/{found[-1][1].name}"
-    front = frontmatter(found[-1][1]) or {}
+    candidates = []
+    for base_rel in (CHECKPOINTS_REL, SCRATCH_CHECKPOINTS_REL):
+        found = _numbered(root / base_rel / ticket)
+        if found:
+            path = found[-1][1]
+            rel = f"{base_rel}/{ticket}/{path.name}"
+            front = frontmatter(path) or {}
+            candidates.append((rel, front))
+    if not candidates:
+        raise GovError(MISSING, f"{ticket} has no checkpoint", {"ticket": ticket}, exit_code=EXIT_UNHEALTHY)
+    if len(candidates) == 1:
+        rel, front = candidates[0]
+    else:
+        # Deliberate is candidates[0]; scratch is candidates[1].  Scratch wins only when strictly newer.
+        if _parse_created(candidates[1][1]) > _parse_created(candidates[0][1]):
+            rel, front = candidates[1]
+        else:
+            rel, front = candidates[0]
     faults = [key for key in ("next_action", "created") if not str(front.get(key) or "").strip()]
     inputs = front.get("inputs")
     if front.get("task") != ticket:
@@ -114,7 +159,14 @@ def brief(root: Path, ticket: str) -> dict:
 
 def briefs(root: Path) -> list[dict]:
     """The brief of every ticket that has a checkpoint: the fresh-agent-reconstruction family check."""
-    return [brief(root, folder.name) for folder in sorted((root / CHECKPOINTS_REL).glob("*")) if _numbered(folder)]
+    tickets = set()
+    for base_rel in (CHECKPOINTS_REL, SCRATCH_CHECKPOINTS_REL):
+        base = root / base_rel
+        if base.is_dir():
+            for folder in base.iterdir():
+                if folder.is_dir() and _numbered(folder):
+                    tickets.add(folder.name)
+    return [brief(root, t) for t in sorted(tickets)]
 
 
 def watch(root: Path, ticket: str | None, max_age_minutes: float, max_commits: int, max_context: float,
@@ -131,7 +183,12 @@ def watch(root: Path, ticket: str | None, max_age_minutes: float, max_commits: i
     if created.tzinfo is None:
         created = created.replace(tzinfo=timezone.utc)
     age = (datetime.now(timezone.utc) - created).total_seconds() / 60
-    carrier = _git(root, "log", "-1", "--format=%H", "--diff-filter=A", "--", rel)  # empty: not committed yet
+    # DEC-444: an automatic record is never committed, so git log --diff-filter=A finds nothing and would give
+    # commits=0, making a stale checkpoint look fresh.  Use the stored head_commit instead.
+    if rel.startswith(SCRATCH_CHECKPOINTS_REL + "/"):
+        carrier = str(front.get("head_commit") or "")
+    else:
+        carrier = _git(root, "log", "-1", "--format=%H", "--diff-filter=A", "--", rel)  # empty: not committed yet
     commits = int(_git(root, "rev-list", "--count", f"{carrier}..HEAD")) if carrier else 0
     judged = (("age", age > max_age_minutes), ("commits", commits > max_commits),
               ("context", context_utilisation is not None and context_utilisation > max_context),

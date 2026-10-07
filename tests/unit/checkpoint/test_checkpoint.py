@@ -61,3 +61,92 @@ def test_a_checkpoint_without_the_recorded_ticket_status_is_stale(project):
     with pytest.raises(GovError) as raised:
         record.watch(project, TICKET, 240, 20, 0.30, None)
     assert raised.value.exit_code == 3 and raised.value.details["reasons"] == ["ticket-transition"]
+
+
+# --- DEC-444: automatic checkpoints to the scratch folder ---
+
+
+def test_write_automatic_checkpoint_goes_to_scratch(project):
+    """dest='automatic' writes under .gov-runtime/scratch/checkpoints/ (DEC-444)."""
+    written = record.write(project, TICKET, "stop", "auto next", [], dest="automatic")
+    assert written["path"].startswith(record.SCRATCH_CHECKPOINTS_REL)
+    assert (project / written["path"]).is_file()
+    assert not (project / record.CHECKPOINTS_REL / TICKET).exists()
+
+
+def test_write_deliberate_is_the_default(project):
+    """dest='deliberate' (the default) writes under docs/checkpoints/ (DEC-444)."""
+    written = record.write(project, TICKET, "stop", "next", [])
+    assert written["path"].startswith(record.CHECKPOINTS_REL)
+    assert not (project / record.SCRATCH_CHECKPOINTS_REL / TICKET).exists()
+
+
+def test_ids_unique_across_both_locations(project):
+    """The next number considers checkpoints in both places (DEC-444)."""
+    d = record.write(project, TICKET, "stop", "d1", [])
+    a = record.write(project, TICKET, "stop", "a1", [], dest="automatic")
+    assert d["id"] != a["id"]
+    assert d["id"].endswith("-0001")
+    assert a["id"].endswith("-0002")
+
+
+def test_readers_pick_newer_automatic_over_older_deliberate(project):
+    """The readers pick the newer checkpoint by created time (DEC-444)."""
+    import time, yaml
+    record.write(project, TICKET, "stop", "old deliberate", [])
+    time.sleep(1.1)
+    record.write(project, TICKET, "stop", "new automatic", [], dest="automatic")
+    b = record.brief(project, TICKET)
+    assert b["next_action"] == "new automatic"
+    assert b["path"].startswith(record.SCRATCH_CHECKPOINTS_REL)
+
+
+def test_readers_pick_newer_deliberate_over_older_automatic(project):
+    """The readers pick the newer checkpoint by created time (DEC-444)."""
+    import time
+    record.write(project, TICKET, "stop", "old automatic", [], dest="automatic")
+    time.sleep(1.1)
+    record.write(project, TICKET, "stop", "new deliberate", [])
+    b = record.brief(project, TICKET)
+    assert b["next_action"] == "new deliberate"
+    assert b["path"].startswith(record.CHECKPOINTS_REL)
+
+
+def test_automatic_record_carries_head_commit(project):
+    """Automatic records carry head_commit for the watchdog (DEC-444)."""
+    import yaml
+    written = record.write(project, TICKET, "stop", "auto", [], dest="automatic")
+    text = (project / written["path"]).read_text(encoding="utf-8")
+    front = yaml.safe_load(text.split("---", 2)[1])
+    assert "head_commit" in front
+    head = subprocess.run(["git", "-C", str(project), "rev-parse", "HEAD"],
+                          capture_output=True, text=True, check=True).stdout.strip()
+    assert front["head_commit"] == head
+
+
+def test_deliberate_record_has_no_head_commit(project):
+    """Deliberate records do not carry head_commit (DEC-444)."""
+    import yaml
+    written = record.write(project, TICKET, "stop", "delib", [])
+    text = (project / written["path"]).read_text(encoding="utf-8")
+    front = yaml.safe_load(text.split("---", 2)[1])
+    assert "head_commit" not in front
+
+
+def test_watchdog_counts_commits_for_automatic_record(project):
+    """An automatic record's commit distance uses head_commit, not assumed zero (DEC-444)."""
+    record.write(project, TICKET, "stop", "auto", [], dest="automatic")
+    (project / "extra.txt").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "-C", str(project), "add", "-A"], check=True, capture_output=True)
+    subprocess.run(["git", "-C", str(project), "-c", "user.name=t", "-c", "user.email=t@example.invalid",
+                     "commit", "-q", "-m", "extra"], check=True, capture_output=True)
+    result = record.watch(project, TICKET, 240, 99999, 0.30, None)
+    assert result["commits"] >= 1
+
+
+def test_briefs_includes_scratch_only_ticket(project):
+    """briefs() lists tickets that have checkpoints only in the scratch folder (DEC-444)."""
+    record.write(project, TICKET, "stop", "auto", [], dest="automatic")
+    bs = record.briefs(project)
+    assert any(b["ticket"] == TICKET for b in bs)
+    assert any(b["path"].startswith(record.SCRATCH_CHECKPOINTS_REL) for b in bs)

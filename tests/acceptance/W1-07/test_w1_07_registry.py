@@ -38,8 +38,12 @@ def test_help_names_every_reserved_command(gov):
 
 
 @pytest.mark.parametrize("name", support.RESERVED_COMMANDS)
-def test_each_wave_1_operation_is_a_gov_command(gov, interface, name):
+def test_each_wave_1_operation_is_a_gov_command(request, interface, name):
     """The name is known: no usage error, and the envelope names the command."""
+    # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+    # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+    # case time out.
+    gov = request.getfixturevalue("small_gov" if name in support.TREE_SENSITIVE_COMMANDS else "gov")
     run = gov(*support.invocation(name), "--json")
     assert run.returncode != 2, f"gov {name} is a usage error: the command is not reserved\n{run.describe()}"
     support.assert_envelope(run, interface, command=name)

@@ -42,6 +42,12 @@ def interface(live):
     return support.load_interface(live)
 
 
+@pytest.fixture(scope="session")
+def small_live(tmp_path_factory):
+    """A committed project with only a few tracked files. For commands whose work grows with tree size (DEC-440)."""
+    return support.copy_minimal_project(tmp_path_factory.mktemp("w1-07-small") / "repo")
+
+
 @pytest.fixture()
 def sandbox(tmp_path):
     """HOME, TMPDIR, the launcher's directory, the bytecode cache and an unrelated directory, outside the project."""
@@ -62,5 +68,23 @@ def gov(project, sandbox):
 
     def _gov(*args, cwd=None):
         return support.run_gov(project, sandbox, *args, cwd=cwd)
+
+    return _gov
+
+
+@pytest.fixture()
+def small_project(small_live, tmp_path):
+    """This test's own copy of the small project (DEC-440)."""
+    target = tmp_path / "small-repo"
+    shutil.copytree(small_live, target, symlinks=True)
+    return target
+
+
+@pytest.fixture()
+def small_gov(small_project, cli, sandbox):
+    """``gov(*args)`` on a project with only a few tracked files, using the full copy's code (DEC-440)."""
+
+    def _gov(*args, cwd=None):
+        return support.run_gov_with_code(cli, small_project, sandbox, *args, cwd=cwd)
 
     return _gov

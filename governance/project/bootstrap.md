@@ -1497,3 +1497,161 @@ settings key `autocompact`. The orchestrator's CONTEXT_CHECKPOINT stop is droppe
 that block are answered by DEC-442 (Stop and SubagentStop are registered at the Wave 1 exit run), DEC-444
 (the hooks' automatic checkpoints go to `.gov-runtime/scratch/checkpoints/`: W1-29 follow-up) and DEC-445 (the
 utilisation-triggered checkpoint is an accepted residual).
+
+## W1-35 residuals (the four method skills: discovery, planning, test design, change, 2026-10-07)
+
+- **Built:** four skill files under `template/governance/kernel/skills/` (discovery, planning, test-design,
+  change), each with a versioned frontmatter, within the size limits, citing the decision or capability it
+  follows and granting nothing; and the check declaration `skill-regression-a`, which runs W1-26's generic
+  skill validator over the four folders.
+- **The suite tests the text of the skills, not sessions that follow them.** These KPI clauses are measured
+  only by a live session and go to the Wave 1 exit run (W1-42): "0 of the decision packages discovery asks
+  are answerable from files its retrieval bundle cites" on the MR-A-02 and MR-B-02 dev scenarios; "its
+  transcript reads no file outside them" for test design; "planning emits schema-valid tickets and one linked
+  gap ticket per required open readiness row"; the change skill's refusal to archive a kernel change that
+  lacks a record; the impact assessment run from a plain-language question. Until then they are unmeasured,
+  not met.
+- **The declaration's command names paths under `template/…`,** which an installed project does not have (its
+  skills are under `governance/kernel/…`). True of every declared check today: for the adoption tickets
+  (W1-39, W1-41).
+- **The first return declared the check with the command `true`,** because the validator did not exist yet
+  (DEC-439 reopened W1-26 for it). The second return runs the real validator.
+- **W1-26's fixture was revised for this ticket:** a project built by W1-26's suite now holds the kernel's
+  skill folders, copied generically, since a check that finds no skill is unmeasured and red (DEC-425). No
+  assertion was changed.
+- **This suite and W1-36's cannot be collected in one pytest run:** both import their fixtures from a module
+  named `conftest` by its bare name, and the second import finds the first. Each passes alone, which is how the
+  regression runs them. For the exit run.
+- **Records:** the merge-back `84bf8d12` was made with git's `ours` preference after the plain merge
+  conflicted on W1-26's README (the branch's file had been aligned to the integration branch's version plus
+  its own lines); the containment check flagged that merge for its own change to that README, and an earlier
+  merge `91568f75` for the shared W1-07 support file. Both are byte-level outcomes of aligned files.
+- **Learning metrics:** two lead starts, plus two short test-designer turns started by the orchestrator (the
+  fixture, the alignment); 112 cases; no reviewer round (STANDARD, self-review); about 200 lines of skill text
+  and a 5-line declaration.
+- **Regression at `ab1fa23c`:** every suite green, no latency occurrence.
+
+## W1-36 residuals (the skills retrieval, audit, checkpoint and adopt, and their checks, 2026-10-07)
+
+- **Built:** four skill files under `template/governance/kernel/skills/` (retrieval, audit, checkpoint, adopt),
+  versioned and within the size limits; the declaration `skill-regression-b1` (W1-26's skill validator over
+  the four folders); the declaration `audit-reproducibility` (W1-26's audit validator over `docs/audit/`,
+  tier G1, hard block). The audit skill (v1.1.0) describes the report form of DEC-441.
+- **"Not applicable until the first audit" (DEC-447):** the audit declaration carries
+  `allows-not-applicable: "true"`. With no report under `docs/audit/` the family is YELLOW with that reason;
+  with a valid report GREEN; with an invalid one RED, a hard block.
+- **The suite tests the text of the skills and the checks on constructed reports, not sessions.** Measured only
+  at the Wave 1 exit (W1-42, W1-43): retrieval runs its facets in disposable subagents and only the validated
+  bundle returns ("intermediate retrieval batches appear in the main context" is a failure line); the audit
+  reports the planted divergence on the MR-A-06 and MR-B-06 dev scenarios; the audit starts a fresh session
+  whose only inputs are the context pack and the repository, and edits no audited file; contested and
+  owner-level findings appear as decision packages; a wave-exit report has one row per LITE feature
+  specification closed in the wave. Until then they are unmeasured, not met.
+- **The vendored superpowers skills carry no `version`,** so the skill-regression declaration names the four
+  folders instead of the whole skills folder, and those three skills are not validated. Open: add a version to
+  the vendored copies (they are committed unchanged, DEC-194) or leave them outside the check.
+- **Declared commands name paths under `template/…`,** which an installed project does not have: for the
+  adoption tickets (W1-39, W1-41).
+- **W1-26's suite was revised for this ticket:** five cases remove the kernel's own audit declaration from
+  their temporary project, because a second check of the same family (over another folder) made their family
+  status ambiguous; the fixture's skill copy was aligned to the integration branch's. No assertion was changed.
+- **Records:** the merge-back `15ac9b54` was flagged by the containment check for the shared W1-26 support
+  file (aligned to the integration branch's version before the merge, DEC-412).
+- **Learning metrics:** two lead starts (the first declared its checks with commands that exited 0 whatever
+  they found), then four short worker turns started by the orchestrator (alignment, DEC-447 cases, the field,
+  the W1-26 life-cycle case); 84 cases; no reviewer round (STANDARD); about 165 lines of skill text and two
+  declarations.
+- **Regression at `087a166a`:** every suite green, no latency occurrence.
+
+## W1-50 follow-up residuals (a public judgement of commits, DEC-453, 2026-10-07)
+
+- **Built:** `gov.guard.containment.judge_commits(root, commit_ids)` returns one finding (commit, paths,
+  reason) per commit that the post-command check would flag in an orchestrator's own call; it calls the same
+  per-commit judgement and the same reading of commits and merges (the parsing loop was split out so both use
+  it; the 642 earlier cases are unchanged and green). It only reads. An empty list, an unknown id, a path that
+  is not a repository and a git failure raise `ContainmentError`.
+- **For `gov close` (W1-30):** it is called with the ticket's commits; any finding refuses the close. W1-30's
+  private rule set is removed in that ticket.
+- **It judges as the orchestrator's own call does** (each commit by its own `Role` and `Task` trailers); it has
+  no caller's role or ticket to judge against. A commit naming a closed ticket is judged against that
+  ticket's close commit, as in the check.
+- **Learning metrics:** one designer turn and one engineer turn started by the orchestrator; 24 cases added;
+  107 lines added and 19 removed in the module, 237 lines of unit tests.
+- **Regression at `3d715a35`:** every suite green except W1-46's 23 live-session cases, which errored while
+  three other test runs were going (DEC-372); W1-46 alone: 493 passed.
+
+## W1-29 and W1-25 follow-up residuals (automatic checkpoints in the ignored scratch folder, DEC-444, 2026-10-07)
+
+- **Built:** PreCompact and Stop write their checkpoint record under
+  `.gov-runtime/scratch/checkpoints/(ticket)/`; a deliberate `gov checkpoint` still writes under
+  `docs/checkpoints/(ticket)/`. `gov.checkpoint.record.write` takes `dest="automatic"` or `"deliberate"` (the
+  default). Record numbers are unique per ticket across both places. `brief`, `briefs` and `watch` read the
+  newer of the two by creation time (on a tie the deliberate one) and return its path. W1-25 was reopened for
+  its module's part.
+- **An automatic record carries `head_commit`,** the HEAD when it was written, and the watchdog counts commits
+  from it (an ignored file is never committed, so the earlier count from "the commit that added the record"
+  would always be zero). A record in the scratch folder **without** that field counts zero commits: the
+  product's writer always sets it, so only a hand-placed record can lack it.
+- **Automatic records written before this change stay under `docs/checkpoints/`** in the trees where hooks ran
+  (untracked); nothing moves them. In this repository and its worktrees they are the orchestrator's to remove.
+- **An installed project must ignore `.gov-runtime/`** for the tree to stay clean after a hook: for the
+  adoption tickets (W1-39, W1-41).
+- **Records:** the designer's commit `3f09f660` names "Claude Opus 4.6" as co-author.
+- **Learning metrics:** one designer turn and two engineer turns started by the orchestrator; 12 cases added
+  and 6 revised (owner decision); about 95 lines of source.
+- **Regression at `b89ba5ce`:** every suite green except one W1-16 case (`test_this_repository_is_not_indexed_by_the_run`), which saw a snapshot file the guard wrote for the orchestrator's own command during the run; W1-16 alone afterwards: 166 passed.
+
+## W1-27 residuals (gov doctor and gov rebuild, 2026-10-07)
+
+- **Built:** `gov doctor [--json]`, a read command with eleven sections (tools, hooks, path map, path
+  compliance, index freshness, canaries, framework lock, isolation, Claude Code, held-out file, adoption
+  level); exit 3 when unhealthy. `gov rebuild` recreates the derived stores through the code that owns each
+  (the record store, the lexical index with its secrets filter, the semantic index and the code index when
+  their tool answers) and names each outcome; it returns `digest`, `store` and `stores`. The check
+  `gov.rebuild.check` is the recovery/rebuild family check. `gov` validates the path map against W1-08's
+  schema; W1-07's provisional cases were revised in this ticket's test design (DEC-228).
+- **Rules decided on the way (DEC-440, DEC-448, DEC-452):** an error in a measurement is a failure and an
+  absent component is "unmeasured", never the top adoption level; doctor looks for a tool under its own
+  registry entry's PATH prefix, then under every prefix the registry carries, then on PATH; a tool passes only
+  by a version read and equal to the pin or, where no version can be read, by a hash computed and equal to the
+  pin; historical records (the register, CIT records, this file, archived sources) are left out of the
+  stale-path check, and the section says how many files it left out.
+- **KPI line 6 against DEC-210:** the extension newer than the CLI, both above the minimum, is reported as
+  drift and makes doctor exit 3. The owner called this drift harmless (DEC-448); it is re-recorded at the
+  Wave 1 exit.
+- **Doctor knows six registry entries by name** (`pyyaml`, `superpowers`, `sqlite-vec`, `qwen3-embedding`,
+  `reranker-venv`, `reranker`): where each is and what its registered hash is the hash of is written in the
+  code, not in the registry. A generic kernel command that knows this repository's tools: the registry needs
+  a field for "what the hash is of and where", for the adoption tickets. It computes the vendored folder's
+  digest with its own function.
+- **A registry entry's PATH prefix is read out of its install command** (`PATH=…:$PATH`); the registry has no
+  field for a tool's location. Node's own entry carries none and is found through the prefix of other
+  entries.
+- **`reranker-venv` passes by the versions in its package metadata,** not by its registered hash (the hash is
+  of a package listing made with a tool; `sha256_match` is false for it). The local version suffix of torch
+  (`+cu130`) is not compared. `pyyaml`, `ccusage`, `bubblewrap` and `socat` pass by version only: their
+  registered hashes are of packages that are not on the machine.
+- **Doctor takes about 7.5 s here:** it hashes the embedding model (610 MB) and the reranker model (1.14 GB)
+  on every run.
+- **Rebuild takes about 157 s on a project of about 955 tracked files** (the secrets filter runs on every
+  file), 2.5 s on three files. The suite's rebuild cases run on a small project, and five of W1-07's cases
+  that ran every command on a copy of this tree were revised to run rebuild on a two-file project.
+- **Rebuild without a path map returns its envelope** with the lexical index named as not recreated and the
+  reason; an owner of a store that raises gives the error `REBUILD_FAILED` with the store and the text. An
+  optional index (semantic, code) whose tool errors is named `not_recreated` with the reason and exit 0.
+- **The recovery check with no store exits 1** ("unmeasured"), so the recovery/rebuild family is not green in
+  a project that was never loaded.
+- **Earlier defects found by reading the code against the KPI clauses, each fixed test-first:** rebuild wrote
+  the lexical index itself, past the secrets filter, and into another module's tables; a false reason "no code
+  index module exists"; a tools case that asserted a key name; `socat` passing with no version read and no
+  hash match; six entries reported as "hash matched" because a folder existed; three "healthy project" cases
+  that depended on this machine's home; rebuild ending in a traceback on a project with no path map; three
+  cases that imported the package into the test process and passed only where PYTHONPATH was set.
+- **Records:** commit `2e6ec15b` (engineer) names "Claude Opus 4.6" as co-author. Temporary folders
+  `/tmp/gov-launch-engineer-en6s9b8e` and `/tmp/gov-launch-engineer-4mcz3fb1` were left by launches. The
+  containment check flagged `94bc7635` (a merge-back's own change to W1-07's support file).
+- **Learning metrics:** three lead starts, then five designer-and-engineer rounds started by the orchestrator
+  (rounds 4 to 10); two review rounds (the limit); 117 cases, of which about 30 were revised after
+  implementation began and about 50 added after it; 943 lines of source against an estimate of 230. Every
+  section of doctor maps to a KPI clause; the estimate was wrong, not the scope.
+- **Regression at `8388138c`:** every suite green except two W1-28 cases: W1-28's check of fixtures that copy from the repository found the new helper of W1-07's suite and could not exercise it. The designer rebuilt the helper without a copy (merge `53fd4293`); W1-28 (149 passed) and W1-07 (219 passed) were then run alone on that state; the full regression was not repeated for this one test-support file.
