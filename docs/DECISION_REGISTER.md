@@ -5378,3 +5378,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.127 | 2026-10-07 | One delegated decision on W1-30: DEC-490 (which task-less commits refuse; judgement words; a refusal's own repair ticket does not dirty the tree; exit codes for "could not measure"). Next free id: DEC-491. |
+
+## 128. One delegated decision on W1-31: session attribution, the sandbox figure, the learning metrics' sources (register v0.128, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-491 — W1-31: the caller names a ticket's sessions; the sandbox's added tokens are measured once at the exit run; rewrites are read from designer commits and disputes from a record the orchestrator writes
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-2, P-5, P-6 and P-7 (`log/W1-31-lead-run1.json`), each with its recommendation. Its P-3 (cache creation in the denominator) and P-4 (how five of the seven governance sources are counted) define the figure the Wave 1 exit is judged by, and its P-1 (the call from `gov close`) depends on them: these are with the owner and are not decided here.
+- **Decision:**
+  - **Attribution.** The caller names the sessions of a ticket (as built). A launch record per session, from which attribution would be automatic, stays on the Wave 2 list (DEC-470).
+  - **The sandbox's added system-prompt tokens (DEC-170)** are measured once, by a paired run in W1-42's exit run (the same prompt in a launched and in a plain session), recorded with its date and the Claude Code version; the counter reports that recorded figure per launched session as its separate line, and "not measured" until the record exists.
+  - **Acceptance tests rewritten after implementation began** are read from the test designer's commits after the ticket's first engineer commit; the reason for each is a trailer `Rewrite-Reason:` on that commit, and a rewrite without one is reported as "reason not recorded", never left out. From this entry on, every designer brief for a ticket that already has an engineer commit asks for the trailer.
+  - **KPI disputes** are read from a per-ticket record the orchestrator writes at the merge (one line per dispute with the decision that settled it); without the record the figure is "not measured".
+  - **Smaller points.** A ticket without a profile is "not measured" for the per-profile report (the counter does not assume STANDARD). The aggregate by profile across tickets is W1-42's. A ticket whose record folders were read and hold nothing counts 0 for them; a folder that is absent is "not measured". The close record's own tokens are counted by a re-measure after the close. A session's model is reported from both places, each named: the session log's and the commits' co-author lines.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.128 | 2026-10-07 | One delegated decision on W1-31: DEC-491 (sessions named by the caller; the sandbox figure measured once in W1-42; rewrites from designer commits with a `Rewrite-Reason:` trailer; disputes from an orchestrator record; smaller points). Next free id: DEC-492. |
