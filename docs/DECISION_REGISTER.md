@@ -5251,3 +5251,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.121 | 2026-10-07 | One delegated decision on W1-26: DEC-479 (the register file and the base commit are two optional keys of the project's path map). Next free id: DEC-480. |
+
+## 122. One delegated decision on W1-30: `gov close` refuses on what `gov check` blocks on (register v0.122, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-480 — For a governance-changing ticket, `gov close` refuses on exactly the checks `gov check` reports red at hard-block; it holds no rule of its own about checks
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status.
+- **Decision:**
+  - When a ticket's commits change a governance file, `gov close` runs the checks at the commit being closed through W1-26's runner and refuses when the runner reports any hard-block check red, naming each. That is the same condition on which `gov check` blocks a merge.
+  - A check of severity warning refuses nothing, whether it ran and failed or could not run: the runner gives both the same status, and `gov close` does not read more into it. The designer's case that expected a refusal for a warning check whose command is absent is reversed.
+  - A hard-block check that cannot run (its command absent, over its time limit) refuses when the runner reports it red, as the runner does today. The time limit of a check is the runner's own; `gov close` adds none, and its `--timeout` stays the limit of its test runs.
+  - A hard-block check the runner reports yellow (not applicable, or a built-in check whose tool is absent) refuses nothing. Whether the runner should report an absent tool of a hard-block check as red is a question for W1-26, listed for the Wave 2 list of DEC-466.
+  - A ticket without acceptance tests is a finding about the ticket's work: exit code 3, counted, a repair ticket (the designer's reading of DEC-455, accepted).
+  - Recorded before the change (DEC-463): the designer's adjusted cases and the engineer's code follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.122 | 2026-10-07 | One delegated decision on W1-30: DEC-480 (`gov close` refuses on exactly the checks the runner reports red at hard-block; warning checks refuse nothing; the time limit of a check is the runner's; a ticket without acceptance tests is a counted finding). Next free id: DEC-481. |
