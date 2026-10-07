@@ -252,6 +252,9 @@ class Project:
         schemas_dst = self.root / "template" / "governance" / "kernel" / "schemas"
         if schemas_src.is_dir():
             shutil.copytree(schemas_src, schemas_dst, dirs_exist_ok=True)
+        # revised after implementation: W1-35's skill-regression check runs the
+        # generic validator over the kernel's skills, so a project built from the
+        # template holds them (DEC-439)
         skills_src = REPO_ROOT / "template" / "governance" / "kernel" / "skills"
         skills_dst = self.root / "template" / "governance" / "kernel" / "skills"
         if skills_src.is_dir():
