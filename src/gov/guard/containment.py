@@ -19,6 +19,7 @@ import os
 import re
 import subprocess
 import time
+from typing import NamedTuple
 
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
 RECORDS_REL = ".gov-runtime/records.jsonl"
@@ -61,6 +62,11 @@ class _NotARepo(Exception):
 
 class _GitError(Exception):
     pass
+
+
+class ContainmentError(Exception):
+    """Raised by ``judge_commits`` for an empty list of commits, an unknown
+    commit id, a path that is not a repository, or a git failure."""
 
 
 # Every git call reads the real objects of the repository at its root,
@@ -774,6 +780,30 @@ def _role_and_task(block: str) -> list:
             for key, ls in found]
 
 
+def _parse_log_output(out: str) -> list:
+    """Parse NUL-separated ``git log`` output produced with
+    ``_LOG_FORMAT`` and ``--raw`` into ``[id, parents, roles, tasks,
+    paths]`` lists.  Shared by ``_move_commits`` and
+    ``_read_one_commit``."""
+    commits: list = []
+    tokens = iter(out.split("\0"))
+    for tok in tokens:
+        if tok.lstrip("\n").startswith(":"):
+            path = next(tokens, "")
+            if not commits or not path:
+                raise _GitError("the commits cannot be read")
+            commits[-1][4].append(path)
+        elif _COMMIT_IDS.fullmatch(tok):
+            ids = tok.split()
+            commits.append([ids[0], ids[1:], set(), set(), []])
+            for key, value in _role_and_task(next(tokens, "")):
+                if value:
+                    commits[-1][2 if key == "role" else 3].add(value)
+        elif tok.strip("\n"):
+            raise _GitError("the commits cannot be read")
+    return commits
+
+
 def _move_commits(root: str, old: str, new: str) -> list:
     """The commits of ``old..new``, newest first, each as
     ``(id, parents, Role values, Task values, paths)``.
@@ -800,32 +830,27 @@ def _move_commits(root: str, old: str, new: str) -> list:
         MAX_MOVE_PROCESSES, processes, read_merge)
     out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
                _LOG_FORMAT, f"{old}..{new}")
-    unreadable = _GitError("the commits of the HEAD move cannot be read")
-    commits: list = []
-    tokens = iter(out.split("\0"))
-    for tok in tokens:
-        if tok.lstrip("\n").startswith(":"):
-            path = next(tokens, "")
-            if not commits or not path:
-                raise unreadable
-            commits[-1][4].append(path)
-        elif _COMMIT_IDS.fullmatch(tok):
-            ids = tok.split()
-            commits.append((ids[0], ids[1:], set(), set(), []))
-            for key, value in _role_and_task(next(tokens, "")):
-                if value:
-                    commits[-1][2 if key == "role" else 3].add(value)
-        elif tok.strip("\n"):
-            raise unreadable
+    commits = _parse_log_output(out)
     if not commits:
-        raise unreadable
+        raise _GitError("the commits of the HEAD move cannot be read")
     merges = [c for c in commits if len(c[1]) > 1]
     if sum(processes(len(set(c[1]))) for c in merges) > MAX_MOVE_PROCESSES:
-        # Stopped at its time limit the check would judge nothing.
         raise _GitError("the HEAD move has too many merge commits to read")
     for c in merges:
         c[4][:] = read_merge(root, c[0]).own
     return [(c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]) for c in commits]
+
+
+def _read_one_commit(root: str, commit_id: str):
+    """Read one commit's parents, trailers and paths, the same way
+    ``_move_commits`` reads the commits of a range."""
+    out = _git(root, *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev",
+               _LOG_FORMAT, "--no-walk", commit_id)
+    commits = _parse_log_output(out)
+    if len(commits) != 1:
+        raise _GitError(f"commit {commit_id} not found")
+    c = commits[0]
+    return (c[0], c[1], sorted(c[2]), sorted(c[3]), c[4])
 
 
 def _ticket_at(root: str, rev: str, ticket_file: str):
@@ -1342,3 +1367,66 @@ def check_containment(
 
     return _format_report(all_flagged, all_reverted, all_failed,
                           " ".join(filter(None, (flag_msg, head_msg))))
+
+
+# ---- public read-only judgement (DEC-453) ----------------------------
+
+class _CommitFinding(NamedTuple):
+    commit: str
+    paths: list
+    reason: str
+
+
+def judge_commits(root: str, commit_ids: list) -> list:
+    """Judge each commit by its trailers exactly as the post-command check
+    judges the commits of an orchestrator session's own call, and return
+    the findings.
+
+    Read-only: nothing is restored, no finding record is written, nothing
+    is created or changed under ``.gov-runtime/``, and HEAD, the index
+    and the working tree are unchanged.
+
+    Raises ``ContainmentError`` for an empty list, an unknown commit id,
+    a path that is not a repository, or a git failure.
+    """
+    from gov.guard.containment_merge import MergeReadError, read_merge
+    from gov.guard.decide import decide
+
+    if not commit_ids:
+        raise ContainmentError("nothing to judge")
+
+    try:
+        head = _git(root, "rev-parse", "HEAD").strip()
+    except _NotARepo as e:
+        raise ContainmentError(str(e)) from e
+    except _GitError as e:
+        raise ContainmentError(str(e)) from e
+
+    findings: list = []
+    closes: dict = {}
+
+    for cid in commit_ids:
+        try:
+            commit = _read_one_commit(root, cid)
+        except (_GitError, _NotARepo) as e:
+            raise ContainmentError(str(e)) from e
+
+        if len(commit[1]) > 1:
+            try:
+                commit = (commit[0], commit[1], commit[2], commit[3],
+                          list(read_merge(root, commit[0]).own))
+            except MergeReadError as e:
+                raise ContainmentError(str(e)) from e
+
+        res = _judge_commit(
+            root, commit,
+            role="orchestrator", tid=None, sub=None,
+            orch_own=True, head=head,
+            decide_fn=decide, closes=closes,
+        )
+        if res is not None:
+            paths, reason = res
+            findings.append(_CommitFinding(
+                commit=cid, paths=paths, reason=reason))
+
+    return findings
