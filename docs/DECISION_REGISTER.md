@@ -5267,3 +5267,42 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.122 | 2026-10-07 | One delegated decision on W1-30: DEC-480 (`gov close` refuses on exactly the checks the runner reports red at hard-block; warning checks refuse nothing; the time limit of a check is the runner's; a ticket without acceptance tests is a counted finding). Next free id: DEC-481. |
+
+## 123. Owner answers: the two new baseline checks, the trailers base, `gov close` in use (register v0.123, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-481 — `adapter-portability` joins the `gov check` baseline with its 43 findings; W1-38 merges and closes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-4. W1-38's check compares this repository's hand-kept `.claude/`, `CLAUDE.md` and `AGENTS.md` with freshly generated output; they differ until the owner applies the generated output at the exit (`log/check-at-W1-38-premerge.json`).
+- **Decision:**
+  - `adapter-portability` joins the baseline of DEC-467, with its 43 findings as the recorded state. A new finding in it blocks a merge, as for the other baseline checks (DEC-472).
+  - It clears at the exit, when the owner applies the generated output.
+  - The check running `rulesync generate` into its own empty temporary folder, writing nothing in the project, is within the owner's rule that nobody runs a writing rulesync command in this repository.
+  - W1-38 is merged and closed.
+
+### DEC-482 — `product-traceability-trailers` joins the baseline with its 735 findings; a project may record a trailers base commit
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-5 (`log/check-at-W1-30-premerge.json`): 408 commits of closed tickets without an `Implements:` trailer, made before DEC-476, and 327 `Implements:` ids that resolve to no record here before adoption.
+- **Decision:**
+  - `product-traceability-trailers` joins the baseline of DEC-467, with its 735 findings as the recorded state. A new finding in it blocks a merge.
+  - The check gets the same base-commit setting as the citations check (DEC-474, DEC-479): a project may record a trailers base, and only commits after it are judged; with none, the whole history. Here the base is the commit that recorded DEC-476, `429815b5`. That removes the 408 commits made before the rule.
+  - The unresolved ids are cleared by W1-41's adoption.
+  - The base setting is built in W1-41 or in a short follow-up the orchestrator chooses.
+  - W1-30 is merged and closed, through `gov close` itself under DEC-476.
+
+### DEC-483 — The owner-decision lookup of `gov close` reading decision files only is a residual for W1-41's adoption
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-30's escalation path reads the owner's decision from decision files, not from a register file such as this repository's.
+- **Decision:** It is recorded as a residual of W1-30 and handed to W1-41's adoption; it does not hold W1-30's merge.
+
+### DEC-484 — The run time of `gov close` here is accepted; it runs in the main tree while the next tickets are worked in their worktrees
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** `gov close` runs the project's tests; on this repository that is about an hour per ticket.
+- **Decision:** The run time is accepted. `gov close` runs in the main tree while the next tickets' sessions work in their worktrees, within the resource gate. (This replaces the orchestrator's own precaution of running it with nothing else running.)
+
+### DEC-485 — DEC-479 and DEC-480 are accepted; three residuals of the citations check go on the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the two delegated decisions told to the owner; W1-26's follow-up residuals.
+- **Decision:** DEC-479 and DEC-480 stand as written. On the Wave 2 list (DEC-466): moving the base takes earlier commits out of judgement unreported; any Markdown file with a decision id in its frontmatter counts as its record; a register heading alone is enough for an entry.
+
+### DEC-486 — The orchestrator's closed count is reconciled: 41 of 50 closed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator reported 45 of 50 closed while nine tickets were open. The ticket files give 41 closed, 2 in progress, 7 open; the orchestrator had counted closed follow-ups of already closed tickets.
+- **Decision:** Reports state the count from the ticket files and list the open tickets by id. At this entry: in progress W1-30 (`DAEO-2lwj`), W1-38 (`DAEO-3ef2`); open W1-31 (`DAEO-6mk8`), W1-32 (`DAEO-8goq`), W1-39 (`DAEO-5ylr`), W1-40 (`DAEO-fdkq`), W1-41 (`DAEO-cdoi`), W1-42 (`DAEO-gjjf`), W1-43 (`DAEO-03pw`). Order of work: W1-31 and W1-40 after W1-30, W1-39 after W1-38, then W1-32, W1-41, the exit run and the exit audit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.123 | 2026-10-07 | Owner answers: DEC-481 (`adapter-portability` in the baseline, 43 findings; W1-38 merges), DEC-482 (`product-traceability-trailers` in the baseline, 735 findings; a trailers base commit, here `429815b5`; W1-30 merges and closes through `gov close`), DEC-483 (owner-decision lookup from a register file: residual for W1-41), DEC-484 (`gov close` run time accepted; runs beside worktree work), DEC-485 (DEC-479 and DEC-480 accepted; three Wave 2 items), DEC-486 (41 of 50 closed; open tickets listed by id). Next free id: DEC-487. |
