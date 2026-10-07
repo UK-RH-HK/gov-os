@@ -1,0 +1,5 @@
+id: "skill-regression-a"
+family: "skill regression"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.check.skill_validator template/governance/kernel/skills/discovery template/governance/kernel/skills/planning template/governance/kernel/skills/test-design template/governance/kernel/skills/change"
