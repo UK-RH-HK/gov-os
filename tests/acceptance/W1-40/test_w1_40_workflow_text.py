@@ -93,6 +93,20 @@ def test_every_step_runs_a_command_or_a_pinned_action(workflows):
                     f"{path.name}: the action {uses!r} is not pinned to a version")
 
 
+def test_the_checkout_brings_the_parent_commit(workflows):
+    """DEC-497: the skill-version check of ``gov check`` compares the head commit with the one before; a checkout
+    of depth 1 does not hold it. The checkout step asks for depth 2."""
+    for path, workflow in workflows:
+        for job_id, job in workflow["jobs"].items():
+            checkouts = [step for step in job.get("steps") or () if str(step.get("uses", "")).startswith("actions/checkout")]
+            assert checkouts, f"{path.name}: job {job_id} has no actions/checkout step"
+            for step in checkouts:
+                depth = (step.get("with") or {}).get("fetch-depth")
+                assert str(depth) == "2", (
+                    f"{path.name}: the checkout of job {job_id} asks for depth {depth!r}, not 2: the parent commit "
+                    "is not on the runner")
+
+
 def test_the_job_names_gitleaks_and_gov_check(workflows):
     """DEC-087: the deterministic checks include ``gov check`` and gitleaks."""
     commands = "\n".join(str(step.get("run", "")) for _, workflow in workflows for _, _, step in support.steps_of(workflow))
@@ -104,10 +118,11 @@ REGISTERED_ONLY = ("gitleaks", "lefthook", "rulesync", "openspec", "codebase-mem
 
 
 def test_a_tool_the_job_installs_is_registered_at_its_registered_version(workflows):
-    """DEC-083, DEC-287: a step that downloads a registered tool names its exact registered version and checks a checksum.
+    """DEC-083, DEC-287: a step that downloads a registered tool names its exact registered version, or reads it
+    from the tool registry of the checkout (DEC-497 allows either), and checks a checksum.
 
-    Whether the workflow may install it at all is the owner's (see the README's package P-4): this case holds
-    only that nothing else than the registered release can arrive.
+    Which tools the workflow installs is DEC-494's (``test_w1_40_ci_installs.py``): this case holds only that
+    nothing else than the registered release can arrive.
     """
     registry = support.registry()
     for path, workflow in workflows:
@@ -119,8 +134,9 @@ def test_a_tool_the_job_installs_is_registered_at_its_registered_version(workflo
                 if not re.search(rf"\b{re.escape(tool)}\b", run):
                     continue
                 version = str(registry[tool]["version"]).lstrip("v")
-                assert version in run, (
-                    f"{path.name}: a step downloads {tool} without naming its registered version {version}")
+                assert version in run or "tool-registry.yaml" in run, (
+                    f"{path.name}: a step downloads {tool} without naming its registered version {version} or "
+                    "reading it from the tool registry")
                 if re.search(r"\b(curl|wget)\b|\bgh\s+release\b", run):
                     assert re.search(r"sha256sum\s+(-c|--check)|shasum\s+-a\s*256\s+(-c|--check)", run), (
                         f"{path.name}: a step downloads {tool} without verifying a checksum")

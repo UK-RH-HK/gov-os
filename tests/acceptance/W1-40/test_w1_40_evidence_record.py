@@ -88,13 +88,18 @@ def test_a_project_without_a_g3_check_can_push_and_its_record_says_so_and_never_
         f"the record of a commit for which no G3 check ran states a pass ({SAYS_PASSED.search(text).group(0)!r}):\n{text}")
 
 
-def test_ci_reports_that_no_g3_check_is_declared(new_project, machine, ci):
-    """The words are in the job's output. Whether the job is then green is not decided (README, package P-6)."""
+def test_ci_reports_that_no_g3_check_is_declared_and_does_not_fail_for_it(new_project, machine, ci):
+    """DEC-497: the step that reads the record prints those words and exits 0; the job is green where
+    everything else is. The record itself never states a pass (the case above)."""
     project = new_project(tiers=("G1", "G2"))
     project.through_the_hooks(machine())
     result = ci(of=project)
     assert support.NO_G3 in result.output, (
         f"the CI job does not report '{support.NO_G3}' for a commit whose record says so:\n{result}")
+    assert result.said_by_one_step(support.NO_G3, failed=False), (
+        f"the step that reports '{support.NO_G3}' fails: the words are a report, not a failure (DEC-497):\n{result}")
+    assert result.green, (
+        f"the job is red for a project that declares no G3 check, every check passing and its record there:\n{result}")
 
 
 # -- records that do not vouch for the head commit --------------------------
