@@ -43,10 +43,11 @@ def _close_and_find_record(project, sandbox):
 
 
 def _green_project(project):
+    project.add_decision("DEC-test", "ACTIVE")
+    project.commit("a decision", who=support.OWNER)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_decision("DEC-test", "ACTIVE")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -344,36 +345,7 @@ def test_context_failure_non_cycle_refuses_close(project, sandbox, interface):
         "the ticket must not be closed when context fails"
 
 
-def test_failing_close_with_context_failure_no_context_hash(project, sandbox, interface):
-    """A4, S6: a failing close with a class whose context cannot be built
-    does not record a context hash; the output and the repair ticket say
-    the context failed.
-    """
-    project.add_ticket(TICKET, WBS)
-    project.add_failing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_decision("DEC-base2", "ACTIVE", title="Base 2")
-    project.add_decision("DEC-new2", "ACTIVE", title="Replacement 2", supersedes="DEC-base2")
-    project.commit("implement with defect and broken context", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, TICKET,
-                            "--disposition", "repair")
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    full_text = json.dumps(envelope)
-    assert "context" in full_text.lower(), \
-        "the output must say the context failed"
-    repairs = [f for f in (project.root / ".tickets").glob("*.md") if f.stem != TICKET]
-    if repairs:
-        import yaml
-        text = repairs[0].read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            front = yaml.safe_load(parts[1]) or {}
-            assert front.get("context_hash") is None, \
-                "the repair ticket must not record a context hash when context failed"
+# The failing close with a class whose context cannot be built: test_w1_30_context_failures.py.
 
 
 # --------------------------------------------------------------------------

@@ -102,11 +102,12 @@ def test_close_runs_acceptance_tests(project, sandbox, interface):
 
 def test_close_runs_regression_tests_when_present(project, sandbox, interface):
     """KPI S1, CAP-38.a: regression tests under tests/unit/ are run too."""
+    support.write(project.root, "tests/unit/close/test_regression.py",
+                  "def test_regression():\n    assert True\n")
+    project.commit("a regression test", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    support.write(project.root, "tests/unit/close/test_regression.py",
-                  "def test_regression():\n    assert True\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -182,11 +183,12 @@ def test_close_writes_checkpoint_on_success(project, sandbox, interface):
 
 def test_close_record_has_kernel_skill_versions(project, sandbox, interface):
     """KPI S1, CAP-24.a, B4: the close record lists kernel skills with their version."""
+    project.add_kernel_skill("discovery", "1.0.0")
+    project.add_kernel_skill("planning", "1.0.0")
+    project.commit("kernel skills", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_kernel_skill("discovery", "1.0.0")
-    project.add_kernel_skill("planning", "1.0.0")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -208,11 +210,12 @@ def test_close_record_has_kernel_skill_versions(project, sandbox, interface):
 
 def test_close_record_lists_vendor_skill_without_version(project, sandbox, interface):
     """B4: vendored skills are listed by name with no version, not dropped."""
+    project.add_kernel_skill("change", "1.0.0")
+    project.add_vendor_skill("systematic-debugging")
+    project.commit("kernel and vendored skills", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_kernel_skill("change", "1.0.0")
-    project.add_vendor_skill("systematic-debugging")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
@@ -479,12 +482,13 @@ def test_close_record_lists_test_counts(project, sandbox, interface):
 
 def test_time_limit_exceeded_refuses_close(project, sandbox, interface):
     """A2: a regression run that exceeds its time limit refuses the close (not a pass)."""
+    support.write(project.root, "tests/unit/test_slow.py",
+                  "import time\ndef test_slow():\n    time.sleep(999)\n")
+    project.commit("a slow test", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    support.write(project.root, "tests/unit/test_slow.py",
-                  "import time\ndef test_slow():\n    time.sleep(999)\n")
-    project.commit("implement with slow test", who=IMPL, trailers=TRAILERS_GOOD)
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET, "--timeout", "1")
@@ -536,12 +540,13 @@ def test_git_failure_is_error_not_empty_list(project, sandbox, interface):
 
 def test_time_limit_is_configurable(project, sandbox, interface):
     """A2: the time limit is configurable (a setting with a default, not hardcoded)."""
+    support.write(project.root, "tests/unit/test_moderate.py",
+                  "import time\ndef test_moderate():\n    time.sleep(0.5)\n    assert True\n")
+    project.commit("a moderate test", who=support.ORCHESTRATOR)
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
-    support.write(project.root, "tests/unit/test_moderate.py",
-                  "import time\ndef test_moderate():\n    time.sleep(0.5)\n    assert True\n")
-    project.commit("implement with moderate test", who=IMPL, trailers=TRAILERS_GOOD)
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET, "--timeout", "30")
@@ -563,10 +568,11 @@ def test_containment_refuses_ticket_changing_acceptance_tests(project, sandbox, 
                        allowed_paths=["src/example/**", "tests/acceptance/" + WBS + "/**"])
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
     project.write("tests/acceptance/W1-other/test_planted.py",
                   "def test_planted():\n    assert True\n")
     project.commit("implement touching another ticket's acceptance tests", who=IMPL,
-                   trailers=TRAILERS_GOOD)
+                   trailers=TRAILERS_GOOD, exact=True)
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
@@ -644,15 +650,29 @@ def test_close_fails_when_ticket_tool_absent(project, sandbox, interface):
         "gov close must report error when the ticket tool is absent"
 
 
-def test_close_record_unwritable_ticket_stays_open(project, sandbox, interface):
-    """B2: when the close record cannot be written, the ticket stays open."""
+def test_close_record_unwritable_ticket_stays_open(project, sandbox, interface, tmp_path):
+    """B2: when the close record cannot be written, nothing is closed.
+
+    Where this ticket's close record goes is measured, not assumed: a twin project with the same ticket is
+    closed first and its answer names the record. In the project under test a file then stands where the
+    record's folder would be, so the record cannot be written there. The answer is an error of the tool, not
+    a finding about the work (API-0002: exit code 1); the ticket file is untouched, so the step after the
+    record, the closing through the ticket tool, did not happen; and no close record exists.
+    """
+    twin = support.Project(tmp_path / "twin")
+    _green_project(twin)
+    record = support.result_of(support.run_close(twin, sandbox, TICKET), interface)["close_record"]
+
     _green_project(project)
-    docs_close = project.root / "docs" / "close"
-    docs_close.mkdir(parents=True, exist_ok=True)
-    blocker = docs_close / "blocker"
-    blocker.write_text("I am a file, not a directory", encoding="utf-8")
-    project.commit("block close record directory", who=support.ORCHESTRATOR)
+    folder = (project.root / record).parent
+    folder.parent.mkdir(parents=True, exist_ok=True)
+    folder.write_text("a file where the folder of the close record goes\n", encoding="utf-8")
+    project.commit("a file where the folder of the close record goes", who=support.ORCHESTRATOR)
+    ticket_file = project.root / support.ticket_path(TICKET)
+    ticket_before = ticket_file.read_bytes()
+
     run = support.run_close(project, sandbox, TICKET)
-    front = support.read_ticket_frontmatter(project.root, TICKET)
-    assert front.get("status") != "closed", \
-        "the ticket must stay open when the close record cannot be written"
+    support.refused(run, interface, support.EXIT_GOV_ERROR)
+    assert ticket_file.read_bytes() == ticket_before, \
+        f"the ticket file changed although the close record could not be written\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)

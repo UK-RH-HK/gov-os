@@ -32,7 +32,7 @@ def _project_with_closed_ticket(project, trailers, ticket_id="PROJ-tttt", wbs="W
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=trailers)
     text = (project.root / support.ticket_path(ticket_id)).read_text(encoding="utf-8")
-    text = text.replace("status: open", "status: closed")
+    text = text.replace("status: in_progress", "status: closed")
     (project.root / support.ticket_path(ticket_id)).write_text(text, encoding="utf-8")
     project.commit("close ticket", who=OWNER)
     return ticket_id
@@ -187,7 +187,7 @@ def test_traceability_commits_from_head_not_all_branches(project, sandbox, inter
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement on main", who=IMPL, trailers=trailers_head)
     text = (project.root / support.ticket_path(ticket_id)).read_text(encoding="utf-8")
-    text = text.replace("status: open", "status: closed")
+    text = text.replace("status: in_progress", "status: closed")
     (project.root / support.ticket_path(ticket_id)).write_text(text, encoding="utf-8")
     project.commit("close ticket", who=OWNER)
 

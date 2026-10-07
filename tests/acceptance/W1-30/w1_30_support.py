@@ -79,6 +79,21 @@ ORCHESTRATOR = {
     "email": "orch@example.invalid",
     "trailers": ("Role: orchestrator",),
 }
+TEST_DESIGNER = {
+    "name": "The Test Designer",
+    "email": "designer@example.invalid",
+    "trailers": ("Task: PROJ-aaaa", "Role: independent-test-designer"),
+}
+DESIGNER_ROLE = "Role: independent-test-designer"
+ENGINEER_ROLE = "Role: engineer"
+
+# Where the roles may write, from ``tests/acceptance/W1-50/README.md`` ("Allowed paths of a commit's trailers",
+# "Ticket files"): a ticket file is the orchestrator's, an acceptance test is the test designer's.
+TICKETS_PREFIX = ".tickets/"
+ACCEPTANCE_PREFIX = "tests/acceptance/"
+
+# The record every fixture ticket names as its source (``tasks_support.ticket_text``: ``sources: [DEC-000]``).
+BASE_SOURCE = "DEC-000"
 
 # The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
@@ -150,7 +165,12 @@ def commit_all(project, message="fixture", who=OWNER, trailers=(), minute=0):
 # --------------------------------------------------------------------------
 
 def ticket_text(ticket_id, wbs, profile="STANDARD", allowed_paths=None, **keys):
-    """A ticket file, optionally overriding profile and allowed_paths."""
+    """A ticket file, optionally overriding profile and allowed_paths.
+
+    The ticket is in progress unless ``status`` says otherwise: W1-50's judgement gives a ticket's paths to a
+    worker's commit only while the ticket is in progress (DEC-318).
+    """
+    keys.setdefault("status", "in_progress")
     text = tasks_support.ticket_text(ticket_id, wbs, **keys)
     if profile != "STANDARD":
         text = text.replace("profile: STANDARD", f"profile: {profile}")
@@ -245,6 +265,9 @@ class Project:
               (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         shutil.copytree(REPO_ROOT / "src", self.root / "src")
         self._copy_kernel_templates()
+        # The source every fixture ticket names (``sources: [DEC-000]``): without it the ticket's context
+        # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
+        write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
         commit_all(self.root, "initial project")
 
     def _copy_kernel_templates(self):
@@ -268,12 +291,41 @@ class Project:
     def write(self, rel, text):
         return write(self.root, rel, text)
 
-    def commit(self, message="fixture", who=OWNER, trailers=None):
+    def commit(self, message="fixture", who=OWNER, trailers=None, exact=False):
+        """Commit what the working tree holds.
+
+        A commit that carries ``Role: engineer`` is made as a project makes it, so that W1-50's judgement finds
+        nothing in it by accident (``tests/acceptance/W1-50/README.md``): the ticket files waiting in the working
+        tree are committed first by the orchestrator, the acceptance tests by the test designer (with the
+        engineer's other trailers), and the engineer's commit holds the rest. ``exact=True`` makes one commit of
+        everything with exactly the given trailers; a case that plants a commit W1-50 must flag uses it.
+        """
+        effective = tuple(who["trailers"] if trailers is None else trailers)
+        if not exact and ENGINEER_ROLE in effective:
+            waiting = self.waiting_paths()
+            tickets = [rel for rel in waiting if rel.startswith(TICKETS_PREFIX)]
+            tests = [rel for rel in waiting if rel.startswith(ACCEPTANCE_PREFIX)]
+            if tickets:
+                self._commit("ticket files", ORCHESTRATOR, ORCHESTRATOR["trailers"], tickets)
+            if tests:
+                designer = tuple(DESIGNER_ROLE if t == ENGINEER_ROLE else t for t in effective)
+                self._commit("acceptance tests", TEST_DESIGNER, designer, tests)
+        return self._commit(message, who, effective)
+
+    def waiting_paths(self):
+        """The paths changed in the working tree and not yet committed."""
+        out = git(self.root, "status", "--porcelain=v1", "-z", "-uall")
+        return [entry[3:] for entry in out.split("\0") if entry]
+
+    def _commit(self, message, who, trailers, paths=None):
         self._minute += 1
         date = FIRST_DATE.format(minute=self._minute)
-        git(self.root, "add", "-A", who=who, date=date)
+        if paths is None:
+            git(self.root, "add", "-A", who=who, date=date)
+        else:
+            git(self.root, "add", "-A", "--", *paths, who=who, date=date)
         args = ["commit", "-q", "--allow-empty", "--no-gpg-sign", "-m", message]
-        for t in (who["trailers"] if trailers is None else trailers):
+        for t in trailers:
             args += ["--trailer", t]
         git(self.root, *args, who=who, date=date)
         return git(self.root, "rev-parse", "HEAD", who=who).strip()
@@ -378,9 +430,237 @@ class FullProject:
 # Running gov close
 # --------------------------------------------------------------------------
 
-def run_close(project, sandbox, ticket, *extra_args):
-    """Run ``gov close <ticket> --json`` and return the Run."""
-    return project.gov(sandbox, COMMAND, ticket, "--json", *extra_args)
+def ticket_commits(root, ticket):
+    """The commits in ``HEAD``'s history whose final trailer block holds ``Task: <ticket>``, oldest first.
+
+    Empty when git cannot read the history (a case may have broken it on purpose).
+    """
+    out = git(root, "log", "--reverse", "--format=%H%x1f%(trailers:key=Task,valueonly,separator=%x1e)%x1d",
+              "HEAD", check=False)
+    commits = []
+    for entry in out.split("\x1d"):
+        commit, _, tasks = entry.strip().partition("\x1f")
+        if commit and ticket in [value.strip() for value in tasks.split("\x1e")]:
+            commits.append(commit)
+    return commits
+
+
+_JUDGE = (
+    "import json, sys\n"
+    "from gov.guard.containment import judge_commits\n"
+    "found = judge_commits(sys.argv[1], sys.argv[2:])\n"
+    "print(json.dumps([{'commit': f.commit, 'paths': list(f.paths), 'reason': f.reason} for f in found]))\n"
+)
+
+
+def judged_by_w1_50(project, sandbox, commits, check=True):
+    """W1-50's public judgement of ``commits`` (DEC-453; ``tests/acceptance/W1-50/README.md``, "The public
+    function"): a list of ``{commit, paths, reason}``, empty when every commit passes. It only reads."""
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(SRC),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+    }
+    done = subprocess.run([sys.executable, "-c", _JUDGE, str(project.root), *commits], cwd=str(project.root),
+                          env=env, capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    if done.returncode != 0 and not check:
+        return None   # the function raised (a case broke the history on purpose): nothing is known
+    assert done.returncode == 0, f"W1-50's judge_commits did not answer:\n{done.stdout}\n{done.stderr}"
+    return json.loads(done.stdout)
+
+
+def sandbox_env(sandbox):
+    """The environment W1-07's stand-in gives ``gov``, for a call of a public function of ``src/``."""
+    return {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(SRC),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+    }
+
+
+def load_store(project, sandbox, check=True):
+    """Load the project's record store, as ``gov.store.load(root)`` does (the W1-24 suite builds what a context
+    reads the same way). ``gov context`` only reads: without a loaded store no context can be built."""
+    done = subprocess.run([sys.executable, "-c", "import sys\nfrom gov.store import load\nload(sys.argv[1])\n",
+                           str(project.root)], cwd=str(project.root), env=sandbox_env(sandbox),
+                          capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    assert done.returncode == 0 or not check, f"gov.store.load failed in the fixture:\n{done.stdout}\n{done.stderr}"
+
+
+_DECISION_CHECK = (
+    "import json, sys\n"
+    "from pathlib import Path\n"
+    "from gov.cli.errors import GovError\n"
+    "from gov.decisions import check\n"
+    "try:\n"
+    "    print(json.dumps({'findings': check(Path(sys.argv[1]))}))\n"
+    "except GovError as error:\n"
+    "    print(json.dumps({'error': error.code}))\n"
+)
+
+
+def decision_check(project, sandbox):
+    """W1-11's checker on the project (``gov.decisions.check(root)``, ``tests/acceptance/W1-11/README.md``):
+    ``{"findings": [...]}``, or ``{"error": <code>}`` when it raises ``GovError`` and so cannot run."""
+    done = subprocess.run([sys.executable, "-c", _DECISION_CHECK, str(project.root)], cwd=str(project.root),
+                          env=sandbox_env(sandbox), capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, f"gov.decisions.check did not answer:\n{done.stdout}\n{done.stderr}"
+    return json.loads(done.stdout.strip().splitlines()[-1])
+
+
+def context_error(project, sandbox, ticket):
+    """The error ``gov context <ticket>`` gives in this project; the case fails when it gives none."""
+    run = project.gov(sandbox, "context", ticket, "--json")
+    envelope = run.envelope()
+    assert envelope["ok"] is False, f"the fixture's context can be built, so the case measures nothing\n{run.describe()}"
+    return envelope["error"]
+
+
+def tk(project, *args):
+    """Run the project's own ticket tool (``governance/kernel/bin/tk``) and return its output."""
+    script = Path(project.root) / "governance" / "kernel" / "bin" / "tk"
+    done = subprocess.run([str(script), *args], cwd=str(project.root), capture_output=True, text=True,
+                          stdin=subprocess.DEVNULL)
+    assert done.returncode == 0, f"tk {' '.join(args)} failed:\n{done.stdout}\n{done.stderr}"
+    return done.stdout
+
+
+def path_without(tool, links):
+    """The caller's ``PATH`` with ``tool`` on none of its folders and every other program still there: a folder
+    that holds ``tool`` is replaced by ``links/<n>``, which links to each of its other programs."""
+    folders = []
+    for number, folder in enumerate(dict.fromkeys(os.environ.get("PATH", "").split(os.pathsep))):
+        if not folder:
+            continue
+        if not (Path(folder) / tool).exists():
+            folders.append(folder)
+            continue
+        stand_in = Path(links) / str(number)
+        stand_in.mkdir(parents=True)
+        for program in Path(folder).iterdir():
+            if program.name != tool:
+                (stand_in / program.name).symlink_to(program)
+        folders.append(str(stand_in))
+    assert shutil.which(tool, path=os.pathsep.join(folders)) is None
+    return os.pathsep.join(folders)
+
+
+def trailers_of(ticket, role="engineer", implements="CAP-01"):
+    return (f"Task: {ticket}", f"Role: {role}", f"Implements: {implements}")
+
+
+def build_ticket(project, ticket, wbs, failing=False, **ticket_keys):
+    """A ticket whose work is done, by the roles that may do it: the orchestrator's ticket file, the test
+    designer's acceptance test (failing when ``failing``), the engineer's source file inside the ticket's
+    paths, and the orchestrator's checkpoint. Returns the engineer's trailers."""
+    trailers = trailers_of(ticket)
+    project.add_ticket(ticket, wbs, **ticket_keys)
+    if failing:
+        project.add_failing_test(wbs)
+    else:
+        project.add_passing_test(wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPLEMENTER, trailers=trailers)
+    project.add_checkpoint(ticket)
+    project.commit("checkpoint", who=ORCHESTRATOR)
+    return trailers
+
+
+def run_close(project, sandbox, ticket, *extra_args, store=True):
+    """Run ``gov close <ticket> --json`` and return the Run.
+
+    The record store is loaded first (``store=False`` leaves it as it is), so that the ticket's context can be
+    built wherever the case did not break it on purpose.
+
+    DEC-453: ``gov close`` adds no exemption to W1-50's judgement of the ticket's commits. So in every case of
+    this suite a close that succeeds had commits that judgement passes; where it finds something and the close
+    succeeds all the same, the case fails here, whatever it went on to assert.
+    """
+    if store:
+        load_store(project, sandbox, check=False)
+    commits = ticket_commits(project.root, ticket)
+    findings = (judged_by_w1_50(project, sandbox, commits, check=False) or []) if commits else []
+    run = project.gov(sandbox, COMMAND, ticket, "--json", *extra_args)
+    try:
+        closed = json.loads(run.stdout).get("ok") is True
+    except (ValueError, AttributeError):
+        closed = False
+    assert not (closed and findings), (
+        "gov close closed a ticket although W1-50's judgement of its commits has findings (DEC-453):\n"
+        + "\n".join(f"  {f['commit'][:10]} {f['paths']}: {f['reason']}" for f in findings))
+    return run
+
+
+def refused(run, interface, exit_code):
+    """The close was refused with ``exit_code``; returns the ``error`` object."""
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+    assert run.returncode == exit_code, f"expected exit code {exit_code}\n{run.describe()}"
+    return envelope["error"]
+
+
+def error_text(error):
+    """The whole ``error`` object as one string: code, message and details."""
+    return json.dumps(error, ensure_ascii=False)
+
+
+def close_records(root, ticket):
+    """Every close record of ``ticket`` the project holds: ``(path, frontmatter)`` of each markdown file outside
+    ``.git`` and ``.gov-runtime`` whose frontmatter has ``type: close`` and names the ticket in ``task``."""
+    found = []
+    for path in sorted(Path(root).rglob("*.md")):
+        rel = path.relative_to(root)
+        if rel.parts[0] in (".git", ".gov-runtime") or not path.is_file():
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        if not text.startswith("---"):
+            continue
+        end = text.find("\n---", 3)
+        try:
+            front = yaml.safe_load(text[3:end]) if end > 0 else None
+        except yaml.YAMLError:
+            continue
+        if isinstance(front, dict) and front.get("type") == "close" and front.get("task") == ticket:
+            found.append((str(rel), front))
+    return found
+
+
+def ticket_status(root, ticket_id):
+    return read_ticket_frontmatter(root, ticket_id).get("status")
+
+
+def other_tickets(root, *known):
+    """The ticket files of the project other than ``known``: the repair tickets a failing close opened."""
+    folder = Path(root) / ".tickets"
+    return sorted(path for path in folder.glob("*.md") if path.stem not in known)
+
+
+def frontmatter_of(path):
+    parts = Path(path).read_text(encoding="utf-8").split("---", 2)
+    return (yaml.safe_load(parts[1]) or {}) if len(parts) >= 3 else {}
+
+
+def iteration_count(root, ticket_id):
+    """The number of consecutive failed closes the project holds for the ticket (settlement 3); 0 without a file."""
+    data = read_iteration_file(root, ticket_id)
+    if data is None:
+        return 0
+    assert isinstance(data, dict) and isinstance(data.get("count"), int), f"unreadable count file: {data!r}"
+    return data["count"]
+
+
+def assert_not_closed(project, ticket, before=None):
+    """Nothing of a close happened: the ticket is in progress and the project holds no close record of it."""
+    assert ticket_status(project.root, ticket) == "in_progress", \
+        f"the ticket's status is {ticket_status(project.root, ticket)!r} after a refused close"
+    records = close_records(project.root, ticket)
+    assert not records, f"a refused close left a close record: {[rel for rel, _ in records]}"
 
 
 def envelope_of(run, interface):
