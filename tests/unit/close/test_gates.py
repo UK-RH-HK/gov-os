@@ -9,8 +9,9 @@ import yaml
 
 from gov.cli.errors import GovError
 from gov.close import command
+from gov.close import repo as close_repo
 from gov.close.command import (NOT_MEASURED, _check_containment, _check_probe, _check_trailers, _commit_models,
-                               _Finding, _git, _ticket_commits)
+                               _commits_since, _Finding, _git, _ticket_commits)
 from gov.guard.containment import ContainmentError
 
 TICKET = "T-0001"
@@ -106,8 +107,13 @@ def _probe(repo, probed, **keys):
                 files={f"docs/probes/{TICKET}/PR.md": "---\n" + yaml.safe_dump(front) + "---\n\n# Probe\n"})
 
 
+def _inside(path):
+    return path.startswith("src/")
+
+
 def _gate(repo):
-    _check_probe(repo.root, TICKET, _ticket_commits(repo.root, TICKET))
+    commits = _ticket_commits(repo.root, TICKET)
+    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, frozenset({TICKET}))
 
 
 def _refused(repo):
@@ -185,7 +191,7 @@ def test_a_git_failure_while_the_probes_commits_are_read_is_an_error_not_a_findi
     probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
     _probe(repo, probed)
     commits = _ticket_commits(repo.root, TICKET)
-    real = command._git
+    real = close_repo.git
 
     for calls_before_the_failure in range(3):
         seen = []
@@ -198,7 +204,8 @@ def test_a_git_failure_while_the_probes_commits_are_read_is_an_error_not_a_findi
             return real(root, *args, **keys)
 
         monkeypatch.setattr(command, "_git", counting)
+        monkeypatch.setattr(close_repo, "git", counting)
         with pytest.raises(GovError) as raised:
-            _check_probe(repo.root, TICKET, commits)
+            _check_probe(repo.root, TICKET, commits, [], _inside, frozenset({TICKET}))
         assert raised.value.code == "GIT_FAILURE"
         assert sum(seen) == calls_before_the_failure + 1
