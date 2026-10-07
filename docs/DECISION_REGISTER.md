@@ -5155,3 +5155,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.117 | 2026-10-07 | Two delegated decisions on W1-38: DEC-468 (OpenSpec's six skills are registered rulesync sources, like its six commands), DEC-469 (the change that moves the registered version refreshes the sources). Next free id: DEC-470. |
+
+## 118. One delegated decision on W1-30: four points the test designer found open in what `gov close` measures (register v0.118, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-470 — `gov close`: no store means no close; a missing source refuses; a probe refusal is a failed verification; the model is read from the commits until launch records carry it
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer (round 5, commit `f07051bf`) returned four points no source settles. The rule of DEC-454 stands over all four: nothing is closed, and nothing is recorded, that was not measured.
+- **Decision:**
+  - **The record store.** When the ticket's context cannot be built because the project has no record store, `gov close` refuses with that reason. It does not build the store itself: building it is `gov rebuild`'s work.
+  - **A missing source.** A ticket naming a source that does not resolve is refused, as DEC-454 and the context command state. The older case that expected a close record listing the missing source with a reason gives way and is rewritten to the refusal.
+  - **The probe gate's exit code.** A refusal by the probe gate is a finding about the ticket's work like missing trailers or a containment finding: exit code 3 (verification failed). Exit code 4 stays for an escalation in force.
+  - **Session models (DEC-460).** No source records a session's model today: the launcher writes no launch record with a model and commits carry no session trailer. Until that exists, the close record lists, for each of the ticket's commits, its role and the model named in its `Co-Authored-By` trailer, exactly as read; a commit without such a line is listed with "not measured". No model is guessed and no commit is left out. A launch record per session (id, role, ticket, model) and a `Session:` trailer are an item for the Wave 2 list of DEC-466.
+  - Recorded before the change (DEC-463): the designer's cases and the engineer's code for these four points follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.118 | 2026-10-07 | One delegated decision on W1-30: DEC-470 (no store, no close; a missing source refuses; a probe refusal exits 3; the model is read from the commits' co-author lines until launch records carry it). Next free id: DEC-471. |
