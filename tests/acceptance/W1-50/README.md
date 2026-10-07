@@ -1121,6 +1121,96 @@ base is the merge commit's own change, whichever side's content it holds. The te
 | DEC-421, identical change, through the helper | `test_read_merge_puts_a_ticket_file_both_sides_changed_in_the_same_way_in_own`: `own` is the ticket file | 1 | **red**: `own` is empty |
 | The other side | `test_a_merge_where_each_side_changed_a_different_ticket_file_is_silent`: each side changed a different ticket file; `own` is empty, the merge is silent | 1 | **green**: must stay green; a fix that flags every merge commit that differs from a parent in a ticket file fails it |
 
+## The public function, DEC-453 (thirteenth batch)
+
+Thirteenth batch, **added after implementation**: DEC-453 reopens W1-50 for a follow-up.
+`gov.guard.containment` gets a public function that judges a list of commits by their trailers
+exactly as the post-command check judges an orchestrator's own commits, and returns the findings.
+It only reads: it restores nothing and writes no record.
+
+### Interface
+
+```python
+from gov.guard.containment import judge_commits, ContainmentError
+
+findings = judge_commits(root, commit_ids)
+```
+
+`root` (`str`): the project root path.
+
+`commit_ids` (`list[str]`): a list of full commit ids to judge.
+
+Returns a list of findings, one per commit that is a finding, in the order of `commit_ids`. Each finding has:
+
+- `.commit` — the full commit id (`str`)
+- `.paths` — the paths that are findings (`list[str]`), repository-relative
+- `.reason` — the reason text (`str`)
+
+An empty list means every commit passed.
+
+Raises `ContainmentError`:
+
+- `commit_ids` is empty: nothing judged is never "no finding" (DEC-425)
+- a commit id in the list names no commit in the repository
+- `root` is not a git repository
+- a git call fails
+
+`ContainmentError` is a class `gov.guard.containment` holds under that name, a subclass of `Exception` but not
+`Exception` itself.
+
+The function judges commits by their trailers exactly as the post-command check (`check_containment`) judges the
+commits of an orchestrator session's own call (DEC-319: own-trailer judging in an orchestrator session's own call
+only). A commit with no `Role` or `Task` trailer is judged as the orchestrator (DEC-267). It is read-only: it
+restores nothing, writes no finding record, creates or changes nothing under `.gov-runtime/`, and leaves HEAD, the
+index and the working tree unchanged. Nothing is written under the state home.
+
+### Cases (`test_w1_50_judge_commits.py`, 24 cases)
+
+These 24 cases are **tests added after implementation**; reason: "DEC-453, W1-50 reopened for a public judgement of
+commits". All are in `test_w1_50_judge_commits.py`.
+
+| Holds | Test function | Cases | Expected red reason |
+|---|---|---|---|
+| Same judgement, simple | `test_the_function_s_answer_equals_the_hook_s_for_a_single_commit`: engineer inside, engineer outside, engineer of acceptance test, test designer inside acceptance, test designer outside acceptance, no trailers of README, no trailers of acceptance test, orchestrator commit | 8 | **red**: `judge_commits` and `ContainmentError` do not exist in `gov.guard.containment` |
+| Same judgement, DP-16 | `test_the_function_agrees_with_the_hook_for_a_worker_commit_of_a_ticket_file` | 1 | **red**: as above |
+| Same judgement, DEC-268 | `test_the_function_agrees_with_the_hook_for_two_role_values`; `test_the_function_agrees_with_the_hook_for_two_task_values` | 2 | **red**: as above |
+| Same judgement, DEC-360 | `test_the_function_agrees_with_the_hook_for_a_role_owner_commit` | 1 | **red**: as above |
+| Same judgement, DEC-318 | `test_the_function_agrees_with_the_hook_for_a_ticket_not_in_progress`; before close commit; after close commit | 3 | **red**: as above |
+| Same judgement, merge, DP-21 | `test_the_function_agrees_with_the_hook_for_a_merge_with_own_change_of_a_ticket_file` | 1 | **red**: as above |
+| Same judgement, merge, DP-27 | `test_the_function_agrees_with_the_hook_for_a_merge_with_own_change_of_an_acceptance_test` | 1 | **red**: as above |
+| Same judgement, clean merge | `test_the_function_agrees_with_the_hook_for_a_clean_merge` | 1 | **red**: as above |
+| Read-only | `test_the_function_does_not_change_the_project`: HEAD, index, working tree, `.gov-runtime/`, state home | 1 | **red**: as above |
+| Several, mixed | `test_a_list_of_clean_and_finding_commits_returns_exactly_the_findings_in_order` | 1 | **red**: as above |
+| Empty list | `test_an_empty_list_of_commits_raises` | 1 | **red**: as above |
+| Unknown id | `test_an_unknown_commit_id_raises` | 1 | **red**: as above |
+| Not a repository | `test_a_path_that_is_not_a_repository_raises` | 1 | **red**: as above |
+| The freeze | `test_every_commit_is_a_finding_while_the_project_is_frozen` | 1 | **red**: as above |
+
+### What the sources say about the freeze
+
+While the project is frozen (`.gov-runtime/freeze` exists with the `FROZEN` marker), the post-command check allows
+nothing: every commit is a finding, regardless of its trailers. Two mechanisms combine:
+
+- For a commit with both trailers and a valid ticket: the lambda `fn` in `_judge_commit` checks
+  `os.path.exists(FREEZE_FLAG)`. While frozen, the file exists, and the lambda returns `False` for every path: all
+  paths are denied.
+- For a commit without trailers, or whose ticket cannot be loaded: `outside(role, tid, sub)` calls `decide`, which
+  checks the freeze through `freeze_state` and denies every path.
+
+The public function is expected to do the same.
+
+### What the sources left open
+
+- **The caller's ticket.** The post-command check runs inside an orchestrator session's call, where `GOV_TICKET`
+  gives the caller's ticket. A commit without trailers is judged as the orchestrator with that ticket (DEC-267). The
+  public function takes no ticket argument. The orchestrator's scope (DEC-156: everything outside
+  `tests/acceptance/**`) does not depend on the specific ticket, so the answer should be the same. The cases assert
+  the equality rather than assuming it.
+- **The caller's session id.** The check writes the session id into the finding record. The public function writes
+  no record, so the session id is not applicable.
+- **Concurrent changes.** The function reads from the git repository and the working tree. If another process
+  changes them concurrently, the function's behaviour is not defined by these cases.
+
 ## What the suite takes as given
 
 - **Not changed by W1-50.** The KPIs speak of a forward `HEAD` move. A reset, a checkout of another branch or
