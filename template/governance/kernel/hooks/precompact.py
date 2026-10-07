@@ -109,7 +109,7 @@ def main() -> None:
             if os.path.isdir(src_dir) and src_dir not in sys.path:
                 sys.path.insert(0, src_dir)
             from gov.checkpoint.record import write as _rec_write
-            _rec_write(Path(project_root), ticket, "compaction", "Resume after compaction", [])
+            _rec_write(Path(project_root), ticket, "compaction", "Resume after compaction", [], dest="automatic")
         except Exception as exc:
             messages.append(f"checkpoint not written ({exc})")
 
