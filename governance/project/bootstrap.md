@@ -1455,3 +1455,110 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
   (`test_this_repository_is_not_indexed_by_the_run`) failed in the full run because a tool call of the
   orchestrator's own session wrote a containment snapshot under `.gov-runtime/` while the case watched that
   folder; it passed alone. The real freeze-mirror folder was unchanged by the run.
+
+## W1-26 follow-up residuals (the generic validators and "not applicable until the first audit", 2026-10-07)
+
+- **Why the ticket was reopened:** W1-35's and W1-36's check declarations ran `true` as their command, because
+  the validators their KPIs name ("the generic validator from W1-26") did not exist. The orchestrator had
+  closed W1-26 without them: its own error, corrected by DEC-439.
+- **Built:** `python3 -m gov.check.skill_validator (folders or files)` finds every `SKILL.md` at any depth and
+  checks the frontmatter, the version, the description and body sizes (with W1-24's token count) and that
+  every `gov` command the file names exists. `python3 -m gov.check.audit_validator (files or folders)` checks a
+  report against DEC-441's form: the frontmatter `milestone`, `commit` (a full commit id that exists),
+  `pack_sha256`; the table `item | class | evidence`; the six classes of DEC-070; an `OK` row cites at least
+  one path, and every cited path exists at the cited commit. Both: any finding exits 1; nothing validated or
+  an unreadable file is "unmeasured" and exits 1 (DEC-425).
+- **"Not applicable until the first audit" (DEC-447):** a declaration that carries
+  `allows-not-applicable: "true"`, whose command exits 2 and prints `{"not_applicable": true, "reason": …}`,
+  is YELLOW with that reason. All three are needed; without the field, exit 2 is an ordinary failure. The
+  audit validator answers so only when a folder it was given is missing or holds no report; with one report it
+  is a hard block again.
+- **The opt-in field is read only from a declaration file named `(check id).yaml`.** A declaration whose file
+  name differs from its id cannot opt in (it stays red: the safe side).
+- **The audit validator does not check the value of `milestone`** (any text passes), nor that `pack_sha256` is
+  the hash of an existing pack beyond its form. For the exit audit (W1-43) to read by hand.
+- **The skill validator checks `gov` commands against the reserved-command list,** not against what is
+  installed on the machine.
+- **Declared commands name paths under `template/…`,** which an installed project does not have: for the
+  adoption tickets (W1-39, W1-41).
+- **Learning metrics:** two lead starts (the first built the skill validator only, with a folder search one
+  level deep that found nothing with the given command line), then two designer-and-engineer pairs started by
+  the orchestrator (four gaps in the audit validator found by reading DEC-441 against the code; DEC-447); 0
+  reviewer rounds (the ticket's two were spent); 450 lines in the two validators plus about 50 in the runner,
+  against an estimate of 120; 238 cases in W1-26's suite.
+- **Regression at `54b8a404`** (machine load 48): green except the load-sensitive cases of DEC-372 (W1-02,
+  W1-05, W1-46), which passed alone, save one W1-05 case in one alone run that was not identified.
+  **Regression at `b706e688`:** every suite green, no latency occurrence (W1-05: 99 passed).
+
+**Correction to "W1-29 residuals" above (DEC-451):** the line "The auto-compact threshold (DEC-208) is not set"
+is wrong. The project's settings set the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW` to `300000`
+since W1-49's merge; the Claude Code documentation names that variable as the setting, and there is no
+settings key `autocompact`. The orchestrator's CONTEXT_CHECKPOINT stop is dropped. The other owner items of
+that block are answered by DEC-442 (Stop and SubagentStop are registered at the Wave 1 exit run), DEC-444
+(the hooks' automatic checkpoints go to `.gov-runtime/scratch/checkpoints/`: W1-29 follow-up) and DEC-445 (the
+utilisation-triggered checkpoint is an accepted residual).
+
+## W1-35 residuals (the four method skills: discovery, planning, test design, change, 2026-10-07)
+
+- **Built:** four skill files under `template/governance/kernel/skills/` (discovery, planning, test-design,
+  change), each with a versioned frontmatter, within the size limits, citing the decision or capability it
+  follows and granting nothing; and the check declaration `skill-regression-a`, which runs W1-26's generic
+  skill validator over the four folders.
+- **The suite tests the text of the skills, not sessions that follow them.** These KPI clauses are measured
+  only by a live session and go to the Wave 1 exit run (W1-42): "0 of the decision packages discovery asks
+  are answerable from files its retrieval bundle cites" on the MR-A-02 and MR-B-02 dev scenarios; "its
+  transcript reads no file outside them" for test design; "planning emits schema-valid tickets and one linked
+  gap ticket per required open readiness row"; the change skill's refusal to archive a kernel change that
+  lacks a record; the impact assessment run from a plain-language question. Until then they are unmeasured,
+  not met.
+- **The declaration's command names paths under `template/…`,** which an installed project does not have (its
+  skills are under `governance/kernel/…`). True of every declared check today: for the adoption tickets
+  (W1-39, W1-41).
+- **The first return declared the check with the command `true`,** because the validator did not exist yet
+  (DEC-439 reopened W1-26 for it). The second return runs the real validator.
+- **W1-26's fixture was revised for this ticket:** a project built by W1-26's suite now holds the kernel's
+  skill folders, copied generically, since a check that finds no skill is unmeasured and red (DEC-425). No
+  assertion was changed.
+- **This suite and W1-36's cannot be collected in one pytest run:** both import their fixtures from a module
+  named `conftest` by its bare name, and the second import finds the first. Each passes alone, which is how the
+  regression runs them. For the exit run.
+- **Records:** the merge-back `84bf8d12` was made with git's `ours` preference after the plain merge
+  conflicted on W1-26's README (the branch's file had been aligned to the integration branch's version plus
+  its own lines); the containment check flagged that merge for its own change to that README, and an earlier
+  merge `91568f75` for the shared W1-07 support file. Both are byte-level outcomes of aligned files.
+- **Learning metrics:** two lead starts, plus two short test-designer turns started by the orchestrator (the
+  fixture, the alignment); 112 cases; no reviewer round (STANDARD, self-review); about 200 lines of skill text
+  and a 5-line declaration.
+- **Regression at `ab1fa23c`:** every suite green, no latency occurrence.
+
+## W1-36 residuals (the skills retrieval, audit, checkpoint and adopt, and their checks, 2026-10-07)
+
+- **Built:** four skill files under `template/governance/kernel/skills/` (retrieval, audit, checkpoint, adopt),
+  versioned and within the size limits; the declaration `skill-regression-b1` (W1-26's skill validator over
+  the four folders); the declaration `audit-reproducibility` (W1-26's audit validator over `docs/audit/`,
+  tier G1, hard block). The audit skill (v1.1.0) describes the report form of DEC-441.
+- **"Not applicable until the first audit" (DEC-447):** the audit declaration carries
+  `allows-not-applicable: "true"`. With no report under `docs/audit/` the family is YELLOW with that reason;
+  with a valid report GREEN; with an invalid one RED, a hard block.
+- **The suite tests the text of the skills and the checks on constructed reports, not sessions.** Measured only
+  at the Wave 1 exit (W1-42, W1-43): retrieval runs its facets in disposable subagents and only the validated
+  bundle returns ("intermediate retrieval batches appear in the main context" is a failure line); the audit
+  reports the planted divergence on the MR-A-06 and MR-B-06 dev scenarios; the audit starts a fresh session
+  whose only inputs are the context pack and the repository, and edits no audited file; contested and
+  owner-level findings appear as decision packages; a wave-exit report has one row per LITE feature
+  specification closed in the wave. Until then they are unmeasured, not met.
+- **The vendored superpowers skills carry no `version`,** so the skill-regression declaration names the four
+  folders instead of the whole skills folder, and those three skills are not validated. Open: add a version to
+  the vendored copies (they are committed unchanged, DEC-194) or leave them outside the check.
+- **Declared commands name paths under `template/…`,** which an installed project does not have: for the
+  adoption tickets (W1-39, W1-41).
+- **W1-26's suite was revised for this ticket:** five cases remove the kernel's own audit declaration from
+  their temporary project, because a second check of the same family (over another folder) made their family
+  status ambiguous; the fixture's skill copy was aligned to the integration branch's. No assertion was changed.
+- **Records:** the merge-back `15ac9b54` was flagged by the containment check for the shared W1-26 support
+  file (aligned to the integration branch's version before the merge, DEC-412).
+- **Learning metrics:** two lead starts (the first declared its checks with commands that exited 0 whatever
+  they found), then four short worker turns started by the orchestrator (alignment, DEC-447 cases, the field,
+  the W1-26 life-cycle case); 84 cases; no reviewer round (STANDARD); about 165 lines of skill text and two
+  declarations.
+- **Regression at `087a166a`:** every suite green, no latency occurrence.
