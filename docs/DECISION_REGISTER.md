@@ -5328,3 +5328,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.124 | 2026-10-07 | One delegated decision on W1-30: DEC-487 (the review's thirteen findings; ten settled behaviours for a follow-up, cases first; four residuals). Next free id: DEC-488. |
+
+## 125. One delegated decision on W1-39: the lock comparison, the update procedure, the adapter generation step (register v0.125, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-488 — W1-39: one comparison of a project with its lock, owned by W1-39; the update procedure is in the template's messages and the lock's header; adapter generation is a documented step after `copier copy`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-1 (in part), P-3 and P-4 (`log/W1-39-lead-run1.json`), each with the lead's recommendation. The parts of its packages that change a ticket's allowed paths (P-1's call site in `gov doctor`, P-2, P-5) are the owner's and are not decided here.
+- **Decision:**
+  - **The comparison of a project with its lock is built once, by W1-39, as a public function of its own code:** given a project, it answers match or drift, the drifted files, and the reason where it could not compare. It never answers match without having hashed: an absent or empty manifest is not a match; a kernel file that the manifest does not list is drift, named; the lock's template tag and commit are compared with the answers file. `gov doctor` is to call it (where and under which ticket: with the owner).
+  - **Only `__pycache__/` folders are left out of "a kernel file the manifest does not list".** Git-ignored files in general are not left out: an ignore rule is the project's to write, and a file hidden by one would escape the comparison.
+  - **The update procedure is documented in two places that reach a product repository:** the template's messages after copy and after update, and a comment header of the generated lock.
+  - **`copier copy` does not run the adapter generation.** Generating `.claude/`, `CLAUDE.md` and `AGENTS.md` from `.rulesync/` is a documented step after the copy, named in the procedure; an install does not fail where rulesync or Node is absent. W1-41's adoption runs or names the step.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.125 | 2026-10-07 | One delegated decision on W1-39: DEC-488 (the lock comparison is W1-39's and never matches unhashed; only `__pycache__/` is left out; the update procedure in the template's messages and the lock's header; adapter generation a documented step). Next free id: DEC-489. |
