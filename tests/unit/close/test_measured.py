@@ -3,6 +3,7 @@ argument is a time limit, every commit of the range is somebody's, the probe rec
 test runs are the suite's own, and a close that fails at its last step leaves nothing that says it closed."""
 from __future__ import annotations
 
+import json
 import os
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -357,7 +358,7 @@ def test_nothing_else_of_the_callers_environment_is_taken_away(tmp_path, monkeyp
     monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
     before = {key: value for key, value in os.environ.items() if key != "PYTEST_ADDOPTS"}
     _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
-    assert seen == before | {"PYTHONPATH": f"{tmp_path / 'src'}{os.pathsep}/elsewhere"}
+    assert seen == before | {"PYTHONPATH": str(tmp_path / "src")}
 
 
 @pytest.mark.parametrize("files", [{"test_a": SKIPPED}, {"test_a": SKIPPED, "test_b": SKIPPED},
@@ -409,8 +410,9 @@ def test_a_ticket_tool_that_fails_on_closing_leaves_nothing_that_says_the_ticket
     assert _says_closed(root) == []
 
 
-def test_an_absent_ticket_tool_leaves_nothing_that_says_the_ticket_closed(root):
+def test_an_absent_ticket_tool_leaves_nothing_that_says_the_ticket_closed(root, monkeypatch):
     (root / "governance" / "kernel" / "bin" / "tk").unlink()
+    monkeypatch.setattr("gov.close.tool.shutil.which", lambda name: None)
     with pytest.raises(GovError) as raised:
         _record_and_close(root, TICKET, {}, [])
     assert raised.value.code == "TICKET_TOOL_ABSENT" and _says_closed(root) == []
@@ -459,5 +461,12 @@ def test_a_finding_and_could_not_measure_are_two_ways_out(root):
                                                                                return_value=[]):
         with pytest.raises(GovError) as raised:
             run(root, _args(), {})
-    assert (raised.value.code, raised.value.exit_code) == ("TRAILER_MISSING", EXIT_CHECK_FAILED)
-    assert _count_path(root, TICKET).is_file() and len(list((root / ".tickets").glob("*.md"))) == 2
+    # every gate was asked (DEC-492): the one refusal holds each gate's finding, counted once
+    assert (raised.value.code, raised.value.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
+    assert [part["code"] for part in raised.value.details["parts"]] == [
+        "TRAILER_MISSING", "NO_ACCEPTANCE_TESTS", "CHECKPOINT_MISSING", "CONTEXT_FAILED"]
+    assert len(raised.value.details["findings"]) == 4
+    assert [part.split(":")[0] for part in raised.value.details["not_measured"]] == [
+        f"the containment of the commits of {TICKET}", f"the acceptance run of {TICKET}"]
+    assert json.loads(_count_path(root, TICKET).read_text(encoding="utf-8"))["count"] == 1
+    assert len(list((root / ".tickets").glob("*.md"))) == 2

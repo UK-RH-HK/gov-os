@@ -55,8 +55,9 @@ def test_the_ignored_folder_is_not_run(tmp_path):
     assert _run_tests(tmp_path, tests, 60, ignore=tests / "unit", none_collected_ok=True)[0] == []
 
 
-def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_first(tmp_path, monkeypatch):
-    """Nothing but ``PYTHONPATH`` is set for the test run: no place of one machine is read."""
+def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_on_the_path(tmp_path, monkeypatch):
+    """Nothing but ``PYTHONPATH`` is set for the test run, and it is the project's ``src/`` alone: the caller's
+    is not passed on."""
     seen = {}
 
     def fake_run(cmd, **keys):
@@ -68,7 +69,15 @@ def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_first(t
     monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
     before = dict(os.environ)
     _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
-    assert seen == before | {"PYTHONPATH": f"{tmp_path / 'src'}{os.pathsep}/elsewhere"}
+    assert seen == before | {"PYTHONPATH": str(tmp_path / "src")}
+
+
+def test_a_test_runner_this_process_had_from_the_callers_path_alone_is_absent_not_a_finding(tmp_path, monkeypatch):
+    monkeypatch.setattr("gov.close.command.subprocess.run", lambda cmd, **keys: SimpleNamespace(
+        returncode=1, stdout="", stderr="/usr/bin/python3: No module named pytest\n"))
+    with pytest.raises(GovError) as raised:
+        _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
+    assert raised.value.code == "TEST_RUNNER_ABSENT" and "PYTHONPATH" in raised.value.message
 
 
 def test_an_interpreter_without_pytest_is_an_error_and_no_test_is_run(tmp_path, monkeypatch):

@@ -14,6 +14,10 @@ Two ways a close ends without closing, and neither becomes the other
 (the tree is not its commit, the record store is older than the commit, a
 state file is no state, an invalid argument, an error of a tool) is a
 ``GovError`` raised as it is: exit code 1, not counted, no repair ticket.
+
+A run does not end at its first finding (DEC-492): every gate is asked, and
+the one refusal names every finding, counted once, with one repair ticket.
+What a finding left unmeasurable is named in it as not measured.
 """
 
 from __future__ import annotations
@@ -25,13 +29,14 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import state as _state
+from gov.close import state as _state, tool as _tool
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tree_differences as _tree_differences)
 from gov.close.state import (ESCALATION_AT, ESCALATION_OPTIONS as _ESCALATION_OPTIONS,
                              ESCALATION_REASON as _ESCALATION_REASON, count_path as _count_path,
                              read_count as _read_count, write_count as _write_count)
+from gov.close.tool import open_repair_ticket as _open_repair_ticket, tk as _tk  # noqa: F401
 
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
 DEFAULT_TIMEOUT = 120
@@ -70,12 +75,15 @@ class _Finding(Exception):
     """A finding about the ticket's work, raised by a gate; ``run`` gives it to ``_refuse`` (DEC-455)."""
 
     def __init__(self, code: str, message: str, details: dict | None = None,
-                 findings: list[str] | None = None):
+                 findings: list[str] | None = None, *, exit_code: int = EXIT_CHECK_FAILED,
+                 not_measured: list[str] | None = None):
         super().__init__(message)
         self.code = code
         self.message = message
         self.details = details or {}
         self.findings = findings or [message]
+        self.exit_code = exit_code
+        self.not_measured = not_measured or []  # what this finding left unmeasurable, by name (DEC-492)
 
 
 def add_arguments(parser) -> None:
@@ -138,78 +146,32 @@ def run(root: Path, args, config: dict):
     ticket_input = {"id": ticket, "hash":
                     "sha256:" + hashlib.sha256(ticket_path.read_bytes()).hexdigest()}
 
-    try:
-        if profile == "FULL":
-            _check_probe(root, ticket, commits, others, inside)
-        _check_trailers(commits, ticket)
-        _check_unmeasured(ticket, others, own)
-        _check_containment(root, commits)
-        # The acceptance tests are part of the ticket's work (DEC-480)
-        acceptance_dir = root / "tests" / "acceptance" / wbs
-        if not acceptance_dir.is_dir() or not any(acceptance_dir.rglob("test_*.py")):
-            raise _Finding("NO_ACCEPTANCE_TESTS",
-                           f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
-                           {"ticket": ticket, "wbs": wbs})
-    except _Finding as f:
-        _refuse(root, ticket, f.code, f.message, f.findings, f.details)
+    # Every gate is asked, whatever an earlier one found (DEC-492)
+    found: list[_Finding] = []
 
+    def gate(check, *given):
+        try:
+            return check(*given)
+        except _Finding as f:
+            found.append(f)
+
+    if profile == "FULL":
+        gate(_check_probe, root, ticket, commits, others, inside)
+    gate(_check_trailers, commits, ticket)
+    gate(_check_unmeasured, ticket, others, own)
+    gate(_check_containment, root, commits)
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end.
-    findings, test_counts = _run_tests(root, acceptance_dir, timeout)
-    more, counts = _run_tests(root, root / "tests", timeout,
-                              ignore=acceptance_dir, none_collected_ok=True)
-    findings += more
-    for key in test_counts:
-        test_counts[key] += counts[key]
+    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout)
+    counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs)
+    # A commit of the range that names no task and changes a governance file has the checks run too (DEC-490)
+    checked = gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c)])
+    gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
+    packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
-    # Governance checks (A7, DEC-480): where the runner blocks, what it reports
-    # as blocking is a finding like a failing test
-    # A commit of the range that names no task and changes a governance file has them run too (DEC-490)
-    checked, blocking = _check_governance(root, commits + [c for c in others if _names_no_task(c)])
-    if blocking is not None:
-        at = f"at commit {checked['check_commit'][:12]}"
-        findings += [f"governance check {check['id']} is RED {at}: "
-                     f"{json.dumps(check.get('findings'), ensure_ascii=False)}"
-                     for check in blocking["red_checks"]]
-        findings += [f"governance check family {name!r} is RED {at}" for name in blocking["red_families"]]
-        if not any(blocking.values()):
-            findings.append(f"the governance checks block {at}; the runner names no red check or family")
-
-    if findings:
-        details = {"findings": findings, "disposition": disposition or "unclassed"}
-        if blocking is not None:
-            details.update(check_commit=checked["check_commit"], **blocking)
-        packet, context_reason = None, None
-        if disposition:  # DEC-454: with a class, the context is built first
-            try:
-                packet = _build_context(root, ticket)
-            except _Finding as f:
-                context_reason = details["context"] = f.message
-        else:
-            details["note"] = "findings await their class; use --disposition to classify"
-        _refuse(root, ticket, "CHECK_FAILED",
-                "tests or checks failed" if disposition else
-                "tests or checks failed; findings are unclassed and await disposition",
-                findings, details, disposition=disposition,
-                context_hash=packet["hash"] if packet else None,
-                context_reason=context_reason)
-
-    # Watchdog (B1)
-    from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT
-    from gov.checkpoint.record import watch as checkpoint_watch
-    try:
-        checkpoint_watch(root, ticket, max_age_minutes=MAX_AGE_MINUTES,
-                         max_commits=MAX_COMMITS,
-                         max_context=MAX_CONTEXT, context_utilisation=None)
-    except GovError as e:
-        _refuse(root, ticket, e.code, e.message, [e.message], e.details,
-                exit_code=e.exit_code)
-
-    # Context (DEC-454, DEC-470)
-    try:
-        packet = _build_context(root, ticket)
-    except _Finding as f:
-        _refuse(root, ticket, f.code, f.message, f.findings, f.details)
+    if found:
+        _refuse_for(root, ticket, found, disposition, packet)
+    test_counts = {key: test_counts[key] + counts[key] for key in test_counts}
 
     mandatory = packet["mandatory"]
     commit_files = sorted({p for c in commits for p in c["paths"]})
@@ -252,6 +214,37 @@ def _time_limit(given, config: dict):
                         f"the time limit ({named}) must be a positive number of seconds, got {limit!r}",
                         {"argument": named, "timeout": str(limit)})
     return limit
+
+
+def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
+                packet: dict | None) -> None:
+    """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
+    order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
+    part under ``parts``."""
+    lines = list(dict.fromkeys(line for f in found for line in f.findings))
+    not_measured = list(dict.fromkeys(part for f in found for part in f.not_measured))
+    codes = sorted({f.code for f in found})
+    if len(found) == 1:
+        message, details = found[0].message, dict(found[0].details)
+    else:
+        message = ("tests or checks failed" if codes == ["CHECK_FAILED"] else
+                   f"{len(lines)} findings refuse the close of {ticket} ({', '.join(codes)})")
+        details = {"parts": [{"code": f.code, "message": f.message, **f.details} for f in found]}
+    details["disposition"] = disposition or "unclassed"
+    if not_measured:
+        details["not_measured"] = not_measured
+    context_reason = None
+    if disposition:  # DEC-454: a class is given with the whole-system context, or says that it had none
+        context_reason = next((f.message for f in found if f.code == "CONTEXT_FAILED"), None)
+        if context_reason:
+            details["context"] = context_reason
+    else:
+        message += "; findings are unclassed and await disposition"
+        details["note"] = "findings await their class; use --disposition to classify"
+    _refuse(root, ticket, codes[0] if len(codes) == 1 else "CHECK_FAILED", message, lines, details,
+            exit_code=found[0].exit_code if len(found) == 1 else EXIT_CHECK_FAILED,
+            disposition=disposition, context_hash=packet["hash"] if packet and disposition else None,
+            context_reason=context_reason, not_measured=not_measured)
 
 
 # ---------------------------------------------------------------------------
@@ -340,7 +333,7 @@ def _record_and_close(root: Path, ticket: str, record: dict, commit_files: list[
             close_rel = _write_close_record(root, ticket, record, commit_files, checkpoint_path)
         except OSError as e:
             raise cannot_record(e)
-        _tk(root, "close", ticket)
+        _tool.close(root, ticket)
     except GovError as failed:
         left = []
         for path, before in ((root / checkpoint_path, None), (close_path, earlier)):
@@ -427,29 +420,36 @@ def _commit_models(commits: list[dict]) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def _check_trailers(commits: list[dict], ticket: str) -> None:
+    """Every commit of the ticket is somebody's and implements something (DEC-487): each trailer a commit
+    lacks is a finding. Without a commit, what is judged of the ticket's commits was not measured."""
     if not commits:
         raise _Finding("TRAILER_MISSING",
                        f"no commits found with Task: {ticket} trailer",
-                       {"ticket": ticket})
-    for c in commits:
-        for key in ("Implements", "Role"):  # a commit of the ticket is somebody's (DEC-487)
-            if not c["trailers"].get(key):
-                raise _Finding("TRAILER_MISSING",
-                               f"commit {c['sha'][:12]} lacks {key}: trailer",
-                               {"commit": c["sha"][:12], "ticket": ticket})
+                       {"ticket": ticket},
+                       not_measured=[f"the containment of the commits of {ticket}: not measured, it has no commit"])
+    lacking = [(c["sha"][:12], key) for c in commits for key in ("Implements", "Role")
+               if not c["trailers"].get(key)]
+    if lacking:
+        lines = [f"commit {sha} lacks {key}: trailer" for sha, key in lacking]
+        raise _Finding("TRAILER_MISSING", "; ".join(lines),
+                       {"commit": lacking[0][0], "commits": sorted({sha for sha, _ in lacking}), "ticket": ticket},
+                       lines)
 
 
 def _check_unmeasured(ticket: str, others: list[dict], own) -> None:
     """A commit in the ticket's range that names no task and changes the ticket's work (its acceptance
     tests, a path inside its allowed paths, its own file) refuses: no ticket measured it. What a commit
     that names another ticket changes is that ticket's, and any other path refuses nothing (DEC-490)."""
+    found = []
     for c in others:
         changed = [p for p in c["paths"] if own(p)] if _names_no_task(c) else []
         if changed:
-            raise _Finding("WORK_WITHOUT_TASK",
-                           f"commit {c['sha'][:12]} names no task and changes {', '.join(changed)}: "
-                           f"work on {ticket} that no ticket measured",
-                           {"commit": c["sha"][:12], "ticket": ticket, "paths": changed})
+            found.append({"commit": c["sha"][:12], "paths": changed})
+    if found:
+        lines = [f"commit {f['commit']} names no task and changes {', '.join(f['paths'])}: "
+                 f"work on {ticket} that no ticket measured" for f in found]
+        raise _Finding("WORK_WITHOUT_TASK", "; ".join(lines),
+                       {**found[0], "ticket": ticket, "work_without_task": found}, lines)
 
 
 def _check_containment(root: Path, commits: list[dict]) -> None:
@@ -457,6 +457,8 @@ def _check_containment(root: Path, commits: list[dict]) -> None:
     refuses, as returned. This command has no rule of its own."""
     from gov.guard.containment import ContainmentError, judge_commits
 
+    if not commits:  # nothing to judge: the finding "no commits" says of containment that it was not measured
+        return
     try:
         judged = judge_commits(str(root), [c["sha"] for c in commits])
     except ContainmentError as e:
@@ -484,7 +486,8 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
     from gov.tasks.tickets import frontmatter
 
     def invalid(message: str, **details):
-        return _Finding("PROBE_INVALID", message, {"ticket": ticket, **details})
+        return _Finding("PROBE_INVALID", message, {"ticket": ticket, **details}, not_measured=[
+            f"what the probe gate of {ticket} asks after this finding: not measured, the gate ends at its first"])
 
     probe_dir = root / "docs" / "probes" / ticket
     if not probe_dir.is_dir():
@@ -581,6 +584,27 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
 # Test runner (A2)
 # ---------------------------------------------------------------------------
 
+def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None = None) -> dict:
+    """The counts of a test run without a finding; ``CHECK_FAILED`` with its findings. With ``ignore`` the run
+    is the regression run, which may collect nothing."""
+    findings, counts = _run_tests(root, test_path, timeout, ignore=ignore, none_collected_ok=ignore is not None)
+    if findings:
+        raise _Finding("CHECK_FAILED", "tests or checks failed", {"tests_run": counts}, findings)
+    return counts
+
+
+def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int) -> dict:
+    """The counts of the ticket's acceptance run. The acceptance tests are part of the ticket's work
+    (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492)."""
+    folder = root / "tests" / "acceptance" / wbs
+    if not folder.is_dir() or not any(folder.rglob("test_*.py")):
+        raise _Finding("NO_ACCEPTANCE_TESTS",
+                       f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
+                       {"ticket": ticket, "wbs": wbs},
+                       not_measured=[f"the acceptance run of {ticket}: not measured, it has no acceptance tests"])
+    return _check_tests(root, folder, timeout)
+
+
 def _run_tests(root: Path, test_path: Path, timeout: int,
                ignore: Path | None = None,
                none_collected_ok: bool = False) -> tuple[list[str], dict]:
@@ -606,10 +630,9 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 
     rel = str(test_path.relative_to(root))
     # The run is the suite's own (DEC-487): what the caller's environment would add to the test runner
-    # (options, plugins) is not passed on.
+    # (options, plugins) or put before the project's own code (the caller's PYTHONPATH) is not passed on.
     env = {key: value for key, value in os.environ.items() if key not in _TEST_RUNNER_VARIABLES}
-    env["PYTHONPATH"] = os.pathsep.join(
-        [str(root / "src")] + [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p])
+    env["PYTHONPATH"] = str(root / "src")
     cmd = [sys.executable, "-m", "pytest", str(test_path), "-q",
            "-p", "no:cacheprovider", "--tb=line", "--no-header"]
     if ignore is not None:
@@ -629,6 +652,10 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
             break
 
     rc = result.returncode
+    if rc == 1 and "No module named pytest" in result.stderr:  # this process had it from the caller's PYTHONPATH
+        raise GovError("TEST_RUNNER_ABSENT",
+                        f"pytest is not installed for {sys.executable} without the caller's PYTHONPATH: "
+                        "no test was run", {"python": sys.executable})
     if rc == 0 and not none_collected_ok and not counts["passed"]:
         return [f"no test passed in {rel}: nothing of it was measured"], counts
     if rc == 0 or (rc == 5 and none_collected_ok):
@@ -691,6 +718,34 @@ def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, dict | Non
     return stated, {"red_checks": red, "red_families": red_families} if blocks else None
 
 
+def _check_governance_blocks(root: Path, commits: list[dict]) -> dict:
+    """What the close record states of the governance checks (A7, DEC-480); where the runner blocks, what it
+    reports as blocking is a finding like a failing test."""
+    checked, blocking = _check_governance(root, commits)
+    if blocking is None:
+        return checked
+    at = f"at commit {checked['check_commit'][:12]}"
+    findings = [f"governance check {check['id']} is RED {at}: "
+                f"{json.dumps(check.get('findings'), ensure_ascii=False)}" for check in blocking["red_checks"]]
+    findings += [f"governance check family {name!r} is RED {at}" for name in blocking["red_families"]]
+    if not any(blocking.values()):
+        findings.append(f"the governance checks block {at}; the runner names no red check or family")
+    raise _Finding("CHECK_FAILED", "tests or checks failed",
+                   {"check_commit": checked["check_commit"], **blocking}, findings)
+
+
+def _check_checkpoint(root: Path, ticket: str) -> None:
+    """The watchdog's judgement of the ticket's latest checkpoint, with W1-25's thresholds (B1): any error of
+    it refuses, with its own code."""
+    from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT
+    from gov.checkpoint.record import watch as checkpoint_watch
+    try:
+        checkpoint_watch(root, ticket, max_age_minutes=MAX_AGE_MINUTES, max_commits=MAX_COMMITS,
+                         max_context=MAX_CONTEXT, context_utilisation=None)
+    except GovError as e:
+        raise _Finding(e.code, e.message, e.details, exit_code=e.exit_code)
+
+
 # ---------------------------------------------------------------------------
 # The one path of a refusal for a finding about the ticket's work (DEC-455)
 # ---------------------------------------------------------------------------
@@ -699,7 +754,7 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
             findings: list[str], details: dict | None = None, *,
             exit_code: int = EXIT_CHECK_FAILED,
             disposition: str | None = None, context_hash: str | None = None,
-            context_reason: str | None = None):
+            context_reason: str | None = None, not_measured: list[str] | None = None):
     """Count the refusal, open its repair ticket, write the escalation at the
     third, and raise the refusal. The next attempt after the third is blocked
     in ``run`` before anything runs."""
@@ -729,79 +784,8 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
 
     details = {"findings": findings, **(details or {})}
     details["repair_ticket"] = _open_repair_ticket(
-        root, ticket, findings, disposition, context_hash, context_reason)
+        root, ticket, findings, disposition, context_hash, context_reason, not_measured)
     raise GovError(code, message, details, exit_code=exit_code)
-
-
-# ---------------------------------------------------------------------------
-# The ticket tool (B2, B3)
-# ---------------------------------------------------------------------------
-
-def _tk(root: Path, *args: str) -> str:
-    """The output of the project's ticket tool; ``TICKET_TOOL_ABSENT`` or ``TICKET_TOOL_FAILED``."""
-    import os
-    from gov.tasks.tickets import TICKETS_REL, TK_REL
-
-    tk_path = root / TK_REL
-    if not tk_path.is_file():
-        raise GovError("TICKET_TOOL_ABSENT",
-                        f"the ticket tool (tk) is not available at {TK_REL}",
-                        {"command": args[0]})
-    try:
-        done = subprocess.run(
-            [str(tk_path), *args], capture_output=True, text=True, cwd=str(root),
-            env={**os.environ, "TICKETS_DIR": str(root / TICKETS_REL)})
-    except OSError as e:
-        raise GovError("TICKET_TOOL_FAILED", f"tk {args[0]} cannot run: {e}",
-                        {"command": args[0]})
-    if done.returncode != 0:
-        raise GovError("TICKET_TOOL_FAILED",
-                        f"tk {args[0]} failed with exit code {done.returncode}: "
-                        f"{done.stderr.strip()[:200]}",
-                        {"command": args[0]})
-    return done.stdout
-
-
-def _open_repair_ticket(root: Path, ticket: str, findings: list[str],
-                        disposition: str | None = None,
-                        context_hash: str | None = None,
-                        context_reason: str | None = None) -> str:
-    """Open the repair ticket of a refused close through the ticket tool: its
-    parent and its findings with ``tk create``, its dependency on ``ticket``
-    with ``tk dep``. Returns what the answer says of it: its id, or that none
-    was opened and why. No ticket file is written by any other means.
-    """
-    from gov.tasks.tickets import TICKETS_REL
-
-    description = [f"Findings of the refused close of {ticket} "
-                   f"(disposition: {disposition or 'unclassed'}):"]
-    description += [f"- {finding}" for finding in findings]
-    if context_reason:
-        description.append(f"The class was given without whole-system context: {context_reason}")
-    try:
-        created = _tk(root, "create", f"Repair {ticket}: {findings[0][:60]}",
-                      "--parent", ticket, "-d", "\n".join(description))
-    except GovError as e:
-        return f"not opened: {e.message}"
-    repair_id = created.strip().split("\n")[-1]
-    path = root / TICKETS_REL / f"{repair_id}.md"
-
-    # What tk has no option for, as lines of the frontmatter tk wrote (as
-    # gov.tasks.tickets.create adds state_class): the class and the context hash.
-    fields = ["state_class: AUTHORITATIVE", f"disposition: {disposition or 'unclassed'}"]
-    if context_hash:
-        fields.append(f"context_hash: {context_hash}")
-    try:
-        lines = path.read_text(encoding="utf-8").split("\n")
-        end = lines.index("---", 1)
-        _state.write_whole(path, "\n".join(lines[:end] + fields + lines[end:]))
-    except (OSError, ValueError) as e:
-        return f"{repair_id} opened by tk; its class could not be recorded: {e}"
-    try:
-        _tk(root, "dep", repair_id, ticket)
-    except GovError as e:
-        return f"{repair_id} opened; its dependency on {ticket} was not recorded: {e.message}"
-    return repair_id
 
 
 # ---------------------------------------------------------------------------

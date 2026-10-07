@@ -142,6 +142,7 @@ def _close(root, *, tests=True, entries=(), test_findings=(), families=None, blo
     with patch.object(command, "_ticket_commits", return_value=[_commit(HEAD, NOTES)]), \
             patch.object(command, "_check_trailers"), patch.object(command, "_check_containment"), \
             patch.object(command, "_check_tree"), patch.object(command, "_commits_since", return_value=[]), \
+            patch.object(command, "_check_checkpoint"), patch.object(command, "_build_context"), \
             patch.object(command, "_run_tests", return_value=(list(test_findings), dict(COUNTS))) as ran, \
             patch.object(command, "_git", return_value=HEAD + "\n"), \
             patch("gov.check.runner.run_checks",
@@ -189,15 +190,20 @@ def test_a_block_the_runner_names_nothing_for_still_refuses(root):
 
 def test_a_red_check_and_a_failing_test_are_one_refusal(root):
     error, _ = _close(root, entries=[_entry("a", "hard-block", "RED")], test_findings=["FAILED test_a"])
-    assert len(error.details["findings"]) == 3 and _counted(root)["count"] == 1  # two test runs, one check
-    assert len(list((root / ".tickets").glob("*.md"))) == 2
+    # two test runs with the same finding and one check: each finding is named once (DEC-492)
+    assert error.details["findings"] == ["FAILED test_a", f"governance check a is RED at commit {HEAD[:12]}: []"]
+    assert [part["code"] for part in error.details["parts"]] == ["CHECK_FAILED"] * 3
+    assert error.details["parts"][2]["check_commit"] == HEAD and error.code == "CHECK_FAILED"
+    assert _counted(root)["count"] == 1 and len(list((root / ".tickets").glob("*.md"))) == 2
 
 
 @pytest.mark.parametrize("tests", [None, False], ids=["no-folder", "folder-without-a-test"])
 def test_a_ticket_without_acceptance_tests_refuses_counted_with_a_repair_ticket(root, tests):
-    error, ran = _close(root, tests=tests)
+    error, ran = _close(root, tests=tests, entries=[_entry("ok", "hard-block", "GREEN")], blocks=False)
     assert (error.code, error.exit_code) == ("NO_ACCEPTANCE_TESTS", EXIT_CHECK_FAILED)
     assert "acceptance" in error.message
-    ran.assert_not_called()
+    assert error.details["not_measured"] == [f"the acceptance run of {TICKET}: not measured, it has no acceptance tests"]
+    [regression] = ran.call_args_list   # the acceptance run is the one run that is not made (DEC-492)
+    assert regression.kwargs["ignore"] == root / "tests" / "acceptance" / TICKET
     assert _counted(root)["count"] == 1
     assert (root / ".tickets" / f"{error.details['repair_ticket']}.md").is_file()

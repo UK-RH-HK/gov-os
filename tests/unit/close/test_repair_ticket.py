@@ -47,8 +47,9 @@ def test_a_context_that_failed_is_named_and_no_hash_is_recorded(root):
     assert "the context cannot be built: X" in path.read_text(encoding="utf-8")
 
 
-def test_an_absent_tool_opens_nothing_and_is_named(root):
+def test_an_absent_tool_opens_nothing_and_is_named(root, monkeypatch):
     (root / TOOL).unlink()
+    monkeypatch.setattr("gov.close.tool.shutil.which", lambda name: None)
     said = _open_repair_ticket(root, TICKET, ["a finding"])
     assert said.startswith("not opened") and "tk" in said
     assert _tickets(root) == [TICKET]
@@ -79,8 +80,9 @@ def test_closing_through_the_tool(root):
     assert frontmatter(root / ".tickets" / f"{TICKET}.md")["status"] == "closed"
 
 
-def test_closing_without_the_tool_is_an_error(root):
+def test_closing_without_the_tool_is_an_error(root, monkeypatch):
     (root / TOOL).unlink()
+    monkeypatch.setattr("gov.close.tool.shutil.which", lambda name: None)
     with pytest.raises(GovError) as raised:
         _tk(root, "close", TICKET)
     assert raised.value.code == "TICKET_TOOL_ABSENT"
