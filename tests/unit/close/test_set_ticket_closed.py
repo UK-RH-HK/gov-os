@@ -1,10 +1,10 @@
-"""Unit tests for YAML-safe ticket closing."""
+"""Unit tests for ticket closing via tk in gov close."""
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
-import yaml
 
 
 @pytest.fixture
@@ -12,53 +12,40 @@ def root(tmp_path):
     r = tmp_path / "project"
     tickets = r / ".tickets"
     tickets.mkdir(parents=True)
+    tk_dir = r / "governance" / "kernel" / "bin"
+    tk_dir.mkdir(parents=True)
+    tk = tk_dir / "tk"
+    tk.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    tk.chmod(0o755)
     return r
 
 
-class TestSetTicketClosed:
-    def test_sets_status_to_closed(self, root):
-        from gov.close.command import _set_ticket_closed
+class TestCloseTicketViaTk:
+    def test_calls_tk_close(self, root):
+        from gov.close.command import _close_ticket_via_tk
 
-        path = root / ".tickets" / "T-0001.md"
-        path.write_text("---\nid: T-0001\nstatus: open\n---\n\n# Title\n",
-                        encoding="utf-8")
-        _set_ticket_closed(root, "T-0001")
-        text = path.read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        front = yaml.safe_load(parts[1])
-        assert front["status"] == "closed"
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = type("R", (), {"returncode": 0, "stderr": ""})()
+            _close_ticket_via_tk(root, "T-0001")
+            args = mock_run.call_args[0][0]
+            assert args[-2:] == ["close", "T-0001"]
 
-    def test_preserves_other_fields(self, root):
-        from gov.close.command import _set_ticket_closed
-
-        path = root / ".tickets" / "T-0001.md"
-        path.write_text(
-            "---\nid: T-0001\nstatus: open\nwbs_id: W1-test\nprofile: FULL\n---\n\n# Title\n",
-            encoding="utf-8")
-        _set_ticket_closed(root, "T-0001")
-        text = path.read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        front = yaml.safe_load(parts[1])
-        assert front["id"] == "T-0001"
-        assert front["wbs_id"] == "W1-test"
-        assert front["profile"] == "FULL"
-        assert front["status"] == "closed"
-
-    def test_preserves_body(self, root):
-        from gov.close.command import _set_ticket_closed
-
-        path = root / ".tickets" / "T-0001.md"
-        path.write_text(
-            "---\nid: T-0001\nstatus: open\n---\n\n# Body content\n",
-            encoding="utf-8")
-        _set_ticket_closed(root, "T-0001")
-        text = path.read_text(encoding="utf-8")
-        assert "Body content" in text
-
-    def test_missing_file_raises(self, root):
+    def test_missing_tk_raises(self, root):
         from gov.cli.errors import GovError
-        from gov.close.command import _set_ticket_closed
+        from gov.close.command import _close_ticket_via_tk
 
+        (root / "governance" / "kernel" / "bin" / "tk").unlink()
         with pytest.raises(GovError) as exc:
-            _set_ticket_closed(root, "T-nonexistent")
-        assert exc.value.code == "TICKET_UNKNOWN"
+            _close_ticket_via_tk(root, "T-0001")
+        assert exc.value.code == "TICKET_TOOL_ABSENT"
+
+    def test_tk_failure_raises(self, root):
+        from gov.cli.errors import GovError
+        from gov.close.command import _close_ticket_via_tk
+
+        with patch("subprocess.run") as mock_run:
+            mock_run.return_value = type(
+                "R", (), {"returncode": 1, "stderr": "something failed"})()
+            with pytest.raises(GovError) as exc:
+                _close_ticket_via_tk(root, "T-0001")
+            assert exc.value.code == "TICKET_TOOL_FAILED"

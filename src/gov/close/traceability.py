@@ -47,6 +47,8 @@ def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
         ["git", "-C", str(root), "log", "-1", "--format=%(trailers)", sha],
         capture_output=True, text=True,
     )
+    if result.returncode != 0:
+        raise RuntimeError(f"git log (trailers) failed for {sha[:12]}: {result.stderr.strip()[:200]}")
     trailers: dict[str, list[str]] = {}
     for line in result.stdout.split("\n"):
         line = line.strip()
@@ -67,12 +69,12 @@ def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
 
 def _commits_for_ticket(root: Path, ticket_id: str) -> list[dict]:
     result = subprocess.run(
-        ["git", "-C", str(root), "log", "--all", "--format=%H",
+        ["git", "-C", str(root), "log", "HEAD", "--format=%H",
          f"--grep=Task: {ticket_id}"],
         capture_output=True, text=True,
     )
     if result.returncode != 0:
-        return []
+        raise RuntimeError(f"git log failed for ticket {ticket_id}: {result.stderr.strip()[:200]}")
 
     shas = [s.strip() for s in result.stdout.strip().split("\n") if s.strip()]
     commits = []
@@ -86,16 +88,18 @@ def _commits_for_ticket(root: Path, ticket_id: str) -> list[dict]:
 
 def _record_ids(root: Path) -> set[str]:
     ids = set()
-    try:
-        from gov.store import connect
-        conn = connect(root)
+    store_path = root / ".gov-runtime" / "store.db"
+    if store_path.is_file():
         try:
-            for row in conn.execute("SELECT id FROM records").fetchall():
-                ids.add(row[0])
-        finally:
-            conn.close()
-    except Exception:
-        pass
+            from gov.store import connect
+            conn = connect(root)
+            try:
+                for row in conn.execute("SELECT id FROM records").fetchall():
+                    ids.add(row[0])
+            finally:
+                conn.close()
+        except Exception as exc:
+            raise RuntimeError(f"cannot read the record store: {exc}") from exc
 
     tickets_dir = root / ".tickets"
     if tickets_dir.is_dir():
@@ -116,14 +120,30 @@ def main() -> int:
     root = Path.cwd()
     findings = []
 
-    known_ids = _record_ids(root)
     closed = _closed_tickets(root)
+
+    if not closed:
+        print(json.dumps({"not_applicable": True, "reason": "no closed ticket"}))
+        return 2
+
+    try:
+        known_ids = _record_ids(root)
+    except RuntimeError as exc:
+        print(json.dumps({"findings": [{"code": "STORE_ERROR", "message": str(exc)}]}))
+        return 1
 
     for ticket in closed:
         ticket_id = ticket.get("id", "")
         if not ticket_id:
             continue
-        commits = _commits_for_ticket(root, ticket_id)
+        try:
+            commits = _commits_for_ticket(root, ticket_id)
+        except RuntimeError as exc:
+            findings.append({
+                "code": "GIT_FAILURE",
+                "message": str(exc),
+            })
+            continue
         if not commits:
             findings.append({
                 "code": "NO_COMMITS",

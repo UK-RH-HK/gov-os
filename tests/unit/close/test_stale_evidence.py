@@ -55,60 +55,45 @@ class TestCheckGovernance:
         mock_run.assert_called_once()
 
     @patch("gov.check.runner.run_checks")
-    def test_hard_block_red_check_raises(self, mock_run, tmp_path):
-        check_file = tmp_path / "template" / "governance" / "kernel" / "checks" / "bad.yaml"
-        check_file.parent.mkdir(parents=True)
-        check_file.write_text("id: product-traceability\n", encoding="utf-8")
+    def test_hard_block_red_changed_check_raises(self, mock_run):
         mock_run.return_value = (
-            {"checks": [{"id": "product-traceability",
+            {"checks": [{"id": "bad-check",
                          "severity": "hard-block", "status": "RED"}]},
             True,
         )
         commits = [_commit("aaa", [
-            "template/governance/kernel/checks/bad.yaml"])]
+            "template/governance/kernel/checks/bad-check.yaml"])]
         from gov.cli.errors import GovError
         with pytest.raises(GovError) as exc:
-            _check_governance(tmp_path, commits)
+            _check_governance(Path("/fake"), commits)
         assert exc.value.code == "CHECK_FAILED"
-        assert "product-traceability" in str(exc.value.details)
 
     @patch("gov.check.runner.run_checks")
-    def test_red_status_check_raises(self, mock_run, tmp_path):
-        check_file = tmp_path / "template" / "governance" / "kernel" / "checks" / "c.yaml"
-        check_file.parent.mkdir(parents=True)
-        check_file.write_text("id: my-check\n", encoding="utf-8")
+    def test_warning_red_check_does_not_block(self, mock_run):
         mock_run.return_value = (
-            {"checks": [{"id": "my-check", "severity": "warning",
+            {"checks": [{"id": "warn-check", "severity": "warning",
                          "status": "RED"}]},
             False,
         )
         commits = [_commit("aaa", [
-            "template/governance/kernel/checks/c.yaml"])]
-        from gov.cli.errors import GovError
-        with pytest.raises(GovError) as exc:
-            _check_governance(tmp_path, commits)
-        assert exc.value.code == "CHECK_FAILED"
+            "template/governance/kernel/checks/warn-check.yaml"])]
+        result = _check_governance(Path("/fake"), commits)
+        assert result is not None
 
     @patch("gov.check.runner.run_checks")
-    def test_green_non_hardblock_check_passes(self, mock_run, tmp_path):
-        check_file = tmp_path / "template" / "governance" / "kernel" / "checks" / "ok.yaml"
-        check_file.parent.mkdir(parents=True)
-        check_file.write_text("id: my-check\n", encoding="utf-8")
+    def test_green_hard_block_check_passes(self, mock_run):
         mock_run.return_value = (
-            {"checks": [{"id": "my-check", "severity": "warning",
+            {"checks": [{"id": "ok-check", "severity": "hard-block",
                          "status": "GREEN"}]},
             False,
         )
         commits = [_commit("aaa", [
-            "template/governance/kernel/checks/ok.yaml"])]
-        result = _check_governance(tmp_path, commits)
+            "template/governance/kernel/checks/ok-check.yaml"])]
+        result = _check_governance(Path("/fake"), commits)
         assert result is not None
 
     @patch("gov.check.runner.run_checks")
-    def test_unrelated_check_red_does_not_block(self, mock_run, tmp_path):
-        check_file = tmp_path / "template" / "governance" / "kernel" / "checks" / "mine.yaml"
-        check_file.parent.mkdir(parents=True)
-        check_file.write_text("id: mine\n", encoding="utf-8")
+    def test_unrelated_check_red_does_not_block(self, mock_run):
         mock_run.return_value = (
             {"checks": [{"id": "other-check", "severity": "hard-block",
                          "status": "RED"},
@@ -118,8 +103,29 @@ class TestCheckGovernance:
         )
         commits = [_commit("aaa", [
             "template/governance/kernel/checks/mine.yaml"])]
-        result = _check_governance(tmp_path, commits)
+        result = _check_governance(Path("/fake"), commits)
         assert result is not None
+
+    def test_check_touched_in_multiple_commits_raises_stale(self):
+        commits = [
+            _commit("aaa", ["template/governance/kernel/checks/x.yaml"]),
+            _commit("bbb", ["template/governance/kernel/checks/x.yaml"]),
+        ]
+        from gov.cli.errors import GovError
+        with pytest.raises(GovError) as exc:
+            _check_governance(Path("/fake"), commits)
+        assert exc.value.code == "STALE_EVIDENCE"
+
+    def test_different_checks_in_different_commits_no_stale(self):
+        from unittest.mock import patch as _p
+        with _p("gov.check.runner.run_checks",
+                return_value=({"checks": []}, False)):
+            commits = [
+                _commit("aaa", ["template/governance/kernel/checks/a.yaml"]),
+                _commit("bbb", ["template/governance/kernel/checks/b.yaml"]),
+            ]
+            result = _check_governance(Path("/fake"), commits)
+            assert result is not None
 
     def test_non_governance_template_path_ignored(self):
         commits = [_commit("aaa", ["template/other/file.yaml"]),

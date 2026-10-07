@@ -25,22 +25,38 @@ EXIT_CODES = {
     EXIT_BLOCKED: "blocked by escalation or human gate",
 }
 
-_INFRA_PREFIXES = (
-    ".tickets/", ".gitignore", ".gov-runtime/", "tests/", "docs/",
-    "governance/", "template/", "openspec/",
-)
-
 _GOVERNANCE_PREFIXES = (
     "template/governance/kernel/checks/",
     "template/governance/kernel/schemas/",
     "governance/project/",
     "template/governance/kernel/hooks/",
     "template/governance/kernel/skills/",
+    "template/governance/kernel/policies/",
+    "template/governance/kernel/roles/",
 )
 
 _ESCALATION_OPTIONS = [
     "fix_differently", "narrow", "split", "defer", "delete", "continue",
 ]
+
+_GOV_DOC_PREFIXES = (
+    "docs/adr/", "docs/close/", "docs/checkpoints/", "docs/probes/",
+)
+
+
+def _is_close_infra(path: str, wbs: str) -> bool:
+    if path.startswith((".tickets/", ".gov-runtime/", "governance/",
+                        "template/", "openspec/")):
+        return True
+    if path in ("README.md", "pyproject.toml", ".gitignore", "LICENSE"):
+        return True
+    if path.startswith("tests/"):
+        if path.startswith("tests/acceptance/"):
+            return path.startswith(f"tests/acceptance/{wbs}/")
+        return True
+    if path.startswith("docs/"):
+        return any(path.startswith(p) for p in _GOV_DOC_PREFIXES)
+    return False
 
 
 def add_arguments(parser) -> None:
@@ -91,11 +107,34 @@ def run(root: Path, args, config: dict):
     # Owner decision or escalation check (A6)
     iter_file = root / ".gov-runtime" / "iterations" / f"{ticket}.json"
     if owner_decision:
+        if not iter_file.is_file():
+            raise GovError("INVALID_DECISION",
+                            "owner decision given but no escalation in force",
+                            {"ticket": ticket})
+        try:
+            iter_data = json.loads(iter_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            raise GovError("ITERATION_CORRUPT",
+                            "iteration count file cannot be read or parsed",
+                            {"ticket": ticket})
+        if not isinstance(iter_data, dict):
+            raise GovError("ITERATION_CORRUPT",
+                            "iteration count file has wrong shape",
+                            {"ticket": ticket})
+        count_val = iter_data.get("count", 0)
+        if not isinstance(count_val, int):
+            raise GovError("ITERATION_CORRUPT",
+                            f"iteration count is not an integer: {count_val!r}",
+                            {"ticket": ticket})
+        if count_val < 3:
+            raise GovError("INVALID_DECISION",
+                            "owner decision given but escalation threshold not reached",
+                            {"ticket": ticket})
         _validate_owner_decision(root, owner_decision)
-        if iter_file.is_file():
-            iter_file.write_text(json.dumps(
-                {"count": 0, "last_failures": [], "outcomes": []}
-            ), encoding="utf-8")
+        iter_file.write_text(json.dumps(
+            {"count": 0, "last_failures": [], "outcomes": [],
+             "decision": owner_decision}
+        ), encoding="utf-8")
     elif iter_file.is_file():
         try:
             iter_data = json.loads(iter_file.read_text(encoding="utf-8"))
@@ -103,7 +142,16 @@ def run(root: Path, args, config: dict):
             raise GovError("ITERATION_CORRUPT",
                             "iteration count file cannot be read or parsed",
                             {"ticket": ticket})
-        if iter_data.get("count", 0) >= 3:
+        if not isinstance(iter_data, dict):
+            raise GovError("ITERATION_CORRUPT",
+                            "iteration count file has wrong shape",
+                            {"ticket": ticket})
+        count_val = iter_data.get("count", 0)
+        if not isinstance(count_val, int):
+            raise GovError("ITERATION_CORRUPT",
+                            f"iteration count is not an integer: {count_val!r}",
+                            {"ticket": ticket})
+        if count_val >= 3:
             safe_outcomes = [
                 {k: v for k, v in o.items() if k != "iteration"}
                 for o in (iter_data.get("outcomes") or [])[-1:]
@@ -116,11 +164,54 @@ def run(root: Path, args, config: dict):
                             exit_code=EXIT_BLOCKED)
 
     if profile == "FULL":
-        _check_probe(root, ticket)
+        try:
+            _check_probe(root, ticket)
+        except GovError as e:
+            _handle_failure(root, ticket, [e.message], front)
+            raise
 
     commits = _ticket_commits(root, ticket)
-    _check_trailers(commits, ticket)
-    _check_commit_containment(commits, allowed_paths)
+
+    try:
+        _check_trailers(commits, ticket)
+    except GovError as e:
+        _handle_failure(root, ticket, [e.message], front)
+        raise GovError(e.code, e.message, e.details,
+                       exit_code=EXIT_CHECK_FAILED)
+
+    # Containment via judge_commits (DEC-453)
+    from gov.guard.containment import judge_commits, ContainmentError
+    try:
+        import fnmatch as _fnm
+        commit_shas = [c["sha"] for c in commits]
+        containment_findings = judge_commits(str(root), commit_shas)
+        if containment_findings:
+            violation_msgs = []
+            for finding in containment_findings:
+                outside = [
+                    p for p in finding.paths
+                    if not _is_close_infra(p, wbs)
+                    and not any(_fnm.fnmatch(p, pat)
+                                for pat in allowed_paths)
+                ]
+                if outside:
+                    violation_msgs.append(
+                        f"containment: commit {finding.commit[:12]}"
+                        f" — {', '.join(outside)}")
+            if violation_msgs:
+                _handle_failure(root, ticket, violation_msgs, front)
+                raise GovError("CONTAINMENT_FINDING",
+                                f"containment violations:"
+                                f" {'; '.join(violation_msgs)}",
+                                {"findings": violation_msgs},
+                                exit_code=EXIT_CHECK_FAILED)
+    except ContainmentError as e:
+        msgs = [f"containment: {e}"]
+        _handle_failure(root, ticket, msgs, front)
+        raise GovError("CONTAINMENT_FINDING",
+                        f"containment error: {e}",
+                        {"findings": msgs},
+                        exit_code=EXIT_CHECK_FAILED)
 
     acceptance_dir = root / "tests" / "acceptance" / wbs
     if not acceptance_dir.is_dir() or not list(acceptance_dir.glob("test_*.py")):
@@ -149,21 +240,19 @@ def run(root: Path, args, config: dict):
         _merge_counts(total_counts, counts)
 
     # Governance checks (A7)
-    gov_check_result = _check_governance(root, commits)
+    gov_check_findings = []
+    gov_check_result = None
+    try:
+        gov_check_result = _check_governance(root, commits)
+    except GovError as e:
+        gov_check_findings.append(e.message)
 
-    all_findings = list(test_failures)
+    all_findings = list(test_failures) + gov_check_findings
 
     if all_findings:
         context_hash = None
         if disposition:
-            try:
-                from gov.context import context as build_context
-                ctx = build_context(root, ticket)
-                context_hash = ctx.get("hash", "")
-            except Exception:
-                import hashlib
-                context_hash = hashlib.sha256(
-                    ticket_path.read_bytes()).hexdigest()
+            context_hash = _try_context_hash(root, ticket)
         _handle_failure(root, ticket, all_findings, front,
                         disposition=disposition, context_hash=context_hash)
         details = {"findings": all_findings}
@@ -172,6 +261,8 @@ def run(root: Path, args, config: dict):
             details["note"] = "findings await their class; use --disposition to classify"
         else:
             details["disposition"] = disposition
+        if context_hash is None and disposition:
+            details["context"] = "context could not be built"
         raise GovError(
             "CHECK_FAILED",
             "tests or checks failed; findings are unclassed and await disposition"
@@ -179,60 +270,46 @@ def run(root: Path, args, config: dict):
             details,
             exit_code=EXIT_CHECK_FAILED)
 
-    # Watchdog (B1): any GovError refuses, use W1-25 thresholds
+    # Watchdog (B1)
     from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT
     from gov.checkpoint.record import watch as checkpoint_watch
     try:
         checkpoint_watch(root, ticket, max_age_minutes=MAX_AGE_MINUTES,
                          max_commits=MAX_COMMITS,
                          max_context=MAX_CONTEXT, context_utilisation=None)
-    except GovError:
+    except GovError as e:
+        _handle_failure(root, ticket, [e.message], front)
         raise
 
-    # Context: try to get packet hash and decisions from gov context
-    try:
-        from gov.context import context as build_context
-        ctx = build_context(root, ticket)
-        packet_hash = ctx.get("hash", "")
-        decisions = [item.get("id", "") for item in ctx.get("mandatory", [])
-                     if item.get("authority") == "decision"]
-    except Exception:
-        import hashlib
-        packet_hash = hashlib.sha256(ticket_path.read_bytes()).hexdigest()
-        decisions = []
-
-    # A4: refuse on decision-register contradictions
-    try:
-        from gov.decisions import check as check_decisions
-        dec_findings = check_decisions(root)
-        cycles = [f for f in dec_findings
-                  if f.get("code") in ("SUPERSESSION_CYCLE",)]
-        if cycles:
-            raise GovError("CONTEXT_FAILED",
-                            "gov context cannot be built: decision register "
-                            "has contradictions",
-                            {"ticket": ticket,
-                             "findings": [f.get("code") for f in cycles]})
-    except GovError:
-        raise
-    except Exception:
-        pass
+    # Context (DEC-454)
+    packet_hash, decisions, context_refused = _build_context(root, ticket, front)
+    if context_refused:
+        _handle_failure(root, ticket, [context_refused], front)
+        raise GovError("CONTEXT_FAILED", context_refused,
+                        {"ticket": ticket},
+                        exit_code=EXIT_CHECK_FAILED)
 
     requirements = _collect_requirements(commits)
-    test_paths = _collect_test_paths(root, wbs)
-    skill_versions = _read_skill_versions(root)
     commit_files = _collect_commit_files(commits)
+    test_paths = _collect_test_paths(root, wbs, commit_files)
+    skill_versions = _read_skill_versions(root)
     head_commit = _head(root)
 
-    _set_ticket_closed(root, ticket)
     inputs = _build_inputs(root, ticket, front)
 
     checkpoint_info = _write_checkpoint(root, ticket)
-    close_record_path = _write_close_record(
-        root, ticket, packet_hash, inputs, requirements,
-        decisions, test_paths, skill_versions, checkpoint_info,
-        total_counts, gov_check_result, head_commit, commit_files,
-    )
+    try:
+        close_record_path = _write_close_record(
+            root, ticket, packet_hash, inputs, requirements,
+            decisions, test_paths, skill_versions, checkpoint_info,
+            total_counts, gov_check_result, head_commit, commit_files,
+        )
+    except OSError as e:
+        raise GovError("CLOSE_RECORD_FAILED",
+                        f"cannot write close record: {e}",
+                        {"ticket": ticket})
+
+    _close_ticket_via_tk(root, ticket)
 
     # Reset iteration count on success (A6)
     if iter_file.is_file():
@@ -242,6 +319,87 @@ def run(root: Path, args, config: dict):
 
     return {"ticket": ticket, "close_record": close_record_path,
             "checkpoint": checkpoint_info.get("path", "")}
+
+
+# ---------------------------------------------------------------------------
+# Context helpers (DEC-454)
+# ---------------------------------------------------------------------------
+
+def _try_context_hash(root: Path, ticket: str) -> str | None:
+    try:
+        from gov.store.loader import load
+        load(root)
+    except Exception:
+        pass
+    try:
+        from gov.context import context as build_context
+        ctx = build_context(root, ticket)
+        return ctx.get("hash", "")
+    except Exception:
+        pass
+    try:
+        from gov.decisions import check as check_decisions
+        findings = check_decisions(root)
+        if findings:
+            return None
+    except Exception:
+        return None
+    return _hash_from_inputs(root, ticket)
+
+
+def _build_context(root: Path, ticket: str,
+                   front: dict) -> tuple[str, list[str], str | None]:
+    from gov.cli.errors import GovError
+
+    try:
+        from gov.store.loader import load
+        load(root)
+    except Exception:
+        pass
+
+    try:
+        from gov.decisions import check as check_decisions
+        dec_findings = check_decisions(root)
+        structural = [f for f in dec_findings
+                      if f.get("code") in ("ACTIVE_SUPERSEDED",
+                                           "DUPLICATE_ID",
+                                           "OVERLAPPING_ID")]
+        if structural:
+            codes = sorted({f.get("code", "") for f in structural})
+            return "", [], (
+                f"context cannot be built: decision register has findings "
+                f"({', '.join(codes)})")
+    except Exception:
+        pass
+
+    try:
+        from gov.context import context as build_context
+        ctx = build_context(root, ticket)
+        packet_hash = ctx.get("hash", "")
+        decisions = [item.get("id", "") for item in ctx.get("mandatory", [])
+                     if item.get("authority") == "decision"]
+        return packet_hash, decisions, None
+    except GovError as e:
+        details = e.details or {}
+        if details.get("superseded") or e.code == "CONTRADICTION":
+            return "", [], e.message
+    except Exception:
+        pass
+
+    packet_hash = _hash_from_inputs(root, ticket)
+    return packet_hash, [], None
+
+
+def _hash_from_inputs(root: Path, ticket: str) -> str:
+    import hashlib
+    import json as _json
+    from gov.tasks.tickets import frontmatter, TICKETS_REL
+    ticket_path = root / TICKETS_REL / f"{ticket}.md"
+    front = frontmatter(ticket_path) or {}
+    inputs = _build_inputs(root, ticket, front)
+    return hashlib.sha256(
+        _json.dumps(inputs, sort_keys=True).encode()
+    ).hexdigest()
 
 
 # ---------------------------------------------------------------------------
@@ -289,10 +447,15 @@ def _ticket_commits(root: Path, ticket: str) -> list[dict]:
 
 def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
     import subprocess
+    from gov.cli.errors import GovError
     result = subprocess.run(
         ["git", "-C", str(root), "log", "-1", "--format=%(trailers)", sha],
         capture_output=True, text=True,
     )
+    if result.returncode != 0:
+        raise GovError("GIT_FAILURE",
+                        f"git log (trailers) failed: {result.stderr.strip()[:200]}",
+                        {"commit": sha[:12]})
     trailers: dict[str, list[str]] = {}
     for line in result.stdout.split("\n"):
         line = line.strip()
@@ -313,11 +476,16 @@ def _read_trailers(root: Path, sha: str) -> dict[str, list[str]]:
 
 def _commit_paths(root: Path, sha: str) -> list[str]:
     import subprocess
+    from gov.cli.errors import GovError
     result = subprocess.run(
         ["git", "-C", str(root), "diff-tree", "--no-commit-id",
          "--name-only", "-r", sha],
         capture_output=True, text=True,
     )
+    if result.returncode != 0:
+        raise GovError("GIT_FAILURE",
+                        f"git diff-tree failed: {result.stderr.strip()[:200]}",
+                        {"commit": sha[:12]})
     return [p.strip() for p in result.stdout.strip().split("\n") if p.strip()]
 
 
@@ -337,29 +505,6 @@ def _check_trailers(commits: list[dict], ticket: str) -> None:
             raise GovError("TRAILER_MISSING",
                             f"commit {c['sha'][:12]} lacks Implements: trailer",
                             {"commit": c["sha"][:12], "ticket": ticket})
-
-
-def _is_infra(path: str) -> bool:
-    if any(path.startswith(p) for p in _INFRA_PREFIXES):
-        return True
-    return path in ("README.md", "pyproject.toml", ".gitignore", "LICENSE")
-
-
-def _check_commit_containment(commits: list[dict],
-                               allowed_paths: list[str]) -> None:
-    import fnmatch
-    from gov.cli.errors import GovError
-
-    for c in commits:
-        for p in c["paths"]:
-            if not p or _is_infra(p):
-                continue
-            if not any(fnmatch.fnmatch(p, pat) for pat in allowed_paths):
-                raise GovError(
-                    "CONTAINMENT_FINDING",
-                    f"commit {c['sha'][:12]} changes {p} outside allowed_paths",
-                    {"commit": c["sha"][:12], "path": p},
-                )
 
 
 # ---------------------------------------------------------------------------
@@ -435,14 +580,12 @@ def _check_probe(root: Path, ticket: str) -> None:
                             "probe has no judgement",
                             {"ticket": ticket})
 
-        # A5: probed_commit must be named
         probed_commit = pf.get("probed_commit")
         if not probed_commit:
             raise GovError("PROBE_INVALID",
                             "probe record does not name the probed commit",
                             {"ticket": ticket})
 
-        # A5: probed_commit must be ancestor of HEAD
         anc = subprocess.run(
             ["git", "-C", str(root), "merge-base", "--is-ancestor",
              str(probed_commit), "HEAD"],
@@ -454,7 +597,6 @@ def _check_probe(root: Path, ticket: str) -> None:
                             {"ticket": ticket,
                              "probed_commit": str(probed_commit)})
 
-        # A5: no commit between probed_commit..HEAD with reviewer role
         between = subprocess.run(
             ["git", "-C", str(root), "log",
              f"{probed_commit}..HEAD", "--format=%H"],
@@ -472,7 +614,6 @@ def _check_probe(root: Path, ticket: str) -> None:
                     "carries the reviewer's role",
                     {"ticket": ticket, "commit": sha[:12]})
 
-        # A5: no ticket commit outside tests/ and docs/probes/ after probe
         after_probe = subprocess.run(
             ["git", "-C", str(root), "log",
              f"{probed_commit}..HEAD", "--format=%H",
@@ -496,7 +637,6 @@ def _check_probe(root: Path, ticket: str) -> None:
                         "after the probed commit",
                         {"ticket": ticket, "commit": sha[:12], "path": p})
 
-        # A5: reviewer session name not in any ticket commit's trailers
         all_tc = subprocess.run(
             ["git", "-C", str(root), "log", "HEAD", "--format=%H",
              f"--grep=Task: {ticket}"],
@@ -546,6 +686,7 @@ def _run_tests(root: Path, test_path: str, timeout: int,
     if src not in pythonpath:
         env["PYTHONPATH"] = src + (":" + pythonpath if pythonpath else "")
 
+    # pytest may be in user-site; propagate its base so the subprocess finds it
     if "PYTHONUSERBASE" not in env:
         pytest_bin = shutil.which("pytest")
         if pytest_bin:
@@ -620,47 +761,52 @@ def _merge_counts(total: dict, new: dict) -> None:
 # ---------------------------------------------------------------------------
 
 def _check_governance(root: Path, commits: list[dict]) -> dict | None:
-    import yaml as _yaml
     from gov.cli.errors import GovError
 
-    has_gov_change = False
-    ticket_check_ids = set()
-    checks_prefix = "template/governance/kernel/checks/"
+    changed_gov_paths = []
     for c in commits:
         for p in c["paths"]:
             if any(p.startswith(prefix) for prefix in _GOVERNANCE_PREFIXES):
-                has_gov_change = True
-            if p.startswith(checks_prefix) and p.endswith(".yaml"):
-                check_path = root / p
-                if check_path.is_file():
-                    try:
-                        decl = _yaml.safe_load(
-                            check_path.read_text(encoding="utf-8"))
-                        if isinstance(decl, dict) and "id" in decl:
-                            ticket_check_ids.add(decl["id"])
-                    except Exception:
-                        pass
+                changed_gov_paths.append(p)
 
-    if not has_gov_change:
+    if not changed_gov_paths:
         return None
+
+    checks_prefix = "template/governance/kernel/checks/"
+    check_commit_map: dict[str, list[str]] = {}
+    for c in commits:
+        for p in c["paths"]:
+            if p.startswith(checks_prefix) and p.endswith(".yaml"):
+                cid = p[len(checks_prefix):-len(".yaml")]
+                check_commit_map.setdefault(cid, []).append(c["sha"])
+
+    stale = sorted(cid for cid, shas in check_commit_map.items()
+                   if len(shas) > 1)
+    if stale:
+        raise GovError("STALE_EVIDENCE",
+                        f"governance evidence is stale: "
+                        f"{', '.join(stale)} changed after evidence was collected",
+                        {"stale_checks": stale},
+                        exit_code=EXIT_CHECK_FAILED)
+
+    changed_check_ids = set(check_commit_map.keys())
 
     from gov.check.runner import run_checks
     result, _has_hard_block = run_checks(root)
 
-    if ticket_check_ids:
+    if changed_check_ids:
         failing = []
         for check in result.get("checks", []):
-            cid = check.get("id")
-            if cid not in ticket_check_ids:
-                continue
-            sev = check.get("severity", "")
-            status = check.get("status", "")
-            if sev == "hard-block" or status == "RED":
-                failing.append(cid or "unknown")
+            cid = check.get("id", "")
+            if (cid in changed_check_ids
+                    and check.get("severity") == "hard-block"
+                    and check.get("status") == "RED"):
+                failing.append(cid)
+
         if failing:
             raise GovError("CHECK_FAILED",
                             f"governance checks failed: {', '.join(failing)}",
-                            {"failing_checks": failing},
+                            {"failing_checks": failing, "result": result},
                             exit_code=EXIT_CHECK_FAILED)
 
     return result
@@ -691,19 +837,31 @@ def _handle_failure(root: Path, ticket: str, failures: list[str],
             raise GovError("ITERATION_CORRUPT",
                             "iteration count file cannot be read or parsed",
                             {"ticket": ticket})
+        if not isinstance(prev, dict):
+            raise GovError("ITERATION_CORRUPT",
+                            "iteration count file has wrong shape",
+                            {"ticket": ticket})
 
-    count = prev.get("count", 0) + 1
+    count_val = prev.get("count", 0)
+    if not isinstance(count_val, int):
+        raise GovError("ITERATION_CORRUPT",
+                        f"iteration count is not an integer: {count_val!r}",
+                        {"ticket": ticket})
+    count = count_val + 1
     outcomes = prev.get("outcomes", [])
     outcomes.append({
         "failures": failure_set,
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     })
 
-    iter_file.write_text(json.dumps({
+    new_data: dict = {
         "count": count,
         "last_failures": failure_set,
         "outcomes": outcomes,
-    }), encoding="utf-8")
+    }
+    if prev.get("decision"):
+        new_data["decision"] = prev["decision"]
+    iter_file.write_text(json.dumps(new_data), encoding="utf-8")
 
     if count >= 3:
         esc_dir = root / ".gov-runtime" / "escalations"
@@ -738,51 +896,17 @@ def _handle_failure(root: Path, ticket: str, failures: list[str],
 # Repair tickets (B3)
 # ---------------------------------------------------------------------------
 
-def _create_repair_ticket_fallback(root: Path, title: str) -> str | None:
-    import hashlib
-    import yaml
-    from datetime import datetime, timezone
-    from gov.tasks.tickets import TICKETS_REL
-
-    ts = datetime.now(timezone.utc)
-    h = hashlib.sha256(f"{title}:{ts.isoformat()}".encode()).hexdigest()[:6]
-    repair_id = f"tt-{h}"
-
-    tickets_dir = root / TICKETS_REL
-    tickets_dir.mkdir(parents=True, exist_ok=True)
-    repair_path = tickets_dir / f"{repair_id}.md"
-
-    front = {
-        "id": repair_id,
-        "title": title[:100],
-        "type": "task",
-        "status": "open",
-        "state_class": "AUTHORITATIVE",
-        "created": ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
-    }
-    try:
-        text = ("---\n"
-                + yaml.safe_dump(front, sort_keys=False, allow_unicode=True)
-                + "---\n\n"
-                + f"# {repair_id}\n\n{title}\n")
-        repair_path.write_text(text, encoding="utf-8")
-        return repair_id
-    except Exception:
-        return None
-
-
 def _open_repair_ticket(root: Path, ticket: str, failures: list[str],
                         disposition: str | None = None,
                         context_hash: str | None = None) -> None:
+    import subprocess
     import yaml
-    from gov.tasks.tickets import create
+    from gov.tasks.tickets import create, TK_REL
 
     title = f"Repair {ticket}: {failures[0][:60] if failures else 'close failure'}"
     try:
         repair_id = create(root, title)
     except Exception:
-        repair_id = _create_repair_ticket_fallback(root, title)
-    if not repair_id:
         return
 
     repair_path = root / ".tickets" / f"{repair_id}.md"
@@ -807,6 +931,16 @@ def _open_repair_ticket(root: Path, ticket: str, failures: list[str],
                                                  allow_unicode=True)
                                 + "---" + body)
                     repair_path.write_text(new_text, encoding="utf-8")
+
+    tk_path = root / TK_REL
+    if tk_path.is_file():
+        try:
+            subprocess.run(
+                [str(tk_path), "dep", repair_id, ticket],
+                capture_output=True, text=True, cwd=str(root),
+            )
+        except Exception:
+            pass
 
 
 # ---------------------------------------------------------------------------
@@ -866,19 +1000,14 @@ def _validate_owner_decision(root: Path, dec_id: str) -> None:
                         f"decision {dec_id} is not ACTIVE (status: {status})",
                         {"decision": dec_id})
 
-    try:
-        from gov.decisions import check as check_decisions
-        findings = check_decisions(root)
-        for f in findings:
-            if (f.get("code") == "ACTIVE_UNAPPROVED"
-                    and dec_id in f.get("ids", [])):
-                raise GovError("INVALID_DECISION",
-                                f"decision {dec_id} is ACTIVE but unapproved",
-                                {"decision": dec_id})
-    except GovError:
-        raise
-    except Exception:
-        pass
+    from gov.decisions import check as check_decisions
+    findings = check_decisions(root)
+    for f in findings:
+        if (f.get("code") == "ACTIVE_UNAPPROVED"
+                and dec_id in f.get("ids", [])):
+            raise GovError("INVALID_DECISION",
+                            f"decision {dec_id} is ACTIVE but unapproved",
+                            {"decision": dec_id})
 
 
 # ---------------------------------------------------------------------------
@@ -895,21 +1024,20 @@ def _collect_requirements(commits: list[dict]) -> list[str]:
     return sorted(reqs)
 
 
-def _collect_test_paths(root: Path, wbs: str) -> list[str]:
+def _collect_test_paths(root: Path, wbs: str,
+                        commit_files: list[str] | None = None) -> list[str]:
     paths = []
-    tests_dir = root / "tests"
-    if not tests_dir.is_dir():
-        return paths
-    acc = tests_dir / "acceptance" / wbs
+    if commit_files is not None:
+        for f in sorted(commit_files):
+            if f.startswith("tests/") and f.endswith(".py") and "test_" in f:
+                if f not in paths:
+                    paths.append(f)
+    acc = root / "tests" / "acceptance" / wbs
     if acc.is_dir():
         for f in sorted(acc.rglob("test_*.py")):
-            paths.append(str(f.relative_to(root)))
-    for f in sorted(tests_dir.rglob("test_*.py")):
-        rel = str(f.relative_to(root))
-        if rel.startswith(f"tests/acceptance/{wbs}/"):
-            continue
-        if rel not in paths:
-            paths.append(rel)
+            rel = str(f.relative_to(root))
+            if rel not in paths:
+                paths.append(rel)
     return paths
 
 
@@ -1074,38 +1202,25 @@ def _write_close_record(root: Path, ticket: str, packet_hash: str,
     return close_rel
 
 
-def _set_ticket_closed(root: Path, ticket: str) -> None:
-    import yaml
-    from gov.cli.errors import GovError
+# ---------------------------------------------------------------------------
+# Ticket closing via tk (B2)
+# ---------------------------------------------------------------------------
 
-    path = root / ".tickets" / f"{ticket}.md"
-    if not path.is_file():
-        raise GovError("TICKET_UNKNOWN",
-                        f"ticket file not found: {ticket}",
+def _close_ticket_via_tk(root: Path, ticket: str) -> None:
+    import subprocess
+    from gov.cli.errors import GovError
+    from gov.tasks.tickets import TK_REL
+
+    tk_path = root / TK_REL
+    if not tk_path.is_file():
+        raise GovError("TICKET_TOOL_ABSENT",
+                        "the ticket tool (tk) is not available",
                         {"ticket": ticket})
-    text = path.read_text(encoding="utf-8")
-    if not text.startswith("---"):
-        raise GovError("TICKET_INVALID",
-                        f"ticket {ticket} has no frontmatter",
+    result = subprocess.run(
+        [str(tk_path), "close", ticket],
+        capture_output=True, text=True, cwd=str(root),
+    )
+    if result.returncode != 0:
+        raise GovError("TICKET_TOOL_FAILED",
+                        f"tk close failed: {result.stderr.strip()[:200]}",
                         {"ticket": ticket})
-    end = text.find("---", 3)
-    if end < 0:
-        raise GovError("TICKET_INVALID",
-                        f"ticket {ticket} has unterminated frontmatter",
-                        {"ticket": ticket})
-    try:
-        front = yaml.safe_load(text[3:end])
-    except yaml.YAMLError:
-        raise GovError("TICKET_INVALID",
-                        f"ticket {ticket} has malformed YAML",
-                        {"ticket": ticket})
-    if not isinstance(front, dict):
-        raise GovError("TICKET_INVALID",
-                        f"ticket {ticket} frontmatter is not a dict",
-                        {"ticket": ticket})
-    front["status"] = "closed"
-    body = text[end + 3:]
-    new_text = ("---\n"
-                + yaml.safe_dump(front, sort_keys=False, allow_unicode=True)
-                + "---" + body)
-    path.write_text(new_text, encoding="utf-8")
