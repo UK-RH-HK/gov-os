@@ -167,8 +167,7 @@ class TestStopHook:
         (tmp_path / ".tickets" / "TEST-abcd.md").write_text(
             "---\nid: TEST-abcd\nstatus: in_progress\ntitle: T\nsources: []\ndepends_on: []\n---\n# T\n",
         )
-        cp_dir = tmp_path / "docs" / "checkpoints" / "TEST-abcd"
-        cp_dir.mkdir(parents=True)
+        (tmp_path / "docs" / "checkpoints" / "TEST-abcd").mkdir(parents=True)
         _init_git(tmp_path)
         stdin_data = json.dumps({
             "hook_event_name": "Stop", "session_id": "s1",
@@ -188,7 +187,8 @@ class TestStopHook:
             },
         )
         assert result.returncode == 0
-        assert list(cp_dir.glob("CP-*.md"))
+        scratch_dir = tmp_path / ".gov-runtime" / "scratch" / "checkpoints" / "TEST-abcd"
+        assert list(scratch_dir.glob("CP-*.md"))
 
 
 # --------------------------------------------------------------------------
@@ -229,10 +229,10 @@ class TestPreCompactCombined:
 
     def test_checkpoint_record_written_for_any_role(self, tmp_path):
         project = _make_project(tmp_path)
-        cp_dir = project / "docs" / "checkpoints" / "TEST-abcd"
         run = _run("precompact.py", project, role="engineer", ticket="TEST-abcd")
         assert run.returncode == 0
-        assert list(cp_dir.glob("CP-*.md")), "checkpoint record must be written"
+        scratch_dir = project / ".gov-runtime" / "scratch" / "checkpoints" / "TEST-abcd"
+        assert list(scratch_dir.glob("CP-*.md")), "checkpoint record must be written"
 
     def test_state_block_still_appended_for_orchestrator(self, tmp_path):
         project = _make_project(tmp_path)
