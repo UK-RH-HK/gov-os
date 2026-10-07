@@ -5437,3 +5437,51 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.129 | 2026-10-07 | Owner answers: DEC-492 (`gov close` reports every finding and finds the ticket tool on PATH; closes for adoption gaps alone go through `tk close` until W1-41; three containment findings accepted as history), DEC-493 (four additions to W1-39's allowed paths), DEC-494 (CI installs gitleaks and the `gov` package, verified by archive checksum; dev-tier steps report "unmeasured"), DEC-495 (the governance share: session logs, a labelled estimate, cache creation in the denominator; the call from `gov close` after W1-31), DEC-496 (DEC-487 to DEC-491 accepted; second review of `gov close`). Next free id: DEC-497. |
+
+## 130. One delegated decision on W1-40: what the CI job does where a tool or a G3 check is absent, and five smaller points (register v0.130, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-497 — W1-40: a step whose tool is not on the runner says "unmeasured" and fails; "no G3 check declared" is reported in words and does not fail the job; the checkout brings the parent commit; an unknown check family fails as in `gov check`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-40 lead's packages P-6 to P-11 of its second return (`log/W1-40-lead-run2.json`), each with its recommendation; its P-4 is decided by the owner in DEC-494, which this entry applies and does not widen · **Refines:** DEC-489, DEC-494
+- **Decision:**
+  - **Installs (DEC-494, applied).** The workflow gains two steps of their own: gitleaks, downloaded from the registry's `archive` and verified against the registry's `archive_sha256` before it is unpacked, the step failing on a mismatch; and the `gov` package, installed from the checkout. The workflow installs nothing else: not pytest, not openspec, not rulesync, not lefthook. The version, the address and the checksum are read from `governance/project/tool-registry.yaml` by the step, or a case holds that the workflow's text and the registry agree.
+  - **A step whose tool is not on the runner.** It prints the word "unmeasured" with the tool's name and fails. It is never green and it is never skipped in silence. This holds for the tests step (pytest is absent) and, inside `gov ci job`, for a check of `gov check` that reports its tool absent (openspec; rulesync for the adapter check): the job names that check as unmeasured and exits non-zero. This replaces the lead's recommendation on P-9 (take `gov check`'s yellow), because DEC-494 says such a step is never green. The later steps still run after a failed one, so one run of the job reports every step. Consequence, stated here and told to the owner: this repository's CI job is red, with "unmeasured" as the reason, until the owner approves those tools for the runner.
+  - **P-6, a record that says "no G3 check declared".** `gov ci record` prints those words and exits 0. The record itself stays what DEC-489 made it: never the word "passed". The weakness is recorded: removing a project's G3 declarations turns that gate into a report. A project stating in a file that it declares no G3 check on purpose, the job failing without that statement, goes on the Wave 2 list.
+  - **P-7, the notes ref with more than one clone.** Left as built: the push of the ref is never forced, and a clone whose notes do not descend from the remote's is refused. Fetching and merging the notes before writing goes on the Wave 2 list.
+  - **P-8, `gov ci` declaring the class "read".** Left; nothing reads the class today. Wave 2 list.
+  - **P-10, the skill-version check on a depth-1 checkout.** The workflow checks out with the parent commit (`fetch-depth: 2`), a case first. That the runner reports a missing parent commit as green instead of not measured is a residual in W1-26's code, on the Wave 2 list; so is that only the last commit of a push is compared.
+  - **P-11, an unknown check family.** `gov ci job` fails for it as `gov check` does, a case first.
+  - **The engineer's `install -D` after the guard refused `mkdir -p .github/workflows`.** Accepted: the file written is on the ticket's allowed paths, it was produced by the Bash copy DEC-489 prescribes, and the guard itself allowed that command. That the guard refuses to create the folder of an allowed file is a residual for the guard (Wave 2 list).
+  - The adapter comparison keeps its named place in the workflow: `gov ci job` already runs the adapter check of `gov check`, which is unmeasured on the runner until rulesync is installed there (DEC-494: with that step).
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.130 | 2026-10-07 | One delegated decision on W1-40: DEC-497 (a step whose tool is absent says "unmeasured" and fails; "no G3 check declared" is reported and does not fail the job; `fetch-depth: 2`; an unknown check family fails; smaller points left for Wave 2). Next free id: DEC-498. |
+
+## 131. Owner answers: W1-30's last review and the order of the probe for FULL tickets (register v0.131, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-498 — W1-30's second review is its last; what it may still change; a FULL ticket is probed before its merge
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-415, DEC-137 · **Refines:** DEC-496
+- **Decision:**
+  - **W1-30.** The review of the fixed `gov close` (after the DEC-487 follow-up) is the ticket's second and last independent review under DEC-415. After it, only two kinds of finding are fixed: a fail-open hole, and a silent close in a shape that ordinary work produces. Every other finding becomes a residual. A fail-open that one fix does not close comes to the owner as a decision package, not as another round. Then W1-30 closes.
+  - **Process, for every FULL ticket from now on.** The fresh reviewer probes the ticket's final code before the orchestrator merges it (DEC-137), not after a later tool asks for the record.
+  - **Deviation.** W1-30 was merged (`2c71bc64`) before any independent probe of its final code; the probe was commissioned only after `gov close` refused for the missing record. This is recorded as a deviation in the compliance report.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.131 | 2026-10-07 | Owner answers: DEC-498 (W1-30's second review is its last, only fail-open holes and silent closes in ordinary shapes are fixed after it, a hole one fix does not close goes to the owner; every FULL ticket is probed before its merge; W1-30's late probe recorded as a deviation). Next free id: DEC-499. |
+
+## 132. One delegated decision on W1-39: a missing lock in an installed project, and three smaller points (register v0.132, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-499 — W1-39: an installed project without its lock is a failure, not "unmeasured"; each Copier message states the whole procedure; a fresh project is at MINIMAL; the lock task's command is settled with W1-41
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-A to P-D of its second return (`log/W1-39-lead-run2.json`), each with its recommendation · **Refines:** DEC-488, DEC-493
+- **Decision:**
+  - **P-C, a missing lock.** Where the project's Copier answers file exists and `governance/framework.lock` does not, the comparison answers that the lock is missing from an installed project, and `gov doctor` reports that part as failed and exits non-zero. Where neither file exists (a project that was never installed from the template, as this repository before adoption) the part stays "unmeasured", as W1-27's cases hold. Reason: as built, deleting the lock silences drift detection with exit code 0, and W1-41 and the exit run rely on doctor's exit code. A case first, then the fix, inside `src/gov/lock/` where possible. That a project can delete both files, or edit the lock's manifest together with a kernel file, is not closed here: the lock is not signed before Wave 3 (CAP-02.c), and both are residuals.
+  - **P-A.** The message after a copy and the message after an update each state all four steps of the procedure, as built.
+  - **P-B.** A fresh project is at MINIMAL with a path map of namespaces only, as built. That this map is not valid against the kernel's path-map schema (which requires 22 systems) is a residual for W1-41's adoption; nothing here changes how doctor derives the level.
+  - **P-D.** The lock task stays `python3 -m gov.lock` in this ticket. A `gov lock` subcommand, needed where `gov` is installed as an isolated tool, is decided with W1-41, which fixes the real install path; residual until then.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.132 | 2026-10-07 | One delegated decision on W1-39: DEC-499 (an installed project without its lock fails in `gov doctor`; each Copier message states the whole procedure; a fresh project is at MINIMAL; the lock task's command is settled with W1-41). Next free id: DEC-500. |
