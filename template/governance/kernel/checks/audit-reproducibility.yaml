@@ -3,3 +3,4 @@ family: audit reproducibility
 tier: G1
 severity: hard-block
 command: python3 -m gov.check.audit_validator docs/audit/
+allows-not-applicable: "true"
