@@ -1,4 +1,4 @@
-"""Fixtures for the W1-07 acceptance tests."""
+"""Fixtures for the W1-27 acceptance tests."""
 
 from __future__ import annotations
 
@@ -9,8 +9,9 @@ from pathlib import Path
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "W1-07"))
 
-import w1_07_support as support  # noqa: E402
+import w1_27_support as support  # noqa: E402
 
 
 def pytest_configure(config):
@@ -20,7 +21,7 @@ def pytest_configure(config):
 @pytest.fixture(scope="session")
 def live(tmp_path_factory):
     """A committed copy of the working tree. Never run a command in it: it is the source of every test's own copy."""
-    return support.copy_working_tree(tmp_path_factory.mktemp("w1-07-live") / "repo")
+    return support.copy_working_tree(tmp_path_factory.mktemp("w1-27-live") / "repo")
 
 
 @pytest.fixture(scope="session")
@@ -29,7 +30,7 @@ def cli(live):
     reason = None
     try:
         support.entry_point(live)
-    except support.CliMissing as exc:
+    except support.base.CliMissing as exc:
         reason = str(exc)
     if reason:
         pytest.fail(reason, pytrace=False)
@@ -39,13 +40,7 @@ def cli(live):
 @pytest.fixture(scope="session")
 def interface(live):
     """The envelope fields and exit codes of ``docs/interfaces/API-0002.yaml``."""
-    return support.load_interface(live)
-
-
-@pytest.fixture(scope="session")
-def small_live(tmp_path_factory):
-    """A committed project with only a few tracked files. For commands whose work grows with tree size (DEC-440)."""
-    return support.copy_minimal_project(tmp_path_factory.mktemp("w1-07-small") / "repo")
+    return support.base.load_interface(live)
 
 
 @pytest.fixture()
@@ -73,18 +68,22 @@ def gov(project, sandbox):
 
 
 @pytest.fixture()
-def small_project(small_live, tmp_path):
-    """This test's own copy of the small project (DEC-440)."""
-    target = tmp_path / "small-repo"
-    shutil.copytree(small_live, target, symlinks=True)
-    return target
+def rebuild_project(cli, tmp_path):
+    """A tiny project for rebuild tests (~3 tracked files, ~2–3 s per rebuild).
+
+    Revised after implementation: rebuild goes through the lexical index's
+    owner and its secrets filter (DEC-440); the full fixture's ~955 tracked
+    files made it time out at 30 s.  The ``gov`` code comes from the
+    session-scope ``cli`` fixture via ``run_gov_with_code``.
+    """
+    return support.make_rebuild_project(cli, tmp_path / "repo")
 
 
 @pytest.fixture()
-def small_gov(small_project, cli, sandbox):
-    """``gov(*args)`` on a project with only a few tracked files, using the full copy's code (DEC-440)."""
+def rebuild_gov(cli, rebuild_project, sandbox):
+    """``rebuild_gov(*args)`` runs gov with code from ``cli`` and project from ``rebuild_project``."""
 
     def _gov(*args, cwd=None):
-        return support.run_gov_with_code(cli, small_project, sandbox, *args, cwd=cwd)
+        return support.run_gov_with_code(cli, rebuild_project, sandbox, *args, cwd=cwd)
 
     return _gov
