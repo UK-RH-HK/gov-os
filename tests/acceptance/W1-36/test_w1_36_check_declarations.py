@@ -115,6 +115,48 @@ class TestSkillRegressionCommandValidation:
             )
 
 
+class TestAuditReproNotApplicableField:
+    """DEC-447: the audit-reproducibility declaration carries
+    ``allows-not-applicable: "true"``."""
+
+    def test_allows_not_applicable_is_present(self, audit_repro_checks):
+        for check in audit_repro_checks:
+            assert "allows-not-applicable" in check, (
+                f"{check['_path'].name} must carry "
+                f"allows-not-applicable: \"true\" (DEC-447)"
+            )
+
+    def test_allows_not_applicable_value_is_true(self, audit_repro_checks):
+        for check in audit_repro_checks:
+            val = check.get("allows-not-applicable")
+            assert val == "true", (
+                f"{check['_path'].name}: allows-not-applicable is "
+                f"{val!r}, expected \"true\" (DEC-447)"
+            )
+
+    def test_severity_stays_hard_block(self, audit_repro_checks):
+        """The field does not change the severity: still hard-block."""
+        for check in audit_repro_checks:
+            assert check.get("severity") == "hard-block", (
+                f"{check['_path'].name}: severity is "
+                f"{check.get('severity')!r}, expected 'hard-block' "
+                f"(DEC-447: a hard block once a report exists)"
+            )
+
+
+class TestSkillRegressionNotApplicableAbsent:
+    """DEC-447: no other declaration (skill-regression) carries the field."""
+
+    def test_skill_regression_has_no_allows_not_applicable(
+            self, skill_regression_checks):
+        for check in skill_regression_checks:
+            assert "allows-not-applicable" not in check, (
+                f"{check['_path'].name} must NOT carry "
+                f"allows-not-applicable — a skill check never "
+                f"becomes 'not applicable' (DEC-447)"
+            )
+
+
 class TestAuditReproCommandValidation:
     """Command validation (DEC-425, DEC-439): the audit-reproducibility command
     calls the W1-26 generic validator with no fallback."""

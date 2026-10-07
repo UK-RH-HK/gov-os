@@ -12,7 +12,11 @@ through ``run_checks`` on temporary projects (b, c).
     - RED on a report with an unknown class.
     - RED on an OK row with no evidence (all ``-``).
     - RED on an evidence path absent at the cited commit.
-    - RED (not green) on a project with no audit report.
+    - YELLOW on a project with no audit report (DEC-447): "not applicable
+      until the first audit", a warning, not red; does not make gov check
+      fail; folder missing and folder-present-but-empty both YELLOW.
+    - RED when one valid and one invalid report are present (DEC-447): the
+      hard block holds once any report exists.
 """
 from __future__ import annotations
 
@@ -256,11 +260,12 @@ class TestAuditReproGovCheck:
             f"when an evidence path does not exist at the cited commit"
         )
 
-    def test_red_when_no_audit_report(self, tmp_path, monkeypatch):
-        """RED (not green) when the project has no audit report yet.
+    def test_yellow_when_no_audit_report_folder_missing(self, tmp_path,
+                                                        monkeypatch):
+        """YELLOW when the reports folder does not exist (DEC-447).
 
-        The validator says 'unmeasured' and exits 1 (DEC-425); the runner
-        treats that as RED for a hard-block check.
+        Revised after implementation: owner decision DEC-447 — before the
+        first audit, the family is a warning (YELLOW), not red.
         """
         _ensure_pythonpath(monkeypatch)
         root = build_check_project(
@@ -268,10 +273,107 @@ class TestAuditReproGovCheck:
             check_decls=["audit-reproducibility.yaml"],
             skill_files=False,
         )
-        result, _ = run_checks(root)
+        result, has_hard_block_red = run_checks(root)
         status = _family_status(result, "audit reproducibility")
+        assert status == "YELLOW", (
+            f"audit-reproducibility family is {status}, expected YELLOW "
+            f"when the project has no audit report (DEC-447)"
+        )
         assert status != "GREEN", (
-            f"audit-reproducibility family is {status}, expected not GREEN "
-            f"when the project has no audit report (unmeasured is never "
-            f"green, DEC-425)"
+            f"audit-reproducibility family must never be GREEN when "
+            f"there is no report"
+        )
+        assert status != "RED", (
+            f"audit-reproducibility family is RED but DEC-447 says it "
+            f"should be a warning before the first audit"
+        )
+
+    def test_yellow_when_no_audit_report_folder_empty(self, tmp_path,
+                                                      monkeypatch):
+        """YELLOW when the reports folder exists but is empty (DEC-447)."""
+        _ensure_pythonpath(monkeypatch)
+        root = build_check_project(
+            tmp_path / "project",
+            check_decls=["audit-reproducibility.yaml"],
+            skill_files=False,
+        )
+        (root / "docs" / "audit").mkdir(parents=True, exist_ok=True)
+
+        result, has_hard_block_red = run_checks(root)
+        status = _family_status(result, "audit reproducibility")
+        assert status == "YELLOW", (
+            f"audit-reproducibility family is {status}, expected YELLOW "
+            f"when the reports folder exists but has no report (DEC-447)"
+        )
+
+    def test_yellow_reason_says_not_applicable(self, tmp_path, monkeypatch):
+        """The YELLOW reason says "not applicable until the first audit"."""
+        _ensure_pythonpath(monkeypatch)
+        root = build_check_project(
+            tmp_path / "project",
+            check_decls=["audit-reproducibility.yaml"],
+            skill_files=False,
+        )
+        result, _ = run_checks(root)
+        families = result.get("families", {})
+        entry = families.get("audit reproducibility", {})
+        reason = ""
+        if isinstance(entry, dict):
+            reason = entry.get("reason", "")
+        assert "not applicable" in reason.lower(), (
+            f"expected reason to contain 'not applicable', got: {reason!r}"
+        )
+
+    def test_yellow_alone_does_not_make_gov_check_fail(self, tmp_path,
+                                                       monkeypatch):
+        """A project with only the audit-reproducibility family YELLOW
+        does not make ``gov check`` exit as failed (DEC-447)."""
+        _ensure_pythonpath(monkeypatch)
+        root = build_check_project(
+            tmp_path / "project",
+            check_decls=["audit-reproducibility.yaml"],
+            skill_files=False,
+        )
+        _, has_hard_block_red = run_checks(root)
+        assert not has_hard_block_red, (
+            "YELLOW audit-reproducibility alone must not cause "
+            "gov check to report a hard-block failure (DEC-447)"
+        )
+
+    def test_red_when_one_valid_and_one_invalid_report(self, tmp_path,
+                                                       monkeypatch):
+        """RED when the folder holds one valid and one invalid report (DEC-447).
+
+        Once any report exists, the hard block holds: a valid report does
+        not excuse a broken one.
+        """
+        _ensure_pythonpath(monkeypatch)
+        root = build_check_project(
+            tmp_path / "project",
+            check_decls=["audit-reproducibility.yaml"],
+            skill_files=False,
+        )
+        commit = head_sha(root)
+        report_dir = root / "docs" / "audit" / "test"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        (report_dir / "good.md").write_text(
+            _valid_report(commit), encoding="utf-8")
+        bad_commit = "deadbeef" * 5
+        (report_dir / "bad.md").write_text(
+            f"---\nmilestone: m1\ncommit: {bad_commit}\n"
+            f"pack_sha256: sha256:{_PACK_HEX}\n---\n"
+            "# Bad Report\n\n| item | class | evidence |\n|---|---|---|\n"
+            "| CAP-01 | OK | README.md |\n",
+            encoding="utf-8",
+        )
+        add_and_commit(root, "add one valid and one invalid report")
+
+        result, has_hard_block_red = run_checks(root)
+        status = _family_status(result, "audit reproducibility")
+        assert status == "RED", (
+            f"audit-reproducibility family is {status}, expected RED "
+            f"when one valid and one invalid report are present (DEC-447)"
+        )
+        assert has_hard_block_red, (
+            "gov check must exit as failed when the audit family is RED"
         )

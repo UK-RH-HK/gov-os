@@ -1,10 +1,11 @@
 # W1-36 acceptance tests: Skills — retrieval, audit, checkpoint/resume, adopt
 
 Written before the implementation by the independent test designer (MR-3) from
-the ticket's KPI lines, its `covers` ids and its sources.  **57 cases** in
-**four test files** plus support and fixtures.  Every case reads and parses the
-skill files (markdown with YAML frontmatter) and check declarations (YAML); no
-case runs code or needs a network.
+the ticket's KPI lines, its `covers` ids and its sources.  **74 cases** in
+**five test files** plus support and fixtures.  The four skill/declaration files
+read and parse the skill files (markdown with YAML frontmatter) and check
+declarations (YAML); no case runs code or needs a network.  The integration
+test file builds temporary git projects and calls ``run_checks``.
 
 Run: `python3 -m pytest tests/acceptance/W1-36 -q -p no:cacheprovider`
 
@@ -46,12 +47,13 @@ normalises (DEC-436) to one of the 17 known families
 | S2 audit report: milestone, rows, six classes, decision packages | CAP-47.d | `test_w1_36_audit_skill.py::TestAuditReport` (4), `::TestAuditDecisionPackages` (4) |
 | S3 each skill versioned, body ≤ 2.5k tokens | CAP-24.b | `test_w1_36_skill_form.py::TestSkillFrontmatter` (12), `::TestSkillTokenLimit` (4) |
 | S4 no skill grants permissions; each cites sources | CAP-24.b | `test_w1_36_skill_form.py::TestSkillAuthority` (8) |
-| S5 skill-regression and audit-reproducibility check declarations | CAP-38.b | `test_w1_36_check_declarations.py` (12) |
+| S5 skill-regression and audit-reproducibility check declarations | CAP-38.b | `test_w1_36_check_declarations.py` (16) |
 | S6 audit: fresh session, context pack + repository, pack hash | CAP-47.b | `test_w1_36_audit_skill.py::TestAuditFreshSession` (4) |
 | S7 wave-exit covers every LITE feature spec | CAP-47.d | `test_w1_36_audit_skill.py::TestAuditWaveExit` (1) |
 | F1 intermediate batches in main context | — | `test_w1_36_retrieval_skill.py::TestRetrievalFailure` (1) |
 | F2 audit edits audited files | — | `test_w1_36_audit_skill.py::TestAuditReadOnly` (1) |
 | F3 owner finding → ticket without package | — | `test_w1_36_audit_skill.py::TestAuditDecisionPackages::test_owner_finding_requires_decision_package_before_ticket` (1) |
+| S5/DEC-447 audit check is "not applicable until the first audit" | CAP-38.b, DEC-447 | `test_w1_36_check_declarations.py` (4), `test_w1_36_check_integration.py` (5) |
 
 ## The first question
 
@@ -100,18 +102,45 @@ does not silently drop this part of S2.
 | `test_w1_36_retrieval_skill.py` | 7 | S1, F1 |
 | `test_w1_36_audit_skill.py` | 14 | S2, S6, S7, F2, F3 |
 | `test_w1_36_skill_form.py` | 24 (6 × 4 skills) | S3, S4 |
-| `test_w1_36_check_declarations.py` | 12 | S5 |
+| `test_w1_36_check_declarations.py` | 16 | S5, DEC-447 |
+| `test_w1_36_check_integration.py` | 13 | S5, DEC-447 |
 | `conftest.py` | — | fixtures |
 | `w1_36_support.py` | — | constants, parsers, helpers |
 
-**Total: 57 cases** (7 + 14 + 24 + 12).
+**Total: 74 cases** (7 + 14 + 24 + 16 + 13).
 
 ## What each case needs
 
-* **No network, no model, no tool, no dev tier.**  Every case reads files from
-  this repository only.
+* **No network, no model, no tool, no dev tier.**
 * **PyYAML** (`yaml`): to parse YAML frontmatter and check declarations.
+* Integration tests (`test_w1_36_check_integration.py`) build temporary git
+  repos and call `run_checks` from `src/gov/check/runner.py`.
+
+## Revised cases (DEC-447)
+
+- `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_red_when_no_audit_report` →
+  `test_yellow_when_no_audit_report_folder_missing`: revised after implementation: owner
+  decision DEC-447 — before the first audit, the family is YELLOW (warning), not RED.
+
+## New cases (DEC-447)
+
+- `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_yellow_when_no_audit_report_folder_empty`:
+  YELLOW when the reports folder exists but holds no report.
+- `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_yellow_reason_says_not_applicable`:
+  the YELLOW reason says "not applicable until the first audit".
+- `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_yellow_alone_does_not_make_gov_check_fail`:
+  a project with only this family YELLOW does not make `gov check` exit as failed.
+- `test_w1_36_check_integration.py::TestAuditReproGovCheck::test_red_when_one_valid_and_one_invalid_report`:
+  RED when one valid and one invalid report are present — the hard block holds.
+- `test_w1_36_check_declarations.py::TestAuditReproNotApplicableField::test_allows_not_applicable_is_present`:
+  the audit-reproducibility declaration carries `allows-not-applicable`.
+- `test_w1_36_check_declarations.py::TestAuditReproNotApplicableField::test_allows_not_applicable_value_is_true`:
+  the value is `"true"`.
+- `test_w1_36_check_declarations.py::TestAuditReproNotApplicableField::test_severity_stays_hard_block`:
+  severity stays `hard-block` with the field present.
+- `test_w1_36_check_declarations.py::TestSkillRegressionNotApplicableAbsent::test_skill_regression_has_no_allows_not_applicable`:
+  skill-regression declarations do not carry the field.
 
 ## Earlier tests revised
 
-None.  This ticket does not revise any earlier suite.
+None beyond the DEC-447 revision above.
