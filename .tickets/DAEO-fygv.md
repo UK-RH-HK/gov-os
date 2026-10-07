@@ -1,6 +1,6 @@
 ---
 id: DAEO-fygv
-status: closed
+status: in_progress
 deps: [DAEO-topz, DAEO-be7u, DAEO-w616]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -37,6 +37,7 @@ kpis:
     mutation scope, path-map compliance, concurrency/claims, command-contract consistency) and provides the generic validators for skill files and audit reports; each other family's check is registered
     by the ticket that builds its subject; a family with no registered check is reported by name, never silently absent [CAP-38.b]
   - 'Fails a record that changes authority class without a decision: a research or lesson record cited as a decision or policy, or a superseded record used to satisfy a current requirement [CAP-01.c]'
+  - 'Flags a commit that cites a decision id missing from the decision register at that commit: a decision is recorded before the change it authorises (DEC-463) [CAP-38.b]'
   failure:
   - A planted defect of any listed family passes
   - The scope of a check is a hand-maintained list [CAP-58.a]

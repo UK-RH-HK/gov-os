@@ -508,9 +508,64 @@ large real file.
 | DEC-425 (false record) | `test_vendored_folder_wrong_content_sha256_match_false`, `test_distribution_package_sha256_match_not_true`, `test_home_tool_wrong_sha256_not_ok[*]` |
 | DEC-199 (vendored folder digest) | `test_vendored_folder_wrong_content_sha256_match_false`, `test_vendored_folder_right_content_passes` |
 
+## Follow-up — the move table and the old cli tree are historical; an old path inside its new path is no stale reference (DEC-456)
+
+> KPI success 3: "path-map compliance checked by doctor" [CAP-06.d]
+
+DEC-456 (owner, 2026-10-07) amends DEC-448's set of historical records:
+
+1. `docs/SOURCES.md` is a historical table of moves: left out of doctor's
+   stale-path check.
+2. The old `cli/` tree is legacy code (the live CLI is `src/gov/cli/`):
+   treated as historical and left out of the check.
+3. An occurrence of an old path that is only a part of its own new path,
+   in the file that names the new path, is not a stale reference.  A file
+   that names the old path on its own (not as the tail of the new path)
+   is still reported, also when the same file names the new path elsewhere.
+
+`historical_excluded` counts the number of files left out of the stale-path
+check as historical records (round 5 README, DEC-448).  On this repository
+after the one rebuild, doctor reported `historical_excluded: 0` although the
+register is full of old paths.
+
+### Point 1 — docs/SOURCES.md is historical
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_stale_path_in_sources_md_is_not_reported` | test_w1_27_path_compliance_r2.py | doctor checks all tracked files including `docs/SOURCES.md`; the move table is not excluded from the stale-path check |
+| `test_stale_path_in_live_document_not_sources_is_reported` | test_w1_27_path_compliance_r2.py | (should pass: the stale-path check already reports moved paths in live documents) |
+
+### Point 2 — the old cli/ tree is historical
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_stale_path_in_old_cli_tree_is_not_reported` | test_w1_27_path_compliance_r2.py | doctor checks all tracked files including `cli/`; the old CLI tree is not excluded from the stale-path check |
+| `test_stale_path_in_src_gov_cli_is_reported` | test_w1_27_path_compliance_r2.py | (should pass: `src/gov/cli/` is the live CLI and is checked by the stale-path check) |
+
+### Point 3 — an old path inside its new path is not a stale reference
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_old_path_inside_its_new_path_is_not_stale` | test_w1_27_path_compliance_r2.py | doctor reports the old path because it appears as a substring of the text even when it is only part of its own new path |
+| `test_old_path_standalone_is_stale_when_new_path_elsewhere` | test_w1_27_path_compliance_r2.py | (should pass: a standalone old path is reported even when the same file names the new path elsewhere) |
+
+### historical_excluded count
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_historical_excluded_nonzero_when_historical_holds_old_path` | test_w1_27_path_compliance_r2.py | `historical_excluded` is 1 (the register only, from DEC-448); it should be >= 3 because DEC-456 adds `docs/SOURCES.md` and `cli/` to the historical set, and the count must include them |
+
+### Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-06.d (path-map compliance) | All tests in test_w1_27_path_compliance_r2.py |
+| DEC-456 (move table + old cli + sub-path) | All tests in test_w1_27_path_compliance_r2.py |
+| DEC-448 (historical records) | `test_historical_excluded_nonzero_when_historical_holds_old_path` |
+
 ## Test count
 
-- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) = 92
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) + 7 (follow-up DEC-456) = 99
 - **W1-27 revised cases (round 5)**: 18 (rebuild/recovery using tiny projects)
 - **W1-07 revised cases**: 6
-- **Total**: 98
+- **Total**: 105

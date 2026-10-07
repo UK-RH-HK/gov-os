@@ -5004,3 +5004,182 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.113 | 2026-10-07 | One delegated decision: DEC-455 (the owner's choice after an escalation is the register entry and `gov close` records its id; every refusal for a finding about the ticket's work counts as an iteration). |
+
+## 114. Owner answers: stale paths, DEC-455, the exit package and a compliance report (register v0.114, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-456 — Stale paths: the move table and the old `cli/` tree are historical; the plan validator's one stale path is fixed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the record of the one rebuild (DEC-448): `gov doctor` reported 180 stale paths on this repository, 156 in `docs/SOURCES.md`, 23 in the old `cli/` tree, one in `docs/plan/tools/validate_s1.py` · **Amends:** DEC-448 (the set of historical records) · **Under:** DEC-440
+- **Decision:**
+  - `docs/SOURCES.md` is a historical table of moves and must keep the old paths: it is left out of doctor's
+    stale-path check.
+  - The old `cli/` tree is legacy code (the live CLI is `src/gov/cli/`): it is treated as historical and left
+    out of the check. W1-41's adoption review decides whether to archive it.
+  - The one stale path in the plan validator script, which is live, is corrected.
+  - Doctor's remaining red on this repository is then only the Claude Code drift, re-recorded at the Wave 1
+    exit.
+  - W1-27 is reopened for the two exclusions, test first.
+
+### DEC-457 — DEC-455 is accepted by the owner
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Confirms:** DEC-455
+- **Decision:** The owner's choice after an escalation is the register entry and `gov close` records its id;
+  every close refused for a finding about the ticket's work counts as an iteration.
+
+### DEC-458 — One package for the owner's actions at the Wave 1 exit
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-442, DEC-444, DEC-448, DEC-070
+- **Decision:** When W1-41 is merged, the orchestrator brings the owner one package listing everything the
+  owner does at the exit, with exact commands and steps for each:
+  - the manual freeze, pause and lift check (DEC-442);
+  - the Stop and SubagentStop hook lines to register (DEC-444);
+  - the Claude Code version to re-record;
+  - the external audit session the owner starts alongside W1-43 (DEC-070).
+
+### DEC-459 — A rule-by-rule compliance report for Wave 1, compiled by a read-only subagent and verified by the exit auditor
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER
+- **Decision:**
+  - A read-only subagent compiles a compliance report for Wave 1 so far, without stopping the running work. It
+    writes nothing; it returns the report to the orchestrator, who saves it as
+    `.gov-runtime/scratch/orchestrator/COMPLIANCE.md`.
+  - It covers each master rule MR-1 to MR-6, quoted from Charter v5, and these process rules: tests before
+    implementation (the READY rule and the MWA-02 reading); independence between test designer, engineer and
+    reviewer, including that no worker saw another's output and none saw a stand-in implementation;
+    `allowed_paths` scope; workers started only through `gov launch`, sandboxed; leads write no source or tests
+    and decide no packages; the loop policy (hidden counts, escalation) and the two-round review cap; the
+    delegation limits (what came to the owner and what the orchestrator decided); decisions recorded before the
+    changes they authorise; held-out discipline; never push, merge into main or rewrite shared history; commit
+    trailers; the proportion rule.
+  - For each rule it gives what enforces it (the guard, containment, a test or check, or only a brief or
+    prompt), the evidence (counts, commit ids, findings, decision numbers), every deviation so far (date,
+    ticket, what happened, how it was caught, the fix), and the remaining risk, named honestly where the rule
+    rests on instructions alone.
+  - The orchestrator brings the owner a short summary: which rules are enforced by mechanism, which by
+    instruction only, and the deviations in one table. The full report goes into W1-43's brief, so the exit
+    auditor verifies it independently instead of taking it as given.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.114 | 2026-10-07 | Owner answers: DEC-456 (the move table and the old `cli/` tree are historical for doctor's stale-path check; the plan validator's stale path is fixed; W1-27 reopened), DEC-457 (DEC-455 accepted), DEC-458 (one package of the owner's exit actions when W1-41 is merged), DEC-459 (a rule-by-rule compliance report by a read-only subagent, verified by the exit auditor). |
+
+## 115. Owner answers on the compliance report (register v0.115, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-460 — Session models: subagents on Opus 4.6 by the owner's setting; main sessions pinned to Opus 5.5 and recorded
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report (DEC-459): 91 co-author lines and about 70 worker sessions name "Claude Opus 4.6"
+- **Decision:**
+  - `CLAUDE_CODE_SUBAGENT_MODEL=claude-opus-4-6` is the owner's own user setting: in-session subagents run on
+    Opus 4.6 by design. It is kept. The "Claude Opus 4.6" co-author lines come from subagent sessions and are
+    not a defect.
+  - Main sessions run on Opus 5.5, pinned explicitly from now on: a lead is started with
+    `~/.local/bin/claude -p ... --model claude-opus-5-5`, a launched worker with
+    `gov launch <role> <ticket> -- --model claude-opus-5-5`.
+  - Each session's model is recorded in close records.
+
+### DEC-461 — The three closes recorded green without a saved re-run are accepted; every re-run alone is saved from now on
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the closes of W1-26 (`64172c93`), W1-23 (`a7964c97`) and W1-50 (`b894a7b7`) say the regression was green while its summary shows failures in the latency suites, and no output of the re-run alone was saved · **Under:** DEC-372
+- **Decision:** Accepted, since later full regressions show those suites green and W1-42 re-checks everything.
+  The orchestrator's new rule is confirmed: the output of every re-run alone is saved beside the regression
+  summary.
+
+### DEC-462 — A designer's brief states behaviour and sources only
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the orchestrator's designer briefs for W1-27 and W1-30 named private identifiers of the implementation · **Under:** MR-3, DEC-069
+- **Decision:** Confirmed stopped. A brief for a test designer states behaviour and sources, never the names of
+  the implementation's private parts.
+
+### DEC-463 — Decisions recorded late are accepted; from now on the record comes first, and `gov check` flags a commit citing an unrecorded decision
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: DEC-391, DEC-417, DEC-437, DEC-440, DEC-450, DEC-452 and DEC-455 were recorded after the work they authorise
+- **Decision:**
+  - Those seven are accepted as recorded late.
+  - From now on a decision is recorded before the change it authorises.
+  - A KPI line is added to W1-26 (or the ticket the orchestrator chooses) so that `gov check` flags a commit
+    that cites a decision id missing from the register at that commit. The orchestrator chooses W1-26 and
+    reopens it for this line, test first.
+
+### DEC-464 — Delegated decisions that touched containment, the freeze or the launcher are ratified after the fact
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report · **Ratifies:** DEC-266, DEC-267, DEC-268, DEC-269, DEC-270, DEC-392, DEC-404, DEC-408, DEC-453
+- **Decision:**
+  - **The deviation:** these nine decisions were taken by the orchestrator under delegation (DEC-220, later
+    DEC-416) although they touched containment (DEC-266 to DEC-270, DEC-453), the freeze or the launcher
+    (DEC-392, DEC-404, DEC-408), before the rule that a delegated decision may only make such things
+    stricter, or outside what delegation covers.
+  - **The ratification:** the owner ratifies all nine now, after the fact. They stand as decided.
+
+### DEC-465 — The pushes of `w1/integrate` were the owner's
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report's open point (who ran the 12 pushes)
+- **Decision:** All 12 pushes of `w1/integrate` were owner actions, through the operator console. No agent
+  session pushes.
+
+### DEC-466 — What the report shows as instruction-only is mechanised with what Wave 1 has built
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report · **Amends:** the orchestrator's standing rule that `gov close` is never run against this repository (it holds until W1-30 is merged) · **Under:** DEC-458, DEC-459
+- **Decision:**
+  - Once W1-30 is merged, every ticket close goes through `gov close`.
+  - Before every merge into `w1/integrate`, `gov check` is run, and red is treated as blocking.
+  - After W1-30 and W1-26 are in use, the read-only subagent re-classifies the rules, and whatever is still
+    instruction-only becomes a Wave 2 list for mechanising. That list is added to the exit package (DEC-458).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.115 | 2026-10-07 | Owner answers on the compliance report: DEC-460 (subagents on Opus 4.6 by the owner's setting; main sessions pinned to Opus 5.5 and recorded in close records), DEC-461 (three closes accepted; every re-run alone saved), DEC-462 (designer briefs state behaviour and sources only), DEC-463 (late records accepted; record first; `gov check` flags a commit citing an unrecorded decision, W1-26 reopened), DEC-464 (nine delegated decisions on containment, the freeze and the launcher ratified after the fact), DEC-465 (the pushes were the owner's), DEC-466 (closes through `gov close` after W1-30; `gov check` before every merge, red blocks; a Wave 2 list of what stays instruction-only). |
+
+## 116. One delegated decision, for the owner to confirm or replace: what "red blocks a merge" means while this repository is not yet adopted (register v0.116, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-467 — Until this repository is adopted, `gov check` blocks a merge on any red that the recorded baseline does not hold
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; provisional: brought to the owner at once, who may replace it) · **Basis:** DEC-466 orders `gov check` before every merge into `w1/integrate`, red blocking. Run on this repository at `46ec8da3` (output kept as `.gov-runtime/scratch/orchestrator/log/check-at-46ec8da3.json`), `gov check` exits 3 with thirteen hard-block checks red, none caused by a ticket branch: `gov` is not on PATH for a check command (fresh-agent reconstruction), the tickets are not in the record store (context reproducibility), the tickets' `depends_on` name W1 ids (core-graph), records without `state_class` (core-schema), the indexes are stale after every commit since the one rebuild (index freshness, recovery/rebuild), the dev tiers are not configured (retrieval regression), the secrets check exceeds its 60 seconds on this tree, and five policy keys have no check (security, test, change, human_gate, tool). Read literally, DEC-466 would stop every merge until W1-39 and W1-41 adopt this repository · **Under:** DEC-466, DEC-425
+- **Decision:**
+  - The baseline is the set of red checks at `46ec8da3`, each with its reason, recorded in
+    `governance/project/bootstrap.md`.
+  - Before every merge into `w1/integrate` the orchestrator runs `gov check` on the branch to be merged (after
+    the integration branch is merged into it) and saves the output beside the regression summary. A check that
+    is red and is not in the baseline, or is in the baseline with a new finding caused by the branch, blocks
+    the merge. A baseline red is named in the merge's record, never called green.
+  - A baseline red that turns green leaves the baseline and may not come back.
+  - The baseline is emptied by W1-39 and W1-41 (adoption of this repository) and by the exit run; what cannot
+    be emptied is an owner item in the exit package.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.116 | 2026-10-07 | One delegated decision, provisional: DEC-467 (until this repository is adopted, `gov check` blocks a merge on any red the recorded baseline at `46ec8da3` does not hold). |
+
+## 117. Two delegated decisions on W1-38: the OpenSpec skills are registered sources too; who refreshes the registered OpenSpec sources (register v0.117, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-468 — The six skills OpenSpec writes beside its commands are registered rulesync sources, like its commands
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer measured with rulesync 24.0.0 that `generate --delete` removes every file under `.claude/commands/` and `.claude/skills/` that is not a registered source, and that `openspec init --tools claude` (OpenSpec 1.13.2) writes six commands and six `openspec-*` skills. The ticket's failure line reads "generate --delete removes OpenSpec or vendored skills"; DEC-074 (question 7) makes rulesync the holder of what OpenSpec writes. Registering the commands alone would let `--delete` remove the six skills.
+- **Decision:**
+  - The registered rulesync sources hold what the registered OpenSpec version ships, unchanged: its six commands and its six skills. A text written for the ticket in their place is not a source.
+  - The acceptance cases compare the generated files with what the installed, registered OpenSpec writes; an OpenSpec that is absent or of another version fails those cases with that reason.
+  - Recorded before the change (DEC-463): the designer's cases for the six skills and the engineer's sources follow this entry.
+
+### DEC-469 — The change that moves the registered OpenSpec or rulesync version refreshes the registered sources in the same change
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the cases of DEC-468 turn red when the tool registry names a new OpenSpec version and the sources still hold the old texts; no source named who refreshes them.
+- **Decision:**
+  - The ticket that changes the `openspec` or `rulesync` entry of the tool registry refreshes the registered sources from that version in the same change, in a temporary folder outside the repository (nobody runs a writing rulesync command in the repository), and copies the result in.
+  - Where a project keeps its check declarations once adopted (`template/governance/kernel/checks/` today, `governance/kernel/` after adoption) is not decided here: W1-39 settles it.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.117 | 2026-10-07 | Two delegated decisions on W1-38: DEC-468 (OpenSpec's six skills are registered rulesync sources, like its six commands), DEC-469 (the change that moves the registered version refreshes the sources). Next free id: DEC-470. |
+
+## 118. One delegated decision on W1-30: four points the test designer found open in what `gov close` measures (register v0.118, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-470 — `gov close`: no store means no close; a missing source refuses; a probe refusal is a failed verification; the model is read from the commits until launch records carry it
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer (round 5, commit `f07051bf`) returned four points no source settles. The rule of DEC-454 stands over all four: nothing is closed, and nothing is recorded, that was not measured.
+- **Decision:**
+  - **The record store.** When the ticket's context cannot be built because the project has no record store, `gov close` refuses with that reason. It does not build the store itself: building it is `gov rebuild`'s work.
+  - **A missing source.** A ticket naming a source that does not resolve is refused, as DEC-454 and the context command state. The older case that expected a close record listing the missing source with a reason gives way and is rewritten to the refusal.
+  - **The probe gate's exit code.** A refusal by the probe gate is a finding about the ticket's work like missing trailers or a containment finding: exit code 3 (verification failed). Exit code 4 stays for an escalation in force.
+  - **Session models (DEC-460).** No source records a session's model today: the launcher writes no launch record with a model and commits carry no session trailer. Until that exists, the close record lists, for each of the ticket's commits, its role and the model named in its `Co-Authored-By` trailer, exactly as read; a commit without such a line is listed with "not measured". No model is guessed and no commit is left out. A launch record per session (id, role, ticket, model) and a `Session:` trailer are an item for the Wave 2 list of DEC-466.
+  - Recorded before the change (DEC-463): the designer's cases and the engineer's code for these four points follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.118 | 2026-10-07 | One delegated decision on W1-30: DEC-470 (no store, no close; a missing source refuses; a probe refusal exits 3; the model is read from the commits' co-author lines until launch records carry it). Next free id: DEC-471. |
+
+## 119. One delegated decision on W1-38: a role's adapter tools equal the kernel role's; which paths under `.claude/` must have a source (register v0.119, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-471 — The adapter source of a role names exactly the kernel role's tools; the three generated folders and the settings file must have a source for everything in them
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer (round 4, commit `5ca159c0`) returned two open points. The kernel role files are the authority for a role's limits (DEC-066, W1-33); the ticket's third success line reads "generated adapters match their source". The delivered adapter source of the independent auditor names four tools where the kernel role names eight (among them `Write` and `Edit`, "for its report only").
+- **Decision:**
+  - **Tools.** The tools an adapter source gives a role are exactly those the kernel role's Tools field names: neither more nor fewer. The auditor's source is brought to the kernel's eight. Whether the kernel's list for a role should be narrower is a question for that role's file (W1-33), not for the adapter.
+  - **Paths under `.claude/`.** For this ticket the check requires a source for everything in `.claude/agents/`, `.claude/skills/`, `.claude/commands/` and for every key of `.claude/settings.json`; `.claude/settings.local.json` and `.claude/worktrees/` belong to other owners (DEC-063, DEC-050) and are not findings. Anything else directly under `.claude/` is not judged yet: W1-42's exit run records what a live session writes there, and the rule for those paths is decided after it (an item for the exit package).
+  - Recorded before the change (DEC-463): the engineer's code and the auditor source follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.119 | 2026-10-07 | One delegated decision on W1-38: DEC-471 (a role's adapter tools equal the kernel role's; the three generated folders and the settings file must have a source for everything in them). Next free id: DEC-472. |

@@ -1677,3 +1677,45 @@ utilisation-triggered checkpoint is an accepted residual).
   for the exit: the table of moves is a historical record for the check; whether `cli/` is
   live is the owner's to say.
 - Adoption level reported for this repository: INTERMEDIATE, 15 of 22 systems identified.
+
+## `gov check` on this repository: the baseline of red checks (DEC-466, DEC-467, 2026-10-07)
+
+Run at `46ec8da3`: exit 3. Thirteen hard-block checks are red, for reasons that lie in this repository's state
+before its adoption (W1-39, W1-41), not in a ticket branch. A merge is blocked by any red outside this list
+(DEC-467).
+
+| Check | Reason at the baseline |
+|---|---|
+| `context-reproducibility` | unmeasured: no tickets in the record store |
+| `core-graph` | the tickets' `depends_on` name W1 ids, which are not record ids |
+| `core-schema` | records without `state_class` (for instance `docs/adr/ADR-0001-threat-model.md`) |
+| `fresh-agent-reconstruction` | its command calls `gov`, which is not on PATH here (exit 127) |
+| `index-freshness` | the lexical index is stale after every commit since the one rebuild (DEC-448) |
+| `recovery-rebuild` | the store's digest differs from a rebuild's, for the same reason |
+| `retrieval-regression` | unmeasured: the dev tiers are not configured |
+| `secrets-indexing` | its command exceeds 60 seconds on this tree |
+| `policy-security`, `policy-test`, `policy-change`, `policy-human_gate`, `policy-tool` | the policy key has no associated check |
+
+Yellow at the baseline: `audit-reproducibility` (not applicable until the first audit), `core-commands`,
+`openspec-validate`, `policy-memory`, `policy-checkpoint`, and the families adapter/model portability (no
+registered check until W1-38) and product traceability. Green: `core-authority`, `core-claims`,
+`core-mutation`, `core-pathmap`, `skill-regression-a`, `skill-regression-b1`, `skill-version`, `readiness`.
+
+## W1-27 follow-up: historical paths in doctor's stale-path check (DEC-456, 2026-10-07)
+
+Merged at `6db36969` (cases `f4ec043c`, code `da877e8a`; sessions on Claude Opus 5.5). `docs/SOURCES.md` and
+the old `cli/` tree are historical for the stale-path check; the plan validator's one stale path was fixed in
+`4eb9aacd`.
+
+- `gov check` on the branch before the merge (DEC-466, DEC-467; `log/check-at-W1-27b-premerge.json`): no red
+  outside the baseline. `secrets-indexing` was not red in that worktree run; it stays in the baseline until
+  it is seen green in the main tree.
+- Full regression at `6db36969` (`log/reg/at-W1-27b-merge.txt`): every suite passed, `RESULT: ALL PASS`; no
+  suite needed a run alone.
+- `gov doctor` at `6db36969` (`log/doctor-at-6db36969.json`), exit 3: the stale-path check passes (0 moved
+  references, 179 historical excluded). Two parts are still not green: the Claude Code drift (re-recorded at
+  the Wave 1 exit, DEC-448), and index freshness (9 stale files): every commit since the one rebuild makes
+  the lexical index stale, and no second rebuild is run here (DEC-448). Hooks, canaries and the framework
+  lock are reported unmeasured. For the owner at the exit: whether the index is rebuilt once more at
+  adoption (W1-41).
+- W1-41's adoption review decides whether the old `cli/` tree is archived (DEC-456).

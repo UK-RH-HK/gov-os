@@ -39,6 +39,8 @@ HISTORICAL_PATHS = [
     "docs/changes/",
     "governance/project/bootstrap.md",
     "docs/source/",
+    "docs/SOURCES.md",
+    "cli/",
 ]
 
 
@@ -59,6 +61,11 @@ def _excluded_from_stale_check(path: str) -> bool:
     if path.startswith("tests/acceptance/"):
         return True
     return False
+
+
+def _has_standalone_old_path(content: str, old_path: str, new_path: str) -> bool:
+    """True when *old_path* appears in *content* outside of *new_path*."""
+    return old_path in content.replace(new_path, "")
 
 
 def _extract_path_prefix(install_cmd: str) -> str | None:
@@ -559,7 +566,14 @@ def _check_path_compliance(root: Path) -> dict:
                     if _is_historical(referencing_file):
                         historical_excluded += 1
                     elif not _excluded_from_stale_check(referencing_file):
-                        refs.append({"old_path": old_path, "new_path": new_path, "referenced_in": referencing_file})
+                        try:
+                            content = (root / referencing_file).read_text(
+                                encoding="utf-8", errors="replace",
+                            )
+                        except OSError:
+                            content = old_path
+                        if _has_standalone_old_path(content, old_path, new_path):
+                            refs.append({"old_path": old_path, "new_path": new_path, "referenced_in": referencing_file})
     return {"status": "pass" if not refs else "fail", "moved_references": refs,
             "historical_excluded": historical_excluded}
 
