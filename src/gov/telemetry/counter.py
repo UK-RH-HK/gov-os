@@ -1,12 +1,13 @@
-"""The governance share of a ticket (W1-31; DEC-086, DEC-106, DEC-170, DEC-491, DEC-495).
+"""The governance share of a ticket (W1-31; DEC-086, DEC-106, DEC-170, DEC-491, DEC-495, DEC-501).
 
 ``measure(root, ticket, sessions)`` returns the record ``gov telemetry`` prints, and writes nothing.
 
 A figure is measured or it says "not measured" (DEC-449, DEC-454): nothing here turns "could not read" into a
-number. The tokens of the sessions are ccusage's, held against the assistant lines of each session's own log;
-when they cannot be measured for every named session the counter refuses. Five sources are measured (three
-from the session logs, ``gov.telemetry.sessionlog``; two from the ticket's record folders) and two are a
-static estimate on a line of their own. The counter gives counts and states no opinion of them.
+number. The tokens of the sessions are ccusage's, held against the assistant lines of each session's own log
+and of its sub-agents' logs; when they cannot be measured for every named session the counter refuses. Five
+sources are measured (three from the session logs, ``gov.telemetry.sessionlog``; two from the ticket's record
+folders) and two are a static estimate on a line of their own. The counter gives counts and states no opinion
+of them.
 """
 
 from __future__ import annotations
@@ -31,10 +32,18 @@ PROFILES = ("LITE", "STANDARD", "FULL")
 # The record's name of each figure, and ccusage's; in the order of ``sessionlog.USAGE``.
 FIGURES = {"tokens_in": "inputTokens", "tokens_out": "outputTokens", "cache_creation_tokens": "cacheCreationTokens",
            "cache_read_tokens": "cacheReadTokens"}
-# No source is decided for these; ``agent`` and ``latency`` (AD-3) and the sandbox's tokens (AD-4) among them.
+# No source is decided for these; the sandbox's tokens among them, until W1-42 records its measurement (DEC-501).
 UNDECIDED = ("role", "skill_versions", "tool_versions", "packet_id", "retrieval_queries", "retrieval_hits",
              "files_written", "tests", "retries", "handoffs", "decisions", "owner_interventions",
-             "agent", "provider", "latency", "files_read", "sandbox_system_prompt_tokens")
+             "provider", "files_read", "sandbox_system_prompt_tokens")
+HARNESS, API_DURATION = "Claude Code", "harness_api_duration_ms"
+# What the counter cannot count, said in every record (DEC-501). No entry makes a figure "not measured".
+KNOWN_GAPS = (
+    # AD-7, awaiting decision: the one place of the PreCompact hook's output. It is not read and not counted.
+    ("precompact_hook_output", "the harness logs the output of a PreCompact hook in no hook line: it is not counted"),
+    ("gov_run_indirectly", "a gov command inside bash -c, eval, backticks or a wrapper script is not seen: its "
+                           "result is not counted"),
+)
 INSTRUCTION_FILE, MCP_FILE = "CLAUDE.md", ".mcp.json"
 # AD-1, awaiting decision: this text says all the estimate is.
 METHOD = (f"A static estimate, not read from a session log. instruction_files: the tokens of {INSTRUCTION_FILE} "
@@ -147,7 +156,7 @@ def _rewrites(commits: list) -> list:
 
 
 def _disputes(root: Path, ticket: str):
-    """The decisions of the ticket's disputes record, one a line (README PR-1, proposed); "not measured"
+    """The decisions of the ticket's disputes record, one a line (DEC-501); "not measured"
     without the record, when it cannot be read, and when a line names no decision."""
     text = _text(root / "docs" / "close" / ticket / DISPUTES_NAME)
     found = [DISPUTE.fullmatch(line) for line in text.splitlines()] if isinstance(text, str) else [None]
@@ -173,8 +182,8 @@ def _ccusage_rows() -> list:
 
 def _session(rows: list, session: str, log: dict) -> dict:
     """What ccusage measured for ``session``. An absent row is not a session of zero tokens, and a row is not
-    proof (ccusage passes over a line it cannot parse): its four figures must be those of the log's own
-    assistant lines, each message once. It refuses otherwise."""
+    proof (ccusage passes over a line it cannot parse): its four figures must be those of the assistant lines
+    of the session's own log and of its sub-agents' logs, each message once. It refuses otherwise."""
     found = [row for row in rows if isinstance(row, dict) and row.get("sessionId") == session]
     if len(found) != 1 or any(type(found[0].get(key)) is not int or found[0][key] < 0 for key in FIGURES.values()):
         raise GovError("SESSIONS_NOT_MEASURED",
@@ -182,18 +191,20 @@ def _session(rows: list, session: str, log: dict) -> dict:
                        {"session": session, "rows": len(found)})
     row = found[0]
     if tuple(row[key] for key in FIGURES.values()) != log["usage"]:
-        raise GovError("SESSIONS_NOT_MEASURED", f"ccusage's figures of session {session} are not those of its "
-                       "log's own lines: it was not measured", {"session": session})
+        raise GovError("SESSIONS_NOT_MEASURED", f"ccusage's figures of session {session} are not those of the "
+                       "lines of its log and of its sub-agents' logs: it was not measured", {"session": session})
     cost, priced = row.get("totalCost"), row.get("modelBreakdowns")
     # A cost is measured only when ccusage had a price for every model of the session.
     costed = (type(cost) in (int, float) and isinstance(priced, list) and priced
               and all(isinstance(each, dict) and not each.get("missingPricing") for each in priced))
     return {"session": session, "model": log["models"] or NOT_MEASURED,
-            **{name: row[key] for name, key in FIGURES.items()}, "cost": cost if costed else NOT_MEASURED}
+            **{name: row[key] for name, key in FIGURES.items()}, "cost": cost if costed else NOT_MEASURED,
+            API_DURATION: NOT_MEASURED if log["duration"] is None else log["duration"]}  # DEC-501: no wall clock
 
 
 def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
-    """The telemetry record of ``ticket``, with ``sessions`` as its sessions (the caller names them, DEC-491).
+    """The telemetry record of ``ticket``, with ``sessions`` as its sessions (the caller names them, DEC-491);
+    the logs of a named session's sub-agents are read with it (DEC-501).
 
     Reads, from the environment, ``CLAUDE_CONFIG_DIR`` (the folder that holds the session logs' ``projects/``;
     without it ``HOME``'s ``.claude``) and ``PATH`` (ccusage, git). Raises ``GovError`` for an unknown ticket
@@ -244,6 +255,8 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
         "governance_share": shares,
         "not_measured": [{"name": name, "reason": "; ".join(missing[name])}
                          for name in (*SOURCES, *ESTIMATED) if name in missing],
+        "counting_notes": {name: sum(log["notes"][name] for log in logs) for name in sessionlog.NOTES},
+        "known_gaps": [{"name": name, "reason": reason} for name, reason in KNOWN_GAPS],
         **figures,
         "cost": _total(entry["cost"] for entry in entries),
         "sessions": entries,
@@ -252,6 +265,9 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
                       {"commit": commit, "model": "; ".join(trailers.get("co-authored-by", [])) or NOT_MEASURED}
                       for commit, trailers in commits]},
         **dict.fromkeys(UNDECIDED, NOT_MEASURED),
+        "latency": {API_DURATION: _total(entry[API_DURATION] for entry in entries)},
+        "agent": {"harness": HARNESS,  # every log read is of this version, or the counter refused
+                  "version": sessionlog.VERSION if all(log["versioned"] for log in logs) else NOT_MEASURED},
         "learning_metrics": {"kpi_disputes": _disputes(root, ticket),
                              "acceptance_tests_rewritten": NOT_MEASURED if commits is None else _rewrites(commits),
                              "governance_share": dict(shares)},
