@@ -141,6 +141,7 @@ def _close(root, *, tests=True, entries=(), test_findings=(), families=None, blo
     args = SimpleNamespace(ticket=TICKET, disposition=None, owner_decision=None, timeout=None)
     with patch.object(command, "_ticket_commits", return_value=[_commit(HEAD, NOTES)]), \
             patch.object(command, "_check_trailers"), patch.object(command, "_check_containment"), \
+            patch.object(command, "_check_tree"), patch.object(command, "_commits_since", return_value=[]), \
             patch.object(command, "_run_tests", return_value=(list(test_findings), dict(COUNTS))) as ran, \
             patch.object(command, "_git", return_value=HEAD + "\n"), \
             patch("gov.check.runner.run_checks",
