@@ -28,7 +28,7 @@ def main() -> None:
 
     try:
         from gov.checkpoint.record import write
-        write(root, ticket, "stop", "Resume after stop", [])
+        write(root, ticket, "stop", "Resume after stop", [], dest="automatic")
     except Exception:
         pass
 

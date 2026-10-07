@@ -40,6 +40,7 @@ if _SRC_DIR not in sys.path:
     sys.path.insert(0, _SRC_DIR)
 
 HOOKS_DIR = REPO_ROOT / "src" / "gov" / "hooks"
+SCRATCH_CHECKPOINTS_REL = ".gov-runtime/scratch/checkpoints"
 
 ORCH = w1_49_support.ORCHESTRATOR_CHECKPOINT_REL
 LEAD = w1_49_support.LEAD_CHECKPOINT_REL
@@ -298,6 +299,9 @@ def _simple_git(root, *args):
 def project(tmp_path):
     """A throwaway project for Stop, SubagentStop and watchdog tests."""
     _simple_git(tmp_path, "init", "-q", "-b", "main")
+    (tmp_path / ".gitignore").write_text(
+        ".gov-runtime/\n__pycache__/\n", encoding="utf-8",
+    )
     (tmp_path / ".tickets").mkdir()
     (tmp_path / ".tickets" / "TEST-abcd.md").write_text(
         TICKET_TEXT, encoding="utf-8",
