@@ -11,12 +11,18 @@ The escalation of every case is made the same way (``support.escalate``): three 
 ticket's failing acceptance test and a fourth that is blocked. Between closes the orchestrator commits what
 the refusal left (the repair ticket), so each close finds its tree committed.
 
-How a case holds "the escalation was not lifted": the close given the decision is refused, and the close
-after it, given none, is blocked with exit code 4. Had the escalation been lifted, that close would have run
-the tests and ended with exit code 3. What the case planted in the working tree is removed before it.
+How a case holds "the escalation was not lifted": the close given the decision stays blocked, with the blocked
+exit code 4 (DEC-490), and the close after it, given none, is blocked with exit code 4 too. Had the escalation
+been lifted, that close would have run the tests and ended with exit code 3. What the case planted in the
+working tree is removed before it.
+
+A counter that is not a count, or that cannot be read, is "could not measure" (DEC-490): exit code 1, the
+counter's file named in the answer, the counter as it was, no repair ticket. An escalation in force whose
+counter is missing blocks (exit code 4, DEC-487).
 
 Written whole, as far as a case can hold it without timing: after a refusal the folders of the counter and of
-the escalation hold the ticket's one file each, readable, and nothing beside it.
+the escalation hold the ticket's one file each, readable, and nothing beside it. DEC-490: "held by the unit
+tests and by reading; no acceptance case with timing."
 """
 
 import json
@@ -35,11 +41,13 @@ def _escalated(project, sandbox, interface):
     support.escalate(project, sandbox, interface, TICKET)
 
 
-def _not_lifted_by(project, sandbox, interface, decision, why):
-    """The close given ``decision`` is refused; the ticket is not closed."""
+def _not_lifted_by(project, sandbox, interface, decision, why, codes=(support.EXIT_BLOCKED,)):
+    """The close given ``decision`` stays blocked, with the blocked exit code (DEC-490: "an owner's decision
+    that does not qualify lifts nothing"); the ticket is not closed."""
     run = support.run_close(project, sandbox, TICKET, "--owner-decision", decision)
     envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False and run.returncode != support.EXIT_OK, f"{why}\n{run.describe()}"
+    assert envelope["ok"] is False and run.returncode in codes, \
+        f"{why}: the close does not end with exit code {' or '.join(map(str, codes))}\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
     return run
 
@@ -49,10 +57,13 @@ def _not_lifted_by(project, sandbox, interface, decision, why):
 # --------------------------------------------------------------------------
 
 def test_a_file_no_commit_holds_lifts_no_escalation(project, sandbox, interface):
-    """The decision is the name of an untracked file that holds an active status line and nothing else."""
+    """The decision is the name of an untracked file that holds an active status line and nothing else. The
+    file also makes the tree another than its commit, and no source states which of the two the close answers
+    first: blocked (exit code 4) or "could not measure" for the tree (exit code 1). The case accepts both."""
     _escalated(project, sandbox, interface)
     planted = project.write("docs/adr/DEC-planted.md", "---\nstatus: ACTIVE\n---\n")
-    _not_lifted_by(project, sandbox, interface, "DEC-planted", "a file no commit holds was taken as the owner's decision")
+    _not_lifted_by(project, sandbox, interface, "DEC-planted", "a file no commit holds was taken as the owner's decision",
+                   codes=(support.EXIT_BLOCKED, support.EXIT_GOV_ERROR))
     planted.unlink()
     support.commit_what_a_refusal_left(project)
     support.assert_escalation_in_force(project, sandbox, interface, TICKET, "a file no commit holds")
@@ -108,9 +119,7 @@ def test_a_decision_that_lifted_one_escalation_lifts_no_second(project, sandbox,
         support.commit_what_a_refusal_left(project)
     support.refused(support.run_close(project, sandbox, TICKET), interface, support.EXIT_BLOCKED)
 
-    again = _not_lifted_by(project, sandbox, interface, "DEC-once", "a decision lifted a second escalation")
-    assert again.returncode != support.EXIT_CHECK_FAILED, \
-        f"the decision lifted a second escalation: the close ran the tests again\n{again.describe()}"
+    _not_lifted_by(project, sandbox, interface, "DEC-once", "a decision lifted a second escalation")
     support.commit_what_a_refusal_left(project)
     support.assert_escalation_in_force(project, sandbox, interface, TICKET, "a decision used before")
 
@@ -134,7 +143,8 @@ def test_an_escalation_in_force_whose_counter_is_missing_blocks_and_says_so(proj
 
 @pytest.mark.parametrize("count", [-5, 1.5], ids=["below zero", "not a whole number"])
 def test_a_counter_that_is_not_a_count_from_zero_up_blocks_and_says_so(count, project, sandbox, interface):
-    """The counter is preset before the first close. Nothing runs: no repair ticket, the counter as it was."""
+    """The counter is preset before the first close. Nothing runs: exit code 1, the counter's file named, no
+    repair ticket, the counter as it was."""
     support.build_ticket(project, TICKET, WBS, failing=True)
     preset = {"count": count, "last_failures": [], "outcomes": []}
     support.write_iteration_file(project.root, TICKET, preset)
@@ -157,6 +167,7 @@ def test_a_counter_that_cannot_be_read_blocks_and_names_its_file(project, sandbo
     error = support.refused_without_a_finding(run, interface)
     assert COUNTER in support.error_text(error), f"the answer does not name the counter {COUNTER}\n{run.describe()}"
     support.assert_no_repair_ticket(project, run, TICKET)
+    support.assert_not_closed(project, TICKET)
 
 
 def test_a_refusal_leaves_the_counter_and_the_escalation_whole_and_nothing_beside_them(project, sandbox, interface):

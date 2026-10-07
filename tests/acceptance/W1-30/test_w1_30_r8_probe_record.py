@@ -7,11 +7,10 @@ refuses wherever it lies in the ticket's range."
 Every refusal by the probe gate is a finding: exit code 3 (DEC-470). The project of each case is the one of
 ``test_full_ticket_closes_with_valid_probe`` but for the one thing the case names.
 
-**The words of a judgement.** No source states them: CAP-38.f and DEC-137 say the orchestrator "judges" the
-probe, and the suite's README names the field (``judgement``) and that it must be present. On the order of
-round 8 the two words are ``passed`` and ``failed``: ``failed`` refuses, ``passed`` is accepted. The suite's
-fixtures have written ``pass`` since round 4 (``support.probe_record``), and every FULL ticket that closes in
-this suite holds that ``pass`` is accepted too (README, "Round 8", package 2).
+**The words of a judgement (DEC-490).** "The judgement of a probe record is ``pass`` or ``passed`` to be
+accepted; ``fail``, ``failed`` or any other value refuses." The cases hold the two accepted words, the two
+named refusing words and one word that is neither (``inconclusive``). The suite's fixtures write ``pass``
+(``support.probe_record``).
 """
 
 import pytest
@@ -34,17 +33,19 @@ def _refused_by_the_probe_gate(project, sandbox, interface, *named):
     return text
 
 
-def test_a_judgement_that_says_the_probe_failed_refuses(project, sandbox, interface):
+@pytest.mark.parametrize("judgement", ["fail", "failed", "inconclusive"])
+def test_a_judgement_that_is_neither_pass_nor_passed_refuses(judgement, project, sandbox, interface):
     support.build_ticket(project, TICKET, WBS, profile="FULL")
-    project.add_probe(TICKET, judgement="failed")
+    project.add_probe(TICKET, judgement=judgement)
     project.commit("the probe record", who=support.ORCHESTRATOR)
     text = _refused_by_the_probe_gate(project, sandbox, interface)
     assert "judgement" in text.lower(), f"the refusal does not name the judgement: {text}"
 
 
-def test_a_judgement_that_says_the_probe_passed_is_accepted(project, sandbox, interface):
+@pytest.mark.parametrize("judgement", ["pass", "passed"])
+def test_a_judgement_of_pass_or_passed_is_accepted(judgement, project, sandbox, interface):
     support.build_ticket(project, TICKET, WBS, profile="FULL")
-    project.add_probe(TICKET, judgement="passed")
+    project.add_probe(TICKET, judgement=judgement)
     project.commit("the probe record", who=support.ORCHESTRATOR)
 
     run = support.run_close(project, sandbox, TICKET)

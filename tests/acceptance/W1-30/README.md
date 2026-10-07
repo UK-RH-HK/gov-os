@@ -717,7 +717,7 @@ it as a check entry of its own (`policy-<key>`, hard-block, RED), so it is "a ha
 is red", the state of rounds 6 and 6b, and the W1-26 README does not state it as a blocking
 state of its own.
 
-## Round 8 (DEC-487)
+## Round 8 (DEC-487, made exact by DEC-490)
 
 A fresh reviewer probed `gov close` and found ways in which it closes a ticket whose work it did
 not measure. DEC-487 (register section 124) states, behaviour by behaviour, what `gov close` does
@@ -725,6 +725,13 @@ after the follow-up. The cases are in six new files, `test_w1_30_r8_*.py`; new h
 end of `w1_30_support.py` ("Round 8"). Each case builds the project the reviewer described, by the
 suite's own means, and holds the outcome DEC-487 names. "Closed" below is what `gov close` did at
 `e5560b9a`: exit code 0, the ticket closed.
+
+**Round 8b.** Round 8 returned seven points no source settled. DEC-490 (register section 127)
+decides them, and the cases were brought to it: which commits that name no task refuse (behaviour
+4), the words of a judgement (7), what a refusal's own repair ticket does to the tree rule (1), the
+exit codes (1, 8, 9, 11, 13). Store freshness (11) keeps its behaviour-only case; "written whole
+or not at all" (9) gets no case with timing. What changed is marked "8b" below; "Packages of
+round 8" says how each point was decided.
 
 **Existing cases changed: one, for point 12.**
 `test_a_change_under_each_governance_prefix_has_the_checks_run` (governance_checks) has an eighth
@@ -741,8 +748,8 @@ DEC-487 is that source now: "The suite's earlier settlement to the contrary is r
 likewise.
 
 **1. The tree a close measures is the commit it records** (tree). Held in every refusal: the answer
-names the path; the exit code is neither 0 nor 3; nothing closed; the count stays 0; no repair
-ticket.
+names the path; the exit code is 1 (8b: "could not measure", DEC-490; before: neither 0 nor 3);
+nothing closed; the count stays 0; no repair ticket.
 
 | Case | The project | Red now because |
 |------|-------------|-----------------|
@@ -752,6 +759,12 @@ ticket.
 | `test_an_uncommitted_governance_change_refuses_where_a_hard_block_check_is_red` | `license-present` red (held by `gov check`); `governance/project/notes.yaml` written, not committed | closed |
 | `test_source_changed_after_the_probed_commit_and_not_committed_refuses` | FULL, probe record committed; the source rewritten in the working tree | closed |
 | `test_a_file_git_ignores_refuses_nothing` | a file under an ignored folder | green: the converse guard |
+| 8b: `test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured` | the failing ticket is closed twice, nothing committed in between; held first: the refusal left one untracked ticket file whose `parent` is the ticket. The second close: exit code 3, the failing test named, the count 2, a second repair ticket | green: the converse guard of the tree rule |
+| 8b: `test_an_untracked_ticket_file_that_is_not_a_repair_ticket_of_this_ticket_refuses` (2 forms: its `parent` is another ticket of the project; it names no parent) | a green, committed ticket; one untracked file under `.tickets/` | closed, both forms |
+
+DEC-490: "An untracked ticket file whose parent is the ticket being closed does not refuse the
+next close. Every other untracked, not ignored file and every change to a tracked file does, the
+ticket's own file included." The ticket's own file changed and not committed is the third row.
 
 **2. The caller's environment** (test_runs). `PYTEST_ADDOPTS` is set in the environment of
 `gov close` only; the ticket's one acceptance test fails.
@@ -766,21 +779,47 @@ exit code 3, nothing closed, one iteration counted, as for a ticket without acce
 (round 6). Red: closed.
 
 **13. The time limit** (test_runs).
-`test_a_time_limit_that_is_not_a_positive_number_is_refused_as_an_invalid_argument` (`0`, `-5`):
-exit code 2 (API-0002's usage error) or 1; the answer names the argument; nothing closed, nothing
-counted, no repair ticket. Red: `0` closed (read as "no limit given"); `-5` was refused with exit
-code 3 as a test run over its time limit, counted, with a repair ticket.
+`test_a_time_limit_that_is_not_a_positive_number_is_refused_as_an_invalid_argument` (`0`, `-5`).
+8b (DEC-490: "refused like any other invalid argument, before anything runs"): the ticket's
+acceptance test now fails, so anything that ran would be counted. The case first gives the other
+invalid argument the suite holds for this command, a disposition that is none of the six names
+(`test_only_six_disposition_names_accepted`), holds exit code 1 for it, and holds the same exit
+code for the time limit; the answer names the argument; nothing closed, nothing counted, no repair
+ticket. Red: with `0` the tests ran (read as "no limit given"): exit code 3, counted, a repair
+ticket; `-5` was refused with exit code 3 as a test run over its time limit, counted, with a
+repair ticket.
 
-**4. Commits that name no task** (commits). Exit code 3; the answer names the commit and says
-"task".
+**4. Commits that name no task** (commits). 8b, DEC-490: "Among the commits after the ticket's
+first, one that names no task refuses the close when it changes the ticket's acceptance tests, a
+path inside the ticket's allowed paths, or the ticket's own file: that is work on this ticket
+which no ticket measured. One that changes a governance file has the governance checks run, as a
+ticket commit would. After the probed commit, one that changes a path inside the ticket's allowed
+paths makes the probe stale. Any other task-less commit (a decision record, a checkpoint, a probe
+record, another folder) refuses nothing. A commit that names another ticket is that ticket's."
 
-| Case | The commit, after the ticket's first | Red now because |
-|------|--------------------------------------|-----------------|
-| `test_a_commit_without_trailers_that_weakens_the_acceptance_test_refuses` | no trailer; makes the failing test pass, adds `src/other/outside.py` | closed |
-| `test_a_commit_with_the_engineers_role_and_no_task_refuses` | the same with `Role: engineer` alone | closed |
-| `test_a_commit_without_trailers_that_changes_a_governance_file_refuses` | no trailer; `governance/project/notes.yaml`; `license-present` red | closed |
-| `test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses` | no trailer; rewrites the probed source | closed |
-| `test_a_commit_that_names_another_ticket_refuses_nothing` | another ticket's commit, inside that ticket's paths | green: the converse guard |
+What refuses is what the commit changes, not its role or its author. Every case holds first that
+its commit names no task and changes the one path named (`_task_less`). A refusal is a finding,
+exit code 3.
+
+| Case | The commit, after the ticket's first, changes only | Held | Red now because |
+|------|----------------------------------------------------|------|-----------------|
+| `test_a_commit_without_trailers_that_weakens_the_acceptance_test_refuses` (8b: no longer adds `src/other/outside.py`) | the ticket's failing acceptance test, so that it passes; no trailer | the commit named, "task" said | closed |
+| `test_a_commit_with_the_engineers_role_and_no_task_refuses` (8b: the same) | the same, `Role: engineer` alone | the same | closed |
+| 8b: `test_a_commit_with_the_orchestrators_role_and_no_task_that_weakens_the_acceptance_test_refuses` | the same, `Role: orchestrator` alone, by the orchestrator | the same | closed |
+| 8b: `test_a_commit_without_trailers_that_adds_a_file_inside_the_tickets_allowed_paths_refuses` | a new `src/example/more.py`; the ticket is green | the same | closed |
+| 8b: `test_a_commit_without_trailers_that_changes_the_tickets_own_file_refuses` | the ticket's file: FULL lowered to STANDARD, no probe record | the same | closed |
+| `test_a_commit_without_trailers_that_changes_a_governance_file_refuses_where_a_check_is_red` (8b: renamed; the answer names the red check, no longer the commit and "task") | `governance/project/notes.yaml`, outside the ticket's paths; `license-present` red | `license-present` named | closed |
+| 8b: `test_a_commit_without_trailers_that_changes_a_governance_file_has_the_checks_run` | the same file; every check green | closed, and the close record's `check_commit` is the commit being closed | the ticket closes; the close record names no `check_commit` |
+| `test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses` (8b: "task" no longer required) | the probed source, inside the ticket's paths | the commit named | closed |
+| 8b: `test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing` (2 forms: `src/other/outside.py`, `notes/meeting.txt`) | a file that is no acceptance test of the ticket, not inside its allowed paths, not its file, no governance file | closed; the close record claims no check result | green: the converse guard, both forms |
+| `test_a_commit_that_names_another_ticket_refuses_nothing` | another ticket's commit, inside that ticket's paths | closed | green: the converse guard |
+
+The four cases of round 8 against the sentence: the first two refused for two things at once, the
+weakened test and a file outside the ticket's paths; the second is no reason, and was taken out.
+The third asked for the commit and the word "task"; a governance file outside the ticket's paths
+is not work on the ticket, it has the checks run, so the case asks for the red check. The fourth
+changes a path inside the ticket's allowed paths after the probed commit: it refuses for both
+reasons the sentence gives, and the case no longer says which word the answer uses.
 
 **5. A commit of the ticket without a role** (commits).
 `test_a_commit_of_the_ticket_without_a_role_refuses`: `Task` and `Implements`, no `Role`; widens
@@ -806,38 +845,47 @@ green, and is not kept.
 
 | Case | Red now because |
 |------|-----------------|
-| `test_a_judgement_that_says_the_probe_failed_refuses` (the answer names the judgement) | closed |
-| `test_a_judgement_that_says_the_probe_passed_is_accepted` | green |
+| 8b: `test_a_judgement_that_is_neither_pass_nor_passed_refuses` (3 forms: `fail`, `failed`, `inconclusive`; the answer names the judgement; replaces `test_a_judgement_that_says_the_probe_failed_refuses`) | closed, all three forms |
+| 8b: `test_a_judgement_of_pass_or_passed_is_accepted` (2 forms; replaces `test_a_judgement_that_says_the_probe_passed_is_accepted`) | green, both forms |
 | `test_a_probe_record_that_is_written_and_not_committed_refuses` (any refusal that names the record's file: for the tree or for the record) | closed |
 | `test_a_probe_record_committed_without_the_orchestrators_role_refuses` (the engineer's ticket commit; the ticket's paths hold `docs/probes/**`, W1-50 has no finding; the answer says "orchestrator") | closed |
 | `test_a_probed_commit_given_as_a_name_that_moves_refuses` (`HEAD`, `main`; an engineer's commit follows) | closed, both forms |
 | `test_a_commit_with_the_reviewers_role_and_no_task_before_the_probed_commit_refuses` (adds a source file; the answer names the commit) | closed |
 
+DEC-490: "The judgement of a probe record is `pass` or `passed` to be accepted; `fail`, `failed`
+or any other value refuses."
+
 **8. The owner's decision** (escalation). The escalation is made by `support.escalate`: three
 refusals for the failing test, a fourth blocked. "Not lifted" is held twice: the close given the
-decision is refused, and the next close, given none, is blocked (exit code 4).
+decision stays blocked, with the blocked exit code 4 (8b, DEC-490: "an owner's decision that does
+not qualify lifts nothing: the close stays blocked, with the blocked exit code"; before: refused,
+not 0), and the next close, given none, is blocked (exit code 4). One case accepts exit code 1
+beside 4: in `test_a_file_no_commit_holds_lifts_no_escalation` the planted file also makes the
+tree another than its commit, and no source states whether the close answers the escalation or
+the tree first.
 
 | Case | Red now because |
 |------|-----------------|
-| `test_a_file_no_commit_holds_lifts_no_escalation` (untracked `docs/adr/DEC-planted.md` holding `status: ACTIVE` only) | lifted: the next close ran the tests (exit code 3) |
+| `test_a_file_no_commit_holds_lifts_no_escalation` (untracked `docs/adr/DEC-planted.md` holding `status: ACTIVE` only) | lifted: the close given the decision ran the tests (exit code 3) |
 | `test_a_path_to_a_file_outside_the_project_lifts_no_escalation` (`../`-paths from each place a decision is looked for) | lifted, the same |
 | `test_the_tickets_own_checkpoint_lifts_no_escalation` | lifted, the same |
 | `test_a_decision_recorded_before_the_escalation_began_lifts_none` (the owner's, ACTIVE, no finding of W1-11's checker) | lifted, the same |
-| `test_a_decision_that_lifted_one_escalation_lifts_no_second` | the same decision lifted the second escalation: the close ran the tests again |
+| `test_a_decision_that_lifted_one_escalation_lifts_no_second` | the same decision lifted the second escalation: the close ran the tests again (exit code 3) |
 
-**9. The escalation state** (escalation).
+**9. The escalation state** (escalation). 8b, DEC-490: a counter that is not a count is "could
+not measure": exit code 1, the file named in the answer, not counted, no repair ticket (before:
+neither 0 nor 3). An escalation in force whose counter is missing blocks (exit code 4, DEC-487).
 
 | Case | Red now because |
 |------|-----------------|
 | `test_an_escalation_in_force_whose_counter_is_missing_blocks_and_says_so` (exit code 4, the counter's path named) | the close ran: exit code 3 |
-| `test_a_counter_that_is_not_a_count_from_zero_up_blocks_and_says_so[below zero]` (preset `-5`; not a finding, the path named, counter unchanged, no repair ticket) | the close ran: exit code 3, a repair ticket |
+| `test_a_counter_that_is_not_a_count_from_zero_up_blocks_and_says_so[below zero]` (preset `-5`; exit code 1, the path named, counter unchanged, no repair ticket) | the close ran: exit code 3, a repair ticket |
 | `...[not a whole number]` (`1.5`) | refused with `ITERATION_CORRUPT`, exit code 1; the answer does not name the file |
-| `test_a_counter_that_cannot_be_read_blocks_and_names_its_file` | refused with `ITERATION_CORRUPT`; the answer does not name the file |
+| `test_a_counter_that_cannot_be_read_blocks_and_names_its_file` (exit code 1, the path named, no repair ticket, nothing closed) | refused with `ITERATION_CORRUPT`, exit code 1; the answer does not name the file |
 | `test_a_refusal_leaves_the_counter_and_the_escalation_whole_and_nothing_beside_them` | green: after each of three refusals the counter's folder holds the one readable file, and so does the escalation's |
 
-"Written whole or not at all" has no case beyond the last one: a write cut short needs a process
-stopped in the middle of it, which a case cannot do without timing. That the answer names the
-file is from this round's order, not from DEC-487's words ("blocks and says so").
+"Written whole or not at all" has no case beyond the last one. DEC-490: it "is held by the unit
+tests and by reading (write beside, then rename); no acceptance case with timing."
 
 **10. The last step fails** (last_step). The ticket stays in progress and
 `support.records_saying_closed` finds nothing: no close record with status ACTIVE, no checkpoint of
@@ -852,7 +900,11 @@ the ticket whose `next_action` is "ticket closed".
 `test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the_rebuild`: the store
 is loaded, the owner's commit supersedes `DEC-000`, the close runs without a reload. Held
 afterwards: with the store loaded again `gov context` answers `BLOCKED` and names `DEC-000`. The
-close is refused, the answer holds "gov rebuild", nothing closed. Red: closed.
+close is refused, the answer holds "gov rebuild", nothing closed. 8b (DEC-490): it is "could not
+measure": exit code 1, not counted, no repair ticket (before: refused, not 0). How the store's
+freshness is told stays out of the case: "the engineer uses a mark the store or the runtime
+already keeps of the commit it was built from; if none exists inside what `gov close` may read,
+that case is returned, not guessed." Red: closed.
 
 **12. The installed kernel is governance** (last_step, governance_checks).
 
@@ -874,15 +926,26 @@ close is refused, the answer holds "gov rebuild", nothing closed. Red: closed.
    refuse nothing. Where the line lies between them (by role, by the paths a role may write under
    W1-50, by who committed) no source states. Not written: a commit with `Role: orchestrator` and
    no task that weakens an acceptance test.
+   **Decided (DEC-490):** the line is what the commit changes: the ticket's acceptance tests, a
+   path inside its allowed paths, its own file refuse; a governance file has the checks run; any
+   other refuses nothing; the role lifts nothing. The middle cases are written (behaviour 4). An
+   audit of every `gov close` the suite starts (a scratch plugin, not part of the suite) found no
+   case outside the round-8 files whose project holds a task-less commit, after the ticket's
+   first, on one of the three kinds of path, but for
+   `test_reviewer_commit_in_ticket_commits_refused` (probe), which holds a refusal.
 2. **The words of a probe's judgement.** No source states them (CAP-38.f, DEC-137: the
    orchestrator "judges"; the README named the field only). On this round's order the cases use
    `failed` (refuses) and `passed` (accepted). The suite's fixtures have written `pass` since
    round 4, and every FULL ticket that closes in the suite does so with `pass`. So either `pass`
    and `passed` are both accepted, or `support.probe_record`'s word is changed in a later round.
+   **Decided (DEC-490):** `pass` and `passed` are accepted; `fail`, `failed` and any other value
+   refuse. The fixtures keep `pass`.
 3. **How a store's freshness against the head commit is told.** The READMEs of W1-06 (pins),
    W1-10 (the store: `load`, the digest) and W1-27 (`gov rebuild`; "index freshness" is the lexical
    index's) state no way to ask whether the store was built from `HEAD`; there is no W1-51 folder.
    The case holds the behaviour only.
+   **Decided (DEC-490):** unchanged; the mark is the engineer's to find, and the case is returned
+   if none exists inside what `gov close` may read. Only the exit code was added (package 5).
 4. **A refused close leaves its repair ticket untracked, and the next close must find the tree
    committed.** Under the first behaviour the second of two closes in a row would be refused for
    the repair ticket's file, uncounted, so no escalation could be reached that way. The new cases
@@ -891,10 +954,32 @@ close is refused, the answer holds "gov rebuild", nothing closed. Red: closed.
    without a commit in between (most of iteration, two of time_limit) were not changed. Either
    the files `gov close` itself wrote are no refusal, or those cases get the commit in a later
    round.
+   **Decided (DEC-490):** an untracked ticket file whose parent is the ticket being closed
+   refuses no later close; every other untracked file does. Three cases hold it (behaviour 1).
+   The existing cases that close repeatedly without a commit were not changed, and none collides:
+   the same audit looked at the working tree at every `gov close` the suite starts, and outside
+   the round-8 files it found nothing waiting but repair tickets whose `parent` is the ticket
+   being closed. That covers every case of iteration, time_limit, disposition, repair_ticket and
+   close that closes more than once. A refused close leaves nothing else that git sees (the
+   counter and the escalation are under the ignored `.gov-runtime/`). The audit could not look
+   at two cases, which break git on purpose and close once:
+   `test_git_failure_is_error_not_empty_list` (close) and
+   `test_a_git_failure_while_the_probes_commits_are_read_refuses` (probe_commits). The new cases
+   of round 8 still commit what a refusal left (`support.commit_what_a_refusal_left`).
 5. **Exit codes DEC-487 does not give.** A refusal for the tree: the cases hold "neither 0 nor 3".
    A counter that is no count: "neither 0 nor 3" (the suite holds exit code 1 for an unreadable
    counter since round 4; DEC-487 says "blocks"). A stale store, an owner's decision that lifts
    nothing: "refused, not 0". A time limit that is no limit: 1 or 2.
+   **Decided (DEC-490):** a tree that is not its commit, a store older than the commit, a counter
+   that is no count: exit code 1, not counted, no repair ticket
+   (`support.refused_without_a_finding` now holds exit code 1). An owner's decision that does not
+   qualify: exit code 4. A time limit that is no limit: the exit code of this command's other
+   invalid argument. The suite held no exit code for one until now:
+   `test_only_six_disposition_names_accepted` holds an error in the envelope. The time-limit case
+   gives that invented disposition first and holds exit code 1 for it (what `gov close` answers
+   today, `INVALID_DISPOSITION`, and API-0002's code for an error in the envelope), then the same
+   for the time limit. Left open, in one case: whether an escalated close with an untracked file
+   answers 4 or 1 (behaviour 8).
 
 ### The run of round 8
 
@@ -903,6 +988,21 @@ close is refused, the answer holds "gov rebuild", nothing closed. Red: closed.
 are green. Of the 43 new cases (42 in the new files and the eighth form of the prefix case) 39 are
 red for the reasons above and four are green: the ignored file, the other ticket's commit, the
 judgement `passed`, the counter left whole.
+
+### The run of round 8b
+
+The same command, with `gov close` as at `e5560b9a` (the branch holds no later change of it): 259
+cases in 24 files; 212 passed, 47 failed, none skipped. The 204 cases of round 7 are green. Of
+the 55 cases of round 8 (54 in the six files and the eighth form of the prefix case) 47 are red
+for the reasons above and eight are green: the ignored file, the second close beside its untracked
+repair ticket, the other ticket's commit, the commit in a folder that is none of the ticket's (2
+forms), the judgements `pass` and `passed`, the counter left whole.
+
+Against round 8: twelve cases more. Eight are red (the orchestrator's task-less commit, the file
+inside the allowed paths, the ticket's own file, the governance file with green checks, the
+untracked ticket file in 2 forms, and two more judgement words: `fail`, `inconclusive`); four are
+green (the second close, the other folder in 2 forms, the judgement `pass`). No case that was
+green in round 8 is red, and none that was red is green.
 
 ## Covers ids
 
@@ -915,8 +1015,8 @@ judgement `passed`, the counter left whole.
 | CAP-38.b | traceability: 5 tests |
 | CAP-38.c | close: Implements, Task trailers |
 | CAP-38.d | governance_checks: 20 tests; stale: 5 tests |
-| CAP-38.f | probe: 16 tests; probe_record (round 8): 7 tests |
-| DEC-487 | the six `test_w1_30_r8_*.py` files: 42 tests; governance_checks: the `governance/kernel/` form |
+| CAP-38.f | probe: 16 tests; probe_record (round 8): 10 tests |
+| DEC-487, DEC-490 | the six `test_w1_30_r8_*.py` files: 54 tests; governance_checks: the `governance/kernel/` form |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |

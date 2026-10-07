@@ -1,19 +1,40 @@
-"""Every commit since the ticket's first is somebody's (DEC-487, third behaviour).
+"""Every commit since the ticket's first is somebody's (DEC-487, third behaviour; made exact by DEC-490).
 
 "A commit after the ticket's first commit that names no task at all refuses the close (its work was measured
 by no ticket); a commit of the ticket without a role refuses like one without ``Implements:``; a root commit
 and a merge commit are judged with the paths they bring."
 
-The commits that name no task, here: no trailer at all, or the engineer's role alone, made by someone who is
-neither the owner nor the orchestrator. Each does what the ticket's own commits may not do or what the close
-would have measured: it weakens the failing acceptance test and adds a source file outside the ticket's paths;
-it changes a governance file where a hard-block check is red; it rewrites the source after the probed commit.
-The refusal is a finding (exit code 3) that names the commit. A commit that names another ticket is that
-ticket's and refuses nothing here.
+**Which commits that name no task refuse (DEC-490).** "Among the commits after the ticket's first, one that
+names no task refuses the close when it changes the ticket's acceptance tests, a path inside the ticket's
+allowed paths, or the ticket's own file: that is work on this ticket which no ticket measured. One that changes
+a governance file has the governance checks run, as a ticket commit would. After the probed commit, one that
+changes a path inside the ticket's allowed paths makes the probe stale. Any other task-less commit (a decision
+record, a checkpoint, a probe record, another folder) refuses nothing. A commit that names another ticket is
+that ticket's."
+
+So what refuses is what the commit changes, not who made it or which role it carries. Each case's commit
+changes one kind of path and nothing else:
+
+- the ticket's acceptance test (weakened so that it passes): with no trailer, with the engineer's role alone,
+  with the orchestrator's role alone. Refused, a finding (exit code 3) that names the commit and says "task".
+- a new file inside the ticket's allowed paths; the ticket's own file (its FULL profile lowered, no probe
+  record). Refused the same way.
+- a governance file outside the ticket's paths: the governance checks run. Where a hard-block check is red the
+  close is refused and names the check; where all are green the ticket closes and its close record names the
+  commit the checks ran at.
+- the source inside the ticket's allowed paths, after the probed commit: refused, the commit named (as work no
+  ticket measured, and as a probe made stale; the case holds neither word alone).
+- a file in a folder that is none of the ticket's (a source folder outside its allowed paths, a folder of
+  notes): refuses nothing, the ticket closes.
+
+A file "outside the ticket's paths" is by itself no reason to refuse: round 8's first two cases added one
+beside the weakened test, and no longer do. A commit that names another ticket is that ticket's and refuses
+nothing here.
 
 The suite's projects all hold commits without a task after the ticket's first one: the orchestrator's
-(``Role: orchestrator``: the checkpoint, the probe record) and the owner's (``Role: owner``: decision
-records). Every case that closes holds that those refuse nothing (README, "Round 8", package 1).
+(``Role: orchestrator``: the checkpoint, the probe record, a repair ticket's file) and the owner's
+(``Role: owner``: decision records). None changes one of the three kinds of path, and every case that closes
+holds that they refuse nothing.
 
 The merge: a side-branch commit without trailers, merged by a merge commit that carries the ticket's trailers.
 What it brings is judged: the governance file has the checks run, the source rewrite makes the probe stale.
@@ -22,12 +43,15 @@ The first commit: a ticket commit without a parent has paths like any other.
 
 import re
 
+import pytest
+
 import w1_30_support as support
 
 TICKET = "PROJ-cmts"
 WBS = "W1-cmts"
 OTHER, OTHER_WBS = "PROJ-othr", "W1-othr"
 FEATURE = "src/example/feature.py"
+INSIDE = "src/example/more.py"
 OUTSIDE = "src/other/outside.py"
 NOTES = "governance/project/notes.yaml"
 INSTALLED = "governance/kernel/hooks/planted-hook.sh"
@@ -64,41 +88,136 @@ def _probed(project):
 # Commits that name no task
 # --------------------------------------------------------------------------
 
+def _changed_by(project, commit):
+    """The paths ``commit`` changes."""
+    out = support.git(project.root, "diff-tree", "--no-commit-id", "--name-only", "-r", "--root", commit)
+    return sorted(rel for rel in out.split("\n") if rel)
+
+
+def _task_less(project, commit, *paths):
+    """The fixture's commit names no task and changes ``paths`` only."""
+    assert commit not in support.ticket_commits(project.root, TICKET)
+    assert _changed_by(project, commit) == sorted(paths), \
+        f"the fixture is wrong: the commit changes {_changed_by(project, commit)}"
+
+
 def test_a_commit_without_trailers_that_weakens_the_acceptance_test_refuses(project, sandbox, interface):
     support.build_ticket(project, TICKET, WBS, failing=True)
-    commit = support.no_trailers_commit(project, "tidy up", {ACCEPTANCE_TEST: PASSING, OUTSIDE: "# outside\n"})
+    commit = support.no_trailers_commit(project, "tidy up", {ACCEPTANCE_TEST: PASSING})
     support.checkpointed(project, TICKET)
-    assert commit not in support.ticket_commits(project.root, TICKET)
+    _task_less(project, commit, ACCEPTANCE_TEST)
     _refused_naming(project, sandbox, interface, commit[:7], word="task")
 
 
 def test_a_commit_with_the_engineers_role_and_no_task_refuses(project, sandbox, interface):
+    """The same change of the acceptance test, with ``Role: engineer`` alone."""
     support.build_ticket(project, TICKET, WBS, failing=True)
     project.write(ACCEPTANCE_TEST, PASSING)
-    project.write(OUTSIDE, "# outside\n")
     commit = project.commit("tidy up", who=support.IMPLEMENTER, trailers=(support.ENGINEER_ROLE,), exact=True)
     support.checkpointed(project, TICKET)
-    assert commit not in support.ticket_commits(project.root, TICKET)
+    _task_less(project, commit, ACCEPTANCE_TEST)
     _refused_naming(project, sandbox, interface, commit[:7], word="task")
 
 
-def test_a_commit_without_trailers_that_changes_a_governance_file_refuses(project_with_checks, sandbox, interface):
-    """A hard-block check is red; no commit of the ticket changed a governance file, the other commit did."""
+def test_a_commit_with_the_orchestrators_role_and_no_task_that_weakens_the_acceptance_test_refuses(
+        project, sandbox, interface):
+    """The same change of the acceptance test, made as the orchestrator makes its commits (``Role:
+    orchestrator`` alone, as the checkpoint's commit that follows it): the role lifts nothing."""
+    support.build_ticket(project, TICKET, WBS, failing=True)
+    project.write(ACCEPTANCE_TEST, PASSING)
+    commit = project.commit("tidy up", who=support.ORCHESTRATOR, exact=True)
+    support.checkpointed(project, TICKET)
+    _task_less(project, commit, ACCEPTANCE_TEST)
+    _refused_naming(project, sandbox, interface, commit[:7], word="task")
+
+
+def test_a_commit_without_trailers_that_adds_a_file_inside_the_tickets_allowed_paths_refuses(
+        project, sandbox, interface):
+    """The ticket is green; the commit adds a source file under ``src/example/``, the ticket's allowed paths."""
+    support.build_ticket(project, TICKET, WBS)
+    commit = support.no_trailers_commit(project, "one more file", {INSIDE: "# inside the ticket's paths\n"})
+    support.checkpointed(project, TICKET)
+    _task_less(project, commit, INSIDE)
+    _refused_naming(project, sandbox, interface, commit[:7], word="task")
+
+
+def test_a_commit_without_trailers_that_changes_the_tickets_own_file_refuses(project, sandbox, interface):
+    """The ticket is FULL and has no probe record; the commit lowers the profile in the ticket's file."""
+    support.build_ticket(project, TICKET, WBS, profile="FULL")
+    rel = support.ticket_path(TICKET)
+    text = (project.root / rel).read_text(encoding="utf-8")
+    assert text.count("profile: FULL\n") == 1, "the fixture is wrong: the ticket file has no FULL profile line"
+    commit = support.no_trailers_commit(project, "the profile", {rel: text.replace("profile: FULL\n", "profile: STANDARD\n")})
+    support.checkpointed(project, TICKET)
+    _task_less(project, commit, rel)
+    _refused_naming(project, sandbox, interface, commit[:7], word="task")
+
+
+def test_a_commit_without_trailers_that_changes_a_governance_file_refuses_where_a_check_is_red(
+        project_with_checks, sandbox, interface):
+    """A hard-block check is red; no commit of the ticket changed a governance file, the other commit did.
+    The governance checks run as for a ticket commit: the refusal names the red check."""
     project = project_with_checks(README_PRESENT, LICENSE_PRESENT)
     support.build_ticket(project, TICKET, WBS)
     commit = support.no_trailers_commit(project, "a note", {NOTES: "note: one\n"})
     support.checkpointed(project, TICKET)
+    _task_less(project, commit, NOTES)
     _one_red(project, sandbox)
-    _refused_naming(project, sandbox, interface, commit[:7], word="task")
+    _refused_naming(project, sandbox, interface, "license-present")
+
+
+def test_a_commit_without_trailers_that_changes_a_governance_file_has_the_checks_run(
+        project_with_checks, sandbox, interface):
+    """Every check is green: the commit refuses nothing, and the close record names the commit being closed as
+    the commit the checks ran at, as it does after a ticket commit under a governance prefix."""
+    project = project_with_checks(README_PRESENT)
+    support.build_ticket(project, TICKET, WBS)
+    commit = support.no_trailers_commit(project, "a note", {NOTES: "note: one\n"})
+    head = support.checkpointed(project, TICKET)
+    _task_less(project, commit, NOTES)
+    assert support.red_hard_blocks(support.checks_at_head(project, sandbox)) == [], "the fixture is wrong: a check is red"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"
+    front = support.the_close_record(project, TICKET)
+    assert front.get(support.CHECK_COMMIT_KEY) == head, \
+        f"the governance file of a commit without a task did not have the checks run at the commit being " \
+        f"closed: {support.CHECK_COMMIT_KEY} is {front.get(support.CHECK_COMMIT_KEY)!r}"
 
 
 def test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses(
         project, sandbox, interface):
+    """The source is inside the ticket's allowed paths: work no ticket measured, and the probe is stale."""
     support.build_ticket(project, TICKET, WBS, profile="FULL")
     _probed(project)
     commit = support.no_trailers_commit(project, "rewrite", {FEATURE: "# rewritten after the probe\n"})
     support.checkpointed(project, TICKET)
-    _refused_naming(project, sandbox, interface, commit[:7], word="task")
+    _task_less(project, commit, FEATURE)
+    _refused_naming(project, sandbox, interface, commit[:7])
+
+
+@pytest.mark.parametrize("rel", [OUTSIDE, "notes/meeting.txt"],
+                         ids=["a source folder outside the ticket's paths", "a folder of notes"])
+def test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing(
+        rel, project, sandbox, interface):
+    """The converse: the folder holds none of the ticket's acceptance tests, is not inside its allowed paths,
+    holds neither its file nor a governance file."""
+    support.build_ticket(project, TICKET, WBS)
+    commit = support.no_trailers_commit(project, "elsewhere", {rel: "# none of the ticket's\n"})
+    support.checkpointed(project, TICKET)
+    _task_less(project, commit, rel)
+    assert not rel.startswith(support.GOVERNANCE_PREFIXES + (support.ACCEPTANCE_PREFIX, support.TICKETS_PREFIX,
+                                                             "src/example/"))
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"
+    front = support.the_close_record(project, TICKET)
+    claimed = {key: front[key] for key in (support.CHECK_COMMIT_KEY, support.CHECK_RESULT_KEY) if front.get(key)}
+    assert not claimed, f"the close record claims a check result although no governance file changed: {claimed}"
 
 
 def test_a_commit_that_names_another_ticket_refuses_nothing(project, sandbox, interface):

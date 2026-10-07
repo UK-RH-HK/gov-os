@@ -12,8 +12,11 @@ acceptance test fails, and the close is refused for that test as it is without t
 Nothing ran: the ticket's only acceptance test is marked to be skipped. It is refused as a ticket without
 acceptance tests is (README, "Round 6"): a finding, exit code 3, counted.
 
-The time limit: an argument that is no limit. Exit code 2 is API-0002's usage error, 1 its governance error;
-the case accepts both and holds that the answer names the argument, nothing is closed and nothing counted.
+The time limit: an argument that is no limit. DEC-490: "refused like any other invalid argument, before
+anything runs." The other invalid argument of this command the suite holds is a disposition that is none of
+the six names: an error in the envelope, exit code 1. The case runs it in the same project and holds the same
+exit code for the time limit; the answer names the argument; the failing ticket is not counted and gets no
+repair ticket, so nothing ran.
 """
 
 import pytest
@@ -63,15 +66,17 @@ def test_a_ticket_whose_only_acceptance_test_is_skipped_refuses(project, sandbox
 @pytest.mark.parametrize("limit", ["0", "-5"])
 def test_a_time_limit_that_is_not_a_positive_number_is_refused_as_an_invalid_argument(
         limit, project, sandbox, interface):
-    support.build_ticket(project, TICKET, WBS)
+    """The ticket's acceptance test fails, so a close that ran anything would count and open a repair ticket.
+    The other invalid argument is the invented disposition of ``test_only_six_disposition_names_accepted``."""
+    support.build_ticket(project, TICKET, WBS, failing=True)
+    other = support.run_close(project, sandbox, TICKET, "--disposition", "invented_name")
+    support.refused(other, interface, support.EXIT_GOV_ERROR)
+    support.assert_nothing_counted(project, TICKET, other)
 
     run = support.run_close(project, sandbox, TICKET, f"--timeout={limit}")
 
-    assert run.returncode in (support.EXIT_GOV_ERROR, 2), \
-        f"a time limit of {limit} is an invalid argument (exit code 2, or 1 with an error)\n{run.describe()}"
-    assert '"ok": true' not in run.stdout.replace('"ok":true', '"ok": true'), run.describe()
-    assert "timeout" in (run.stdout + run.stderr).lower(), \
-        f"the answer does not name the argument\n{run.describe()}"
+    error = support.refused(run, interface, other.returncode)
+    assert "timeout" in support.error_text(error).lower(), f"the answer does not name the argument\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
     support.assert_nothing_counted(project, TICKET, run)
     support.assert_no_repair_ticket(project, run, TICKET)

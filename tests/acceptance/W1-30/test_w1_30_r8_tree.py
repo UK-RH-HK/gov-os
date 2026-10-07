@@ -1,4 +1,4 @@
-"""The tree a close measures is the commit it records (DEC-487, first behaviour).
+"""The tree a close measures is the commit it records (DEC-487, first behaviour; DEC-490).
 
 "With any tracked file changed or any untracked, not ignored file present, ``gov close`` refuses before it
 measures and names the paths. It is not a finding about the ticket's work: not counted, no repair ticket."
@@ -8,8 +8,17 @@ runs. Each case is a way the review found in which the measured tree was better 
 tests, the ticket's profile, the governance files and the probed source are read from the working tree, and
 the close record names ``HEAD``.
 
-Held in every refusal: the answer names the path; the exit code is neither 0 nor 3 (3 is a finding, DEC-470);
-nothing is closed; the ticket's count stays 0; no repair ticket is opened. A file git ignores refuses nothing.
+Held in every refusal: the answer names the path; the exit code is 1 ("could not measure", DEC-490; 3 is a
+finding, DEC-470); nothing is closed; the ticket's count stays 0; no repair ticket is opened. A file git
+ignores refuses nothing.
+
+**A refusal's own files (DEC-490).** "A refused close leaves its repair ticket as an untracked ticket file. An
+untracked ticket file whose parent is the ticket being closed does not refuse the next close. Every other
+untracked, not ignored file and every change to a tracked file does, the ticket's own file included." The
+second close after a refusal, with the repair ticket left as the refusal left it, is measured: it is refused
+for the failing test again (exit code 3) and counted. An untracked ticket file that names another ticket as its
+parent, or none, is a file like any other and refuses for the tree; the ticket of those cases is green, so
+nothing else refuses.
 """
 
 import pytest
@@ -18,6 +27,8 @@ import w1_30_support as support
 
 TICKET = "PROJ-tree"
 WBS = "W1-tree"
+OTHER, OTHER_WBS = "PROJ-othr", "W1-othr"
+PLANTED = "PROJ-plnt"
 FEATURE = "src/example/feature.py"
 NOTES = "governance/project/notes.yaml"
 
@@ -33,7 +44,7 @@ EVERY_TEST_PASSES = (
 )
 
 
-def _refused_for_the_tree(project, sandbox, interface, *paths):
+def _refused_for_the_tree(project, sandbox, interface, *paths, known=()):
     assert sorted(project.waiting_paths()) == sorted(paths), \
         f"the fixture is wrong: the working tree differs from the commit in {project.waiting_paths()}"
     head = support.head_of(project)
@@ -45,7 +56,7 @@ def _refused_for_the_tree(project, sandbox, interface, *paths):
         assert rel in text, f"the refusal does not name {rel}\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
     support.assert_nothing_counted(project, TICKET, run)
-    support.assert_no_repair_ticket(project, run, TICKET)
+    support.assert_no_repair_ticket(project, run, TICKET, *known)
     assert support.head_of(project) == head
 
 
@@ -109,3 +120,48 @@ def test_a_file_git_ignores_refuses_nothing(project, sandbox, interface):
 
     support.result_of(run, interface)
     assert support.ticket_status(project.root, TICKET) == "closed"
+
+
+# --------------------------------------------------------------------------
+# A refusal's own files (DEC-490)
+# --------------------------------------------------------------------------
+
+def test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured(project, sandbox, interface):
+    """Nothing is committed between the two closes. The second is refused for the failing test, not for the
+    tree: exit code 3, counted, a repair ticket of its own."""
+    support.build_ticket(project, TICKET, WBS, failing=True)
+    first = support.run_close(project, sandbox, TICKET)
+    support.refused(first, interface, support.EXIT_CHECK_FAILED)
+    left = project.waiting_paths()
+    repairs = support.other_tickets(project.root, TICKET)
+    assert len(repairs) == 1 and left == support.untracked_paths(project) == [f".tickets/{repairs[0].name}"], \
+        f"the fixture is wrong: the refused close left {left}, not one untracked repair ticket\n{first.describe()}"
+    assert support.frontmatter_of(repairs[0]).get("parent") == TICKET, \
+        f"the fixture is wrong: the repair ticket's parent is {support.frontmatter_of(repairs[0]).get('parent')!r}"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    assert "test_fail" in support.error_text(error), \
+        f"the second close was not refused for the failing acceptance test\n{run.describe()}"
+    assert support.iteration_count(project.root, TICKET) == 2, \
+        f"the second close was not counted: the count is {support.iteration_count(project.root, TICKET)}\n{run.describe()}"
+    assert len(support.other_tickets(project.root, TICKET)) == 2, \
+        f"the second refusal opened no repair ticket of its own\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
+
+
+@pytest.mark.parametrize("parent", [OTHER, None], ids=["another ticket's", "no parent"])
+def test_an_untracked_ticket_file_that_is_not_a_repair_ticket_of_this_ticket_refuses(
+        parent, project, sandbox, interface):
+    """The ticket is green and committed. A ticket file git does not know lies beside it: its parent is
+    another ticket of the project, or it names none."""
+    project.add_ticket(OTHER, OTHER_WBS, allowed_paths=["src/other/**"])
+    project.commit("the other ticket", who=support.ORCHESTRATOR)
+    support.build_ticket(project, TICKET, WBS)
+    keys = {"status": "open"} if parent is None else {"status": "open", "parent": parent}
+    rel = support.ticket_path(PLANTED)
+    project.write(rel, support.ticket_text(PLANTED, "", acceptance=False, **keys))
+    assert support.frontmatter_of(project.root / rel).get("parent") == parent, "the fixture is wrong: the parent"
+    assert support.untracked_paths(project) == [rel]
+    _refused_for_the_tree(project, sandbox, interface, rel, known=(OTHER, PLANTED))

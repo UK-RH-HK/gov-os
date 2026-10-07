@@ -939,7 +939,7 @@ def read_iteration_file(root, ticket_id):
 
 
 # --------------------------------------------------------------------------
-# Round 8 (DEC-487): what a close did not measure
+# Round 8 (DEC-487, made exact by DEC-490): what a close did not measure
 # --------------------------------------------------------------------------
 
 ESCALATION_DIR = ".gov-runtime/escalations"
@@ -959,12 +959,12 @@ def no_trailers_commit(project, message, files):
 
 
 def refused_without_a_finding(run, interface):
-    """The close was refused, and not for a finding about the ticket's work: the exit code is neither 0 nor 3
-    (DEC-470 gives 3 to a finding). Returns the ``error`` object."""
+    """The close was refused because it could not measure, not for a finding about the ticket's work: exit
+    code 1 (DEC-490; DEC-470 gives 3 to a finding). Returns the ``error`` object."""
     envelope = envelope_of(run, interface)
     assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
-    assert run.returncode not in (EXIT_OK, EXIT_CHECK_FAILED), \
-        f"the refusal is no finding about the ticket's work, and ends with exit code {run.returncode}\n{run.describe()}"
+    assert run.returncode == EXIT_GOV_ERROR, \
+        f"a close that could not measure ends with exit code 1, not {run.returncode}\n{run.describe()}"
     return envelope["error"]
 
 
@@ -994,9 +994,16 @@ def records_saying_closed(root, ticket):
     return found
 
 
+def untracked_paths(project):
+    """The files of the working tree that git neither knows nor ignores."""
+    out = git(project.root, "ls-files", "--others", "--exclude-standard", "-z")
+    return sorted(rel for rel in out.split("\0") if rel)
+
+
 def commit_what_a_refusal_left(project):
-    """A refused close opens a repair ticket, a file git does not know yet. The orchestrator commits it, so
-    that the next close of the case finds the tree it measures committed (DEC-487)."""
+    """A refused close opens a repair ticket, a file git does not know yet. The orchestrator commits it here.
+    DEC-490: left untracked it refuses no later close (its parent is the ticket being closed); the cases of
+    ``test_w1_30_r8_tree.py`` hold that, the others commit it."""
     if project.waiting_paths():
         project.commit("what the refused close left", who=ORCHESTRATOR)
 
