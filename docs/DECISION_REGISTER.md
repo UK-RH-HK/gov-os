@@ -5058,3 +5058,81 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.114 | 2026-10-07 | Owner answers: DEC-456 (the move table and the old `cli/` tree are historical for doctor's stale-path check; the plan validator's stale path is fixed; W1-27 reopened), DEC-457 (DEC-455 accepted), DEC-458 (one package of the owner's exit actions when W1-41 is merged), DEC-459 (a rule-by-rule compliance report by a read-only subagent, verified by the exit auditor). |
+
+## 115. Owner answers on the compliance report (register v0.115, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-460 — Session models: subagents on Opus 4.6 by the owner's setting; main sessions pinned to Opus 5.5 and recorded
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report (DEC-459): 91 co-author lines and about 70 worker sessions name "Claude Opus 4.6"
+- **Decision:**
+  - `CLAUDE_CODE_SUBAGENT_MODEL=claude-opus-4-6` is the owner's own user setting: in-session subagents run on
+    Opus 4.6 by design. It is kept. The "Claude Opus 4.6" co-author lines come from subagent sessions and are
+    not a defect.
+  - Main sessions run on Opus 5.5, pinned explicitly from now on: a lead is started with
+    `~/.local/bin/claude -p ... --model claude-opus-5-5`, a launched worker with
+    `gov launch <role> <ticket> -- --model claude-opus-5-5`.
+  - Each session's model is recorded in close records.
+
+### DEC-461 — The three closes recorded green without a saved re-run are accepted; every re-run alone is saved from now on
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the closes of W1-26 (`64172c93`), W1-23 (`a7964c97`) and W1-50 (`b894a7b7`) say the regression was green while its summary shows failures in the latency suites, and no output of the re-run alone was saved · **Under:** DEC-372
+- **Decision:** Accepted, since later full regressions show those suites green and W1-42 re-checks everything.
+  The orchestrator's new rule is confirmed: the output of every re-run alone is saved beside the regression
+  summary.
+
+### DEC-462 — A designer's brief states behaviour and sources only
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: the orchestrator's designer briefs for W1-27 and W1-30 named private identifiers of the implementation · **Under:** MR-3, DEC-069
+- **Decision:** Confirmed stopped. A brief for a test designer states behaviour and sources, never the names of
+  the implementation's private parts.
+
+### DEC-463 — Decisions recorded late are accepted; from now on the record comes first, and `gov check` flags a commit citing an unrecorded decision
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report: DEC-391, DEC-417, DEC-437, DEC-440, DEC-450, DEC-452 and DEC-455 were recorded after the work they authorise
+- **Decision:**
+  - Those seven are accepted as recorded late.
+  - From now on a decision is recorded before the change it authorises.
+  - A KPI line is added to W1-26 (or the ticket the orchestrator chooses) so that `gov check` flags a commit
+    that cites a decision id missing from the register at that commit. The orchestrator chooses W1-26 and
+    reopens it for this line, test first.
+
+### DEC-464 — Delegated decisions that touched containment, the freeze or the launcher are ratified after the fact
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report · **Ratifies:** DEC-266, DEC-267, DEC-268, DEC-269, DEC-270, DEC-392, DEC-404, DEC-408, DEC-453
+- **Decision:**
+  - **The deviation:** these nine decisions were taken by the orchestrator under delegation (DEC-220, later
+    DEC-416) although they touched containment (DEC-266 to DEC-270, DEC-453), the freeze or the launcher
+    (DEC-392, DEC-404, DEC-408), before the rule that a delegated decision may only make such things
+    stricter, or outside what delegation covers.
+  - **The ratification:** the owner ratifies all nine now, after the fact. They stand as decided.
+
+### DEC-465 — The pushes of `w1/integrate` were the owner's
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report's open point (who ran the 12 pushes)
+- **Decision:** All 12 pushes of `w1/integrate` were owner actions, through the operator console. No agent
+  session pushes.
+
+### DEC-466 — What the report shows as instruction-only is mechanised with what Wave 1 has built
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the compliance report · **Amends:** the orchestrator's standing rule that `gov close` is never run against this repository (it holds until W1-30 is merged) · **Under:** DEC-458, DEC-459
+- **Decision:**
+  - Once W1-30 is merged, every ticket close goes through `gov close`.
+  - Before every merge into `w1/integrate`, `gov check` is run, and red is treated as blocking.
+  - After W1-30 and W1-26 are in use, the read-only subagent re-classifies the rules, and whatever is still
+    instruction-only becomes a Wave 2 list for mechanising. That list is added to the exit package (DEC-458).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.115 | 2026-10-07 | Owner answers on the compliance report: DEC-460 (subagents on Opus 4.6 by the owner's setting; main sessions pinned to Opus 5.5 and recorded in close records), DEC-461 (three closes accepted; every re-run alone saved), DEC-462 (designer briefs state behaviour and sources only), DEC-463 (late records accepted; record first; `gov check` flags a commit citing an unrecorded decision, W1-26 reopened), DEC-464 (nine delegated decisions on containment, the freeze and the launcher ratified after the fact), DEC-465 (the pushes were the owner's), DEC-466 (closes through `gov close` after W1-30; `gov check` before every merge, red blocks; a Wave 2 list of what stays instruction-only). |
+
+## 116. One delegated decision, for the owner to confirm or replace: what "red blocks a merge" means while this repository is not yet adopted (register v0.116, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-467 — Until this repository is adopted, `gov check` blocks a merge on any red that the recorded baseline does not hold
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; provisional: brought to the owner at once, who may replace it) · **Basis:** DEC-466 orders `gov check` before every merge into `w1/integrate`, red blocking. Run on this repository at `46ec8da3` (output kept as `.gov-runtime/scratch/orchestrator/log/check-at-46ec8da3.json`), `gov check` exits 3 with thirteen hard-block checks red, none caused by a ticket branch: `gov` is not on PATH for a check command (fresh-agent reconstruction), the tickets are not in the record store (context reproducibility), the tickets' `depends_on` name W1 ids (core-graph), records without `state_class` (core-schema), the indexes are stale after every commit since the one rebuild (index freshness, recovery/rebuild), the dev tiers are not configured (retrieval regression), the secrets check exceeds its 60 seconds on this tree, and five policy keys have no check (security, test, change, human_gate, tool). Read literally, DEC-466 would stop every merge until W1-39 and W1-41 adopt this repository · **Under:** DEC-466, DEC-425
+- **Decision:**
+  - The baseline is the set of red checks at `46ec8da3`, each with its reason, recorded in
+    `governance/project/bootstrap.md`.
+  - Before every merge into `w1/integrate` the orchestrator runs `gov check` on the branch to be merged (after
+    the integration branch is merged into it) and saves the output beside the regression summary. A check that
+    is red and is not in the baseline, or is in the baseline with a new finding caused by the branch, blocks
+    the merge. A baseline red is named in the merge's record, never called green.
+  - A baseline red that turns green leaves the baseline and may not come back.
+  - The baseline is emptied by W1-39 and W1-41 (adoption of this repository) and by the exit run; what cannot
+    be emptied is an owner item in the exit package.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.116 | 2026-10-07 | One delegated decision, provisional: DEC-467 (until this repository is adopted, `gov check` blocks a merge on any red the recorded baseline at `46ec8da3` does not hold). |
