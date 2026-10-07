@@ -37,6 +37,8 @@ def _failing_project(project, ticket_id=TICKET, wbs=WBS):
     project.add_failing_test(wbs)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     return ticket_id
 
 
@@ -211,11 +213,13 @@ def test_escalation_outcomes_are_distinct_per_iteration(project, sandbox, interf
         support.run_close(project, sandbox, TICKET)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
-    error = envelope.get("error", {})
-    details = error.get("details", {})
-    outcomes = details.get("outcomes") or details.get("iterations") or []
+
+    esc_file = project.root / ".gov-runtime" / "escalations" / f"{TICKET}.json"
+    assert esc_file.is_file(), f"escalation file must exist at {esc_file}"
+    esc_data = json.loads(esc_file.read_text(encoding="utf-8"))
+    outcomes = esc_data.get("outcomes", [])
     assert isinstance(outcomes, list) and len(outcomes) >= 3, \
-        f"the escalation package must list at least 3 outcomes (one per iteration): {details}"
+        f"the escalation package must list at least 3 outcomes (one per iteration): {esc_data}"
 
 
 def test_escalation_includes_reason_not_converging(project, sandbox, interface):

@@ -30,6 +30,8 @@ def _green_project(project, ticket_id=TICKET, wbs=WBS, profile="STANDARD"):
     project.add_passing_test(wbs)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement feature", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     if profile == "FULL":
         project.add_probe(ticket_id)
         project.commit("add probe", who=support.ORCHESTRATOR)

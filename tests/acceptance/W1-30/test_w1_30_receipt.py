@@ -40,6 +40,8 @@ def _green_project(project):
     project.write("src/example/feature.py", "# feature\n")
     project.add_decision("DEC-test", "ACTIVE")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
 
 
 # --------------------------------------------------------------------------

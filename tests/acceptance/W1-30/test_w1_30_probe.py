@@ -27,6 +27,8 @@ def _full_project_without_probe(project, ticket_id=TICKET, wbs=WBS):
     project.add_passing_test(wbs)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     return ticket_id
 
 

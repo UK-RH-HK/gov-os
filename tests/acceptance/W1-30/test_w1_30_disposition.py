@@ -31,6 +31,8 @@ def _project_with_finding(project, ticket_id=TICKET, wbs=WBS):
     project.add_check_declaration("planted-defect", "schema/invariants",
                                   command="exit 1")
     project.commit("implement with defect", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     return ticket_id
 
 

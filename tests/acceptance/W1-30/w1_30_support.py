@@ -189,7 +189,8 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
                  implementer_session="impl-001",
                  reviewer_wrote_nothing=True,
                  commissioned_by="orchestrator",
-                 judged_by="orchestrator"):
+                 judged_by="orchestrator",
+                 judgement="pass"):
     """A probe record for a FULL-profile ticket (DEC-137)."""
     probe_id = f"PR-{ticket_id}"
     front = {
@@ -203,6 +204,7 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
         "reviewer_wrote_nothing": reviewer_wrote_nothing,
         "commissioned_by": commissioned_by,
         "judged_by": judged_by,
+        "judgement": judgement,
     }
     text = "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n\n"
     text += f"# {probe_id} — Probe record for {ticket_id}\n\nPost-green probe.\n"
@@ -301,6 +303,10 @@ class Project:
         rel = f"docs/probes/{ticket_id}/PR-{ticket_id}.md"
         write(self.root, rel, text)
         return rel
+
+    def add_checkpoint(self, ticket_id, trigger="stop", next_action="resume"):
+        from gov.checkpoint.record import write as cp_write
+        cp_write(self.root, ticket_id, trigger, next_action, [])
 
     def add_check_declaration(self, check_id, family, tier="G1", severity="hard-block",
                               command="true"):
