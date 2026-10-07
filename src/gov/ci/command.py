@@ -8,14 +8,16 @@ tier, a gitleaks that cannot run or does not decide, and rules that cannot be re
 
 ``gov ci job`` is the gate of the CI job (DEC-087, DEC-489): every check ``gov check`` runs but the declared
 checks of a tier above G2, so the checks of ``gov check`` that carry no tier (openspec, skill version, readiness,
-the policy keys) run there, the one place left for them. It refuses as ``gov ci checks G1 G2`` does, and takes
-the status of every check as the check runner gives it.
+the policy keys) run there, the one place left for them. It refuses as ``gov ci checks G1 G2`` does, and beside
+that (DEC-497): a check that reports its tool absent (``TOOL_ABSENT``) is named as unmeasured and refused, whatever
+its status, and a declared check of a family ``gov check`` does not know is refused as ``gov check`` refuses it.
 
 ``gov ci push <remote>`` is the pre-push gate (DEC-489): it runs the declared checks of tier G3, writes the
 evidence record, a git note on the head commit under ``refs/notes/gov-evidence``, and pushes that ref to
 ``<remote>``. The note is JSON: ``{"commit": <id>, "result": "passed" | "failed" | "no G3 check declared",
 "checks": {<check id>: <status>}}``. ``gov ci record`` is what the CI job runs after fetching the ref: it refuses
-unless the note of the head commit is there, names that commit and holds an accepted result.
+unless the note of the head commit is there, names that commit and holds an accepted result. It prints the
+record: for one that says "no G3 check declared" those words are its report, and it does not refuse (DEC-497).
 """
 
 from __future__ import annotations
@@ -36,9 +38,11 @@ TIERS = ("G0", "G1", "G2", "G3", "G4", "G5", "G6")  # CAP-39
 JOB_TIERS, JOB_NEVER = ("G1", "G2"), TIERS[3:]  # the job: G1 and G2 must have a check; none above G2 runs there
 EVIDENCE_REF = "refs/notes/gov-evidence"
 PASSED, FAILED, NO_G3 = "passed", "failed", "no G3 check declared"
-# P-6 (open, the owner's): the results the CI job accepts. Until it is decided a record that says NO_G3 is refused
-# (what was not measured is not green); adding NO_G3 to this one line makes the job green for it, the words printed.
-ACCEPTED = (PASSED,)
+# The results the CI job accepts (DEC-497): a record that says NO_G3 is printed in those words and not refused.
+ACCEPTED = (PASSED, NO_G3)
+# The finding code by which a check of `gov check` says its tool is not there -> the tool, as the sources emit
+# them: gov.check.runner._check_openspec, gov.adapters.portability._version_finding. Never read from a message.
+TOOL_ABSENT = {"OPENSPEC_ABSENT": "openspec", "RULESYNC_ABSENT": "rulesync"}
 
 
 def add_arguments(parser) -> None:
@@ -72,8 +76,20 @@ def _checks(root: Path, tiers: list[str], job: bool = False) -> dict:
         results += runner._check_policy_enforcement(root, commit, families)
     statuses = {each["id"]: each["status"] for each in results}
     red = sorted({each["id"] for each in results if each["status"] == runner.RED})  # by result: two may share an id
-    if red:
-        raise GovError("CHECK_FAILED", "hard-block checks failed: " + ", ".join(red), {"checks": statuses}, exit_code=3)
+    refused = ["hard-block checks failed: " + ", ".join(red)] if red else []
+    if job:  # DEC-497: a check whose tool is absent was not measured, whatever its status; an unknown family fails
+        absent = sorted({f"{each['id']} ({TOOL_ABSENT[finding['code']]} is not on the runner)"
+                         for each in results for finding in each["findings"]
+                         if isinstance(finding, dict) and isinstance(finding.get("code"), str)
+                         and finding["code"] in TOOL_ABSENT})
+        unknown = sorted(families - set(runner.FAMILIES))
+        if unknown:
+            refused.insert(0, "a declared check is of a family gov check does not know: " + ", ".join(unknown))
+        if absent:
+            raise GovError(NOT_MEASURED, "; ".join(["unmeasured: " + ", ".join(absent)] + refused),
+                           {"checks": statuses})
+    if refused:
+        raise GovError("CHECK_FAILED", "; ".join(refused), {"checks": statuses}, exit_code=3)
     return {"tiers": tiers, "checks": statuses}
 
 

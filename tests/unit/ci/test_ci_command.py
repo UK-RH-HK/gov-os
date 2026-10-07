@@ -57,7 +57,43 @@ def test_a_name_that_is_no_tier_refuses(tmp_path, tiers):
     assert refused.value.code == "CI_TIER_UNKNOWN"
 
 
-def test_the_job_gate_runs_the_tier_less_checks_and_no_check_above_g2(tmp_path):
+@pytest.fixture()
+def openspec(tmp_path, monkeypatch):
+    """A stand-in ``openspec`` on PATH that validates anything: with it the openspec check is measured."""
+    folder = tmp_path / "stand-in-bin"
+    folder.mkdir()
+    (folder / "openspec").write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    (folder / "openspec").chmod(0o755)
+    monkeypatch.setenv("PATH", f"{folder}{os.pathsep}{os.environ['PATH']}")
+
+
+def test_the_job_gate_names_a_check_whose_tool_is_absent_as_unmeasured_and_refuses(tmp_path, monkeypatch):
+    _declare(tmp_path, "G1", "true")
+    _declare(tmp_path, "G2", """echo '{"findings": [{"code": "RULESYNC_ABSENT", "message": "m"}]}'; exit 1""")
+    monkeypatch.setenv("PATH", "/usr/bin:/bin")  # no openspec: the runner gives OPENSPEC_ABSENT, YELLOW
+    with pytest.raises(GovError) as refused:
+        command._checks(tmp_path, list(command.JOB_TIERS), job=True)
+    assert refused.value.code == command.NOT_MEASURED and refused.value.exit_code != 0
+    message = refused.value.message
+    assert message.startswith("unmeasured: check-g2 (rulesync is not on the runner), openspec-validate (openspec ")
+    assert "hard-block checks failed: check-g2" in message
+    assert refused.value.details["checks"]["openspec-validate"] == "YELLOW"
+
+
+def test_the_job_gate_refuses_a_declared_check_of_an_unknown_family_and_the_hook_gate_does_not(tmp_path, openspec):
+    _declare(tmp_path, "G1", "true")
+    _declare(tmp_path, "G2", "true")
+    path = tmp_path / CHECKS_DIR / "check-g2.yaml"
+    path.write_text(path.read_text(encoding="utf-8").replace("schema/invariants", "a family nobody knows"),
+                    encoding="utf-8")
+    assert command._checks(tmp_path, ["G1", "G2"])["checks"] == {"check-g1": "GREEN", "check-g2": "GREEN"}
+    with pytest.raises(GovError) as refused:
+        command._checks(tmp_path, list(command.JOB_TIERS), job=True)
+    assert (refused.value.code, refused.value.exit_code) == ("CHECK_FAILED", 3)
+    assert "a family nobody knows" in refused.value.message
+
+
+def test_the_job_gate_runs_the_tier_less_checks_and_no_check_above_g2(tmp_path, openspec):
     _declare(tmp_path, "G0", "touch ran-g0")
     _declare(tmp_path, "G1", "true")
     _declare(tmp_path, "G2", "true")
@@ -68,7 +104,7 @@ def test_the_job_gate_runs_the_tier_less_checks_and_no_check_above_g2(tmp_path):
     assert (tmp_path / "ran-g0").exists() and not (tmp_path / "ran-g3").exists()
 
 
-def test_the_job_gate_refuses_a_red_readiness_check_and_the_hook_gate_does_not_run_it(tmp_path):
+def test_the_job_gate_refuses_a_red_readiness_check_and_the_hook_gate_does_not_run_it(tmp_path, openspec):
     _declare(tmp_path, "G1", "true")
     _declare(tmp_path, "G2", "true")
     proposal = tmp_path / "openspec" / "changes" / "unjudged" / "proposal.md"
@@ -132,12 +168,10 @@ def test_a_failing_g3_check_refuses_and_its_record_is_neither_pushed_nor_accepte
     assert refused.value.code == "EVIDENCE_REFUSED" and "failed" in refused.value.message
 
 
-def test_no_g3_check_is_recorded_in_those_words_and_is_not_accepted(pushed_to):
+def test_no_g3_check_is_recorded_in_those_words_and_the_record_gate_reports_them(pushed_to):
     root, _ = pushed_to
     assert command._push(root, ["origin"])["result"] == "no G3 check declared"
-    with pytest.raises(GovError) as refused:
-        command._record(root)
-    assert refused.value.code == "EVIDENCE_REFUSED" and "no G3 check declared" in refused.value.message
+    assert command._record(root)["result"] == "no G3 check declared"  # DEC-497: printed, not refused, no "passed"
 
 
 def test_the_record_gate_refuses_no_record_and_the_record_of_another_commit(pushed_to):

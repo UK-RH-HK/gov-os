@@ -1,20 +1,27 @@
-# CI on every push (W1-40, CAP-39.a; DEC-075, DEC-087, DEC-489): the deterministic checks, and the evidence
-# record of the commit that is built.
+# CI on every push (W1-40, CAP-39.a; DEC-075, DEC-087, DEC-489, DEC-494, DEC-497): the deterministic checks, and
+# the evidence record of the commit that is built.
 #
-# The job runs every check `gov check` runs but the declared checks of a tier above G2 (`gov ci job`), gitleaks
-# and the project's tests. The checks of `gov check` that carry no tier (openspec, skill version, readiness, the
-# policy keys) run at neither hook: the job is the one place for them, and it takes each status as `gov check`
-# gives it. It never runs a G3 check: G3 runs in the pre-push hook on the developer's machine (lefthook.yml),
-# which leaves the evidence record.
+# The job puts two things on the runner, each in a step of its own, and nothing else (DEC-494): the `gov`
+# package, from the checkout, and gitleaks, from the address governance/project/tool-registry.yaml records as
+# `archive`, verified against the registry's `archive_sha256` before it is unpacked.
+#
+# The job then runs every check `gov check` runs but the declared checks of a tier above G2 (`gov ci job`),
+# gitleaks and the project's tests. The checks of `gov check` that carry no tier (openspec, skill version,
+# readiness, the policy keys) run at neither hook: the job is the one place for them. The skill version check
+# compares the commit with the one before, so the checkout brings the parent commit. The job never runs a G3
+# check: G3 runs in the pre-push hook on the developer's machine (lefthook.yml), which leaves the evidence record.
 #
 # The evidence record is a git note on the head commit, under a ref of its own: refs/notes/gov-evidence.
 # The pre-push hook writes and pushes it. A fresh checkout brings no notes, so the job fetches that ref itself
 # and `gov ci record` reads the note of the commit it builds. The job fails when the ref cannot be fetched, when
 # the commit has no note, when the note cannot be read or names another commit, and when it says failed.
-# For a note that says "no G3 check declared" the job prints those words and fails too, until package P-6 is
-# decided: the one line that decides it is ACCEPTED in src/gov/ci/command.py.
+# For a note that says "no G3 check declared" the step prints those words and does not fail (DEC-497).
 #
-# A result is measured or it is refused (DEC-449, DEC-454): a tool that is not on the runner fails its step.
+# A result is measured or it is refused (DEC-449, DEC-454, DEC-497): a step whose tool is not on the runner
+# fails, and says "unmeasured" with the name: the tests step without pytest, and `gov ci job` for a check that
+# reports its tool absent (openspec; rulesync for the adapter check). Neither tool is installed here, nor is
+# pytest: until the owner approves them for the runner, those steps are red for that reason.
+# One run reports every step: a step after a failed one still runs, and the failed one stays failed.
 
 name: ci
 
@@ -27,28 +34,60 @@ jobs:
   deterministic:
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout
+      - name: Checkout, with the parent commit
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 2
 
-      # PLACE: TOOLS ON THE RUNNER (package P-4, the owner's; not decided).
-      # The steps that put `gov` (this package), gitleaks and pytest on the runner go here, each registered
-      # tool at the version and checksum governance/project/tool-registry.yaml records (DEC-083, DEC-287).
-      # Until they are here the steps below fail on the hosted runner: the tools are absent.
+      # PLACE: TOOLS ON THE RUNNER (DEC-494, DEC-497). These two steps and no other.
+
+      - name: Install the gov package from the checkout
+        run: python3 -m pip install .
+
+      # The address and the checksum are read from the tool registry of the checkout: no second copy here.
+      # A download that does not match fails the step before anything is unpacked or put on the PATH.
+      - name: Install gitleaks, verified against the checksum of the tool registry
+        if: success() || failure()
+        run: |
+          field() {
+            python3 -c 'import sys, yaml
+          tools = yaml.safe_load(open(sys.argv[1], encoding="utf-8"))["tools"]
+          (entry,) = [tool for tool in tools if tool["name"] == "gitleaks"]
+          print(entry[sys.argv[2]])' governance/project/tool-registry.yaml "$1"
+          }
+          archive=$(field archive)
+          checksum=$(field archive_sha256)
+          download="$RUNNER_TEMP/gitleaks-archive"
+          curl --fail --silent --show-error --location --proto '=https' --output "$download" "$archive"
+          sha256sum --check --strict - <<< "$checksum  $download"
+          mkdir "$RUNNER_TEMP/gitleaks"
+          tar -xzf "$download" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          echo "$RUNNER_TEMP/gitleaks" >> "$GITHUB_PATH"
 
       - name: Checks of gov check, but the declared ones of a tier above G2
+        if: success() || failure()
         run: gov ci job
 
       - name: gitleaks over the commits of the checkout
+        if: success() || failure()
         run: gitleaks git --config .gitleaks.toml --no-banner --redact --verbose --log-level error
 
       - name: Tests of the project
-        run: python3 -m pytest tests
+        if: success() || failure()
+        run: |
+          if ! python3 -c 'import importlib.util, sys; sys.exit(importlib.util.find_spec("pytest") is None)'; then
+            echo "unmeasured: pytest is not on the runner, the tests of the project did not run"
+            exit 1
+          fi
+          python3 -m pytest tests
 
-      # PLACE: ADAPTER COMPARISON (W1-38, rulesync drift; not merged).
-      # The step that compares the generated adapters with their sources goes here.
+      # PLACE: ADAPTER COMPARISON (DEC-494, DEC-497). No step of its own: `gov ci job` above runs the adapter
+      # check of `gov check` (W1-38), which is unmeasured on the runner while rulesync is not there.
 
       - name: Fetch the ref of the evidence record
+        if: success() || failure()
         run: git fetch origin +refs/notes/gov-evidence:refs/notes/gov-evidence
 
       - name: Evidence record of the commit that is built
+        if: success() || failure()
         run: gov ci record
