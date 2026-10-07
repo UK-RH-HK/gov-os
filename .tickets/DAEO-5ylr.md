@@ -19,7 +19,7 @@ depends_on:
 - W1-38
 allowed_paths:
 - copier.yml
-- template/copier-answers*
+- template/.copier-answers.yml*
 - template/governance/framework.lock*
 - src/gov/lock/**
 - tests/unit/lock/**
