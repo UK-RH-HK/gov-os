@@ -1,6 +1,6 @@
 ---
 id: DAEO-xw3k
-status: in_progress
+status: closed
 deps: [DAEO-78bn, DAEO-lkeb, DAEO-rxln, DAEO-8nue]
 links: []
 created: 2026-09-30T22:49:59Z
