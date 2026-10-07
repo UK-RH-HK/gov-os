@@ -1,0 +1,13 @@
+{
+  "permission": {
+    "edit": {
+      ".tickets/**": "deny",
+      "tests/acceptance/**": "deny"
+    },
+    "bash": {
+      "npm install*": "deny",
+      "pip install*": "deny",
+      "sudo *": "deny"
+    }
+  }
+}
