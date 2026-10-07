@@ -1,0 +1,126 @@
+"""Unit tests for gov.lock (DEC-135: regression evidence). Every project is built from scratch in tmp_path."""
+
+from __future__ import annotations
+
+import os
+
+import pytest
+import yaml
+
+from gov.lock import ANSWERS_REL, HEADER, KERNEL_REL, LOCK_REL, LockError, compare, write
+
+HOOK = f"{KERNEL_REL}/hooks/guard.py"
+COMMIT = "a" * 40
+
+
+def _project(root):
+    for rel, text in ((HOOK, "print('hook')\n"), (f"{KERNEL_REL}/settings.json", "{}\n")):
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(text, encoding="utf-8")
+    (root / ANSWERS_REL).write_text(f"_commit: v0.1.0\n_src_path: /elsewhere\n_template_commit: \"{COMMIT}\"\n",
+                                    encoding="utf-8")
+    write(root)
+    return root
+
+
+def _rewrite(root, change):
+    lock = yaml.safe_load((root / LOCK_REL).read_text(encoding="utf-8"))
+    change(lock)
+    (root / LOCK_REL).write_text(yaml.safe_dump(lock), encoding="utf-8")
+
+
+def test_write_gives_header_identity_answers_reference_and_manifest(tmp_path):
+    root = _project(tmp_path)
+    text = (root / LOCK_REL).read_text(encoding="utf-8")
+    assert text.startswith(HEADER)
+    lock = yaml.safe_load(text)
+    assert lock["template_tag"] == "v0.1.0" and lock["template_commit"] == COMMIT
+    assert lock["answers_file"] == ANSWERS_REL
+    assert sorted(lock["manifest"]) == [HOOK, f"{KERNEL_REL}/settings.json"]
+    assert compare(root) == compare(root).__class__("MATCH", (), None)
+
+
+def test_write_refuses_without_the_commit_or_without_a_kernel(tmp_path):
+    root = _project(tmp_path)
+    (root / ANSWERS_REL).write_text("_commit: v0.1.0\n", encoding="utf-8")
+    with pytest.raises(LockError):
+        write(root)
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    (empty / ANSWERS_REL).write_text(f"_commit: v0.1.0\n_template_commit: \"{COMMIT}\"\n", encoding="utf-8")
+    with pytest.raises(LockError):
+        write(empty)
+
+
+def test_no_lock_is_missing(tmp_path):
+    answer = compare(tmp_path)
+    assert (answer.verdict, answer.reason) == ("MISSING", "no framework.lock")
+
+
+def test_edited_missing_and_unreadable_files_are_named(tmp_path):
+    root = _project(tmp_path)
+    (root / HOOK).write_text("print('edited')\n", encoding="utf-8")
+    assert compare(root).drifted_files == (HOOK,) and compare(root).verdict == "DRIFT"
+    (root / HOOK).chmod(0)
+    try:
+        if not os.access(root / HOOK, os.R_OK):
+            assert compare(root).drifted_files == (HOOK,)
+    finally:
+        (root / HOOK).chmod(0o644)
+    (root / HOOK).unlink()
+    assert compare(root).drifted_files == (HOOK,) and compare(root).verdict == "DRIFT"
+
+
+def test_a_missing_file_listed_without_a_hash_is_drift(tmp_path):
+    root = _project(tmp_path)
+    (root / HOOK).unlink()
+    _rewrite(root, lambda lock: lock["manifest"].update({HOOK: None}))
+    assert compare(root).drifted_files == (HOOK,)
+
+
+def test_unlisted_kernel_file_is_drift_and_pycache_is_not(tmp_path):
+    root = _project(tmp_path)
+    cache = root / KERNEL_REL / "hooks" / "__pycache__" / "guard.pyc"
+    cache.parent.mkdir()
+    cache.write_bytes(b"\0")
+    (root / "src.py").write_text("x = 1\n", encoding="utf-8")
+    assert compare(root).verdict == "MATCH"
+    added = f"{KERNEL_REL}/hooks/added.py"
+    (root / added).write_text("x = 1\n", encoding="utf-8")
+    assert compare(root).drifted_files == (added,)
+
+
+@pytest.mark.parametrize("change", (
+    lambda lock: lock.update(manifest={}),
+    lambda lock: lock.pop("manifest"),
+    lambda lock: lock.pop("template_tag"),
+    lambda lock: lock.pop("template_commit"),
+))
+def test_a_lock_without_manifest_or_identity_is_an_error(tmp_path, change):
+    root = _project(tmp_path)
+    _rewrite(root, change)
+    answer = compare(root)
+    assert answer.verdict == "ERROR" and answer.reason
+
+
+def test_a_lock_that_is_not_a_map_is_an_error(tmp_path):
+    root = _project(tmp_path)
+    (root / LOCK_REL).write_text("- not a map\n", encoding="utf-8")
+    assert compare(root).verdict == "ERROR"
+
+
+@pytest.mark.parametrize("answers", (None, ": not yaml: [", "_commit: v0.1.0\n"))
+def test_an_answers_file_absent_unreadable_or_without_the_commit_is_an_error(tmp_path, answers):
+    root = _project(tmp_path)
+    (root / ANSWERS_REL).unlink()
+    if answers is not None:
+        (root / ANSWERS_REL).write_text(answers, encoding="utf-8")
+    assert compare(root).verdict == "ERROR"
+
+
+@pytest.mark.parametrize("key, other", (("template_tag", "v9.9.9"), ("template_commit", "0" * 40)))
+def test_identity_that_differs_from_the_answers_file_is_drift(tmp_path, key, other):
+    root = _project(tmp_path)
+    _rewrite(root, lambda lock: lock.update({key: other}))
+    answer = compare(root)
+    assert answer.verdict == "DRIFT" and key in answer.reason and answer.drifted_files == ()
