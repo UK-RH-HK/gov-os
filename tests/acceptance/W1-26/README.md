@@ -204,6 +204,14 @@ command: python3 -m gov.check.audit_validator audit-reports/
 allows-not-applicable: "true"
 ```
 
+## Fixture: kernel skills copied (DEC-439)
+
+`_copy_kernel_templates()` in `w1_26_support.py`: revised after implementation: W1-35's
+skill-regression check runs the generic validator over the kernel's skills, so a project
+built from the template holds them (DEC-439). The copy is generic (every folder under
+`template/governance/kernel/skills/`), so future tickets that add skill folders need no
+revision of this file.
+
 ## Not tested
 
 - Latency under load (DEC-372): a latency case re-run alone when failing under parallel load is not tested;
