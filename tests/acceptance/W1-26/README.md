@@ -38,6 +38,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | **S6** "Fails a skill file whose content changed without a version change and a linked decision" [CAP-24.c] | `test_w1_26_skill.py` (4) | `NOT_IMPLEMENTED` |
 | **S7** "The check registry names all 17 families; registered checks run; absent reported" [CAP-38.b] | `test_w1_26_registry.py` (13) | `NOT_IMPLEMENTED` |
 | **S8** "Fails a record that changes authority class without a decision" [CAP-01.c] | `test_w1_26_authority.py` (5) | `NOT_IMPLEMENTED` |
+| **S9** "Flags a commit that cites a decision id missing from the decision register at that commit" (DEC-463) [CAP-38.b] | `test_w1_26_decision_citations.py` (45) | no declaration `core-decision-citations`; see "A commit citing an unrecorded decision" |
 | **F-1** "A planted defect of any listed family passes" | `test_w1_26_planted_defects.py` (13) | `NOT_IMPLEMENTED` |
 | **F-2** "The scope of a check is a hand-maintained list" [CAP-58.a] | `test_w1_26_derived.py` (6) | `NOT_IMPLEMENTED` |
 
@@ -71,6 +72,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_skill_validator.py` | 36 | S7 (DEC-439) |
 | `test_w1_26_audit_validator.py` | 36 | S7 (DEC-441) |
 | `test_w1_26_not_applicable.py` | 21 | S2, S7 (DEC-447) |
+| `test_w1_26_decision_citations.py` | 45 | S9 (DEC-463) |
 
 ## The interface the tests fix
 
@@ -204,6 +206,118 @@ severity: hard-block
 command: python3 -m gov.check.audit_validator audit-reports/
 allows-not-applicable: "true"
 ```
+
+## A commit citing an unrecorded decision (DEC-463) — follow-up round
+
+Added by the Independent Test Designer (MR-3) for owner decision DEC-463, before implementation.
+`test_w1_26_decision_citations.py`, 45 cases.
+
+**S9** "Flags a commit that cites a decision id missing from the decision register at that commit: a decision is
+recorded before the change it authorises (DEC-463) [CAP-38.b]".
+
+### What is settled, and from what
+
+| Point | Settled | Source |
+|---|---|---|
+| The decision register in a project | The decision files of the project: every Markdown file whose frontmatter has `type: decision`, or an `id` in the `decision_id` grammar, in any folder. A decision is recorded when such a file carries its id. Read by frontmatter, never by prose. | `tests/acceptance/W1-11/README.md` ("A decision file"), DEC-329, DEC-387 |
+| The register as one file of headed entries | **Open: package P-1.** No source gives a checker that form. It is this repository's present state only (Charter v5 names `docs/DECISION_REGISTER.md`; DEC-274: "decisions are headings in the register, not files"; W1-11's README: the two series "are not both files yet"). No case here uses it. | as named |
+| What a citation is | A whole word in the `decision_id` grammar of the kernel's shared definitions (`ADR-` or `DEC-` and three or more digits), in the commit's message: subject, body or trailers. Lower case, fewer digits, another prefix (`CAP-38`, `W1-26`, `L-0900`, `DP-900`, a ticket id) or a longer word around it is no citation. | DEC-227 and `tests/acceptance/W1-08/README.md` (reading 11: one shared `decision_id`), DEC-182 (trailers are part of the message) |
+| The changed text | Not read. DEC-463 says "a commit that cites": the commit speaks through its message. An id named by a file is that file's reference (the graph's dangling reference of DEC-274), whoever commits it. | DEC-463, DEC-274 |
+| "At that commit" | The register in the tree of the same commit. A commit that adds the decision and cites it is not flagged. A commit citing a decision that a later commit adds stays flagged. A decision present at the citing commit and removed later does not flag that commit; a commit citing it after the removal is flagged. A commit on a merged branch is judged by its own tree, not the merge's. | The KPI line ("missing from the decision register at that commit"), DEC-463 ("recorded before the change it authorises") |
+| Which commits are judged | **Open: package P-2.** DEC-463 says "from now on" and accepts seven late records by name; no source says how `gov check` knows where "now" is, and `gov check` takes no range (`--list`, `--json`; DEC-186). W1-11's README leaves it to this design ("W1-26 may need a range or a baseline"). Every project of these cases records no base and dates every commit it judges after 2026-10-07, so each is judged under options (a), (b) and (d) of P-2; under (c) the cases gain the argument. No case plants history from before the rule. | DEC-463, DEC-186, `tests/acceptance/W1-11/README.md` ("Notes for the lead") |
+| The form of the check | A declared check in the kernel's checks (`id`, `family`, `tier`, `severity`, `command`), id `core-decision-citations` (the ticket's path is `template/governance/kernel/checks/core-*`). `gov check` runs it because it is declared. | KPI S7, the ticket's `allowed_paths` |
+| Family | "authority/role limits": the rule is about what authorises a change, and this suite already places the decision checker's findings there. | KPI S7 (the 17 families), CAP-01, `test_w1_26_decisions.py` |
+| Severity | `warning`: YELLOW, never a hard block. The owner's word is "flags"; every other line of this ticket says "Fails". A commit once made cannot be mended (DEC-182: history is not rewritten), so a hard block would stay red for ever and stop every merge under DEC-466. | DEC-463, DEC-182, DEC-466, CAP-39.d |
+| Fail-opens | No repository, a repository without a commit, a git that fails, a history that cannot be read: the unmeasured answer of this suite (`"unmeasured": true`, a reason, exit 1). A decision file of a judged commit that cannot be read: exit 1 and the file is named. None is clean, and none is the not-applicable answer: DEC-447 gives that answer to the audit check alone. | DEC-425, DEC-447, DEC-387, "Validator exit codes" above |
+
+### The interface the cases fix
+
+| What | Value |
+|---|---|
+| Declaration | exactly one declaration with `id: core-decision-citations` under `template/governance/kernel/checks/`; `family` "authority/role limits" (compared as DEC-436 compares); `severity: warning`; no `allows-not-applicable` |
+| Command | the declaration's `command`, run by a shell in the project's root with this worktree's `src/` on `PYTHONPATH`; its name is the engineer's |
+| Output | one JSON object on stdout |
+| A flagged commit | one entry of `findings`: `{"code": "DECISION_UNRECORDED", "commit": "<the full commit id>", "decision": "<the id>"}`, one for each commit and id (an id written twice in one message is one finding); other keys are free |
+| Exit codes | 0 clean; 1 findings or unmeasured; never 2 |
+| Through `gov check` | the check's result has `id` `core-decision-citations`; `status` YELLOW with a flagged commit, GREEN on a clean history, never GREEN over a register it cannot read |
+
+A case that expects "not flagged" also holds one flagged commit (it cites `DEC-900`, recorded nowhere) and
+asserts the exact set of findings. So it is red until the check exists, and a check that reports nothing does
+not pass it.
+
+### Cases
+
+| Group | Cases | What |
+|---|---|---|
+| The declaration | 3 | family; severity `warning`; no `allows-not-applicable` |
+| An unrecorded citation is flagged | 8 | in the subject, the body, a trailer (3); exit 1; an `ADR-` id; two ids are two findings and a repeated id one; the unrecorded id alone beside a recorded one; every citing commit, not the last alone |
+| At that commit | 6 | a clean history is clean (exit 0, no finding); record and citation in one commit; recorded by a later commit; removed later; cited after removal; a merged branch's commit by its own tree |
+| What the register is | 4 | a typed file in `docs/adr/`, a typed file in another folder, a file with no `type` and an id in the grammar (3); an id named in prose or in another decision's `supersedes` is not recorded |
+| What a citation is | 14 | thirteen id-like words that are no decision id; an id in the changed text alone |
+| Fail-opens | 6 | no repository; no commit; a stand-in `git` that fails; a missing commit object; a decision file with frontmatter not closed or not YAML (2) |
+| Through `gov check` | 4 | YELLOW with a flagged commit; GREEN on a clean history; the family YELLOW; never GREEN over an unreadable register |
+
+Red before implementation, observed 2026-10-07 (`4 failed, 212 passed, 1 skipped, 41 errors`; before this file
+`212 passed, 1 skipped`):
+
+- 41 errors at the `declaration` fixture: `0 check declarations with id 'core-decision-citations' under
+  template/governance/kernel/checks/ (expected exactly one): the check on commits citing decisions is not declared`.
+- 4 failures, the cases through `gov check`: `gov check gives no result for the check 'core-decision-citations'`.
+
+| Covers id | Tests |
+|---|---|
+| DEC-463 (a decision is recorded before the change it authorises) | `test_w1_26_decision_citations.py` |
+| CAP-38.b (a declared check of a named family) | `test_w1_26_decision_citations.py` (the declaration, through `gov check`) |
+| DEC-425, DEC-447 (unmeasured, never green; not-applicable for the audit check alone) | `test_w1_26_decision_citations.py` (fail-opens) |
+
+### Open packages
+
+**P-1 (P1). Does the check know a register that is one file of headed entries?**
+The sources define decisions as files (W1-11). This repository records them as headings `### DEC-nnn — title` in
+`docs/DECISION_REGISTER.md`, and DEC-466 has `gov check` run here before every merge. A check that knows files
+alone flags every commit of this repository that cites a `DEC-` id (DEC-274: every such reference dangles), so here
+it measures nothing.
+- (a) **Recommended.** Both forms. A decision is recorded at a commit when a decision file of that commit's tree
+  carries its id, or when a register file of that tree has a heading that opens with the id. The project names its
+  register file (one line of project configuration under `governance/project/`); no path of this repository is
+  written into the kernel. With no register file named, files alone.
+- (b) Files alone. The check stays yellow in this repository until its decisions are records; DEC-467's baseline
+  would carry it.
+- (c) Both forms, with `docs/DECISION_REGISTER.md` and `### <id>` fixed in the kernel. Simplest; it puts this
+  repository's layout into every adopter's kernel.
+
+Needed with (a) or (c), then written as cases: the heading grammar (level, what may follow the id), and whether an
+id in a heading inside a fenced block or a table row counts (recommended: a heading line outside a fence only).
+
+**P-2 (P1). Which commits are judged, and what of the commits made before the rule?**
+- (a) **Recommended.** A base commit recorded in the project (under `governance/project/`): the commits reachable
+  from `HEAD` and not from the base are judged, merges and the commits they bring included. With no base recorded,
+  every commit reachable from `HEAD`. For this repository the base is the commit that records DEC-463
+  (`46ec8da3`); the seven late records lie before it. A base that is not a commit of the repository, or not an
+  ancestor of `HEAD`, is unmeasured.
+- (b) A date in the kernel (2026-10-07). Dates are the committer's to choose, and the kernel would carry this
+  repository's date into every adopter.
+- (c) A range argument to `gov check`. It changes the command's interface (DEC-186), and a check before a merge
+  would judge only what its caller thinks to pass.
+- (d) Every commit, and a list of accepted findings by commit and id (as DEC-467 does for red checks). Exact, and a
+  hand-maintained list (failure KPI 2).
+
+Cases that wait for the answer: commits before the base are not flagged; a base that cannot be resolved; a shallow
+clone whose boundary hides judged commits.
+
+### Not tested
+
+- The headed register (P-1) and history from before the rule (P-2).
+- A decision's `status`: whether a `PROPOSED` or `SUPERSEDED` decision counts as recorded. The KPI says "missing
+  from the decision register"; the cases record with `ACTIVE`.
+- A range written in prose ("DEC-460 to DEC-466"): both ends are citations by the grammar; the ids between are not
+  read.
+- An id with a prefix before it (`X-DEC-900`) or a suffix after a hyphen (`DEC-900-draft`).
+- A decision file with the extension `.MD` or `.markdown` (DEC-387's residual), and one moved between two commits.
+- Notes (`git notes`) and tag messages: the commit's own message alone.
+- Whether an unreadable decision file is reported as a finding or as unmeasured: the cases fix exit 1 and the
+  file's name in the output.
+- Latency on a long history.
 
 ## Fixture: kernel skills copied (DEC-439)
 
