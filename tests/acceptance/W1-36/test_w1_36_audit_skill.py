@@ -136,3 +136,51 @@ class TestAuditReadOnly:
             "the audit skill must say the session is read-only "
             "or that it does not edit audited files"
         )
+
+
+class TestAuditReportDEC441Form:
+    """DEC-441: the audit skill states the report's minimal form —
+    frontmatter fields, table columns, classes, and no-evidence notation."""
+
+    def test_mentions_pack_sha256_field(self, audit_skill):
+        """The skill must name pack_sha256 as a report frontmatter field."""
+        assert "pack_sha256" in audit_skill["body"], (
+            "the audit skill must name pack_sha256 as a frontmatter field "
+            "(DEC-441: the report's YAML frontmatter holds pack_sha256)"
+        )
+
+    def test_mentions_commit_as_report_field(self, audit_skill):
+        """The skill must name commit as a report frontmatter field."""
+        body = audit_skill["body"]
+        has_commit_field = (
+            "frontmatter" in body.lower()
+            or "`commit`" in body
+        )
+        assert has_commit_field, (
+            "the audit skill must state commit as a report frontmatter field "
+            "(DEC-441: the report's YAML frontmatter holds commit)"
+        )
+
+    def test_describes_table_columns(self, audit_skill):
+        """The skill must describe the table columns: item, class, evidence."""
+        body = audit_skill["body"].lower()
+        has_evidence_col = "evidence" in body
+        has_table_context = "table" in body or "|" in body or "column" in body
+        assert has_evidence_col and has_table_context, (
+            "the audit skill must describe the table with columns "
+            "item, class, evidence (DEC-441)"
+        )
+
+    def test_describes_no_evidence_as_dash(self, audit_skill):
+        """The skill must state that no evidence is written as '-'."""
+        body = audit_skill["body"]
+        has_dash_notation = (
+            "`-`" in body
+            or "written as `-`" in body
+            or "written as -" in body.lower()
+            or "cite none" in body.lower() and "`-`" in body
+        )
+        assert has_dash_notation, (
+            "the audit skill must state that no evidence is written as "
+            "'-' (DEC-441: a non-OK row may cite none, written as -)"
+        )

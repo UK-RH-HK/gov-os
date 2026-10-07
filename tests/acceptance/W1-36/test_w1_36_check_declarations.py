@@ -4,8 +4,13 @@ S5: Registers the skill-regression family check over its four skills and the
     audit-reproducibility family check (an audit report's cited commit, rows
     and evidence paths resolve), using the generic validators from W1-26
     [CAP-38.b].
+
+Command validation (DEC-425, DEC-439): no fallback that can succeed without
+the generic validator.
 """
 from w1_36_support import NORMALISED_FAMILIES, normalise_family
+
+_BYPASS_PATTERNS = ("if ", "test ", "importlib", "find_spec", "which ")
 
 
 class TestSkillRegressionCheck:
@@ -80,3 +85,59 @@ class TestAuditReproducibilityCheck:
         for check in audit_repro_checks:
             assert isinstance(check["command"], str) and check["command"].strip(), \
                 f"{check['_path'].name}: command must be a non-empty string"
+
+
+class TestSkillRegressionCommandValidation:
+    """Command validation (DEC-425, DEC-439): the skill-regression command
+    calls the W1-26 generic validator with no fallback."""
+
+    def test_no_or_fallback_in_command(self, skill_regression_checks):
+        for check in skill_regression_checks:
+            assert "||" not in check["command"], (
+                f"{check['_path'].name}: command has '||' fallback — "
+                f"a check that can succeed without measuring is not merged (DEC-425)"
+            )
+
+    def test_no_conditional_bypass_in_command(self, skill_regression_checks):
+        for check in skill_regression_checks:
+            cmd = check["command"]
+            for pat in _BYPASS_PATTERNS:
+                assert pat not in cmd, (
+                    f"{check['_path'].name}: command contains '{pat.strip()}' "
+                    f"which can bypass the validator (DEC-439)"
+                )
+
+    def test_command_calls_skill_validator(self, skill_regression_checks):
+        for check in skill_regression_checks:
+            assert "gov.check.skill_validator" in check["command"], (
+                f"{check['_path'].name}: command must call "
+                f"gov.check.skill_validator (the W1-26 generic validator)"
+            )
+
+
+class TestAuditReproCommandValidation:
+    """Command validation (DEC-425, DEC-439): the audit-reproducibility command
+    calls the W1-26 generic validator with no fallback."""
+
+    def test_no_or_fallback_in_command(self, audit_repro_checks):
+        for check in audit_repro_checks:
+            assert "||" not in check["command"], (
+                f"{check['_path'].name}: command has '||' fallback — "
+                f"a check that can succeed without measuring is not merged (DEC-425)"
+            )
+
+    def test_no_conditional_bypass_in_command(self, audit_repro_checks):
+        for check in audit_repro_checks:
+            cmd = check["command"]
+            for pat in _BYPASS_PATTERNS:
+                assert pat not in cmd, (
+                    f"{check['_path'].name}: command contains '{pat.strip()}' "
+                    f"which can bypass the validator (DEC-439)"
+                )
+
+    def test_command_calls_audit_validator(self, audit_repro_checks):
+        for check in audit_repro_checks:
+            assert "gov.check.audit_validator" in check["command"], (
+                f"{check['_path'].name}: command must call "
+                f"gov.check.audit_validator (the W1-26 generic validator)"
+            )
