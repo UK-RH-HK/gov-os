@@ -8,7 +8,9 @@ tested on the skill text as far as possible and noted for W1-42.
 from __future__ import annotations
 
 import math
+import os
 import re
+import shutil
 from pathlib import Path
 
 import pytest
@@ -21,12 +23,18 @@ from conftest import (
     MAX_BODY_TOKENS,
     MAX_DESC_TOKENS,
     PERMISSION_PATTERNS,
+    REPO_ROOT,
     RESERVED_COMMANDS,
+    SKILL_FOLDER_RELS,
     SKILL_NAMES,
     SKILL_PATHS,
+    SKILL_REGRESSION_FAMILY,
+    check_support,
+    cli_support,
     find_check_declaration,
     parse_skill,
     token_count,
+    well_formed_skill,
 )
 
 
@@ -772,3 +780,254 @@ class TestTestDesignReadRestrictionProxy:
         text_lower = full_text.lower()
         assert "only" in text_lower or "must not" in text_lower or "never" in text_lower, \
             "test-design skill does not declare a read restriction"
+
+
+# ============================================================================
+# A. Declaration's command runs the generic validator correctly (CAP-38.b)
+# ============================================================================
+
+class TestDeclarationCommand:
+    """covers: S8 (validator integration)"""
+
+    def test_command_is_not_true(self):
+        path = find_check_declaration()
+        assert path is not None
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        command = data["command"]
+        assert command.strip() != "true", \
+            "the check declaration's command is still 'true'"
+
+    def test_command_runs_skill_validator(self):
+        path = find_check_declaration()
+        assert path is not None
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        command = data["command"]
+        assert "python3 -m gov.check.skill_validator" in command, \
+            f"command does not invoke the generic skill validator: {command}"
+
+    def test_command_has_no_fallback(self):
+        path = find_check_declaration()
+        assert path is not None
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        command = data["command"]
+        assert "||" not in command, \
+            f"command contains '||' fallback: {command}"
+
+    def test_command_references_all_four_skill_folders(self):
+        path = find_check_declaration()
+        assert path is not None
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        command = data["command"]
+        for folder_rel in SKILL_FOLDER_RELS:
+            assert folder_rel in command, \
+                f"command does not reference skill folder {folder_rel}: {command}"
+
+    def test_command_referenced_paths_exist(self):
+        path = find_check_declaration()
+        assert path is not None
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        command = data["command"]
+        for folder_rel in SKILL_FOLDER_RELS:
+            if folder_rel in command:
+                full_path = REPO_ROOT / folder_rel
+                assert full_path.is_dir(), \
+                    f"path {folder_rel} referenced in command does not exist"
+
+
+# ============================================================================
+# B. Integration: gov check on a temporary project
+# ============================================================================
+
+class TestSkillRegressionGreen:
+    """covers: S8 (GREEN path)"""
+
+    def test_skill_regression_green_with_well_formed_skills(
+        self, full_project, sandbox
+    ):
+        full_project.commit("before check")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.GREEN, (
+            f"skill regression family is {status}, expected GREEN "
+            f"with well-formed skills\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedMissingFrontmatter:
+    """covers: S8 (RED: missing frontmatter)"""
+
+    def test_red_when_frontmatter_removed(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "discovery" / "SKILL.md"
+        skill_path.write_text("# Discovery\n\nNo frontmatter here.\n", encoding="utf-8")
+        full_project.commit("break frontmatter")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when frontmatter is missing\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedMissingVersion:
+    """covers: S8 (RED: missing version)"""
+
+    def test_red_when_version_missing(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "planning" / "SKILL.md"
+        skill_path.write_text(
+            "---\nname: planning\ndescription: Plans things.\n---\n\n# Planning\n\nBody.\n",
+            encoding="utf-8",
+        )
+        full_project.commit("remove version field")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when version field is missing\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedDescriptionTooLong:
+    """covers: S8 (RED: description exceeds 60 tokens)"""
+
+    def test_red_when_description_exceeds_60_tokens(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "change" / "SKILL.md"
+        long_desc = "word " * 100
+        skill_path.write_text(
+            f"---\nname: change\nversion: \"1.0.0\"\ndescription: {long_desc}\n---\n\n# Change\n\nBody.\n",
+            encoding="utf-8",
+        )
+        full_project.commit("bloat description")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when description exceeds 60 tokens\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedBodyTooLong:
+    """covers: S8 (RED: body exceeds 2500 tokens)"""
+
+    def test_red_when_body_exceeds_2500_tokens(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "test-design" / "SKILL.md"
+        long_body = "word " * 3000
+        skill_path.write_text(
+            f"---\nname: test-design\nversion: \"1.0.0\"\ndescription: Designs tests.\n---\n\n{long_body}\n",
+            encoding="utf-8",
+        )
+        full_project.commit("bloat body")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when body exceeds 2500 tokens\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedUnknownCommand:
+    """covers: S8 (RED: unknown gov command)"""
+
+    def test_red_when_unknown_gov_command(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "discovery" / "SKILL.md"
+        skill_path.write_text(
+            "---\nname: discovery\nversion: \"1.0.0\"\n"
+            "description: Discovers things.\n---\n\n"
+            "# Discovery\n\nRun `gov foobar` to do nothing.\n",
+            encoding="utf-8",
+        )
+        full_project.commit("inject unknown command")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when an unknown gov command is referenced\n{run.describe()}"
+        )
+
+
+class TestSkillRegressionRedMissingFolder:
+    """covers: S8 (RED: skill folder missing)"""
+
+    def test_red_when_skill_folder_missing(self, full_project, sandbox):
+        skill_dir = full_project.root / "template" / "governance" / "kernel" / "skills" / "discovery"
+        shutil.rmtree(skill_dir)
+        full_project.commit("remove discovery folder")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when a skill folder is missing entirely\n{run.describe()}"
+        )
+
+
+# ============================================================================
+# D. Planned vs misspelt commands: gov close is valid, gov foobar is not
+# ============================================================================
+
+class TestPlannedVsMisspeltCommands:
+    """covers: S8 (command-exists: planned commands valid, misspelt ones rejected)"""
+
+    def test_planned_command_is_valid(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "change" / "SKILL.md"
+        skill_path.write_text(
+            "---\nname: change\nversion: \"1.0.0\"\n"
+            "description: Changes things.\n---\n\n"
+            "# Change\n\nRun `gov close` to close a ticket.\n",
+            encoding="utf-8",
+        )
+        full_project.commit("use planned command")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        checks = check_support.checks_of(result)
+        sr_findings = []
+        for entry in checks:
+            if isinstance(entry, dict) and entry.get("id") == "skill-regression-a":
+                sr_findings = entry.get("findings", [])
+        unknown_cmd_findings = [
+            f for f in sr_findings
+            if isinstance(f, dict) and f.get("code") == "SKILL_UNKNOWN_COMMAND"
+        ]
+        assert not unknown_cmd_findings, (
+            f"'gov close' is a planned reserved command but was flagged: {unknown_cmd_findings}"
+        )
+
+    def test_misspelt_command_is_rejected(self, full_project, sandbox):
+        skill_path = full_project.root / "template" / "governance" / "kernel" / "skills" / "change" / "SKILL.md"
+        skill_path.write_text(
+            "---\nname: change\nversion: \"1.0.0\"\n"
+            "description: Changes things.\n---\n\n"
+            "# Change\n\nRun `gov foobar` to do nothing.\n",
+            encoding="utf-8",
+        )
+        full_project.commit("use misspelt command")
+        run = check_support.run_check(full_project, sandbox)
+        interface = cli_support.load_interface(REPO_ROOT)
+        envelope = check_support.envelope_of(run, interface)
+        result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+        status = check_support.family_status(result, SKILL_REGRESSION_FAMILY)
+        assert status == check_support.RED, (
+            f"skill regression family is {status}, expected RED "
+            f"when a misspelt command 'gov foobar' is used\n{run.describe()}"
+        )
