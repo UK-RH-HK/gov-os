@@ -4,8 +4,9 @@ Ticket: `DAEO-3ef2` · Profile: STANDARD · Covers: CAP-52.a, CAP-52.b, CAP-38.b
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-38 -q -p no:cacheprovider -rs`
 
-**59 cases in 16 classes.** Round 3 (2026-10-07), run before the engineer's third round: **39 green, 20 red,
-0 skipped**. The red reasons are in the tables below.
+**67 cases in 17 classes.** Round 3b (2026-10-07), run before the engineer's third round: **40 green, 27 red,
+0 skipped**. The red reasons are in the tables below. Round 3b added the eight cases of DEC-468 (seven red, one
+green) and changed no other case.
 
 Two rules hold for every case:
 
@@ -57,12 +58,22 @@ ends with exit 0 is green; `gov check` shows a failed or unmeasured hard-block c
 4. **Behaviour in place of file-exists.** See the tables: the declaration and the module are measured through
    `gov check`; CLAUDE.md and AGENTS.md are compared with the root rule.
 5. **Findings.** Read from the check's entry in `gov check --json`.
+6. **OpenSpec skills (round 3b, DEC-468).** The six skills `openspec init --tools claude` of the registered version
+   writes under `.claude/skills/` (`openspec-apply-change`, `openspec-archive-change`, `openspec-explore`,
+   `openspec-propose`, `openspec-sync-specs`, `openspec-update-change`; one `SKILL.md` each) are registered rulesync
+   sources, unchanged, like the six commands. Measured with rulesync 24.0.0 in a temporary folder: `rulesync import`
+   followed by `rulesync generate --delete` gives each of the six back with the same body and the same frontmatter
+   values, so the comparison is reachable. A skill text written for this ticket fails it.
+7. **Who refreshes the sources (DEC-469).** The ticket that changes the `openspec` or `rulesync` entry of the tool
+   registry refreshes the registered sources from that version in the same change; it needs no case here.
 
 ## The one tolerated difference between a source file and its generated file
 
 rulesync rewrites the frontmatter (key order, quoting, folded lines) and **drops the blank lines between the closing
 `---` of the frontmatter and the first line of the body**. Nothing else is tolerated: after that point the body is
-compared byte for byte. Frontmatter, where a case compares it, is compared as a parsed mapping.
+compared byte for byte. Frontmatter, where a case compares it, is compared as a parsed mapping. The six OpenSpec
+skills are compared with this same tolerance and no other: the body of `SKILL.md` byte for byte after that point,
+its frontmatter as a mapping (as for the OpenSpec commands).
 
 **The kernel skill files stay as W1-35 and W1-36 left them**, with their blank line after the frontmatter. The
 eight edits of the last run that removed it are undone by the engineer; `test_skill_body_matches_source` holds with
@@ -82,6 +93,8 @@ the kernel files unchanged, because the tolerance is in the comparison and not i
 | `TestClaudeMdAndAgentsMd::test_agents_md_token_limit` | `ceil(len / 4)` of AGENTS.md ≤ 1500 | green |
 | `TestOpenSpecCommands::test_generated_command_is_the_one_openspec_ships[<name>]` × 6 | `.claude/commands/opsx/<name>.md`: body and frontmatter mapping with the file `openspec init --tools claude` writes | 6 red: `apply`, `archive`, `explore`, `sync`, `update` are not generated (no registered source); `propose` is generated with a body written for the ticket |
 | `TestOpenSpecCommands::test_no_opsx_command_that_openspec_does_not_ship` | the names under `.claude/commands/opsx/` against the names OpenSpec ships | red: `close` and `status` are not OpenSpec's |
+| `TestOpenSpecSkills::test_generated_skill_is_the_one_openspec_ships[<skill>]` × 6 (DEC-468) | every file `openspec init --tools claude` writes under `.claude/skills/<skill>/` with the generated file of that name: `SKILL.md` by body and frontmatter mapping | 6 red: none of the six `SKILL.md` is generated (no registered source) |
+| `TestOpenSpecSkills::test_no_openspec_skill_that_openspec_does_not_ship` (DEC-468) | the `openspec-*` folder names under `.claude/skills/` against the skill names OpenSpec ships | green (no `openspec-*` skill is generated yet); it stays as the guard against one written for the ticket |
 | `TestRulesyncVersion::test_registry_file_absent_is_not_green` | the check without a tool registry | red: the check ends green; the version was not looked at |
 | `TestRulesyncVersion::test_registry_without_a_rulesync_entry_is_not_green` | the check with a registry that holds only `uv` | red: green, same reason |
 | `TestRulesyncVersion::test_project_expecting_another_version_is_not_green` | registry expects 23.0.0, the installed rulesync is 24.0.0; the output names both | red: green, the registry is not read |
@@ -115,6 +128,7 @@ its family, its command; the module exists).
 | Test | Measures | Red reason |
 |---|---|---|
 | `TestDeleteProtection::test_delete_preserves_openspec_commands` | after `generate --delete`, every command OpenSpec ships is under `.claude/commands/opsx/` with OpenSpec's body | red: none of the six is there with OpenSpec's body |
+| `TestDeleteProtection::test_delete_preserves_openspec_skills` (DEC-468) | after `generate --delete`, every file of the six skills OpenSpec ships is under `.claude/skills/<skill>/` as OpenSpec ships it (same comparison as above) | red: none of the six is there |
 | `TestDeleteProtection::test_delete_preserves_vendored_skills` | after `generate --delete`, the three vendored `SKILL.md` are still there | green |
 
 ### Failure 2 — A generated file is hand-edited
@@ -141,7 +155,7 @@ its family, its command; the module exists).
 
 | Covers ID | Tests |
 |---|---|
-| CAP-52.a | `TestSkillGeneration`, `TestVendoredSkillRegistration`, `TestClaudeMdAndAgentsMd`, `TestOpenSpecCommands`, `TestRulesyncVersion`, `TestHookStubs`, `TestGenerateCheck`, `TestDeleteProtection`, `TestHandEditDetected` (CLAUDE.md, AGENTS.md, skill), `TestSourceChangeDetected`, `TestMissingFileDetected::test_missing_agents_md_fails_check` |
+| CAP-52.a | `TestSkillGeneration`, `TestVendoredSkillRegistration`, `TestClaudeMdAndAgentsMd`, `TestOpenSpecCommands`, `TestOpenSpecSkills`, `TestRulesyncVersion`, `TestHookStubs`, `TestGenerateCheck`, `TestDeleteProtection`, `TestHandEditDetected` (CLAUDE.md, AGENTS.md, skill), `TestSourceChangeDetected`, `TestMissingFileDetected::test_missing_agents_md_fails_check` |
 | CAP-52.b | `TestRoleFieldAgreement`, `TestHandEditDetected::test_hand_edit_role_file` |
 | CAP-38.b | `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging`, `TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read` |
 
@@ -150,8 +164,9 @@ its family, its command; the module exists).
 - **rulesync.** Cases marked `@pytest.mark.needs_rulesync` need the binary at `/home/usain/.local/bin/rulesync`
   (override with `RULESYNC_BIN`, which the check reads too). They are skipped when rulesync is not installed. This
   is the suite's only skip.
-- **openspec.** The seven OpenSpec cases (`TestOpenSpecCommands`, `test_delete_preserves_openspec_commands`) run
-  `openspec init --tools claude` in a temporary folder with a temporary home. `openspec` is taken from
+- **openspec.** The fifteen OpenSpec cases (`TestOpenSpecCommands`, `TestOpenSpecSkills`,
+  `test_delete_preserves_openspec_commands`, `test_delete_preserves_openspec_skills`) read what one
+  `openspec init --tools claude` wrote in a temporary folder with a temporary home. `openspec` is taken from
   `OPENSPEC_BIN`, or from PATH with the registered Node's `bin` folder first (the registry's own note). A missing
   openspec, or one whose version is not the registry's, **fails** these cases with that reason; there is no skip.
 
@@ -170,7 +185,10 @@ its family, its command; the module exists).
 
 ## Packages
 
-**P-1. The six skills OpenSpec writes beside its commands.** (new, round 3; no case written)
+P-1 and P-2 are decided: P-1 by DEC-468 (option a; its cases are `TestOpenSpecSkills` and
+`test_delete_preserves_openspec_skills`), P-2 by DEC-469 (the recommendation). They are kept below as raised.
+
+**P-1. The six skills OpenSpec writes beside its commands.** (round 3; decided by DEC-468)
 - Question: must the skills `openspec init --tools claude` writes under `.claude/skills/` (`openspec-apply-change`,
   `openspec-archive-change`, `openspec-explore`, `openspec-propose`, `openspec-sync-specs`,
   `openspec-update-change`) be registered rulesync sources too?
@@ -184,7 +202,7 @@ its family, its command; the module exists).
 - Reversibility: high. Recommendation: (a), since rulesync owns `.claude/` and a later `openspec init` or
   `openspec update` would otherwise write files that the next `--delete` removes. Confidence: medium.
 
-**P-2. Who refreshes the registered OpenSpec sources when the registered OpenSpec version changes.** (new)
+**P-2. Who refreshes the registered OpenSpec sources when the registered OpenSpec version changes.** (round 3; decided by DEC-469)
 - Question: when the registry's OpenSpec version changes, is refreshing `template/.rulesync/commands/opsx/` part of
   that install's ticket?
 - Why now: the cases compare with the installed, registered OpenSpec, so a version change turns them red until the

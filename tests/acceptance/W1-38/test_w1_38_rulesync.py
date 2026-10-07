@@ -245,6 +245,50 @@ class TestOpenSpecCommands:
 
 
 # ===================================================================
+# KPI Success 1 — OpenSpec's skills are registered sources (DEC-468)
+# ===================================================================
+
+class TestOpenSpecSkills:
+    """DEC-468: the six skills OpenSpec writes beside its commands are
+    registered rulesync sources, unchanged. Compared with what
+    ``openspec init --tools claude`` of the registered version writes; a
+    skill text written for this ticket is a stand-in and fails."""
+
+    @needs_rulesync
+    @pytest.mark.parametrize("skill", support.OPENSPEC_SKILLS)
+    def test_generated_skill_is_the_one_openspec_ships(
+        self, generated_project, openspec_shipped_skills, skill,
+    ):
+        """Compared: every file OpenSpec writes in the skill's folder;
+        SKILL.md by body byte for byte and by frontmatter as a mapping."""
+        assert (generated_project / support.SKILLS_REL / skill / "SKILL.md").is_file(), (
+            f"{support.SKILLS_REL}/{skill}/SKILL.md is not generated: the skill OpenSpec "
+            f"ships is not a registered rulesync source"
+        )
+        differing = support.differing_openspec_skill_files(
+            generated_project, skill, openspec_shipped_skills[skill],
+        )
+        assert not differing, (
+            f"{support.SKILLS_REL}/{skill}/ is not the skill OpenSpec ships "
+            f"under that name: {differing}"
+        )
+
+    @needs_rulesync
+    def test_no_openspec_skill_that_openspec_does_not_ship(
+        self, generated_project, openspec_shipped_skills,
+    ):
+        generated = {
+            p.name for p in (generated_project / support.SKILLS_REL).iterdir()
+            if p.is_dir() and p.name.startswith(support.OPENSPEC_SKILL_PREFIX)
+        }
+        extra = sorted(generated - set(openspec_shipped_skills))
+        assert not extra, (
+            f"{support.SKILLS_REL}/ holds {support.OPENSPEC_SKILL_PREFIX}* skills "
+            f"OpenSpec does not ship: {extra}"
+        )
+
+
+# ===================================================================
 # KPI Success 2 — hook-script stubs exist
 # ===================================================================
 
@@ -495,6 +539,23 @@ class TestDeleteProtection:
         assert not lost, (
             f"after generate --delete these OpenSpec commands are missing from "
             f"{support.OPSX_REL}/ or no longer OpenSpec's: {lost}"
+        )
+
+    @needs_rulesync
+    def test_delete_preserves_openspec_skills(self, generated_project, openspec_shipped_skills):
+        """After ``--delete`` every skill OpenSpec ships is still there as
+        OpenSpec ships it (DEC-468)."""
+        delete = support.run_rulesync_delete(generated_project)
+        assert delete.returncode == 0, f"--delete failed: {delete.stderr}"
+
+        lost = {
+            skill: differing for skill, shipped in sorted(openspec_shipped_skills.items())
+            if (differing := support.differing_openspec_skill_files(
+                generated_project, skill, shipped))
+        }
+        assert not lost, (
+            f"after generate --delete these OpenSpec skills are missing from "
+            f"{support.SKILLS_REL}/ or no longer OpenSpec's: {lost}"
         )
 
     @needs_rulesync

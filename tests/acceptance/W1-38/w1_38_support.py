@@ -53,6 +53,18 @@ PROJECT_CHECKS_REL = cli_support.CHECKS_REL
 OPENSPEC_COMMANDS = ("apply", "archive", "explore", "propose", "sync", "update")
 OPSX_REL = ".claude/commands/opsx"
 
+# The skills the same command writes under ``.claude/skills/`` (DEC-468).
+OPENSPEC_SKILLS = (
+    "openspec-apply-change",
+    "openspec-archive-change",
+    "openspec-explore",
+    "openspec-propose",
+    "openspec-sync-specs",
+    "openspec-update-change",
+)
+OPENSPEC_SKILL_PREFIX = "openspec-"
+SKILLS_REL = ".claude/skills"
+
 ROLE_NAMES = (
     "engineer",
     "independent-auditor",
@@ -391,10 +403,9 @@ def openspec_environment(home: Path) -> tuple[str, dict]:
     return binary, env
 
 
-def openspec_shipped_commands(work: Path) -> dict[str, str]:
-    """Run ``openspec init --tools claude`` in a fresh folder and return the
-    command files it writes: ``{name: text}`` for ``.claude/commands/opsx/<name>.md``.
-    """
+def openspec_init(work: Path) -> Path:
+    """Run ``openspec init --tools claude`` of the registered version in a
+    fresh folder under ``work`` and return that folder."""
     home = work / "home"
     target = work / "openspec-project"
     home.mkdir(parents=True)
@@ -413,6 +424,12 @@ def openspec_shipped_commands(work: Path) -> dict[str, str]:
         env=env, cwd=str(target), timeout=120, stdin=subprocess.DEVNULL,
     )
     assert done.returncode == 0, f"openspec init failed: {done.stdout}\n{done.stderr}"
+    return target
+
+
+def openspec_shipped_commands(target: Path) -> dict[str, str]:
+    """The command files ``openspec init`` wrote in ``target``: ``{name: text}``
+    for ``.claude/commands/opsx/<name>.md``."""
     shipped = {
         path.stem: path.read_text(encoding="utf-8")
         for path in sorted((target / OPSX_REL).glob("*.md"))
@@ -422,6 +439,44 @@ def openspec_shipped_commands(work: Path) -> dict[str, str]:
         f"this suite lists {sorted(OPENSPEC_COMMANDS)}"
     )
     return shipped
+
+
+def openspec_shipped_skills(target: Path) -> dict[str, dict[str, str]]:
+    """The skills ``openspec init`` wrote in ``target``:
+    ``{skill: {path inside the skill folder: text}}`` for ``.claude/skills/<skill>/``."""
+    shipped = {
+        folder.name: {
+            str(path.relative_to(folder)): path.read_text(encoding="utf-8")
+            for path in sorted(folder.rglob("*")) if path.is_file()
+        }
+        for folder in sorted((target / SKILLS_REL).iterdir()) if folder.is_dir()
+    }
+    assert set(shipped) == set(OPENSPEC_SKILLS), (
+        f"openspec init wrote the skills {sorted(shipped)}; "
+        f"this suite lists {sorted(OPENSPEC_SKILLS)}"
+    )
+    return shipped
+
+
+def differing_openspec_skill_files(project_dir: Path, skill: str, shipped: dict[str, str]) -> list[str]:
+    """The files of one skill OpenSpec ships that the project does not hold as
+    shipped under ``.claude/skills/<skill>/``. SKILL.md is compared by body
+    (byte for byte) and by frontmatter (as a mapping); any other file by text."""
+    differing = []
+    for rel, text in sorted(shipped.items()):
+        path = project_dir / SKILLS_REL / skill / rel
+        if not path.is_file():
+            differing.append(f"{rel}: not there")
+            continue
+        found = path.read_text(encoding="utf-8")
+        if Path(rel).name != "SKILL.md":
+            if found != text:
+                differing.append(f"{rel}: differs")
+        elif generated_body(found) != generated_body(text):
+            differing.append(f"{rel}: body differs")
+        elif frontmatter(found) != frontmatter(text):
+            differing.append(f"{rel}: frontmatter differs")
+    return differing
 
 
 # ---------------------------------------------------------------------------

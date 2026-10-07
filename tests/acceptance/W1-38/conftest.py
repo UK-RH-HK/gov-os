@@ -60,7 +60,21 @@ def mock_dir(tmp_path):
 
 
 @pytest.fixture(scope="session")
-def openspec_shipped(tmp_path_factory):
+def openspec_initialised(tmp_path_factory):
+    """The folder ``openspec init --tools claude`` of the registered version
+    wrote. A missing or differently versioned openspec fails the case."""
+    return support.openspec_init(tmp_path_factory.mktemp("w1-38-openspec"))
+
+
+@pytest.fixture(scope="session")
+def openspec_shipped(openspec_initialised):
     """``{name: text}`` of the command files the registered OpenSpec writes for
-    Claude Code. A missing or differently versioned openspec fails the case."""
-    return support.openspec_shipped_commands(tmp_path_factory.mktemp("w1-38-openspec"))
+    Claude Code."""
+    return support.openspec_shipped_commands(openspec_initialised)
+
+
+@pytest.fixture(scope="session")
+def openspec_shipped_skills(openspec_initialised):
+    """``{skill: {path: text}}`` of the skills the registered OpenSpec writes
+    for Claude Code (DEC-468)."""
+    return support.openspec_shipped_skills(openspec_initialised)
