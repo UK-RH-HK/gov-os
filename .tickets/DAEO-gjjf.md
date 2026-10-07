@@ -39,6 +39,7 @@ kpis:
   - The exit run measures callers/impact hit@5 on the dev query set's code classes, the measurement comparable to the S0b2 code-intelligence baseline (DEC-377)
   - The exit run re-measures the dev query set's mean hit@5 against the S0b2 R1 baseline of 85 and reports it (DEC-414)
   - The owner freezes, pauses and lifts from a plain terminal, on a throwaway repository and on this one, and the results are recorded (DEC-428)
+  - The gov check baseline of this repository (DEC-467) is empty at the exit run, cleared by W1-39 and W1-41's adoption; any item still in it comes to the owner as a decision package (DEC-472)
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme
