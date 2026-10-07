@@ -6,6 +6,11 @@ is staged, twice: with the project's ``.gitleaks.toml`` as it stands, then with 
 (DEC-347, DEC-369). A result is measured or it is refused: a named tier with no declared check, a name that is no
 tier, a gitleaks that cannot run or does not decide, and rules that cannot be read all refuse.
 
+``gov ci job`` is the gate of the CI job (DEC-087, DEC-489): every check ``gov check`` runs but the declared
+checks of a tier above G2, so the checks of ``gov check`` that carry no tier (openspec, skill version, readiness,
+the policy keys) run there, the one place left for them. It refuses as ``gov ci checks G1 G2`` does, and takes
+the status of every check as the check runner gives it.
+
 ``gov ci push <remote>`` is the pre-push gate (DEC-489): it runs the declared checks of tier G3, writes the
 evidence record, a git note on the head commit under ``refs/notes/gov-evidence``, and pushes that ref to
 ``<remote>``. The note is JSON: ``{"commit": <id>, "result": "passed" | "failed" | "no G3 check declared",
@@ -28,6 +33,7 @@ EXIT_CODES = {3: "refused: a hard-block check failed, or a secret is staged"}
 NOT_MEASURED = "CI_NOT_MEASURED"
 _LEAKS = 3
 TIERS = ("G0", "G1", "G2", "G3", "G4", "G5", "G6")  # CAP-39
+JOB_TIERS, JOB_NEVER = ("G1", "G2"), TIERS[3:]  # the job: G1 and G2 must have a check; none above G2 runs there
 EVIDENCE_REF = "refs/notes/gov-evidence"
 PASSED, FAILED, NO_G3 = "passed", "failed", "no G3 check declared"
 # P-6 (open, the owner's): the results the CI job accepts. Until it is decided a record that says NO_G3 is refused
@@ -36,26 +42,36 @@ ACCEPTED = (PASSED,)
 
 
 def add_arguments(parser) -> None:
-    parser.add_argument("gate", choices=("checks", "staged-secrets", "push", "record"))
+    parser.add_argument("gate", choices=("checks", "job", "staged-secrets", "push", "record"))
     parser.add_argument("tiers", nargs="*", metavar="<name>",
                         help="for checks: the tiers to run (G1 G2); for push: the remote")
 
 
-def _checks(root: Path, tiers: list[str]) -> dict:
+def _checks(root: Path, tiers: list[str], job: bool = False) -> dict:
     from gov.check import runner
     from gov.cli.checks import load_declarations
 
     unknown = [tier for tier in tiers if tier not in TIERS]
     if unknown or not tiers:
         raise GovError("CI_TIER_UNKNOWN", f"not a tier ({', '.join(TIERS)}): {' '.join(unknown) or '(none named)'}")
-    declarations = [each for each in load_declarations(root) if each["tier"] in tiers]
+    every = load_declarations(root)
+    # the job: every declared check but those of a tier above G2; a hook: the declared checks of the tiers named
+    declarations = [each for each in every if (each["tier"] not in JOB_NEVER if job else each["tier"] in tiers)]
     missing = [tier for tier in tiers if tier not in {each["tier"] for each in declarations}]
     if missing:  # a named tier is run or the gate refuses: it is never passed over beside one that has a check
         raise GovError(NOT_MEASURED, f"no check of tier {' or '.join(missing)} is declared", {"tiers": missing})
     runner._augment_declarations(declarations, root)
     commit = runner._head(root)
-    statuses = {each["id"]: runner._run_declared_check(each, root, commit)["status"] for each in declarations}
-    red = sorted(check_id for check_id, status in statuses.items() if status == runner.RED)
+    results = [runner._run_declared_check(each, root, commit) for each in declarations]
+    if job:  # the checks of `gov check` that carry no tier, as runner.run_checks runs them
+        results += [runner._check_openspec(root, commit), runner._check_skill_version(root, commit),
+                    runner._check_readiness(root, commit)]
+        known = {runner._normalise_family(family) for family in runner.FAMILIES}
+        families = set(runner.FAMILIES) | {each["family"] for each in every
+                                           if runner._normalise_family(each["family"]) not in known}
+        results += runner._check_policy_enforcement(root, commit, families)
+    statuses = {each["id"]: each["status"] for each in results}
+    red = sorted({each["id"] for each in results if each["status"] == runner.RED})  # by result: two may share an id
     if red:
         raise GovError("CHECK_FAILED", "hard-block checks failed: " + ", ".join(red), {"checks": statuses}, exit_code=3)
     return {"tiers": tiers, "checks": statuses}
@@ -133,6 +149,10 @@ def _record(root: Path) -> dict:
 def run(root: Path, args, config: dict) -> dict:
     if args.gate == "checks":
         return _checks(root, args.tiers)
+    if args.gate == "job":
+        if args.tiers:
+            raise GovError(NOT_MEASURED, "gov ci job takes no tier: " + " ".join(args.tiers))
+        return _checks(root, list(JOB_TIERS), job=True)
     if args.gate == "push":
         return _push(root, args.tiers)
     return _record(root) if args.gate == "record" else _staged_secrets(root)

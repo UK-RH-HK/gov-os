@@ -57,6 +57,37 @@ def test_a_name_that_is_no_tier_refuses(tmp_path, tiers):
     assert refused.value.code == "CI_TIER_UNKNOWN"
 
 
+def test_the_job_gate_runs_the_tier_less_checks_and_no_check_above_g2(tmp_path):
+    _declare(tmp_path, "G0", "touch ran-g0")
+    _declare(tmp_path, "G1", "true")
+    _declare(tmp_path, "G2", "true")
+    _declare(tmp_path, "G3", "touch ran-g3; false")
+    statuses = command._checks(tmp_path, list(command.JOB_TIERS), job=True)["checks"]
+    assert {"check-g0", "check-g1", "check-g2", "openspec-validate", "skill-version", "readiness"} <= set(statuses)
+    assert "check-g3" not in statuses and statuses["readiness"] == "GREEN"
+    assert (tmp_path / "ran-g0").exists() and not (tmp_path / "ran-g3").exists()
+
+
+def test_the_job_gate_refuses_a_red_readiness_check_and_the_hook_gate_does_not_run_it(tmp_path):
+    _declare(tmp_path, "G1", "true")
+    _declare(tmp_path, "G2", "true")
+    proposal = tmp_path / "openspec" / "changes" / "unjudged" / "proposal.md"
+    proposal.parent.mkdir(parents=True)
+    proposal.write_text("# A change with no specification record\n", encoding="utf-8")
+    assert set(command._checks(tmp_path, ["G1", "G2"])["checks"]) == {"check-g1", "check-g2"}
+    with pytest.raises(GovError) as refused:
+        command._checks(tmp_path, list(command.JOB_TIERS), job=True)
+    assert (refused.value.code, refused.value.exit_code) == ("CHECK_FAILED", 3)
+    assert refused.value.details["checks"]["readiness"] == "RED"
+
+
+def test_the_job_gate_refuses_where_no_g2_check_is_declared(tmp_path):
+    _declare(tmp_path, "G1", "true")
+    with pytest.raises(GovError) as refused:
+        command._checks(tmp_path, list(command.JOB_TIERS), job=True)
+    assert refused.value.code == command.NOT_MEASURED and refused.value.details == {"tiers": ["G2"]}
+
+
 def _git(cwd, *args):
     return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True, check=True).stdout.strip()
 

@@ -1,8 +1,11 @@
 # CI on every push (W1-40, CAP-39.a; DEC-075, DEC-087, DEC-489): the deterministic checks, and the evidence
 # record of the commit that is built.
 #
-# The job runs the declared checks of tiers G1 and G2, gitleaks and the project's tests. It never runs a G3
-# check: G3 runs in the pre-push hook on the developer's machine (lefthook.yml), which leaves the evidence record.
+# The job runs every check `gov check` runs but the declared checks of a tier above G2 (`gov ci job`), gitleaks
+# and the project's tests. The checks of `gov check` that carry no tier (openspec, skill version, readiness, the
+# policy keys) run at neither hook: the job is the one place for them, and it takes each status as `gov check`
+# gives it. It never runs a G3 check: G3 runs in the pre-push hook on the developer's machine (lefthook.yml),
+# which leaves the evidence record.
 #
 # The evidence record is a git note on the head commit, under a ref of its own: refs/notes/gov-evidence.
 # The pre-push hook writes and pushes it. A fresh checkout brings no notes, so the job fetches that ref itself
@@ -32,8 +35,8 @@ jobs:
       # tool at the version and checksum governance/project/tool-registry.yaml records (DEC-083, DEC-287).
       # Until they are here the steps below fail on the hosted runner: the tools are absent.
 
-      - name: Declared checks of tiers G1 and G2
-        run: gov ci checks G1 G2
+      - name: Checks of gov check, but the declared ones of a tier above G2
+        run: gov ci job
 
       - name: gitleaks over the commits of the checkout
         run: gitleaks git --config .gitleaks.toml --no-banner --redact --verbose --log-level error
