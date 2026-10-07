@@ -119,6 +119,16 @@ def _doctor_sections(envelope):
     return envelope.get("error", {}).get("details", {})
 
 
+def _find_tool_entry(sections, tool_name):
+    """Find a tool entry by name in the parsed doctor sections."""
+    tools_section = sections.get("tools", {})
+    entries = tools_section.get("tools", [])
+    for entry in entries:
+        if isinstance(entry, dict) and entry.get("name") == tool_name:
+            return entry
+    return None
+
+
 # =========================================================================== #
 # Part 1: Tools at registered locations (DEC-448, DEC-202)
 # =========================================================================== #
@@ -135,6 +145,9 @@ def test_tool_at_registered_location_passes(gov, project, tmp_path):
 
     KPI: "doctor reports pinned vs found tool versions" [CAP-25.a].
     DEC-448: "Each tool is checked at its registered location".
+
+    Revised after implementation: the assertion matched a key name and
+    could not fail.
     """
     tool_dir = tmp_path / "registered-location" / "bin"
     tool_dir.mkdir(parents=True)
@@ -148,28 +161,31 @@ def test_tool_at_registered_location_passes(gov, project, tmp_path):
 
     run = gov("doctor", "--json")
     envelope = run.envelope()
-    text = json.dumps(envelope).lower()
-
-    assert "fake-registered-tool" in text, (
-        f"doctor does not mention fake-registered-tool at all\n{run.describe()}"
-    )
-
     sections = _doctor_sections(envelope)
-    tools = sections.get("tools", {})
-    tools_text = json.dumps(tools).lower()
-    found_and_pass = (
-        "1.2.3" in tools_text
-        and ("pass" in tools_text or "ok" in tools_text or "found" in tools_text)
-    )
-    assert found_and_pass, (
-        f"doctor did not find fake-registered-tool at its registered "
-        f"location {tool_dir} or did not pass for it\n"
-        f"tools section: {tools}\n{run.describe()}"
+    entry = _find_tool_entry(sections, "fake-registered-tool")
+
+    assert entry is not None, (
+        f"doctor does not have an entry for fake-registered-tool\n"
+        f"tools section: {sections.get('tools', {})}\n{run.describe()}"
     )
 
-    assert str(tool_dir) in json.dumps(envelope) or "registered" in text, (
-        f"doctor does not say where the tool was found\n"
-        f"tools section: {tools}\n{run.describe()}"
+    assert entry.get("ok") is True, (
+        f"doctor does not pass for fake-registered-tool at its registered "
+        f"location {tool_dir}\n"
+        f"entry: {entry}\n{run.describe()}"
+    )
+
+    found_ver = str(entry.get("found_version", "")).lstrip("v")
+    assert found_ver == "1.2.3", (
+        f"found version should be '1.2.3' for fake-registered-tool but "
+        f"got '{entry.get('found_version')}'\n"
+        f"entry: {entry}\n{run.describe()}"
+    )
+
+    assert entry.get("location") == str(tool_dir), (
+        f"location should be '{tool_dir}' for fake-registered-tool but "
+        f"got '{entry.get('location')}'\n"
+        f"entry: {entry}\n{run.describe()}"
     )
 
 
@@ -211,6 +227,10 @@ def test_tool_at_empty_registered_location_fails(gov, project, tmp_path):
 
     KPI: "doctor reports pinned vs found tool versions" [CAP-25.a].
     DEC-448.
+
+    Revised after implementation: the diagnostic assertion matched the
+    tool's name in the serialised output (always present as a registry
+    key) and could not fail.
     """
     empty_dir = tmp_path / "empty-location" / "bin"
     empty_dir.mkdir(parents=True)
@@ -222,16 +242,24 @@ def test_tool_at_empty_registered_location_fails(gov, project, tmp_path):
 
     run = gov("doctor", "--json")
     envelope = run.envelope()
-    text = json.dumps(envelope)
 
     assert envelope.get("ok") is not True, (
         f"doctor passes for a tool that is neither at its registered "
         f"location nor on PATH\n{run.describe()}"
     )
 
-    assert str(empty_dir) in text or "absent-tool" in text, (
-        f"doctor does not name the place it looked at for the absent "
-        f"tool\n{run.describe()}"
+    sections = _doctor_sections(envelope)
+    entry = _find_tool_entry(sections, "absent-tool")
+
+    assert entry is not None, (
+        f"doctor has no entry for absent-tool\n"
+        f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+    )
+
+    assert entry.get("location") == str(empty_dir), (
+        f"doctor does not name the place it looked at for absent-tool: "
+        f"expected location '{empty_dir}', got '{entry.get('location')}'\n"
+        f"entry: {entry}\n{run.describe()}"
     )
 
 
@@ -244,16 +272,27 @@ def test_tool_without_registered_location_found_on_path(gov, project):
 
     KPI: "doctor reports pinned vs found tool versions" [CAP-25.a].
     DEC-448: the default PATH lookup still works.
+
+    Revised after implementation: the assertion matched the tool's name
+    in the serialised output, which is always present because the name is
+    in the registry entry; it did not verify the tool was actually found.
     """
     registry = _registry_without_location("python3", "3.12.3", "0" * 64)
     support.write_tool_registry(project, registry)
 
     run = gov("doctor", "--json")
     envelope = run.envelope()
-    text = json.dumps(envelope).lower()
+    sections = _doctor_sections(envelope)
+    entry = _find_tool_entry(sections, "python3")
 
-    assert "python3" in text or "python" in text, (
-        f"doctor does not mention python3 from PATH\n{run.describe()}"
+    assert entry is not None, (
+        f"doctor has no entry for python3\n"
+        f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+    )
+
+    assert entry.get("found_version") is not None, (
+        f"python3 should be found on PATH but found_version is None\n"
+        f"entry: {entry}\n{run.describe()}"
     )
 
 
