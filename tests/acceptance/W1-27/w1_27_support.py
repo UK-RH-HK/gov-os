@@ -22,9 +22,11 @@ reported). Put this paragraph word for word in every worker's brief.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import shutil
 import stat
+import subprocess
 import sys
 from pathlib import Path
 
@@ -273,6 +275,47 @@ def tool_entry_with_location_yaml(name, version, sha256, location_prefix, **extr
     for key, value in extra.items():
         lines.append(f'    {key}: "{value}"')
     return "\n".join(lines)
+
+
+def run_python_snippet(code_root, sandbox, script, cwd=None):
+    """Run a Python snippet as a subprocess with the code root's ``src/`` on PYTHONPATH.
+
+    Returns a ``subprocess.CompletedProcess`` whose ``stdout`` and ``stderr``
+    the caller can parse.  The environment is the same as ``run_gov_with_code``
+    builds for the ``gov`` command.
+    """
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(Path(code_root) / "src"),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+    }
+    return subprocess.run(
+        [sys.executable, "-c", script],
+        capture_output=True, text=True, env=env,
+        cwd=str(cwd) if cwd else None,
+        timeout=base.COMMAND_TIMEOUT_S,
+        stdin=subprocess.DEVNULL,
+    )
+
+
+def make_rebuild_project_no_path_map(cli, destination):
+    """A tiny project for rebuild tests without a path map.
+
+    Same as ``make_rebuild_project`` but does not write
+    ``governance/project/path-map.yaml``.
+    """
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    gitleaks = Path(cli) / ".gitleaks.toml"
+    if gitleaks.is_file():
+        shutil.copy2(gitleaks, destination / ".gitleaks.toml")
+    git(destination, "init", "-q", "-b", "main")
+    git(destination, "add", "-A")
+    git(destination, "commit", "-q", "--allow-empty", "-m", "init")
+    return destination
 
 
 def doctor_result(run):

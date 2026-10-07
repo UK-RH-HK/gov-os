@@ -152,7 +152,7 @@ def test_doctor_canary_error_is_fail(gov, project, interface):
 # Case 3: isolation with .gov-runtime but no git → section is "fail"
 # --------------------------------------------------------------------------- #
 
-def test_doctor_isolation_broken_git_is_fail():
+def test_doctor_isolation_broken_git_is_fail(cli, sandbox):
     """When ``.gov-runtime`` exists but git root cannot be determined,
     doctor's isolation section must be "fail", not "unmeasured".
 
@@ -160,12 +160,13 @@ def test_doctor_isolation_broken_git_is_fail():
     Currently fails: returns ``"unmeasured"`` with ``"cannot determine
     git root"``.
 
-    Tested via the ``_check_isolation`` function directly because the
-    scenario requires a directory with ``.gov-runtime`` but no ``.git``
-    — a state that cannot be produced by a ``gov`` command.
-    """
-    from gov.doctor.command import _check_isolation
+    Tested via the ``_check_isolation`` function in a subprocess because
+    the scenario requires a directory with ``.gov-runtime`` but no
+    ``.git`` — a state that cannot be produced by a ``gov`` command.
 
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
+    """
     with tempfile.TemporaryDirectory() as tmpdir:
         broken = Path(tmpdir) / "broken-project"
         broken.mkdir()
@@ -173,7 +174,16 @@ def test_doctor_isolation_broken_git_is_fail():
         runtime.mkdir()
         (runtime / "store.db").write_text("placeholder", encoding="utf-8")
 
-        result = _check_isolation(broken)
+        snippet = (
+            "import json, sys\n"
+            "from pathlib import Path\n"
+            "from gov.doctor.command import _check_isolation\n"
+            f"result = _check_isolation(Path({str(broken)!r}))\n"
+            "json.dump(result, sys.stdout)\n"
+        )
+        done = support.run_python_snippet(cli, sandbox, snippet)
+        assert done.returncode == 0, f"_check_isolation snippet failed:\n{done.stderr}"
+        result = json.loads(done.stdout)
 
     assert result.get("status") == "fail", (
         f"isolation should be 'fail' when .gov-runtime exists but git "

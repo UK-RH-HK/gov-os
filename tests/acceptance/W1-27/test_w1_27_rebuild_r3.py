@@ -45,11 +45,37 @@ import pytest
 import w1_27_support as support
 
 
+def _freshness_via_subprocess(cli, sandbox, project):
+    """Call ``freshness(root)`` in a subprocess, returning the dict."""
+    snippet = (
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "from gov.retrieval.lexical import freshness\n"
+        f"json.dump(freshness(Path({str(project)!r})), sys.stdout)\n"
+    )
+    done = support.run_python_snippet(cli, sandbox, snippet)
+    assert done.returncode == 0, f"freshness snippet failed:\n{done.stderr}"
+    return json.loads(done.stdout)
+
+
+def _search_via_subprocess(cli, sandbox, project, query):
+    """Call ``search(root, query, refresh=False)`` in a subprocess, returning the dict."""
+    snippet = (
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "from gov.retrieval.lexical import search\n"
+        f"json.dump(search(Path({str(project)!r}), {query!r}, refresh=False), sys.stdout)\n"
+    )
+    done = support.run_python_snippet(cli, sandbox, snippet)
+    assert done.returncode == 0, f"search snippet failed:\n{done.stderr}"
+    return json.loads(done.stdout)
+
+
 # --------------------------------------------------------------------------- #
 # Case 1: After rebuild, the lexical index is fresh
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_lexical_index_is_fresh(rebuild_gov, rebuild_project, interface):
+def test_rebuild_lexical_index_is_fresh(cli, rebuild_gov, rebuild_project, sandbox, interface):
     """After rebuild on a project with tracked files, ``freshness(root)``
     returns status ``"fresh"`` — not ``"empty"`` or ``"missing"``.
 
@@ -60,6 +86,9 @@ def test_rebuild_lexical_index_is_fresh(rebuild_gov, rebuild_project, interface)
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
     """
     py_file = rebuild_project / "hello.py"
     py_file.write_text("def greet():\n    return 'hello world'\n", encoding="utf-8")
@@ -69,8 +98,7 @@ def test_rebuild_lexical_index_is_fresh(rebuild_gov, rebuild_project, interface)
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    from gov.retrieval.lexical import freshness
-    state = freshness(rebuild_project)
+    state = _freshness_via_subprocess(cli, sandbox, rebuild_project)
     assert state["status"] == "fresh", (
         f"after rebuild the lexical index should be 'fresh' but is "
         f"'{state['status']}' — rebuild did not populate the index\n"
@@ -82,7 +110,7 @@ def test_rebuild_lexical_index_is_fresh(rebuild_gov, rebuild_project, interface)
 # Case 2: After rebuild, a lexical search finds tracked file text
 # --------------------------------------------------------------------------- #
 
-def test_rebuild_lexical_search_finds_tracked_text(rebuild_gov, rebuild_project, interface):
+def test_rebuild_lexical_search_finds_tracked_text(cli, rebuild_gov, rebuild_project, sandbox, interface):
     """After rebuild on a project with tracked files, a lexical search
     finds text from the tracked file.
 
@@ -92,6 +120,9 @@ def test_rebuild_lexical_search_finds_tracked_text(rebuild_gov, rebuild_project,
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
     """
     marker = "UNIQUE_MARKER_FOR_REBUILD_TEST_xk7q"
     py_file = rebuild_project / "marker_file.py"
@@ -102,8 +133,7 @@ def test_rebuild_lexical_search_finds_tracked_text(rebuild_gov, rebuild_project,
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    from gov.retrieval.lexical import search
-    result = search(rebuild_project, marker, refresh=False)
+    result = _search_via_subprocess(cli, sandbox, rebuild_project, marker)
     assert result.get("available"), (
         f"lexical search is not available after rebuild: "
         f"state={result.get('state')}, reason={result.get('reason')}\n{run.describe()}"

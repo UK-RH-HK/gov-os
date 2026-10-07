@@ -76,7 +76,7 @@ def _project_with_secret(project):
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, interface):
+def test_rebuild_secret_file_not_in_lexical_index(cli, rebuild_gov, rebuild_project, sandbox, interface):
     """After rebuild on a project with a tracked file holding a secret,
     ``search(root, secret_text, refresh=False)`` returns no hits and the
     file is not marked as indexed in ``lexical_file`` — exactly as after
@@ -93,6 +93,9 @@ def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, 
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
     """
     _project_with_secret(rebuild_project)
 
@@ -100,8 +103,16 @@ def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, 
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    from gov.retrieval.lexical import search
-    result = search(rebuild_project, SECRET_TEXT, refresh=False)
+    snippet = (
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "from gov.retrieval.lexical import search\n"
+        f"result = search(Path({str(rebuild_project)!r}), {SECRET_TEXT!r}, refresh=False)\n"
+        "json.dump(result, sys.stdout)\n"
+    )
+    done = support.run_python_snippet(cli, sandbox, snippet)
+    assert done.returncode == 0, f"search snippet failed:\n{done.stderr}"
+    result = json.loads(done.stdout)
     hits = result.get("hits", [])
     assert not hits, (
         f"after rebuild, a search for the secret text returned {len(hits)} "
@@ -109,8 +120,7 @@ def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, 
         f"hit paths: {[h.get('path') for h in hits]}\n{run.describe()}"
     )
 
-    from gov.store import STORE_REL
-    store = rebuild_project / STORE_REL
+    store = rebuild_project / ".gov-runtime" / "store.db"
     if store.is_file():
         conn = sqlite3.connect(store.resolve().as_uri() + "?mode=ro", uri=True)
         try:
@@ -133,7 +143,7 @@ def test_rebuild_secret_file_not_in_lexical_index(rebuild_gov, rebuild_project, 
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_lexical_digest_matches_owner_refresh(rebuild_gov, rebuild_project, interface, cli, tmp_path):
+def test_rebuild_lexical_digest_matches_owner_refresh(cli, rebuild_gov, rebuild_project, sandbox, interface, tmp_path):
     """The lexical index after ``gov rebuild`` on a fresh project is the same
     as after the owner's ``refresh`` alone on an identical fresh project,
     compared through ``digest(root)``.
@@ -148,6 +158,9 @@ def test_rebuild_lexical_digest_matches_owner_refresh(rebuild_gov, rebuild_proje
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
     """
     _project_with_secret(rebuild_project)
 
@@ -155,20 +168,27 @@ def test_rebuild_lexical_digest_matches_owner_refresh(rebuild_gov, rebuild_proje
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    from gov.retrieval.lexical import digest, refresh
-
-    digest_rebuild = digest(rebuild_project)
-
     project_b = support.make_rebuild_project(cli, tmp_path / "repo_b")
     _project_with_secret(project_b)
-    refresh(project_b)
-    digest_refresh = digest(project_b)
 
-    assert digest_rebuild == digest_refresh, (
+    snippet = (
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "from gov.retrieval.lexical import digest, refresh\n"
+        f"rebuild_root = Path({str(rebuild_project)!r})\n"
+        f"refresh_root = Path({str(project_b)!r})\n"
+        "refresh(refresh_root)\n"
+        "json.dump({'rebuild': digest(rebuild_root), 'refresh': digest(refresh_root)}, sys.stdout)\n"
+    )
+    done = support.run_python_snippet(cli, sandbox, snippet)
+    assert done.returncode == 0, f"digest snippet failed:\n{done.stderr}"
+    digests = json.loads(done.stdout)
+
+    assert digests["rebuild"] == digests["refresh"], (
         f"the lexical index after rebuild differs from the index after the "
         f"owner's refresh alone:\n"
-        f"  rebuild digest:  {digest_rebuild}\n"
-        f"  refresh digest:  {digest_refresh}\n"
+        f"  rebuild digest:  {digests['rebuild']}\n"
+        f"  refresh digest:  {digests['refresh']}\n"
         f"rebuild did not recreate the index through the owner's code path"
     )
 
@@ -178,7 +198,7 @@ def test_rebuild_lexical_digest_matches_owner_refresh(rebuild_gov, rebuild_proje
 # --------------------------------------------------------------------------- #
 
 @needs_gitleaks
-def test_rebuild_stores_hold_no_secret(rebuild_gov, rebuild_project, interface):
+def test_rebuild_stores_hold_no_secret(cli, rebuild_gov, rebuild_project, sandbox, interface):
     """``stores_with_secrets(root)`` returns nothing for a project after
     ``gov rebuild`` — the same as after a plain refresh.  This is the
     backstop the secrets-indexing family check of W1-15 uses.
@@ -193,6 +213,9 @@ def test_rebuild_stores_hold_no_secret(rebuild_gov, rebuild_project, interface):
     Revised after implementation: rebuild goes through the lexical index's
     owner and its secrets filter (DEC-440); the fixture's size, not the
     behaviour, made it time out.
+
+    Revised after implementation: the case imported the package into the
+    test process and passed only where PYTHONPATH was set.
     """
     _project_with_secret(rebuild_project)
 
@@ -200,8 +223,16 @@ def test_rebuild_stores_hold_no_secret(rebuild_gov, rebuild_project, interface):
     support.assert_envelope(run, interface, command="rebuild")
     assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
 
-    from gov.secrets import stores_with_secrets
-    tainted = stores_with_secrets(rebuild_project)
+    snippet = (
+        "import json, sys\n"
+        "from pathlib import Path\n"
+        "from gov.secrets import stores_with_secrets\n"
+        f"tainted = stores_with_secrets(Path({str(rebuild_project)!r}))\n"
+        "json.dump(tainted, sys.stdout)\n"
+    )
+    done = support.run_python_snippet(cli, sandbox, snippet)
+    assert done.returncode == 0, f"stores_with_secrets snippet failed:\n{done.stderr}"
+    tainted = json.loads(done.stdout)
     assert not tainted, (
         f"after rebuild, {len(tainted)} store(s) hold a secret: {tainted}\n"
         f"the secret bypassed the filter during rebuild\n{run.describe()}"
