@@ -422,9 +422,95 @@ The cases identify the four kinds by the paths the decision names.
 | DEC-202 (PATH prefix for Node 22 tools) | `test_tool_at_registered_location_passes` |
 | DEC-440 (rebuild through lexical owner) | All 18 revised rebuild/recovery cases |
 
+## Round 6 — tools found under registered prefixes and never pass unverified (DEC-440, DEC-448, DEC-452)
+
+> KPI failure 1: "doctor passes with a tool at the wrong version" [CAP-25.a]
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_tool_found_under_another_entrys_prefix` | test_w1_27_doctor_r6.py | doctor only looks under the tool's own prefix; for an entry with no prefix it falls back to PATH, finding the system python3 at the wrong version |
+| `test_tool_absent_from_all_prefixes_found_on_path` | test_w1_27_doctor_r6.py | (green: PATH fallback works) |
+| `test_own_prefix_wins_over_other_entrys_prefix` | test_w1_27_doctor_r6.py | (green: own prefix already wins) |
+| `test_tool_no_version_no_hash_not_ok` | test_w1_27_doctor_r6.py | code sets ok=true when version command fails and hash does not match |
+| `test_tool_no_version_hash_match_ok` | test_w1_27_doctor_r6.py | (green: hash match passes) |
+| `test_tool_version_raises_no_hash_not_ok` | test_w1_27_doctor_r6.py | code catches version-command failure and sets ok=true regardless of hash |
+| `test_tool_version_mismatch_fails_despite_hash_match` | test_w1_27_doctor_r6.py | (green: version mismatch already fails for binary tools) |
+
+## Round 7 — an entry without a binary passes by a version compared or a hash computed, never by a folder that exists (DEC-452)
+
+> KPI failure 1: "doctor passes with a tool at the wrong version" [CAP-25.a]
+> DEC-452: a tool passes only when the version read equals the pin, or the
+> file's hash equals the pinned hash; a tool for which neither can be
+> established fails, with the reason.
+> DEC-425: a field that says "matched" when nothing was compared is a false record.
+
+Round 6's cases test binary tools on PATH.  No case before round 7 tests the
+six entries that have no binary (`NO_BINARY_TOOLS`: superpowers, pyyaml,
+sqlite-vec, qwen3-embedding, reranker-venv, reranker).  The current code
+passes every one as soon as a folder exists (or a module imports), with
+`sha256_match: true` and no hash computed, and with no version comparison
+for pyyaml.
+
+### Cases — vendored folder (superpowers)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_vendored_folder_wrong_content_sha256_match_false` | test_w1_27_doctor_r7.py | code says `sha256_match: true, ok: true` when the vendor folder exists, without computing the DEC-199 digest |
+| `test_vendored_folder_wrong_content_has_reason` | test_w1_27_doctor_r7.py | code gives no `reason` field; the folder's existence is enough for `ok: true` |
+| `test_vendored_folder_right_content_passes` | test_w1_27_doctor_r7.py | (green: code says `sha256_match: true, ok: true` regardless, correct by accident) |
+| `test_vendored_folder_absent_not_ok` | test_w1_27_doctor_r7.py | (green: the existing fallback correctly returns `ok: false`) |
+
+### Cases — version compared (pyyaml)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_python_package_wrong_version_not_ok` | test_w1_27_doctor_r7.py | code reads `yaml.__version__` (6.0.1) but returns `ok: true` without comparing it to the pin 99.99.99 |
+| `test_python_package_right_version_ok` | test_w1_27_doctor_r7.py | (green: code says `ok: true` regardless, correct here) |
+
+### Cases — distribution-package hash (DEC-425)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_distribution_package_sha256_match_not_true` | test_w1_27_doctor_r7.py | code says `sha256_match: true` without computing any hash; the registered hash is of a .deb package not on the machine |
+
+The expected value of `sha256_match` for a distribution-package hash is `false`
+or a value that says "not comparable" (e.g. `"not_comparable"` or `"skipped"`);
+the assertion accepts any value that is not `True`.
+
+### Cases — file under the home (DEC-452, DEC-425)
+
+| Test | File | Red reason |
+|------|------|------------|
+| `test_home_tool_wrong_sha256_not_ok[sqlite-vec]` | test_w1_27_doctor_r7.py | code says `sha256_match: true` when `~/.local/lib/.../sqlite_vec` exists, without hashing `vec0.so` |
+| `test_home_tool_wrong_sha256_not_ok[qwen3-embedding]` | test_w1_27_doctor_r7.py | code says `sha256_match: true` when `~/.ollama/models` exists, without hashing the model blob |
+| `test_home_tool_wrong_sha256_not_ok[reranker-venv]` | test_w1_27_doctor_r7.py | code says `sha256_match: true` when the venv dir exists, without hashing the freeze output |
+| `test_home_tool_wrong_sha256_not_ok[reranker]` | test_w1_27_doctor_r7.py | code says `sha256_match: true` when the HF hub model dir exists, without hashing `model.safetensors` |
+
+### Residual — generic kernel knows six tool names
+
+The four home-based tools (sqlite-vec, qwen3-embedding, reranker-venv, reranker)
+can only be tested under the six real names because the code dispatches on
+`name in NO_BINARY_TOOLS`.  Their checks use `_real_home()` (`pwd.getpwuid`),
+which ignores the sandbox's HOME.  On this machine, where the real tools are
+installed, the code finds the real installation and falsely says
+`sha256_match: true`; on a clean machine without these tools, the code falls to
+absent and the tests pass (masking the bug).  After the fix (the code should use
+HOME or accept a configurable home), the tests will reliably use fake content
+under the sandbox home.  No case reads the real home's models; no case hashes a
+large real file.
+
+### Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-25.a (tool registry) | All tests in test_w1_27_doctor_r7.py |
+| DEC-452 (verified pass for no-binary tools) | All tests in test_w1_27_doctor_r7.py |
+| DEC-425 (false record) | `test_vendored_folder_wrong_content_sha256_match_false`, `test_distribution_package_sha256_match_not_true`, `test_home_tool_wrong_sha256_not_ok[*]` |
+| DEC-199 (vendored folder digest) | `test_vendored_folder_wrong_content_sha256_match_false`, `test_vendored_folder_right_content_passes` |
+
 ## Test count
 
-- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) = 74
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) = 92
 - **W1-27 revised cases (round 5)**: 18 (rebuild/recovery using tiny projects)
 - **W1-07 revised cases**: 6
-- **Total**: 80
+- **Total**: 98
