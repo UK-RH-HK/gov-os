@@ -1,7 +1,7 @@
 """Unit tests for gov.adapters.portability.
 
 Each test builds a small project under ``tmp_path``. The rulesync binary is a stand-in script that
-prints a fixed answer; no real rulesync runs here.
+writes a fixed set of files into the folder it is run in; no real rulesync runs here.
 """
 
 from __future__ import annotations
@@ -16,9 +16,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "sr
 
 from gov.adapters import portability
 
-ROLE = "- **Purpose:** build one ticket.\n"
+ROLE = "- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n"
+ROLE_SOURCE = "---\nname: engineer\nclaudecode:\n  tools: [{tools}]\n---\n\n" + ROLE
 SKILL = "---\nname: planning\nversion: \"1.0.0\"\n---\n\n# Planning\n\nA method.\n"
-CLEAN = {"success": True, "data": {"hasDiff": False, "features": {"rules": {"count": 0, "paths": []}}}}
+GENERATED = {"CLAUDE.md": "# Rules\n", ".claude/settings.json": '{\n  "permissions": {"deny": ["Bash(sudo *)"]}\n}\n',
+             ".claude/agents/engineer.md": "an engineer\n", ".claude/skills/planning/SKILL.md": "a method\n",
+             ".claude/commands/opsx/apply.md": "apply\n"}
 
 
 def _write(path, text):
@@ -31,19 +34,28 @@ def _registry(root, version="24.0.0", name="rulesync"):
     return _write(root / portability.REGISTRY, f'tools:\n  - name: {name}\n    version: "{version}"\n')
 
 
-def _binary(tmp_path, *, version="24.0.0", answer=CLEAN, stream=1, code=0):
-    """A stand-in rulesync: ``--version`` prints ``version``; any other call prints ``answer``
-    (a mapping as JSON, a string as it is) on ``stream`` and ends with ``code``."""
-    text = json.dumps(answer) if isinstance(answer, dict) else answer
-    _write(tmp_path / "answer.txt", text)
+def _binary(tmp_path, *, version="24.0.0", files=GENERATED, said="", stream=2, code=0):
+    """A stand-in rulesync: ``--version`` prints ``version``; any other call writes ``files`` into the
+    folder it runs in, prints ``said`` on ``stream`` and ends with ``code``."""
+    (tmp_path / "made").mkdir()
+    for rel, text in files.items():
+        _write(tmp_path / "made" / rel, text)
+    _write(tmp_path / "said.txt", said)
     script = tmp_path / "bin" / "rulesync"
     _write(script, (
         "#!/bin/bash\n"
         f'if [[ "$1" == "--version" ]]; then echo "{version}"; exit 0; fi\n'
-        f'cat "{tmp_path / "answer.txt"}" >&{stream}\nexit {code}\n'
+        f'echo "$@" > "{tmp_path / "called.txt"}"\ncp -r "{tmp_path / "made"}/." .\n'
+        f'cat "{tmp_path / "said.txt"}" >&{stream}\nexit {code}\n'
     ))
     script.chmod(0o755)
     return str(script)
+
+
+def _generate(root, files=GENERATED):
+    for rel, text in files.items():
+        _write(root / rel, text)
+    return root
 
 
 @pytest.fixture()
@@ -53,14 +65,14 @@ def project(tmp_path):
     _registry(root)
     _write(root / ".rulesync/rules/governance.md", "---\nroot: true\n---\n\n# Rules\n")
     _write(root / "governance/kernel/roles/engineer.md", ROLE)
-    _write(root / ".rulesync/subagents/engineer.md", "---\nname: engineer\n---\n\n" + ROLE)
+    _write(root / ".rulesync/subagents/engineer.md", ROLE_SOURCE.format(tools="Bash, Read, Grep"))
     _write(root / "governance/kernel/skills/planning/SKILL.md", SKILL)
     _write(root / ".rulesync/skills/planning/SKILL.md", SKILL)
     _write(root / "governance/kernel/skills/superpowers/debugging/SKILL.md", SKILL)
     _write(root / "governance/kernel/skills/superpowers/debugging/notes.md", "notes\n")
     _write(root / ".rulesync/skills/debugging/SKILL.md", SKILL)
     _write(root / ".rulesync/skills/debugging/notes.md", "notes\n")
-    return root
+    return _generate(root)
 
 
 def _files(findings):
@@ -158,12 +170,67 @@ class TestKernelFindings:
         assert "governance/kernel/roles/engineer.md" in findings[0]["message"]
 
     def test_role_source_changed(self, project):
-        _write(project / ".rulesync/subagents/engineer.md", "---\nname: engineer\n---\n" + ROLE + "More.\n")
-        assert _files(portability._kernel_findings(project)[0]) == [".rulesync/subagents/engineer.md"]
+        _write(project / ".rulesync/subagents/engineer.md", ROLE_SOURCE.format(tools="Bash, Read, Grep") + "More.\n")
+        findings, _count = portability._kernel_findings(project)
+        assert [(f["code"], f["file"]) for f in findings] == [("SOURCE_DIFFERS", ".rulesync/subagents/engineer.md")]
 
     def test_role_source_frontmatter_is_not_part_of_the_pair(self, project):
-        _write(project / ".rulesync/subagents/engineer.md", "---\nname: engineer\ntargets: [x]\n---\n" + ROLE)
+        source = ROLE_SOURCE.format(tools="Read, Grep, Bash").replace("name: engineer", "name: other\ntargets: [x]")
+        _write(project / ".rulesync/subagents/engineer.md", source)
         assert portability._kernel_findings(project)[0] == []
+
+    @pytest.mark.parametrize("tools, said", [
+        ("Read, Grep, Bash, NotebookEdit", "only in the source ['NotebookEdit'], only in the kernel role []"),
+        ("Read, Grep", "only in the source [], only in the kernel role ['Bash']"),
+        ("Read, Grep, bash", "only in the source ['bash'], only in the kernel role ['Bash']"),
+    ])
+    def test_role_source_with_other_tools_names_the_source_and_the_difference(self, project, tools, said):
+        _write(project / ".rulesync/subagents/engineer.md", ROLE_SOURCE.format(tools=tools))
+        findings, _count = portability._kernel_findings(project)
+        assert [(f["code"], f["file"]) for f in findings] == [
+            ("SOURCE_TOOLS_DIFFER", ".rulesync/subagents/engineer.md")]
+        assert said in findings[0]["message"] and "governance/kernel/roles/engineer.md" in findings[0]["message"]
+
+    @pytest.mark.parametrize("source", [
+        "---\nname: engineer\n---\n\n" + ROLE, "---\nname: engineer\nclaudecode:\n  tools: Read\n---\n\n" + ROLE, ROLE,
+    ])
+    def test_role_source_without_a_tools_list_is_a_finding(self, project, source):
+        _write(project / ".rulesync/subagents/engineer.md", source)
+        findings, _count = portability._kernel_findings(project)
+        assert [f["code"] for f in findings] == ["SOURCE_TOOLS_DIFFER"] and "claudecode.tools" in findings[0]["message"]
+
+    def test_kernel_role_without_a_tools_field_is_a_finding(self, project):
+        for rel in ("governance/kernel/roles/engineer.md", ".rulesync/subagents/engineer.md"):
+            path = project / rel
+            _write(path, path.read_text(encoding="utf-8").replace("**Tools:**", "**Means:**"))
+        findings, _count = portability._kernel_findings(project)
+        assert [f["code"] for f in findings] == ["SOURCE_TOOLS_DIFFER"] and "no Tools field" in findings[0]["message"]
+
+
+class TestToolsDifference:
+    FRONT = {"claudecode": {"tools": ["Read", "Edit"]}}
+
+    @pytest.mark.parametrize("body", [
+        "- **Tools:** Read and Edit.\n",
+        "- **Tools:** Edit; Read for its report only. No installs.\n",
+        "* **Tools**: Read,\n  Edit.\n- **Network:** WebFetch runs outside the sandbox.\n",
+        "- **Tools:** Read,\n  Edit.\n\nA paragraph naming Bash.\n",
+        "- **Purpose:** uses Bash.\n- **Tools:** Read, Edit, `gov launch`, reading and NotebookEditor.\n# Write\n",
+    ])
+    def test_field_is_read_to_the_end_of_its_indented_lines_by_whole_words(self, body):
+        assert portability._tools_difference(body, self.FRONT) == ""
+
+    def test_tool_named_on_a_continuation_line_counts(self):
+        difference = portability._tools_difference("- **Tools:** Read, Edit and\n  WebSearch.\n", self.FRONT)
+        assert difference == "only in the source [], only in the kernel role ['WebSearch']"
+
+    def test_order_and_repetition_are_free(self):
+        front = {"claudecode": {"tools": ["Edit", "Read", "Edit"]}}
+        assert portability._tools_difference("- **Tools:** Read, Edit.\n", front) == ""
+
+    def test_empty_list_is_compared_not_skipped(self):
+        difference = portability._tools_difference("- **Tools:** Read.\n", {"claudecode": {"tools": []}})
+        assert difference == "only in the source [], only in the kernel role ['Read']"
 
     @pytest.mark.parametrize("changed", [
         "governance/kernel/skills/planning/SKILL.md", ".rulesync/skills/planning/SKILL.md",
@@ -217,70 +284,92 @@ class TestKernelFindings:
 
 
 class TestGeneratedFindings:
-    @pytest.fixture(autouse=True)
-    def root_rule(self, tmp_path):
-        _write(tmp_path / ".rulesync/rules/governance.md", "---\nroot: true\n---\n\n# Rules\n")
+    @pytest.fixture()
+    def root(self, tmp_path):
+        root = tmp_path / "project"
+        _write(root / ".rulesync/rules/governance.md", "---\nroot: true\n---\n\n# Rules\n")
+        return _generate(root)
 
-    def test_clean_answer(self, tmp_path):
-        assert portability._generated_findings(tmp_path, _binary(tmp_path)) == []
+    def _codes(self, findings):
+        return [(f["code"], f.get("file")) for f in findings]
+
+    def test_project_holding_what_rulesync_writes(self, root, tmp_path):
+        assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
+
+    def test_rulesync_is_given_the_project_s_sources_and_writes_nothing_in_the_project(self, root, tmp_path):
+        before = sorted(path for path in root.rglob("*"))
+        portability._generated_findings(root, _binary(tmp_path, files={**GENERATED, "new.md": "new\n"}))
+        called = (tmp_path / "called.txt").read_text(encoding="utf-8").split()
+        assert called[0] == "generate" and called[-2:] == ["--input-roots", str(root / ".rulesync")]
+        assert "--delete" not in called and sorted(path for path in root.rglob("*")) == before
 
     @pytest.mark.parametrize("rule", [None, "# Rules\n", "---\nroot: false\n---\n# Rules\n"])
-    def test_no_root_rule_is_a_finding_although_rulesync_answers_clean(self, tmp_path, rule):
-        (tmp_path / ".rulesync/rules/governance.md").unlink()
+    def test_no_root_rule_is_a_finding_and_nothing_is_counted(self, root, tmp_path, rule):
+        (root / ".rulesync/rules/governance.md").unlink()
         if rule is not None:
-            _write(tmp_path / ".rulesync/rules/other.md", rule)
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path))
-        assert [f["code"] for f in findings] == ["ROOT_RULE_ABSENT"]
+            _write(root / ".rulesync/rules/other.md", rule)
+        findings, count = portability._generated_findings(root, _binary(tmp_path))
+        assert self._codes(findings) == [("ROOT_RULE_ABSENT", None)] and count == 0
 
-    def test_long_answer_is_read_whole(self, tmp_path):
-        paths = [f".claude/skills/s{n}/SKILL.md" for n in range(3)]
-        answer = {"success": True, "data": {"hasDiff": True, "skills": ["x" * 2_000_000],
-                                            "features": {"skills": {"count": 3, "paths": paths}}}}
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path, answer=answer))
-        assert _files(findings) == paths
+    @pytest.mark.parametrize("rel", sorted(GENERATED))
+    def test_changed_file_is_one_finding_naming_it(self, root, tmp_path, rel):
+        _write(root / rel, GENERATED[rel] + " ")
+        findings, count = portability._generated_findings(root, _binary(tmp_path))
+        assert self._codes(findings) == [("GENERATED_DIFFERS", rel)] and count == len(GENERATED)
 
-    def test_long_text_that_is_no_json_is_reported_by_its_end(self, tmp_path):
-        binary = _binary(tmp_path, answer="x" * 5000 + " the end", stream=2, code=1)
-        message = portability._generated_findings(tmp_path, binary)[0]["message"]
-        assert message.endswith("the end") and len(message) < 600
+    def test_missing_file_is_a_finding(self, root, tmp_path):
+        (root / "CLAUDE.md").unlink()
+        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
+            ("GENERATED_DIFFERS", "CLAUDE.md")]
 
-    def test_one_finding_per_path_of_the_answer(self, tmp_path):
-        answer = {"success": True, "data": {"hasDiff": True, "features": {
-            "rules": {"count": 2, "paths": ["CLAUDE.md", "AGENTS.md"]},
-            "skills": {"count": 1, "paths": [".claude/skills/planning/SKILL.md"]},
-        }}}
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path, answer=answer))
-        assert _files(findings) == [".claude/skills/planning/SKILL.md", "AGENTS.md", "CLAUDE.md"]
-        assert {f["code"] for f in findings} == {"GENERATED_DIFFERS"}
+    @pytest.mark.parametrize("settings", [
+        '{\n  "permissions": {"deny": ["Bash(sudo *)"], "allow": ["WebFetch(domain:example.com)"]}\n}\n',
+        '{\n  "permissions": {"deny": ["Bash(sudo *)"], "defaultMode": "bypassPermissions"}\n}\n',
+        '{\n  "permissions": {"deny": ["Bash(sudo *)"]}, "env": {"BY_HAND": "1"}\n}\n',
+        '{\n  "permissions": {"deny": ["Bash(sudo *)"]}, "hooks": {"Notification": []}\n}\n',
+        '{\n  "permissions": {"deny": []}\n}\n',
+    ])
+    def test_settings_key_added_or_removed_by_hand(self, root, tmp_path, settings):
+        _write(root / ".claude/settings.json", settings)
+        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
+            ("GENERATED_DIFFERS", ".claude/settings.json")]
 
-    def test_difference_without_a_path(self, tmp_path):
-        answer = {"success": True, "data": {"hasDiff": True, "features": {}}}
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path, answer=answer))
-        assert [f["code"] for f in findings] == ["GENERATED_DIFFERS"] and "file" not in findings[0]
+    @pytest.mark.parametrize("rel", [
+        ".claude/agents/by-hand.md", ".claude/skills/by-hand/SKILL.md", ".claude/skills/planning/by-hand.md",
+        ".claude/commands/by-hand.md", ".claude/commands/opsx/deep/by-hand.md",
+    ])
+    def test_file_without_a_source_is_one_finding_naming_it(self, root, tmp_path, rel):
+        _write(root / rel, "by hand\n")
+        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
+            ("GENERATED_WITHOUT_SOURCE", rel)]
 
-    def test_rulesync_error_is_reported_with_its_message(self, tmp_path):
-        answer = {"success": False, "error": {"code": "GENERATION_FAILED", "message": "the reason"}}
-        binary = _binary(tmp_path, answer=answer, stream=2, code=1)
-        findings = portability._generated_findings(tmp_path, binary)
-        assert findings == [{"code": "RULESYNC_FAILED", "message": "rulesync generate --dry-run: the reason"}]
+    @pytest.mark.parametrize("rel", [
+        ".claude/settings.local.json", ".claude/worktrees/w/.claude/agents/by-hand.md", ".claude/other.json",
+        "docs/by-hand.md",
+    ])
+    def test_file_outside_the_generated_folders_is_not_judged(self, root, tmp_path, rel):
+        _write(root / rel, "{}\n")
+        assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
 
-    def test_text_that_is_no_json_is_reported_as_it_is(self, tmp_path):
-        binary = _binary(tmp_path, answer="plain reason mentioning CLAUDE.md", stream=2, code=1)
-        findings = portability._generated_findings(tmp_path, binary)
-        assert [f["code"] for f in findings] == ["RULESYNC_FAILED"] and "file" not in findings[0]
+    def test_failure_is_reported_with_rulesync_s_reason_and_no_file(self, root, tmp_path):
+        binary = _binary(tmp_path, said="plain reason mentioning CLAUDE.md", code=1)
+        findings, count = portability._generated_findings(root, binary)
+        assert self._codes(findings) == [("RULESYNC_FAILED", None)] and count == 0
         assert "plain reason mentioning CLAUDE.md" in findings[0]["message"]
 
-    @pytest.mark.parametrize("answer", [
-        {"success": True}, {"success": True, "data": {"features": {}}},
-        {"success": True, "data": {"hasDiff": False}}, {"data": CLEAN["data"]}, "",
-    ])
-    def test_answer_without_the_expected_fields_is_not_clean(self, tmp_path, answer):
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path, answer=answer))
-        assert [f["code"] for f in findings] == ["RULESYNC_FAILED"]
+    def test_long_reason_is_reported_by_its_end(self, root, tmp_path):
+        binary = _binary(tmp_path, said="x" * 5000 + " the end", code=1)
+        message = portability._generated_findings(root, binary)[0][0]["message"]
+        assert message.endswith("the end") and len(message) < 600
 
-    def test_clean_answer_with_a_failing_exit_is_not_clean(self, tmp_path):
-        findings = portability._generated_findings(tmp_path, _binary(tmp_path, code=1))
-        assert [f["code"] for f in findings] == ["RULESYNC_FAILED"]
+    def test_failing_exit_is_a_failure_although_the_files_were_written(self, root, tmp_path):
+        findings, count = portability._generated_findings(root, _binary(tmp_path, code=1))
+        assert self._codes(findings) == [("RULESYNC_FAILED", None)] and count == 0
+
+    def test_rulesync_that_writes_nothing_is_a_failure_not_a_match(self, root, tmp_path):
+        findings, count = portability._generated_findings(root, _binary(tmp_path, files={}))
+        assert self._codes(findings) == [("RULESYNC_FAILED", None)] and count == 0
+        assert "0 files written" in findings[0]["message"]
 
 
 class TestMain:
@@ -294,14 +383,14 @@ class TestMain:
         code, printed = self._run(project, _binary(tmp_path), monkeypatch, capsys)
         assert code == 0
         assert printed == {"findings": [], "compared": {
-            "rulesync_version": True, "kernel_files": 4, "generated_files": True}}
+            "rulesync_version": True, "kernel_files": 4, "generated_files": len(GENERATED)}}
 
     def test_other_version_stops_before_the_generated_files(self, project, tmp_path, monkeypatch, capsys):
         code, printed = self._run(project, _binary(tmp_path, version="99.0.0"), monkeypatch, capsys)
         assert code == 1
         assert [f["code"] for f in printed["findings"]] == ["RULESYNC_VERSION_DIFFERS"]
         assert "not compared" in printed["findings"][0]["message"]
-        assert printed["compared"] == {"rulesync_version": False, "kernel_files": 4, "generated_files": False}
+        assert printed["compared"] == {"rulesync_version": False, "kernel_files": 4, "generated_files": 0}
 
     def test_kernel_is_compared_also_without_rulesync(self, project, monkeypatch, capsys):
         _write(project / "governance/kernel/roles/engineer.md", ROLE + "More.\n")
@@ -310,6 +399,6 @@ class TestMain:
         assert [f["code"] for f in printed["findings"]] == ["RULESYNC_ABSENT", "SOURCE_DIFFERS"]
 
     def test_rulesync_failure_is_not_counted_as_compared(self, project, tmp_path, monkeypatch, capsys):
-        binary = _binary(tmp_path, answer="stopped", stream=2, code=1)
+        binary = _binary(tmp_path, said="stopped", code=1)
         code, printed = self._run(project, binary, monkeypatch, capsys)
-        assert code == 1 and printed["compared"]["generated_files"] is False
+        assert code == 1 and printed["compared"]["generated_files"] == 0

@@ -3,7 +3,7 @@ name: independent-auditor
 targets: ["claudecode"]
 description: "Independent auditor role: audits finished work as a fresh read-only session."
 claudecode:
-  tools: ["Read", "Grep", "Glob", "Bash"]
+  tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob", "WebSearch", "WebFetch"]
 ---
 
 # Independent auditor role (Wave 1)
