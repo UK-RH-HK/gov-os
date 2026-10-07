@@ -4845,3 +4845,95 @@ Decided by the orchestrator on 2026-10-06.
 | Version | Date | Change |
 |---|---|---|
 | 0.110 | 2026-10-06 | Delegated: DEC-440 (W1-27: rebuild recreates each derived store through its owner; a failed doctor measurement is a failure), DEC-441 (minimal form of an audit report). |
+
+
+## 111. Owner answers after W1-29's close, and one delegated decision (register v0.111, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orchestrator.
+
+### DEC-442 — The Stop and SubagentStop hooks are activated at the Wave 1 exit run, not mid-wave
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-29's residuals: the two hooks are built and not registered; SubagentStop would refuse the returns of the leads' verification subagents, which do not carry the twelve contract fields · **Under:** DEC-137, DEC-208
+- **Decision:**
+  - The two hooks are not registered while Wave 1 tickets are being built.
+  - Both are activated at the Wave 1 exit run (W1-42), after every brief asks for the twelve-field return.
+    That step is part of W1-42.
+  - The orchestrator brings the exact settings lines to the owner at that point.
+
+### DEC-443 — The auto-compact threshold is verified from Claude Code's official documentation
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-49 reported a settings key; W1-29 reports that the threshold is not set · **Under:** DEC-208
+- **Decision:**
+  - The orchestrator verifies from Claude Code's official documentation which setting, a settings key or an
+    environment variable, controls the auto-compact threshold, and whether it is set in this repository.
+  - If a documented key exists and is not set, the orchestrator brings the exact line to the operator.
+  - Until then the orchestrator's CONTEXT_CHECKPOINT fallback stays.
+
+### DEC-444 — The hooks' automatic checkpoints go to the ignored scratch folder; deliberate checkpoint records are committed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-29's residuals: the hooks wrote untracked files under `docs/checkpoints/` in every session with a ticket · **Under:** DEC-264
+- **Decision:**
+  - The checkpoints the hooks write by themselves go to `.gov-runtime/scratch/checkpoints/`, which is ignored.
+  - Only deliberate `gov checkpoint` records go to `docs/checkpoints/` and are committed.
+  - The orchestrator chooses the ticket for the change. It chose W1-29, reopened for one follow-up round in
+    its own paths.
+
+### DEC-445 — "A checkpoint when context utilisation passes the threshold" is accepted as a residual
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-29's KPI line 3; no hook receives the context utilisation
+- **Decision:**
+  - The clause is accepted as a residual of W1-29. What exists stands in its place: a checkpoint at every
+    stop and every compaction, and the watchdog marking a checkpoint stale on utilisation.
+
+### DEC-446 — DEC-441, the minimal form of an audit report, is accepted by the owner
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-441 was delegated and open to overturn
+- **Decision:**
+  - The form of DEC-441 stands as decided.
+
+### DEC-447 — The audit-reproducibility check before the first audit is a warning, and a hard block afterwards
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** a hard-block check that measured nothing is red, so a project with no audit report yet would be red at every `gov check` · **Under:** DEC-425, DEC-438, DEC-441
+- **Decision:**
+  - While a project has no audit report, the audit-reproducibility check reports "not applicable until the
+    first audit" as a warning, not red.
+  - Once an audit report exists, the check is a hard block.
+  - How it is built (the orchestrator's detail under DEC-416): the audit-report validator says "not
+    applicable" by name only when the folder it is given holds no report at all, and `gov check` shows that
+    answer as yellow with that reason. A report that is unreadable, broken or failing is red as before. No
+    other check gains this answer, and the answer is never green.
+
+### DEC-448 — `gov doctor`: registered tool locations, historical records, one rebuild, and the Claude Code drift
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** `gov doctor` on this repository: Node 18 found against 22 pinned, `openspec` and `ccusage` not found, 180 references to moved paths, a stale index, Claude Code drift · **Under:** DEC-202, DEC-210, DEC-440
+- **Decision:**
+  - Each tool is checked at its registered location (the PATH prefix of DEC-202 and the registry's paths),
+    not only on PATH, so Node 22, `openspec` and `ccusage` are found where they are installed. The machine's
+    default Node stays 18.
+  - Historical records (the register, the CIT records, `bootstrap.md`, archived sources) are excluded from the
+    stale-path check. The stale paths in live documents are fixed, and any remainder becomes a small cleanup
+    task.
+  - `gov rebuild` is run once on this repository when W1-27's fixed rebuild is merged. This one run is the
+    owner's exception to the rule that `gov rebuild` is never run against this repository.
+  - The Claude Code drift (extension 2.1.289, command line 2.1.288) is harmless, both being above the
+    minimum; the record is renewed at the Wave 1 exit.
+
+### DEC-449 — Every KPI clause is read against the tests and the code before a close is accepted
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator's practice since DEC-439 · **Under:** DEC-439
+- **Decision:**
+  - The orchestrator's practice of reading every KPI clause against the tests and the code before accepting a
+    close is confirmed and kept for every ticket.
+
+### DEC-450 — `gov close` calls the checkpoint watchdog before it closes
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** W1-29's failure line "a handoff or ticket close proceeds while the latest checkpoint is stale for its policy"; W1-29's design left the call to `gov close`, and W1-30's first design left it out · **Under:** DEC-413, DEC-425
+- **Decision:**
+  - `gov close` calls W1-25's watchdog before it closes and refuses on a stale or missing checkpoint with the
+    watchdog's own code. The closing checkpoint is written after the checks pass. The cases are W1-30's.
+
+### DEC-451 — The auto-compact threshold is already set by environment variable; the CONTEXT_CHECKPOINT fallback is dropped
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the check asked for by DEC-443: the official documentation names the settings key `autoCompactWindow` and the equivalent environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, each a number of tokens from 100000 to 1000000, capped at the model's context window; the owner, through the operator, read the project's settings file · **Under:** DEC-208, DEC-443
+- **Decision:**
+  - The project's settings file already sets `CLAUDE_CODE_AUTO_COMPACT_WINDOW` to 300000 in its environment
+    block, added by W1-49. There is no `autoCompactWindow` key and none is needed. No settings change is made.
+  - The orchestrator's session started after W1-49's merge, so the setting is active in it.
+  - The orchestrator drops its CONTEXT_CHECKPOINT fallback and relies on auto-compaction with the hooks of
+    W1-49 and W1-29, as section 7 of its prompt says.
+  - W1-29's residual line that the threshold is not set, and the key name `autocompact` its lead gave, are
+    wrong and are corrected by this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.111 | 2026-10-07 | Owner answers: DEC-442 (Stop and SubagentStop activated at the exit run), DEC-443 (auto-compact threshold verified from the official documentation), DEC-444 (automatic checkpoints to the ignored scratch folder), DEC-445 (utilisation-triggered checkpoint accepted as a residual), DEC-446 (DEC-441 accepted), DEC-447 (audit reproducibility: a warning before the first audit, a hard block after), DEC-448 (`gov doctor`: registered tool locations, historical records, one rebuild, drift), DEC-449 (KPI clauses read against tests and code before every close). DEC-451 (the auto-compact threshold is already set by environment variable; the CONTEXT_CHECKPOINT fallback is dropped). Delegated: DEC-450 (`gov close` calls the checkpoint watchdog). |
