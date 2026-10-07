@@ -191,7 +191,7 @@ def copy_working_tree(destination, root=REPO_ROOT):
     return destination
 
 
-def copy_minimal_project(destination, root=REPO_ROOT):
+def copy_minimal_project(destination):
     """A committed project with only a few tracked files: the gitignore and the gitleaks configuration.
 
     For commands whose work grows with the size of the tracked tree (DEC-440).
@@ -200,11 +200,14 @@ def copy_minimal_project(destination, root=REPO_ROOT):
     """
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
-    for rel in (".gitignore", ".gitleaks.toml"):
-        source = Path(root) / rel
-        if source.is_file():
-            target = destination / rel
-            shutil.copy2(source, target)
+    (destination / ".gitignore").write_text(
+        ".gov-runtime/\n__pycache__/\n*.pyc\n.tickets/.claims/\n",
+        encoding="utf-8",
+    )
+    (destination / ".gitleaks.toml").write_text(
+        'title = "Minimal gitleaks configuration"\n\n[extend]\nuseDefault = true\n',
+        encoding="utf-8",
+    )
     git(destination, "init", "-q", "-b", "main")
     git(destination, "add", "-A")
     git(destination, "commit", "-q", "-m", "minimal project")
