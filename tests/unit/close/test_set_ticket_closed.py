@@ -55,6 +55,10 @@ class TestSetTicketClosed:
         text = path.read_text(encoding="utf-8")
         assert "Body content" in text
 
-    def test_missing_file_is_noop(self, root):
+    def test_missing_file_raises(self, root):
+        from gov.cli.errors import GovError
         from gov.close.command import _set_ticket_closed
-        _set_ticket_closed(root, "T-nonexistent")
+
+        with pytest.raises(GovError) as exc:
+            _set_ticket_closed(root, "T-nonexistent")
+        assert exc.value.code == "TICKET_UNKNOWN"

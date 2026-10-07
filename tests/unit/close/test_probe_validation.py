@@ -1,12 +1,17 @@
 """Unit tests for probe-record validation in gov close."""
 from __future__ import annotations
 
+import subprocess as _subprocess
 import textwrap
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 import yaml
+
+
+def _git_noop(*args, **kwargs):
+    return _subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
 
 
 def _make_probe(root: Path, ticket: str, **overrides) -> Path:
@@ -22,6 +27,7 @@ def _make_probe(root: Path, ticket: str, **overrides) -> Path:
         "commissioned_by": "orchestrator",
         "judged_by": "orchestrator",
         "judgement": "pass",
+        "probed_commit": "abc123def456",
     }
     defaults.update(overrides)
     probe_dir = root / "docs" / "probes" / ticket
@@ -48,7 +54,8 @@ class TestCommissionedBy:
         assert exc.value.code == "PROBE_INVALID"
         assert "commissioned_by" in exc.value.message
 
-    def test_accepts_orchestrator(self, root):
+    @patch("subprocess.run", side_effect=_git_noop)
+    def test_accepts_orchestrator(self, mock_run, root):
         from gov.close.command import _check_probe
 
         _make_probe(root, "T-0001", commissioned_by="orchestrator")
@@ -66,7 +73,8 @@ class TestJudgedBy:
         assert exc.value.code == "PROBE_INVALID"
         assert "judged_by" in exc.value.message
 
-    def test_accepts_orchestrator(self, root):
+    @patch("subprocess.run", side_effect=_git_noop)
+    def test_accepts_orchestrator(self, mock_run, root):
         from gov.close.command import _check_probe
 
         _make_probe(root, "T-0001", judged_by="orchestrator")

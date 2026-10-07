@@ -42,14 +42,14 @@ class TestIterationTracking:
         data = json.loads(iter_file.read_text())
         assert data["count"] == 2
 
-    def test_different_failure_resets_count(self, root):
+    def test_different_failure_still_increments(self, root):
         from gov.close.command import _handle_failure
 
         _handle_failure(root, "T-0001", ["failure A"], {})
         _handle_failure(root, "T-0001", ["failure B"], {})
         iter_file = root / ".gov-runtime" / "iterations" / "T-0001.json"
         data = json.loads(iter_file.read_text())
-        assert data["count"] == 1
+        assert data["count"] == 2
 
     def test_escalation_after_three_non_converging(self, root):
         from gov.cli.errors import GovError
