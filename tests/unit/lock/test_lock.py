@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 
 import pytest
@@ -88,6 +89,43 @@ def test_unlisted_kernel_file_is_drift_and_pycache_is_not(tmp_path):
     added = f"{KERNEL_REL}/hooks/added.py"
     (root / added).write_text("x = 1\n", encoding="utf-8")
     assert compare(root).drifted_files == (added,)
+
+
+@pytest.mark.parametrize("mode", (0, 0o100))
+def test_a_kernel_folder_that_cannot_be_listed_is_an_error_naming_it_and_no_lock_is_written(tmp_path, mode):
+    root = _project(tmp_path)
+    folder = root / KERNEL_REL / "closed"
+    folder.mkdir()
+    (folder / "added.py").write_text("x = 1\n", encoding="utf-8")
+    before = (root / LOCK_REL).read_text(encoding="utf-8")
+    folder.chmod(mode)
+    try:
+        try:
+            os.listdir(folder)
+            pytest.skip("permissions do not bind this user")
+        except OSError:
+            pass
+        answer = compare(root)
+        assert answer.verdict == "ERROR" and f"{KERNEL_REL}/closed" in answer.reason
+        with pytest.raises(LockError, match="closed"):
+            write(root)
+    finally:
+        folder.chmod(0o755)
+    assert (root / LOCK_REL).read_text(encoding="utf-8") == before
+
+
+def test_a_manifest_that_lists_no_installed_kernel_file_is_an_error(tmp_path):
+    root = _project(tmp_path)
+    (root / "other.txt").write_text("x\n", encoding="utf-8")
+    digest = hashlib.sha256(b"x\n").hexdigest()
+    _rewrite(root, lambda lock: lock.update(manifest={"other.txt": digest}))
+    for rel in (HOOK, f"{KERNEL_REL}/settings.json"):
+        (root / rel).unlink()
+    assert compare(root).verdict == "ERROR"                 # a kernel folder with no file in it
+    (root / KERNEL_REL / "hooks").rmdir()
+    (root / KERNEL_REL).rmdir()
+    answer = compare(root)                                  # no kernel folder at all
+    assert answer.verdict == "ERROR" and KERNEL_REL in answer.reason
 
 
 @pytest.mark.parametrize("change", (

@@ -8,6 +8,7 @@ comparison of a project with its lock (DEC-488): it never answers MATCH without 
 from __future__ import annotations
 
 import hashlib
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -53,14 +54,22 @@ def _read_map(path: Path) -> dict | None:
     return data if isinstance(data, dict) else None
 
 
-def _kernel_files(root: Path) -> list[str]:
-    """Every file under ``governance/kernel/``, git-ignored or not; only ``__pycache__/`` folders are left out."""
-    found = []
-    for path in (root / KERNEL_REL).rglob("*"):
-        rel = path.relative_to(root)
-        if "__pycache__" not in rel.parts and (path.is_file() or path.is_symlink()):
-            found.append(rel.as_posix())
-    return sorted(found)
+def _kernel_files(root: Path) -> tuple[list[str], list[str]]:
+    """Every file under ``governance/kernel/``, git-ignored or not, and the folders that could not be listed.
+
+    Only ``__pycache__/`` folders are left out. A folder that cannot be listed is returned by name with the
+    system's reason: its files were not seen, so the caller must not answer for them.
+    """
+    found, unlisted = [], []
+
+    def refused(error: OSError) -> None:
+        unlisted.append(f"{Path(error.filename).relative_to(root).as_posix()} ({error.strerror})")
+
+    for folder, folders, files in os.walk(root / KERNEL_REL, onerror=refused):
+        folders[:] = [name for name in folders if name != "__pycache__"]
+        links = [name for name in folders if os.path.islink(os.path.join(folder, name))]
+        found.extend((Path(folder) / name).relative_to(root).as_posix() for name in files + links)
+    return sorted(found), sorted(unlisted)
 
 
 def _sha256(path: Path) -> str | None:
@@ -96,7 +105,13 @@ def compare(root: Path) -> Comparison:
         actual = _sha256(root / str(rel))
         if actual is None or actual != recorded:
             drifted.add(str(rel))
-    drifted.update(rel for rel in _kernel_files(root) if rel not in manifest)
+    installed_files, unlisted = _kernel_files(root)
+    if unlisted:
+        return Comparison("ERROR", (), f"cannot list the kernel folders {unlisted}: their files were not compared")
+    if not any(rel in manifest for rel in installed_files):
+        return Comparison("ERROR", (), f"no installed file under {KERNEL_REL}/ is listed in the manifest: "
+                                       "nothing of the kernel was hashed")
+    drifted.update(rel for rel in installed_files if rel not in manifest)
     if drifted or differing:
         reason = f"{' and '.join(differing)} of framework.lock differ from {ANSWERS_REL}" if differing else None
         return Comparison("DRIFT", tuple(sorted(drifted)), reason)
@@ -116,7 +131,10 @@ def write(root: Path) -> Path:
             raise LockError(f"{ANSWERS_REL} lacks {answers_key}")
         lock[lock_key] = value
     lock["answers_file"] = ANSWERS_REL
-    lock["manifest"] = {rel: _sha256(root / rel) for rel in _kernel_files(root)}
+    installed_files, unlisted = _kernel_files(root)
+    if unlisted:
+        raise LockError(f"cannot list the kernel folders {unlisted}")
+    lock["manifest"] = {rel: _sha256(root / rel) for rel in installed_files}
     unreadable = sorted(rel for rel, digest in lock["manifest"].items() if digest is None)
     if unreadable or not lock["manifest"]:
         raise LockError(f"cannot hash the kernel files {unreadable}" if unreadable else f"no file under {KERNEL_REL}/")
