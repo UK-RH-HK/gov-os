@@ -3,6 +3,7 @@ name: retrieval
 description: Method for running gov retrieve — facet retrieval in disposable subagents with validated bundle return
 version: "1.0.0"
 ---
+
 # Retrieval
 
 A method for gathering evidence with `gov retrieve`. The guard and the role file decide what the caller may read and write (CAP-24.b); this skill is the method only.

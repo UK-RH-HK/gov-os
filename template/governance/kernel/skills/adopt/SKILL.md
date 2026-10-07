@@ -3,6 +3,7 @@ name: adopt
 description: Method for progressive adoption of the Gov OS into a repository through the A0-A11 transaction
 version: "1.0.0"
 ---
+
 # Adopt
 
 A method for progressive adoption. The guard and the role file decide what each session may do; this skill is the method only (CAP-24.b).

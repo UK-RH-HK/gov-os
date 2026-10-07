@@ -3,6 +3,7 @@ name: checkpoint
 description: Method for writing, watching and resuming from structured checkpoints with gov checkpoint
 version: "1.0.0"
 ---
+
 # Checkpoint / Resume
 
 A method for using `gov checkpoint` to write, watch and resume from structured checkpoints. The guard and the role file decide where the session may write; this skill is the method only (CAP-24.b).

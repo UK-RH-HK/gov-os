@@ -3,6 +3,7 @@ name: planning
 version: "1.0.0"
 description: Method for emitting schema-valid tickets, gap tickets and readiness rows during planning.
 ---
+
 # Planning
 
 This skill describes how to plan work by emitting tickets and tracking readiness. It follows the Contract and the decision register; it does not grant permissions or set rules on its own authority.
