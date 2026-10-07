@@ -806,3 +806,201 @@ class TestToolAbsentOrHanging:
         assert result.returncode != 0, (
             "portability check must not be GREEN when rulesync hangs"
         )
+
+
+# ===================================================================
+# Round 4 — three hand edits and one adapter/kernel difference that
+# rulesync's own comparison does not see
+# ===================================================================
+
+def _assert_red_naming_exactly(project, sandbox, rel, what):
+    """``gov check`` shows the check and its family RED, and the findings
+    name ``rel`` and no other file of the project."""
+    entry, family, run = _gov_check(project, sandbox)
+    assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+        f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+        f"family as {family.get('status')!r}\n{run.describe()}"
+    )
+    named = support.named_files(project, json.dumps(entry.get("findings")))
+    assert named == {rel}, (
+        f"{what}: the findings must name {rel} and no other file; "
+        f"they name {sorted(named)}\n{run.describe()}"
+    )
+
+
+# KPI Failure 2 — a file with no source under a wholly generated folder
+
+UNSOURCED = {
+    "role": (".claude/agents/by-hand.md",
+             "---\nname: by-hand\ndescription: a role nobody registered\n---\nA role written by hand.\n"),
+    "skill-folder": (".claude/skills/by-hand/SKILL.md",
+                     "---\nname: by-hand\ndescription: a skill nobody registered\n---\nA skill written by hand.\n"),
+    "command": (".claude/commands/by-hand.md",
+                "---\ndescription: a command nobody registered\n---\nA command written by hand.\n"),
+    "file-in-a-generated-skill": (f".claude/skills/{KERNEL_SKILL}/by-hand.md", "A file written by hand.\n"),
+}
+
+
+class TestUnsourcedFile:
+    """rulesync owns ``.claude/`` and holds OpenSpec's files and the vendored
+    skills as sources (ADR-0002 section 5, DEC-074 Q7), so every file under
+    ``.claude/agents/``, ``.claude/skills/`` and ``.claude/commands/`` has a
+    rulesync source. A file written by hand beside the generated ones is a
+    hand edit of generated output (KPI failure 2); a role among them is a role
+    outside the kernel's limits (W1-33)."""
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(UNSOURCED))
+    def test_file_without_a_source_is_found_and_named(self, generated_project, sandbox, kind):
+        rel, text = UNSOURCED[kind]
+        assert rel.startswith(tuple(f"{folder}/" for folder in support.GENERATED_FOLDERS))
+        path = generated_project / rel
+        assert not path.exists(), f"{rel} is generated; the case needs a path without a source"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+        _assert_red_naming_exactly(
+            generated_project, sandbox, rel,
+            f"{rel} was written by hand and has no rulesync source",
+        )
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", support.OTHER_OWNERS)
+    def test_file_of_another_owner_is_not_a_finding(self, generated_project, rel):
+        """``.claude/settings.local.json`` is the user's (DEC-063) and
+        ``.claude/worktrees/`` holds whole checkouts (DEC-050): neither is
+        generated output, and the check stays green with them."""
+        path = generated_project / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}\n" if rel.endswith(".json") else "A file of another owner.\n",
+                        encoding="utf-8")
+        result = support.run_portability_check(generated_project)
+        assert result.returncode == 0, (
+            f"{rel} is not generated output, but the check is not green with it: "
+            f"{support.output_of(result)}"
+        )
+
+
+# KPI Failure 2 — a key added by hand to the generated settings file
+
+def _add_allow_rule(settings):
+    settings.setdefault("permissions", {}).setdefault("allow", []).append("WebFetch(domain:example.com)")
+
+
+def _add_default_mode(settings):
+    settings.setdefault("permissions", {})["defaultMode"] = "bypassPermissions"
+
+
+def _add_hook_entry(settings):
+    settings.setdefault("hooks", {}).setdefault("Notification", []).append(
+        {"hooks": [{"type": "command", "command": "echo by-hand"}]}
+    )
+
+
+def _add_env_key(settings):
+    settings["env"] = {"BY_HAND": "1"}
+
+
+def _add_sandbox_key(settings):
+    settings["sandbox"] = {"enabled": False}
+
+
+SETTINGS_ADDED = {
+    "permission-allow-rule": _add_allow_rule,
+    "permission-default-mode": _add_default_mode,
+    "hook-entry": _add_hook_entry,
+    "top-level-env": _add_env_key,
+    "top-level-sandbox": _add_sandbox_key,
+}
+
+
+class TestSettingsHandEdit:
+    """``.claude/settings.json`` of the project is generated from
+    ``.rulesync/hooks.jsonc`` and ``.rulesync/permissions.jsonc`` and from
+    nothing else. A key the sources do not give is a hand edit (KPI failure
+    2), whatever rulesync does with it when it writes the file again."""
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+        _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+    @needs_rulesync
+    def test_rule_removed_by_hand_is_found_and_named(self, generated_project, sandbox):
+        def remove_one_deny_rule(settings):
+            deny = settings["permissions"]["deny"]
+            assert deny, "the generated settings hold no deny rule"
+            deny.pop()
+
+        support.edit_settings(generated_project, remove_one_deny_rule)
+        _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"a deny rule was removed by hand from {support.SETTINGS_REL}",
+        )
+
+
+# KPI Success 3 — a role's tools: the adapter source against the kernel role
+
+class TestRoleToolsAgainstKernel:
+    """The kernel role file is the authority of a role's limits (W1-33,
+    DEC-066). The tools of ``.rulesync/subagents/<role>.md``
+    (``claudecode.tools``) are the Claude Code tools the kernel role's Tools
+    field names. rulesync generates whatever the source says, so only the
+    check's own comparison can find a difference."""
+
+    ROLE_KERNEL = TestKernelAgainstAdapterSource.ROLE_KERNEL
+    ROLE_SOURCE = TestKernelAgainstAdapterSource.ROLE_SOURCE
+    FOREIGN_TOOL = "NotebookEdit"
+
+    @needs_rulesync
+    @pytest.mark.parametrize("role", support.ROLE_NAMES)
+    def test_source_tools_are_the_kernel_role_s(self, project, role):
+        """Compared, in the project as built from the template: the set of
+        ``claudecode.tools`` of the source with the set of tool names in the
+        kernel role's Tools field."""
+        kernel = support.kernel_role_tools(
+            (project / support.PROJECT_KERNEL_REL / "roles" / f"{role}.md").read_text(encoding="utf-8")
+        )
+        source = support.source_role_tools(
+            (project / ".rulesync" / "subagents" / f"{role}.md").read_text(encoding="utf-8")
+        )
+        assert source is not None, (
+            f".rulesync/subagents/{role}.md states no claudecode.tools: the role would have every tool"
+        )
+        assert set(source) == kernel, (
+            f".rulesync/subagents/{role}.md does not carry the tools of the kernel role: "
+            f"only in the source {sorted(set(source) - kernel)}, "
+            f"only in the kernel role {sorted(kernel - set(source))}"
+        )
+
+    def _change_tools(self, project, change):
+        kernel_before = (project / self.ROLE_KERNEL).read_bytes()
+        source = project / self.ROLE_SOURCE
+        tools = support.source_role_tools(source.read_text(encoding="utf-8"))
+        assert tools is not None, f"{self.ROLE_SOURCE} states no claudecode.tools"
+        support.write_source_role_tools(source, change(tools))
+        support.regenerate(project)
+        assert (project / self.ROLE_KERNEL).read_bytes() == kernel_before
+
+    @needs_rulesync
+    def test_source_with_a_tool_the_kernel_role_does_not_name(self, generated_project, sandbox):
+        kernel = support.kernel_role_tools((generated_project / self.ROLE_KERNEL).read_text(encoding="utf-8"))
+        assert self.FOREIGN_TOOL not in kernel
+        self._change_tools(generated_project, lambda tools: [*tools, self.FOREIGN_TOOL])
+        TestKernelAgainstAdapterSource()._assert_found(
+            generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+            f"a role's rulesync source names the tool {self.FOREIGN_TOOL}, which its kernel role does not",
+        )
+
+    @needs_rulesync
+    def test_source_without_a_tool_the_kernel_role_names(self, generated_project, sandbox):
+        kernel = support.kernel_role_tools((generated_project / self.ROLE_KERNEL).read_text(encoding="utf-8"))
+        removed = sorted(kernel)[-1]
+        self._change_tools(generated_project, lambda tools: [tool for tool in tools if tool != removed])
+        TestKernelAgainstAdapterSource()._assert_found(
+            generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+            f"a role's rulesync source lacks the tool {removed}, which its kernel role names",
+        )

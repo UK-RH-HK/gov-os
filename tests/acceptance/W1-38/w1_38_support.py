@@ -100,6 +100,21 @@ SUPERPOWERS_SKILLS = (
     "verification-before-completion",
 )
 
+# Round 4. ADR-0002 section 5 and DEC-074 Q7: rulesync owns ``.claude/``, and
+# OpenSpec's files and the vendored skills are rulesync sources. Every file
+# under these three folders therefore has a rulesync source.
+GENERATED_FOLDERS = (".claude/agents", ".claude/skills", ".claude/commands")
+SETTINGS_REL = ".claude/settings.json"
+# Paths under ``.claude/`` the sources give to another owner: the per-user
+# settings Claude Code writes (DEC-063) and the gitignored worktrees (DEC-050).
+OTHER_OWNERS = (".claude/settings.local.json", ".claude/worktrees/by-hand/.claude/agents/by-hand.md")
+
+# The Claude Code tool names a kernel role's Tools field is read for.
+CLAUDE_CODE_TOOLS = (
+    "Agent", "Bash", "Edit", "Glob", "Grep", "NotebookEdit", "Read", "Skill",
+    "Task", "TodoWrite", "WebFetch", "WebSearch", "Write",
+)
+
 PORTABILITY_FAMILY = "adapter/model portability"
 PORTABILITY_FAMILY_NORMALISED = "adapter-model-portability"
 ALL_FEATURES = "rules,hooks,permissions,subagents,commands,skills"
@@ -380,6 +395,40 @@ def append_line(path: Path) -> None:
 
 
 # ---------------------------------------------------------------------------
+# A role's tools: the kernel role's Tools field and the adapter source
+# ---------------------------------------------------------------------------
+
+def kernel_role_tools(text: str) -> set[str]:
+    """The Claude Code tool names the Tools field of a kernel role file names
+    (whole words, case as written)."""
+    field = parse_fields(text).get("tools")
+    assert field, "the kernel role file has no Tools field"
+    return {word for word in re.findall(r"[A-Za-z]+", field) if word in CLAUDE_CODE_TOOLS}
+
+
+def source_role_tools(text: str) -> list[str] | None:
+    """``claudecode.tools`` of a role's rulesync source, or None when the
+    source states no tools (the role would then inherit every tool)."""
+    tools = (frontmatter(text).get("claudecode") or {}).get("tools")
+    return [str(tool) for tool in tools] if isinstance(tools, list) else None
+
+
+def write_source_role_tools(path: Path, tools: list[str]) -> None:
+    """Replace ``claudecode.tools`` in a role's rulesync source. Every other
+    frontmatter value and every byte of the body stay as they were."""
+    text = path.read_text(encoding="utf-8")
+    data = frontmatter(text)
+    assert isinstance(data.get("claudecode"), dict) and "tools" in data["claudecode"], (
+        f"{path.name} states no claudecode.tools"
+    )
+    data["claudecode"]["tools"] = list(tools)
+    head = yaml.safe_dump(data, sort_keys=False, allow_unicode=True, width=1000)
+    changed = f"---\n{head}---\n{body(text)}"
+    assert body(changed) == body(text) and frontmatter(changed) == data
+    path.write_text(changed, encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
 # What OpenSpec ships
 # ---------------------------------------------------------------------------
 
@@ -544,6 +593,28 @@ def load_settings(project_dir: Path) -> dict:
     path = project_dir / ".claude" / "settings.json"
     assert path.is_file(), f".claude/settings.json does not exist in {project_dir}"
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def edit_settings(project_dir: Path, change) -> None:
+    """Apply ``change`` to the parsed ``.claude/settings.json`` and write it
+    back in the form rulesync writes it, so that the change is the only
+    difference from the generated file."""
+    import json
+    path = project_dir / SETTINGS_REL
+    text = path.read_text(encoding="utf-8")
+    data = json.loads(text)
+
+    def dump(value: dict) -> str:
+        return json.dumps(value, indent=2, ensure_ascii=False) + "\n"
+
+    assert dump(data) == text, (
+        f"{SETTINGS_REL} is not written as two-space JSON with a final newline: "
+        f"writing it back would itself be a change"
+    )
+    before = dump(data)
+    change(data)
+    assert dump(data) != before, "the case changed nothing in the settings"
+    path.write_text(dump(data), encoding="utf-8")
 
 
 def _find_commands_recursive(obj: object) -> list[str]:
