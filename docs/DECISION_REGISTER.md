@@ -5117,3 +5117,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.115 | 2026-10-07 | Owner answers on the compliance report: DEC-460 (subagents on Opus 4.6 by the owner's setting; main sessions pinned to Opus 5.5 and recorded in close records), DEC-461 (three closes accepted; every re-run alone saved), DEC-462 (designer briefs state behaviour and sources only), DEC-463 (late records accepted; record first; `gov check` flags a commit citing an unrecorded decision, W1-26 reopened), DEC-464 (nine delegated decisions on containment, the freeze and the launcher ratified after the fact), DEC-465 (the pushes were the owner's), DEC-466 (closes through `gov close` after W1-30; `gov check` before every merge, red blocks; a Wave 2 list of what stays instruction-only). |
+
+## 116. One delegated decision, for the owner to confirm or replace: what "red blocks a merge" means while this repository is not yet adopted (register v0.116, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-467 — Until this repository is adopted, `gov check` blocks a merge on any red that the recorded baseline does not hold
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; provisional: brought to the owner at once, who may replace it) · **Basis:** DEC-466 orders `gov check` before every merge into `w1/integrate`, red blocking. Run on this repository at `46ec8da3` (output kept as `.gov-runtime/scratch/orchestrator/log/check-at-46ec8da3.json`), `gov check` exits 3 with thirteen hard-block checks red, none caused by a ticket branch: `gov` is not on PATH for a check command (fresh-agent reconstruction), the tickets are not in the record store (context reproducibility), the tickets' `depends_on` name W1 ids (core-graph), records without `state_class` (core-schema), the indexes are stale after every commit since the one rebuild (index freshness, recovery/rebuild), the dev tiers are not configured (retrieval regression), the secrets check exceeds its 60 seconds on this tree, and five policy keys have no check (security, test, change, human_gate, tool). Read literally, DEC-466 would stop every merge until W1-39 and W1-41 adopt this repository · **Under:** DEC-466, DEC-425
+- **Decision:**
+  - The baseline is the set of red checks at `46ec8da3`, each with its reason, recorded in
+    `governance/project/bootstrap.md`.
+  - Before every merge into `w1/integrate` the orchestrator runs `gov check` on the branch to be merged (after
+    the integration branch is merged into it) and saves the output beside the regression summary. A check that
+    is red and is not in the baseline, or is in the baseline with a new finding caused by the branch, blocks
+    the merge. A baseline red is named in the merge's record, never called green.
+  - A baseline red that turns green leaves the baseline and may not come back.
+  - The baseline is emptied by W1-39 and W1-41 (adoption of this repository) and by the exit run; what cannot
+    be emptied is an owner item in the exit package.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.116 | 2026-10-07 | One delegated decision, provisional: DEC-467 (until this repository is adopted, `gov check` blocks a merge on any red the recorded baseline at `46ec8da3` does not hold). |
