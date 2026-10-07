@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.cli.checks import load_declarations
+from gov.cli.checks import CHECKS_DIR, load_declarations
 
 VERSION = "1.0.0"
 
@@ -37,6 +37,8 @@ FAMILIES = (
 )
 
 RED, YELLOW, GREEN = "RED", "YELLOW", "GREEN"
+NA_FIELD = "allows-not-applicable"
+EXIT_NOT_APPLICABLE = 2
 
 
 def _normalise_family(name: str) -> str:
@@ -91,13 +93,44 @@ def _run_command(command: str, root: Path) -> tuple[int, str, str]:
         shutil.rmtree(xdg_tmp, ignore_errors=True)
 
 
+def _augment_declarations(declarations: list[dict], root: Path) -> None:
+    checks_dir = root / CHECKS_DIR
+    for decl in declarations:
+        yaml_path = checks_dir / f"{decl['id']}.yaml"
+        if yaml_path.is_file():
+            try:
+                raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+            except (yaml.YAMLError, OSError):
+                continue
+            if isinstance(raw, dict) and raw.get(NA_FIELD) == "true":
+                decl[NA_FIELD] = "true"
+
+
 def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
     check_id = decl["id"]
     family = decl["family"]
     severity = decl["severity"]
     command = decl["command"]
+    allows_na = decl.get(NA_FIELD) == "true"
 
     exit_code, stdout, stderr = _run_command(command, root)
+
+    if exit_code == EXIT_NOT_APPLICABLE and allows_na and stdout.strip():
+        try:
+            parsed = json.loads(stdout)
+            if isinstance(parsed, dict) and parsed.get("not_applicable") is True:
+                return {
+                    "id": check_id,
+                    "family": family,
+                    "severity": severity,
+                    "status": YELLOW,
+                    "reason": parsed.get("reason", ""),
+                    "findings": [],
+                    "provenance": _provenance(check_id, commit),
+                }
+        except json.JSONDecodeError:
+            pass
+
     findings = []
     if stdout.strip():
         try:
@@ -317,6 +350,7 @@ def run_checks(root: Path) -> tuple[dict, bool]:
     root = Path(root)
     commit = _head(root)
     declarations = load_declarations(root)
+    _augment_declarations(declarations, root)
 
     check_results = []
     for decl in declarations:
@@ -344,8 +378,11 @@ def run_checks(root: Path) -> tuple[dict, bool]:
         entry_status = entry.get("status", GREEN)
         if entry_status == RED:
             families[canonical]["status"] = RED
+            families[canonical].pop("reason", None)
         elif entry_status == YELLOW and current != RED:
             families[canonical]["status"] = YELLOW
+            if entry.get("reason"):
+                families[canonical]["reason"] = entry["reason"]
 
     check_families = set(families.keys())
     policy_results = _check_policy_enforcement(root, commit, check_families)

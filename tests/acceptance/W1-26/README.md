@@ -1,7 +1,7 @@
 # W1-26 acceptance tests: `gov check` G0-G2
 
 Ticket `DAEO-fygv`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-91 cases in 13 files.
+136 cases in 15 files.
 
 ```
 python3 -m pytest tests/acceptance/W1-26 -q -p no:cacheprovider
@@ -68,6 +68,9 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_openspec.py` | 5 | S1 |
 | `test_w1_26_readiness.py` | 4 | S1 |
 | `test_w1_26_decisions.py` | 6 | S1 |
+| `test_w1_26_skill_validator.py` | 36 | S7 (DEC-439) |
+| `test_w1_26_audit_validator.py` | 36 | S7 (DEC-441) |
+| `test_w1_26_not_applicable.py` | 21 | S2, S7 (DEC-447) |
 
 ## The interface the tests fix
 
@@ -95,6 +98,119 @@ before and after.
 ## Revised cases
 
 - `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
+
+## Generic validators (DEC-439, DEC-441) — follow-up round
+
+Added by the Independent Test Designer (MR-3) for the follow-up round (DEC-439).
+
+### Skill-file validator (`test_w1_26_skill_validator.py`)
+
+The first start created 17 cases (10 test methods + 1 parametrized ×4). The follow-up adds 19 cases for the six fixes:
+
+| Fix | Cases | What |
+|---|---|---|
+| Fix 1: folder search at every depth | 2 | Deep SKILL.md discovery, broken nested skill |
+| Fix 2: SKILL.md without frontmatter is a finding | 1 | SKILL_NO_FRONTMATTER, not silently skipped |
+| Fix 3: command refs with args after the name | 4 | Misspelt with args, valid with args, fenced block, bare still works |
+| Fix 4: name/description/version not text | 5 | Integer version, integer name, list description, empty name, empty description |
+| Fix 5: token count matches gov context formula | 1 | 10001 chars = ceil(10001/4) = 2501 tokens > 2500 |
+| Fix 6: unreadable file is unmeasured, not traceback | 2 | Valid folder + missing path, binary file |
+
+Total skill validator: 36 cases.
+
+### Audit-report validator (`test_w1_26_audit_validator.py`)
+
+36 cases testing `python3 -m gov.check.audit_validator` (DEC-441):
+
+| Case | What |
+|---|---|
+| 1. Valid report passes | Well-formed report, resolvable commit, valid paths |
+| 2. Missing frontmatter | No `---` delimiters |
+| 3. Missing `commit` | Frontmatter without `commit` |
+| 4. Missing `milestone` | Frontmatter without `milestone` |
+| 5. Missing `pack_sha256` | Frontmatter without `pack_sha256` |
+| 6. Unresolvable commit | Commit hash not in the repository |
+| 7. No table rows | Valid frontmatter, empty table |
+| 8. Invalid class | Class not in DEC-070's six |
+| 9. OK row with `-` evidence | OK row must cite a path |
+| 10. Non-OK row with `-` (×5) | MISSING, WEAKENED, CONTRADICTS, UNJUSTIFIED_DROP, SCOPE_CREEP |
+| 11. Evidence path not at commit | `git show <commit>:<path>` fails |
+| 12. Evidence path at commit (×2) | Single path, comma-separated paths |
+| 13. Multiple rows, one bad | One non-existent path fails the report |
+| 14. No arguments | Unmeasured (DEC-425) |
+| 15. Empty folder | Unmeasured |
+| 16. Unreadable file | Nonexistent path, unmeasured |
+| 17. Outside git repo | Unmeasured |
+| 18. Folder search | Finds .md files with milestone+commit frontmatter |
+| 19. Valid folder + missing path | Not green |
+| 20. Malformed row (×2) | Two columns (missing evidence), four columns (extra) |
+| 21. OK row empty evidence (×4) | Empty cell, empty entry among real, trailing comma, non-OK empty cell |
+| 22. Folder broken frontmatter (×2) | Broken YAML not skipped, missing `commit` not skipped |
+| 23. commit must be hex id (×2) | HEAD and branch name are findings |
+| 24. pack_sha256 format (×2) | Too short and non-hex values are findings |
+
+### KPI and covers for the generic validators
+
+| KPI line | Tests | Red reason |
+|---|---|---|
+| **S7** "provides the generic validators for skill files and audit reports" [CAP-38.b] | `test_w1_26_skill_validator.py` (36), `test_w1_26_audit_validator.py` (26) | `ModuleNotFoundError` (audit_validator not built yet); skill_validator exits non-zero on the new fix cases |
+| **S1** "Runs schema … and the rule that no implementer allowed_paths covers tests/acceptance/**" | Indirectly: the validators are check commands called by the check runner | As above |
+| **S2** / **S7** "not applicable until the first audit" [DEC-447] | `test_w1_26_not_applicable.py` (21) | Validator: says unmeasured, exits 1; Runner: ignores the field |
+
+| Covers id | Tests |
+|---|---|
+| DEC-439 (generic validators for skill files and audit reports) | `test_w1_26_skill_validator.py`, `test_w1_26_audit_validator.py` |
+| DEC-441 (minimal form of an audit report) | `test_w1_26_audit_validator.py` |
+| DEC-425 (unmeasured, never green) | `test_w1_26_audit_validator.py` (cases 14–17), `test_w1_26_skill_validator.py` (Fix 6) |
+| DEC-447 (not applicable until the first audit) | `test_w1_26_not_applicable.py`, `test_w1_26_audit_validator.py` (case 15 revised) |
+
+### "Not applicable until the first audit" (DEC-447) — revision round
+
+Added by the Independent Test Designer (MR-3) for owner decision DEC-447.
+
+#### Not-applicable answer (`test_w1_26_not_applicable.py`)
+
+21 cases testing DEC-447: the audit check is "not applicable until the first audit", a warning, never green.
+
+The validator says `{"not_applicable": true, "reason": "not applicable until the first audit"}` and exits **2** (not 0 and not 1) when a folder holds no report. A declaration opts in with `allows-not-applicable: "true"` (optional; absent means no change).
+
+| Case group | Cases | What | Red reason |
+|---|---|---|---|
+| Validator: not applicable | 4 | Empty/missing folder → `not_applicable` JSON, exit 2 | Currently says unmeasured, exits 1 |
+| Validator: unmeasured unchanged | 3 | No args, missing file, outside git → unmeasured | (passes) |
+| Validator: folder with reports | 2 | Valid/broken folder → validated, never not-applicable | (passes) |
+| Runner: opted in | 3 | `allows-not-applicable: "true"` + NA answer → YELLOW, reason in JSON | Runner ignores the field |
+| Runner: not opted in | 1 | Same answer without field → RED | (passes) |
+| Runner: other failures | 5 | Opted in + findings/unmeasured/crash/exit-42/marker-exit-0 | (passes) |
+| Lifecycle | 1 | No → YELLOW → valid → GREEN → broken → RED → removed → YELLOW | Phase 1 fails |
+| Never green | 2 | JSON and text: family never GREEN on not-applicable | (passes) |
+
+Validator exit codes: 0 clean, 1 findings or unmeasured, **2 not applicable**.
+
+Declaration field: `allows-not-applicable: "true"` (optional; a declaration without it behaves exactly as before).
+
+#### Revised case (owner decision DEC-447)
+
+- `test_w1_26_audit_validator.py::TestEmptyFolder::test_empty_folder_unmeasured` → `test_empty_folder_not_applicable`: a folder with no report files is "not applicable", not "unmeasured".
+
+#### Literal declaration W1-36 should write for audit-reproducibility
+
+```yaml
+id: audit-reproducibility
+family: audit reproducibility
+tier: G2
+severity: hard-block
+command: python3 -m gov.check.audit_validator audit-reports/
+allows-not-applicable: "true"
+```
+
+## Fixture: kernel skills copied (DEC-439)
+
+`_copy_kernel_templates()` in `w1_26_support.py`: revised after implementation: W1-35's
+skill-regression check runs the generic validator over the kernel's skills, so a project
+built from the template holds them (DEC-439). The copy is generic (every folder under
+`template/governance/kernel/skills/`), so future tickets that add skill folders need no
+revision of this file.
 
 ## Not tested
 

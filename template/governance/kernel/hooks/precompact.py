@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-PreCompact hook (W1-49, light form of CAP-37; W1-29 replaces it).
+PreCompact hook (W1-49 state block + W1-29 checkpoint record, CAP-37).
 
-Never blocks a compaction (DEC-264). Appends one generated state block
-to the checkpoint, after the part the session wrote: the orchestrator's
-in the main tree, the lead's in a linked worktree. A second compaction
-replaces the block. Acts only when GOV_ROLE is exactly "orchestrator"
-(DEC-259).
+Never blocks a compaction (DEC-264). Two actions, in order:
 
-The written part is never changed: the state is gathered first, then
-the file is read and the block written in place after the written part,
-which is not rewritten, and the modification time is set back, so the
-file's time stays the time of its written part. No other file is
-touched. A block is the hook's own only when its lines match the digest
-on its `generated:` line; anything else is written text and stays.
-What the hook could not do it says in a systemMessage. Always exits 0.
+1. W1-29 checkpoint record: calls gov.checkpoint.record.write with
+   trigger "compaction" for any role that has a GOV_TICKET. If the
+   write fails, the error is reported in a systemMessage.
+
+2. W1-49 state block: appends one generated state block to the
+   checkpoint file. Acts only when GOV_ROLE is exactly "orchestrator"
+   (DEC-259). The written part is never changed; the modification
+   time is set back so the file's time stays the time of its written
+   part. A block is the hook's own only when its lines match the
+   digest on its ``generated:`` line.
+
+Always exits 0.
 """
 
 from __future__ import annotations
@@ -27,6 +28,7 @@ import re
 import subprocess
 import sys
 import time
+from pathlib import Path
 
 BEGIN = b"<!-- GENERATED STATE BLOCK BEGIN -->"
 END = b"<!-- GENERATED STATE BLOCK END -->"
@@ -48,7 +50,7 @@ def split(data: bytes) -> tuple[bytes, bytes]:
     """(written part, generated block). There is a block only when the
     last line that is not empty is exactly the end marker, the last
     line that is exactly the begin marker is followed by the
-    `generated:` line, and the digest on that line is that of the
+    ``generated:`` line, and the digest on that line is that of the
     lines after it. Anything else is written text."""
     lines = data.splitlines(keepends=True)
     end = len(lines)
@@ -97,9 +99,26 @@ def put(f, offset: int, data: bytes) -> None:
 
 
 def main() -> None:
-    if os.environ.get("GOV_ROLE") != "orchestrator":
-        return
     project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    ticket = os.environ.get("GOV_TICKET", "")
+    messages: list[str] = []
+
+    if ticket:
+        try:
+            src_dir = os.path.join(project_root, "src")
+            if os.path.isdir(src_dir) and src_dir not in sys.path:
+                sys.path.insert(0, src_dir)
+            from gov.checkpoint.record import write as _rec_write
+            _rec_write(Path(project_root), ticket, "compaction", "Resume after compaction", [])
+        except Exception as exc:
+            messages.append(f"checkpoint not written ({exc})")
+
+    if os.environ.get("GOV_ROLE") != "orchestrator":
+        if messages:
+            sys.stdout.write(json.dumps({"systemMessage":
+                f"PreCompact: {'; '.join(messages)}. The compaction proceeds."}))
+        return
+
     rel = checkpoint_rel(project_root)
     block = state_block(project_root)  # before the file is read: a checkpoint saved meanwhile is not put back
     try:
@@ -117,8 +136,11 @@ def main() -> None:
             finally:
                 os.utime(f.fileno(), ns=(was.st_atime_ns, was.st_mtime_ns))
     except OSError as exc:
-        sys.stdout.write(json.dumps({"systemMessage": f"PreCompact: no state block was appended to {rel} "
-                                                      f"({exc.strerror}). The compaction proceeds."}))
+        messages.append(f"no state block was appended to {rel} ({exc.strerror})")
+
+    if messages:
+        sys.stdout.write(json.dumps({"systemMessage":
+            f"PreCompact: {'; '.join(messages)}. The compaction proceeds."}))
 
 
 if __name__ == "__main__":

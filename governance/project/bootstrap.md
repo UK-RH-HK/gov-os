@@ -1413,3 +1413,87 @@ The owner's answers (2026-10-06): MWA-01 is built on W1-50 as a mirror of the fr
   an estimate of 150; three starts (one ended on a running reviewer, one for the packages).
 - **Regression at `5d830d3e`:** every suite green (W1-50 642 passed), no latency occurrence; the real mirror
   folder unchanged by it.
+
+## W1-29 residuals (session hooks, 2026-10-07)
+
+- **Built:** SessionStart and PreCompact add W1-29's behaviour to W1-49's hooks (W1-49's suite unchanged and
+  green); Stop and SubagentStop are new. SessionStart injects the `gov context --brief` text and the ready
+  tickets for a session with a ticket, within the 10,000-character cap, optional parts cut first. PreCompact
+  and Stop write a checkpoint record when the session has a ticket; a session with none writes nothing.
+  SubagentStop refuses, once, a return that lacks any of the twelve fields or holds an empty one, in JSON or
+  in text.
+- **Stop and SubagentStop are not registered.** They run only once the owner adds them to the project's
+  settings file (the lines are in the lead's return, `W1-29-lead-run3.json`, and were given to the owner).
+  The installer may need the same lines for an installed project: for the adoption ticket.
+- **KPI line 3 is not met in its literal reading.** "A checkpoint is written when the session's context
+  utilisation passes the configured threshold": no hook receives the utilisation. What exists: a checkpoint at
+  every stop (once Stop is registered) and at every compaction, and W1-25's watchdog marks a checkpoint stale
+  on utilisation when a caller gives it the figure. For the owner.
+- **The auto-compact threshold (DEC-208) is not set.** The Claude Code command line has `--autocompact` (seen
+  in its help text by the orchestrator); the lead names a settings key `autocompact` with the value 300000,
+  which nobody verified. The settings file is the owner's. Until it is set, the KPI's second half holds: the
+  orchestrator's CONTEXT_CHECKPOINT stop stays.
+- **Checkpoint records written by the hooks are untracked files** under `docs/checkpoints/(ticket)/`. No code
+  commits them. A hook is a process of its own, not a tool call: its write is not decided by the guard, so a
+  worker whose role may not write `docs/**` still gets these files written in its tree. What becomes of them
+  (commit, ignore, clean at close) is open; `gov close` (W1-30) writes its closing checkpoint the same way.
+- **"Preserves the open decisions and the loop counts" holds for the orchestrator only,** through W1-49's
+  checkpoint file and its RESUME HERE section; a worker's checkpoint record holds its ticket and a next action.
+  A session inside a loop never sees a count (DEC-096).
+- **`src/gov/hooks/stop.py` and `subagentstop.py` are copies** of the two files under
+  `template/governance/kernel/hooks/`; a case pins that they are identical.
+- **A case's rewrite is labelled "owner correction"** (`test_auto_compact_threshold`): it was the
+  orchestrator's finding that the case could not fail, not an owner's correction. The label stays in the test
+  text (the orchestrator does not edit tests); this line corrects the record.
+- **Records:** the merge commit `478a8ed0` on the branch carries no `Role:` trailer. Source S0a-G-09 was
+  passed to the third start by the orchestrator (DEC-432).
+- **Learning metrics:** three starts (the first replaced W1-49's hooks and returned DONE with 65 of W1-49's
+  cases red; the second was accepted except six points found by reading each KPI clause against the case
+  table); 33 cases; 1 case rewritten after implementation, 5 added after it; about 210 lines of source against
+  an estimate of 180, plus 104 lines of copies; two reviews.
+- **Regression at `ee5eaf40`:** every suite green. One W1-16 case
+  (`test_this_repository_is_not_indexed_by_the_run`) failed in the full run because a tool call of the
+  orchestrator's own session wrote a containment snapshot under `.gov-runtime/` while the case watched that
+  folder; it passed alone. The real freeze-mirror folder was unchanged by the run.
+
+## W1-26 follow-up residuals (the generic validators and "not applicable until the first audit", 2026-10-07)
+
+- **Why the ticket was reopened:** W1-35's and W1-36's check declarations ran `true` as their command, because
+  the validators their KPIs name ("the generic validator from W1-26") did not exist. The orchestrator had
+  closed W1-26 without them: its own error, corrected by DEC-439.
+- **Built:** `python3 -m gov.check.skill_validator (folders or files)` finds every `SKILL.md` at any depth and
+  checks the frontmatter, the version, the description and body sizes (with W1-24's token count) and that
+  every `gov` command the file names exists. `python3 -m gov.check.audit_validator (files or folders)` checks a
+  report against DEC-441's form: the frontmatter `milestone`, `commit` (a full commit id that exists),
+  `pack_sha256`; the table `item | class | evidence`; the six classes of DEC-070; an `OK` row cites at least
+  one path, and every cited path exists at the cited commit. Both: any finding exits 1; nothing validated or
+  an unreadable file is "unmeasured" and exits 1 (DEC-425).
+- **"Not applicable until the first audit" (DEC-447):** a declaration that carries
+  `allows-not-applicable: "true"`, whose command exits 2 and prints `{"not_applicable": true, "reason": …}`,
+  is YELLOW with that reason. All three are needed; without the field, exit 2 is an ordinary failure. The
+  audit validator answers so only when a folder it was given is missing or holds no report; with one report it
+  is a hard block again.
+- **The opt-in field is read only from a declaration file named `(check id).yaml`.** A declaration whose file
+  name differs from its id cannot opt in (it stays red: the safe side).
+- **The audit validator does not check the value of `milestone`** (any text passes), nor that `pack_sha256` is
+  the hash of an existing pack beyond its form. For the exit audit (W1-43) to read by hand.
+- **The skill validator checks `gov` commands against the reserved-command list,** not against what is
+  installed on the machine.
+- **Declared commands name paths under `template/…`,** which an installed project does not have: for the
+  adoption tickets (W1-39, W1-41).
+- **Learning metrics:** two lead starts (the first built the skill validator only, with a folder search one
+  level deep that found nothing with the given command line), then two designer-and-engineer pairs started by
+  the orchestrator (four gaps in the audit validator found by reading DEC-441 against the code; DEC-447); 0
+  reviewer rounds (the ticket's two were spent); 450 lines in the two validators plus about 50 in the runner,
+  against an estimate of 120; 238 cases in W1-26's suite.
+- **Regression at `54b8a404`** (machine load 48): green except the load-sensitive cases of DEC-372 (W1-02,
+  W1-05, W1-46), which passed alone, save one W1-05 case in one alone run that was not identified.
+  **Regression at `b706e688`:** every suite green, no latency occurrence (W1-05: 99 passed).
+
+**Correction to "W1-29 residuals" above (DEC-451):** the line "The auto-compact threshold (DEC-208) is not set"
+is wrong. The project's settings set the environment variable `CLAUDE_CODE_AUTO_COMPACT_WINDOW` to `300000`
+since W1-49's merge; the Claude Code documentation names that variable as the setting, and there is no
+settings key `autocompact`. The orchestrator's CONTEXT_CHECKPOINT stop is dropped. The other owner items of
+that block are answered by DEC-442 (Stop and SubagentStop are registered at the Wave 1 exit run), DEC-444
+(the hooks' automatic checkpoints go to `.gov-runtime/scratch/checkpoints/`: W1-29 follow-up) and DEC-445 (the
+utilisation-triggered checkpoint is an accepted residual).
