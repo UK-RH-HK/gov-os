@@ -150,15 +150,22 @@ def run(root: Path, args, config: dict):
     for key in test_counts:
         test_counts[key] += counts[key]
 
-    # Governance checks (A7, DEC-480): a red hard-block check is a finding like a failing test
-    checked, red_checks = _check_governance(root, commits)
-    findings += [f"governance check {check['id']} is RED at commit {checked['check_commit'][:12]}: "
-                 f"{json.dumps(check.get('findings'), ensure_ascii=False)}" for check in red_checks]
+    # Governance checks (A7, DEC-480): where the runner blocks, what it reports
+    # as blocking is a finding like a failing test
+    checked, blocking = _check_governance(root, commits)
+    if blocking is not None:
+        at = f"at commit {checked['check_commit'][:12]}"
+        findings += [f"governance check {check['id']} is RED {at}: "
+                     f"{json.dumps(check.get('findings'), ensure_ascii=False)}"
+                     for check in blocking["red_checks"]]
+        findings += [f"governance check family {name!r} is RED {at}" for name in blocking["red_families"]]
+        if not any(blocking.values()):
+            findings.append(f"the governance checks block {at}; the runner names no red check or family")
 
     if findings:
         details = {"findings": findings, "disposition": disposition or "unclassed"}
-        if red_checks:
-            details.update(check_commit=checked["check_commit"], red_checks=red_checks)
+        if blocking is not None:
+            details.update(check_commit=checked["check_commit"], **blocking)
         packet, context_reason = None, None
         if disposition:  # DEC-454: with a class, the context is built first
             try:
@@ -522,19 +529,22 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 # Governance checks (A7)
 # ---------------------------------------------------------------------------
 
-def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, list[dict]]:
+def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, dict | None]:
     """W1-26's judgement of the project at the commit being closed, when the
     ticket's commits change a governance file (DEC-454, DEC-480).
 
     Returns what the close record states of it (``check_commit`` and the
     runner's result under ``governance_checks``; nothing when no governance
-    file changed) and the checks the runner reports red at hard-block, as it
-    gave them. This command has no rule of its own about checks and stands on
-    no result but this run's: ``CHECKS_NOT_MEASURED`` when the runner's answer
-    is not one of the commit being closed.
+    file changed) and, where the runner says it blocks (the answer it returns
+    beside its result, on which ``gov check`` forms its exit code), what it
+    reports as blocking: the ``red_checks`` at hard-block and the
+    ``red_families``, as it gave them; ``None`` where it does not block. This
+    command has no rule of its own about checks and stands on no result but
+    this run's: ``CHECKS_NOT_MEASURED`` when the runner's answer is not one of
+    the commit being closed.
     """
     if not any(p.startswith(_GOVERNANCE_PREFIXES) for c in commits for p in c["paths"]):
-        return {}, []
+        return {}, None
 
     from gov.check.runner import HARD_BLOCK, RED, run_checks
 
@@ -543,19 +553,21 @@ def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, list[dict]
                         f"the governance checks were not measured: {why}", details)
 
     head = _git(root, "rev-parse", "HEAD").strip()
-    result, _ = run_checks(root)
+    result, blocks = run_checks(root)
     try:
         checks = result["checks"]
         ran_at = sorted({check["provenance"]["commit"] for check in checks})
         red = [check for check in checks
                if (check["id"], check["severity"], check["status"])[1:] == (HARD_BLOCK, RED)]
-    except (KeyError, TypeError) as e:
+        red_families = sorted(name for name, family in result["families"].items() if family["status"] == RED)
+    except (KeyError, TypeError, AttributeError) as e:
         raise not_measured(f"the runner's result has another shape ({e!r})")
     if ran_at != [head]:
         raise not_measured(f"the runner's result is of {', '.join(ran_at) or 'no check'}, "
                            f"not of the commit being closed ({head})",
                            commit=head, checked=ran_at)
-    return {"check_commit": head, "governance_checks": result}, red
+    stated = {"check_commit": head, "governance_checks": result}
+    return stated, {"red_checks": red, "red_families": red_families} if blocks else None
 
 
 # ---------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 """The governance checks of a close (DEC-454, DEC-480) and a ticket without acceptance tests: W1-26's runner is
-the authority on a check's status; what it reports red at hard-block refuses, through the one failure path."""
+the authority on whether the checks block; where it says so, what it reports red (hard-block checks, families)
+refuses, through the one failure path."""
 from __future__ import annotations
 
 import json
@@ -29,17 +30,23 @@ def _entry(check_id: str, severity: str, status: str, commit: str = HEAD, findin
             "findings": list(findings), "provenance": {"commit": commit, "check_version": "1", "inputs_hash": "x"}}
 
 
-def _judged(commits, *entries, head=HEAD):
-    """``_check_governance`` with the runner answering ``entries`` and ``HEAD`` at ``head``."""
-    result = {"families": {}, "checks": list(entries)}
-    with patch("gov.check.runner.run_checks", return_value=(result, False)) as runner, \
+def _families(**statuses) -> dict:
+    return {name.replace("_", " "): {"status": status, "family": name.replace("_", " ")}
+            for name, status in statuses.items()}
+
+
+def _judged(commits, *entries, head=HEAD, blocks=False, families=None):
+    """``_check_governance`` with the runner answering ``entries``, ``families`` and ``blocks``, and ``HEAD`` at
+    ``head``."""
+    result = {"families": families or {}, "checks": list(entries)}
+    with patch("gov.check.runner.run_checks", return_value=(result, blocks)) as runner, \
             patch.object(command, "_git", return_value=head + "\n"):
         return _check_governance(Path("/p"), commits), result, runner
 
 
 def test_no_governance_file_changed_runs_no_check_and_claims_no_result():
     with patch("gov.check.runner.run_checks") as runner:
-        assert _check_governance(Path("/p"), [_commit("a", "src/app.py", "template/other/x.yaml")]) == ({}, [])
+        assert _check_governance(Path("/p"), [_commit("a", "src/app.py", "template/other/x.yaml")]) == ({}, None)
     runner.assert_not_called()
 
 
@@ -47,7 +54,7 @@ def test_no_governance_file_changed_runs_no_check_and_claims_no_result():
 def test_a_change_under_each_governance_prefix_has_the_checks_run(prefix):
     (stated, red), result, runner = _judged([_commit("a", f"{prefix}x.yaml")], _entry("ok", "hard-block", "GREEN"))
     runner.assert_called_once_with(Path("/p"))
-    assert stated == {"check_commit": HEAD, "governance_checks": result} and red == []
+    assert stated == {"check_commit": HEAD, "governance_checks": result} and red is None
 
 
 @pytest.mark.parametrize("paths", [(DECLARATION,), ("template/governance/kernel/checks/another.yaml",), (NOTES,)],
@@ -55,8 +62,9 @@ def test_a_change_under_each_governance_prefix_has_the_checks_run(prefix):
 def test_any_red_hard_block_check_is_returned_whatever_the_ticket_changed(paths):
     mine = _entry("mine", "hard-block", "RED", findings=[{"code": "CHECK_FAILED"}])
     other = _entry("other", "hard-block", "RED")
-    (stated, red), result, _ = _judged([_commit("a", *paths)], mine, _entry("ok", "hard-block", "GREEN"), other)
-    assert red == [mine, other]
+    (stated, red), result, _ = _judged([_commit("a", *paths)], mine, _entry("ok", "hard-block", "GREEN"), other,
+                                       blocks=True)
+    assert red == {"red_checks": [mine, other], "red_families": []}
     assert stated["governance_checks"] is result
 
 
@@ -64,14 +72,31 @@ def test_any_red_hard_block_check_is_returned_whatever_the_ticket_changed(paths)
                                               ("hard-block", "GREEN")])
 def test_a_warning_and_a_yellow_refuse_nothing(severity, status):
     (_, red), _, _ = _judged([_commit("a", NOTES)], _entry("x", severity, status))
-    assert red == []
+    assert red is None
+
+
+def test_the_runner_s_own_answer_decides_whether_the_checks_block():
+    """Not a derivation of this command's: the same result blocks or not as the runner says beside it."""
+    entries = (_entry("mine", "hard-block", "RED"),)
+    families = _families(mutation_scope="RED")
+    (_, quiet), _, _ = _judged([_commit("a", NOTES)], *entries, families=families, blocks=False)
+    (_, loud), _, _ = _judged([_commit("a", NOTES)], *entries, families=families, blocks=True)
+    assert quiet is None
+    assert loud == {"red_checks": list(entries), "red_families": ["mutation scope"]}
+
+
+def test_a_red_family_without_a_red_hard_block_check_is_what_blocks():
+    families = _families(licence_hygiene="RED", graph_integrity="GREEN", wanted="YELLOW", another="RED")
+    (_, red), _, _ = _judged([_commit("a", NOTES)], _entry("ok", "hard-block", "GREEN"), families=families,
+                             blocks=True)
+    assert red == {"red_checks": [], "red_families": ["another", "licence hygiene"]}
 
 
 def test_a_declaration_changed_in_two_commits_is_judged_by_the_run_alone():
     (stated, red), _, runner = _judged([_commit("b", DECLARATION), _commit("a", DECLARATION)],
                                        _entry("mine", "hard-block", "GREEN"))
     runner.assert_called_once()
-    assert red == [] and stated["check_commit"] == HEAD
+    assert red is None and stated["check_commit"] == HEAD
 
 
 @pytest.mark.parametrize("entries", [(_entry("x", "hard-block", "GREEN", commit="d" * 40),),
@@ -84,7 +109,10 @@ def test_a_result_that_is_not_of_the_commit_being_closed_is_an_error(entries):
     assert HEAD in raised.value.message
 
 
-@pytest.mark.parametrize("result", [{}, {"checks": [{"id": "x", "status": "RED"}]}, {"checks": ["x"]}, None])
+@pytest.mark.parametrize("result", [{}, {"checks": [{"id": "x", "status": "RED"}]}, {"checks": ["x"]}, None,
+                                    {"checks": [_entry("x", "hard-block", "GREEN")]},
+                                    {"checks": [_entry("x", "hard-block", "GREEN")], "families": ["x"]},
+                                    {"checks": [_entry("x", "hard-block", "GREEN")], "families": {"x": {}}}])
 def test_a_result_of_another_shape_is_an_error(result):
     with patch("gov.check.runner.run_checks", return_value=(result, False)), \
             patch.object(command, "_git", return_value=HEAD + "\n"):
@@ -103,9 +131,9 @@ def test_an_error_of_the_runner_is_not_caught():
 
 # ---- through the one failure path (DEC-455, DEC-480) ----
 
-def _close(root, *, tests=True, entries=(), test_findings=()):
+def _close(root, *, tests=True, entries=(), test_findings=(), families=None, blocks=True):
     """``run`` on the conftest's project: the gates before the tests pass, the test runs answer
-    ``test_findings``, the runner answers ``entries``."""
+    ``test_findings``, the runner answers ``entries``, ``families`` and ``blocks``."""
     if tests is not None:
         folder = root / "tests" / "acceptance" / TICKET / ("" if tests else "notes")
         folder.mkdir(parents=True)
@@ -115,7 +143,8 @@ def _close(root, *, tests=True, entries=(), test_findings=()):
             patch.object(command, "_check_trailers"), patch.object(command, "_check_containment"), \
             patch.object(command, "_run_tests", return_value=(list(test_findings), dict(COUNTS))) as ran, \
             patch.object(command, "_git", return_value=HEAD + "\n"), \
-            patch("gov.check.runner.run_checks", return_value=({"families": {}, "checks": list(entries)}, False)):
+            patch("gov.check.runner.run_checks",
+                  return_value=({"families": families or {}, "checks": list(entries)}, blocks)):
         with pytest.raises(GovError) as raised:
             run(root, args, {})
     return raised.value, ran
@@ -135,6 +164,26 @@ def test_a_red_hard_block_check_refuses_counted_with_a_repair_ticket_and_is_name
     assert _counted(root)["count"] == 1 and _counted(root)["last_failures"] == [finding]
     assert (root / ".tickets" / f"{error.details['repair_ticket']}.md").is_file()
     assert not (root / "docs" / "close").exists()
+
+
+def test_a_red_family_without_a_red_check_refuses_counted_with_a_repair_ticket_and_is_named(root):
+    error, _ = _close(root, entries=[_entry("feature-present", "hard-block", "GREEN")],
+                      families=_families(licence_hygiene="RED", graph_integrity="GREEN"))
+    assert (error.code, error.exit_code) == ("CHECK_FAILED", EXIT_CHECK_FAILED)
+    assert error.details["red_checks"] == [] and error.details["red_families"] == ["licence hygiene"]
+    assert error.details["check_commit"] == HEAD
+    [finding] = error.details["findings"]
+    assert "licence hygiene" in finding and HEAD[:12] in finding and "graph integrity" not in finding
+    assert _counted(root)["count"] == 1 and _counted(root)["last_failures"] == [finding]
+    assert (root / ".tickets" / f"{error.details['repair_ticket']}.md").is_file()
+    assert not (root / "docs" / "close").exists()
+
+
+def test_a_block_the_runner_names_nothing_for_still_refuses(root):
+    error, _ = _close(root, entries=[_entry("ok", "hard-block", "GREEN")])
+    assert error.code == "CHECK_FAILED" and error.details["red_checks"] == error.details["red_families"] == []
+    [finding] = error.details["findings"]
+    assert "block" in finding and HEAD[:12] in finding
 
 
 def test_a_red_check_and_a_failing_test_are_one_refusal(root):
