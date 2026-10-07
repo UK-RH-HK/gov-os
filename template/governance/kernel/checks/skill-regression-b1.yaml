@@ -2,4 +2,4 @@ id: skill-regression-b1
 family: skill regression
 tier: G1
 severity: hard-block
-command: python3 -m gov.check.skill_regression || python3 -c "import importlib.util; exit(1 if importlib.util.find_spec('gov.check.skill_regression') else 0)"
+command: python3 -m gov.check.skill_validator template/governance/kernel/skills/retrieval template/governance/kernel/skills/audit template/governance/kernel/skills/checkpoint template/governance/kernel/skills/adopt

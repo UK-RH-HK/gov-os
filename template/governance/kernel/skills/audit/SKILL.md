@@ -1,7 +1,7 @@
 ---
 name: audit
 description: Method for running an independent fidelity audit against the Contract and governing decisions
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Audit
@@ -18,6 +18,14 @@ The audit runs in a fresh session with no prior context (CAP-47). The only input
 The role file states that the session is read-only with respect to audited files: the auditor does not edit audited files (MR-4). The guard decides what the session may write.
 
 ## Writing the report
+
+The report is a Markdown file with YAML frontmatter holding three required fields:
+
+- `milestone` — the milestone being audited.
+- `commit` — the hexadecimal commit id of the audited commit.
+- `pack_sha256` — the SHA-256 hash of the context pack the auditor received.
+
+The body holds one table with three columns: `item | class | evidence`. Evidence values are paths relative to the repository root, separated by commas. A row of class `OK` must cite at least one path. A row of another class may cite no evidence, written as `-`.
 
 The report names its milestone (DEC-088). It has one row per contract item and decision in scope (DEC-088, CAP-47). Each row is classified into exactly one of the six classes:
 
