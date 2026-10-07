@@ -4787,3 +4787,61 @@ Decided by the orchestrator on 2026-10-06.
 |---|---|---|
 | 0.108 | 2026-10-06 | Delegated: DEC-438 (W1-26: a family with no registered check is YELLOW with its reason and a count, never green). |
 
+## 109. A delegated decision: W1-26 is reopened for the generic validators it did not build (register v0.109, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-439 — W1-26 reopened: the generic validators for skill files and audit reports
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** W1-35's return: its check `skill-regression-a` had no validator to call and was declared with a command that always succeeds; W1-26's KPI line "provides the generic validators for skill files and audit reports" was met by no code and by no case, and the ticket was closed by the orchestrator without noticing · **Under:** DEC-413, DEC-425, DEC-438
+- **Decision:**
+  - W1-26 (`DAEO-fygv`) is reopened for one follow-up round in its own paths: a validator for skill files
+    (frontmatter, version, description and body size, every referenced `gov` command exists) and a validator
+    for audit reports (the cited commit, the rows and the evidence paths resolve), each callable as a check
+    command with the files or folders to validate as arguments, test first.
+  - A validator that is given nothing to validate, or that cannot read what it is given, is unmeasured and
+    never green (DEC-425).
+  - W1-35 and W1-36 declare their checks with these validators. A check declared with a command that always
+    succeeds is not merged.
+  - No new ticket is made and no KPI line changes: the line was already W1-26's.
+  - The close of W1-26 on 2026-10-06 was the orchestrator's error: a KPI clause with no case. From now on the
+    orchestrator reads every clause of every KPI line against the designer's case table before a close.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.109 | 2026-10-06 | Delegated: DEC-439 (W1-26 reopened for the generic validators for skill files and audit reports; a check declared with a command that always succeeds is not merged). |
+
+
+## 110. Two delegated decisions: what rebuild and doctor must do, and the form of an audit report (register v0.110, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided by the orchestrator on 2026-10-06.
+
+### DEC-440 — W1-27: rebuild recreates each derived store through its owner; a doctor measurement that fails is a failure
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06) · **Basis:** W1-27's second return: `gov rebuild` recreated only the record graph, created empty lexical tables from a copy of W1-17's table definitions and named the semantic and the code index as skipped with constant sentences; `gov doctor` was healthy whenever no section said "fail" or "drift", and a measurement that raised an error said "unmeasured" · **Under:** DEC-413, DEC-425, DEC-438
+- **Decision:**
+  - `gov rebuild` recreates the lexical index by the code that owns it and holds no copy of another module's
+    table definitions. It recreates the semantic index and the code index by the code that owns them when
+    their tool answers, and names each as not recreated, with the measured reason, when it does not. Rebuild
+    itself succeeds with nothing but git. Its result names every derived store with what was done to it.
+  - In `gov doctor`, a section whose measurement raised an error, or whose input exists and cannot be read, is
+    a failure. A section whose component is not installed in the project is unmeasured with its reason; it
+    does not by itself make the project unhealthy, and such a project is never reported at the top adoption
+    level.
+
+### DEC-441 — The minimal form of an audit report, for the audit-reproducibility check
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-06; the owner may overturn) · **Basis:** the W1-26 follow-up's package: no source fixes the report as a file; DEC-070 fixes the six row classes, DEC-088 the triggers and the milestone, CAP-47 the pack hash and the evidence · **Under:** DEC-070, DEC-088, DEC-439
+- **Decision:**
+  - An audit report is a Markdown file with YAML frontmatter holding `milestone`, `commit` (the audited
+    commit) and `pack_sha256` (the hash of the context pack the auditor received), and a body holding one
+    table whose header is `item`, `class`, `evidence`.
+  - Each row names one contract item or decision, exactly one of the six classes of DEC-070, and its evidence:
+    paths relative to the repository root, separated by commas. A row of class `OK` cites at least one path;
+    a row of another class may cite none, written as `-`.
+  - The audit-report validator of W1-26 is green only when the commit resolves in the repository, the table
+    has at least one row, every row is well-formed, and every cited path exists at the cited commit. Prose
+    around the table is free.
+  - The audit skill of W1-36 states this form. The form is the minimum the check needs; a later decision may
+    add fields.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.110 | 2026-10-06 | Delegated: DEC-440 (W1-27: rebuild recreates each derived store through its owner; a failed doctor measurement is a failure), DEC-441 (minimal form of an audit report). |
