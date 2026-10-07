@@ -5540,3 +5540,46 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.135 | 2026-10-07 | One delegated decision on W1-31: DEC-502 (forms of a third specimen counted; DEC-501's sentence on the PreCompact hook corrected; `gov` by a path or the interpreter counted; W1-31 merges as built, the points follow on its branch). Next free id: DEC-503. |
+
+## 136. Owner answers: W1-30's leftovers and its close, the probe gate against the probe's order, W1-39's doctor message, the estimate, the held-out file in the guard, the runner's tools (register v0.136, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-503 — W1-30: files that the project's own ignore rules hide are a residual
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-10 option (a) · **Refines:** DEC-500
+- **Decision:** That a file ignored by the commit's own ignore rules is in the tree the tests run in, and not in the commit, is a residual. "Tests run in a clean checkout of the commit" goes on the Wave 2 list.
+
+### DEC-504 — W1-30: the three points the last fix closed in part are residuals; W1-30 closes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-13 option (a) · **Under:** DEC-498
+- **Decision:** Recorded as residuals: git calls made by other modules still inherit the caller's git variables and replacement refs; git configuration still reaches every call; `PYTHONUSERBASE` stays. Then W1-30 closes.
+
+### DEC-505 — A probe refusal caused only by the orchestrator's merge and residual commits, or by a fix round the owner ordered, counts with the adoption gaps; the probe gate is changed in the planned W1-30 follow-up
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-14 option (a) · **Refines:** DEC-492, DEC-498 · **Under:** DEC-137
+- **Decision:**
+  - Until the tool is changed, a `PROBE_INVALID` refusal whose only later commits are the orchestrator's merge and residual commits, or a fix round the owner ordered, counts with the DEC-492 adoption gaps: the ticket closes with `tk close` and is listed for the exit auditor.
+  - W1-30's probe record names `b59d7244` as the probed commit, truthfully.
+  - The probe gate is changed in the planned W1-30 follow-up (the one that adds the counter call, DEC-495), so that a merge bringing exactly the probed code no longer counts as "after" the probed commit.
+
+### DEC-506 — W1-39: the doctor message change is accepted; W1-39 merges
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-11 option (a) · **Refines:** DEC-493
+- **Decision:** The change to `gov doctor`'s failure message in `src/gov/doctor/command.py` (every failed part named with its reason), which goes beyond "the lock-comparison call only", is accepted. W1-39 merges.
+
+### DEC-507 — W1-31: what the estimated part of the governance share stands on
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-12 option (a) · **Refines:** DEC-495
+- **Decision:** Per session: the session role's file under `.claude/agents/`, plus `CLAUDE.md` and `AGENTS.md` where they exist. MCP counts 0, because the Governance OS defines no MCP server.
+
+### DEC-508 — The held-out file: the brief rule is confirmed, and the guard refuses any agent tool call whose targets include it
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on the incident in W1-31's second run (a test designer's search with a glob over the folder that holds the held-out file) · **Under:** DEC-108
+- **Decision:**
+  - The orchestrator's brief rule is confirmed: no worker runs a glob, a search or a listing over `governance/project/`; files there are named one by one.
+  - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call whose expanded file targets (globs included, DEC-108) include the project's held-out file under `governance/project/` (the owner's answer names its path). The orchestrator chooses the ticket.
+
+### DEC-509 — DEC-499 to DEC-502 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Ratifies:** DEC-499, DEC-500, DEC-501, DEC-502
+- **Decision:** DEC-499, DEC-500, DEC-501 and DEC-502 stand as written, including the orchestrator's correction to DEC-501.
+
+### DEC-510 — Exit package: the tools the CI runner still needs, each as an install for the owner to approve
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-083, DEC-494
+- **Decision:** The exit package lists which tools the hosted runner still needs for this repository's CI to go green (pytest, openspec, rulesync, as the W1-40 residual says), each as an install for the owner to approve, with its version and checksum.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.136 | 2026-10-07 | Owner answers: DEC-503 (ignored files a residual), DEC-504 (three partly closed points residuals; W1-30 closes), DEC-505 (a probe refusal from the orchestrator's merge and residual commits or an owner-ordered fix round counts with the adoption gaps; the gate changes in the W1-30 follow-up), DEC-506 (W1-39's doctor message accepted), DEC-507 (the estimate's basis), DEC-508 (the guard refuses tool calls whose targets include the held-out file), DEC-509 (DEC-499 to DEC-502 accepted), DEC-510 (the runner's tools in the exit package). Next free id: DEC-511. |
