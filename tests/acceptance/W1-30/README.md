@@ -1091,6 +1091,72 @@ files; 263 passed, 11 failed, none skipped. The 259 cases of round 8b are green.
 cases 11 are red for the reasons above and four are green: the tree that is not its commit, the
 two cases of precedence, the tool at neither place.
 
+## Round 10: the last review's five behaviours (DEC-500)
+
+DEC-500 (orchestrator, delegated, 2026-10-07; register v0.133), its "fixed" part: every probe
+record of the ticket is read; a `Task:` that names no ticket of the project names no task; the git
+that `gov close` asks is not the caller's to bend; the test runs take no interpreter switches from
+the caller's environment; skipped tests are counted in the close record. The cases hold these five
+and nothing of the decision's other two parts (what goes to the owner, the residuals).
+
+Five new files, 16 cases, no change to the support code.
+
+| File | Cases | Holds | As observed at `53bada71` |
+|------|-------|-------|---------------------------|
+| `test_w1_30_r10_probe_records.py` | `test_a_failing_probe_record_beside_a_passing_one_refuses` (2: the second record fails, the first record fails) | a FULL ticket with two records in `docs/probes/<ticket>/` that differ only in id, file and judgement (`pass`, `fail`), both of the final code, both in the orchestrator's one commit: exit code 3, "judgement" said, nothing closed | "the first record fails" is red: the ticket closes (exit code 0). "The second record fails" is green: `PROBE_INVALID`, "the probe's judgement is 'fail'". So one record of the two is read today, the one whose file sorts last |
+| | `test_one_passing_probe_record_alone_closes` (2: under the first name, under the second name) | one passing record, as `PR-<ticket>.md` or as `PR-<ticket>-2.md`: the ticket closes | green, both |
+| `test_w1_30_r10_task_names_no_ticket.py` | `test_a_commit_whose_task_names_no_ticket_and_that_changes_the_tickets_work_refuses` (3) | a commit with the engineer's trailers whose `Task:` names no ticket file (a mistyped id, `PROJ-cmtz`; a record's id, `DEC-000`) and that changes only the weakened acceptance test, or a new file inside the allowed paths, or the ticket's own file (FULL lowered, no probe record): exit code 3, the commit named, "task" said, nothing closed | red, all three: the ticket closes (exit code 0) |
+| | `test_a_commit_whose_task_names_no_ticket_and_that_changes_nobodys_work_refuses_nothing` | the same commit on `notes/meeting.txt` only: the ticket closes | green |
+| `test_w1_30_r10_git.py` | `test_a_file_ignored_only_by_the_repositorys_private_exclude_file_refuses` | the failing ticket and the untracked root `conftest.py` that passes every test, ignored by `.git/info/exclude`: exit code 1, the file named, nothing closed, not counted, no repair ticket | red: the ticket closes (exit code 0) |
+| | `test_a_file_ignored_only_by_an_excludes_file_named_in_the_callers_environment_refuses` | the same, ignored by a file outside the project that `GIT_CONFIG_COUNT`, `GIT_CONFIG_KEY_0=core.excludesFile`, `GIT_CONFIG_VALUE_0` name in the environment of `gov close` only | red: the ticket closes (exit code 0) |
+| | `test_a_replacement_ref_that_gives_a_commit_its_missing_trailer_does_not_pass_the_trailers_gate` | no commit of the ticket carries `Implements:`; each has a replacement (`git replace`) that does: exit code 3, "Implements" named, nothing closed | red: the ticket closes (exit code 0) |
+| `test_w1_30_r10_interpreter.py` | `test_the_switch_that_removes_assertions_does_not_reach_the_test_runs` (2: `PYTHONOPTIMIZE=1`, `=2`) | the acceptance test fails only through an `assert` in a helper module of its folder; with the variable in the environment of `gov close`: exit code 3, the test named, counted once | red, both: the ticket closes (exit code 0) |
+| `test_w1_30_r10_skips.py` | `test_skipped_acceptance_tests_are_counted_and_refuse_nothing` | one passing and two skipped acceptance tests: closed; the record's counts say `skipped: 2` | red: `tests_run` is `{passed: 1, failed: 0, errors: 0}`, no `skipped` |
+| | `test_skipped_regression_tests_are_counted_and_refuse_nothing` | one skipped test among the project's regression tests: closed; `skipped: 1` | red: `{passed: 2, failed: 0, errors: 0}`, no `skipped` |
+| | `test_a_close_without_skipped_tests_says_zero` | no skipped test: closed; `skipped: 0` | red: `{passed: 1, failed: 0, errors: 0}`, no `skipped` |
+
+Each fixture holds itself before the close runs. The git cases ask git which file's rule ignores
+the planted file (`git check-ignore -v`): the private exclude file, or the caller's excludes file
+and, without the caller's environment, none. The replacement case asks git for the trailer with
+replacements followed and without (`--no-replace-objects`). The interpreter case runs the test
+runner on the ticket's folder in the suite's environment (it fails) and with the variable (it
+passes). The session this round was written in has `GIT_CONFIG_COUNT` in its own environment; no
+case inherits it, because every process of the suite gets an environment built anew.
+
+Held by cases that exist and are unchanged, as the decision says "as today": a file the commit's
+own ignore file ignores refuses nothing (`test_a_file_git_ignores_refuses_nothing`); a commit that
+names another existing ticket is that ticket's
+(`test_a_commit_that_names_another_ticket_refuses_nothing`); a ticket whose only acceptance test is
+skipped is refused, since no test passed
+(`test_a_ticket_whose_only_acceptance_test_is_skipped_refuses`).
+
+Not held, and why. Which of two probe records a refusal names: no source says it. An excludes
+file named by a configuration file (the caller's global one) and not by the environment: the
+decision names it, the round's order only the environment's form; one fix (asking git with the
+commit's own ignore rules only) covers both. Other variables that change how Python runs: the
+decision names the one switch. A governance file changed by a commit whose `Task:` names no
+ticket: DEC-490's cases hold it for the commit without a task, and the order of this round names
+the ticket's work and nobody's work only. Whether the two test runs get one object of counts or
+one each (settlement 16).
+
+### Existing cases against DEC-500
+
+None was rewritten, so the round's commit carries no `Rewrite-Reason:`. Looked for, in every file
+of the suite: a ticket with two probe records (none; every case writes `PR-<ticket>.md` only); a
+commit whose `Task:` names something that is no ticket of its project and whose close succeeds
+(none: every `Task:` of the suite names a ticket file of the same project); a rule outside the
+commit that ignores a file, a replacement ref, an interpreter variable in a caller's environment
+(none); a case that holds the close record's counts as exactly `passed`, `failed`, `errors`
+(none: `test_close_record_lists_test_counts` holds only that the record lists test results).
+
+### The run of round 10
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`, at
+`53bada71` (the engineer's round 9, `b59d7244`, and the merge of `w1/integrate`): 290 cases in 31
+files; 278 passed, 12 failed, none skipped. The 274 cases of round 9 are green. Of the 16 new
+cases 12 are red for the reasons above and four are green: the second of two records failing, one
+passing record alone in its two forms, the commit that changes nobody's work.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1105,6 +1171,7 @@ two cases of precedence, the tool at neither place.
 | CAP-38.f | probe: 16 tests; probe_record (round 8): 10 tests |
 | DEC-487, DEC-490 | the six `test_w1_30_r8_*.py` files: 54 tests; governance_checks: the `governance/kernel/` form |
 | DEC-492 | the two `test_w1_30_r9_*.py` files: 15 tests (every finding: 10; the ticket tool: 5) |
+| DEC-500 | the five `test_w1_30_r10_*.py` files: 16 tests (probe records: 4; a task that names no ticket: 4; git: 3; the interpreter: 2; skips: 3) |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1129,6 +1196,8 @@ two cases of precedence, the tool at neither place.
 13. **The time limit of a governance check** (round 6b, DEC-480): the runner's own; `gov close` adds none, and `--timeout` (settlement 8) is the limit of the close's test runs only. Round 6's settlement (the close's `--timeout` as the limit of each check) is withdrawn
 14. **How an answer says "not measured, by name"** (round 9, DEC-492): no source gives the form. Taken, in the refusal's `error` object: one sentence of one string holds both "not measured" and the part's name (for the acceptance run: "acceptance"), or one of the two is in a key and the other is under that key; `_` and `-` read as blanks, case is not held (`support.says_not_measured`). So `"the acceptance run was not measured: ..."`, `{"not_measured": ["acceptance tests"]}` and `{"acceptance": "not measured"}` all say it; the finding "no acceptance tests for ..." alone does not
 15. **Where the ticket tool is found** (round 9, DEC-492): `governance/kernel/bin/tk`, else `tk` on `PATH`; the kernel's wherever it exists, also when it fails
+16. **The number of skipped tests in the close record** (round 10, DEC-500): the key `skipped`, a whole number, beside `passed`, `failed` and `errors` in every object of the close record's frontmatter that states those three, at any depth. No source says whether the acceptance run and the regression run get one object or one each: the number of tests skipped in one run is the `skipped` of at least one object, and no object holds a number that is neither that nor 0
+17. **The probe records of a ticket** (round 10, DEC-500): every record of type `probe` in `docs/probes/<ticket>/` that names the ticket in `task`, whatever its file is called; the cases write `PR-<ticket>.md` and `PR-<ticket>-2.md`
 
 ## Residuals
 
