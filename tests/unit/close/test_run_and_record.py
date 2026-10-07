@@ -1,0 +1,85 @@
+"""The test runs of a close and what its close record holds."""
+from __future__ import annotations
+
+import pytest
+import yaml
+
+from gov.close.command import NOT_MEASURED, _read_skill_versions, _run_tests, _write_close_record
+
+
+def _tests(root, **files):
+    for name, text in files.items():
+        path = root / "tests" / "unit" / f"{name}.py"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    return root / "tests"
+
+
+def test_a_passing_run_has_no_finding_and_its_counts(tmp_path):
+    tests = _tests(tmp_path, test_a="def test_a():\n    assert True\n")
+    assert _run_tests(tmp_path, tests, 60) == ([], {"passed": 1, "failed": 0, "errors": 0})
+
+
+def test_every_failing_test_is_a_finding(tmp_path):
+    tests = _tests(tmp_path, test_a="def test_a():\n    assert False\n\n\ndef test_b():\n    assert False\n",
+                   test_c="def test_c():\n    assert True\n")
+    findings, counts = _run_tests(tmp_path, tests, 60)
+    assert len(findings) == 2 and "test_a" in findings[0] and "test_b" in findings[1]
+    assert counts == {"passed": 1, "failed": 2, "errors": 0}
+
+
+def test_a_collection_error_is_a_finding(tmp_path):
+    findings, counts = _run_tests(tmp_path, _tests(tmp_path, test_a="def test_a(:\n"), 60)
+    assert findings and counts["errors"] >= 1
+
+
+def test_a_run_over_the_time_limit_is_a_finding_not_an_error(tmp_path):
+    tests = _tests(tmp_path, test_slow="import time\n\n\ndef test_slow():\n    time.sleep(999)\n")
+    findings, counts = _run_tests(tmp_path, tests, 1)
+    assert findings == ["the test run of tests exceeded the time limit of 1s"]
+    assert counts == {"passed": 0, "failed": 0, "errors": 0}
+
+
+def test_no_test_collected_is_a_finding_unless_the_run_may_be_empty(tmp_path):
+    tests = _tests(tmp_path, helper="x = 1\n")
+    assert _run_tests(tmp_path, tests, 60)[0] == ["no test was collected in tests"]
+    assert _run_tests(tmp_path, tests, 60, none_collected_ok=True)[0] == []
+
+
+def test_the_ignored_folder_is_not_run(tmp_path):
+    tests = _tests(tmp_path, test_a="def test_a():\n    assert False\n")
+    assert _run_tests(tmp_path, tests, 60, ignore=tests / "unit", none_collected_ok=True)[0] == []
+
+
+RECORD = {"packet_hash": "ab" * 32, "commits": [{"commit": "c" * 40, "role": "engineer", "model": NOT_MEASURED}]}
+
+
+def test_the_close_record_holds_what_it_is_given_and_its_outputs(tmp_path):
+    rel = _write_close_record(tmp_path, "T-1", RECORD, ["src/a.py"], "docs/checkpoints/T-1/CP.md")
+    assert rel == "docs/close/T-1/CL-T-1.md"
+    front = yaml.safe_load((tmp_path / rel).read_text(encoding="utf-8").split("---")[1])
+    assert front["type"] == "close" and front["task"] == "T-1"
+    assert front["outputs"] == ["src/a.py", rel, "docs/checkpoints/T-1/CP.md"]
+    assert RECORD.items() <= front.items()
+    assert "governance_checks" not in front and "check_commit" not in front
+
+
+def test_a_close_record_that_cannot_be_written_is_an_error(tmp_path):
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "close").write_text("a file where the folder goes\n", encoding="utf-8")
+    with pytest.raises(OSError):
+        _write_close_record(tmp_path, "T-1", RECORD, [], "")
+
+
+def test_skills_are_listed_with_the_version_read(tmp_path):
+    kernel = tmp_path / "template" / "governance" / "kernel"
+    for rel, text in (("skills/a/SKILL.md", '---\nname: alpha\nversion: "1.2"\n---\n'),
+                      ("skills/b/SKILL.md", "---\nname: beta\n---\n"),
+                      ("skills/c/SKILL.md", "no frontmatter\n"),
+                      ("vendor/pack/skills/v/SKILL.md", '---\nname: vendored\nversion: "9"\n---\n')):
+        (kernel / rel).parent.mkdir(parents=True)
+        (kernel / rel).write_text(text, encoding="utf-8")
+    assert _read_skill_versions(tmp_path) == [
+        {"name": "alpha", "version": "1.2"}, {"name": "beta", "version": "no version"},
+        {"name": "c", "version": NOT_MEASURED}, {"name": "vendored", "version": "no version"}]
+    assert _read_skill_versions(tmp_path / "elsewhere") == []
