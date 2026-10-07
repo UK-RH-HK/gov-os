@@ -7,6 +7,8 @@ These tests run ``gov check`` (not ``gov close``) to verify that a check in the
 product-traceability family detects trailer violations on closed tickets.
 """
 
+import json
+
 import pytest
 
 import w1_30_support as support
@@ -186,13 +188,24 @@ def test_traceability_unreadable_record_store_reported(project, sandbox, interfa
 def test_no_closed_ticket_not_applicable(project, sandbox, interface):
     """DEC-454 point 12, DEC-447: when no closed ticket exists, the check is 'not applicable'.
 
-    Per DEC-447, a "not applicable" answer exits 2 with {"not_applicable": true}.
+    Per DEC-447 and the W1-26 README, the check says {"not_applicable": true}
+    and exits 2; the runner reports the check YELLOW with the reason. The
+    product-traceability-trailers check is never GREEN when there are no closed
+    tickets (DEC-425: nothing measured is never a pass).
     """
     project.write("src/example/feature.py", "# feature\n")
     project.commit("no tickets at all", who=OWNER)
     run = support.run_check(project, sandbox)
     envelope = support.check_envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
-    assert status is None or status in ("NOT_APPLICABLE", "SKIP", "GREEN"), \
-        f"no closed ticket means 'not applicable', not RED; got {status}"
+    checks = support.checks_of(result)
+    trailer_check = [c for c in checks if c.get("id") == "product-traceability-trailers"]
+    assert trailer_check, "product-traceability-trailers check should be registered"
+    check_status = trailer_check[0].get("status")
+    assert check_status != "GREEN", \
+        f"DEC-425, DEC-447: not applicable is never green; got {check_status}"
+    assert check_status != "RED", \
+        f"DEC-447: not applicable is a warning, not red; got {check_status}"
+    check_text = json.dumps(trailer_check[0]).lower()
+    assert "no closed ticket" in check_text or "not applicable" in check_text, \
+        f"the reason must name 'no closed ticket': {trailer_check[0]}"

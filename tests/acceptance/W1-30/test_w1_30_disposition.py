@@ -198,6 +198,16 @@ def test_repair_ticket_created_through_ticket_tool(project, sandbox, interface):
     assert envelope["ok"] is False
     repairs = _repair_tickets(project)
     assert len(repairs) >= 1, "a repair ticket should have been created in .tickets/"
+    tk = project.root / "governance" / "kernel" / "bin" / "tk"
+    assert tk.is_file(), "the project fixture must place tk"
+    import subprocess
+    repair_id = _repair_frontmatter(repairs[0]).get("id", repairs[0].stem)
+    result = subprocess.run(
+        [str(tk), "show", repair_id], capture_output=True, text=True,
+        cwd=str(project.root),
+    )
+    assert result.returncode == 0, \
+        f"the repair ticket must be known to tk (created through the tool): {result.stderr}"
 
 
 def test_repair_ticket_records_findings(project, sandbox, interface):
@@ -263,8 +273,7 @@ def test_repair_ticket_known_to_tk_show(project, sandbox, interface):
     repairs = _repair_tickets(project)
     assert len(repairs) >= 1, "a repair ticket should exist"
     tk = project.root / "governance" / "kernel" / "bin" / "tk"
-    if not tk.is_file():
-        pytest.skip("tk is not in this tree")
+    assert tk.is_file(), "the project fixture must place tk"
     import subprocess
     repair_id = _repair_frontmatter(repairs[0]).get("id", repairs[0].stem)
     result = subprocess.run(
@@ -297,11 +306,9 @@ def test_tk_fails_no_repair_ticket_file(project, sandbox, interface):
     """DEC-454 point 6: when tk fails, no orphan ticket file is left behind."""
     _project_with_finding(project)
     tk = project.root / "governance" / "kernel" / "bin" / "tk"
-    if tk.is_file():
-        tk.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
-        project.commit("break tk", who=support.ORCHESTRATOR)
-    else:
-        pytest.skip("tk not present; cannot test tk failure")
+    assert tk.is_file(), "the project fixture must place tk"
+    tk.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+    project.commit("break tk", who=support.ORCHESTRATOR)
     tickets_before = set((project.root / ".tickets").glob("*.md"))
     support.run_close(project, sandbox, TICKET)
     tickets_after = set((project.root / ".tickets").glob("*.md"))

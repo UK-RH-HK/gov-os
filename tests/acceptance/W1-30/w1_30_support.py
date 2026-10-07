@@ -258,7 +258,7 @@ class Project:
             shutil.copytree(schemas_src, schemas_dst, dirs_exist_ok=True)
         if TEMPLATE_OPENSPEC.is_dir():
             shutil.copytree(TEMPLATE_OPENSPEC, self.root / "openspec", dirs_exist_ok=True)
-        tk_src = REPO_ROOT / "governance" / "kernel" / "bin" / "tk"
+        tk_src = REPO_ROOT / "template" / "governance" / "kernel" / "bin" / "tk"
         tk_dst = self.root / "governance" / "kernel" / "bin" / "tk"
         if tk_src.is_file():
             tk_dst.parent.mkdir(parents=True, exist_ok=True)

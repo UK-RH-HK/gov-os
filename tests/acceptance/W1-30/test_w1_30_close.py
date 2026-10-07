@@ -513,7 +513,8 @@ def test_ticket_commits_from_head_only(project, sandbox, interface):
     support.git(project.root, "checkout", "main")
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True or envelope["ok"] is False
+    assert envelope["ok"] is True, \
+        "B6: only HEAD commits matter; the main-branch ticket is green and must close"
 
 
 def test_git_failure_is_error_not_empty_list(project, sandbox, interface):
@@ -613,8 +614,7 @@ def test_ticket_tool_close_is_what_tk_produces(project, sandbox, interface):
     _green_project(project)
     support.run_close(project, sandbox, TICKET)
     tk = project.root / "governance" / "kernel" / "bin" / "tk"
-    if not tk.is_file():
-        pytest.skip("tk is not in this tree")
+    assert tk.is_file(), "the project fixture must place tk"
     import subprocess
     result = subprocess.run(
         [str(tk), "show", TICKET], capture_output=True, text=True,
