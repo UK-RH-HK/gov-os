@@ -18,8 +18,9 @@ import w1_31_support as support
 from w1_31_support import (EXIT_GOV_ERROR, EXIT_NOT_MEASURED, EXIT_OK, EXIT_USAGE, NOT_MEASURED, OTHER_TICKET,
                            SESSION_A, SESSION_B, SESSION_NOWHERE, SESSION_OTHER, SOURCES, TICKET)
 
-# (input, output, cache creation, cache read) of each assistant line. No cache creation: whether it belongs to
-# "fresh input" is awaiting decision (README, P-3), and without it the share is the same under either answer.
+# (input, output, cache creation, cache read) of each message of the model, in sessions without hooks and
+# without commands. The cases of the sources read from the logs, of the estimate and of the three share
+# figures are in ``test_w1_31_measured_and_estimated.py``.
 TURNS_A = [(1000, 200, 0, 50000), (500, 300, 0, 70000)]
 TURNS_B = [(400, 100, 0, 0)]
 TURNS_OTHER = [(9000, 900, 0, 0)]
@@ -68,13 +69,17 @@ def test_joins_ccusage_input_and_output_of_the_tickets_sessions(project, sandbox
 
 
 def test_names_each_of_the_seven_sources_of_governance_tokens(project, sandbox, logs, ccusage):
-    """Each DEC-086 source has its own figure: a count, or "not measured". Nothing else is in the total."""
+    """Each DEC-086 source has its own figure, a count or "not measured": the five measured ones in
+    ``governance_tokens`` with their total, the two estimated ones on a line of their own (DEC-495)."""
     write_logs(logs)
-    counted = measured(project, sandbox, logs)["governance_tokens"]
-    assert sorted(counted) == sorted((*SOURCES, "total")), f"the sources named: {sorted(counted)}"
-    for name in SOURCES:
-        assert support.is_count(counted[name]) or counted[name] == NOT_MEASURED, \
-            f"{name} is {counted[name]!r}: neither a count nor 'not measured'"
+    result = measured(project, sandbox, logs)
+    counted = result["governance_tokens"]
+    assert sorted(counted) == sorted((*SOURCES, "total")), f"the measured sources named: {sorted(counted)}"
+    estimate = support.estimate(result)
+    for name, value in [(name, counted[name]) for name in (*SOURCES, "total")] + \
+                       [(name, estimate[name]) for name in (*support.ESTIMATED_SOURCES, "total")]:
+        assert support.is_count(value) or value == NOT_MEASURED, \
+            f"{name} is {value!r}: neither a count nor 'not measured'"
 
 
 def test_counts_the_tickets_checkpoint_records(project, sandbox, logs, ccusage):
@@ -103,28 +108,6 @@ def test_counts_the_tickets_close_record(project, sandbox, logs, ccusage):
     project.write(f"docs/close/{TICKET}/CL-{TICKET}.md", text)
     project.write(f"docs/close/{OTHER_TICKET}/CL-{OTHER_TICKET}.md", text + "more\n" * 40)
     assert measured(project, sandbox, logs)["governance_tokens"]["close_records"] == support.tokens(text)
-
-
-def test_share_is_the_governance_total_over_input_plus_output(project, sandbox, logs, ccusage):
-    """With every source measured the share is total / (tokens in + tokens out) and the exit code is 0; with a
-    source not measured the share is "not measured", the record names what was not, and the exit code is 3."""
-    write_logs(logs)
-    project.add_checkpoint(1)
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
-    result = support.record(run)
-    counted, share = result["governance_tokens"], result["governance_share"]
-    missing = [name for name in SOURCES if counted[name] == NOT_MEASURED]
-    if missing:
-        assert counted["total"] == NOT_MEASURED and share == NOT_MEASURED, \
-            f"{missing} not measured, yet the total is {counted['total']!r} and the share {share!r}"
-        assert run.returncode == EXIT_NOT_MEASURED, run.describe()
-        assert set(missing) <= set(result["not_measured"]), f"not_measured names {result['not_measured']}"
-    else:
-        assert counted["total"] == sum(counted[name] for name in SOURCES), counted
-        assert support.is_number(share), f"the share is {share!r}"
-        assert share == pytest.approx(counted["total"] / (IN_AB + OUT_AB), abs=5e-5), \
-            f"share {share!r}, total {counted['total']}, tokens in + out {IN_AB + OUT_AB}"
-        assert run.returncode == EXIT_OK and result["not_measured"] == [], run.describe()
 
 
 # --------------------------------------------------------------------------
@@ -263,36 +246,24 @@ def test_record_carries_the_three_learning_metrics(project, sandbox, logs, ccusa
 # --------------------------------------------------------------------------
 
 def test_sandbox_tokens_are_a_line_apart_and_never_assumed(project, sandbox, logs, ccusage):
-    """The line is in the record, outside the governance tokens. Nothing in these hand-written logs measures
-    what a sandbox added, so it says "not measured": the 3,250 of EXP-001 is a past measurement, not a value."""
-    write_logs(logs)
-    result = measured(project, sandbox, logs)
+    """The line is in the record, outside the governance tokens, their estimate and every share figure. No
+    measurement is recorded yet (DEC-491: it is made once, in the Wave 1 exit run), so it says "not measured":
+    the 3,250 of EXP-001 is a past measurement, not a value, and appears nowhere in what is printed."""
+    support.full_fixture(project, logs)
+    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
+    result = support.record(run)
     assert support.SANDBOX_LINE in result, f"the record has no {support.SANDBOX_LINE}"
     assert result[support.SANDBOX_LINE] == NOT_MEASURED, f"it is {result[support.SANDBOX_LINE]!r}"
     assert sorted(result["governance_tokens"]) == sorted((*SOURCES, "total")), \
         "the sandbox's tokens are not a source of the governance share"
+    assert "sandbox" not in " ".join(support.estimate(result)).lower()
+    assert sorted(result["governance_share"]) == sorted(support.SHARE_PARTS), result["governance_share"]
+    assert "3250" not in run.stdout.replace(",", ""), "the constant of EXP-001 is in the output"
 
 
 # --------------------------------------------------------------------------
 # Failure line 1: no share figure. A figure is measured, or the command does not succeed.
 # --------------------------------------------------------------------------
-
-def test_unreadable_checkpoint_record_gives_no_share(project, sandbox, logs, ccusage):
-    """A checkpoint record that cannot be read: its source is "not measured", and so are the total and the
-    share; the exit code is 3. What was measured (the tokens of the sessions) is still given."""
-    write_logs(logs)
-    project.add_checkpoint(1)
-    folder = project.root / "docs" / "checkpoints" / TICKET
-    os.symlink(folder / "no-such-file", folder / f"CP-{TICKET}-0002.md")  # a record that is there and unreadable
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
-    result = support.record(run)
-    assert run.returncode == EXIT_NOT_MEASURED, run.describe()
-    assert result["governance_tokens"]["checkpoint_records"] == NOT_MEASURED, result["governance_tokens"]
-    assert result["governance_tokens"]["total"] == NOT_MEASURED
-    assert result["governance_share"] == NOT_MEASURED
-    assert "checkpoint_records" in result["not_measured"]
-    assert (result["tokens_in"], result["tokens_out"]) == (IN_AB, OUT_AB)
-
 
 def test_no_session_of_the_ticket_gives_no_figure(project, sandbox, logs, ccusage):
     """No session is named for the ticket: there is no denominator, and logs of other work are not taken."""
