@@ -1,9 +1,19 @@
-"""Tests for the close record as a consumption receipt: S5 (CAP-50.c).
+"""Tests for the close record as a consumption receipt: S5 (CAP-50.c), A4, B5, B7.
 
 S5: The close record is a consumption receipt: the input ids and hashes supplied
     (packet hash) and used, outputs produced, requirements implemented, decisions
     applied, tests produced, and deviations.
+A4: When gov context cannot be built, the close refuses (no fallback hash, no
+    silently empty decisions list). The case reaches the context call.
+B5: "Outputs produced" lists files from the ticket's commits. "Deviations" says
+    "not measured" when not measured, never "none". Unmeasurable inputs listed
+    with the reason.
+B7: Sources resolve through a defined lookup. Unresolvable sources listed with
+    no hash and a reason. The ticket file is always an input.
 """
+
+import hashlib
+import json
 
 import pytest
 
@@ -15,8 +25,6 @@ TICKET = "PROJ-rcpt"
 WBS = "W1-rcpt"
 IMPL = support.IMPLEMENTER
 TRAILERS = ("Task: PROJ-rcpt", "Role: engineer", "Implements: CAP-01")
-RECEIPT_FIELDS = ("packet_hash", "inputs", "outputs", "requirements_implemented",
-                  "decisions_applied", "tests_produced", "deviations")
 
 
 # --------------------------------------------------------------------------
@@ -69,7 +77,6 @@ def test_close_record_has_input_ids_and_hashes(project, sandbox, interface):
     for inp in inputs:
         assert isinstance(inp, dict), f"each input must be a dict: {inp!r}"
         assert "id" in inp, f"each input must have an id: {inp!r}"
-        assert "hash" in inp, f"each input must have a hash: {inp!r}"
 
 
 def test_close_record_has_outputs(project, sandbox, interface):
@@ -106,22 +113,16 @@ def test_close_record_has_tests_and_deviations(project, sandbox, interface):
     assert isinstance(tests, list), \
         f"close record must list tests_produced: {sorted(front)}"
     devs = front.get("deviations")
-    assert isinstance(devs, list), \
-        f"close record must list deviations: {sorted(front)}"
+    assert devs is not None, \
+        f"close record must have a deviations field: {sorted(front)}"
 
-
-# --------------------------------------------------------------------------
-# Point 5 (WEAK): packet_hash matches context; refuses on context failure;
-# input hash is of file content (S5, CAP-50.c)
-# --------------------------------------------------------------------------
 
 def test_close_record_packet_hash_matches_context(project, sandbox, interface):
-    """KPI S5, CAP-50.c: the packet_hash in the close record must equal the one from gov context."""
+    """KPI S5, CAP-50.c: the packet_hash equals the one from gov context."""
     _green_project(project)
     ctx_run = project.gov(sandbox, "context", TICKET, "--json")
     ctx_data = {}
     try:
-        import json
         ctx_data = json.loads(ctx_run.stdout)
     except Exception:
         pass
@@ -140,29 +141,84 @@ def test_close_record_packet_hash_matches_context(project, sandbox, interface):
             "packet_hash must be non-trivial even when context is unavailable"
 
 
+# --------------------------------------------------------------------------
+# A4: Context failure refuses close (no fallback hash)
+# --------------------------------------------------------------------------
+
 def test_close_refuses_when_context_cannot_be_built(project, sandbox, interface):
-    """KPI S5, CAP-50.c: when gov context raises/BLOCKED, close must refuse, not invent a hash."""
+    """A4: when gov context cannot be built, close refuses with the reason.
+
+    The case reaches the context call: watchdog passes, tests pass, but context
+    fails -> refusal (no fallback hash, no silently empty decisions).
+    """
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    project.add_decision("DEC-cyc1", "ACTIVE", supersedes="DEC-cyc2")
+    project.add_decision("DEC-cyc2", "ACTIVE", supersedes="DEC-cyc1")
+    project.commit("create contradiction for context failure", who=support.OWNER)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "close must refuse when gov context cannot be built (A4)"
+
+
+def test_no_fallback_hash_when_context_fails(project, sandbox, interface):
+    """A4: no fallback hash from sha256(ticket file) when context fails."""
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    project.add_decision("DEC-cyc3", "ACTIVE", supersedes="DEC-cyc4")
+    project.add_decision("DEC-cyc4", "ACTIVE", supersedes="DEC-cyc3")
+    project.commit("contradiction", who=support.OWNER)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
     after = cli_support.snapshot(project.root)
     created = support.new_files(project.root, before, after)
     _, front = support.find_close_record(project.root, created)
     if front is not None:
+        ticket_path = project.root / ".tickets" / f"{TICKET}.md"
+        fallback = hashlib.sha256(ticket_path.read_bytes()).hexdigest()
         record_hash = front.get("packet_hash") or front.get("hash", "")
-        import hashlib
-        head = support.git(project.root, "rev-parse", "HEAD").strip()
-        invented = hashlib.sha256(f"close:{TICKET}:{head}".encode()).hexdigest()
-        assert record_hash != invented, \
-            "the packet_hash must not be an invented fallback hash from sha256(close:ticket:commit)"
+        assert record_hash != fallback and record_hash != f"sha256:{fallback}", \
+            "the close must not use sha256(ticket file) as fallback hash (A4)"
 
 
-def test_input_hash_is_of_file_content_not_id_string(project, sandbox, interface):
-    """KPI S5, CAP-50.c: each input's hash must be sha256 of the file content, not sha256(source_id)."""
-    import hashlib
+# --------------------------------------------------------------------------
+# B5: Receipt field details
+# --------------------------------------------------------------------------
+
+def test_outputs_lists_files_from_ticket_commits(project, sandbox, interface):
+    """B5: the outputs field lists files the ticket's commits produced or changed."""
+    _green_project(project)
+    front = _close_and_find_record(project, sandbox)
+    outputs = front.get("outputs", [])
+    assert isinstance(outputs, list), "outputs must be a list"
+    output_strs = [str(o) for o in outputs]
+    all_outputs = " ".join(output_strs)
+    assert "feature.py" in all_outputs or "src/example" in all_outputs, \
+        f"outputs must include files from the ticket's commits (e.g. feature.py): {outputs}"
+
+
+def test_deviations_says_not_measured_when_unverified(project, sandbox, interface):
+    """B5: deviations says 'not measured' when not measured, never 'none' or empty."""
+    _green_project(project)
+    front = _close_and_find_record(project, sandbox)
+    devs = front.get("deviations")
+    if isinstance(devs, list) and len(devs) == 0:
+        pytest.fail("deviations must not be an empty list when not measured; use 'not measured'")
+    if isinstance(devs, str) and devs.lower() == "none":
+        pytest.fail("deviations must say 'not measured', not 'none'")
+
+
+def test_input_hash_is_of_file_content(project, sandbox, interface):
+    """B5, S5: each input's hash must be sha256 of the file content, not sha256(source_id)."""
     _green_project(project)
     front = _close_and_find_record(project, sandbox)
     inputs = front.get("inputs", [])
@@ -180,3 +236,69 @@ def test_input_hash_is_of_file_content_not_id_string(project, sandbox, interface
         f"input hash must be of file content, not sha256('{TICKET}')"
     assert actual_hash == expected_hash, \
         f"input hash {actual_hash!r} must match sha256 of ticket file content {expected_hash!r}"
+
+
+def test_unmeasurable_inputs_listed_with_reason(project, sandbox, interface):
+    """B5: inputs that cannot be measured are listed with 'not measured' reason."""
+    _green_project(project)
+    front = _close_and_find_record(project, sandbox)
+    inputs = front.get("inputs", [])
+    for inp in inputs:
+        if isinstance(inp, dict):
+            h = inp.get("hash")
+            if h is None or h == "":
+                reason = inp.get("reason") or inp.get("note")
+                assert reason is not None, \
+                    f"an input with no hash must have a reason: {inp}"
+
+
+# --------------------------------------------------------------------------
+# B7: Source resolution
+# --------------------------------------------------------------------------
+
+def test_ticket_file_is_always_an_input(project, sandbox, interface):
+    """B7: the ticket file itself is always included as an input."""
+    _green_project(project)
+    front = _close_and_find_record(project, sandbox)
+    inputs = front.get("inputs", [])
+    ids = [inp.get("id") for inp in inputs if isinstance(inp, dict)]
+    assert TICKET in ids, \
+        f"the ticket file must always be listed as an input: {ids}"
+
+
+def test_unresolvable_source_listed_with_reason(project, sandbox, interface):
+    """B7: a source that cannot be resolved is listed with no hash and a reason."""
+    project.add_ticket(TICKET, WBS, sources=["NO-SUCH-SOURCE-999"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    before = cli_support.snapshot(project.root)
+    run = support.run_close(project, sandbox, TICKET)
+    after = cli_support.snapshot(project.root)
+    created = support.new_files(project.root, before, after)
+    _, front = support.find_close_record(project.root, created)
+    if front is not None:
+        inputs = front.get("inputs", [])
+        unresolved = [inp for inp in inputs if isinstance(inp, dict)
+                      and inp.get("id") == "NO-SUCH-SOURCE-999"]
+        if unresolved:
+            assert unresolved[0].get("hash") is None or "not" in str(unresolved[0].get("hash", "")).lower(), \
+                f"unresolvable source must have no hash: {unresolved[0]}"
+            reason = unresolved[0].get("reason") or unresolved[0].get("note")
+            assert reason is not None, \
+                f"unresolvable source must have a reason: {unresolved[0]}"
+
+
+def test_sources_resolve_through_defined_lookup(project, sandbox, interface):
+    """B7: sources resolve through a defined lookup, not a tree-wide search."""
+    _green_project(project)
+    front = _close_and_find_record(project, sandbox)
+    inputs = front.get("inputs", [])
+    assert len(inputs) >= 1, "close record must have at least one input (the ticket)"
+    for inp in inputs:
+        if isinstance(inp, dict) and inp.get("id") == TICKET:
+            h = inp.get("hash", "")
+            assert h and len(h) > 8, \
+                f"the ticket file input must have a real hash: {inp}"

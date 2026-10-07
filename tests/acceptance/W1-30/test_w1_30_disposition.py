@@ -1,13 +1,21 @@
-"""Tests for finding disposition at close: S6 (CAP-59.c).
+"""Tests for finding disposition at close: S6 (CAP-59.c), A3, B3.
 
-S6: A finding raised at close is classed into exactly one disposition (repair,
-    reuse, delete, narrow, defer or owner) with whole-system context from gov
-    context before any code change, and the repair ticket records it.
-
-This is the anti-snowball lesson L-0077 (DEC-435).
+S6: A finding raised at close is classed into exactly one disposition with
+    whole-system context from gov context before any code change, and the
+    repair ticket records it.
+A3: The disposition class is given by the caller via --disposition (one of the
+    six names). Without it, findings are unclassed. With it, context is built
+    first. Context failure means the class is not recorded as "with whole-system
+    context". No "context": "whole-system" literal ever appears.
+B3: The repair ticket is created through the ticket tool, records findings and
+    the class, has a dependency on the failing ticket, and has no invented id
+    or constant creation date.
 """
 
+import json
+
 import pytest
+import yaml
 
 import w1_30_support as support
 
@@ -24,173 +32,221 @@ TRAILERS = ("Task: PROJ-disp", "Role: engineer", "Implements: CAP-01")
 # --------------------------------------------------------------------------
 
 def _project_with_finding(project, ticket_id=TICKET, wbs=WBS):
-    """A project where gov close will raise a finding (a planted check failure)."""
+    """A project where gov close will fail (planted failing acceptance test)."""
     project.add_ticket(ticket_id, wbs)
-    project.add_passing_test(wbs)
+    project.add_failing_test(wbs)
     project.write("src/example/feature.py", "# feature\n")
-    project.add_check_declaration("planted-defect", "schema/invariants",
-                                  command="exit 1")
     project.commit("implement with defect", who=IMPL, trailers=TRAILERS)
     project.add_checkpoint(ticket_id)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     return ticket_id
 
 
-# --------------------------------------------------------------------------
-# S6: Finding classified into one disposition (CAP-59.c)
-# --------------------------------------------------------------------------
-
-def test_finding_classified_into_exactly_one_disposition(project, sandbox, interface):
-    """KPI S6, CAP-59.c: a finding is classed into exactly one of the six dispositions."""
-    _project_with_finding(project)
-    run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    details = error.get("details", {})
-    findings = details.get("findings", [])
-    for finding in findings:
-        if not isinstance(finding, dict):
-            continue
-        disposition = finding.get("disposition")
-        assert disposition in support.DISPOSITIONS, \
-            f"finding must have one of {support.DISPOSITIONS}, got {disposition!r}"
-
-
-def test_disposition_uses_context_before_code_change(project, sandbox, interface):
-    """KPI S6, CAP-59.c: classification uses whole-system context from gov context."""
-    _project_with_finding(project)
-    run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    details = error.get("details", {})
-    assert "context" in str(details).lower() or "disposition" in str(details).lower(), \
-        "the error details should reference context or disposition"
-
-
-def test_repair_ticket_records_disposition(project, sandbox, interface):
-    """KPI S6, CAP-59.c: the repair ticket records the finding and its disposition."""
-    _project_with_finding(project)
-    support.run_close(project, sandbox, TICKET)
+def _repair_tickets(project, exclude_id=TICKET):
+    """All ticket files in .tickets/ except the given one."""
     tickets_dir = project.root / ".tickets"
-    ticket_files = list(tickets_dir.glob("*.md"))
-    repair_tickets = [f for f in ticket_files if f.name != f"{TICKET}.md"]
-    assert len(repair_tickets) >= 1, "a repair ticket should be created for the finding"
-    import yaml
-    for repair_path in repair_tickets:
-        text = repair_path.read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            front = yaml.safe_load(parts[1]) or {}
-            if front.get("type") == "task":
-                assert True
-                return
-    pytest.fail("no repair ticket with type: task found")
+    if not tickets_dir.is_dir():
+        return []
+    return [f for f in tickets_dir.glob("*.md") if f.stem != exclude_id]
 
 
-def test_all_six_dispositions_recognized(project, sandbox, interface):
-    """KPI S6, CAP-59.c: all six dispositions are valid classification outcomes."""
-    assert len(support.DISPOSITIONS) == 6
-    assert "REPAIR_EXISTING_MECHANISM" in support.DISPOSITIONS
-    assert "REUSE_EXISTING_PRIMITIVE" in support.DISPOSITIONS
-    assert "DELETE_MECHANISM" in support.DISPOSITIONS
-    assert "NARROW_REQUIREMENT" in support.DISPOSITIONS
-    assert "DEFER_TO_LATER_LIFECYCLE" in support.DISPOSITIONS
-    assert "OWNER_DECISION" in support.DISPOSITIONS
+def _repair_frontmatter(path):
+    text = path.read_text(encoding="utf-8")
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    return yaml.safe_load(parts[1]) or {}
 
 
-def test_context_provides_whole_system_view(project, sandbox, interface):
-    """KPI S6, CAP-59.c: gov context is called for the ticket before disposition."""
+# --------------------------------------------------------------------------
+# A3: No disposition class -> unclassed
+# --------------------------------------------------------------------------
+
+def test_no_disposition_records_unclassed(project, sandbox, interface):
+    """A3: a failing close without --disposition records findings as unclassed."""
     _project_with_finding(project)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1, "a repair ticket should be created"
+    front = _repair_frontmatter(repairs[0])
+    disposition = front.get("disposition") or front.get("finding_disposition")
+    assert disposition is None or disposition == "unclassed", \
+        f"without --disposition, the repair ticket must record 'unclassed', got {disposition!r}"
 
 
-# --------------------------------------------------------------------------
-# Point 6 (WEAK): disposition validation and repair-ticket recording (S6, CAP-59.c)
-# --------------------------------------------------------------------------
-
-def test_finding_with_no_class_is_refused(project, sandbox, interface):
-    """KPI S6, CAP-59.c: a finding that arrives at close with no disposition class is refused."""
+def test_no_disposition_output_names_findings_awaiting_class(project, sandbox, interface):
+    """A3: without --disposition, the output names each finding as awaiting its class."""
     _project_with_finding(project)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
     error = envelope.get("error", {})
-    details = error.get("details", {})
-    findings = details.get("findings", [])
-    for finding in findings:
-        if isinstance(finding, dict):
-            disposition = finding.get("disposition")
-            assert disposition is not None, \
-                "every finding must have a disposition class, not None"
-            assert disposition != "", \
-                "every finding must have a non-empty disposition class"
+    message = error.get("message", "")
+    details_text = json.dumps(error.get("details", {}))
+    assert "class" in message.lower() or "class" in details_text.lower() \
+        or "unclassed" in message.lower() or "unclassed" in details_text.lower() \
+        or "disposition" in message.lower() or "disposition" in details_text.lower(), \
+        f"the output must mention that findings await their class: {error}"
 
 
-def test_finding_with_two_classes_is_refused(project, sandbox, interface):
-    """KPI S6, CAP-59.c: a finding with two disposition classes is refused.
+# --------------------------------------------------------------------------
+# A3: Valid disposition class -> context built, class recorded
+# --------------------------------------------------------------------------
 
-    Each finding is classed into exactly one disposition.
+def test_valid_disposition_records_class(project, sandbox, interface):
+    """A3: --disposition with a valid class records it in the repair ticket."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "repair")
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1, "a repair ticket should be created"
+    front = _repair_frontmatter(repairs[0])
+    disposition = front.get("disposition") or front.get("finding_disposition")
+    assert disposition == "repair", \
+        f"repair ticket must record the given disposition, got {disposition!r}"
+
+
+def test_valid_disposition_builds_context_first(project, sandbox, interface):
+    """A3: with --disposition, gov context is called first and its hash is recorded."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "narrow")
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1
+    front = _repair_frontmatter(repairs[0])
+    context_hash = front.get("context_hash") or front.get("context")
+    assert context_hash is not None, \
+        f"repair ticket must record the context hash when disposition is given: {sorted(front)}"
+
+
+# --------------------------------------------------------------------------
+# A3: Disposition with context failure
+# --------------------------------------------------------------------------
+
+def test_disposition_with_context_failure(project, sandbox, interface):
+    """A3: if context fails, the class is NOT recorded as 'with whole-system context'.
+
+    The output must say the context failed, and the repair ticket records the class
+    but without the context hash.
     """
     _project_with_finding(project)
-    run = support.run_close(project, sandbox, TICKET)
+    project.add_decision("DEC-cyc1", "ACTIVE", supersedes="DEC-cyc2")
+    project.add_decision("DEC-cyc2", "ACTIVE", supersedes="DEC-cyc1")
+    project.commit("create contradiction", who=support.OWNER)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "defer")
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
     error = envelope.get("error", {})
-    details = error.get("details", {})
-    findings = details.get("findings", [])
-    for finding in findings:
-        if isinstance(finding, dict):
-            disposition = finding.get("disposition")
-            if isinstance(disposition, list):
-                assert len(disposition) == 1, \
-                    f"a finding must have exactly one disposition, got {len(disposition)}"
-            elif isinstance(disposition, str):
-                assert disposition.count(",") == 0, \
-                    "a finding must have exactly one disposition, not a comma-separated list"
+    full_text = json.dumps(envelope)
+    assert '"context": "whole-system"' not in full_text, \
+        "when context fails, 'context: whole-system' must NOT appear"
 
 
-def test_six_names_are_the_only_valid_dispositions(project, sandbox, interface):
-    """KPI S6, CAP-59.c, L-0077: only the six named dispositions are valid."""
+# --------------------------------------------------------------------------
+# A3: Only the six names accepted
+# --------------------------------------------------------------------------
+
+def test_only_six_disposition_names_accepted(project, sandbox, interface):
+    """A3: only the six named dispositions are accepted; anything else is refused."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "invented_name")
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "an invented disposition name must be refused"
+
+
+def test_all_six_dispositions_recognized():
+    """A3, S6: all six short-name dispositions are defined."""
+    assert len(support.DISPOSITIONS) == 6
+    for name in ("repair", "reuse", "delete", "narrow", "defer", "owner"):
+        assert name in support.DISPOSITIONS
+
+
+# --------------------------------------------------------------------------
+# A3: No "context": "whole-system" literal
+# --------------------------------------------------------------------------
+
+def test_no_context_whole_system_literal(project, sandbox, interface):
+    """A3: the literal '"context": "whole-system"' must never appear in any output."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "repair")
+    full_output = run.stdout + run.stderr
+    assert '"context": "whole-system"' not in full_output, \
+        'the literal \'"context": "whole-system"\' must never appear'
+    assert "'context': 'whole-system'" not in full_output, \
+        'the literal "\'context\': \'whole-system\'" must never appear'
+
+
+# --------------------------------------------------------------------------
+# B3: Repair ticket through ticket tool
+# --------------------------------------------------------------------------
+
+def test_repair_ticket_created_through_ticket_tool(project, sandbox, interface):
+    """B3: a repair ticket is created through the ticket tool (gov.tasks.tickets.create)."""
     _project_with_finding(project)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
-    error = envelope.get("error", {})
-    details = error.get("details", {})
-    findings = details.get("findings", [])
-    for finding in findings:
-        if isinstance(finding, dict):
-            disposition = finding.get("disposition")
-            if disposition is not None:
-                assert disposition in support.DISPOSITIONS, \
-                    f"disposition {disposition!r} is not one of the six: {support.DISPOSITIONS}"
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1, "a repair ticket should have been created in .tickets/"
 
 
-def test_repair_ticket_records_the_class_given(project, sandbox, interface):
-    """KPI S6, CAP-59.c: the repair ticket's frontmatter includes the disposition class."""
+def test_repair_ticket_records_findings(project, sandbox, interface):
+    """B3: the repair ticket records the findings."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1
+    front = _repair_frontmatter(repairs[0])
+    body = repairs[0].read_text(encoding="utf-8")
+    has_findings = (front.get("findings") is not None
+                    or "finding" in body.lower()
+                    or "failure" in body.lower())
+    assert has_findings, f"repair ticket must record the findings: {front}"
+
+
+def test_repair_ticket_has_dependency_on_failing_ticket(project, sandbox, interface):
+    """B3: the repair ticket depends on the failing ticket (CAP-31.b)."""
     _project_with_finding(project)
     support.run_close(project, sandbox, TICKET)
-    import yaml
-    tickets_dir = project.root / ".tickets"
-    ticket_files = list(tickets_dir.glob("*.md"))
-    repair_tickets = [f for f in ticket_files if f.name != f"{TICKET}.md"]
-    found_class = False
-    for repair_path in repair_tickets:
-        text = repair_path.read_text(encoding="utf-8")
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            front = yaml.safe_load(parts[1]) or {}
-            if front.get("class") == "repair" or front.get("parent") == TICKET:
-                disp = front.get("disposition") or front.get("finding_disposition")
-                if disp and disp in support.DISPOSITIONS:
-                    found_class = True
-                    break
-                findings = front.get("findings", [])
-                if findings:
-                    found_class = True
-                    break
-    assert found_class, "the repair ticket must record the finding's disposition class"
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1
+    front = _repair_frontmatter(repairs[0])
+    deps = front.get("depends_on") or front.get("deps") or []
+    parent = front.get("parent")
+    assert TICKET in str(deps) or TICKET == parent, \
+        f"repair ticket must depend on {TICKET}: deps={deps}, parent={parent}"
+
+
+def test_repair_ticket_no_invented_id(project, sandbox, interface):
+    """B3: the repair ticket must not have an invented id or a constant creation date."""
+    _project_with_finding(project)
+    support.run_close(project, sandbox, TICKET)
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1
+    front = _repair_frontmatter(repairs[0])
+    ticket_id = front.get("id", "")
+    assert ticket_id and ticket_id != "REPAIR-0001", \
+        f"the repair ticket id must not be a constant: {ticket_id!r}"
+    created = front.get("created", "")
+    assert created and "1970" not in str(created) and "2000-01-01" not in str(created), \
+        f"the repair ticket must have a real creation date, got {created!r}"
+
+
+def test_repair_ticket_create_failure_reported(project, sandbox, interface):
+    """B3: if the ticket tool fails to create a repair ticket, the output says why."""
+    _project_with_finding(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False

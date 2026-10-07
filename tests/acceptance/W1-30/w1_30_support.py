@@ -80,15 +80,20 @@ ORCHESTRATOR = {
     "trailers": ("Role: orchestrator",),
 }
 
-# The six finding dispositions (L-0077, DEC-435).
-DISPOSITIONS = (
-    "REPAIR_EXISTING_MECHANISM",
-    "REUSE_EXISTING_PRIMITIVE",
-    "DELETE_MECHANISM",
-    "NARROW_REQUIREMENT",
-    "DEFER_TO_LATER_LIFECYCLE",
-    "OWNER_DECISION",
+# The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
+DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
+
+# Governance file prefixes whose change forces a check re-run at close (A7, CAP-38.d).
+GOVERNANCE_PREFIXES = (
+    "template/governance/kernel/checks/",
+    "template/governance/kernel/schemas/",
+    "governance/project/",
+    "template/governance/kernel/hooks/",
+    "template/governance/kernel/skills/",
 )
+
+# Iteration count storage (A6): under .gov-runtime/, inaccessible to workers.
+ITERATION_DIR = ".gov-runtime/iterations"
 
 # The 17 families (from W1-26).
 FAMILIES = check_support.FAMILIES
@@ -190,8 +195,9 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
                  reviewer_wrote_nothing=True,
                  commissioned_by="orchestrator",
                  judged_by="orchestrator",
-                 judgement="pass"):
-    """A probe record for a FULL-profile ticket (DEC-137)."""
+                 judgement="pass",
+                 probed_commit=None):
+    """A probe record for a FULL-profile ticket (DEC-137, A5)."""
     probe_id = f"PR-{ticket_id}"
     front = {
         "id": probe_id,
@@ -206,6 +212,8 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
         "judged_by": judged_by,
         "judgement": judgement,
     }
+    if probed_commit is not None:
+        front["probed_commit"] = probed_commit
     text = "---\n" + yaml.safe_dump(front, sort_keys=False) + "---\n\n"
     text += f"# {probe_id} — Probe record for {ticket_id}\n\nPost-green probe.\n"
     return text
@@ -298,8 +306,24 @@ class Project:
         write(self.root, rel, skill_file(name, version, content_marker))
         return rel
 
-    def add_probe(self, ticket_id, **kwargs):
-        text = probe_record(ticket_id, **kwargs)
+    def add_kernel_skill(self, name, version):
+        """A skill with a version under template/governance/kernel/skills/<name>/SKILL.md (B4)."""
+        text = f"---\nname: {name}\nversion: \"{version}\"\n---\n# {name}\n\nContent.\n"
+        rel = f"template/governance/kernel/skills/{name}/SKILL.md"
+        write(self.root, rel, text)
+        return rel
+
+    def add_vendor_skill(self, name):
+        """A vendored skill without a version under vendor/superpowers/skills/<name>/SKILL.md (B4)."""
+        text = f"---\nname: {name}\n---\n# {name}\n\nVendored content.\n"
+        rel = f"template/governance/kernel/vendor/superpowers/skills/{name}/SKILL.md"
+        write(self.root, rel, text)
+        return rel
+
+    def add_probe(self, ticket_id, probed_commit=None, **kwargs):
+        if probed_commit is None:
+            probed_commit = git(self.root, "rev-parse", "HEAD").strip()
+        text = probe_record(ticket_id, probed_commit=probed_commit, **kwargs)
         rel = f"docs/probes/{ticket_id}/PR-{ticket_id}.md"
         write(self.root, rel, text)
         return rel
@@ -447,3 +471,31 @@ def checks_of(result):
 
 def finding_codes(result):
     return check_support.finding_codes(result)
+
+
+# --------------------------------------------------------------------------
+# Iteration file helpers (A6)
+# --------------------------------------------------------------------------
+
+def write_iteration_file(root, ticket_id, data):
+    """Write an iteration count file under .gov-runtime/iterations/."""
+    path = Path(root) / ITERATION_DIR / f"{ticket_id}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data), encoding="utf-8")
+    return path
+
+
+def corrupt_iteration_file(root, ticket_id, content="not json at all {{{"):
+    """Write an unparseable iteration count file."""
+    path = Path(root) / ITERATION_DIR / f"{ticket_id}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+    return path
+
+
+def read_iteration_file(root, ticket_id):
+    """Read an iteration count file, or None if absent."""
+    path = Path(root) / ITERATION_DIR / f"{ticket_id}.json"
+    if not path.is_file():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))

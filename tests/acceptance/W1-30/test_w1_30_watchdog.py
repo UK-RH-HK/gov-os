@@ -1,11 +1,15 @@
-"""Tests for the stale-checkpoint watchdog at close: Point 10 (S1, DEC-416).
+"""Tests for the stale-checkpoint watchdog at close: B1 (S1, DEC-416).
 
-DEC-416 decides: gov close calls gov.checkpoint.record.watch before it closes
-and refuses on a stale or missing checkpoint with the watchdog's own code.
-The closing checkpoint is written after the checks pass.
-
-DEC-321 defaults: 240 minutes max age, 20 max commits.
+B1: Any error from the watchdog (not just CHECKPOINT_STALE and CHECKPOINT_MISSING)
+    refuses the close with the watchdog's own code. The close uses W1-25's
+    thresholds (MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT from
+    gov.checkpoint.command), not its own constants.
+DEC-416: gov close calls gov.checkpoint.record.watch before it closes and refuses
+    on a stale or missing checkpoint with the watchdog's own code. The closing
+    checkpoint is written after the checks pass.
 """
+
+import yaml
 
 import w1_30_support as support
 
@@ -32,8 +36,6 @@ def _green_project(project, ticket_id=TICKET, wbs=WBS):
 
 def _write_stale_checkpoint(project, ticket_id):
     """Write a checkpoint with a created time far in the past (stale by DEC-321: > 240 min)."""
-    import yaml
-
     cp_dir = project.root / "docs" / "checkpoints" / ticket_id
     cp_dir.mkdir(parents=True, exist_ok=True)
     cp_id = f"CP-{ticket_id}-0001"
@@ -56,11 +58,11 @@ def _write_stale_checkpoint(project, ticket_id):
 
 
 # --------------------------------------------------------------------------
-# Point 10 (MISSING): Stale-checkpoint watchdog (S1, DEC-416)
+# B1: Stale-checkpoint watchdog (DEC-416)
 # --------------------------------------------------------------------------
 
 def test_close_refuses_on_stale_checkpoint(project, sandbox, interface):
-    """KPI S1, DEC-416: gov close refuses on a checkpoint older than the threshold."""
+    """B1, DEC-416: gov close refuses on a checkpoint older than the threshold."""
     _green_project(project)
     _write_stale_checkpoint(project, TICKET)
     project.commit("add stale checkpoint", who=support.ORCHESTRATOR)
@@ -71,7 +73,7 @@ def test_close_refuses_on_stale_checkpoint(project, sandbox, interface):
 
 
 def test_close_refuses_on_missing_checkpoint(project, sandbox, interface):
-    """KPI S1, DEC-416: gov close refuses when no checkpoint exists at all."""
+    """B1, DEC-416: gov close refuses when no checkpoint exists at all."""
     _green_project(project)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
@@ -80,11 +82,10 @@ def test_close_refuses_on_missing_checkpoint(project, sandbox, interface):
 
 
 def test_closing_checkpoint_written_after_checks_pass(project, sandbox, interface):
-    """KPI S1, DEC-416: on success, the checkpoint is written after containment/trailer/test checks pass."""
+    """B1, DEC-416: the closing checkpoint is written after checks pass."""
     _green_project(project)
     from gov.checkpoint.record import write as cp_write
-    import yaml
-    cp_info = cp_write(project.root, TICKET, "stop", "begin", [])
+    cp_write(project.root, TICKET, "stop", "begin", [])
     project.commit("add fresh checkpoint", who=support.ORCHESTRATOR)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
@@ -95,3 +96,28 @@ def test_closing_checkpoint_written_after_checks_pass(project, sandbox, interfac
     assert cp_front is not None, "a closing checkpoint must be written on success"
     assert cp_front.get("trigger") == "ticket-transition", \
         f"the closing checkpoint's trigger must be 'ticket-transition', got {cp_front.get('trigger')!r}"
+
+
+def test_any_watchdog_error_refuses_close(project, sandbox, interface):
+    """B1: any GovError from the watchdog (not just two codes) refuses the close.
+
+    The close uses the watchdog with W1-25's thresholds. Any GovError from
+    gov.checkpoint.record.watch refuses the close with the watchdog's own code.
+    """
+    _green_project(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "without a checkpoint, the watchdog should refuse with its own GovError code"
+    error = envelope.get("error", {})
+    code = error.get("code", "")
+    assert code and code != "NOT_IMPLEMENTED", \
+        f"the error code must be the watchdog's own code: {code!r}"
+
+
+def test_close_uses_w1_25_thresholds(project, sandbox, interface):
+    """B1: the close uses W1-25's thresholds (MAX_AGE_MINUTES=240, MAX_COMMITS=20)."""
+    from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT
+    assert MAX_AGE_MINUTES == 240, f"W1-25 MAX_AGE_MINUTES should be 240, got {MAX_AGE_MINUTES}"
+    assert MAX_COMMITS == 20, f"W1-25 MAX_COMMITS should be 20, got {MAX_COMMITS}"
+    assert MAX_CONTEXT == 0.30, f"W1-25 MAX_CONTEXT should be 0.30, got {MAX_CONTEXT}"
