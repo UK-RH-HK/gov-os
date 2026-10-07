@@ -93,8 +93,24 @@ def test_check_framework_lock_missing(tmp_path):
     assert result["status"] == "unmeasured"
 
 
+def test_failed_parts_names_each_failed_or_drifted_part_with_its_reason():
+    from gov.doctor.command import _failed_parts
+    sections = {"hooks": {"status": "pass"}, "path_map": {"status": "unmeasured", "reason": "no path-map.yaml"},
+                "framework_lock": {"status": "fail", "reason": "framework.lock is missing"},
+                "stores": {"status": "drift"}, "tools": {"status": "fail", "reason": None}}
+    assert _failed_parts(sections) == "framework_lock (framework.lock is missing); stores; tools"
+
+
+def test_check_framework_lock_fails_an_installed_project_without_its_lock(tmp_path):
+    from gov.doctor.command import _check_framework_lock
+    (tmp_path / ".copier-answers.yml").write_text("_commit: v0.1.0\n", encoding="utf-8")
+    result = _check_framework_lock(tmp_path)
+    assert result["status"] == "fail" and result["match"] == "UNLOCKED"
+    assert "framework.lock" in result["reason"]
+
+
 @pytest.mark.parametrize("verdict, status", (("MATCH", "pass"), ("MISSING", "unmeasured"), ("DRIFT", "fail"),
-                                             ("ERROR", "fail"), ("anything else", "fail")))
+                                             ("ERROR", "fail"), ("UNLOCKED", "fail"), ("anything else", "fail")))
 def test_check_framework_lock_reports_the_answer_of_gov_lock(tmp_path, verdict, status):
     from gov.doctor.command import _check_framework_lock
     from gov.lock import Comparison

@@ -618,6 +618,16 @@ def _check_framework_lock(root: Path) -> dict:
     return section
 
 
+def _failed_parts(sections: dict) -> str:
+    """The parts that failed or drifted, each with its reason where it gives one: what plain ``gov doctor`` prints."""
+    failed = []
+    for name, section in sections.items():
+        if section.get("status") in ("fail", "drift"):
+            reason = section.get("reason")
+            failed.append(f"{name} ({reason})" if isinstance(reason, str) and reason else name)
+    return "; ".join(failed)
+
+
 def _check_isolation(root: Path) -> dict:
     runtime = root / ".gov-runtime"
     if not runtime.is_dir():
@@ -834,6 +844,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
 
     if not healthy:
         from gov.cli.errors import GovError
-        raise GovError("DOCTOR_UNHEALTHY", "one or more health checks failed or reported drift",
+        raise GovError("DOCTOR_UNHEALTHY", f"one or more health checks failed or reported drift: "
+                                           f"{_failed_parts(sections)}",
                        details=result, exit_code=3)
     return result

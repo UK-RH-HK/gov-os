@@ -41,9 +41,26 @@ class LockError(Exception):
 
 @dataclass(frozen=True)
 class Comparison:
-    verdict: str            # "MATCH", "DRIFT", "MISSING" (no lock) or "ERROR" (could not compare)
+    # "MATCH", "DRIFT", "ERROR" (could not compare), "UNLOCKED" (an answers file and no lock: the lock is
+    # missing from an installed project, DEC-499) or "MISSING" (neither: never installed from the template)
+    verdict: str
     drifted_files: tuple    # paths relative to the project root; empty unless the verdict is "DRIFT"
     reason: str | None      # why it is not a match, where files alone do not say
+
+
+def _present(path: Path) -> bool:
+    """Whether anything has this name: a file, a folder or a link, readable or not (DEC-499).
+
+    Only a name the system reports as absent is absent; a name that cannot be looked at counts as present,
+    so that an installed project is never taken for one that was never installed.
+    """
+    try:
+        os.lstat(path)
+    except (FileNotFoundError, NotADirectoryError):
+        return False
+    except OSError:
+        return True
+    return True
 
 
 def _read_map(path: Path) -> dict | None:
@@ -82,7 +99,12 @@ def _sha256(path: Path) -> str | None:
 def compare(root: Path) -> Comparison:
     """Compare the project at ``root`` with its lock: match or drift, the drifted files, the reason."""
     root = Path(root)
-    if not (root / LOCK_REL).is_file():
+    if not os.path.isfile(root / LOCK_REL):
+        if _present(root / LOCK_REL):
+            return Comparison("ERROR", (), "framework.lock is not a file that can be read")
+        if _present(root / ANSWERS_REL):
+            return Comparison("UNLOCKED", (), f"framework.lock is missing from an installed project "
+                                              f"({ANSWERS_REL} exists): nothing of the kernel was compared")
         return Comparison("MISSING", (), "no framework.lock")
     lock = _read_map(root / LOCK_REL)
     if lock is None:

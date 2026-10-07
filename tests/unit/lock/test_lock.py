@@ -58,6 +58,55 @@ def test_no_lock_is_missing(tmp_path):
     assert (answer.verdict, answer.reason) == ("MISSING", "no framework.lock")
 
 
+def test_no_lock_beside_an_answers_file_is_unlocked_and_names_the_lock(tmp_path):
+    root = _project(tmp_path)
+    (root / HOOK).write_text("print('edited')\n", encoding="utf-8")
+    (root / LOCK_REL).unlink()
+    answer = compare(root)
+    assert answer.verdict == "UNLOCKED" and answer.drifted_files == ()
+    assert "framework.lock" in answer.reason and ANSWERS_REL in answer.reason
+    (root / ANSWERS_REL).unlink()
+    assert compare(root).verdict == "MISSING"
+
+
+@pytest.mark.parametrize("answers", ("empty", "not a map", "folder", "dangling link"))
+def test_no_lock_beside_any_entry_named_as_the_answers_file_is_unlocked(tmp_path, answers):
+    path = tmp_path / ANSWERS_REL
+    if answers == "folder":
+        path.mkdir()
+    elif answers == "dangling link":
+        path.symlink_to(tmp_path / "nowhere")
+    else:
+        path.write_text("" if answers == "empty" else "- not a map\n", encoding="utf-8")
+    assert compare(tmp_path).verdict == "UNLOCKED"
+
+
+@pytest.mark.parametrize("lock", ("folder", "dangling link"))
+def test_a_lock_that_is_no_file_is_an_error_with_or_without_an_answers_file(tmp_path, lock):
+    path = tmp_path / LOCK_REL
+    path.parent.mkdir()
+    if lock == "folder":
+        path.mkdir()
+    else:
+        path.symlink_to(tmp_path / "nowhere")
+    assert compare(tmp_path).verdict == "ERROR"
+    (tmp_path / ANSWERS_REL).write_text("_commit: v0.1.0\n", encoding="utf-8")
+    answer = compare(tmp_path)
+    assert answer.verdict == "ERROR" and "framework.lock" in answer.reason
+
+
+def test_a_governance_folder_that_cannot_be_searched_is_not_taken_for_no_lock(tmp_path):
+    root = _project(tmp_path)
+    (root / ANSWERS_REL).unlink()
+    (root / "governance").chmod(0)
+    try:
+        if os.access(root / "governance", os.X_OK):
+            pytest.skip("permissions do not bind this user")
+        assert compare(root).verdict == "ERROR"
+    finally:
+        (root / "governance").chmod(0o755)
+
+
 def test_edited_missing_and_unreadable_files_are_named(tmp_path):
     root = _project(tmp_path)
     (root / HOOK).write_text("print('edited')\n", encoding="utf-8")
