@@ -465,26 +465,35 @@ class TestNoArguments:
 
 
 # --------------------------------------------------------------------------
-# 15. Empty folder -> unmeasured, exit non-zero
+# 15. Empty folder -> not applicable, exit non-zero (revised DEC-447)
 # --------------------------------------------------------------------------
 
 class TestEmptyFolder:
 
-    def test_empty_folder_unmeasured(self, tmp_path):
-        """A folder with no report files: exit non-zero, 'unmeasured'."""
+    def test_empty_folder_not_applicable(self, tmp_path):
+        """A folder with no report files: exit non-zero, "not applicable
+        until the first audit" (owner decision DEC-447).
+
+        Previously asserted 'unmeasured'; revised because DEC-447 requires
+        the validator to say "not applicable" when a folder holds no report
+        at all."""
         repo, _ = make_git_repo(tmp_path)
         empty = repo / "reports"
         empty.mkdir()
         (empty / "notes.txt").write_text("not a report\n", encoding="utf-8")
         result = run_audit_validator(str(empty), cwd=repo)
         assert result.returncode != 0, (
-            f"empty folder should exit non-zero but got exit 0\n"
+            f"folder with no reports should exit non-zero but got exit 0\n"
             f"stdout: {result.stdout}"
         )
-        combined = (result.stdout + result.stderr).lower()
-        assert "unmeasured" in combined, (
-            f"empty folder should report 'unmeasured'\n"
-            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        parsed = json.loads(result.stdout)
+        assert parsed.get("not_applicable") is True, (
+            f"expected not_applicable=true (owner decision DEC-447)\n"
+            f"stdout: {result.stdout}"
+        )
+        assert "not applicable until the first audit" in parsed.get("reason", ""), (
+            f"expected reason 'not applicable until the first audit' (DEC-447)\n"
+            f"got: {parsed.get('reason')}"
         )
 
 

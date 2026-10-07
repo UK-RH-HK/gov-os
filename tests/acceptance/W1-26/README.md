@@ -70,6 +70,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_decisions.py` | 6 | S1 |
 | `test_w1_26_skill_validator.py` | 36 | S7 (DEC-439) |
 | `test_w1_26_audit_validator.py` | 36 | S7 (DEC-441) |
+| `test_w1_26_not_applicable.py` | 21 | S2, S7 (DEC-447) |
 
 ## The interface the tests fix
 
@@ -154,12 +155,54 @@ Total skill validator: 36 cases.
 |---|---|---|
 | **S7** "provides the generic validators for skill files and audit reports" [CAP-38.b] | `test_w1_26_skill_validator.py` (36), `test_w1_26_audit_validator.py` (26) | `ModuleNotFoundError` (audit_validator not built yet); skill_validator exits non-zero on the new fix cases |
 | **S1** "Runs schema … and the rule that no implementer allowed_paths covers tests/acceptance/**" | Indirectly: the validators are check commands called by the check runner | As above |
+| **S2** / **S7** "not applicable until the first audit" [DEC-447] | `test_w1_26_not_applicable.py` (21) | Validator: says unmeasured, exits 1; Runner: ignores the field |
 
 | Covers id | Tests |
 |---|---|
 | DEC-439 (generic validators for skill files and audit reports) | `test_w1_26_skill_validator.py`, `test_w1_26_audit_validator.py` |
 | DEC-441 (minimal form of an audit report) | `test_w1_26_audit_validator.py` |
 | DEC-425 (unmeasured, never green) | `test_w1_26_audit_validator.py` (cases 14–17), `test_w1_26_skill_validator.py` (Fix 6) |
+| DEC-447 (not applicable until the first audit) | `test_w1_26_not_applicable.py`, `test_w1_26_audit_validator.py` (case 15 revised) |
+
+### "Not applicable until the first audit" (DEC-447) — revision round
+
+Added by the Independent Test Designer (MR-3) for owner decision DEC-447.
+
+#### Not-applicable answer (`test_w1_26_not_applicable.py`)
+
+21 cases testing DEC-447: the audit check is "not applicable until the first audit", a warning, never green.
+
+The validator says `{"not_applicable": true, "reason": "not applicable until the first audit"}` and exits **2** (not 0 and not 1) when a folder holds no report. A declaration opts in with `allows-not-applicable: "true"` (optional; absent means no change).
+
+| Case group | Cases | What | Red reason |
+|---|---|---|---|
+| Validator: not applicable | 4 | Empty/missing folder → `not_applicable` JSON, exit 2 | Currently says unmeasured, exits 1 |
+| Validator: unmeasured unchanged | 3 | No args, missing file, outside git → unmeasured | (passes) |
+| Validator: folder with reports | 2 | Valid/broken folder → validated, never not-applicable | (passes) |
+| Runner: opted in | 3 | `allows-not-applicable: "true"` + NA answer → YELLOW, reason in JSON | Runner ignores the field |
+| Runner: not opted in | 1 | Same answer without field → RED | (passes) |
+| Runner: other failures | 5 | Opted in + findings/unmeasured/crash/exit-42/marker-exit-0 | (passes) |
+| Lifecycle | 1 | No → YELLOW → valid → GREEN → broken → RED → removed → YELLOW | Phase 1 fails |
+| Never green | 2 | JSON and text: family never GREEN on not-applicable | (passes) |
+
+Validator exit codes: 0 clean, 1 findings or unmeasured, **2 not applicable**.
+
+Declaration field: `allows-not-applicable: "true"` (optional; a declaration without it behaves exactly as before).
+
+#### Revised case (owner decision DEC-447)
+
+- `test_w1_26_audit_validator.py::TestEmptyFolder::test_empty_folder_unmeasured` → `test_empty_folder_not_applicable`: a folder with no report files is "not applicable", not "unmeasured".
+
+#### Literal declaration W1-36 should write for audit-reproducibility
+
+```yaml
+id: audit-reproducibility
+family: audit reproducibility
+tier: G2
+severity: hard-block
+command: python3 -m gov.check.audit_validator audit-reports/
+allows-not-applicable: "true"
+```
 
 ## Not tested
 
