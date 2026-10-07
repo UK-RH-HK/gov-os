@@ -29,6 +29,15 @@ def run(root: Path, args, config: dict) -> dict:
     if uncovered:
         print("families with no registered check: " + ", ".join(uncovered), file=sys.stderr)
 
+    for name in sorted(result.get("families", {})):
+        fam = result["families"][name]
+        status = fam.get("status", "?")
+        reason = fam.get("reason", "")
+        line = f"  {name}: {status}"
+        if reason:
+            line += f" ({reason})"
+        print(line, file=sys.stderr)
+
     if has_hard_block_red:
         red_families = [
             name for name, fam in result.get("families", {}).items()

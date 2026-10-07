@@ -206,6 +206,14 @@ def _unmeasured(reason: str) -> int:
     return 1
 
 
+_NOT_APPLICABLE_REASON = "not applicable until the first audit"
+
+
+def _not_applicable(reason: str) -> int:
+    print(json.dumps({"not_applicable": True, "reason": reason}))
+    return 2
+
+
 def main(argv: list[str] | None = None) -> int:
     args = argv if argv is not None else sys.argv[1:]
 
@@ -221,6 +229,8 @@ def main(argv: list[str] | None = None) -> int:
     for arg in args:
         p = Path(arg)
         if not p.exists():
+            if not p.suffix:
+                return _not_applicable(_NOT_APPLICABLE_REASON)
             return _unmeasured(f"path does not exist: {arg}")
 
         if p.is_file():
@@ -231,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
         elif p.is_dir():
             files = _find_report_files(p)
             if not files:
-                return _unmeasured(f"no report files found in {arg}")
+                return _not_applicable(_NOT_APPLICABLE_REASON)
             for f in files:
                 result = validate_file(f, repo_root)
                 if result is None:
