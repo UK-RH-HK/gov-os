@@ -1,7 +1,7 @@
 # W1-30 acceptance tests: `gov close`
 
 Ticket `DAEO-2lwj`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-75 cases in 8 files (49 first-start + 2 fail-open probe-gate + 24 second-start).
+76 cases in 8 files (49 first-start + 2 fail-open probe-gate + 25 second-start).
 
 ```
 python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider
@@ -63,7 +63,7 @@ Expected: `1 skipped, 48 errors`.
 | File | Cases | KPI |
 |---|---|---|
 | `test_w1_30_close.py` | 18 | S1, F1, MWA-04 |
-| `test_w1_30_iteration.py` | 14 | S2, F2, F3 |
+| `test_w1_30_iteration.py` | 15 | S2, F2, F3 |
 | `test_w1_30_traceability.py` | 5 | S3 |
 | `test_w1_30_stale.py` | 5 | S4 |
 | `test_w1_30_receipt.py` | 9 | S5 |
@@ -141,7 +141,7 @@ Added by a second Independent Test Designer pass (11 points).
 | 8 | `test_w1_30_close.py` | 2 (trailer exact match, ticket tool interface) | Substring match bug; string replacement |
 | 9 | `test_w1_30_stale.py` | 1 (stale evidence without prior close) | Existing test closes first, masking stale check |
 | 10 | `test_w1_30_watchdog.py` | 3 (stale checkpoint, missing checkpoint, closing checkpoint written) | No call to gov.checkpoint.record.watch() |
-| 11 | `test_w1_30_iteration.py` | 1 (outcomes list reveals count to looping session) | Outcomes list length IS the count (CAP-59.b) |
+| 11 | `test_w1_30_iteration.py` | 2 (outcomes list reveals count to looping session, outcome contains iteration field) | Outcomes list length IS the count; outcome dict contains `iteration` key (CAP-59.b) |
 
 ### Packages (not testable without new code)
 

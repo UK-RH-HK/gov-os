@@ -275,3 +275,21 @@ def test_escalation_output_to_looping_session_has_no_count(project, sandbox, int
             "which reveals the iteration count (CAP-59.b); the outcomes list must go "
             "to the orchestrator/owner, not to the looping session"
         )
+
+
+def test_escalation_outcome_has_no_iteration_field(project, sandbox, interface):
+    """KPI F3, CAP-59.b: the outcome returned to the looping session must not contain
+    an 'iteration' field whose value reveals the count."""
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    serialised = json.dumps(envelope)
+    error = envelope.get("error", {})
+    details = error.get("details", {})
+    outcomes = details.get("outcomes", [])
+    for outcome in outcomes:
+        if isinstance(outcome, dict):
+            assert "iteration" not in outcome, \
+                f"the outcome contains an 'iteration' field that reveals the count: {outcome}"
