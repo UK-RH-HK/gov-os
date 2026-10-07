@@ -1,366 +1,157 @@
-"""Tests for stale check evidence rejection: S4 (CAP-38.d), A7.
+"""Stale check evidence (KPI S4, CAP-38.d).
 
-S4: A ticket that changes governance files cannot close on check results recorded
-    for another commit or inputs hash: gov close re-runs the checks or rejects the
-    stale green evidence.
-A7: When a ticket's commits change governance files, gov close re-runs the checks
-    at HEAD through gov.check.runner.run_checks(root) and refuses on any hard-block
-    red, naming the checks. It trusts no recorded result. The close record states the
-    commit and the result. For a ticket that changes no governance file, no check
-    result is needed and none is claimed.
+"A ticket that changes governance files cannot close on check results recorded for another commit or inputs
+hash: gov close re-runs the checks or rejects the stale green evidence."
 
-Governance file prefixes (A7): template/governance/kernel/checks/,
-    template/governance/kernel/schemas/, governance/project/,
-    template/governance/kernel/hooks/, template/governance/kernel/skills/.
+What that sentence means in a project (README, "Stale evidence"): W1-26's runner writes no result into the
+project, so the only check result a close can stand on is the one of its own run at the commit being closed
+(DEC-454: "re-runs the checks at HEAD ... It trusts no recorded result"). Measured here: a check that was
+green at another commit, or at this commit before what it reads changed, and is red when the close runs,
+refuses; a check that was red at another commit and is green at the commit being closed does not, and the
+close record states the status of the commit being closed. No source gives a rule about how often or in
+which commits of the ticket a governance file changed: a declaration changed twice, green at closing, closes.
+
+Every project declares its own checks (``project_with_checks``); the green evidence of each case is the
+answer of ``gov check --json`` itself, with the commit in its ``provenance``.
 """
-
-import json
-
-import pytest
 
 import w1_30_support as support
 
-cli_support = support.cli_support
-
 TICKET = "PROJ-stl1"
 WBS = "W1-stale"
-IMPL = support.IMPLEMENTER
-TRAILERS = ("Task: PROJ-stl1", "Role: engineer", "Implements: CAP-01")
+
+SETTINGS = "governance/project/settings.yaml"
+NOTES = "governance/project/notes.yaml"
+MAINTENANCE = "local-state/maintenance"
+FEATURE = {"src/example/feature.py": "# feature\n"}
+
+README_PRESENT = support.declared_check("readme-present", "test -s README.md")
+SETTINGS_STRICT = support.declared_check("settings-strict", f"grep -qx 'mode: strict' {SETTINGS}",
+                                         family="path-map compliance")
+NOT_IN_MAINTENANCE = support.declared_check("not-in-maintenance", f"test ! -e {MAINTENANCE}",
+                                            family="recovery/rebuild")
+
+STRICT = "mode: strict\nlevel: 2\n"
+LOOSE = "mode: loose\nlevel: 2\n"
 
 
-# --------------------------------------------------------------------------
-# Helpers
-# --------------------------------------------------------------------------
-
-def _project_with_governance_change(project, ticket_id=TICKET, wbs=WBS,
-                                     governance_path="template/governance/kernel/checks/extra-test.yaml"):
-    """A project where the ticket's commits touch governance files."""
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**",
-                                      "template/governance/kernel/schemas/**",
-                                      "template/governance/kernel/hooks/**",
-                                      "template/governance/kernel/skills/**",
-                                      "governance/project/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write(governance_path,
-                  'id: "extra-test"\nfamily: "schema/invariants"\ntier: "G1"\n'
-                  'severity: "warning"\ncommand: "true"\n')
-    project.commit("implement with governance change", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    return ticket_id
+def _settings_project(project_with_checks):
+    project = project_with_checks(README_PRESENT, SETTINGS_STRICT)
+    project.write(SETTINGS, "mode: strict\n")
+    project.commit("the project's settings", who=support.ORCHESTRATOR)
+    return project
 
 
-def _project_without_governance_change(project, ticket_id=TICKET, wbs=WBS):
-    """A project where the ticket's commits do NOT touch governance files."""
-    project.add_ticket(ticket_id, wbs)
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement without governance", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    return ticket_id
+def _status_at(project, sandbox, check_id, commit):
+    """The status W1-26's runner gives ``check_id`` now, with ``commit`` as the commit of that result."""
+    entry = support.checks_at_head(project, sandbox)[check_id]
+    assert entry["provenance"]["commit"] == commit, \
+        f"the fixture is wrong: the runner's result is for {entry['provenance']['commit']}, not {commit}"
+    return entry["status"]
 
 
-# --------------------------------------------------------------------------
-# A7: Ticket changing governance file -> checks re-run
-# --------------------------------------------------------------------------
+def _red_then_green(project_with_checks, sandbox):
+    """``settings-strict`` is red at the ticket's first commit and green at the commit being closed."""
+    project = _settings_project(project_with_checks)
+    support.start_ticket(project, TICKET, WBS)
+    first = support.engineer_commit(project, TICKET, {**FEATURE, SETTINGS: LOOSE})
+    assert _status_at(project, sandbox, "settings-strict", first) == support.RED, \
+        "the fixture is wrong: the check is not red at the ticket's first commit"
+    support.engineer_commit(project, TICKET, {SETTINGS: STRICT})
+    head = support.checkpointed(project, TICKET)
+    assert _status_at(project, sandbox, "settings-strict", head) == support.GREEN, \
+        "the fixture is wrong: the check is not green at the commit being closed"
+    assert support.red_hard_blocks(support.checks_at_head(project, sandbox)) == []
+    return project, head
 
-def test_governance_change_reruns_checks(project, sandbox, interface):
-    """A7, S4: a ticket changing governance files triggers run_checks(root)."""
-    _project_with_governance_change(project)
+
+def test_a_check_green_at_an_earlier_commit_and_red_at_the_commit_being_closed_refuses(
+        project_with_checks, sandbox, interface):
+    project = _settings_project(project_with_checks)
+    support.start_ticket(project, TICKET, WBS)
+    first = support.engineer_commit(project, TICKET, {**FEATURE, SETTINGS: STRICT})
+    # The green evidence of another commit: the runner's own answer at the ticket's first commit.
+    entries = support.checks_at_head(project, sandbox)
+    assert support.red_hard_blocks(entries) == [] and _status_at(project, sandbox, "settings-strict", first) == \
+        support.GREEN, "the fixture is wrong: the checks are not green at the ticket's first commit"
+    support.engineer_commit(project, TICKET, {SETTINGS: LOOSE})
+    head = support.checkpointed(project, TICKET)
+    assert _status_at(project, sandbox, "settings-strict", head) == support.RED, \
+        "the fixture is wrong: the check is not red at the commit being closed"
+
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None, "gov close must run to completion"
+
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    assert "settings-strict" in support.error_text(error), f"the answer does not name the red check\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
-def test_governance_change_hard_block_red_refuses(project, sandbox, interface):
-    """A7: a hard-block red from run_checks refuses the close, naming the checks."""
-    project.add_ticket(TICKET, WBS,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**"])
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_check_declaration("planted-block", "schema/invariants",
-                                  severity="hard-block", command="exit 1")
-    project.commit("implement with hard-block check", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
+def test_a_check_red_at_an_earlier_commit_and_green_at_the_commit_being_closed_closes(
+        project_with_checks, sandbox, interface):
+    project, _ = _red_then_green(project_with_checks, sandbox)
+
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "a hard-block red from run_checks must refuse the close"
-    error = envelope.get("error", {})
-    error_text = json.dumps(error)
-    assert "planted-block" in error_text or "hard" in error_text.lower(), \
-        f"the error should name the failing check: {error}"
+
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"
 
 
-def test_governance_change_warning_does_not_refuse(project, sandbox, interface):
-    """A7: a warning (not hard-block) from run_checks does NOT refuse the close."""
-    project.add_ticket(TICKET, WBS,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**"])
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_check_declaration("planted-warn", "schema/invariants",
-                                  severity="warning", command="exit 1")
-    project.commit("implement with warning check", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
+def test_the_close_record_states_the_status_of_the_commit_being_closed_not_an_earlier_one(
+        project_with_checks, sandbox, interface):
+    project, head = _red_then_green(project_with_checks, sandbox)
+
     run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True, \
-        "a warning from run_checks must NOT refuse the close"
+
+    support.result_of(run, interface)
+    front = support.the_close_record(project, TICKET)
+    stated = (front.get(support.CHECK_COMMIT_KEY), support.recorded_check_statuses(front).get("settings-strict"))
+    assert stated == (head, support.GREEN), \
+        f"the close record states {stated} for settings-strict; at the commit being closed it is {(head, support.GREEN)}"
 
 
-def test_governance_change_passing_checks_in_close_record(project, sandbox, interface):
-    """A7: when checks pass, the close record states the commit and the result."""
-    _project_with_governance_change(project)
-    before = cli_support.snapshot(project.root)
+def test_a_check_green_at_this_commit_before_what_it_reads_changed_refuses(project_with_checks, sandbox, interface):
+    """The same commit, other inputs: the check reads a file git does not track."""
+    project = project_with_checks(README_PRESENT, NOT_IN_MAINTENANCE)
+    project.write(".gitignore", ".gov-runtime/\nlocal-state/\n")
+    project.commit("the project's untracked state", who=support.ORCHESTRATOR)
+    support.start_ticket(project, TICKET, WBS)
+    support.engineer_commit(project, TICKET, {**FEATURE, NOTES: "note: one\n"})
+    head = support.checkpointed(project, TICKET)
+    # The green evidence of this very commit.
+    assert support.red_hard_blocks(support.checks_at_head(project, sandbox)) == [] and \
+        _status_at(project, sandbox, "not-in-maintenance", head) == support.GREEN, \
+        "the fixture is wrong: the checks are not green at the commit being closed"
+    project.write(MAINTENANCE, "since today\n")
+    assert support.head_of(project) == head and project.waiting_paths() == [], \
+        "the fixture is wrong: the change of the check's input is visible to git"
+    assert _status_at(project, sandbox, "not-in-maintenance", head) == support.RED, \
+        "the fixture is wrong: the check is not red after its input changed"
+
     run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    if envelope["ok"]:
-        created = support.new_files(project.root, before, after)
-        _, front = support.find_close_record(project.root, created)
-        assert front is not None, "close record should exist on success"
-        check_info = front.get("check_result") or front.get("checks") or front.get("governance_checks")
-        assert check_info is not None, \
-            f"close record must state check results when governance files changed: {sorted(front)}"
+
+    error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+    assert "not-in-maintenance" in support.error_text(error), \
+        f"the answer does not name the red check\n{run.describe()}"
+    support.assert_not_closed(project, TICKET)
 
 
-def test_checks_run_at_head(project, sandbox, interface):
-    """A7: the checks are run at HEAD, not at the commit that changed the governance file."""
-    _project_with_governance_change(project)
-    head = support.git(project.root, "rev-parse", "HEAD").strip()
-    before = cli_support.snapshot(project.root)
+def test_a_declaration_changed_in_two_commits_and_green_at_the_commit_being_closed_closes(
+        project_with_checks, sandbox, interface):
+    project = project_with_checks(README_PRESENT)
+    declaration = f"{support.CHECKS_REL}/feature-present.yaml"
+    text = ('id: "feature-present"\nfamily: "mutation scope"\ntier: "G1"\nseverity: "{severity}"\n'
+            'command: "test -s src/example/feature.py"\n')
+    support.start_ticket(project, TICKET, WBS)
+    support.engineer_commit(project, TICKET, {**FEATURE, declaration: text.format(severity=support.WARNING)})
+    support.engineer_commit(project, TICKET, {declaration: text.format(severity=support.HARD_BLOCK)})
+    support.checkpointed(project, TICKET)
+    changes = support.git(project.root, "log", "--format=%H", "--", declaration).split()
+    entries = support.checks_at_head(project, sandbox)
+    assert len(changes) == 2 and support.red_hard_blocks(entries) == [] and \
+        (entries["feature-present"]["severity"], entries["feature-present"]["status"]) == \
+        (support.HARD_BLOCK, support.GREEN), "the fixture is wrong"
+
     run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    if envelope["ok"]:
-        created = support.new_files(project.root, before, after)
-        _, front = support.find_close_record(project.root, created)
-        if front:
-            commit_in_record = front.get("check_commit") or front.get("commit")
-            if commit_in_record:
-                assert commit_in_record.startswith(head[:8]) or commit_in_record == head, \
-                    f"checks must run at HEAD ({head[:8]}...), record says {commit_in_record}"
 
-
-# --------------------------------------------------------------------------
-# A7: No governance change -> no check result needed
-# --------------------------------------------------------------------------
-
-def test_no_governance_change_no_check_needed(project, sandbox, interface):
-    """A7: for a ticket that changes no governance file, no check result is claimed."""
-    _project_without_governance_change(project)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True, \
-        "a ticket with no governance changes should close without checks"
-
-
-# --------------------------------------------------------------------------
-# A7: Each governance prefix triggers checks
-# --------------------------------------------------------------------------
-
-def test_governance_prefix_checks(project, sandbox, interface):
-    """A7: changing template/governance/kernel/checks/ triggers check re-run."""
-    _project_with_governance_change(
-        project,
-        governance_path="template/governance/kernel/checks/test-prefix.yaml")
-    run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None
-
-
-def test_governance_prefix_schemas(project, sandbox, interface):
-    """A7: changing template/governance/kernel/schemas/ triggers check re-run."""
-    ticket_id = "PROJ-sch1"
-    wbs = "W1-schema"
-    trailers = ("Task: PROJ-sch1", "Role: engineer", "Implements: CAP-01")
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/schemas/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write("template/governance/kernel/schemas/test-schema.json",
-                  '{"type": "object"}')
-    project.commit("implement with schema change", who=IMPL, trailers=trailers)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None
-
-
-def test_governance_prefix_project(project, sandbox, interface):
-    """A7: changing governance/project/ triggers check re-run."""
-    ticket_id = "PROJ-proj"
-    wbs = "W1-proj"
-    trailers = ("Task: PROJ-proj", "Role: engineer", "Implements: CAP-01")
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**", "governance/project/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write("governance/project/test-config.yaml", "test: true\n")
-    project.commit("implement with project governance change", who=IMPL, trailers=trailers)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None
-
-
-# --------------------------------------------------------------------------
-# S4: Stale evidence after governance change
-# --------------------------------------------------------------------------
-
-def test_governance_prefix_policies(project, sandbox, interface):
-    """A7, DEC-454 point 8: changing template/governance/kernel/policies/ triggers
-    check re-run. (Added prefix per DEC-454.)
-    """
-    ticket_id = "PROJ-pol1"
-    wbs = "W1-pol"
-    trailers = ("Task: PROJ-pol1", "Role: engineer", "Implements: CAP-01")
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/policies/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write("template/governance/kernel/policies/test-policy.md",
-                  "# Test policy\n\nA governance policy.\n")
-    project.commit("implement with policy change", who=IMPL, trailers=trailers)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None, "gov close must run checks when policies/ changed"
-
-
-def test_governance_prefix_roles(project, sandbox, interface):
-    """A7, DEC-454 point 8: changing template/governance/kernel/roles/ triggers
-    check re-run. (Added prefix per DEC-454.)
-    """
-    ticket_id = "PROJ-rol1"
-    wbs = "W1-role"
-    trailers = ("Task: PROJ-rol1", "Role: engineer", "Implements: CAP-01")
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/roles/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write("template/governance/kernel/roles/test-role.md",
-                  "# Test role\n\nA governance role definition.\n")
-    project.commit("implement with role change", who=IMPL, trailers=trailers)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope is not None, "gov close must run checks when roles/ changed"
-
-
-def test_governance_change_green_hard_block_closes(project, sandbox, interface):
-    """A7, DEC-454 point 8: governance change with all hard-block checks GREEN allows close."""
-    project.add_ticket(TICKET, WBS,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**"])
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_check_declaration("green-hb", "schema/invariants",
-                                  severity="hard-block", command="true")
-    project.commit("implement with green hard-block", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    run = support.run_close(project, sandbox, TICKET)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is True, \
-        "governance change with all green hard-block checks must allow close"
-
-
-def test_close_record_states_each_check_status(project, sandbox, interface):
-    """A7, DEC-454 point 8: the close record states each check's status as run."""
-    project.add_ticket(TICKET, WBS,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**"])
-    project.add_passing_test(WBS)
-    project.write("src/example/feature.py", "# feature\n")
-    project.add_check_declaration("status-rec", "schema/invariants",
-                                  severity="warning", command="true")
-    project.commit("implement with check", who=IMPL, trailers=TRAILERS)
-    project.add_checkpoint(TICKET)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    if envelope["ok"]:
-        created = support.new_files(project.root, before, after)
-        _, front = support.find_close_record(project.root, created)
-        assert front is not None, "close record should exist on success"
-        check_info = (front.get("check_result") or front.get("checks")
-                      or front.get("governance_checks"))
-        assert check_info is not None, \
-            f"close record must state each check's status: {sorted(front)}"
-        info_str = json.dumps(check_info)
-        assert "status-rec" in info_str or "schema" in info_str, \
-            f"close record must name the checks that were run: {check_info}"
-
-
-def test_no_governance_change_no_check_result_in_record(project, sandbox, interface):
-    """A7, DEC-454 point 8: no governance change → no check result is needed and
-    none is claimed in the close record.
-    """
-    _project_without_governance_change(project)
-    before = cli_support.snapshot(project.root)
-    run = support.run_close(project, sandbox, TICKET)
-    after = cli_support.snapshot(project.root)
-    envelope = support.envelope_of(run, interface)
-    if envelope["ok"]:
-        created = support.new_files(project.root, before, after)
-        _, front = support.find_close_record(project.root, created)
-        if front is not None:
-            check_info = (front.get("check_result") or front.get("checks")
-                          or front.get("governance_checks"))
-            assert check_info is None or check_info == [] or check_info == {}, \
-                f"no governance change: close record must not claim a check result: {check_info}"
-
-
-def test_stale_evidence_after_governance_change(project, sandbox, interface):
-    """S4, CAP-38.d: stale evidence after a governance change blocks close.
-
-    Record check evidence (run gov check), then change governance, then try
-    to close. Close must refuse because the evidence is stale.
-    """
-    ticket_id = "PROJ-stl2"
-    wbs = "W1-stale2"
-    trailers = ("Task: PROJ-stl2", "Role: engineer", "Implements: CAP-01")
-    project.add_ticket(ticket_id, wbs,
-                       allowed_paths=["src/example/**",
-                                      "template/governance/kernel/checks/**"])
-    project.add_passing_test(wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.write("template/governance/kernel/checks/stale-test.yaml",
-                  'id: "stale-test"\nfamily: "schema/invariants"\ntier: "G1"\n'
-                  'severity: "warning"\ncommand: "true"\n')
-    project.commit("implement with governance", who=IMPL, trailers=trailers)
-
-    run_check = support.run_check(project, sandbox)
-    support.check_envelope_of(run_check, interface)
-
-    project.write("template/governance/kernel/checks/stale-test.yaml",
-                  'id: "stale-test"\nfamily: "schema/invariants"\ntier: "G1"\n'
-                  'severity: "hard-block"\ncommand: "true"\n')
-    project.commit("change governance check severity", who=IMPL, trailers=trailers)
-    project.add_checkpoint(ticket_id)
-    project.commit("checkpoint", who=support.ORCHESTRATOR)
-
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False or run.returncode != support.EXIT_OK, \
-        "gov close must refuse stale evidence after a governance change"
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"

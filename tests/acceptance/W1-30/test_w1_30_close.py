@@ -282,39 +282,7 @@ def test_containment_blocks_close_for_out_of_scope_commit(project, sandbox, inte
         "gov close must refuse when a commit changes files outside allowed_paths"
 
 
-# --------------------------------------------------------------------------
-# No acceptance tests: nothing measured is never a pass (S1, F1, DEC-425)
-# --------------------------------------------------------------------------
-
-def test_close_refuses_when_no_acceptance_tests_exist(project, sandbox, interface):
-    """KPI S1, DEC-425: a ticket with no tests/acceptance/<wbs>/ directory cannot close."""
-    ticket_id = "PROJ-noat"
-    wbs = "W1-noat"
-    project.add_ticket(ticket_id, wbs)
-    acc_dir = project.root / "tests" / "acceptance" / wbs
-    if acc_dir.is_dir():
-        shutil.rmtree(acc_dir)
-    project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement without acceptance tests", who=IMPL,
-                   trailers=("Task: PROJ-noat", "Role: engineer", "Implements: CAP-01"))
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "gov close must refuse when no acceptance test directory exists (DEC-425)"
-
-
-def test_close_refuses_when_acceptance_dir_is_empty(project, sandbox, interface):
-    """KPI S1, DEC-425: a ticket whose acceptance dir has only README.md cannot close."""
-    ticket_id = "PROJ-empt"
-    wbs = "W1-empt"
-    project.add_ticket(ticket_id, wbs)
-    project.write("src/example/feature.py", "# feature\n")
-    project.commit("implement with empty acceptance dir", who=IMPL,
-                   trailers=("Task: PROJ-empt", "Role: engineer", "Implements: CAP-01"))
-    run = support.run_close(project, sandbox, ticket_id)
-    envelope = support.envelope_of(run, interface)
-    assert envelope["ok"] is False, \
-        "gov close must refuse when the acceptance dir has no test files (DEC-425)"
+# No acceptance tests (S1, F1, DEC-425): ``test_w1_30_no_acceptance_tests.py``.
 
 
 # --------------------------------------------------------------------------

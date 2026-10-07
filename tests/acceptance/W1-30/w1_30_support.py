@@ -24,8 +24,11 @@ import json
 import os
 import re
 import shutil
+import site
 import subprocess
 import sys
+import time
+import venv
 from pathlib import Path
 
 import yaml
@@ -117,6 +120,106 @@ FAMILIES = check_support.FAMILIES
 PRODUCT_TRACEABILITY = "product traceability"
 
 TEMPLATE_OPENSPEC = REPO_ROOT / "template" / "openspec"
+
+
+# --------------------------------------------------------------------------
+# The sandbox: its own home, the installed packages of the interpreter running the suite
+# --------------------------------------------------------------------------
+
+def installed_packages_env():
+    """What keeps the installed packages in sight when ``HOME`` is the sandbox's.
+
+    Of everything an interpreter imports, only its per-user folder is found through ``HOME``. The interpreter
+    running the suite says where its own is (``site.getuserbase()``), and ``PYTHONUSERBASE`` gives the same
+    folder to the interpreter a case starts and to every interpreter that one starts in turn. Where the running
+    interpreter uses no per-user folder (a virtual environment), nothing is needed and nothing is set.
+    """
+    return {"PYTHONUSERBASE": site.getuserbase()} if site.ENABLE_USER_SITE else {}
+
+
+def sandbox_env(sandbox):
+    """The environment of every process this suite starts: W1-07's stand-in environment (the sandbox's own
+    ``HOME``, ``TMPDIR`` and bytecode folder, ``src/`` on ``PYTHONPATH``) and the installed packages of the
+    interpreter running the suite."""
+    return {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(SRC),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+        **installed_packages_env(),
+    }
+
+
+def run_gov(project_root, sandbox, *args, python=None, env=None):
+    """Run ``gov <args>`` in the project through W1-07's console-script stand-in, as
+    ``cli_support.run_gov_with_code`` does, in ``sandbox_env``. ``python`` is another interpreter than the one
+    running the suite and ``env`` replaces the environment; only the case without a test runner gives them."""
+    launcher = cli_support.write_launcher(REPO_ROOT, sandbox)
+    limit = cli_support.COMMAND_TIMEOUT_S
+    started = time.perf_counter()
+    try:
+        done = subprocess.run([str(python or sys.executable), str(launcher), *args], cwd=str(project_root),
+                              env=sandbox_env(sandbox) if env is None else env, capture_output=True, text=True,
+                              timeout=limit, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"gov {' '.join(args)} did not end within {limit:.0f} s") from None
+    return cli_support.Run(tuple(args), done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
+
+
+def can_import(module, sandbox, python=None, env=None):
+    """Whether the interpreter a case starts finds ``module``, asked of that interpreter in that environment."""
+    done = subprocess.run([str(python or sys.executable), "-c",
+                           "import importlib.util, sys\n"
+                           "sys.exit(0 if importlib.util.find_spec(sys.argv[1]) else 1)\n", module],
+                          env=sandbox_env(sandbox) if env is None else env, cwd=str(sandbox.elsewhere),
+                          capture_output=True, text=True, stdin=subprocess.DEVNULL)
+    assert done.returncode in (0, 1), f"the interpreter did not answer:\n{done.stdout}\n{done.stderr}"
+    return done.returncode == 0
+
+
+# What makes up the test runner in a folder of installed packages.
+_TEST_RUNNER_NAMES = ("pytest", "_pytest", "pytest.py", "py.test")
+
+
+def interpreter_without_test_runner(base, sandbox):
+    """An interpreter that has every installed package of the one running the suite except pytest, and the
+    environment to start it in: ``(python, env)``.
+
+    The interpreter is a virtual environment without packages of its own, so it sees none of the machine's
+    folders of installed packages, wherever pytest lies on this machine. Each of those folders is given back on
+    ``PYTHONPATH`` as a folder of links to everything in it but the test runner. ``PATH`` names the virtual
+    environment first, so that ``python3`` is that interpreter too.
+    """
+    base = Path(base)
+    venv.EnvBuilder(with_pip=False, symlinks=True, system_site_packages=False).create(base / "venv")
+    python = base / "venv" / "bin" / "python3"
+    assert python.exists(), f"the virtual environment has no interpreter at {python}"
+    folders = list(site.getsitepackages())
+    if site.ENABLE_USER_SITE:
+        folders.append(site.getusersitepackages())
+    mirrors = []
+    for number, folder in enumerate(dict.fromkeys(folders)):
+        if not Path(folder).is_dir():
+            continue
+        mirror = base / "packages" / str(number)
+        mirror.mkdir(parents=True)
+        for entry in Path(folder).iterdir():
+            name = entry.name.lower()
+            if name in _TEST_RUNNER_NAMES or name.startswith("pytest-") or name.endswith(".pth"):
+                continue
+            (mirror / entry.name).symlink_to(entry)
+        mirrors.append(str(mirror))
+    env = {
+        "PATH": str(python.parent) + os.pathsep + os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": os.pathsep.join([str(SRC), *mirrors]),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+    }
+    return python, env
 
 
 # --------------------------------------------------------------------------
@@ -248,10 +351,13 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
 class Project:
     """A temporary git repository that gov close can run in."""
 
-    def __init__(self, root):
+    def __init__(self, root, checks=None):
+        """``checks`` is the project's own set of check declarations (``declared_check``); without it the
+        project holds a copy of the kernel's declarations."""
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self._minute = 0
+        self._checks = checks
         self._init_minimal()
 
     def _init_minimal(self):
@@ -270,7 +376,10 @@ class Project:
     def _copy_kernel_templates(self):
         checks_src = REPO_ROOT / CHECKS_REL
         checks_dst = self.root / CHECKS_REL
-        if checks_src.is_dir():
+        if self._checks is not None:
+            for declaration in self._checks:
+                self.add_check_declaration(**declaration)
+        elif checks_src.is_dir():
             shutil.copytree(checks_src, checks_dst, dirs_exist_ok=True)
         schemas_src = REPO_ROOT / "template" / "governance" / "kernel" / "schemas"
         schemas_dst = self.root / "template" / "governance" / "kernel" / "schemas"
@@ -394,8 +503,8 @@ class Project:
         write(self.root, f"{CHECKS_REL}/{check_id}.yaml", text)
         return check_id
 
-    def gov(self, sandbox, *args):
-        return cli_support.run_gov_with_code(REPO_ROOT, self.root, sandbox, *args)
+    def gov(self, sandbox, *args, python=None, env=None):
+        return run_gov(self.root, sandbox, *args, python=python, env=env)
 
 
 # --------------------------------------------------------------------------
@@ -428,32 +537,12 @@ _JUDGE = (
 def judged_by_w1_50(project, sandbox, commits, check=True):
     """W1-50's public judgement of ``commits`` (DEC-453; ``tests/acceptance/W1-50/README.md``, "The public
     function"): a list of ``{commit, paths, reason}``, empty when every commit passes. It only reads."""
-    env = {
-        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-        "HOME": str(sandbox.home),
-        "TMPDIR": str(sandbox.tmpdir),
-        "LC_ALL": "C.UTF-8",
-        "PYTHONPATH": str(SRC),
-        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
-    }
     done = subprocess.run([sys.executable, "-c", _JUDGE, str(project.root), *commits], cwd=str(project.root),
-                          env=env, capture_output=True, text=True, stdin=subprocess.DEVNULL)
+                          env=sandbox_env(sandbox), capture_output=True, text=True, stdin=subprocess.DEVNULL)
     if done.returncode != 0 and not check:
         return None   # the function raised (a case broke the history on purpose): nothing is known
     assert done.returncode == 0, f"W1-50's judge_commits did not answer:\n{done.stdout}\n{done.stderr}"
     return json.loads(done.stdout)
-
-
-def sandbox_env(sandbox):
-    """The environment W1-07's stand-in gives ``gov``, for a call of a public function of ``src/``."""
-    return {
-        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-        "HOME": str(sandbox.home),
-        "TMPDIR": str(sandbox.tmpdir),
-        "LC_ALL": "C.UTF-8",
-        "PYTHONPATH": str(SRC),
-        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
-    }
 
 
 def load_store(project, sandbox, check=True):
@@ -727,6 +816,95 @@ def checks_of(result):
 
 def finding_codes(result):
     return check_support.finding_codes(result)
+
+
+# --------------------------------------------------------------------------
+# The governance checks of a close (CAP-38.d, DEC-454, DEC-476)
+# --------------------------------------------------------------------------
+
+RED, YELLOW, GREEN = check_support.RED, check_support.YELLOW, check_support.GREEN
+HARD_BLOCK, WARNING = check_support.HARD_BLOCK, check_support.WARNING
+
+# Where the close record states the governance checks (settlement 12).
+CHECK_COMMIT_KEY = "check_commit"
+CHECK_RESULT_KEY = "governance_checks"
+
+
+def declared_check(check_id, command, severity=HARD_BLOCK, family="schema/invariants", tier="G1"):
+    """One check declaration of a project's own set (``Project(root, checks=[...])``)."""
+    return {"check_id": check_id, "family": family, "tier": tier, "severity": severity, "command": command}
+
+
+def checks_at_head(project, sandbox):
+    """What W1-26's runner says of every check in the project as it stands: ``{id: entry}`` from
+    ``gov check --json``, read from ``result`` (exit code 0) or from ``error.details`` (exit code 3)."""
+    run = run_check(project, sandbox)
+    envelope = run.envelope()
+    body = envelope.get("result") if envelope.get("ok") else (envelope.get("error") or {}).get("details")
+    entries = (body or {}).get("checks")
+    assert isinstance(entries, list) and entries, f"gov check named no check\n{run.describe()}"
+    return {entry["id"]: entry for entry in entries}
+
+
+def statuses(entries):
+    return {check_id: entry["status"] for check_id, entry in entries.items()}
+
+
+def red_hard_blocks(entries):
+    return sorted(check_id for check_id, entry in entries.items()
+                  if entry["severity"] == HARD_BLOCK and entry["status"] == RED)
+
+
+def the_close_record(project, ticket):
+    """The frontmatter of the ticket's one close record."""
+    records = close_records(project.root, ticket)
+    assert len(records) == 1, f"one close record of {ticket} is expected, found {[rel for rel, _ in records]}"
+    return records[0][1]
+
+
+def recorded_check_statuses(front):
+    """``{id: status}`` of every check the close record states: each object under ``governance_checks`` that has
+    an ``id`` and a ``status``, at any depth."""
+    found = [entry for entry in cli_support.find_records(front.get(CHECK_RESULT_KEY), key="id") if "status" in entry]
+    return {entry["id"]: entry["status"] for entry in found}
+
+
+def head_of(project):
+    return git(project.root, "rev-parse", "HEAD").strip()
+
+
+# The paths of a ticket that may change governance files: W1-50's judgement passes an engineer's commit there.
+GOVERNANCE_TICKET_PATHS = ("src/example/**", "governance/project/**", "template/governance/kernel/**")
+
+
+def start_ticket(project, ticket, wbs, allowed_paths=GOVERNANCE_TICKET_PATHS):
+    """The orchestrator's ticket file and the test designer's passing acceptance test, waiting for the
+    engineer's first commit (``engineer_commit``)."""
+    project.add_ticket(ticket, wbs, allowed_paths=list(allowed_paths))
+    project.add_passing_test(wbs)
+
+
+def engineer_commit(project, ticket, files):
+    """One commit of the ticket's engineer that writes ``files`` (``{path: text}``); returns its id."""
+    for rel, text in files.items():
+        project.write(rel, text)
+    return project.commit("work on the ticket", who=IMPLEMENTER, trailers=trailers_of(ticket))
+
+
+def checkpointed(project, ticket):
+    """The orchestrator's checkpoint, committed: the project is ready for its close. Returns ``HEAD``, the
+    commit being closed."""
+    project.add_checkpoint(ticket)
+    return project.commit("checkpoint", who=ORCHESTRATOR)
+
+
+def assert_dependent_repair_ticket(project, ticket, run):
+    """The refused close opened exactly one other ticket, and by the ticket tool it depends on ``ticket``."""
+    repairs = other_tickets(project.root, ticket)
+    assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
+    tree = tk(project, "dep", "tree", repairs[0].stem).splitlines()
+    assert any(ticket in line for line in tree[1:]), \
+        f"by the ticket tool the repair ticket does not depend on {ticket}: {tree}"
 
 
 # --------------------------------------------------------------------------
