@@ -5343,3 +5343,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.125 | 2026-10-07 | One delegated decision on W1-39: DEC-488 (the lock comparison is W1-39's and never matches unhashed; only `__pycache__/` is left out; the update procedure in the template's messages and the lock's header; adapter generation a documented step). Next free id: DEC-489. |
+
+## 126. One delegated decision on W1-40: the hook files' author, what pre-push runs, the evidence record (register v0.126, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-489 — W1-40: the engineer writes the hook and workflow files through its template files; pre-push runs the declared G3 checks; the evidence record is a git note on the head commit
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-40 lead's packages P-A, P-1, P-2, P-3, P-5, P-B and P-C (`log/W1-40-lead-run1.json`), each with its recommendation. Its P-4 (whether the CI workflow may install registered tools on the hosted runner) is an install and the owner's; it is not decided here.
+- **Decision:**
+  - **Who writes `lefthook.yml` and the workflow files.** A launched engineer's Write tool refuses these file names. The files stay the implementer's: the engineer writes the template file with its tools and produces the repository's own file from it with a command (a copy, or a rendering where the two differ). Only if that is refused too does the orchestrator place the engineer's content word for word, with a commit that says so.
+  - **What pre-push runs.** The declared checks of tier G3; a model-dependent test belongs there when its ticket declares it as a check. Where a project declares no G3 check, the push is not refused for that alone: the evidence record states that no G3 check is declared, in those words and never as a pass, and CI reports it.
+  - **A tier named to the hook's command that has no declaration is never passed over silently** when another named tier has one, except G3 as above; a mistyped tier refuses.
+  - **The evidence record is a git note on the head commit, under a ref of its own,** written by the pre-push hook after G3 has run, and pushed by the hook; CI fetches that ref and reads the note of the commit it builds. It holds at least the commit id, the result and the checks that ran. A record for another commit, or none, fails CI. The choice is documented in the hook file and the workflow.
+  - **A record edited by hand is not detected in Wave 1** (a deliberate bypass, like skipping the hook): residual; a hash or signature is a Wave 2 item.
+  - **The template files use no Copier answers**; they render to this repository's own files, with GitHub's expressions escaped.
+  - **Tier selection stays as built** (the hook command calls the check runner's internals): residual, unit tests hold the join; a public tier argument of the runner, and whether its tier-less built-in checks belong to G1 and G2, go on the Wave 2 list. CI runs the whole of the deterministic checks, so no check runs nowhere.
+  - **The second gitleaks scan stays strict** (it does not carry the project's path allowlist): residual; in this repository it will refuse commits that touch the canary fixtures once the hooks are activated, which is named in the exit package.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.126 | 2026-10-07 | One delegated decision on W1-40: DEC-489 (hook and workflow files written by the engineer through their templates; pre-push runs declared G3 checks, none declared is recorded as such; the evidence record is a git note under its own ref; three residuals). Next free id: DEC-490. |
