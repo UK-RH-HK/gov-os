@@ -468,7 +468,9 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     """Run pytest on ``test_path`` to its end: its findings and its counts.
 
     A run over the time limit is a finding like a failing test (DEC-454).
+    ``TEST_RUNNER_ABSENT`` when this interpreter has no pytest: nothing ran.
     """
+    import importlib.util
     import os
     import re
 
@@ -478,18 +480,15 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
             return [], counts
         raise GovError("TESTS_MISSING", f"{test_path} is not a folder",
                         {"test_path": str(test_path)})
+    if importlib.util.find_spec("pytest") is None:
+        raise GovError("TEST_RUNNER_ABSENT",
+                        f"pytest is not installed for {sys.executable}: no test was run",
+                        {"python": sys.executable})
 
     rel = str(test_path.relative_to(root))
     env = dict(os.environ)
     env["PYTHONPATH"] = os.pathsep.join(
         [str(root / "src")] + [p for p in env.get("PYTHONPATH", "").split(os.pathsep) if p])
-
-    # pytest may be in user-site; propagate its base so the subprocess finds it
-    if "PYTHONUSERBASE" not in env:
-        import shutil
-        pytest_bin = shutil.which("pytest")
-        if pytest_bin:
-            env["PYTHONUSERBASE"] = str(Path(pytest_bin).resolve().parent.parent)
     cmd = [sys.executable, "-m", "pytest", str(test_path), "-q",
            "-p", "no:cacheprovider", "--tb=line", "--no-header"]
     if ignore is not None:

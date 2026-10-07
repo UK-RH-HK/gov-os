@@ -1,9 +1,13 @@
 """The test runs of a close and what its close record holds."""
 from __future__ import annotations
 
+import os
+from types import SimpleNamespace
+
 import pytest
 import yaml
 
+from gov.cli.errors import GovError
 from gov.close.command import NOT_MEASURED, _read_skill_versions, _run_tests, _write_close_record
 
 
@@ -49,6 +53,30 @@ def test_no_test_collected_is_a_finding_unless_the_run_may_be_empty(tmp_path):
 def test_the_ignored_folder_is_not_run(tmp_path):
     tests = _tests(tmp_path, test_a="def test_a():\n    assert False\n")
     assert _run_tests(tmp_path, tests, 60, ignore=tests / "unit", none_collected_ok=True)[0] == []
+
+
+def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_first(tmp_path, monkeypatch):
+    """Nothing but ``PYTHONPATH`` is set for the test run: no place of one machine is read."""
+    seen = {}
+
+    def fake_run(cmd, **keys):
+        seen.update(keys["env"])
+        return SimpleNamespace(returncode=0, stdout="1 passed in 0.01s\n", stderr="")
+
+    monkeypatch.setenv("PYTHONPATH", "/elsewhere")
+    monkeypatch.delenv("PYTHONUSERBASE", raising=False)
+    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    before = dict(os.environ)
+    _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
+    assert seen == before | {"PYTHONPATH": f"{tmp_path / 'src'}{os.pathsep}/elsewhere"}
+
+
+def test_an_interpreter_without_pytest_is_an_error_and_no_test_is_run(tmp_path, monkeypatch):
+    monkeypatch.setattr("importlib.util.find_spec", lambda name: None)
+    monkeypatch.setattr("gov.close.command.subprocess.run", lambda *a, **k: pytest.fail("a test run was started"))
+    with pytest.raises(GovError) as raised:
+        _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
+    assert (raised.value.code, raised.value.exit_code) == ("TEST_RUNNER_ABSENT", 1)
 
 
 RECORD = {"packet_hash": "ab" * 32, "commits": [{"commit": "c" * 40, "role": "engineer", "model": NOT_MEASURED}]}
