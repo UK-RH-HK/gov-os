@@ -5306,3 +5306,25 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.123 | 2026-10-07 | Owner answers: DEC-481 (`adapter-portability` in the baseline, 43 findings; W1-38 merges), DEC-482 (`product-traceability-trailers` in the baseline, 735 findings; a trailers base commit, here `429815b5`; W1-30 merges and closes through `gov close`), DEC-483 (owner-decision lookup from a register file: residual for W1-41), DEC-484 (`gov close` run time accepted; runs beside worktree work), DEC-485 (DEC-479 and DEC-480 accepted; three Wave 2 items), DEC-486 (41 of 50 closed; open tickets listed by id). Next free id: DEC-487. |
+
+## 124. One delegated decision on W1-30: what the review of `gov close` found and how each finding is settled (register v0.124, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-487 — W1-30's review found thirteen ways `gov close` closes what it did not measure; the fail-open ones are fixed in a follow-up, cases first
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** `gov close` refused W1-30 for a missing probe record (FULL profile). The final code had the orchestrator's reading (DEC-449) and no fresh review. A read-only reviewer (brief A3, session `350cc2a3`, at `6f2130c8`) returned thirteen findings, most reproduced in throwaway projects (`log/W1-30-probe.json`). The orchestrator prompt, section 5 step 5: findings that could lose work, let an implementer change acceptance tests or fail open are fixed, a test design batch first; the rest are residuals. Recorded before the change (DEC-463).
+- **Decision (what `gov close` does after the follow-up):**
+  - **The tree it measures is the commit it records.** With any tracked file changed or any untracked, not ignored file present, `gov close` refuses before it measures and names the paths. It is not a finding about the ticket's work: not counted, no repair ticket.
+  - **The test runs are the suite's own.** Options a caller's environment would add to the test runner are not passed on; a run of the ticket's acceptance tests in which no test passed refuses, as a run that collects none does.
+  - **Every commit since the ticket's first is somebody's.** A commit after the ticket's first commit that names no task at all refuses the close (its work was measured by no ticket); a commit of the ticket without a role refuses like one without `Implements:`; a root commit and a merge commit are judged with the paths they bring.
+  - **The probe record is evidence only if it could not have been written by the implementer:** it is committed, by a commit with the orchestrator's role; its judgement says the probe passed (a failing judgement refuses); the probed commit is a commit id, not a name that moves; a commit with the reviewer's role refuses wherever it lies in the ticket's range.
+  - **The owner's decision lifts an escalation only if** W1-11's checker confirms it as the owner's and in force, it is committed, it was recorded after the escalation began, and it has not lifted an escalation before.
+  - **The escalation state cannot be reset by its absence:** an escalation in force with its counter missing, or a counter that is not a count from zero up, blocks and says so. The counter, the ticket files and the records are written whole or not at all.
+  - **A close that fails at its last step leaves no record that says the ticket closed.**
+  - **A record store older than the commit being closed refuses** (the context would be built from superseded records); the answer names `gov rebuild`.
+  - **The installed kernel counts as governance files:** a ticket commit under `governance/kernel/` runs the checks, as one under the template's kernel does. The suite's earlier settlement to the contrary is revised.
+  - A time limit that is not a positive number is refused as an invalid argument.
+- **Residuals, not fixed in Wave 1:** a second close of a reopened ticket overwrites the first close record (it survives in git); every refusal for the same cause opens a new repair ticket, and their number shows the count to the looping session (against DEC-096 in spirit: Wave 2 list); the folder of escalation files is not among the command's declared write paths; `gov close` records `Implements:` ids without resolving them (the traceability check resolves them).
+- **Not decided here (package P-6, with the owner):** that `gov close` stops at its first finding, where it looks for the ticket tool, and how tickets close in this repository before adoption.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.124 | 2026-10-07 | One delegated decision on W1-30: DEC-487 (the review's thirteen findings; ten settled behaviours for a follow-up, cases first; four residuals). Next free id: DEC-488. |
