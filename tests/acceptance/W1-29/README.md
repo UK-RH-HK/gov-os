@@ -93,6 +93,41 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 |------|--------|------------|
 | `TestCutOrder::test_instruction_preserved_when_cap_tight` | CAP-15.g, DEC-136 | hook not built |
 
+### DEC-444 — Automatic checkpoints go to the ignored scratch folder
+
+Revised or added after the implementation, from the owner's decision DEC-444.
+
+**Revised cases** (the assertion that the hook writes under `docs/checkpoints/`
+is replaced by the assertion that it writes under
+`.gov-runtime/scratch/checkpoints/` and writes nothing under
+`docs/checkpoints/`; no other assertion weakened, no case removed):
+
+| Test | Covers | Red reason |
+|------|--------|------------|
+| `TestPreCompact::test_writes_checkpoint` | CAP-37.b, DEC-444 | revised after implementation: owner decision DEC-444 — asserts scratch, current code writes to docs |
+| `TestStop::test_writes_checkpoint` | CAP-37.b, DEC-444 | revised after implementation: owner decision DEC-444 — asserts scratch, current code writes to docs |
+| `TestStop::test_no_checkpoint_without_ticket` | CAP-37.b, DEC-444 | revised after implementation: owner decision DEC-444 — GREEN (now checks both places; Stop still writes nothing without a ticket) |
+| `TestStop::test_respects_stop_hook_active` | CAP-37.b, DEC-444 | revised after implementation: owner decision DEC-444 — GREEN (now checks scratch; stop_hook_active still prevents writing) |
+| `TestCheckpointOnContextUtilisation::test_stop_writes_checkpoint_not_only_precompact` | CAP-37.c, DEC-444 | revised after implementation: owner decision DEC-444 — asserts scratch, current code writes to docs |
+| `TestNoStopLoop::test_stop_exits_without_side_effects_when_active` | DEC-025, DEC-444 | revised after implementation: owner decision DEC-444 — GREEN (now checks scratch; no checkpoint is written when re-entered) |
+
+**New cases:**
+
+| Test | Covers | Red reason |
+|------|--------|------------|
+| `TestAutomaticCheckpointLocation::test_precompact_writes_under_scratch_not_docs` | DEC-444 point 1 | hook writes to docs/checkpoints/ instead of .gov-runtime/scratch/checkpoints/ |
+| `TestAutomaticCheckpointLocation::test_stop_writes_under_scratch_not_docs` | DEC-444 point 1 | hook writes to docs/checkpoints/ instead of .gov-runtime/scratch/checkpoints/ |
+| `TestAutomaticCheckpointLocation::test_precompact_does_not_create_docs_folder` | DEC-444 point 1 | hook creates docs/checkpoints/(ticket)/ |
+| `TestDeliberateCheckpointLocation::test_gov_checkpoint_writes_under_docs_not_scratch` | DEC-444 point 2 | GREEN (current code already writes deliberate checkpoints to docs/checkpoints/) |
+| `TestGitCleanAfterHook::test_precompact_leaves_tree_clean` | DEC-444 point 3 | hook writes untracked files under docs/checkpoints/ |
+| `TestGitCleanAfterHook::test_stop_leaves_tree_clean` | DEC-444 point 3 | hook writes untracked files under docs/checkpoints/ |
+| `TestCheckpointReinjection::test_reinjects_automatic_checkpoint_from_scratch` | DEC-444 point 4 | SessionStart does not look in .gov-runtime/scratch/checkpoints/ |
+| `TestCheckpointReinjection::test_newer_automatic_wins_over_older_deliberate` | DEC-444 point 4 | SessionStart does not look in .gov-runtime/scratch/checkpoints/ |
+| `TestCheckpointReinjection::test_newer_deliberate_wins_over_older_automatic` | DEC-444 point 4 | GREEN (SessionStart already reads from docs/checkpoints/, which is the deliberate location) |
+| `TestCheckpointReinjection::test_injection_says_which_path` | DEC-444 point 4 | SessionStart does not report the scratch path |
+| `TestWatchdogCountsBoth::test_automatic_checkpoint_counts_for_freshness` | DEC-444 point 4 | watchdog does not look in .gov-runtime/scratch/checkpoints/ |
+| `TestRecordIdUniqueness::test_ids_unique_across_automatic_and_deliberate` | DEC-444 point 5 | id numbering does not consider both locations |
+
 ### Hook copies — src/gov/hooks/ matches template/governance/kernel/hooks/ (Point 6)
 
 | Test | Covers | Red reason |
@@ -113,6 +148,7 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
 | DEC-208 | Compaction preserves decisions, ticket and loop counts; auto-compact threshold | `test_precompact_then_sessionstart_preserves_ticket`, `test_precompact_then_sessionstart_preserves_decisions`, `test_precompact_then_sessionstart_preserves_loop_counts`, `test_auto_compact_threshold` |
 | DEC-259 | Hooks act only for GOV_ROLE=orchestrator (W1-49 behaviour); W1-29 extends so non-orchestrator roles get W1-29 content | `test_orchestrator_compact_carries_prompt_path`, `test_orchestrator_compact_carries_resume_section`, `test_orchestrator_compact_combined_within_cap` |
 | DEC-413 | SubagentStop text-path fail-open on labels without content | `test_text_labels_without_content_do_not_satisfy_contract` |
+| DEC-444 | Automatic checkpoints go to the ignored scratch folder; deliberate records stay under docs/checkpoints/ | `test_precompact_writes_under_scratch_not_docs`, `test_stop_writes_under_scratch_not_docs`, `test_precompact_does_not_create_docs_folder`, `test_gov_checkpoint_writes_under_docs_not_scratch`, `test_precompact_leaves_tree_clean`, `test_stop_leaves_tree_clean`, `test_reinjects_automatic_checkpoint_from_scratch`, `test_newer_automatic_wins_over_older_deliberate`, `test_newer_deliberate_wins_over_older_automatic`, `test_injection_says_which_path`, `test_automatic_checkpoint_counts_for_freshness`, `test_ids_unique_across_automatic_and_deliberate`, and 6 revised cases |
 
 ## Red/green summary
 
@@ -127,7 +163,7 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
   (W1-25), which is already built.  Since `gov close` (W1-30) is not built,
   these test the function directly per the instruction: "if the watchdog can
   only be a function that W1-30 calls, the case tests the function."
-- **5 new tests are GREEN** because they test existing behaviour:
+- **5 tests are GREEN** because they test existing behaviour:
   - `test_precompact_then_sessionstart_preserves_decisions` — PreCompact's
     `split()` already preserves the written part containing decision IDs.
   - `test_precompact_then_sessionstart_preserves_loop_counts` — same
@@ -139,7 +175,37 @@ The watchdog tests call `gov.checkpoint.record.watch` directly because
   - `test_hook_copies_identical[stop.py]` and `[subagentstop.py]` — files are
     currently byte-for-byte identical.
 
-Total: **33 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
+### DEC-444 cases (added 2026-10-07)
+
+- **9 new DEC-444 tests are RED** because the hooks' automatic checkpoints
+  still go to `docs/checkpoints/`, not to `.gov-runtime/scratch/checkpoints/`:
+  `test_precompact_writes_under_scratch_not_docs`,
+  `test_stop_writes_under_scratch_not_docs`,
+  `test_precompact_does_not_create_docs_folder`,
+  `test_precompact_leaves_tree_clean`,
+  `test_stop_leaves_tree_clean`,
+  `test_reinjects_automatic_checkpoint_from_scratch`,
+  `test_newer_automatic_wins_over_older_deliberate`,
+  `test_injection_says_which_path`,
+  `test_automatic_checkpoint_counts_for_freshness`.
+- **1 new DEC-444 test is RED** because the id numbering does not consider
+  both locations: `test_ids_unique_across_automatic_and_deliberate`.
+- **2 new DEC-444 tests are GREEN** because the existing code already
+  satisfies them:
+  - `test_gov_checkpoint_writes_under_docs_not_scratch` — deliberate
+    `gov checkpoint` already writes to `docs/checkpoints/`.
+  - `test_newer_deliberate_wins_over_older_automatic` — SessionStart already
+    reads from `docs/checkpoints/`, which is the deliberate location.
+- **3 revised cases are RED** because the assertion was changed from
+  `docs/checkpoints/` to `.gov-runtime/scratch/checkpoints/`:
+  `test_writes_checkpoint` (PreCompact),
+  `test_writes_checkpoint` (Stop),
+  `test_stop_writes_checkpoint_not_only_precompact`.
+- **3 revised cases remain GREEN**: `test_no_checkpoint_without_ticket`,
+  `test_respects_stop_hook_active`,
+  `test_stop_exits_without_side_effects_when_active`.
+
+Total: **45 test cases** (the parametrized `test_reinjects_on_compact_clear_resume`
 counts as 3; the parametrized `test_malformed_input_fails_closed` counts as 3;
 the parametrized `test_hook_copies_identical` counts as 2).
 
@@ -176,12 +242,16 @@ not satisfy the contract (DEC-136, Finding 2).
 
 ### 3. Where a checkpoint is written
 
-By `gov checkpoint --ticket <id> --trigger <trigger> --next <text>` (W1-25,
-`gov.checkpoint.record.write`) under `docs/checkpoints/<ticket>/`.
+A deliberate checkpoint (`gov checkpoint`, W1-25) writes under
+`docs/checkpoints/<ticket>/`.  An automatic checkpoint (written by the
+PreCompact or Stop hook) writes under
+`.gov-runtime/scratch/checkpoints/<ticket>/` (DEC-444).
 
 "Stale for its policy" = the watchdog (`gov checkpoint --watch`), which checks
 age, commits since the checkpoint, context utilisation and ticket-status
-transitions.  Exit 3 = `CHECKPOINT_STALE` or `CHECKPOINT_MISSING`.
+transitions.  Exit 3 = `CHECKPOINT_STALE` or `CHECKPOINT_MISSING`.  The
+watchdog counts the newer of the two (automatic and deliberate) checkpoints
+(DEC-444).
 
 `gov close` (W1-30) is not built.  The tests test `record.watch()` directly.
 

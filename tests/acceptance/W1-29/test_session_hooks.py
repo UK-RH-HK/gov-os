@@ -21,20 +21,35 @@ import json
 import os
 import subprocess
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from conftest import (
-    BRIEF_TOKEN_LIMIT,
-    HOOKS_DIR,
-    ORCH,
-    REPO_ROOT,
-    SIZE_CAP_CHARS,
-    TWELVE_FIELDS,
-    _tokens,
-    run_w29_hook,
+# When all three suites run in one pytest invocation, W1-49's conftest
+# may already be cached under the name "conftest" in sys.modules (because
+# our conftest adds the W1-49 directory to sys.path for w1_49_support).
+# Load our conftest explicitly by file path so we always get the right one.
+import importlib.util as _imputil
+
+_w29_spec = _imputil.spec_from_file_location(
+    "w29_conftest", str(Path(__file__).resolve().parent / "conftest.py"),
 )
+_w29_conftest = _imputil.module_from_spec(_w29_spec)
+sys.modules["w29_conftest"] = _w29_conftest
+_w29_spec.loader.exec_module(_w29_conftest)
+
+BRIEF_TOKEN_LIMIT = _w29_conftest.BRIEF_TOKEN_LIMIT
+CHECKPOINT_RECORD_TEXT = _w29_conftest.CHECKPOINT_RECORD_TEXT
+HOOKS_DIR = _w29_conftest.HOOKS_DIR
+ORCH = _w29_conftest.ORCH
+REPO_ROOT = _w29_conftest.REPO_ROOT
+SCRATCH_CHECKPOINTS_REL = _w29_conftest.SCRATCH_CHECKPOINTS_REL
+SIZE_CAP_CHARS = _w29_conftest.SIZE_CAP_CHARS
+TWELVE_FIELDS = _w29_conftest.TWELVE_FIELDS
+_tokens = _w29_conftest._tokens
+run_w29_hook = _w29_conftest.run_w29_hook
 
 import w1_49_support
 
@@ -139,18 +154,28 @@ class TestPreCompact:
     """PreCompact writes a checkpoint at the compaction trigger."""
 
     def test_writes_checkpoint(self, w49_project, run):
-        """PreCompact calls gov checkpoint --trigger compaction.  [CAP-37.b]"""
-        cp_dir = w49_project / "docs" / "checkpoints" / "TEST-abcd"
-        cp_before = list(cp_dir.glob("CP-*.md"))
+        """PreCompact calls gov checkpoint --trigger compaction.  The
+        automatic checkpoint goes to .gov-runtime/scratch/checkpoints/
+        (DEC-444), not to docs/checkpoints/.  [CAP-37.b]
+
+        Revised after implementation: owner decision DEC-444."""
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        docs_dir = w49_project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_before = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
         result = run.precompact(
             w49_project, "auto", role="engineer", ticket="TEST-abcd",
         )
         assert result.returncode == 0, (
             f"PreCompact must never block (exit 0): {result.describe()}"
         )
-        cp_after = list(cp_dir.glob("CP-*.md"))
-        assert len(cp_after) > len(cp_before), (
-            "PreCompact must write a new checkpoint record"
+        scratch_after = list(scratch_dir.glob("CP-*.md")) if scratch_dir.exists() else []
+        assert len(scratch_after) > 0, (
+            "PreCompact must write a new checkpoint record under "
+            ".gov-runtime/scratch/checkpoints/TEST-abcd/ (DEC-444)"
+        )
+        docs_after = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        assert docs_after == docs_before, (
+            "PreCompact must not write anything under docs/checkpoints/ (DEC-444)"
         )
 
 
@@ -158,10 +183,14 @@ class TestStop:
     """Stop writes a checkpoint and respects stop_hook_active."""
 
     def test_writes_checkpoint(self, project):
-        """Stop calls gov checkpoint --trigger stop.  [CAP-37.b]"""
-        cp_before = list(
-            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
-        )
+        """Stop calls gov checkpoint --trigger stop.  The automatic
+        checkpoint goes to .gov-runtime/scratch/checkpoints/ (DEC-444),
+        not to docs/checkpoints/.  [CAP-37.b]
+
+        Revised after implementation: owner decision DEC-444."""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        docs_dir = project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_before = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
         rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
@@ -170,19 +199,28 @@ class TestStop:
             env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
         )
         assert rc == 0
-        cp_after = list(
-            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+        scratch_after = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_after) > 0, (
+            "Stop must write a new checkpoint under "
+            ".gov-runtime/scratch/checkpoints/TEST-abcd/ (DEC-444)"
         )
-        assert len(cp_after) > len(cp_before), (
-            "Stop must write a new checkpoint"
+        docs_after = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        assert docs_after == docs_before, (
+            "Stop must not write anything under docs/checkpoints/ (DEC-444)"
         )
 
     def test_no_checkpoint_without_ticket(self, project):
-        """When GOV_TICKET is not set, the Stop hook writes no checkpoint.
-        Sessions without a ticket must not pollute the checkpoint
-        directory.  [Point 4]"""
-        cp_dir = project / "docs" / "checkpoints"
-        cp_before = set(cp_dir.rglob("CP-*.md")) if cp_dir.exists() else set()
+        """When GOV_TICKET is not set, the Stop hook writes no checkpoint
+        anywhere — neither under docs/checkpoints/ nor under
+        .gov-runtime/scratch/checkpoints/.  [Point 4]
+
+        Revised after implementation: owner decision DEC-444."""
+        docs_dir = project / "docs" / "checkpoints"
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL
+        docs_before = set(docs_dir.rglob("CP-*.md")) if docs_dir.exists() else set()
+        scratch_before = set(scratch_dir.rglob("CP-*.md")) if scratch_dir.exists() else set()
         rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
@@ -191,17 +229,24 @@ class TestStop:
             env_extra={"GOV_ROLE": "engineer"},
         )
         assert rc == 0, f"Stop must exit 0 even without GOV_TICKET, got {rc}"
-        cp_after = set(cp_dir.rglob("CP-*.md")) if cp_dir.exists() else set()
-        assert cp_after == cp_before, (
-            "Stop must not write any checkpoint when GOV_TICKET is not set"
+        docs_after = set(docs_dir.rglob("CP-*.md")) if docs_dir.exists() else set()
+        scratch_after = set(scratch_dir.rglob("CP-*.md")) if scratch_dir.exists() else set()
+        assert docs_after == docs_before, (
+            "Stop must not write any checkpoint under docs/ when GOV_TICKET is not set"
+        )
+        assert scratch_after == scratch_before, (
+            "Stop must not write any checkpoint under .gov-runtime/ when GOV_TICKET is not set"
         )
 
     def test_respects_stop_hook_active(self, project):
         """When stop_hook_active is present, Stop exits 0 without writing a
-        checkpoint or blocking — this prevents re-entrancy loops.  [FL1]"""
-        cp_before = list(
-            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
-        )
+        checkpoint or blocking — this prevents re-entrancy loops.  [FL1]
+
+        Revised after implementation: owner decision DEC-444."""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_before = set(
+            p.name for p in scratch_dir.glob("CP-*.md")
+        ) if scratch_dir.exists() else set()
         rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
@@ -217,10 +262,10 @@ class TestStop:
             hso = output.get("hookSpecificOutput", {})
             assert hso.get("permissionDecision") != "block", \
                 "Stop must not block when stop_hook_active is set"
-        cp_after = list(
-            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
-        )
-        assert len(cp_after) == len(cp_before), \
+        scratch_after = set(
+            p.name for p in scratch_dir.glob("CP-*.md")
+        ) if scratch_dir.exists() else set()
+        assert scratch_after == scratch_before, \
             "Stop must not write a checkpoint when stop_hook_active is set"
 
 
@@ -369,8 +414,12 @@ class TestCheckpointOnContextUtilisation:
     """Checkpoints are written at multiple triggers, not only PreCompact."""
 
     def test_stop_writes_checkpoint_not_only_precompact(self, project):
-        """The Stop hook writes a checkpoint (trigger: stop), proving that
-        checkpoints are not limited to PreCompact events.  [CAP-37.c]"""
+        """The Stop hook writes a checkpoint (trigger: stop) under
+        .gov-runtime/scratch/checkpoints/ (DEC-444), proving that
+        checkpoints are not limited to PreCompact events.  [CAP-37.c]
+
+        Revised after implementation: owner decision DEC-444."""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
         rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
@@ -380,9 +429,12 @@ class TestCheckpointOnContextUtilisation:
         )
         assert rc == 0
         cps = list(
-            (project / "docs" / "checkpoints" / "TEST-abcd").glob("CP-*.md"),
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(cps) >= 1, (
+            "Stop must have written a new checkpoint under "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444)"
         )
-        assert len(cps) >= 2, "Stop must have written a new checkpoint"
 
     def test_watchdog_marks_stale_on_context_utilisation(self, project):
         """The watchdog marks the checkpoint stale when context utilisation
@@ -535,13 +587,13 @@ class TestNoStopLoop:
     def test_stop_exits_without_side_effects_when_active(self, project):
         """When stop_hook_active is set, the hook exits 0 with no checkpoint
         write and no block decision.  This is the single mechanism that
-        prevents the Stop hook from looping."""
+        prevents the Stop hook from looping.
+
+        Revised after implementation: owner decision DEC-444."""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
         cp_before = set(
-            p.name
-            for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob(
-                "CP-*.md",
-            )
-        )
+            p.name for p in scratch_dir.glob("CP-*.md")
+        ) if scratch_dir.exists() else set()
         rc, output, _ = run_w29_hook(
             "stop",
             {"hook_event_name": "Stop", "session_id": "s1",
@@ -554,11 +606,8 @@ class TestNoStopLoop:
         )
         assert rc == 0
         cp_after = set(
-            p.name
-            for p in (project / "docs" / "checkpoints" / "TEST-abcd").glob(
-                "CP-*.md",
-            )
-        )
+            p.name for p in scratch_dir.glob("CP-*.md")
+        ) if scratch_dir.exists() else set()
         assert cp_after == cp_before, (
             "no checkpoint written during re-entrant stop"
         )
@@ -682,6 +731,402 @@ class TestCutOrder:
         assert w1_49_support.PROMPT_REL in ctx, (
             "the instruction to read the prompt must survive even when the "
             "cap is tight — it is the last thing to be cut"
+        )
+
+
+# ======================================================================
+# DEC-444 — Automatic checkpoints go to the ignored scratch folder
+# ======================================================================
+
+
+class TestAutomaticCheckpointLocation:
+    """DEC-444 point 1: PreCompact and Stop write their automatic
+    checkpoints under .gov-runtime/scratch/checkpoints/(ticket)/, and
+    write nothing under docs/checkpoints/."""
+
+    def test_precompact_writes_under_scratch_not_docs(self, w49_project, run):
+        """PreCompact writes the automatic checkpoint record under
+        .gov-runtime/scratch/checkpoints/(ticket)/ and nothing under
+        docs/checkpoints/.  [DEC-444 point 1]"""
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        docs_dir = w49_project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_before = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        result = run.precompact(
+            w49_project, "auto", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        scratch_after = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_after) > 0, (
+            "PreCompact must write a checkpoint under "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444)"
+        )
+        docs_after = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        assert docs_after == docs_before, (
+            "PreCompact must not write anything under docs/checkpoints/ (DEC-444)"
+        )
+
+    def test_stop_writes_under_scratch_not_docs(self, project):
+        """Stop writes the automatic checkpoint record under
+        .gov-runtime/scratch/checkpoints/(ticket)/ and nothing under
+        docs/checkpoints/.  [DEC-444 point 1]"""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        docs_dir = project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_before = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        rc, output, _ = run_w29_hook(
+            "stop",
+            {"hook_event_name": "Stop", "session_id": "s1",
+             "cwd": str(project), "last_assistant_message": "Done."},
+            project,
+            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        )
+        assert rc == 0
+        scratch_after = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_after) > 0, (
+            "Stop must write a checkpoint under "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444)"
+        )
+        docs_after = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        assert docs_after == docs_before, (
+            "Stop must not write anything under docs/checkpoints/ (DEC-444)"
+        )
+
+    def test_precompact_does_not_create_docs_folder(self, w49_project, run):
+        """When there is no prior deliberate checkpoint for a ticket,
+        PreCompact must not create docs/checkpoints/(ticket)/ at all
+        (DEC-444): the folder is not even created.  [DEC-444 point 1]"""
+        ticket = "NOCK-wxyz"
+        (w49_project / ".tickets" / f"{ticket}.md").write_text(
+            f"---\nid: {ticket}\nstatus: in_progress\ntitle: No checkpoint\n"
+            "sources: []\ndepends_on: []\n---\n# NOCK-wxyz\n",
+            encoding="utf-8",
+        )
+        docs_dir = w49_project / "docs" / "checkpoints" / ticket
+        assert not docs_dir.exists(), "precondition: no docs checkpoint folder"
+        result = run.precompact(
+            w49_project, "auto", role="engineer", ticket=ticket,
+        )
+        assert result.returncode == 0, result.describe()
+        assert not docs_dir.exists(), (
+            f"PreCompact must not create docs/checkpoints/{ticket}/ (DEC-444): "
+            "automatic checkpoints go to .gov-runtime/scratch/checkpoints/"
+        )
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / ticket
+        scratch_cps = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_cps) > 0, (
+            "PreCompact must write the automatic checkpoint under "
+            f".gov-runtime/scratch/checkpoints/{ticket}/ (DEC-444)"
+        )
+
+
+class TestDeliberateCheckpointLocation:
+    """DEC-444 point 2: a deliberate ``gov checkpoint`` still writes
+    under docs/checkpoints/ and nowhere under .gov-runtime/."""
+
+    def test_gov_checkpoint_writes_under_docs_not_scratch(self, project):
+        """A deliberate ``gov checkpoint`` (as W1-25's cases run it) still
+        writes under docs/checkpoints/(ticket)/ and nowhere under
+        .gov-runtime/ (DEC-444).  This test is GREEN: the current code
+        already writes to docs/checkpoints/.  [DEC-444 point 2]"""
+        from gov.checkpoint.record import write
+
+        docs_dir = project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_before = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+
+        write(project, "TEST-abcd", "compaction",
+              "Deliberate checkpoint", [])
+
+        docs_after = set(docs_dir.glob("CP-*.md")) if docs_dir.exists() else set()
+        assert len(docs_after) > len(docs_before), (
+            "gov checkpoint must write under docs/checkpoints/ (DEC-444)"
+        )
+        scratch_cps = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_cps) == 0, (
+            "gov checkpoint must write nothing under "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444)"
+        )
+
+
+class TestGitCleanAfterHook:
+    """DEC-444 point 3: after a hook has run, ``git status --porcelain``
+    shows no new untracked path, because .gov-runtime/ is ignored."""
+
+    def test_precompact_leaves_tree_clean(self, w49_project, run):
+        """After PreCompact writes an automatic checkpoint, the project's
+        tree is clean for git because .gov-runtime/ is in .gitignore.
+        [DEC-444 point 3]"""
+        result = run.precompact(
+            w49_project, "auto", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        status = w1_49_support.git(w49_project, "status", "--porcelain")
+        assert status.strip() == "", (
+            "After PreCompact, the project's tree must be clean for git "
+            "(automatic checkpoint goes to .gov-runtime/ which is ignored, "
+            f"DEC-444): git status --porcelain shows: {status.strip()!r}"
+        )
+
+    def test_stop_leaves_tree_clean(self, project):
+        """After Stop writes an automatic checkpoint, the project's tree
+        is clean for git because .gov-runtime/ is in .gitignore.
+        [DEC-444 point 3]"""
+        rc, output, _ = run_w29_hook(
+            "stop",
+            {"hook_event_name": "Stop", "session_id": "s1",
+             "cwd": str(project), "last_assistant_message": "Done."},
+            project,
+            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        )
+        assert rc == 0
+        env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": str(project),
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+        }
+        status = subprocess.run(
+            ["git", "-C", str(project), "status", "--porcelain"],
+            capture_output=True, text=True, env=env, check=True,
+        )
+        assert status.stdout.strip() == "", (
+            "After Stop, the project's tree must be clean for git "
+            "(automatic checkpoint goes to .gov-runtime/ which is ignored, "
+            f"DEC-444): git status --porcelain shows: {status.stdout.strip()!r}"
+        )
+
+
+class TestCheckpointReinjection:
+    """DEC-444 point 4: SessionStart re-injects the latest checkpoint
+    even when it is an automatic one in the new place; when both exist,
+    the newer one is injected; the injected text says which path."""
+
+    @staticmethod
+    def _scratch_record(ticket, ident, next_action, created=None):
+        """Build a checkpoint record text for the scratch location."""
+        if created is None:
+            created = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        return CHECKPOINT_RECORD_TEXT.replace(
+            "CP-TEST-abcd-0001", ident,
+        ).replace(
+            "Continue implementation", next_action,
+        ).replace(
+            "2026-10-05T00:00:00Z", created,
+        ).replace(
+            "TEST-abcd", ticket,
+        )
+
+    def test_reinjects_automatic_checkpoint_from_scratch(
+        self, w49_project, run,
+    ):
+        """SessionStart on compact re-injects the latest checkpoint of the
+        session's ticket when that checkpoint is an automatic one in
+        .gov-runtime/scratch/checkpoints/.  [DEC-444 point 4]"""
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+        record = self._scratch_record(
+            "TEST-abcd", "CP-TEST-abcd-0002",
+            "Resume from automatic scratch checkpoint",
+        )
+        (scratch_dir / "CP-TEST-abcd-0002.md").write_text(
+            record, encoding="utf-8",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "Resume from automatic scratch checkpoint" in ctx, (
+            "SessionStart must re-inject the latest checkpoint of the ticket "
+            "even when it is an automatic one in "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444): "
+            f"{ctx[:400]!r}"
+        )
+
+    def test_newer_automatic_wins_over_older_deliberate(
+        self, w49_project, run,
+    ):
+        """When both an automatic and a deliberate checkpoint exist for the
+        ticket and the automatic one is newer, SessionStart injects the
+        automatic one.  [DEC-444 point 4]"""
+        docs_cp = (
+            w49_project / "docs" / "checkpoints" / "TEST-abcd"
+            / "CP-TEST-abcd-0001.md"
+        )
+        old_text = docs_cp.read_text(encoding="utf-8").replace(
+            "Continue implementation", "Deliberate is older",
+        ).replace(
+            "2026-10-05T00:00:00Z", "2026-10-04T00:00:00Z",
+        )
+        docs_cp.write_text(old_text, encoding="utf-8")
+
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        record = self._scratch_record(
+            "TEST-abcd", "CP-TEST-abcd-0002",
+            "Automatic is newer", created=now,
+        )
+        (scratch_dir / "CP-TEST-abcd-0002.md").write_text(
+            record, encoding="utf-8",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "Automatic is newer" in ctx, (
+            "When both an automatic and a deliberate checkpoint exist and "
+            "the automatic is newer, SessionStart must inject the automatic "
+            f"one (DEC-444): {ctx[:400]!r}"
+        )
+
+    def test_newer_deliberate_wins_over_older_automatic(
+        self, w49_project, run,
+    ):
+        """When both an automatic and a deliberate checkpoint exist for the
+        ticket and the deliberate one is newer, SessionStart injects the
+        deliberate one.  [DEC-444 point 4]"""
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        docs_cp = (
+            w49_project / "docs" / "checkpoints" / "TEST-abcd"
+            / "CP-TEST-abcd-0001.md"
+        )
+        new_text = docs_cp.read_text(encoding="utf-8").replace(
+            "Continue implementation", "Deliberate is newer",
+        ).replace(
+            "2026-10-05T00:00:00Z", now,
+        )
+        docs_cp.write_text(new_text, encoding="utf-8")
+
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+        record = self._scratch_record(
+            "TEST-abcd", "CP-TEST-abcd-0002",
+            "Automatic is older", created="2026-10-04T00:00:00Z",
+        )
+        (scratch_dir / "CP-TEST-abcd-0002.md").write_text(
+            record, encoding="utf-8",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert "Deliberate is newer" in ctx, (
+            "When the deliberate checkpoint is newer, SessionStart must "
+            f"inject the deliberate one (DEC-444): {ctx[:400]!r}"
+        )
+
+    def test_injection_says_which_path(self, w49_project, run):
+        """The injected text says which path the checkpoint came from, so
+        the reader knows whether it is an automatic one from scratch or a
+        deliberate one from docs.  [DEC-444 point 4]"""
+        docs_cp = (
+            w49_project / "docs" / "checkpoints" / "TEST-abcd"
+            / "CP-TEST-abcd-0001.md"
+        )
+        old_text = docs_cp.read_text(encoding="utf-8").replace(
+            "2026-10-05T00:00:00Z", "2026-10-04T00:00:00Z",
+        )
+        docs_cp.write_text(old_text, encoding="utf-8")
+
+        scratch_dir = w49_project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        record = self._scratch_record(
+            "TEST-abcd", "CP-TEST-abcd-0002",
+            "Scratch checkpoint for path test", created=now,
+        )
+        (scratch_dir / "CP-TEST-abcd-0002.md").write_text(
+            record, encoding="utf-8",
+        )
+        result = run.sessionstart(
+            w49_project, "compact", role="engineer", ticket="TEST-abcd",
+        )
+        assert result.returncode == 0, result.describe()
+        ctx = result.injection
+        assert SCRATCH_CHECKPOINTS_REL in ctx or "scratch" in ctx.lower(), (
+            "The injection must say which path the checkpoint came from "
+            f"(DEC-444): {ctx[:400]!r}"
+        )
+
+
+class TestWatchdogCountsBoth:
+    """DEC-444 point 4: the watchdog counts the newer of automatic and
+    deliberate checkpoints."""
+
+    def test_automatic_checkpoint_counts_for_freshness(self, project):
+        """An automatic checkpoint written a moment ago means the checkpoint
+        is not stale, even when the deliberate one is old.  The watchdog
+        must look in both places.  [DEC-444 point 4]"""
+        from gov.checkpoint.record import watch
+
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        record = CHECKPOINT_RECORD_TEXT.replace(
+            "CP-TEST-abcd-0001", "CP-TEST-abcd-0002",
+        ).replace(
+            "2026-10-05T00:00:00Z", now,
+        )
+        (scratch_dir / "CP-TEST-abcd-0002.md").write_text(
+            record, encoding="utf-8",
+        )
+        result = watch(
+            project, "TEST-abcd",
+            max_age_minutes=60, max_commits=99999,
+            max_context=1.0, context_utilisation=None,
+        )
+        assert result.get("stale") is False, (
+            "The watchdog must count the automatic checkpoint in "
+            ".gov-runtime/scratch/checkpoints/ as the latest when it is "
+            "newer than the deliberate one (DEC-444)"
+        )
+
+
+class TestRecordIdUniqueness:
+    """DEC-444 point 5: record ids stay unique per ticket across the two
+    places."""
+
+    def test_ids_unique_across_automatic_and_deliberate(self, project):
+        """An automatic and a deliberate record of one ticket never carry
+        the same id.  The id generation must consider checkpoints in both
+        docs/checkpoints/ and .gov-runtime/scratch/checkpoints/.
+        [DEC-444 point 5]"""
+        scratch_dir = project / SCRATCH_CHECKPOINTS_REL / "TEST-abcd"
+        rc, output, _ = run_w29_hook(
+            "stop",
+            {"hook_event_name": "Stop", "session_id": "s1",
+             "cwd": str(project), "last_assistant_message": "Done."},
+            project,
+            env_extra={"GOV_TICKET": "TEST-abcd", "GOV_ROLE": "engineer"},
+        )
+        assert rc == 0
+        scratch_cps = list(
+            scratch_dir.glob("CP-*.md"),
+        ) if scratch_dir.exists() else []
+        assert len(scratch_cps) >= 1, (
+            "Stop must write an automatic checkpoint under "
+            ".gov-runtime/scratch/checkpoints/ (DEC-444)"
+        )
+        docs_dir = project / "docs" / "checkpoints" / "TEST-abcd"
+        docs_ids = {
+            p.stem for p in docs_dir.glob("CP-*.md")
+        } if docs_dir.exists() else set()
+        scratch_ids = {p.stem for p in scratch_cps}
+        overlap = docs_ids & scratch_ids
+        assert not overlap, (
+            f"Record ids must be unique per ticket across both places "
+            f"(DEC-444): ids {overlap} appear in both docs/checkpoints/ and "
+            ".gov-runtime/scratch/checkpoints/"
         )
 
 
