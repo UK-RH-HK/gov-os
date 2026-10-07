@@ -23,6 +23,8 @@ allowed_paths:
 - template/governance/framework.lock*
 - src/gov/lock/**
 - tests/unit/lock/**
+- src/gov/doctor/command.py
+- tests/unit/doctor/**
 kpis:
   success:
   - copier copy creates governance/, the overlay (_skip_if_exists), .rulesync/, hooks and framework.lock with a file-hash manifest; gov doctor passes on the result [CAP-44.a]
