@@ -244,6 +244,37 @@ def tool_entry_yaml(name, version, sha256, **extra):
     return "\n".join(lines)
 
 
+def fake_tool(directory, name, version):
+    """Write a fake tool shell script that prints ``version`` and return (path, sha256).
+
+    Round-6 and round-7 cases use this pattern to test tool verification
+    without depending on real tools installed on the machine.
+    """
+    path = Path(directory) / name
+    body = f"#!/bin/sh\necho '{version}'\n"
+    path.write_text(body, encoding="utf-8")
+    path.chmod(path.stat().st_mode | stat.S_IEXEC)
+    sha = hashlib.sha256(path.read_bytes()).hexdigest()
+    return path, sha
+
+
+def tool_entry_with_location_yaml(name, version, sha256, location_prefix, **extra):
+    """One tool entry with a PATH prefix, for use inside ``write_tool_registry``."""
+    install = f'PATH={location_prefix}:$PATH {location_prefix}/{name} --version'
+    lines = [
+        f"  - name: {name}",
+        f'    version: "{version}"',
+        f'    sha256: "{sha256}"',
+        f'    install: "{install}"',
+        f'    uninstall: "rm -f {location_prefix}/{name}"',
+        f'    date: "2026-01-01"',
+        f'    approved_by: "test"',
+    ]
+    for key, value in extra.items():
+        lines.append(f'    {key}: "{value}"')
+    return "\n".join(lines)
+
+
 def doctor_result(run):
     """Parse the doctor's JSON output and return the ``result`` object from the envelope."""
     envelope = run.envelope()
