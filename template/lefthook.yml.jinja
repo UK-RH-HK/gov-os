@@ -1,0 +1,27 @@
+# The lefthook hooks (W1-40, CAP-39.a; DEC-075, DEC-087, DEC-489). Installed by `lefthook install`.
+#
+# pre-commit: the declared checks of tiers G1 and G2, and two gitleaks scans over what is staged: with the
+#   project's .gitleaks.toml as it stands, then with the project's rules alone (DEC-347, DEC-369).
+# pre-push: the declared checks of tier G3, then the evidence record.
+#
+# The evidence record is a git note on the head commit, under a ref of its own: refs/notes/gov-evidence
+# (not git's default notes ref). `gov ci push` writes it after G3 has run and pushes that ref to the remote
+# the push goes to, inside the one plain `git push <remote> <branch>`. The note is JSON and holds the commit
+# id, the result and the checks that ran. A failing hard-block G3 check stops the push, and its record, which
+# says failed, is not pushed. A project that declares no G3 check can push: its record says
+# "no G3 check declared". The CI job fetches the ref and reads the note of the commit it builds.
+#
+# A result is measured or it is refused (DEC-449, DEC-454): a tool that is missing, a named tier with no
+# declared check, a note that cannot be written or pushed, each stops the commit or the push.
+
+pre-commit:
+  commands:
+    checks:
+      run: gov ci checks G1 G2
+    staged-secrets:
+      run: gov ci staged-secrets
+
+pre-push:
+  commands:
+    g3-and-evidence-record:
+      run: gov ci push {1}

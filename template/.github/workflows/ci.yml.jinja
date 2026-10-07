@@ -1,0 +1,51 @@
+# CI on every push (W1-40, CAP-39.a; DEC-075, DEC-087, DEC-489): the deterministic checks, and the evidence
+# record of the commit that is built.
+#
+# The job runs the declared checks of tiers G1 and G2, gitleaks and the project's tests. It never runs a G3
+# check: G3 runs in the pre-push hook on the developer's machine (lefthook.yml), which leaves the evidence record.
+#
+# The evidence record is a git note on the head commit, under a ref of its own: refs/notes/gov-evidence.
+# The pre-push hook writes and pushes it. A fresh checkout brings no notes, so the job fetches that ref itself
+# and `gov ci record` reads the note of the commit it builds. The job fails when the ref cannot be fetched, when
+# the commit has no note, when the note cannot be read or names another commit, and when it says failed.
+# For a note that says "no G3 check declared" the job prints those words and fails too, until package P-6 is
+# decided: the one line that decides it is ACCEPTED in src/gov/ci/command.py.
+#
+# A result is measured or it is refused (DEC-449, DEC-454): a tool that is not on the runner fails its step.
+
+name: ci
+
+on: push
+
+permissions:
+  contents: read
+
+jobs:
+  deterministic:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      # PLACE: TOOLS ON THE RUNNER (package P-4, the owner's; not decided).
+      # The steps that put `gov` (this package), gitleaks and pytest on the runner go here, each registered
+      # tool at the version and checksum governance/project/tool-registry.yaml records (DEC-083, DEC-287).
+      # Until they are here the steps below fail on the hosted runner: the tools are absent.
+
+      - name: Declared checks of tiers G1 and G2
+        run: gov ci checks G1 G2
+
+      - name: gitleaks over the commits of the checkout
+        run: gitleaks git --config .gitleaks.toml --no-banner --redact --verbose --log-level error
+
+      - name: Tests of the project
+        run: python3 -m pytest tests
+
+      # PLACE: ADAPTER COMPARISON (W1-38, rulesync drift; not merged).
+      # The step that compares the generated adapters with their sources goes here.
+
+      - name: Fetch the ref of the evidence record
+        run: git fetch origin +refs/notes/gov-evidence:refs/notes/gov-evidence
+
+      - name: Evidence record of the commit that is built
+        run: gov ci record
