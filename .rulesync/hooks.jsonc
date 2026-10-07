@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/pretooluse.py"
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/posttooluse.py"
+      }
+    ],
+    "sessionStart": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/sessionstart.py"
+      }
+    ],
+    "stop": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/stop.py"
+      }
+    ],
+    "preCompact": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/precompact.py"
+      }
+    ],
+    "subagentStop": [
+      {
+        "type": "command",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/subagentstop.py"
+      }
+    ]
+  }
+}
