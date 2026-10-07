@@ -5470,3 +5470,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.131 | 2026-10-07 | Owner answers: DEC-498 (W1-30's second review is its last, only fail-open holes and silent closes in ordinary shapes are fixed after it, a hole one fix does not close goes to the owner; every FULL ticket is probed before its merge; W1-30's late probe recorded as a deviation). Next free id: DEC-499. |
+
+## 132. One delegated decision on W1-39: a missing lock in an installed project, and three smaller points (register v0.132, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-499 — W1-39: an installed project without its lock is a failure, not "unmeasured"; each Copier message states the whole procedure; a fresh project is at MINIMAL; the lock task's command is settled with W1-41
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-39 lead's packages P-A to P-D of its second return (`log/W1-39-lead-run2.json`), each with its recommendation · **Refines:** DEC-488, DEC-493
+- **Decision:**
+  - **P-C, a missing lock.** Where the project's Copier answers file exists and `governance/framework.lock` does not, the comparison answers that the lock is missing from an installed project, and `gov doctor` reports that part as failed and exits non-zero. Where neither file exists (a project that was never installed from the template, as this repository before adoption) the part stays "unmeasured", as W1-27's cases hold. Reason: as built, deleting the lock silences drift detection with exit code 0, and W1-41 and the exit run rely on doctor's exit code. A case first, then the fix, inside `src/gov/lock/` where possible. That a project can delete both files, or edit the lock's manifest together with a kernel file, is not closed here: the lock is not signed before Wave 3 (CAP-02.c), and both are residuals.
+  - **P-A.** The message after a copy and the message after an update each state all four steps of the procedure, as built.
+  - **P-B.** A fresh project is at MINIMAL with a path map of namespaces only, as built. That this map is not valid against the kernel's path-map schema (which requires 22 systems) is a residual for W1-41's adoption; nothing here changes how doctor derives the level.
+  - **P-D.** The lock task stays `python3 -m gov.lock` in this ticket. A `gov lock` subcommand, needed where `gov` is installed as an isolated tool, is decided with W1-41, which fixes the real install path; residual until then.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.132 | 2026-10-07 | One delegated decision on W1-39: DEC-499 (an installed project without its lock fails in `gov doctor`; each Copier message states the whole procedure; a fresh project is at MINIMAL; the lock task's command is settled with W1-41). Next free id: DEC-500. |
