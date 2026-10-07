@@ -150,3 +150,98 @@ def test_read_dist_version(tmp_path):
     assert _read_dist_version(tmp_path, "my-package") == "1.2.3"
     assert _read_dist_version(tmp_path, "my_package") == "1.2.3"
     assert _read_dist_version(tmp_path, "other") is None
+
+
+class TestHasStandaloneOldPath:
+    """Unit tests for the occurrence-level sub-path logic (DEC-456 point 3)."""
+
+    def _fn(self, content, old_path, new_path):
+        from gov.doctor.command import _has_standalone_old_path
+        return _has_standalone_old_path(content, old_path, new_path)
+
+    def test_old_path_only_inside_new_path(self):
+        assert self._fn(
+            'FRAMEWORK_PATH = "docs/source/originals/target.py"\n',
+            "target.py",
+            "docs/source/originals/target.py",
+        ) is False
+
+    def test_old_path_standalone(self):
+        assert self._fn(
+            'OLD = "target.py"\n',
+            "target.py",
+            "docs/source/originals/target.py",
+        ) is True
+
+    def test_old_path_standalone_alongside_new_path(self):
+        assert self._fn(
+            'NEW = "docs/source/originals/target.py"\nOLD = "target.py"\n',
+            "target.py",
+            "docs/source/originals/target.py",
+        ) is True
+
+    def test_no_old_path_at_all(self):
+        assert self._fn(
+            "no reference here\n",
+            "target.py",
+            "docs/source/originals/target.py",
+        ) is False
+
+    def test_old_path_not_suffix_of_new(self):
+        assert self._fn(
+            'import old_mod\n',
+            "old_mod",
+            "new_mod",
+        ) is True
+
+    def test_multiple_new_path_occurrences_hide_old(self):
+        assert self._fn(
+            'a = "lib/foo.py"\nb = "lib/foo.py"\n',
+            "foo.py",
+            "lib/foo.py",
+        ) is False
+
+    def test_old_path_between_new_paths(self):
+        assert self._fn(
+            'a = "lib/foo.py"\nb = "foo.py"\nc = "lib/foo.py"\n',
+            "foo.py",
+            "lib/foo.py",
+        ) is True
+
+
+class TestIsHistorical:
+    """Unit tests for the historical-path classification (DEC-448, DEC-456)."""
+
+    def _fn(self, path):
+        from gov.doctor.command import _is_historical
+        return _is_historical(path)
+
+    def test_decision_register(self):
+        assert self._fn("docs/DECISION_REGISTER.md") is True
+
+    def test_cit_records(self):
+        assert self._fn("docs/changes/W1-01.md") is True
+
+    def test_bootstrap(self):
+        assert self._fn("governance/project/bootstrap.md") is True
+
+    def test_archived_sources(self):
+        assert self._fn("docs/source/original.py") is True
+
+    def test_sources_md(self):
+        assert self._fn("docs/SOURCES.md") is True
+
+    def test_old_cli_tree(self):
+        assert self._fn("cli/commands.py") is True
+
+    def test_old_cli_root(self):
+        assert self._fn("cli/main.py") is True
+
+    def test_src_gov_cli_is_not_historical(self):
+        assert self._fn("src/gov/cli/commands.py") is False
+
+    def test_live_file(self):
+        assert self._fn("src/gov/doctor/command.py") is False
+
+    def test_nested_cli_is_not_historical(self):
+        assert self._fn("src/gov/cli/sub/module.py") is False

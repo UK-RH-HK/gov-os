@@ -183,9 +183,12 @@ check('WBS points to docs/plan/tools/validate_s1.py, and the file is this script
 
 # 4. readiness dimensions = Framework §37 verbatim
 rd = yaml.safe_load(open(f'{R}/docs/contract/readiness-dimensions.yaml'))
-_p = f'{R}/docs/source/originals/DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md'
-if os.path.exists(_p):
-    fw = open(_p).read()
+# The original was archived out of the working tree (DEC-058, DEC-082); docs/SOURCES.md names the commit that holds it (DEC-456).
+import subprocess as _sp
+_p = 'bb6ec3a8d8242fda7a76f86f0f0eff46813bc65f:docs/source/originals/DYNAMIC_AGENTIC_SOFTWARE_ENGINEERING_OPERATING_FRAMEWORK_v4.1.2.md'
+_fw = _sp.run(['git', '-C', R, 'show', _p], capture_output=True, text=True)
+if _fw.returncode == 0:
+    fw = _fw.stdout
     sec = fw[fw.index('## 37.'):fw.index('## 38.')]
     names = re.findall(r'^\d+\. (.+?);?\.?$', sec, re.M)
     check('26 readiness dimensions match Framework §37', [d['name'] for d in rd['dimensions']] == [n.rstrip(';.') for n in names] and len(names) == 26)

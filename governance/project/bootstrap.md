@@ -1655,3 +1655,92 @@ utilisation-triggered checkpoint is an accepted residual).
   implementation began and about 50 added after it; 943 lines of source against an estimate of 230. Every
   section of doctor maps to a KPI clause; the estimate was wrong, not the scope.
 - **Regression at `8388138c`:** every suite green except two W1-28 cases: W1-28's check of fixtures that copy from the repository found the new helper of W1-07's suite and could not exercise it. The designer rebuilt the helper without a copy (merge `53fd4293`); W1-28 (149 passed) and W1-07 (219 passed) were then run alone on that state; the full regression was not repeated for this one test-support file.
+
+## The one rebuild of this repository's stores (DEC-448, 2026-10-07)
+
+- **Run once at `5d2390e4`,** after W1-27's merge: `gov rebuild` exit 0 in about 8 minutes; the record store,
+  the lexical index, the semantic index and the code index were recreated. The record store names three files
+  as invalid (no `type` key): `docs/charter/CHARTER_v5.md`, `docs/contract/CONTRACT_v4.md`,
+  `docs/plan/WAVE_1_WBS.md`.
+- **`gov doctor` before and after:** index freshness went from unmeasured (no index) to pass, the canaries from
+  unmeasured to pass on both indexes. Doctor still exits 3, for two reasons: the Claude Code drift (extension
+  2.1.289 above the pinned CLI 2.1.288; harmless by DEC-448, re-recorded at the exit) and path compliance.
+  Unmeasured: hooks (no hook-manager configuration, no binary) and the framework lock (none exists).
+- **Path compliance reports 180 stale paths and none of them is in a live document to correct by hand:** 156
+  are in `docs/SOURCES.md`, which is the table of moves itself (new path, old path, hash); 23 are in the old
+  `cli/` tree (its configuration, fixtures and two source files, carried unchanged from the v4 line); one is
+  the original Framework's file name in `docs/plan/tools/validate_s1.py`. Doctor counts no file as left out
+  as historical on this repository (`historical_excluded: 0`), though the register and this file are full of
+  old paths: either the exclusion is not counted or the old paths in those files are not in the move table.
+  No ticket holds this: the plan validator admits exactly the fifty Wave 1 tickets, so a cleanup ticket
+  (opened as `DAEO-0f1y`, removed in the next commit) cannot be added without the owner. It is a named item
+  for the exit: the table of moves is a historical record for the check; whether `cli/` is
+  live is the owner's to say.
+- Adoption level reported for this repository: INTERMEDIATE, 15 of 22 systems identified.
+
+## `gov check` on this repository: the baseline of red checks (DEC-466, DEC-467, 2026-10-07)
+
+Run at `46ec8da3`: exit 3. Thirteen hard-block checks are red, for reasons that lie in this repository's state
+before its adoption (W1-39, W1-41), not in a ticket branch. A merge is blocked by any red outside this list
+(DEC-467).
+
+| Check | Reason at the baseline |
+|---|---|
+| `context-reproducibility` | unmeasured: no tickets in the record store |
+| `core-graph` | the tickets' `depends_on` name W1 ids, which are not record ids |
+| `core-schema` | records without `state_class` (for instance `docs/adr/ADR-0001-threat-model.md`) |
+| `fresh-agent-reconstruction` | its command calls `gov`, which is not on PATH here (exit 127) |
+| `index-freshness` | the lexical index is stale after every commit since the one rebuild (DEC-448) |
+| `recovery-rebuild` | the store's digest differs from a rebuild's, for the same reason |
+| `retrieval-regression` | unmeasured: the dev tiers are not configured |
+| `secrets-indexing` | its command exceeds 60 seconds on this tree |
+| `policy-security`, `policy-test`, `policy-change`, `policy-human_gate`, `policy-tool` | the policy key has no associated check |
+
+Yellow at the baseline: `audit-reproducibility` (not applicable until the first audit), `core-commands`,
+`openspec-validate`, `policy-memory`, `policy-checkpoint`, and the families adapter/model portability (no
+registered check until W1-38) and product traceability. Green: `core-authority`, `core-claims`,
+`core-mutation`, `core-pathmap`, `skill-regression-a`, `skill-regression-b1`, `skill-version`, `readiness`.
+
+## W1-27 follow-up: historical paths in doctor's stale-path check (DEC-456, 2026-10-07)
+
+Merged at `6db36969` (cases `f4ec043c`, code `da877e8a`; sessions on Claude Opus 5.5). `docs/SOURCES.md` and
+the old `cli/` tree are historical for the stale-path check; the plan validator's one stale path was fixed in
+`4eb9aacd`.
+
+- `gov check` on the branch before the merge (DEC-466, DEC-467; `log/check-at-W1-27b-premerge.json`): no red
+  outside the baseline. `secrets-indexing` was not red in that worktree run; it stays in the baseline until
+  it is seen green in the main tree.
+- Full regression at `6db36969` (`log/reg/at-W1-27b-merge.txt`): every suite passed, `RESULT: ALL PASS`; no
+  suite needed a run alone.
+- `gov doctor` at `6db36969` (`log/doctor-at-6db36969.json`), exit 3: the stale-path check passes (0 moved
+  references, 179 historical excluded). Two parts are still not green: the Claude Code drift (re-recorded at
+  the Wave 1 exit, DEC-448), and index freshness (9 stale files): every commit since the one rebuild makes
+  the lexical index stale, and no second rebuild is run here (DEC-448). Hooks, canaries and the framework
+  lock are reported unmeasured. For the owner at the exit: whether the index is rebuilt once more at
+  adoption (W1-41).
+- W1-41's adoption review decides whether the old `cli/` tree is archived (DEC-456).
+
+## W1-26 follow-up: the decision-citations check (DEC-463, DEC-473, DEC-474, DEC-475, DEC-479; 2026-10-07)
+
+Merged at `8f0dcc8d` (cases `e3d2cc1b`, `ac952490`; code `c2058c80`, `f2361f1d`; all sessions pinned to
+Claude Opus 5.5). `core-decision-citations` (family authority/role limits, tier G1, severity warning) flags a
+commit whose message cites a decision id that its own tree does not record, as a decision file or as an
+entry of the register file the project names. This repository names `docs/DECISION_REGISTER.md` and the base
+commit `46ec8da3` in `governance/project/path-map.yaml`; the check is green here.
+
+- `gov check` on the branch before the merge (`log/check-at-W1-26e-premerge.json`): no red outside the
+  baseline; twelve baseline reds; `secrets-indexing` green in the worktree run (third time; it stays in the
+  baseline until seen green in the main tree).
+- Full regression at `8f0dcc8d` (`log/reg/at-W1-26e-merge.txt`): every suite passed, `RESULT: ALL PASS`; no
+  suite needed a run alone.
+- Closed with `tk close` (W1-30 is not merged yet, DEC-476).
+- The first engineer session of the second part ended before committing (it started its runs in the
+  background); a second session ran them in the foreground and committed. No acceptance case was changed
+  after implementation began.
+- Where the check can still say clean without having measured (for the Wave 2 list, DEC-466): commits after
+  the base that cite nothing give the same answer as none compared; whoever moves the base forward takes
+  earlier commits out of judgement, unreported; any Markdown file in the tree whose frontmatter carries a
+  decision id counts as its record, wherever it lies; a register heading counts whatever the entry's status
+  or body says (a heading inside an HTML comment too); only HEAD's history is judged.
+- The check imports private helpers of W1-11's decision checker (`_front`, `_git`, `_Objects`, `_once`):
+  a change there can break it; the unit tests cover the join.
