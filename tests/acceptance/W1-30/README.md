@@ -6,7 +6,9 @@ the probe, the time limit. Round 5b (see "Round 5b"): the four points DEC-470 de
 all of it: nothing is closed, and nothing is recorded, that was not measured. Round 6 (see
 "Round 6"): the suite's sandbox, the governance checks of a close under DEC-476, stale evidence,
 a ticket without acceptance tests. Round 6b (see "Round 6b"): DEC-480, `gov close` refuses on
-what `gov check` blocks on. The counts of the last run are in "Round 6b".
+what `gov check` blocks on. Round 7 (see "Round 7"): the blocking state without a red hard-block
+check. Round 8 (see "Round 8"): DEC-487, the findings of the review of `gov close`. The counts of
+the last run are in "Round 8".
 
 ```
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs
@@ -497,6 +499,9 @@ failed, none skipped (round 5b's 184 and the new case).
 
 ### Which paths are governance files
 
+Revised in round 8: DEC-487 adds the installed kernel, `governance/kernel/`, as the eighth prefix
+(see "Round 8", point 12). What follows is round 6's text.
+
 Settlement 5, unchanged, seven prefixes. Sources: the brief of the third start (A7) names five
 "at least" (`template/governance/kernel/checks/`, `.../schemas/`, `governance/project/`,
 `.../hooks/`, `.../skills/`) and leaves the exact set to the designer; round 4 added
@@ -712,6 +717,193 @@ it as a check entry of its own (`policy-<key>`, hard-block, RED), so it is "a ha
 is red", the state of rounds 6 and 6b, and the W1-26 README does not state it as a blocking
 state of its own.
 
+## Round 8 (DEC-487)
+
+A fresh reviewer probed `gov close` and found ways in which it closes a ticket whose work it did
+not measure. DEC-487 (register section 124) states, behaviour by behaviour, what `gov close` does
+after the follow-up. The cases are in six new files, `test_w1_30_r8_*.py`; new helpers are at the
+end of `w1_30_support.py` ("Round 8"). Each case builds the project the reviewer described, by the
+suite's own means, and holds the outcome DEC-487 names. "Closed" below is what `gov close` did at
+`e5560b9a`: exit code 0, the ticket closed.
+
+**Existing cases changed: one, for point 12.**
+`test_a_change_under_each_governance_prefix_has_the_checks_run` (governance_checks) has an eighth
+form, `governance/kernel/`. With it `support.GOVERNANCE_PREFIXES` holds eight prefixes and
+`support.GOVERNANCE_TICKET_PATHS` holds `governance/kernel/**` (the paths of the governance cases'
+ticket, so that W1-50's judgement passes the engineer's commit there). No other existing case and
+no existing helper is changed. No case held the contrary of point 12; the settlement did
+(settlement 5, "Which paths are governance files" in round 6: "no source names another path").
+DEC-487 is that source now: "The suite's earlier settlement to the contrary is revised."
+
+### The behaviours, the cases, and why each is red
+
+`tree` = `test_w1_30_r8_tree.py`, `test_runs`, `commits`, `probe_record`, `escalation`, `last_step`
+likewise.
+
+**1. The tree a close measures is the commit it records** (tree). Held in every refusal: the answer
+names the path; the exit code is neither 0 nor 3; nothing closed; the count stays 0; no repair
+ticket.
+
+| Case | The project | Red now because |
+|------|-------------|-----------------|
+| `test_an_uncommitted_edit_that_makes_the_failing_acceptance_test_pass_refuses` | the committed acceptance test fails, the working tree's passes | closed |
+| `test_an_untracked_file_at_the_root_that_makes_every_test_pass_refuses` | an untracked `conftest.py` at the root answers for every test function | closed |
+| `test_an_uncommitted_edit_of_the_ticket_file_that_takes_the_full_profile_away_refuses` (2 forms: lowered to STANDARD, line removed) | the committed ticket is FULL, no probe record | closed, both forms |
+| `test_an_uncommitted_governance_change_refuses_where_a_hard_block_check_is_red` | `license-present` red (held by `gov check`); `governance/project/notes.yaml` written, not committed | closed |
+| `test_source_changed_after_the_probed_commit_and_not_committed_refuses` | FULL, probe record committed; the source rewritten in the working tree | closed |
+| `test_a_file_git_ignores_refuses_nothing` | a file under an ignored folder | green: the converse guard |
+
+**2. The caller's environment** (test_runs). `PYTEST_ADDOPTS` is set in the environment of
+`gov close` only; the ticket's one acceptance test fails.
+
+| Case | Red now because |
+|------|-----------------|
+| `test_options_in_the_callers_environment_do_not_reach_the_test_runs[collect only]` | closed |
+| `...[deselect the failing test]` | refused with exit code 3 for "no test was collected": the option reached the run; the answer does not name `test_fail` |
+
+**3. Nothing ran** (test_runs). `test_a_ticket_whose_only_acceptance_test_is_skipped_refuses`:
+exit code 3, nothing closed, one iteration counted, as for a ticket without acceptance tests
+(round 6). Red: closed.
+
+**13. The time limit** (test_runs).
+`test_a_time_limit_that_is_not_a_positive_number_is_refused_as_an_invalid_argument` (`0`, `-5`):
+exit code 2 (API-0002's usage error) or 1; the answer names the argument; nothing closed, nothing
+counted, no repair ticket. Red: `0` closed (read as "no limit given"); `-5` was refused with exit
+code 3 as a test run over its time limit, counted, with a repair ticket.
+
+**4. Commits that name no task** (commits). Exit code 3; the answer names the commit and says
+"task".
+
+| Case | The commit, after the ticket's first | Red now because |
+|------|--------------------------------------|-----------------|
+| `test_a_commit_without_trailers_that_weakens_the_acceptance_test_refuses` | no trailer; makes the failing test pass, adds `src/other/outside.py` | closed |
+| `test_a_commit_with_the_engineers_role_and_no_task_refuses` | the same with `Role: engineer` alone | closed |
+| `test_a_commit_without_trailers_that_changes_a_governance_file_refuses` | no trailer; `governance/project/notes.yaml`; `license-present` red | closed |
+| `test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses` | no trailer; rewrites the probed source | closed |
+| `test_a_commit_that_names_another_ticket_refuses_nothing` | another ticket's commit, inside that ticket's paths | green: the converse guard |
+
+**5. A commit of the ticket without a role** (commits).
+`test_a_commit_of_the_ticket_without_a_role_refuses`: `Task` and `Implements`, no `Role`; widens
+the ticket's allowed paths in the ticket file and adds a file under `governance/kernel/`. Exit
+code 3, the commit named, "role" said. Red: closed.
+
+**6. Merges and the first commit** (commits).
+
+| Case | Red now because |
+|------|-----------------|
+| `test_a_merge_with_the_tickets_trailers_that_brings_a_governance_file_refuses_where_a_check_is_red` (the answer names the red check, the side commit or the merge) | closed |
+| `test_a_merge_with_the_tickets_trailers_that_brings_a_source_rewrite_after_the_probed_commit_refuses` | closed |
+| `test_the_paths_of_a_ticket_commit_that_is_the_first_commit_are_judged` | closed |
+
+The first commit of the last case carries the ticket's trailers with the orchestrator's role and
+holds the project's check declarations and a file under `governance/project/`; W1-50's judgement
+has no finding (held), `license-present` is red (held). So the only reason to refuse is that the
+first commit's paths are governance files. A first commit with the engineer's role and a path
+outside the ticket's paths is refused today, by W1-50's judgement; that form was written, was
+green, and is not kept.
+
+**7. The probe record** (probe_record). Exit code 3 (DEC-470).
+
+| Case | Red now because |
+|------|-----------------|
+| `test_a_judgement_that_says_the_probe_failed_refuses` (the answer names the judgement) | closed |
+| `test_a_judgement_that_says_the_probe_passed_is_accepted` | green |
+| `test_a_probe_record_that_is_written_and_not_committed_refuses` (any refusal that names the record's file: for the tree or for the record) | closed |
+| `test_a_probe_record_committed_without_the_orchestrators_role_refuses` (the engineer's ticket commit; the ticket's paths hold `docs/probes/**`, W1-50 has no finding; the answer says "orchestrator") | closed |
+| `test_a_probed_commit_given_as_a_name_that_moves_refuses` (`HEAD`, `main`; an engineer's commit follows) | closed, both forms |
+| `test_a_commit_with_the_reviewers_role_and_no_task_before_the_probed_commit_refuses` (adds a source file; the answer names the commit) | closed |
+
+**8. The owner's decision** (escalation). The escalation is made by `support.escalate`: three
+refusals for the failing test, a fourth blocked. "Not lifted" is held twice: the close given the
+decision is refused, and the next close, given none, is blocked (exit code 4).
+
+| Case | Red now because |
+|------|-----------------|
+| `test_a_file_no_commit_holds_lifts_no_escalation` (untracked `docs/adr/DEC-planted.md` holding `status: ACTIVE` only) | lifted: the next close ran the tests (exit code 3) |
+| `test_a_path_to_a_file_outside_the_project_lifts_no_escalation` (`../`-paths from each place a decision is looked for) | lifted, the same |
+| `test_the_tickets_own_checkpoint_lifts_no_escalation` | lifted, the same |
+| `test_a_decision_recorded_before_the_escalation_began_lifts_none` (the owner's, ACTIVE, no finding of W1-11's checker) | lifted, the same |
+| `test_a_decision_that_lifted_one_escalation_lifts_no_second` | the same decision lifted the second escalation: the close ran the tests again |
+
+**9. The escalation state** (escalation).
+
+| Case | Red now because |
+|------|-----------------|
+| `test_an_escalation_in_force_whose_counter_is_missing_blocks_and_says_so` (exit code 4, the counter's path named) | the close ran: exit code 3 |
+| `test_a_counter_that_is_not_a_count_from_zero_up_blocks_and_says_so[below zero]` (preset `-5`; not a finding, the path named, counter unchanged, no repair ticket) | the close ran: exit code 3, a repair ticket |
+| `...[not a whole number]` (`1.5`) | refused with `ITERATION_CORRUPT`, exit code 1; the answer does not name the file |
+| `test_a_counter_that_cannot_be_read_blocks_and_names_its_file` | refused with `ITERATION_CORRUPT`; the answer does not name the file |
+| `test_a_refusal_leaves_the_counter_and_the_escalation_whole_and_nothing_beside_them` | green: after each of three refusals the counter's folder holds the one readable file, and so does the escalation's |
+
+"Written whole or not at all" has no case beyond the last one: a write cut short needs a process
+stopped in the middle of it, which a case cannot do without timing. That the answer names the
+file is from this round's order, not from DEC-487's words ("blocks and says so").
+
+**10. The last step fails** (last_step). The ticket stays in progress and
+`support.records_saying_closed` finds nothing: no close record with status ACTIVE, no checkpoint of
+the ticket whose `next_action` is "ticket closed".
+
+| Case | Red now because |
+|------|-----------------|
+| `test_a_ticket_tool_that_fails_on_closing_leaves_nothing_that_says_the_ticket_closed` | refused (`TICKET_TOOL_FAILED`), the ticket in progress; the close record and the checkpoint "ticket closed" are left |
+| `test_a_close_record_that_cannot_be_written_leaves_nothing_that_says_the_ticket_closed` | refused (`CLOSE_RECORD_FAILED`); the checkpoint "ticket closed" is left |
+
+**11. A stale record store** (last_step).
+`test_a_record_store_older_than_the_commit_being_closed_refuses_and_names_the_rebuild`: the store
+is loaded, the owner's commit supersedes `DEC-000`, the close runs without a reload. Held
+afterwards: with the store loaded again `gov context` answers `BLOCKED` and names `DEC-000`. The
+close is refused, the answer holds "gov rebuild", nothing closed. Red: closed.
+
+**12. The installed kernel is governance** (last_step, governance_checks).
+
+| Case | Red now because |
+|------|-----------------|
+| `test_a_ticket_commit_under_the_installed_kernel_refuses_where_a_hard_block_check_is_red` (W1-50 has no finding, `license-present` red, both held) | closed |
+| `test_a_change_under_each_governance_prefix_has_the_checks_run[governance/kernel/]` | closed; the close record names no `check_commit` |
+
+### Packages of round 8
+
+1. **"A commit that names no task at all refuses", and the suite's own projects.** Every project
+   of this suite holds commits without a `Task` trailer after the ticket's first commit: the
+   orchestrator's (`Role: orchestrator`: the checkpoint, the probe record, what a refusal left) and
+   the owner's (`Role: owner`: decision records, the owner's decision that lifts an escalation).
+   DEC-487 itself needs both (the probe record "by a commit with the orchestrator's role", the
+   owner's decision "committed"). Read to the letter, the sentence refuses every close of the
+   suite. The cases hold the two ends: a commit with no trailer at all, or with the engineer's
+   role alone, refuses; the orchestrator's and the owner's commits of the existing 208 green cases
+   refuse nothing. Where the line lies between them (by role, by the paths a role may write under
+   W1-50, by who committed) no source states. Not written: a commit with `Role: orchestrator` and
+   no task that weakens an acceptance test.
+2. **The words of a probe's judgement.** No source states them (CAP-38.f, DEC-137: the
+   orchestrator "judges"; the README named the field only). On this round's order the cases use
+   `failed` (refuses) and `passed` (accepted). The suite's fixtures have written `pass` since
+   round 4, and every FULL ticket that closes in the suite does so with `pass`. So either `pass`
+   and `passed` are both accepted, or `support.probe_record`'s word is changed in a later round.
+3. **How a store's freshness against the head commit is told.** The READMEs of W1-06 (pins),
+   W1-10 (the store: `load`, the digest) and W1-27 (`gov rebuild`; "index freshness" is the lexical
+   index's) state no way to ask whether the store was built from `HEAD`; there is no W1-51 folder.
+   The case holds the behaviour only.
+4. **A refused close leaves its repair ticket untracked, and the next close must find the tree
+   committed.** Under the first behaviour the second of two closes in a row would be refused for
+   the repair ticket's file, uncounted, so no escalation could be reached that way. The new cases
+   commit what a refusal left, as the orchestrator, before the next close
+   (`support.commit_what_a_refusal_left`). The existing cases that close twice or more in a row
+   without a commit in between (most of iteration, two of time_limit) were not changed. Either
+   the files `gov close` itself wrote are no refusal, or those cases get the commit in a later
+   round.
+5. **Exit codes DEC-487 does not give.** A refusal for the tree: the cases hold "neither 0 nor 3".
+   A counter that is no count: "neither 0 nor 3" (the suite holds exit code 1 for an unreadable
+   counter since round 4; DEC-487 says "blocks"). A stale store, an owner's decision that lifts
+   nothing: "refused, not 0". A time limit that is no limit: 1 or 2.
+
+### The run of round 8
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`, at
+`e5560b9a`: 247 cases in 24 files; 208 passed, 39 failed, none skipped. The 204 cases of round 7
+are green. Of the 43 new cases (42 in the new files and the eighth form of the prefix case) 39 are
+red for the reasons above and four are green: the ignored file, the other ticket's commit, the
+judgement `passed`, the counter left whole.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -723,7 +915,8 @@ state of its own.
 | CAP-38.b | traceability: 5 tests |
 | CAP-38.c | close: Implements, Task trailers |
 | CAP-38.d | governance_checks: 20 tests; stale: 5 tests |
-| CAP-38.f | probe: 16 tests |
+| CAP-38.f | probe: 16 tests; probe_record (round 8): 7 tests |
+| DEC-487 | the six `test_w1_30_r8_*.py` files: 42 tests; governance_checks: the `governance/kernel/` form |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -737,7 +930,7 @@ state of its own.
 2. **Owner decision argument name**: `--owner-decision` (value: decision register id)
 3. **Iteration file location**: `.gov-runtime/iterations/<ticket>.json`
 4. **Repair ticket dependency direction**: repair ticket depends_on the failing ticket
-5. **Governance file prefixes** (A7): `template/governance/kernel/checks/`, `template/governance/kernel/schemas/`, `governance/project/`, `template/governance/kernel/hooks/`, `template/governance/kernel/skills/`, `template/governance/kernel/policies/`, `template/governance/kernel/roles/`
+5. **Governance file prefixes** (A7): `template/governance/kernel/checks/`, `template/governance/kernel/schemas/`, `governance/project/`, `template/governance/kernel/hooks/`, `template/governance/kernel/skills/`, `template/governance/kernel/policies/`, `template/governance/kernel/roles/`. Revised in round 8 (DEC-487): the installed kernel, `governance/kernel/`, is the eighth
 6. **Exit codes**: 0 success, 1 GovError, 3 check failed, 4 blocked
 7. **Regression tests**: all under `tests/` except `tests/acceptance/<ticket-wbs>/`
 8. **Time limit argument**: `--timeout` (seconds)

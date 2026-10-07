@@ -101,8 +101,10 @@ BASE_SOURCE = "DEC-000"
 # The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
 
-# Governance file prefixes whose change forces a check re-run at close (A7, CAP-38.d).
+# Governance file prefixes whose change forces a check re-run at close (A7, CAP-38.d). The installed kernel
+# (``governance/kernel/``) is among them since round 8 (DEC-487).
 GOVERNANCE_PREFIXES = (
+    "governance/kernel/",
     "template/governance/kernel/checks/",
     "template/governance/kernel/schemas/",
     "governance/project/",
@@ -874,7 +876,8 @@ def head_of(project):
 
 
 # The paths of a ticket that may change governance files: W1-50's judgement passes an engineer's commit there.
-GOVERNANCE_TICKET_PATHS = ("src/example/**", "governance/project/**", "template/governance/kernel/**")
+GOVERNANCE_TICKET_PATHS = ("src/example/**", "governance/project/**", "template/governance/kernel/**",
+                           "governance/kernel/**")
 
 
 def start_ticket(project, ticket, wbs, allowed_paths=GOVERNANCE_TICKET_PATHS):
@@ -933,3 +936,84 @@ def read_iteration_file(root, ticket_id):
     if not path.is_file():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------
+# Round 8 (DEC-487): what a close did not measure
+# --------------------------------------------------------------------------
+
+ESCALATION_DIR = ".gov-runtime/escalations"
+
+# The test runner's own option variable: what it holds is added to every run of the runner that inherits it.
+TEST_RUNNER_OPTIONS = "PYTEST_ADDOPTS"
+
+CLOSED_NEXT_ACTION = "ticket closed"
+
+
+def no_trailers_commit(project, message, files):
+    """One commit that writes ``files`` and carries no trailer at all, by someone who is neither the owner
+    nor the orchestrator; returns its id."""
+    for rel, text in files.items():
+        project.write(rel, text)
+    return project.commit(message, who=AGENT, trailers=(), exact=True)
+
+
+def refused_without_a_finding(run, interface):
+    """The close was refused, and not for a finding about the ticket's work: the exit code is neither 0 nor 3
+    (DEC-470 gives 3 to a finding). Returns the ``error`` object."""
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+    assert run.returncode not in (EXIT_OK, EXIT_CHECK_FAILED), \
+        f"the refusal is no finding about the ticket's work, and ends with exit code {run.returncode}\n{run.describe()}"
+    return envelope["error"]
+
+
+def assert_nothing_counted(project, ticket, run, count=0):
+    """The refusal is not counted: the ticket's count is still ``count``."""
+    assert iteration_count(project.root, ticket) == count, \
+        f"the refusal was counted as an iteration: the count is {iteration_count(project.root, ticket)}\n{run.describe()}"
+
+
+def assert_no_repair_ticket(project, run, *known):
+    repairs = other_tickets(project.root, *known)
+    assert not repairs, f"the refusal opened a repair ticket: {[p.name for p in repairs]}\n{run.describe()}"
+
+
+def records_saying_closed(root, ticket):
+    """What in the tree says the ticket closed: its close records whose status is ACTIVE, and its checkpoints
+    whose next action is "ticket closed". Paths, relative to the project."""
+    found = [rel for rel, front in close_records(root, ticket) if str(front.get("status", "")).upper() == "ACTIVE"]
+    for path in sorted(Path(root).rglob("*.md")):
+        rel = path.relative_to(root)
+        if rel.parts[0] in (".git", ".gov-runtime") or not path.is_file():
+            continue
+        front = frontmatter_of(path) if path.read_text(encoding="utf-8", errors="replace").startswith("---") else {}
+        if isinstance(front, dict) and front.get("type") == "checkpoint" and front.get("task") == ticket \
+                and str(front.get("next_action", "")).strip().lower() == CLOSED_NEXT_ACTION:
+            found.append(str(rel))
+    return found
+
+
+def commit_what_a_refusal_left(project):
+    """A refused close opens a repair ticket, a file git does not know yet. The orchestrator commits it, so
+    that the next close of the case finds the tree it measures committed (DEC-487)."""
+    if project.waiting_paths():
+        project.commit("what the refused close left", who=ORCHESTRATOR)
+
+
+def escalate(project, sandbox, interface, ticket):
+    """Three closes refused for the ticket's failing acceptance test, each a finding, and a fourth that is
+    blocked: the escalation is in force. What each refusal left is committed by the orchestrator."""
+    for _ in range(3):
+        refused(run_close(project, sandbox, ticket), interface, EXIT_CHECK_FAILED)
+        commit_what_a_refusal_left(project)
+    refused(run_close(project, sandbox, ticket), interface, EXIT_BLOCKED)
+    commit_what_a_refusal_left(project)
+
+
+def assert_escalation_in_force(project, sandbox, interface, ticket, why):
+    """A close without an owner's decision is blocked (exit code 4): the escalation was not lifted."""
+    run = run_close(project, sandbox, ticket)
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False and run.returncode == EXIT_BLOCKED, \
+        f"{why}: the escalation is no longer in force, the next close ran\n{run.describe()}"
