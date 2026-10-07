@@ -3,8 +3,8 @@
 Every push is a plain ``git push origin main`` to a bare repository in the test's temporary folder (DEC-465: no
 push leaves the machine). A push is refused when the bare repository does not hold the pushed commit afterwards.
 
-Whether the record is there is asked the only way the sources fix: the CI job is green for that commit
-(DEC-087). No case names the record's carrier, its ref or its file.
+Whether the record is there is asked here the way DEC-087 fixes: the CI job is green for that commit. The
+record as a git note (DEC-489) is held by ``test_w1_40_evidence_record.py``.
 """
 
 from __future__ import annotations

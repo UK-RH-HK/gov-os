@@ -147,23 +147,19 @@ def test_the_hooks_carry_no_baseline_and_no_bypass(hook_config, workflows):
 
 
 def test_the_carrier_of_the_evidence_record_is_documented():
-    """KPI S2: "carrier (git note or commit) chosen and documented". The choice is stated beside the hooks or the job.
-
-    The engineer's paths are the hook file, the workflow files and ``src/gov/ci/``: the statement is in one of
-    them, names the evidence record, and names the one carrier chosen.
+    """KPI S2: "carrier (git note or commit) chosen and documented". DEC-489: a git note, documented in the hook
+    file and the workflow. Each of the two states it: the words "evidence record" and the note.
     """
-    places = [support.LEFTHOOK_YML, *support.workflow_files()]
-    ci_package = support.SRC / "gov" / "ci"
-    if ci_package.is_dir():
-        places += sorted(ci_package.rglob("*.py")) + sorted(ci_package.rglob("*.md"))
-    places = [path for path in places if path.is_file()]
-    assert places, "neither lefthook.yml nor a workflow exists"
-    stated = [path for path in places
-              if re.search(r"evidence record", _text(path), re.IGNORECASE)
-              and re.search(r"carrier", _text(path), re.IGNORECASE)
-              and re.search(r"git note|\bnotes?\b|\bcommit\b", _text(path), re.IGNORECASE)]
-    assert stated, ("no file of the ticket states the carrier of the evidence record (the words 'evidence record', "
-                    "'carrier', and the carrier chosen)")
+    assert support.LEFTHOOK_YML.is_file(), "lefthook.yml is absent from the repository root"
+    try:
+        places = [support.LEFTHOOK_YML] + [path for path, _ in support.push_workflows()]
+    except support.Absent as absent:
+        pytest.fail(str(absent), pytrace=False)
+    for path in places:
+        text = _text(path)
+        assert re.search(r"evidence record", text, re.IGNORECASE) and re.search(r"\bgit notes?\b", text, re.IGNORECASE), (
+            f"{path.name} does not state the carrier of the evidence record (the words 'evidence record' and "
+            "'git note')")
 
 
 def test_no_lefthook_hook_is_installed_in_this_repository():

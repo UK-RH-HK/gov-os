@@ -12,6 +12,9 @@ How the tests run:
 - **A project that is green or red by construction.** The temporary project declares three checks of its own,
   one per tier G1, G2 and G3 (the tier is a field of every check declaration, DEC-186). Each leaves a mark in a
   folder outside the project when it runs and fails when a file there tells it to. No model is involved.
+- **The evidence record, through git.** DEC-489 makes it a git note on the head commit under a ref of its own.
+  No case names the ref: ``Project.records`` asks the bare repository for every notes ref it holds other than
+  git's default one and reads the note of a commit there with ``git notes``.
 - **Nothing is written in this repository**, and no hook is installed in it. No network.
 """
 
@@ -46,6 +49,9 @@ CHECKS_REL = "template/governance/kernel/checks"             # DEC-186, gov.cli.
 SYSTEM_PATH = "/usr/bin:/bin"
 CALL_TIMEOUT_S = 300.0
 BRANCH = "main"
+NOTES = "refs/notes/"                    # git keeps notes under this prefix and refuses any other
+DEFAULT_NOTES = "refs/notes/commits"     # git's default notes ref: the record is not there (DEC-489)
+NO_G3 = "no G3 check declared"           # DEC-489: the record's words where the project declares no G3 check
 
 # The three checks of the temporary project: tier -> (id, family).
 TIER_CHECKS = {
@@ -195,16 +201,22 @@ class Project:
 
     Green by construction: its three checks pass, it holds no secret, its one test passes. Its first commit is
     made and pushed before the hooks are installed, so every later commit and push of a test meets the hooks.
+
+    ``tiers`` names the tiers the project declares a check for (all three unless told otherwise). With
+    ``hooks=False`` the project has no hook file and no hook: it is for the cases that call ``gov`` directly,
+    and needs neither lefthook nor gitleaks.
     """
 
-    def __init__(self, base, marks):
-        if not LEFTHOOK_YML.is_file():
+    def __init__(self, base, marks, tiers=tuple(TIER_CHECKS), hooks=True):
+        if hooks and not LEFTHOOK_YML.is_file():
             raise Absent("lefthook.yml is absent from the repository root")
         self.base = Path(base)
         self.root = self.base / "project"
         self.remote = self.base / "origin.git"
         self.marks = Path(marks)
-        self.setup = Machine(self.base / "setup-machine", self.marks, own_lefthook=True)
+        self.tiers = tuple(tiers)
+        self.setup = Machine(self.base / "setup-machine", self.marks, lefthook=hooks, gitleaks=hooks,
+                             own_lefthook=hooks)
         self.root.mkdir(parents=True)
         env = self.setup.env()
         sh(["git", "init", "-q", "--bare", "-b", BRANCH, self.remote], self.base, env, check=True)
@@ -212,14 +224,17 @@ class Project:
         self.write("README.md", "# A project\n")
         self.write(".gitignore", ".gov-runtime/\n__pycache__/\n.pytest_cache/\n")
         self.write(".gitleaks.toml", GITLEAKS_RULES.read_text(encoding="utf-8"))
-        self.write("lefthook.yml", LEFTHOOK_YML.read_text(encoding="utf-8"))
+        if hooks:
+            self.write("lefthook.yml", LEFTHOOK_YML.read_text(encoding="utf-8"))
         self.write("tests/test_ok.py", "def test_ok():\n    assert True\n")
-        for tier, (check_id, family) in TIER_CHECKS.items():
-            self.declare(check_id, family, tier)
+        for tier in self.tiers:
+            self.declare(*TIER_CHECKS[tier], tier)
         sh(["git", "add", "-A"], self.root, env, check=True)
         sh(["git", "commit", "-q", "-m", "initial project"], self.root, env, check=True)
         sh(["git", "remote", "add", "origin", self.remote], self.root, env, check=True)
         sh(["git", "push", "-q", "origin", BRANCH], self.root, env, check=True)
+        if not hooks:
+            return
         installed = sh(["lefthook", "install"], self.root, env)
         if installed.returncode != 0:
             raise AssertionError(f"lefthook install refused the repository's lefthook.yml:\n{said(installed)}")
@@ -270,9 +285,42 @@ class Project:
     def head(self):
         return sh(["git", "rev-parse", "HEAD"], self.root, self.setup.env(), check=True).stdout.strip()
 
-    def remote_head(self):
-        done = sh(["git", "rev-parse", "--verify", "-q", f"refs/heads/{BRANCH}"], self.remote, self.setup.env())
+    def remote_head(self, remote=None):
+        done = sh(["git", "rev-parse", "--verify", "-q", f"refs/heads/{BRANCH}"], remote or self.remote,
+                  self.setup.env())
         return done.stdout.strip() or None
+
+    def add_remote(self, name):
+        """A second bare repository in the temporary folder, known to the project as ``name``. Returns its path."""
+        path = self.base / f"{name}.git"
+        env = self.setup.env()
+        sh(["git", "init", "-q", "--bare", "-b", BRANCH, path], self.base, env, check=True)
+        sh(["git", "remote", "add", name, path], self.root, env, check=True)
+        return path
+
+    def gov(self, machine, *args):
+        """``gov <args>`` in the project, as a hook would call it on ``machine``."""
+        return sh(["gov", *args], self.root, machine.env())
+
+    # -- the evidence record: a git note (DEC-489) ---------------------
+
+    def notes_refs(self, repo=None):
+        """Every notes ref ``repo`` holds (the bare ``origin`` unless told otherwise), git's default one included."""
+        done = sh(["git", "for-each-ref", "--format=%(refname)", NOTES], repo or self.remote, self.setup.env(),
+                  check=True)
+        return sorted(done.stdout.split())
+
+    def records(self, sha, repo=None):
+        """``ref -> text`` of the note of ``sha`` under every notes ref of ``repo`` other than git's default."""
+        repo = repo or self.remote
+        found = {}
+        for ref in self.notes_refs(repo):
+            if ref == DEFAULT_NOTES:
+                continue
+            done = sh(["git", "notes", "--ref", ref, "show", sha], repo, self.setup.env())
+            if done.returncode == 0:
+                found[ref] = done.stdout
+        return found
 
     def commit(self, machine, rel="notes.txt", text=None, verify=True):
         """Stage one file and commit it on ``machine``. Returns the finished process and whether HEAD moved."""
@@ -289,11 +337,20 @@ class Project:
         assert moved, f"the fixture commit failed:\n{said(done)}"
         return self.head()
 
-    def push(self, machine, verify=True):
-        """``git push origin main`` on ``machine``. Returns the finished process and whether origin now holds HEAD."""
-        args = ["git", "push", "origin", BRANCH] + ([] if verify else ["--no-verify"])
+    def push(self, machine, verify=True, remote="origin"):
+        """``git push <remote> main`` on ``machine``. Returns the finished process and whether the remote now holds HEAD."""
+        args = ["git", "push", remote, BRANCH] + ([] if verify else ["--no-verify"])
         done = sh(args, self.root, machine.env())
-        return done, self.remote_head() == self.head()
+        held = self.remote_head(None if remote == "origin" else self.base / f"{remote}.git")
+        return done, held == self.head()
+
+    def through_the_hooks(self, machine):
+        """A new commit, made and pushed through the hooks on ``machine``. Returns its id."""
+        done, moved = self.commit(machine)
+        assert moved, f"a clean commit was refused:\n{said(done)}"
+        done, arrived = self.push(machine)
+        assert arrived, f"a push with every declared check passing was refused:\n{said(done)}"
+        return self.head()
 
 
 # --------------------------------------------------------------------------
@@ -371,6 +428,11 @@ class CiResult:
     @property
     def green(self):
         return bool(self.ran) and all(step.returncode == 0 for step in self.ran)
+
+    @property
+    def output(self):
+        """What the steps that ran printed, in order: the job's log as far as this runner has one."""
+        return "\n".join(step.output for step in self.ran)
 
     def __str__(self):
         lines = []

@@ -55,14 +55,36 @@ def machine(tmp_path, marks):
 
 
 @pytest.fixture()
-def ci(project, machine, tmp_path):
-    """``ci(**what)``: the push workflows' steps run on a fresh checkout of what ``origin`` holds."""
+def new_project(request, tmp_path, marks):
+    """``new_project(tiers=..., hooks=...)``: a temporary project that declares checks for ``tiers`` only.
+
+    With ``hooks=False`` it has no hook file and needs neither lefthook nor gitleaks. Not to be mixed with the
+    ``project`` fixture in one case: both build in the case's temporary folder.
+    """
+    def make(tiers=tuple(support.TIER_CHECKS), hooks=True):
+        if hooks:
+            request.getfixturevalue("lefthook")
+            request.getfixturevalue("gitleaks")
+        try:
+            return support.Project(tmp_path, marks, tiers=tiers, hooks=hooks)
+        except support.Absent as absent:
+            pytest.fail(str(absent), pytrace=False)
+    return make
+
+
+@pytest.fixture()
+def ci(request, machine, tmp_path):
+    """``ci(**what)``: the push workflows' steps run on a fresh checkout of what ``origin`` holds.
+
+    The project is the ``project`` fixture, or the one given as ``of=``.
+    """
     count = []
 
-    def run(**what):
+    def run(of=None, **what):
         count.append(1)
+        subject = of if of is not None else request.getfixturevalue("project")
         try:
-            return support.Runner(project, machine(**what), tmp_path / f"ci-{len(count)}").run()
+            return support.Runner(subject, machine(**what), tmp_path / f"ci-{len(count)}").run()
         except support.Absent as absent:
             pytest.fail(str(absent), pytrace=False)
         except support.Unsupported as unsupported:
@@ -73,9 +95,4 @@ def ci(project, machine, tmp_path):
 @pytest.fixture()
 def pushed(project, machine):
     """A new commit, made and pushed through the hooks on a complete machine, all checks passing."""
-    dev = machine()
-    done, moved = project.commit(dev)
-    assert moved, f"a clean commit was refused:\n{support.said(done)}"
-    done, arrived = project.push(dev)
-    assert arrived, f"a push with every check passing was refused:\n{support.said(done)}"
-    return project.head()
+    return project.through_the_hooks(machine())
