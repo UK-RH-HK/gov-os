@@ -1,7 +1,7 @@
 # W1-26 acceptance tests: `gov check` G0-G2
 
 Ticket `DAEO-fygv`, profile FULL (DEC-221). Written before implementation by the Independent Test Designer (MR-3).
-136 cases in 15 files.
+295 cases in 21 files.
 
 ```
 python3 -m pytest tests/acceptance/W1-26 -q -p no:cacheprovider
@@ -38,7 +38,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | **S6** "Fails a skill file whose content changed without a version change and a linked decision" [CAP-24.c] | `test_w1_26_skill.py` (4) | `NOT_IMPLEMENTED` |
 | **S7** "The check registry names all 17 families; registered checks run; absent reported" [CAP-38.b] | `test_w1_26_registry.py` (13) | `NOT_IMPLEMENTED` |
 | **S8** "Fails a record that changes authority class without a decision" [CAP-01.c] | `test_w1_26_authority.py` (5) | `NOT_IMPLEMENTED` |
-| **S9** "Flags a commit that cites a decision id missing from the decision register at that commit" (DEC-463) [CAP-38.b] | `test_w1_26_decision_citations.py` (45) | no declaration `core-decision-citations`; see "A commit citing an unrecorded decision" |
+| **S9** "Flags a commit that cites a decision id missing from the decision register at that commit" (DEC-463) [CAP-38.b] | `test_w1_26_decision_citations.py` (45), `test_w1_26_decision_register_and_base.py` (37) | no declaration `core-decision-citations`; see "A commit citing an unrecorded decision". The 37: the check knows neither entry of the configuration; see "The register file and the base commit" |
 | **F-1** "A planted defect of any listed family passes" | `test_w1_26_planted_defects.py` (13) | `NOT_IMPLEMENTED` |
 | **F-2** "The scope of a check is a hand-maintained list" [CAP-58.a] | `test_w1_26_derived.py` (6) | `NOT_IMPLEMENTED` |
 
@@ -73,6 +73,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_audit_validator.py` | 36 | S7 (DEC-441) |
 | `test_w1_26_not_applicable.py` | 21 | S2, S7 (DEC-447) |
 | `test_w1_26_decision_citations.py` | 45 | S9 (DEC-463) |
+| `test_w1_26_decision_register_and_base.py` | 37 | S9 (DEC-473, DEC-474) |
 
 ## The interface the tests fix
 
@@ -220,11 +221,11 @@ recorded before the change it authorises (DEC-463) [CAP-38.b]".
 | Point | Settled | Source |
 |---|---|---|
 | The decision register in a project | The decision files of the project: every Markdown file whose frontmatter has `type: decision`, or an `id` in the `decision_id` grammar, in any folder. A decision is recorded when such a file carries its id. Read by frontmatter, never by prose. | `tests/acceptance/W1-11/README.md` ("A decision file"), DEC-329, DEC-387 |
-| The register as one file of headed entries | **Open: package P-1.** No source gives a checker that form. It is this repository's present state only (Charter v5 names `docs/DECISION_REGISTER.md`; DEC-274: "decisions are headings in the register, not files"; W1-11's README: the two series "are not both files yet"). No case here uses it. | as named |
+| The register as one file of headed entries | **Answered by DEC-473: see "The register file and the base commit".** As written before the answer: package P-1. No source gives a checker that form. It is this repository's present state only (Charter v5 names `docs/DECISION_REGISTER.md`; DEC-274: "decisions are headings in the register, not files"; W1-11's README: the two series "are not both files yet"). No case here uses it. | as named |
 | What a citation is | A whole word in the `decision_id` grammar of the kernel's shared definitions (`ADR-` or `DEC-` and three or more digits), in the commit's message: subject, body or trailers. Lower case, fewer digits, another prefix (`CAP-38`, `W1-26`, `L-0900`, `DP-900`, a ticket id) or a longer word around it is no citation. | DEC-227 and `tests/acceptance/W1-08/README.md` (reading 11: one shared `decision_id`), DEC-182 (trailers are part of the message) |
 | The changed text | Not read. DEC-463 says "a commit that cites": the commit speaks through its message. An id named by a file is that file's reference (the graph's dangling reference of DEC-274), whoever commits it. | DEC-463, DEC-274 |
 | "At that commit" | The register in the tree of the same commit. A commit that adds the decision and cites it is not flagged. A commit citing a decision that a later commit adds stays flagged. A decision present at the citing commit and removed later does not flag that commit; a commit citing it after the removal is flagged. A commit on a merged branch is judged by its own tree, not the merge's. | The KPI line ("missing from the decision register at that commit"), DEC-463 ("recorded before the change it authorises") |
-| Which commits are judged | **Open: package P-2.** DEC-463 says "from now on" and accepts seven late records by name; no source says how `gov check` knows where "now" is, and `gov check` takes no range (`--list`, `--json`; DEC-186). W1-11's README leaves it to this design ("W1-26 may need a range or a baseline"). Every project of these cases records no base and dates every commit it judges after 2026-10-07, so each is judged under options (a), (b) and (d) of P-2; under (c) the cases gain the argument. No case plants history from before the rule. | DEC-463, DEC-186, `tests/acceptance/W1-11/README.md` ("Notes for the lead") |
+| Which commits are judged | **Answered by DEC-474: see "The register file and the base commit".** As written before the answer: package P-2. DEC-463 says "from now on" and accepts seven late records by name; no source says how `gov check` knows where "now" is, and `gov check` takes no range (`--list`, `--json`; DEC-186). W1-11's README leaves it to this design ("W1-26 may need a range or a baseline"). Every project of these cases records no base and dates every commit it judges after 2026-10-07, so each is judged under options (a), (b) and (d) of P-2; under (c) the cases gain the argument. No case plants history from before the rule. | DEC-463, DEC-186, `tests/acceptance/W1-11/README.md` ("Notes for the lead") |
 | The form of the check | A declared check in the kernel's checks (`id`, `family`, `tier`, `severity`, `command`), id `core-decision-citations` (the ticket's path is `template/governance/kernel/checks/core-*`). `gov check` runs it because it is declared. | KPI S7, the ticket's `allowed_paths` |
 | Family | "authority/role limits": the rule is about what authorises a change, and this suite already places the decision checker's findings there. | KPI S7 (the 17 families), CAP-01, `test_w1_26_decisions.py` |
 | Severity | `warning`: YELLOW, never a hard block. The owner's word is "flags"; every other line of this ticket says "Fails". A commit once made cannot be mended (DEC-182: history is not rewritten), so a hard block would stay red for ever and stop every merge under DEC-466. | DEC-463, DEC-182, DEC-466, CAP-39.d |
@@ -272,6 +273,10 @@ Red before implementation, observed 2026-10-07 (`4 failed, 212 passed, 1 skipped
 
 ### Open packages
 
+Both are answered: P-1 by DEC-473 (option (a)), P-2 by DEC-474 (option (a)). DEC-475 confirms the severity, the
+family and the citation in the message alone. The cases are in the next section. The packages stay here as they
+were put.
+
 **P-1 (P1). Does the check know a register that is one file of headed entries?**
 The sources define decisions as files (W1-11). This repository records them as headings `### DEC-nnn — title` in
 `docs/DECISION_REGISTER.md`, and DEC-466 has `gov check` run here before every merge. A check that knows files
@@ -307,7 +312,8 @@ clone whose boundary hides judged commits.
 
 ### Not tested
 
-- The headed register (P-1) and history from before the rule (P-2).
+- The headed register (P-1) and history from before the rule (P-2): tested since DEC-473 and DEC-474, see the next
+  section.
 - A decision's `status`: whether a `PROPOSED` or `SUPERSEDED` decision counts as recorded. The KPI says "missing
   from the decision register"; the cases record with `ACTIVE`.
 - A range written in prose ("DEC-460 to DEC-466"): both ends are citations by the grammar; the ids between are not
@@ -318,6 +324,103 @@ clone whose boundary hides judged commits.
 - Whether an unreadable decision file is reported as a finding or as unmeasured: the cases fix exit 1 and the
   file's name in the output.
 - Latency on a long history.
+
+## The register file and the base commit (DEC-473, DEC-474) — follow-up round
+
+Added by the Independent Test Designer (MR-3) for the owner's answers to packages P-1 and P-2, before
+implementation. `test_w1_26_decision_register_and_base.py`, 37 cases. The interface (the declared command, its JSON,
+the finding `DECISION_UNRECORDED`, the exit codes) is that of the section above.
+
+### The configuration: settled by the designer
+
+No source names a file for "the project's configuration" of a check, and none names the two entries. DEC-473 says
+"one line of configuration under `governance/project/`"; DEC-474 says "recorded in the project's configuration".
+This is the designer's settlement, not a source's word:
+
+| What | Settled | From |
+|---|---|---|
+| The file | `governance/project/path-map.yaml` | DEC-185: "There is no new `overlay.yaml`"; a `gov` command loads the `governance/project/` files it knows, `path-map.yaml` first. DEC-224, DEC-230: the project's floor "lives in `path-map.yaml`, under top-level keys". DEC-060: a project's configuration is its path map, its capabilities and its policy strengths, and all three are in that file. This suite's policy cases read `policies` from it (`test_w1_26_policy.py`): it is the one file from which a check of this suite reads project data. The other files of the folder each hold one thing that is not a check's (`roster.yaml`, `tool-registry.yaml`, `research-allowlist.yaml`). |
+| The register's entry | top-level key `decision_register`: the path of the register file from the project's root, with `/` | "one line of configuration" (DEC-473); snake case as the file's other keys (`state_class`, `human_gate`) |
+| The base's entry | top-level key `decision_citations_base`: a commit id in hexadecimal, full or abbreviated, written as a YAML string (quoted where it could read as a number) | DEC-474 writes this repository's base abbreviated (`46ec8da3`) |
+| Both optional | a project without the file, or with a path map that has neither key, is judged as before: decision files alone, the whole history | DEC-473 ("With no register file named"), DEC-474 ("With no base recorded"), DEC-185 ("A missing file is not an error") |
+| The schema | not touched by a case. The kernel's path-map schema leaves its top level open, so a path map with the two keys loads today (`gov status` exits 0 on the cases' path map). Whether the schema names the two keys is the engineer's and the lead's. | `template/governance/kernel/schemas/path-map.schema.json` |
+
+Every path map a case writes is valid under the kernel's schema (its twenty-two systems are read from the schema), so
+the check may read the file itself or through the configuration loader.
+
+What this repository then writes in its own `governance/project/path-map.yaml` (the lead's, not a case's):
+
+```yaml
+decision_register: docs/DECISION_REGISTER.md
+decision_citations_base: "46ec8da3"
+```
+
+No case names that path as something the check knows. The cases' register is `records/decision-log.md`. A file at
+`docs/DECISION_REGISTER.md` appears in three cases, as a file of headed entries that no configuration names: it
+records nothing.
+
+### What is settled, and from what
+
+| Point | Settled | Source |
+|---|---|---|
+| An entry of the register | A line that opens with `### `, then `DEC-` and digits, then a space, a colon or a dash, then the title. Recorded: that id. | DEC-473 |
+| The three separators | `### DEC-101 The title`, `### DEC-101: The title`, `### DEC-101 — The title`. The dash case is written as the owner's own headings are (space, em dash, space). | DEC-473; the headings of the register itself |
+| No entry | A heading of level 1, 2 or 4. A heading with one space before its marks, or with text before them. `### DEC-101` with nothing after the id. `### DEC-1010 — …` for `DEC-101`. A heading inside a fenced code block; a heading after the fence is closed is an entry again. | DEC-473 ("level-3", "at the start of a line", "followed by … and the title", "inside a fenced code block does not count") |
+| Both forms | With a register named, a decision recorded only as a decision file is recorded. | DEC-473 ("either … or") |
+| No register named | Decision files alone. A file of headed entries in the project is not read, whatever its path; with a register named, a second such file is not read either. | DEC-473 ("With no register file named, decision files alone count. No path of this repository goes into the kernel.") |
+| "At that commit", for the register | The register file as it is in the tree of the citing commit: an entry added by a later commit does not record for the earlier one; an entry and its citation in one commit are not flagged; an entry removed later does not flag the commit that cited it. | The KPI line; the section above ("At that commit") |
+| Which configuration | **Reading.** The project's present configuration (the working tree, as the configuration loader reads it), not the configuration of each judged commit. A base can only be recorded after it exists, so the commits between the base and the commit that records it are judged by a configuration they do not hold; the same holds for the register's name. A commit that cited an entry of the file before the configuration named it is not flagged. | DEC-474 (this repository's base is recorded after `46ec8da3`), DEC-185 |
+| A named register that cannot be read | The tree of a citing commit does not hold the named register as a readable file (absent there and added later; a directory; bytes that are not text): exit 1 and the register's path in the output. Never clean, although the cited decision is recorded as a decision file. Whether it is a finding or the unmeasured answer is free, as for an unreadable decision file. | DEC-425; the section above ("Fail-opens"); `test_w1_26_skill_validator.py` (a binary file is unreadable) |
+| The commits judged | Those reachable from `HEAD` and not from the base: the base itself and the commits before it are not judged, every commit after it is, and a side commit made before the base and merged after it is. | DEC-474; package P-2, option (a), which it accepts |
+| No base recorded | The whole history, with a configuration file or without one. | DEC-474 |
+| A base that is not a commit of the repository, or not an ancestor of `HEAD` | The unmeasured answer (`"unmeasured": true`, a reason, exit 1). | Package P-2, option (a); DEC-425 |
+| No commit after the base | The unmeasured answer. This suite gives it to a repository without a commit: "no commit to judge is not a clean history" (the section above, "Fail-opens"), and a base with nothing after it leaves no commit to judge. A commit cannot hold its own id, so the base is `HEAD` only while the configuration that records it is not committed; the case leaves it uncommitted. | The section above ("Fail-opens"); DEC-425 |
+
+### Cases
+
+| Group | Cases | What | Red reason (observed 2026-10-07) |
+|---|---|---|---|
+| The heading grammar: an entry | 4 | the three separators (3); a heading after a closed fence | the recorded ids are flagged: the register is not read |
+| The heading grammar: no entry | 8 | another level (3); not at the start of a line (2); nothing after the id; a longer id; inside a fence | the control `DEC-200`, recorded by a well-formed heading, is flagged |
+| Both forms, and the file the project names | 5 | a decision file beside a named register; no register named (2: no configuration file, a configuration without the entry); only the named file; a register named later | the control or the entry is flagged; the 2 cases with no register named stop at the fixture `register_is_read`: `the check does not read the register file that governance/project/path-map.yaml names under 'decision_register' (DEC-473)` |
+| "At that commit" | 3 | an entry added later; an entry and its citation in one commit; an entry removed later | the control or the entry is flagged |
+| A named register that cannot be read | 3 | absent at the citing commit; a directory; not text | exit 0 |
+| The base | 6 | a commit before the base (2: full id, eight characters); the base itself; every commit after it; a branch merged after it; a register and a base together | the commits at and before the base are flagged |
+| No base recorded | 1 | the whole history | stops at the fixture `base_is_honoured`: `the check does not honour the base commit that governance/project/path-map.yaml records under 'decision_citations_base' (DEC-474)` |
+| A base that gives nothing to judge | 3 | not a commit of the repository; not an ancestor of `HEAD`; no commit after it | exit 0, no unmeasured answer |
+| Through `gov check` | 4 | GREEN on a citation of a register entry; never GREEN with the named register absent; GREEN when only commits before the base are flagged; never GREEN with an unknown base | YELLOW where GREEN is expected; GREEN where it must not be |
+
+A case that expects an id to be flagged because a line is no entry also cites the control (`DEC-200`, recorded by a
+well-formed heading of the same register) and asserts the exact set of findings: a check that reads no register
+does not pass it. Three cases cannot hold a control (no register is named, or no base is recorded); they depend on
+a fixture that shows the entry is known, and are errors until then.
+
+Red before implementation, observed 2026-10-07: `34 failed, 257 passed, 1 skipped, 3 errors`; before this file
+`257 passed, 1 skipped`.
+
+| Covers id | Tests |
+|---|---|
+| DEC-473 (both register forms; the heading grammar; no path of this repository in the kernel) | `test_w1_26_decision_register_and_base.py` (the register groups) |
+| DEC-474 (a base commit recorded in the project) | `test_w1_26_decision_register_and_base.py` (the base groups) |
+| DEC-425 (unmeasured, never green) | `test_w1_26_decision_register_and_base.py` (a register that cannot be read; a base that gives nothing to judge) |
+
+### Not tested
+
+- Which characters are a dash, and a dash or a colon with no space around it (`### DEC-101—title`,
+  `### DEC-101-title`): DEC-473 says "a dash"; the case uses the form of the owner's headings.
+- A heading `### ADR-nnnn …`: DEC-473's grammar names `DEC-` alone.
+- A fence opened with `~~~`, an indented code block, a fence that is never closed, a heading in a table row or a
+  block quote.
+- A separator with no title after it (`### DEC-101:`), and a heading with closing `#` marks.
+- A named register absent at a judged commit that cites no decision. Every register case holds the register from
+  the project's first commit on, so no case depends on it.
+- A base written as a branch, a tag or `HEAD~n`, a base that names a tree or a blob, an abbreviation that matches
+  two objects, and a `decision_register` or `decision_citations_base` of the wrong type (a list, a number): the
+  `CONFIG_INVALID` contract of DEC-189 is the loader's.
+- A register path that leaves the project (`../…`, an absolute path) or is a symbolic link.
+- A shallow clone whose boundary hides commits after the base.
+- The configuration as committed against the configuration in the working tree, apart from the one case with no
+  commit after the base.
 
 ## Fixture: kernel skills copied (DEC-439)
 
