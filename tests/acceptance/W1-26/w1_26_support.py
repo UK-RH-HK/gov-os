@@ -252,6 +252,10 @@ class Project:
         schemas_dst = self.root / "template" / "governance" / "kernel" / "schemas"
         if schemas_src.is_dir():
             shutil.copytree(schemas_src, schemas_dst, dirs_exist_ok=True)
+        skills_src = REPO_ROOT / "template" / "governance" / "kernel" / "skills"
+        skills_dst = self.root / "template" / "governance" / "kernel" / "skills"
+        if skills_src.is_dir():
+            shutil.copytree(skills_src, skills_dst, dirs_exist_ok=True)
         if TEMPLATE_OPENSPEC.is_dir():
             shutil.copytree(TEMPLATE_OPENSPEC, self.root / "openspec", dirs_exist_ok=True)
 
