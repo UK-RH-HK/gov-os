@@ -488,11 +488,12 @@ def _handle_failure(root: Path, ticket: str, failures: list[str],
             "reason": "three consecutive non-converging iterations with identical failures",
         }), encoding="utf-8")
 
+        safe_outcomes = [{k: v for k, v in o.items() if k != "iteration"} for o in outcomes[-1:]]
         raise GovError(
             "ESCALATION_BLOCKED",
             "three consecutive non-converging iterations reached",
             {
-                "outcomes": outcomes[-1:],
+                "outcomes": safe_outcomes,
                 "reason": "three consecutive non-converging iterations with identical failures",
                 "options": ["fix_differently", "narrow", "split",
                             "defer", "delete", "continue"],
