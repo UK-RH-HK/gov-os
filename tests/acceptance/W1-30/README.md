@@ -5,7 +5,8 @@ Round 5 (see "Round 5" below): containment without exemption, context failures, 
 the probe, the time limit. Round 5b (see "Round 5b"): the four points DEC-470 decides. The rule for
 all of it: nothing is closed, and nothing is recorded, that was not measured. Round 6 (see
 "Round 6"): the suite's sandbox, the governance checks of a close under DEC-476, stale evidence,
-a ticket without acceptance tests. The counts of the last run are in "Round 6".
+a ticket without acceptance tests. Round 6b (see "Round 6b"): DEC-480, `gov close` refuses on
+what `gov check` blocks on. The counts of the last run are in "Round 6b".
 
 ```
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs
@@ -519,7 +520,10 @@ Three checks are built into the runner and run in every project: `readiness` and
 `skill-version` are GREEN in these projects; `openspec-validate` (hard-block) is YELLOW,
 "openspec is not on PATH", as in W1-26's suite, which has no `openspec` tool either. YELLOW is
 not red: DEC-454 refuses "on any hard-block red". The green-path cases hold first that no
-hard-block check is RED and that the project's own hard-block checks are GREEN.
+hard-block check is RED and that the project's own hard-block checks are GREEN. DEC-480 decides
+it: "A hard-block check the runner reports yellow (not applicable, or a built-in check whose
+tool is absent) refuses nothing. Whether the runner should report an absent tool of a
+hard-block check as red is a question for W1-26, listed for the Wave 2 list of DEC-466."
 
 Every case asks W1-26's runner (`gov check --json`) for the state right before the close and
 fails there if the project is not what the case is about.
@@ -534,7 +538,7 @@ fails there if the project is not what the case is about.
 | 2. The green path | `test_a_governance_changing_ticket_closes_when_no_hard_block_check_is_red`; `test_the_close_record_names_the_commit_being_closed` (it is not the commit that changed the file); `test_the_close_record_states_every_checks_status_as_run_at_that_commit` (equal to the runner's answer, check by check, a YELLOW warning among them); seven prefix cases | DEC-454; the brief of the third start (A7: "The close record states the commit and the result") |
 | 3. No governance file changed | `test_a_ticket_that_changes_no_governance_file_needs_no_check_result` (the project holds a red hard-block check and the ticket closes), `test_the_close_record_of_a_ticket_that_changes_no_governance_file_claims_no_check_result` | DEC-454 ("when a ticket's commits change governance files"); A7 ("no check result is needed and none is claimed") |
 | 4. Stale evidence | stale: five cases, below | KPI S4; DEC-454; "Stale evidence" above |
-| 5. A check that cannot run | `test_a_hard_block_check_whose_command_is_absent_refuses_the_close`, `test_a_warning_check_whose_command_is_absent_refuses_the_close`, `test_a_check_over_its_time_limit_refuses_the_close`. Exit code 3, the answer names the check and the reason (the absent command by its name; "time"), nothing closed | this round's order; DEC-454's rule (nothing is closed that was not measured); DEC-455 |
+| 5. A check that cannot run | `test_a_hard_block_check_whose_command_is_absent_refuses_the_close`: exit code 3, the answer names the check and the absent command, nothing closed. `test_a_warning_check_whose_command_is_absent_refuses_nothing` (round 6b): the ticket closes and the close record states the check's status as the runner gave it. No case for a check over its time limit (round 6b, below) | DEC-480; DEC-454; DEC-455 |
 | 6. No acceptance tests | no_acceptance_tests: three cases in two forms (no folder; a folder without a test) | below |
 
 **Stale evidence, measured exactly.** The statement of round 5 stands: W1-26's runner writes
@@ -555,10 +559,11 @@ that field. What a close does with a tracked file changed and not committed has 
 no case: the suite commits the project before every close.
 
 **A warning check that cannot run.** W1-26's runner gives a warning check whose command is
-absent the same YELLOW as one that ran and failed. The order of this round says of a check
-that cannot run "never a close", without a severity; and a check that did not run measured
-nothing. The case is written to that. It is the one case of this round that rests on the
-round's order alone.
+absent the same YELLOW as one that ran and failed. Round 6 wrote the case to a refusal, on the
+round's order alone ("never a close", without a severity). DEC-480 reverses it: "A check of
+severity warning refuses nothing, whether it ran and failed or could not run: the runner gives
+both the same status, and `gov close` does not read more into it." The case is now
+`test_a_warning_check_whose_command_is_absent_refuses_nothing` (see "Round 6b").
 
 **A ticket without acceptance tests is a finding about the ticket's work.** DEC-455 counts "a
 close refused for a finding about the ticket's work" and names what it leaves uncounted: the
@@ -585,8 +590,9 @@ the machine's state, exit code 1, not a finding.
 | `test_stale_evidence_after_governance_change` (accepted any refusal; nothing was stale) | stale | the five cases of `test_w1_30_stale.py`; its project now closes (`..._changed_in_two_commits_...`) |
 | `test_close_refuses_when_no_acceptance_tests_exist`, `test_close_refuses_when_acceptance_dir_is_empty` (no checkpoint, any refusal accepted) | close | `test_w1_30_no_acceptance_tests.py` |
 
-### The last run
+### The run of round 6
 
+Superseded by "Round 6b", "The last run".
 `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`:
 200 cases in 17 files; 186 passed, 14 failed, none skipped.
 
@@ -611,6 +617,51 @@ record; the seven prefixes; the two cases without a governance change; an earlie
 green at closing; a ticket without acceptance tests is refused with nothing closed; no test
 runner.
 
+## Round 6b (DEC-480)
+
+DEC-480 is in the register of the main tree (section 122), not yet in this branch's: "For a
+governance-changing ticket, `gov close` refuses on exactly the checks `gov check` reports red at
+hard-block; it holds no rule of its own about checks." W1-26's runner is the authority on a
+check's status. Two cases change, in `test_w1_30_governance_checks.py`; nothing else does.
+
+| Point of DEC-480 | Case | Change |
+|------------------|------|--------|
+| "A check of severity warning refuses nothing, whether it ran and failed or could not run" | `test_a_warning_check_whose_command_is_absent_refuses_nothing` | reversed (was `..._refuses_the_close`): the fixture holds that no hard-block check is red and that the runner does not give the check GREEN; the ticket closes; the close record states for that check the status the runner gave |
+| "The time limit of a check is the runner's own; `gov close` adds none, and its `--timeout` stays the limit of its test runs" | `test_a_check_over_its_time_limit_refuses_the_close` | removed, with its declaration (`sleep 120`) and its `--timeout 8`; no case replaces it, see below |
+| "A hard-block check the runner reports yellow ... refuses nothing" | `test_a_governance_changing_ticket_closes_when_no_hard_block_check_is_red` | unchanged (no hard-block check red; the project's own hard-block checks green); the sentence is quoted in "How a case's project declares its checks" |
+
+**No case for a hard-block check over the runner's time limit.** DEC-480 says such a check
+refuses "when the runner reports it red, as the runner does today". A case needs the runner's
+limit to be reached within the 30 s this suite gives a command. No source states a means:
+`tests/acceptance/W1-26/README.md` names no time limit of a check and no key, argument or
+variable by which a project sets one (its declaration fields are `id`, `family`, `tier`,
+`severity`, `command`, `allows-not-applicable`); W1-26's cases time nothing but their own calls
+(60 s and 30 s). The runner's code holds the limit as a constant of 60 s
+(`src/gov/check/runner.py`), which no project can change and which is twice this suite's own
+limit. A case would wait a minute and rest on a number no source gives, so none is written. The
+point is returned as a package: either W1-26 states the limit and a way for a project to set
+it (then the case is one declaration with a short limit and a command that sleeps longer), or
+the point stays without a case in this suite.
+
+### The last run
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`:
+199 cases in 17 files; 187 passed, 12 failed, none skipped. Against round 6: one case removed,
+one reversed and green; the twelve red cases are round 6's, for the same reasons.
+
+| Red case | File | What `gov close` did |
+|----------|------|----------------------|
+| `test_a_red_hard_block_check_the_ticket_did_not_touch_refuses_the_close` | governance_checks | closed the ticket; `license-present` is red |
+| `test_a_red_hard_block_check_refuses_a_ticket_whose_governance_change_declares_no_check` | governance_checks | closed the ticket; `license-present` is red |
+| `test_a_refusal_for_a_red_check_is_counted` | governance_checks | closed the ticket |
+| `test_a_refusal_for_a_red_check_opens_a_dependent_repair_ticket` | governance_checks | closed the ticket |
+| `test_a_hard_block_check_whose_command_is_absent_refuses_the_close` | governance_checks | closed the ticket; `tool-absent` is red |
+| `test_a_check_green_at_an_earlier_commit_and_red_at_the_commit_being_closed_refuses` | stale | closed the ticket; `settings-strict` is red at HEAD |
+| `test_a_check_green_at_this_commit_before_what_it_reads_changed_refuses` | stale | closed the ticket; `not-in-maintenance` is red |
+| `test_a_declaration_changed_in_two_commits_and_green_at_the_commit_being_closed_closes` | stale | refused: "governance evidence is stale: feature-present changed after evidence was collected" |
+| `test_a_refusal_for_no_acceptance_tests_is_counted` (2 forms) | no_acceptance_tests | refused with `NO_ACCEPTANCE_TESTS`, exit code 3; no iteration counted |
+| `test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket` (2 forms) | no_acceptance_tests | refused; no repair ticket |
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -621,7 +672,7 @@ runner.
 | CAP-38.a | close: runs tests, refuses on failure, regression |
 | CAP-38.b | traceability: 5 tests |
 | CAP-38.c | close: Implements, Task trailers |
-| CAP-38.d | governance_checks: 21 tests; stale: 5 tests |
+| CAP-38.d | governance_checks: 20 tests; stale: 5 tests |
 | CAP-38.f | probe: 16 tests |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
@@ -644,7 +695,7 @@ runner.
 10. **Probe record probed_commit**: required field naming the commit the probe covers
 11. **Models of the commits** (DEC-470): one list in the close record's frontmatter; each entry has `commit`, `role`, `model`; `model` is `not measured` for a commit without a `Co-Authored-By` line
 12. **The governance checks in the close record** (round 6): `check_commit` holds the full id of the commit being closed; under `governance_checks`, every check that ran is an object with `id` and `status`, at any depth; a ticket that changed no governance file has neither key, or both empty
-13. **The time limit of a governance check** (round 6): no source names it. The close's `--timeout` (settlement 8) is taken as the limit of each check the close runs, as it is of the test run
+13. **The time limit of a governance check** (round 6b, DEC-480): the runner's own; `gov close` adds none, and `--timeout` (settlement 8) is the limit of the close's test runs only. Round 6's settlement (the close's `--timeout` as the limit of each check) is withdrawn
 
 ## Residuals
 

@@ -1,10 +1,12 @@
-"""The governance checks of a close (KPI S4, CAP-38.d; DEC-454; DEC-455; DEC-476).
+"""The governance checks of a close (KPI S4, CAP-38.d; DEC-454; DEC-455; DEC-476; DEC-480).
 
 A ticket whose commits change a governance file closes only on checks run at the commit being closed
 (DEC-454: "re-runs the checks at HEAD through W1-26's runner and refuses on any hard-block red. It trusts no
 recorded result"). ``gov close`` holds no baseline and is strict for every project (DEC-476): any red
 hard-block check refuses, whoever declared it and whatever made it red. The refusal is a finding about the
 ticket's work (DEC-455 names "the governance checks"): exit code 3, counted, a dependent repair ticket.
+The status of a check is the runner's (DEC-480): ``gov close`` refuses on exactly the checks the runner
+reports red at hard-block, and holds no rule of its own about checks.
 
 Every project here declares its own checks (``project_with_checks``; README, "Round 6"): the kernel's
 declarations are not copied, so no check is red for a reason of the test project. Each check's command
@@ -35,10 +37,6 @@ ABSENT_COMMAND = "no-such-program-w1-30"
 TOOL_ABSENT = support.declared_check("tool-absent", f"{ABSENT_COMMAND} --verify", family="index freshness")
 TOOL_ABSENT_WARNING = support.declared_check("tool-absent", f"{ABSENT_COMMAND} --verify",
                                              severity=support.WARNING, family="index freshness")
-NEVER_ENDS = support.declared_check("never-ends", "sleep 120", family="index freshness")
-
-# The limit the time-limit case gives the close (settlement 13), in seconds.
-LIMIT = ("--timeout", "8")
 
 
 def _declaration(check_id, command, severity):
@@ -275,7 +273,7 @@ def test_the_close_record_of_a_ticket_that_changes_no_governance_file_claims_no_
 
 
 # --------------------------------------------------------------------------
-# 5. A check that cannot run: never a close
+# 5. A check that cannot run: refuses when the runner reports it red at hard-block (DEC-480)
 # --------------------------------------------------------------------------
 
 def test_a_hard_block_check_whose_command_is_absent_refuses_the_close(project_with_checks, sandbox, interface):
@@ -290,27 +288,20 @@ def test_a_hard_block_check_whose_command_is_absent_refuses_the_close(project_wi
     support.assert_not_closed(project, TICKET)
 
 
-def test_a_warning_check_whose_command_is_absent_refuses_the_close(project_with_checks, sandbox, interface):
-    """A warning check that ran and failed refuses nothing; one that could not run measured nothing."""
+def test_a_warning_check_whose_command_is_absent_refuses_nothing(project_with_checks, sandbox, interface):
+    """DEC-480: a warning check refuses nothing, whether it ran and failed or could not run; the close record
+    still states its status as the runner gave it."""
     project = project_with_checks(README_PRESENT, TOOL_ABSENT_WARNING)
     _ready(project, {NOTES: "note: one\n"})
-    _none_red(project, sandbox)
+    expected = support.statuses(_none_red(project, sandbox))
+    assert expected["tool-absent"] != support.GREEN, \
+        f"the fixture is wrong: the runner gives the check that cannot run {expected['tool-absent']}"
 
     run = support.run_close(project, sandbox, TICKET)
 
-    error = _refused_naming(run, interface, "tool-absent")
-    assert ABSENT_COMMAND in support.error_text(error), \
-        f"the answer does not say which command is absent\n{run.describe()}"
-    support.assert_not_closed(project, TICKET)
-
-
-def test_a_check_over_its_time_limit_refuses_the_close(project_with_checks, sandbox, interface):
-    project = project_with_checks(README_PRESENT, NEVER_ENDS)
-    _ready(project, {NOTES: "note: one\n"})
-
-    run = support.run_close(project, sandbox, TICKET, *LIMIT)
-
-    error = _refused_naming(run, interface, "never-ends")
-    assert "time" in support.error_text(error).lower(), \
-        f"the answer does not give the time limit as the reason\n{run.describe()}"
-    support.assert_not_closed(project, TICKET)
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"
+    recorded = support.recorded_check_statuses(support.the_close_record(project, TICKET))
+    assert recorded.get("tool-absent") == expected["tool-absent"], \
+        f"the close record states {recorded.get('tool-absent')!r} for the check that could not run; " \
+        f"W1-26's runner gave {expected['tool-absent']!r}"
