@@ -79,6 +79,8 @@ def test_non_governance_change_does_not_require_rerun(project, sandbox, interfac
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True

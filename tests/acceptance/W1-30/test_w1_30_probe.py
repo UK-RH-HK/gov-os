@@ -96,6 +96,8 @@ def test_standard_profile_closes_without_probe(project, sandbox, interface):
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL,
                    trailers=("Task: PROJ-std1", "Role: engineer", "Implements: CAP-01"))
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, ticket_id)
     result = support.result_of(run, interface)
     assert result is not None

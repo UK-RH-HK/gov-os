@@ -81,6 +81,8 @@ def test_close_runs_acceptance_tests(project, sandbox, interface):
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True
@@ -94,6 +96,8 @@ def test_close_runs_regression_tests_when_present(project, sandbox, interface):
     support.write(project.root, "tests/unit/close/test_regression.py",
                   "def test_regression():\n    assert True\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True
@@ -137,6 +141,8 @@ def test_close_runs_containment_check(project, sandbox, interface):
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True
@@ -169,6 +175,8 @@ def test_close_record_has_skill_versions(project, sandbox, interface):
     project.write("src/example/feature.py", "# feature\n")
     project.add_skill("retrieval", "1.0.0")
     project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
     before = cli_support.snapshot(project.root)
     support.run_close(project, sandbox, TICKET)
     after = cli_support.snapshot(project.root)
