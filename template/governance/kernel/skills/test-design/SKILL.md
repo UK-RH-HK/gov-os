@@ -3,7 +3,6 @@ name: test-design
 version: "1.0.0"
 description: Method for independent test design from specification and KPIs, without reading implementation.
 ---
-
 # Test design
 
 This skill describes how the independent test designer writes acceptance tests. It follows the Contract and the decision register; it does not grant permissions or set rules on its own authority.

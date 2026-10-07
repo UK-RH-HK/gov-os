@@ -3,7 +3,6 @@ name: change
 description: Method for taking a Gov OS change through evidence, proposal, independent review and owner approval to a new version.
 version: "1.0.0"
 ---
-
 # Change
 
 This skill describes how to propose and promote changes to the Gov OS kernel, policy and skills. It follows the Contract and the decision register; it does not grant permissions or set rules on its own authority.

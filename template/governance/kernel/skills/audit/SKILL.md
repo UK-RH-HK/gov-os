@@ -3,7 +3,6 @@ name: audit
 description: Method for running an independent fidelity audit against the Contract and governing decisions
 version: "1.1.0"
 ---
-
 # Audit
 
 A method for the independent auditor role. The guard and the role file decide what the session may read and write; this skill is the method only (CAP-24.b).

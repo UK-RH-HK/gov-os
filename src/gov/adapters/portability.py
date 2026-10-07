@@ -16,13 +16,21 @@ def _find_rulesync() -> str | None:
     return shutil.which("rulesync")
 
 
-def _check_version(bin_path: str) -> str | None:
-    expected = os.environ.get("RULESYNC_EXPECTED_VERSION")
-    if not expected:
-        return None
-    result = subprocess.run(
-        [bin_path, "--version"], capture_output=True, text=True, timeout=10,
-    )
+def _read_project_config() -> dict:
+    path = os.path.join(os.getcwd(), "rulesync.jsonc")
+    if not os.path.isfile(path):
+        return {}
+    with open(path) as f:
+        return json.loads(f.read())
+
+
+def _check_version(bin_path: str, expected: str) -> str | None:
+    try:
+        result = subprocess.run(
+            [bin_path, "--version"], capture_output=True, text=True, timeout=10,
+        )
+    except subprocess.TimeoutExpired:
+        return "rulesync version check timed out"
     if result.returncode != 0:
         return f"rulesync version check failed (exit {result.returncode})"
     actual = result.stdout.strip()
@@ -48,21 +56,28 @@ def main() -> int:
         print("rulesync not found", file=sys.stderr)
         return 1
 
-    version_err = _check_version(bin_path)
-    if version_err:
-        print(version_err, file=sys.stderr)
+    config = _read_project_config()
+
+    expected_version = config.get("version")
+    if expected_version:
+        version_err = _check_version(bin_path, expected_version)
+        if version_err:
+            print(version_err, file=sys.stderr)
+            return 1
+
+    targets = config.get("targets", "claudecode,agentsmd")
+    features = config.get("features", "rules,hooks,permissions,subagents,commands,skills")
+
+    try:
+        result = subprocess.run(
+            [bin_path, "generate", "--check",
+             "--targets", targets,
+             "--features", features],
+            capture_output=True, text=True, timeout=10,
+        )
+    except subprocess.TimeoutExpired:
+        print("rulesync generate --check timed out", file=sys.stderr)
         return 1
-
-    targets = "claudecode"
-    if os.path.isfile(os.path.join(os.getcwd(), "AGENTS.md")):
-        targets = "claudecode,agentsmd"
-
-    result = subprocess.run(
-        [bin_path, "generate", "--check",
-         "--targets", targets,
-         "--features", "rules,hooks,permissions,subagents,commands,skills"],
-        capture_output=True, text=True, timeout=30,
-    )
 
     if result.returncode == 0:
         print("[]")
@@ -77,8 +92,7 @@ def main() -> int:
                 findings.append({"file": clean, "status": "differs"})
 
     if not findings:
-        for name in ("CLAUDE.md", "AGENTS.md", ".claude/settings.json"):
-            findings.append({"file": name, "status": "differs"})
+        findings.append({"detail": output.strip(), "status": "check-failed"})
 
     print(json.dumps(findings))
     return 1

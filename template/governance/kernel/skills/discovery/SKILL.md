@@ -3,7 +3,6 @@ name: discovery
 version: "1.0.0"
 description: Method for discovery, research, experiments and decision packages during specification work.
 ---
-
 # Discovery
 
 This skill describes how to conduct discovery and research as part of the specification lifecycle. It follows the Contract and the decision register; it does not grant permissions or set rules on its own authority.
