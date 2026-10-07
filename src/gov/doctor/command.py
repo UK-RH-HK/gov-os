@@ -88,6 +88,10 @@ def _real_home() -> Path:
     return Path(pwd.getpwuid(os.getuid()).pw_dir)
 
 
+def _home() -> Path:
+    return Path(os.environ.get("HOME", pwd.getpwuid(os.getuid()).pw_dir))
+
+
 def _git(root: Path, *args: str) -> str:
     try:
         return subprocess.run(
@@ -141,52 +145,258 @@ def _tool_version(binary: Path, name: str) -> str | None:
     return None
 
 
+def _vendored_folder_digest(vendor: Path, root: Path) -> str | None:
+    """DEC-199 digest of committed files under *vendor*."""
+    rel_vendor = str(vendor.relative_to(root))
+    ls_output = _git(root, "ls-files", "-z", "--", rel_vendor + "/")
+    if not ls_output:
+        return None
+    lines = []
+    for entry in ls_output.split("\0"):
+        if not entry:
+            continue
+        file_path = root / entry
+        if not file_path.is_file():
+            return None
+        sha = hashlib.sha256(file_path.read_bytes()).hexdigest()
+        rel = entry[len(rel_vendor) + 1:]
+        lines.append(f"{sha}  {rel}\n".encode("utf-8"))
+    if not lines:
+        return None
+    lines.sort()
+    return hashlib.sha256(b"".join(lines)).hexdigest()
+
+
+def _find_ollama_model_blob(models_dir: Path, model_name: str, tag: str) -> Path | None:
+    manifest = models_dir / "manifests" / "registry.ollama.ai" / "library" / model_name / tag
+    if not manifest.is_file():
+        return None
+    try:
+        data = json.loads(manifest.read_text(encoding="utf-8"))
+        for layer in data.get("layers", []):
+            if "model" in layer.get("mediaType", ""):
+                digest = layer.get("digest", "")
+                if digest.startswith("sha256:"):
+                    blob = models_dir / "blobs" / digest.replace(":", "-")
+                    if blob.is_file():
+                        return blob
+    except (json.JSONDecodeError, OSError):
+        pass
+    return None
+
+
+def _hash_uv_freeze(venv_python: Path) -> str | None:
+    if not venv_python.is_file():
+        return None
+    uv = shutil.which("uv")
+    if not uv:
+        return None
+    try:
+        result = subprocess.run(
+            [uv, "pip", "freeze", "--python", str(venv_python)],
+            capture_output=True, text=True, timeout=10,
+        )
+        if result.returncode == 0 and result.stdout:
+            return hashlib.sha256(result.stdout.encode("utf-8")).hexdigest()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    return None
+
+
+def _parse_version_list(s: str) -> dict[str, str]:
+    result = {}
+    for part in s.split(","):
+        part = part.strip()
+        if " " in part:
+            pkg, ver = part.rsplit(" ", 1)
+            result[pkg.strip()] = ver.strip()
+    return result
+
+
+def _find_site_packages(venv: Path) -> Path | None:
+    lib = venv / "lib"
+    if not lib.is_dir():
+        return None
+    for child in lib.iterdir():
+        site = child / "site-packages"
+        if site.is_dir():
+            return site
+    return None
+
+
+def _read_dist_version(site_packages: Path, pkg_name: str) -> str | None:
+    normalized = pkg_name.replace("-", "_").lower()
+    if not site_packages.is_dir():
+        return None
+    for entry in site_packages.iterdir():
+        if entry.name.endswith(".dist-info") and entry.is_dir():
+            metadata_file = entry / "METADATA"
+            if not metadata_file.is_file():
+                continue
+            try:
+                meta_name = meta_version = None
+                for line in metadata_file.read_text(encoding="utf-8").splitlines():
+                    if not line:
+                        break
+                    if line.startswith("Name:"):
+                        meta_name = line.split(":", 1)[1].strip()
+                    elif line.startswith("Version:"):
+                        meta_version = line.split(":", 1)[1].strip()
+                if meta_name and meta_name.replace("-", "_").lower() == normalized:
+                    return meta_version
+            except OSError:
+                continue
+    return None
+
+
 def _check_no_binary_tool(name: str, pinned: str, pinned_sha: str, root: Path) -> dict:
+    home = _home()
+
     if name == "pyyaml":
         try:
             import yaml
-            ver = getattr(yaml, "__version__", "present")
-            return {"name": name, "pinned_version": pinned, "found_version": ver,
-                    "sha256_match": True, "ok": True}
+            ver = getattr(yaml, "__version__", None)
         except ImportError:
-            pass
-    elif name == "sqlite-vec":
-        try:
-            import sqlite_vec
-            return {"name": name, "pinned_version": pinned, "found_version": "present",
-                    "sha256_match": True, "ok": True}
-        except ImportError:
-            pass
-        real_home = _real_home()
-        lib_dir = real_home / ".local" / "lib"
-        if lib_dir.is_dir():
-            for child in lib_dir.iterdir():
-                site = child / "site-packages" / "sqlite_vec"
-                if site.is_dir():
-                    return {"name": name, "pinned_version": pinned, "found_version": "present",
-                            "sha256_match": True, "ok": True}
-    elif name == "superpowers":
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "pyyaml not importable"}
+        if ver is None:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "cannot read pyyaml version"}
+        ok = ver == pinned
+        result = {"name": name, "pinned_version": pinned, "found_version": ver,
+                  "sha256_match": False, "ok": ok}
+        if not ok:
+            result["reason"] = f"version {ver} does not match pin {pinned}"
+        return result
+
+    if name == "superpowers":
         vendor = root / "template" / "governance" / "kernel" / "vendor" / "superpowers"
-        if vendor.is_dir():
-            return {"name": name, "pinned_version": pinned, "found_version": "present",
-                    "sha256_match": True, "ok": True}
-    elif name == "qwen3-embedding":
-        model_dir = _real_home() / ".ollama" / "models"
-        if model_dir.is_dir():
-            return {"name": name, "pinned_version": pinned, "found_version": "present",
-                    "sha256_match": True, "ok": True}
-    elif name == "reranker-venv":
-        venv = _real_home() / ".local" / "share" / "gov-os" / "reranker-venv"
-        if venv.is_dir():
-            return {"name": name, "pinned_version": pinned, "found_version": "present",
-                    "sha256_match": True, "ok": True}
-    elif name == "reranker":
-        model_dir = _real_home() / ".cache" / "huggingface" / "hub" / "models--Qwen--Qwen3-Reranker-0.6B"
-        if model_dir.is_dir():
-            return {"name": name, "pinned_version": pinned, "found_version": "present",
-                    "sha256_match": True, "ok": True}
+        if not vendor.is_dir():
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "vendor folder absent"}
+        digest = _vendored_folder_digest(vendor, root)
+        if digest is None:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "could not compute vendor folder digest"}
+        sha_match = digest == pinned_sha
+        result = {"name": name, "pinned_version": pinned, "found_version": None,
+                  "sha256_match": sha_match, "ok": sha_match}
+        if not sha_match:
+            result["reason"] = "vendor folder digest does not match pin"
+        return result
+
+    if name == "sqlite-vec":
+        vec_so = None
+        lib_base = home / ".local" / "lib"
+        if lib_base.is_dir():
+            for child in lib_base.iterdir():
+                candidate = child / "site-packages" / "sqlite_vec" / "vec0.so"
+                if candidate.is_file():
+                    vec_so = candidate
+                    break
+        if vec_so is None:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "vec0.so not found"}
+        found_sha = _sha256_file(vec_so)
+        sha_match = bool(found_sha and found_sha == pinned_sha)
+        result = {"name": name, "pinned_version": pinned, "found_version": None,
+                  "sha256_match": sha_match, "ok": sha_match}
+        if not sha_match:
+            result["reason"] = "vec0.so hash does not match pin"
+        return result
+
+    if name == "qwen3-embedding":
+        models_dir = home / ".ollama" / "models"
+        if not models_dir.is_dir():
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "ollama models directory not found"}
+        blob_path = _find_ollama_model_blob(models_dir, "qwen3-embedding", pinned)
+        if blob_path is None:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "model blob not found"}
+        found_sha = _sha256_file(blob_path)
+        sha_match = bool(found_sha and found_sha == pinned_sha)
+        result = {"name": name, "pinned_version": pinned, "found_version": None,
+                  "sha256_match": sha_match, "ok": sha_match}
+        if not sha_match:
+            result["reason"] = "model blob hash does not match pin"
+        return result
+
+    if name == "reranker-venv":
+        venv = home / ".local" / "share" / "gov-os" / "reranker-venv"
+        if not venv.is_dir():
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "reranker venv not found"}
+        venv_python = venv / "bin" / "python"
+        freeze_sha = _hash_uv_freeze(venv_python)
+        if freeze_sha is not None:
+            sha_match = freeze_sha == pinned_sha
+            result = {"name": name, "pinned_version": pinned, "found_version": None,
+                      "sha256_match": sha_match, "ok": sha_match}
+            if not sha_match:
+                result["reason"] = "freeze output hash does not match pin"
+            return result
+        pinned_pkgs = _parse_version_list(pinned)
+        if not pinned_pkgs:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "cannot parse pinned version string"}
+        site = _find_site_packages(venv)
+        if site is None:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "cannot find site-packages in venv"}
+        found = {}
+        all_match = True
+        for pkg, expected in pinned_pkgs.items():
+            installed = _read_dist_version(site, pkg)
+            found[pkg] = installed
+            if installed is None:
+                all_match = False
+            elif installed.split("+")[0] != expected.split("+")[0]:
+                all_match = False
+        found_str = ", ".join(f"{k} {v}" for k, v in found.items() if v) or None
+        result = {"name": name, "pinned_version": pinned, "found_version": found_str,
+                  "sha256_match": False, "ok": all_match}
+        if not all_match:
+            result["reason"] = "installed package versions do not match pin"
+        return result
+
+    if name == "reranker":
+        model_dir = home / ".cache" / "huggingface" / "hub" / "models--Qwen--Qwen3-Reranker-0.6B"
+        if not model_dir.is_dir():
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "model directory not found"}
+        revision = pinned.split("@", 1)[1] if "@" in pinned else None
+        if not revision:
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "cannot parse revision from pin"}
+        model_file = model_dir / "snapshots" / revision / "model.safetensors"
+        if not model_file.is_file():
+            return {"name": name, "pinned_version": pinned, "found_version": None,
+                    "sha256_match": False, "ok": False,
+                    "reason": "model.safetensors not found at pinned revision"}
+        found_sha = _sha256_file(model_file)
+        sha_match = bool(found_sha and found_sha == pinned_sha)
+        result = {"name": name, "pinned_version": pinned, "found_version": None,
+                  "sha256_match": sha_match, "ok": sha_match}
+        if not sha_match:
+            result["reason"] = "model.safetensors hash does not match pin"
+        return result
+
     return {"name": name, "pinned_version": pinned, "found_version": None,
-            "sha256_match": False, "ok": False}
+            "sha256_match": False, "ok": False,
+            "reason": f"unknown no-binary tool {name}"}
 
 
 def _check_tools(root: Path) -> dict:
