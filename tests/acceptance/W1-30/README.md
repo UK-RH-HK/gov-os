@@ -107,6 +107,11 @@ close record timing, and receipt basics.
 ### S3: Product-traceability family check
 **Covers: CAP-38.b**
 
+`test_product_traceability_check_in_family` asserts on the family; its status
+depends on all checks in the product-traceability family, not only this ticket's
+`product-traceability-trailers` check. All other traceability cases assert on the
+`product-traceability-trailers` check entry itself (DEC-425 revision).
+
 | Test | File | Red reason |
 |------|------|------------|
 | `test_product_traceability_check_in_family` | traceability | not registered |
