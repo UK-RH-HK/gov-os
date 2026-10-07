@@ -5362,3 +5362,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.126 | 2026-10-07 | One delegated decision on W1-40: DEC-489 (hook and workflow files written by the engineer through their templates; pre-push runs declared G3 checks, none declared is recorded as such; the evidence record is a git note under its own ref; three residuals). Next free id: DEC-490. |
+
+## 127. One delegated decision on W1-30: the test designer's seven points on DEC-487 (register v0.127, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-490 — DEC-487 made exact: which task-less commits refuse, the judgement words, what a refusal's own files do to the tree rule, the exit codes
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer wrote the cases for DEC-487 (commit `ed52a286`: 43 new cases, 39 red for the reviewer's reasons) and returned seven points no source settles (`log/W1-30-r8-cases.json`). Recorded before the engineer's change (DEC-463).
+- **Decision:**
+  - **A commit that names no task** (DEC-487 said: refuses). Made exact: among the commits after the ticket's first, one that names no task refuses the close when it changes the ticket's acceptance tests, a path inside the ticket's allowed paths, or the ticket's own file: that is work on this ticket which no ticket measured. One that changes a governance file has the governance checks run, as a ticket commit would. After the probed commit, one that changes a path inside the ticket's allowed paths makes the probe stale. Any other task-less commit (a decision record, a checkpoint, a probe record, another folder) refuses nothing. A commit that names another ticket is that ticket's.
+  - **The judgement of a probe record** is `pass` or `passed` to be accepted; `fail`, `failed` or any other value refuses.
+  - **Store freshness:** the cases hold the behaviour only (refused, the rebuild named, nothing closed). The engineer uses a mark the store or the runtime already keeps of the commit it was built from; if none exists inside what `gov close` may read, that case is returned, not guessed.
+  - **The tree rule and a refusal's own files.** A refused close leaves its repair ticket as an untracked ticket file. An untracked ticket file whose parent is the ticket being closed does not refuse the next close. Every other untracked, not ignored file and every change to a tracked file does, the ticket's own file included.
+  - **Exit codes.** A tree that is not its commit, a record store older than the commit, and a counter that is not a count (the file named in the answer) are "could not measure": exit code 1, not counted, no repair ticket. An owner's decision that does not qualify lifts nothing: the close stays blocked, with the blocked exit code. A time limit that is not a positive number is refused like any other invalid argument, before anything runs.
+  - **"Written whole or not at all"** is held by the unit tests and by reading (write beside, then rename); no acceptance case with timing.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.127 | 2026-10-07 | One delegated decision on W1-30: DEC-490 (which task-less commits refuse; judgement words; a refusal's own repair ticket does not dirty the tree; exit codes for "could not measure"). Next free id: DEC-491. |
