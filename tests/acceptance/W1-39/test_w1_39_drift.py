@@ -2,7 +2,11 @@
 
 And the rule that a result is measured or it is refused (DEC-449, DEC-454):
 the lock part of ``gov doctor`` never says MATCH, and never counts as passed,
-without having hashed the files the installed kernel holds.
+without having hashed the files the installed kernel holds. DEC-488 makes it
+exact: an absent or empty manifest is not a match; a kernel file the manifest
+does not list is drift, named, whether or not git ignores it; only what lies
+in a ``__pycache__/`` folder is left out. ``gov doctor`` reports that
+comparison's answer (DEC-493).
 
 Every case changes a project created by ``copier copy`` in a temporary folder
 and runs ``gov doctor --json`` there.
@@ -102,6 +106,35 @@ def test_a_kernel_file_the_manifest_does_not_list_is_drift_naming_it(project, sa
     support.assert_drift_naming(support.doctor(project, sandbox), rel, f"{rel} is in the kernel and not in the manifest")
 
 
+def test_a_kernel_file_hidden_from_git_by_an_ignore_rule_is_still_drift_naming_it(project, sandbox):
+    """An ignore rule is the project's to write: a kernel file it hides from git does not escape the comparison.
+
+    DEC-488: git-ignored files in general are not left out of "a kernel file the manifest does not list".
+    """
+    rel = f"{support.HOOKS_REL}/w1_39_hidden_by_an_ignore_rule.py"
+    with open(project / support.IGNORE_REL, "a", encoding="utf-8") as handle:
+        handle.write(f"\n/{rel}\n")
+    support.commit_all(project, "an ignore rule of the project")
+    (project / rel).write_text("print('not part of any release')\n", encoding="utf-8")
+    assert support.is_ignored(project, rel) and rel not in support.untracked(project), \
+        f"this case needs {rel} hidden from git by the project's ignore rule"
+    support.assert_drift_naming(support.doctor(project, sandbox), rel,
+                                f"{rel} is in the kernel, not in the manifest, and only hidden from git")
+
+
+def test_a_file_in_a_bytecode_folder_inside_the_kernel_is_not_drift(project, sandbox):
+    """Only ``__pycache__/`` folders are left out (DEC-488): what Python writes beside a hook it ran is not drift."""
+    rels = (f"{support.HOOKS_REL}/{support.PYCACHE}/w1_39_hook.cpython-312.pyc",
+            f"{support.KERNEL_REL}/{support.PYCACHE}/w1_39_top.cpython-312.pyc")
+    for rel in rels:
+        (project / rel).parent.mkdir(parents=True, exist_ok=True)
+        (project / rel).write_bytes(b"\x00bytecode\n")
+    result = support.doctor(project, sandbox)
+    named = [rel for rel in rels if result.names(rel)]
+    assert result.claims_match and result.section.get("status") == "pass" and not result.reports_drift and not named, \
+        f"gov doctor reports files of a {support.PYCACHE}/ folder inside the kernel against the lock\n{result.describe()}"
+
+
 def test_a_kernel_file_struck_from_the_manifest_is_drift_naming_it(project, sandbox):
     """The same from the other side: an installed kernel file whose manifest entry was removed is not passed over."""
     rel = _a_kernel_file(project, "hooks")
@@ -122,7 +155,10 @@ def test_a_file_the_project_adds_outside_the_kernel_is_not_drift(project, sandbo
 
 
 def test_a_missing_lock_is_not_a_match(project, sandbox):
-    """A project installed by Copier whose lock was removed: nothing was hashed, so nothing matches."""
+    """A project installed by Copier whose lock was removed: nothing was hashed, so nothing matches.
+
+    Whether doctor must also fail there is not decided by a source, and is not asserted.
+    """
     support.lock_path(project).unlink()
     support.assert_not_a_match(support.doctor(project, sandbox), f"{support.LOCK_REL} was removed")
 

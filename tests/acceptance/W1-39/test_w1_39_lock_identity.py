@@ -42,17 +42,22 @@ def test_the_lock_of_an_untagged_template_commit_still_names_the_commit(copier_b
         f"{support.LOCK_REL} names the commit of the tag {support.FIRST_TAG}, not the commit the project was created from"
 
 
-def test_the_lock_refers_to_the_answers_file(installed, pristine_source):
-    """DEC-023 and ADR-0002 (L7): the lock is the answers reference plus the manifest."""
-    rel = pristine_source.answers_rel()
-    assert rel in support.lock_text(installed), f"{support.LOCK_REL} does not refer to the answers file {rel}"
+def test_the_lock_refers_to_the_answers_file(installed):
+    """DEC-023 and ADR-0002 (L7): the lock is the answers reference plus the manifest.
+
+    The reference is looked for outside the comment header, which names the answers file for another reason.
+    """
+    rel = support.ANSWERS_REL
+    body = support.lock_text(installed)[len(support.lock_header(installed)):]
+    assert rel in body, f"{support.LOCK_REL} does not refer to the answers file {rel} outside its comment header"
 
 
 @pytest.mark.parametrize("what", ("tag", "commit"))
 def test_doctor_fails_when_the_locks_tag_or_commit_disagrees_with_the_install(project, source, sandbox, what):
     """CAP-43: a lock whose tag or commit is not the one the project was installed from is not a match.
 
-    Red until the doctor package is decided (``src/gov/doctor/`` is outside this ticket's paths).
+    DEC-488: the lock's template tag and commit are compared with the answers file, which this case leaves
+    as Copier wrote it.
     """
     recorded, other = {"tag": (support.FIRST_TAG, "v9.9.9"), "commit": (source.first.commit, "0" * 40)}[what]
     text = support.lock_text(project)

@@ -22,6 +22,12 @@ question is asked, and the tasks ``copier.yml`` declares may run. They run with
 ``gov`` on ``PATH`` (this worktree's command line) and with the ``gov`` package
 importable by ``python3`` (``PYTHONPATH``), which stands in for the installed
 package; ``HOME`` is an empty temporary folder; there is no network.
+``copier_environment(..., without=...)`` gives the same environment with the
+named commands absent from ``PATH`` (DEC-488: an install does not fail where
+rulesync or Node is absent).
+
+**What Copier prints.** Copier shows a template's messages after copy and after
+update on its standard error; ``Done.printed`` is both streams of a run.
 """
 
 from __future__ import annotations
@@ -56,7 +62,19 @@ OVERLAY_REL = "governance/project"                 # ADR-0002 section 5: the ove
 LOCK_REL = "governance/framework.lock"             # ADR-0002 section 5; allowed path template/governance/framework.lock*
 HOOKS_REL = "governance/kernel/hooks"              # W1-04: where Copier puts the hooks in a product
 RULESYNC_REL = ".rulesync"                         # W1-38
-DEFAULT_ANSWERS_REL = ".copier-answers.yml"        # DEC-023; Copier's own default
+ANSWERS_REL = ".copier-answers.yml"                # DEC-023, DEC-493: Copier's standard answers file
+PATH_MAP_REL = "governance/project/path-map.yaml"  # DEC-493; where gov reads a project's path map (DEC-185)
+IGNORE_REL = ".gitignore"                          # DEC-493
+PYCACHE = "__pycache__"                            # DEC-488: the one folder name left out of the comparison
+DOCTOR_PATH_MAP_SECTION = "path_map"               # the name of gov doctor's section today (W1-27)
+DOCTOR_LEVEL_SECTION = "adoption_level"            # the name of gov doctor's section today (W1-27)
+# What rulesync generates from .rulesync/ (ADR-0002 section 5); `copier copy` writes none of it (DEC-488).
+GENERATED_BY_RULESYNC = ("AGENTS.md", "CLAUDE.md", ".claude")
+# The commands an install must not need (DEC-488), by the name before the first dot.
+ADAPTER_TOOLS = ("rulesync", "node", "nodejs", "npx", "npm")
+# What the update procedure names (DEC-488, DEC-023, CAP-02): the command, the answers file that is never
+# edited by hand, the check that follows, and the adapter generation step (generation from .rulesync/).
+PROCEDURE_WORDS = ("copier update", ANSWERS_REL, "gov doctor", "rulesync")
 TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"   # DEC-083, DEC-127: one named file
 MANIFEST_KEY = "manifest"                          # CAP-02.a "file-hash manifest"; the key gov doctor reads (W1-27)
 DOCTOR_LOCK_SECTION = "framework_lock"             # the name of gov doctor's section today (W1-27)
@@ -66,6 +84,9 @@ PRODUCT_TOP_LEVEL = frozenset({
     "AGENTS.md", "CLAUDE.md", ".claude", ".rulesync", "governance", "openspec", "spec", ".tickets", "tests",
     "lefthook.yml", ".github", ".gitleaks.toml", ".gov-runtime", ".gitignore",
 })
+# What `copier copy` may write at the top level: the product layout without what rulesync generates, and the
+# answers file.
+COPIED_TOP_LEVEL = (PRODUCT_TOP_LEVEL - frozenset(GENERATED_BY_RULESYNC)) | {ANSWERS_REL}
 # The trees that are the Gov OS repository's own (ADR-0002 section 5) and never a product's.
 GOV_OS_ONLY = ("copier.yml", "template", "src", "cli", "fixtures", "docs", "pyproject.toml")
 # The separate trees success line 3 names, as ADR-0002 section 5 places them in this repository.
@@ -83,6 +104,8 @@ FIRST_TAG = "v0.1.0"
 SECOND_TAG = "v0.2.0"
 COPIER_TIMEOUT_S = 180.0
 SHA256_RE = re.compile(r"[0-9a-f]{64}")
+_ANSI_RE = re.compile(r"\x1b\[[0-9;]*[A-Za-z]")
+_COPIER_PROGRESS_RE = re.compile(r"^\s*(?:(?:create|identical|overwrite|conflict|skip|force)\s{2,}\S|>\s*Running task\b)")
 
 git = base.git
 commit_all = base.commit_all
@@ -165,11 +188,6 @@ class Source:
         assert isinstance(data, dict), f"{COPIER_YML_REL} is not a YAML map"
         return data
 
-    def answers_rel(self):
-        """Where Copier writes its answers in a project: ``_answers_file`` of ``copier.yml``, else Copier's default."""
-        value = self.configuration().get("_answers_file")
-        return value if isinstance(value, str) and value else DEFAULT_ANSWERS_REL
-
     def suffix(self):
         """The suffix of a file Copier renders (``_templates_suffix``, by default ``.jinja``)."""
         value = self.configuration().get("_templates_suffix")
@@ -236,11 +254,37 @@ def release(source_path, tag, message="a later release"):
 
 
 def write_template_file(source, rel, text):
-    """Write ``rel`` (a path as a project sees it) into the temporary template source."""
+    """Write ``rel`` (a path as a project sees it) into the temporary template source, as a file copied as it is.
+
+    A rendered file the template holds for that path is removed, so that the release ships one file there.
+    """
     path = source.template / rel
     path.parent.mkdir(parents=True, exist_ok=True)
+    suffix = source.suffix()
+    if suffix and (source.template / (rel + suffix)).is_file():
+        (source.template / (rel + suffix)).unlink()
     path.write_text(text, encoding="utf-8")
     return path
+
+
+def path_map_text(project):
+    """The text of the project's path map; the case fails where the project has none (DEC-493)."""
+    path = Path(project) / PATH_MAP_REL
+    assert path.is_file(), f"the project has no {PATH_MAP_REL}: `copier copy` created no path map (DEC-493)"
+    return path.read_text(encoding="utf-8")
+
+
+def edited_by_the_project(shipped):
+    """A path map the project has edited: the shipped one with a line of the project's at its end.
+
+    A comment, so that the text stays a path map whatever the shipped one holds.
+    """
+    return shipped.rstrip("\n") + "\n# edited by the project\n"
+
+
+def shipped_by_a_later_release(shipped):
+    """A different path map for a later release to ship: the shipped one with a line of the template's at its head."""
+    return "# changed by the second release\n" + shipped
 
 
 # --------------------------------------------------------------------------
@@ -253,6 +297,20 @@ class Done:
     returncode: int
     stdout: str
     stderr: str
+
+    @property
+    def printed(self):
+        """What the run printed beyond Copier's own account of its work.
+
+        Copier shows the template's messages on its standard error, among one line per file it writes
+        (``create  <path>``) and one per task it runs (``> Running task ...``, which repeats the task's
+        command). Those lines are left out, colour codes too: a path or a command is not a message.
+        """
+        kept = []
+        for line in _ANSI_RE.sub("", self.stdout + "\n" + self.stderr).splitlines():
+            if not _COPIER_PROGRESS_RE.match(line):
+                kept.append(line)
+        return "\n".join(kept)
 
     def describe(self):
         return (f"{' '.join(self.argv)}\nexit code: {self.returncode}\nstdout:\n{self.stdout[-4000:]}\n"
@@ -280,12 +338,47 @@ def _write_gov_command(folder):
     return command
 
 
-def copier_environment(sandbox):
+def _is_one_of(name, commands):
+    return name.split(".", 1)[0].lower() in commands
+
+
+def path_without(folders, commands, farm):
+    """``folders`` as a ``PATH`` on which none of ``commands`` is found.
+
+    A folder that holds none of them is kept as it is. One that does is replaced by a folder under ``farm`` of
+    links to its other entries, so that everything else it offers (git, python3, sh) stays on ``PATH``.
+    """
+    kept, seen = [], set()
+    for folder in folders:
+        folder = Path(folder)
+        try:
+            resolved = folder.resolve()
+            names = sorted(os.listdir(folder))
+        except OSError:
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if not any(_is_one_of(name, commands) for name in names):
+            kept.append(str(folder))
+            continue
+        links = Path(farm) / f"{len(seen):03d}"
+        links.mkdir(parents=True, exist_ok=True)
+        for name in names:
+            if not _is_one_of(name, commands) and not (links / name).is_symlink():
+                (links / name).symlink_to(resolved / name)
+        kept.append(str(links))
+    return os.pathsep.join(kept)
+
+
+def copier_environment(sandbox, without=()):
     commands = Path(sandbox.elsewhere) / "commands"
     _write_gov_command(commands)
+    folders = [str(Path(sys.executable).parent), *os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)]
+    rest = (path_without(folders, tuple(without), Path(sandbox.elsewhere) / "path-without") if without
+            else os.pathsep.join(folders))
     return {
-        "PATH": f"{commands}{os.pathsep}{Path(sys.executable).parent}{os.pathsep}"
-                f"{os.environ.get('PATH', '/usr/bin:/bin')}",
+        "PATH": f"{commands}{os.pathsep}{rest}",
         "HOME": str(sandbox.home),
         "TMPDIR": str(sandbox.tmpdir),
         "LC_ALL": "C.UTF-8",
@@ -297,45 +390,49 @@ def copier_environment(sandbox):
     }
 
 
-def run_copier(binary, sandbox, cwd, *args):
+def run_copier(binary, sandbox, cwd, *args, without=()):
     for forbidden in (REPO_ROOT,):
         assert Path(cwd).resolve() != forbidden.resolve() and str(forbidden) not in args, \
             "Copier is never given this repository as its source or its destination"
     argv = (str(binary), *args)
     try:
-        done = subprocess.run(argv, cwd=str(cwd), env=copier_environment(sandbox), capture_output=True, text=True,
-                              timeout=COPIER_TIMEOUT_S, stdin=subprocess.DEVNULL)
+        done = subprocess.run(argv, cwd=str(cwd), env=copier_environment(sandbox, without), capture_output=True,
+                              text=True, timeout=COPIER_TIMEOUT_S, stdin=subprocess.DEVNULL)
     except subprocess.TimeoutExpired:
         raise AssertionError(f"{' '.join(argv)} did not end within {COPIER_TIMEOUT_S:.0f} s") from None
     return Done(("copier", *args), done.returncode, done.stdout, done.stderr)
 
 
-def copy(binary, sandbox, source, destination, ref=FIRST_TAG):
+def copy(binary, sandbox, source, destination, ref=FIRST_TAG, without=()):
     """``copier copy --defaults --trust --vcs-ref <ref> <source> <destination>``; the run, whatever its exit code."""
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     return run_copier(binary, sandbox, destination.parent, "copy", "--defaults", "--trust", "--vcs-ref", ref,
-                      str(source.path), str(destination))
+                      str(source.path), str(destination), without=without)
 
 
-def create_project(binary, sandbox, source, destination, ref=FIRST_TAG):
-    """A project created by ``copier copy`` and committed as a git repository of its own."""
-    done = copy(binary, sandbox, source, destination, ref=ref)
+def create_project_and_run(binary, sandbox, source, destination, ref=FIRST_TAG, without=()):
+    """A project created by ``copier copy`` and committed as a git repository of its own, and the run of the copy."""
+    done = copy(binary, sandbox, source, destination, ref=ref, without=without)
     assert done.returncode == 0, f"`copier copy` failed\n{done.describe()}"
     destination = Path(destination)
     if not (destination / ".git").exists():
         git(destination, "init", "-q", "-b", "main")
     commit_all(destination, "created by copier copy")
-    return destination
+    return destination, done
+
+
+def create_project(binary, sandbox, source, destination, ref=FIRST_TAG):
+    """A project created by ``copier copy`` and committed as a git repository of its own."""
+    return create_project_and_run(binary, sandbox, source, destination, ref=ref)[0]
 
 
 def update(binary, sandbox, source, project, ref=SECOND_TAG):
-    """``copier update --defaults --trust --vcs-ref <ref>`` in the project; the run, whatever its exit code."""
-    args = ["update", "--defaults", "--trust", "--vcs-ref", ref]
-    answers = source.answers_rel()
-    if answers != DEFAULT_ANSWERS_REL:
-        args += ["--answers-file", answers]
-    return run_copier(binary, sandbox, project, *args)
+    """``copier update --defaults --trust --vcs-ref <ref>`` in the project; the run, whatever its exit code.
+
+    Copier finds its standard answers file, ``.copier-answers.yml``, by itself (DEC-023, DEC-493).
+    """
+    return run_copier(binary, sandbox, project, "update", "--defaults", "--trust", "--vcs-ref", ref)
 
 
 # --------------------------------------------------------------------------
@@ -361,9 +458,23 @@ def files_under(project, below=""):
 
 
 def kernel_files(project):
-    files = files_under(project, KERNEL_REL)
+    """The installed kernel's files; what lies in a ``__pycache__/`` folder is no kernel file (DEC-488)."""
+    files = [rel for rel in files_under(project, KERNEL_REL) if PYCACHE not in rel.split("/")]
     assert files, f"the project has no file under {KERNEL_REL}/"
     return files
+
+
+def is_ignored(project, rel):
+    """Whether git, in the project, ignores the path ``rel`` (``git check-ignore``)."""
+    done = subprocess.run(["git", "-C", str(project), "check-ignore", "-q", "--", rel], capture_output=True, text=True)
+    assert done.returncode in (0, 1), f"git check-ignore {rel} failed: {done.stderr}"
+    return done.returncode == 0
+
+
+def untracked(project):
+    """The paths ``git status`` shows as untracked in the project, file by file."""
+    listing = git(project, "status", "--porcelain", "--untracked-files=all")
+    return sorted(line[3:] for line in listing.splitlines() if line.startswith("?? "))
 
 
 def is_executable(path):
@@ -392,6 +503,16 @@ def read_lock(project):
         raise AssertionError(f"{LOCK_REL} is not YAML: {exc}") from None
     assert isinstance(data, dict), f"{LOCK_REL} is not a YAML map"
     return data
+
+
+def lock_header(project):
+    """The comment header of the lock: its leading lines that begin with ``#``, blank lines among them passed over."""
+    lines = []
+    for line in lock_text(project).splitlines():
+        if line.strip() and not line.lstrip().startswith("#"):
+            break
+        lines.append(line)
+    return "\n".join(lines)
 
 
 def manifest_of(project):
@@ -434,6 +555,12 @@ class Doctor:
 
     def names(self, rel):
         return rel in self.text
+
+    def part(self, name):
+        """Another section of the report, by the name doctor gives it."""
+        section = self.report.get(name)
+        assert isinstance(section, dict), f"gov doctor's report has no {name} section\n{self.run.describe()}"
+        return section
 
     def describe(self):
         return f"framework-lock section: {self.text}\n{self.run.describe()}"

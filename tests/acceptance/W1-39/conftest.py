@@ -31,11 +31,23 @@ def pristine_source(tmp_path_factory):
 
 
 @pytest.fixture(scope="session")
-def pristine_project(copier_bin, pristine_source, tmp_path_factory):
-    """A project created once by ``copier copy`` from the first release. Never changed."""
+def pristine_creation(copier_bin, pristine_source, tmp_path_factory):
+    """A project created once by ``copier copy`` from the first release, and the run that created it."""
     base = tmp_path_factory.mktemp("w1-39-pristine")
-    return support.create_project(copier_bin, support.make_sandbox(base / "sandbox"), pristine_source,
-                                  base / "product")
+    return support.create_project_and_run(copier_bin, support.make_sandbox(base / "sandbox"), pristine_source,
+                                          base / "product")
+
+
+@pytest.fixture(scope="session")
+def pristine_project(pristine_creation):
+    """The project created once for the session. Never changed."""
+    return pristine_creation[0]
+
+
+@pytest.fixture(scope="session")
+def copy_run(pristine_creation):
+    """The run of ``copier copy`` that created the session's project: what Copier printed."""
+    return pristine_creation[1]
 
 
 @pytest.fixture()
