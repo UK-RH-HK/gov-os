@@ -34,6 +34,44 @@ NO_BINARY_TOOLS = frozenset({
     "reranker-venv", "reranker",
 })
 
+HISTORICAL_PATHS = [
+    "docs/DECISION_REGISTER.md",
+    "docs/changes/",
+    "governance/project/bootstrap.md",
+    "docs/source/",
+]
+
+
+def _is_historical(path: str) -> bool:
+    for hist in HISTORICAL_PATHS:
+        if hist.endswith("/"):
+            if path.startswith(hist):
+                return True
+        else:
+            if path == hist:
+                return True
+    return False
+
+
+def _excluded_from_stale_check(path: str) -> bool:
+    if _is_historical(path):
+        return True
+    if path.startswith("tests/acceptance/"):
+        return True
+    return False
+
+
+def _extract_path_prefix(install_cmd: str) -> str | None:
+    m = re.search(r'PATH=([^:]+):\$PATH', install_cmd)
+    if not m:
+        return None
+    prefix = m.group(1)
+    home = str(_real_home())
+    prefix = prefix.replace("$HOME", home)
+    if prefix.startswith("~"):
+        prefix = home + prefix[1:]
+    return prefix
+
 
 def _version_tuple(v: str) -> tuple:
     return tuple(int(x) for x in re.findall(r"\d+", v))
@@ -77,18 +115,27 @@ def _find_binary(name: str) -> Path | None:
 
 def _tool_version(binary: Path, name: str) -> str | None:
     version_cmds = {
-        "node": ([str(binary), "--version"], None),
-        "uv": ([str(binary), "--version"], None),
-        "lefthook": ([str(binary), "version"], None),
+        "node": [str(binary), "--version"],
+        "uv": [str(binary), "--version"],
+        "lefthook": [str(binary), "version"],
     }
     if name in version_cmds:
-        cmd, _ = version_cmds[name]
         try:
-            out = subprocess.run(cmd, capture_output=True, text=True, timeout=5).stdout.strip()
+            out = subprocess.run(version_cmds[name], capture_output=True, text=True, timeout=5).stdout.strip()
             m = re.search(r"v?(\d+[\d.]*\S*)", out)
             return m.group(0) if m else out
         except Exception:
             return None
+    try:
+        result = subprocess.run([str(binary), "--version"], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            out = result.stdout.strip()
+            if out:
+                m = re.search(r"v?(\d+\.\d+[\d.]*)", out)
+                if m:
+                    return m.group(0)
+    except Exception:
+        pass
     return "present"
 
 
@@ -166,10 +213,26 @@ def _check_tools(root: Path) -> dict:
             if not result["ok"]:
                 all_ok = False
             continue
-        binary = _find_binary(name)
+        install_cmd = entry.get("install", "")
+        path_prefix = _extract_path_prefix(install_cmd)
+        binary = None
+        registered_location = None
+        if path_prefix:
+            binary_name = TOOL_BINARIES.get(name, name)
+            candidate = Path(path_prefix) / binary_name
+            if candidate.is_file():
+                binary = candidate
+                registered_location = path_prefix
         if binary is None:
-            results.append({"name": name, "pinned_version": pinned, "found_version": None,
-                            "sha256_match": False, "ok": False})
+            binary = _find_binary(name)
+        if binary is None:
+            detail = {"name": name, "pinned_version": pinned, "found_version": None,
+                      "sha256_match": False, "ok": False}
+            if registered_location:
+                detail["location"] = registered_location
+            elif path_prefix:
+                detail["location"] = path_prefix
+            results.append(detail)
             all_ok = False
             continue
         found_sha = _sha256_file(binary)
@@ -183,8 +246,11 @@ def _check_tools(root: Path) -> dict:
                 ok = False
         if not ok:
             all_ok = False
-        results.append({"name": name, "pinned_version": pinned, "found_version": found_version,
-                        "sha256_match": sha_match, "ok": ok})
+        detail = {"name": name, "pinned_version": pinned, "found_version": found_version,
+                  "sha256_match": sha_match, "ok": ok}
+        if registered_location:
+            detail["location"] = registered_location
+        results.append(detail)
     return {"status": "pass" if all_ok else "fail", "tools": results}
 
 
@@ -240,15 +306,20 @@ def _check_path_compliance(root: Path) -> dict:
         if len(parts) >= 3 and parts[0].startswith("R"):
             moved[parts[1]] = parts[2]
     if not moved:
-        return {"status": "pass", "moved_references": []}
+        return {"status": "pass", "moved_references": [], "historical_excluded": 0}
     refs = []
+    historical_excluded = 0
     for old_path, new_path in moved.items():
         grep_out = _git(root, "grep", "-l", "--", old_path)
         if grep_out.strip():
             for referencing_file in grep_out.strip().splitlines():
                 if referencing_file != new_path:
-                    refs.append({"old_path": old_path, "new_path": new_path, "referenced_in": referencing_file})
-    return {"status": "pass" if not refs else "fail", "moved_references": refs}
+                    if _is_historical(referencing_file):
+                        historical_excluded += 1
+                    elif not _excluded_from_stale_check(referencing_file):
+                        refs.append({"old_path": old_path, "new_path": new_path, "referenced_in": referencing_file})
+    return {"status": "pass" if not refs else "fail", "moved_references": refs,
+            "historical_excluded": historical_excluded}
 
 
 def _check_index_freshness(root: Path) -> dict:

@@ -25,7 +25,7 @@ def run(root: Path, args, config: dict) -> dict:
     lex_s = round(time.monotonic() - t0, 1)
 
     stores: dict = {}
-    stores["lexical"] = {"status": "recreated", "time_s": lex_s}
+    stores["lexical"] = {"status": "recreated"}
 
     try:
         from gov.retrieval.semantic import refresh as semantic_refresh
@@ -62,4 +62,5 @@ def run(root: Path, args, config: dict) -> dict:
         "digest": store_result["digest"],
         "store": store_result,
         "stores": stores,
+        "timing": {"lexical_s": lex_s},
     }
