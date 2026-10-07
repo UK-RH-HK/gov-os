@@ -79,7 +79,7 @@ def _commits_for_ticket(root: Path, ticket_id: str) -> list[dict]:
     for sha in shas:
         trailers = _read_trailers(root, sha)
         task_values = trailers.get("Task", [])
-        if any(ticket_id in v for v in task_values):
+        if any(v.strip() == ticket_id for v in task_values):
             commits.append({"sha": sha, "trailers": trailers})
     return commits
 
@@ -135,7 +135,7 @@ def main() -> int:
             task_vals = c["trailers"].get("Task", [])
             impl_vals = c["trailers"].get("Implements", [])
 
-            if not any(ticket_id in v for v in task_vals):
+            if not any(v.strip() == ticket_id for v in task_vals):
                 findings.append({
                     "code": "MISSING_TASK_TRAILER",
                     "message": f"commit {c['sha'][:12]} of {ticket_id} lacks Task: trailer",
