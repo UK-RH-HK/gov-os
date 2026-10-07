@@ -662,6 +662,56 @@ one reversed and green; the twelve red cases are round 6's, for the same reasons
 | `test_a_refusal_for_no_acceptance_tests_is_counted` (2 forms) | no_acceptance_tests | refused with `NO_ACCEPTANCE_TESTS`, exit code 3; no iteration counted |
 | `test_a_refusal_for_no_acceptance_tests_opens_a_dependent_repair_ticket` (2 forms) | no_acceptance_tests | refused; no repair ticket |
 
+## Round 7 (DEC-480)
+
+DEC-480 (register of the main tree) says of a governance-changing ticket that `gov close`
+refuses on "the same condition on which `gov check` blocks a merge". Rounds 6 and 6b fixed
+that condition as "a hard-block check is red". One state differs: `gov check` ends with its
+blocking exit code (3) while no single hard-block check is red, and `gov close` closed the
+ticket. The cases are in `test_w1_30_check_blocks.py`; nothing else changes.
+
+**The blocking states taken.** `tests/acceptance/W1-26/README.md` states one blocking state in
+words: "Hard-block RED: `ok: false`, exit 3". Of a family it says that each has a status RED,
+YELLOW or GREEN and that a family the runner does not name is "reported by name, never silently
+missing"; it states no further blocking state. The one written here is the state the order
+names, which W1-26's own cases fix (`test_w1_26_dec436.py`, DEC-436: a declaration whose family
+is none of the runner's families "is reported by name and makes the result not green"): the
+check runs and passes, its family is RED, `gov check` blocks. No other state is written.
+
+**The fixture, held by running `gov check`.** A project with its own two checks
+(`project_with_checks`): `readme-present`, and `feature-present`, declared in the family
+`licence hygiene`, which is none of the runner's. Before the close each case runs
+`gov check --json` at the commit being closed and fails there unless: the exit code is 3 and
+`ok` is false; no hard-block check is red; `feature-present` is GREEN; the families the runner
+reports RED are exactly `licence hygiene`. The family the answer must name is read from the
+runner's answer.
+
+| Case | What it holds |
+|------|---------------|
+| `test_a_close_is_refused_where_gov_check_blocks_and_no_hard_block_check_is_red` (2 forms: the passing check declared hard-block, declared warning) | refused, exit code 3; the answer names the family the runner reports RED; the ticket is not closed |
+| `test_a_refusal_where_gov_check_blocks_is_counted` | the refusal is one iteration |
+| `test_a_refusal_where_gov_check_blocks_opens_a_dependent_repair_ticket` | one repair ticket; by the ticket tool it depends on the ticket |
+| `test_the_same_ticket_closes_where_gov_check_does_not_block` | the converse guard: the same project, ticket and check, the check declared in `graph integrity`; `gov check` ends with exit code 0, no check and no family red; the ticket closes |
+
+### The run of round 7
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs`,
+against the engineer's commit `5505ba57`: 204 cases in 18 files; 200 passed, 4 failed, none
+skipped. The 199 cases of round 6b are green. Of the five new cases the converse guard is
+green and four are red:
+
+| Red case | What `gov close` did |
+|----------|----------------------|
+| `test_a_close_is_refused_where_gov_check_blocks_and_no_hard_block_check_is_red[hard-block]` | closed the ticket (exit code 0); `gov check` blocks, family `licence hygiene` RED |
+| `test_a_close_is_refused_where_gov_check_blocks_and_no_hard_block_check_is_red[warning]` | closed the ticket (exit code 0); the same |
+| `test_a_refusal_where_gov_check_blocks_is_counted` | closed the ticket; nothing refused, nothing counted |
+| `test_a_refusal_where_gov_check_blocks_opens_a_dependent_repair_ticket` | closed the ticket; no repair ticket |
+
+Not written: a hard-block policy key of the path map that no check covers. The runner reports
+it as a check entry of its own (`policy-<key>`, hard-block, RED), so it is "a hard-block check
+is red", the state of rounds 6 and 6b, and the W1-26 README does not state it as a blocking
+state of its own.
+
 ## Covers ids
 
 | Covers id | Tests |
