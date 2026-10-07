@@ -5004,3 +5004,57 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.113 | 2026-10-07 | One delegated decision: DEC-455 (the owner's choice after an escalation is the register entry and `gov close` records its id; every refusal for a finding about the ticket's work counts as an iteration). |
+
+## 114. Owner answers: stale paths, DEC-455, the exit package and a compliance report (register v0.114, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-456 — Stale paths: the move table and the old `cli/` tree are historical; the plan validator's one stale path is fixed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, answering the record of the one rebuild (DEC-448): `gov doctor` reported 180 stale paths on this repository, 156 in `docs/SOURCES.md`, 23 in the old `cli/` tree, one in `docs/plan/tools/validate_s1.py` · **Amends:** DEC-448 (the set of historical records) · **Under:** DEC-440
+- **Decision:**
+  - `docs/SOURCES.md` is a historical table of moves and must keep the old paths: it is left out of doctor's
+    stale-path check.
+  - The old `cli/` tree is legacy code (the live CLI is `src/gov/cli/`): it is treated as historical and left
+    out of the check. W1-41's adoption review decides whether to archive it.
+  - The one stale path in the plan validator script, which is live, is corrected.
+  - Doctor's remaining red on this repository is then only the Claude Code drift, re-recorded at the Wave 1
+    exit.
+  - W1-27 is reopened for the two exclusions, test first.
+
+### DEC-457 — DEC-455 is accepted by the owner
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Confirms:** DEC-455
+- **Decision:** The owner's choice after an escalation is the register entry and `gov close` records its id;
+  every close refused for a finding about the ticket's work counts as an iteration.
+
+### DEC-458 — One package for the owner's actions at the Wave 1 exit
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-442, DEC-444, DEC-448, DEC-070
+- **Decision:** When W1-41 is merged, the orchestrator brings the owner one package listing everything the
+  owner does at the exit, with exact commands and steps for each:
+  - the manual freeze, pause and lift check (DEC-442);
+  - the Stop and SubagentStop hook lines to register (DEC-444);
+  - the Claude Code version to re-record;
+  - the external audit session the owner starts alongside W1-43 (DEC-070).
+
+### DEC-459 — A rule-by-rule compliance report for Wave 1, compiled by a read-only subagent and verified by the exit auditor
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER
+- **Decision:**
+  - A read-only subagent compiles a compliance report for Wave 1 so far, without stopping the running work. It
+    writes nothing; it returns the report to the orchestrator, who saves it as
+    `.gov-runtime/scratch/orchestrator/COMPLIANCE.md`.
+  - It covers each master rule MR-1 to MR-6, quoted from Charter v5, and these process rules: tests before
+    implementation (the READY rule and the MWA-02 reading); independence between test designer, engineer and
+    reviewer, including that no worker saw another's output and none saw a stand-in implementation;
+    `allowed_paths` scope; workers started only through `gov launch`, sandboxed; leads write no source or tests
+    and decide no packages; the loop policy (hidden counts, escalation) and the two-round review cap; the
+    delegation limits (what came to the owner and what the orchestrator decided); decisions recorded before the
+    changes they authorise; held-out discipline; never push, merge into main or rewrite shared history; commit
+    trailers; the proportion rule.
+  - For each rule it gives what enforces it (the guard, containment, a test or check, or only a brief or
+    prompt), the evidence (counts, commit ids, findings, decision numbers), every deviation so far (date,
+    ticket, what happened, how it was caught, the fix), and the remaining risk, named honestly where the rule
+    rests on instructions alone.
+  - The orchestrator brings the owner a short summary: which rules are enforced by mechanism, which by
+    instruction only, and the deviations in one table. The full report goes into W1-43's brief, so the exit
+    auditor verifies it independently instead of taking it as given.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.114 | 2026-10-07 | Owner answers: DEC-456 (the move table and the old `cli/` tree are historical for doctor's stale-path check; the plan validator's stale path is fixed; W1-27 reopened), DEC-457 (DEC-455 accepted), DEC-458 (one package of the owner's exit actions when W1-41 is merged), DEC-459 (a rule-by-rule compliance report by a read-only subagent, verified by the exit auditor). |
