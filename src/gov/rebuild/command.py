@@ -15,17 +15,45 @@ EXIT_CODES = {}
 
 
 def run(root: Path, args, config: dict) -> dict:
+    from gov.cli.errors import GovError
     from gov.retrieval.lexical import refresh as lexical_refresh
     from gov.store import load as store_load
 
-    store_result = store_load(root)
+    has_path_map = "path-map.yaml" in config
 
-    t0 = time.monotonic()
-    lexical_refresh(root)
-    lex_s = round(time.monotonic() - t0, 1)
+    try:
+        store_result = store_load(root)
+    except GovError:
+        raise
+    except Exception as exc:
+        raise GovError(
+            "REBUILD_FAILED",
+            f"rebuild failed on the record store: {exc}",
+            {"store": "record", "error": str(exc)},
+        )
 
     stores: dict = {}
-    stores["lexical"] = {"status": "recreated"}
+
+    if has_path_map:
+        try:
+            t0 = time.monotonic()
+            lexical_refresh(root)
+            lex_s = round(time.monotonic() - t0, 1)
+            stores["lexical"] = {"status": "recreated"}
+        except GovError:
+            raise
+        except Exception as exc:
+            raise GovError(
+                "REBUILD_FAILED",
+                f"rebuild failed on the lexical index: {exc}",
+                {"store": "lexical", "error": str(exc)},
+            )
+    else:
+        lex_s = 0.0
+        stores["lexical"] = {
+            "status": "not_recreated",
+            "reason": "no path map: nothing is classified as indexable",
+        }
 
     try:
         from gov.retrieval.semantic import refresh as semantic_refresh
