@@ -1,0 +1,6 @@
+id: "product-traceability-trailers"
+family: "product traceability"
+tier: "G1"
+severity: "hard-block"
+command: "python3 -m gov.close.traceability"
+allows-not-applicable: "true"

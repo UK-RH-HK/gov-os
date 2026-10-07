@@ -1,0 +1,5 @@
+id: "core-decision-citations"
+family: "authority/role limits"
+tier: "G1"
+severity: "warning"
+command: "python3 -m gov.check.citations"

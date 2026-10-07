@@ -5183,3 +5183,126 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.119 | 2026-10-07 | One delegated decision on W1-38: DEC-471 (a role's adapter tools equal the kernel role's; the three generated folders and the settings file must have a source for everything in them). Next free id: DEC-472. |
+
+## 120. Owner answers: the `gov check` baseline, the decision-citations check, `gov close` before adoption, index freshness, four delegated decisions accepted (register v0.120, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-472 — DEC-467 confirmed: the `gov check` baseline; it must be empty at W1-42's exit run
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator's provisional DEC-467.
+- **Decision:**
+  - A merge into `w1/integrate` is blocked by any red outside the recorded baseline, or by a new finding in a baseline check. A baseline red is named in the merge record and never called green. A baseline check that turns green may not return to the baseline.
+  - Added: the baseline must be empty at W1-42's exit run, cleared by W1-39 and by W1-41's adoption. Any item still in it then comes to the owner as a decision package. This is added to W1-42's KPI lines.
+
+### DEC-473 — The decision-citations check knows both register forms (W1-26, package P-1)
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-463; the test designer's package P-1 on W1-26's follow-up.
+- **Decision:**
+  - A decision is recorded either as a decision file, or as an entry of a register file that the project names in one line of configuration under `governance/project/`. With no register file named, decision files alone count. No path of this repository goes into the kernel.
+  - Heading grammar of a register file: a level-3 heading `### DEC-<digits>` at the start of a line, followed by a space, a colon or a dash and the title. A heading inside a fenced code block does not count.
+
+### DEC-474 — The decision-citations check judges the commits after a base commit recorded in the project (W1-26, package P-2)
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-463; the test designer's package P-2.
+- **Decision:**
+  - A base commit is recorded in the project's configuration: the commits after it are judged. With no base recorded, the whole history is judged.
+  - In this repository the base is `46ec8da3`, the commit that records DEC-463.
+
+### DEC-475 — The designer's three readings on the decision-citations check are confirmed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-26's follow-up cases (`e3d2cc1b`).
+- **Decision:**
+  - Severity is `warning`: history cannot be rewritten, and a hard block could never clear.
+  - The family is authority/role limits.
+  - A citation is a DEC id in the commit message only.
+  - W1-26's follow-up is then merged and closed, with the pre-merge `gov check`.
+
+### DEC-476 — `gov close` stays strict for every project; how every ticket closes here until W1-41 (W1-30, package P-3)
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** DEC-466; the orchestrator's package P-3 (thirteen baseline reds; commits without `Implements:`).
+- **Decision:**
+  - `gov close` holds no baseline: it stays strict for every project.
+  - From now on every worker commit carries `Implements:`.
+  - Until W1-41, the orchestrator runs `gov close` on every ticket. Where it refuses only because of baseline reds (DEC-467, DEC-472), or only because of commits made before this decision without `Implements:`, its output is saved beside the close, the ticket is closed with `tk close`, and the ticket is listed for the exit auditor.
+  - Any other refusal reason means the ticket does not close.
+
+### DEC-477 — Index freshness: `gov rebuild` is run before W1-42's exit run and whenever a measurement needs fresh indexes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Supersedes:** the one-off limit of DEC-448 (its other parts stand) · **Basis:** `gov doctor` at `6db36969` reports nine stale index files after the one rebuild.
+- **Decision:**
+  - Stale indexes between commits are normal during development.
+  - `gov rebuild` is run on this repository before W1-42's exit run, and whenever a measurement needs fresh indexes. This replaces DEC-448's limit of a single run.
+
+### DEC-478 — DEC-468, DEC-469, DEC-470 and DEC-471 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator's delegated decisions on W1-38 and W1-30.
+- **Decision:**
+  - DEC-468 (OpenSpec's six skills are registered sources), DEC-469 (who refreshes the registered sources), DEC-470 (`gov close`: no store, a missing source, the probe gate's exit code, the models of the commits) and DEC-471 (role tools; paths under `.claude/`) are accepted as recorded.
+  - On DEC-471: the independent auditor's eight tools stay as in its kernel role; the guard holds its writes to its report folder.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.120 | 2026-10-07 | Owner answers: DEC-472 (DEC-467 confirmed; the baseline empty at W1-42's exit run), DEC-473 (both register forms; heading grammar), DEC-474 (base commit, here `46ec8da3`), DEC-475 (severity warning, family authority/role limits, citation in the message only), DEC-476 (`gov close` strict; closes until W1-41), DEC-477 (`gov rebuild` before the exit run and when a measurement needs it; replaces DEC-448's one-off limit), DEC-478 (DEC-468 to DEC-471 accepted). Next free id: DEC-479. |
+
+## 121. One delegated decision on W1-26: where a project records its register file and its base commit (register v0.121, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-479 — The register file and the base commit of the decision-citations check are two optional keys of the project's path map
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-473 and DEC-474 order "one line of configuration under `governance/project/`" without naming the file. W1-26's test designer (commit `ac952490`) found no source that names it and settled on the path map: DEC-185 refuses a new overlay file and has commands load the `governance/project/` files they know, the path map first; DEC-224 and DEC-230 already put project data there under top-level keys.
+- **Decision:**
+  - `governance/project/path-map.yaml` holds two optional top-level keys: `decision_register` (the register file's path from the project root) and `decision_citations_base` (a commit id, full or abbreviated).
+  - The configuration read is the project's present one, not each judged commit's: a base can only be recorded after it exists.
+  - With a base recorded and no commit after it, the check gives the unmeasured answer, never green.
+  - A named register that cannot be read at a judged commit is never green and its path is reported, also when the cited decision is recorded as a decision file.
+  - In this repository the two keys are `docs/DECISION_REGISTER.md` and `46ec8da3` (DEC-474); the orchestrator adds them when the check is merged.
+  - Recorded before the change (DEC-463): the engineer's code follows this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.121 | 2026-10-07 | One delegated decision on W1-26: DEC-479 (the register file and the base commit are two optional keys of the project's path map). Next free id: DEC-480. |
+
+## 122. One delegated decision on W1-30: `gov close` refuses on what `gov check` blocks on (register v0.122, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-480 — For a governance-changing ticket, `gov close` refuses on exactly the checks `gov check` reports red at hard-block; it holds no rule of its own about checks
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** DEC-476 (strict, no baseline inside `gov close`). W1-30's test designer (round 6, commit `fd7ad4f0`) returned three points no source settles: a warning check that cannot run, the time limit of a check, and a built-in hard-block check that the runner reports yellow where its tool is absent. As for containment (DEC-453), the close gate takes the judgement of the component that owns it: W1-26's runner is the authority on a check's status.
+- **Decision:**
+  - When a ticket's commits change a governance file, `gov close` runs the checks at the commit being closed through W1-26's runner and refuses when the runner reports any hard-block check red, naming each. That is the same condition on which `gov check` blocks a merge.
+  - A check of severity warning refuses nothing, whether it ran and failed or could not run: the runner gives both the same status, and `gov close` does not read more into it. The designer's case that expected a refusal for a warning check whose command is absent is reversed.
+  - A hard-block check that cannot run (its command absent, over its time limit) refuses when the runner reports it red, as the runner does today. The time limit of a check is the runner's own; `gov close` adds none, and its `--timeout` stays the limit of its test runs.
+  - A hard-block check the runner reports yellow (not applicable, or a built-in check whose tool is absent) refuses nothing. Whether the runner should report an absent tool of a hard-block check as red is a question for W1-26, listed for the Wave 2 list of DEC-466.
+  - A ticket without acceptance tests is a finding about the ticket's work: exit code 3, counted, a repair ticket (the designer's reading of DEC-455, accepted).
+  - Recorded before the change (DEC-463): the designer's adjusted cases and the engineer's code follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.122 | 2026-10-07 | One delegated decision on W1-30: DEC-480 (`gov close` refuses on exactly the checks the runner reports red at hard-block; warning checks refuse nothing; the time limit of a check is the runner's; a ticket without acceptance tests is a counted finding). Next free id: DEC-481. |
+
+## 123. Owner answers: the two new baseline checks, the trailers base, `gov close` in use (register v0.123, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-481 — `adapter-portability` joins the `gov check` baseline with its 43 findings; W1-38 merges and closes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-4. W1-38's check compares this repository's hand-kept `.claude/`, `CLAUDE.md` and `AGENTS.md` with freshly generated output; they differ until the owner applies the generated output at the exit (`log/check-at-W1-38-premerge.json`).
+- **Decision:**
+  - `adapter-portability` joins the baseline of DEC-467, with its 43 findings as the recorded state. A new finding in it blocks a merge, as for the other baseline checks (DEC-472).
+  - It clears at the exit, when the owner applies the generated output.
+  - The check running `rulesync generate` into its own empty temporary folder, writing nothing in the project, is within the owner's rule that nobody runs a writing rulesync command in this repository.
+  - W1-38 is merged and closed.
+
+### DEC-482 — `product-traceability-trailers` joins the baseline with its 735 findings; a project may record a trailers base commit
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-5 (`log/check-at-W1-30-premerge.json`): 408 commits of closed tickets without an `Implements:` trailer, made before DEC-476, and 327 `Implements:` ids that resolve to no record here before adoption.
+- **Decision:**
+  - `product-traceability-trailers` joins the baseline of DEC-467, with its 735 findings as the recorded state. A new finding in it blocks a merge.
+  - The check gets the same base-commit setting as the citations check (DEC-474, DEC-479): a project may record a trailers base, and only commits after it are judged; with none, the whole history. Here the base is the commit that recorded DEC-476, `429815b5`. That removes the 408 commits made before the rule.
+  - The unresolved ids are cleared by W1-41's adoption.
+  - The base setting is built in W1-41 or in a short follow-up the orchestrator chooses.
+  - W1-30 is merged and closed, through `gov close` itself under DEC-476.
+
+### DEC-483 — The owner-decision lookup of `gov close` reading decision files only is a residual for W1-41's adoption
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** W1-30's escalation path reads the owner's decision from decision files, not from a register file such as this repository's.
+- **Decision:** It is recorded as a residual of W1-30 and handed to W1-41's adoption; it does not hold W1-30's merge.
+
+### DEC-484 — The run time of `gov close` here is accepted; it runs in the main tree while the next tickets are worked in their worktrees
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** `gov close` runs the project's tests; on this repository that is about an hour per ticket.
+- **Decision:** The run time is accepted. `gov close` runs in the main tree while the next tickets' sessions work in their worktrees, within the resource gate. (This replaces the orchestrator's own precaution of running it with nothing else running.)
+
+### DEC-485 — DEC-479 and DEC-480 are accepted; three residuals of the citations check go on the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the two delegated decisions told to the owner; W1-26's follow-up residuals.
+- **Decision:** DEC-479 and DEC-480 stand as written. On the Wave 2 list (DEC-466): moving the base takes earlier commits out of judgement unreported; any Markdown file with a decision id in its frontmatter counts as its record; a register heading alone is enough for an entry.
+
+### DEC-486 — The orchestrator's closed count is reconciled: 41 of 50 closed
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** the orchestrator reported 45 of 50 closed while nine tickets were open. The ticket files give 41 closed, 2 in progress, 7 open; the orchestrator had counted closed follow-ups of already closed tickets.
+- **Decision:** Reports state the count from the ticket files and list the open tickets by id. At this entry: in progress W1-30 (`DAEO-2lwj`), W1-38 (`DAEO-3ef2`); open W1-31 (`DAEO-6mk8`), W1-32 (`DAEO-8goq`), W1-39 (`DAEO-5ylr`), W1-40 (`DAEO-fdkq`), W1-41 (`DAEO-cdoi`), W1-42 (`DAEO-gjjf`), W1-43 (`DAEO-03pw`). Order of work: W1-31 and W1-40 after W1-30, W1-39 after W1-38, then W1-32, W1-41, the exit run and the exit audit.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.123 | 2026-10-07 | Owner answers: DEC-481 (`adapter-portability` in the baseline, 43 findings; W1-38 merges), DEC-482 (`product-traceability-trailers` in the baseline, 735 findings; a trailers base commit, here `429815b5`; W1-30 merges and closes through `gov close`), DEC-483 (owner-decision lookup from a register file: residual for W1-41), DEC-484 (`gov close` run time accepted; runs beside worktree work), DEC-485 (DEC-479 and DEC-480 accepted; three Wave 2 items), DEC-486 (41 of 50 closed; open tickets listed by id). Next free id: DEC-487. |
