@@ -5170,3 +5170,16 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.118 | 2026-10-07 | One delegated decision on W1-30: DEC-470 (no store, no close; a missing source refuses; a probe refusal exits 3; the model is read from the commits' co-author lines until launch records carry it). Next free id: DEC-471. |
+
+## 119. One delegated decision on W1-38: a role's adapter tools equal the kernel role's; which paths under `.claude/` must have a source (register v0.119, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-471 — The adapter source of a role names exactly the kernel role's tools; the three generated folders and the settings file must have a source for everything in them
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-38's test designer (round 4, commit `5ca159c0`) returned two open points. The kernel role files are the authority for a role's limits (DEC-066, W1-33); the ticket's third success line reads "generated adapters match their source". The delivered adapter source of the independent auditor names four tools where the kernel role names eight (among them `Write` and `Edit`, "for its report only").
+- **Decision:**
+  - **Tools.** The tools an adapter source gives a role are exactly those the kernel role's Tools field names: neither more nor fewer. The auditor's source is brought to the kernel's eight. Whether the kernel's list for a role should be narrower is a question for that role's file (W1-33), not for the adapter.
+  - **Paths under `.claude/`.** For this ticket the check requires a source for everything in `.claude/agents/`, `.claude/skills/`, `.claude/commands/` and for every key of `.claude/settings.json`; `.claude/settings.local.json` and `.claude/worktrees/` belong to other owners (DEC-063, DEC-050) and are not findings. Anything else directly under `.claude/` is not judged yet: W1-42's exit run records what a live session writes there, and the rule for those paths is decided after it (an item for the exit package).
+  - Recorded before the change (DEC-463): the engineer's code and the auditor source follow this entry.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.119 | 2026-10-07 | One delegated decision on W1-38: DEC-471 (a role's adapter tools equal the kernel role's; the three generated folders and the settings file must have a source for everything in them). Next free id: DEC-472. |
