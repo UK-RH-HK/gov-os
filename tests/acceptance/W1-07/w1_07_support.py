@@ -99,6 +99,12 @@ READ_COMMANDS = tuple(("context", "--dry-run", *REQUIRED_ARGUMENTS["context"]) i
 BUILT_LATER = BUILT_LATER + ("doctor", "rebuild")
 NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
 
+# Planned revision (DEC-190, "planned: command implemented"): W1-30 builds ``close``; its cases are in
+# ``tests/acceptance/W1-30/``. It requires a ticket argument.
+BUILT_LATER = BUILT_LATER + ("close",)
+NOT_BUILT = tuple(name for name in NOT_BUILT if name not in BUILT_LATER)
+REQUIRED_ARGUMENTS["close"] = ("W1-07-NO-SUCH-TICKET",)
+
 # Every invocation these tests know: one per reserved command, and ``check --list``.
 EVERY_INVOCATION = tuple(invocation(name) for name in RESERVED_COMMANDS) + (("check", "--list"),)
 
