@@ -65,7 +65,7 @@ def run(root: Path, args, config: dict):
         checkpoint_watch(root, ticket, max_age_minutes=240, max_commits=20,
                          max_context=1.0, context_utilisation=None)
     except GovError as e:
-        if e.code == "CHECKPOINT_STALE":
+        if e.code in ("CHECKPOINT_STALE", "CHECKPOINT_MISSING"):
             raise
 
     if profile == "FULL":
@@ -312,6 +312,11 @@ def _check_probe(root: Path, ticket: str) -> None:
             raise GovError("PROBE_INVALID",
                             f"probe judged_by must be 'orchestrator', got '{judged}'",
                             {"ticket": ticket})
+        judgement = pf.get("judgement", "")
+        if not str(judgement).strip():
+            raise GovError("PROBE_INVALID",
+                            "probe has no judgement (judged_by is set but judgement is missing or empty)",
+                            {"ticket": ticket})
         return
 
     raise GovError("PROBE_MISSING",
@@ -487,7 +492,7 @@ def _handle_failure(root: Path, ticket: str, failures: list[str],
             "ESCALATION_BLOCKED",
             "three consecutive non-converging iterations reached",
             {
-                "outcomes": outcomes,
+                "outcomes": outcomes[-1:],
                 "reason": "three consecutive non-converging iterations with identical failures",
                 "options": ["fix_differently", "narrow", "split",
                             "defer", "delete", "continue"],
