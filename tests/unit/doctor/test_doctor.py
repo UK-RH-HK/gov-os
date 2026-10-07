@@ -93,6 +93,19 @@ def test_check_framework_lock_missing(tmp_path):
     assert result["status"] == "unmeasured"
 
 
+@pytest.mark.parametrize("verdict, status", (("MATCH", "pass"), ("MISSING", "unmeasured"), ("DRIFT", "fail"),
+                                             ("ERROR", "fail"), ("anything else", "fail")))
+def test_check_framework_lock_reports_the_answer_of_gov_lock(tmp_path, verdict, status):
+    from gov.doctor.command import _check_framework_lock
+    from gov.lock import Comparison
+    answer = Comparison(verdict, ("governance/kernel/a.py",), "a reason")
+    with mock.patch("gov.lock.compare", return_value=answer) as compare:
+        result = _check_framework_lock(tmp_path)
+    compare.assert_called_once_with(tmp_path)
+    assert result == {"status": status, "match": verdict, "reason": "a reason",
+                      "drifted_files": ["governance/kernel/a.py"]}
+
+
 def test_home_uses_env():
     from gov.doctor.command import _home
     with mock.patch.dict(os.environ, {"HOME": "/tmp/test-fake-home"}):
