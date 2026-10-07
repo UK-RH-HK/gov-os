@@ -5457,3 +5457,16 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.130 | 2026-10-07 | One delegated decision on W1-40: DEC-497 (a step whose tool is absent says "unmeasured" and fails; "no G3 check declared" is reported and does not fail the job; `fetch-depth: 2`; an unknown check family fails; smaller points left for Wave 2). Next free id: DEC-498. |
+
+## 131. Owner answers: W1-30's last review and the order of the probe for FULL tickets (register v0.131, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-498 — W1-30's second review is its last; what it may still change; a FULL ticket is probed before its merge
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-415, DEC-137 · **Refines:** DEC-496
+- **Decision:**
+  - **W1-30.** The review of the fixed `gov close` (after the DEC-487 follow-up) is the ticket's second and last independent review under DEC-415. After it, only two kinds of finding are fixed: a fail-open hole, and a silent close in a shape that ordinary work produces. Every other finding becomes a residual. A fail-open that one fix does not close comes to the owner as a decision package, not as another round. Then W1-30 closes.
+  - **Process, for every FULL ticket from now on.** The fresh reviewer probes the ticket's final code before the orchestrator merges it (DEC-137), not after a later tool asks for the record.
+  - **Deviation.** W1-30 was merged (`2c71bc64`) before any independent probe of its final code; the probe was commissioned only after `gov close` refused for the missing record. This is recorded as a deviation in the compliance report.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.131 | 2026-10-07 | Owner answers: DEC-498 (W1-30's second review is its last, only fail-open holes and silent closes in ordinary shapes are fixed after it, a hole one fix does not close goes to the owner; every FULL ticket is probed before its merge; W1-30's late probe recorded as a deviation). Next free id: DEC-499. |
