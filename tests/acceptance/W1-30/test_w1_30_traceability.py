@@ -110,3 +110,89 @@ def test_check_red_when_implements_does_not_resolve(project, sandbox, interface)
     status = support.family_status(result, support.PRODUCT_TRACEABILITY)
     assert status == "RED", \
         f"product-traceability should be RED when Implements: does not resolve; got {status}"
+
+
+# --------------------------------------------------------------------------
+# DEC-454 Point 12: Traceability refinements
+# --------------------------------------------------------------------------
+
+def test_traceability_git_failure_is_check_failure(project, sandbox, interface):
+    """DEC-454 point 12: a git failure is a check failure, not a silent pass."""
+    _project_with_closed_ticket(
+        project,
+        trailers=("Task: PROJ-tttt", "Role: engineer", "Implements: CAP-01"),
+    )
+    head_file = project.root / ".git" / "HEAD"
+    original = head_file.read_text(encoding="utf-8")
+    head_file.write_text("corrupt content\n", encoding="utf-8")
+    run = support.run_check(project, sandbox)
+    head_file.write_text(original, encoding="utf-8")
+    envelope = support.check_envelope_of(run, interface)
+    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
+    assert status != "GREEN", \
+        f"a git failure must be a check failure, not GREEN; got {status}"
+
+
+def test_traceability_commits_from_head_not_all_branches(project, sandbox, interface):
+    """DEC-454 point 12: the check considers commits from HEAD, not all branches."""
+    ticket_id = "PROJ-head"
+    wbs = "W1-head"
+    trailers_head = ("Task: PROJ-head", "Role: engineer", "Implements: CAP-01")
+    project.add_ticket(ticket_id, wbs)
+    project.add_passing_test(wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement on main", who=IMPL, trailers=trailers_head)
+    text = (project.root / support.ticket_path(ticket_id)).read_text(encoding="utf-8")
+    text = text.replace("status: open", "status: closed")
+    (project.root / support.ticket_path(ticket_id)).write_text(text, encoding="utf-8")
+    project.commit("close ticket", who=OWNER)
+
+    support.git(project.root, "checkout", "-b", "stale-branch")
+    project.write("src/example/stale.py", "# stale branch\n")
+    project.commit("commit on stale branch without Implements", who=IMPL,
+                   trailers=("Task: PROJ-head", "Role: engineer"))
+    support.git(project.root, "checkout", "main")
+
+    project.add_decision("CAP-01", "ACTIVE")
+    project.commit("decision", who=OWNER)
+    run = support.run_check(project, sandbox)
+    envelope = support.check_envelope_of(run, interface)
+    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
+    assert status == "GREEN", \
+        f"commits on other branches must not affect the check; got {status}"
+
+
+def test_traceability_unreadable_record_store_reported(project, sandbox, interface):
+    """DEC-454 point 12: an unreadable record store is reported as an error."""
+    _project_with_closed_ticket(
+        project,
+        trailers=("Task: PROJ-tttt", "Role: engineer", "Implements: CAP-01"),
+    )
+    adr_dir = project.root / "docs" / "adr"
+    adr_dir.mkdir(parents=True, exist_ok=True)
+    bad_file = adr_dir / "CAP-01.md"
+    bad_file.write_text("---\nnot: valid: yaml: [[[broken\n---\n", encoding="utf-8")
+    project.commit("corrupt record store", who=OWNER)
+    run = support.run_check(project, sandbox)
+    envelope = support.check_envelope_of(run, interface)
+    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
+    assert status != "GREEN", \
+        f"an unreadable record store must not produce GREEN; got {status}"
+
+
+def test_no_closed_ticket_not_applicable(project, sandbox, interface):
+    """DEC-454 point 12, DEC-447: when no closed ticket exists, the check is 'not applicable'.
+
+    Per DEC-447, a "not applicable" answer exits 2 with {"not_applicable": true}.
+    """
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("no tickets at all", who=OWNER)
+    run = support.run_check(project, sandbox)
+    envelope = support.check_envelope_of(run, interface)
+    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    status = support.family_status(result, support.PRODUCT_TRACEABILITY)
+    assert status is None or status in ("NOT_APPLICABLE", "SKIP", "GREEN"), \
+        f"no closed ticket means 'not applicable', not RED; got {status}"

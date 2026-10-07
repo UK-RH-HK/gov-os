@@ -547,3 +547,112 @@ def test_time_limit_is_configurable(project, sandbox, interface):
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is True, \
         "with a generous --timeout, a 0.5s test must pass"
+
+
+# --------------------------------------------------------------------------
+# Containment: DEC-453, KPI S1 "runs the containment check"
+# --------------------------------------------------------------------------
+
+def test_containment_refuses_ticket_changing_acceptance_tests(project, sandbox, interface):
+    """DEC-453, S1: an engineer's commit that changes a file under tests/acceptance/
+    must be refused by the containment check (W1-50: acceptance tests are the test
+    designer's paths, not the implementer's).
+    """
+    project.add_ticket(TICKET, WBS,
+                       allowed_paths=["src/example/**", "tests/acceptance/" + WBS + "/**"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("tests/acceptance/W1-other/test_planted.py",
+                  "def test_planted():\n    assert True\n")
+    project.commit("implement touching another ticket's acceptance tests", who=IMPL,
+                   trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "containment must refuse a commit changing tests/acceptance/ outside the ticket's own"
+    error = envelope.get("error", {})
+    error_text = json.dumps(error).lower()
+    assert "containment" in error_text or "scope" in error_text or "path" in error_text, \
+        f"the error should name containment as the reason: {error}"
+
+
+def test_containment_refuses_ticket_changing_docs_outside_paths(project, sandbox, interface):
+    """DEC-453: an engineer's commit changing docs/ outside the ticket's allowed paths
+    must be refused.
+    """
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("docs/extra.md", "# Out of scope\n")
+    project.commit("implement touching docs/", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "containment must refuse a commit changing docs/ outside allowed_paths"
+
+
+def test_containment_clean_within_paths(project, sandbox, interface):
+    """DEC-453: a commit within allowed_paths passes containment (W1-50: clean)."""
+    _green_project(project)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is True, \
+        "a commit only within allowed_paths must pass containment"
+
+
+# --------------------------------------------------------------------------
+# B2 extended: ticket closed through the ticket tool (KPI S1)
+# --------------------------------------------------------------------------
+
+def test_ticket_tool_close_is_what_tk_produces(project, sandbox, interface):
+    """B2: after a good close the ticket's file is what the ticket tool produces."""
+    _green_project(project)
+    support.run_close(project, sandbox, TICKET)
+    tk = project.root / "governance" / "kernel" / "bin" / "tk"
+    if not tk.is_file():
+        pytest.skip("tk is not in this tree")
+    import subprocess
+    result = subprocess.run(
+        [str(tk), "show", TICKET], capture_output=True, text=True,
+        cwd=str(project.root),
+    )
+    assert result.returncode == 0, \
+        f"tk show must succeed on the closed ticket: {result.stderr}"
+
+
+def test_close_fails_when_ticket_tool_absent(project, sandbox, interface):
+    """B2: when the ticket tool is absent or fails, gov close reports an error
+    and not success.
+    """
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement", who=IMPL, trailers=TRAILERS_GOOD)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    tk = project.root / "governance" / "kernel" / "bin" / "tk"
+    if tk.is_file():
+        tk.unlink()
+        project.commit("remove tk", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "gov close must report error when the ticket tool is absent"
+
+
+def test_close_record_unwritable_ticket_stays_open(project, sandbox, interface):
+    """B2: when the close record cannot be written, the ticket stays open."""
+    _green_project(project)
+    docs_close = project.root / "docs" / "close"
+    docs_close.mkdir(parents=True, exist_ok=True)
+    blocker = docs_close / "blocker"
+    blocker.write_text("I am a file, not a directory", encoding="utf-8")
+    project.commit("block close record directory", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    front = support.read_ticket_frontmatter(project.root, TICKET)
+    assert front.get("status") != "closed", \
+        "the ticket must stay open when the close record cannot be written"

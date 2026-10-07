@@ -250,3 +250,64 @@ def test_repair_ticket_create_failure_reported(project, sandbox, interface):
     run = support.run_close(project, sandbox, TICKET)
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False
+
+
+# --------------------------------------------------------------------------
+# B3/DEC-454 Point 6: Repair ticket via tk
+# --------------------------------------------------------------------------
+
+def test_repair_ticket_known_to_tk_show(project, sandbox, interface):
+    """DEC-454 point 6: the repair ticket is known to ``tk show``."""
+    _project_with_finding(project)
+    support.run_close(project, sandbox, TICKET)
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1, "a repair ticket should exist"
+    tk = project.root / "governance" / "kernel" / "bin" / "tk"
+    if not tk.is_file():
+        pytest.skip("tk is not in this tree")
+    import subprocess
+    repair_id = _repair_frontmatter(repairs[0]).get("id", repairs[0].stem)
+    result = subprocess.run(
+        [str(tk), "show", repair_id], capture_output=True, text=True,
+        cwd=str(project.root),
+    )
+    assert result.returncode == 0, \
+        f"tk show must know the repair ticket {repair_id}: {result.stderr}"
+
+
+def test_repair_ticket_dependency_direction(project, sandbox, interface):
+    """DEC-454 point 6: the repair ticket depends on the FAILING ticket, not vice versa."""
+    _project_with_finding(project)
+    support.run_close(project, sandbox, TICKET)
+    repairs = _repair_tickets(project)
+    assert len(repairs) >= 1
+    front = _repair_frontmatter(repairs[0])
+    deps = front.get("depends_on") or front.get("deps") or []
+    parent = front.get("parent")
+    assert TICKET in str(deps) or TICKET == parent, \
+        f"the repair ticket must depend on the failing ticket {TICKET}, not the other way"
+    main_front = support.read_ticket_frontmatter(project.root, TICKET)
+    main_deps = main_front.get("depends_on") or main_front.get("deps") or []
+    repair_id = front.get("id", "")
+    assert repair_id not in str(main_deps), \
+        f"the failing ticket {TICKET} must NOT depend on the repair ticket {repair_id}"
+
+
+def test_tk_fails_no_repair_ticket_file(project, sandbox, interface):
+    """DEC-454 point 6: when tk fails, no orphan ticket file is left behind."""
+    _project_with_finding(project)
+    tk = project.root / "governance" / "kernel" / "bin" / "tk"
+    if tk.is_file():
+        tk.write_text("#!/bin/sh\nexit 1\n", encoding="utf-8")
+        project.commit("break tk", who=support.ORCHESTRATOR)
+    else:
+        pytest.skip("tk not present; cannot test tk failure")
+    tickets_before = set((project.root / ".tickets").glob("*.md"))
+    support.run_close(project, sandbox, TICKET)
+    tickets_after = set((project.root / ".tickets").glob("*.md"))
+    new_tickets = tickets_after - tickets_before
+    for t in new_tickets:
+        if t.stem != TICKET:
+            front = _repair_frontmatter(t)
+            assert front.get("id") is not None, \
+                f"orphan ticket file {t.name} found without a proper id when tk failed"

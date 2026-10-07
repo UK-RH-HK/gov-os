@@ -218,8 +218,17 @@ def test_deviations_says_not_measured_when_unverified(project, sandbox, interfac
 
 
 def test_input_hash_is_of_file_content(project, sandbox, interface):
-    """B5, S5: each input's hash must be sha256 of the file content, not sha256(source_id)."""
+    """B5, S5: each input's hash is sha256 of the ticket file as supplied to the close,
+    before gov close changes its status.
+
+    Revised after implementation: the case hashed the file after close (when the
+    status had changed) and so the hash never matched.
+    """
     _green_project(project)
+    ticket_path = project.root / ".tickets" / f"{TICKET}.md"
+    content_before_close = ticket_path.read_bytes()
+    expected_hash = "sha256:" + hashlib.sha256(content_before_close).hexdigest()
+    bad_hash = "sha256:" + hashlib.sha256(TICKET.encode()).hexdigest()
     front = _close_and_find_record(project, sandbox)
     inputs = front.get("inputs", [])
     ticket_input = None
@@ -228,9 +237,6 @@ def test_input_hash_is_of_file_content(project, sandbox, interface):
             ticket_input = inp
             break
     assert ticket_input is not None, f"the ticket itself must be listed as an input: {inputs}"
-    ticket_path = project.root / ".tickets" / f"{TICKET}.md"
-    expected_hash = "sha256:" + hashlib.sha256(ticket_path.read_bytes()).hexdigest()
-    bad_hash = "sha256:" + hashlib.sha256(TICKET.encode()).hexdigest()
     actual_hash = ticket_input.get("hash", "")
     assert actual_hash != bad_hash, \
         f"input hash must be of file content, not sha256('{TICKET}')"
@@ -302,3 +308,97 @@ def test_sources_resolve_through_defined_lookup(project, sandbox, interface):
             h = inp.get("hash", "")
             assert h and len(h) > 8, \
                 f"the ticket file input must have a real hash: {inp}"
+
+
+# --------------------------------------------------------------------------
+# A4 extended: context failure from a non-cycle cause (DEC-454, KPI S5/S6)
+# --------------------------------------------------------------------------
+
+def test_context_failure_non_cycle_refuses_close(project, sandbox, interface):
+    """A4, S5: a successful-otherwise close whose context cannot be built
+    (by a cause other than a supersession cycle) refuses with the reason
+    and writes no close record and closes no ticket.
+
+    The cause: the ticket sources a superseded decision (W1-24 README: BLOCKED).
+    """
+    project.add_ticket(TICKET, WBS, sources=["DEC-base"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.add_decision("DEC-base", "ACTIVE", title="Base")
+    project.add_decision("DEC-new", "ACTIVE", title="Replacement", supersedes="DEC-base")
+    project.commit("implement with superseded source", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    before = cli_support.snapshot(project.root)
+    run = support.run_close(project, sandbox, TICKET)
+    after = cli_support.snapshot(project.root)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "close must refuse when context cannot be built (superseded source, not a cycle)"
+    created = support.new_files(project.root, before, after)
+    _, front = support.find_close_record(project.root, created)
+    assert front is None, \
+        "no close record must be written when context fails"
+    ticket_front = support.read_ticket_frontmatter(project.root, TICKET)
+    assert ticket_front.get("status") != "closed", \
+        "the ticket must not be closed when context fails"
+
+
+def test_failing_close_with_context_failure_no_context_hash(project, sandbox, interface):
+    """A4, S6: a failing close with a class whose context cannot be built
+    does not record a context hash; the output and the repair ticket say
+    the context failed.
+    """
+    project.add_ticket(TICKET, WBS)
+    project.add_failing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.add_decision("DEC-base2", "ACTIVE", title="Base 2")
+    project.add_decision("DEC-new2", "ACTIVE", title="Replacement 2", supersedes="DEC-base2")
+    project.commit("implement with defect and broken context", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET,
+                            "--disposition", "repair")
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    error = envelope.get("error", {})
+    full_text = json.dumps(envelope)
+    assert "context" in full_text.lower(), \
+        "the output must say the context failed"
+    repairs = [f for f in (project.root / ".tickets").glob("*.md") if f.stem != TICKET]
+    if repairs:
+        import yaml
+        text = repairs[0].read_text(encoding="utf-8")
+        parts = text.split("---", 2)
+        if len(parts) >= 3:
+            front = yaml.safe_load(parts[1]) or {}
+            assert front.get("context_hash") is None, \
+                "the repair ticket must not record a context hash when context failed"
+
+
+# --------------------------------------------------------------------------
+# B5 extended: tests_produced lists the ticket's own test files (KPI S5)
+# --------------------------------------------------------------------------
+
+def test_tests_produced_lists_ticket_own_tests(project, sandbox, interface):
+    """KPI S5: 'tests produced' lists the test files the ticket's own commits
+    added or changed (and the ticket's acceptance folder), not every test file
+    of the project.
+    """
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    support.write(project.root, "tests/unit/preexisting/test_other.py",
+                  "def test_other():\n    assert True\n")
+    project.commit("set up pre-existing tests", who=support.ORCHESTRATOR)
+    project.write("tests/acceptance/W1-rcpt/test_mine.py",
+                  "def test_mine():\n    assert True\n")
+    project.commit("implement and add own test", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    front = _close_and_find_record(project, sandbox)
+    tests_produced = front.get("tests_produced", [])
+    assert isinstance(tests_produced, list), "tests_produced must be a list"
+    produced_str = " ".join(str(t) for t in tests_produced)
+    assert "test_other" not in produced_str, \
+        f"tests_produced must not include another ticket's pre-existing tests: {tests_produced}"

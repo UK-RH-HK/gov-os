@@ -298,6 +298,38 @@ def test_count_file_invalid_json_refuses(project, sandbox, interface):
         "a count file with truncated JSON must refuse"
 
 
+def test_count_file_wrong_shape_list_refuses(project, sandbox, interface):
+    """A6, DEC-454: a count file that is valid JSON but the wrong shape (a list)
+    refuses with the corrupt-file error, never a traceback.
+    """
+    _failing_project(project)
+    support.write_iteration_file(project.root, TICKET, [1, 2, 3])
+    run = support.run_close(project, sandbox, TICKET)
+    assert "Traceback" not in run.stderr, \
+        "a wrong-shape count file must not produce a traceback"
+    assert run.returncode != support.EXIT_OK, \
+        "a count file that is a list must refuse (non-zero exit)"
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a count file that is a list must refuse"
+
+
+def test_count_file_wrong_shape_string_count_refuses(project, sandbox, interface):
+    """A6, DEC-454: a count file with {\"count\": \"x\"} refuses with the
+    corrupt-file error, never a traceback.
+    """
+    _failing_project(project)
+    support.write_iteration_file(project.root, TICKET, {"count": "x"})
+    run = support.run_close(project, sandbox, TICKET)
+    assert "Traceback" not in run.stderr, \
+        "a wrong-shape count file must not produce a traceback"
+    assert run.returncode != support.EXIT_OK, \
+        'a count file with {"count": "x"} must refuse (non-zero exit)'
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        'a count file with {"count": "x"} must refuse'
+
+
 def test_iteration_file_under_gov_runtime(project, sandbox, interface):
     """A6: the iteration file is under .gov-runtime/iterations/ (inaccessible to workers)."""
     _failing_project(project)
@@ -348,6 +380,178 @@ def test_iteration_count_hidden_across_multiple_failures(project, sandbox, inter
         for field in ITERATION_FIELDS + BUDGET_FIELDS:
             assert field not in serialised, \
                 f"iteration {i + 1}: output exposes '{field}' (CAP-59.b)"
+
+
+# --------------------------------------------------------------------------
+# DEC-454, KPI S2/S6: every failed close counts, not just test failures
+# --------------------------------------------------------------------------
+
+def test_containment_refusal_counts_as_iteration(project, sandbox, interface):
+    """DEC-454, S2: three consecutive closes refused for containment end in escalation."""
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("src/other/out_of_scope.py", "# out of scope\n")
+    project.commit("implement out of scope", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    assert run.returncode == support.EXIT_BLOCKED, \
+        "three consecutive containment refusals must escalate"
+
+
+def test_mixed_causes_reach_escalation(project, sandbox, interface):
+    """DEC-454, S2: a sequence mixing causes (trailers, a failing test, a hard-block
+    check) ends in escalation.
+    """
+    project.add_ticket(TICKET, WBS,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/checks/**"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.commit("implement without trailers", who=IMPL,
+                   trailers=("Role: engineer",))
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    support.run_close(project, sandbox, TICKET)
+
+    project.commit("fix trailers", who=IMPL, trailers=TRAILERS)
+    project.add_failing_test(WBS, name="test_break")
+    project.commit("add failing test", who=IMPL, trailers=TRAILERS)
+    support.run_close(project, sandbox, TICKET)
+
+    support.write(project.root, f"tests/acceptance/{WBS}/test_break.py",
+                  "def test_break():\n    assert True\n")
+    project.add_check_declaration("block-close", "schema/invariants",
+                                  severity="hard-block", command="exit 1")
+    project.commit("fix test, add hard-block", who=IMPL, trailers=TRAILERS)
+    support.run_close(project, sandbox, TICKET)
+
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False
+    assert run.returncode == support.EXIT_BLOCKED, \
+        "three consecutive failures of mixed causes must escalate"
+
+
+def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
+    """DEC-454, S2/S6: each of the first two containment refusals opens a repair
+    ticket recording the finding and 'unclassed'.
+    """
+    project.add_ticket(TICKET, WBS)
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("src/other/out_of_scope.py", "# out of scope\n")
+    project.commit("implement out of scope", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    tickets_before = set((project.root / ".tickets").glob("*.md"))
+    support.run_close(project, sandbox, TICKET)
+    tickets_after_1 = set((project.root / ".tickets").glob("*.md"))
+    new_1 = tickets_after_1 - tickets_before
+    assert len(new_1) >= 1, "the first refusal must open a repair ticket"
+    support.run_close(project, sandbox, TICKET)
+    tickets_after_2 = set((project.root / ".tickets").glob("*.md"))
+    new_2 = tickets_after_2 - tickets_after_1
+    assert len(new_2) >= 1, "the second refusal must also open a repair ticket"
+
+
+def test_unknown_ticket_does_not_count(project, sandbox, interface):
+    """DEC-454: a refusal because the ticket is unknown is not an iteration."""
+    _failing_project(project)
+    support.run_close(project, sandbox, "NO-SUCH-TICKET")
+    support.run_close(project, sandbox, "NO-SUCH-TICKET")
+    support.run_close(project, sandbox, "NO-SUCH-TICKET")
+    run = support.run_close(project, sandbox, "NO-SUCH-TICKET")
+    assert run.returncode != support.EXIT_BLOCKED, \
+        "unknown-ticket refusals must not escalate"
+
+
+def test_escalation_already_in_force_not_counted(project, sandbox, interface):
+    """DEC-454: a refusal because the escalation is already in force is not an
+    iteration; it does not extend the escalation.
+    """
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    run4 = support.run_close(project, sandbox, TICKET)
+    assert support.envelope_of(run4, interface)["ok"] is False
+    run5 = support.run_close(project, sandbox, TICKET)
+    assert run5.returncode == support.EXIT_BLOCKED, \
+        "repeated runs under escalation should stay blocked without further escalation"
+
+
+# --------------------------------------------------------------------------
+# DEC-454, KPI S2: owner decision refinements
+# --------------------------------------------------------------------------
+
+def test_owner_decision_unapproved_refused(project, sandbox, interface):
+    """DEC-454: a decision that exists but lacks the owner's approval fact
+    (ACTIVE_UNAPPROVED from W1-11) is refused.
+    """
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    dec_id = "DEC-noapproval"
+    project.add_decision(dec_id, "ACTIVE", title="Unapproved decision")
+    project.commit("add decision without owner approval", who=support.AGENT)
+    run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a decision lacking the owner's approval fact must be refused"
+    assert run.returncode != support.EXIT_OK, \
+        "an unapproved decision must not allow the attempt to proceed"
+
+
+def test_owner_decision_checker_failing_refuses(project, sandbox, interface):
+    """DEC-454: the decision checker failing (corrupted decision file) refuses."""
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    dec_id = "DEC-checkfail"
+    project.add_decision(dec_id, "ACTIVE", title="Decision")
+    dec_file = project.root / "docs" / "adr" / f"{dec_id}.md"
+    dec_file.write_text("---\nnot valid yaml: [[[broken\n---\n", encoding="utf-8")
+    project.commit("corrupt decision file", who=support.OWNER)
+    run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is False, \
+        "a corrupted decision file must cause the checker to fail and refuse close"
+    assert run.returncode != support.EXIT_OK
+
+
+def test_owner_decision_only_when_escalated(project, sandbox, interface):
+    """DEC-454: an owner-approved decision is accepted only when the ticket is
+    escalated (after three consecutive failures).
+    """
+    _failing_project(project)
+    dec_id = "DEC-early"
+    project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
+    project.commit("add decision early", who=support.OWNER)
+    run = support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
+    envelope = support.envelope_of(run, interface)
+    assert run.returncode != support.EXIT_OK or envelope["ok"] is False, \
+        "an owner decision before escalation (no 3 failures) must not be accepted"
+
+
+def test_owner_decision_id_recorded_in_count(project, sandbox, interface):
+    """DEC-454: the count file records the decision's id after an owner decision."""
+    _failing_project(project)
+    for _ in range(3):
+        support.run_close(project, sandbox, TICKET)
+    dec_id = "DEC-owner-rec"
+    project.add_decision(dec_id, "ACTIVE", title="Owner says continue")
+    project.commit("add owner decision", who=support.OWNER)
+    support.run_close(project, sandbox, TICKET, "--owner-decision", dec_id)
+    iter_data = support.read_iteration_file(project.root, TICKET)
+    assert iter_data is not None, "iteration file must exist after owner decision"
+    data_str = json.dumps(iter_data)
+    assert dec_id in data_str, \
+        f"the iteration file must record the decision id {dec_id}: {iter_data}"
 
 
 def test_escalation_output_to_looping_session_has_no_count(project, sandbox, interface):

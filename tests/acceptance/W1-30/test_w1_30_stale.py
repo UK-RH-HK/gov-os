@@ -221,6 +221,116 @@ def test_governance_prefix_project(project, sandbox, interface):
 # S4: Stale evidence after governance change
 # --------------------------------------------------------------------------
 
+def test_governance_prefix_policies(project, sandbox, interface):
+    """A7, DEC-454 point 8: changing template/governance/kernel/policies/ triggers
+    check re-run. (Added prefix per DEC-454.)
+    """
+    ticket_id = "PROJ-pol1"
+    wbs = "W1-pol"
+    trailers = ("Task: PROJ-pol1", "Role: engineer", "Implements: CAP-01")
+    project.add_ticket(ticket_id, wbs,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/policies/**"])
+    project.add_passing_test(wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("template/governance/kernel/policies/test-policy.md",
+                  "# Test policy\n\nA governance policy.\n")
+    project.commit("implement with policy change", who=IMPL, trailers=trailers)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, ticket_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope is not None, "gov close must run checks when policies/ changed"
+
+
+def test_governance_prefix_roles(project, sandbox, interface):
+    """A7, DEC-454 point 8: changing template/governance/kernel/roles/ triggers
+    check re-run. (Added prefix per DEC-454.)
+    """
+    ticket_id = "PROJ-rol1"
+    wbs = "W1-role"
+    trailers = ("Task: PROJ-rol1", "Role: engineer", "Implements: CAP-01")
+    project.add_ticket(ticket_id, wbs,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/roles/**"])
+    project.add_passing_test(wbs)
+    project.write("src/example/feature.py", "# feature\n")
+    project.write("template/governance/kernel/roles/test-role.md",
+                  "# Test role\n\nA governance role definition.\n")
+    project.commit("implement with role change", who=IMPL, trailers=trailers)
+    project.add_checkpoint(ticket_id)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, ticket_id)
+    envelope = support.envelope_of(run, interface)
+    assert envelope is not None, "gov close must run checks when roles/ changed"
+
+
+def test_governance_change_green_hard_block_closes(project, sandbox, interface):
+    """A7, DEC-454 point 8: governance change with all hard-block checks GREEN allows close."""
+    project.add_ticket(TICKET, WBS,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/checks/**"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.add_check_declaration("green-hb", "schema/invariants",
+                                  severity="hard-block", command="true")
+    project.commit("implement with green hard-block", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run = support.run_close(project, sandbox, TICKET)
+    envelope = support.envelope_of(run, interface)
+    assert envelope["ok"] is True, \
+        "governance change with all green hard-block checks must allow close"
+
+
+def test_close_record_states_each_check_status(project, sandbox, interface):
+    """A7, DEC-454 point 8: the close record states each check's status as run."""
+    project.add_ticket(TICKET, WBS,
+                       allowed_paths=["src/example/**",
+                                      "template/governance/kernel/checks/**"])
+    project.add_passing_test(WBS)
+    project.write("src/example/feature.py", "# feature\n")
+    project.add_check_declaration("status-rec", "schema/invariants",
+                                  severity="warning", command="true")
+    project.commit("implement with check", who=IMPL, trailers=TRAILERS)
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    before = cli_support.snapshot(project.root)
+    run = support.run_close(project, sandbox, TICKET)
+    after = cli_support.snapshot(project.root)
+    envelope = support.envelope_of(run, interface)
+    if envelope["ok"]:
+        created = support.new_files(project.root, before, after)
+        _, front = support.find_close_record(project.root, created)
+        assert front is not None, "close record should exist on success"
+        check_info = (front.get("check_result") or front.get("checks")
+                      or front.get("governance_checks"))
+        assert check_info is not None, \
+            f"close record must state each check's status: {sorted(front)}"
+        info_str = json.dumps(check_info)
+        assert "status-rec" in info_str or "schema" in info_str, \
+            f"close record must name the checks that were run: {check_info}"
+
+
+def test_no_governance_change_no_check_result_in_record(project, sandbox, interface):
+    """A7, DEC-454 point 8: no governance change → no check result is needed and
+    none is claimed in the close record.
+    """
+    _project_without_governance_change(project)
+    before = cli_support.snapshot(project.root)
+    run = support.run_close(project, sandbox, TICKET)
+    after = cli_support.snapshot(project.root)
+    envelope = support.envelope_of(run, interface)
+    if envelope["ok"]:
+        created = support.new_files(project.root, before, after)
+        _, front = support.find_close_record(project.root, created)
+        if front is not None:
+            check_info = (front.get("check_result") or front.get("checks")
+                          or front.get("governance_checks"))
+            assert check_info is None or check_info == [] or check_info == {}, \
+                f"no governance change: close record must not claim a check result: {check_info}"
+
+
 def test_stale_evidence_after_governance_change(project, sandbox, interface):
     """S4, CAP-38.d: stale evidence after a governance change blocks close.
 

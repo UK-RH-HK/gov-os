@@ -9,6 +9,8 @@ DEC-416: gov close calls gov.checkpoint.record.watch before it closes and refuse
     checkpoint is written after the checks pass.
 """
 
+import os
+
 import yaml
 
 import w1_30_support as support
@@ -82,10 +84,13 @@ def test_close_refuses_on_missing_checkpoint(project, sandbox, interface):
 
 
 def test_closing_checkpoint_written_after_checks_pass(project, sandbox, interface):
-    """B1, DEC-416: the closing checkpoint is written after checks pass."""
+    """B1, DEC-416: the closing checkpoint is written after checks pass.
+
+    Revised after implementation: the case imported the package into the test
+    process and passed only where PYTHONPATH was set.
+    """
     _green_project(project)
-    from gov.checkpoint.record import write as cp_write
-    cp_write(project.root, TICKET, "stop", "begin", [])
+    project.add_checkpoint(TICKET, trigger="stop", next_action="begin")
     project.commit("add fresh checkpoint", who=support.ORCHESTRATOR)
     before = cli_support.snapshot(project.root)
     run = support.run_close(project, sandbox, TICKET)
@@ -116,8 +121,23 @@ def test_any_watchdog_error_refuses_close(project, sandbox, interface):
 
 
 def test_close_uses_w1_25_thresholds(project, sandbox, interface):
-    """B1: the close uses W1-25's thresholds (MAX_AGE_MINUTES=240, MAX_COMMITS=20)."""
-    from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT
-    assert MAX_AGE_MINUTES == 240, f"W1-25 MAX_AGE_MINUTES should be 240, got {MAX_AGE_MINUTES}"
-    assert MAX_COMMITS == 20, f"W1-25 MAX_COMMITS should be 20, got {MAX_COMMITS}"
-    assert MAX_CONTEXT == 0.30, f"W1-25 MAX_CONTEXT should be 0.30, got {MAX_CONTEXT}"
+    """B1: the close uses W1-25's thresholds (MAX_AGE_MINUTES=240, MAX_COMMITS=20).
+
+    Revised after implementation: the case imported the package into the test
+    process and passed only where PYTHONPATH was set.
+    """
+    import subprocess, sys
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "PYTHONPATH": str(support.REPO_ROOT / "src"),
+    }
+    result = subprocess.run(
+        [sys.executable, "-c",
+         "from gov.checkpoint.command import MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT; "
+         "print(MAX_AGE_MINUTES, MAX_COMMITS, MAX_CONTEXT)"],
+        capture_output=True, text=True, env=env,
+    )
+    assert result.returncode == 0, f"could not read W1-25 thresholds: {result.stderr}"
+    values = result.stdout.strip().split()
+    assert values == ["240", "20", "0.3"], \
+        f"W1-25 thresholds should be 240, 20, 0.30: got {values}"

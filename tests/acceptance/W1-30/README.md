@@ -1,8 +1,10 @@
 # W1-30 Acceptance Tests — `gov close`
 
 Ticket: DAEO-2lwj (W1-30, "gov close"), profile FULL.
-Third-start revision: updated from owner decisions A1–A8, B1–B7.
-115 cases in 8 files.
+Fourth-start revision: round-4 cases for DEC-453, DEC-454. The suite runs
+without PYTHONPATH; close measures containment, context, checks and the
+owner's decision.
+~140 cases in 8 files.
 
 ```
 python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider
@@ -89,7 +91,18 @@ close record timing, and receipt basics.
 | `test_owner_decision_must_be_active` | iteration | DRAFT accepted |
 | `test_count_file_unreadable_refuses` | iteration | corrupt file = zero |
 | `test_count_file_invalid_json_refuses` | iteration | truncated JSON = zero |
+| `test_count_file_wrong_shape_list_refuses` | iteration | list shape accepted |
+| `test_count_file_wrong_shape_string_count_refuses` | iteration | string count accepted |
 | `test_iteration_file_under_gov_runtime` | iteration | file elsewhere |
+| `test_containment_refusal_counts_as_iteration` | iteration | containment not counted |
+| `test_mixed_causes_reach_escalation` | iteration | mixed causes not counted |
+| `test_each_refusal_opens_repair_ticket` | iteration | no repair ticket on refusal |
+| `test_unknown_ticket_does_not_count` | iteration | unknown ticket escalates |
+| `test_escalation_already_in_force_not_counted` | iteration | reescalates |
+| `test_owner_decision_unapproved_refused` | iteration | unapproved accepted |
+| `test_owner_decision_checker_failing_refuses` | iteration | corrupt decision accepted |
+| `test_owner_decision_only_when_escalated` | iteration | pre-escalation accepted |
+| `test_owner_decision_id_recorded_in_count` | iteration | decision id not recorded |
 
 ### S3: Product-traceability family check
 **Covers: CAP-38.b**
@@ -101,6 +114,10 @@ close record timing, and receipt basics.
 | `test_check_red_when_closed_ticket_lacks_task_trailer` | traceability | passes without Task |
 | `test_check_green_when_trailers_present_and_resolve` | traceability | fails with valid trailers |
 | `test_check_red_when_implements_does_not_resolve` | traceability | passes with bad Implements |
+| `test_traceability_git_failure_is_check_failure` | traceability | git failure = pass |
+| `test_traceability_commits_from_head_not_all_branches` | traceability | all branches counted |
+| `test_traceability_unreadable_record_store_reported` | traceability | unreadable store = GREEN |
+| `test_no_closed_ticket_not_applicable` | traceability | RED with no closed ticket |
 
 ### S4: Stale evidence rejected for governance changes
 **Covers: CAP-38.d**
@@ -116,6 +133,11 @@ close record timing, and receipt basics.
 | `test_governance_prefix_checks` | stale | prefix not recognized |
 | `test_governance_prefix_schemas` | stale | prefix not recognized |
 | `test_governance_prefix_project` | stale | prefix not recognized |
+| `test_governance_prefix_policies` | stale | policies/ not recognized |
+| `test_governance_prefix_roles` | stale | roles/ not recognized |
+| `test_governance_change_green_hard_block_closes` | stale | green hard-block refused |
+| `test_close_record_states_each_check_status` | stale | check status not in record |
+| `test_no_governance_change_no_check_result_in_record` | stale | check result claimed |
 | `test_stale_evidence_after_governance_change` | stale | stale evidence accepted |
 
 ### S5: Close record is a consumption receipt
@@ -139,6 +161,9 @@ close record timing, and receipt basics.
 | `test_ticket_file_is_always_an_input` | receipt | ticket not listed |
 | `test_unresolvable_source_listed_with_reason` | receipt | source dropped |
 | `test_sources_resolve_through_defined_lookup` | receipt | tree-wide search |
+| `test_context_failure_non_cycle_refuses_close` | receipt | superseded source accepted |
+| `test_failing_close_with_context_failure_no_context_hash` | receipt | context hash in repair |
+| `test_tests_produced_lists_ticket_own_tests` | receipt | other tickets' tests included |
 
 ### S6: Finding disposition
 **Covers: CAP-59.c**
@@ -158,6 +183,9 @@ close record timing, and receipt basics.
 | `test_repair_ticket_has_dependency_on_failing_ticket` | disposition | no dependency |
 | `test_repair_ticket_no_invented_id` | disposition | constant id/date |
 | `test_repair_ticket_create_failure_reported` | disposition | failure silent |
+| `test_repair_ticket_known_to_tk_show` | disposition | tk doesn't know repair |
+| `test_repair_ticket_dependency_direction` | disposition | wrong dependency direction |
+| `test_tk_fails_no_repair_ticket_file` | disposition | orphan file on tk failure |
 
 ### S7: Probe-record gate for FULL tickets
 **Covers: CAP-38.f, DEC-137**
@@ -199,9 +227,14 @@ close record timing, and receipt basics.
 | `test_escalation_output_to_looping_session_has_no_count` | iteration | outcomes list reveals count |
 | `test_escalation_outcome_has_no_iteration_field` | iteration | iteration field in outcome |
 
-### MWA-04: Containment
+### MWA-04: Containment (DEC-453)
 
+| Test | File | Red reason |
+|------|------|------------|
 | `test_containment_blocks_close_for_out_of_scope_commit` | close | out-of-scope accepted |
+| `test_containment_refuses_ticket_changing_acceptance_tests` | close | other acceptance tests accepted |
+| `test_containment_refuses_ticket_changing_docs_outside_paths` | close | docs/ accepted |
+| `test_containment_clean_within_paths` | close | within-paths refused |
 
 ### B1: Watchdog
 
@@ -220,10 +253,16 @@ close record timing, and receipt basics.
 | `test_ticket_closed_through_ticket_tool_interface` | close | frontmatter invalid |
 | `test_close_record_exists_before_ticket_status_changes` | close | record missing |
 | `test_checkpoint_exists_before_ticket_status_changes` | close | checkpoint missing |
+| `test_ticket_tool_close_is_what_tk_produces` | close | tk show fails |
+| `test_close_fails_when_ticket_tool_absent` | close | absent tk = success |
+| `test_close_record_unwritable_ticket_stays_open` | close | ticket closed without record |
 
 ### B6: Commits from HEAD only
 
+| Test | File | Red reason |
+|------|------|------------|
 | `test_ticket_commits_from_head_only` | close | other branches counted |
+| `test_git_failure_is_error_not_empty_list` | close | git failure = empty list |
 
 ## Covers ids
 
@@ -249,7 +288,7 @@ close record timing, and receipt basics.
 2. **Owner decision argument name**: `--owner-decision` (value: decision register id)
 3. **Iteration file location**: `.gov-runtime/iterations/<ticket>.json`
 4. **Repair ticket dependency direction**: repair ticket depends_on the failing ticket
-5. **Governance file prefixes** (A7): `template/governance/kernel/checks/`, `template/governance/kernel/schemas/`, `governance/project/`, `template/governance/kernel/hooks/`, `template/governance/kernel/skills/`
+5. **Governance file prefixes** (A7): `template/governance/kernel/checks/`, `template/governance/kernel/schemas/`, `governance/project/`, `template/governance/kernel/hooks/`, `template/governance/kernel/skills/`, `template/governance/kernel/policies/`, `template/governance/kernel/roles/`
 6. **Exit codes**: 0 success, 1 GovError, 3 check failed, 4 blocked
 7. **Regression tests**: all under `tests/` except `tests/acceptance/<ticket-wbs>/`
 8. **Time limit argument**: `--timeout` (seconds)

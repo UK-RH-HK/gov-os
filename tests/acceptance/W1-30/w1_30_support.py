@@ -90,6 +90,8 @@ GOVERNANCE_PREFIXES = (
     "governance/project/",
     "template/governance/kernel/hooks/",
     "template/governance/kernel/skills/",
+    "template/governance/kernel/policies/",
+    "template/governance/kernel/roles/",
 )
 
 # Iteration count storage (A6): under .gov-runtime/, inaccessible to workers.
@@ -329,8 +331,10 @@ class Project:
         return rel
 
     def add_checkpoint(self, ticket_id, trigger="stop", next_action="resume"):
-        from gov.checkpoint.record import write as cp_write
-        cp_write(self.root, ticket_id, trigger, next_action, [])
+        sb = cli_support.make_sandbox(self.root.parent / "_cp_sandbox")
+        run = self.gov(sb, "checkpoint", "--ticket", ticket_id,
+                       "--trigger", trigger, "--next", next_action, "--json")
+        assert run.returncode == 0, f"gov checkpoint failed:\n{run.stdout}\n{run.stderr}"
 
     def add_check_declaration(self, check_id, family, tier="G1", severity="hard-block",
                               command="true"):
