@@ -1672,6 +1672,8 @@ utilisation-triggered checkpoint is an accepted residual).
   the original Framework's file name in `docs/plan/tools/validate_s1.py`. Doctor counts no file as left out
   as historical on this repository (`historical_excluded: 0`), though the register and this file are full of
   old paths: either the exclusion is not counted or the old paths in those files are not in the move table.
-  The cleanup ticket `DAEO-0f1y` holds this: the table of moves is a historical record for the check; whether `cli/` is
+  No ticket holds this: the plan validator admits exactly the fifty Wave 1 tickets, so a cleanup ticket
+  (opened as `DAEO-0f1y`, removed in the next commit) cannot be added without the owner. It is a named item
+  for the exit: the table of moves is a historical record for the check; whether `cli/` is
   live is the owner's to say.
 - Adoption level reported for this repository: INTERMEDIATE, 15 of 22 systems identified.
