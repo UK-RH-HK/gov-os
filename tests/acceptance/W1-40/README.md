@@ -1,7 +1,8 @@
 # W1-40 acceptance tests: lefthook hooks and the CI workflow
 
 Ticket `DAEO-fdkq`, profile STANDARD (DEC-221). Written by the Independent Test Designer (MR-3): 48 cases before
-implementation, brought to DEC-489 in a second session (one case changed, 13 added). 61 cases in 7 files.
+implementation, brought to DEC-489 in a second session (one case changed, 13 added); one case added in a third
+session, with the hook file and the workflow in the tree (see "Red today"). 62 cases in 7 files.
 
 ```
 env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-40 -q -p no:cacheprovider -rs
@@ -35,10 +36,38 @@ env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-40 -q -p no:cacheprovide
 - **This repository is never the subject of a run.** Its `gov check` is red on a recorded baseline (DEC-467);
   no case expects it green, and no hook is installed in it (one guard case reads the hooks folder).
 
-lefthook 2.1.15 and gitleaks 8.30.1 are needed by 43 cases (everything in `test_w1_40_pre_commit.py`,
+lefthook 2.1.15 and gitleaks 8.30.1 are needed by 44 cases (everything in `test_w1_40_pre_commit.py`,
 `test_w1_40_pre_push.py`, `test_w1_40_ci_evidence.py` and `test_w1_40_evidence_record.py`, and the two hook
 cases of `test_w1_40_tiers.py`). Where either is absent those cases skip with a named reason. Both ran inside
 the designer's session.
+
+## Red today
+
+Observed 2026-10-07 at `6fcad2c7`, with the hook file, the workflow and their templates in the tree:
+`1 failed, 61 passed`.
+
+- The one failure, for its own reason:
+  `test_w1_40_ci_evidence.py::test_ci_is_red_when_a_check_of_gov_check_that_carries_no_tier_fails`. The job
+  runs the declared checks of tiers G1 and G2, gitleaks, the project's tests and the evidence record: all five
+  `run:` steps exit 0, and the job is green for a project whose readiness check is RED.
+- Why this check. `gov check` runs, beside the declared checks, checks of its own that carry no tier:
+  `openspec-validate`, `skill-version`, `readiness`, and one per policy key without a check. The hooks select
+  declared checks by tier, so none of these runs at commit or at push; DEC-489 leaves them to CI ("CI runs the
+  whole of the deterministic checks, so no check runs nowhere"), and DEC-087 names readiness among what the job
+  runs. Readiness is the one the case plants: it needs no tool (`openspec-validate` needs `openspec`, which is
+  on no PATH here), and it reads the tree alone (`skill-version` compares with the commit before, which a
+  checkout of depth 1 does not hold).
+- The defect, by construction: one file `openspec/changes/w1-40-unjudged/proposal.md` with no frontmatter. A
+  change that holds no specification record cannot be judged: `READINESS_INVALID`, hard-block (W1-13, W1-26).
+  The case first shows the job green for the commit before; it then commits and pushes the file through the
+  hooks, reads the record of the new head commit on the remote, and reads from `gov check --json` in the
+  project that `readiness` is the only RED check (the declared G1, G2 and G3 checks GREEN).
+- The fixture project is green for the tier-less checks as it stands, so no fixture was changed: `gov check`
+  in it exits 0 (`openspec-validate` YELLOW for the absent tool, `skill-version` and `readiness` GREEN, no path
+  map and so no policy key). The case says nothing on how the job runs these checks. A job that runs the whole
+  of `gov check` also runs the declared G3 check, which
+  `test_ci_does_not_run_the_g3_check_and_calls_no_model_tool` and
+  `test_ci_does_not_go_red_for_a_g3_check_that_would_fail_on_the_runner` refuse.
 
 ## Red before implementation
 
@@ -74,7 +103,7 @@ designer ran a copy of the suite outside the tree against a throwaway stand-in (
 |---|---|---|
 | **S1a** "pre-commit runs G1-G2" [CAP-39.a] | `test_w1_40_pre_commit.py`: clean commit runs G1 and G2; failing G1, failing G2 stop the commit (2); passes again; G3 does not run at commit; missing `gov` stops the commit. `test_w1_40_tiers.py`: a project with no G1 check, or no G2 check, cannot commit (2); `gov ci checks` refuses a named tier without a declaration and a name that is no tier (3) (DEC-489) | `lefthook.yml` absent; the three command cases: the command passes the tier over |
 | **S1b** "pre-push runs G3 including model-dependent tests and writes an evidence record bound to the head commit" [CAP-39.a] | `test_w1_40_pre_push.py`: push runs G3; failing G3 stops the push; passes again; one push leaves the record CI asks for; the record follows the head commit; the push leaves the tree clean; missing `gov` or `lefthook` never ends with CI green (2). `test_w1_40_evidence_record.py`: one push leaves the note of the head commit on the remote under a ref of its own; the note holds the commit id and the G3 check that ran; the note goes to the remote that is pushed to; a project without a G3 check can push, its record says "no G3 check declared" and never states a pass (DEC-489) | `lefthook.yml` absent |
-| **S2** "GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier chosen and documented" [CAP-39.a] | `test_w1_40_ci_evidence.py`: red with no record; red with the record of another commit; runs G1 and G2; red on a failing G1 or G2 (2); red on a gitleaks finding; red with `gitleaks` or `gov` missing (2); red on a failing test of the project. `test_w1_40_evidence_record.py`: red with the note of another commit copied onto the head commit; red with a record of a failed G3 run; the job reports "no G3 check declared"; the ref is named in the hook file and the workflow. `test_w1_40_workflow_text.py`: runs on every push; names gitleaks and `gov`; no result thrown away; pinned actions; no baseline or bypass; the carrier is documented in the hook file and in the workflow | no push workflow; `lefthook.yml` absent |
+| **S2** "GitHub Actions runs the deterministic checks and fails when the evidence record is missing or for another commit; carrier chosen and documented" [CAP-39.a] | `test_w1_40_ci_evidence.py`: red with no record; red with the record of another commit; runs G1 and G2; red on a failing G1 or G2 (2); red on a gitleaks finding; red with `gitleaks` or `gov` missing (2); red on a failing test of the project; red where a check that `gov check` runs without a tier (readiness) is red, the declared G1 and G2 checks green and the record there (DEC-087, DEC-489). `test_w1_40_evidence_record.py`: red with the note of another commit copied onto the head commit; red with a record of a failed G3 run; the job reports "no G3 check declared"; the ref is named in the hook file and the workflow. `test_w1_40_workflow_text.py`: runs on every push; names gitleaks and `gov`; no result thrown away; pinned actions; no baseline or bypass; the carrier is documented in the hook file and in the workflow | no push workflow; `lefthook.yml` absent; the tier-less case: red today, see "Red today" |
 | **S3** "pre-commit also runs the second gitleaks scan, with the project's rules alone" (DEC-347, DEC-369) | `test_w1_40_pre_commit.py`: a staged secret stops the commit; a staged secret the built-in allowlist shelters stops it (2: alphabet run, `false`), each after showing that one scan with the project's file does not flag it; the sheltering words alone pass; a staged secret counts though the working copy is clean; missing `gitleaks` stops the commit | `lefthook.yml` absent |
 | **F1** "CI downloads models or needs a GPU" | `test_w1_40_ci_evidence.py`: CI does not run the G3 check and calls no model tool; CI does not go red for a G3 check that would fail on the runner. `test_w1_40_workflow_text.py`: hosted Ubuntu runner; no model or GPU word outside comments; an installed tool is the registered release | no push workflow |
 | **F2** "A push with a failing G3 check leaves CI green" | `test_w1_40_ci_evidence.py`: a push with a failing G3 check never leaves CI green; a failed attempt leaves nothing a later bypass can use; red with the record of another commit. `test_w1_40_evidence_record.py`: a record of a failed G3 run that reaches the remote fails CI. `test_w1_40_pre_push.py`: failing G3 stops the push | `lefthook.yml` absent |
@@ -90,7 +119,7 @@ designer ran a copy of the suite outside the tree against a throwaway stand-in (
 |---|---|---|
 | `test_w1_40_pre_commit.py` | 12 | yes |
 | `test_w1_40_pre_push.py` | 8 | yes |
-| `test_w1_40_ci_evidence.py` | 13 | yes |
+| `test_w1_40_ci_evidence.py` | 14 | yes |
 | `test_w1_40_evidence_record.py` | 8 | yes |
 | `test_w1_40_tiers.py` | 5 | 2 yes (the hook cases); 3 no (`gov` alone) |
 | `test_w1_40_workflow_text.py` | 11 | no |
@@ -144,6 +173,8 @@ designer ran a copy of the suite outside the tree against a throwaway stand-in (
 | CI is red where the note on the head commit was written for another commit, and where what a failed G3 run left is on the remote | | from a source (DEC-489: "a record for another commit ... fails CI"; KPI failure line 2) |
 | CI prints `no G3 check declared` for a commit whose record says so | in the output of a `run:` step | from a source (DEC-489 "CI reports it"); the job's colour: not pinned (P-6) |
 | CI runs G1 and G2, gitleaks and the project's tests; not G3 | | a source (DEC-087) |
+| CI is red where a hard-block check that `gov check` runs without a tier is RED | readiness, by a change folder with no specification record; the job's colour only, no command or option | from a source (DEC-087 names readiness; DEC-489 "CI runs the whole of the deterministic checks, so no check runs nowhere"). That this defect is RED: observed, and held by the case's own reading of `gov check --json` (W1-13, W1-26) |
+| `gov check --json` in the temporary project | prints the API-0002 envelope; each entry of `checks` has `id` and `status`; read from `result`, or from `error.details` when it refuses | a source (W1-26's interface); used to show the fixture, not the job |
 | The project's tests run from a `tests/` folder holding one file | the temporary project has only `tests/test_ok.py` | assumed: a step that names a deeper folder is red here |
 | A download step is recognised by its command and not run | list above | assumed: a step that both downloads and checks would not be run, and its check would not count |
 | A download of a registered tool names its registered version; a binary download verifies a checksum | only if such a step exists | a source (DEC-083, tool registry); whether it may install at all: P-4 |
@@ -197,6 +228,23 @@ code or record format is named.
 - **Confidence.** Medium. No case holds the colour: `test_ci_reports_that_no_g3_check_is_declared` holds the
   words only.
 
+### P-7: is the CI job red where `openspec` is not on the runner (open)
+- **Question.** DEC-087 lists `openspec validate --strict` among what the job runs. `gov check` reports an
+  absent `openspec` as YELLOW (`OPENSPEC_ABSENT`) and exits 0. DEC-449 and DEC-454, as the workflow reads them:
+  "a tool that is not on the runner fails its step". Is the job red until `openspec` is on the runner?
+- **Why now.** The engineer brings the tier-less checks into the job for the new case. If the step fails for
+  the absent tool, every case that expects the job green turns red here: the simulated runner has no `openspec`.
+- **Options.** (a) The job takes `gov check`'s own verdict: YELLOW does not fail it, the output names it.
+  (b) The job fails for an absent `openspec`; the designer then puts a stand-in on the simulated runner and
+  adds the case. (c) As (b), once P-4 has put the registered `openspec` on the runner.
+- **Impact.** (a) a hosted runner without `openspec` never validates the specifications, and says so only in
+  its output. (b) and (c) the job is red on the hosted runner until P-4 is decided, as it already is for
+  `gov` and gitleaks.
+- **Reversibility.** High. **Cost.** (a) none; (b) one stand-in, one case.
+- **Recommendation.** (a) for this round, since `gov check` is W1-26's and its verdict is the measured one;
+  (c) with P-4.
+- **Confidence.** Medium. No case was written for either.
+
 ## Residuals
 
 - **R-1. Tier selection stays as built** (DEC-489): the hook command calls the check runner's internals;
@@ -212,9 +260,13 @@ code or record format is named.
 - **R-6. The runner is a simulation.** `uses:` steps, the real checkout, the runner image and the network are
   not exercised; the first real run is the owner's first push. Whether GitHub accepts the pushed notes ref and
   the job's fetch of it is seen there for the first time.
-- **R-7. DEC-087's other deterministic checks** (schemas, readiness, the decision checker, the ticket DAG,
-  `openspec validate --strict`) are inside `gov check`, as W1-26 built it; no case names them separately.
-  `openspec` is on no PATH here, and `gov check` reports it YELLOW, not red.
+- **R-7. DEC-087's other deterministic checks** (schemas, the decision checker, the ticket DAG) are declared
+  checks of `gov check`, as W1-26 built it, each with a tier; no case names them separately. Of the checks
+  without a tier one is held, readiness; `skill-version` and the policy keys are not planted (the first needs
+  the commit before, which the checkout does not bring).
+- **R-14. `openspec validate --strict` on the runner** (package P-7). `openspec` is on no PATH here, and
+  `gov check` reports its absence YELLOW, not red. Every green case of the job therefore needs a job that does
+  not go red for that YELLOW. No case holds either colour for a runner without `openspec`.
 - **R-8. gitleaks' built-in rules stay sheltered by the built-in allowlist** (DEC-347's own residual).
 - **R-9. A pre-push gate stricter than G3** (one that also runs G1-G2 or the tests) is allowed by every case
   but one: if such a gate writes the statuses of G1-G2 checks into the record of a project without a G3 check,

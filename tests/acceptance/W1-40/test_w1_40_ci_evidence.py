@@ -11,6 +11,9 @@ import pytest
 
 import w1_40_support as support
 
+# A change folder of the temporary project whose proposal holds no specification record (gov.readiness.checker).
+UNJUDGED_CHANGE = "openspec/changes/w1-40-unjudged/proposal.md"
+
 
 # -- the evidence record ---------------------------------------------------
 
@@ -89,6 +92,31 @@ def test_ci_is_red_when_a_deterministic_check_fails(project, pushed, ci, tier):
     project.fail(tier)
     result = ci()
     assert not result.green, f"a failing {tier} hard-block check left CI green:\n{result}"
+
+
+def test_ci_is_red_when_a_check_of_gov_check_that_carries_no_tier_fails(project, machine, pushed, ci):
+    """DEC-087 names readiness among what the job runs; DEC-489: "CI runs the whole of the deterministic checks,
+    so no check runs nowhere". ``gov check`` runs its readiness check beside the declared ones; it carries no
+    tier, so no hook runs it, and the job is the one place left for it.
+
+    The defect: a change folder whose ``proposal.md`` holds no specification record. The readiness check cannot
+    judge it and is RED, hard-block (W1-13, W1-26). It needs no tool, and it is in the tree that is pushed.
+    """
+    assert ci().green, "the fixture is not green before the defect"
+    dev = machine()
+    done, moved = project.commit(dev, UNJUDGED_CHANGE, "# A change with no specification record\n")
+    assert moved, f"the hook refused the commit: the fixture cannot be built\n{support.said(done)}"
+    done, arrived = project.push(dev)
+    assert arrived, f"the hook refused the push: the fixture cannot be built\n{support.said(done)}"
+    head = project.head()
+    assert any(head in text for text in project.records(head).values()), "the head commit has no evidence record"
+    statuses = support.check_statuses(project.gov(dev, "check", "--json"))
+    red = sorted(check for check, status in statuses.items() if status == "RED")
+    assert red == ["readiness"], f"the fixture is not red by its readiness check alone: {statuses}"
+    result = ci()
+    assert not result.green, (
+        "the CI job is green for a project whose readiness check is red: the check carries no tier, so the job "
+        f"is the only place it could have run (DEC-087, DEC-489):\n{result}")
 
 
 def test_ci_is_red_when_gitleaks_reports_a_finding(project, pushed, ci):

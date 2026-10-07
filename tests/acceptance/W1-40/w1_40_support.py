@@ -20,6 +20,7 @@ How the tests run:
 
 from __future__ import annotations
 
+import json
 import os
 import pwd
 import re
@@ -190,6 +191,16 @@ def sh(args, cwd, env, check=False):
 
 def said(done):
     return f"exit {done.returncode}\n--- stdout\n{done.stdout[-3000:]}\n--- stderr\n{done.stderr[-3000:]}"
+
+
+def check_statuses(done):
+    """``check id -> status`` of a finished ``gov check --json`` (API-0002: the result, or the error's details)."""
+    try:
+        envelope = json.loads(done.stdout)
+    except ValueError:
+        raise AssertionError(f"gov check --json did not print its envelope:\n{said(done)}") from None
+    body = envelope.get("result") or (envelope.get("error") or {}).get("details") or {}
+    return {check["id"]: check["status"] for check in body.get("checks") or ()}
 
 
 # --------------------------------------------------------------------------
