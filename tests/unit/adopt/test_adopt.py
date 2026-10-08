@@ -214,6 +214,58 @@ def test_a_verdict_does_not_hold_for_a_path_map_or_a_verdict_that_changed_after_
     assert (root / "lib/util.py").is_file() and not (root / "pkg").exists()
 
 
+def _another_target(plan):
+    plan["batches"][0]["artefacts"][0]["target"] = "pkg/elsewhere.py"
+
+
+def _a_move_of_a_kept_artefact(plan):
+    plan["batches"][0]["artefacts"].append({"path": "README.md", "blob": "0" * 40, "action": "MOVE",
+                                            "target": "docs/README.md"})
+
+
+def _a_retirement_the_map_does_not_hold(plan):
+    plan["retirements"].append("README.md")
+
+
+@pytest.mark.parametrize("change", [_another_target, _a_move_of_a_kept_artefact, _a_retirement_the_map_does_not_hold])
+def test_a_plan_changed_after_a4_is_not_the_audited_path_maps_plan_and_is_not_executed(root, change):
+    planned(root)
+    rel, plan = project.record_path("A4"), record(root, "A4")
+    change(plan)
+    text = (root / rel).read_text(encoding="utf-8")
+    write(root, rel, "---\n" + yaml.safe_dump(plan, sort_keys=False) + "---" + text.split("\n---", 1)[1])
+    commit(root, "the plan, changed after A4")
+    verdict(root)  # a pass on the path map, which did not change
+    stage(root, "A5", verdict=VERDICT)
+    tree = project.tree(root)
+    assert refused("PLAN_NOT_THE_PATH_MAPS", root, "A6").details["differs"]
+    refused("STAGE_MISSING", root, "A8")
+    assert project.tree(root) == tree and project.dirty(root) == [] and not (root / "pkg").exists()
+    assert (root / "lib/util.py").is_file() and (root / "README.md").is_file()
+
+
+STORE = "legacy/memory/index.md"
+
+
+@pytest.mark.parametrize("kept", [".windsurfrules", ".cursorrules", ".cursor/rules/vote.mdc"])
+def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept):
+    write(root, STORE, "# Legacy memory\n")
+    write(root, kept, f"Before a vote, read {STORE}.\n")
+    commit(root, "a store, and a legacy rule file that cites it")
+    conf = config(paths=(*PATHS, "legacy/**", ".windsurfrules", ".cursorrules", ".cursor/**", "governance/**"))
+    for name in ("A0", "A1", "A2"):
+        stage(root, name, conf=conf)
+    stage(root, "A3", conf=conf, map=proposal(root, {"path": STORE, "action": "RETIRE", "kind": "memory-store"}))
+    stage(root, "A4", conf=conf)
+    verdict(root)
+    stage(root, "A5", conf=conf, verdict=VERDICT)
+    stage(root, "A6", conf=conf)
+    tree = project.tree(root)
+    error = refused("STORE_STILL_CITED", root, "A8", conf=conf)
+    assert kept in error.details["rules_read"] and {"rule": kept, "cites": [STORE]} in error.details["citers"]
+    assert project.tree(root) == tree and project.dirty(root) == [] and (root / STORE).is_file()
+
+
 def test_a_batch_that_fails_is_rolled_back_and_the_batches_after_it_do_not_run(root):
     planned(root, {"path": "lib/other.py", "action": "MOVE", "target": "pkg", "batch": 1},
             {"path": "lib/util.py", "action": "MOVE", "target": "pkg/util.py", "batch": 2},

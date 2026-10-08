@@ -256,13 +256,9 @@ def a3(run: Run) -> dict:
                        "code_intelligence": project.code_intelligence(run.config), "artefacts": artefacts})
 
 
-def a4(run: Run) -> dict:
+def _plan(run: Run) -> dict:
+    """The batched plan of the path map (A3) as it stands: what A4 records, and what A6 and A8 hold A4's record to."""
     artefacts = run.records["A3"]["artefacts"]
-    content = [item["path"] for item in artefacts if item["action"] in ("SPLIT", "MERGE", "EXTRACT")]
-    if content:
-        raise refuse("CONTENT_CHANGE", "SPLIT, MERGE and EXTRACT change file content, which no batch of this tool "
-                     "does: make them a change of their own, then run the stages again from A1 (" + ", ".join(content)
-                     + ")", artefacts=content)
     batches = {}
     for item in artefacts:
         if item["action"] in EXECUTED:
@@ -273,8 +269,18 @@ def a4(run: Run) -> dict:
     dependents = [{"artefact": item["path"], "relation": relation[:-1], "dependent": dependent, "handling": "flag"}
                   for item in artefacts for relation in ("importers", "references", "consumers")
                   for dependent in item.get(relation, [])]
-    return run.finish({"path_map_hash": run.hashes["A3"], "batches": plan, "dependents": dependents,
-                       "retirements": [item["path"] for item in artefacts if item["action"] == "RETIRE"]})
+    return {"path_map_hash": run.hashes["A3"], "batches": plan, "dependents": dependents,
+            "retirements": [item["path"] for item in artefacts if item["action"] == "RETIRE"]}
+
+
+def a4(run: Run) -> dict:
+    artefacts = run.records["A3"]["artefacts"]
+    content = [item["path"] for item in artefacts if item["action"] in ("SPLIT", "MERGE", "EXTRACT")]
+    if content:
+        raise refuse("CONTENT_CHANGE", "SPLIT, MERGE and EXTRACT change file content, which no batch of this tool "
+                     "does: make them a change of their own, then run the stages again from A1 (" + ", ".join(content)
+                     + ")", artefacts=content)
+    return run.finish(_plan(run))
 
 
 # --------------------------------------------------------------------------
@@ -314,10 +320,16 @@ def a5(run: Run) -> dict:
 
 
 def guard(run: Run) -> None:
-    """Before anything leaves its place: the accepted verdict still holds, and no artefact is unknown."""
+    """Before anything leaves its place: the accepted verdict still holds, the plan is the audited path map's
+    plan, and no artefact is unknown."""
     accepted = run.records["A5"]
     if _verdict(run, accepted["verdict"])["verdict_sha256"] != accepted.get("verdict_sha256"):
         raise refuse("VERDICT_CHANGED", f"{accepted['verdict']} is not the verdict A5 accepted: run A5 again")
+    differs = [key for key, value in _plan(run).items() if run.records["A4"].get(key) != value]
+    if differs:  # the verdict is about the path map: a plan that says anything else has none
+        raise refuse("PLAN_NOT_THE_PATH_MAPS", f"{project.record_path('A4')} is not the plan of the audited path map "
+                     f"({project.record_path('A3')}): its {', '.join(differs)} differ from what the path map yields; "
+                     "nothing is moved, retired or deleted: run the stages again from A4", differs=differs)
     unknown = project.unknown(run.config, run.tracked)
     if unknown:
         raise refuse("UNKNOWN_ARTEFACT", "no namespace of the path map holds " + ", ".join(unknown) + ": while an "

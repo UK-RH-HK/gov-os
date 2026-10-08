@@ -27,7 +27,8 @@ from gov.cli.errors import GovError
 RULESYNC_IMPORT = ("rulesync", "import", "--targets", "cursor", "--features", "rules")
 GENERATE = "rulesync generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills"
 RULES, TIME_LIMIT = ".rulesync/rules", 120  # seconds, for the one rulesync call
-LOADED = (".rulesync/", ".claude/")  # with CLAUDE.md and AGENTS.md: where a rule that may cite the store stands
+LOADED = (".rulesync/", ".claude/", ".cursor/")  # with the names below: where a rule that may cite the store stands
+LOADED_NAMES = ("CLAUDE.md", "AGENTS.md", ".cursorrules", ".windsurfrules")  # a legacy rule file that is kept stays loaded
 CIT_E = f"{FOLDER}/CIT-E-ADOPT-A8.md"
 
 
@@ -147,8 +148,9 @@ def _proof(run, store: list[str], retiring: set, rule_files: list[str]) -> dict:
                        | {rel for rel in store if rel in text})
         if cited:
             citers.append({"record": record["id"], "path": record["path"], "cites": cited})
-    rules = sorted({rel for rel in run.tracked if rel.startswith(LOADED) or rel in ("CLAUDE.md", "AGENTS.md")}
-                   .union(rule_files) - set(store))
+    declared = {item["path"] for item in run.records["A3"]["artefacts"] if item.get("kind") == "rule-file"}
+    rules = sorted({rel for rel in run.tracked if rel.startswith(LOADED) or PurePosixPath(rel).name in LOADED_NAMES}
+                   .union(rule_files, declared & set(run.tracked)) - set(store))
     for rel in rules:
         text = project.blob(run.root, run.tracked[rel]).decode("utf-8", "replace")
         cited = [name for name in (*store, *ids) if re.search(rf"(?<![\w/-]){re.escape(name)}(?![\w-])", text)]
