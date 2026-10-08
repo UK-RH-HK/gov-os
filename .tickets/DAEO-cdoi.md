@@ -33,6 +33,8 @@ kpis:
   - A legacy memory store is retired only after a dependency proof (no active record or rule cites it); its retirement is a CIT-E followed by an index refresh [CAP-42.b]
   - Retired material leaves the active tree and stays reachable through git history or an archive ref; nothing is deleted without a recorded disposition [CAP-42.c]
   - 'A3: the path map keeps a healthy native framework or package layout unless the target structure is materially better and the migration risk is justified [CAP-44.j]'
+  - When this ticket is merged, every adoption-gap exception at a close ends (DEC-492, DEC-505, DEC-511); from then on a ticket closes only through a clean gov close (DEC-511)
+  - Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references the context accepts (DEC-511)
   failure:
   - Any file content changes during a move batch
   - A move runs without an A5 verdict [CAP-44.c]
