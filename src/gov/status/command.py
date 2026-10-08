@@ -14,6 +14,7 @@ project without a store): a caller reads ``not_read``, not the exit code, to kno
 from __future__ import annotations
 
 import os
+import stat
 import subprocess
 from pathlib import Path
 
@@ -38,7 +39,8 @@ def _listable(folder: Path) -> None:
 
 
 def _store_fault(root: Path) -> str | None:
-    """Why the record store cannot answer for ``HEAD``; None when it was loaded from a history that holds it."""
+    """Why the record store cannot answer for ``HEAD``; None when it was loaded from a history that holds it and
+    its records and edges, which the READY rule and the packages are read from, answer too."""
     from gov import records
     from gov.store import STORE_REL
 
@@ -46,6 +48,7 @@ def _store_fault(root: Path) -> str | None:
         head = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True,
                               check=True).stdout.strip()
         loaded = {commit["commit"] for commit in records.commits(root)}
+        records.records(root), records.edges(root)  # the READY rule answers "none ready" for a store without them
     except Exception as error:
         return f"the record store ({STORE_REL}) was not read: {type(error).__name__}: {error}"
     return None if head in loaded else (f"the record store ({STORE_REL}) is older than HEAD ({head[:12]}): what was "
@@ -70,14 +73,20 @@ def _tickets(root: Path, fault: str | None) -> dict:
 
 
 def _packages(root: Path, fault: str | None):
-    """The open decision packages (PROPOSED, DEC-308), each with the tickets it constrains."""
+    """The open decision packages (PROPOSED, DEC-308), each with the tickets it constrains. A file of ``HEAD`` that
+    the store's load could not take as a record (DEC-239) may be one: it is listed by its path, not read. The load
+    keeps no list of them, so they are read again from ``HEAD``, which the store holds, by the load's own rule."""
     from gov import records
+    from gov.store.loader import _read_records
 
     if fault:
         return _unread(fault)
     return [{"id": record["id"],
              "tickets": [edge["target"] for edge in records.edges(root, type="CONSTRAINS", source=record["id"])]}
-            for record in records.records(root, type="decision-package", status="PROPOSED")]
+            for record in records.records(root, type="decision-package", status="PROPOSED")] + [
+        {"name": entry["path"], **_unread(f"{entry['path']} could not be loaded as a record ({entry['reason']}): "
+                                          "it may be an open decision package")}
+        for entry in _read_records(root)[2]]
 
 
 def _readiness(root: Path) -> list:
@@ -127,6 +136,12 @@ def _pause(root: Path) -> dict:
     from gov.guard.decide import FREEZE_FLAG, _mirror_frozen, freeze_state
 
     flag, mirror = freeze_state(str(root)), _mirror_frozen(str(root))
+    if flag == "unmarked" and stat.S_ISCHR(os.stat(root / FREEZE_FLAG).st_mode):
+        # A session's sandbox puts a device at the path whether or not a flag exists (DEC-402): the flag was not
+        # read. The mirror alone can still say paused (DEC-429); it cannot say not paused.
+        hidden = _unread(f"{FREEZE_FLAG} is a character device, what a session's sandbox puts at the path whether "
+                         "or not a flag exists: the flag was not read")
+        return {"paused": True, "flag": hidden, "mirror": True} if mirror else {**hidden, "mirror": False}
     part = {"paused": flag == "frozen" or mirror, "flag": flag, "mirror": mirror}
     if flag == "frozen":  # the marker line is ``FROZEN <who> <when>`` (DEC-404)
         words = _part(lambda: (root / FREEZE_FLAG).read_text(encoding="utf-8", errors="replace").split("\n")[0].split())

@@ -13,6 +13,7 @@ No message of this module carries a held-out path.
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
@@ -250,6 +251,24 @@ def _check_cli_args(cli_args: list[str]) -> None:
                           "would have no guard hook")
 
 
+def _say(line: str) -> None:
+    """One line to stderr. A stderr that is closed or that nobody reads loses the line and nothing else (DEC-392):
+    the line goes past the stream's buffer, since what stays in it changes the exit code when the interpreter ends."""
+    stream = sys.stderr
+    if stream is None:  # the launcher was started without a stderr
+        return
+    try:
+        try:
+            descriptor = stream.fileno()
+        except io.UnsupportedOperation:  # a stream of the caller's that has no descriptor
+            stream.write(line)
+            return
+        stream.flush()
+        os.write(descriptor, line.encode(errors="replace"))
+    except (OSError, ValueError):
+        pass
+
+
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     """Start one worker session and return the CLI's exit code; raise ``GovError`` to refuse."""
     root = Path(os.path.realpath(root))
@@ -311,8 +330,8 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
             if tmpdir is not None:
                 shutil.rmtree(tmpdir)
         except OSError as error:  # DEC-392: the session's exit code is kept, and one line names what stayed
-            sys.stderr.write(f"gov launch: the temp folder {tmpdir} could not be removed and stays: "
-                             f"{' '.join(str(error).split())}\n")
+            _say(f"gov launch: the temp folder {tmpdir} could not be removed and stays: "
+                 f"{' '.join(str(error).split())}\n")
         for number, handler in previous.items():
             signal.signal(number, handler or signal.SIG_DFL)
         signal.alarm(0)

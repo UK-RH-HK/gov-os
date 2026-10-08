@@ -154,6 +154,21 @@ def test_a_failed_removal_keeps_the_exit_code_and_names_the_folder_in_one_line(l
     assert len(lines) == 1 and str(Session.made[0].folder) in lines[0]
 
 
+@pytest.mark.parametrize("way", ("no-stderr", "reader-gone", "closed"))
+@pytest.mark.parametrize("code", (0, 7))
+def test_a_failed_removal_keeps_the_exit_code_when_stderr_cannot_be_written(launch, monkeypatch, way, code):
+    """Nothing of the line stays in the stream's buffer: what stays there fails the interpreter's last flush."""
+    monkeypatch.setattr(launcher.shutil, "rmtree", lambda folder: (_ for _ in ()).throw(OSError(39, "not empty")))
+    reader, writer = os.pipe()
+    os.close(reader)
+    stream = os.fdopen(writer, "w", encoding="utf-8")  # a pipe nobody reads: every write to it fails
+    if way != "reader-gone":
+        stream.close()
+    monkeypatch.setattr(sys, "stderr", None if way == "no-stderr" else stream)
+    assert launch(lambda session: code) == code
+    stream.close()  # raises when the line was left in the buffer
+
+
 def test_a_failed_removal_after_a_signal_still_gives_130(launch, monkeypatch, capsys):
     monkeypatch.setattr(launcher.shutil, "rmtree", lambda folder: (_ for _ in ()).throw(OSError(39, "not empty")))
     assert launch(lambda session: _raise(signal.SIGTERM)) == launcher.INTERRUPT_EXIT

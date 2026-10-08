@@ -7,6 +7,8 @@ temporary, so no freeze mirror and no session log of this machine is read.
 from __future__ import annotations
 
 import argparse
+import os
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -23,7 +25,7 @@ from gov.status import command  # noqa: E402
 
 ARGS = argparse.Namespace(json=True)
 PARTS = ("tickets", "decision_packages", "readiness", "governance_share", "pause", "doctor")
-TICKET = "---\nid: {id}\nstatus: {status}\ndeps: []\nwbs_id: W9-01\n---\n# A ticket\n"
+TICKET = "---\nid: {id}\ntype: task\nstatus: {status}\ndeps: []\nwbs_id: W9-01\n---\n# A ticket\n"
 
 
 def _git(root, *args):
@@ -105,6 +107,48 @@ def test_a_flag_that_cannot_be_read_is_paused_and_who_paused_is_not_read(project
     (project / FREEZE_FLAG).write_text("FROZEN owner 2026-10-08T00:00:00Z\n", encoding="utf-8")
     assert command._pause(project) == {"paused": True, "flag": "frozen", "mirror": False, "by": "owner",
                                        "since": "2026-10-08T00:00:00Z"}
+
+
+def test_a_device_at_the_flags_path_is_a_flag_not_read_and_only_the_mirror_can_say_paused(project):
+    from gov.guard.decide import _mirror_path
+
+    flag = project / FREEZE_FLAG
+    flag.parent.mkdir(exist_ok=True)
+    flag.write_bytes(b"")
+    assert command._pause(project) == {"paused": False, "flag": "unmarked", "mirror": False}  # an empty file was read
+    flag.unlink()
+    os.symlink(os.devnull, flag)
+    part = command._pause(project)
+    assert FREEZE_FLAG in _unread(part) and "paused" not in part and part["mirror"] is False
+    mirror = _mirror_path(str(project))
+    assert Path(os.environ["HOME"]) in mirror.parents, "the mirror is not under the temporary HOME"
+    mirror.parent.mkdir(parents=True)
+    mirror.write_text("FROZEN owner 2026-10-08T00:00:00Z\n", encoding="utf-8")
+    part = command._pause(project)
+    assert part["paused"] is True and part["mirror"] is True and _unread(part["flag"]) and "read" not in part
+
+
+@pytest.mark.parametrize("text", ("---\nid: [unclosed\n---\n", "---\nid: DP-1\ntype: decision-package\n---\n"))
+def test_a_file_the_load_could_not_take_is_listed_with_the_packages_as_not_read(project, text):
+    assert command._packages(project, None) == []
+    (project / "DP-1.md").write_text(text, encoding="utf-8")
+    (project / "DP-2.md").write_text("---\nid: DP-2\ntype: decision-package\nstatus: PROPOSED\n---\n", encoding="utf-8")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "a record that does not load")
+    assert [entry["path"] for entry in store.load(project)["invalid"]] == ["DP-1.md"]
+    listed, unread = command._packages(project, None)
+    assert listed == {"id": "DP-2", "tickets": []} and unread["name"] == "DP-1.md" and "DP-1.md" in _unread(unread)
+
+
+@pytest.mark.parametrize("table", ("records", "edges"))
+def test_a_store_without_its_records_or_edges_does_not_answer(project, table):
+    connection = sqlite3.connect(project / store.STORE_REL)
+    connection.execute(f"DROP TABLE {table}")
+    connection.commit()
+    connection.close()
+    assert table in command._store_fault(project)
+    tickets = command._tickets(project, command._store_fault(project))
+    assert table in _unread(tickets["ready"]) and table in _unread(tickets["blocked"])
 
 
 def test_a_doctor_that_gives_no_verdict_or_no_state_is_not_read(project, monkeypatch):
