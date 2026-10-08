@@ -73,6 +73,7 @@ sources:
 - MR-4
 - MR-6
 - CAP-24
+- CAP-28
 - CAP-30
 - CAP-33
 - CAP-34

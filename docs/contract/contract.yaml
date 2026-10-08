@@ -1595,6 +1595,7 @@ capabilities:
   - Claude Code (harness)
   - W1-07
   - W1-32
+  - W1-35
   - W1-42
   sources:
   - Contract v3 Gate G1, G2
@@ -1614,6 +1615,7 @@ capabilities:
     wave: W1
     provider:
     - W1-32
+    - W1-35
   - id: CAP-28.b
     item: Internal governance operations exposed as gov commands
     source: Framework v4.1.2 §35
