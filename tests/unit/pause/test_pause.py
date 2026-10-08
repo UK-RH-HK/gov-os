@@ -196,7 +196,7 @@ def test_a_pipe_is_no_terminal_and_no_code_is_shown(project):
 def test_the_chain_read_from_proc_is_this_process_first_and_each_next_one_its_parent():
     chain = command.read_ancestry()
     assert chain[0]["pid"] == os.getpid() and chain[0]["ppid"] == os.getppid()
-    assert chain[0]["exe"] == os.path.realpath(sys.executable) and "pytest" in " ".join(chain[0]["cmdline"])
+    assert chain[0]["exe"] == os.path.realpath(sys.executable) and chain[0]["cmdline"] == sys.orig_argv
     assert all(process["ppid"] == parent["pid"] for process, parent in zip(chain, chain[1:]))
     assert (chain[-1]["pid"], chain[-1]["ppid"]) == (1, 0) and all(process["comm"] for process in chain)
 
