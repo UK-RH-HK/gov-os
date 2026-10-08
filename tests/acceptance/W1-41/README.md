@@ -9,7 +9,7 @@ code of the suites the stages stand on. No earlier ticket's test was rewritten.
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41 -q -p no:cacheprovider -rs`
 
-**110 cases in 7 files** (108 without the two `local_only` dev-tier cases). Standard library, PyYAML, pytest, and
+**114 cases in 7 files** (112 without the two `local_only` dev-tier cases). Standard library, PyYAML, pytest, and
 W1-07's support. No network, no model.
 
 **This ticket builds the tool. It adopts nothing.** Every case runs `gov adopt --lite` on a project the case
@@ -29,6 +29,12 @@ At `c96add70`: 80 failed, 23 errors, 1 passed in 25 s (104 cases). With the six 
   cases of DEC-517 in the fixture that carries their project through A2 (stage A0 answers `NOT_IMPLEMENTED`). Among them
   `test_lite_without_a_stage_is_a_usage_error` fails as "exit code 1, expected 2", for the same reason.
 - **1 case is green and must stay green**: `test_adopt_without_lite_is_still_reserved` (see "The interface", 1).
+
+**Four cases added after the command was built** (`0a148039`), each red for a reason of its own: the two of
+`test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (A8 reports success, lists the three files of the
+store under `retired` and does not name the citing rule file; measured in the sandbox), and the two of
+`test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed` (they stop at A3 in the sandbox, see "Where the
+cases can run"; the lead runs them).
 
 No behaviour assertion can be red for a reason of its own before the command exists; every refusing case asserts
 that the refusal is the tool's own (`assert_refused` fails on `NOT_IMPLEMENTED`), so none passes by the command's
@@ -151,10 +157,22 @@ The case's verdict: `id`, `type: adoption-verdict`, `status`, `state_class: EVID
 
 | Clause | Tests |
 |---|---|
-| no move before an A5 verdict (failure 2) | `verdict`: all 17 cases (table above) |
+| no move before an A5 verdict (failure 2) | `verdict`: the 17 cases of the table above |
+| a plan that is not the audited path map's plan is not executed (failure 2) | `verdict`: `test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed` (2: another target for an artefact the path map moves; a move of an artefact the path map keeps) |
 | a failed batch rolls back to its recorded point | `migration`: `test_a_failed_batch_rolls_back_to_its_point_and_the_batches_before_it_stay` |
 | moves precede `gov rebuild` | `migration`: `test_the_index_refresh_follows_the_moves` |
 | the baseline is measured | `migration`: `test_a_backup_ref_that_no_longer_resolves_stops_the_migration`, `test_a_tree_that_is_dirty_at_a6_is_not_migrated` |
+
+**The plan that is not the path map's.** The verdict is about the path map (the A3 record); the batches A6
+executes are recorded by A4. After A4 wrote its record, the case changes that record's frontmatter, commits the
+change (no trailer), and the Independent Auditor then passes the path map, which did not change (same content
+hash); A5 is run in the ordinary way. The change, on the shape of interface point 6 (`batches[].artefacts[]`):
+the guide's entry gets `action: MOVE` and `target: docs/elsewhere/guide.md`, and every string of the frontmatter
+that holds the path map's target holds the other one instead; or an entry for `README.md` (which the path map
+keeps), shaped as the plan's own entry for the guide, is added to the guide's batch with `target: docs/README.md`.
+Held: A6 refuses (the tool's own refusal); no origin left its place; no target and no altered target exists at HEAD
+or on disk; every file the project held before A5 is at its path with its content; nothing arrived but records in
+the stages' own folder. **Left open:** whether A5 already refuses or only A6 does, and what the refusal names.
 
 **How the batch is made to fail.** Batch 2 holds two moves. The folder of one target (`spec/decisions/`) exists and
 is made read-only before A6; git does not see that, so the tree is clean. Batch 1 stays, batch 2 is undone as a
@@ -214,6 +232,9 @@ nothing is moved there. The project is the harbour project with `code_intelligen
 `legacy`: `test_a_memory_store_nothing_cites_is_retired`, `test_the_dependency_proof_is_recorded`,
 `test_a_memory_store_an_active_record_cites_is_not_retired` (an edge `depends_on` to a record of the store),
 `test_a_memory_store_a_rule_cites_is_not_retired` (a rule under `.rulesync/rules/` that names a file of the store),
+`test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (2: `.windsurfrules`, `.cursorrules`; a legacy
+rule file the proposal does not retire, so the path map keeps it and it stays loaded after A8, that names a file of
+the store),
 `test_a_record_that_is_not_active_does_not_keep_the_store`,
 `test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency`,
 `test_the_retirement_of_the_memory_store_is_a_cit_e` (a committed record of type `change-execution-record`, the
@@ -221,7 +242,9 @@ form of `docs/changes/S2-CIT-E.md`, that names every retired file),
 `test_the_index_is_refreshed_after_the_retirement` (`gov doctor`'s `index_freshness` in the temporary project).
 
 In the "not retired" cases the stage's exit code is left open (it may retire the rest and say so, or refuse as a
-whole); what is held is that the files stay and the citer is named.
+whole); what is held is that the files stay and the citer is named. In the kept-rule-file case
+the kept file stays as it was too, and where the stage reports success its record's `dependency_proof.citers` is not
+the empty list. Two of the five kinds are held, not every kind.
 
 ### Success 6 — archive policy [CAP-42.c]
 
@@ -257,6 +280,8 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | a legacy rule file cannot be read or parsed | `legacy`: the two cases above | a retirement |
 | the chat database cannot be read | `legacy`: `test_a_chat_database_that_cannot_be_read_is_not_retired` | a retirement |
 | a record cannot be read | `legacy`: `test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency` | "no citer", a retirement |
+| a rule file that stays in the tree lies outside `.rulesync/` (a kept legacy rule file) | `legacy`: `test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (2) | "no citer" about a rule file that was not read, a retirement |
+| the plan (A4) is not the plan of the path map the verdict is about | `verdict`: `test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed` (2) | a pass for the plan, a move |
 
 ### Covers → tests
 
@@ -266,10 +291,10 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | CAP-06.c | `unknown` |
 | CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no move where code intelligence is off) |
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
-| CAP-42.b | `legacy` (chat database; dependency proof; CIT-E; index refresh) |
+| CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
 | CAP-44.b | `baseline`, `path_map` (A4), `unknown` (packages), `dev_tier` |
-| CAP-44.c | `verdict` |
+| CAP-44.c | `verdict` (the verdict; the plan that is not the audited path map's) |
 | CAP-44.d | `migration` |
 | CAP-44.e | `legacy` |
 | CAP-44.j | `path_map` (native layout) |
@@ -280,11 +305,13 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
   below), so every case that proposes a move there needs the code graph (W1-16's tool). In a launched worker session that tool cannot build an index: its daemon
   folder `/tmp/gov-cbm-<uid>` is read-only there (measured in this session; `tests/acceptance/W1-20/README.md`
   records the same). **These cases can go green only outside the sandbox; that run is the lead's** (package P-2):
-  all of `test_w1_41_migration.py`, all of `test_w1_41_verdict.py`, in `test_w1_41_path_map.py` every case that
+  all of `test_w1_41_migration.py`, all of `test_w1_41_verdict.py` (the two cases of the changed plan among them:
+  in the sandbox they stop in `_planned`, at stage A3, with `ADOPT_CODE_GRAPH_UNREADABLE`, before the plan is
+  changed; their fixture was only dry-run on a made-up A4 record), in `test_w1_41_path_map.py` every case that
   reaches A3 with a move (the eight actions, importers/references/consumers, the justified native move, A4's
   batches), and `test_an_unknown_artefact_blocks_the_whole_destructive_migration`.
 - **Everything else** (baseline, the A3 refusals, unknown artefacts, all of `legacy`, the dev tier) proposes no
-  move, or is refused before one is examined.
+  move, or is refused before one is examined. The two kept-rule-file cases are among them: they run in the sandbox.
 - **The six cases of DEC-517 run inside the sandbox.** Their project turns code intelligence off, so no code index
   is built or read: the moves are refused at A3, and the proposal that moves nothing needs no code graph.
 - **b-dev.** A clone of `~/gov-os-workbench/synthetic/b-dev` into the session's temporary folder was made in this

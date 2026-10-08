@@ -447,6 +447,26 @@ def frontmatter(text, where="the record"):
     return data
 
 
+def with_frontmatter(text, front):
+    """``text``, a Markdown record, with ``front`` as its frontmatter; what follows the frontmatter stays."""
+    lines = text.split("\n")
+    assert lines and lines[0].strip() == "---", "the record has no frontmatter"
+    end = [line.strip() for line in lines[1:]].index("---") + 1
+    return "---\n" + yaml.safe_dump(front, sort_keys=False) + "\n".join(lines[end:])
+
+
+def replaced(value, swaps):
+    """A copy of ``value`` in which every string, at any depth, holds each key of ``swaps`` as its value."""
+    if isinstance(value, dict):
+        return {key: replaced(item, swaps) for key, item in value.items()}
+    if isinstance(value, list):
+        return [replaced(item, swaps) for item in value]
+    if isinstance(value, str):
+        for old, new in swaps.items():
+            value = value.replace(old, new)
+    return value
+
+
 def at_head(project, rel):
     """The bytes of ``rel`` at HEAD, None where HEAD has no such file."""
     done = subprocess.run(["git", "-C", str(project), "show", f"HEAD:{rel}"], capture_output=True)

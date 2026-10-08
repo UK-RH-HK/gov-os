@@ -256,6 +256,29 @@ def test_a_memory_store_a_rule_cites_is_not_retired(tmp_path, adopt_in, interfac
     _not_retired(run, project, interface, baseline, list(support.MEMORY_FILES), CITER_RULE)
 
 
+@pytest.mark.parametrize("kept", [".windsurfrules", ".cursorrules"])
+def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(tmp_path, adopt_in, interface, kept):
+    """"No active record or rule cites it": a legacy rule file the proposal does not retire is kept by the path
+    map, so it stays in the tree and stays loaded after A8. It names a file of the store, so the store stays, and
+    the rule file is named. The proof never says "no citer" about a rule file it did not read (DEC-449)."""
+    citing = support.RULE_FILES[kept] + "Before a vote, read legacy/memory/index.md.\n"
+    project = support.build_project(tmp_path / "cited-by-kept-rule-file", extra={kept: citing})
+    entries = [item for item in support.legacy_proposal() if item["path"] != kept]
+    adoption, baseline = _before_a8(adopt_in, project, entries)
+    assert adoption.map_entries()[kept].get("action") == "KEEP", f"the path map does not keep {kept}"
+    run = adoption.run("A8")
+    _not_retired(run, project, interface, baseline, [*support.MEMORY_FILES, kept], kept)
+    assert (project / kept).read_text(encoding="utf-8") == citing, f"{kept}, which the path map keeps, changed"
+    if run.returncode == 0:
+        # The stage went on without the store: what it recorded as its proof is not "no citer".
+        rel = json.loads(run.stdout).get("result", {}).get("record")
+        data = support.at_head(project, rel) if isinstance(rel, str) and rel else None
+        assert data is not None, f"A8 reports success and left no committed record\n{run.describe()}"
+        proof = support.frontmatter(data.decode("utf-8"), rel).get("dependency_proof")
+        assert isinstance(proof, dict) and proof.get("citers") != [], \
+            f"{rel}: the dependency proof records no citer although {kept} cites the store ({proof!r})"
+
+
 def test_a_record_that_is_not_active_does_not_keep_the_store(tmp_path, adopt_in):
     """"No active record or rule cites it": a deprecated record's citation is no dependency."""
     citer = support.record_text("DEC-401", "decision", "DEPRECATED", "An older vote rule.", depends_on=["LEG-002"])

@@ -112,6 +112,78 @@ def test_a_path_map_that_changes_after_a5_passed_is_not_executed(adoption, inter
     assert (adoption.project / "README.md").is_file() and not (adoption.project / "docs/README.md").exists()
 
 
+# --------------------------------------------------------------------------
+# The verdict is about the path map; the batches A6 executes are recorded by A4
+# --------------------------------------------------------------------------
+# A plan that is not the audited path map's plan is not executed: the A4 record is changed after A4 wrote it, the
+# change is committed, and the auditor then passes the path map, which did not change.
+
+ALTERED_GUIDE_TARGET = "docs/elsewhere/guide.md"
+KEPT, KEPT_TARGET = "README.md", "docs/README.md"
+
+
+def _another_target(adoption, front):
+    """The plan takes the guide to another target than the path map does."""
+    entries = [item for batch in front["batches"] for item in batch["artefacts"] if item.get("path") == support.GUIDE]
+    assert entries, f"{adoption.stages['A4'].record}: no batch holds {support.GUIDE}"
+    for item in entries:
+        item["action"], item["target"] = "MOVE", ALTERED_GUIDE_TARGET
+    return support.replaced(front, {support.GUIDE_TARGET: ALTERED_GUIDE_TARGET}), ALTERED_GUIDE_TARGET
+
+
+def _a_move_of_a_kept_artefact(adoption, front):
+    """The plan moves an artefact the path map keeps: an entry shaped as the plan's own entry for the guide."""
+    assert adoption.map_entries()[KEPT].get("action") == "KEEP", f"the path map does not keep {KEPT}"
+    blobs = support.tree(adoption.project)
+    batch = next(batch for batch in front["batches"]
+                 if any(item.get("path") == support.GUIDE for item in batch["artefacts"]))
+    model = next(item for item in batch["artefacts"] if item.get("path") == support.GUIDE)
+    added = support.replaced(model, {support.GUIDE_TARGET: KEPT_TARGET, support.GUIDE: KEPT,
+                                     blobs[support.GUIDE]: blobs[KEPT]})
+    added.update(path=KEPT, action="MOVE", target=KEPT_TARGET)
+    batch["artefacts"].append(added)
+    return front, KEPT_TARGET
+
+
+@pytest.mark.parametrize("change", [_another_target, _a_move_of_a_kept_artefact],
+                         ids=["another-target", "a-move-of-a-kept-artefact"])
+def test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed(adoption, interface, change):
+    """Failure line 2: the auditor's pass is about the path map. A plan that names a move the path map does not
+    hold has no verdict, so A6 moves nothing: no origin left its place, no file of the project is at another path,
+    and the altered target does not exist. Whether A5 already refuses is left open."""
+    project = adoption.project
+    _planned(adoption)
+    plan, path_map = adoption.stages["A4"].record, adoption.stages["A3"].record
+    audited = support.map_hash(project, path_map)
+    text = (project / plan).read_text(encoding="utf-8")
+    front = support.frontmatter(text, plan)
+    assert isinstance(front.get("batches"), list) and front["batches"], f"{plan}: no list 'batches'"
+    changed, altered_target = change(adoption, front)
+    support.write(project, plan, support.with_frontmatter(text, changed))
+    assert altered_target in (project / plan).read_text(encoding="utf-8"), "the fixture did not change the plan"
+    support.commit(project, "the plan, changed after A4")
+    assert support.map_hash(project, path_map) == audited, "the fixture changed the path map"
+
+    support.write_verdict(project, path_map)                    # a passing verdict on the unchanged path map
+    baseline = support.tree(project)
+    a5 = adoption.run("A5", "--verdict", support.VERDICT_REL)   # recorded in the ordinary way, or refused: open
+    support.base.assert_envelope(a5, interface, command="adopt")
+    run = adoption.run("A6")
+    support.assert_refused(run, interface)
+
+    _assert_no_move(adoption, baseline)
+    now = support.tree(project)
+    assert altered_target not in now and not (project / altered_target).exists(), \
+        f"{altered_target}, which the path map does not hold, exists\n{run.describe()}"
+    elsewhere = sorted(rel for rel, blob in baseline.items() if now.get(rel) != blob or not (project / rel).is_file())
+    assert not elsewhere, f"files of the project changed or left their place: {elsewhere}\n{run.describe()}"
+    records = {stage.record.rpartition("/")[0] for stage in adoption.stages.values()}
+    if a5.returncode == 0:
+        records.add(str(a5.envelope()["result"].get("record", "")).rpartition("/")[0])
+    arrived = sorted(rel for rel in set(now) - set(baseline) if rel.rpartition("/")[0] not in records)
+    assert not arrived, f"files arrived that are no record of a stage: {arrived}\n{run.describe()}"
+
+
 def _broken_yaml(adoption):
     return "---\nid: AV-0001\nverdict: [pass\n  path_map: }\n---\n\nA verdict nobody can read.\n"
 
