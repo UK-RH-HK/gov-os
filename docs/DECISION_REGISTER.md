@@ -5745,3 +5745,21 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.142 | 2026-10-08 | Owner answers: DEC-518 (a full regression after every merge again; DEC-513 amended), DEC-519 (`7c6bf804` recorded history; a register decision not yet a store record is an adoption gap; W1-40 and W1-31 close), DEC-520 (W1-41's paths gain the context code and an external-references file), DEC-521 (one follow-up after W1-41, with register decisions loaded as records; capability records are agent work), DEC-522 (the close exceptions end when this repository's adoption is complete), DEC-523 (three stricter readings of the adoption tool stand), DEC-524 (DEC-512, DEC-516 and the measuring agent's role accepted), DEC-525 (the guard refuses reads of the settings file and the held-out file for every role; a helper lists hook events). Next free id: DEC-526. |
+
+## 143. Delegated: W1-32 merges as built while its six packages are with the owner (register v0.143, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-526 — W1-32 (`gov status`, the launcher's two residuals) merges as built; its open questions are with the owner and the ticket stays open until they are answered
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; interim until the owner answers package P-19) · **Basis:** the lead's return at `ff85c968` (`log/W1-32-lead-run1.json`): 81 cases green, every suite run · **Under:** DEC-392, DEC-449, DEC-491, DEC-518
+- **Decision:**
+  - The branch `w1/W1-32` is merged into `w1/integrate` as built, after the orchestrator's own runs and `gov check`, and a full regression follows (DEC-518). The merge loosens nothing: `gov status` only reads, and the launcher change only adds the ending of a session on SIGTERM and SIGHUP and keeps the session's exit code.
+  - Until the owner answers, these readings hold, each as built:
+    - the governance share in `gov status` is asked of the counter for each claimed ticket with no session named, so it reads "not measured" with the counter's reason and never a number (no record names a ticket's sessions, DEC-491);
+    - an open gate is an open decision package or a specification with an open required readiness row;
+    - a tickets folder or a changes folder that is absent reads as an empty list; one that exists and cannot be listed reads as not read;
+    - the three commands found beyond the twelve reserved names (`ci`, `launch`, `telemetry`) are pinned by the suite as found; no command is added.
+  - The ticket is **not closed** on this decision: the half of its KPI line that routes a status question asked in natural language to `gov status --json` has no file within the ticket's paths and no case, and whether that half is built by another ticket or recorded as not covered is the owner's (P-19 point 2).
+  - A record file the store's load cannot take is shown by `gov status` as not read; that the READY rule still calls a ticket ready when the package constraining it failed to load lies outside this ticket and goes to the owner as a proposal for the follow-up of DEC-521 (P-19 point 5).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.143 | 2026-10-08 | Delegated: DEC-526 (W1-32 merges as built; four interim readings; the ticket stays open until the owner answers package P-19). Next free id: DEC-527. |
