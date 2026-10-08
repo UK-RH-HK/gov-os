@@ -16,7 +16,7 @@ TICKET = "T-0001"
 class Repo:
     def __init__(self, root: Path):
         self.root = root
-        root.mkdir()
+        root.mkdir(exist_ok=True)
         self.git("init", "-q", "-b", "main")
 
     def git(self, *args: str) -> str:
@@ -46,14 +46,25 @@ def repo(tmp_path):
 
 @pytest.fixture
 def root(tmp_path):
-    """A project folder with one ticket in progress and the project's ticket tool."""
+    """A project with one ticket in progress and the project's ticket tool, committed; ``.gov-runtime/`` is
+    ignored."""
     root = tmp_path / "project"
     (root / ".tickets").mkdir(parents=True)
     (root / ".tickets" / f"{TICKET}.md").write_text(
         f"---\nid: {TICKET}\nstatus: in_progress\ndeps: []\nlinks: []\ncreated: 2026-10-07T00:00:00Z\n"
-        "type: task\npriority: 2\n---\n# A ticket\n", encoding="utf-8")
+        "type: task\npriority: 2\nallowed_paths:\n- src/example/**\n---\n# A ticket\n", encoding="utf-8")
+    (root / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")
     tool = root / "governance" / "kernel" / "bin" / "tk"
     tool.parent.mkdir(parents=True)
     shutil.copy2(TK, tool)
     tool.chmod(0o755)
+    Repo(root).commit("the project", "Role: orchestrator")
     return root
+
+
+@pytest.fixture
+def project(root):
+    """The ``root`` project as a ``Repo``: its git commands and commits."""
+    repo = Repo.__new__(Repo)
+    repo.root = root
+    return repo

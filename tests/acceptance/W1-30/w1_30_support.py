@@ -101,8 +101,10 @@ BASE_SOURCE = "DEC-000"
 # The six finding dispositions (L-0077, DEC-435, A3 settlement: short names).
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
 
-# Governance file prefixes whose change forces a check re-run at close (A7, CAP-38.d).
+# Governance file prefixes whose change forces a check re-run at close (A7, CAP-38.d). The installed kernel
+# (``governance/kernel/``) is among them since round 8 (DEC-487).
 GOVERNANCE_PREFIXES = (
+    "governance/kernel/",
     "template/governance/kernel/checks/",
     "template/governance/kernel/schemas/",
     "governance/project/",
@@ -583,9 +585,10 @@ def context_error(project, sandbox, ticket):
     return envelope["error"]
 
 
-def tk(project, *args):
-    """Run the project's own ticket tool (``governance/kernel/bin/tk``) and return its output."""
-    script = Path(project.root) / "governance" / "kernel" / "bin" / "tk"
+def tk(project, *args, script=None):
+    """Run the project's own ticket tool (``governance/kernel/bin/tk``) and return its output. ``script`` is
+    another ticket tool than the project's (round 9: the one on ``PATH``)."""
+    script = Path(script or Path(project.root) / "governance" / "kernel" / "bin" / "tk")
     done = subprocess.run([str(script), *args], cwd=str(project.root), capture_output=True, text=True,
                           stdin=subprocess.DEVNULL)
     assert done.returncode == 0, f"tk {' '.join(args)} failed:\n{done.stdout}\n{done.stderr}"
@@ -874,7 +877,8 @@ def head_of(project):
 
 
 # The paths of a ticket that may change governance files: W1-50's judgement passes an engineer's commit there.
-GOVERNANCE_TICKET_PATHS = ("src/example/**", "governance/project/**", "template/governance/kernel/**")
+GOVERNANCE_TICKET_PATHS = ("src/example/**", "governance/project/**", "template/governance/kernel/**",
+                           "governance/kernel/**")
 
 
 def start_ticket(project, ticket, wbs, allowed_paths=GOVERNANCE_TICKET_PATHS):
@@ -898,13 +902,15 @@ def checkpointed(project, ticket):
     return project.commit("checkpoint", who=ORCHESTRATOR)
 
 
-def assert_dependent_repair_ticket(project, ticket, run):
-    """The refused close opened exactly one other ticket, and by the ticket tool it depends on ``ticket``."""
+def assert_dependent_repair_ticket(project, ticket, run, script=None):
+    """The refused close opened exactly one other ticket, and by the ticket tool it depends on ``ticket``.
+    Returns the repair ticket's file. ``script`` as in ``tk``."""
     repairs = other_tickets(project.root, ticket)
     assert len(repairs) == 1, f"one repair ticket is expected, found {[p.name for p in repairs]}\n{run.describe()}"
-    tree = tk(project, "dep", "tree", repairs[0].stem).splitlines()
+    tree = tk(project, "dep", "tree", repairs[0].stem, script=script).splitlines()
     assert any(ticket in line for line in tree[1:]), \
         f"by the ticket tool the repair ticket does not depend on {ticket}: {tree}"
+    return repairs[0]
 
 
 # --------------------------------------------------------------------------
@@ -933,3 +939,154 @@ def read_iteration_file(root, ticket_id):
     if not path.is_file():
         return None
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------
+# Round 8 (DEC-487, made exact by DEC-490): what a close did not measure
+# --------------------------------------------------------------------------
+
+ESCALATION_DIR = ".gov-runtime/escalations"
+
+# The test runner's own option variable: what it holds is added to every run of the runner that inherits it.
+TEST_RUNNER_OPTIONS = "PYTEST_ADDOPTS"
+
+CLOSED_NEXT_ACTION = "ticket closed"
+
+
+def no_trailers_commit(project, message, files):
+    """One commit that writes ``files`` and carries no trailer at all, by someone who is neither the owner
+    nor the orchestrator; returns its id."""
+    for rel, text in files.items():
+        project.write(rel, text)
+    return project.commit(message, who=AGENT, trailers=(), exact=True)
+
+
+def refused_without_a_finding(run, interface):
+    """The close was refused because it could not measure, not for a finding about the ticket's work: exit
+    code 1 (DEC-490; DEC-470 gives 3 to a finding). Returns the ``error`` object."""
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False, f"gov close was not refused\n{run.describe()}"
+    assert run.returncode == EXIT_GOV_ERROR, \
+        f"a close that could not measure ends with exit code 1, not {run.returncode}\n{run.describe()}"
+    return envelope["error"]
+
+
+def assert_nothing_counted(project, ticket, run, count=0):
+    """The refusal is not counted: the ticket's count is still ``count``."""
+    assert iteration_count(project.root, ticket) == count, \
+        f"the refusal was counted as an iteration: the count is {iteration_count(project.root, ticket)}\n{run.describe()}"
+
+
+def assert_no_repair_ticket(project, run, *known):
+    repairs = other_tickets(project.root, *known)
+    assert not repairs, f"the refusal opened a repair ticket: {[p.name for p in repairs]}\n{run.describe()}"
+
+
+def records_saying_closed(root, ticket):
+    """What in the tree says the ticket closed: its close records whose status is ACTIVE, and its checkpoints
+    whose next action is "ticket closed". Paths, relative to the project."""
+    found = [rel for rel, front in close_records(root, ticket) if str(front.get("status", "")).upper() == "ACTIVE"]
+    for path in sorted(Path(root).rglob("*.md")):
+        rel = path.relative_to(root)
+        if rel.parts[0] in (".git", ".gov-runtime") or not path.is_file():
+            continue
+        front = frontmatter_of(path) if path.read_text(encoding="utf-8", errors="replace").startswith("---") else {}
+        if isinstance(front, dict) and front.get("type") == "checkpoint" and front.get("task") == ticket \
+                and str(front.get("next_action", "")).strip().lower() == CLOSED_NEXT_ACTION:
+            found.append(str(rel))
+    return found
+
+
+def untracked_paths(project):
+    """The files of the working tree that git neither knows nor ignores."""
+    out = git(project.root, "ls-files", "--others", "--exclude-standard", "-z")
+    return sorted(rel for rel in out.split("\0") if rel)
+
+
+def commit_what_a_refusal_left(project):
+    """A refused close opens a repair ticket, a file git does not know yet. The orchestrator commits it here.
+    DEC-490: left untracked it refuses no later close (its parent is the ticket being closed); the cases of
+    ``test_w1_30_r8_tree.py`` hold that, the others commit it."""
+    if project.waiting_paths():
+        project.commit("what the refused close left", who=ORCHESTRATOR)
+
+
+def escalate(project, sandbox, interface, ticket):
+    """Three closes refused for the ticket's failing acceptance test, each a finding, and a fourth that is
+    blocked: the escalation is in force. What each refusal left is committed by the orchestrator."""
+    for _ in range(3):
+        refused(run_close(project, sandbox, ticket), interface, EXIT_CHECK_FAILED)
+        commit_what_a_refusal_left(project)
+    refused(run_close(project, sandbox, ticket), interface, EXIT_BLOCKED)
+    commit_what_a_refusal_left(project)
+
+
+def assert_escalation_in_force(project, sandbox, interface, ticket, why):
+    """A close without an owner's decision is blocked (exit code 4): the escalation was not lifted."""
+    run = run_close(project, sandbox, ticket)
+    envelope = envelope_of(run, interface)
+    assert envelope["ok"] is False and run.returncode == EXIT_BLOCKED, \
+        f"{why}: the escalation is no longer in force, the next close ran\n{run.describe()}"
+
+
+# --------------------------------------------------------------------------
+# Round 9 (DEC-492): every finding in one run; the ticket tool on PATH
+# --------------------------------------------------------------------------
+
+TOOL_REL = "governance/kernel/bin/tk"
+TOOL_NAME = "tk"
+KERNEL_TOOL = REPO_ROOT / "template" / "governance" / "kernel" / "bin" / "tk"
+
+
+def path_with_tool(folder, links, script=None):
+    """A ``PATH`` whose only ticket tool is ``folder/tk``: the caller's ``PATH`` without ``tk``
+    (``path_without``), and ``folder`` before it. ``script`` is the text of that tool; without it the tool is a
+    copy of the kernel's. Returns ``(path, tool)``."""
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)
+    tool = folder / TOOL_NAME
+    if script is None:
+        shutil.copy2(KERNEL_TOOL, tool)
+    else:
+        tool.write_text(script, encoding="utf-8")
+    tool.chmod(0o755)
+    path = str(folder) + os.pathsep + path_without(TOOL_NAME, links)
+    assert shutil.which(TOOL_NAME, path=path) == str(tool), "the fixture is wrong: another ticket tool is on PATH"
+    return path, tool
+
+
+def _plain(text):
+    """Lower case, with ``_``, ``-`` and runs of blanks as one blank: ``not_measured`` reads "not measured"."""
+    return re.sub(r"[_\-\s]+", " ", str(text)).lower()
+
+
+def says_not_measured(error, what):
+    """Whether the answer says of ``what`` (a word, as "acceptance") that it was not measured, by name
+    (DEC-492). No source gives the form, so any of these is taken (README, round 9, settlement 14): one
+    sentence of one string holds both "not measured" and ``what``; or one of the two is in a key and the other
+    is under that key. ``_`` and ``-`` read as blanks. A string that only names ``what`` elsewhere (the finding
+    "no acceptance tests") says nothing of the kind."""
+    what = _plain(what)
+
+    def under(node, word):
+        return word in _plain(json.dumps(node, ensure_ascii=False))
+
+    def walk(node):
+        if isinstance(node, str):
+            return any(NOT_MEASURED_WORDS in part and what in part
+                       for part in map(_plain, re.split(r"[;\n]|\.\s", node)))
+        if isinstance(node, dict):
+            for key, value in node.items():
+                key = _plain(key)
+                if (NOT_MEASURED_WORDS in key and under(value, what)) or \
+                        (what in key and under(value, NOT_MEASURED_WORDS)):
+                    return True
+            return any(walk(value) for value in node.values())
+        if isinstance(node, list):
+            return any(walk(value) for value in node)
+        return False
+
+    return walk(error)
+
+
+NOT_MEASURED_WORDS = "not measured"
