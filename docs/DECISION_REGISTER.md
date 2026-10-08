@@ -5625,3 +5625,50 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.138 | 2026-10-08 | One delegated decision on W1-31: DEC-512 (the follow-up's packages A to G; DEC-502's sentence on the template's PreCompact hook corrected; a fourth specimen before the exit run; W1-31 merges and closes at `35904984`). Next free id: DEC-513. |
+
+## 139. Owner decisions on test run time: no double runs, a measuring agent, and the bar for parallel runs (register v0.139, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-513 — No double runs: a `gov close` that directly follows its ticket's merge counts as the post-merge regression
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Refines:** the orchestrator's practice of a full regression after every merge
+- **Decision:**
+  - When a merge is followed directly by its ticket's `gov close` on the same merge commit, the `gov close` run counts as the post-merge regression; no separate regression is run for it.
+  - A separate full regression is needed only after a merge that is not followed directly by a close.
+  - Each run's output is saved, as now.
+
+### DEC-514 — A measuring agent profiles `gov close` and trials parallel test runs (an experiment under DEC-102); pytest-xdist is installed for it
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Under:** DEC-102, DEC-083, DEC-372
+- **Decision:**
+  - A fresh worker session, in its own worktree cut from `w1/integrate`, writes only its report under `.gov-runtime/scratch/perf/` and never commits. The orchestrator chooses its role and ticket within the launcher's rules (attaching it to W1-30 is acceptable) and tells the owner which it chose. It runs alongside the other work, within the resource gate.
+  - **(a) Profile of today's `gov close`:** run once on a closed ticket's state in that worktree; reported are the time per phase (store rebuild, each suite, `gov check`, containment, the other gates) and the 20 slowest test cases.
+  - **(b) Trial of parallel runs:**
+    - pytest-xdist, pinned to its current release, is installed into the user site of `/usr/bin/python3`, as was done for sqlite-vec (an install under DEC-083: the guard's ask is the owner's approval), and recorded in the tool registry with its version and checksum;
+    - the unit tests and the largest suites (W1-02, W1-47, W1-50, and whichever the profile shows as slowest) are timed serially and with `pytest -n auto`;
+    - the latency and live-session cases are run separately and serially in both arms, because they fail under load (DEC-372);
+    - reported are the time in each arm, any case that fails only in parallel (and why: a shared path, port, file or daemon), and the machine load.
+
+### DEC-515 — The bar for parallel runs: three times faster with no failure the tests cannot fix; then one package for a W1-30 follow-up, else serial
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Under:** DEC-514
+- **Decision:**
+  - If the parallel arm is at least 3 times faster, with no new failures that cannot be fixed in the tests themselves, the orchestrator brings the owner one package proposing a W1-30 follow-up:
+    - `gov close`'s test runner and the regression script run suites in parallel, with the latency and live-session cases run alone afterwards;
+    - any test that collides in parallel is fixed by the test designer, with its own temporary paths;
+    - built the normal way: test designer, engineer, the reviewer probe before the merge;
+    - the plan stays at 50 tickets.
+  - If the trial does not meet that bar, the result is recorded and the runs stay serial.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.139 | 2026-10-08 | Owner decisions on test run time: DEC-513 (a `gov close` directly after its ticket's merge counts as the post-merge regression), DEC-514 (a measuring agent profiles `gov close` and trials parallel runs; pytest-xdist installed and registered), DEC-515 (the bar: three times faster with no failure the tests cannot fix, then a package for a W1-30 follow-up; else serial). Next free id: DEC-516. |
+
+## 140. One reading by the orchestrator: the trailers check's count grows with each close (register v0.140, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-516 — `product-traceability-trailers`: findings that a close adds for the closed ticket's own commits, of the two kinds the baseline already holds, count with the baseline until W1-41
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-08; told to the owner, who may replace it) · **Basis:** `gov close` on W1-38, W1-39 and W1-40 at `2f31bef2` (`log/close-W1-38b.json`, `log/close-W1-39.json`, `log/close-W1-40.json`) reports the check red with 814 findings where DEC-482 records 735. The 79 new findings are all about commits of W1-30, which was closed between the two measurements: 57 `IMPLEMENTS_UNRESOLVED` (capability ids such as `CAP-38.f`, which resolve to no record until adoption) and 22 `MISSING_IMPLEMENTS_TRAILER` (commits made before DEC-476). The check judges the commits of closed tickets, so its count rises with every close. · **Refines:** DEC-482 · **Under:** DEC-492, DEC-511
+- **Decision:**
+  - Until W1-41 is merged, findings of this check that are about the commits of a ticket closed since the last measurement, and are of those two kinds (a capability id that resolves to no record; a commit before DEC-476 without `Implements:`), count with the baseline of DEC-482. Any other new finding of the check blocks, as before.
+  - The orchestrator's comparison before a merge and at a close therefore reads the check's findings by kind and ticket, not by the count alone, and each saved output shows the count at that time.
+  - This ends with the other adoption-gap exceptions when W1-41 is merged (DEC-511).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.140 | 2026-10-08 | One reading by the orchestrator: DEC-516 (the trailers check's findings for a newly closed ticket's own commits, of the two kinds the baseline holds, count with the baseline until W1-41; 814 at `2f31bef2` against 735). Next free id: DEC-517. |
