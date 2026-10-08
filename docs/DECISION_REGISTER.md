@@ -5672,3 +5672,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.140 | 2026-10-08 | One reading by the orchestrator: DEC-516 (the trailers check's findings for a newly closed ticket's own commits, of the two kinds the baseline holds, count with the baseline until W1-41; 814 at `2f31bef2` against 735). Next free id: DEC-517. |
+
+## 141. One delegated decision on W1-41: the adoption tool's input, records and import (register v0.141, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-517 — W1-41: who supplies the path map's actions, who runs the move cases, the A8 import, moves out of a native layout, rewrites, the interface; the stricter readings stand until the owner answers the rest
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-08; told to the owner, who may replace it) · **Basis:** the W1-41 lead's first return (`log/W1-41-lead-run1.json`: 104 cases at `74500e1f`, red because the command is not built; the test designer's packages P-1 to P-9, the lead's L-1 to L-3). L-1, L-2, L-3, P-4, P-5 and P-8 are with the owner. · **Under:** DEC-006, DEC-090, DEC-449, DEC-454
+- **Decision:**
+  - **P-1. A3's actions, targets and batches come from a proposal file the caller supplies.** An artefact the proposal does not name is kept where it is. The tool proposes nothing itself in Wave 1: no readable source says how it would.
+  - **P-2. The move cases are run by the ticket lead outside the sandbox** (a launched session cannot build the code index: its index folder is read-only there). The engineer runs every case its sandbox allows and names the rest; the lead runs the whole suite and reports both. The launcher is not changed, and code intelligence is not turned off in the fixtures.
+  - **P-3. The A8 import.** `rulesync import`, run by the tool in the project being adopted, is used for what it imports correctly (measured with 24.0.0: `.cursor/rules/*.mdc`). The tool itself imports what rulesync does not or does not split: `.cursorrules`, `.windsurfrules`, `.mcp/tools.json`, and the role sections of `AGENTS.md` one by one. The cases hold what lies under `.rulesync/` afterwards. No rulesync command is run in this repository or a worktree of it: only in a case's own temporary project.
+  - **P-6. A move out of a healthy native layout (CAP-44.j):** the proposal states both grounds (the target is materially better; the migration risk is justified) or the stage refuses; the A5 auditor judges them. The tool scores nothing.
+  - **P-7. Rewrites of importers and references:** the tool flags, it does not rewrite, in Wave 1. A move batch changes no file content; each importer, reference and consumer is marked `rewrite` or `flag` in the plan.
+  - **P-9. The interface as the cases hold it is accepted:** `gov adopt --lite --stage <A0|A1|A2|A3|A4|A5|A6|A8> [--map <file>] [--verdict <path>]`, one stage per call; each stage commits its evidence record and refuses without the previous stage's; the A5 verdict is a committed record with the hash of the A3 record and an auditor session other than the adopting one, checked again at A6; each A6 batch is one commit with its rollback ref; an unknown artefact is a tracked path no namespace of the project's path map holds; `gov adopt` without `--lite` stays reserved.
+  - **Until the owner answers P-4, P-5 and P-8, the stricter reading is built, as the cases hold it:** a chat database is retired only when a committed record cites it by path and current hash (the caller extracts its knowledge); one unknown artefact blocks all of A6 and A8; nothing is moved where the project's path map turns code intelligence off (a case is added for this one). Each is a refusal that an owner answer can only loosen.
+  - **L-1 (outside sources) is not built yet:** it needs paths this ticket does not have, which is the owner's to give.
+  - Recorded before the engineer starts (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.141 | 2026-10-08 | One delegated decision on W1-41: DEC-517 (a caller's proposal file for A3; the lead runs the move cases outside the sandbox; the A8 import by `rulesync import` plus the tool's own; both grounds for a move out of a native layout; flag, not rewrite; the interface accepted; stricter readings until the owner answers). Next free id: DEC-518. |
