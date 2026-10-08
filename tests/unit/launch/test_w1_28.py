@@ -1,9 +1,9 @@
 """Builder tests for the launcher changes of W1-28 (DEC-386).
 
-Regression evidence only (DEC-136). No CLI is started: ``subprocess.run`` is
-replaced, and the project is a temporary directory. They cover the two exits
-the acceptance tests reach only through a real process: an interrupt and a
-CLI that cannot be started.
+Regression evidence only (DEC-136). No CLI is started: ``subprocess.Popen`` is
+replaced, and the project is a temporary directory. They cover an exit the
+acceptance tests reach only through a real process: a CLI that cannot be
+started. The interrupt is in ``test_w1_32.py`` (DEC-392).
 """
 from __future__ import annotations
 
@@ -33,11 +33,19 @@ def session(tmp_path, monkeypatch):
     monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
 
     def _session(end):
-        def run(argv, cwd, env):
-            _session.made.append(Path(env["TMPDIR"]))
-            assert _session.made[-1].is_dir()
-            return end(_session.made[-1])
-        monkeypatch.setattr(launcher.subprocess, "run", run)
+        class Session:  # in place of ``subprocess.Popen`` (W1-32): ``end`` runs where the session is started
+            def __init__(self, argv, cwd, env):
+                _session.made.append(Path(env["TMPDIR"]))
+                assert _session.made[-1].is_dir()
+                self.returncode = end(_session.made[-1]).returncode
+
+            def wait(self):
+                return self.returncode
+
+            def poll(self):
+                return self.returncode
+
+        monkeypatch.setattr(launcher.subprocess, "Popen", Session)
         return launcher.launch(project, "engineer", "TST-a001", [])
 
     _session.made, _session.temp = [], temp
@@ -60,18 +68,14 @@ def test_product_spec_is_held_to_a_ticket_of_its_own(monkeypatch, tmp_path, tick
         launcher._check_ticket(tmp_path, "product-spec", "TST-a001")
 
 
-def _interrupted(folder):
-    raise KeyboardInterrupt
-
-
 def _not_started(folder):
     raise PermissionError(13, "Permission denied")
 
 
-@pytest.mark.parametrize("end, error", ((_interrupted, KeyboardInterrupt), (_not_started, GovError)))
-def test_the_folder_is_removed_when_the_session_does_not_return(session, end, error):
-    with pytest.raises(error):
-        session(end)
+def test_the_folder_is_removed_when_the_session_cannot_be_started(session):
+    """The interrupt, which W1-28 let through as ``KeyboardInterrupt``, is in ``test_w1_32.py`` (DEC-392)."""
+    with pytest.raises(GovError):
+        session(_not_started)
     assert len(session.made) == 1 and os.listdir(session.temp) == []
 
 
