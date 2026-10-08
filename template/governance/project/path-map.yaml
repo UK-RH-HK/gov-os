@@ -15,7 +15,11 @@ namespaces:
   specification:
     paths:
       - openspec/**
+  ci:
+    paths:
+      - .github/**
   repository:
     paths:
       - .gitignore
       - .gitleaks.toml
+      - lefthook.yml
