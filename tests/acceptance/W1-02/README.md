@@ -397,6 +397,74 @@ A throwaway helper of about 30 lines passed all 12 cases; it lived in the sessio
 - who may write the held-out file (unchanged, and not restated here);
 - the helper called with arguments.
 
+### Second batch: more spellings of a read (`test_w1_02_protected_reads_forms.py`)
+
+A review of the implementation found spellings of a read that no case held. The order is unchanged; each form is
+visible in the hook input, reads one of the two files, and must be refused by a rule's decision (`deny`, exit code
+0). Every form is asked on both stand-in files, by the orchestrator (the role with the widest scope).
+
+```sh
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_protected_reads_forms.py \
+  -q -p no:cacheprovider -rs
+```
+
+Red run on `w1/W1-02` at `97fd99cc`, against the guard as built: **71 failed, 10 passed** (81 cases, 8 test
+functions, about 15 s). Every red case has one reason: the guard allows the read (`decision=allow`, exit code 0). The
+three earlier files of this revision: 366 passed.
+
+`{file}` is either stand-in file, `{folder}` its folder, `{name}` its bare name, `{other}` another file's name.
+
+| Form | Test function | Spellings | Cases | Red |
+|---|---|---|---|---|
+| **1.** A search whose glob is the file's own name | `test_a_search_whose_glob_names_the_file_is_refused` · `test_a_search_from_a_folder_above_with_the_bare_name_as_its_glob_is_refused` | Grep with `glob` = `{name}` from the root (`path` = the root; no `path`); Grep from the root with `glob` = `/{file}`; Grep with `glob` = `{name}` from the folder between the root and the held-out file's folder (the settings file's folder is directly under the root) | 7 | 7 |
+| **2.** An input redirect in every spelling | `test_a_shell_spelling_of_a_read_is_refused` | `echo a;<{file} cat` · `(<{file} cat)` · `true&&<{file} cat` · `true\|<{file} cat` · `echo $(<{file})` · `echo "$(<{file})"` · `cat <>{file}` | 14 | 14 |
+| **3.** Backticks | the same | ``echo `cat {file}` `` · ``echo "`cat {file}`"`` | 4 | 4 |
+| **4.** A brace expansion | the same · `test_a_search_whose_glob_names_the_file_is_refused` · `test_a_listing_glob_with_braces_around_the_name_is_refused` | `cat {folder}/{{name},{other}}` and with the name last; Grep from the root with `glob` = `{{name},{other}}`; Glob with the pattern `{folder}/{{name},{other}}` | 8 | 8 |
+| **5.** A substitution inside the two git forms | `test_a_shell_spelling_of_a_read_is_refused` | `git diff --stat "$(cat {file})"` · ``git diff --stat `cat {file}` `` · `git status "$(cat {file})"` · ``git status `cat {file}` `` · `git diff --stat <(cat {file})` · `cat <<< "$(cat {file})"` | 12 | 12 |
+| **6.** Into the folder, then a search that names no path | the same · `test_a_search_with_no_path_in_a_session_that_stands_in_the_folder_is_refused` | `cd {folder} && grep -r VALUE` · `cd {folder} && rg VALUE` · `cd {folder}; grep -rn VALUE` · `cd {folder} && ls` · `grep -r VALUE` with the hook input's `cwd` = `{folder}` | 10 | 10 |
+| **7.** `cd` with an option | `test_a_shell_spelling_of_a_read_is_refused` | `cd -P {folder} && cat {name}` · `cd -- {folder} && cat {name}` · `pushd {folder} && cat {name}` | 6 | 6 |
+| **8.** The name glued to a prefix in one word | the same | `python3 -m pytest @{file}` · `gcc @{file}` · `grep -f{file} README.md` | 6 | 6 |
+| Another role | `test_a_shell_spelling_of_a_read_is_refused_for_another_role` | `echo a;<{file} cat` and ``echo `cat {file}` `` by the engineer | 4 | 4 |
+
+No listed form was refused before this batch. Spellings next to them that the guard already refuses, found by
+running the hook, and given no case: `cat<{file}`, `cat 0<{file}`, `<{file} cat`, a loop fed by `< {file}`;
+`echo $(cat {file})`, quoted or not, and `git status $(cat {file})` unquoted; `cat <(cat {file})`;
+`cd {folder}; cat {name}`, `(cd {folder} && cat {name})`, `cd {folder} && cat *`, `cd {folder} && grep -r VALUE .`;
+`cat`, `Read`, a Grep with no path and a Glob for `*` when the hook input's `cwd` is the folder; `?` and `[…]` globs
+in a shell word and in a tool's glob; `--file={file}`, `dd if={file}`; `eval`, `bash -c`, `sh -c`, `source`;
+`git diff --stat` with `-p`, `--patch`, `-u`, `-U3`, `--word-diff`, `git diff --patch-with-stat`, `git status -v`.
+
+Forms beyond the eight that were asked for, each settled by the order's words (the call's expanded targets take the
+file in, or the shell opens it): the redirect glued after `&&` and after `|`; braces in a Grep `glob` and in a Glob
+pattern; a process substitution inside `git diff --stat` and a substitution inside a here-string; `cd {folder} && ls`
+(the listing the earlier cases hold as `ls -la {folder}`); the search with no path when the session already stands
+in the folder; `pushd`; a file glued to a short option (`-f{file}`).
+
+**What keeps working** (10 cases, green before and after): `cd {folder} && cat {other}`, `wc -c < {folder}/{other}`
+and `cat {folder}/{{other},w1-02-other.md}` beside each file
+(`test_the_same_spelling_on_another_file_of_the_folder_stays_allowed`); a Grep from the root whose `glob` is
+`{other}` (`test_a_search_from_the_root_whose_glob_is_another_file_s_name_stays_allowed`);
+`git diff --stat "$(git rev-parse HEAD)"` and `git status "$(git rev-parse --show-toplevel)"`
+(`test_git_diff_stat_and_git_status_with_a_substitution_that_reads_neither_file_stay_allowed`).
+
+**Read with this batch:** residual 4 above is about a *name* that only exists at run time (the output of a
+substitution used as a path). A substitution whose own command names the file (`$(cat {file})`, backticks,
+`$(<{file})`) is visible in the command and is held as refused here.
+
+**Added to the residual list** (what a guard that reads a command line cannot see):
+
+10. An argument file or a response file (`@{other}`) whose content names either file.
+11. A `cd` whose folder exists only at run time (a variable the command sets, a substitution's output, `cd -`,
+    `CDPATH`), followed by a bare name or a search with no path.
+12. A shell function or an alias defined in the command that hides the reading program or the change of folder.
+
+**Not in this batch, with the owner; no case either way:** a search from the root with no glob or with a type filter
+only, or from above the root (DP-1); a listing glob for everything from the root; a move, a hard link or an in-place
+edit with a backup suffix that gives the file a second name; copies of the two files outside the project; a shell
+command that only mentions the file; how far the helper redacts (DP-2).
+
+No earlier case was changed and the support module is as it was. No decision package comes with this batch.
+
 ### Rewrites
 
 None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`).
