@@ -5485,3 +5485,101 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.132 | 2026-10-07 | One delegated decision on W1-39: DEC-499 (an installed project without its lock fails in `gov doctor`; each Copier message states the whole procedure; a fresh project is at MINIMAL; the lock task's command is settled with W1-41). Next free id: DEC-500. |
+
+## 133. The orchestrator's judgement of W1-30's second and last review (register v0.133, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-500 — W1-30: of the last review's sixteen findings, six behaviours are fixed in one round, the rest are residuals, and one fail-open that this round cannot close goes to the owner
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the second reviewer's return on `gov close` at `b59d7244` (`log/W1-30-probe2.json`, reviewer session `35e6015b-375b-4173-87df-7d5abfc1e07b`, sixteen findings, each reproduced in projects built in its temporary folder; the collection of every finding into one refusal and the ticket-tool lookup did not fail open in anything it tried) · **Under:** DEC-498 (only fail-open holes, and silent closes in shapes that ordinary work produces, are fixed) · **Refines:** DEC-487, DEC-490
+- **Decision — fixed, a case first, in one round:**
+  - **Every probe record of the ticket is read (finding 3).** A record that says the probe of the final code failed refuses the close, whatever another record says; a close needs a passing record of the final code and no failing one. Ordinary shape: a ticket with two reviews has two records.
+  - **A `Task:` that names no ticket of the project names no task (finding 1).** Such a commit is judged as a commit without a task is (DEC-490): where it changes the ticket's work it refuses the close, and where it changes a governance file the checks run. Ordinary shape: a mistyped id, and this project's own commits whose `Task:` names a kind of record and not a ticket.
+  - **The git that `gov close` asks is not the caller's to bend (findings 6 and 8).** An untracked file that is ignored only by a rule outside the commit (the repository's private exclude file, an excludes file named by configuration or by the caller's environment) makes the tree not its commit. Replacement refs are not followed, and configuration passed in the caller's environment does not reach the git calls.
+  - **The test runs take no interpreter switches from the caller's environment (finding 7):** a variable that changes how Python runs the tests (for one, the switch that removes assertions) does not reach them.
+  - **Skipped tests are counted in the close record (finding 13),** for the acceptance run and the regression run, beside passed, failed and errors. They refuse nothing: a skip is ordinary, and it is no longer silent.
+- **Decision — to the owner, not fixed in this round:** a file that the commit's own ignore rules ignore (a build product, a local file) is in the tree the tests run in and not in the commit, so it can decide a test's result (the ordinary form of finding 6). Closing it means running the tests in a clean checkout of the commit, which one fix does not do. Under DEC-498 it comes to the owner as a package.
+- **Decision — residuals (in `bootstrap.md`, each with its finding number):** a trailer-less commit that adds a test configuration file outside the ticket's folder (2: a gap in DEC-490's own rule, deliberate shape); the range when commit dates disagree with ancestry (4); the orchestrator's role on the probe record is a self-written trailer, the guard's matter (5); any later owner decision lifts an escalation, and removing both state files resets it (9, 10); the close record lists no skills in a project with an installed kernel (11, for W1-41's adoption); an interruption while the ticket tool closes leaves the two records, and the next close refuses for them (12); template kernel folders outside the six prefixes do not run the checks (14); a ticket argument that is a path (15); a refused close's own compiled files in a project that does not ignore them (16); a record of an earlier round refuses beside a passing one, so the orchestrator keeps only the record of the final code (3, other side).
+- Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.133 | 2026-10-07 | The orchestrator's judgement of W1-30's last review: DEC-500 (fixed in one round: every probe record read, a `Task:` naming no ticket, git not bent by the caller, no interpreter switches from the caller, skips counted; to the owner: files ignored by the commit's own rules; the rest residuals). Next free id: DEC-501. |
+
+## 134. One delegated decision on W1-31: the log forms a second specimen shows, and the smaller fields (register v0.134, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-501 — W1-31: hook runs of every event and `gov` commands in every plain form are counted from a second specimen; where a form allows two readings the counter takes the larger; the estimate's formula is the owner's
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-2 to P-7 of its second return (`log/W1-31-lead-run2.json`); a second specimen made by the orchestrator as DEC-495 prescribes (one short headless session in a throwaway project in `/tmp`, Claude Code 2.1.288, with hooks on six events, one that blocks and one that fails, four forms of a `gov` command, one sub-agent and one compaction; its reduced copy is `specimen/session-specimen-2.jsonl` with the sub-agent's log, the settings, the hook script and the prompt beside it). The lead's P-1 (what the estimated part stands on) defines a figure the exit is judged by: it is with the owner and is not decided here · **Refines:** DEC-491, DEC-495
+- **Decision:**
+  - **Hook runs (P-2).** As the second specimen shows them: a successful run of any event without a following added-context line added nothing and counts 0 (Stop and SubagentStop in the specimen); added context of PreToolUse counts as hook output like PostToolUse's; SessionStart's added context counts again each time it is given (after a compaction too); the text of a hook that blocks a tool call reaches the session as that call's error result and counts as hook output; the text of a hook that fails without blocking is counted as hook output too (whether it reaches the model is not shown: the larger reading is taken, and the record says so). A PreCompact hook left no line in the specimen: its output cannot be counted and the record names that as a known gap. Any hook line of a form neither specimen shows still makes hook output "not measured", by name.
+  - **Sub-agents.** A sub-agent's lines are in a file of their own under the session's folder (the specimen shows where). They belong to the named session: their hook lines and `gov` results are counted with it. Whether the token cross-check with ccusage covers those files is established by the lead from the tool's own behaviour, or returned.
+  - **`gov` commands (P-3).** A result marked as an error is counted like any other (every refusal of `gov` is one). A command in which `gov` runs beside other commands, through a pipe or with a redirection has its whole result counted, and the record says that such results were counted whole: it over-counts, the safe side for a ceiling. How a command "runs `gov`" is told is the test designer's to settle from how this project and an installed project call it. `gov` inside `bash -c`, `eval`, backticks or a wrapper script stays a residual.
+  - **The harness's own totals (P-4).** Tokens come from the assistant lines, cross-checked with ccusage, as built. The harness's summed figures are not used for tokens: they include calls the log does not show as assistant lines, so the denominator is slightly low and the share reads slightly high. Residual; W1-42 reports the difference once.
+  - **Smaller fields (P-5).** Latency is the harness's summed API duration from the session's last totals line, named as such. The agent is the harness and its version. Provider and files read stay "not measured".
+  - **The sandbox measurement's record (P-6)** is placed and formed by W1-42 when it makes the measurement; "not measured" until then.
+  - **The KPI disputes record (P-7)** is `docs/close/<ticket>/kpi-disputes.txt` as built: one line per dispute beginning with the decision that settled it, an empty file for none. The orchestrator writes it at the merge; for a FULL ticket before the probe.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.134 | 2026-10-07 | One delegated decision on W1-31: DEC-501 (hook runs of every event and `gov` commands in every plain form counted from a second specimen, the larger reading where two are possible; sub-agent logs belong to the session; the smaller fields; the disputes record's place). Next free id: DEC-502. |
+
+## 135. One delegated decision on W1-31: the forms a third specimen shows, and one correction of DEC-501 (register v0.135, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-502 — W1-31: the remaining log forms are counted from a third specimen; DEC-501's sentence on the PreCompact hook was wrong and is corrected; W1-31 merges as built and these points follow on its branch
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** the W1-31 lead's packages P-1 to P-5 of its third return (`log/W1-31-lead-run3-return.json`); a third specimen made by the orchestrator as DEC-495 prescribes (throwaway project in `/tmp`, Claude Code 2.1.288: a SessionStart hook that prints plain text and one that fails, a hook that denies a call by its answer, a call denied by a permission rule, a hook of the event after a failed tool call, a Stop and a SubagentStop hook that each block once, a `gov` called by a path, an over-long tool output, one sub-agent; reduced copies `specimen/session-specimen-3*.jsonl` with settings, hook script and prompt) · **Corrects:** DEC-501 (one sentence) · **Refines:** DEC-495, DEC-501
+- **Correction.** DEC-501 says a PreCompact hook "left no line in the specimen". That was the orchestrator's misreading: after the manual compaction the second specimen holds the hook's text inside a line that records the compaction command's output, not in a hook line. The lead found it.
+- **Decision:**
+  - **PreCompact (the lead's P-1).** Its output stays a named gap of the record, with the reason corrected to "in no hook line". The template registers no hook for that event. An automatic compaction is shown by no specimen.
+  - **`gov` by a path or by the interpreter (P-2).** A command word whose last path component is `gov`, and a Python interpreter run with the module `gov.cli.main`, run `gov` and are counted. `gov` through another runner stays "not measured" by name.
+  - **A SessionStart hook that fails (P-3)** is counted as hook output by the larger reading, as DEC-501 says for a failing hook of any event.
+  - **A SessionStart hook that prints plain text (P-4).** The third specimen shows its run line with the text and no added-context line. The harness gives a SessionStart hook's plain output to the session, so that text is counted as the packet, the record saying the larger reading was taken. For every other event a successful run with plain output and no added-context line counts 0, as DEC-501 says; the lead's stricter branch is replaced by these two rules.
+  - **What else a session's folder holds (P-5).** A `tool-results` folder beside `subagents` is passed over by name: the third specimen shows it holds the full text of an over-long tool output, while the log's result line holds a shortened form with a preview. The result is counted as logged (what reached the session). Any other content of the folder still refuses the session.
+  - **Further forms the third specimen shows.** A hook that denies a call by its answer appears as the call's error result with the hook's reason, like a hook that blocks: hook output. A call denied by a permission rule is no hook's and no `gov` output: it counts nothing. A Stop or SubagentStop hook that blocks appears as a line of feedback given to the session: hook output. Added context of the event after a failed tool call is counted like any event's.
+  - **Order of work.** W1-31 is green as built, and what it does not know it reports as "not measured" by name: it merges now, so that W1-32 and the W1-30 follow-up can start. The points above are built as a follow-up on its branch (a test designer first), together with the owner's answer on the estimate when it is given; the ticket closes after that follow-up.
+  - Recorded before the change (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.135 | 2026-10-07 | One delegated decision on W1-31: DEC-502 (forms of a third specimen counted; DEC-501's sentence on the PreCompact hook corrected; `gov` by a path or the interpreter counted; W1-31 merges as built, the points follow on its branch). Next free id: DEC-503. |
+
+## 136. Owner answers: W1-30's leftovers and its close, the probe gate against the probe's order, W1-39's doctor message, the estimate, the held-out file in the guard, the runner's tools (register v0.136, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-503 — W1-30: files that the project's own ignore rules hide are a residual
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-10 option (a) · **Refines:** DEC-500
+- **Decision:** That a file ignored by the commit's own ignore rules is in the tree the tests run in, and not in the commit, is a residual. "Tests run in a clean checkout of the commit" goes on the Wave 2 list.
+
+### DEC-504 — W1-30: the three points the last fix closed in part are residuals; W1-30 closes
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-13 option (a) · **Under:** DEC-498
+- **Decision:** Recorded as residuals: git calls made by other modules still inherit the caller's git variables and replacement refs; git configuration still reaches every call; `PYTHONUSERBASE` stays. Then W1-30 closes.
+
+### DEC-505 — A probe refusal caused only by the orchestrator's merge and residual commits, or by a fix round the owner ordered, counts with the adoption gaps; the probe gate is changed in the planned W1-30 follow-up
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-14 option (a) · **Refines:** DEC-492, DEC-498 · **Under:** DEC-137
+- **Decision:**
+  - Until the tool is changed, a `PROBE_INVALID` refusal whose only later commits are the orchestrator's merge and residual commits, or a fix round the owner ordered, counts with the DEC-492 adoption gaps: the ticket closes with `tk close` and is listed for the exit auditor.
+  - W1-30's probe record names `b59d7244` as the probed commit, truthfully.
+  - The probe gate is changed in the planned W1-30 follow-up (the one that adds the counter call, DEC-495), so that a merge bringing exactly the probed code no longer counts as "after" the probed commit.
+
+### DEC-506 — W1-39: the doctor message change is accepted; W1-39 merges
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-11 option (a) · **Refines:** DEC-493
+- **Decision:** The change to `gov doctor`'s failure message in `src/gov/doctor/command.py` (every failed part named with its reason), which goes beyond "the lock-comparison call only", is accepted. W1-39 merges.
+
+### DEC-507 — W1-31: what the estimated part of the governance share stands on
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on package P-12 option (a) · **Refines:** DEC-495
+- **Decision:** Per session: the session role's file under `.claude/agents/`, plus `CLAUDE.md` and `AGENTS.md` where they exist. MCP counts 0, because the Governance OS defines no MCP server.
+
+### DEC-508 — The held-out file: the brief rule is confirmed, and the guard refuses any agent tool call whose targets include it
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER, on the incident in W1-31's second run (a test designer's search with a glob over the folder that holds the held-out file) · **Under:** DEC-108
+- **Decision:**
+  - The orchestrator's brief rule is confirmed: no worker runs a glob, a search or a listing over `governance/project/`; files there are named one by one.
+  - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call whose expanded file targets (globs included, DEC-108) include the project's held-out file under `governance/project/` (the owner's answer names its path). The orchestrator chooses the ticket.
+
+### DEC-509 — DEC-499 to DEC-502 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Ratifies:** DEC-499, DEC-500, DEC-501, DEC-502
+- **Decision:** DEC-499, DEC-500, DEC-501 and DEC-502 stand as written, including the orchestrator's correction to DEC-501.
+
+### DEC-510 — Exit package: the tools the CI runner still needs, each as an install for the owner to approve
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** OWNER · **Under:** DEC-083, DEC-494
+- **Decision:** The exit package lists which tools the hosted runner still needs for this repository's CI to go green (pytest, openspec, rulesync, as the W1-40 residual says), each as an install for the owner to approve, with its version and checksum.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.136 | 2026-10-07 | Owner answers: DEC-503 (ignored files a residual), DEC-504 (three partly closed points residuals; W1-30 closes), DEC-505 (a probe refusal from the orchestrator's merge and residual commits or an owner-ordered fix round counts with the adoption gaps; the gate changes in the W1-30 follow-up), DEC-506 (W1-39's doctor message accepted), DEC-507 (the estimate's basis), DEC-508 (the guard refuses tool calls whose targets include the held-out file), DEC-509 (DEC-499 to DEC-502 accepted), DEC-510 (the runner's tools in the exit package). Next free id: DEC-511. |

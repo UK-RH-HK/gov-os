@@ -208,8 +208,10 @@ def test_the_close_record_states_every_checks_status_as_run_at_that_commit(proje
         f"the close record states {recorded}; W1-26's runner gave {expected} at the commit being closed"
 
 
-# A file under each prefix that counts as a governance file (settlement 5).
+# A file under each prefix that counts as a governance file (settlement 5; the installed kernel since round 8,
+# DEC-487).
 GOVERNANCE_FILES = {
+    "governance/kernel/": ("governance/kernel/hooks/sample-hook.sh", "#!/bin/sh\nexit 0\n"),
     f"{KERNEL}/checks/": (f"{CHECKS}/feature-present.yaml",
                           _declaration("feature-present", "test -s src/example/feature.py", support.WARNING)),
     f"{KERNEL}/schemas/": (f"{KERNEL}/schemas/sample.schema.json", '{"type": "object"}\n'),
