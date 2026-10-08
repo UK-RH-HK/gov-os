@@ -37,7 +37,7 @@ kpis:
   - Retired material leaves the active tree and stays reachable through git history or an archive ref; nothing is deleted without a recorded disposition [CAP-42.c]
   - 'A3: the path map keeps a healthy native framework or package layout unless the target structure is materially better and the migration risk is justified [CAP-44.j]'
   - This ticket closes under the adoption-gap exceptions; they end when this repository's adoption is complete (gov adopt --lite run on it, the gov check baseline empty, capability records present), a step after this merge and before W1-42 (DEC-522)
-  - Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references: the context accepts an id listed in governance/project/external-references.yaml and reports it as external, never as content (DEC-511, DEC-520)
+  - 'Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references: the context accepts an id listed in governance/project/external-references.yaml and reports it as external, never as content (DEC-511, DEC-520)'
   failure:
   - Any file content changes during a move batch
   - A move runs without an A5 verdict [CAP-44.c]
