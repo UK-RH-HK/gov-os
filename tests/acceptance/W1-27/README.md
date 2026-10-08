@@ -563,9 +563,59 @@ register is full of old paths.
 | DEC-456 (move table + old cli + sub-path) | All tests in test_w1_27_path_compliance_r2.py |
 | DEC-448 (historical records) | `test_historical_excluded_nonzero_when_historical_holds_old_path` |
 
+## Round 8 — a rebuild without embeddings (DEC-530)
+
+DEC-530 (owner's answer to P-18, register v0.144): "`gov rebuild` gets a mode without embeddings,
+for closes and checks that need only fresh lexical and graph indexes." Written in the reopened
+W1-30 (DAEO-2lwj); the close part is in `tests/acceptance/W1-30/test_w1_30_r11_rebuild_mode.py`.
+
+The interface the cases fix: the argument `--no-embeddings` of `gov rebuild`. In the result,
+`stores.semantic` is `{"status": "not_recreated", "requested": false, "reason": ...}` with a reason
+that names `--no-embeddings` and says neither "unavailable" nor "ollama": not built because not
+asked for, told apart from not built because the endpoint failed. Everything else of the result
+is as for a rebuild without the argument. No suite holds `gov rebuild`'s arguments as a closed
+set (looked for in W1-07 and here), so no case of another suite changes.
+
+One file, `test_w1_27_rebuild_r8_no_embeddings.py`, 9 cases. Each builds a tiny project from
+scratch and runs `gov rebuild` in the suite's sandbox, with a stand-in for the embedding endpoint
+on a local port that records every request (it answers the version and an empty list of models)
+and a stand-in for the endpoint's program that records a start.
+
+| Case | Holds | Today |
+|------|-------|-------|
+| `test_a_rebuild_without_the_argument_asks_the_endpoint_as_today` | the control: without the argument the endpoint is asked, and the semantic entry says nothing of the mode (`requested` is not `false`) | green |
+| `test_the_mode_asks_the_endpoint_nothing_and_starts_no_program` | with the endpoint up: no request reaches it, its program is not started | red |
+| `test_the_mode_starts_no_program_when_the_endpoint_is_down` | with nothing on the port: the program is not started, the rebuild does not wait for it | red |
+| `test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for` | the semantic entry as above | red |
+| `test_the_mode_builds_everything_else_a_rebuild_builds` | the same digest, the same store names, lexical `recreated`, the same code-index status as a rebuild of the same project without the argument; no vector in the store | red |
+| `test_two_rebuilds_in_the_mode_give_the_same_digest` | determinism (CAP-46.a) | red |
+| `test_the_mode_writes_only_under_gov_runtime` | the working tree and the sandbox's home outside the project's `.gov-runtime/` are as before | red |
+| `test_a_retrieval_on_a_store_whose_vectors_could_not_be_built_says_so` | the control of retrieval honesty: after a rebuild whose endpoint has no model, `gov retrieve` says the semantic facet is not available and gives lexical evidence | green |
+| `test_a_retrieval_on_a_store_rebuilt_without_embeddings_says_so` | the same after the mode: the facet is not available, the stopping reason says so, no route of the evidence names it, and the endpoint was asked nothing | red |
+
+Red reason of all seven: `gov rebuild` takes no `--no-embeddings` (a usage error, exit code 2).
+
+Retrieval is honest today on a store without vectors (the green control), so the mode needs
+nothing outside `src/gov/rebuild/**`: no package. Not held: whether the mode removes vectors that
+an earlier full rebuild left in the store; no source says, and each case starts from no store.
+
+### Covers coverage
+
+| Covers item | Tests |
+|-------------|-------|
+| CAP-07.a, CAP-20.a, CAP-46.a (rebuild) | All tests in test_w1_27_rebuild_r8_no_embeddings.py |
+| DEC-530 | the same |
+
+### The run of round 8
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-27 -q -p no:cacheprovider -rs -n auto`, at
+`45c36def` plus this round's file: 133 cases; 125 passed, 8 failed. Seven are this round's. The
+eighth, `test_rebuild_codeintel_is_recreated_when_tool_answers` (round 4), fails only in the
+session's sandbox: the code-index tool writes under `/tmp/gov-cbm-1000`, which is read-only there.
+
 ## Test count
 
-- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) + 7 (follow-up DEC-456) = 99
+- **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) + 7 (follow-up DEC-456) + 9 (round 8) = 108
 - **W1-27 revised cases (round 5)**: 18 (rebuild/recovery using tiny projects)
 - **W1-07 revised cases**: 6
-- **Total**: 105
+- **Total**: 114

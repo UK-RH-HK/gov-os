@@ -167,6 +167,31 @@ is in the repository. With one PreToolUse entry and no matcher, all 86 cases of 
 the matcher `Edit|Write|NotebookEdit|Bash`, 42 fail, every one of them a case of the rewritten wiring test or of the
 first four added tests, and the 44 others pass.
 
+## Inside a full regression
+
+Added on 2026-10-08 in the reopened W1-30 (DAEO-2lwj), by the owner's answer DEC-527 (its W1-05
+addition) as DEC-532 applies it. No test of this suite changed.
+
+`test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` runs the acceptance suites of
+W1-05's dependencies in a child test run. Inside a parallel regression that child run holds W1-02's
+five p95 cases under the load of every other worker, and it fails for the load alone. Of the two
+forms the decision allows, "satisfied by the regression's own results" and "runs alone last", the
+second is taken: the case is declared in `tests/acceptance/serial-only.txt` (kind `latency`), so
+`gov close` runs it after the parallel run, alone, exactly once. Its body is as it was.
+
+Why this one. The child run is the measurement the KPI asks for: the dependencies pass, by a run
+of their own at the switch-over. The other form would have the case trust an account of the
+regression handed to it, which is a new interface between `gov close` and a test, and one that
+passes when the account is missing or wrong unless more cases hold it. One line in a list is the
+smaller change (DEC-221).
+
+What it costs: the case took about 338 s alone in the measuring agent's trial, in every full
+regression, and the dependencies' suites run twice there (once in the regression, once in the
+child run). A close of this repository needs a time limit that allows it (`gov close --timeout`).
+
+Run by hand, the suite is as under "Run"; with `-n auto`, deselect this case and run it alone
+afterwards.
+
 ## Not tested
 
 - **A live harness session.** That the harness itself loads the settings file, shows the prompt in Auto mode and sends

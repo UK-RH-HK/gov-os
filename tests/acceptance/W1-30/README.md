@@ -1157,6 +1157,124 @@ files; 278 passed, 12 failed, none skipped. The 274 cases of round 9 are green. 
 cases 12 are red for the reasons above and four are green: the second of two records failing, one
 passing record alone in its two forms, the commit that changes nobody's work.
 
+## Round 11: the test runs in parallel; a rebuild without embeddings (DEC-527 to DEC-530)
+
+The owner's answers to P-18 (register v0.144), applied as DEC-532 says. Four pieces; this suite
+holds the first and the close part of the fourth, and carries the statement of the third.
+
+Three new files, 43 cases; the support code got one new section ("Round 11") and no change to what
+was there. One new file outside the suite's folder: `tests/acceptance/serial-only.txt`.
+
+### 1. The runs (`test_w1_30_r11_parallel_runs.py`, 12 cases)
+
+DEC-527: `gov close` runs the ticket's acceptance tests and the regression tests in parallel; the
+cases a project declares as unable to hold under load run afterwards, alone and serially, each
+exactly once; without the parallel runner the runs are serial and the close says so; the close
+record and the output say which form each run had and how long it took; a failing test is a
+finding as before.
+
+How a case sees the form: every test of the case's temporary project appends one line to a file
+of its own outside the project, with the value of `PYTEST_XDIST_WORKER` (the parallel runner sets
+it in each of its workers and nowhere else) and the time. "In parallel" is a worker's name; "alone"
+is no worker's name; "exactly once" is one line; "afterwards" is a later time than every line of
+the parallel run.
+
+| Case | Holds | Today (`3e70460c`) |
+|------|-------|--------------------|
+| `test_the_acceptance_run_and_the_regression_run_are_parallel` | every acceptance case and every regression case of the project ran in a worker, once | red: every case ran with no worker |
+| `test_a_declared_case_runs_alone_after_the_parallel_run_and_exactly_once` (3: a case of the ticket's suite, a case of another suite, a whole file) | the declared case ran once, in no worker, after the last case of the parallel run; the others ran in workers | red, all three: no case ran in a worker |
+| `test_an_entry_names_a_whole_file_or_every_parameter_set_of_a_function` | `file::function` sets every parameter set of the function apart and not a function whose name only begins with it; a comment and a blank line declare nothing | red: no case ran in a worker |
+| `test_a_failing_declared_case_is_a_finding_like_any_other` (2: of the ticket's suite, of another suite) | exit code 3, the case named, nothing closed, counted once | green, both: a failing test is a finding today |
+| `test_a_failing_case_of_the_parallel_run_is_named_as_before` | the same for a case of the parallel run, and the declared case that passed is not named | red: the failing case ran with no worker (the refusal itself is as before) |
+| `test_a_declared_case_over_the_time_limit_is_a_finding` | with `--timeout 20`, a declared case that sleeps longer is the finding; the parallel run before it is counted | red: today the one serial run is cut and nothing is counted |
+| `test_the_close_record_and_the_output_say_which_cases_ran_in_which_form_and_how_long` | settlement 19, in the close record and in the JSON result alike; seconds from a clock (one case sleeps a second); the declared entry named; the totals count every case once | red: "the close record states no test runs under 'test_runs'" |
+| `test_without_declared_cases_no_run_afterwards_is_stated` | a project without the list: two parallel runs stated, none afterwards | red: no `test_runs` |
+| `test_without_the_parallel_runner_the_ticket_closes_serially_and_says_so` | in an environment whose test runner has no parallel plugin: closed, exit code 0, no finding, every case once in no worker (in no held order), each run's form `serial` with a note that says "parallel" | red: no `test_runs`. The case skips, with its reason, where such an environment cannot be arranged (the test runner outside the user's site) |
+
+### 2. What this repository declares (`test_w1_30_r11_declared_here.py`, 29 cases, green)
+
+`tests/acceptance/serial-only.txt` is the declaration applied here (settlement 18). It has 53
+entries of four kinds: a time bound (`latency`), a real model or daemon (`real-model-or-daemon`), a
+live session (`live-session`), a race by design (`race`). A case is not declared merely because it
+is slow. Declared:
+
+- the cases the measuring agent named in the suites it timed (DEC-514): W1-02's
+  `test_decision_p95_is_under_100_ms` (5 parameter sets); W1-05's
+  `test_a_call_waits_under_100_ms_p95_for_the_hook` (9) and
+  `test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over` (W1-05's README, "Inside a
+  full regression"); W1-50's in-time case of the symmetric rule and its two live-session cases;
+- found by reading the suites the agent did not time in parallel: the live-session files of W1-25,
+  W1-46 and W1-49; the real-model files of W1-19 and W1-21; W1-20's code file; W1-07's help within
+  300 ms; W1-10's full load within 5 s; W1-17's re-index within its bound; W1-18's two deadline
+  cases; W1-09's two raced cases;
+- W1-16: every case that runs the codebase-memory daemon (its marker `local_only`), as five whole
+  files and 29 functions; its six other cases stay in the parallel run.
+
+The cases hold: each named case is declared, with every parameter set; W1-16's marked cases are
+all declared and none of its others; seven controls of the same files are not declared; every
+entry names a file and a function that exist, once, and says its kind. They read the list and ask
+the test runner only to collect; none runs a declared case.
+
+### 3. A store rebuilt without embeddings (`test_w1_30_r11_rebuild_mode.py`, 2 cases)
+
+DEC-530. What the mode builds is held in `tests/acceptance/W1-27/` (its README, round 8). Here:
+`test_a_ticket_closes_on_a_store_rebuilt_without_embeddings` (the store check of DEC-487 accepts
+the store) and `test_a_store_rebuilt_without_embeddings_is_stale_one_commit_later` (`STORE_STALE`,
+as for any store). Both red: `gov rebuild` takes no `--no-embeddings` (a usage error, exit code 2).
+
+### The unit case of the pause (DEC-529): the statement for the engineer
+
+`tests/unit/pause/test_pause.py::test_the_chain_read_from_proc_is_this_process_first_and_each_next_one_its_parent`
+expects the word "pytest" in its own process's command line. A worker of the parallel runner is
+started as `python -c ...` and has no such word, so the case fails in every parallel run although
+the chain it reads is right. The test designer writes no unit test; the engineer applies this,
+word for word, in a commit that carries `Rewrite-Reason: defect found by the parallel trial`:
+
+> In `tests/unit/pause/test_pause.py`, in
+> `test_the_chain_read_from_proc_is_this_process_first_and_each_next_one_its_parent`, replace the
+> line
+>
+> `    assert chain[0]["exe"] == os.path.realpath(sys.executable) and "pytest" in " ".join(chain[0]["cmdline"])`
+>
+> by the line
+>
+> `    assert chain[0]["exe"] == os.path.realpath(sys.executable) and chain[0]["cmdline"] == sys.orig_argv`
+>
+> and change nothing else of the case or of the file. The case then expects the first entry's
+> command line to be this very process's own, as the interpreter was started, whatever started it.
+
+Tried in this session on a throwaway copy of the assertion outside the tree: it holds when the
+test runner is started as `python3 -m pytest`, as `pytest`, and in a worker of `-n 2`.
+`sys.orig_argv` exists from Python 3.10; the project requires 3.11.
+
+### Existing cases against round 11
+
+None of this suite was rewritten, so the round's commit carries no `Rewrite-Reason:`. Looked for:
+a case that holds the test runs as serial, or as two child processes exactly (none); a case that
+holds the close record's or the result's keys as a closed set (none: `test_runs` is a new key
+beside `tests_run`, which stays); a case that holds `gov rebuild`'s arguments (none, here or in
+W1-07 or W1-27). `test_regression_includes_other_acceptance_folders` and the time-limit cases hold
+as they are.
+
+Not held, and why. How many workers a parallel run has: no source says. What `gov close` does with
+an entry of the list that names no case: no source says; in this repository
+`test_every_entry_names_cases_that_exist_and_says_its_kind` keeps such an entry out. Whether the
+time limit is one for a run or one for the close: `--timeout` stays "of each run" (settlement 8),
+and the run afterwards is a run. Note for the lead: the default limit is 120 s and the declared
+switch-over case of W1-05 alone took about 338 s in the trial, so a close of this repository needs
+a larger `--timeout` or a larger default; no case here fixes the default.
+
+### The run of round 11
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n auto`, at
+`45c36def` plus this round's files: 333 cases in 34 files; 321 passed, 12 failed, none skipped, in
+101 s. The 290 cases of round 10 are green. Of the 43 new cases 12 are red for the reasons above
+(10 of the runs, 2 of the rebuild mode) and 31 are green (the 29 of the declaration, the failing
+declared case in its two forms).
+
+The suite will take longer once the runs are parallel: every close of a temporary project then
+starts the parallel runner twice or three times (about a second each on this machine).
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1172,6 +1290,7 @@ passing record alone in its two forms, the commit that changes nobody's work.
 | DEC-487, DEC-490 | the six `test_w1_30_r8_*.py` files: 54 tests; governance_checks: the `governance/kernel/` form |
 | DEC-492 | the two `test_w1_30_r9_*.py` files: 15 tests (every finding: 10; the ticket tool: 5) |
 | DEC-500 | the five `test_w1_30_r10_*.py` files: 16 tests (probe records: 4; a task that names no ticket: 4; git: 3; the interpreter: 2; skips: 3) |
+| DEC-527, DEC-530 (CAP-13.a, CAP-38.a) | the three `test_w1_30_r11_*.py` files: 43 tests (the runs: 12; this repository's declaration: 29; a store rebuilt without embeddings: 2) |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1198,6 +1317,9 @@ passing record alone in its two forms, the commit that changes nobody's work.
 15. **Where the ticket tool is found** (round 9, DEC-492): `governance/kernel/bin/tk`, else `tk` on `PATH`; the kernel's wherever it exists, also when it fails
 16. **The number of skipped tests in the close record** (round 10, DEC-500): the key `skipped`, a whole number, beside `passed`, `failed` and `errors` in every object of the close record's frontmatter that states those three, at any depth. No source says whether the acceptance run and the regression run get one object or one each: the number of tests skipped in one run is the `skipped` of at least one object, and no object holds a number that is neither that nor 0
 17. **The probe records of a ticket** (round 10, DEC-500): every record of type `probe` in `docs/probes/<ticket>/` that names the ticket in `task`, whatever its file is called; the cases write `PR-<ticket>.md` and `PR-<ticket>-2.md`
+18. **How a project declares its serial-only cases** (round 11, DEC-527): the list `tests/acceptance/serial-only.txt` of the project. One entry on a line: the beginning of a pytest node id relative to the project's root, either a test file (every case of it) or `file::function` (every parameter set of that function, and no function whose name merely begins with it). Text from ` #` to the line's end, and a line that begins with `#`, is a comment; blank lines count for nothing; a project without the list declares nothing. The list changes no line of any suite's files. In this repository each entry's comment begins with its kind: `latency`, `real-model-or-daemon`, `live-session` or `race`
+19. **The test runs in the close record and the output** (round 11, DEC-527): the key `test_runs`, in the close record's frontmatter and in the JSON `result` alike: a list of objects, each with `run` (`acceptance` or `regression`), `form` (`parallel`, `serial` or `serial-afterwards`), `seconds` (a number, not negative), and `passed`, `failed`, `errors`, `skipped` (whole numbers). An object of form `serial-afterwards` also has `cases`, the list's entries it ran; a run with nothing declared has no such object. Without the parallel runner the two runs have the form `serial` and a `note`, a string that says "parallel"; a run in the form asked for has no `note`. `tests_run` (settlement 16) stays and counts every case once
+20. **The rebuild without embeddings** (round 11, DEC-530): `gov rebuild --no-embeddings`; what its result says is settled in W1-27's README, round 8
 
 ## Residuals
 

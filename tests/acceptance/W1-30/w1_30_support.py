@@ -1090,3 +1090,129 @@ def says_not_measured(error, what):
 
 
 NOT_MEASURED_WORDS = "not measured"
+
+
+# --------------------------------------------------------------------------
+# Round 11 (DEC-527): the test runs in parallel, the declared cases alone afterwards
+# --------------------------------------------------------------------------
+
+# The list a project owns of its cases that cannot hold under parallel load (README, round 11, settlement 18).
+SERIAL_ONLY_REL = "tests/acceptance/serial-only.txt"
+# The kinds an entry of this repository's list names in its comment.
+SERIAL_ONLY_KINDS = ("latency", "real-model-or-daemon", "live-session", "race")
+
+# Where the close record and the result state the test runs, and the forms a run has (settlement 19).
+TEST_RUNS_KEY = "test_runs"
+PARALLEL, SERIAL, SERIAL_AFTERWARDS = "parallel", "serial", "serial-afterwards"
+ACCEPTANCE_RUN, REGRESSION_RUN = "acceptance", "regression"
+RUN_COUNTS = ("passed", "failed", "errors", "skipped")
+
+# What a worker of the installed parallel runner (pytest-xdist) has in its environment, and no other test process.
+WORKER_VARIABLE = "PYTEST_XDIST_WORKER"
+NO_WORKER = "none"
+_PARALLEL_RUNNER_NAMES = ("xdist",)
+_PARALLEL_RUNNER_PREFIXES = ("pytest_xdist", "pytest-xdist")
+
+
+def telling_test(name, told, body="assert True", decorator="", arguments=""):
+    """The text of a test file with one test function, ``name``, that tells how it ran: at every run it adds a
+    line to a file of its own under ``told``, outside the project, with the parallel worker it ran in
+    (``NO_WORKER`` when it ran in none) and the time. The file is named as the case is in its node id
+    (``name``, or ``name[set]`` for a parameter set). ``body`` is what the test does after that; ``decorator``
+    stands before the function and ``arguments`` are its own."""
+    return (
+        "import os\nimport time\n\nimport pytest\n\n\n"
+        f"{decorator}"
+        f"def {name}({arguments}):\n"
+        "    case = os.environ['PYTEST_CURRENT_TEST'].split('::')[-1].split(' ')[0]\n"
+        f"    with open(os.path.join({str(told)!r}, case), 'a', encoding='utf-8') as told:\n"
+        f"        told.write(os.environ.get({WORKER_VARIABLE!r}, {NO_WORKER!r}) + ' ' + repr(time.time()) + '\\n')\n"
+        f"    {body}\n"
+    )
+
+
+def told_by(told):
+    """What the telling tests told: ``{name: [(worker, time), ...]}``, one pair for each time the test ran."""
+    runs = {}
+    for path in sorted(Path(told).iterdir()):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        runs[path.name] = [(line.split()[0], float(line.split()[1])) for line in lines]
+    return runs
+
+
+def ran_in_a_worker(runs):
+    """Whether a telling test ran exactly once, in a worker of the parallel runner."""
+    return len(runs) == 1 and re.fullmatch(r"gw\d+", runs[0][0]) is not None
+
+
+def ran_alone(runs):
+    """Whether a telling test ran exactly once, in no worker."""
+    return len(runs) == 1 and runs[0][0] == NO_WORKER
+
+
+def serial_only_entries(path):
+    """The entries of a serial-only list, as ``[(entry, comment)]``: one on a line, the beginning of a node id;
+    what follows `` #`` (or a ``#`` that begins the line) is the comment; empty lines hold nothing."""
+    entries = []
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        entry, _, comment = (" " + line).partition(" #")
+        if entry.strip():
+            entries.append((entry.strip(), comment.strip()))
+    return entries
+
+
+def declared_serial_only(node_id, entries):
+    """Whether a node id is named by one of the entries: it is the entry, or begins with it at a boundary of
+    the id (``::`` after a file, ``[`` after a function)."""
+    return any(node_id == entry or (node_id.startswith(entry) and node_id[len(entry):].startswith(("::", "[", "/")))
+               for entry in entries)
+
+
+def runs_stated_by(holder, where):
+    """The test runs ``holder`` (the close record's frontmatter, or the result) states under ``test_runs``,
+    each checked for its form: ``run``, ``form``, ``seconds`` and the four counts."""
+    runs = holder.get(TEST_RUNS_KEY)
+    assert isinstance(runs, list) and runs, f"{where} states no test runs under {TEST_RUNS_KEY!r}: {sorted(holder)}"
+    for run in runs:
+        assert isinstance(run, dict), f"{where}: a test run is not an object: {run!r}"
+        assert run.get("run") in (ACCEPTANCE_RUN, REGRESSION_RUN), f"{where}: a test run names no run: {run!r}"
+        assert run.get("form") in (PARALLEL, SERIAL, SERIAL_AFTERWARDS), f"{where}: a test run names no form: {run!r}"
+        seconds = run.get("seconds")
+        assert isinstance(seconds, (int, float)) and not isinstance(seconds, bool) and seconds >= 0, \
+            f"{where}: a test run does not say how long it took: {run!r}"
+        for key in RUN_COUNTS:
+            assert isinstance(run.get(key), int) and not isinstance(run.get(key), bool), \
+                f"{where}: a test run does not count {key}: {run!r}"
+    return runs
+
+
+def the_run(runs, run, form):
+    """The one test run of ``runs`` that is ``run`` in ``form``; None when there is none."""
+    found = [entry for entry in runs if (entry["run"], entry["form"]) == (run, form)]
+    assert len(found) <= 1, f"more than one {form} run of the {run} tests: {found}"
+    return found[0] if found else None
+
+
+def environment_without_parallel_runner(base, sandbox):
+    """The environment of ``sandbox_env`` in which the interpreter running the suite finds every installed
+    package but the parallel runner; None where that cannot be arranged.
+
+    ``gov close`` gives its test runs no ``PYTHONPATH`` of the caller, and passes on where the per-user folder
+    of installed packages is (``PYTHONUSERBASE``). So the runner is taken away there: a per-user folder of
+    links to everything in the real one but the parallel runner. Where the runner is installed elsewhere (or
+    there is no per-user folder), this fixture cannot take it away.
+    """
+    if not site.ENABLE_USER_SITE:
+        return None
+    real = Path(site.getusersitepackages())
+    if not real.is_dir():
+        return None
+    mirror = Path(base) / "userbase" / real.relative_to(site.getuserbase())
+    mirror.mkdir(parents=True)
+    for entry in real.iterdir():
+        name = entry.name.lower()
+        if name in _PARALLEL_RUNNER_NAMES or name.startswith(_PARALLEL_RUNNER_PREFIXES) or name.endswith(".pth"):
+            continue
+        (mirror / entry.name).symlink_to(entry)
+    env = {**sandbox_env(sandbox), "PYTHONUSERBASE": str(Path(base) / "userbase")}
+    return None if can_import("xdist", sandbox, env=env) else env
