@@ -5810,3 +5810,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.144 | 2026-10-08 | Owner answers to P-18: DEC-527 (suites in parallel in `gov close`'s regression step and the regression script; W1-05's switch-over case; serial cases alone afterwards), DEC-528 (built now as a W1-30 follow-up beside W1-41), DEC-529 (the two test defects repaired as rewrites), DEC-530 (`gov rebuild` without embeddings), DEC-531 (every later regression and close uses it). Delegated: DEC-532 (paths, the unit case, the regression script). Next free id: DEC-533. |
+
+## 145. A correction of fact about `gov close`'s test runs, and two Wave 2 items (register v0.145, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-533 — Correction: `gov close` does run the regression tests; the orchestrator's report to the owner that it runs only the ticket's own suite was wrong
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; a correction of fact, no rule changed) · **Basis:** `src/gov/close/command.py` (after the ticket's acceptance run it runs everything under `tests/` except the ticket's own acceptance folder, in one serial call); the measuring agent's report (DEC-514), which reads the same; the times of the closes of 2026-10-08 (about 80 minutes each) · **Corrects:** the stated basis of DEC-518
+- **Decision:**
+  - The sentence in DEC-518 "DEC-513's premise was wrong: `gov close` runs only the ticket's own acceptance suite" is itself wrong, and so was the orchestrator's report that led to it. `gov close` runs the ticket's acceptance suite and then the regression (every other suite and the unit tests), serially. DEC-513's premise was right.
+  - DEC-518's rule (a full regression after every merge) is the owner's and stands until the owner changes it. Whether a `gov close` on the merge commit again counts as that regression (DEC-513) is put to the owner (package P-20); until the answer, both are run.
+  - What DEC-527 changes in `gov close` is therefore the form of its regression run (parallel, with the serial cases alone afterwards), not its coverage.
+
+### DEC-534 — Two items join the Wave 2 list: declared test commands in any language, and test selection by impact
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER; the orchestrator's reading that `gov close` can run only pytest today (the command and the two paths `tests/acceptance/<ticket>/` and `tests/` are fixed in the code; a project cannot declare a test command)
+- **Decision:** The Wave 2 list gains:
+  - declared, language-agnostic test commands for `gov close` and the regression, each with its own parallel option (for example `cargo test` for Rust, `npm test` or `vitest` for TypeScript);
+  - impact-based test selection: run only the tests a change can affect (`gov impact`), with the full suite nightly or in CI, for large repositories.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.145 | 2026-10-08 | DEC-533 (correction of fact: `gov close` runs the regression tests too; the basis stated in DEC-518 was wrong; its rule stands until the owner answers P-20), DEC-534 (owner: two Wave 2 items, declared test commands in any language and test selection by impact). Next free id: DEC-535. |
