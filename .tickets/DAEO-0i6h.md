@@ -1,6 +1,6 @@
 ---
 id: DAEO-0i6h
-status: closed
+status: in_progress
 deps: [DAEO-lc4q, DAEO-w616, DAEO-w9l3, DAEO-xog0, DAEO-egm9, DAEO-5x4l, DAEO-fygv]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -28,6 +28,12 @@ allowed_paths:
 - template/governance/kernel/skills/test-design/**
 - template/governance/kernel/skills/change/**
 - template/governance/kernel/checks/skill-regression-a*
+- template/governance/kernel/skills/orchestration/**
+- template/governance/kernel/roles/orchestrator.md
+- template/governance/kernel/templates/**
+- template/governance/kernel/checks/skill-regression-orchestration*
+- template/.rulesync/skills/orchestration/**
+- template/.rulesync/subagents/orchestrator.md
 kpis:
   success:
   - Each skill has a versioned frontmatter, a description <= 60 tokens and a body <= 2.5k tokens [CAP-24.a]
@@ -49,6 +55,8 @@ kpis:
   - Test design takes probe findings from the orchestrator's review as described behaviours, never as code; it decides from the specification whether each becomes an acceptance test and reports a finding
     that reveals a specification gap (DEC-136) [CAP-38.e]
   - 'A question of the form "what is the impact of X?", asked in plain language, makes the change skill run the impact assessment: an OpenSpec proposal plus gov closure over the affected records (DEC-167) [CAP-33.f]'
+  - 'The orchestration skill, the ticket lead section of the orchestrator role file and five brief templates (test designer, engineer, reviewer, product-spec worker, lead) hold the way a wave is run: parallel tickets, integration order, the ticket loop, decisions, stops, sessions, briefs, commits, checkpoints and temp hygiene; wording is language-neutral where tests are named; a skill-regression check covers the new skill (DEC-537, DEC-539) [CAP-24.a, CAP-24.b]'
+  - 'A status question asked in natural language is answered from gov status --json: the orchestration skill states the route, and a case holds it (DEC-541) [CAP-28.a]'
   failure:
   - A skill body exceeds 2.5k tokens
   - The test-design skill reads implementation files
