@@ -607,31 +607,25 @@ def _check_canaries(root: Path) -> dict:
 
 
 def _check_framework_lock(root: Path) -> dict:
-    lock_path = root / "framework.lock"
-    if not lock_path.is_file():
-        return {"status": "unmeasured", "reason": "no framework.lock", "match": "MISSING"}
-    try:
-        import yaml
-        lock = yaml.safe_load(lock_path.read_text(encoding="utf-8"))
-    except Exception:
-        return {"status": "fail", "reason": "cannot read framework.lock", "match": "ERROR"}
-    if not isinstance(lock, dict):
-        return {"status": "fail", "reason": "framework.lock is not a map", "match": "ERROR"}
-    manifest = lock.get("manifest") or lock.get("files") or {}
-    if not isinstance(manifest, dict):
-        return {"status": "fail", "reason": "no manifest in framework.lock", "match": "ERROR"}
-    drift_files = []
-    for rel_path, expected_hash in manifest.items():
-        file_path = root / rel_path
-        if not file_path.is_file():
-            drift_files.append(rel_path)
-            continue
-        actual = _sha256_file(file_path)
-        if actual != expected_hash:
-            drift_files.append(rel_path)
-    if drift_files:
-        return {"status": "fail", "match": "DRIFT", "drifted_files": drift_files}
-    return {"status": "pass", "match": "MATCH"}
+    from gov.lock import compare
+    answer = compare(root)
+    section = {"status": {"MATCH": "pass", "MISSING": "unmeasured"}.get(answer.verdict, "fail"),
+               "match": answer.verdict}
+    if answer.reason:
+        section["reason"] = answer.reason
+    if answer.drifted_files:
+        section["drifted_files"] = list(answer.drifted_files)
+    return section
+
+
+def _failed_parts(sections: dict) -> str:
+    """The parts that failed or drifted, each with its reason where it gives one: what plain ``gov doctor`` prints."""
+    failed = []
+    for name, section in sections.items():
+        if section.get("status") in ("fail", "drift"):
+            reason = section.get("reason")
+            failed.append(f"{name} ({reason})" if isinstance(reason, str) and reason else name)
+    return "; ".join(failed)
 
 
 def _check_isolation(root: Path) -> dict:
@@ -850,6 +844,7 @@ def run(root: Path, args, config: dict) -> dict | tuple:
 
     if not healthy:
         from gov.cli.errors import GovError
-        raise GovError("DOCTOR_UNHEALTHY", "one or more health checks failed or reported drift",
+        raise GovError("DOCTOR_UNHEALTHY", f"one or more health checks failed or reported drift: "
+                                           f"{_failed_parts(sections)}",
                        details=result, exit_code=3)
     return result

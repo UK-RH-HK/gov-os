@@ -1,0 +1,26 @@
+# The Gov OS repository as a Copier template (DEC-023, ADR-0002 section 5). No questions: a project
+# receives template/ as it is, and its own settings live in governance/project/ (the overlay).
+_subdirectory: template
+
+# The overlay is the project's: a file that exists there is never replaced, at copy or at update.
+_skip_if_exists:
+  - governance/project/**
+
+# Writes governance/framework.lock (template tag and commit, answers reference, sha256 manifest of
+# governance/kernel/). The adapter generation is not a task: it is a step of the procedure below.
+_tasks:
+  - command: [python3, -m, gov.lock]
+
+_message_after_copy: &procedure |
+  governance/kernel/ and governance/framework.lock are written.
+
+  Update procedure:
+    1. Never edit .copier-answers.yml by hand: Copier reads the installed release from it.
+    2. Commit your work, then run `copier update --trust` at the project root. It brings the new
+       governance/kernel/, writes the lock again, and never overwrites governance/project/.
+    3. Run the adapter generation step: rulesync generates .claude/, CLAUDE.md and AGENTS.md
+       from .rulesync/ (`copier copy` and `copier update` do not run it).
+    4. Run `gov doctor`: its framework_lock part compares the lock with the installed kernel
+       and with .copier-answers.yml.
+
+_message_after_update: *procedure

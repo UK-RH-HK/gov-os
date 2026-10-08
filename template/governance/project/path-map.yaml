@@ -1,0 +1,21 @@
+# The project's path map: the namespaces that classify every tracked path. This file is the project's:
+# `copier update` never overwrites it. Add a namespace for each tree the project adds (src/, tests/, ...).
+namespaces:
+  kernel:
+    paths:
+      - governance/kernel/**
+      - governance/framework.lock
+      - .copier-answers.yml
+  project:
+    paths:
+      - governance/project/**
+  adapters:
+    paths:
+      - .rulesync/**
+  specification:
+    paths:
+      - openspec/**
+  repository:
+    paths:
+      - .gitignore
+      - .gitleaks.toml
