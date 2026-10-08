@@ -5829,3 +5829,95 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.145 | 2026-10-08 | DEC-533 (correction of fact: `gov close` runs the regression tests too; the basis stated in DEC-518 was wrong; its rule stands until the owner answers P-20), DEC-534 (owner: two Wave 2 items, declared test commands in any language and test selection by impact). Next free id: DEC-535. |
+
+## 146. Delegated: two packages of W1-41's second run (register v0.146, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-535 — W1-41: the unit file of the command-module convention joins the ticket's paths; SPLIT, MERGE and EXTRACT are refused where code intelligence is off
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; P3, reversible, the lead's recommendation and the orchestrator's agree, nothing loosened) · **Basis:** the lead's return at `b8d97636` (`log/W1-41-lead-run2.json`: 114 cases green, every acceptance suite green, 11 unit tests red in one file outside the ticket's paths) · **Under:** DEC-517, DEC-523
+- **Decision:**
+  - **U-1.** `tests/unit/launch/test_command_modules.py` joins W1-41's `allowed_paths`. The file plants a stand-in `adopt` module because `adopt` was the last reserved command without one; now that the command is built, the built package is found first and 11 of its cases fail. A fresh engineer repairs the file so that its stand-in is the module the cases load, as W1-46 and W1-28 did for the same file when they built `checkpoint` and `pause`. The cases keep what they hold about the convention; nothing in `src/` is changed for it.
+  - **P-10.** In a project whose path map turns code intelligence off, SPLIT, MERGE and EXTRACT are refused at A3 as MOVE and RENAME are (DEC-523: nothing is moved there). The tool does so as built; the test designer adds the rows that hold it.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.146 | 2026-10-08 | Delegated: DEC-535 (W1-41: one unit file joins the ticket's paths and is repaired by an engineer; SPLIT, MERGE and EXTRACT refused where code intelligence is off). Next free id: DEC-536. |
+
+## 147. Owner answers: a close on the merge commit is the regression again; the way the wave is run goes into the kernel (register v0.147, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-536 — Package P-20: a `gov close` on the merge commit counts as the post-merge regression, from now
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-20 option (b); DEC-533 is noted: `gov close` runs the ticket's suite and then everything under `tests/`, and DEC-513's premise was right · **Amends:** DEC-518 · **Restores:** DEC-513
+- **Decision:**
+  - A `gov close` on the merge commit counts as the post-merge regression. DEC-518's separate full regression is dropped for merges followed directly by their close.
+  - The plan validator is run separately, since it is not under `tests/`.
+  - A merge not followed directly by its close still gets a full regression.
+  - When the parallel run merges (DEC-527), `gov close` uses it.
+
+### DEC-537 — Package P-21: the way the wave is run is promoted into the kernel by one follow-up on W1-35, before the exit run
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-21 option (a); the orchestrator's report C (most working rules live only in this repository's prompt, briefs and decisions) · **Under:** DEC-534
+- **Decision:**
+  - One STANDARD follow-up on W1-35, alongside W1-41, with W1-33's role path and the kernel templates folder added to its paths, builds:
+    - an orchestration skill (about 150 to 200 lines) holding every "only in prompt or decisions" row of report C, written as text the skill states;
+    - the orchestrator role file extended, with the ticket lead as a section of it, not a seventh role;
+    - five brief templates (test designer, engineer, reviewer, product-spec worker, lead) under the kernel's templates, including the "behaviour and sources only" rule;
+    - a skill-regression check for the new skill.
+  - The wording stays language-neutral where tests are named, so that it does not assume pytest (DEC-534).
+  - W1-42 runs from the kernel's orchestration skill and briefs, not from this repository's prompt; that KPI line is added to W1-42.
+  - The parts that need code go on the Wave 2 list: the resource gate as a command, the launcher refusing a launch without a model, `AUTH_REQUIRED` as a mechanism, and starting leads through the launcher.
+  - The generated `.claude/**` output is the owner's to apply at the exit, with the other adapters.
+
+### DEC-538 — DEC-532, DEC-534 and DEC-535 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Ratifies:** DEC-532, DEC-534, DEC-535
+- **Decision:** DEC-532, DEC-534 and DEC-535 stand as written.
+
+### DEC-539 — How the orchestrator applies DEC-537: the paths W1-35 gains and what the skill may hold
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; consequences of the owner's order, nothing loosened) · **Under:** DEC-537, DEC-463
+- **Decision:**
+  - For this follow-up W1-35 (`DAEO-0i6h`, reopened for it) gains in `allowed_paths`: `template/governance/kernel/skills/orchestration/**`, `template/governance/kernel/roles/orchestrator.md`, `template/governance/kernel/templates/**`, `template/governance/kernel/checks/skill-regression-orchestration*`, and the rulesync sources of the same two things in the template (`template/.rulesync/skills/orchestration/**`, `template/.rulesync/subagents/orchestrator.md`). Nothing under this repository's `.claude/**`, `.rulesync/**`, `CLAUDE.md` or `AGENTS.md` is written by the follow-up.
+  - The ticket's own rule holds for the new skill: a skill is a method, grants no permission, and cites the policy or decision it follows; its size bounds are those of the ticket's first KPI line. If every row of report C does not fit within them, the rows are divided between the skill and the brief templates it names, and the lead returns how; no row is dropped.
+  - The sources of the text are this repository's orchestrator prompt and its appendix of briefs, the two common lead files of the orchestrator's scratch folder (given to the lead as content), and the decisions named in report C. Rules that are particular to this repository's wave (its ticket ids, its branch names, its workbench folders, its installed versions) are stated in the kernel as a project's own values, not copied.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.147 | 2026-10-08 | Owner answers: DEC-536 (P-20: a `gov close` on the merge commit is the post-merge regression again; the validator runs separately), DEC-537 (P-21: an orchestration skill, the lead as a section of the orchestrator role, five brief templates and a skill-regression check, as a follow-up on W1-35; W1-42 runs from them; code parts to Wave 2), DEC-538 (DEC-532, DEC-534, DEC-535 accepted). Delegated: DEC-539 (W1-35's added paths; what the skill holds). Next free id: DEC-540. |
+
+## 148. Owner answers to package P-19 (W1-32, `gov status`) (register v0.148, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-540 — P-19.1: `gov status` shows the governance share as "not measured", with the counter's reason
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 1 option (a) · **Under:** DEC-491
+- **Decision:** `gov status` shows the governance share as "not measured", with the counter's reason. Per-session attribution stays on the Wave 2 list (the launch record).
+
+### DEC-541 — P-19.2: the natural-language route to `gov status --json` goes into the W1-35 follow-up; W1-32 closes
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 2 option (a) · **Under:** DEC-537 · **Supersedes:** the last point of DEC-526 (the ticket stays open)
+- **Decision:**
+  - The natural-language route to `gov status --json`, with its test, goes into the W1-35 follow-up (the orchestration skill).
+  - The provider of that half of CAP-28.a moves to that follow-up: W1-32's KPI line keeps the command-set half, and W1-35 gains a KPI line for the route.
+  - W1-32 then closes under the current close rules.
+
+### DEC-542 — P-19.3: `ci`, `launch`, `telemetry` and `lock` are recorded in the command list
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 3 option (a)
+- **Decision:** `ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer line.
+
+### DEC-543 — P-19.4: for W1-32 an open gate is an open decision package or an open required readiness row; the source is read for more kinds
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 4 option (a)
+- **Decision:**
+  - For W1-32, option (a): the two kinds as built.
+  - In addition the orchestrator reads S0a-G-01 by exact path in the workbench's `s0a/out/` (`STACK_OPTIONS.md` or `BAKEOFF_PLAN.md`, by the bare id G-01), never listing folders there. If the source names more kinds of gate (gate records, audit tickets, check gates), it is brought as a package for Wave 2; otherwise (a) stands.
+- **What the reading gave (2026-10-08):** `STACK_OPTIONS.md` names G-01 as "`gov` CLI skeleton, API-0002 JSON envelope + exit codes 0–4; `gov status`; record templates (lesson, failure, gate, research); overlay config for model tiers", for CAP-14, CAP-28, CAP-34 (human decision gates), CAP-35 and CAP-41. It names a `gate` record as a template; it does not say what `gov status` shows, and it names neither audit tickets nor check gates. `BAKEOFF_PLAN.md` does not name G-01. The one further kind, `gate` records in status, is brought to the owner as a Wave 2 proposal (P-22).
+
+### DEC-544 — P-19.5: the READY rule treats a constraining package the store could not load as blocking
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 5 option (a); stricter-only · **Under:** DEC-521
+- **Decision:** In the follow-up after W1-41, the READY rule treats a constraining package the store could not load as blocking.
+
+### DEC-545 — P-19.6: an absent tickets or changes folder reads as an empty list
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-19 point 6 option (a)
+- **Decision:** An absent tickets or changes folder reads as an empty list, as built.
+
+### DEC-546 — How the orchestrator applies DEC-541 and DEC-542
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; consequences of the owner's answers, nothing loosened) · **Under:** DEC-541, DEC-542, DEC-463
+- **Decision:**
+  - W1-32's fifth success line becomes "The command set stays at the Wave 1 list (no command without a contract item) [CAP-28.a]". W1-35 gains the success line "A status question asked in natural language is answered from gov status --json: the orchestration skill states the route, and a case holds it [CAP-28.a]", on the follow-up's branch.
+  - The four command-list lines of DEC-542 are written by a test designer in the follow-up after W1-41 (DEC-521), with the list itself; until then W1-32's suite pins `ci`, `launch` and `telemetry` as found.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.148 | 2026-10-08 | Owner answers to P-19: DEC-540 (governance share "not measured" in status), DEC-541 (the natural-language route goes into the W1-35 follow-up; W1-32 closes), DEC-542 (`ci`, `launch`, `telemetry`, `lock` in the command list), DEC-543 (two kinds of gate for W1-32; what S0a-G-01 says), DEC-544 (READY blocks on a package the store could not load), DEC-545 (an absent folder reads as empty). Delegated: DEC-546 (the two KPI lines; where the command-list lines are written). Next free id: DEC-547. |
