@@ -1,4 +1,5 @@
-"""The governance share of a ticket (W1-31; DEC-086, DEC-106, DEC-170, DEC-491, DEC-495, DEC-501).
+"""The governance share of a ticket (W1-31; DEC-086, DEC-106, DEC-170, DEC-491, DEC-495, DEC-501, DEC-502,
+DEC-507).
 
 ``measure(root, ticket, sessions)`` returns the record ``gov telemetry`` prints, and writes nothing.
 
@@ -6,8 +7,8 @@ A figure is measured or it says "not measured" (DEC-449, DEC-454): nothing here 
 number. The tokens of the sessions are ccusage's, held against the assistant lines of each session's own log
 and of its sub-agents' logs; when they cannot be measured for every named session the counter refuses. Five
 sources are measured (three from the session logs, ``gov.telemetry.sessionlog``; two from the ticket's record
-folders) and two are a static estimate on a line of their own. The counter gives counts and states no opinion
-of them.
+folders) and two are a static estimate on a line of their own, which stands on the role each session is named
+with (DEC-507). The counter gives counts and states no opinion of them.
 """
 
 from __future__ import annotations
@@ -39,17 +40,24 @@ UNDECIDED = ("role", "skill_versions", "tool_versions", "packet_id", "retrieval_
 HARNESS, API_DURATION = "Claude Code", "harness_api_duration_ms"
 # What the counter cannot count, said in every record (DEC-501). No entry makes a figure "not measured".
 KNOWN_GAPS = (
-    # AD-7, awaiting decision: the one place of the PreCompact hook's output. It is not read and not counted.
-    ("precompact_hook_output", "the harness logs the output of a PreCompact hook in no hook line: it is not counted"),
+    # DEC-502: the output is inside the line of the compaction command's own output. It is not read.
+    ("precompact_hook_output", "the output of a PreCompact hook is in no hook line of the log: nothing is counted "
+                               "for it"),
     ("gov_run_indirectly", "a gov command inside bash -c, eval, backticks or a wrapper script is not seen: its "
                            "result is not counted"),
+    # DEC-507 leaves them undecided: this entry and the estimate's method are where the record says so.
+    ("subagent_instruction_files", "the instruction files a sub-agent of a named session was given are not part "
+                                   "of the estimate: they are not counted"),
 )
-INSTRUCTION_FILE, MCP_FILE = "CLAUDE.md", ".mcp.json"
-# AD-1, awaiting decision: this text says all the estimate is.
-METHOD = (f"A static estimate, not read from a session log. instruction_files: the tokens of {INSTRUCTION_FILE} "
-          "(4 characters a token, rounded up) once per session named for the ticket; no other instruction file "
-          f"is counted. mcp_definitions: 0 where {MCP_FILE} was read and defines no server; where it is absent, "
-          "cannot be read or defines any server, it is not measured.")
+ROOT_FILES, ROLE_FILES_REL = ("CLAUDE.md", "AGENTS.md"), ".claude/agents"
+ROLE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")  # a role is the plain name of its file, never a path
+# DEC-507: this text and ``_estimate`` say all the estimate is.
+METHOD = ("A static estimate, not read from a session log. instruction_files: for each session named for the "
+          f"ticket, the tokens (4 characters a token, rounded up) of the file of its role, {ROLE_FILES_REL}/<role>.md, "
+          f"and of {' and '.join(ROOT_FILES)} at the project's root where they exist, summed over the sessions; "
+          "the caller names each session's role, and the instruction files of a sub-agent are not counted. "
+          "mcp_definitions: 0 by decision, with its reason beside it; no file is read for it.")
+MCP_REASON = "the Governance OS defines no MCP server (DEC-507): whatever the project defines is not governance text"
 DISPUTES_NAME = "kpi-disputes.txt"
 DISPUTE = re.compile(r"(DEC-\d+):\s*\S.*")
 REASON_NOT_RECORDED = "reason not recorded"
@@ -96,28 +104,30 @@ def _checkpoints(root: Path, ticket: str):
     return sum(_tokens(text) for text in texts)
 
 
-def _estimate(root: Path, sessions: int, missing: dict) -> dict:
-    """The line of the estimate (DEC-495). AD-1, awaiting decision: this function is the whole formula."""
-    rule, servers = _text(root / INSTRUCTION_FILE), _text(root / MCP_FILE)
+def _estimate(root: Path, roles: list, missing: dict) -> dict:
+    """The line of the estimate (DEC-495, DEC-507): for each session, by its role in ``roles`` (None where the
+    caller named none), the role's file and the root files that exist. One session without a figure leaves
+    the ticket without one: no role is guessed and the other sessions' sum is not given."""
+    read, reasons, counted = {}, [], 0
+    for role in roles:
+        if role is None or not ROLE.fullmatch(role):
+            reasons.append("a session was named without its role" if role is None
+                           else "a session's role is not the plain name of a role file")
+            continue
+        for rel in (f"{ROLE_FILES_REL}/{role}.md", *ROOT_FILES):
+            text = read[rel] = read[rel] if rel in read else _text(root / rel)
+            if isinstance(text, str):
+                counted += _tokens(text)
+            elif text is False:
+                reasons.append(f"{rel} is there and cannot be read")
+            elif rel not in ROOT_FILES:  # a root file that does not exist adds nothing; a role has its file
+                reasons.append(f"{rel} is not there: the role has no file")
+    if reasons:
+        missing["instruction_files"] = list(dict.fromkeys(reasons))
     line = {"label": "estimated", "method": METHOD,
-            "files": [name for name, text in ((INSTRUCTION_FILE, rule), (MCP_FILE, servers))
-                      if isinstance(text, str)] or NOT_MEASURED,
-            "instruction_files": NOT_MEASURED, "mcp_definitions": NOT_MEASURED}
-    if isinstance(rule, str):
-        line["instruction_files"] = _tokens(rule) * sessions
-    else:
-        missing["instruction_files"] = [f"{INSTRUCTION_FILE} is not there" if rule is None
-                                        else f"{INSTRUCTION_FILE} cannot be read"]
-    try:
-        defined = json.loads(servers)["mcpServers"] if isinstance(servers, str) else None
-    except (ValueError, KeyError, TypeError):
-        defined = None
-    if isinstance(defined, dict) and not defined:
-        line["mcp_definitions"] = 0
-    else:
-        missing["mcp_definitions"] = [
-            f"{MCP_FILE} is not there" if servers is None else f"{MCP_FILE} cannot be read" if defined is None
-            else f"{MCP_FILE} defines a server, and which servers are governance is not decided"]
+            "files": NOT_MEASURED if reasons else sorted(rel for rel, text in read.items() if isinstance(text, str)),
+            "instruction_files": NOT_MEASURED if reasons else counted,
+            "mcp_definitions": 0, "mcp_definitions_reason": MCP_REASON}  # DEC-507: 0, never without its reason
     line["total"] = _total(line[name] for name in ESTIMATED)
     return line
 
@@ -206,14 +216,27 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
     """The telemetry record of ``ticket``, with ``sessions`` as its sessions (the caller names them, DEC-491);
     the logs of a named session's sub-agents are read with it (DEC-501).
 
+    Each entry of ``sessions`` is a text in the form ``--ticket-session`` takes: ``"<session id>"``, or
+    ``"<session id>=<role>"`` to name the session's role (DEC-507). ``<role>`` is the plain name of the role's
+    file, ``.claude/agents/<role>.md`` under ``root`` (``"engineer"``; no path, no ``.md``). No role is read
+    from a log or guessed: where an entry names none, names one that is no plain name or one without its
+    file, the record is still returned and its estimate of the instruction files, the estimated share and
+    the sum of the shares say "not measured". An entry given twice counts once.
+
     Reads, from the environment, ``CLAUDE_CONFIG_DIR`` (the folder that holds the session logs' ``projects/``;
-    without it ``HOME``'s ``.claude``) and ``PATH`` (ccusage, git). Raises ``GovError`` for an unknown ticket
-    and when the tokens of a named session could not be measured; writes nothing."""
+    without it ``HOME``'s ``.claude``) and ``PATH`` (ccusage, git). Raises ``GovError`` for an unknown ticket,
+    when no session is named, when one session is named with two roles, and when the tokens of a named
+    session could not be measured; writes nothing."""
     root = Path(root).resolve()
     front = frontmatter(root / TICKETS_REL / f"{ticket}.md") if TICKET_ID.fullmatch(ticket) else None
     if front is None:
         raise GovError("TICKET_UNKNOWN", f"{ticket} is not a ticket of this project", {"ticket": ticket})
-    sessions = list(dict.fromkeys(sessions))
+    roles: dict = {}
+    for session, named, role in (entry.partition("=") for entry in sessions):
+        if roles.setdefault(session, role if named else None) != (role if named else None):
+            raise GovError("TICKET_SESSION_ROLE", "a session of the ticket is named with two roles "
+                           "(--ticket-session): nothing was measured", {"ticket": ticket})
+    sessions = list(roles)
     if not sessions:
         raise GovError("TICKET_SESSION_MISSING", "no session of the ticket is named (--ticket-session): "
                        "the sessions' tokens were not measured", {"ticket": ticket})
@@ -224,6 +247,8 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
     figures = {name: sum(entry[name] for entry in entries) for name in FIGURES}
     for entry in entries:
         del entry["cache_creation_tokens"]  # shown for the ticket, not per session
+        role = roles[entry["session"]]  # DEC-507: as the caller named it, never read or guessed
+        entry["role"] = role if role is not None and ROLE.fullmatch(role) else NOT_MEASURED
 
     missing: dict[str, list] = {}
     for log in logs:
@@ -238,7 +263,7 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
     if not isinstance(closed, str):
         missing["close_records"] = ["the ticket has no close record yet: it is counted by a measure after the close"
                                     if closed is None else "the ticket's close record cannot be read"]
-    estimate = _estimate(root, len(sessions), missing)
+    estimate = _estimate(root, list(roles.values()), missing)
     counted = {name: NOT_MEASURED if name in missing else counted[name] for name in SOURCES}
     counted["total"] = _total(counted.values())
 
