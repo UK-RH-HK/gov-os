@@ -1,6 +1,6 @@
 ---
 id: DAEO-fdkq
-status: in_progress
+status: closed
 deps: [DAEO-8nue, DAEO-fygv, DAEO-2lwj]
 links: []
 created: 2026-09-30T22:49:59Z
