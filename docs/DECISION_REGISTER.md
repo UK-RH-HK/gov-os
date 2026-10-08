@@ -5583,3 +5583,45 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.136 | 2026-10-07 | Owner answers: DEC-503 (ignored files a residual), DEC-504 (three partly closed points residuals; W1-30 closes), DEC-505 (a probe refusal from the orchestrator's merge and residual commits or an owner-ordered fix round counts with the adoption gaps; the gate changes in the W1-30 follow-up), DEC-506 (W1-39's doctor message accepted), DEC-507 (the estimate's basis), DEC-508 (the guard refuses tool calls whose targets include the held-out file), DEC-509 (DEC-499 to DEC-502 accepted), DEC-510 (the runner's tools in the exit package). Next free id: DEC-511. |
+
+## 137. Owner answer: what else counts as an adoption gap at a close, when every such exception ends, and real checkpoints (register v0.137, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-511 — Four more adoption gaps until W1-41; every adoption-gap exception ends when W1-41 is merged; W1-42 shows one clean `gov close`; leads write real checkpoints
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-15 option (a) with three guards. `gov close DAEO-2lwj`, run once with the fixed tool, reported 55 findings in seven classes (`log/close-W1-30b.json`); four things among them are not on DEC-492's list. · **Refines:** DEC-476, DEC-492, DEC-505
+- **Decision:**
+  - **Until W1-41, these also count as adoption gaps:**
+    - a missing checkpoint record;
+    - a context that fails only because a source outside the repository (such as `S0a-G-12`) is not in the store;
+    - the orchestrator's merge commits without `Implements:` made before DEC-492 was recorded (2026-10-07 19:46);
+    - the two history commits `7674efde` and `478a8ed0`, as recorded history.
+  - **Repair tickets** made by such refusals are not committed; their text is kept beside the close output.
+  - **W1-30** closes with `tk close` and is listed for the exit auditor. Then `gov close` is run once each on W1-38, W1-39 and W1-40 under the same rule.
+  - **Expiry.** Every adoption-gap exception (DEC-492, DEC-505 and this decision) ends when W1-41 is merged. From then on a ticket closes only through a clean `gov close`. W1-41's and W1-42's KPI lines say so.
+  - **Proof at the exit.** W1-42's exit run includes at least one real ticket closed by a clean `gov close`, with no exception, showing the gate works end to end. W1-42 gains that KPI line.
+  - **Real checkpoints, not closing ones.** From now on every lead runs `gov checkpoint` at each round boundary of its ticket, so that W1-32 and W1-41 have genuine checkpoint records when they close. No checkpoint is written at the close only to pass the gate.
+  - **Sources.** W1-41 brings sources such as `S0a-G-12` into the store, or records them as external references the context accepts.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.137 | 2026-10-08 | Owner answer: DEC-511 (a missing checkpoint, a context failing for a source outside the repository, the orchestrator's merge commits before DEC-492 without `Implements:` and two history commits count as adoption gaps until W1-41; every such exception ends at W1-41's merge; W1-42 shows one clean `gov close`; leads run `gov checkpoint` at each round boundary; W1-41 brings outside sources into the store). Next free id: DEC-512. |
+
+## 138. One delegated decision on W1-31: the packages of its follow-up, and a second correction of DEC-502 (register v0.138, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-512 — W1-31: the follow-up's packages A to G; DEC-502's sentence on the template's PreCompact hook is corrected; W1-31 merges and closes at `35904984`
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-08; told to the owner, who may replace it) · **Basis:** the W1-31 lead's fourth return (`log/W1-31-lead-run4.json`: suite of 131 cases green at `35904984`; packages A to F from the test designer, G from the lead) · **Corrects:** DEC-502 (one sentence) · **Refines:** DEC-502, DEC-507
+- **Correction.** DEC-502 says "The template registers no hook for that event" (PreCompact). That is wrong: this repository's settings register a PreCompact hook that runs the template's `precompact.py` (the lead read the registered hook events). The decision itself stands: the hook's output is in no hook line of the log and stays a named gap of the record.
+- **Decision:**
+  - **A. Interpreter words.** DEC-502 says "a Python interpreter": a command word whose last path component is `python`, `python3` or `python3.<n>`, run with the module `gov.cli.main`, runs `gov`. As built only `python3` is counted and the others are "not measured" by name, which is the safe side. The wider form is built with the next change of the counter (below), not now.
+  - **B. A SessionStart with plain text and an added-context line at the same start** stays "not measured" until a specimen shows it.
+  - **C. The larger-reading note** also counts a hook's denial by its answer and the Stop and SubagentStop feedback lines, as built.
+  - **D. The plain SessionStart text** is counted from the run line's `content`, as built.
+  - **E. A permission rule's denial of a tool other than Bash** stays "not measured" until a specimen shows its sentence.
+  - **F. A sub-agent's own instruction files** are not in the estimate; the record names that as a known gap, as built. DEC-507 speaks of sessions; whether the estimate should grow by the agent-type file per sub-agent is for the owner if the exit run shows sub-agents matter.
+  - **G. A user line whose content is a list holding anything but tool results** keeps the three log sources "not measured", as built.
+  - **What follows, and when.** A, B, E and G are forms no specimen shows. Before W1-42's exit run the orchestrator makes a fourth specimen (a denied Write, a prompt logged as a list, two SessionStart hooks of different forms, an interpreter called by a path) and, only if the exit run's real sessions would otherwise be "not measured" for one of these forms, one more change of the counter is built from it, a test designer first. Until then each of these forms is "not measured" by name and never a figure.
+  - **W1-31 merges at `35904984` and closes.** Its residual list is the lead's (runs 2 to 4).
+  - Recorded before the merge (DEC-463).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.138 | 2026-10-08 | One delegated decision on W1-31: DEC-512 (the follow-up's packages A to G; DEC-502's sentence on the template's PreCompact hook corrected; a fourth specimen before the exit run; W1-31 merges and closes at `35904984`). Next free id: DEC-513. |
