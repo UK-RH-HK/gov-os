@@ -194,3 +194,11 @@ tools:
     date: "2026-10-01"
     approved_by: "DEC-141"
     note: "Sandbox prerequisite, the system package socat 1.8.0.0-4ubuntu0.1 (Ubuntu); sha256 of the distribution package, from the apt package index. Installed by the owner for the sandbox spike (DEC-141). Both commands are owner actions: no agent session runs sudo."
+  - name: pytest-xdist
+    version: "3.8.0"
+    sha256: "202ca578cfeb7370784a8c33d6d05bc6e13b4f25b5053c30a152269fd10f0b88"
+    install: "/usr/bin/python3 -m pip install --user --break-system-packages pytest-xdist==3.8.0"
+    uninstall: "/usr/bin/python3 -m pip uninstall --break-system-packages pytest-xdist execnet"
+    date: "2026-10-08"
+    approved_by: "DEC-514"
+    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/xdist, installed by the orchestrator for the trial of parallel test runs (DEC-514); sha256 of its wheel pytest_xdist-3.8.0-py3-none-any.whl from PyPI. The install brought its one dependency execnet 2.1.2 (wheel execnet-2.1.2-py3-none-any.whl, sha256 67fba928dd5a544b783f6056f449e5e3931a5c378b128bc18501f7ea79e296ec). pytest loads the plugin in every run from now on; without -n it changes no run."
