@@ -1,6 +1,6 @@
 ---
 id: DAEO-6mk8
-status: in_progress
+status: closed
 deps: [DAEO-ipqy, DAEO-zsvl, DAEO-2lwj]
 links: []
 created: 2026-09-30T22:49:59Z

@@ -22,6 +22,10 @@ depends_on:
 allowed_paths:
 - src/gov/adopt/**
 - tests/unit/adopt/**
+- src/gov/context/**
+- tests/unit/context/**
+- governance/project/external-references.yaml
+- tests/unit/launch/test_command_modules.py
 kpis:
   success:
   - 'On b-dev, stages A0-A4, A5, A6 and A8 each write an evidence record: A0 clean tree and backup ref; A1 inventory; A2 classification; A3 target path map with KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE
@@ -33,8 +37,8 @@ kpis:
   - A legacy memory store is retired only after a dependency proof (no active record or rule cites it); its retirement is a CIT-E followed by an index refresh [CAP-42.b]
   - Retired material leaves the active tree and stays reachable through git history or an archive ref; nothing is deleted without a recorded disposition [CAP-42.c]
   - 'A3: the path map keeps a healthy native framework or package layout unless the target structure is materially better and the migration risk is justified [CAP-44.j]'
-  - When this ticket is merged, every adoption-gap exception at a close ends (DEC-492, DEC-505, DEC-511); from then on a ticket closes only through a clean gov close (DEC-511)
-  - Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references the context accepts (DEC-511)
+  - This ticket closes under the adoption-gap exceptions; they end when this repository's adoption is complete (gov adopt --lite run on it, the gov check baseline empty, capability records present), a step after this merge and before W1-42 (DEC-522)
+  - 'Sources that live outside the repository (such as S0a-G-12) are in the record store, or are recorded as external references: the context accepts an id listed in governance/project/external-references.yaml and reports it as external, never as content (DEC-511, DEC-520)'
   failure:
   - Any file content changes during a move batch
   - A move runs without an A5 verdict [CAP-44.c]
