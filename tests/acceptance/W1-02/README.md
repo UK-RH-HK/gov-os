@@ -219,6 +219,224 @@ W1-45 test design batch (DEC-106). No test for another role was changed; no test
 | `test_w1_02_allow_list.py` `MISMATCHED`: `orchestrator-on-engineer-ticket`, `orchestrator-on-product-spec-ticket` | Removed | DEC-156: the orchestrator writes regardless of the active ticket's role |
 | `test_w1_02_subagent.py` `ROLE_DENIES`: `orchestrator-in-engineer-session-on-the-engineer-s-ticket` | Moved to `ROLE_ALLOWS` | DEC-156: the orchestrator subagent may write source regardless of ticket |
 
+## Revision of 2026-10-08: reads of the settings file and the held-out file (DEC-508, DEC-525)
+
+W1-02 is reopened for one change ordered by the owner: **the guard refuses any agent tool call that reads the Claude
+Code settings file of the project (`.claude/settings.json`) or the project's held-out file, for every role, the
+orchestrator included**, and a small helper lists the registered hooks so that no session needs to open the settings
+file. The cases were written before any code for the change. The change is stricter-only.
+
+**The two files are never this repository's.** Every case builds a temporary project with a stand-in settings file
+(a stand-in deny line, stand-in hooks, stand-in permission, environment and sandbox entries) and a stand-in held-out
+file that lists a stand-in directory (`w1_02_protected_support.make_guarded`). **The held-out file's path is not
+spelled anywhere in this suite:** it is imported from the guard's own module (`gov.guard.heldout.CONFIG_REL`, with
+`CONFIG_KEY`). That import is the one thing these cases take from the package directly; `CONFIG_REL` and `CONFIG_KEY`
+must keep their names. Every decision is asked of the hook, run as a process, as in the rest of the suite.
+
+### Run and red count
+
+```sh
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_protected_reads.py \
+  tests/acceptance/W1-02/test_w1_02_protected_reads_open.py tests/acceptance/W1-02/test_w1_02_hook_listing.py \
+  -q -p no:cacheprovider -rs
+```
+
+Red run on `w1/W1-02` at `a0bd166b`, against the guard as built: **202 failed, 164 passed** (366 cases, 22 test
+functions, about 30 s). The whole of `tests/acceptance/W1-02`: 202 failed, 693 passed (895 cases); the 529 earlier
+cases are all green, the latency case included.
+
+| File | Cases | Red | Reason |
+|---|---|---|---|
+| `test_w1_02_protected_reads.py` | 190 | 190 | The guard allows the read: every one of the 190 calls comes back `decision=allow`, exit code 0 |
+| `test_w1_02_protected_reads_open.py` | 164 | 0 | What must keep working: green today, and it stays green |
+| `test_w1_02_hook_listing.py` | 12 | 12 | The command does not exist (`No module named gov.guard.hooks`) |
+
+### What the guard refused before the change
+
+Found by running the hook on the stand-in project, for the eleven actors below and the 48 forms of
+`test_w1_02_protected_reads.py`:
+
+- **The settings file:** no read is refused, for any role, through any tool. Read, Grep, Glob and every shell form
+  (`cat`, `head`, `grep`, `jq`, an input redirect, `git diff`, `git show HEAD:<file>`, an interpreter with a script on
+  the command line) are allowed for a session with no role, an unknown role, each known role, a role subagent and a
+  subagent that is not a role.
+- **The held-out file:** the same: no read is refused, for anyone. The rule as built (DEC-162, DEC-215) hides the
+  paths the file *lists*, not the file; reading the file that holds them was an accepted residual.
+- **A copy with the file as its source** is decided as a write at its destination only: allowed when the role may
+  write the destination (scratch for every known role), denied otherwise. The source is not looked at.
+- **Writes** to either file are decided by the allow-list, as before.
+
+So nothing of line 1 was held; every refusal case is red.
+
+### The owner's lines → tests
+
+Actors ("every role"): no role, an unknown role (`developer`), `orchestrator`, `engineer`, `product-spec`,
+`independent-test-designer`, `independent-auditor`, `research`, `ticket-lead`, an `engineer` subagent of the
+orchestrator, a `general-purpose` subagent of the engineer.
+
+| Line | Test file | Test functions |
+|---|---|---|
+| **1.** The guard refuses any agent tool call that reads either file, for every role | `test_w1_02_protected_reads.py` | `test_a_read_of_a_protected_file_is_refused` (42 forms × 2 files, by the orchestrator) · `test_a_command_that_prints_the_settings_file_is_refused` (6; the DEC-525 incident is `interpreter-loading-the-settings-for-their-hooks`) · `test_the_search_behind_dec_508_is_refused` (the DEC-508 incident, by the test designer) · `test_a_read_of_a_protected_file_is_refused_for_every_role` (4 forms × 11 actors × 2 files) · `test_a_read_of_a_protected_file_is_refused_while_frozen` |
+| **2.** What a guard reading a command line cannot see is not pretended | this README | [Residuals](#residuals); no case |
+| **3a.** `git diff --stat` and `git status` naming the settings file | `test_w1_02_protected_reads_open.py` | `test_git_diff_stat_and_git_status_on_the_settings_file_stay_allowed` (6 forms × 4 actors) |
+| **3b.** A write to the settings file where the role may write it today | `test_w1_02_protected_reads_open.py` | `test_a_write_to_the_settings_file_is_decided_as_today` (20 actors × Write, Edit) · `test_a_bash_write_to_the_settings_file_is_decided_as_today` (a redirect, a copy with the file as destination × 4 actors) |
+| **3c.** The harness's own use of the settings file | this README | [What stands](#what-stands); no case can exist |
+| **3d.** Ordinary work near the two files | `test_w1_02_protected_reads_open.py` | `test_another_file_of_the_same_folder_named_alone_stays_readable` (6 forms × 3 actors × 2 files) · `test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed` (14 forms × 3 actors) · `test_text_that_mentions_the_settings_file_is_not_a_read` (3) |
+| **3e.** Every decision W1-02's and W1-50's suites hold today | the 529 earlier cases of this suite; W1-50's suite | unchanged, with one point returned as a package (DP-1) |
+| **4.** A helper for hook listings | `test_w1_02_hook_listing.py` · `test_w1_02_protected_reads_open.py` | the 9 functions of the first file (12 cases) · `test_the_helper_s_command_is_allowed_for_every_role` (11 actors) |
+| **5.** A refusal names the rule and the decision, not the file's content | `test_w1_02_protected_reads.py` | `test_a_refusal_names_the_decision_and_nothing_of_the_file` (5 forms × 2 files) |
+
+### The forms held as refused
+
+`{file}` is either stand-in file, `{folder}` the folder that holds it.
+
+- **File tools.** Read of the file: absolute, relative, with a limit, through `..`, through a symbolic link. Grep in
+  the file (absolute, relative, through the link). Grep over `{folder}` (absolute, relative, and with a glob for the
+  file's extension). Glob in `{folder}` (`path` = the folder; a pattern `{folder}/*`; an absolute pattern). From the
+  project root with a glob that takes the file in: Grep with `glob` = `*<extension>` or `{folder}/**`; Glob with
+  `**/*<extension>` or `**/<name>`; Glob with the file's own path as the pattern.
+- **Shell.** `cat` of the file: relative, absolute, double-quoted, single-quoted, `./`, through `..`, through
+  `$CLAUDE_PROJECT_DIR` (a variable of the hook's environment), through a symbolic link, after `cd {folder} &&`, by
+  a glob `{folder}/*`, beside another file. `head`; an input redirect (`wc -c < {file}`); the first command of a
+  pipeline; after `&&`. `grep` in the file; `grep -rn` over `{folder}`; `ls -la {folder}`; `find {folder} -type f`.
+  `cp` with the file as its source, into scratch (relative and absolute). An interpreter with a script on the command
+  line that names the file, relative or absolute (`python3 -c "print(open('{file}').read())"`).
+- **The settings file alone.** The incident form, `python3 -c "import json; print(json.load(open('…'))['hooks'])"`;
+  `jq .hooks {file}`; `git diff {file}`; `git diff --stat -p {file}`; `git show HEAD:{file}`; and
+  `git diff --stat {file} && cat {file}`.
+- **A refusal is a decision of a rule:** exit code 0 with `permissionDecision: deny`. Exit code 2, the guard's report
+  of its own failure (DEC-110), does not pass these cases.
+
+### What a refusal says (line 5)
+
+For five forms on each file the cases read the reason and everything else the hook wrote (standard output and
+standard error):
+
+- the reason holds `DEC-508` or `DEC-525`, and words beside the decision id (the rule);
+- for the stand-in held-out file: the file's path (relative and absolute), its name and the directory it lists appear
+  nowhere. Three of the forms are shell commands that name the file, so a refusal that echoes the command fails;
+- for the stand-in settings file: no deny value, no allow or ask value, no environment name or value and no sandbox
+  value appears. The settings file's own path may be named.
+
+A failing case does not print the values either: it reports their positions in `Guarded.secrets`.
+
+### What stands
+
+- **Who may write the settings file** (found in `decide.py` and held by the 48 write cases, all green): an
+  orchestrator session, on any ticket or none (DEC-156); any other role only on an in-progress ticket of its own
+  role whose `allowed_paths` name the file (the engineer on `DAEO-zz96`; an engineer subagent on that ticket; an
+  orchestrator subagent in another role's session on the orchestrator's ticket that names it). Everyone else is
+  denied: a role on a ticket that does not name the file or belongs to another role, the test designer, the auditor,
+  research and the ticket lead on a ticket that names it, a subagent that is not a role, no role, an unknown role.
+  As the target of a shell write (`>`, the destination of `cp`) the file is a write and is decided the same way.
+  The `Edit` deny rules for `.claude/**` in launched worker sessions (DEC-315) and rulesync's ownership of
+  `.claude/` (W1-38) are not the guard's and are untouched.
+- **The harness's own use of the settings file** is no tool call: the harness loads the file itself, and no
+  PreToolUse input exists for that. The guard decides tool calls only, which every case here shows by its form (a
+  hook input in, a decision out); the registered hooks keep running, as W1-05's suite holds.
+- **`git diff --stat` and `git status`** naming the settings file, relative or absolute, with or without `--`.
+- **Near the files:** another file of the same folder named alone (Read, Grep, Glob, `cat`, `grep`); a file and a
+  folder below `.claude/`; a search over `src/`; from the root, a Grep with `glob` = `*.py` or `src/**` and a Glob
+  for `**/*.py`; `ls -la` of the root; `cat README.md`.
+- **A mention is not a read** in a file tool or a brief: a Grep pattern that holds the file's name, the content of
+  a Write to another file, and the prompt of an `Agent` call may name `.claude/settings.json`.
+
+### The helper
+
+Settled from the sources:
+
+- **Where it lives.** In the guard's package, on this ticket's paths: `src/gov/guard/hooks.py`, run as a module, the
+  way `python3 -m gov.guard.heldout` already is. No new `gov` subcommand; W1-07's command set is not touched.
+- **How the guard lets exactly that helper read the file.** The guard decides a tool call by its file targets, and
+  the helper's command line names none: it takes no argument and finds the file from the project. So the guard needs
+  no exception for it, and `test_the_helper_s_command_is_allowed_for_every_role` holds that the command stays an
+  ordinary read-only command for all eleven actors. Any other command has to name the file to read it, and is refused.
+
+The interface the cases require:
+
+| | |
+|---|---|
+| Invocation | `python3 -m gov.guard.hooks`, no argument |
+| Project | `CLAUDE_PROJECT_DIR`; without it, the working directory. The file read is that project's `.claude/settings.json` |
+| Output | exit code 0; standard output is one JSON array, one object per registered hook command, in the file's order, each with exactly the keys `event`, `matcher`, `command` (strings). A matcher that is left out is `""`. Other keys of an entry (`type`, `timeout`) are left out |
+| Redaction | every value of `permissions.deny` that appears inside a hook command is replaced by `[redacted]`; the rest of the command stays |
+| Nothing else | no deny line, no permission entry, no environment entry, no sandbox entry, none of their keys |
+| No hooks | no `hooks` key, an empty `hooks`, or `{}`: `[]`, exit code 0 |
+| No settings file | exit code 1, nothing on standard output, one line on standard error that names `.claude/settings.json` |
+| Not valid JSON | the same, and the line carries nothing of the file (a parser's message is not passed on) |
+| Writes | nothing: `git status --porcelain` of the project is unchanged |
+
+A throwaway helper of about 30 lines passed all 12 cases; it lived in the session's temporary folder only.
+
+### Residuals
+
+**What a guard that reads a command line cannot see** (no case; none is pretended):
+
+1. A script file that opens either file, by a literal or a computed name: the guard reads the command, not the script.
+2. A script on the command line that builds the name (joined parts, a variable, an encoding).
+3. An interpreter or a shell fed by a pipe or by standard input.
+4. A name that reaches the command at run time: command substitution, a variable the command itself sets, `xargs`,
+   `find -exec`. The guard refuses such a target for a *write* today (DEC-115), and that stays; a read is not held.
+5. A command that names no path and reads the tree or the history by itself: `git diff` and `git diff --stat -p`
+   with no path, `git show <commit>`, `git log -p`, `git stash show -p`, `git grep`, `rg` with no path, an archive
+   of the root.
+6. A git object read by its id (`git cat-file -p <id>`).
+7. A second name made earlier and outside the call: a hard link, or a copy, that already exists.
+8. A program that reads the settings file by itself (a `claude` process started from the shell, `rulesync`).
+9. A tool the guard does not know (an MCP file tool, a tool added later) with the file in one of its fields.
+
+**Left open on purpose; the cases take no side:**
+
+- an unrestricted recursive search from the project root, through any tool (package DP-1);
+- a deny line's bare path inside a hook command, in the helper's output (package DP-2);
+- a shell command that only mentions the settings file (a commit message, an `echo`), and git commands other than
+  the two named ones that take the file as a path without printing it (`git add`, `git log --oneline --`): a guard
+  that refuses them is stricter than ordered, a guard that allows them reads nothing; neither is held;
+- `git diff --stat` and `git status` naming the held-out file (the order names the settings file only);
+- Grep with a `type` filter; `~` and `$HOME` spellings; a look-alike sibling such as `.claude/settings.local.json`;
+- who may write the held-out file (unchanged, and not restated here);
+- the helper called with arguments.
+
+### Rewrites
+
+None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`).
+
+### Decision packages
+
+**DP-1. An unrestricted recursive search from the project root.**
+- Question: is a search from the project root with no glob that keeps both files out (Grep with `path` = the root
+  or no `path`; `grep -r … .`, `find .`, `ls -R`; Glob `**/*`) refused?
+- Why now: the order lists "a recursive search from the project root" among the forms to refuse, and it also says
+  every decision W1-02's and W1-50's suites hold today stands. Four suites hold exactly that Grep as allowed:
+  W1-02 `test_role_less_session_can_still_read_with_file_tools`, W1-50 `test_ticket_lead_may_read[Grep]`, W1-47
+  `test_a_call_that_names_another_path_stays_allowed[…Grep]` (6 cases) and W1-05
+  `test_a_read_only_tool_goes_through_the_hook_and_is_allowed` (Grep, 6 cases). Three of them are not this ticket's.
+- Options: (a) refuse it; the four suites' cases are rewritten by their designers to search `src/` or to pass a
+  glob, with `Rewrite-Reason` trailers. (b) keep it allowed and record it as a residual: either file's content can
+  then come back from one root search. (c) refuse it, in a follow-up after this ticket, once the four rewrites are
+  in.
+- Impact: (a) and (c) change everyday work in every project that has the kernel: a search from the root needs a
+  path or a glob, for every role. (b) leaves the held-out file readable by a listed tool, which is the incident
+  class of DEC-508.
+- Reversibility: high; a rule and about 14 cases.
+- Cost: (a) one more rule in the guard, about 10 cases here, 14 cases rewritten in four suites; (b) none; (c) as
+  (a), later.
+- Recommendation: (a). Confidence: medium (the order's wording is clear; the cost in daily use is real).
+- Held under both readings: a search over the folder that holds the file, a glob that takes the file in from any
+  start, and a root search under a glob that matches neither file.
+
+**DP-2. A deny line's bare path inside a hook command.**
+- Question: the helper redacts a deny value (`Read(//…/**)`) that appears inside a hook command. Does it also
+  redact the path that value carries when a hook command holds the path without the rule around it?
+- Why now: the interface is fixed by these cases; the deny lines are where the held-out paths are written.
+- Options: (a) the whole deny value only (held by the cases); (b) also the argument of each deny rule, with and
+  without its trailing `/**`.
+- Impact: (a) a hook command that names a held-out path would print it; the guard's own rule (DEC-215) would still
+  refuse any call that then uses it. (b) a short common argument (`sudo:*`, `**/*.key`) could blank ordinary text
+  of a command.
+- Reversibility: high. Cost: (b) a few lines and two cases.
+- Recommendation: (b) for arguments that are absolute paths only. Confidence: medium.
+
 ## Not tested
 
 With the owner (`~/gov-os-workbench/w1-tests/decision-packages/W1-02-kpi-disputes.md`):
