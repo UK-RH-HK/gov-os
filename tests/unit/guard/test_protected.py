@@ -21,7 +21,8 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.guard.decide import decide  # noqa: E402
 from gov.guard.heldout import CONFIG_KEY, CONFIG_REL, SETTINGS_REL  # noqa: E402
 from gov.guard.hooks import REDACTED, listing  # noqa: E402
-from gov.guard.protected import READ_REFUSAL, _glob_rx, read_refusal  # noqa: E402
+from gov.guard.protected import (READ_REFUSAL, _braces, _glob_rx,  # noqa: E402
+                                 _substitutions, _takes_folder, read_refusal)
 
 FILES = (CONFIG_REL, SETTINGS_REL)
 DENY = "Read(//stand-in/**)"
@@ -220,6 +221,120 @@ def test_globs_are_matched_as_the_tools_read_them():
     assert not _glob_rx("*.{py,md}").match("c.yaml")
     assert _glob_rx("c.[a-z]?").match("c.md")
     assert _glob_rx("{a").match("a")
+
+
+# -- more spellings of a read --------------------------------------------------
+
+def test_braces_are_expanded_as_the_shell_expands_them():
+    assert _braces("a") == ["a"]
+    assert sorted(_braces("d/{a,b}")) == ["d/a", "d/b", "d/{a,b}"]
+    assert set(_braces("{a,b{c,d}}x")) >= {"ax", "bcx", "bdx"}
+    for word in ("{a}", "{a", "a,b}", "${HOME}", "", "{,"):
+        assert _braces(word) == [word]
+    assert len(_braces("{a,b}" * 40)) < 600
+
+
+def test_the_commands_inside_substitutions_are_found():
+    assert _substitutions("echo a") == []
+    assert _substitutions("echo `cat a` \"`cat b`\"") == ["cat a", "cat b"]
+    assert _substitutions('echo "$(cat a)" <(cat b) >(cat c)') == ["cat a", "cat b", "cat c"]
+    assert sorted(_substitutions("echo $(cat $(cat a))")) == ["cat $(cat a)", "cat a"]
+    assert _substitutions("(cd a && ls)") == []
+    assert _substitutions("echo $(cat a") == ["cat a"]
+    assert _substitutions("echo `cat a") == ["cat a"]
+    assert _substitutions(")))($(") == [""]
+
+
+def test_a_listing_or_a_search_with_no_path_takes_the_folder():
+    for name, args in (("ls", []), ("ls", ["-la"]), ("rg", ["x"]), ("rg", ["--files"]),
+                       ("grep", ["-r", "x"]), ("grep", ["-rn", "x"]), ("grep", ["x", "-R"]),
+                       ("grep", ["--recursive", "x"])):
+        assert _takes_folder(name, args), (name, args)
+    for name, args in (("ls", ["src"]), ("rg", ["x", "src"]), ("grep", ["x"]),
+                       ("grep", ["-n", "x"]), ("grep", ["-rn", "x", "src"]),
+                       ("grep", ["--color", "x"]), ("cat", []), ("git", ["status"])):
+        assert not _takes_folder(name, args), (name, args)
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_more_spellings_of_a_read_are_refused(project, rel):
+    folder, name = _folder(rel), os.path.basename(rel)
+    for tool_name, tool_input in (
+        ("Grep", {"pattern": ".", "path": str(project), "glob": name}),
+        ("Grep", {"pattern": ".", "glob": name}),
+        ("Grep", {"pattern": ".", "path": str(project), "glob": f"/{rel}"}),
+        ("Grep", {"pattern": ".", "path": str(project), "glob": f"{{{name},other.md}}"}),
+        ("Grep", {"pattern": ".", "path": folder.split("/")[0], "glob": name}),
+        ("Glob", {"pattern": f"{folder}/{{{name},other.md}}"}),
+    ):
+        assert _refused(project, tool_name, tool_input), (tool_name, tool_input)
+    for command in (
+        f"echo a;<{rel} cat",
+        f"(<{rel} cat)",
+        f"true&&<{rel} cat",
+        f"true|<{rel} cat",
+        f"echo $(<{rel})",
+        f'echo "$(<{rel})"',
+        f"cat <>{rel}",
+        f"echo `cat {rel}`",
+        f'echo "`cat {rel}`"',
+        f"cat {folder}/{{{name},neighbour.md}}",
+        f"cat {folder}/{{neighbour.md,{name}}}",
+        f'git diff --stat "$(cat {rel})"',
+        f"git diff --stat `cat {rel}`",
+        f'git status "$(cat {rel})"',
+        f"git status `cat {rel}`",
+        f"git diff --stat <(cat {rel})",
+        f'cat <<< "$(cat {rel})"',
+        f"cd {folder} && grep -r VALUE",
+        f"cd {folder} && rg VALUE",
+        f"cd {folder}; grep -rn VALUE",
+        f"cd {folder} && ls",
+        f"cd -P {folder} && cat {name}",
+        f"cd -- {folder} && cat {name}",
+        f"pushd {folder} && cat {name}",
+        f"python3 -m pytest @{rel}",
+        f"gcc @{rel}",
+        f"grep -f{rel} README.md",
+    ):
+        assert _refused(project, "Bash", {"command": command}), command
+    assert _refused(project, "Bash", {"command": "grep -r VALUE"}, cwd=project / folder)
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_the_same_spellings_beside_the_files_are_let_through(project, rel):
+    folder = _folder(rel)
+    for tool_name, tool_input in (
+        ("Grep", {"pattern": ".", "path": str(project), "glob": "neighbour.md"}),
+        ("Grep", {"pattern": ".", "path": str(project), "glob": "/src/**"}),
+        ("Glob", {"pattern": f"{folder}/{{neighbour.md,other.md}}"}),
+    ):
+        assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
+    for command in (
+        f"cd {folder} && cat neighbour.md",
+        f"wc -c < {folder}/neighbour.md",
+        f"cat {folder}/{{neighbour.md,other.md}}",
+        'git diff --stat "$(git rev-parse HEAD)"',
+        'git status "$(git rev-parse --show-toplevel)"',
+        f'git diff --stat "$(git rev-parse HEAD)" -- {rel}',
+        "ls -la",
+        "git status --short",
+        "git add -A",
+        'git commit -m "a text (with `ticks` and $(words))"',
+        "python3 -m pytest tests/acceptance/W1-02",
+        f"cd {project} && ls -la",
+        f"cd {project} && rg VALUE",
+        "grep -rn VALUE src tests",
+        "grep -rn VALUE src | wc -l",
+        "echo $(ls src) `ls docs`",
+        "wc -c < README.md",
+        f"cd {folder} && git status --short",
+        "pushd src && ls && popd",
+        "cat <<EOF",
+        "pushd && pushd +1 && cd -P && cd --",
+    ):
+        assert not _refused(project, "Bash", {"command": command}), command
+    assert not _refused(project, "Bash", {"command": "ls -la"}, cwd=project / "src")
 
 
 # -- the decision --------------------------------------------------------------

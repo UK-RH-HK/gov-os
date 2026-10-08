@@ -24,8 +24,14 @@ READ_REFUSAL = ("the call reads the settings file or the held-out file, which "
                 "is refused to every role (DEC-508, DEC-525); the registered "
                 "hooks are listed by python3 -m gov.guard.hooks")
 # What separates a file name from the text around it in one shell word: a
-# script on the command line, <commit>:<file>, --option=<file>.
-_PIECE_RE = re.compile(r"""[\s'"()=:,;]+""")
+# script on the command line, <commit>:<file>, --option=<file>, @<file>.
+_PIECE_RE = re.compile(r"""[\s'"()=:,;@]+""")
+# A short option with its value glued to it: -f<file>.
+_GLUED_RE = re.compile(r"-[A-Za-z].")
+# The innermost braces of a word that hold a comma: {a,b}.
+_BRACE_RE = re.compile(r"\{([^{}]*,[^{}]*)\}")
+# The options with which grep searches a folder: -r, -R, a cluster, the long forms.
+_RECURSIVE_RE = re.compile(r"-[A-Za-z]*[rR]|--(dereference-)?recursive\Z")
 # The options with which git diff and git status print no line of a file.
 _GIT_QUIET = frozenset({"--", "--stat", "--short", "-s", "--porcelain"})
 
@@ -68,6 +74,47 @@ def _glob_rx(pattern: str) -> re.Pattern:
         else:
             out.append(re.escape(c))
     return re.compile("".join(out) + ")" * depth + r"\Z", re.S)
+
+
+def _braces(word: str) -> list[str]:
+    """*word*, and after it the words a brace expansion makes of it."""
+    out: list[str] = []
+    todo = [word]
+    while todo and len(out) + len(todo) <= 256:
+        w = todo.pop()
+        m = _BRACE_RE.search(w)
+        if m:
+            todo += [w[:m.start()] + alt + w[m.end():]
+                     for alt in m.group(1).split(",")]
+        else:
+            out.append(w)
+    return [word] + [w for w in out + todo if w != word]
+
+
+def _substitutions(command: str) -> list[str]:
+    """The commands inside a command's substitutions: between backticks,
+    and in ``$(...)``, ``<(...)`` and ``>(...)`` at any depth.  One that is
+    not closed runs to the end."""
+    out = command.split("`")[1::2]
+    stack: list[int | None] = []
+    for i, c in enumerate(command):
+        if c == "(":
+            stack.append(i + 1 if i and command[i - 1] in "$<>" else None)
+        elif c == ")" and stack:
+            start = stack.pop()
+            if start is not None:
+                out.append(command[start:i])
+    return out + [command[s:] for s in stack if s is not None]
+
+
+def _takes_folder(name: str, args: list[str]) -> bool:
+    """True for a listing or a recursive search that names no path: it
+    takes in the folder it runs in."""
+    plain = [a for a in args if not a.startswith("-")]
+    if name == "ls":
+        return not plain
+    return len(plain) <= 1 and (name == "rg" or (
+        name == "grep" and any(_RECURSIVE_RE.match(a) for a in args)))
 
 
 class _Protected:
@@ -119,7 +166,13 @@ def _search_reads(prot: _Protected, path, globs: list[str], cwd: str) -> bool:
     globs = [g for g in globs if not g.startswith("!")]
     if not globs:
         return bool(prot.taken_by(base))
-    return any(prot.matched_by(g, base, by_name="/" not in g) for g in globs)
+    # A glob with no slash is a name at any depth, with or without a
+    # wildcard; one that starts with a slash is read from the search's folder.
+    return any(prot.matched_by(g, base, by_name="/" not in g)
+               or prot.matched_by(g.lstrip("/"), base)
+               or any(g == os.path.basename(f) and f.startswith(base + "/")
+                      for f in prot.files)
+               for glob in globs for g in _braces(glob))
 
 
 def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
@@ -136,24 +189,32 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
         if not words:
             return False
         name, args = os.path.basename(words[0]), words[1:]
-        if name == "cd":
-            exp = _expand_token(args[0]) if args else os.environ.get("HOME")
+        if name in ("cd", "pushd"):
+            while args and args[0].startswith("-") and args[0] != "-":
+                args = args[1:]  # an option: -P, --
+            exp = (_expand_token(args[0]) if args
+                   else os.environ.get("HOME") if name == "cd" else None)
             ecwd = (None if exp is None or exp.startswith("-") or _has_glob(exp)
+                    or (name == "pushd" and exp.startswith("+"))
                     or (ecwd is None and not os.path.isabs(exp))
                 else os.path.join(ecwd or "/", exp))
             return False
-        if name in ("pushd", "popd"):
+        if name == "popd":
             ecwd = None
             return False
+        if (ecwd is not None and _takes_folder(name, args)
+                and prot.taken_by(_real(".", ecwd))):
+            return True
         hits: list[str] = []
         for word in args:
             exp = _expand_token(word) or word
             if ecwd is None and not os.path.isabs(exp):
                 continue
-            hit = prot.read_by(exp, ecwd or "/")
-            if hit:
-                hits.append(hit)
+            hits += [hit for one in _braces(exp)
+                     if (hit := prot.read_by(one, ecwd or "/"))]
             pieces = [p for p in _PIECE_RE.split(exp) if p and p != exp]
+            if _GLUED_RE.match(exp):
+                pieces.append(exp[2:])
             if any(_real(p, ecwd or "/") in prot.files for p in pieces
                    if ecwd is not None or os.path.isabs(p)):
                 return not _git_quiet(name, args)
@@ -166,7 +227,10 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
     cur: list[str] = []
     tokens = _words(command)
     for i, tok in enumerate(tokens):
-        if tok == "<" and i + 1 < len(tokens):
+        # An input redirect, alone or glued to what precedes it (";<", "<>");
+        # "<<" and "<<<" open no file.
+        if (_is_punct(tok) and i + 1 < len(tokens) and not tok.endswith("<<")
+                and tok.endswith(("<", "<>"))):
             exp = _expand_token(tokens[i + 1]) or tokens[i + 1]
             if (ecwd is not None or os.path.isabs(exp)) and prot.read_by(
                     exp, ecwd or "/"):
@@ -210,9 +274,11 @@ def read_refusal(tool_name: str, tool_input: dict, project_root: str,
     elif tool_name == "Glob":
         base = _real(text("path") or ".", cwd)
         reads = bool(base and text("pattern")
-                     and prot.matched_by(text("pattern"), base))
+                     and any(prot.matched_by(p, base)
+                             for p in _braces(text("pattern"))))
     elif tool_name == "Bash":
-        reads = _command_reads(prot, text("command"), cwd)
+        reads = any(_command_reads(prot, c, cwd) for c in
+                    [text("command"), *_substitutions(text("command"))])
     else:
         reads = False
     return READ_REFUSAL if reads else ""
