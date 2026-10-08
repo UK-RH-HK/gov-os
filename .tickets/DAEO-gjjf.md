@@ -42,6 +42,7 @@ kpis:
   - The gov check baseline of this repository (DEC-467) is empty at the exit run, cleared by W1-39 and W1-41's adoption; any item still in it comes to the owner as a decision package (DEC-472)
   - This repository's adoption is complete before the exit run (gov adopt --lite run on it, the gov check baseline empty, capability records present); from then on every adoption-gap exception at a close has ended and a ticket closes only through a clean gov close (DEC-511, DEC-522)
   - The exit run includes at least one real ticket closed by a clean gov close, with no exception, showing the gate works end to end (DEC-511)
+  - The exit run is run from the kernel's orchestration skill and brief templates, not from this repository's orchestrator prompt (DEC-537)
   failure:
   - Any forbidden outcome
   - Governance share > 15 % on either programme
