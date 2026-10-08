@@ -5921,3 +5921,15 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.148 | 2026-10-08 | Owner answers to P-19: DEC-540 (governance share "not measured" in status), DEC-541 (the natural-language route goes into the W1-35 follow-up; W1-32 closes), DEC-542 (`ci`, `launch`, `telemetry`, `lock` in the command list), DEC-543 (two kinds of gate for W1-32; what S0a-G-01 says), DEC-544 (READY blocks on a package the store could not load), DEC-545 (an absent folder reads as empty). Delegated: DEC-546 (the two KPI lines; where the command-list lines are written). Next free id: DEC-547. |
+
+## 149. Delegated: how the provider of half of CAP-28.a is moved (register v0.149, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-547 — W1-35 is named as a second provider of CAP-28 and of its item CAP-28.a in the Contract's capability file
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; the form of a change the owner ordered in DEC-541, nothing else in the Contract changed) · **Under:** DEC-541, DEC-546, DEC-463
+- **Decision:**
+  - The plan validator holds that a ticket's KPI may cite a covers item only when the Contract names that ticket as its provider, and that the provider is also a provider of the capability and has it among its sources. To move the natural-language half of CAP-28.a to the W1-35 follow-up, `docs/contract/contract.yaml` therefore gains `W1-35` in the provider list of CAP-28 and in the provider list of its item CAP-28.a (W1-32 stays, for the command-set half), and W1-35's ticket gains `CAP-28` among its sources.
+  - The change is made in its own commit on the follow-up's branch, with the trailer `Task: DAEO-0i6h`, so that the Contract and the ticket's new KPI line arrive on the integration branch together. No scope, wave or wording of the Contract changes.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.149 | 2026-10-09 | Delegated: DEC-547 (W1-35 named as a second provider of CAP-28 and CAP-28.a, the form of the move ordered in DEC-541). Next free id: DEC-548. |
