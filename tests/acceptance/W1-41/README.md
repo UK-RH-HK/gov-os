@@ -4,12 +4,12 @@ Ticket: `DAEO-cdoi` · Profile: FULL · Covers: CAP-06.b, CAP-06.c, CAP-06.d, CA
 CAP-44.b, CAP-44.c, CAP-44.d, CAP-44.e, CAP-44.j
 
 Written by the Independent Test Designer (MR-3, DEC-069) before implementation, from the ticket's KPI lines, the
-Contract items they cite, DEC-006, DEC-090, DEC-137, DEC-449, DEC-454, DEC-488, DEC-499, and the READMEs and code of
-the suites the stages stand on. No earlier ticket's test was rewritten.
+Contract items they cite, DEC-006, DEC-090, DEC-137, DEC-449, DEC-454, DEC-488, DEC-499, DEC-517, and the READMEs and
+code of the suites the stages stand on. No earlier ticket's test was rewritten.
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41 -q -p no:cacheprovider -rs`
 
-**104 cases in 7 files** (102 without the two `local_only` dev-tier cases). Standard library, PyYAML, pytest, and
+**110 cases in 7 files** (108 without the two `local_only` dev-tier cases). Standard library, PyYAML, pytest, and
 W1-07's support. No network, no model.
 
 **This ticket builds the tool. It adopts nothing.** Every case runs `gov adopt --lite` on a project the case
@@ -20,11 +20,13 @@ points and archive ref are created by the tool in the temporary project only.
 
 ## Red run (before implementation)
 
-At `c96add70`: **80 failed, 23 errors, 1 passed** in 25 s.
+At `c96add70`: 80 failed, 23 errors, 1 passed in 25 s (104 cases). With the six cases of DEC-517 added on top of
+`eb64224f`: **80 failed, 29 errors, 1 passed** in 37 s.
 
-- **103 cases are red only because the command is not built**: `gov adopt --lite …` answers `NOT_IMPLEMENTED`
-  ("gov adopt is reserved and not built yet"). 80 fail in the case, 23 error in a module fixture that carries one
-  adoption through A8 (21 in `test_w1_41_legacy.py`, 2 in `test_w1_41_dev_tier.py`). Among them
+- **109 cases are red only because the command is not built**: `gov adopt --lite …` answers `NOT_IMPLEMENTED`
+  ("gov adopt is reserved and not built yet"). 80 fail in the case, 29 error in a fixture: 23 in a module fixture
+  that carries one adoption through A8 (21 in `test_w1_41_legacy.py`, 2 in `test_w1_41_dev_tier.py`), and the 6
+  cases of DEC-517 in the fixture that carries their project through A2 (stage A0 answers `NOT_IMPLEMENTED`). Among them
   `test_lite_without_a_stage_is_a_usage_error` fails as "exit code 1, expected 2", for the same reason.
 - **1 case is green and must stay green**: `test_adopt_without_lite_is_still_reserved` (see "The interface", 1).
 
@@ -189,6 +191,24 @@ afterwards. The way is package P-3.
 `test_the_plan_rewrites_or_flags_every_importer_reference_and_consumer`,
 `test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers` (the code index tool is taken off `PATH`).
 
+**Where the project's path map turns code intelligence off (DEC-517, the stricter reading of package P-8).** The
+importers of an artefact are read from the code graph; such a project has none, so they cannot be measured, and
+nothing is moved there. The project is the harbour project with `code_intelligence: {enabled: false}`.
+
+| Clause | Tests (`path_map`) |
+|---|---|
+| a proposal that takes an artefact to another path is refused by A3, which names the artefact and the reason and writes nothing (no record, no ref, no commit, the tree as it was) | `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3: MOVE of a module that has an importer, MOVE of a document, RENAME of a document) |
+| the proposal is refused as a whole | `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off` |
+| no later stage moves it | `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` (A4 and A6 each refuse; no origin left its place, no target exists) |
+| a proposal that moves nothing is not refused for that reason | `test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off` (on a built project; the two dev-tier cases hold the same on a clone, but are `local_only`) |
+
+- **The reason** is read from the error object, whatever the case of its letters: it holds "code intelligence"
+  (or `code_intelligence`, `code-intelligence`) and "importer". The error code and the exit code (1, 3 or 4) are
+  the implementation's.
+- **Which actions move.** MOVE and RENAME take an artefact whole from its path to another ("Failure 1": a planned
+  target holds its origin's blob); these are held. SPLIT, MERGE and EXTRACT are not held in such a project: package
+  P-10.
+
 ### Success 5 — memory store: dependency proof, CIT-E, index refresh [CAP-42.b]
 
 `legacy`: `test_a_memory_store_nothing_cites_is_retired`, `test_the_dependency_proof_is_recorded`,
@@ -231,6 +251,7 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | no path map in the project | `baseline`: `test_a_project_without_a_path_map_is_not_classified` | "nothing is unknown" |
 | the proposal cannot be read | `path_map`: `test_a_proposal_that_cannot_be_read_is_refused` | "keep everything" |
 | the code graph cannot be read | `path_map`: `test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers` | "no importers", a move |
+| the project has no code graph (code intelligence is off in its path map) | `path_map`: `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off`, `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` | "no importers", a move |
 | the verdict cannot be read | `verdict`: `test_a_verdict_that_cannot_be_read_moves_nothing` (4) | a pass, a move |
 | the backup ref no longer resolves | `migration`: `test_a_backup_ref_that_no_longer_resolves_stops_the_migration` | a move |
 | a legacy rule file cannot be read or parsed | `legacy`: the two cases above | a retirement |
@@ -243,7 +264,7 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 |---|---|
 | CAP-06.b | `path_map` (the eight actions) |
 | CAP-06.c | `unknown` |
-| CAP-06.d | `path_map` (importers, references, consumers; the plan's handling) |
+| CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no move where code intelligence is off) |
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
 | CAP-42.b | `legacy` (chat database; dependency proof; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
@@ -255,8 +276,8 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 
 ## Where the cases can run
 
-- **The code graph.** The path map of the project turns code intelligence on, so every case that proposes a move
-  needs the code graph (W1-16's tool). In a launched worker session that tool cannot build an index: its daemon
+- **The code graph.** The path map of the project turns code intelligence on (but for the six cases of DEC-517,
+  below), so every case that proposes a move there needs the code graph (W1-16's tool). In a launched worker session that tool cannot build an index: its daemon
   folder `/tmp/gov-cbm-<uid>` is read-only there (measured in this session; `tests/acceptance/W1-20/README.md`
   records the same). **These cases can go green only outside the sandbox; that run is the lead's** (package P-2):
   all of `test_w1_41_migration.py`, all of `test_w1_41_verdict.py`, in `test_w1_41_path_map.py` every case that
@@ -264,6 +285,8 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
   batches), and `test_an_unknown_artefact_blocks_the_whole_destructive_migration`.
 - **Everything else** (baseline, the A3 refusals, unknown artefacts, all of `legacy`, the dev tier) proposes no
   move, or is refused before one is examined.
+- **The six cases of DEC-517 run inside the sandbox.** Their project turns code intelligence off, so no code index
+  is built or read: the moves are refused at A3, and the proposal that moves nothing needs no code graph.
 - **b-dev.** A clone of `~/gov-os-workbench/synthetic/b-dev` into the session's temporary folder was made in this
   sandbox (149 tracked files; it tracks `AGENTS.md`, `.cursorrules` and `.windsurfrules`). The two dev-tier cases
   give the clone a path map with code intelligence off and move nothing.
@@ -283,5 +306,6 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | P-5 | Does one unknown artefact block all destructive migration, or only actions on itself? | all of it (the contract item's words) |
 | P-6 | What must the record show for a move out of a native layout, and who judges "healthy" and "materially better"? | both grounds stated in the proposal and shown in the path map; the A5 auditor reads them |
 | P-7 | Does the tool perform the rewrites of references (apart from the move batches), or only flag them? | only that a move batch changes no content, and that the plan names `rewrite` or `flag` for each |
-| P-8 | In a project whose path map turns code intelligence off, may an artefact be moved? | no case with a move in such a project |
+| P-8 | In a project whose path map turns code intelligence off, may an artefact be moved? | held as a refusal (DEC-517, the stricter reading) until the owner answers: A3 refuses a MOVE or a RENAME there and writes nothing |
 | P-9 | `gov adopt` without `--lite` stays `NOT_IMPLEMENTED`; does "all twelve Wave 1 commands are implemented" accept that? | W1-07's lists untouched |
+| P-10 | Where code intelligence is off, are SPLIT, MERGE and EXTRACT refused as MOVE and RENAME are? | no case with one of the three in such a project |

@@ -3,7 +3,8 @@
 The caller gives A3 a proposal (``--map <file>``): the artefacts that are not kept, each with its action and its
 target. The tool checks it against the inventory and the classification, adds what the graphs say, and records the
 path map. Every case that proposes a move in a project whose path map turns code intelligence on needs the code
-graph, so the code index tool (W1-16) must be able to run (README, "Where the cases can run").
+graph, so the code index tool (W1-16) must be able to run (README, "Where the cases can run"). Where the project's
+path map turns code intelligence off, a proposal that moves an artefact is refused (DEC-517).
 """
 
 from __future__ import annotations
@@ -184,6 +185,98 @@ def test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers(adopt
     support.assert_refused(run, interface, any_of=("code graph", "code index", "codeintel", support.CODE_INDEX_TOOL))
     assert support.head(adoption.project) == head, \
         f"a path map was recorded although the code graph could not be read\n{run.describe()}"
+
+
+# --------------------------------------------------------------------------
+# CAP-06.d, DEC-517: nothing is moved where the project's path map turns code intelligence off
+# --------------------------------------------------------------------------
+# The importers of an artefact are read from the code graph. A project whose path map turns code intelligence off
+# has none, so they cannot be measured there, and what is not measured is refused (DEC-449, DEC-454). Of the eight
+# actions, MOVE and RENAME take an artefact whole from its path to another (README, "Failure 1": a planned target
+# holds its origin's blob). These cases need no code index: they run inside the sandbox.
+
+def _said(error, *spellings):
+    said = json.dumps(error).lower()
+    return any(spelling in said for spelling in spellings)
+
+
+def _refused_because_code_intelligence_is_off(adoption, interface, entries, artefact):
+    """A3 with ``entries`` is refused by the tool itself: it names the artefact and the reason, and it leaves no
+    record, no ref and no commit, with the tree as it was. Returns what the project's refs and tree were."""
+    project = adoption.project
+    before = support.snapshot(project, skip=(".git", ".gov-runtime"))
+    state, tracked = support.git_state(project), support.tree(project)
+    run = adoption.run("A3", *adoption.map_argument(entries))
+    error = support.assert_refused(run, interface, artefact)
+    assert _said(error, "code intelligence", "code_intelligence", "code-intelligence"), \
+        f"the refusal does not say that code intelligence is off in the project's path map\n{run.describe()}"
+    assert _said(error, "importer"), \
+        f"the refusal does not say that the importers cannot be established\n{run.describe()}"
+    changed = support.snapshot_difference(before, support.snapshot(project, skip=(".git", ".gov-runtime")))
+    assert not changed, f"the refused A3 wrote in the project: {changed}\n{run.describe()}"
+    assert support.git_state(project) == state, f"the refused A3 committed or wrote a ref\n{run.describe()}"
+    assert support.porcelain(project) == "", f"the refused A3 left the tree dirty\n{run.describe()}"
+    return state, tracked
+
+
+@pytest.fixture()
+def unindexed(tmp_path, adopt_in):
+    """An adoption of the legacy project with code intelligence turned off in its path map, carried through A2."""
+    adoption = adopt_in(support.build_project(tmp_path / "unindexed", code_intelligence=False))
+    adoption.through("A2")
+    return adoption
+
+
+@pytest.mark.parametrize("path,action,target", [
+    (support.UTIL, "MOVE", support.UTIL_TARGET),            # a module another file imports
+    (support.GUIDE, "MOVE", support.GUIDE_TARGET),          # a document: its importers are not measured either
+    (support.NOTES, "RENAME", "docs/tides.txt"),
+])
+def test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing(unindexed, interface, path, action,
+                                                                            target):
+    """The path map is never recorded with "no importers" for an artefact whose importers could not be measured."""
+    _refused_because_code_intelligence_is_off(unindexed, interface, [support.entry(path, action, target, batch=1)],
+                                              path)
+
+
+def test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off(unindexed, interface):
+    """The proposal that is recorded without the move (the case below) is refused with it: no part of it is
+    recorded, and the legacy files it would retire stay."""
+    entries = support.legacy_proposal() + [support.entry(support.UTIL, "MOVE", support.UTIL_TARGET, batch=1)]
+    _, tracked = _refused_because_code_intelligence_is_off(unindexed, interface, entries, support.UTIL)
+    problems = support.moved_nothing(unindexed.project, tracked, [item["path"] for item in entries])
+    assert not problems, f"the refused A3 moved or retired something: {problems}"
+
+
+def test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off(unindexed, interface):
+    """After the refusal the plan and the migration have no path map to stand on: each refuses, and no file of the
+    project is at another path."""
+    project = unindexed.project
+    entries = [support.entry(support.UTIL, "MOVE", support.UTIL_TARGET, batch=1),
+               support.entry(support.NOTES, "RENAME", "docs/tides.txt", batch=1)]
+    state, tracked = _refused_because_code_intelligence_is_off(unindexed, interface, entries, support.UTIL)
+    for stage in ("A4", "A6"):
+        run = unindexed.run(stage)
+        support.assert_refused(run, interface)
+        assert support.tree(project) == tracked, \
+            f"stage {stage} changed the tracked files after the refused path map\n{run.describe()}"
+        assert support.git_state(project) == state, f"stage {stage} committed or wrote a ref\n{run.describe()}"
+        problems = support.moved_nothing(project, tracked, [item["path"] for item in entries])
+        assert not problems, f"stage {stage} moved something: {problems}"
+        arrived = [item["target"] for item in entries if (project / item["target"]).exists()]
+        assert not arrived, f"stage {stage} put a file at a proposed target: {arrived}"
+
+
+def test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off(unindexed):
+    """Code intelligence being off is no reason to refuse a path map that takes no artefact to another path: the
+    legacy material is retired, everything else is kept."""
+    proposal = support.legacy_proposal()
+    unindexed.ok("A3", *unindexed.map_argument(proposal))
+    entries = unindexed.map_entries()
+    named = {item["path"]: item["action"] for item in proposal}
+    wrong = {rel: item.get("action") for rel, item in entries.items()
+             if item.get("action") != named.get(rel, "KEEP")}
+    assert not wrong, f"entries whose action is not the proposed one, or not KEEP where none was proposed: {wrong}"
 
 
 # --------------------------------------------------------------------------
