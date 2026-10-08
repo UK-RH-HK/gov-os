@@ -5691,3 +5691,57 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.141 | 2026-10-08 | One delegated decision on W1-41: DEC-517 (a caller's proposal file for A3; the lead runs the move cases outside the sandbox; the A8 import by `rulesync import` plus the tool's own; both grounds for a move out of a native layout; flag, not rewrite; the interface accepted; stricter readings until the owner answers). Next free id: DEC-518. |
+
+## 142. Owner answers: the regression after every merge again, W1-40 and W1-31 close, W1-41's paths and follow-up, when the close exceptions end, the guard against two files (register v0.142, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-518 — DEC-513 amended: a full regression runs after every merge into `w1/integrate`
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER. DEC-513's premise was wrong: `gov close` runs only the ticket's own acceptance suite. · **Amends:** DEC-513
+- **Decision:**
+  - A full regression runs after every merge into `w1/integrate`, as before DEC-513. One is run now at the current head, since W1-31 was merged without one.
+  - If the parallel trial passes (DEC-515), the W1-30 follow-up makes `gov close`'s regression step run every suite, in parallel; then the separate regression is dropped.
+
+### DEC-519 — Package P-16: commit `7c6bf804` is recorded history; a register decision that is not yet a store record is an adoption gap; W1-40 and W1-31 close
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-16 option (a) (`log/close-W1-40.json`, `log/close-W1-31.json`) · **Refines:** DEC-511
+- **Decision:**
+  - `7c6bf804` (the orchestrator's commit "Start W1-31, W1-40 and W1-39", whose `Task:` names no ticket) counts as recorded history.
+  - A decision that is in the register but not yet a store record (such as DEC-086) counts as an adoption gap, like a source outside the repository.
+  - W1-40 and W1-31 close with `tk close`, after the full regression of DEC-518 is green, and both are listed for the exit auditor.
+
+### DEC-520 — Package P-17.1: W1-41's paths gain the context code and one file of external references
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-17 point 1 option (a) · **Under:** DEC-511
+- **Decision:** W1-41's `allowed_paths` gain `src/gov/context/**`, `tests/unit/context/**` and one file under `governance/project/` that lists external references. The context accepts a listed id and reports it as external, never as content.
+
+### DEC-521 — Package P-17.2: one short follow-up after W1-41; capability records for this repository are agent work
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-17 point 2 · **Under:** DEC-482, DEC-483, DEC-473
+- **Decision:**
+  - One short follow-up builds: the trailers base commit (DEC-482); the owner-decision lookup from a register file (DEC-483); the close record's skills list in a project with an installed kernel; the declared check commands that name `template/` paths; and, added by the owner, that the record store loads decisions from the project's named register file (DEC-473) as decision records, one per heading.
+  - Creating capability records for this repository from `contract.yaml` is agent work after W1-41 merges, not an owner step.
+  - The owner's exit package holds only owner actions.
+
+### DEC-522 — Package P-17.3: the close exceptions end when this repository's adoption is complete, not at W1-41's merge
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-17 point 3 · **Amends:** DEC-511 (its expiry)
+- **Decision:**
+  - The expiry of every adoption-gap exception (DEC-492, DEC-505, DEC-511, DEC-516, DEC-519) moves from "W1-41's merge" to "this repository's adoption is complete".
+  - **Adoption complete** means: `gov adopt --lite` run on this repository, the `gov check` baseline empty, and capability records present. It is a defined step after W1-41's merge and before W1-42.
+  - W1-41 itself closes under the exceptions.
+  - From adoption on, every ticket closes only through a clean `gov close`, and W1-42 proves it on a real ticket.
+  - The KPI lines of W1-41 and W1-42 are brought to this.
+
+### DEC-523 — Package P-17.4 to P-17.6: the adoption tool's three stricter readings stand as built
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-17 points 4, 5 and 6 · **Ratifies:** the interim readings of DEC-517
+- **Decision:** As built: a chat database is retired only when a committed record cites it by path and current hash (the caller extracts its knowledge); one unknown artefact blocks all of A6 and A8; nothing is moved where the project's path map turns code intelligence off.
+
+### DEC-524 — DEC-512 and DEC-516 are accepted; the measuring agent's role and ticket are accepted
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Ratifies:** DEC-512, DEC-516
+- **Decision:** DEC-512 and DEC-516 stand as written. The measuring agent of DEC-514 as an independent auditor on W1-31 is accepted.
+
+### DEC-525 — The guard refuses any agent tool call that reads the Claude Code settings file or the held-out file, for every role
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on the incident in W1-31's fourth run (a lead loaded `.claude/settings.json` in a script to list hook events) · **Extends:** DEC-508 · **Under:** DEC-108
+- **Decision:**
+  - Delegated to the orchestrator, stricter-only: the guard refuses any agent tool call that reads `.claude/settings.json` or the project's held-out file under `governance/project/` (the owner's answer names its path), for every role, the orchestrator included.
+  - For hook listings, a small helper prints only the hook events, with the deny lines redacted.
+  - The orchestrator chooses the ticket.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.142 | 2026-10-08 | Owner answers: DEC-518 (a full regression after every merge again; DEC-513 amended), DEC-519 (`7c6bf804` recorded history; a register decision not yet a store record is an adoption gap; W1-40 and W1-31 close), DEC-520 (W1-41's paths gain the context code and an external-references file), DEC-521 (one follow-up after W1-41, with register decisions loaded as records; capability records are agent work), DEC-522 (the close exceptions end when this repository's adoption is complete), DEC-523 (three stricter readings of the adoption tool stand), DEC-524 (DEC-512, DEC-516 and the measuring agent's role accepted), DEC-525 (the guard refuses reads of the settings file and the held-out file for every role; a helper lists hook events). Next free id: DEC-526. |
