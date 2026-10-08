@@ -1,16 +1,19 @@
 # W1-41 Acceptance Tests — gov adopt --lite and legacy importer
 
 Ticket: `DAEO-cdoi` · Profile: FULL · Covers: CAP-06.b, CAP-06.c, CAP-06.d, CAP-42.a, CAP-42.b, CAP-42.c,
-CAP-44.b, CAP-44.c, CAP-44.d, CAP-44.e, CAP-44.j
+CAP-44.b, CAP-44.c, CAP-44.d, CAP-44.e, CAP-44.j, and CAP-15.c for the ticket's ninth success line
 
 Written by the Independent Test Designer (MR-3, DEC-069) before implementation, from the ticket's KPI lines, the
 Contract items they cite, DEC-006, DEC-090, DEC-137, DEC-449, DEC-454, DEC-488, DEC-499, DEC-517, and the READMEs and
-code of the suites the stages stand on. No earlier ticket's test was rewritten.
+code of the suites the stages stand on. The ninth success line and the rows of DEC-535 were added later, from
+DEC-473, DEC-511, DEC-519, DEC-520, DEC-521, DEC-523, DEC-535 and W1-24's README. No earlier ticket's test was
+rewritten.
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41 -q -p no:cacheprovider -rs`
 
-**114 cases in 7 files** (112 without the two `local_only` dev-tier cases). Standard library, PyYAML, pytest, and
-W1-07's support. No network, no model.
+**153 cases in 8 files** (151 without the two `local_only` dev-tier cases): the 114 of the adoption tool, 3 rows
+for DEC-535, and 36 for the ninth success line. Standard library, PyYAML, pytest, W1-07's support, and W1-24's
+support for the context. No network, no model.
 
 **This ticket builds the tool. It adopts nothing.** Every case runs `gov adopt --lite` on a project the case
 builds itself, file by file, in its own temporary folder, as a git repository of its own. `run_gov` refuses a
@@ -40,6 +43,14 @@ No behaviour assertion can be red for a reason of its own before the command exi
 that the refusal is the tool's own (`assert_refused` fails on `NOT_IMPLEMENTED`), so none passes by the command's
 absence.
 
+**Added on `9ad3bfbe`** (measured in the sandbox):
+
+- **3 rows of DEC-535, green**: `test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing`
+  (SPLIT, MERGE, EXTRACT). The tool refuses as built.
+- **36 cases of the ninth success line: 30 failed, 6 passed** in 5 s, against the context as W1-24 built it. The red
+  reasons and the six that are green by design are in "Success 9". Run against a stand-in kept outside the tree
+  (and not committed), all 36 pass: the cases can be satisfied together.
+
 ## Sources that could not be read
 
 - **S0a-G-13 and G-10** (the ticket's first two sources) are not in the readable tree: `docs/source/` is closed to
@@ -50,9 +61,15 @@ absence.
 
 ## Not covered here
 
-The ticket's last two success lines (every adoption-gap exception ends at this ticket's merge; sources that live
-outside the repository are in the record store or are recorded as external references) are not derived in this
-batch: the lead returns them as a package. No case is written for them.
+- The ticket's eighth success line (the ticket closes under the adoption-gap exceptions, which end when this
+  repository's adoption is complete, DEC-522) is about how this ticket is closed, not about what the tool does. No
+  case is written for it.
+- `gov close` is not run by any case of the ninth success line: it uses the context as it is. What W1-30's README
+  records about it: where `gov context` answers `BLOCKED`, the close is refused with exit code 3, the answer says
+  the context failed and names the source, no close record is written, the ticket stays in progress and the
+  attempt is counted (DEC-454: a context that cannot be built refuses the close).
+- That this repository's own `governance/project/external-references.yaml` lists the right sources is not held:
+  the engineer writes that file, and no case reads it.
 
 ## The project every case builds
 
@@ -209,13 +226,15 @@ afterwards. The way is package P-3.
 `test_the_plan_rewrites_or_flags_every_importer_reference_and_consumer`,
 `test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers` (the code index tool is taken off `PATH`).
 
-**Where the project's path map turns code intelligence off (DEC-517, the stricter reading of package P-8).** The
-importers of an artefact are read from the code graph; such a project has none, so they cannot be measured, and
-nothing is moved there. The project is the harbour project with `code_intelligence: {enabled: false}`.
+**Where the project's path map turns code intelligence off (DEC-517, ratified by DEC-523; DEC-535 point P-10).**
+The importers of an artefact are read from the code graph; such a project has none, so they cannot be measured, and
+nothing is moved there: none of the five actions that put an artefact, or its content, at another path is
+accepted. The project is the harbour project with `code_intelligence: {enabled: false}`.
 
 | Clause | Tests (`path_map`) |
 |---|---|
 | a proposal that takes an artefact to another path is refused by A3, which names the artefact and the reason and writes nothing (no record, no ref, no commit, the tree as it was) | `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3: MOVE of a module that has an importer, MOVE of a document, RENAME of a document) |
+| SPLIT, MERGE and EXTRACT are refused in the same way: the same refusal, the same reason, nothing written, no origin gone, nothing at a proposed target (DEC-535) | `test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3: SPLIT of a document into two, MERGE of two documents into one, EXTRACT from a document) |
 | the proposal is refused as a whole | `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off` |
 | no later stage moves it | `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` (A4 and A6 each refuse; no origin left its place, no target exists) |
 | a proposal that moves nothing is not refused for that reason | `test_a_proposal_that_moves_nothing_is_recorded_where_code_intelligence_is_off` (on a built project; the two dev-tier cases hold the same on a clone, but are `local_only`) |
@@ -224,8 +243,9 @@ nothing is moved there. The project is the harbour project with `code_intelligen
   (or `code_intelligence`, `code-intelligence`) and "importer". The error code and the exit code (1, 3 or 4) are
   the implementation's.
 - **Which actions move.** MOVE and RENAME take an artefact whole from its path to another ("Failure 1": a planned
-  target holds its origin's blob); these are held. SPLIT, MERGE and EXTRACT are not held in such a project: package
-  P-10.
+  target holds its origin's blob). SPLIT, MERGE and EXTRACT put its content, or a part of it, at another path.
+  All five are held in such a project, one row per action for the last three (DEC-535 decides package P-10). KEEP,
+  RETIRE and DELETE_FROM_ACTIVE_TREE take nothing to another path and are recorded there.
 
 ### Success 5 — memory store: dependency proof, CIT-E, index refresh [CAP-42.b]
 
@@ -267,6 +287,101 @@ the empty list. Two of the five kinds are held, not every kind.
 DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive_migration`,
 `test_an_unknown_artefact_blocks_retirement_too`. **The last two hold the refusing reading, package P-5.**
 
+### Success 9 — the context and sources that live outside the repository [CAP-15.c; DEC-511, DEC-520]
+
+`test_w1_41_external_references.py`, 36 cases. Reached through the public interface only: the command
+`gov context --json --root <project> [--brief] <ticket>` for the main rows, the function
+`gov.context.context(root, ticket, ...)` for five. Every case builds the "quay" project in its own temporary
+folder (a charter `CHARTER-H9`, a decision `ADR-H9-A`, a superseded decision `ADR-H9-OLD`, seven tickets, a path
+map written from the kernel's schema), commits it and loads its record store there, as W1-24's cases do. No index
+is built. Each point below is the cases' reading; the engineer may dispute any of them through the lead.
+
+**The file: `governance/project/external-references.yaml`.** Shaped as the project's other lists there (one
+top-level key that holds the entries, as `hosts:` and `tools:` do; an entry carries its own name, as a tool does,
+so that a second entry for the same id can be seen).
+
+```yaml
+references:
+  - id: S0a-G-12
+    location: "the owner's archive of source documents: sources/S0a/G-12.md"
+    reason: "a planning source the owner keeps outside this repository"
+```
+
+| Key | Required | Type | Meaning |
+|---|---|---|---|
+| `references` (top level) | yes | list of entries; may be empty | the sources that live outside the repository |
+| `id` | yes | text, not empty | the id a ticket declares, exactly (compared as written) |
+| `location` | yes | text, not empty | where the source lives |
+| `reason` | yes | text, not empty | why it is not in the record store |
+
+**The file is not of the stated shape** when any of these holds: it is not valid YAML; it is empty; its top level
+is not a mapping; the mapping has no `references`; `references` is not a list; an entry is not a mapping; an entry
+lacks `id`, `location` or `reason`; one of the three is not text, or is empty or only white space; two entries
+have the same `id`; an `id` is of the decision register's form, `DEC-` followed by digits only (below). One
+defective entry makes the whole file defective. A file with `references: []` is of the shape. **Left open, no
+case:** a key the table does not name (at the top level or in an entry).
+
+**The packet's addition: the key `external`.** A list, one item per id the ticket declares that is not a record of
+the store and is listed, in the order the ticket declares them:
+
+| Key of an item | Value |
+|---|---|
+| `id` | the declared id |
+| `location` | the entry's `location`, as the file states it |
+| `reason` | the entry's `reason`, as the file states it |
+| `read` | `false`: this source was not read |
+
+An item carries none of `sha256`, `authority`, `lifecycle`, `constraint`, `text`, `tokens`, `path`. The id is in
+none of `mandatory`, `authority`, `supplementary`. The packet's `tokens` and `budget` are what they are for a
+ticket that declares the same records and no external id. The packet's `hash` covers the items. **The key is
+absent, not present and empty, where the ticket declares no external reference:** the packet of a ticket whose ids
+are all records keeps W1-24's eight keys and its hash, with or without the file. An entry no id of the ticket
+names is not reported. With `--brief` the summary has a line that names the id and holds the words "not read"
+(whatever the case of the letters), and the file the result points to is the packet, `external` included.
+
+**A refusal** is the context's `BLOCKED` (the code it gives a missing input today), never a packet. For a
+defective file the error names the file by its path `governance/project/external-references.yaml`: anywhere in the
+error object of the command's envelope, and in the message for a caller of the function.
+
+| Clause | Tests (`external_references`) | Against the context as it stands |
+|---|---|---|
+| a listed id is accepted: the context is built, the other declared ids are its mandatory inputs | `test_the_context_of_a_ticket_that_declares_a_listed_id_is_built` | red: `BLOCKED`, the listed id reported as not found in the store |
+| reported as external, with its id, where it lives and why, and that it was not read; in the ticket's order; an entry the ticket does not name is not reported | `test_the_packet_reports_each_listed_id_as_external_with_where_it_lives`, `test_the_function_reports_the_same_external_reference` | red: the same |
+| never as content: in no block of read items, no hash, tier or lifecycle | `test_an_external_reference_is_not_among_the_items_read_as_records` | red: the same |
+| nothing of it counts into the packet's tokens | `test_an_external_reference_adds_nothing_to_the_packets_tokens` | red: the same |
+| the summary of `--brief` says the source was not read; the brief file is the packet | `test_the_brief_says_that_the_external_source_was_not_read` | red: the same |
+| the hash covers it: the same project gives the same packet twice; a change of the entry's `location` or `reason` changes the hash | `test_the_same_project_gives_the_same_hash_twice`, `test_a_change_of_the_listed_entry_changes_the_packets_hash` (2) | red: the same |
+| unlisted stays blocked, the id named | `test_an_id_that_is_neither_a_record_nor_listed_stays_blocked` | **green, and stays green** |
+| … also beside a listed id | `test_an_unlisted_id_blocks_a_ticket_that_also_declares_a_listed_one` | red: the error names the listed id as missing and stops before the unlisted one |
+| the list never hides a record: a listed id that is a record stands among the mandatory inputs with its hash and is not reported as external | `test_a_listed_id_that_is_a_record_is_the_stores_record` | red: `BLOCKED` on the external id the ticket declares beside it |
+| … and a listed superseded record still blocks, named | `test_a_listed_id_that_is_a_superseded_record_still_blocks` | **green, and stays green** |
+| nothing fails open: a file that is not of the stated shape blocks and is named | `test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named` (13 rows, the list above but the register's form), `test_the_function_names_the_defective_file_in_its_message` | red: `BLOCKED` for the missing id, the file not named (it is not read) |
+| … a file that cannot be read | `test_a_file_that_cannot_be_read_blocks_and_is_named` (skipped for a user that permissions do not hold) | red: the same |
+| … for a ticket whose ids are all records too (package P-11) | `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) | red: the packet is built |
+| a project without the file: the packet has W1-24's eight keys and no other | `test_a_project_without_the_file_gives_the_packet_it_gave_before` | **green, and stays green** |
+| … a missing id blocks there, the id named (function and command) | `test_a_missing_id_blocks_in_a_project_without_the_file` | **green, and stays green** |
+| … and a file that lists nothing the ticket declares leaves its whole packet, hash included, as it was without the file | `test_a_file_the_ticket_names_nothing_of_leaves_its_packet_as_it_was` (2: `references: []`; other ids) | **green, and stays green** |
+| a register decision is not an external reference | `test_a_listed_id_of_the_decision_registers_form_is_refused` (2) | red: `BLOCKED` for the missing id, the file not named |
+
+**Readings.**
+
+- **The list never hides a record (held as stated).** The store is asked first: an id that is a record is that
+  record, whatever the file says. A listed id that is also a record is not refused as a defect of the file: the
+  file is judged from its own text and the project's configuration, never from what the store holds at that
+  moment, so that the same file is not sound before a record arrives and defective after.
+- **A defective file blocks every ticket (the stricter reading, package P-11).** DEC-449 and DEC-454 settle that
+  what cannot be read is never taken for a clean answer (a count file that cannot be read refuses; a context that
+  cannot be built refuses the close). They do not say whether the file is an input of a context that would not
+  consult it. Held: it is one of every context's inputs once it exists.
+- **A register decision (DEC-519, DEC-521).** The context can tell in two ways the sources give: the form of the
+  id (DEC-473: a register entry is `### DEC-<digits>`), and the register file the project's path map names
+  (`decision_register`, DEC-473). Held: a listed id of the form `DEC-<digits>` makes the file defective, and the
+  error names the file and the id. One row has the id as an entry of a register the path map names; the other has
+  no register at all and is refused by the form alone (the stricter reading, package P-12). The id itself stays
+  blocked in both until the store loads register decisions as records (DEC-521's follow-up).
+- **Left open, no case:** a ticket whose declared ids are all external (today a ticket that declares nothing is
+  blocked); whether the summary of `--brief` also gives the location; the exit code of the refusal (1 today).
+
 ### Measured or refused (DEC-449, DEC-454)
 
 | A reading that fails | Case | Never becomes |
@@ -274,7 +389,8 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | no path map in the project | `baseline`: `test_a_project_without_a_path_map_is_not_classified` | "nothing is unknown" |
 | the proposal cannot be read | `path_map`: `test_a_proposal_that_cannot_be_read_is_refused` | "keep everything" |
 | the code graph cannot be read | `path_map`: `test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers` | "no importers", a move |
-| the project has no code graph (code intelligence is off in its path map) | `path_map`: `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off`, `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` | "no importers", a move |
+| the project has no code graph (code intelligence is off in its path map) | `path_map`: `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off`, `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` | "no importers", a move |
+| the external references file is there and cannot be read, is not YAML, or is not of the stated shape | `external_references`: `test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named` (13), `test_a_file_that_cannot_be_read_blocks_and_is_named`, `test_the_function_names_the_defective_file_in_its_message`, `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2), `test_a_listed_id_of_the_decision_registers_form_is_refused` (2) | "no external references", a missing id reported without the defect, a packet |
 | the verdict cannot be read | `verdict`: `test_a_verdict_that_cannot_be_read_moves_nothing` (4) | a pass, a move |
 | the backup ref no longer resolves | `migration`: `test_a_backup_ref_that_no_longer_resolves_stops_the_migration` | a move |
 | a legacy rule file cannot be read or parsed | `legacy`: the two cases above | a retirement |
@@ -289,7 +405,8 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 |---|---|
 | CAP-06.b | `path_map` (the eight actions) |
 | CAP-06.c | `unknown` |
-| CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no move where code intelligence is off) |
+| CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no MOVE, RENAME, SPLIT, MERGE or EXTRACT where code intelligence is off) |
+| CAP-15.c | `external_references` (a listed id is accepted and reported as external; an unlisted one, a superseded record and a defective file block) |
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
 | CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
@@ -312,8 +429,11 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
   batches), and `test_an_unknown_artefact_blocks_the_whole_destructive_migration`.
 - **Everything else** (baseline, the A3 refusals, unknown artefacts, all of `legacy`, the dev tier) proposes no
   move, or is refused before one is examined. The two kept-rule-file cases are among them: they run in the sandbox.
-- **The six cases of DEC-517 run inside the sandbox.** Their project turns code intelligence off, so no code index
-  is built or read: the moves are refused at A3, and the proposal that moves nothing needs no code graph.
+- **The six cases of DEC-517 and the three rows of DEC-535 run inside the sandbox.** Their project turns code
+  intelligence off, so no code index is built or read: the moves are refused at A3, and the proposal that moves
+  nothing needs no code graph.
+- **The 36 cases of the ninth success line run inside the sandbox.** They need no code index and no `gitleaks`:
+  the record store of the case's own project is loaded, no index is built.
 - **b-dev.** A clone of `~/gov-os-workbench/synthetic/b-dev` into the session's temporary folder was made in this
   sandbox (149 tracked files; it tracks `AGENTS.md`, `.cursorrules` and `.windsurfrules`). The two dev-tier cases
   give the clone a path map with code intelligence off and move nothing.
@@ -335,4 +455,6 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 | P-7 | Does the tool perform the rewrites of references (apart from the move batches), or only flag them? | only that a move batch changes no content, and that the plan names `rewrite` or `flag` for each |
 | P-8 | In a project whose path map turns code intelligence off, may an artefact be moved? | held as a refusal (DEC-517, the stricter reading) until the owner answers: A3 refuses a MOVE or a RENAME there and writes nothing |
 | P-9 | `gov adopt` without `--lite` stays `NOT_IMPLEMENTED`; does "all twelve Wave 1 commands are implemented" accept that? | W1-07's lists untouched |
-| P-10 | Where code intelligence is off, are SPLIT, MERGE and EXTRACT refused as MOVE and RENAME are? | no case with one of the three in such a project |
+| P-10 | Where code intelligence is off, are SPLIT, MERGE and EXTRACT refused as MOVE and RENAME are? | **decided by DEC-535: refused.** One row per action, green as built |
+| P-11 | Does a defective external references file block every ticket's context, or only that of a ticket that declares an id the store does not hold? | every ticket (the stricter reading): `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) |
+| P-12 | Is a listed id of the form `DEC-<digits>` refused in every project, or only where it is an entry of the register the project names? | every project, by the form alone: the second row of `test_a_listed_id_of_the_decision_registers_form_is_refused` |

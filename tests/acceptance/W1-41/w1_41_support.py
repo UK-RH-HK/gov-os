@@ -688,6 +688,88 @@ def can_be_made_unreadable(tmp_path):
         restore()
 
 
+# --------------------------------------------------------------------------
+# The context and the sources that live outside the repository (success line 9; DEC-511, DEC-520)
+# --------------------------------------------------------------------------
+# W1-24's support calls the context's function and its command, each in a new process, and loads a project's record
+# store. Every project here is written file by file in the case's own temporary folder; its path map is the one
+# this file writes from the kernel's schema.
+
+_W1_24_DIR = str(Path(__file__).resolve().parents[1] / "W1-24")
+if _W1_24_DIR not in sys.path:
+    sys.path.insert(0, _W1_24_DIR)
+
+import w1_24_support as context_base  # noqa: E402
+
+EXTERNAL_REFERENCES_REL = "governance/project/external-references.yaml"
+F_REFERENCES, F_ID, F_LOCATION, F_REASON = "references", "id", "location", "reason"     # the file's keys
+K_EXTERNAL, X_READ = "external", "read"                                                 # the packet's addition
+PACKET_KEYS = (context_base.K_TICKET, context_base.K_AUTHORITY, context_base.K_MANDATORY,
+               context_base.K_SUPPLEMENTARY, context_base.K_DROPPED, context_base.K_HASH, context_base.K_TOKENS,
+               context_base.K_BUDGET)                                                   # W1-24's README, the packet
+RECORD_ONLY_KEYS = (context_base.M_SHA, context_base.M_AUTHORITY, context_base.M_LIFECYCLE,
+                    context_base.M_CONSTRAINT, "text", "tokens", "path")
+REGISTER_KEY, REGISTER_REL = "decision_register", "docs/decision-register.md"           # DEC-473
+
+CHARTER_ID, CHARTER_REL = "CHARTER-H9", "docs/charter/charter.md"
+ADR_ID, ADR_REL = "ADR-H9-A", "docs/adr/adr-a.md"
+OLD_ADR_ID = "ADR-H9-OLD"
+CONTEXT_PATTERNS = ("*", "docs/**", ".tickets/**", "governance/**")
+
+
+def reference(reference_id, location="the owner's archive of source documents, outside this repository",
+              reason="a planning source the owner keeps; it was never a record of this project", **more):
+    """One entry of the external references file; a key given as None is left out."""
+    made = {F_ID: reference_id, F_LOCATION: location, F_REASON: reason, **more}
+    return {key: value for key, value in made.items() if value is not None}
+
+
+def references_text(entries):
+    return yaml.safe_dump({F_REFERENCES: list(entries)}, sort_keys=False)
+
+
+def context_project(api, destination, tickets, references=None, text=None, register=None):
+    """A project with a charter, a decision, a superseded decision and the tickets of ``tickets`` (id -> the ids it
+    declares as sources), committed, with its record store loaded. ``references`` (entries) or ``text`` (the
+    file's own text) writes the external references file; with neither the project has none. ``register`` is the
+    text of a decision register the path map then names (DEC-473)."""
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    assert_own_project(destination)
+    document = path_map(CONTEXT_PATTERNS, code_intelligence=False)
+    if register is not None:
+        document[REGISTER_KEY] = REGISTER_REL
+        write(destination, REGISTER_REL, register)
+    files = {
+        ".gitignore": ".gov-runtime/\n",
+        "README.md": "# Quay\n\nA project built by the W1-41 tests for the context.\n",
+        PATH_MAP_REL: yaml.safe_dump(document, sort_keys=False),
+        CHARTER_REL: context_base.record(CHARTER_ID, "charter", "ACTIVE", "Every berth has one harbour master."),
+        ADR_REL: context_base.record(ADR_ID, "decision", "ACTIVE", "Berths are numbered from the north."),
+        "docs/adr/adr-old.md": context_base.record(OLD_ADR_ID, "decision", "SUPERSEDED",
+                                                   "Berths were numbered from the south.", superseded_by=ADR_ID),
+    }
+    for ticket, sources in tickets.items():
+        files[f".tickets/{ticket}.md"] = context_base.ticket_file(ticket, sources=sources)
+    for rel, content in files.items():
+        write(destination, rel, content)
+    context_base.git(destination, "init", "-q", "-b", "main")
+    set_references(api, destination, references, text, message="the project")
+    return destination
+
+
+def set_references(api, project, references=None, text=None, message="the external references change"):
+    """Write the external references file (or leave the project as it is), commit, and load the record store."""
+    if text is None and references is not None:
+        text = references_text(references)
+    if text is not None:
+        write(project, EXTERNAL_REFERENCES_REL, text)
+    context_base.commit(project, message)
+    loaded = api.build_store(project)
+    assert not loaded.get("invalid"), f"the case's own project holds a record the store refuses: {loaded}"
+    return project
+
+
 def clone_tier(name, destination):
     """A clone of a dev tier in a temporary directory; None where this machine has no such tier."""
     tier = DEV_TIERS / name

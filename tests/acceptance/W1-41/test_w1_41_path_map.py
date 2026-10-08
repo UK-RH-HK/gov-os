@@ -239,6 +239,27 @@ def test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing(uni
                                               path)
 
 
+@pytest.mark.parametrize("entries", [
+    [support.entry(support.GUIDE, "SPLIT", ["docs/guide-a.md", "docs/guide-b.md"], batch=1)],
+    [support.entry(support.GUIDE, "MERGE", "docs/handbook.md", batch=1),
+     support.entry(support.NOTES, "MERGE", "docs/handbook.md", batch=1)],
+    [support.entry(support.GUIDE, "EXTRACT", "docs/extracted.md", batch=1)],
+], ids=["SPLIT", "MERGE", "EXTRACT"])
+def test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing(
+        unindexed, interface, entries):
+    """DEC-535 (P-10), DEC-523: nothing is moved there, so the three actions that put an artefact's content at
+    another path are refused as MOVE and RENAME are: the same refusal, the same reason, nothing written, and
+    nothing at another path afterwards."""
+    project = unindexed.project
+    _, tracked = _refused_because_code_intelligence_is_off(unindexed, interface, entries, support.GUIDE)
+    assert support.tree(project) == tracked, "the refused A3 changed the tracked files"
+    problems = support.moved_nothing(project, tracked, [item["path"] for item in entries])
+    assert not problems, f"the refused A3 moved something: {problems}"
+    targets = [target for item in entries for target in item.get("targets", [item.get("target")])]
+    arrived = [target for target in targets if (project / target).exists()]
+    assert not arrived, f"the refused A3 put a file at a proposed target: {arrived}"
+
+
 def test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off(unindexed, interface):
     """The proposal that is recorded without the move (the case below) is refused with it: no part of it is
     recorded, and the legacy files it would retire stay."""
