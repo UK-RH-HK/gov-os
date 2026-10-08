@@ -8,9 +8,10 @@ Run, without `PYTHONPATH`:
 
     env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-32 -q -p no:cacheprovider -rs
 
-70 cases. One is marked `local_only` (it needs `GOV_DEV_TIERS`). The launcher
-file takes about 40 seconds: each signal case waits for a session that today
-does not end.
+81 cases: 70 written before implementation and 11 added after it (the last
+section). One is marked `local_only` (it needs `GOV_DEV_TIERS`). The launcher
+file took about 40 seconds before implementation: each signal case waited for
+a session that did not end.
 
 Every case works on a temporary project it builds itself. No case touches this
 repository's freeze flag (a tripwire in `conftest.py` fails any that does), the
@@ -26,6 +27,7 @@ real `~/.local/state/gov-os/`, a session log, or a process it did not start.
 | `test_w1_32_status_not_read.py` | "Measured or refused" part by part; failure 2 (an open gate missing) |
 | `test_w1_32_status_read_only.py` | KPI success 1 and failure 1: status is read-only |
 | `test_w1_32_command_set.py` | CAP-28.a, second half: the command set |
+| `test_w1_32_added_cases.py` | Cases added after implementation: a placeholder at the flag's path, a record the load cannot take, a store without its records, the launcher without a stderr |
 | `w1_32_support.py`, `w1_32_launch_support.py`, `conftest.py` | The fixture project, the reading of an answer, the stand-in session program |
 
 ## The answer (the designer's contract)
@@ -145,6 +147,56 @@ All three pass today and are guards: this ticket fills a reserved command and
 adds none. `test_this_ticket_adds_no_command` pins the three commands found
 beyond the twelve reserved ones (`ci`, `launch`, `telemetry`) as found; see
 package P-3.
+
+## Cases added after implementation
+
+Eleven cases in `test_w1_32_added_cases.py`, for four behaviours a reading of
+the built work found uncovered. The rule is the one of failure 2: a result is
+measured or it is refused (DEC-449, DEC-454). No earlier case is changed.
+"Red" is against the implementation as it stood when the cases were written.
+
+### 1. A flag path that holds a placeholder (DEC-402, DEC-311, DEC-429)
+
+A session's sandbox puts a character device at the flag's path whether or not
+a flag exists. The cases stand one in without privileges: a symbolic link to
+the null device. The status has then not read the flag.
+
+| Case | Holds the status to | Then |
+|---|---|---|
+| `test_a_placeholder_device_at_the_flags_path_is_never_a_plain_not_paused` | The pause part, or something inside it, says `read: false` with a reason, or `paused` is not false | Red: the part is `{"flag": "unmarked", "mirror": false, "paused": false}` |
+| `test_a_placeholder_device_is_not_reported_as_an_empty_file_is` | The pause part differs from the one given for an empty file at the path | Red: the two parts are equal |
+| `test_the_mirror_still_answers_beside_a_placeholder` | A project paused with `gov pause`, its flag path then a placeholder: never "not paused" | Passes: the mirror is read. A guard |
+
+### 2. A decision-package record that cannot be loaded (DEC-239, DEC-308)
+
+The file is committed under `spec/gates/` and the store is loaded at that
+commit; each case first checks that the load lists the file in `invalid`
+(W1-10). It may be an open gate.
+
+| Case | Holds the status to | Then |
+|---|---|---|
+| `test_a_record_the_load_cannot_take_is_not_hidden_behind_a_clean_list_of_packages[frontmatter-that-does-not-parse]`, `[no-status]` | The decision packages part, or an entry of it, says `read: false` with a reason, and the part names the file's path | Red: the part is the clean list of the two packages that load |
+| `test_a_project_whose_records_all_load_keeps_its_clean_list_of_packages` | Nothing in the part says `read: false`; the two open packages are listed | Passes. A guard against a fix that marks every project |
+
+### 3. A store whose commits read and whose records do not
+
+The case removes one table from the project's store file (`records`, then
+`edges`) and checks that the store still answers for `HEAD`.
+
+| Case | Holds the status to | Then |
+|---|---|---|
+| `test_a_store_without_its_records_or_edges_leaves_the_ready_and_blocked_tickets_not_read[records]`, `[edges]` | `tickets`, or its `ready` list, says `read: false` with a reason; and so does `tickets` or its `blocked` list | Red: `ready` is `[]` and three tickets are blocked with `"reasons": []` |
+
+### 4. The launcher's exit code when stderr cannot be written (DEC-392)
+
+The removal fails as in `test_w1_32_launch.py` (a folder the session left
+read-only). The launcher's stderr is closed before `gov` starts, or is a pipe
+whose reading end is closed.
+
+| Case | Holds the launcher to | Then |
+|---|---|---|
+| `test_a_failed_removal_keeps_the_sessions_exit_code_when_stderr_cannot_be_written[stderr-closed-7]` | Exit code 7, the session's | Red: exit code 1 |
+| `...[stderr-reader-gone-7]`, `[stderr-reader-gone-0]` | Exit code 7, and 0 | Red: exit code 120 both times |
 
 ## Earlier tests rewritten
 
