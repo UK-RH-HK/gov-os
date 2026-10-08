@@ -5763,3 +5763,50 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.143 | 2026-10-08 | Delegated: DEC-526 (W1-32 merges as built; four interim readings; the ticket stays open until the owner answers package P-19). Next free id: DEC-527. |
+
+## 144. Owner answers to package P-18: suites run in parallel, built now as a W1-30 follow-up (register v0.144, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-527 — Package P-18: `gov close`'s regression step and the regression script run suites in parallel
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER, on package P-18 option (a) with the W1-05 addition; the measuring agent's report (DEC-514; `log/PERF-REPORT.md` in the orchestrator's scratch: 6.0 times faster on what ran in parallel, 2.8 times with the serial cases counted on both sides; no failure from a shared path, port, file or daemon) · **Under:** DEC-515, DEC-518, DEC-372
+- **Decision:**
+  - `gov close`'s regression step and the regression script run suites in parallel (`pytest -n auto`).
+  - Inside a full regression, W1-05's switch-over case is satisfied by the regression's own W1-02, W1-03 and W1-04 results, or runs alone last.
+  - The latency, real-model and live-session cases run alone afterwards, serially (DEC-372).
+
+### DEC-528 — The parallel run is built now, as its own W1-30 follow-up, alongside W1-41
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Under:** DEC-527, DEC-498
+- **Decision:**
+  - The follow-up starts now, on W1-30 (`DAEO-2lwj`, reopened for it), in parallel with W1-41. It does not touch W1-41's paths; if it touches the guard's paths, it is sequenced after the W1-02 follow-up (DEC-525).
+  - It is built the normal way: test designer, engineer, the reviewer probe before the merge.
+  - The plan stays at 50 tickets.
+
+### DEC-529 — The same follow-up repairs the two test defects the trial found
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER; the report's section "Cases that fail only in parallel" · **Under:** DEC-491
+- **Decision:**
+  - The test designer fixes: the W1-50 test file that imports `gov` without setting its own import path (it fails when run alone serially as well), and the unit case that expects the word "pytest" in its own command line.
+  - Both are recorded as rewrites after implementation, with the reason "defect found by the parallel trial".
+
+### DEC-530 — The same follow-up gives `gov rebuild` a mode without embeddings
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER; the report (a rebuild with embeddings did not end in 44 minutes; 161 seconds with the embedding endpoint unreachable) · **Refines:** DEC-477
+- **Decision:**
+  - `gov rebuild` gets a mode without embeddings, for closes and checks that need only fresh lexical and graph indexes.
+  - A full rebuild with embeddings runs before W1-42's retrieval measurements.
+
+### DEC-531 — From its merge on, every regression and every close uses the parallel run
+- **Status:** ACCEPTED (owner, 2026-10-08) · **Basis:** OWNER · **Under:** DEC-518, DEC-527
+- **Decision:**
+  - Once the follow-up is merged, every later regression and close uses the parallel run, including this repository's adoption, W1-42 and W1-43.
+  - The orchestrator reports the new regression time after the first run.
+
+### DEC-532 — How the orchestrator applies DEC-527 to DEC-530: the ticket's paths and who repairs the unit case
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-08; consequences of the owner's order, nothing loosened) · **Under:** DEC-527, DEC-529, DEC-530, DEC-463
+- **Decision:**
+  - For this follow-up W1-30's `allowed_paths` gain `src/gov/rebuild/**`, `tests/unit/rebuild/**` and the one unit file `tests/unit/pause/test_pause.py`, beside `src/gov/close/**` and `tests/unit/close/**`. The acceptance cases, and the repair of the W1-50 file, are the test designer's under `tests/acceptance/`.
+  - The guard lets a test designer write only under `tests/acceptance/**`. The unit case is therefore repaired by the engineer exactly as the test designer states it in writing, in a commit of its own that carries `Rewrite-Reason: defect found by the parallel trial`; it changes what the case expects of its own command line and nothing else.
+  - "The regression script" is the orchestrator's own script in its scratch folder: no regression script is shipped today. The product's parallel run lives in `gov close`; the orchestrator's script is brought to the same form (the same parallel option, the same cases set apart) when the follow-up merges, and is dropped once `gov close`'s regression step covers every suite (DEC-518).
+  - No command is added. If the mode without embeddings needs a new argument that a suite pins, the lead returns it as a package.
+  - The other planned changes to `gov close` (the counter call of DEC-495, the probe gate of DEC-505, the items of DEC-521) stay with the follow-up after W1-41 and are sequenced after this one, since they share its paths.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.144 | 2026-10-08 | Owner answers to P-18: DEC-527 (suites in parallel in `gov close`'s regression step and the regression script; W1-05's switch-over case; serial cases alone afterwards), DEC-528 (built now as a W1-30 follow-up beside W1-41), DEC-529 (the two test defects repaired as rewrites), DEC-530 (`gov rebuild` without embeddings), DEC-531 (every later regression and close uses it). Delegated: DEC-532 (paths, the unit case, the regression script). Next free id: DEC-533. |
