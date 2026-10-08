@@ -72,8 +72,9 @@ def test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the
     """Success lines 1 and 2, failure lines 1 and 2. SessionStart twice around a compaction, PreToolUse and
     PostToolUse context, a blocking hook, failing hooks, Stop and SubagentStop runs, the four ``gov`` forms,
     the sub-agent's file and two totals lines: every measured source, the session tokens (ccusage's, the
-    sub-agent's messages among them) and the three share figures are numbers, and the exit code is 0."""
-    expected, run = run_second(project, sandbox, logs)
+    sub-agent's messages among them) and the three share figures are numbers, and the exit code is 0. The
+    two sessions are named with their roles (DEC-507), so the estimate is a number too."""
+    expected, run = run_second(project, sandbox, logs, *support.ROLED)
     fresh_in, out, created, read = expected["usage"]
     rows = support.ccusage_sessions(logs, support.cli_support.make_sandbox(project.root.parent / "probe").home)
     assert (fresh_in, out, created, read) == tuple(
@@ -91,7 +92,8 @@ def test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the
     assert result["governance_tokens"] == {**expected["counts"], "total": measured_total}, \
         f"each source is the number the case computes: {expected['counts']}"
     estimated_total = support.estimate(result)["total"]
-    assert support.is_count(estimated_total) and estimated_total >= expected["rule"], estimated_total
+    assert estimated_total == expected["estimate"], \
+        f"the estimate is {estimated_total!r}, and the two sessions' instruction files hold {expected['estimate']}"
     denominator = fresh_in + created + out
     assert support.share(result, "measured") == pytest.approx(measured_total / denominator, abs=5e-5), \
         f"measured {measured_total} over {fresh_in} + {created} + {out}"
@@ -140,7 +142,7 @@ def test_the_sessionstart_packet_is_counted_each_time_it_is_given(project, sandb
 
 def test_added_context_of_any_other_event_is_hook_output(project, sandbox, logs, ccusage):
     """What a hook of another event than SessionStart added is hook output: PreToolUse's like PostToolUse's
-    (the second specimen), and an event neither specimen shows, when it adds context in the specimens' form."""
+    (the second specimen), and an event no specimen shows, when it adds context in the specimens' form."""
     def build(log):
         log.call("ls -la", support.OTHER_OUT, pre=TEXT, post=support.HOOK_1)
         log.hook("UserPromptSubmit", MORE)
@@ -314,7 +316,7 @@ def test_a_session_without_a_totals_line_has_no_latency(project, sandbox, logs, 
     figures are numbers and the exit code is 0."""
     def change(_first, second):
         second.api_duration = None
-    _expected, run = run_second(project, sandbox, logs, change=change)
+    _expected, run = run_second(project, sandbox, logs, *support.ROLED, change=change)
     result = support.record(run)
     by_id = {entry["session"]: entry.get(support.API_DURATION) for entry in result["sessions"]}
     assert by_id == {SESSION_A: support.API_DURATION_A, SESSION_B: NOT_MEASURED}, by_id
@@ -336,11 +338,15 @@ def test_the_agent_is_the_harness_and_its_version(project, sandbox, logs, ccusag
 def test_the_precompact_gap_is_named_and_is_no_entry_of_not_measured(project, sandbox, logs, tmp_path, ccusage):
     """The output of a PreCompact hook cannot be counted: the record names that as a known gap, with a
     reason, for a session with a compaction and for one without. It is no entry of ``not_measured``, and
-    neither it nor the two counting notes keeps the exit code from 0. The reason holds no text of the log."""
-    _expected, run = run_second(project, sandbox, logs)
+    neither it nor the two counting notes keeps the exit code from 0. The reason holds no text of the log.
+    DEC-502: the hook's output is in the log, inside the compaction command's own output and in no hook
+    line; the gap's reason says that it is in no hook line."""
+    _expected, run = run_second(project, sandbox, logs, *support.ROLED)
     result = support.record(run)
     known = support.gaps(result)
     assert support.PRECOMPACT_GAP in known, f"the known gaps are {sorted(known)}"
+    assert "no hook line" in known[support.PRECOMPACT_GAP], \
+        f"the reason of the gap is {known[support.PRECOMPACT_GAP]!r}: the output is in no hook line (DEC-502)"
     assert support.MARK not in printed(run), f"text of the log is printed\n{run.describe()}"
     assert result["not_measured"] == [] and run.returncode == EXIT_OK, run.describe()
     assert support.notes(result)[support.LARGER_READING] > 0 and support.notes(result)[support.COUNTED_WHOLE] > 0

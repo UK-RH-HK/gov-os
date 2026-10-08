@@ -1,9 +1,10 @@
 """W1-31 after DEC-491 and DEC-495: what the counter reads from the session logs, the labelled estimate, the
 three share figures, and the learning metrics read from the commits and from the orchestrator's record.
-The forms the second specimen adds (DEC-501) are in ``test_w1_31_second_specimen.py``.
+The forms the second specimen adds (DEC-501) are in ``test_w1_31_second_specimen.py``, the third's (DEC-502) in
+``test_w1_31_third_specimen.py``; the estimate is as DEC-507 decides it.
 
 A result is measured or it is refused (DEC-449, DEC-454): no case here accepts a figure whose source was
-absent, unreadable or of a form neither specimen shows. The README maps every case to its KPI line and
+absent, unreadable or of a form no specimen shows. The README maps every case to its KPI line and
 says which are red against the counter as built, and why.
 """
 
@@ -93,7 +94,7 @@ def test_a_log_that_was_read_and_holds_none_counts_zero(project, sandbox, logs, 
 
 
 # --------------------------------------------------------------------------
-# What neither specimen shows is "not measured", by name, never guessed (DEC-495, DEC-501)
+# What no specimen shows is "not measured", by name, never guessed (DEC-495, DEC-501)
 # --------------------------------------------------------------------------
 
 def _success_run_with_another_exit_code(log):
@@ -156,7 +157,7 @@ def _gov_result_in_another_form(log):
 def test_a_form_the_specimen_does_not_show_is_not_measured(project, sandbox, logs, tmp_path, ccusage,
                                                            variant, source, named):
     """The same ticket twice: with logs in the specimens' forms the source is a count; with one thing more
-    that neither specimen shows, it is never a number. Either the record says "not measured" for it, for the
+    that no specimen shows, it is never a number. Either the record says "not measured" for it, for the
     measured total and for the measured share and the sum (exit code 3) and names the reason, or the command
     refuses. The reason holds no text of the log."""
     expected, run = run_full(project, sandbox, logs)
@@ -203,26 +204,32 @@ def test_a_log_of_another_claude_code_version_is_refused_by_its_version(project,
 # --------------------------------------------------------------------------
 
 def test_the_counter_prints_counts_only_never_content(project, sandbox, logs, tmp_path, ccusage):
-    """No text of a log is in anything the command prints: with and without ``--json``, where it succeeds,
-    where a source is not measured and where it refuses. The fixture holds every form of the second specimen:
-    the packets, the hooks' texts and commands, the blocking hook's text, the failing hooks' texts, the
-    commands (the pipe's, the blocked one, the one behind ``cd``), their results (the error result among
-    them), the sub-agent's lines, the prompts and answers, the summary and the local command's output after
-    the compaction."""
-    expected = support.second_fixture(project, logs)
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
-    plain = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B, as_json=False)
+    """No text of a log or of an instruction file is in anything the command prints: with and without
+    ``--json``, where it succeeds, where a source is not measured and where it refuses. The fixtures hold
+    every form of the second and of the third specimen. Of the third: the plain SessionStart text, the
+    failing SessionStart hook's text, the hook's denial reason, the rules' denial texts (which hold the
+    commands), the feedback texts and the ``system`` line's copy, the shortened results with their previews,
+    the paths of the ``tool-results`` files, the sub-agent's lines; and the role files' and the root
+    instruction files' texts."""
+    expected = support.third_fixture(project, logs)
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
+    plain = support.run_telemetry(project, sandbox, logs, *support.ROLED, as_json=False)
+    earlier = tmp_path / "second-config"
+    for log in support.second_logs():
+        log.write(earlier)
+    second = support.run_telemetry(project, sandbox, earlier, *support.ROLED)
 
-    def varied(name, change):
+    def varied(name, change, *sessions):
         folder = tmp_path / name
-        first, second, other = support.second_logs()
+        first, second, other = support.third_logs(folder)
         change(first, second)
         for log in (first, second, other):
             log.write(folder)
-        return support.run_telemetry(project, sandbox, folder, SESSION_A, SESSION_B)
+        return support.run_telemetry(project, sandbox, folder, *(sessions or support.ROLED))
 
     def unseen(first, second):
-        _stop_summary_with_added_context(first)
+        first.denied("echo MARK-DUGONG", TEXT)                          # a denial with a text of neither form
+        first.feedback(support.feedback_text(TEXT), summary=False).stop_summary(prevented=True)
         _gov_result_in_another_form(second)
         first.subagents[0].hook("SubagentStop", TEXT, run_type="hook_blocking_error", context=False)
 
@@ -230,73 +237,212 @@ def test_the_counter_prints_counts_only_never_content(project, sandbox, logs, tm
         sub = first.subagents[0]
         sub.spaced = {number for number, line in enumerate(sub.lines) if line.get("type") == "assistant"}
 
+    def something_else(first, _second):
+        first.tool_results["../MARK-notes.txt"] = TEXT   # beside ``subagents`` and ``tool-results``
+
     not_measured = varied("unseen-config", unseen)
     disagreeing = varied("passed-over-config", passed_over)
+    other_content = varied("other-content-config", something_else)
+    no_role = varied("no-role-config", lambda *_: None, SESSION_A, support.named(SESSION_B, support.ROLE_B))
+    no_file = varied("no-file-config", lambda *_: None, support.named(SESSION_A, "auditor-of-nothing"), SESSION_B)
     refused = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_NOWHERE)
     assert run.returncode == EXIT_OK and support.record(run)["governance_tokens"]["total"] == sum(
-        expected["counts"].values()), f"the second fixture is measured\n{run.describe()}"
-    assert EXIT_OK not in (not_measured.returncode, disagreeing.returncode, refused.returncode)
-    for each in (run, plain, not_measured, disagreeing, refused):
-        assert support.MARK not in printed(each), f"text of the log is printed\n{each.describe()}"
+        expected["counts"].values()), f"the third fixture is measured\n{run.describe()}"
+    assert second.returncode == EXIT_OK, f"the second fixture is measured\n{second.describe()}"
+    others = (not_measured, disagreeing, other_content, no_role, no_file, refused)
+    assert EXIT_OK not in [each.returncode for each in others], [each.returncode for each in others]
+    for each in (run, plain, second, *others):
+        assert support.MARK not in printed(each), f"text of a log or of a file is printed\n{each.describe()}"
 
 
 # --------------------------------------------------------------------------
-# The estimate: instruction files and governance MCP definitions, on a line of their own (DEC-495)
+# The estimate: instruction files and governance MCP definitions, on a line of their own (DEC-495, DEC-507)
 # --------------------------------------------------------------------------
 
 def test_the_estimate_is_a_line_of_its_own_labelled_estimated(project, sandbox, logs, ccusage):
     """The line carries its label, how it was formed, the files it stands on, a count for each of the two
-    sources and their sum. Nothing of it is inside ``governance_tokens``, whose total is the measured one."""
-    expected, run = run_full(project, sandbox, logs)
+    sources, the reason of the MCP count and the sum. DEC-507: the instruction files are, per session, the
+    file of the session's role under ``.claude/agents/`` plus ``CLAUDE.md`` and ``AGENTS.md``, summed over the
+    ticket's sessions; the method says what the estimate stands on. Nothing of it is inside
+    ``governance_tokens``, whose total is the measured one."""
+    expected, run = run_full(project, sandbox, logs, *support.ROLED)
     result = support.record(run)
     estimate = support.estimate(result)
-    assert sorted(estimate) == sorted(support.ESTIMATE_KEYS), f"the estimate's line is {estimate!r}"
     assert estimate["label"] == support.ESTIMATED
-    assert isinstance(estimate["method"], str) and estimate["method"].strip(), "it names how it was formed"
-    assert isinstance(estimate["files"], list) and "CLAUDE.md" in estimate["files"], \
-        f"it stands on the root rule Claude Code is given (W1-38): {estimate['files']!r}"
-    assert all((project.root / rel).is_file() for rel in estimate["files"]), estimate["files"]
-    assert support.is_count(estimate["instruction_files"]) and estimate["instruction_files"] >= expected["rule"], \
-        f"instruction_files is {estimate['instruction_files']!r}; CLAUDE.md alone holds {expected['rule']}"
-    assert support.is_count(estimate["mcp_definitions"]), estimate
-    assert estimate["total"] == estimate["instruction_files"] + estimate["mcp_definitions"]
+    method = estimate["method"]
+    assert isinstance(method, str) and all(name in method for name in (
+        support.ROLE_FILES_REL, *support.ROOT_INSTRUCTION_FILES)), \
+        f"the method says what the estimate stands on (the role's file under {support.ROLE_FILES_REL}/, " \
+        f"CLAUDE.md, AGENTS.md): {method!r}"
+    assert support.MARK not in method
+    assert isinstance(estimate["files"], list) and sorted(estimate["files"]) == project.estimate_files(
+        support.ROLE_A, support.ROLE_B), f"the files it stands on, each once: {estimate['files']!r}"
+    one_each = sum(project.file_tokens(rel) for rel in estimate["files"])
+    assert estimate["instruction_files"] == expected["estimate"] == one_each + sum(
+        project.file_tokens(rel) for rel in support.ROOT_INSTRUCTION_FILES), \
+        f"instruction_files is {estimate['instruction_files']!r}: two sessions, each its role's file and the " \
+        f"two root files, hold {expected['estimate']} tokens"
+    assert estimate["mcp_definitions"] == 0 and estimate["total"] == expected["estimate"], estimate
     counted = result["governance_tokens"]
     assert counted["total"] == sum(expected["counts"].values()) == sum(counted[name] for name in support.SOURCES), \
         "the measured total is the sum of the five measured sources and of nothing else"
+    assert run.returncode == EXIT_OK and result["not_measured"] == [], run.describe()
+    by_id = {entry["session"]: entry.get("role") for entry in result["sessions"]}
+    assert by_id == {SESSION_A: support.ROLE_A, SESSION_B: support.ROLE_B}, \
+        f"each session's entry carries the role the caller named: {by_id}"
 
 
 def test_the_estimate_follows_the_instruction_file(project, sandbox, logs, ccusage):
-    """A longer instruction file is a larger estimate, and the measured sources do not move."""
-    _expected, run = run_full(project, sandbox, logs)
+    """A longer root instruction file is a larger estimate once per session; a longer role file once per
+    session of that role. The measured sources do not move."""
+    _expected, run = run_full(project, sandbox, logs, *support.ROLED)
     before = support.record(run)
-    project.add_instructions(more="One more rule. " * 80)   # 1,200 characters more: 300 tokens
-    after = support.record(support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B))
+    project.add_instructions(more="One more rule. " * 80)        # CLAUDE.md and AGENTS.md: 300 tokens more each
+    middle = support.record(support.run_telemetry(project, sandbox, logs, *support.ROLED))
+    assert support.estimate(middle)["instruction_files"] == support.estimate(before)["instruction_files"] + 1200, \
+        "two files, 300 tokens more each, for each of two sessions"
+    project.add_role(support.ROLE_A, more="One more duty. " * 80)   # 300 tokens more, the role of one session
+    after = support.record(support.run_telemetry(project, sandbox, logs, *support.ROLED))
     grown = support.estimate(after)["instruction_files"]
-    assert support.is_count(grown) and grown >= support.estimate(before)["instruction_files"] + 300, \
-        f"{before['estimated_governance_tokens']['instruction_files']!r} -> {grown!r}"
+    assert grown == support.estimate(middle)["instruction_files"] + 300 == project.estimate(
+        support.ROLE_A, support.ROLE_B), f"{support.estimate(middle)['instruction_files']!r} -> {grown!r}"
     assert after["governance_tokens"] == before["governance_tokens"]
     assert support.share(after, "measured") == support.share(before, "measured")
     assert support.share(after, "estimated") > support.share(before, "estimated")
 
 
-@pytest.mark.parametrize("state", ["absent", "unreadable"])
-def test_the_estimate_is_not_measured_without_its_instruction_file(project, sandbox, logs, ccusage, state):
-    """``CLAUDE.md`` is not there, or is there and cannot be read: the estimate of the instruction files is
-    "not measured", and so are the estimate's sum, the estimated share and the sum of the shares (exit code
-    3). What was measured stays a number."""
+def test_the_estimate_is_per_session(project, sandbox, logs, ccusage):
+    """Per session, not per ticket and not per role: two sessions of the same role count that role's file
+    twice, and one session named alone counts its own files once."""
+    support.full_fixture(project, logs)
+    same = support.record(support.run_telemetry(
+        project, sandbox, logs, support.named(SESSION_A, support.ROLE_A), support.named(SESSION_B, support.ROLE_A)))
+    assert support.estimate(same)["instruction_files"] == project.estimate(support.ROLE_A, support.ROLE_A)
+    assert sorted(support.estimate(same)["files"]) == project.estimate_files(support.ROLE_A)
+    alone = support.record(support.run_telemetry(project, sandbox, logs, support.named(SESSION_B, support.ROLE_B)))
+    assert support.estimate(alone)["instruction_files"] == project.estimate(support.ROLE_B)
+    assert project.estimate(support.ROLE_A, support.ROLE_A) != project.estimate(support.ROLE_A, support.ROLE_B) \
+        != 2 * project.estimate(support.ROLE_B), "the fixture is sound: the two role files differ in length"
+
+
+@pytest.mark.parametrize("absent", [("CLAUDE.md",), ("AGENTS.md",), ("CLAUDE.md", "AGENTS.md")],
+                         ids=["no CLAUDE.md", "no AGENTS.md", "neither"])
+def test_a_root_instruction_file_that_does_not_exist_adds_nothing(project, sandbox, logs, ccusage, absent):
+    """``CLAUDE.md`` and ``AGENTS.md`` count where they exist (DEC-507). A project without one of them, or
+    without both, has an estimate that is a number: the roles' files and what is there. Exit code 0."""
+    support.full_fixture(project, logs)
+    for rel in absent:
+        (project.root / rel).unlink()
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
+    result = support.record(run)
+    estimate = support.estimate(result)
+    assert estimate["instruction_files"] == project.estimate(support.ROLE_A, support.ROLE_B) > 0, estimate
+    assert sorted(estimate["files"]) == project.estimate_files(support.ROLE_A, support.ROLE_B), estimate["files"]
+    assert not set(absent) & set(estimate["files"])
+    assert run.returncode == EXIT_OK and "instruction_files" not in support.reasons(result), run.describe()
+
+
+@pytest.mark.parametrize("unreadable", ["CLAUDE.md", "AGENTS.md", f"{support.ROLE_FILES_REL}/{support.ROLE_B}.md"],
+                         ids=["CLAUDE.md", "AGENTS.md", "a role's file"])
+def test_the_estimate_is_not_measured_without_its_instruction_file(project, sandbox, logs, ccusage, unreadable):
+    """A file the estimate stands on is there and cannot be read: it is never counted as nothing. The
+    estimate of the instruction files is "not measured", and so are the estimate's sum, the estimated share
+    and the sum of the shares (exit code 3). What was measured stays a number, and the MCP part stays 0."""
     expected = support.full_fixture(project, logs)
-    (project.root / "CLAUDE.md").unlink()
-    if state == "unreadable":
-        os.symlink(project.root / "no-such-file", project.root / "CLAUDE.md")
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
+    (project.root / unreadable).unlink()
+    os.symlink(project.root / "no-such-file", project.root / unreadable)
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
     result = support.record(run)
     estimate = support.estimate(result)
     assert estimate["instruction_files"] == NOT_MEASURED and estimate["total"] == NOT_MEASURED, estimate
+    assert estimate["mcp_definitions"] == 0, estimate
     assert support.share(result, "estimated") == NOT_MEASURED and support.share(result, "total") == NOT_MEASURED
     assert run.returncode == EXIT_NOT_MEASURED, run.describe()
     assert "instruction_files" in support.reasons(result)
     assert result["governance_tokens"]["total"] == sum(expected["counts"].values())
     assert support.is_number(support.share(result, "measured")), result["governance_share"]
+    assert support.MARK not in printed(run)
+
+
+@pytest.mark.parametrize("sessions", [
+    pytest.param((support.named(SESSION_A, support.ROLE_A), SESSION_B), id="one session without its role"),
+    pytest.param((SESSION_A, SESSION_B), id="no session with its role"),
+])
+def test_a_session_named_without_its_role_has_no_estimate_of_instruction_files(project, sandbox, logs, ccusage,
+                                                                               sessions):
+    """Nothing the counter reads tells a session's role: the caller names it. A session named without one is
+    still measured, and the estimate of the instruction files is then "not measured", by name: no role is
+    guessed or assumed, and the sum of the other sessions is not given in its place. The estimate's sum, the
+    estimated share and the sum of the shares say "not measured" (exit code 3)."""
+    expected = support.full_fixture(project, logs)
+    run = support.run_telemetry(project, sandbox, logs, *sessions)
+    result = support.record(run)
+    estimate = support.estimate(result)
+    assert estimate["instruction_files"] == NOT_MEASURED and estimate["total"] == NOT_MEASURED, \
+        f"a session's role was not named, and the estimate is {estimate!r}"
+    assert estimate["mcp_definitions"] == 0, estimate
+    assert "instruction_files" in support.reasons(result), result["not_measured"]
+    assert support.share(result, "estimated") == NOT_MEASURED and support.share(result, "total") == NOT_MEASURED
+    assert run.returncode == EXIT_NOT_MEASURED, run.describe()
+    assert result["governance_tokens"]["total"] == sum(expected["counts"].values()), "the sessions are measured"
+    assert support.is_number(support.share(result, "measured")), result["governance_share"]
+    assert (result["tokens_in"], result["tokens_out"]) == expected["usage"][:2]
+    by_id = {entry["session"]: entry.get("role") for entry in result["sessions"]}
+    assert by_id == {SESSION_A: support.ROLE_A if "=" in sessions[0] else NOT_MEASURED, SESSION_B: NOT_MEASURED}, \
+        f"a session named without a role has none in its entry: {by_id}"
+
+
+@pytest.mark.parametrize("role", ["auditor-of-nothing", "../../CLAUDE", f"{support.ROLE_A}/../{support.ROLE_A}",
+                                  f"{support.ROLE_A}.md"],
+                         ids=["a role without a file", "a path out of the folder", "a path inside the folder",
+                              "a file's name, not a role's"])
+def test_a_role_that_names_no_role_file_never_yields_a_figure(project, sandbox, logs, ccusage, role):
+    """The role's file is ``.claude/agents/<role>.md``, and ``<role>`` is a plain file name. A role without
+    that file, and a role whose name is a path (also one that would reach a file that exists), never give a
+    figure for the instruction files: the command refuses, or the record says "not measured" for them and
+    for the estimated share and the sum (exit code 3). No text of a file is printed."""
+    support.full_fixture(project, logs)
+    assert (project.root / support.ROLE_FILES_REL / "../../CLAUDE.md").is_file(), "the fixture is sound"
+    run = support.run_telemetry(project, sandbox, logs, support.named(SESSION_A, role),
+                                support.named(SESSION_B, support.ROLE_B))
+    assert run.returncode not in (EXIT_OK, support.EXIT_USAGE), f"{role!r} names no role file\n{run.describe()}"
+    assert support.MARK not in printed(run), f"text of a file is printed\n{run.describe()}"
+    if run.envelope().get("ok") is False:
+        support.refusal(run)
+        return
+    result = support.record(run)
+    estimate = support.estimate(result)
+    assert estimate["instruction_files"] == NOT_MEASURED and estimate["total"] == NOT_MEASURED, estimate
+    assert "instruction_files" in support.reasons(result), result["not_measured"]
+    assert support.share(result, "estimated") == NOT_MEASURED and support.share(result, "total") == NOT_MEASURED
+
+
+@pytest.mark.parametrize("state", ["no MCP file", "an MCP file that defines no server",
+                                   "an MCP file that defines a server", "an MCP file that cannot be read"])
+def test_mcp_definitions_count_zero_and_the_record_gives_the_reason(project, sandbox, logs, ccusage, state):
+    """DEC-507: MCP definitions count 0 because the Governance OS defines no MCP server. That holds whatever
+    the project's root holds (a server there is the project's, not a governance definition), and the 0 is
+    never without its reason: the estimate's line says it. The part is measured: exit code 0."""
+    support.full_fixture(project, logs)
+    (project.root / ".mcp.json").unlink()
+    if state == "an MCP file that defines no server":
+        project.write(".mcp.json", '{"mcpServers": {}}\n')
+    elif state == "an MCP file that defines a server":
+        project.write(".mcp.json", json.dumps({"mcpServers": {"MARK-tracker": {
+            "command": "npx", "args": ["-y", "MARK-tracker-server"], "env": {"TOKEN": "MARK-secret"}}}}))
+    elif state == "an MCP file that cannot be read":
+        os.symlink(project.root / "no-such-file", project.root / ".mcp.json")
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
+    result = support.record(run)
+    estimate = support.estimate(result)
+    assert estimate["mcp_definitions"] == 0, f"mcp_definitions is {estimate['mcp_definitions']!r}"
+    reason = estimate[support.MCP_REASON]
+    assert isinstance(reason, str) and support.NO_MCP_SERVER.lower() in reason.lower(), \
+        f"the reason of the 0 is {reason!r}: the Governance OS defines no MCP server"
+    assert "mcp_definitions" not in support.reasons(result), result["not_measured"]
+    assert estimate["total"] == estimate["instruction_files"] == project.estimate(support.ROLE_A, support.ROLE_B)
+    assert run.returncode == EXIT_OK, run.describe()
+    assert support.MARK not in printed(run), f"text of the MCP file is printed\n{run.describe()}"
 
 
 # --------------------------------------------------------------------------
@@ -305,8 +451,9 @@ def test_the_estimate_is_not_measured_without_its_instruction_file(project, sand
 
 def test_the_three_share_figures_are_the_numbers_the_case_computes(project, sandbox, logs, ccusage):
     """Every source measured or estimated: the measured part, the estimated part and their sum are numbers,
-    each over fresh input plus cache creation plus output (ccusage's), and the exit code is 0."""
-    expected, run = run_full(project, sandbox, logs)
+    each over fresh input plus cache creation plus output (ccusage's), and the exit code is 0. The estimated
+    part is the instruction files of the two sessions, each named with its role (DEC-507)."""
+    expected, run = run_full(project, sandbox, logs, *support.ROLED)
     result = support.record(run)
     fresh_in, out, created, read = expected["usage"]
     rows = support.ccusage_sessions(logs, support.cli_support.make_sandbox(project.root.parent / "probe").home)
@@ -319,7 +466,8 @@ def test_the_three_share_figures_are_the_numbers_the_case_computes(project, sand
     measured_total = sum(expected["counts"].values())
     assert result["governance_tokens"] == {**expected["counts"], "total": measured_total}
     estimated_total = support.estimate(result)["total"]
-    assert support.is_count(estimated_total) and estimated_total >= expected["rule"], estimated_total
+    assert estimated_total == expected["estimate"], \
+        f"the estimate is {estimated_total!r}, and the two sessions' instruction files hold {expected['estimate']}"
     denominator = fresh_in + created + out
     assert created > 0 and read > 0
     assert support.share(result, "measured") == pytest.approx(measured_total / denominator, abs=5e-5), \
@@ -339,7 +487,7 @@ def test_a_part_that_is_not_measured_gives_no_sum_and_exit_code_3(project, sandb
     expected = support.full_fixture(project, logs)
     folder = project.root / "docs" / "checkpoints" / TICKET
     os.symlink(folder / "no-such-file", folder / f"CP-{TICKET}-0002.md")
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
     result = support.record(run)
     assert run.returncode == EXIT_NOT_MEASURED, run.describe()
     assert result["governance_tokens"]["checkpoint_records"] == NOT_MEASURED, result["governance_tokens"]
@@ -353,8 +501,8 @@ def test_a_part_that_is_not_measured_gives_no_sum_and_exit_code_3(project, sandb
 def test_the_record_states_no_verdict_and_no_threshold(project, sandbox, logs, ccusage):
     """The counter measures; the verdict on the 15 % is the owner's at the Wave 1 exit (DEC-495). Nothing
     printed says whether a budget is met, and no threshold is in it."""
-    _expected, run = run_full(project, sandbox, logs)
-    plain = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B, as_json=False)
+    _expected, run = run_full(project, sandbox, logs, *support.ROLED)
+    plain = support.run_telemetry(project, sandbox, logs, *support.ROLED, as_json=False)
     assert run.returncode == EXIT_OK, run.describe()
     judging = re.compile(r"verdict|threshold|budget|ceiling|exceed|within|complian|breach"
                          r"|(?<![\d.])15(?:\.0+)? ?%|(?<![\d.])0\.150*(?!\d)", re.IGNORECASE)

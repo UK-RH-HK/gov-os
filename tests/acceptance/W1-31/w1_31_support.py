@@ -6,8 +6,8 @@ How the cases run (README, "The interface the cases assume"):
   its API-0002 envelope and its exit code. Nothing of ``src/gov/telemetry/`` is imported.
 - **Every project is a temporary git repository built from scratch** (a ticket file, commits, checkpoint
   records). Nothing of this repository is copied; the code under test is this worktree's ``src/``.
-- **No case reads the session logs of this machine**, and no case reads the specimen. Each case writes its own
-  session logs, in the specimen's form and with its own texts, in a temporary folder and gives that folder to
+- **No case reads the session logs of this machine**, and no case reads a specimen. Each case writes its own
+  session logs, in the specimens' forms and with its own texts, in a temporary folder and gives that folder to
   the command, and to ccusage, as ``CLAUDE_CONFIG_DIR``; ``HOME`` is a temporary folder too, so that a counter
   which ignored the variable would still find no real log.
 - **Deterministic, no network**: ccusage runs with its built-in prices (``--offline``).
@@ -50,13 +50,24 @@ SESSION_B = "22222222-2222-4222-8222-222222222222"
 SESSION_OTHER = "33333333-3333-4333-8333-333333333333"
 SESSION_NOWHERE = "99999999-9999-4999-8999-999999999999"
 
+
+def named(session, role):
+    """A session of the ticket named with its role (DEC-507): the value of one ``--ticket-session``."""
+    return f"{session}={role}"
+
 # DEC-086 names seven sources of governance text. DEC-495: five are measured (three from the session logs, two
 # from the ticket's record folders) and two are a static estimate on a line of their own.
 LOG_SOURCES = ("sessionstart_packet", "hook_output", "gov_output")
 RECORD_SOURCES = ("checkpoint_records", "close_records")
 SOURCES = (*LOG_SOURCES, *RECORD_SOURCES)                    # ``governance_tokens``: the measured ones
 ESTIMATED_SOURCES = ("instruction_files", "mcp_definitions")  # ``estimated_governance_tokens``
-ESTIMATE_KEYS = ("label", "method", "files", *ESTIMATED_SOURCES, "total")
+MCP_REASON = "mcp_definitions_reason"  # DEC-507: the 0 of the MCP definitions is never without its reason
+ESTIMATE_KEYS = ("label", "method", "files", *ESTIMATED_SOURCES, MCP_REASON, "total")
+NO_MCP_SERVER = "no MCP server"        # what that reason says: the Governance OS defines no MCP server
+# DEC-507: the estimate stands, per session, on the file of the session's role and on these two where they exist.
+ROLE_FILES_REL = ".claude/agents"
+ROOT_INSTRUCTION_FILES = ("CLAUDE.md", "AGENTS.md")
+ROLE_A, ROLE_B = "engineer", "independent-test-designer"
 SHARE_PARTS = ("measured", "estimated", "total")
 # Ticket KPI, second success line: the Contract v3 P1 fields, as the result names them.
 P1_FIELDS = ("sessions", "model", "role", "ticket", "skill_versions", "tool_versions", "packet_id",
@@ -165,6 +176,59 @@ def error_text(text, code=2):
     return pad(f"Exit code {code}\n{text}")
 
 
+# The third specimen's hooks are one script too, the case named by its argument.
+HOOK_COMMAND_3 = "python3 /work/project/hooks/hook.py --MARK-GENET"
+
+
+def plain_text(text):
+    """The plain output of a SessionStart hook, as its run line carries it: the line's ``content`` holds the
+    text and its ``stdout`` the text and a line end. One character short of a whole number of 4-character
+    tokens, so that the text with and without its line end is the same count."""
+    return text + "." * ((3 - len(text)) % 4)
+
+
+def hook_denial_text(reason, *, tool="Bash"):
+    """The result of a call a PreToolUse hook denied by its answer, as the third specimen holds it: the
+    harness's prefix and the hook's reason; no hook command in brackets and no line end (the result of a
+    call a hook blocked has both)."""
+    return pad(f"PreToolUse:{tool} hook error: {reason}")
+
+
+def rule_denial_text(command, *, tool="Bash"):
+    """The result of a call a permission rule denied, as the third specimen holds it: the harness's own
+    sentence, which names the tool and the command. It is no hook's and no ``gov`` output."""
+    return f"Permission to use {tool} with command {command} has been denied."
+
+
+def feedback_errors(text, event="Stop"):
+    """What a blocking Stop or SubagentStop hook left, as the ``system`` line after it holds it in
+    ``hookErrors``: the hook's command in brackets, the hook's text and a line end."""
+    head = f"Stop hook feedback:\n[{HOOK_COMMAND_3} {event}]: {text}"
+    return (head + "." * (-(len(head) + 1) % 4) + "\n")[len("Stop hook feedback:\n"):]
+
+
+def feedback_text(text, event="Stop"):
+    """The line of feedback a blocking Stop or SubagentStop hook gives the session: the harness's heading
+    (the same words for both events), then ``feedback_errors``. A whole number of 4-character tokens."""
+    return "Stop hook feedback:\n" + feedback_errors(text, event)
+
+
+def shortened_text(full, folder, session, *, mark="b5u4ggt"):
+    """The result of a command whose output was too long, as the third specimen's result line holds it: the
+    harness's words, the path of the file in the session's ``tool-results`` folder that holds the full
+    text, and a preview of the first 2,000 characters. Returns ``(content, file name)``; the file's name is
+    as long as makes the content a whole number of 4-character tokens."""
+    for extra in range(4):
+        name = f"{mark}{'k' * (2 + extra)}.txt"
+        content = ("<persisted-output>\n"
+                   f"Output too large ({round(len(full) / 1024)}KB). Full output saved to: "
+                   f"{Path(folder) / session / 'tool-results' / name}\n\n"
+                   f"Preview (first 2KB):\n{full[:2000]}\n...\n</persisted-output>")
+        if len(content) % 4 == 0:
+            return content, name
+    raise AssertionError("no file name makes the shortened result a whole number of tokens")
+
+
 class Log:
     """The log of one session, line by line as Claude Code 2.1.288 wrote the specimen.
 
@@ -185,6 +249,7 @@ class Log:
         self._count, self._last = 0, None
         self.tag, self._block = session[:8], "0000"   # what this log's message, request and tool ids carry
         self.subagents, self.slug = [], None
+        self.tool_results = {}     # what the session's ``tool-results`` folder holds: {file name: full text}
         self.api_duration = 5000   # ``totalAPIDuration`` of the totals line at the end; None: no such line
 
     # -- line by line -------------------------------------------------------
@@ -339,15 +404,78 @@ class Log:
                   "type": "attachment"})
         return run_id
 
+    def stop_summary(self, run_id=None, *, added=(), errors=(), prevented=False, command=f"{HOOK_COMMAND_2} Stop"):
+        """The ``system`` line after the Stop hooks ran. After a run that succeeded it names the run and its
+        duration and holds no error; after a hook that blocked (the third specimen) it holds the hook's
+        command and text in ``hookErrors``, no duration, and an id of its own. ``added`` and ``prevented``
+        are what no specimen's line carries."""
+        info = {"command": command} if errors else {"command": command, "durationMs": 17}
+        self.add({"type": "system", "subtype": "stop_hook_summary", "hookCount": 1, "hookInfos": [info],
+                  "hookErrors": list(errors), "hookAdditionalContext": list(added),
+                  "preventedContinuation": prevented, "stopReason": "", "hasOutput": True, "level": "suggestion"},
+                 toolUseID=run_id or self._uuid())
+        return self
+
     def stop(self, text, *, added=()):
         """A Stop hook's run and the ``system`` line that follows it. ``added`` is what that line would carry
         as added context: the specimen's carries none."""
-        run_id = self.run_only("Stop", text)
-        self.add({"type": "system", "subtype": "stop_hook_summary", "hookCount": 1,
-                  "hookInfos": [{"command": f"{HOOK_COMMAND_2} Stop", "durationMs": 17}], "hookErrors": [],
-                  "hookAdditionalContext": list(added), "preventedContinuation": False, "stopReason": "",
-                  "hasOutput": True, "level": "suggestion"}, toolUseID=run_id)
+        return self.stop_summary(self.run_only("Stop", text), added=added)
+
+    # -- the forms the third specimen adds (README, "The session logs the cases write") -------------------
+
+    summary_after = True    # the session's own file: a ``system`` line follows the feedback of a blocking hook
+
+    def start_plain(self, text):
+        """A SessionStart hook that prints plain text: its run line carries the text as ``content`` and, with
+        a line end, as ``stdout``, and what the harness rendered of it; no added-context line follows.
+        Returns the run's id, which the specimen's second SessionStart hook shares."""
+        run_id = self._uuid()
+        self.add({"attachment": {"type": "hook_success", "hookName": "SessionStart:startup", "toolUseID": run_id,
+                                 "hookEvent": "SessionStart", "content": text, "stdout": text + "\n", "stderr": "",
+                                 "exitCode": 0, "command": f"{HOOK_COMMAND_3} SessionStartPlain", "durationMs": 56},
+                  "type": "attachment"},
+                 rendered=[{"content": "<system-reminder>\nSessionStart:startup hook success: "
+                                       f"{text}\n</system-reminder>"}], renderedRole="system")
+        return run_id
+
+    def start_failing(self, stderr, run_id=None):
+        """A SessionStart hook that fails: the line of a failing hook (``failing_text``) with that event."""
+        return self.failing("SessionStart", stderr, name="SessionStart:startup", tool_use_id=run_id or self._uuid())
+
+    def denied(self, command, content, usage=(10, 20, 0, 0)):
+        """A command that was denied: by a PreToolUse hook's answer (``hook_denial_text``) or by a permission
+        rule (``rule_denial_text``). The two result lines differ in their text and in nothing else: both are
+        marked as an error and both carry ``toolDenialKind: "permission-rule"``, as the result of a call a
+        hook blocked does. No hook line is written and none follows."""
+        return self.blocked(command, content, usage)
+
+    def feedback(self, content, *, summary=None, prevented=False):
+        """A Stop or SubagentStop hook that blocks: the ``user`` line of feedback given to the session
+        (``feedback_text``), marked ``isMeta``. In the session's own file a ``system`` line follows, which
+        holds the same text, less the heading, in ``hookErrors``; in a sub-agent's file none follows. No
+        hook line is written for the run."""
+        self.add({"promptId": f"prompt-{self.session[:8]}", "type": "user",
+                  "message": {"role": "user", "content": content}, "isMeta": True})
+        if self.summary_after if summary is None else summary:
+            self.stop_summary(errors=[content[len("Stop hook feedback:\n"):]], prevented=prevented,
+                              command=f"{HOOK_COMMAND_3} Stop")
         return self
+
+    def folder(self, logs):
+        """The folder of this session's project among the logs: its own file is in it, and so is the folder
+        named after the session, which holds ``subagents`` and ``tool-results``."""
+        return Path(logs) / "projects" / self.cwd.replace("/", "-")
+
+    def long_call(self, command, full, logs, usage=(10, 20, 0, 0), **how):
+        """A command whose output ``full`` was too long: the result line holds the shortened form
+        (``shortened_text``), and the session's ``tool-results`` folder a file with the full text. Returns
+        the result line's text, which is what reached the session."""
+        content, name = shortened_text(full, self.folder(logs), self.session,
+                                       mark=f"b{len(self.tool_results)}u4ggt")
+        self.tool_results[name] = full + "\n"
+        self.call(command, content, usage, kept=(full, str(self.folder(logs) / self.session / "tool-results" / name)),
+                  **how)
+        return content
 
     def failing(self, event, stderr, *, name, tool_use_id, **other):
         """The line of a hook that failed without blocking: an attachment of a type of its own, whose
@@ -358,17 +486,21 @@ class Log:
                   "type": "attachment"})
         return self
 
-    def result(self, tool_id, called, content, *, error=False, denial=None):
+    def result(self, tool_id, called, content, *, error=False, denial=None, kept=None):
         """The ``user`` line with the result of the call ``tool_id``. A result marked as an error has its
         block's keys in another order and ``toolUseResult`` as a text; a call a hook blocked carries
-        ``toolDenialKind`` too. A sub-agent's result line carries no ``toolUseResult``."""
+        ``toolDenialKind`` too. A sub-agent's result line carries no ``toolUseResult``. ``kept`` is
+        ``(full text, path)`` of an output the harness kept in a file: ``toolUseResult`` then holds the first
+        30,000 characters of the full text, the file's path and its size."""
         if error:
             block = {"type": "tool_result", "content": content, "is_error": True, "tool_use_id": tool_id}
             tail = {"toolUseResult": "Error: " + content}
         else:
             block = {"tool_use_id": tool_id, "type": "tool_result", "content": content, "is_error": False}
-            tail = {"toolUseResult": {"stdout": content, "stderr": "", "interrupted": False, "isImage": False,
-                                      "noOutputExpected": False}}
+            tail = {"toolUseResult": {"stdout": kept[0][:30000] if kept else content, "stderr": "",
+                                      "interrupted": False, "isImage": False, "noOutputExpected": False}}
+            if kept:
+                tail["toolUseResult"].update(persistedOutputPath=kept[1], persistedOutputSize=len(kept[0]) + 1)
         if not self.use_result:
             tail = {}
         if denial:
@@ -383,19 +515,24 @@ class Log:
         return tool_id, called
 
     def call(self, command, output, usage=(10, 20, 0, 0), *, pre=None, post=None, fails=None, error=False,
-             wire=None, **how):
+             wire=None, failure=None, kept=None, **how):
         """A command through the Bash tool as the second specimen shows it: the call; with ``pre`` the
         PreToolUse hook's run and the text it added; the result (``error``: marked as an error); then, with
         ``post``, the PostToolUse hook's run and the text it added, and with ``fails`` the line of a second
         PostToolUse hook that failed (``fails`` is its ``stderr``). ``wire`` is the command as the model sent
-        it where the harness logged ``command`` without its leading ``cd``."""
+        it where the harness logged ``command`` without its leading ``cd``. The third specimen: with
+        ``failure``, the run of the hook of the event after a failed tool call and the text it added;
+        ``kept``, see ``result``."""
         tool_input = {"command": command, "description": "run the command"}
         tool_id, called = self._call("Bash", tool_input, usage,
                                      wire={**tool_input, "command": wire} if wire else None, **how)
         if pre is not None:
             self.hook("PreToolUse", pre, name="PreToolUse:Bash", tool_use_id=tool_id,
                       command=f"{HOOK_COMMAND_2} PreToolUse")
-        self.result(tool_id, called, output, error=error)
+        self.result(tool_id, called, output, error=error, kept=kept)
+        if failure is not None:
+            self.hook("PostToolUseFailure", failure, name="PostToolUseFailure:Bash", tool_use_id=tool_id,
+                      command=f"{HOOK_COMMAND_3} PostToolUseFailure")
         after = []
         if post is not None:
             after.append(lambda: self.hook("PostToolUse", post, name="PostToolUse:Bash", tool_use_id=tool_id,
@@ -510,9 +647,13 @@ class Log:
                  {"type": "last-prompt", "sessionId": self.session}]
         if self.api_duration is not None:
             lines.append(self._totals(self.api_duration))
-        folder = Path(logs) / "projects" / self.cwd.replace("/", "-")
+        folder = self.folder(logs)
         for sub in self.subagents:
             sub.write_beside(folder)
+        for name, text in self.tool_results.items():
+            kept = folder / self.session / "tool-results" / name
+            kept.parent.mkdir(parents=True, exist_ok=True)
+            kept.write_text(text, encoding="utf-8")
         return self._dump(folder / f"{self.session}.jsonl", lines, 1)
 
 
@@ -524,6 +665,7 @@ class SubLog(Log):
     hook's run and added context; it holds no totals line."""
 
     failing_first, use_result = True, False
+    summary_after = False   # the third specimen: no ``system`` line follows the feedback in a sub-agent's file
 
     def __init__(self, parent, agent, model):
         super().__init__(parent.session, cwd=parent.cwd, model=model, version=parent.version)
@@ -650,14 +792,42 @@ class Project:
         self.write(f"docs/close/{ticket}/CL-{ticket}.md", close_text(ticket))
         return tokens(close_text(ticket))
 
+    def add_role(self, role, more=""):
+        """The file of ``role`` as rulesync generates it for Claude Code (W1-33): ``.claude/agents/<role>.md``,
+        a whole number of 4-character tokens long. Returns its tokens."""
+        text = pad(f"---\nname: {role}\ndescription: \"MARK-AARDVARK the {role} role of the fixture\"\n---\n\n"
+                   f"# {role}\n\n- **Purpose:** MARK-AARDVARK do the work of the {role} role.\n" + more)
+        self.write(f"{ROLE_FILES_REL}/{role}.md", text)
+        return tokens(text)
+
     def add_instructions(self, more=""):
-        """The instruction files rulesync generates for Claude Code and the others (W1-38), and a project MCP
-        file that defines no server. Returns the tokens of ``CLAUDE.md``."""
-        rule = pad("# Governance\n\nWork on one ticket. Stay inside its allowed paths.\n" + more)
+        """The instruction files rulesync generates for Claude Code and the others (W1-38), the files of two
+        roles (W1-33), and a project MCP file that defines no server. Returns the tokens of ``CLAUDE.md``."""
+        rule = pad("# Governance\n\nMARK-AARDVARK Work on one ticket. Stay inside its allowed paths.\n" + more)
         self.write("CLAUDE.md", rule)
         self.write("AGENTS.md", pad("Please also follow the rule below.\n\n" + rule))
         self.write(".mcp.json", '{"mcpServers": {}}\n')
+        for role in (ROLE_A, ROLE_B):
+            self.add_role(role, "It is the longer of the two files.\n" if role == ROLE_B else "")
         return tokens(rule)
+
+    def file_tokens(self, rel):
+        """The tokens of the project file ``rel`` as the case counts them itself; 0 for a file that is not
+        there (DEC-507: ``CLAUDE.md`` and ``AGENTS.md`` count "where they exist")."""
+        path = self.root / rel
+        return tokens(path.read_text(encoding="utf-8")) if path.is_file() else 0
+
+    def estimate(self, *roles):
+        """What the case computes for ``instruction_files`` (DEC-507): for each session, named here by its
+        role, the role's file under ``.claude/agents/`` plus ``CLAUDE.md`` and ``AGENTS.md`` where they
+        exist; the ticket's figure is the sum over its sessions."""
+        shared = sum(self.file_tokens(rel) for rel in ROOT_INSTRUCTION_FILES)
+        return sum(self.file_tokens(f"{ROLE_FILES_REL}/{role}.md") + shared for role in roles)
+
+    def estimate_files(self, *roles):
+        """The project files that estimate stands on, each once: relative paths."""
+        return sorted({f"{ROLE_FILES_REL}/{role}.md" for role in roles}
+                      | {rel for rel in ROOT_INSTRUCTION_FILES if (self.root / rel).is_file()})
 
     def add_disputes(self, *lines, ticket=TICKET):
         """The record the orchestrator writes by hand at the merge (proposed place and form, README PR-1)."""
@@ -717,7 +887,13 @@ def full_fixture(project, logs, *, change=None):
     rule = project.add_instructions()
     project.commit("governance files", "Role: orchestrator")
     usage = tuple(a + b for a, b in zip(first.usage(), second.usage()))
-    return {"counts": counts, "rule": rule, "usage": usage, "logs": (first, second, other)}
+    return {"counts": counts, "rule": rule, "usage": usage, "logs": (first, second, other),
+            "estimate": project.estimate(ROLE_A, ROLE_B)}
+
+
+# The two sessions of the fixtures' ticket, each named with its role (DEC-507). Named so, the estimate of the
+# instruction files is ``expected["estimate"]``; named by their ids alone it is "not measured".
+ROLED = (named(SESSION_A, ROLE_A), named(SESSION_B, ROLE_B))
 
 
 # --------------------------------------------------------------------------
@@ -824,7 +1000,112 @@ def second_fixture(project, logs, *, change=None):
     usage = tuple(a + b for a, b in zip(first.usage(subagents=True), second.usage()))
     return {"counts": counts, "rule": rule, "usage": usage, "logs": (first, second, other),
             "notes": {LARGER_READING: 5, COUNTED_WHOLE: 1},
-            "latency": API_DURATION_A + API_DURATION_B}
+            "latency": API_DURATION_A + API_DURATION_B, "estimate": project.estimate(ROLE_A, ROLE_B)}
+
+
+# --------------------------------------------------------------------------
+# The third fixture: every form the third specimen shows (DEC-502)
+# --------------------------------------------------------------------------
+
+PACKET_3 = plain_text("MARK-FOSSA packet printed as plain text: ticket PROJ-aaaa is in progress")
+START_FAIL = failing_text("MARK-TAYRA the second SessionStart hook could not read its record")
+FAIL_CONTEXT = pad("MARK-KINKAJOU the command failed: read its message before the next step")
+GOV3_1 = pad("MARK-OLINGO usage: gov doctor [-h] [--json] [--root <path>]\n  --json  structured output")
+GOV3_2 = error_text("MARK-COATI usage: gov [-h] <command> ...\ngov: error: argument <command>: invalid choice")
+GOV3_LONG = "MARK-GRISON a line of the over-long gov output\n" * 2600        # about 120,000 characters
+OTHER_LONG = "MARK-ZORILLA a line of another command's over-long output\n" * 2200
+GOV3_PIPE = pad("MARK-RATEL usage: gov doctor [-h] [--json]\n   [--role <role>]")
+HOOK_DENY = hook_denial_text("MARK-TAMANDUA the guard denies this command: outside the allowed paths")
+STOP_FEEDBACK = feedback_text("MARK-CACOMISTLE the record is not written yet: write it, then stop")
+SUB_FEEDBACK = feedback_text("MARK-BINTURONG the sub-agent has not answered in one word", "SubagentStop")
+SUB_GOV3 = pad("MARK-LINSANG usage: gov doctor [-h] [--json] [--root <path>] [--session <id>]")
+STOP_TEXT_3 = "MARK-SURICATE the stop hook's plain output after it let the session stop"
+SUBSTOP_TEXT_3 = "MARK-KUSIMANSE the sub-agent stop hook's plain output"
+GOV_PATH = "/work/project/.venv/bin/gov"   # ``gov`` called by a path, as the third specimen's sessions call it
+RULE_DENIED = ("echo MARK-NYALA now", "gov close PROJ-aaaa --MARK-NYALA", f"{GOV_PATH} pause --MARK-NYALA")
+API_DURATION_3 = 20000
+
+
+def third_logs(logs):
+    """The logs of the third fixture, not yet written; ``logs`` is the folder they will be written to (a
+    shortened result names a file in it).
+
+    The first session is in the third specimen's forms, in its order: a SessionStart hook that prints plain
+    text and one that fails; ``gov`` called by a path; ``gov`` called by the interpreter after an
+    assignment, its result marked as an error, with the run and the added context of the hook of the event
+    after a failed tool call; a command that is not ``gov`` and a ``gov`` command by a path whose outputs
+    were too long (a shortened result each, the full texts in ``tool-results``); ``gov`` by a path through
+    a pipe; a call a PreToolUse hook denies by its answer; three calls a permission rule denies, two of
+    which would run ``gov``; a sub-agent, whose file holds a first message of one line with its ``gov``
+    call by a path, a blocking SubagentStop hook's feedback and a later successful run; a blocking Stop
+    hook's feedback with its ``system`` line; two later Stop runs that succeed; a totals line. The second
+    session is in the first specimen's forms. The third is other work in the same forms: nothing of it is
+    the ticket's."""
+    first = Log(SESSION_A)
+    first.start_failing(START_FAIL, first.start_plain(PACKET_3))
+    first.prompt("MARK-WOMBAT do the six steps")
+    first.call(f"{GOV_PATH} doctor --help", GOV3_1, (900, 350, 3300, 0))
+    first.call(gov_command("nosuchcommand --MARK-KEA", installed=False), GOV3_2, (80, 130, 500, 3300),
+               error=True, failure=FAIL_CONTEXT)
+    first.long_call("python3 -c \"print('MARK-DUGONG ' * 6000)\"", OTHER_LONG, logs, (80, 120, 300, 3800))
+    shortened = first.long_call(f"{GOV_PATH} status --all --MARK-KAKAPO", GOV3_LONG, logs, (80, 110, 900, 4100))
+    first.call(f"{GOV_PATH} doctor --help 2>&1 | head -3  # MARK-TAKAHE", GOV3_PIPE, (80, 100, 200, 5000))
+    first.denied("echo MARK-DUGONG denied", HOOK_DENY, (80, 100, 900, 5200))
+    for command in RULE_DENIED:
+        first.denied(command, rule_denial_text(command), (80, 110, 200, 6100))
+    sub = first.subagent(AGENT_A)
+    first.launch(sub, (80, 160, 200, 6700))
+    sub.task().call(f"{GOV_PATH} doctor --help", SUB_GOV3, (3, 92, 2000, 0), thinking=False)
+    sub.say((1, 4, 300, 2000), "MARK-GECKO done", thinking=False).feedback(SUB_FEEDBACK)
+    sub.say((2, 4, 60, 2300), "MARK-GECKO done", thinking=False).run_only(
+        "SubagentStop", SUBSTOP_TEXT_3, command=HOOK_COMMAND_3)
+    first.say((80, 110, 500, 6900), "MARK-GECKO five steps are done").feedback(STOP_FEEDBACK)
+    first.say((90, 65, 170, 7400), "MARK-GECKO done").stop(STOP_TEXT_3)
+    first.notice(NOTICE).say((100, 200, 440, 7600), "MARK-GECKO done").stop(STOP_TEXT_3)
+    first.api_duration = API_DURATION_3
+    second = Log(SESSION_B).session_start(PACKET_B).prompt()
+    second.bash(gov_command("doctor"), GOV_3, (400, 100, 500, 0), hook=HOOK_3).say((30, 20, 0, 0))
+    second.api_duration = API_DURATION_B
+    other = Log(SESSION_OTHER, cwd="/work/other")
+    other.start_failing(failing_text(HOOK_OTHER), other.start_plain(plain_text(PACKET_OTHER)))
+    other.prompt().call(f"{GOV_PATH} status", GOV_OTHER, (9000, 900, 0, 0))
+    other.long_call(f"{GOV_PATH} status --all", GOV_OTHER * 40, logs)
+    other.denied("echo denied", hook_denial_text(HOOK_OTHER))
+    stray = other.subagent(AGENT_OTHER)
+    other.launch(stray)
+    stray.task().call(f"{GOV_PATH} status", GOV_OTHER, (7000, 700, 0, 0), thinking=False)
+    stray.say((10, 10, 0, 0), thinking=False).feedback(feedback_text(HOOK_OTHER, "SubagentStop"))
+    stray.say((10, 10, 0, 0), thinking=False)
+    other.say((10, 10, 0, 0)).feedback(feedback_text(HOOK_OTHER)).say((10, 10, 0, 0)).stop(STOP_TEXT_3)
+    first.shortened = shortened
+    return first, second, other
+
+
+def third_fixture(project, logs, *, change=None):
+    """A ticket of which every source can be measured or estimated, with a session in the third specimen's
+    forms. Returns what the case computes itself: ``counts`` (each measured source; the over-long ``gov``
+    output with the count of its shortened result line, ``shortened``, not of its full text), ``notes``
+    (five hook texts by the larger reading: the plain SessionStart text, the failing SessionStart hook's,
+    the hook's denial, the Stop and the SubagentStop feedback; one ``gov`` result counted whole: the
+    pipe's), ``usage`` (the two sessions' and the sub-agent's messages), ``latency`` and ``estimate`` (the
+    instruction files of the two sessions when they are named with their roles, ``ROLED``)."""
+    first, second, other = third_logs(logs)
+    if change:
+        change(first, second)
+    for log in (first, second, other):
+        log.write(logs)
+    hook_texts = (START_FAIL, FAIL_CONTEXT, HOOK_DENY, STOP_FEEDBACK, SUB_FEEDBACK, HOOK_3)
+    gov_texts = (GOV3_1, GOV3_2, first.shortened, GOV3_PIPE, SUB_GOV3, GOV_3)
+    counts = {"sessionstart_packet": tokens(PACKET_3) + tokens(PACKET_B),
+              "hook_output": sum(tokens(text) for text in hook_texts),
+              "gov_output": sum(tokens(text) for text in gov_texts),
+              "checkpoint_records": project.add_checkpoint(1), "close_records": project.add_close()}
+    project.add_instructions()
+    project.commit("governance files", "Role: orchestrator")
+    usage = tuple(a + b for a, b in zip(first.usage(subagents=True), second.usage()))
+    return {"counts": counts, "usage": usage, "logs": (first, second, other), "shortened": first.shortened,
+            "notes": {LARGER_READING: 5, COUNTED_WHOLE: 1}, "latency": API_DURATION_3 + API_DURATION_B,
+            "estimate": project.estimate(ROLE_A, ROLE_B)}
 
 
 # --------------------------------------------------------------------------
