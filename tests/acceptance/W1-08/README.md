@@ -317,3 +317,44 @@ stop being findings, not that they be rewritten.
 (`test_w1_26_probe_records.py`).
 
 Not held: a commit id of forty digits and no letter, which YAML reads as a number unless it is quoted.
+
+### The path-map schema names the optional keys the tools read (DEC-554, point 6; `test_w1_08_path_map_tool_keys.py`, 19 cases)
+
+DEC-554, point 6: "The kernel's path-map schema names neither key, nor DEC-479's two: it goes to the follow-up
+after W1-41 with DEC-521's items". The fifth key is the trailers base of DEC-482.
+
+No name is proposed here: each key is read by a tool today under the name below, and each shape is the one
+that tool accepts.
+
+| Key | Read by | Valid | Refused (each held) |
+|---|---|---|---|
+| `close_timeout` | `gov close` (DEC-554; W1-30's round 12, settlement 21) | a positive number of seconds: `7200`, `90.5` | `0`, `-5`, a word, a number in quotes, a truth value, a list, no value |
+| `close_workers` | `gov close` (DEC-549, DEC-554 point 5) | a positive whole number (`4`, `1`), or `auto` | `0`, `-2`, `1.5`, a word, a number in quotes, `AUTO`, a truth value, an empty text, no value |
+| `decision_register` | the citations check, the store, `gov close` (DEC-479) | a path as text, not empty | an empty text, a list, a number, a truth value, no value |
+| `decision_citations_base` | the citations check (DEC-479) | a commit id as text, full (40) or abbreviated (8) | an empty text, a number, `main`, a list, a truth value, no value |
+| `trailers_base` | the trailers check (DEC-482; named by W1-30's round 13, settlement 31, and read under that name today) | as the citations base | as the citations base |
+
+A commit id is hexadecimal characters; the cases hold a full id, one of eight characters, and that a name
+with other characters is refused. They do not fix the shortest abbreviation (the two checks take four
+characters or more today).
+
+The path map of the cases is a fixture (the required systems are read from the schema); this repository's own
+path map is held by the suite's earlier cases, unchanged, and must stay valid with the keys it has.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_the_path_map_schema_names_the_optional_key` (5) | the key is a top-level property of the schema, with a description | red, all five: "does not name the key" |
+| `test_an_optional_key_in_a_wrong_shape_is_refused` (5) | each wrong shape of the table is refused, each for itself, after the valid shape was accepted | red, all five: every wrong shape is accepted |
+| `test_an_optional_key_in_a_valid_shape_validates` (5) | each valid shape of the table | green; holds that naming the key refuses nothing a tool accepts |
+| `test_a_path_map_with_all_five_keys_validates` | the five together | green |
+| `test_a_path_map_without_the_optional_keys_validates_as_before` | none of the five | green; holds what stays |
+| `test_no_optional_key_is_required` | none of the five is among the schema's required keys | green; holds what stays |
+| `test_a_top_level_key_the_schema_does_not_know_is_no_finding_as_before` | an unknown top-level key validates | green: **today an unknown top-level key is no finding**, and this piece does not change that |
+
+10 red, 9 green.
+
+Not held: what `gov` itself answers for a path map with one of the keys in a wrong shape when it loads the
+project's configuration (`CONFIG_INVALID`). That validation is written by hand outside the kernel's schema
+file and does not read it; each tool refuses its own key today (`INVALID_TIMEOUT`, `INVALID_WORKERS`,
+`CITATIONS_CONFIG_INVALID`, `TRAILERS_BASE_UNKNOWN`). The decision orders the schema, and the cases hold the
+schema.
