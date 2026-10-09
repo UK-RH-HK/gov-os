@@ -6295,3 +6295,20 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.167 | 2026-10-09 | Owner: DEC-585 (P-32: "close → CI → merge" on the clones is the CI gate W1-40 built, run locally; no hosted run is needed for W1-42; the hosted-CI items go to the exit package and the Wave 2 list). Next free id: DEC-586. |
+
+## 168. The packages of the follow-up after W1-41, second run (register v0.168, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-586 — Follow-up after W1-41, second run: one unit fixture added to the paths; the stricter readings stay as built; the clean combination of a ticket file goes to the owner
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-09; the owner's acceptance is asked) · **Basis:** the lead's return of run G2 (head `3d4803fd`), read whole; every point is the stricter reading or changes no behaviour · **Under:** DEC-579, DEC-572, DEC-584
+- **Decision:**
+  - **P-A, option (a):** `tests/unit/retrieve/test_retrieve.py` is added to the paths of `DAEO-2lwj`. Its fixture copies this repository's path map, with the register key, into a project that holds no register; since the refusal of DEC-579 (a named register absent from the commit) four of its set-ups error, and a close runs the unit tests. An engineer drops the key from the copy in the last run, the same repair the seven support fixtures got. No assertion changes.
+  - **DP-30:** DEC-572 amends DEC-421 for ticket files (a merge commit's ticket file that equals one parent's version, every commit that brought it passing, is not the merge's own change). The one W1-50 case that held that shape as a finding was rewritten with its reason. Recorded here; DEC-421 stands for everything else.
+  - **DP-31, as built:** at most 50 commits may have brought a version on one side, and at most 1000 git processes serve the lifts of one HEAD move; beyond either bound the path stays a finding.
+  - **DP-32, as built (each the stricter reading):** a commit that brought the version must be no finding at all; the lift is not applied inside the lift; nothing is lifted across several merge bases.
+  - **Checks in a project with both layouts, as built:** a declaration in one layout only is run; one check id declared differently in the two is refused with `CHECK_DECLARATION_INVALID`; a record is held to the schemas of both. This repository holds the template layout only.
+  - **DP-29 is the owner's (package P-33):** `803f731c` equals neither parent (git's clean combination of a ticket file), so it stays a finding and stays the named exception of DEC-572. Whether a clean combination of a ticket file is lifted is a loosening; until the owner answers it is kept as built, and by DEC-584 it opens no run.
+  - **Residual, unchanged from DEC-579:** the `secrets-indexing` check times out at 60 seconds when the machine is loaded (seen in four of the orchestrator's own pre-merge checks) and passes when it is not; it is measured on a quiet machine before W1-42.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.168 | 2026-10-09 | Delegated: DEC-586 (the follow-up after W1-41, second run: one unit fixture added to the paths, DEC-572 recorded as amending DEC-421 for ticket files, the bounds and the stricter readings as built, the clean combination of a ticket file to the owner as P-33). Next free id: DEC-587. |
