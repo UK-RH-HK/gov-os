@@ -57,6 +57,8 @@ _RG_VALUED = frozenset(
     "--threads --max-columns --max-depth --encoding --sort --sortr --color".split())
 # The options that give the text to look for: no operand is that text then.
 _PATTERN_OPTIONS = frozenset({"-e", "-f", "--regexp", "--file"})
+# The options with which rg, asked nothing else, prints its version or its help.
+_RG_ASKED = frozenset({"--version", "-V", "--help", "-h"})
 # The tests of find on a file's name: a find that has one is not judged as
 # a search of everything below its start.
 _FIND_NAMED = frozenset({"-name", "-iname", "-path", "-ipath", "-wholename",
@@ -248,6 +250,21 @@ def _shell_search(name: str, args: list[str],
     return paths or ["."], globs, iglobs
 
 
+def _reads_input(args: list[str], command: str) -> bool:
+    """True for an rg that names no path and lists no files: fed by a pipe
+    or an input redirect it searches that, and no folder (DEC-557).  In a
+    command that cannot be tokenised, what feeds it is not known."""
+    operands, options = _options(args, _RG_VALUED)
+    if "--files" in args or len(operands) > _PATTERN_OPTIONS.isdisjoint(
+            o for o, _ in options):
+        return False
+    try:
+        shlex.split(command)
+    except ValueError:
+        return False
+    return True
+
+
 def _copies(target: str | None) -> list[tuple[str, str]]:
     """The copies of the two files at or below *target*, each with its
     folder <P>: an existing file at <P>/<the file's project-relative path>,
@@ -348,9 +365,10 @@ class _Protected:
 
 
 def _search_reads(prot: _Protected, path, globs: list[str], cwd: str,
-                  iglobs: list[str] = ()) -> bool:
+                  iglobs: list[str] = (), fed: bool = False) -> bool:
     """A Grep call, or a search in the shell: its path, narrowed by its
-    glob when it has one; *iglobs* are globs read in any case of letter."""
+    glob when it has one; *iglobs* are globs read in any case of letter.
+    A search that is *fed* reads its standard input and no folder."""
     base = _real(path if isinstance(path, str) and path else ".", cwd)
     if not base or prot.holds(base):
         return bool(base)
@@ -360,7 +378,7 @@ def _search_reads(prot: _Protected, path, globs: list[str], cwd: str,
     if not found:
         # DEC-557: nor does anything keep a file out of a search that starts
         # at the folder it lies under.
-        return bool(prot.taken_by(base) or prot.starts_at(base))
+        return bool(prot.taken_by(base) or (not fed and prot.starts_at(base)))
     # A glob with no slash is a name at any depth, with or without a
     # wildcard; one that starts with a slash is read from the search's folder.
     return any(prot.matched_by(g, base, "/" not in g, fold)
@@ -379,7 +397,7 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
     is git diff --stat or git status."""
     ecwd: str | None = cwd
 
-    def reads(words: list[str]) -> bool:
+    def reads(words: list[str], fed: bool = False) -> bool:
         nonlocal ecwd
         while words and _ASSIGN_RE.match(words[0]):
             words = words[1:]
@@ -409,10 +427,11 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
                 len(_braces(g)) for g in search[1] + search[2]) > _MOST_PAIRS:
             prot.long = True
             return True
+        fed = fed and name == "rg" and _reads_input(args, command)
         for path in (search[0] if search else ()):
             exp = _expand_token(path) or path
             if (ecwd is not None or os.path.isabs(exp)) and _search_reads(
-                    prot, exp, search[1], ecwd or "/", search[2]):
+                    prot, exp, search[1], ecwd or "/", search[2], fed):
                 return True
         hits: list[str] = []
         second = _second_names(name, args)
@@ -448,7 +467,19 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
     cur: list[str] = []
     tokens = _words(command)
     named = not _FIND_NAMED.isdisjoint(tokens)
+    # DEC-557: what feeds each command with something to search: the pipe
+    # it reads, or its input redirect from a file.  A line that is rg asked
+    # only for its version or its help searches nothing; in a line with a
+    # background job nothing is taken as fed.
+    jobs = any(_is_punct(t) and t.strip("\n;()") == "&" for t in tokens)
+    fed = (len(tokens) == 2 and tokens[0] == "rg" and tokens[1] in _RG_ASKED)
     for i, tok in enumerate(tokens):
+        if _is_punct(tok) and "<" in tok:
+            # Another redirect of the input, or one from no file: not known.
+            exp = "".join(tokens[i + 1:i + 2]) if tok == "<" and not jobs else ""
+            exp = _expand_token(exp) or exp
+            fed = bool(exp and (ecwd is not None or os.path.isabs(exp))
+                       and os.path.isfile(os.path.join(ecwd or "/", exp)))
         # An input redirect, alone or glued to what precedes it (";<", "<>");
         # "<<" and "<<<" open no file.
         if (_is_punct(tok) and i + 1 < len(tokens) and not tok.endswith("<<")
@@ -463,10 +494,11 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
                     and ("<" in tokens[i - 1] or ">" in tokens[i - 1])):
                 cur.append(tok)
         elif ">" not in tok and "<" not in tok:
-            if reads(cur):
+            if reads(cur, fed):
                 return True
             cur = []
-    return reads(cur)
+            fed = tok in ("|", "|&") and not jobs
+    return reads(cur, fed)
 
 
 def _git_quiet(name: str, args: list[str]) -> bool:

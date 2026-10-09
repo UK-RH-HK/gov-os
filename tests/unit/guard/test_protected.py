@@ -21,7 +21,8 @@ import pytest
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
-from gov.guard.decide import LONG_REFUSAL, MOST_READ, decide  # noqa: E402
+from gov.guard.decide import (LONG_PATH_REFUSAL, LONG_REFUSAL, MOST_PATH,  # noqa: E402
+                              MOST_READ, decide)
 from gov.guard.heldout import CONFIG_KEY, CONFIG_REL, SETTINGS_REL  # noqa: E402
 from gov.guard.hooks import REDACTED, listing  # noqa: E402
 from gov.guard.protected import (NUL_REFUSAL, READ_REFUSAL,  # noqa: E402
@@ -708,6 +709,78 @@ def test_a_search_with_a_path_or_a_glob_that_keeps_both_files_out_is_let_through
             "find . -name '*.py'", "git grep x", "rg x *", "ls -R *", f"grep -r x {start}/*",
         ):
             assert not _refused(project, "Bash", {"command": command}, start), command
+
+
+def test_rg_fed_by_a_pipe_or_an_input_redirect_searches_no_folder(project, site):
+    (project / "src" / "main.py").write_text("x\n", encoding="utf-8")
+    named = project / "src" / "main.py"
+    for start in (project, site, os.environ["HOME"]):
+        for command in (
+            "git log --oneline | rg x", "ls | rg -n x", "git status |& rg -e x",
+            "git status 2>&1 | rg x", "ls | rg x | head -5", "ls | sort | rg x",
+            f"rg x < {named}", f"rg -n x <{named}", f"< {named} rg x", "ls | rg -g '!*.md' x",
+            "ls | rg -g '*.py' x", "n=$(ls | rg -c x)", "ls | A=1 rg x", "ls | rg \"don't\"",
+            "rg --version", "rg -V", "rg --help", "rg -h",
+        ):
+            assert not _refused(project, "Bash", {"command": command}, start), command
+        for command in (
+            "ls | rg x .", f"ls | rg x {start}", "ls | rg --files", "rg x | head -5",
+            "true || rg x", "true && rg x", "true; rg x", "ls | sort; rg x", "a | rg w; rg w",
+            "a | b && rg w", "ls | grep -r x", "ls | grep -rn x", "ls | grep --recursive x",
+            # What feeds it is not known, or is no file: decided as before.
+            "ls | rg x &", "ls | rg x | head &", f"rg x < {named} &", "ls | (rg x)",
+            "rg x <<< word", "rg x < /dev/null", "ls | rg x < /dev/null", "rg x < src",
+            "rg x < missing.txt", "rg x < <(ls)", f"rg x < {named} < /dev/null",
+            f"rg x < {named} <&-", f"rg x <> {named}", "ls ' | rg x", "ls |\nrg x",
+            "echo $'\\'' ' | A='\nrg x", "rg --version x", "rg -Vn", "rg --version &",
+            "rg --version; rg x", "rg --version | head -1",
+        ):
+            assert read_refusal("Bash", {"command": command}, str(project),
+                                str(start)) == SEARCH_REFUSAL, command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_rg_fed_by_a_pipe_is_refused_as_before_where_a_file_is_read(project, rel):
+    folder, name = _folder(rel), os.path.basename(rel)
+    for command in (f"cat {rel} | rg x", f"rg x < {rel}", f"ls | rg x {folder}",
+                    f"ls | rg -g '{name}' x"):
+        assert _refused(project, "Bash", {"command": command}), command
+    # In the folder that holds a file: the rule from before the round.
+    for command in ("git log --oneline | rg x", "rg --version", "rg x < neighbour.md"):
+        assert _refused(project, "Bash", {"command": command}, project / folder), command
+
+
+def test_the_decision_refuses_a_path_longer_than_the_guard_resolves(project, tmp_path):
+    for root in (project, tmp_path):
+        for role in (None, "orchestrator", "engineer"):
+            for unit in ("a/", "./", f"./{SETTINGS_REL}/../"):
+                long = unit * (MOST_PATH // len(unit) + 1)
+                for tool_name, tool_input in (
+                    ("Read", {"file_path": long}), ("Grep", {"pattern": "x", "path": long}),
+                    ("Grep", {"pattern": "x", "path": "src", "glob": long}),
+                    ("Glob", {"pattern": "*.py", "path": long}), ("Glob", {"pattern": long}),
+                    ("Write", {"file_path": long, "content": "x"}),
+                    ("Edit", {"file_path": long, "old_string": "a", "new_string": "b"}),
+                    ("NotebookEdit", {"notebook_path": long, "new_source": "x"}),
+                ):
+                    assert decide(tool_name, tool_input, str(root), role, None, cwd=str(root),
+                                  flag="absent") == ("deny", LONG_PATH_REFUSAL), tool_name
+    assert "DEC-562" in LONG_PATH_REFUSAL
+    # A path of the bound's length is not refused for its length, nor is a
+    # long text in a field that is no path.
+    at = str(project / "docs" / "a").ljust(MOST_PATH, "a")
+    for tool_name, tool_input in (
+        ("Read", {"file_path": at}), ("Grep", {"pattern": "x" * 2 * MOST_PATH, "path": at}),
+        ("Glob", {"pattern": "*.py", "path": at}),
+        ("Write", {"file_path": at, "content": "a/" * MOST_PATH}),
+        ("Edit", {"file_path": str(project / "docs" / "a.md"), "old_string": "a/" * MOST_PATH,
+                  "new_string": "b/" * MOST_PATH}),
+        ("Read", {"file_path": 7}), ("Glob", {}),
+    ):
+        assert decide(tool_name, tool_input, str(project), "orchestrator", None,
+                      cwd=str(project), flag="absent")[1] != LONG_PATH_REFUSAL, tool_name
+    assert decide("Read", {"file_path": at}, str(project), "orchestrator", None,
+                  cwd=str(project), flag="absent") == ("allow", "")
 
 
 @pytest.mark.parametrize("rel", FILES)
