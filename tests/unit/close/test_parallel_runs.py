@@ -1,12 +1,18 @@
 """The test runs of a close are parallel, and the declared cases run alone afterwards (DEC-527)."""
 from __future__ import annotations
 
+from functools import partial
 from types import SimpleNamespace
 
 import pytest
 
-from gov.close.command import _run_tests
+from gov.cli.errors import GovError
+from gov.close import command
+from gov.close.command import _workers
 from gov.close.pytest_plugin import gov_close_serial_only as serial_only
+
+# The runs these cases start have two workers (DEC-549): not as many as the machine gives, inside a parallel run.
+_run_tests = partial(command._run_tests, workers=2)
 
 WORKER = "import os\n\n\ndef {name}():\n    assert ('PYTEST_XDIST_WORKER' in os.environ) is {parallel}\n"
 ZERO = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}
@@ -80,3 +86,47 @@ def test_without_the_parallel_plugin_the_run_is_serial_and_says_so(tmp_path, mon
     assert _run_tests(tmp_path, tests, 60, stated=stated) == ([], ZERO | {"passed": 2})
     assert len(commands) == 2 and "-n" not in commands[1] and not any("serial_only" in part for part in commands[1])
     assert [(run["form"], run["passed"]) for run in stated] == [("serial", 2)] and "parallel" in stated[0]["note"]
+
+
+# ---- the number of workers is the project's (DEC-549) ----
+
+def test_the_number_of_workers_is_the_projects_else_auto():
+    assert [_workers(settings) for settings in ({}, {"close_workers": "auto"}, {"close_workers": 3})] == \
+        ["auto", "auto", 3]
+
+
+@pytest.mark.parametrize("written", [0, -2, 1.5, 2.0, "many", "3", True, None])
+def test_a_setting_that_is_no_number_of_workers_is_refused_and_named(written):
+    with pytest.raises(GovError) as raised:
+        _workers({"close_workers": written})
+    assert (raised.value.code, raised.value.exit_code) == ("INVALID_WORKERS", 1)
+    assert "close_workers" in raised.value.message
+    assert raised.value.details == {"argument": "close_workers", "workers": str(written)}
+
+
+def test_an_invalid_number_of_workers_of_the_path_map_is_refused_before_anything_is_read(tmp_path):
+    args = SimpleNamespace(ticket="T-0001", disposition=None, owner_decision=None, timeout=None)
+    with pytest.raises(GovError) as raised:   # no project at all: nothing was looked for
+        command.run(tmp_path / "nowhere", args, {"path-map.yaml": {"namespaces": {}, "close_workers": 0}})
+    assert raised.value.code == "INVALID_WORKERS"
+    with pytest.raises(GovError) as raised:   # the time limit is read from the same place
+        command.run(tmp_path / "nowhere", args, {"path-map.yaml": {"namespaces": {}, "close_timeout": "soon"}})
+    assert raised.value.code == "INVALID_TIMEOUT" and raised.value.details["argument"] == "close_timeout"
+
+
+@pytest.mark.parametrize("workers", [3, "auto"])
+def test_a_parallel_run_is_given_the_number_and_states_it_and_the_run_afterwards_states_none(tmp_path, monkeypatch,
+                                                                                            workers):
+    commands = []
+
+    def fake_run(cmd, **keys):
+        commands.append(cmd)
+        return SimpleNamespace(returncode=0, stdout="" if cmd[1] == "-c" else "1 passed in 0.01s\n", stderr="")
+
+    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    tests = _project(tmp_path, "tests/unit/test_a.py\n", test_a="")
+    stated = []
+    command._run_tests(tmp_path, tests, 60, stated=stated, workers=workers)
+    assert commands[1][commands[1].index("-n") + 1] == str(workers) and "-n" not in commands[2]
+    assert [(run["form"], run.get("workers")) for run in stated] == [("parallel", workers), ("serial-afterwards", None)]
+    assert "workers" not in stated[1]
