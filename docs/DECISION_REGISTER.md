@@ -6349,3 +6349,21 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.170 | 2026-10-09 | Owner: DEC-588 (P-33: the clean combination of a ticket file stays a finding for Wave 1; avoided in the exit run; lifting it to the Wave 2 list), DEC-589 (DEC-586 accepted), DEC-590 (DEC-587 accepted; the brace-list shape a deliberate-shape residual, Wave 2 fix: refuse a shell word whose brace expansion exceeds a fixed number of alternatives), DEC-591 (the secrets-indexing check measured on a quiet machine before W1-42). Next free id: DEC-592. |
+
+## 171. The last run and the probe of the follow-up after W1-41 (register v0.171, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-592 — Follow-up after W1-41: the probe is judged pass with no fix round; the last run's stricter readings stay as built; its findings are residuals
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-09; the owner's acceptance is asked) · **Basis:** the lead's return of run G3 (head `83d11b2d`) and the fresh reviewer's return on that head (session `671388f7-f3a9-426f-9c6c-dee47dd1ffc8`), both read whole · **Under:** DEC-498, DEC-584, DEC-581, DEC-580, DEC-586
+- **Decision:**
+  - The probe of the whole follow-up (`e12df900..83d11b2d`) is judged **pass**: it found no fail-open hole that ordinary work produces. By DEC-584 a run G3 was the last run, so there is no fix round; every finding is a named residual in `governance/project/bootstrap.md`.
+  - **Run G3's stricter readings, as built:** a ticket commit that changes the ticket's own file after the probe refuses; "guard hook entry" means every hook entry that runs a program of the kernel's hooks folder; only the integer 60 counts as the limit.
+  - **Residuals the owner is told of in plain words:**
+    - *Ordinary work stopped, fails closed:* the probe gate refuses when the integration branch is merged into the ticket branch after the probe and that merge is merged back (the probed commit is then the first parent of the merge, not the merged side). Until Wave 2 the orchestrator probes the branch's final head, after its last merge of the integration branch, and merges that head directly.
+    - *For W1-42:* `gov check` in a project with the installed layout only now runs the installed declarations (DEC-579) and is red until its checks can be measured (an empty lexical index, no tickets in the store, the dev tiers not configured). Before the follow-up it ran nothing there and was green. It is watched in the exit run on the clones.
+    - *Fails open by a slip or a malformed file only:* a `Task:` trailer of the ticket written with unusual spacing (two spaces, a tab, none) makes a later commit escape the probe gate and the work-without-task check; a merge of the probed commit that drops or replaces probed code by a hand-resolved conflict passes the gate; `allowed_paths` written twice in a ticket file is read as the union by the guard and as the last block by the close. Wave 2 list.
+  - The packages P-34 (the limit of 60 seconds is not in the template's rulesync hooks source) and P-35 (another ticket's later commit inside this ticket's paths) are with the owner; neither is built, and the follow-up merges without them.
+  - The follow-up merges after the orchestrator's own verification and `gov check`; `trailers_base: "429815b5"` is written into the path map at the merge (DEC-482, DEC-579); `DAEO-2lwj` then closes under the standing exception rules.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.171 | 2026-10-09 | Delegated: DEC-592 (the follow-up after W1-41: the probe judged pass, no fix round; run G3's stricter readings as built; the probe's findings named as residuals, among them the probe gate refusing a merge of the integration branch into the ticket branch and back, and `gov check` red in a fresh project with the installed layout). Next free id: DEC-593. |
