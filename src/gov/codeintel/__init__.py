@@ -9,8 +9,9 @@ cannot decide, there is no index. The answers are read from the graph the tool b
 The root must be the top level of a git repository whose ``.gov-runtime/`` is no link:
 any other root is refused before anything is written or deleted. The tool's daemon keeps
 its lock and socket files in ``daemon_dir(root)``, never in the tool's shared default
-(DEC-338), and does not serve the tool's loopback UI: every call sets ``ui_enabled`` to
-``false`` in the home first (DEC-362).
+(DEC-338), and does not serve the tool's loopback UI: every start of the tool sets ``ui_enabled``
+to ``false`` in the home first (DEC-362). The graph is read in one session of the tool, so that
+its daemon starts once for it (DEC-561).
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ import json
 import os
 import shutil
 import subprocess
+import threading
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -33,6 +35,8 @@ BASE_REL = ".gov-runtime/codeintel"
 DAEMON_BASE = Path(f"/tmp/gov-cbm-{os.getuid()}")
 PROJECT = "code"
 _PAGE, _BUDGET = 50000, 100_000_000  # rows and output tokens of one answer of the tool; more is paged
+# Seconds a session of the tool has for one answer, and for its end once its input is closed; then it is killed.
+_ANSWER_S, _END_S = 120.0, 10.0
 # Nodes that say where something stands, and edges that are no use of a symbol by another.
 _PLACES = {"Project", "Branch", "Folder", "File", "Module"}
 _NO_USE = {"DEFINES", "DEFINES_METHOD", "CONTAINS_FILE", "CONTAINS_FOLDER", "HAS_BRANCH", "SEMANTICALLY_RELATED"}
@@ -73,19 +77,25 @@ def _checked(root: Path) -> Path:
     return root
 
 
-def _tool(root: Path, tool: str, **args) -> dict:
-    """Run one tool of the binary in the repository's home, with the repository's daemon directory.
+def _env(root: Path, tool: str) -> dict:
+    """The environment of a start of the binary: the repository's home and the repository's daemon directory.
 
     Both are set here whatever the caller's environment holds; the rest of that environment is passed on.
     The tool's loopback UI is turned off in that home first (DEC-362).
     """
     root = _checked(root)
     env = {**os.environ, "CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
-    run = functools.partial(subprocess.run, capture_output=True, text=True, stdin=subprocess.DEVNULL, env=env)
-    # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every call.
-    if run([TOOL, "config", "set", "ui_enabled", "false"]).returncode != 0:
+    # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every start.
+    if subprocess.run([TOOL, "config", "set", "ui_enabled", "false"], capture_output=True, text=True,
+                      stdin=subprocess.DEVNULL, env=env).returncode != 0:
         raise RuntimeError(f"{TOOL} config set ui_enabled false failed: {tool} is not run")
-    done = run([TOOL, "cli", "--quiet", "--json", tool, json.dumps(args)])
+    return env
+
+
+def _tool(root: Path, tool: str, **args) -> dict:
+    """Run one tool of the binary in the repository's home, with the repository's daemon directory (``_env``)."""
+    done = subprocess.run([TOOL, "cli", "--quiet", "--json", tool, json.dumps(args)], capture_output=True, text=True,
+                          stdin=subprocess.DEVNULL, env=_env(root, tool))
     try:
         envelope = json.loads(done.stdout)
         if done.returncode == 0 and envelope["isError"] is False:
@@ -93,6 +103,74 @@ def _tool(root: Path, tool: str, **args) -> dict:
     except (ValueError, LookupError, TypeError):
         pass
     raise RuntimeError(f"{TOOL} {tool} failed (exit code {done.returncode})")
+
+
+class _Session:
+    """Several tools of the binary under one daemon: the binary as a server on its standard input and output (MCP).
+
+    It is started at the first tool, with ``_env``, and ended when the block is left: its input is closed. An
+    answer that does not come within ``_ANSWER_S`` ends it, and so does any failure: both are a refusal.
+    """
+
+    def __init__(self, root: Path) -> None:
+        self.root, self.server, self.asked = root, None, 0
+
+    def __enter__(self) -> _Session:
+        return self
+
+    def __exit__(self, *_error) -> None:
+        self._end()
+
+    def _end(self) -> int | None:
+        """End the server, if one runs, and return its exit code."""
+        if self.server is None:
+            return None
+        with self.server as server:  # closes its pipes
+            try:
+                server.stdin.close()  # the end of its input ends the server, and its daemon with it
+            except OSError:
+                pass
+            try:
+                return server.wait(_END_S)
+            except subprocess.TimeoutExpired:
+                server.kill()
+                return server.wait()
+
+    def _send(self, method: str, **params) -> None:
+        self.server.stdin.write(json.dumps({"jsonrpc": "2.0", "method": method, "params": params} | (
+            {} if method.startswith("notifications/") else {"id": self.asked})) + "\n")
+        self.server.stdin.flush()
+
+    def _ask(self, method: str, **params) -> dict:
+        self.asked += 1
+        self._send(method, **params)
+        for line in self.server.stdout:
+            message = json.loads(line) if line.startswith("{") else {}  # any other line is no answer
+            if message.get("id") == self.asked:
+                return message["result"]  # an error of the server has none
+        raise LookupError("the server ended without an answer")
+
+    def tool(self, tool: str, **args) -> dict:
+        """What ``_tool`` returns, from the server of this session."""
+        started = self.server is not None
+        if not started:
+            self.server = subprocess.Popen([TOOL], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                                           stderr=subprocess.DEVNULL, text=True, env=_env(self.root, tool))
+        limit = threading.Timer(_ANSWER_S, self.server.kill)
+        limit.start()
+        try:
+            if not started:
+                self._ask("initialize", protocolVersion="2024-11-05", capabilities={},
+                          clientInfo={"name": "gov.codeintel", "version": "1"})
+                self._send("notifications/initialized")
+            envelope = self._ask("tools/call", name=tool, arguments=args)
+            if envelope.get("isError", False) is False:  # MCP: an envelope without the field is no error
+                return json.loads(envelope["content"][0]["text"])
+        except (OSError, ValueError, LookupError, TypeError, AttributeError):
+            pass
+        finally:
+            limit.cancel()
+        raise RuntimeError(f"{TOOL} {tool} failed (exit code {self._end()})")
 
 
 def index(root: Path) -> None:
@@ -120,11 +198,11 @@ def projects(root: Path) -> list[str]:
     return [project["name"] for project in _tool(root, "list_projects", format="json")["projects"]]
 
 
-def _rows(root: Path, query: str) -> list[list]:
+def _rows(session: _Session, query: str) -> list[list]:
     rows, more = [], True
     while more:
-        page = _tool(root, "query_graph", project=PROJECT, format="json", query=query, max_rows=_PAGE,
-                     max_output_tokens=_BUDGET, offset=len(rows))
+        page = session.tool("query_graph", project=PROJECT, format="json", query=query, max_rows=_PAGE,
+                            max_output_tokens=_BUDGET, offset=len(rows))
         rows += page["rows"]
         more = bool(page.get("has_more")) and bool(page["rows"])
     return rows
@@ -132,12 +210,17 @@ def _rows(root: Path, query: str) -> list[list]:
 
 @functools.cache
 def _graph(root: Path) -> tuple[dict, dict]:
-    """The symbols of the index by qualified name, and for each the symbols that use it with the kind of use."""
-    nodes = {key: {"path": path, "name": name, "label": label}
-             for key, name, label, path in _rows(root, "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path")
+    """The symbols of the index by qualified name, and for each the symbols that use it with the kind of use.
+
+    Both queries, pages included, are asked in one session of the tool: one start of its daemon (DEC-561).
+    """
+    with _Session(root) as session:
+        found = _rows(session, "MATCH (n) RETURN n.qualified_name, n.name, n.label, n.file_path")
+        edges = _rows(session, "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name")
+    nodes = {key: {"path": path, "name": name, "label": label} for key, name, label, path in found
              if label not in _PLACES and (root / BASE_REL / "files" / path).is_file()}
     users = defaultdict(list)
-    for source, kind, target in _rows(root, "MATCH (a)-[r]->(b) RETURN a.qualified_name, type(r), b.qualified_name"):
+    for source, kind, target in edges:
         if kind not in _NO_USE and source in nodes and target in nodes and (source, kind) not in users[target]:
             users[target].append((source, kind))
     return nodes, users
