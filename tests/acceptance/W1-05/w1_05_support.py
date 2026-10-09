@@ -570,7 +570,7 @@ def read_input(tool_name, project):
     if tool_name == "Read":
         return {"file_path": str(Path(project) / "README.md")}
     if tool_name == "Grep":
-        return {"pattern": "guard", "path": str(project)}
+        return {"pattern": "guard", "path": str(Path(project) / "src")}
     if tool_name == "Glob":
         return {"pattern": "**/*.py", "path": str(project)}
     raise ValueError(tool_name)

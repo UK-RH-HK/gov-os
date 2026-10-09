@@ -387,7 +387,8 @@ A throwaway helper of about 30 lines passed all 12 cases; it lived in the sessio
 
 **Left open on purpose; the cases take no side:**
 
-- an unrestricted recursive search from the project root, through any tool (package DP-1);
+- an unrestricted recursive search from the project root, through any tool (package DP-1; *decided by DEC-557 and
+  held by the fifth batch*);
 - a deny line's bare path inside a hook command, in the helper's output (package DP-2);
 - a shell command that only mentions the settings file (a commit message, an `echo`), and git commands other than
   the two named ones that take the file as a path without printing it (`git add`, `git log --oneline --`): a guard
@@ -885,16 +886,267 @@ acceptance cases and not this designer's to touch; they are returned by name (pa
 - `tests/unit/guard/test_protected.py::test_the_listing_redacts_an_absolute_path_a_deny_rule_carries`: with the
   rule `Read(~/w/**)`, `~/w` in a hook command is held as printing unchanged (DP-7 redacts it).
 
+### Fifth batch (2026-10-09): the round of DEC-557
+
+Four points, written before any code of the round exists: a search from the root with no path or glob (DEC-557),
+a shell search whose name filter takes either file in, an answer in bounded time, and a NUL byte (DEC-562). Every
+case asks the hook as a process, in the stand-in world of the fourth batch (`w1_02_folders_support.make_world`: the
+session's project with both stand-in files, a sibling checkout, a folder below the root, a stand-in home folder).
+`w1_02_round_support.py` holds what the four files share. No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_root_searches.py
+tests/acceptance/W1-02/test_w1_02_name_filters.py tests/acceptance/W1-02/test_w1_02_bounded_time.py
+tests/acceptance/W1-02/test_w1_02_nul_bytes.py -q -p no:cacheprovider -rs`
+
+| File | Cases | Red today | Green today | Time here |
+| --- | --- | --- | --- | --- |
+| `test_w1_02_root_searches.py` | 234 | 125 | 109 | 28 s |
+| `test_w1_02_name_filters.py` | 244 | 168 | 76 | 24 s |
+| `test_w1_02_bounded_time.py` | 59 | 27 | 32 | 3 min 45 s red (each red case waits for its limit) |
+| `test_w1_02_nul_bytes.py` | 128 | 82 | 46 | 15 s |
+| Together | 665 | 402 | 263 | |
+
+The whole suite, once, on the guard as built: 402 failed, 1953 passed in 8 min 20 s on a loaded machine (the 1690
+cases before this batch all pass; the 402 are the red cases above and no other).
+
+A refusal of points 1 and 2 is `deny` with exit code 0, and its reason names a decision of the read rule (DEC-508,
+DEC-525, DEC-548, DEC-553, DEC-557 or DEC-562; none of them required). Under all four points a refusal names a rule
+and a decision and carries no content of a file, no path (the file, a copy, `<P>`) and not the command.
+
+#### Point 1 → `test_w1_02_root_searches.py`
+
+Red, each because the guard answers `allow` (exit 0):
+
+- `test_a_search_tool_call_from_the_root_with_no_path_or_glob_is_refused` (12): the Grep tool with no `path` in a
+  session that stands in the root; the root as `path` (absolute, `.`, `./`, `src/..`, `..` from one folder below, a
+  trailing slash); a `type` filter and nothing else; an excluding glob (`!…`) and nothing else; both together.
+- `test_a_shell_search_from_the_root_with_no_path_is_refused` (40): `grep -r`, `-R`, `-rn`, `-Rn`, a cluster that
+  ends in `r`, `--recursive`, `--dereference-recursive`, the pattern after `-e`; `rg` (with no path, with `-n`, `-l`,
+  `--files`); `find` with no test on the name (no start, `.`, `./`, the absolute root, `-type f`); `ls -R`, `-lR`,
+  `-laR`; each with no path or with the root as its path (`.`, `./`, absolute, `..` from one folder below), after a
+  `cd` to the root, and with several paths of which one is the root.
+- `test_a_recursive_search_over_a_wildcard_word_from_the_root_is_refused` (2): `grep -r <word> *` and
+  `grep -rn <word> ./*`.
+- `test_a_search_from_a_copy_s_folder_with_no_path_or_glob_is_refused` (45): fifteen forms from each `<P>` (the
+  sibling checkout, the folder below the root, the stand-in home folder for the settings file).
+- `test_a_search_from_the_home_folder_as_a_shell_spells_it_is_refused` (5): `~`, `~/`, `$HOME`, a bare `cd`.
+- `test_a_search_with_no_path_or_glob_is_refused_for_every_role` (12) and
+  `test_a_search_tool_call_from_the_root_is_refused_for_a_role_subagent_too` (2).
+- `test_the_refusal_of_a_search_names_the_rule_and_no_path` (7).
+
+Green today, and held to stay so (the daily forms):
+
+| Daily form | Case |
+| --- | --- |
+| Grep with `path` = a source folder and no glob | `test_a_search_tool_call_with_a_source_folder_or_a_glob_for_source_files_stays_allowed` |
+| Grep from the root, or with no `path`, with a glob for source files (`*.py`, `**/*.py`, `src/**`) | the same case |
+| the same with a `type` and a glob | the same case |
+| the search tool forms, for every role and a role-less session | `test_the_daily_search_tool_forms_stay_allowed_for_every_role` |
+| `grep -rn <word> src tests`, `rg <word> src`, `find src -name '*.py'`, `ls -R src`, `git grep <word> -- src`, `grep <word> <named file>`, `ls`, `ls -la` at the root | `test_the_daily_shell_forms_stay_allowed` (8 forms, 4 actors) |
+| a search with no glob from a folder under which neither file nor a copy lies (the sibling checkout's source folder too) | `test_a_search_with_no_glob_from_a_folder_under_which_neither_file_lies_stays_allowed`, `test_a_search_with_no_glob_from_a_source_folder_stays_allowed_for_every_role` |
+| the daily forms from a copy's `<P>` | `test_the_daily_forms_stay_allowed_from_a_copy_s_folder` |
+
+No case either way, by the order: `find . -name '*.py'` (allowed today; so are `find . -iname '*.py'`,
+`find -name '*.py'` and `find . -name <a protected file's own name>`); `git grep <word>` with no path, `git log -p`
+and `git show` (all allowed today); a search that starts above `<P>` outside the project.
+
+#### Point 2 → `test_w1_02_name_filters.py`
+
+Red, each because the guard answers `allow` (exit 0):
+
+- `test_a_shell_search_from_the_root_whose_name_filter_takes_a_protected_file_in_is_refused` (80): ten spellings
+  (`--include=<f>`, quoted, `--include <f>`, with no path; `rg -g <f>`, `-g<f>`, `--glob=<f>`, `--glob <f>`,
+  `--iglob=<f>`, `--iglob <f>`) × four filters (the file's own name, by its extension, a part of its name, `*`) ×
+  the two files.
+- `test_a_case_insensitive_filter_in_another_case_takes_the_file_in` (4).
+- `test_the_root_as_the_search_s_path_in_another_spelling_is_refused` (8).
+- `test_with_several_filters_one_that_matches_is_enough` (8).
+- `test_a_shell_search_from_a_copy_s_folder_whose_name_filter_takes_the_copy_in_is_refused` (40) and
+  `test_a_name_filter_for_the_user_level_settings_file_from_the_home_folder_is_refused` (6).
+- `test_a_search_whose_only_filter_excludes_is_refused_as_a_search_with_no_filter` (8): point 1 through a filter.
+- `test_a_name_filter_that_takes_a_protected_file_in_is_refused_for_every_role` (9).
+- `test_the_refusal_of_a_name_filter_names_the_rule_and_neither_the_file_nor_the_start` (5).
+
+Green today, held to stay so: `test_a_search_with_a_filter_that_cannot_match_either_file_stays_allowed` (44: `*.py`
+and its spellings from the root and from each `<P>`), `test_a_search_from_the_root_with_a_source_filter_stays_allowed_for_every_role`
+(6), `test_a_filter_that_names_a_protected_file_in_a_search_of_a_source_folder_stays_allowed` (24) and
+`test_such_a_search_of_a_source_folder_by_its_relative_path_stays_allowed` (2).
+
+#### Point 3 → `test_w1_02_bounded_time.py`
+
+**The bound: the hook ends with a decision within 5 seconds of its own time** (`BOUND_S`); a case stops the process
+after 8 seconds (`PROCESS_LIMIT_S`) and fails. An ordinary call is answered in 0.05 to 0.13 s here, so the bound is
+some forty times an ordinary answer and far below the times measured; it is a bound on the answer, and no promise
+about what the harness does with a hook that runs past its own time limit (not established by this designer: no
+session could be started, and the settings file is not read).
+
+Measured on the guard as built, through the hook as a process, before the cases were written:
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| twelve or more glued star pairs and a tail that matches nothing (a Glob pattern, a Grep glob, a word after `cat`, a word after `echo`; from the root and from a sibling `<P>`) | over 30 s | none within it |
+| glued star pairs and a protected file's name (16 pairs for the settings file, 60 for the other) | over 30 s | none within it |
+| 60 pairs with slashes from `/` (40 pairs: over 12 s) | over 30 s | none within it |
+| pairs with slashes relative from the root; pairs with a letter between; `**/*` many times; glued pairs from `src` | under 1 s | allow |
+| pairs alone; pairs with slashes and the name or `*` | under 1 s | deny |
+| unclosed `$(`: 1000 / 3000 | 2 s / over 12 s | allow / none |
+| `$(echo a ` unclosed: 300 / 1000 | 2.5 s / over 12 s | allow / none |
+| `<(` unclosed: 3000 / 10000 | 3.4 s / over 12 s | allow / none |
+| 1000 nested closed substitutions | over 12 s | none |
+| 10000 closed substitutions; backticks | about 1 s | allow |
+| 200 KB of short words / 1 MB | 3.0 to 4.2 s (8 s once, under load) / about 15 s | allow |
+| 1 MB in one word | over 30 s | none |
+| 1 MB, then a read of a protected file | 14 s | deny |
+| a read of a protected file, then 1 MB | 6 to 7.5 s | deny |
+| a commit with a message of a few thousand characters; a test run that names forty files; a glob with two or three star pairs | 0.05 to 0.13 s | allow |
+
+Red (27), each because the hook gives no decision within the limit or gives it after the bound:
+
+- `test_a_glob_of_many_star_pairs_is_answered_within_the_bound` (8 of its shapes): shapes that take neither file
+  in; a decision in time is held, `allow` or a refusal.
+- `test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_refused_within_the_bound` (6): a refusal in time.
+- `test_a_long_run_of_substitutions_or_a_very_long_command_is_answered_within_the_bound` (6 of its shapes): 3000
+  unclosed `$(`, 1000 `$(echo a `, 10000 `<(`, 1000 nested, 1 MB of short words, 1 MB in one word.
+- `test_a_very_long_command_that_reads_a_protected_file_is_refused_within_the_bound` (4).
+- `test_the_bound_holds_for_every_role` (3).
+
+Green (32): the shapes of the same functions the guard answers in time today (among them 200 KB of short words at
+4.2 s: near the bound here, and it may fail on a slower or loaded machine before the change), and
+`test_an_ordinary_long_command_and_an_ordinary_glob_stay_allowed_within_the_bound` (14: seven ordinary shapes for
+the orchestrator and for a role-less session).
+
+No line was added to `tests/acceptance/serial-only.txt`: after the change every case is expected far under the
+bound, and the whole-suite run above shows no case of this file changing its result under load today. If the 200 KB
+case fails under parallel load after the change, a serial-only line for this file is the remedy, and it is a
+decision for whoever sees it.
+
+#### Point 4 → `test_w1_02_nul_bytes.py`
+
+Red (82), each `allow` with exit 0 today:
+
+- `test_a_nul_byte_in_a_path_or_a_glob_of_a_reading_tool_is_refused` (28): the byte in a Read path (start, middle,
+  end, beside either file's path), in a Grep path or glob, in a Glob path or pattern.
+- `test_a_nul_byte_anywhere_in_a_shell_command_is_refused` (18): in a word, a path, an option, a quoted text, a
+  commit message, beside either file's path, after a path below the home folder.
+- `test_a_nul_byte_in_a_reading_tool_is_refused_for_every_role` (16),
+  `test_a_nul_byte_in_a_shell_command_is_refused_for_every_role` (12),
+  `test_a_nul_byte_is_refused_while_the_project_is_frozen_too` (1).
+- `test_the_refusal_of_a_nul_byte_in_a_tool_call_names_the_rule_and_no_path` (4) and
+  `test_the_refusal_of_a_nul_byte_in_a_command_names_the_rule_and_does_not_echo_the_command` (3).
+
+Green (46):
+
+- `test_a_shell_command_the_guard_already_refuses_for_its_nul_byte_is_still_not_allowed` (3): a word that is `~`
+  and the byte (two commands) and the byte in the target of an output redirect. Today's shape is `deny` with exit
+  code 2 for all three; the cases hold "not allowed" and take no side on the shape.
+- `test_a_nul_byte_in_the_path_of_a_writing_tool_is_not_allowed` (27): Write, Edit and NotebookEdit, for the
+  orchestrator, an engineer and a role-less session. Today's shape is `deny` with exit code 2; no side on the shape.
+- `test_the_same_calls_with_no_nul_byte_stay_allowed` (16): the neighbours, and commands that only spell the byte
+  (`\0` in a pattern, `printf 'a\0b'`, `-z`).
+
+No case on a NUL byte in Grep's `pattern`, by the order.
+
+#### What the guard already refused before this batch
+
+- Point 1: nothing. Every form of the red cases is allowed, for every role, from the root and from each `<P>`.
+- Point 2: nothing. Every spelling and every filter is allowed; a search over the folder that holds the file was
+  refused before and still is (earlier batches).
+- Point 3: a glob of star pairs alone, and pairs with slashes that end in the file's name or `*`, are refused fast;
+  a run of unclosed substitutions followed by a read of a file is refused fast. Everything in the red list is not.
+- Point 4: the byte in the path of a writing tool, in a word that is `~` and the byte, and in the target of an
+  output redirect (all `deny`, exit code 2). Everywhere else it is allowed.
+
+#### Changes to the residual list
+
+Answered by this round, and no residual any more:
+
+- "an unrestricted recursive search from the project root, through any tool (package DP-1)" of the list left open
+  on purpose: decided by DEC-557, held by point 1. The Glob tool with a wildcard-only pattern was held by the fourth
+  batch.
+- "Grep with a `type` filter" and the "`~` and `$HOME` spellings" of the same list, as far as a search with no glob
+  from the root or from the home folder goes (point 1).
+- Residual 5, for `rg` with no path only. `git diff`, `git show`, `git log -p`, `git stash show -p`, `git grep` and
+  an archive of the root stand.
+- Residual 15, for the search from `<P>` itself with no glob ("follows DP-1"): held by point 1. The start above
+  `<P>` stands.
+- The shell search with a name filter (DEC-562 finding 1), the two time findings (DEC-562 finding 7) and the NUL
+  byte, which the residual list of the follow-up carried as found by the probe: points 2, 3 and 4.
+
+Residuals 1 to 4, 6 to 14 and 16 to 30 stand. Added (forms this designer could not hold; those a guard that reads a
+command line cannot see come first):
+
+31. A search started by something the command line does not show: a script or an alias that runs the search, a
+    search fed by `xargs` or `find -exec`, a `cd` into a folder known only at run time before a search with no path
+    (residuals 1 to 4 and 11, on a search).
+32. A shell search whose name filter is built at run time (a variable, a substitution), or given in a file
+    (`--exclude-from`, `rg --ignore-file`, a `.rgignore` or a `.ripgreprc` that lifts or sets a filter).
+33. A search from a folder between the root and a `<P>` below it (the parent of a nested copy's folder when it is
+    not the root): telling needs a walk of the tree. No case.
+34. A project root under which neither file lies: DEC-557's wording refuses the search there too; the engineer's
+    unit case `test_a_project_without_either_file_refuses_nothing` holds the opposite for the earlier rule. No case
+    either way (returned as a package of this round).
+35. `find` with a test on the name (`-name`, `-iname`, `-path`, `-regex`) from the root, whatever the name is: no
+    case either way, by the order. Today all are allowed, a test for a protected file's own name among them.
+36. A recursive search over a wildcard word other than the two plainest (`{root}/*`, `.*`, `*/`, `rg <word> *`,
+    `ls -R *`, braces): allowed today; not held one by one.
+37. Spellings of the held programs without a case of their own (`rg -t py` with no path, `ls --recursive`, the
+    pattern after `--`, an empty `glob` or `path` of the search tool): allowed today; and other programs that search or list a tree (`ag`, `ack`, `fd`, `tree`, `du -a`, `git ls-files`, `grep -d recurse`,
+    `grep --directories=recurse`, `ls` with `-R` hidden in an environment variable or an alias): no case.
+38. Name filters of other programs and other options (`grep --exclude` that leaves a file in, `rg -t`/`--type-add`,
+    `rg --files -g`, `find -name`, `fd -g`): only `--include`, `-g`, `--glob` and `--iglob` are held.
+39. Point 3: an input the bound cannot be shown on in a case of a few seconds (a command of tens of megabytes;
+    shapes of slow work not found by this designer's probe); and what the harness does with a hook that passes its
+    own time limit (DEC-110 records that a timeout does not block).
+40. Point 4: a NUL byte in a field of a tool the guard does not know (residual 9), in Grep's `pattern` (no case, by
+    the order), and in fields that are neither path nor command (`description`, `output_mode`).
+
+#### Cases of other suites found by the search
+
+Searched: `tests/acceptance`, `*.py`, for the Grep tool with the root as `path` or no `path`, for shell searches
+(`grep -r`, `rg`, `find`, `ls -R`), for name filters and for a NUL byte in a hook input. Besides the fourteen
+cases of the order, no acceptance case holds as allowed a form this round refuses: the other shell searches name a
+source folder or a stand-in folder (`grep -rn gov docs`, `grep -rn -- "--off" src/`, `rg … docs tests`), the Glob
+calls from the root carry a pattern for source files, and no suite puts a NUL byte into a hook input. No decision
+package comes from the search.
+
 ### Rewrites
 
-None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third batch (DEC-548) rewrote
-none either: it added five test files and `w1_02_copies_support.py`, and changed no line of an earlier file but this
-README. The fourth batch (DEC-553) rewrote none: it added three test files and `w1_02_folders_support.py`, and
-changed no line of an earlier file but this README (residuals 13 and 15 amended, this section and the packages).
+Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
+batch (DEC-548) rewrote none either: it added five test files and `w1_02_copies_support.py`, and changed no line of
+an earlier file but this README. The fourth batch (DEC-553) rewrote none: it added three test files and
+`w1_02_folders_support.py`, and changed no line of an earlier file but this README (residuals 13 and 15 amended,
+this section and the packages).
+
+Fifth batch: fourteen cases held as allowed a Grep call with the project root as its `path` and no glob, which
+DEC-557 refuses. Reason of every rewrite below: **owner decision P-23 (DEC-557)**. One line changed per suite; each
+case still holds that a read-only search is allowed, now over the project's `src` folder. All are green on the guard
+as built and stay green after the change.
+
+| Suite | Case | Old input | New input |
+| --- | --- | --- | --- |
+| W1-02 | `test_w1_02_role_less_session.py::test_role_less_session_can_still_read_with_file_tools` (its Grep call) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-50 | `test_w1_50_ticket_lead_role.py::test_ticket_lead_may_read[Grep]` | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-47 | `test_w1_47_oracle_guard.py::test_a_call_that_names_another_path_stays_allowed` (its 6 Grep cases; the `Grep` entry of `UNRELATED`, used by this function only) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-05 | `test_w1_05_live_hooks.py::test_a_read_only_tool_goes_through_the_hook_and_is_allowed` (its 6 Grep cases; the builder `read_input` of `w1_05_support.py`) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+
+Beyond the fourteen: W1-05's builder `read_input` is shared, so the same change of input reaches four more cases of
+`test_w1_05_live_hooks.py`, each of which held the same root search as allowed (same reason):
+
+- `test_a_read_only_tool_is_allowed_while_frozen[Grep]`
+- `test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]`
+- `test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]`
+- `test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over[Grep]`
+
+Run by node id on 2026-10-09: the fourteen pass (1 + 1 + 6 + 6), and so do the four beyond them, with one note: the
+two latency cases are sensitive to load. On a machine with a load average of 13 to 21, `[Grep-engineer]` failed once
+in a run with the other W1-05 cases (p95 of 110 to 190 ms against 100 ms) and passed alone; in a second run alone a
+`Read` case of the same function, whose input is unchanged, failed the same way. The rewrite makes the search
+smaller, not larger.
 
 ### Decision packages
 
-**DP-1. An unrestricted recursive search from the project root.**
+**DP-1. An unrestricted recursive search from the project root.** *Decided by DEC-557 (2026-10-09): refused, for
+every role; the fourteen cases are rewritten (see "Rewrites") and the fifth batch holds it.*
 - Question: is a search from the project root with no glob that keeps both files out (Grep with `path` = the root
   or no `path`; `grep -r … .`, `find .`, `ls -R`; Glob `**/*`) refused?
 - Why now: the order lists "a recursive search from the project root" among the forms to refuse, and it also says

@@ -194,7 +194,7 @@ def test_the_oracle_path_is_hidden_through_the_committed_settings(wired, live, l
 
 UNRELATED = {
     "Read": ("Read", lambda project, tmp: {"file_path": f"{project}/README.md"}),
-    "Grep": ("Grep", lambda project, tmp: {"pattern": "guard", "path": f"{project}"}),
+    "Grep": ("Grep", lambda project, tmp: {"pattern": "guard", "path": f"{project}/src"}),
     "Glob": ("Glob", lambda project, tmp: {"pattern": "**/*.py", "path": f"{project}/src"}),
     "Bash-ls": ("Bash", lambda project, tmp: support.bash_input("ls -la")),
     "Bash-cat": ("Bash", lambda project, tmp: support.bash_input(f"cat {project}/README.md")),
