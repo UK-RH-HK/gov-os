@@ -635,14 +635,17 @@ Found by running the hook as a process on these calls (no file of this repositor
 
 #### Added to the residual list
 
-13. The helper (DP-2): a deny rule's path written in a spelling that is not the absolute one (from the home folder
-    with `~/`, or project-relative with one slash) and then held bare in a hook command. No case either way
-    (package DP-7).
+13. The helper (DP-2): a deny rule's path written in a project-relative spelling (one leading slash, `./`, a bare
+    relative glob) and then held bare in a hook command: it prints, and a case holds that it does (DEC-553: redacting
+    it would blank ordinary relative paths). *Amended by the fourth batch:* the spelling from the home folder (`~/`)
+    is no residual any more; it is redacted as written and with the home folder in its place.
 14. The helper (DP-2): the tail of a longer path that starts with a deny rule's path. The deny path is gone; whether
     the tail prints is not held.
 15. A copy reached by a glob or a search whose start is above `<P>` (`**/<name>` from the folder that holds several
     checkouts, from the home folder, from `/`): telling needs a walk of the tree, or a refusal by pattern alone
-    (package DP-6). The same search from `<P>` itself with nothing that selects the file follows DP-1.
+    (package DP-6). The same search from `<P>` itself with no glob at all follows DP-1. *Amended by the fourth
+    batch:* a glob of wildcards alone from `<P>` itself is no residual any more (DEC-553: refused as from the
+    session's root); the start above `<P>` stays, with DP-1.
 16. A path that ends in either file's project-relative path and names no existing file (a copy made later in the
     same command, a folder that exists only at run time). No case either way, by the brief.
 17. A copy under another name or at another relative path (the file copied to `notes.txt`, a backup an editor left,
@@ -659,11 +662,235 @@ Found by running the hook as a process on these calls (no file of this repositor
 
 Residuals 1 to 12 stand.
 
+### Fourth batch (2026-10-09): the three points of DEC-553
+
+DEC-553 decided three points the third batch returned: DP-6 (a glob made of wildcards alone from the folder a copy
+lies under is refused as from the session's own root), DP-7 (the helper also redacts a deny path spelled from the
+home folder, as written and with the home folder in its place), DP-8 (a move or a link of a folder that holds either
+file or a copy is a second name and is refused as a read, for every role). DP-1 (a search from the root, and with it
+a glob or a search from above `<P>`) is still with the owner: no case here takes a side on it, and none of the cases
+that hold a root search as allowed was touched.
+
+Written before any code. Three test files and one support module (`w1_02_folders_support.py`), all new; 383 cases.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_wildcard_globs.py \
+  tests/acceptance/W1-02/test_w1_02_hook_listing_home_paths.py \
+  tests/acceptance/W1-02/test_w1_02_holding_folders.py -q -p no:cacheprovider -rs
+```
+
+Red first, 2026-10-09, against the guard as built at `f0c352a5`: **235 failed, 148 passed** in about 45 s. The whole
+of `tests/acceptance/W1-02`, once: 235 failed, 1455 passed (1690 cases, 4 min 27 s); the 235 are these and no other,
+the latency case passed in the whole run, nothing was skipped.
+
+| File | Point | Cases | Red | Green | Why red today |
+|---|---|---|---|---|---|
+| `test_w1_02_wildcard_globs.py` | DP-6 | 176 | 104 | 72 | the guard allows the glob from `<P>`: every one of the 104 calls comes back `decision=allow`, exit code 0 |
+| `test_w1_02_hook_listing_home_paths.py` | DP-7 | 36 | 30 | 6 | the helper prints the deny path, as written and with the home folder in its place |
+| `test_w1_02_holding_folders.py` | DP-8 | 171 | 101 | 70 | a move, a hard link and a hard-linking copy of a holding folder are decided as writes only: allowed for a role that may write the folder (57 cases), denied by the allow-list and not by the rule for the others and outside the project (44) |
+
+Every red case fails on the decision itself (`decision=allow`, or a denial whose reason names none of DEC-508,
+DEC-525, DEC-548, DEC-553) or on a helper output that still carries the path. None fails on an import, a fixture or
+a crash.
+
+**The world of the cases** (`w1_02_folders_support.make_world`) is the third batch's world with three things added:
+a ticket of an engineer whose `allowed_paths` name every folder above either stand-in file, `template/` and `docs/`
+(a role other than the orchestrator that may write those folders today); a package below `src/` of the sibling
+checkout; a work folder below the stand-in home. The folders above the held-out file are computed from the guard's
+constant: no path of it is typed, and a case's id names a folder by its level below `<P>` only. The DP-7 cases write
+their stand-in settings files into one temporary project; the home folder is the `HOME` of the helper's environment,
+an empty temporary folder.
+
+**How "refused by the rule" is told** (`w1_02_folders_support.assert_refused_by_the_rule`): as in the third batch,
+with DEC-553 accepted beside DEC-508, DEC-525 and DEC-548 in the reason. "Denied, and not by this rule"
+(`assert_denied_but_not_by_the_rule`) is `deny`, exit code 0, and a reason that names none of the four.
+
+#### DP-6 → `test_w1_02_wildcard_globs.py`
+
+**What the guard refuses from the session's own root today** (found by running the hook on the stand-in project).
+A glob of wildcards alone is refused when its pattern reaches the depth where one of the two files lies:
+
+| Pattern | Glob tool | Grep tool (`glob`) | Shell word |
+|---|---|---|---|
+| `**`, `**/*`, `**/**`, `*/**`, `**/*/*` (everything) | refused | refused | refused |
+| one star per level down to a file (`*/*` for the settings file; one level more for the held-out file) | refused | refused | refused |
+| `*` (one level; neither file lies there) | allowed | **refused** (a glob with no slash is a name at any depth) | allowed |
+| more levels than the deeper file has | allowed | allowed | allowed |
+
+Through these tool forms: Glob with `path` = the root, with no `path` when the session stands in the root, and as
+one pattern with the root in front; Grep with the glob and `path` = the root, with no `path`, and with a slash in
+front of the glob; a shell word after `cat`, `grep`, `ls` and also after `echo` (any word of a command), absolute,
+relative to the working folder, and after `cd`.
+
+**From a copy's `<P>` today** every one of them is allowed, at every site, with one exception: a Grep glob over
+everything with a slash in front (`/**`, `/**/*`) is refused from `<P>` already.
+
+Refused from `<P>` (sibling checkout, `template/` below the session's root, the stand-in home), red unless said:
+
+- `test_a_glob_over_everything_from_a_copy_s_folder_is_refused` (14 tool forms × 3 sites): `**/*` in Glob (absolute
+  `path`, relative `path`, no `path` in a session that stands in `<P>`, absolute pattern, relative pattern), Grep
+  (absolute `path`, relative `path`, no `path`), `cat` (absolute, relative, standing in `<P>`, after `cd`), `grep`,
+  `ls -d`. The relative spellings go from the session's project to `<P>`.
+- `test_a_glob_over_every_file_at_the_copy_s_depth_is_refused` (4 forms × 5 copies): one star per level of the copy.
+- `test_the_other_globs_over_everything_are_refused` (6): `**` and `*/**`, from the sibling checkout.
+- `test_a_search_whose_glob_is_a_single_star_is_refused` (3 Grep forms × 3 sites).
+- `test_a_search_whose_glob_starts_with_a_slash_is_refused` (5 copies);
+  `test_a_search_over_everything_with_a_slash_in_front_is_still_refused` (3, **green today**: refused before).
+- `test_a_wildcard_only_glob_from_the_home_folder_as_a_shell_spells_it_is_refused` (4 forms × 2 patterns): `~/`,
+  `$HOME/`, `ls -d ~/`, a bare `cd` and then the glob.
+- `test_a_wildcard_only_glob_from_a_copy_s_folder_is_refused_for_every_role` (3 sites × an engineer, a session with
+  no role, the test designer); the orchestrator asks every other case.
+- `test_the_refusal_of_a_wildcard_only_glob_names_neither_the_copy_nor_its_folder` (5 copies): no path of the copy,
+  no folder of it, not `<P>` (the command carries it), no value of the file.
+
+Stays allowed, green before and after (72):
+
+- `test_a_glob_over_everything_from_a_source_folder_of_the_project_stays_allowed` (the 14 tool forms from `src/`)
+  and `test_a_glob_over_everything_from_a_folder_outside_under_which_no_copy_lies_stays_allowed` (7 forms × `src/`
+  of the sibling checkout and the work folder below the stand-in home);
+  `test_the_other_wildcard_only_globs_from_such_a_folder_stay_allowed` (`*/*` and `**` × 3 forms × the 3 folders).
+- `test_a_glob_from_a_copy_s_folder_that_selects_other_files_stays_allowed` (5 forms × 3 sites): `**/*.py`,
+  `**/README.md`, a Grep with `glob` = `*.py`, `cat <P>/**/*.py`, `ls <P>/src/*.py`.
+- `test_a_single_star_stays_allowed_from_the_root_and_from_a_copy_s_folder` (2 forms × the root and the 3 sites).
+
+**Allowed from the root today and so not refused from `<P>`** (no case makes `<P>` stricter than the root): a
+single star in the Glob tool and in a shell word (held, above); a pattern with more levels than the copy has (no
+case). No case either way, by the brief: a glob or a search that starts above `<P>`; a search from `<P>` or from the
+root with no glob at all.
+
+#### DP-7 → `test_w1_02_hook_listing_home_paths.py`
+
+A deny path spelled from the home folder is the argument of a deny rule that starts with `~/`: `Tool(~/<path>…)`;
+its tail may be `/**`, `/` or nothing, a blank may follow the bracket, the path may go below a folder, the tool may
+be any. A hook command may hold it as written (`~/<path>`) or with the home folder in its place (`<home>/<path>`,
+the home folder being the `HOME` of the helper's environment); both print as `[redacted]`.
+
+- `test_a_deny_path_spelled_from_the_home_folder_is_redacted_as_written` (6 spellings of the rule) and
+  `…_is_redacted_with_the_home_folder_in_its_place` (6): the path alone in a hook command, the rest unchanged.
+- `test_both_spellings_in_one_command_are_redacted` (3): both in one command, in either order.
+- `test_the_path_with_the_rule_s_wildcard_part_or_inside_a_word_is_redacted` (8): each spelling with `/**`, with
+  `/`, in quotes, after `=`.
+- `test_the_path_as_the_start_of_a_longer_path_is_redacted` (4): only "the deny path is gone" is asserted (residual
+  14 covers the tail).
+- `test_the_paths_of_several_deny_rules_of_both_kinds_are_all_redacted` (1): an absolute deny path (DEC-548), two
+  from the home folder, a command pattern and a relative glob; a whole deny value and bare paths in one command.
+- `test_a_home_path_that_starts_like_another_rule_s_path_is_redacted_whole` (1).
+- `test_without_a_home_folder_the_helper_does_not_fail_and_redacts_the_path_as_written` (1): with no `HOME` in the
+  helper's environment the case holds only exit code 0 and the as-written spelling; **no side is taken on the
+  resolved spelling** (the command holds none).
+- Green before and after (6): `test_a_project_relative_deny_path_held_bare_is_not_blanked` (3: one leading slash,
+  `./`, a bare relative glob, each beside a deny rule from the home folder; the whole value is still redacted),
+  `test_the_home_folder_alone_and_another_path_below_it_print_unchanged` (`~`, the home folder, `$HOME`, a path
+  below the home that no deny rule carries, in both spellings),
+  `test_a_hook_command_that_holds_no_deny_path_prints_unchanged`,
+  `test_a_whole_deny_value_spelled_from_the_home_folder_is_still_redacted_as_one` (as built).
+
+A failure message never prints the path it looks for (positions only). The 35 earlier cases of the helper are
+untouched and green.
+
+#### DP-8 → `test_w1_02_holding_folders.py`
+
+A folder that holds a file or a copy is a folder strictly between `<P>` and the file. The settings file has one;
+the held-out file lies below more than one, and each is asked.
+
+- `test_a_second_name_for_a_folder_that_holds_a_protected_file_is_refused_as_a_read` (15 forms × 3 folders, by the
+  orchestrator): move (relative, absolute, with a trailing slash, `-t`), rename beside itself, hard link (relative,
+  absolute), symbolic link (`-s` absolute and relative, `--symbolic`), linking copy (`-rl`, `-al`, `-r --link`,
+  `-rs`, `-R --symbolic-link`). 30 red, 15 green.
+- `test_a_second_name_for_a_holding_folder_is_refused_whether_or_not_the_role_may_write_it` (4 forms × 3 folders ×
+  the engineer whose ticket names the folders and the one whose ticket does not): 18 red, 6 green.
+- A copy in a sibling checkout: `test_a_second_name_for_a_folder_that_holds_a_copy_in_another_checkout_is_refused_as_a_read`
+  (6 forms × 3 folders, by the orchestrator; the relative spelling goes from the session's project into the other
+  checkout: 12 red, 6 green) and `…_in_another_checkout_is_refused_for_a_role_that_writes_less` (4, red).
+- A copy below the session's root: `…_below_the_project_s_root_is_refused_as_a_read` (4 forms × 3 folders, 12 red),
+  `…_below_the_root_is_refused_whether_or_not_the_role_may_write_it` (8, red),
+  `test_a_symbolic_second_name_for_a_folder_that_holds_a_copy_below_the_root_is_refused_as_a_read` (4, green).
+- The user-level settings file's folder: `test_a_second_name_for_the_folder_that_holds_the_user_level_settings_file_is_refused_as_a_read`
+  (7 forms with `~`, `$HOME`, `"${HOME}"`: 6 red, 1 green) and
+  `test_a_second_name_for_that_folder_by_its_absolute_path_is_refused_for_every_role` (3 forms × 2 roles, red).
+- `test_the_refusal_for_a_holding_folder_names_the_rule_and_no_path` (5, red): not the file, not the folder moved
+  (the command carries it), not `<P>`, no value of the file.
+
+Stays as it is, green before and after (38):
+
+- `test_a_second_name_for_a_folder_that_holds_neither_file_stays_allowed_for_a_role_that_may_write_it` (9 forms on
+  `docs/spec` × the orchestrator and the engineer whose ticket names `docs/`): move, hard link, linking copy,
+  symbolic link, symbolic-linking copy, and a plain `cp -r`.
+- `test_a_second_name_for_such_a_folder_by_a_role_that_may_not_write_it_is_decided_by_the_allow_list` (9): the six
+  forms that write the folder are denied, and **not** by this rule; the three that only write scratch are allowed.
+- `test_a_folder_that_holds_neither_file_as_the_destination_of_a_move_is_decided_as_today` (3 forms × 2 roles).
+- `test_a_second_name_for_a_folder_outside_the_project_that_holds_no_copy_is_decided_as_today` (5): a symbolic link
+  to and a plain copy of `src/` of the sibling checkout and of the work folder below the home are allowed; a move
+  of either is the allow-list's denial.
+
+No case either way, by the brief: a move or a link of `<P>` itself or of a folder above it (afterwards the file
+lies at the same project-relative path under the new name, which the rule as built covers as a copy); an in-place
+edit whose backup suffix is a word of its own without a dot; a move or copy with an option the guard's reading of
+operands cannot read.
+
+#### What the guard already refused before this batch
+
+Found by running the hook and the helper as processes on stand-ins (no file of this repository opened):
+
+- DP-6: from the session's root, the table above. From a copy's `<P>`: only a Grep glob over everything with a
+  slash in front. A glob from `<P>` that names the file, its extension or its folder was refused already (third
+  batch).
+- DP-7: a whole deny value inside a hook command, whatever its spelling, and a bare absolute (two-slash) deny path.
+  Nothing of a deny path spelled from the home folder, in either spelling.
+- DP-8: as reads, for every role and at every site: a symbolic link to a holding folder (`ln -s`, `--symbolic`,
+  `-sfn`), a recursive copy that makes symbolic links (`cp -rs`, `--symbolic-link`), and a plain recursive copy of
+  it (`cp -r`: the folder is a read source). As writes only: `mv` in every form, `ln` (hard), `cp -rl`, `cp -al`,
+  `cp -r --link`: allowed for the orchestrator and for an engineer whose ticket names the folder (in the project
+  and below `template/`), denied by the allow-list for an engineer whose ticket does not and for a session with no
+  role, and denied by the allow-list for every role in another checkout and below the home folder.
+
+#### Changes to the residual list
+
+Amended above: **13** (the spelling from the home folder is held; the project-relative one stays, and a case holds
+that it prints) and **15** (the wildcard-only glob from `<P>` is held; the start above `<P>` stays, with DP-1).
+Residuals 1 to 12, 14 and 16 to 21 stand. Added:
+
+22. DP-6: a wildcard-only glob from `<P>` in a word of a command that is no reader (`echo <P>/**/*`): refused from
+    the root today, so it follows; no case. Other spellings of "everything" (`**/**`, `**/*/*`, a pattern made by
+    braces) are not held one by one.
+23. DP-6: a `<P>` the guard cannot resolve from the command line (a `cd` into a folder that exists only at run time,
+    as residual 11), and a copy that comes to lie under the start only later in the same command (residual 16).
+24. DP-7: the home folder spelled in a hook command in another way than `~/` or its absolute path (`$HOME/…`,
+    `${HOME}/…`, `~user/…`, a path through a symbolic link to the home folder). Not held either way.
+25. DP-7: the resolved spelling when the helper's `HOME` is missing or is not the home folder the hooks run with
+    (the helper started with another `HOME`). Without `HOME` only the as-written spelling is held.
+26. DP-7: a deny rule whose path is the home folder itself (`~`, `~/**`): not held either way (the home folder
+    alone is held as printing unchanged only when no rule carries it).
+27. DP-8: a holding folder given a second name by a program the guard does not know as one (`git mv`, `rsync`,
+    `tar`, `install`, `rename`, `cp --reflink`, a bind mount), or by a script (residual 19, on a folder).
+28. DP-8: a holding folder reached by a glob in the command's word (`mv <P>/.c* …`) or through a symbolic link to
+    it made earlier (residual 7). No case.
+29. DP-8: a move or a link of `<P>` itself or of a folder above it: after it the copy lies at the same
+    project-relative path under the new name and is covered as a copy; the command itself is not held either way.
+30. DP-8, left by DEC-553: an in-place edit whose backup suffix is a word of its own without a dot; a move or copy
+    with an option the guard's reading of operands cannot read.
+
+#### Rewrites and cases outside this suite
+
+No case of this suite was rewritten: none holds as allowed what DP-6, DP-7 or DP-8 now refuses or redacts (read:
+the files of the three earlier batches and the 529 cases before them; the third batch took no side on a deny path
+spelled from the home folder, on a wildcard-only glob from `<P>` or on a holding folder). No acceptance suite of
+another ticket holds such a form either (searched: `tests/acceptance`).
+
+Two cases of the engineer's unit suite hold such a form as allowed and go red with the change. They are not
+acceptance cases and not this designer's to touch; they are returned by name (package DP-9):
+
+- `tests/unit/guard/test_protected.py::test_what_is_beside_or_above_a_copy_is_let_through`: a Glob for `**/*` with
+  `path` = a copy's `<P>` is held as let through (DP-6 refuses it).
+- `tests/unit/guard/test_protected.py::test_the_listing_redacts_an_absolute_path_a_deny_rule_carries`: with the
+  rule `Read(~/w/**)`, `~/w` in a hook command is held as printing unchanged (DP-7 redacts it).
+
 ### Rewrites
 
 None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third batch (DEC-548) rewrote
 none either: it added five test files and `w1_02_copies_support.py`, and changed no line of an earlier file but this
-README.
+README. The fourth batch (DEC-553) rewrote none: it added three test files and `w1_02_folders_support.py`, and
+changed no line of an earlier file but this README (residuals 13 and 15 amended, this section and the packages).
 
 ### Decision packages
 
@@ -736,6 +963,22 @@ README.
 - Reversibility: high. Cost: (b) a few lines and about four cases; (c) the same and a risk of blanking.
 - Recommendation: (b), not (c). Confidence: medium.
 - No case either way in this batch (residual 13).
+- Decided by DEC-553 as recommended; held by `test_w1_02_hook_listing_home_paths.py`.
+
+**DP-6, after DEC-553.** The wildcard-only glob from `<P>` itself is decided (refused as from the root) and held by
+`test_w1_02_wildcard_globs.py`. The start above `<P>` is not: it is answered with DP-1 and stays residual 15.
+
+**DP-9 (fourth batch). Two unit cases of the guard hold as allowed what DEC-553 refuses or redacts.**
+- Question: `tests/unit/guard/test_protected.py::test_what_is_beside_or_above_a_copy_is_let_through` holds a Glob
+  for `**/*` from a copy's `<P>` as let through, and `…::test_the_listing_redacts_an_absolute_path_a_deny_rule_carries`
+  holds `~/w` as printing unchanged under the rule `Read(~/w/**)`. Who changes them, and how?
+- Why now: both go red the moment DP-6 and DP-7 are built; they are on the ticket's own paths (`tests/unit/guard/**`).
+- Options: (a) the engineer changes those two lines with the code (each moves from the "let through" list to the
+  refused or redacted one), as the engineer's own unit cases; (b) the lines are removed; (c) the cases are kept and
+  the change is narrowed to pass them.
+- Impact: (a) none beyond the two lines; (b) loses the neighbours the same cases hold; (c) would undo DEC-553.
+- Reversibility: high. Cost: two lines.
+- Recommendation: (a). Confidence: high. Not this designer's to edit (unit cases are the engineer's).
 
 ## Not tested
 
