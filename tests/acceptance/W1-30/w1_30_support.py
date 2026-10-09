@@ -657,11 +657,12 @@ def build_ticket(project, ticket, wbs, failing=False, **ticket_keys):
     return trailers
 
 
-def run_close(project, sandbox, ticket, *extra_args, store=True):
+def run_close(project, sandbox, ticket, *extra_args, store=True, env=None):
     """Run ``gov close <ticket> --json`` and return the Run.
 
     The record store is loaded first (``store=False`` leaves it as it is), so that the ticket's context can be
-    built wherever the case did not break it on purpose.
+    built wherever the case did not break it on purpose. ``env`` replaces the environment of the close alone
+    (round 13: where the session logs are, another ``PATH``).
 
     DEC-453: ``gov close`` adds no exemption to W1-50's judgement of the ticket's commits. So in every case of
     this suite a close that succeeds had commits that judgement passes; where it finds something and the close
@@ -671,7 +672,7 @@ def run_close(project, sandbox, ticket, *extra_args, store=True):
         load_store(project, sandbox, check=False)
     commits = ticket_commits(project.root, ticket)
     findings = (judged_by_w1_50(project, sandbox, commits, check=False) or []) if commits else []
-    run = project.gov(sandbox, COMMAND, ticket, "--json", *extra_args)
+    run = project.gov(sandbox, COMMAND, ticket, "--json", *extra_args, env=env)
     try:
         closed = json.loads(run.stdout).get("ok") is True
     except (ValueError, AttributeError):

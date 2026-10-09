@@ -1466,6 +1466,49 @@ refuses the merge of a later head whose later commits changed only tests. A rule
 code alone would accept it; nothing in DEC-505 or DEC-498 asks for that, and DEC-498 has the
 probe at the head that is merged.
 
+### Piece 2. `gov close` calls the counter (`test_w1_30_r13_governance_share.py`, 7 cases)
+
+DEC-495, fourth point: the share reaches the close record through this follow-up. DEC-491: the
+caller names the ticket's sessions, and the close record's own tokens are counted by a measure
+after the close. The counter is W1-31's (`gov telemetry`, `tests/acceptance/W1-31/README.md`).
+
+**Settlement 25, how the caller names the sessions (proposed).** As it names them to
+`gov telemetry`: `gov close <ticket> --ticket-session <session id>[=<role>]`, once for each
+session. No command is added.
+
+**Settlement 26, the share in the close record and the output (proposed).** The key
+`governance_share`, in the close record's frontmatter and in the JSON `result` alike: a map with
+exactly `measured`, `estimated` and `total`, each the counter's figure (a fraction of 1) or the
+string `not measured`. With no session named, or where the counter refused or could not measure,
+all three say `not measured`; a part the counter gave as `not measured` beside a measured one is
+stated as given. The ticket closes with exit code 0 in every one of these: the share refuses no
+close.
+
+**The record first.** The counter says `not measured` of a ticket whose close record does not
+exist yet, so a measured share in the record is there only when the record was written before
+the measure. The lines that state the share are written into the record after it, so the counter
+asked again afterwards differs by those lines: the case accepts 0.02 of a share for them and
+holds the estimated part exactly.
+
+**No real session log.** Every close of this file runs with `HOME` and `CLAUDE_CONFIG_DIR` in
+temporary folders. The logs are the ones W1-31's support writes in the specimens' forms
+(`w1_31_support.full_logs`: two sessions of the ticket, one of other work), given to the close
+the way that suite gives them to `gov telemetry`; ccusage runs with its built-in prices. Every
+text of those logs carries `MARK-`. `support.run_close` gained `env=` for this (the close's
+environment alone).
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_the_close_record_states_the_share_of_the_sessions_the_caller_names` | closed; the three parts are fractions between 0 and 1; `total` is their sum; the estimate is the counter's own, the measured part the counter's within the record's own lines; the result states the same map | red: exit code 2, "unrecognized arguments: --ticket-session" |
+| `test_no_text_of_a_session_is_in_the_record_or_in_what_the_close_prints` (2: a close that passes, a close that is refused) | no `MARK-` in standard output, standard error, or any file of the project outside `src/` and `.git` | red, both: exit code 2 |
+| `test_without_a_session_named_the_share_is_not_measured_and_the_ticket_closes` | exit code 0, closed, the three parts say `not measured` | red: the close record has no `governance_share` |
+| `test_a_counter_that_cannot_measure_does_not_refuse_the_close` (2: ccusage not on `PATH`, a named session without a log) | the same, where the counter refuses (`CCUSAGE_ABSENT`, `SESSION_LOG_MISSING`) | red, both: exit code 2 |
+| `test_a_part_the_counter_did_not_measure_says_so_beside_the_part_it_measured` | sessions named without roles: `measured` a fraction, `estimated` and `total` say `not measured`; closed | red: exit code 2 |
+
+7 red. Five of the seven need ccusage and skip where this machine has none (it has: Node
+v22.23.3's, as the tool registry names it). Not held, as no decision names it: what a refused
+close states of the share (nothing is measured for it: there is no close record to count).
+
 ## Covers ids
 
 | Covers id | Tests |
