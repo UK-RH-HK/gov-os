@@ -6172,3 +6172,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.162 | 2026-10-09 | Delegated, stricter-only: DEC-570 (the probe of W1-02's root-search round is judged pass with one fix round: numbered redirects, searches after shell keywords, daily spellings, a brace word past the bound, bounded decision time). Next free id: DEC-571. |
+
+## 163. Delegated: the fix round of W1-02's root-search round merges without a second probe (register v0.163, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-571 — W1-02's fix round after the probe: read line by line, stricter-only, no second probe
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only; the lead's reading and the orchestrator's agree) · **Basis:** the lead's return at `02f0294d` (`log/W1-02-lead-run5.json`: code at `10e6ef39`; 2762 cases in the suite, every acceptance suite and 1804 unit tests green; over three seeds of 420,000 random calls no call that was refused is now allowed; the probe's thirteen slow inputs answer in under 0.4 s) and the orchestrator's own reading of `git diff 033bbbca 02f0294d -- src/` · **Under:** DEC-570, DEC-498, DEC-552
+- **Decision:**
+  - DEC-570's condition holds: the product diff is 127 lines added and 22 removed in one file, and every changed line adds refusals or does the same work with the same answer. The one line that alone would loosen (a path is no longer resolved once a call's paths hold more than 131,072 folders) sets in the same statement the mark that refuses the call. No second probe.
+  - **Refused beyond what was ordered, kept as built (stricter):** a quoted word whose brace groups expand past the bound (inline JSON or a script with many brace groups: put it in a file); a digit word directly before a redirect in a search is read as the redirect's number; a call whose paths together hold more than 131,072 folders; `find` and `ls` behind a keyword or prefix.
+  - The designer's point on `mkdir -p` with a brace word under the scratch folder (denied today by the write rule, not by this round) changes nothing; allowing it would loosen the write rule and is not proposed.
+  - The residuals of the round (the lead's 36 to 51) go to `governance/project/bootstrap.md`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.163 | 2026-10-09 | Delegated, stricter-only: DEC-571 (W1-02's fix round after the probe is read line by line and merges without a second probe; four stricter behaviours kept as built). Next free id: DEC-572. |
