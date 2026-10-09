@@ -1710,6 +1710,70 @@ that, in projects whose path map holds the suite's own setting only.
   the base named. It refuses (c).
 - **Confidence.** Medium.
 
+### Piece 8. The skills list in a project with an installed kernel (`test_w1_30_r13_installed_skills.py`, 6 cases)
+
+DEC-569 lists it. Today the close record lists the skills of the template layout only
+(`template/governance/kernel/skills/` with versions, `template/governance/kernel/vendor/` with
+"no version"); in an adopted project, whose kernel is installed under `governance/kernel/`, the
+list is empty. This repository has the template layout.
+
+**Settlement 32, what is listed.**
+
+- The skills of an installed kernel are listed as those of the template layout: each skill of
+  `governance/kernel/skills/` with the version its file states, each vendored one under
+  `governance/kernel/vendor/` with "no version", a skill file whose frontmatter cannot be read
+  under its folder's name with "not measured".
+- A project with both layouts lists the skills of both (the stricter reading: no skill a role
+  could have loaded is left out). A skill that both hold with one version is listed once. A skill
+  whose two layouts state different versions is listed with each version: neither is dropped and
+  the record shows that the two differ. The close is not refused for the difference.
+- The form is as today: `skill_versions`, a list of objects with `name` and `version`. No field
+  is added, so the record does not say which layout an entry is from; if that is wanted it is one
+  more field and a decision.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_the_skills_of_an_installed_kernel_are_listed_with_their_versions` | two installed skills, each with its version | red: the list is empty |
+| `test_a_vendored_skill_of_an_installed_kernel_is_listed_without_a_version` | an installed skill and an installed vendored one with "no version" | red: the list is empty |
+| `test_an_installed_skill_whose_frontmatter_cannot_be_read_is_listed_as_not_measured` | the folder's name with "not measured" beside a readable skill | red: the list is empty |
+| `test_a_project_with_both_layouts_lists_the_skills_of_both` | a skill and a vendored skill in each layout: all four | red: the template's two only |
+| `test_a_skill_whose_two_layouts_state_different_versions_is_listed_with_each` | `discovery` 1.1.0 in the template, 1.0.0 installed: both entries | red: the template's version only |
+| `test_a_skill_that_both_layouts_hold_with_one_version_is_listed_once` | one entry for the skill and one for the vendored skill | green (as today: the template's entries); it holds that the second layout doubles nothing |
+
+5 red, 1 green. The template layout alone and a project without skills stay with the three cases
+of `test_w1_30_close.py`, unchanged.
+
+### Names proposed in round 13
+
+Every name below is this round's proposal; the cases hold it and a decision may replace it.
+
+| Name | What it is | Piece |
+|------|------------|-------|
+| `--ticket-session <session id>[=<role>]` | option of `gov close`, once for each session, as `gov telemetry` takes it | 2 |
+| `governance_share` with `measured`, `estimated`, `total` | key of the close record's frontmatter and of the JSON `result` | 2 |
+| `test_runs` under `error.details` | the runs of a refused close, in the form of settlements 19 and 22 | 3 |
+| `SERIAL_ONLY_LIST_UNREADABLE` | finding code: the serial-only list is no UTF-8 text | 4 |
+| `repair_ticket_findings_cut`, `findings_cut` | whole numbers under `error.details` of a refusal | 5 |
+| a line with the word "cut" and the number | in a repair ticket that leaves findings out | 5 |
+| `**Status:** ACCEPTED` as the first word of the status line | what "accepted" is for a register entry | 6 |
+| `trailers_base` | optional top-level key of the path map | 7 |
+| `TRAILERS_BASE_UNKNOWN` | finding code of the trailers check | 7 |
+
+No name is proposed for pieces 1 and 8: piece 1 adds no key and no code (the existing
+`PROBE_INVALID` stays), piece 8 keeps `skill_versions`.
+
+### Cases of other suites and of earlier rounds
+
+None is rewritten. `run_close` of `w1_30_support.py` gained the keyword `env` (the environment of
+the close alone), used by piece 2; no case changed with it.
+
+### Packages of round 13
+
+P-1 (piece 1): the orchestrator's commits after the merge that name the ticket. P-2 (piece 6):
+what makes a register entry the owner's, and what "accepted" reads. P-3 (piece 7): a base after
+which no closed ticket has a commit. Each stands in its piece's section, with the stricter
+reading built meanwhile.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1727,6 +1791,7 @@ that, in projects whose path map holds the suite's own setting only.
 | DEC-500 | the five `test_w1_30_r10_*.py` files: 16 tests (probe records: 4; a task that names no ticket: 4; git: 3; the interpreter: 2; skips: 3) |
 | DEC-527, DEC-530 (CAP-13.a, CAP-38.a) | the three `test_w1_30_r11_*.py` files: 43 tests (the runs: 12; this repository's declaration: 29; a store rebuilt without embeddings: 2) |
 | DEC-549 (CAP-13.a, CAP-38.a) | `test_w1_30_r12_worker_setting.py`: 22 tests (the number of workers: 2; never which tests: 2; the stated number: 4; a setting that is none: 5; without the parallel runner: 2; the project's time limit: 5; a list entry that names no case: 2) |
+| DEC-569, round 13 | the eight `test_w1_30_r13_*.py` files: 57 tests. CAP-38.f: the probe and a merge (9). CAP-50.c, CAP-13.a: the governance share (7). CAP-38.a, CAP-13.a: the runs of a refused close (3); five findings of the probe of the parallel run (9). CAP-31.b, CAP-59.a: long findings (4); the owner's decision as a register entry (7). CAP-38.b: the trailers base (12). CAP-24.a: installed skills (6) |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1759,6 +1824,15 @@ that, in projects whose path map holds the suite's own setting only.
 21. **Where a project writes its settings for `gov close`** (round 12, DEC-549): two optional top-level keys of `governance/project/path-map.yaml`: `close_workers` (a positive whole number, or `auto`; without it `auto`) and `close_timeout` (a positive number of seconds; without it the default). `--timeout` wins over `close_timeout`; there is no argument for the number of workers
 22. **The number of workers in the close record and the output** (round 12, DEC-549): the key `workers` in every object of `test_runs` (settlement 19) whose `form` is `parallel`, and in no other: the whole number the project wrote, or the string `auto` where it wrote `auto` or nothing (the number the runner then chose is not stated: the close does not choose it). A `serial-afterwards` run and the `serial` runs of a project without the parallel plugin had no worker and carry no `workers`
 23. **A setting that is none** (round 12, DEC-549; in the form of DEC-487's `INVALID_TIMEOUT`): `close_workers` that is not a positive whole number or `auto` (zero, a negative number, a fraction, another word, a truth value) is `INVALID_WORKERS`; `close_timeout` that is not a positive number is `INVALID_TIMEOUT`. Both: exit code 1, before anything runs, not counted against the ticket, no repair ticket; the message names the key; `details.argument` is the key and one value of `details` is the value as read, as text. Nothing falls back to `auto` or to a serial run. Without the parallel plugin a valid `close_workers` is accepted and changes nothing, an invalid one is refused all the same
+24. **"Exactly the probed code"** (round 13, DEC-505): a ticket commit after the probed commit is not "after" it when it is a merge whose parent other than the first is the probed commit itself and every path it brings outside `tests/` and `docs/probes/` is byte for byte the probed commit's. Full text in round 13, piece 1
+25. **How the caller of `gov close` names the ticket's sessions** (round 13, DEC-495; proposed): `--ticket-session <session id>[=<role>]`, once for each session, as for `gov telemetry`
+26. **The governance share in the close record and the output** (round 13, DEC-495; proposed): the key `governance_share`, a map with exactly `measured`, `estimated` and `total`, each the counter's fraction or `not measured`; the share refuses no close
+27. **The test runs of a refused close** (round 13, DEC-566; proposed): `test_runs` under `error.details`, in the form of settlements 19 and 22, whether or not a test failed
+28. **A serial-only list that is no UTF-8 text** (round 13, DEC-555; proposed): the finding `SERIAL_ONLY_LIST_UNREADABLE`, exit code 3, counted, with a repair ticket
+29. **Findings longer than a repair ticket or an answer carries** (round 13; proposed): `repair_ticket_findings_cut` and `findings_cut` under `error.details`, whole numbers, 0 or absent when nothing was left out; a repair ticket that leaves findings out has a line with the word "cut" and the number
+30. **An owner's decision as a register entry** (round 13, DEC-483): one heading of DEC-473's form in the register named by `decision_register`, a status line whose first word is `ACCEPTED`, brought into the register by a commit that carries `Role: owner` alone, absent from the register of the commit at which the escalation began, not used before. Full table in round 13, piece 6
+31. **The base commit of the trailers check** (round 13, DEC-482; proposed): the optional top-level key `trailers_base` of the path map; a base that is no commit the checked commit descends from is the finding `TRAILERS_BASE_UNKNOWN`; a base with no commit after it gives the unmeasured answer; a closed ticket no commit names stays `NO_COMMITS`. Full text in round 13, piece 7
+32. **The skills of an installed kernel in the close record** (round 13): `governance/kernel/skills/` and `governance/kernel/vendor/` are listed as the template layout is; a project with both layouts lists both, one entry for a skill both hold with one version, an entry for each version where they differ
 
 ## Residuals
 
