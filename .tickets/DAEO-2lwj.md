@@ -1,6 +1,6 @@
 ---
 id: DAEO-2lwj
-status: closed
+status: in_progress
 deps: [DAEO-8qvp, DAEO-topz, DAEO-rrxp, DAEO-fygv, DAEO-wk2v]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -27,6 +27,20 @@ allowed_paths:
 - tests/unit/rebuild/**
 - tests/unit/pause/test_pause.py
 - template/governance/kernel/checks/product-traceability*
+- src/gov/check/**
+- tests/unit/check/**
+- src/gov/store/**
+- tests/unit/store/**
+- src/gov/readiness/**
+- tests/unit/readiness/**
+- src/gov/context/**
+- tests/unit/context/**
+- src/gov/telemetry/**
+- tests/unit/telemetry/**
+- src/gov/codeintel/**
+- tests/unit/codeintel/**
+- template/governance/kernel/schemas/**
+- template/governance/kernel/checks/**
 kpis:
   success:
   - 'Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions [CAP-13.a,
