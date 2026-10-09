@@ -1266,6 +1266,217 @@ None. Searched `tests/acceptance` and `tests/unit`, `*.py`, for the search progr
 input redirect, and asked for its version or help: no case holds any of them, as refused or as allowed. The fifth
 batch's own forms of that program stand without a pipe (`rg VALUE`, `rg -n VALUE`, `rg --files`, after `cd … &&`).
 
+### Seventh batch (2026-10-09): the fix round of DEC-570
+
+Five points, written before any code of the fix round exists; each refuses more than today and none allows more.
+Every case asks the hook as a process, in the stand-in world of the fifth batch, with its starts, its bound and its
+assertions (`w1_02_round_support.py`, no line changed). `w1_02_fix_support.py` holds what the five files share: a
+shell form is asked in a session that stands in its start (the root; a copy's `<P>`: sibling, nested, home; or a
+folder of the session's project that holds a protected file), and a refusal is held as the read rule's own
+decision: `deny`, exit code 0, a reason that names a decision of the rule (DEC-508, DEC-525, DEC-548, DEC-553,
+DEC-557, DEC-562 or DEC-570; none of them required) and words beside it, with no protected file's path, folder or
+value, not the folder the session stands in, and not the command or its word. No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_numbered_redirects.py
+tests/acceptance/W1-02/test_w1_02_shell_keywords.py tests/acceptance/W1-02/test_w1_02_daily_spellings.py
+tests/acceptance/W1-02/test_w1_02_brace_bound.py -q -p no:cacheprovider -rs`, and the time file in a call of its
+own: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_fix_round_time.py -q -p no:cacheprovider -rs`
+
+| File | Point | Cases | Red today | Green today | Red reason | Time here |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_w1_02_numbered_redirects.py` | 1 | 70 | 50 | 20 | the guard allows a form that is refused | 6 s |
+| `test_w1_02_shell_keywords.py` | 2 | 49 | 28 | 21 | the same | 4 s |
+| `test_w1_02_daily_spellings.py` | 3 | 99 | 69 | 30 | the same | 8 s |
+| `test_w1_02_brace_bound.py` | 4 | 46 | 33 | 13 | the same | 4 s |
+| `test_w1_02_fix_round_time.py` | 5 | 45 | 12 | 33 | 8: no answer within the bound; 4: the guard allows a form that is refused | 1 min 25 s red (each of the 8 waits for its limit) |
+| Together | | 309 | 192 | 117 | | |
+
+Every one of the 180 red cases of points 1 to 4 fails with `decision=allow exit=0`. The fifth and sixth batches' six
+files, once, on the guard as built: 763 passed in 42 s.
+
+#### Point 1 → `test_w1_02_numbered_redirects.py`
+
+Red, each because the guard answers `allow`:
+
+- `test_a_search_with_no_path_and_a_numbered_redirect_is_refused_at_the_root` (20): the four kinds of a search with
+  no path (the other program with a word; `grep -rn <word>`; `ls -R`; the other program with its option that lists
+  files) × `2>/dev/null`, `2>&1 | head`, `2>/dev/null | head`, `1><a file in the scratch folder>`, `2>>/dev/null`.
+- `test_a_search_whose_name_filter_takes_a_protected_file_in_is_refused_with_a_numbered_redirect_too` (8): `--include`
+  (quoted, with `=`) and the other program's `-g` and `--glob=`, each for both files; the filter is the file's own
+  name or a glob over its extension, in turn.
+- `test_a_search_with_a_numbered_redirect_is_refused_from_a_copy_s_folder` (6): two forms from each `<P>`.
+- `test_a_numbered_input_redirect_that_does_not_feed_the_search_program_leaves_it_a_search_of_the_folder` (4): `0<&-`
+  and `3<<a named source file>`, at the root and in the sibling checkout.
+- `test_a_search_with_a_numbered_redirect_is_refused_in_a_folder_that_holds_a_protected_file` (6) and
+  `test_a_search_with_a_numbered_redirect_is_refused_for_every_role` (6).
+
+Green, as today: `test_a_search_of_a_source_folder_with_a_numbered_redirect_stays_allowed` (4) and `…_for_every_role`
+(3); `test_a_search_of_the_root_by_its_path_with_a_numbered_redirect_stays_refused` (3);
+`test_a_fed_search_program_and_an_ordinary_command_with_a_numbered_redirect_stay_allowed` (4), `…_for_every_role` (3)
+and `test_a_fed_search_program_with_a_numbered_redirect_stays_allowed_from_a_copy_s_folder` (3).
+
+No case either way, by the order: a digit as a word of its own, set apart from the redirect by a space; and
+`0<<a named file>` (it feeds the standard input by number; allowed today).
+
+#### Point 2 → `test_w1_02_shell_keywords.py`
+
+Red, each because the guard answers `allow`:
+
+- `test_a_search_of_the_root_after_a_shell_keyword_is_refused` (10): the ten forms of the order (`do`, `then`,
+  `else`, `elif`, `if`, `while`, `until`, `!`).
+- `test_a_search_after_a_shell_keyword_is_refused_from_a_copy_s_folder` (6),
+  `…_in_a_folder_that_holds_a_protected_file` (6), `…_for_every_role` (6).
+
+Green: `test_a_read_of_a_protected_file_after_a_shell_keyword_stays_refused` (8: after `then`, `do`, `!` and `else`,
+both files, the file and a copy; **measured: the guard refuses these today**, as the read it is, and the cases hold
+it); `test_a_search_of_a_source_folder_or_a_named_file_after_a_shell_keyword_stays_allowed` (7: the five forms of the
+order and two more) and `…_for_every_role` (6).
+
+#### Point 3 → `test_w1_02_daily_spellings.py`
+
+Red, each because the guard answers `allow`:
+
+- A comment: `test_a_search_with_no_path_and_a_comment_is_refused` (8: the three kinds at the root, one from each
+  `<P>`, the other program in each holding folder).
+- A digit in the option group: `test_a_recursive_option_group_that_holds_a_digit_is_refused_as_the_search_it_is` (11:
+  `ls -1R`, `ls -l1R`, `ls -1R .`, `grep -2r <word>`, `grep -2r <word> .`, `grep -A2r <word> .` at the root; one from
+  each `<P>`; `grep -2r <word>` in each holding folder).
+- `egrep` and `fgrep`: `test_the_other_names_of_grep_are_refused_as_grep_is` (9) and
+  `test_the_other_names_of_grep_with_a_name_filter_that_takes_a_protected_file_in_are_refused` (4).
+- A prefix: `test_a_search_of_the_root_behind_a_prefix_command_is_refused` (26: each of the nine prefixes before a
+  search with no path and before one with the root as its path, the two programs in turn; `ls -R` behind two; three
+  stacked pairs; one after `if`; two with a numbered redirect behind the search) and
+  `test_a_search_behind_a_prefix_command_is_refused_from_a_copy_s_folder_and_beside_a_protected_file` (5).
+- `test_a_daily_spelling_of_a_root_search_is_refused_for_every_role` (6).
+
+Green, as today: `test_a_search_of_a_source_folder_with_a_comment_or_a_hash_inside_a_word_stays_allowed` (5),
+`test_an_option_group_with_a_digit_and_no_search_of_the_root_stays_allowed` (5),
+`test_the_other_names_of_grep_stay_allowed_where_grep_is` (8),
+`test_an_ordinary_command_behind_a_prefix_command_stays_allowed` (6; among them
+`git log --oneline | timeout 5 <the other program> <word>`: **measured: allowed today**, so the case is written) and
+`test_the_daily_forms_of_these_spellings_stay_allowed_for_every_role` (6).
+
+No case either way, by the order: other options of a prefix; `sudo` as a prefix.
+
+#### Point 4 → `test_w1_02_brace_bound.py`
+
+**The bound, measured on the guard as built: one brace word is expanded to at most 256 words.** A word of a
+two-alternative group and doubling groups (`{<x>,zz}{,a}{,a}…`) with a protected file's path as `<x>`: at 64, 128 and
+256 words it is refused in all four places (a shell reader, the Glob tool's `pattern`, the Grep tool's `glob`, the
+other program's glob option); at 512 and at 4096 words it is allowed in all four.
+
+Red, each because the guard answers `allow`:
+
+- `test_a_brace_word_past_the_bound_whose_expansions_take_a_protected_file_in_is_refused` (16: four places × twice and
+  sixteen times the bound × both files).
+- `test_a_brace_word_past_the_bound_is_refused_also_where_no_expansion_names_a_protected_file` (8).
+- `test_a_brace_word_past_the_bound_that_takes_a_copy_in_is_refused` (4), `…_in_a_folder_that_holds_a_protected_file`
+  (2), `…_for_every_role` (3).
+
+Green: `test_a_brace_word_at_the_bound_whose_expansions_take_a_protected_file_in_stays_refused` (4),
+`test_an_ordinary_brace_word_stays_allowed` (8: `ls src/{a,b,c}.py`, a word of 64 source files, the Glob tool with
+`src/**/*.{py,md}`, the Grep tool with `*.{py,md}` and a source folder, the other program with the same) and
+`test_a_brace_word_in_a_write_target_is_decided_as_today_and_not_as_a_read` (1).
+
+**A form the order names as allowed and the guard denies today:** `mkdir -p <a scratch folder>/{a,b}/{x,y}`. It is
+denied for every role by the rule for a Bash write whose target the guard does not resolve (a brace word in a write
+target; the same command without braces is allowed), not by the read rule. Allowing it would loosen another rule,
+so the case holds only that the read rule is not what refuses it, before and after. See the packages.
+
+No case either way: a word of more than 64 and fewer than 512 words that takes neither file in.
+
+#### Point 5 → `test_w1_02_fix_round_time.py`
+
+**The bound is the fifth batch's, unchanged: 5 s of the hook's own time (`BOUND_S`); the process is stopped at 8 s.**
+No reason to change it was measured: an ordinary decision takes 0.04 to 0.25 s here, the new forms at the length
+bound take 0.2 to 0.7 s today, and the slow inputs take 9 s and more. Every input is under the round's length bounds
+(`test_every_input_is_under_the_round_s_length_bounds`, no process).
+
+The reviewer's thirteen inputs, measured on the guard as built through the hook as a process (load average about 11
+during the first seven, lower after):
+
+| # | Input | Time | Decision | Case today |
+| --- | --- | --- | --- | --- |
+| 1 | Grep, `path` = `a/` × 2047, `glob` = `x ` × 2047 | 14.5 s | allow | red |
+| 2 | Grep, `path` = `a/` × 1000, `glob` = `x ` × 500 | 1.5 s | allow | green |
+| 3 | Grep, `glob` = `{a,b}` × 8 + `/` + `a/` × 2000 + `*` | 1.7 s | allow | green |
+| 4 | Glob, the same string as `pattern` | 0.9 s | allow | green |
+| 5 | Glob, `path` = `a/` × 2048, `pattern` = `{a,b}` × 8 + `/*` | 0.9 s | allow | green |
+| 6 | `cat ` + `{a,b}` × 8 + `/` + `a/` × 16000 | 10.8 s | allow | red |
+| 7 | `cat ` + `{a,b}` × 4 + `/` + `a/` × 16000 | 0.9 s | allow | green |
+| 8 | `ln -s ` + `{a,b}` × 8 + `a/` × 15000 + ` b` | 9.4 s | allow | red |
+| 9 | the other program, 300 `-gx` filters, `V`, `a/` × 8000 | 10.4 s | allow | red |
+| 10 | the same with 3000 filters | over 90 s | none within it | red |
+| 11 | `grep -r`, 1000 `--include=x`, `V`, `a/` × 8000 | 32.0 s | allow | red |
+| 12 | `true ` + `\| <the other program> V ` × 1000 | 1.7 s | allow | green |
+| 13 | the same × 4000 | 20.2 s | allow | red |
+
+- `test_each_of_the_reviewer_s_inputs_is_decided_within_the_bound` (13: 7 red, 6 green and kept) and
+  `test_the_reviewer_s_inputs_are_decided_within_the_bound_for_other_roles` (3: inputs 2, 9 and 12; the one on input 9
+  is red). The six green inputs are within the bound by a factor of three to five only: the engineer's target of well
+  under a second is not held by a case.
+- `test_each_new_form_of_the_round_at_the_length_bound_is_decided_within_the_bound` (9, green today: the guard does not
+  judge them yet) and `…_for_other_roles` (3). Measured today, each `allow`: a prefix repeated 0.32 s; `env X=1`
+  repeated 0.48 s; `!` repeated 0.72 s; an `if` nested about 1775 times 0.33 s; a numbered redirect repeated 0.64 s;
+  short loops with a search each 0.40 s; a search and a very long comment 0.45 s; searches with a comment each on
+  lines of their own 0.54 s; `egrep -r` with 1000 filters and a path of 8000 folders 0.22 s.
+- `test_a_new_form_at_the_length_bound_that_searches_the_root_is_refused_within_the_bound` (4, red: `allow` in 0.3 to
+  0.7 s): a prefix repeated before a search of the root; many loops and then one that searches the root; a search
+  with no path and a very long comment; a search with no path and a numbered redirect repeated.
+- `test_a_new_form_at_the_length_bound_that_reads_a_protected_file_is_refused_within_the_bound` (4, green: `deny` in
+  0.25 s today): a nested `if` and a repeated prefix around a read of either file.
+- `test_an_ordinary_size_stays_allowed_within_the_bound` (8, green: 60 source paths with 60 filters 0.24 s; a commit
+  message of 30000 characters 0.22 s; `cat` of 200 named files 0.10 s; a pipeline of 20 `grep` filters 0.09 s; for
+  the orchestrator and a session with no role).
+
+No line was added to `tests/acceptance/serial-only.txt`: the bound is five to twenty times what each input is to
+take after the change, and none of the green cases changed its result in the runs here.
+
+#### What the guard as built decides, where it differs from what the order expects
+
+| Form | Order | Today |
+| --- | --- | --- |
+| every refused form of points 1 to 4 (root, `<P>`, holding folder, every role asked) | red: allowed | allowed, all 180 |
+| `if true; then cat <the file>; fi` and its like | measure | refused, as a read (exit 0) |
+| `git log --oneline \| timeout 5 <the other program> <word>` | measure | allowed: case written |
+| `mkdir -p <a scratch folder>/{a,b}/{x,y}` | stays allowed | denied by the write rule (unresolved target) |
+| the reviewer's inputs 2, 3, 4, 5, 7, 12 | red: no answer within the bound | answered in 0.9 to 1.7 s: green, kept |
+| the new forms at the length bound that search the root | refused in time | allowed in time: red for the decision |
+
+#### Changes to the residual list
+
+Residual 43 is narrowed: the other program behind `env` or `command` is held by point 3 (`sudo` and a path such as
+`/usr/bin/…` stand). Residual 36's "braces" is narrowed by point 4. Residuals 1 to 45 otherwise stand. Added, the
+forms a guard that reads a command line cannot see first:
+
+46. A search whose command, keyword or prefix is made at run time (a variable or a substitution as the command
+    word, `eval`, an alias or a function named like a prefix), and a search with a substitution as its path.
+47. A brace word made past the bound by something the command line does not show (a variable expanded inside the
+    braces, `eval`), and a sequence (`{1..1000}`).
+48. Not built by DEC-570, no case: `find` with a name test; valued options the rule does not list; a search in a
+    brace group, in a shell started with `-c`, or behind `xargs`; a file-tool path that is not text; a line of a
+    here-document's body that reads as a search (refused as built); the other program's option that lists its file
+    types; the type filter with no path (refused as built).
+49. No case either way, by the order: `sudo` as a prefix and other options of a prefix (`timeout -k`, `env -i`,
+    `env -u`, `nice --adjustment`, `time -p`, `command -p`); a digit as a word of its own before a redirect; a word
+    of 65 to 511 expansions that takes neither file in.
+50. Not held by this designer: further keywords and shapes (`case … in`, `select`, `{ …; }`, `( … )`, `function`,
+    `coproc`, `&&` or `||` between a keyword and the search); further prefixes (`stdbuf`, `ionice`, `setsid`,
+    `chronic`, `watch`, `strace`, `exec`, `builtin`); further names of the search programs (`zgrep`, `rgrep`, a
+    path such as `/usr/bin/grep`, which the guard as built judges by its last part); a comment after a `;` or
+    inside a substitution; numbered redirects of other shapes (`2>|`, `&>`, `>&2`, `{fd}>`); the input `0<<file>`.
+51. Point 5: the engineer's target of well under a second is not a case (the bound is 5 s); a slow input of a
+    shape neither the reviewer nor this designer found; what the harness does with a hook that passes its own time
+    limit (residual 39).
+
+#### Rewrites and cases of other suites
+
+None. Searched `tests`, `*.py`, for a search program with a numbered redirect, after a keyword, behind a prefix,
+with a digit in its option group, and for `egrep` and `fgrep`: no acceptance case of any suite holds as allowed a
+form this round refuses. Two unit cases of the guard (`tests/unit/guard/test_decide.py`: `ls -la 2>&1` and
+`ls 2>/dev/null`) hold a listing without recursion with a numbered redirect as allowed; that stays allowed at the
+root, and they are the engineer's.
+
 ### Rewrites
 
 Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
@@ -1388,6 +1599,21 @@ every role; the fourteen cases are rewritten (see "Rewrites") and the fifth batc
 - Impact: (a) none beyond the two lines; (b) loses the neighbours the same cases hold; (c) would undo DEC-553.
 - Reversibility: high. Cost: two lines.
 - Recommendation: (a). Confidence: high. Not this designer's to edit (unit cases are the engineer's).
+
+**DP-10 (seventh batch). A brace word in a Bash write target is denied today, and the order of DEC-570's fix round
+names such a command as one that stays allowed.**
+- Question: is `mkdir -p <a scratch folder>/{a,b}/{x,y}` (a brace word of a few alternatives in a write target a
+  role may write) to be allowed?
+- Why now: the fix round's order lists it under "stays allowed, each held by a case". Measured on the guard as
+  built: denied for the orchestrator and for an engineer (`deny`, exit 0, by the rule for a Bash write whose target
+  the guard does not resolve), while the same command without braces is allowed. The read rule has no part in it.
+- Options: (a) it stays denied, and the line of the order is read as "not refused by the read rule" (the case as
+  written); (b) the write rule learns to expand a brace word of a few alternatives in a write target and judges
+  each expansion against the role's paths.
+- Impact: (a) none; the way round is one command per folder, or the folders named one by one. (b) loosens the
+  write rule (a change of who may write what through which spelling), outside a stricter-only round.
+- Reversibility: high either way. Cost: (a) nothing; (b) a designer round and an engineer round on the write rule.
+- Recommendation: (a). Confidence: high.
 
 ## Not tested
 
