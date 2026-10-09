@@ -6154,3 +6154,21 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.161 | 2026-10-09 | Delegated: DEC-569 (the follow-up after W1-41 runs on W1-30's ticket, reopened, FULL with its own probe; its pieces by decision; the paths it adds). Next free id: DEC-570. |
+
+## 162. Delegated: the probe of W1-02's root-search round (register v0.162, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-570 — W1-02's round of DEC-557: the probe is judged pass with one fix round, stricter-only
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only; told to the owner, who may replace it) · **Basis:** the probe's return (`log/W1-02-probe4.json`, session `ea1c1fed-b545-4461-b029-09dae6731851`, at `dc9fda16`, code `02d0b35b`; each finding reproduced on a stand-in project) · **Under:** DEC-498, DEC-137, DEC-557, DEC-562
+- **Decision:** DEC-498 orders a fix before the merge for a hole in a shape ordinary work produces. The probe found such shapes, so one fix round is built before the merge, test designer first, each point refusing more than today:
+  - **A root search with a numbered redirect** (`2>/dev/null`, `2>&1`, `1>file`) is refused like the same search without it: the number of a redirect is no path. (The probe's A1; ordinary work types it constantly.)
+  - **A search after a shell keyword** (`do`, `then`, `else`, `if`, `while`, `until`, and a `!` in front) is judged as the search it is. (A2.)
+  - **Daily spellings:** a comment after the search is no path; `ls` and `grep` option groups that hold a digit beside the recursive letter; `egrep` and `fgrep`; a search behind `timeout`, `command`, `env`, `nice`, `nohup` or `time`. (A3, and `time` of A4.)
+  - **A brace word that expands past the bound is refused**, not judged unexpanded. (A5; a deliberate shape, but one line.)
+  - **Time.** The harness lets a call through when the hook passes its time limit (DEC-110, DEC-179), so a slow decision fails open. The probe found decisions of 1 to 190 seconds for inputs under the round's bounds (long paths times many filters or expansions; many fed searches in one command). The rule's work is bounded by count times length, or the input is refused; the test designer states the bound as a time with a wide margin for a loaded machine.
+  - **Residuals, not built:** `find` with a name test (it prints names; what reads them is the run-time-name residual already recorded); valued options the rule does not list; a search in a brace group, in a shell started with `-c`, behind `xargs`, or with a substitution as its path; a file-tool path that is not text; a line of a here-document's body that reads as a search is refused (the way round is the file tool); `rg --type-list`.
+  - **Told to the owner, as built:** a type filter with no path (`rg -t py <word>` from the root) is refused, as DEC-557's wording "no path or glob" gives it; the refusal names the way round (`-g '*.py'`).
+  - **No second probe** if the fix round's product diff only adds refusals and is small enough for the lead and the orchestrator to read line by line (DEC-552's precedent); otherwise a second probe before the merge.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.162 | 2026-10-09 | Delegated, stricter-only: DEC-570 (the probe of W1-02's root-search round is judged pass with one fix round: numbered redirects, searches after shell keywords, daily spellings, a brace word past the bound, bounded decision time). Next free id: DEC-571. |
