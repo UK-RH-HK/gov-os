@@ -6139,3 +6139,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.160 | 2026-10-09 | Delegated, stricter-only: DEC-568 (W1-41's fix round: an all-external ticket is refused whatever its dependencies name; only superseded, retired and rejected records release a legacy store). Next free id: DEC-569. |
+
+## 161. Delegated: the follow-up after W1-41, its ticket and its paths (register v0.161, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-569 — The follow-up after W1-41 runs on W1-30's ticket, reopened; its pieces and its paths
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; told to the owner, who may replace it) · **Basis:** DEC-521 orders one short follow-up after W1-41 and names no ticket; most of its pieces change `gov close` · **Under:** DEC-521, DEC-416, DEC-498, DEC-532
+- **Decision:**
+  - **Ticket.** The follow-up runs on `DAEO-2lwj` (W1-30, `gov close`), reopened for it, profile FULL, with its own reviewer probe before the merge (DEC-498, DEC-559). A test designer comes first for every piece.
+  - **Pieces, each ordered by the decision named:** the trailers base commit (DEC-482); the owner-decision lookup from a register file (DEC-483); the record store loads the decisions of the project's named register file as decision records, one per heading (DEC-521, DEC-473); the close record's skills list in a project with an installed kernel, and the declared check commands that name `template/` paths (DEC-521); `gov close` calls the counter (DEC-495); the probe gate (DEC-505); the command-list lines for `ci`, `launch`, `telemetry` and `lock` (DEC-542); the READY rule on a constraining package the store could not load (DEC-544); the repair ticket of a refused close whose findings are too long for one argument; findings 9 and 10 of W1-41's probe with the two readings beside them (DEC-552); findings 1, 2, 3, 4 and the first shape of 7 of W1-30's probe (DEC-555); a refused close prints each test run (DEC-566); a longer command wait in W1-07's support and the path-map schema's keys (DEC-554); the probe type in the kernel's record schema (DEC-565); W1-16's runtime-folder case narrowed to the index stores (DEC-563); the code-index daemon cases of W1-16 and W1-20 (DEC-561).
+  - **Paths.** The ticket's `allowed_paths` gain, for this follow-up: `src/gov/check/**`, `tests/unit/check/**`, `src/gov/store/**`, `tests/unit/store/**`, `src/gov/readiness/**`, `tests/unit/readiness/**`, `src/gov/context/**`, `tests/unit/context/**`, `src/gov/telemetry/**`, `tests/unit/telemetry/**`, `src/gov/codeintel/**`, `tests/unit/codeintel/**`, `template/governance/kernel/schemas/**`, `template/governance/kernel/checks/**`. Nothing under the guard's paths is in it. A piece that needs another path comes back as a package.
+  - **This repository's own settings** (the trailers base `429815b5` of DEC-482, as a key of the path map) are written by the orchestrator at the merge, as `close_timeout` was (DEC-554).
+  - If the lead finds the follow-up too large for one round, it returns the pieces it built with the head named and lists the rest; nothing is dropped silently.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.161 | 2026-10-09 | Delegated: DEC-569 (the follow-up after W1-41 runs on W1-30's ticket, reopened, FULL with its own probe; its pieces by decision; the paths it adds). Next free id: DEC-570. |
