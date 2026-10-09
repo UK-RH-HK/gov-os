@@ -1767,6 +1767,12 @@ No name is proposed for pieces 1 and 8: piece 1 adds no key and no code (the exi
 None is rewritten. `run_close` of `w1_30_support.py` gained the keyword `env` (the environment of
 the close alone), used by piece 2; no case changed with it.
 
+Rewritten after the round was built, reason DEC-566 (a refused close states each test run, the
+cases set apart among them): `test_a_failing_case_of_the_parallel_run_is_named_as_before` of
+`test_w1_30_r11_parallel_runs.py` held that the declared case, which passed, is named nowhere in
+the refusal; it now holds that for the whole refusal (its code, its message, its findings and
+every other detail) except `test_runs`, where settlement 27 has the run afterwards name its cases.
+
 ### Packages of round 13
 
 P-1 (piece 1): the orchestrator's commits after the merge that name the ticket. P-2 (piece 6):

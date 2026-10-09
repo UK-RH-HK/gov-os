@@ -185,8 +185,9 @@ def test_a_failing_case_of_the_parallel_run_is_named_as_before(project, sandbox,
     error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
     assert "test_unit_one" in support.error_text(error), \
         f"the refusal does not name the failing case of the parallel run\n{run.describe()}"
-    assert declared not in support.error_text(error), \
-        f"the refusal names the declared case, which passed\n{run.describe()}"
+    details = {key: value for key, value in (error.get("details") or {}).items() if key != support.TEST_RUNS_KEY}
+    assert declared not in support.error_text({**error, "details": details}), \
+        f"the refusal names the declared case, which passed, outside the statement of its runs\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
     assert support.iteration_count(project.root, TICKET) == 1
     ran = support.told_by(told)
