@@ -1531,6 +1531,37 @@ the finding; it closes.
 
 3 red.
 
+### Piece 4. Five findings of the probe of the parallel run (`test_w1_30_r13_probe_findings.py`, 9 cases)
+
+DEC-555 names the five (findings 1, 2, 3, 4 and the first shape of 7 of `log/W1-30-probe3.json`).
+The projects declare their serial-only cases as round 11's do.
+
+| Behaviour | Case | Holds | Today (`8ddc5330`) |
+|-----------|------|-------|--------------------|
+| 1. A run of the declared cases that ends with exit code 0 and no result is a finding, whatever the parallel run passed | `test_a_run_of_the_declared_cases_with_exit_code_0_and_no_result_refuses` (2: the only declared case ends its own process with 0; a failing declared case follows it in the same file and never runs) | exit code 3, the ticket's acceptance folder named, counted once, nothing closed | red, both: the ticket closes; the run afterwards is stated with 0 passed |
+| 2. A project file named like the close's own plugin does not replace it | `test_a_project_file_named_like_the_closes_plugin_keeps_no_failing_case_out` (2: at the project's root, under `src/`) | the ticket's own commit adds the file, which would keep the failing acceptance case out of the run; the close does not close (exit code 3 or 1) and names the failing case or the planted file | red, both: the ticket closes with a failing acceptance case (the parallel run states 2 passed: the planted file ran in the plugin's place) |
+| 3. A run cut at the time limit leaves no process and writes nothing afterwards | `test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project` | a case of the parallel run tells its process and its parent, sleeps 14 s and would then write a marker into the project; `--timeout 5`. After the close returned: neither process is alive (two seconds are given for an ended process to be reaped), and after the sleep would have ended the marker is not there | red: "still alive: the case's process". In this run the marker was not written afterwards; DEC-555 found that it can be |
+| 4. A list entry that names an existing file with no case in it refuses (DEC-549, fourth point) | `test_a_list_entry_that_names_a_file_without_a_case_refuses_the_close` (2: a test file without a test function, a helper module) | exit code 3, the entry named, counted once, nothing closed | red, both: the ticket closes; the run afterwards is stated with 0 passed |
+| 5. A byte in the list that is not UTF-8 is a finding of its own | `test_a_byte_in_the_list_that_is_not_utf8_is_a_finding_that_names_the_list` (2: in a comment, in an entry) | no traceback; exit code 3, `SERIAL_ONLY_LIST_UNREADABLE` and the list's path in the answer, counted once, nothing closed | red, both: a traceback (`UnicodeDecodeError`), exit code 1, no JSON |
+
+9 red.
+
+**Settlement 28 (proposed).** A serial-only list that cannot be read as UTF-8 text is the finding
+`SERIAL_ONLY_LIST_UNREADABLE`: exit code 3, counted, with a repair ticket, as every finding about
+the ticket's work (DEC-470); the list is among the project's tests, which a ticket's commits
+change. Nothing is read as "no list". The other four behaviours get no code of their own from
+this round: the cases hold exit code 3 and what the answer names.
+
+How behaviour 2 finds the plugin's name. The case first closes a scout project whose own
+`conftest.py` writes down the arguments and the plugin variable the test runner was given, and
+plants a module for every plugin name it saw (a dotted name with its packages), together with
+the name the close uses today (`gov_close_serial_only`, which any test of a project can read
+from its runner's arguments). So the case follows a plugin that is renamed. A plugin that
+reached the runner by no name a project's test can see would leave only today's name planted;
+the case then still holds that this file changes nothing. Not held: a file elsewhere on the
+import path than the root and `src/` (a project's own `pythonpath` setting of its test runner);
+the two places are the two the close itself puts on the run's import path.
+
 ## Covers ids
 
 | Covers id | Tests |
