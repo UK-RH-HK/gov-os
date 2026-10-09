@@ -6226,3 +6226,72 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.164 | 2026-10-09 | Owner: DEC-572 (P-26: 803f731c a named exception, W1-41 closes; a merge commit's file equal to one parent's version is not its own change), DEC-573 (P-27: a root search is refused only where a protected file or a copy lies under its start), DEC-574 (P-28: the held-out check skips path resolution for strings longer than the system path limit), DEC-575 (a type filter with no path stays refused), DEC-576 (DEC-569 to DEC-571 accepted), DEC-577 (no further guard rounds in Wave 1 except for a hole ordinary work produces), DEC-578 (delegated experiment on a hook's time limit; an explicit time limit for the guard hooks through the owner). Next free id: DEC-579. |
+
+## 165. Delegated: the packages of the follow-up after W1-41, first run (register v0.165, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-579 — The follow-up after W1-41: its packages as decided by the orchestrator, the paths of its second run, and what goes to the owner
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; as built or stricter in every point; told to the owner, who may replace it) · **Basis:** the lead's return at `2eeb9cf3` (`log/W1-30-lead-runG1.json`: 17 of 18 pieces built; units 1809 green; the whole of `tests/` green in the close's form except 11 cases that wait on packages; the serial-only entries green alone; validator ALL PASS) · **Under:** DEC-569, DEC-521, DEC-544, DEC-572, DEC-416
+- **Decision:**
+  - **Paths added for the second run:** `src/gov/tasks/**`, `tests/unit/tasks/**` (the READY rule, DEC-544); `src/gov/records/**`, `tests/unit/records/**` (the records query returns a register entry's heading and title); `src/gov/cli/checks.py`, `tests/unit/cli/**` (below); `src/gov/retrieval/retrieve_check.py` (below); `src/gov/guard/containment.py`, `tests/unit/containment/**` (DEC-572, and nothing else under the guard's paths).
+  - **READY rule (DEC-544), stricter as the designer wrote it:** a constraining package whose frontmatter cannot be read holds every ticket, since what it constrains is not known; the reason names the file (`DECISION_NOT_LOADED: <path>`).
+  - **A project whose path map names a register that is not in the commit is refused**, not read as "no register". The fixtures of the suites that copy this repository's path map into projects without the register file are repaired first by a test designer (a rewrite with its reason), with `retrieve_check.py`'s copy.
+  - **Checks in a project with an installed kernel.** `gov check` reads the check declarations, and the schema check reads the schemas, from the installed kernel as well as from the template layout: today an installed project runs no declared check. Built in the second run, test designer first. The skill validator's `--both-layouts` option is kept as built (an option of a check's module, no command).
+  - **`lock`** is recorded in the command list as the module command it is (DEC-542); no command is added.
+  - **The trailers base (DEC-482):** a base with no commit of a closed ticket after it reads as not measured, as the citations check does for its base; kept as built. An all-digit commit id written unquoted in a path map is refused; kept as built.
+  - **The two shortened daemon cases** the designer names (W1-20's case on the file that differs from `HEAD` reads its answer before the determinism case rebuilds; in W1-16's home case the second index stands between the queries and the look for index files) are accepted as not weakened; the probe looks at both.
+  - **The schema check's baseline is 11, not 15:** there were four probe records, not three. With the probe type in the schema the check stands at 11 and DEC-565 is met.
+  - **Residuals, not built:** the context hashes the whole register file for each decision; `Amends`, `Refines`, `Under` and a partial supersession give no edge; whether a refused load leaves the earlier store readable; ticket-id forms and general record-id forms are still accepted in the external list; a never-built index says nothing under `dropped`; lower-case status words still satisfy a mandatory source; the secrets scan starts about four processes per file (50 to 90 seconds of a close); and the lead's residual list.
+  - **To the owner, not decided here:** whether the probe gate refuses an orchestrator commit after the merge that names the ticket and lies outside its code (the lead's P-1); how an owner's decision in a register file is known to be the owner's (P-2: as built, only an entry brought by a commit whose only role is the owner's, which no entry of this repository's register is).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.165 | 2026-10-09 | Delegated: DEC-579 (the follow-up after W1-41, first run: paths for the second run; the READY rule's stricter readings; a named register absent from the commit refuses; checks and schemas read from an installed kernel; lock as a module command; the schema baseline is 11; residuals; two packages to the owner). Next free id: DEC-580. |
+
+## 166. Owner answers to P-29, P-30 and P-31, on DEC-579, and the Wave 1 finish line (register v0.166, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-580 — P-29: the guard's hook program keeps its own deadline of 20 seconds; the hook entries carry a time limit of 60 seconds, here and in the kernel template
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-29 option (a); the evidence record `docs/research/EXP-hook-time-limit.md` (a hook that passes its time limit lets the call through) · **Under:** DEC-578, DEC-577, DEC-254
+- **Decision:**
+  - The guard's hook program keeps its own deadline of 20 seconds and answers "refuse" when it reaches it. It is built in the current W1-02 round, test designer first.
+  - The kernel template's settings carry `"timeout": 60` on every guard hook entry, so that every adopted project gets it. That is added to the follow-up after W1-41, with the template settings path added to its ticket.
+  - The `gov doctor` check that the configured limit is above the guard's deadline goes on the Wave 2 list.
+  - This repository's hook entries carry `"timeout": 60` since the operator's commit `0894faab` (all five entries: PreToolUse, PostToolUse, PostToolUseFailure, PreCompact, SessionStart; nothing else changed). It takes effect in sessions started after it. If containment flags `0894faab` or `27ec3482` (the orchestrator prompt's section 11), each is a record of an owner action (DEC-254).
+
+### DEC-581 — P-30: the probe gate refuses only for later commits that change the ticket's code or its acceptance tests
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-30 option (a) · **Refines:** DEC-505 · **Under:** DEC-498, DEC-137
+- **Decision:** The probe gate refuses only for commits after the probed one that change files inside the ticket's `allowed_paths` or its acceptance tests. It is built in the running follow-up after W1-41.
+
+### DEC-582 — P-31: how a register entry is known to be the owner's stays as built for Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-31 option (a) · **Under:** DEC-483
+- **Decision:** Kept as built for Wave 1 (an entry lifts an escalation only if a commit whose only role is the owner's brought it). "How the system knows a register entry is the owner's" goes on the Wave 2 list (for example, decision commits signed by the owner).
+
+### DEC-583 — DEC-579 is accepted
+- **Status:** ACCEPTED (owner, 2026-10-09)
+- **Decision:** The orchestrator's delegated decision DEC-579 (the packages of the follow-up after W1-41, first run) is accepted.
+
+### DEC-584 — The Wave 1 finish line
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER; section 11 of the orchestrator prompt states it standing (commit `27ec3482`) · **Under:** DEC-577, DEC-522
+- **Decision:**
+  - **a.** The two running pieces (the W1-02 round and the follow-up after W1-41) each get at most one more run plus its probe. Anything still open after that becomes a named residual, unless it is a fail-open hole in ordinary work, which comes to the owner as a package.
+  - **b.** From then on, before any new work is opened in Wave 1, it is classified: does it break a Wave 1 exit criterion (WBS §4, and the KPI lines of W1-42), or is it a fail-open hole that ordinary work produces? If neither, it goes on the Wave 2 list with no new round. If either, it comes to the owner as a package before any round starts.
+  - **c.** Exit audit findings (W1-43): a BLOCKER is fixed. Every other finding comes to the owner, recommended for the Wave 2 list unless it meets b's test.
+  - **d.** The order from here: close the two running pieces, then this repository's adoption step (with the owner's exit package), then W1-42, then W1-43, then the owner's exit decision. Nothing else starts in Wave 1.
+  - **e.** Every report from now on starts with a countdown: the steps left to the end of Wave 1, with a time estimate for each.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.166 | 2026-10-09 | Owner: DEC-580 (P-29: the guard keeps its own deadline of 20 seconds; a 60-second time limit on the hook entries here, by the operator's 0894faab, and in the kernel template), DEC-581 (P-30: the probe gate refuses only for later commits inside the ticket's paths or its acceptance tests), DEC-582 (P-31: as built for Wave 1; the question to the Wave 2 list), DEC-583 (DEC-579 accepted), DEC-584 (the Wave 1 finish line: one more run plus probe for each running piece, classification before any new work, exit audit findings, the order to the end, a countdown in every report). Next free id: DEC-585. |
+
+## 167. Owner answer to P-32: what "CI" means in the Wave 1 exit criteria (register v0.167, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-585 — P-32: "close → CI → merge" on the clones means the CI gate W1-40 built, run locally; the hosted-CI items go to the exit package and the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-32 option (a); the first real run on GitHub (run 37959334612, commit `c7e5c3ed`) failed as W1-40's residuals said · **Under:** DEC-584, DEC-497, DEC-083, DEC-465
+- **Decision:**
+  - "Close → CI → merge" in exit criterion 1 (WBS §4) and in W1-42's first KPI line means the CI gate W1-40 built (`gov ci job`, the hooks and the evidence record), run locally in the a-dev and b-dev clones with this machine's tools. No GitHub-hosted run is needed for W1-42.
+  - The hosted-CI items are classified under DEC-584 b: none breaks a Wave 1 exit criterion and none is a fail-open (every failure of the run is red or "unmeasured"). No round is opened in Wave 1.
+  - **Exit package (owner actions):** the runner tools to approve, each with version and checksum (rulesync 24.0.0 and openspec 1.13.2 from the tool registry; pytest 9.0.3 has no registry entry and the openspec package's own integrity value is not recorded: both are taken at the approval, none is invented); `lefthook install` and pushing `refs/notes/gov-evidence` with each push; the commit id of the actions/checkout version that replaces the one on Node 20.
+  - **Wave 2 list:** the workflow installs the approved tools by checksum; a check is declared "local-only" and `gov ci job` reports it as "local-only", never as failed or green; the full history for the checks that read it; the actions/checkout bump in the workflow and its template; what CI runs of the project tests (with "fast feedback at scale", DEC-567).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.167 | 2026-10-09 | Owner: DEC-585 (P-32: "close → CI → merge" on the clones is the CI gate W1-40 built, run locally; no hosted run is needed for W1-42; the hosted-CI items go to the exit package and the Wave 2 list). Next free id: DEC-586. |

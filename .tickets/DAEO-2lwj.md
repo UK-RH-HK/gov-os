@@ -41,6 +41,16 @@ allowed_paths:
 - tests/unit/codeintel/**
 - template/governance/kernel/schemas/**
 - template/governance/kernel/checks/**
+- src/gov/tasks/**
+- tests/unit/tasks/**
+- src/gov/records/**
+- tests/unit/records/**
+- src/gov/cli/checks.py
+- tests/unit/cli/**
+- src/gov/retrieval/retrieve_check.py
+- src/gov/guard/containment.py
+- tests/unit/containment/**
+- template/governance/kernel/settings.json
 kpis:
   success:
   - 'Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions [CAP-13.a,
