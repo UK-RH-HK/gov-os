@@ -1509,6 +1509,28 @@ environment alone).
 v22.23.3's, as the tool registry names it). Not held, as no decision names it: what a refused
 close states of the share (nothing is measured for it: there is no close record to count).
 
+### Piece 3. A refused close states each test run (`test_w1_30_r13_refused_runs.py`, 3 cases)
+
+DEC-566; DEC-555 has the orchestrator read the `test_runs` of every close. Today a refusal holds
+the totals (`tests_run`) where a test failed, and nothing of the runs where none did.
+
+**Settlement 27 (proposed).** The JSON of a refused close holds `test_runs` under
+`error.details`: the list a passed close holds under `result` and in its close record
+(settlements 19 and 22), an object for each run made, with `run`, `form`, `seconds`, the four
+counts, `workers` for a parallel run and `cases` for the run afterwards of the declared cases.
+It is there whether or not a test failed.
+
+Each project has one acceptance case that runs in parallel, one declared serial-only, and a unit
+test as the regression run, so three runs. The twin of a project is the same project without
+the finding; it closes.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_close_refused_for_a_failing_test_states_each_run` | a failing acceptance case and a commit without `Implements:`: the three runs, the parallel acceptance run with 1 passed and 1 failed and 2 workers, the run afterwards with its `cases` | red: "the refusal's details states no test runs under 'test_runs'" |
+| `test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close_does` (2: a commit without `Implements:`, a FULL ticket without a probe record) | every test green: the three runs, and they are the twin's runs, the seconds apart | red, both: the same |
+
+3 red.
+
 ## Covers ids
 
 | Covers id | Tests |
