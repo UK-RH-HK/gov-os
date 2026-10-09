@@ -1388,6 +1388,84 @@ looser than the 30 s it held until now and keeps what the case tells apart; noth
 case changed, and no other case of this suite tells two limits apart by the wait (the others give
 `--timeout` and a test that sleeps 999 s, or assert a status).
 
+## Round 13: the follow-up after W1-41, group A (DEC-569)
+
+Eight small pieces of `gov close`, each ordered by a decision; DEC-569 lists them. New files are
+named `test_w1_30_r13_*.py`; the support code gains a section "Round 13". Every case drives
+`gov close <ticket> --json` in a temporary project of its own, with the suite's two workers.
+A name a user or a project file sees that no source gives is a proposal of this round and is
+listed under "Names proposed in round 13" and in the settlements (24 onwards). Each piece below
+says which cases are red and why, and which are green because they hold what stays as today.
+
+### Piece 1. The probe gate: a merge of exactly the probed code (`test_w1_30_r13_probe_merge.py`, 9 cases)
+
+DEC-498: the reviewer probes the ticket's final code before the orchestrator merges it. So the
+probed commit is the head of the ticket's branch and the merge commit follows it. Today every
+commit of the ticket after the probed commit that changes anything outside `tests/` and
+`docs/probes/` refuses, the merge among them, since a merge is judged with the paths it brings to
+its first parent. DEC-505: "a merge bringing exactly the probed code no longer counts as 'after'
+the probed commit."
+
+**Settlement 24, what "exactly the probed code" means (the stricter reading).** A commit of the
+ticket after the probed commit does not count as "after" it when both hold:
+
+1. it is a merge commit and the probed commit itself is one of its parents other than the first
+   (the head that was merged is the probed commit, not a later head);
+2. every path the merge brings to its first parent, outside `tests/` and `docs/probes/`, is at
+   the merge byte for byte what it is at the probed commit; a path the probed commit does not
+   hold is not at the merge either.
+
+Nothing else of the gate changes. The projects make the ticket's work on a branch, probe its
+head, merge it into `main` with a merge commit that carries the ticket's trailers and the
+orchestrator's role, and commit the probe record after the merge, as this repository does.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_merge_that_brings_exactly_the_probed_code_does_not_refuse` (2: `main` stayed, `main` went on) | the ticket closes; the close record lists the merge among the ticket's commits | red, both: `PROBE_INVALID`, "ticket commit <merge> changes .tickets/PROJ-prmg.md after the probed commit" |
+| `test_the_orchestrators_notes_after_the_merge_that_name_no_ticket_do_not_refuse` | notes outside the ticket's paths, in a commit after the merge that names no ticket: the ticket closes | red, for the merge alone (the same finding); the notes commit refuses nothing today either |
+| `test_a_commit_after_the_merge_that_changes_the_tickets_code_refuses` | an engineer's commit after the merge: exit code 3, the probe gate, that commit named | green (as today) |
+| `test_a_merge_whose_result_is_not_the_probed_code_refuses` (2: a probed file changed in the merge, a file added in the merge) | what a conflict resolution or an edit in the merge leaves: the merge named | green (as today: the merge refuses whatever it brings). It is the case that must stay red-proof once rule 2 is built |
+| `test_a_merge_of_a_later_head_that_changed_the_code_refuses` | the engineer went on after the probe; the later commit or the merge named | green (as today) |
+| `test_a_merge_of_a_later_head_that_changed_only_tests_refuses` | rule 1: the head merged is not the probed commit, though its code is the probed code | green (as today); it holds the stricter reading against a rule that compared code alone |
+| `test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses` | package P-1 below, the stricter reading: the orchestrator's notes after the merge, in a commit that names the ticket, outside the ticket's paths | green (as today) |
+
+3 red, 6 green.
+
+**Package P-1 (round 13): the orchestrator's commits after the merge that name the ticket.**
+
+- *Question.* Does the gate still refuse a commit that follows the merge, carries `Task: <ticket>`
+  and changes only paths outside the ticket's code (the residual notes, a project setting)?
+  DEC-566 names such a commit (`ccac9506`) and says DEC-505 covers it until the tool is changed.
+- *Why now.* DEC-505 orders one change of the gate, for the merge. Read to the letter, that change
+  leaves `ccac9506`'s shape refused: every FULL ticket whose orchestrator writes its residuals in
+  a commit that names the ticket still ends in `PROBE_INVALID` and closes by exception.
+- *What my reading covers.* The merge of the probed commit: yes. The probe record committed after
+  the merge: yes, as today (`docs/probes/` never refused). Notes in a commit that names no
+  ticket: yes, as today (no commit of the ticket, no path inside its paths). Notes in a commit
+  that names the ticket: **left refused**, and held so by
+  `test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses`.
+- *Options.* (a) As built here: such a commit refuses; the orchestrator writes residual notes in
+  a commit without `Task:` (which W1-30's trailer rules allow for a commit that changes nothing
+  of the ticket's work), or before the probe. (b) A commit of the ticket after the probed commit
+  refuses only for a path inside the ticket's `allowed_paths` (its code), beside the merge rule;
+  a path outside them is either another role's own place or a containment finding of W1-50
+  already. (c) As (b), only for a commit that carries the orchestrator's role alone.
+- *Impact.* (b) and (c) let a ticket close with fewer refusals of this gate than today, which is
+  why it is not mine to decide. (a) keeps one exception of DEC-505 alive in practice.
+- *Reversibility.* Full: one rule of one gate, and one case to rewrite.
+- *Cost.* (a) none. (b) or (c): a small change of the gate; the last case of the table is
+  rewritten to "closes" and one case is added for a path inside the ticket's paths in such a
+  commit.
+- *Recommendation.* (b). The probe judges the ticket's code; what lies outside the ticket's
+  paths was never the reviewer's subject, and W1-50 already judges who may write there. (c) rests
+  on a role trailer where the path already decides.
+- *Confidence.* Medium: I have not read `ccac9506` itself, only DEC-566's description of it.
+
+A second, smaller reading is stated here and needs no decision unless the lead disagrees: rule 1
+refuses the merge of a later head whose later commits changed only tests. A rule that compared
+code alone would accept it; nothing in DEC-505 or DEC-498 asks for that, and DEC-498 has the
+probe at the head that is merged.
+
 ## Covers ids
 
 | Covers id | Tests |
