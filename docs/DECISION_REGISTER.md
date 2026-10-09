@@ -6094,3 +6094,48 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.158 | 2026-10-09 | Delegated: DEC-562 (the probe of the guard follow-up on W1-02 judged pass; it merges as probed; a shell search with a name filter, an answer in bounded time and a NUL byte join the round of DEC-557; the rest are residuals). Next free id: DEC-563. |
+
+## 159. Owner answers to P-25, on EXP-001's evidence file, on the schema findings of probe records, on two findings of W1-30's close, and a Wave 2 item (register v0.159, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-563 — P-25: W1-16's case on this repository's runtime folder is re-run alone until a designer narrows it; W1-30 closes
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-372, DEC-322, DEC-527
+- **Decision:** Until it is fixed, W1-16's `test_this_repository_is_not_indexed_by_the_run` is treated like a case of DEC-372: when it fails in a regression or a close it is re-run alone, and it is named for the exit auditor. W1-30 closes now. In the follow-up after W1-41 a test designer narrows the case to watch only the index stores, not the whole runtime folder.
+
+### DEC-564 — EXP-001's evidence file: its place, and its import at the adoption step
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-152, DEC-560
+- **Decision:** EXP-001's evidence file is at `/home/usain/gov-os-workbench/spike-sandbox/EVIDENCE.md`. It is read by that exact path only; the folder is never listed. It is imported as a record at the adoption step, with its origin path and its sha256 (DEC-560). The orchestrator confirmed on 2026-10-09 that the file exists (266 lines; sha256 `84ce1d1390d40a25ae1b5a8af224db871132ebcd8d5b0842b64796f1e0ad7714`); the import checks the bytes against that value.
+
+### DEC-565 — The schema findings a probe record adds are known growth; the probe type enters the kernel's record schema in the follow-up after W1-41
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-467, DEC-481, DEC-505
+- **Decision:** The four findings each probe record adds to the schema check are accepted as known growth and are recorded with each probe record. In the follow-up after W1-41 the probe type is added to the kernel's record schema, so that the schema check returns to its recorded baseline. DEC-467's rule that a new finding in a baseline check blocks a merge applies to everything else as before.
+
+### DEC-566 — Two findings of W1-30's close: the probe gate on `ccac9506`, and the runs of a refused close
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-505, DEC-549, DEC-555
+- **Decision:** The probe gate's finding on the orchestrator's commit `ccac9506` (the residual notes and the project's close time limit, made after the probed commit) is covered by DEC-505. That a refused close prints the totals of its test runs and not each run is accepted as an item of the follow-up after W1-41.
+
+### DEC-567 — Wave 2 list: "fast feedback at scale", one item beside DEC-534's two; and its ranking
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-534, DEC-527 · **Scope:** the Wave 2 list only; nothing in Wave 1 changes
+- **Decision:** The Wave 2 list gains one item, "fast feedback at scale", beside impact-based test selection and language-agnostic test commands (DEC-534). Its parts:
+  - **Test result caching.** A test whose code, dependencies and data are unchanged since its last green run is not re-run; its earlier result is reused and named as reused.
+  - **A merge queue.** Several finished tickets are merged as one batch, the batch's combination is tested once, and a failing batch is split automatically to find the culprit.
+  - **Staged gates.** A ticket's close runs its own tests plus the tests impact selection names; the full suite runs nightly, at each wave's exit, and before any release.
+  - **The full suite on CI machines** rather than this one, where the project allows it.
+  - **Flaky-test quarantine.** A case that fails and then passes alone is marked flaky automatically, kept out of the gate with its record, and must be fixed or removed within a set time; the list of quarantined cases is visible in gov status.
+- **Ranking for Wave 2 planning:** language-agnostic test commands are a must-have before the Gov OS is adopted in any non-Python repository (UPIM, ASMO). They, impact-based selection and result caching stand at the top of Wave 2.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.159 | 2026-10-09 | Owner: DEC-563 (W1-16's runtime-folder case re-run alone and named until a designer narrows it; W1-30 closes), DEC-564 (EXP-001's evidence file, its exact path and sha256, imported at adoption), DEC-565 (a probe record's four schema findings are known growth; the probe type enters the schema in the follow-up after W1-41), DEC-566 (the probe gate on ccac9506 is covered by DEC-505; per-run figures on a refused close go to the follow-up), DEC-567 (Wave 2 list: fast feedback at scale - result caching, a merge queue, staged gates, the full suite on CI machines, flaky-test quarantine; language-agnostic test commands, impact selection and result caching rank at the top). Next free id: DEC-568. |
+
+## 160. Delegated, stricter-only: one package of W1-41's fix round (register v0.160, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-568 — All-external sources: refused whatever the ticket's dependencies name; a deprecated record holds a store back
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only, as built; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `868d72b9` (`log/W1-41-lead-run4.json`: the three behaviours of DEC-552 built, 182 cases green, every acceptance suite green) · **Under:** DEC-552, DEC-551, DEC-454
+- **Decision:**
+  - **P-14: (a).** A ticket is refused whenever every id under its `sources` is an external reference, whatever its `depends_on` or `deps` name (a ticket, a decision or another record). Listing a record as a dependency does not make a source read.
+  - A record with the status `DEPRECATED`, with no status or with an unknown one holds a legacy store back in the dependency proof, as DEC-552's wording gives it: only `SUPERSEDED`, `RETIRED` and `REJECTED` release. A record that is superseded by an edge alone, with its status unchanged, holds the store back too.
+  - No second probe (DEC-498): the fix round's diff is 17 lines added and 8 removed, each refusing more; the lead and the orchestrator read it.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.160 | 2026-10-09 | Delegated, stricter-only: DEC-568 (W1-41's fix round: an all-external ticket is refused whatever its dependencies name; only superseded, retired and rejected records release a legacy store). Next free id: DEC-569. |
