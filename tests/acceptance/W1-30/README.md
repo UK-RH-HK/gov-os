@@ -1774,6 +1774,29 @@ what makes a register entry the owner's, and what "accepted" reads. P-3 (piece 7
 which no closed ticket has a commit. Each stands in its piece's section, with the stricter
 reading built meanwhile.
 
+### The run of round 13
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rfEs --tb=no -n auto`,
+at `8ddc5330` plus this round's eight files: 412 cases in 43 files; 369 passed, 43 failed, none
+skipped, in 159 s; the same counts in three whole runs. The 355 cases of round 12 are green. Of
+this round's 57 cases 43 are red for the reasons above and 14 are green, each said above to hold
+what stays as today:
+
+| File | Cases | Red | Green |
+|------|-------|-----|-------|
+| `test_w1_30_r13_probe_merge.py` | 9 | 3 | 6 |
+| `test_w1_30_r13_governance_share.py` | 7 | 7 | 0 |
+| `test_w1_30_r13_refused_runs.py` | 3 | 3 | 0 |
+| `test_w1_30_r13_probe_findings.py` | 9 | 9 | 0 |
+| `test_w1_30_r13_long_findings.py` | 4 | 2 | 2 |
+| `test_w1_30_r13_owner_decision_register.py` | 7 | 3 | 4 |
+| `test_w1_30_r13_trailers_base.py` | 12 | 11 | 1 |
+| `test_w1_30_r13_installed_skills.py` | 6 | 5 | 1 |
+
+No case of the round needs a model, a daemon, the network or a session log of the machine: the
+cases of piece 2 read the fixture logs of W1-31's suite through the `ccusage` of the machine,
+offline. No other suite and no unit test was changed, and none was run for this round.
+
 ## Covers ids
 
 | Covers id | Tests |
