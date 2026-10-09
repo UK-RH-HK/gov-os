@@ -6312,3 +6312,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.168 | 2026-10-09 | Delegated: DEC-586 (the follow-up after W1-41, second run: one unit fixture added to the paths, DEC-572 recorded as amending DEC-421 for ticket files, the bounds and the stricter readings as built, the clean combination of a ticket file to the owner as P-33). Next free id: DEC-587. |
+
+## 169. The probe of W1-02's last round and the lead's package on the other hook programs (register v0.169, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-587 — W1-02's last round: the probe is judged pass with no fix round; its findings and the deadline for the other hook programs go to the Wave 2 list
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-09; the owner's acceptance is asked) · **Basis:** the fresh reviewer's return on `ae6d8a74` (session `d527c0e4-c13b-4708-80ce-782dfa2b3348`), read whole; the diff `02f0294d..60d1a4a8` read line by line by the orchestrator; the lead's return of run 8 · **Under:** DEC-498, DEC-577, DEC-584, DEC-580, DEC-574
+- **Decision:**
+  - The probe of the code of runs 7 and 8 (the held-out check's path limit, DEC-574; the guard's own deadline of 20 seconds, DEC-580) is judged **pass**. It found no fail-open that ordinary work can meet. By DEC-584 a this was the last run of the round, so there is no fix round.
+  - **Named residual, deliberate shape only (DEC-577):** a shell word longer than the path limit that carries a brace list (some 900 alternatives, no literal held-out path) is allowed and, expanded by the shell, reads a held-out folder; the same word under the limit is refused. It is wider than the residual the owner accepted with DEC-574 (a program that shortens the string): the shell does it. Wave 2 list: a textual shortening and brace expansion before the skip. The owner is told of it in plain words with this decision.
+  - The probe's lesser findings (no lower bound of the guard's own on the path limit; a hook started with the child signal ignored refuses every call; thin findings from the waiting process; a program that keeps the pipes open is left running) are residuals.
+  - **The lead's package DP-12, option (a):** the hook programs that run after a tool call get no deadline in Wave 1. They cannot refuse a call that has run, so it is no fail-open; by DEC-584 b it goes on the Wave 2 list, with an experiment first on what the harness does at their limit.
+  - The round merges after the orchestrator's own verification and `gov check`; `DAEO-emkd` then closes under the standing exception rules.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.169 | 2026-10-09 | Delegated: DEC-587 (W1-02's last round: the probe judged pass, no fix round; the brace-list shape past the path limit and the lesser findings are residuals for Wave 2; no deadline for the hook programs after a call in Wave 1). Next free id: DEC-588. |
