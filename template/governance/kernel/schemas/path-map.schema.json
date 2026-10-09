@@ -99,6 +99,30 @@
         "budget-governance": { "$ref": "#/$defs/system" },
         "emergency-stop-and-rollback": { "$ref": "#/$defs/system" }
       }
+    },
+    "close_timeout": {
+      "description": "Optional. The time limit of one test run of `gov close`, in seconds: a positive number (DEC-554).",
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "close_workers": {
+      "description": "Optional. The number of workers of a parallel test run of `gov close`: a positive whole number, or the word `auto` (DEC-549, DEC-554).",
+      "oneOf": [
+        { "type": "integer", "minimum": 1 },
+        { "const": "auto" }
+      ]
+    },
+    "decision_register": {
+      "description": "Optional. The project's decision register: the path of the file from the project's root (DEC-479).",
+      "$ref": "#/$defs/text"
+    },
+    "decision_citations_base": {
+      "description": "Optional. The base commit of the decision-citations check: a commit id, full or abbreviated (DEC-479).",
+      "$ref": "common.schema.json#/$defs/commit_id"
+    },
+    "trailers_base": {
+      "description": "Optional. The base commit of the trailers check: a commit id, full or abbreviated (DEC-482).",
+      "$ref": "common.schema.json#/$defs/commit_id"
     }
   },
   "$defs": {

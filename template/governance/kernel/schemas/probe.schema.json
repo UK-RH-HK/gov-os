@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "probe",
+  "description": "Frontmatter of a probe record: the record of an independent review that `gov close` reads for a FULL-profile ticket (DEC-137, DEC-487, DEC-490, DEC-565). It is the one record schema that does not require the shared frontmatter's `id`, `status` and `state_class`. The schema says what a well-formed record is; whether a probe lets a ticket close (who reviewed, who judged, what the judgement was) is asked by the probe gate, not here.",
+  "type": "object",
+  "required": [
+    "type", "task", "reviewer_session", "implementer_session", "reviewer_wrote_nothing", "commissioned_by",
+    "judged_by", "judgement", "probed_commit"
+  ],
+  "properties": {
+    "type": { "const": "probe" },
+    "task": { "$ref": "common.schema.json#/$defs/ticket_id" },
+    "reviewer_session": { "$ref": "#/$defs/text" },
+    "implementer_session": { "$ref": "#/$defs/text" },
+    "reviewer_wrote_nothing": { "type": "boolean" },
+    "commissioned_by": { "$ref": "#/$defs/text" },
+    "judged_by": { "$ref": "#/$defs/text" },
+    "judgement": {
+      "description": "The four words DEC-490 names. A record of a failed probe is a well-formed record.",
+      "enum": ["pass", "passed", "fail", "failed"]
+    },
+    "probed_commit": { "$ref": "common.schema.json#/$defs/full_commit_id" },
+    "id": { "type": "string" },
+    "status": { "$ref": "#/$defs/text" },
+    "state_class": { "$ref": "common.schema.json#/$defs/state_class" }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 }
+  }
+}

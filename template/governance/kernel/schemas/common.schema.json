@@ -28,6 +28,16 @@
       "type": "string",
       "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
     },
+    "commit_id": {
+      "description": "A commit id, full or abbreviated: hexadecimal characters, four or more, as the tools that take a base commit read it (DEC-479, DEC-482).",
+      "type": "string",
+      "pattern": "^[0-9a-fA-F]{4,64}$"
+    },
+    "full_commit_id": {
+      "description": "A full commit id: forty lower-case hexadecimal characters, no abbreviation and no name that moves (DEC-565).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
     "state_class": {
       "description": "The state class of a record (CAP-07.b, DEC-229).",
       "type": "string",
