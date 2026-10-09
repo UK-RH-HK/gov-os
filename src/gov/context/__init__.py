@@ -203,6 +203,12 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
                            f"mandatory input {rid!r} is superseded and cannot satisfy a current requirement",
                            {"ticket": ticket, "superseded": rid})
         resolved.append(rec)
+    if not resolved:  # every declared id is external: nothing was read, no packet stands on it (DEC-454)
+        ids = [item["id"] for item in external]
+        raise GovError("BLOCKED",
+                       f"ticket {ticket!r}: every declared mandatory input is an external reference "
+                       f"({', '.join(repr(i) for i in ids)}) and none was read",
+                       {"ticket": ticket, "external": ids})
 
     # Step 4: check for conflicts at the same precedence level
     by_type: dict[str, list] = {}
