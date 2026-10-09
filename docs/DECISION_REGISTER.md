@@ -5948,3 +5948,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.150 | 2026-10-09 | Delegated, stricter-only: DEC-548 (the guard follow-up on W1-02: helper redaction, second names refused, copies outside the project covered, the refusals beyond the order stand; the root search is with the owner). Next free id: DEC-549. |
+
+## 151. Delegated: six packages of the parallel-run follow-up on W1-30 (register v0.151, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-549 — The parallel run in `gov close`: W1-27's command bound, the worker count as a project setting, the time limit, a list entry that names no case, and the second W1-50 repair
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, test-side or as built; no ticket closes on fewer tests) · **Basis:** the lead's return at `33a1b1c5` (`log/W1-30-lead-runF1.json`: the four pieces built; two regressions of this repository in the parallel form each red on three or four W1-27 cases whose command did not end within 30 seconds under ten workers) · **Under:** DEC-527, DEC-529, DEC-532, DEC-372
+- **Decision:**
+  - **P-1.** A test designer gives the `gov rebuild` and `gov doctor` commands of W1-27's cases a longer bound in W1-27's own support (a rewrite with the reason "defect found by the parallel trial": the bound is how long the case waits for the command, not a time the ticket promises). The cases stay parallel. Where a case asserts a time the ticket's KPI names, nothing is changed. If the cases still do not hold under ten workers, declaring them serial-only changes which cases count as serial-only and is the owner's.
+  - **P-2.** The number of parallel workers of a `gov close` is a setting of the project, default `auto`; the temporary projects of the suites set it small, so that a close under test does not start ten workers inside a parallel run. The setting changes how many workers run, never which tests run.
+  - **P-3.** No code: a close of this repository is given a time limit of 7200 seconds, as the orchestrator has passed it until now; the project's own setting is written at the merge.
+  - **P-4.** A list entry that names no case: as built. The run afterwards fails and the close is refused with a finding. (The lead recommended a refusal that is not counted against the ticket; the stricter form already built is kept, and this repository's own case keeps such entries out of its list.)
+  - **P-5.** The stray untracked file under the worktree's `tests/acceptance/W1-27/` (a two-line comment, no test, in no commit) is not the orchestrator's to remove (MR-3); it goes with the worktree when the worktree is removed.
+  - **P-6.** The second W1-50 repair (`1e2ec82b`, the same missing import path in another file of that suite) stands, with its `Rewrite-Reason:`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.151 | 2026-10-09 | Delegated: DEC-549 (the parallel-run follow-up on W1-30: a longer command bound in W1-27's support, the worker count as a project setting, the time limit, a list entry without a case stays a finding, the second W1-50 repair stands). Next free id: DEC-550. |
