@@ -106,6 +106,14 @@ Every brief says so. Checks that read trailers fall back to the message body for
 - let two writing workers run in the same working tree, or commit in a tree while a worker's command is running there;
 - tell anyone the loop count, or give a worker your notes or another worker's output.
 
+## 11. The Wave 1 finish line (owner decision)
+
+- Before opening any new work in Wave 1, classify it. Does it break a Wave 1 exit criterion (WBS §4, the KPI lines of W1-42)? Is it a fail-open hole that ordinary work produces? If neither, it goes on the Wave 2 list with no new round. If either, it comes to the owner as a package before any round starts.
+- A running follow-up gets at most one more run plus its probe; then whatever remains becomes a named residual, unless it is a fail-open in ordinary work.
+- Exit audit findings: a BLOCKER is fixed; every other finding comes to the owner, recommended for the Wave 2 list unless it meets the test above.
+- The order to the end: close the running pieces, this repository's adoption step (with the owner's exit package), W1-42, W1-43, the owner's exit decision. Nothing else starts in Wave 1.
+- Every report starts with a countdown: the steps left to the end of Wave 1, with a time estimate for each.
+
 ## Appendix A — briefs
 
 ### A1. Independent test designer
