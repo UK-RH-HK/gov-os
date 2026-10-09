@@ -6378,3 +6378,42 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.172 | 2026-10-09 | Owner: DEC-593 (the owner lifts the escalation of DAEO-2lwj, the W1-30 follow-up). Next free id: DEC-594. |
+
+## 173. Owner answers to P-34 to P-37 and on DEC-592; the round on W1-15 (register v0.173, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-594 — P-36: the escalation of DAEO-2lwj is lifted the built way, by the owner's entry DEC-593
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-36 option (a); the operator's commit `700bb5b5` (register v0.172, `Role: owner` as its only role) · **Under:** DEC-593, DEC-487, DEC-483, DEC-582
+- **Decision:** `gov close DAEO-2lwj --owner-decision DEC-593` is re-run with no main-tree commit before it. The result is judged under the standing exception rules, the ticket is closed, and the orchestrator reports whether the escalation path worked as built.
+
+### DEC-595 — P-37: one fix round on W1-15 for the secrets-indexing check
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-37 option (a); the measurement of DEC-591 (the check did not finish in 300 seconds on a quiet machine with this repository's real store; the runner allows 60) · **Under:** DEC-584 b, DEC-591, DEC-285 to DEC-290
+- **Decision:** One fix round on W1-15, test designer first: the secrets-indexing scan runs its files in parallel, as the module already does for the indexer, and a check's declaration may state its own time limit. No rule is loosened; every file is still scanned. One run plus its probe. Afterwards it is measured on this repository's real store and on one adopted dev-tier clone. Scanning only changed files (result caching) goes on the Wave 2 list.
+
+### DEC-596 — P-34: the template's rulesync hooks source carries the time limit and the entry for a failed tool call
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-34 option (a), widened · **Under:** DEC-580, DEC-584 b
+- **Decision:** The template's rulesync hooks source (`template/.rulesync/hooks.jsonc`) gets `"timeout": 60` on every guard hook entry, and the missing PostToolUseFailure entry for the containment check. Without it an adopted project runs no containment after a failed command, which ordinary work meets. It is verified that rulesync 24.0.0 passes both through to the generated settings, and that an adopted dev-tier clone's sessions run the containment check after a failed command. It is built in the same round as DEC-595 if the paths allow, otherwise as its own short round, test designer first, with a probe.
+
+### DEC-597 — P-35: another ticket's later commit inside a ticket's paths is a named residual
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Basis:** OWNER, on package P-35 option (b) · **Under:** DEC-581, DEC-584
+- **Decision:** The probe gate does not judge a later commit that names another ticket and changes this ticket's paths: a named residual on the Wave 2 list. In the exit run one ticket is closed at a time, and shared paths are kept from overlapping by order.
+
+### DEC-598 — DEC-592 is accepted
+- **Status:** ACCEPTED (owner, 2026-10-10)
+- **Decision:** The orchestrator's delegated decision DEC-592 is accepted, including the `Task:` trailer spacing slip as a residual.
+
+### DEC-599 — The clean-close proof of W1-42 uses a ticket with no accumulated refused closes
+- **Status:** ACCEPTED (owner, 2026-10-10) · **Under:** DEC-487, DEC-522
+- **Decision:** The orchestrator's caution is confirmed: the clean-close proof of W1-42 uses a ticket with no accumulated refused closes, after adoption.
+
+### DEC-600 — The round of DEC-595 and DEC-596 runs on `DAEO-7nne` (W1-15) reopened, both pieces in one round
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-595, DEC-596, DEC-584
+- **Decision:**
+  - `DAEO-7nne` (W1-15, FULL) is reopened for one round with both pieces, test designer first in each, one run of a lead plus the orchestrator's probe before the merge. It has no accumulated refused closes.
+  - Paths added to the ticket for the round: `src/gov/check/**`, `src/gov/cli/checks.py`, `tests/unit/check/**`, `tests/unit/cli/**` (the time limit a declaration may state), `template/.rulesync/hooks.jsonc`, `src/gov/adapters/**`, `tests/unit/adapters/**` (the hooks source; W1-38's suite holds its cases). This repository's own `.rulesync/**` is not touched: applying generated output here stays the owner's step.
+  - A time limit in a declaration that is not a positive whole number is refused as an invalid declaration (the stricter reading).
+  - If rulesync 24.0.0 does not pass the limit or the failed-tool-call entry through, that returns as a package; no generated file is hand-edited.
+  - The measurement on an adopted dev-tier clone (both pieces) is the orchestrator's, with the adoption step and W1-42.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.173 | 2026-10-10 | Owner: DEC-594 (P-36: the escalation of DAEO-2lwj lifted by DEC-593, the close re-run), DEC-595 (P-37: one fix round on W1-15, the secrets-indexing scan in parallel and a time limit a declaration may state), DEC-596 (P-34 widened: the template's rulesync hooks source gets the 60-second limit and the entry for a failed tool call), DEC-597 (P-35: a named residual), DEC-598 (DEC-592 accepted), DEC-599 (the clean-close proof uses a ticket with no refused closes). Delegated: DEC-600 (the round runs on DAEO-7nne reopened, paths added). Next free id: DEC-601. |
