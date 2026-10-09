@@ -250,7 +250,7 @@ of the kernel.
    states, as a record file does today. A `**Supersedes:**` field with other words (this repository
    writes "the one-off limit of DEC-448 (its other parts stand)") gives no edge, and neither do
    `**Amends:**`, `**Refines:**`, `**Under:**` and the other relations: the decision named still stands,
-   and the graph has no edge type for them. Package P-9.2.
+   and the graph has no edge type for them. Kept as built; a residual by DEC-579 (was package P-9.2).
 6. **An id recorded as a decision file and as an entry** is one record, the file's. The entry is no
    record; `invalid` names the register file, the id and the decision file.
 7. **The same id under two headings** is no record at all (neither heading is chosen); `invalid` names
@@ -258,7 +258,8 @@ of the kernel.
 8. **A named register that cannot be read** (not a file of `HEAD`, there only in the working tree, not
    UTF-8 text, a link, a folder, or a key that is not a path) refuses the load with the code
    `STORE_REGISTER_UNREADABLE`; the refusal names the file (for a key that is no path, the key). It is
-   never an empty register.
+   never an empty register. Decided by DEC-579 for the register that is not in the commit: the project
+   is refused, not read as a project without a register.
 9. **What then resolves.** A decision of the register that a record's edge or a commit's trailer cites is
    no longer in the dangling references; an id that no entry records stays there.
 
@@ -295,7 +296,47 @@ of the kernel.
 | `**Status:**` and a word, on the first line that is not blank | the status line of an entry |
 | `**Supersedes:**` with ids alone | the field that gives SUPERSEDES edges |
 
-### Packages
+### The second run (DEC-579), at `d80597fd`
+
+Read again against DEC-579 by a fresh Independent Test Designer. Of the 25 cases 21 are green after the
+first run; 4 are red and wait on the build, and they are the specification of two decided pieces:
+
+| Piece | Red cases | Today |
+|---|---|---|
+| The records query returns a register entry's `heading` and `title` (settlement 2) | `test_each_entry_of_the_named_register_is_a_decision_record`, `test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails` | red: the record carries `id`, `type`, `status` and `path` only |
+| A project whose path map names a register that is not in the commit is refused (settlement 8, DEC-579) | `test_a_named_register_that_cannot_be_read_refuses_the_load[not in the commit]` and `[in the working tree only]` | red, both: "the load answered as if the project named no register" |
+
+What must stay beside the second piece is held already, and green: a project that names no register loads
+as before (`test_without_a_named_register_the_store_is_what_it_is_today`, 2, by the recorded digests; and
+`test_a_register_named_only_in_the_working_tree_is_not_loaded`); a project whose named register is in the
+commit loads its entries (`test_a_register_record_answers_the_filters_of_the_record_query` and the other
+green cases of a named register). No case is added to this suite and none is rewritten.
+
+**Projects that name a register they do not hold.** The second piece could not be built while other
+projects named this repository's register without holding it: they would all be refused. Repaired in this
+run, each a fixture rewrite with its reason, no assertion changed: the support files of W1-15, W1-16,
+W1-17, W1-19, W1-21, W1-22 and W1-24 took this repository's path map whole, with its `decision_register`
+key, as the path map of temporary projects that hold no such file; their copy now leaves that key out.
+W1-08's `test_the_gov_cli_loads_the_committed_path_map` keeps the path map byte for byte, and its project
+now holds a file at the path the map names.
+
+**The retrieval check's own project (for the engineer; `src/gov/retrieval/retrieve_check.py` is in the
+second run's paths).** The retrieval-regression check builds a project of its own from each dev tier and
+gives it a path map taken from this repository's. Stated as behaviour: *the project the retrieval check
+measures names no register it does not hold*, so that the stricter rule does not refuse it and a dev tier
+that could be measured before is still measured. Without that, every tier's load is refused and the check
+answers "unmeasured: no dev tier could be indexed" on a machine where it measured before. Held by
+`tests/acceptance/W1-21/test_w1_21_check_project.py`, 1 case, through the declared check command, on a
+stand-in dev tier and the suite's stand-in embeddings endpoint (no model, no daemon, no network). It is
+**green today**, since no rule refuses yet: it cannot be made red before the rule exists, and it goes red
+as soon as the rule is built without the repair.
+
+### Packages of the first run, as decided (DEC-579)
+
+None is open. DEC-579 records all three as residuals, not built: the context hashes the whole register
+file for each decision (P-9.1); `Amends`, `Refines`, `Under` and a partial supersession give no edge
+(P-9.2, as built); whether a refused load leaves the earlier store readable (P-9.3). The texts below are
+kept as they were returned.
 
 **P-9.1. What the context reads for a decision of the register.**
 - *Question.* A ticket names `DEC-473` as a source and the record's `path` is the whole register file. Does

@@ -361,7 +361,7 @@ The rule is asked as this suite asks it: `ready` and `blocked` of `gov.tasks`, a
 committed and its store loaded. `gov status` gives the same lists under `tickets`; `gov readiness` judges
 a specification's rows and does not hold this rule.
 
-### As settled here (each proposed; a decision may replace it)
+### As settled here (confirmed by DEC-579: settlements 2 and 3 are decided, no longer proposals)
 
 1. **Which file.** A Markdown file of the commit of which the store holds no record, and whose
    frontmatter names the ticket under `constrains`: a required key (`id`, `type`, `status`) is absent
@@ -369,8 +369,8 @@ a specification's rows and does not hold this rule.
 2. **What the ticket gets.** It is not READY. Its reasons hold `DECISION_NOT_LOADED: <the file's path>`,
    one for each such file, beside the codes of today. A ticket the file does not name stays READY.
 3. **A frontmatter that cannot be read at all** (not valid YAML, not closed): the tickets it constrains
-   are not known, so every ticket is held by it and names it. This is the stricter reading; package
-   P-10.2.
+   are not known, so every ticket is held by it and names it. This is the stricter reading, decided
+   by DEC-579.
 4. **What stays.** A package that loaded is judged by its status, as today: `PROPOSED` holds with
    `DECISION_OPEN` and no file named; any other status holds nothing. A file the store could not load
    whose readable frontmatter names no ticket holds nothing.
@@ -397,7 +397,16 @@ case runs git with the worktree as its home.
 |---|---|
 | `DECISION_NOT_LOADED: <path>` | a reason of `blocked`, the code and the file it names |
 
-### Packages
+### Packages of the first run, as decided (DEC-579)
+
+None is open. The three packages below are kept as they were returned; DEC-579 decides each:
+
+- **P-10.1:** option (a). The ticket's paths gain the tasks package and its unit tests for the second run.
+- **P-10.2:** option (a). A constraining package whose frontmatter cannot be read holds every ticket.
+- **P-10.3:** option (a). The reason names the file: `DECISION_NOT_LOADED: <path>`.
+
+The ten cases were read again against DEC-579 by a fresh Independent Test Designer in the second run (at
+`d80597fd`): nothing is added and nothing is rewritten; the same 7 are red and wait on the build.
 
 **P-10.1. The READY rule's code is outside the ticket's paths.**
 - *Question.* May the follow-up change the READY rule where it is held today?
