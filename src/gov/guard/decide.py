@@ -786,6 +786,14 @@ def decide(
                                    cwd or project_root, held_out):
         return "deny", "the call names a held-out path"
 
+    # DEC-508, DEC-525: no call reads the settings file or the held-out
+    # file, whatever the tool and the role.
+    from gov.guard.protected import read_refusal
+    refusal = read_refusal(tool_name, tool_input, project_root,
+                           cwd or project_root)
+    if refusal:
+        return "deny", refusal
+
     if tool_name in READ_TOOLS:
         return "allow", ""
 

@@ -77,3 +77,14 @@ def bash(call):
                     subagent=subagent, env=env)
 
     return _bash
+
+
+@pytest.fixture(scope="module")
+def guarded(hook, tmp_path_factory):
+    """A committed project with a stand-in settings file and a stand-in held-out file (DEC-508, DEC-525).
+
+    One project for a module: the cases only ask the guard for decisions.
+    """
+    import w1_02_protected_support as protected
+
+    return protected.make_guarded(tmp_path_factory.mktemp("guarded"))
