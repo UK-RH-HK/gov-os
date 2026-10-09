@@ -25,6 +25,7 @@ allowed_paths:
 - src/gov/context/**
 - tests/unit/context/**
 - governance/project/external-references.yaml
+- tests/unit/launch/test_command_modules.py
 kpis:
   success:
   - 'On b-dev, stages A0-A4, A5, A6 and A8 each write an evidence record: A0 clean tree and backup ref; A1 inventory; A2 classification; A3 target path map with KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE
