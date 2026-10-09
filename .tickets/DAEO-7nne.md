@@ -1,6 +1,6 @@
 ---
 id: DAEO-7nne
-status: closed
+status: in_progress
 deps: [DAEO-drvn, DAEO-uudf]
 links: []
 created: 2026-09-30T22:49:58Z
@@ -23,6 +23,13 @@ allowed_paths:
 - .gitleaks.toml
 - tests/unit/secrets/**
 - template/governance/kernel/checks/secrets-indexing*
+- src/gov/check/**
+- src/gov/cli/checks.py
+- tests/unit/check/**
+- tests/unit/cli/**
+- template/.rulesync/hooks.jsonc
+- src/gov/adapters/**
+- tests/unit/adapters/**
 kpis:
   success:
   - .gitleaks.toml extends the defaults with token and canary rules; ARGUS_TOKEN_CANARY_4WM8 is detected
