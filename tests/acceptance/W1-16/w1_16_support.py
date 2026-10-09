@@ -747,6 +747,16 @@ def ui_served(home):
     return sum(UI_SERVING in line for line in (daemon_log(home) or "").splitlines())
 
 
+# The tool's log message of a daemon's start (version 0.11.0 holds ``daemon.start`` and ``daemon.stop``, and
+# longer names such as ``daemon.start_failed``, which are no start).
+DAEMON_START = re.compile(r"(?<![\w.])daemon\.start(?![\w.])")
+
+
+def daemon_starts(log_text):
+    """How many lines of a daemon log's text say that a daemon started."""
+    return sum(DAEMON_START.search(line) is not None for line in (log_text or "").splitlines())
+
+
 def _proc_bytes(pid, name):
     """The bytes of ``/proc/<pid>/<name>``: ``b""`` when the process is gone, None when it may not be read."""
     try:

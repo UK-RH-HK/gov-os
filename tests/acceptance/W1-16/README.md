@@ -5,15 +5,16 @@ CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-07
 DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation; the later batches
 serve DEC-338, DEC-339, DEC-346, DEC-347 and DEC-362.
 
-The suite has **71 test functions, 166 cases** in eight files, a support module, a conftest and the question set
+The suite has **72 test functions, 167 cases** in nine files, a support module, a conftest and the question set
 `questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
 the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. The sixth file,
 `test_w1_16_daemon_dir_and_names.py` (10 functions, 13 cases), is a third batch, added after implementation for the
 delegated decisions DEC-338 and DEC-339; see "The third batch" below. The seventh file,
 `test_w1_16_builtin_allowlist_and_daemon_secrets.py` (6 functions, 12 cases), is a fourth batch, added after
 implementation for the delegated decisions DEC-346 and DEC-347; see "The fourth batch" below. The eighth file,
-`test_w1_16_ui_off.py` (7 functions, 9 cases), is a fifth and last batch, added after implementation for the
-owner's decision DEC-362; see "The fifth batch" below. **No W1-15
+`test_w1_16_ui_off.py` (7 functions, 9 cases), is a fifth batch, added after implementation for the
+owner's decision DEC-362; see "The fifth batch" below. The ninth file, `test_w1_16_one_daemon.py` (1 function,
+1 case), is a sixth batch, added in the follow-up after W1-41 for DEC-561; see "The sixth batch" below. **No W1-15
 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
@@ -126,7 +127,7 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (160 cases)
+## `local_only` (161 cases)
 
 Deselect with `-m "not local_only"` (6 cases remain: the interface test, the four that read the two gitleaks
 files as TOML, and the one that reads what the wrapper's source imports).
@@ -136,7 +137,8 @@ files as TOML, and the one that reads what the wrapper's source imports).
   `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, all of
   `test_w1_16_paths_and_roots.py` but its premise, the daemon directory case of the fourth batch, and the nine
   cases of the fifth batch (`test_w1_16_ui_off.py`; they also need a user and network namespace, and are skipped
-  on a machine that gives none). Skipped when the binary is not on `PATH`.
+  on a machine that gives none), and the case of the sixth batch (`test_w1_16_one_daemon.py`). Skipped when the
+  binary is not on `PATH`.
 - **Run the `gitleaks` binary**, directly or through the filter: the other marked cases of
   `test_w1_16_token_rule.py`, the premise of `test_w1_16_paths_and_roots.py`, and the other eleven cases of the
   fourth batch. Skipped when the binary is not on `PATH`.
@@ -573,7 +575,8 @@ user's own home of the tool; the tool's server form; a machine without namespace
 ## Shorter daemon cases (DEC-561)
 
 In the follow-up after W1-41 the daemon cases were shortened where nothing a case asserts is weakened. The count
-is unchanged by this: 71 functions, 166 cases, the same names and the same files.
+is unchanged by this: 71 functions and 166 cases before and after, the same names and the same files (the sixth
+batch then adds one case in a file of its own).
 
 **Where the time goes** (measured by the lead; there is no sleep, poll or timeout in the wrapper). Each process
 of the tool costs about 1.4 s before it does anything. A call of the wrapper starts two (the UI setting, then
@@ -608,6 +611,55 @@ Run there: collection (166 cases, the same node ids), `py_compile` of every chan
 need neither the daemon nor a sandbox, and the helper `wait_for_daemon_end` against stand-in processes (one whose
 environment names the home, one named like the tool with no home, one named like the tool with another home,
 and the bound). The lead runs the daemon cases outside the sandbox and times them.
+
+## The sixth batch: one question starts the daemon at most once
+
+`test_w1_16_one_daemon.py`, 1 test function, 1 case, marked `local_only` and named in
+`tests/acceptance/serial-only.txt`. A case added after implementation, reason "owner decision": DEC-561. No KPI
+line was added; the batch serves CAP-12.
+
+**The behaviour.** On an indexed temporary repository, answering one question that needs the code graph
+(`callers(root, name)`, in a child process of its own) starts the tool's daemon at most once, and the answer is
+what it was (the one caller of the fixture's function, and no other).
+
+**Red run: not run by the designer** (the daemon cannot start in its session). **Expected red reason today, for
+the lead to confirm outside the sandbox:**
+`callers(root, name) started the tool's daemon 2 times; one question of the code graph starts it at most once`.
+As built, one load of the code graph asks the tool twice (the nodes, then the edges), each time with a process
+and a daemon of its own. The other 166 cases are not touched by this batch.
+
+How the case decides:
+
+- **A start is a line of the tool's own daemon log**, `<home>/logs/cbm-daemon.log` in the home the wrapper names
+  (`support.daemon_log`, which the fifth batch reads already). The binary of version 0.11.0 holds the log
+  messages `daemon.start` and `daemon.stop`; the lead reports that each start and each stop of a daemon is a line
+  there. `support.daemon_starts` counts the lines with `daemon.start` as a whole name (`daemon.start_failed` is
+  no start).
+- **The premise, held in the case.** After `index(root)` the log holds at least one such line: the index ran the
+  tool, so the count works on the machine of the run. After the question the log still begins with the text it
+  had before: it was added to, not written anew, so the new lines are the question's. If either does not hold
+  the case fails and says that starts cannot be counted there; it never passes on a log that cannot show it.
+- **The daemon of the index is not the question's.** Its end is waited for before the log is read, three seconds
+  at most (`support.wait_for_daemon_end`), so that the question does not meet a daemon that still runs.
+- **At most once**, not exactly once: an answer that needs no daemon at all is not refused. The answer is
+  checked, so a wrapper that runs nothing does not pass.
+- **How the wrapper asks is not held**: no command line is read and no process is counted.
+
+**The UI stays off for that one session (DEC-362).** The existing cases of the fifth batch hold it for every call
+of the wrapper, by outcome and not by mechanism, so they hold it for a wrapper that answers in one session as
+well: `test_a_call_of_the_wrapper_leaves_the_ui_off[callers]` (the three signs after `callers(root, name)` in a
+child of its own), `test_a_second_index_keeps_the_ui_off`,
+`test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on`,
+`test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on`, and
+`test_a_setting_left_in_the_home_is_turned_off_by_the_next_call`, which holds that a setting left on in the home
+is turned off before the question's session starts. No new UI case was written. The new case reads two of the
+three signs beside its count, at no cost of a namespace: no line of the log says a daemon served the UI, and the
+tool, asked in the home, says `false`. The port is watched by the fifth batch.
+
+Not tested, on purpose: how many processes of the tool a question starts; the time a question takes (no time
+bound is asserted, on this machine or any other); `index(root)` and `projects(root)`, which ask the tool once
+already; several questions in one process (the graph is kept for the life of the process, as before); a
+closure of `gov closure` (W1-20's suite).
 
 ## The W1-15 suite
 
