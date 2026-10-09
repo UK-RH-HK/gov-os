@@ -75,3 +75,64 @@ def test_a_dangling_trailer_is_reported_with_its_commit_and_is_not_an_edge(proje
     assert records.dangling(project) == [{"type": "TASK", "source": head, "target": "T-404"}]
     assert records.edges(project) == []
     assert records.commits(project, path=ADR) == [{"commit": head, "task": ["T-404"], "implements": ["ADR-0001"]}]
+
+
+# ---- the named register (the follow-up after W1-41, piece 9; DEC-521, DEC-473, DEC-479)
+
+PATH_MAP = "governance/project/path-map.yaml"
+REGISTER = ("### DEC-001 — The first\n- **Status:** SUPERSEDED by DEC-002\n\n"
+            "### DEC-002: The second\n- **Status:** ACCEPTED (owner) · **Supersedes:** DEC-001\n\n"
+            "### DEC-003 - No status\n- **Decision:** nothing.\n")
+
+
+def _named(project, register=REGISTER, key="decisions/REGISTER.md"):
+    if register is not None:
+        _write(project, "decisions/REGISTER.md", register)
+    _write(project, PATH_MAP, f"namespaces: {{}}\ndecision_register: {key}\n")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "the register")
+    return project
+
+
+def test_the_entries_of_the_named_register_are_decision_records_with_their_headings_in_the_store(project):
+    before = store.load(project)["digest"]
+    summary = store.load(_named(project))
+
+    found = {record["id"]: record for record in records.records(project, type="decision")}
+    assert {name: (record["status"], record["path"]) for name, record in found.items()} == {
+        "ADR-0001": ("ACTIVE", ADR), "DEC-001": ("SUPERSEDED", "decisions/REGISTER.md"),
+        "DEC-002": ("ACCEPTED", "decisions/REGISTER.md")}
+    assert records.edges(project) == [{"type": "SUPERSEDES", "source": "DEC-002", "target": "DEC-001"}]
+    assert [entry["path"] for entry in summary["invalid"]] == ["decisions/REGISTER.md"]
+    assert "DEC-003" in summary["invalid"][0]["reason"] and summary["digest"] != before
+    connection = store.connect(project)
+    try:
+        assert connection.execute("SELECT id, heading, title FROM register_entries ORDER BY id").fetchall() == [
+            ("DEC-001", "### DEC-001 — The first", "The first"), ("DEC-002", "### DEC-002: The second", "The second")]
+    finally:
+        connection.close()
+
+
+@pytest.mark.parametrize("key", ["[decisions/REGISTER.md]", "decisions"])
+def test_a_named_register_that_is_no_file_of_the_commit_refuses_the_load(project, key):
+    with pytest.raises(GovError) as raised:
+        store.load(_named(project, key=key))
+    assert raised.value.code == "STORE_REGISTER_UNREADABLE"
+
+
+def test_a_path_map_that_is_no_mapping_refuses_the_load(project):
+    _write(project, PATH_MAP, "- a list\n")
+    _git(project, "add", "-A")
+    _git(project, "commit", "-q", "-m", "a broken path map")
+    with pytest.raises(GovError) as raised:
+        store.load(project)
+    assert raised.value.code == "STORE_REGISTER_UNREADABLE" and PATH_MAP in raised.value.message
+
+
+def test_a_register_the_commit_holds_nothing_of_is_no_register_until_a_decision_says_otherwise(project):
+    """Open, returned as a package: the README of W1-10 orders a refusal here; fixtures of other suites name this
+    repository's register in projects that do not hold it. Today's answer is kept: nothing of a register loads."""
+    before = store.load(project)["digest"]
+    summary = store.load(_named(project, register=None))
+    assert summary["invalid"] == [] and records.records(project, type="decision")[0]["id"] == "ADR-0001"
+    assert len(records.records(project)) == 1 and summary["digest"] != before  # another commit, no other record
