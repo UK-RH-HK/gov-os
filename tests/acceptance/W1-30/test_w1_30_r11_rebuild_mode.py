@@ -30,6 +30,15 @@ STORE_STALE = "STORE_STALE"
 
 
 @pytest.fixture()
+def project(built, tmp_path):
+    """The suite's project without a path map, as it was when these cases were written. Since round 12 the
+    suite's projects carry one for the close's number of workers (README, round 12), and a rebuild of a
+    project with a path map also builds the lexical index, which needs the project's ``.gitleaks.toml`` and
+    reads every tracked file. These cases hold the store check of a close, not that index."""
+    return support.Project(tmp_path / "project", settings=None)
+
+
+@pytest.fixture()
 def rebuild_without_embeddings(project, sandbox, interface, tmp_path):
     """``rebuild_without_embeddings()`` runs ``gov rebuild --no-embeddings --json`` in the project; it must
     succeed, and must not start the endpoint's program."""
