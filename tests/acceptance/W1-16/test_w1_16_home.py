@@ -45,13 +45,12 @@ def sandbox(module_sandbox):
 
 @pytest.fixture(scope="module")
 def two(module, cbm, sandbox, tmp_path_factory):
-    """Two repositories, both indexed, and what stood in the tool's default home and this repository before."""
+    """Two repositories, both indexed, and what stood in the tool's default home and in this repository's index
+    stores before."""
     tmp_path = tmp_path_factory.mktemp("w1-16-home")
     before = {
         "default-home": support.snapshot(Path.home() / support.TOOL_DEFAULT_HOME_REL),
-        "this-repository": {rel for rel in support.listing(support.REPO_ROOT / support.RUNTIME_REL)
-                            if not rel.startswith("scratch/")}
-        if (support.REPO_ROOT / support.RUNTIME_REL).is_dir() else set(),
+        "this-repository": support.index_stores(support.REPO_ROOT / support.RUNTIME_REL),
     }
     alpha = _repository(tmp_path / "alpha", ALPHA)
     beta = _repository(tmp_path / "beta", BETA)
@@ -156,9 +155,11 @@ def test_the_tools_default_home_is_not_used(two, sandbox):
 
 @pytest.mark.local_only
 def test_this_repository_is_not_indexed_by_the_run(two):
-    """DEC-322: the tests build their indexes in temporary repositories; this repository's stores are not theirs."""
+    """DEC-322: the tests build their indexes in temporary repositories; this repository's stores are not theirs.
+
+    Only the index stores are watched (DEC-563): the rest of this repository's runtime folder is written by other
+    sessions while the suite runs."""
     before = two[2]
     runtime = support.REPO_ROOT / support.RUNTIME_REL
-    now = {rel for rel in support.listing(runtime) if not rel.startswith("scratch/")} if runtime.is_dir() else set()
-    changed = sorted(now ^ before["this-repository"])
-    assert not changed, f"files appeared or went under {runtime}: {changed}"
+    changed = sorted(support.index_stores(runtime) ^ before["this-repository"])
+    assert not changed, f"files of an index store appeared or went under {runtime}: {changed}"

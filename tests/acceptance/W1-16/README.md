@@ -23,14 +23,15 @@ python3 -m pytest tests/acceptance/W1-16 -q -p no:cacheprovider
 ```
 
 Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About eight minutes with the ticket built (the tool
-takes 5 to 6 seconds per indexing run, and one runs at a time; the fifth batch adds about one minute). Run it
-alone: one test watches this repository's `.gov-runtime/`.
+takes 5 to 6 seconds per indexing run, and one runs at a time; the fifth batch adds about one minute). One test
+watches the index stores of this repository's `.gov-runtime/` (not the whole folder, since DEC-563): it can run
+beside sessions that write logs, checkpoints or locks there, and not beside one that indexes this repository.
 
 - **No secret is committed.** Every planted string (canaries in a string, a comment and an identifier, token-shaped
   strings, the seven dev-tier values) and every prefixed identifier is built at run time from parts in
   `w1_16_support.py`. None stands whole in a committed file, this README included.
 - **Every index is built in a temporary repository** (DEC-322). No test indexes this repository or writes its
-  `.gov-runtime/`; one test asserts that. The dev tiers are only cloned (`git clone --no-hardlinks`) into a temporary
+  `.gov-runtime/`; one test asserts it of the index stores there (see "This repository's index stores"). The dev tiers are only cloned (`git clone --no-hardlinks`) into a temporary
   directory; the clone is adopted, renamed in and indexed, never the tier.
 - **The code under test** is the repository's `src/`, put on `PYTHONPATH` of a child process. The child's
   environment is built from scratch: `PATH`, an empty temporary `HOME`, `TMPDIR`, `XDG_RUNTIME_DIR` and
@@ -170,6 +171,34 @@ files as TOML, and the one that reads what the wrapper's source imports).
   dump. None may exist in the repository outside `.gov-runtime/` and `.git/`, nor in the child's `HOME`, `TMPDIR`,
   runtime directory or working directory. The child's `~/.cache/codebase-memory-mcp` must stay empty, and the
   user's own must not gain, lose or change a file.
+
+### This repository's index stores (DEC-322; rewritten, reason "owner decision P-25", DEC-563)
+
+`test_this_repository_is_not_indexed_by_the_run` lists the index stores of this repository before the two
+temporary repositories are indexed and again after every other case of the file, and fails when a file of them
+appeared or went. Until DEC-563 it listed the whole `.gov-runtime/` but `scratch/`, so a log, a checkpoint or a
+lock of any other session on this repository failed it, in a regression and in a close.
+
+- **The index stores** (`support.index_stores`) are the places an indexing run of this repository writes, read
+  from the code that writes them and stated here, not imported from it:
+  - `.gov-runtime/codeintel/`, every file under it: the code index. The wrapper removes and rebuilds that folder
+    at every `index`: the tool's home (`codeintel/home/`, one SQLite file per project, `_config.db`, `logs/`) and
+    the files it stages for the tool (`codeintel/files/`). (`src/gov/codeintel/`.)
+  - `.gov-runtime/store.db`: the record store (`src/gov/store/`). The lexical index and the semantic vectors are
+    tables of that same file (`src/gov/retrieval/`), so a lexical indexing run writes it too; `gov rebuild`
+    writes these two places and no other (`src/gov/rebuild/`).
+- **Not watched:** everything else under `.gov-runtime/` (snapshots, checkpoints, logs, locks, `scratch/`, the
+  notes of a synthesis), and the store's SQLite side files (`store.db-journal`, `-wal`, `-shm`), which come and
+  go with any session that opens the store; a run that wrote the store leaves `store.db` itself.
+- **What it still catches:** a run that indexes this repository where it had no code index or no record store
+  (the state of a worktree no orchestrator has rebuilt), and one that changes which files the code index holds.
+- **What it does not catch, as before:** the comparison is of names, as it always was. A run that rebuilt an
+  index already there, with the same files, changes no name. `test_no_index_file_exists_outside_gov_runtime_after_a_run`
+  and the temporary roots every call is given are what keep a run out of this repository; this case is the
+  check after the fact.
+- **Still not for every neighbour:** a session that indexes or rebuilds this repository while the file runs
+  (an orchestrator's `gov rebuild`, DEC-322) can create or remove a watched file. Then the case is re-run
+  alone, as a case of DEC-372.
 
 ### Secret exclusion (success 2, failure 3)
 

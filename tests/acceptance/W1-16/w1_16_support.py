@@ -794,6 +794,28 @@ def snapshot(root):
     return found
 
 
+# The index stores of a repository, under its ``.gov-runtime/``: where an indexing run writes. The code index is
+# the folder the wrapper builds anew at every ``index`` (its home for the tool and the files it stages for it);
+# the record store is one SQLite file, and the lexical index and the vectors are tables of that file. Everything
+# else in the folder (logs, checkpoints, locks, snapshots, scratch) belongs to whatever session wrote it.
+CODE_INDEX_REL = "codeintel"
+RECORD_STORE_REL = "store.db"
+
+
+def index_stores(runtime):
+    """The files of the index stores under the runtime folder ``runtime``, as relative paths: every file under
+    the code index's folder, and the record store's file. Empty when there is none, or no such folder.
+
+    The store's SQLite side files are not listed: they come and go with any session that opens the store, and
+    a run that wrote the store leaves the store's own file.
+    """
+    runtime = Path(runtime)
+    found = {f"{CODE_INDEX_REL}/{rel}" for rel in listing(runtime / CODE_INDEX_REL)}
+    if (runtime / RECORD_STORE_REL).exists():
+        found.add(RECORD_STORE_REL)
+    return found
+
+
 def index_files(root, skip=()):
     """The files under ``root`` that are index files: SQLite databases and their side files, or a graph dump."""
     root = Path(root)
