@@ -7,6 +7,7 @@ import pytest
 import gov.context as ctx
 from gov.cli.errors import GovError
 from gov.context import EXTERNAL_REFERENCES_REL
+from test_external_references import commit
 
 LISTED = ("references:\n"
           "  - id: S0a-G-12\n    location: the archive\n    reason: kept outside\n"
@@ -19,6 +20,7 @@ def _project(tmp_path, monkeypatch, declared, records=()):
     path.parent.mkdir(parents=True)
     path.write_text(LISTED, encoding="utf-8")
     (tmp_path / "charter.md").write_text("the charter\n", encoding="utf-8")
+    commit(tmp_path)  # the external references are read from HEAD (DEC-552, finding 9)
     monkeypatch.setattr(ctx, "_ticket_mandatory_ids", lambda root, ticket: list(declared))
     monkeypatch.setattr(ctx, "_record_map", lambda root: {r["id"]: r for r in records})
     monkeypatch.setattr(ctx, "_supersedes_edges", lambda root: set())
@@ -50,3 +52,29 @@ def test_a_record_beside_the_external_ids_is_still_built(tmp_path, monkeypatch):
     packet = ctx.context(project, "TK-1")
     assert [item["id"] for item in packet["mandatory"]] == ["CH-1"]
     assert [item["id"] for item in packet["external"]] == ["S0a-G-12", "G-10"]
+
+
+@pytest.mark.parametrize("status", ["SUPERSEDED", "RETIRED", "REJECTED"])
+def test_a_record_that_no_longer_stands_does_not_satisfy(tmp_path, monkeypatch, status):
+    project = _project(tmp_path, monkeypatch, ["CH-1"], [{**CHARTER, "status": status}])
+    with pytest.raises(GovError) as raised:
+        ctx.context(project, "TK-1")
+    assert raised.value.code == "BLOCKED" and "CH-1" in raised.value.message
+    assert status.lower() in raised.value.message.lower()
+
+
+def test_a_record_whose_file_cannot_be_read_is_blocked_and_the_file_is_named(tmp_path, monkeypatch):
+    project = _project(tmp_path, monkeypatch, ["CH-1"], [CHARTER])
+    (project / "charter.md").unlink()
+    with pytest.raises(GovError) as raised:
+        ctx.context(project, "TK-1")
+    assert raised.value.code == "BLOCKED" and "charter.md" in raised.value.message
+    assert raised.value.details["unreadable"] == "CH-1"
+
+
+def test_a_lookup_failure_is_said_in_its_own_words(tmp_path):
+    import sqlite3
+    unread = ctx._lookup_failure(tmp_path, PermissionError(13, "Permission denied", str(tmp_path / "docs/a.md")))
+    assert unread == "the lookup could not read docs/a.md: Permission denied"
+    assert ctx._lookup_failure(tmp_path, sqlite3.OperationalError("no such table")) == "index unavailable"
+    assert ctx._lookup_failure(tmp_path, ValueError("a bad\nanswer")) == "the lookup failed: a bad answer"
