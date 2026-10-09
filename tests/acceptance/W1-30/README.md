@@ -1816,6 +1816,193 @@ No case of the round needs a model, a daemon, the network or a session log of th
 cases of piece 2 read the fixture logs of W1-31's suite through the `ccusage` of the machine,
 offline. No other suite and no unit test was changed, and none was run for this round.
 
+## Round 14: which commits after the probed one refuse (DEC-581)
+
+One piece of the follow-up after W1-41 (DEC-569), on the owner's answer to package P-1 of round
+13. DEC-581: "The probe gate refuses only for commits after the probed one that change files
+inside the ticket's `allowed_paths` or its acceptance tests." It replaces what round 13 built
+for a commit of the ticket after the probed one (refused for every path outside `tests/` and
+`docs/probes/`). The rule moves the line in both directions:
+
+- **Looser.** A commit that names the ticket and changes only files outside the ticket's
+  allowed paths and outside its acceptance tests refuses nothing, whatever the file is: the
+  orchestrator's residual notes, the probe record itself, a register entry, a checkpoint record.
+- **Stricter.** "Its acceptance tests" are the folder the close runs for the ticket:
+  `tests/acceptance/<wbs>/`, `<wbs>` being the ticket's `wbs_id` (settlement 7). A commit of the
+  ticket after the probed one that changes a file there refuses. Until this round nothing under
+  `tests/` refused, so a test designer's commit could change the tests after the probe and the
+  ticket closed on tests the reviewer never saw.
+
+New cases: `test_w1_30_r14_probe_later_commits.py`, 13 cases. Each drives `gov close <ticket>
+--json` in a temporary project: a FULL ticket whose engineer's commit is probed, the later
+commits, then the orchestrator's probe record and checkpoint. The project's path map names a
+register file (`decision_register`, DEC-479). Every later commit is made by a role W1-50's
+judgement passes for its paths, and each case holds that before the close runs, so the probe
+gate is the only gate with a reason. The gate's finding is read where the close states it
+today: the refusal itself when its code is `PROBE_INVALID`, else the one entry of
+`error.details.parts` with that code.
+
+### The rule and its cases
+
+| Rule | Case | Holds | Today (`2cf1367b`) |
+|------|------|-------|--------------------|
+| 1. outside both does not refuse | `test_a_commit_of_the_ticket_after_the_probed_one_outside_its_work_does_not_refuse` (3: the orchestrator's notes `docs/residuals.md`, a register entry in the named register, a checkpoint record under `docs/checkpoints/<ticket>/`) | the ticket closes; the close record lists the later commit among the ticket's commits | red, all three: `PROBE_INVALID`, "ticket commit <id> changes <path> after the probed commit" |
+| 1 | `test_the_probe_record_in_a_commit_that_names_the_ticket_does_not_refuse` | the record committed with the orchestrator's role alone, in a commit that carries the ticket's `Task` and `Implements`: closes | green (`docs/probes/` never refused) |
+| 1, several in a row | `test_several_commits_of_the_ticket_after_the_probed_one_outside_its_work_do_not_refuse` | notes, a register entry, a checkpoint, the probe record, each in its own commit that names the ticket: closes, every one listed | red: the first of them refuses as above |
+| 2. inside refuses | `test_a_commit_of_the_ticket_after_the_probed_one_inside_its_allowed_paths_refuses` | the engineer's commit of `src/example/feature.py`: exit code 3, the probe gate's finding names the commit and the path | green (as today) |
+| 3. its acceptance tests refuse | `test_a_commit_of_the_ticket_after_the_probed_one_in_its_acceptance_tests_refuses` (2: a case added, a case changed) | the test designer's commit in `tests/acceptance/<wbs>/`: the probe gate's finding names the commit and the path | red, both: the ticket closes. The stricter half of the rule |
+| 4. one inside and one outside | `test_a_commit_that_changes_one_file_inside_and_one_outside_refuses_for_the_inside_file` | one commit changes the notes and the source: refused, the finding names the source file and does not name the notes | red: refused today, but the finding names `docs/residuals.md`, the first path of the commit outside `tests/` and `docs/probes/` |
+| 5. under `tests/`, neither inside nor the ticket's folder | `test_a_commit_of_the_ticket_in_another_acceptance_folder_does_not_refuse` | the test designer's commit, with this ticket's trailers, adds a case to another work package's acceptance folder: the ticket closes | green (as today). Package P-2 below |
+| settlement 33 | `test_a_commit_of_the_ticket_after_the_probed_one_that_changes_its_ticket_file_refuses` | the orchestrator's commit of the ticket changes `.tickets/<ticket>.md`: refused, commit and path named | green (as today). Package P-1 below |
+| settlement 34 | `test_a_merge_after_the_probed_commit_that_brings_only_files_outside_the_tickets_work_does_not_refuse` | a merge commit of the ticket that is not the merge of the probed commit and brings the notes alone: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
+| settlement 34 | `test_the_merge_of_the_probed_commit_with_a_file_outside_the_tickets_work_added_in_it_does_not_refuse` | DEC-505's merge, with the notes written into the merge itself: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
+
+13 cases: 9 red, 4 green.
+
+### Rewritten (`Rewrite-Reason: owner decision P-30`)
+
+One case, in `test_w1_30_r13_probe_merge.py`:
+`test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses` held the stricter reading
+of round 13's package P-1 (the orchestrator's notes after the merge, in a commit that names the
+ticket: refused). It is now
+`test_a_commit_of_the_ticket_after_the_merge_outside_its_code_does_not_refuse`: the same project
+closes and the close record lists the notes commit. Red today (`PROBE_INVALID` for
+`docs/residuals.md`). The file's opening text points to this round for the rule.
+
+No other case of the acceptance suites refuses a commit of the ticket after the probed one for a
+path outside both: `test_ticket_commit_after_probed_commit_refused` (`test_w1_30_probe.py`) and
+`test_a_probed_commit_given_as_a_name_that_moves_refuses` (`test_w1_30_r8_probe_record.py`) change
+a file under `src/example/`, inside the ticket's allowed paths, and stand. Round 13's table and
+its settlement 24 are left as they were written; this section says how they read now.
+
+Not mine to change, for the engineer: the unit case
+`test_ticket_work_after_the_probed_commit_refuses_and_a_test_does_not` (`tests/unit/close/test_gates.py`)
+holds by its name that a test after the probed commit does not refuse; whatever of it changes
+the ticket's acceptance folder is reversed by rule 3.
+
+### What stays, and the case that holds it
+
+Every case named here is unchanged and green.
+
+| Stays | Case |
+|-------|------|
+| the merge that brings exactly the probed code does not refuse (DEC-505) | `test_a_merge_that_brings_exactly_the_probed_code_does_not_refuse` (2), `test_the_orchestrators_notes_after_the_merge_that_name_no_ticket_do_not_refuse` (r13 probe merge) |
+| a merge whose result is not the probed code refuses | `test_a_merge_whose_result_is_not_the_probed_code_refuses` (2) |
+| a merge of a later head that changed the code refuses | `test_a_merge_of_a_later_head_that_changed_the_code_refuses` |
+| a merge of a later head that changed only the ticket's tests refuses | `test_a_merge_of_a_later_head_that_changed_only_tests_refuses`: its later commit adds a case to the ticket's acceptance folder, so it stands under rule 3 as well as under settlement 24 |
+| a commit after the merge that changes the ticket's code refuses | `test_a_commit_after_the_merge_that_changes_the_tickets_code_refuses` |
+| a commit that names no task and changes the ticket's paths after the probed one refuses (DEC-490) | `test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses`, `test_a_merge_with_the_tickets_trailers_that_brings_a_source_rewrite_after_the_probed_commit_refuses` (r8 commits) |
+| no record | `test_full_ticket_requires_probe_record` (probe) |
+| a record not committed | `test_a_probe_record_that_is_written_and_not_committed_refuses` (r8 probe record) |
+| the wrong role | `test_a_probe_record_committed_without_the_orchestrators_role_refuses` (r8 probe record) |
+| a judgement that is not a pass | `test_a_judgement_that_is_neither_pass_nor_passed_refuses` (3), `test_probe_requires_judgement_present`, `test_a_failing_probe_record_beside_a_passing_one_refuses` (2) |
+| a record that names a commit that is none of HEAD's history, or a name that moves | `test_probed_commit_must_be_ancestor_of_head`, `test_probe_must_name_probed_commit`, `test_a_probed_commit_given_as_a_name_that_moves_refuses` (2) |
+| a reviewer's commit | `test_reviewer_commit_in_ticket_commits_refused`, `test_reviewer_commit_between_probed_and_head_refused`, the three reviewer cases of `test_w1_30_probe_commits.py`, `test_a_commit_with_the_reviewers_role_and_no_task_before_the_probed_commit_refuses` |
+
+On "a record that names another commit than one of the ticket's": the gate asks today that the
+probed commit is a full commit id and an ancestor of HEAD, not that it carries the ticket's
+trailers (`test_a_git_failure_while_the_probes_commits_are_read_refuses` probes the
+orchestrator's checkpoint commit in a project that otherwise closes). The cases above hold what
+exists; nothing in DEC-581 changes it, and no case is added for it.
+
+### Settlements of round 14 (the stricter reading where the words leave doubt)
+
+**33. The ticket's own ticket file.** By the words of DEC-581 `.tickets/<ticket>.md` is neither
+inside `allowed_paths` nor an acceptance test. DEC-490 counts it with the ticket's work for a
+commit that names no task, and it is the file that says what the ticket's allowed paths and its
+profile are. Held: a commit of the ticket after the probed one that changes it refuses, as
+today. The merge of the probed commit brings the ticket file as the probed commit has it and is
+not touched by this. Package P-1.
+
+**34. A merge commit of the ticket after the probed one** is judged by what it changes itself,
+with the rule's paths. One that is not the merge of the probed commit: by every path it brings
+to its first parent (so one that brings the notes alone does not refuse, one that brings a
+source rewrite refuses as before). The merge of the probed commit (DEC-505, settlement 24): its
+second condition now reads "every path inside the ticket's allowed paths or in its acceptance
+folder, and its ticket file, is at the merge what it is at the probed commit"; a file outside
+those, written into the merge, does not refuse. An acceptance test changed in a merge commit
+itself is refused today by W1-50's judgement, whoever made the merge (`CONTAINMENT_FINDING`, "a
+merge commit's own change to a ticket file or an acceptance test"; W1-50's suite holds it), so
+no case here asks the probe gate for a second finding.
+
+**35. Whose commits are judged** is unchanged: the ticket's own commits, by the rule; a commit
+that names no task, by DEC-490 (inside the ticket's allowed paths after the probed one). A
+commit that names another ticket "is that ticket's" (DEC-490) and is not judged; held by
+`test_a_commit_that_names_another_ticket_refuses_nothing`, unchanged. No case is added. Package
+P-3.
+
+### Packages of round 14
+
+**P-1: the ticket's own file after the probed commit.**
+- *Question.* Does a commit of the ticket that changes only `.tickets/<ticket>.md` after the
+  probed commit refuse the probe gate?
+- *Why now.* The owner's words name two kinds of path; the ticket file is neither, and today it
+  refuses. Building the words to the letter would lift a refusal the order did not list among
+  the kinds that no longer refuse.
+- *Options.* (a) It refuses, as built here. (b) It does not refuse: the words to the letter.
+  (c) It refuses only where `allowed_paths` or `profile` differ from the probed commit's.
+- *Impact.* (b) lets a ticket close after its paths were narrowed following the probe, so that a
+  later commit on the probed code is "outside" for this gate; W1-50's judgement would then be the
+  only answer. (a) refuses an orchestrator's note written into the ticket file after the probe
+  in a commit that names the ticket; in a commit that names no task the same change is refused
+  today by DEC-490's rule, so (a) adds no new way to be stuck.
+- *Reversibility.* Full: one case.
+- *Cost.* (a) none. (b) one case rewritten. (c) a comparison of two keys, two cases.
+- *Recommendation.* (a). *Confidence.* Medium.
+
+**P-2: a test outside the ticket's acceptance folder (rule 5).**
+- *Question.* Which gate answers for a commit that names this ticket and, after the probe,
+  changes a test that is neither in the ticket's folder nor inside its allowed paths?
+- *What the close answers today.* Another work package's acceptance folder, by the test
+  designer: no gate of this close answers. W1-50's judgement passes it (an acceptance test is the
+  test designer's place), the probe gate has no finding by the rule, the ticket closes; the case
+  of rule 5 holds that. The close of the ticket whose folder it is does not judge it either (a
+  commit that names another ticket is that ticket's). What does see it is the regression run of
+  every later close, which runs all of `tests/` but the closing ticket's own folder: a case that
+  fails there refuses, a case weakened so that it passes does not. Anywhere else under `tests/`
+  (seen for `tests/unit/`, by the test designer): W1-50's judgement refuses,
+  `CONTAINMENT_FINDING`, "committed path(s) outside allowed paths".
+- *Options.* (a) As the rule says and as built. (b) Any acceptance folder refuses the probe gate.
+  (c) Left to W1-50: a test designer's commit may change only the acceptance folder of the ticket
+  it names.
+- *Impact.* (b) and (c) refuse more than today; neither is ordered. *Reversibility.* Full.
+  *Cost.* (a) none; (c) is a change of W1-50, not of this ticket.
+- *Recommendation.* (a) for this piece; (c) to the Wave 2 list. *Confidence.* Medium.
+
+**P-3: a commit that names another ticket and changes this ticket's paths after the probe.**
+- *Question.* Is it judged by this ticket's probe gate?
+- *What the close answers today* (tried in a temporary project, no case kept): an engineer's
+  commit with another ticket's trailers that rewrites this ticket's probed source after the
+  probe. Where the other ticket's allowed paths hold the file too: no finding anywhere, this
+  ticket closes. Where they do not: W1-50's judgement has a finding for that commit ("committed
+  path(s) outside allowed paths"), but the close of this ticket judges this ticket's commits
+  only, and closes; the finding refuses the other ticket's close.
+- *Why now.* DEC-581's words ("commits after the probed one that change files inside the
+  ticket's `allowed_paths`") can be read to judge every commit. DEC-490 says a commit that names
+  another ticket is that ticket's, and an existing case holds that it refuses nothing here.
+- *Options.* (a) As today (held). (b) Every commit after the probed one that changes a file
+  inside the ticket's allowed paths or in its acceptance folder refuses, whoever's it is.
+  (c) As (b) only for a commit W1-50's judgement does not pass.
+- *Impact.* (a) leaves a way to change probed code and close on the old probe: name another
+  ticket whose paths overlap. (b) refuses two tickets with overlapping paths that work at the
+  same time; the one probed first must be closed first or probed again.
+- *Reversibility.* Full. *Cost.* (b) small in the gate; one existing case stays (its commit is
+  outside this ticket's paths), two cases added.
+- *Recommendation.* (b): the probe is of the code, not of the commits' names.
+  *Confidence.* Medium. It is a fail-open hole that ordinary work can produce where two tickets
+  share paths (DEC-584 b); it is older than this piece and not widened by it.
+
+### The run of round 14
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n 6`, at
+`2cf1367b` plus this round's file and the rewritten case: 425 cases; 415 passed, 10 failed, none
+skipped, in 210 s. The 10 red are the 9 of this round's file and the rewritten case of round 13,
+each for the reason in the tables above; the 4 green cases of this round and every other case of
+the suite are green.
+
+No case of the round needs a model, a daemon, the network or a session log of the machine. No
+other suite and no unit test was changed.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1834,6 +2021,7 @@ offline. No other suite and no unit test was changed, and none was run for this 
 | DEC-527, DEC-530 (CAP-13.a, CAP-38.a) | the three `test_w1_30_r11_*.py` files: 43 tests (the runs: 12; this repository's declaration: 29; a store rebuilt without embeddings: 2) |
 | DEC-549 (CAP-13.a, CAP-38.a) | `test_w1_30_r12_worker_setting.py`: 22 tests (the number of workers: 2; never which tests: 2; the stated number: 4; a setting that is none: 5; without the parallel runner: 2; the project's time limit: 5; a list entry that names no case: 2) |
 | DEC-569, round 13 | the eight `test_w1_30_r13_*.py` files: 57 tests. CAP-38.f: the probe and a merge (9). CAP-50.c, CAP-13.a: the governance share (7). CAP-38.a, CAP-13.a: the runs of a refused close (3); five findings of the probe of the parallel run (9). CAP-31.b, CAP-59.a: long findings (4); the owner's decision as a register entry (7). CAP-38.b: the trailers base (12). CAP-24.a: installed skills (6) |
+| DEC-581, round 14 (CAP-38.f) | `test_w1_30_r14_probe_later_commits.py`: 13 tests (outside both: 5; inside: 1; the acceptance folder: 2; inside and outside: 1; another acceptance folder: 1; the ticket file: 1; merges: 2); one case of `test_w1_30_r13_probe_merge.py` rewritten |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1875,6 +2063,9 @@ offline. No other suite and no unit test was changed, and none was run for this 
 30. **An owner's decision as a register entry** (round 13, DEC-483): one heading of DEC-473's form in the register named by `decision_register`, a status line whose first word is `ACCEPTED`, brought into the register by a commit that carries `Role: owner` alone, absent from the register of the commit at which the escalation began, not used before. Full table in round 13, piece 6
 31. **The base commit of the trailers check** (round 13, DEC-482; proposed): the optional top-level key `trailers_base` of the path map; a base that is no commit the checked commit descends from is the finding `TRAILERS_BASE_UNKNOWN`; a base with no commit after it gives the unmeasured answer; a closed ticket no commit names stays `NO_COMMITS`. Full text in round 13, piece 7
 32. **The skills of an installed kernel in the close record** (round 13): `governance/kernel/skills/` and `governance/kernel/vendor/` are listed as the template layout is; a project with both layouts lists both, one entry for a skill both hold with one version, an entry for each version where they differ
+33. **The ticket's own file after the probed commit** (round 14, DEC-581; the stricter reading, package P-1): a commit of the ticket that changes `.tickets/<ticket>.md` after the probed one refuses, as before
+34. **A merge commit of the ticket after the probed one** (round 14, DEC-581): judged by what it changes itself, with the rule's paths; settlement 24's second condition reads with those paths. Full text in round 14
+35. **Whose commits the probe gate judges** (round 14, DEC-581): the ticket's own, and those that name no task (DEC-490); a commit that names another ticket is not judged (package P-3)
 
 ## Residuals
 
