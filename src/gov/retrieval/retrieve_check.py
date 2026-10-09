@@ -119,10 +119,12 @@ def main():
 def _adopt(root: Path):
     """Give the project a path map that classes everything as embedded governance memory."""
     import yaml
+    from gov.store.loader import REGISTER_KEY
     path_map_path = REPO_ROOT / "governance/project/path-map.yaml"
     if not path_map_path.is_file():
         return
     document = yaml.safe_load(path_map_path.read_text(encoding="utf-8"))
+    document.pop(REGISTER_KEY, None)  # the project names no register it does not hold (DEC-579)
     document["namespaces"] = {"everything": {
         "paths": ["**"], "memory_class": "governance",
         "sensitivity": "internal",

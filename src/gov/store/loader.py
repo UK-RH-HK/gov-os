@@ -13,7 +13,8 @@ commit gives the same store wherever and whenever it is loaded.
 - Each entry of the register file that the path map of ``HEAD`` names under ``decision_register`` is a record of
   type ``decision`` (DEC-521, DEC-473, DEC-479): its id is the heading's, its status the word after
   ``**Status:**`` on its first line that is not blank, its path the register file. Its heading and title are kept
-  in ``register_entries``. A named register that ``HEAD`` does not hold as a file of text refuses the load.
+  in ``register_entries``. A named register that ``HEAD`` does not hold as a file of text refuses the load
+  (DEC-579: one that is not in the commit too).
 - ``Task:`` and ``Implements:`` trailers are read from the final trailer block;
   a commit made before 2026-10-03 is read from the whole message (DEC-182).
 """
@@ -109,11 +110,7 @@ def _register(root: Path, tree: dict) -> tuple[str, str] | None:
     path = path_map[REGISTER_KEY]
     if not isinstance(path, str) or not path.strip():
         raise unreadable(REGISTER_KEY, f"the key of {PATH_MAP_REL} is not a path")
-    if path not in tree and not any(name.startswith(path.rstrip("/") + "/") for name in tree):
-        # Open (returned as a package): the fixtures of other suites and the retrieval check name this repository's
-        # register in projects that do not hold it, so a register HEAD holds nothing of is still no register.
-        return None
-    text = _file(root, tree, path)
+    text = _file(root, tree, path)  # a named register that is not in the commit is refused, never no register (DEC-579)
     if text is None:
         raise unreadable(path, f"HEAD does not hold the register named under '{REGISTER_KEY}' as a file of text")
     return path, text
@@ -182,6 +179,17 @@ def _frontmatter(text: str):
         return yaml.safe_load("\n".join(lines[1:lines.index("---", 1)]))
     except (yaml.YAMLError, ValueError) as exc:
         raise ValueError("the frontmatter is not valid YAML: " + " ".join(str(exc).split())) from None
+
+
+def frontmatters(root: Path, but: frozenset[str] = frozenset()) -> list[tuple[str, object, str | None]]:
+    """``(path, frontmatter, why it cannot be read)`` of every Markdown file of ``HEAD`` whose path is not in ``but``."""
+    found = []
+    for path, text in _markdown(root, {path: entry for path, entry in _tree(root).items() if path not in but}):
+        try:
+            found.append((path, _frontmatter(text), None))
+        except ValueError as exc:
+            found.append((path, None, str(exc)))
+    return found
 
 
 def _ids(value) -> list[str]:

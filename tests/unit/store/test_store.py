@@ -129,10 +129,8 @@ def test_a_path_map_that_is_no_mapping_refuses_the_load(project):
     assert raised.value.code == "STORE_REGISTER_UNREADABLE" and PATH_MAP in raised.value.message
 
 
-def test_a_register_the_commit_holds_nothing_of_is_no_register_until_a_decision_says_otherwise(project):
-    """Open, returned as a package: the README of W1-10 orders a refusal here; fixtures of other suites name this
-    repository's register in projects that do not hold it. Today's answer is kept: nothing of a register loads."""
-    before = store.load(project)["digest"]
-    summary = store.load(_named(project, register=None))
-    assert summary["invalid"] == [] and records.records(project, type="decision")[0]["id"] == "ADR-0001"
-    assert len(records.records(project)) == 1 and summary["digest"] != before  # another commit, no other record
+def test_a_named_register_that_is_not_in_the_commit_refuses_the_load(project):
+    """DEC-579: refused, not read as a project without a register."""
+    with pytest.raises(GovError) as raised:
+        store.load(_named(project, register=None))
+    assert raised.value.code == "STORE_REGISTER_UNREADABLE" and "decisions/REGISTER.md" in raised.value.message
