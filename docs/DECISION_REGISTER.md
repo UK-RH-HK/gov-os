@@ -6367,3 +6367,14 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.171 | 2026-10-09 | Delegated: DEC-592 (the follow-up after W1-41: the probe judged pass, no fix round; run G3's stricter readings as built; the probe's findings named as residuals, among them the probe gate refusing a merge of the integration branch into the ticket branch and back, and `gov check` red in a fresh project with the installed layout). Next free id: DEC-593. |
+
+## 172. The owner lifts the escalation of DAEO-2lwj (register v0.172, appended by the operator on the owner's instruction, on branch `w1/integrate`)
+
+### DEC-593 — Lift the escalation of DAEO-2lwj (W1-30 follow-up)
+- **Status:** ACCEPTED (owner, 2026-10-09)
+- **Decision:**
+  - The owner lifts the escalation in force on DAEO-2lwj, recorded 2026-10-09 06:46 UTC. The follow-up's full regression on its merge (caa8ac5c) is green. Continue: re-run gov close with this decision, judged under the standing exception rules.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.172 | 2026-10-09 | Owner: DEC-593 (the owner lifts the escalation of DAEO-2lwj, the W1-30 follow-up). Next free id: DEC-594. |
