@@ -14,8 +14,11 @@ of the ticket that follows the probed commit does not count as "after" it when a
   byte for byte what it is at the probed commit (a path the probed commit does not hold is not there at the
   merge either).
 
-Everything else stays as it is: a commit of the ticket after the probed commit that changes anything outside
-``tests/`` and ``docs/probes/`` refuses, a merge that is not that merge among them.
+Which other commits of the ticket after the probed one refuse is DEC-581's rule since round 14
+(``test_w1_30_r14_probe_later_commits.py``): those that change a file inside the ticket's allowed paths or in
+its acceptance tests, a merge that is not that merge among them. The second condition above is read with
+that rule's paths since then (README, round 14, settlement 34). One case of this file was rewritten to it
+(``test_a_commit_of_the_ticket_after_the_merge_outside_its_code_does_not_refuse``); the others stand.
 
 The projects: the ticket's work is made on a branch (``work``), probed at its head, and merged into ``main`` by
 the orchestrator with a merge commit that carries the ticket's trailers. The probe record is committed after the
@@ -167,16 +170,27 @@ def test_a_merge_of_a_later_head_that_changed_only_tests_refuses(project, sandbo
     _refused_by_the_probe_gate(project, sandbox, interface, merge)
 
 
-def test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses(project, sandbox, interface):
-    """Package P-1 of round 13, the stricter reading meanwhile: the orchestrator's notes, committed after the
-    merge with the ticket named, change a file that is neither a test nor a probe record. The file is outside
-    the ticket's paths; the gate refuses all the same, as today."""
+def test_a_commit_of_the_ticket_after_the_merge_outside_its_code_does_not_refuse(project, sandbox, interface):
+    """Package P-1 of round 13, answered by the owner (DEC-581): the orchestrator's notes, committed after the
+    merge with the ticket named, change a file outside the ticket's allowed paths and outside its acceptance
+    tests. The gate does not refuse for it; the ticket closes, and the close record lists the commit.
+
+    Until round 14 this case held the stricter reading meanwhile (the same commit refused) under the name
+    ``test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses``."""
     probed = _work_on_a_branch(project)
     _merge(project)
     project.write(NOTES, "# Residuals of the ticket\n")
     notes = project.commit("residual notes", who=support.ORCHESTRATOR, trailers=MERGE_TRAILERS, exact=True)
     _recorded_and_checkpointed(project, probed)
-    _refused_by_the_probe_gate(project, sandbox, interface, notes)
+    assert notes in support.ticket_commits(project.root, TICKET)
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    support.result_of(run, interface)
+    assert support.ticket_status(project.root, TICKET) == "closed"
+    record = support.the_close_record(project, TICKET)
+    assert notes in [entry["commit"] for entry in record["commits"]], \
+        "the close record does not list the notes commit among the ticket's commits"
 
 
 def test_the_orchestrators_notes_after_the_merge_that_name_no_ticket_do_not_refuse(project, sandbox, interface):
