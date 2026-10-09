@@ -1562,6 +1562,29 @@ the case then still holds that this file changes nothing. Not held: a file elsew
 import path than the root and `src/` (a project's own `pythonpath` setting of its test runner);
 the two places are the two the close itself puts on the run's import path.
 
+### Piece 5. The repair ticket of a refused close with long findings (`test_w1_30_r13_long_findings.py`, 4 cases)
+
+DEC-569 lists it. One acceptance file with 1200 failing cases, each with an id of 300
+characters: the findings are more than twice what one command-line argument carries on Linux
+(128 KiB). Three cases read what one refused close of that project left; the project's ticket
+tool is the kernel's behind a line that writes down what it was asked.
+
+**Settlement 29 (proposed).** Two whole numbers in the refusal's `details`, each 0 or absent when
+nothing was left out: `repair_ticket_findings_cut`, how many findings the repair ticket does not
+hold, and `findings_cut`, how many the answer's own `findings` do not hold. A repair ticket that
+leaves findings out says so in a line that holds the word "cut" and that number; one that holds
+every finding has no such line. A finding counts as held where its case's own name is in the
+text.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_refused_close_with_very_long_findings_opens_its_repair_ticket_through_the_ticket_tool` | one repair ticket, named in the answer; the project's ticket tool was asked to create it; by `tk dep tree` it depends on the refused ticket; counted once | red: "not opened: tk create cannot run: [Errno 7] Argument list too long" |
+| `test_what_the_repair_ticket_does_not_hold_of_the_findings_is_said_in_it_and_in_the_answer` | the number of findings the ticket leaves out is `repair_ticket_findings_cut` and stands in a "cut" line of the ticket; nothing of the kind where all are held | red: there is no repair ticket |
+| `test_the_answer_names_every_finding_or_says_how_many_it_left_out` | the number of findings the answer leaves out is `findings_cut` | green (as today: the answer names all 1200) |
+| `test_with_very_long_findings_and_a_failing_ticket_tool_no_ticket_file_is_written` | the tool fails: no ticket file, no file left in the project, the answer says no ticket was opened | green (as today for short findings); it holds that nothing writes a ticket in the tool's place, whatever carries the findings to it |
+
+2 red, 2 green.
+
 ## Covers ids
 
 | Covers id | Tests |
