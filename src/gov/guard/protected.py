@@ -15,6 +15,7 @@ module carries a path.
 
 from __future__ import annotations
 
+import functools
 import os
 import re
 import shlex
@@ -42,11 +43,11 @@ _PIECE_RE = re.compile(r"""[\s'"()=:,;@]+""")
 # A short option with its value glued to it: -f<file>.
 _GLUED_RE = re.compile(r"-[A-Za-z].")
 # The innermost braces of a word that hold a comma: {a,b}.
-_BRACE_RE = re.compile(r"\{([^{}]*,[^{}]*)\}")
+_BRACE_RE = re.compile(r"\{([^{},]*,[^{}]*)\}")
 # The options with which grep searches a folder: -r, -R, a cluster, the long forms.
-_RECURSIVE_RE = re.compile(r"-[A-Za-z]*[rR]|--(dereference-)?recursive\Z")
+_RECURSIVE_RE = re.compile(r"-[A-Za-z0-9]*[rR]|--(dereference-)?recursive\Z")
 # The options with which ls lists a folder and every folder below it.
-_LS_RECURSIVE_RE = re.compile(r"-[A-Za-z]*R|--recursive\Z")
+_LS_RECURSIVE_RE = re.compile(r"-[A-Za-z0-9]*R|--recursive\Z")
 # The options of grep and of rg that take the next word as their value.
 _GREP_VALUED = frozenset(
     "-e -f -m -A -B -C -d -D --regexp --file --include --exclude --exclude-dir "
@@ -67,6 +68,17 @@ _FIND_NAMED = frozenset({"-name", "-iname", "-path", "-ipath", "-wholename",
 # filters expand to, and the most words the brace expansions of one call
 # make.  Each is matched, so the count bounds the time.
 _MOST_PAIRS = 4096
+# The most folders the paths resolved for one call hold together: a path is
+# resolved once, and resolving one costs its folders (DEC-570).
+_MOST_RESOLVED = 131072
+# What stands before the command that is run and is not it (DEC-570): the
+# keywords of the shell, and the commands that run the words after them.
+_KEYWORDS = frozenset({"do", "then", "else", "elif", "if", "while", "until", "!"})
+_PREFIXES = frozenset({"timeout", "command", "env", "nice", "nohup", "time"})
+# The programs whose search is judged behind those words.
+_SEARCHES = frozenset({"grep", "egrep", "fgrep", "rg", "find", "ls"})
+# What a word of a command starts after: a # there opens a comment.
+_BEFORE_A_WORD = frozenset(" \t\n;&|()<>")
 # The options with which git diff and git status print no line of a file.
 _GIT_QUIET = frozenset({"--", "--stat", "--short", "-s", "--porcelain"})
 # The two files' project-relative paths, in parts.
@@ -258,11 +270,60 @@ def _reads_input(args: list[str], command: str) -> bool:
     if "--files" in args or len(operands) > _PATTERN_OPTIONS.isdisjoint(
             o for o, _ in options):
         return False
+    return _tokenised(command)
+
+
+@functools.lru_cache(maxsize=1)
+def _tokenised(command: str) -> bool:
+    """True for a command that can be tokenised; each command is tried once."""
     try:
         shlex.split(command)
     except ValueError:
         return False
     return True
+
+
+def _behind(words: list[str]) -> list[str]:
+    """The command behind what stands before it (DEC-570): the keywords of
+    the shell, assignments, and timeout <n>, command, env, nice, nice -n <n>,
+    nohup and time, in any number and order."""
+    i = 0
+    while i < len(words):
+        w = words[i]
+        if w == "nice" and words[i + 1:i + 2] == ["-n"]:
+            i += 3
+        elif w == "timeout":
+            i += 2
+        elif w in _KEYWORDS or w in _PREFIXES or _ASSIGN_RE.match(w):
+            i += 1
+        else:
+            break
+    return words[i:]
+
+
+def _uncommented(command: str) -> str:
+    """*command* without its comments (DEC-570): each from a ``#`` that
+    starts a word outside quotes to the end of its line.  A ``#`` inside a
+    word opens none, nor does one inside a quote, closed or not."""
+    if "#" not in command:
+        return command
+    out: list[str] = []
+    quote, kept, i = "", 0, 0
+    while i < len(command):
+        c = command[i]
+        if c == "\\" and quote != "'":
+            i += 1  # the character after it is itself
+        elif quote:
+            quote = "" if c == quote else quote
+        elif c in "'\"":
+            quote = c
+        elif c == "#" and (not i or command[i - 1] in _BEFORE_A_WORD):
+            out.append(command[kept:i])
+            end = command.find("\n", i)
+            i = kept = len(command) if end < 0 else end
+            continue
+        i += 1
+    return "".join(out) + command[kept:]
 
 
 def _copies(target: str | None) -> list[tuple[str, str]]:
@@ -312,6 +373,27 @@ class _Protected:
         self.wide = False  # a search was found to start where a file lies under
         self.long = False  # a command was found to hold more than is read
         self.made = 0  # the words the brace expansions made so far
+        self.spent = 0  # the folders of the paths resolved so far
+        self.seen: dict[tuple[str, str], str | None] = {}  # the paths resolved
+        self.copies: dict[str | None, list[tuple[str, str]]] = {}  # per target
+
+    def real(self, path: str, cwd: str) -> str | None:
+        """``_real``, once for each path of a call (DEC-570).  A call whose
+        paths hold more folders than the rule resolves is more than it
+        reads: no further path is resolved, and the call is refused."""
+        key = (path, cwd)
+        if key not in self.seen:
+            self.spent += path.count("/") + cwd.count("/") + 1
+            self.long = self.long or self.spent > _MOST_RESOLVED
+            self.seen[key] = None if self.long else _real(path, cwd)
+        return self.seen[key]
+
+    def braces(self, word: str) -> list[str]:
+        """``_braces``; an expansion that stopped at its bound leaves words
+        unexpanded, and the call is then more than the rule reads (DEC-570)."""
+        ones = _braces(word)
+        self.long = self.long or any(_BRACE_RE.search(w) for w in ones[1:])
+        return ones
 
     def starts_at(self, target: str | None) -> bool:
         """True when *target* is the folder a file lies under: the project
@@ -324,7 +406,9 @@ class _Protected:
     def near(self, target: str | None) -> list[tuple[str, str]]:
         """The files *target* may take in, each with the folder that plays
         the project root's part for it: the project's, and the copies."""
-        return [(f, self.root) for f in self.files] + _copies(target)
+        if target not in self.copies:
+            self.copies[target] = _copies(target)  # looked for once
+        return [(f, self.root) for f in self.files] + self.copies[target]
 
     def holds(self, target: str | None) -> bool:
         """True when *target* is one of the files, or a copy of one."""
@@ -347,7 +431,7 @@ class _Protected:
         *fold* in any case of letter."""
         parts = pattern.split("/")
         n = next((i for i, p in enumerate(parts) if _has_glob(p)), len(parts))
-        base = _real("/".join(parts[:n]) or ("/" if pattern[:1] == "/" else "."), cwd)
+        base = self.real("/".join(parts[:n]) or ("/" if pattern[:1] == "/" else "."), cwd)
         if n == len(parts):
             return self.taken_by(base)
         cased = str.lower if fold else str
@@ -361,7 +445,7 @@ class _Protected:
 
     def read_by(self, text: str, cwd: str) -> str | None:
         return (self.matched_by(text, cwd) if _has_glob(text)
-                else self.taken_by(_real(text, cwd)))
+                else self.taken_by(self.real(text, cwd)))
 
 
 def _search_reads(prot: _Protected, path, globs: list[str], cwd: str,
@@ -369,7 +453,7 @@ def _search_reads(prot: _Protected, path, globs: list[str], cwd: str,
     """A Grep call, or a search in the shell: its path, narrowed by its
     glob when it has one; *iglobs* are globs read in any case of letter.
     A search that is *fed* reads its standard input and no folder."""
-    base = _real(path if isinstance(path, str) and path else ".", cwd)
+    base = prot.real(path if isinstance(path, str) and path else ".", cwd)
     if not base or prot.holds(base):
         return bool(base)
     # A glob that only excludes narrows nothing here.
@@ -387,7 +471,7 @@ def _search_reads(prot: _Protected, path, globs: list[str], cwd: str,
                           g.lower() == os.path.basename(f).lower() if fold
                           else g == os.path.basename(f))
                       for f, _ in prot.near(base))
-               for glob, fold in found for g in _braces(glob))
+               for glob, fold in found for g in prot.braces(glob))
 
 
 def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
@@ -397,13 +481,16 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
     is git diff --stat or git status."""
     ecwd: str | None = cwd
 
-    def reads(words: list[str], fed: bool = False) -> bool:
+    def reads(words: list[str], fed: bool = False,
+              plain: list[str] | None = None) -> bool:
         nonlocal ecwd
         while words and _ASSIGN_RE.match(words[0]):
             words = words[1:]
         if not words:
             return False
         name, args = os.path.basename(words[0]), words[1:]
+        if name in ("egrep", "fgrep"):
+            name = "grep"  # DEC-570: judged as grep is
         if name in ("cd", "pushd"):
             while args and args[0].startswith("-") and args[0] != "-":
                 args = args[1:]  # an option: -P, --
@@ -417,14 +504,21 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
         if name == "popd":
             ecwd = None
             return False
+        # DEC-570: the search behind a keyword of the shell or a prefix
+        # command, read without the numbers of its redirects (*plain*), is
+        # judged as the search it is, beside the command as it was read.
+        behind = _behind(plain or [])
+        if (behind and behind != words and os.path.basename(behind[0]) in _SEARCHES
+                and reads(behind, fed)):
+            return True
         if (ecwd is not None and _takes_folder(name, args)
-                and prot.taken_by(_real(".", ecwd))):
+                and prot.taken_by(prot.real(".", ecwd))):
             return True
         # DEC-557, DEC-562: a search is judged as the search tool's is, from
         # each of its paths and with its name filters.
         search = _shell_search(name, args, named)
         if search and len(search[0]) * sum(
-                len(_braces(g)) for g in search[1] + search[2]) > _MOST_PAIRS:
+                len(prot.braces(g)) for g in search[1] + search[2]) > _MOST_PAIRS:
             prot.long = True
             return True
         fed = fed and name == "rg" and _reads_input(args, command)
@@ -433,13 +527,15 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
             if (ecwd is not None or os.path.isabs(exp)) and _search_reads(
                     prot, exp, search[1], ecwd or "/", search[2], fed):
                 return True
+        if plain is None:
+            return False  # the search behind: its words are read with the command
         hits: list[str] = []
         second = _second_names(name, args)
         for word in args:
             exp = _expand_token(word) or word
             if ecwd is None and not os.path.isabs(exp):
                 continue
-            ones = _braces(exp)
+            ones = prot.braces(exp)
             prot.made += len(ones) - 1
             if prot.made > _MOST_PAIRS:
                 prot.long = True
@@ -455,7 +551,7 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
             pieces = [p for p in _PIECE_RE.split(exp) if p and p != exp]
             if _GLUED_RE.match(exp):
                 pieces.append(exp[2:])
-            if any(prot.holds(_real(p, ecwd or "/")) for p in pieces
+            if any(prot.holds(prot.real(p, ecwd or "/")) for p in pieces
                    if ecwd is not None or os.path.isabs(p)):
                 return not _git_quiet(name, args)
         if not hits or _git_quiet(name, args):
@@ -465,6 +561,7 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
         return any(h not in written for h in hits)
 
     cur: list[str] = []
+    plain: list[str] = []  # DEC-570: *cur* without the numbers of its redirects
     tokens = _words(command)
     named = not _FIND_NAMED.isdisjoint(tokens)
     # DEC-557: what feeds each command with something to search: the pipe
@@ -476,7 +573,9 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
     for i, tok in enumerate(tokens):
         if _is_punct(tok) and "<" in tok:
             # Another redirect of the input, or one from no file: not known.
-            exp = "".join(tokens[i + 1:i + 2]) if tok == "<" and not jobs else ""
+            # DEC-570: nor does one of another descriptor than the standard input.
+            exp = "".join(tokens[i + 1:i + 2]) if tok == "<" and not jobs and not (
+                i and tokens[i - 1].isdigit() and tokens[i - 1] != "0") else ""
             exp = _expand_token(exp) or exp
             fed = bool(exp and (ecwd is not None or os.path.isabs(exp))
                        and os.path.isfile(os.path.join(ecwd or "/", exp)))
@@ -493,12 +592,16 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
             if not (i and _is_punct(tokens[i - 1])
                     and ("<" in tokens[i - 1] or ">" in tokens[i - 1])):
                 cur.append(tok)
+                if not (tok.isdigit() and _is_punct("".join(tokens[i + 1:i + 2]))
+                        and tokens[i + 1][0] in "<>"):
+                    plain.append(tok)
         elif ">" not in tok and "<" not in tok:
-            if reads(cur, fed):
+            if reads(cur, fed, plain):
                 return True
             cur = []
+            plain = []
             fed = tok in ("|", "|&") and not jobs
-    return reads(cur, fed)
+    return reads(cur, fed, plain)
 
 
 def _git_quiet(name: str, args: list[str]) -> bool:
@@ -530,21 +633,23 @@ def read_refusal(tool_name: str, tool_input: dict, project_root: str,
         return LONG_REFUSAL
     if tool_name == "Read":
         reads = bool(text("file_path")
-                     and prot.taken_by(_real(text("file_path"), cwd)))
+                     and prot.taken_by(prot.real(text("file_path"), cwd)))
     elif tool_name == "Grep":
         reads = _search_reads(prot, text("path"), text("glob").split(), cwd)
     elif tool_name == "Glob":
-        base = _real(text("path") or ".", cwd)
+        base = prot.real(text("path") or ".", cwd)
         reads = bool(base and text("pattern")
                      and any(prot.matched_by(p, base)
-                             for p in _braces(text("pattern"))))
+                             for p in prot.braces(text("pattern"))))
     elif tool_name == "Bash":
-        reads = any(_command_reads(prot, c, cwd) for c in
+        # DEC-570: each is read as it is written, and without its comments.
+        reads = any(_command_reads(prot, c, cwd) for whole in
                     [text("command"), *(text("command")[start:end]
-                                        for start, end in spans)])
+                                        for start, end in spans)]
+                    for c in dict.fromkeys((whole, _uncommented(whole))))
     else:
         reads = False
-    if not reads:
+    if not reads and not prot.long:
         return ""
     return (LONG_REFUSAL if prot.long else SEARCH_REFUSAL if prot.wide
             else READ_REFUSAL)

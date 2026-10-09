@@ -26,9 +26,10 @@ from gov.guard.decide import (LONG_PATH_REFUSAL, LONG_REFUSAL, MOST_PATH,  # noq
 from gov.guard.heldout import CONFIG_KEY, CONFIG_REL, SETTINGS_REL  # noqa: E402
 from gov.guard.hooks import REDACTED, listing  # noqa: E402
 from gov.guard.protected import (NUL_REFUSAL, READ_REFUSAL,  # noqa: E402
-                                 SEARCH_REFUSAL, _braces, _glob_rx, _options,
+                                 SEARCH_REFUSAL, _MOST_RESOLVED, _Protected,
+                                 _behind, _braces, _glob_rx, _options,
                                  _shell_search, _substitutions, _takes_folder,
-                                 read_refusal)
+                                 _tokenised, _uncommented, read_refusal)
 
 FILES = (CONFIG_REL, SETTINGS_REL)
 DENY = "Read(//stand-in/**)"
@@ -862,6 +863,235 @@ def test_the_refusals_of_the_round_name_a_decision_and_no_path():
         assert decision in reason
         for rel in FILES:
             assert rel not in reason and os.path.basename(rel) not in reason
+
+
+# -- the fix round of the root-search round (DEC-570) --------------------------
+
+def test_the_command_behind_keywords_and_prefix_commands_is_found():
+    for command, expected in (
+        ("rg x", "rg x"), ("do grep -rn x .", "grep -rn x ."), ("! rg -q x", "rg -q x"),
+        ("then if ! rg x", "rg x"), ("elif rg x", "rg x"), ("until grep -rq x .", "grep -rq x ."),
+        ("timeout 10 rg x", "rg x"), ("command grep -r x", "grep -r x"), ("env rg x", "rg x"),
+        ("env X=1 Y=2 rg x", "rg x"), ("X=1 rg x", "rg x"), ("nice rg x", "rg x"),
+        ("nice -n 5 rg x", "rg x"), ("nohup nice rg x", "rg x"), ("time nice -n 5 ls -R", "ls -R"),
+        ("if timeout 5 rg -q x", "rg -q x"), ("timeout 60 python3 -m pytest", "python3 -m pytest"),
+        ("command -v python3", "-v python3"), ("echo if rg x", "echo if rg x"),
+        ("timeout", ""), ("nice -n", ""), ("if", ""), ("", ""),
+    ):
+        assert _behind(command.split()) == expected.split(), command
+    assert _behind(["timeout", "1"] * 20000 + ["rg"]) == ["rg"]
+
+
+def test_the_comments_of_a_command_are_cut_and_nothing_else():
+    for command, expected in (
+        ("rg x # all", "rg x "), ("rg x #all\nls", "rg x \nls"), ("# a\nls -R # b\n# c", "\nls -R \n"),
+        ("ls;#a", "ls;"), ("(ls)#a", "(ls)"), ("rg x #a 'b\nls", "rg x \nls"),
+        ("rg x #", "rg x "), ("#", ""),
+    ):
+        assert _uncommented(command) == expected, command
+    for command in ("rg a#b src", "rg 'a #b' src", 'rg "a #b" src', "rg \\#b src", "echo $# ${#a}",
+                    "rg 'a\n#b' src", "echo 'a # b", 'echo "a \\" # b', "echo \"it's\" 'a # b'",
+                    "rg x", "", "a\\"):
+        assert _uncommented(command) == command, command
+    assert _uncommented("ls # " + "word " * 6000) == "ls "
+    assert _uncommented("ls # a\n" * 4000) == "ls \n" * 4000
+
+
+def test_a_command_is_tokenised_once():
+    assert _tokenised("ls | rg x") and _tokenised("")
+    assert not _tokenised("ls ' | rg x") and not _tokenised('a "')
+    _tokenised.cache_clear()
+    for _ in range(5):
+        assert _tokenised("ls | rg \"don't\"")
+    assert (_tokenised.cache_info().misses, _tokenised.cache_info().hits) == (1, 4)
+
+
+def test_a_path_is_resolved_once_and_no_more_folders_than_the_bound(project, tmp_path):
+    prot = _Protected(str(project))
+    link = str(tmp_path / "link")
+    assert prot.real(link, str(project)) == str(project / SETTINGS_REL)
+    assert prot.real("src/../docs", str(project)) == str(project / "docs")
+    spent = prot.spent
+    assert prot.real(link, str(project)) == str(project / SETTINGS_REL)
+    assert prot.spent == spent and not prot.long
+    # Past the bound nothing more is resolved, and the call is marked.
+    deep = "a/" * (_MOST_RESOLVED // 2)
+    assert prot.real(deep, str(project)) is not None and not prot.long
+    assert prot.real(deep + "b", str(project)) is None and prot.long
+    assert prot.real("docs", str(project)) is None
+    assert prot.real(link, str(project)) == str(project / SETTINGS_REL)  # resolved before
+
+
+def test_a_brace_expansion_that_stopped_at_its_bound_is_marked(project):
+    for word, stopped in (("a", False), ("d/{a,b}", False), ("{a,b}" * 8, False),
+                          ("{" + ",".join("abcdefgh" * 40) + "}", False), ("{a}{b", False),
+                          ("{a,b}" * 9, True), ("{x,zz}" + "{,a}" * 8, True),
+                          ("{" + ",".join("a" * 300) + "}{b,c}", True)):
+        prot = _Protected(str(project))
+        assert prot.braces(word) == _braces(word)
+        assert prot.long == stopped, word
+
+
+def test_the_brace_pattern_finds_what_the_one_it_replaced_found():
+    old = re.compile(r"\{([^{}]*,[^{}]*)\}")
+    new = re.compile(r"\{([^{},]*,[^{}]*)\}")
+    rng = random.Random(570)
+    found = 0
+    for _ in range(40000):
+        word = "".join(rng.choice("{{}},,ab/") for _ in range(rng.randint(0, 12)))
+        was, now = old.search(word), new.search(word)
+        assert (was and (was.span(), was.group(1))) == (now and (now.span(), now.group(1))), word
+        found += bool(was)
+    assert found > 4000
+    assert _braces("{" + "a," * 16000) == ["{" + "a," * 16000]  # in the time of its length
+
+
+def test_a_search_of_the_root_in_its_daily_spellings_is_refused(project, site):
+    named = project / "src" / "main.py"
+    named.write_text("x\n", encoding="utf-8")
+    for start in (project, site, os.environ["HOME"]):
+        for command in (
+            # the number of a redirect is no path
+            "rg x 2>/dev/null", "grep -rn x 2>&1 | head", "ls -R 2>/dev/null | head",
+            "rg --files 1>.gov-runtime/scratch/out.txt", "rg x 2>>/dev/null", "rg x 0<&-",
+            f"rg x 3<{named}", "grep -rn 2 >/dev/null",
+            # a keyword of the shell is not the command
+            "for p in A B; do grep -rn $p .; done", "for p in A B; do rg $p; done",
+            "if rg -q x; then echo y; fi", "if true; then grep -rn x .; fi",
+            "if false; then :; else ls -R; fi", "if false; then :; elif rg -q x; then :; fi",
+            "while read f; do rg x; done", "until grep -rq x .; do sleep 1; done", "! rg -q x",
+            "while rg -q x; do :; done",
+            # a comment is no path, a digit in the group does not undo the letter
+            "rg x # all", "grep -rn x # all", "ls -R # all", "ls -R #all\nls src", "ls -1R",
+            "ls -l1R", "ls -1R .", "grep -2r x", "grep -2r x .", "grep -A2r x .",
+            # the other names of grep, and a prefix command
+            "egrep -r x", "fgrep -rn x .", "timeout 10 rg x", "command grep -rn x .", "env rg x",
+            "env X=1 grep -rn x .", "env X=1 Y=2 rg x", "nice grep -rn x", "nice -n 5 rg x",
+            "nohup grep -rn x .", "time rg x", "timeout 10 ls -R", "nice ls -R .",
+            "timeout 10 env X=1 rg x", "nohup nice rg x", "time nice -n 5 grep -rn x .",
+            "if timeout 5 rg -q x; then :; fi", "timeout 10 rg x 2>/dev/null",
+            "nice grep -rn x 2>&1 | head", "timeout 5 find . -type f", "echo $(time rg x # all\n)",
+        ):
+            assert read_refusal("Bash", {"command": command}, str(project),
+                                str(start)) == SEARCH_REFUSAL, command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_the_daily_spellings_are_refused_where_a_file_is_read(project, rel):
+    folder, name = _folder(rel), os.path.basename(rel)
+    # In the folder that holds a file: the rule from before the round.
+    for command in ("rg x 2>/dev/null", "ls -R 2>&1 | head", "grep -rn x 2>/dev/null",
+                    "if rg -q x; then echo y; fi", "for p in A B; do rg $p; done",
+                    "if false; then :; else ls -R; fi", "rg x # all", "grep -2r x", "egrep -r x",
+                    "fgrep -r x", "timeout 10 rg x", "do ls", "time ls -la", "ls 1>/dev/null"):
+        assert read_refusal("Bash", {"command": command}, str(project),
+                            str(project / folder)) == READ_REFUSAL, command
+    # A name filter that takes the file in, and a read of the file.
+    for command in (f"grep -rn x --include='{name}' 2>/dev/null", f"rg x -g '*{_ext(rel)}' 2>/dev/null",
+                    f"egrep -rn x --include='{name}' .", f"fgrep -rn --include=*{_ext(rel)} x",
+                    f"timeout 5 rg x -g '{name}'", f"if true; then cat {rel}; fi",
+                    f"for f in a; do cat {rel}; done", f"! cat {project / rel}", f"ls # {rel}",
+                    f"timeout 5 cat {rel}", f"cat {rel} 2>/dev/null"):
+        assert read_refusal("Bash", {"command": command}, str(project),
+                            str(project)) == READ_REFUSAL, command
+
+
+def test_the_daily_spellings_that_search_no_root_are_let_through(project, site):
+    named = project / "src" / "main.py"
+    named.write_text("x\n", encoding="utf-8")
+    for start in (project, site, os.environ["HOME"]):
+        for command in (
+            "grep -rn x src 2>/dev/null", "rg x src 2>&1 | head", "ls -R src 2>/dev/null",
+            "grep -rn x src 1>.gov-runtime/scratch/out.txt", "git log --oneline | rg x 2>/dev/null",
+            "git log --oneline | rg -n x 2>&1 | head", "git status --short 2>&1",
+            "python3 -m pytest tests/unit -q 2>&1 | tail -5", "ls -la 2>&1", "ls 2>/dev/null",
+            "for f in a b; do grep -n x src/$f; done", "for p in A B; do grep -rn $p src; done",
+            f"if grep -q x {named}; then echo y; fi", f"while read f; do echo $f; done < {named}",
+            f"! grep -q x {named}", "if true; then rg x src; fi", "while ls -R src; do break; done",
+            "if ls; then ls -la; fi", "rg x src # all", "grep -rn x src # all", "ls -R src # all",
+            "rg 'a#b' src", "grep -rn a#b src", "rg '# all' src", "ls -1 src", "ls -1", "ls -1R src",
+            f"grep -2 x {named}", "grep -2r x src", f"egrep x {named}", "fgrep -rn x src",
+            "git log --oneline | egrep x", "egrep -rn x --include='*.py' .",
+            "timeout 60 python3 -m pytest tests/unit -q", "time rg x src",
+            "env X=1 python3 -m pytest tests/unit -q", "nice grep -rn x src", "command -v python3",
+            "git log --oneline | timeout 5 rg x", "git log --oneline | rg x # all",
+        ):
+            assert not _refused(project, "Bash", {"command": command}, start), command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_a_brace_word_past_its_bound_is_refused_and_one_at_it_is_judged(project, site, rel):
+    for first in (rel, "yy", str(site / rel)):
+        for groups in (8, 11):
+            word = "{" + first + ",zz}" + "{,a}" * groups
+            for tool_name, tool_input in (
+                ("Bash", {"command": f"cat {word}"}), ("Glob", {"pattern": word}),
+                ("Grep", {"pattern": "x", "glob": word}), ("Bash", {"command": f"rg x -g '{word}'"}),
+                ("Bash", {"command": f"grep -r x --include='{word}' src"}),
+                ("Bash", {"command": f"echo $(cat {word})"}),
+            ):
+                assert read_refusal(tool_name, tool_input, str(project),
+                                    str(project)) == LONG_REFUSAL, (tool_name, first, groups)
+    at = "{" + rel + ",zz}" + "{,a}" * 7
+    for tool_name, tool_input in (("Bash", {"command": f"cat {at}"}), ("Glob", {"pattern": at}),
+                                  ("Grep", {"pattern": "x", "glob": at}),
+                                  ("Bash", {"command": f"rg x -g '{at}'"})):
+        assert read_refusal(tool_name, tool_input, str(project), str(project)) == READ_REFUSAL
+    for tool_name, tool_input in (
+        ("Bash", {"command": "ls src/{a,b,c}.py"}), ("Bash", {"command": "ls src/" + "{a,b}" * 6 + ".py"}),
+        ("Bash", {"command": "cat {yy,zz}" + "{,a}" * 7}), ("Glob", {"pattern": "src/**/*.{py,md}"}),
+        ("Grep", {"pattern": "x", "glob": "*.{py,md}", "path": "src"}),
+        ("Bash", {"command": "rg x -g '*.{py,md}' src"}),
+        ("Bash", {"command": "mkdir -p .gov-runtime/scratch/{a,b}/{x,y}"}),
+    ):
+        assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
+
+
+def test_what_the_rule_resolves_for_one_call_is_bounded(project, tmp_path, monkeypatch):
+    wide, deep = "{a,b}" * 8, "a/"
+    resolved = []
+    real = os.path.realpath
+    monkeypatch.setattr(os.path, "realpath",
+                        lambda path, **more: resolved.append(path) or real(path, **more))
+    # More folders than the rule resolves: refused, and no more are resolved.
+    for tool_name, tool_input in (
+        ("Grep", {"pattern": "x", "glob": wide + "/" + deep * 2000 + "*"}),
+        ("Glob", {"pattern": wide + "/" + deep * 2000 + "*"}),
+        ("Glob", {"path": deep * 2048, "pattern": wide + "/*"}),
+        ("Bash", {"command": "cat " + wide + "/" + deep * 16000}),
+        ("Bash", {"command": "cat " + "{a,b}" * 4 + "/" + deep * 16000}),
+        ("Bash", {"command": "ln -s " + wide + deep * 15000 + " b"}),
+        ("Bash", {"command": "rg " + "".join(f"-gx{i} " for i in range(2000)) + "V " + deep * 7000}),
+    ):
+        for root in (project, tmp_path):
+            del resolved[:]
+            assert read_refusal(tool_name, tool_input, str(root), str(root)) == LONG_REFUSAL, tool_name
+            assert sum(path.count("/") for path in resolved) <= _MOST_RESOLVED + 40000
+    # The same path many times is resolved once, and a command is tokenised once.
+    for tool_name, tool_input in (
+        ("Grep", {"pattern": "x", "path": deep * 2047, "glob": "x " * 2047}),
+        ("Bash", {"command": "rg " + "-gx " * 3000 + "V " + deep * 8000}),
+        ("Bash", {"command": "grep -r " + "--include=x " * 1000 + "V " + deep * 8000}),
+        ("Bash", {"command": "egrep -r " + "--include=x " * 1000 + "V " + deep * 8000}),
+        ("Bash", {"command": "true " + "| rg V " * 4000}),
+        ("Bash", {"command": "timeout 1 " * 3200 + "rg x src"}),
+        ("Bash", {"command": "rg x src " + "2>&1 " * 6400}),
+        ("Bash", {"command": "rg x src # " + "word " * 6000}),
+        ("Bash", {"command": "git commit -m '" + "word " * 6000 + "'"}),
+        ("Bash", {"command": "echo " + " ".join(f"w{i:04}" for i in range(5400))}),
+        ("Bash", {"command": "cat " + " ".join(f"src/app/module_{i:03}.py" for i in range(200))}),
+        ("Bash", {"command": "grep -rn x " + " ".join(f"--include='mod_{i:02}*.py'" for i in range(60))
+                  + " " + " ".join(f"src/pkg_{i:02}" for i in range(60))}),
+    ):
+        del resolved[:]
+        _tokenised.cache_clear()
+        assert not _refused(project, tool_name, tool_input), tool_input.get("command", "")[:16]
+        assert len(resolved) <= 6000 and _tokenised.cache_info().misses <= 1
+    for command in ("timeout 1 " * 3200 + "rg x .", "rg x # " + "word " * 6000,
+                    "rg x " + "2>&1 " * 6400,
+                    "for p in A; do grep -rn $p src; done; " * 800 + "for p in A; do grep -rn $p .; done"):
+        assert read_refusal("Bash", {"command": command}, str(project),
+                            str(project)) == SEARCH_REFUSAL, command[:16]
 
 
 # -- the decision --------------------------------------------------------------
