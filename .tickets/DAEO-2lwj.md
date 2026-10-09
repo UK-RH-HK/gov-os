@@ -1,6 +1,6 @@
 ---
 id: DAEO-2lwj
-status: closed
+status: in_progress
 deps: [DAEO-8qvp, DAEO-topz, DAEO-rrxp, DAEO-fygv, DAEO-wk2v]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -23,6 +23,9 @@ depends_on:
 allowed_paths:
 - src/gov/close/**
 - tests/unit/close/**
+- src/gov/rebuild/**
+- tests/unit/rebuild/**
+- tests/unit/pause/test_pause.py
 - template/governance/kernel/checks/product-traceability*
 kpis:
   success:

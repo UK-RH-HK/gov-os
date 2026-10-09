@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import os
+from functools import partial
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -15,9 +16,12 @@ from gov.cli.errors import GovError
 from gov.close import command
 from gov.close.command import (DEFAULT_TIMEOUT, EXIT_CHECK_FAILED, _GOVERNANCE_PREFIXES, _check_probe, _check_store,
                                _check_trailers, _check_tree, _check_unmeasured, _commits_since, _count_path,
-                               _Finding, _record_and_close, _run_tests, _ticket_commits, _time_limit, _work_of, run)
+                               _Finding, _record_and_close, _ticket_commits, _time_limit, _work_of, run)
 from gov.store import load
 from gov.tasks.tickets import frontmatter
+
+# The runs these cases start have two workers (DEC-549): not as many as the machine gives, inside a parallel run.
+_run_tests = partial(command._run_tests, workers=2)
 
 TICKET = "T-0001"
 TICKETS = frozenset({TICKET, "T-0002"})

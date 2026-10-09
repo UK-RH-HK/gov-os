@@ -2,13 +2,18 @@
 from __future__ import annotations
 
 import os
+from functools import partial
 from types import SimpleNamespace
 
 import pytest
 import yaml
 
 from gov.cli.errors import GovError
-from gov.close.command import NOT_MEASURED, _read_skill_versions, _run_tests, _write_close_record
+from gov.close import command
+from gov.close.command import NOT_MEASURED, _read_skill_versions, _write_close_record
+
+# The runs these cases start have two workers (DEC-549): not as many as the machine gives, inside a parallel run.
+_run_tests = partial(command._run_tests, workers=2)
 
 
 def _tests(root, **files):
