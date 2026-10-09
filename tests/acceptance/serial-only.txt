@@ -1,0 +1,74 @@
+# The cases of this project that cannot hold under parallel load (DEC-372, DEC-527).
+#
+# `gov close` runs the ticket's acceptance tests and the regression tests in parallel, and the cases
+# this list names afterwards, alone and serially, each exactly once. A case no line names runs in
+# parallel. The list is read by `gov close` and by nothing else; it changes nothing of what a case
+# asserts. Its rules are in tests/acceptance/W1-30/README.md, "Round 11".
+#
+# One entry on a line: the beginning of a pytest node id, relative to the project (a test file, or
+# `file::function`, which names every parameter set of the function). What follows ` #` is a comment.
+# In this project every entry says which of the four kinds it is:
+#   latency               asserts a time bound
+#   real-model-or-daemon  starts or asks a real model or a real daemon
+#   live-session          launches a real session
+#   race                  races its own processes by design
+# A case is not listed merely because it is slow.
+
+# --- named by the measuring agent in the suites it timed (DEC-514)
+tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms  # latency: p95 under 100 ms over 40 hook processes
+tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook  # latency: p95 under 100 ms
+tests/acceptance/W1-05/test_w1_05_switch_over_record.py::test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over  # latency: its child run holds the five p95 cases of W1-02 (W1-05's README, "Inside a full regression")
+tests/acceptance/W1-50/test_w1_50_review_of_the_symmetric_rule.py::test_read_merge_answers_for_a_merge_commit_with_very_many_parents_in_time_and_never_calls_the_undone_test_brought  # latency: an answer within a third of the hook's time limit
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py::test_a_flag_put_over_the_placeholder_during_a_command_stays  # live-session: launches a real worker session
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py::test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path  # live-session: launches a real worker session
+
+# --- found by reading, in the suites the agent did not time in parallel
+tests/acceptance/W1-25/test_w1_25_live_session.py  # live-session: a real session answers
+tests/acceptance/W1-46/test_w1_46_live_sessions.py  # live-session: launched worker sessions
+tests/acceptance/W1-49/test_w1_49_live_session.py  # live-session: a real session is compacted
+tests/acceptance/W1-07/test_w1_07_help.py::test_help_answers_in_under_300_ms  # latency: the median of nine runs under 300 ms
+tests/acceptance/W1-10/test_w1_10_dev_tier.py::test_a_full_load_of_a_dev_tier_takes_less_than_5_seconds  # latency: a full load under 5 s
+tests/acceptance/W1-17/test_w1_17_dev_tier.py::test_one_changed_file_is_re_indexed_by_the_next_retrieval_within_the_bound  # latency: the retrieval after one changed file within its bound
+tests/acceptance/W1-18/test_w1_18_deadline.py::test_a_daemon_that_never_becomes_healthy_is_given_up_at_the_deadline  # latency: the time taken against the deadline's bound
+tests/acceptance/W1-18/test_w1_18_deadline.py::test_an_endpoint_that_accepts_and_never_answers_does_not_hang_the_call  # latency: the time taken against the deadline's bound
+tests/acceptance/W1-19/test_w1_19_real_models.py  # real-model-or-daemon: the pinned embedder and the reranker; one case is a warm p95
+tests/acceptance/W1-20/test_w1_20_code.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-21/test_w1_21_dev_tier.py  # real-model-or-daemon: the embedder and the reranker on the dev tiers
+tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # race: claims raced from separate processes
+tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim  # race: releases and claims raced from separate processes
+
+# --- W1-16: every case that runs the codebase-memory daemon (its `local_only` cases)
+tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_code_answers.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_paths_and_roots.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_secret_exclusion.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_ui_off.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_body_that_begins_with_a_separator_is_flagged_only_when_the_rest_is_token_shaped  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_directory_given_by_the_callers_environment_is_not_used  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_file_with_a_token_whose_body_begins_with_a_separator_is_not_indexable  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_path_name_that_holds_a_secret_is_told_from_an_ordinary_one  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_run_does_not_use_the_tools_shared_default  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_a_socket_path_in_the_daemon_directory_fits_in_a_socket_address  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_an_allowlist_of_the_project_does_not_shelter_a_path_name  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_each_repository_has_a_daemon_directory_of_its_own  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_the_daemon_directory_is_outside_the_repository  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_daemon_dir_and_names.py::test_the_tool_alone_keeps_its_daemon_files_in_one_shared_default  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_a_repository_answers_only_from_its_own_code  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_indexing_again_keeps_one_project  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_list_projects_in_one_repository_shows_only_its_own_project  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_no_index_file_exists_outside_gov_runtime_after_a_run  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_the_home_is_under_the_repositorys_gov_runtime  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_the_tools_default_home_is_not_used  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_this_repository_is_not_indexed_by_the_run  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_home.py::test_two_repositories_have_two_homes  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_body_with_a_digit_or_with_mixed_case_is_flagged  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_body_without_a_digit_and_without_mixed_case_is_not_flagged  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_is_indexable  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_whose_only_match_is_an_ordinary_identifier_reaches_the_index  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_is_not_indexable  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_file_with_a_token_shaped_string_stays_out_of_the_index  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_a_token_shaped_string_is_still_flagged  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_every_file_holding_a_dev_canary_is_still_reported  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_no_prefix_and_no_separator_flags_an_ordinary_identifier  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_ordinary_identifiers_in_code_are_not_flagged  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_token_rule.py::test_the_length_floor_of_sixteen_characters_stays  # real-model-or-daemon: the codebase-memory daemon

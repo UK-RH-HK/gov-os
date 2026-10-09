@@ -41,6 +41,10 @@ from gov.close.tool import open_repair_ticket as _open_repair_ticket, tk as _tk 
 
 DISPOSITIONS = ("repair", "reuse", "delete", "narrow", "defer", "owner")
 DEFAULT_TIMEOUT = 120
+# The project's settings for a close (DEC-549): top-level keys of its path map, as DEC-479's two are.
+SETTINGS_FILE = "path-map.yaml"
+TIMEOUT_KEY, WORKERS_KEY = "close_timeout", "close_workers"
+AUTO_WORKERS = "auto"
 NOT_MEASURED = "not measured"
 REVIEWER_ROLE = "independent-auditor"
 PROBE_ROLE = "orchestrator"
@@ -114,7 +118,9 @@ def run(root: Path, args, config: dict):
         raise GovError("INVALID_DISPOSITION",
                         f"disposition must be one of {', '.join(DISPOSITIONS)}",
                         {"disposition": disposition, "valid": list(DISPOSITIONS)})
-    timeout = _time_limit(args.timeout, config)
+    settings = config.get(SETTINGS_FILE) or {}
+    timeout = _time_limit(args.timeout, settings)
+    workers = _workers(settings)
 
     ticket_path = root / TICKETS_REL / f"{ticket}.md"
     front = frontmatter(ticket_path)
@@ -168,9 +174,12 @@ def run(root: Path, args, config: dict):
     gate(_check_unmeasured, ticket, others, own, tickets)
     gate(_check_containment, root, commits)
     # Acceptance tests, then the regression tests (A2): all of tests/ except
-    # the ticket's acceptance folder. Both run to their end.
-    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout)
-    counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs)
+    # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
+    # as serial-only afterwards (DEC-527); ``test_runs`` are the runs as they were made.
+    test_runs: list[dict] = []
+    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers)
+    counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs, test_runs,
+                  workers)
     # A commit of the range that names no task and changes a governance file has the checks run too (DEC-490)
     checked = gate(_check_governance_blocks, root,
                    commits + [c for c in others if _names_no_task(c, tickets)])
@@ -192,6 +201,7 @@ def run(root: Path, args, config: dict):
                               if item["authority"] == "decision"],
         "tests_produced": _collect_test_paths(root, wbs, commit_files),
         "tests_run": test_counts,
+        "test_runs": test_runs,
         "deviations": NOT_MEASURED,
         "skill_versions": _read_skill_versions(root),
         "commits": _commit_models(commits),
@@ -207,21 +217,34 @@ def run(root: Path, args, config: dict):
         _write_count(root, ticket, reset)
 
     return {"ticket": ticket, "close_record": close_record_path,
-            "checkpoint": checkpoint_path}
+            "checkpoint": checkpoint_path, "test_runs": test_runs}
 
 
-def _time_limit(given, config: dict):
-    """The time limit of a test run in seconds: the argument's, else the project's, else the default.
-    ``INVALID_TIMEOUT`` when it is not a positive number: nothing has run (DEC-487)."""
+def _time_limit(given, settings: dict):
+    """The time limit of a test run in seconds: the argument's, else the project's (``settings``, its path
+    map), else the default. ``INVALID_TIMEOUT`` when it is not a positive number: nothing has run (DEC-487)."""
     import math
 
-    named = "--timeout" if given is not None else "close_timeout"
-    limit = given if given is not None else config.get("close_timeout", DEFAULT_TIMEOUT)
+    named = "--timeout" if given is not None else TIMEOUT_KEY
+    limit = given if given is not None else settings.get(TIMEOUT_KEY, DEFAULT_TIMEOUT)
     if isinstance(limit, bool) or not isinstance(limit, (int, float)) or not math.isfinite(limit) or limit <= 0:
         raise GovError("INVALID_TIMEOUT",
                         f"the time limit ({named}) must be a positive number of seconds, got {limit!r}",
                         {"argument": named, "timeout": str(limit)})
     return limit
+
+
+def _workers(settings: dict):
+    """The number of workers of each parallel test run (DEC-549): the whole number the project's path map
+    gives, else ``auto``, as many as the runner chooses. ``INVALID_WORKERS`` when the project wrote anything
+    else: nothing has run, and nothing is read as ``auto`` or as a serial run."""
+    workers = settings.get(WORKERS_KEY, AUTO_WORKERS)
+    if workers != AUTO_WORKERS and (isinstance(workers, bool) or not isinstance(workers, int) or workers <= 0):
+        raise GovError("INVALID_WORKERS",
+                        f"the number of workers ({WORKERS_KEY}) must be a positive whole number or "
+                        f"{AUTO_WORKERS}, got {workers!r}",
+                        {"argument": WORKERS_KEY, "workers": str(workers)})
+    return workers
 
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
@@ -599,16 +622,19 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
 # Test runner (A2)
 # ---------------------------------------------------------------------------
 
-def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None = None) -> dict:
+def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None = None,
+                 stated: list | None = None, workers=AUTO_WORKERS) -> dict:
     """The counts of a test run without a finding; ``CHECK_FAILED`` with its findings. With ``ignore`` the run
-    is the regression run, which may collect nothing."""
-    findings, counts = _run_tests(root, test_path, timeout, ignore=ignore, none_collected_ok=ignore is not None)
+    is the regression run, which may collect nothing. ``stated`` gets the runs as they were made."""
+    findings, counts = _run_tests(root, test_path, timeout, ignore=ignore, none_collected_ok=ignore is not None,
+                                  stated=stated, workers=workers)
     if findings:
         raise _Finding("CHECK_FAILED", "tests or checks failed", {"tests_run": counts}, findings)
     return counts
 
 
-def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int) -> dict:
+def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: list | None = None,
+                      workers=AUTO_WORKERS) -> dict:
     """The counts of the ticket's acceptance run. The acceptance tests are part of the ticket's work
     (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492)."""
     folder = root / "tests" / "acceptance" / wbs
@@ -617,20 +643,30 @@ def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int) -> dict:
                        f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
                        {"ticket": ticket, "wbs": wbs},
                        not_measured=[f"the acceptance run of {ticket}: not measured, it has no acceptance tests"])
-    return _check_tests(root, folder, timeout)
+    return _check_tests(root, folder, timeout, stated=stated, workers=workers)
+
+
+_HAS_PARALLEL_RUNNER = "import importlib.util, sys; sys.exit(importlib.util.find_spec('xdist') is None)"
 
 
 def _run_tests(root: Path, test_path: Path, timeout: int,
                ignore: Path | None = None,
-               none_collected_ok: bool = False) -> tuple[list[str], dict]:
-    """Run pytest on ``test_path`` to its end: its findings and its counts.
+               none_collected_ok: bool = False,
+               stated: list | None = None, workers=AUTO_WORKERS) -> tuple[list[str], dict]:
+    """Run pytest on ``test_path`` to its end: its findings and its counts, every case counted once.
+
+    The run is parallel (DEC-527): the installed runner's ``-n`` with ``workers``, the project's number or
+    ``auto`` (DEC-549), which changes how many workers run and never which tests. The cases the project's list declares
+    for this run are kept out of it and run afterwards, alone and serially, as a run of their own with the
+    time limit of a run. Where the test runner has no parallel plugin the one run is serial, list or no list,
+    and says so. ``stated`` gets one object for each run made (its form, its seconds, its counts).
 
     A run over the time limit is a finding like a failing test (DEC-454).
     ``TEST_RUNNER_ABSENT`` when this interpreter has no pytest: nothing ran.
     """
     import importlib.util
     import os
-    import re
+    from gov.close.pytest_plugin import gov_close_serial_only as serial_only
 
     counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}  # a skip is counted, not refused (DEC-500)
     if not test_path.is_dir():
@@ -643,7 +679,7 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
                         f"pytest is not installed for {sys.executable}: no test was run",
                         {"python": sys.executable})
 
-    rel = str(test_path.relative_to(root))
+    rel = test_path.relative_to(root).as_posix()
     # The run is the suite's own (DEC-487): what the caller's environment would add to the test runner
     # (options, plugins), put before the project's own code (the caller's PYTHONPATH) or switch in the
     # interpreter (DEC-500: for one, PYTHONOPTIMIZE, which removes assertions) is not passed on.
@@ -651,22 +687,80 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
            if key not in _TEST_RUNNER_VARIABLES
            and (not key.startswith(_INTERPRETER_VARIABLES) or key in _INTERPRETER_PLACES)}
     env["PYTHONPATH"] = str(root / "src")
-    cmd = [sys.executable, "-m", "pytest", str(test_path), "-q",
-           "-p", "no:cacheprovider", "--tb=line", "--no-header"]
-    if ignore is not None:
-        cmd += ["--ignore", str(ignore)]
+    pytest = [sys.executable, "-m", "pytest"]
+    options = ["-q", "-p", "no:cacheprovider", "--tb=line", "--no-header"]
+    whole = [str(test_path)] + (["--ignore", str(ignore)] if ignore is not None else [])
 
+    # Asked of the interpreter of the run, in the run's environment: this process may have the plugin from
+    # the caller's PYTHONPATH alone.
+    parallel = subprocess.run([sys.executable, "-c", _HAS_PARALLEL_RUNNER], capture_output=True, text=True,
+                              cwd=str(root), env=env).returncode == 0
+    if parallel:
+        def within(entry: str, folder: Path | None) -> bool:
+            return folder is not None and (entry.partition("::")[0] + "/").startswith(
+                folder.relative_to(root).as_posix() + "/")
+
+        declared = [entry for entry in serial_only.entries(root)
+                    if within(entry, test_path) and not within(entry, ignore)]
+        runs = [("parallel", pytest + whole + options + ["-n", str(workers)], env, f"the test run of {rel}")]
+        if declared:  # the plugin keeps them out of the parallel run; its folder holds nothing else
+            plugin_env = {**env, serial_only.ROOT_VARIABLE: str(root), "PYTHONPATH": os.pathsep.join(
+                [env["PYTHONPATH"], str(Path(serial_only.__file__).resolve().parent)])}
+            runs = [("parallel", runs[0][1] + ["-p", serial_only.PLUGIN], plugin_env, runs[0][3]),
+                    ("serial-afterwards", pytest + declared + options, env,
+                     f"the serial run afterwards of the declared cases of {rel}")]
+    else:
+        declared = []
+        runs = [("serial", pytest + whole + options, env, f"the test run of {rel}")]
+
+    findings: list[str] = []
+    collected = False
+    for form, cmd, run_env, what in runs:
+        found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
+        collected = collected or found is not None
+        findings += found or []
+        counts = {key: counts[key] + ran[key] for key in counts}
+        if stated is not None:
+            run = {"run": "regression" if ignore is not None else "acceptance", "form": form, **ran}
+            if form == "parallel":
+                run["workers"] = workers
+            if form == "serial-afterwards":
+                run["cases"] = declared
+            if form == "serial":
+                run["note"] = (f"not parallel: the test runner of {sys.executable} has no parallel plugin "
+                               "(pytest-xdist), so every case ran in one serial run")
+            stated.append(run)
+
+    if not findings and not none_collected_ok:
+        if not collected:
+            findings = [f"no test was collected in {rel}"]
+        elif not counts["passed"]:
+            findings = [f"no test passed in {rel}: nothing of it was measured"]
+    return findings, counts
+
+
+def _one_test_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str,
+                  rel: str) -> tuple[list[str] | None, dict]:
+    """One run of the test runner to its end: its findings (``None`` when it collected no test) and what the
+    close states of it (its seconds and its counts)."""
+    import re
+    import time
+
+    ran = {"seconds": 0.0, "passed": 0, "failed": 0, "errors": 0, "skipped": 0}
+    started = time.monotonic()
     try:
         result = subprocess.run(cmd, capture_output=True, text=True,
                                 cwd=str(root), env=env, timeout=timeout)
     except subprocess.TimeoutExpired:
-        return [f"the test run of {rel} exceeded the time limit of {timeout}s"], counts
+        ran["seconds"] = round(time.monotonic() - started, 2)
+        return [f"{what} exceeded the time limit of {timeout}s"], ran
+    ran["seconds"] = round(time.monotonic() - started, 2)
 
     for line in reversed(result.stdout.split("\n")):
         found = {key: re.search(rf"(\d+)\s+{word}", line) for key, word in
                  (("passed", "passed"), ("failed", "failed"), ("errors", "error"), ("skipped", "skipped"))}
         if any(found.values()):
-            counts.update({key: int(m.group(1)) for key, m in found.items() if m})
+            ran.update({key: int(m.group(1)) for key, m in found.items() if m})
             break
 
     rc = result.returncode
@@ -674,21 +768,21 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
         raise GovError("TEST_RUNNER_ABSENT",
                         f"pytest is not installed for {sys.executable} without the caller's PYTHONPATH: "
                         "no test was run", {"python": sys.executable})
-    if rc == 0 and not none_collected_ok and not counts["passed"]:
-        return [f"no test passed in {rel}: nothing of it was measured"], counts
-    if rc == 0 or (rc == 5 and none_collected_ok):
-        return [], counts
+    if rc == 0:
+        return [], ran
     if rc == 5:
-        return [f"no test was collected in {rel}"], counts
+        return None, ran
     if rc == 2:
         failures = [line.strip() for line in
                     (result.stdout + "\n" + result.stderr).split("\n")
                     if "ERROR" in line or "SyntaxError" in line]
-        counts["errors"] = counts["errors"] or len(failures)
-        return failures or [f"collection error in {rel}"], counts
-    failures = [line.strip() for line in result.stdout.split("\n") if "FAILED" in line]
-    return failures or [f"the test run of {rel} exited {rc}: "
-                        f"{result.stderr.strip()[-200:]}"], counts
+        ran["errors"] = ran["errors"] or len(failures)
+        return failures or [f"collection error in {rel}"], ran
+    # A parallel run goes on after a file that cannot be collected, and names it as an error beside the
+    # failing cases; in the order of the names, since the workers end in any order.
+    failures = sorted(line.strip() for line in result.stdout.split("\n")
+                      if "FAILED" in line or line.startswith("ERROR "))
+    return failures or [f"{what} exited {rc}: {result.stderr.strip()[-200:]}"], ran
 
 
 # ---------------------------------------------------------------------------

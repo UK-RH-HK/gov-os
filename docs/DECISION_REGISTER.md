@@ -6014,3 +6014,34 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.154 | 2026-10-09 | Delegated, stricter-only: DEC-553 (the guard follow-up on W1-02: a wildcard-only glob from a copy's folder refused, a deny path spelled from the home folder redacted, a move or link of a holding folder refused as a read). Next free id: DEC-554. |
+
+## 155. Delegated: six points of the parallel-run follow-up's second run on W1-30 (register v0.155, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-554 — The close's time limit and worker count in the project's path map; a command wait in W1-07; four points as built
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; no ticket closes on fewer tests; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `c52de7c2` (`log/W1-30-lead-runF2.json`: two whole regressions in the close form, each green except one case that passed alone; a close of this repository takes about 16 to 20 minutes for the parallel part and 28 to 33 for the serial part) · **Under:** DEC-527, DEC-549, DEC-372
+- **Decision:**
+  1. **The time limit is a setting of the project, as built.** DEC-549's third point said "no code"; no project file could reach the limit, so the engineer moved its read: `close_timeout` and `close_workers` are optional top-level keys of `governance/project/path-map.yaml`, and the argument wins over the file. Kept. The orchestrator writes `close_timeout: 7200` there at the merge.
+  2. **W1-07's wait for a read command** (30 seconds; `gov status --json` passed it once under ten workers): until the follow-up after W1-41, a case that fails on that wait and passes alone is re-run alone and named, as a latency case is (DEC-372). In that follow-up a test designer gives W1-07's commands a longer wait in W1-07's own support, as DEC-549 did for W1-27, with the same reason. The worker count of this repository stays `auto`.
+  3. A project that gains a path map for these keys also gets what a path map brings in `gov rebuild` (the lexical index): accepted; the two rebuild-mode cases keep a project without one.
+  4. The record states `auto` where the project says `auto`, not the count the runner chose: as built.
+  5. The stricter readings of a worker count (a quoted number, a fraction, an empty value, another spelling of `auto` are refused): as built.
+  6. The kernel's path-map schema names neither key, nor DEC-479's two: it goes to the follow-up after W1-41 with DEC-521's items, as a product-spec line.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.155 | 2026-10-09 | Delegated: DEC-554 (the parallel-run follow-up on W1-30: the close's time limit and worker count are settings in the path map; W1-07's command wait is re-run alone until a designer lengthens it; four points as built). Next free id: DEC-555. |
+
+## 156. Delegated: the judgement of the probe of the parallel-run follow-up on W1-30 (register v0.156, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-555 — The parallel run in `gov close`: the probe is judged pass without a fix round; five of its findings are built in the follow-up after W1-41
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible) · **Basis:** the probe's return (`log/W1-30-probe3.json`, session `2e97ad0c-eee6-4500-baae-303e79f117f7`, at `c52de7c2`; nine findings, each reproduced or read; "no case is lost in any shape ordinary work produces") · **Under:** DEC-498, DEC-137, DEC-527, DEC-549, DEC-521
+- **Decision:** The follow-up merges as probed. DEC-498 orders a fix before the merge only for a fail-open hole or a silent close in a shape ordinary work produces; the probe found none. The two shapes that close a ticket on a failing acceptance case need a deliberate or unusual input, and are named here and to the owner:
+  - **Finding 1.** A run of the declared cases that ends with exit code 0 and no result (a case that ends its own process with 0) is accepted, because the parallel run's passes cover it.
+  - **Finding 2.** A file in the project named like the close's own plugin replaces it (the plugin is named bare and its folder stands last on the import path), so a ticket's own commit can keep a failing case out of every run.
+  - Both, with **finding 3** (parallel workers outlive a run cut at the time limit and can still write into the project), **finding 4** (a list entry that names an existing file without a case refuses nothing, against DEC-549's fourth point) and the first shape of **finding 7** (a byte in the list that is not UTF-8 ends in a traceback), are built in the follow-up after W1-41 with DEC-521's items, test designer first; that follow-up is FULL and is probed before its merge.
+  - Findings 5, 6, 8 and 9 and the rest of 7 are residuals in `bootstrap.md` (counts that do not match what ran for entries outside the documented forms; `parallel` recorded for a run with no worker; no upper bound and YAML's own readings of the two settings; an unusable parallel plugin counted against the ticket; a very large time limit; a list that is a folder or begins with a byte-order mark).
+  - Until that follow-up merges, the orchestrator reads the `test_runs` of every close: a run of declared cases with no passed case is not accepted as green.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.156 | 2026-10-09 | Delegated: DEC-555 (the probe of W1-30's parallel-run follow-up judged pass without a fix round; five findings, two of them fail-open in deliberate shapes, go to the follow-up after W1-41; until then the orchestrator reads each close's test runs). Next free id: DEC-556. |
