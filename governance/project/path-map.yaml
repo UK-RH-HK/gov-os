@@ -211,6 +211,9 @@ systems:
 # after which commits are judged (the commit that records DEC-463).
 decision_register: docs/DECISION_REGISTER.md
 decision_citations_base: "46ec8da3"
+# The trailers check (DEC-482, DEC-579): the commit after which commits are judged for their trailers
+# (the commit that records DEC-476).
+trailers_base: "429815b5"
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
