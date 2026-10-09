@@ -1477,6 +1477,253 @@ form this round refuses. Two unit cases of the guard (`tests/unit/guard/test_dec
 `ls 2>/dev/null`) hold a listing without recursion with a numbered redirect as allowed; that stays allowed at the
 root, and they are the engineer's.
 
+### Eighth batch (2026-10-09): the held-out check and the system path limit (DEC-574)
+
+DEC-574: "The held-out check skips path resolution for any string longer than the system path limit, and keeps the
+literal substring check." The rule is the older held-out check of W1-47 (DEC-162, DEC-215, DEC-218), which refuses
+any call whose input names a held-out path; it is not the read rule of this revision. Nothing else is built in this
+round (DEC-577).
+
+Every case asks the hook, run as a process on a hook input, in a temporary project with a stand-in held-out file
+that lists a stand-in held-out folder (`w1_02_limit_support.py`, on the project of `w1_02_protected_support.py`).
+The held-out file's path comes from the guard's constants and is never typed; no held-out path of this machine is
+used. The orchestrator asks every case; an engineer and a session with no role ask a share.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_path_limit_boundary.py \
+    tests/acceptance/W1-02/test_w1_02_path_limit_unchanged.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_path_limit_time.py -q -p no:cacheprovider -rs
+```
+
+| File | Cases | Red today | Green today | Why red |
+| --- | --- | --- | --- | --- |
+| `test_w1_02_path_limit_boundary.py` | 47 | 15 | 32 | the held-out check refuses a string past the limit that holds no literal held-out path |
+| `test_w1_02_path_limit_unchanged.py` | 56 | 2 | 54 | the same, for a string of lines whose first line reaches the folder |
+| `test_w1_02_path_limit_time.py` | 26 | 12 | 14 | no answer within the bound (11 ended at the process limit; 1 at the bound itself) |
+
+129 cases, 29 red and 100 green on the guard as built (code at `e34968df`). The red run of the time file takes
+about 96 s (each red case ends the hook's process at 8 s); the other two files take under 10 s together.
+
+#### The limit, and the readings chosen
+
+- **Where the value comes from.** The system reports 4096 for the length of a path (`PC_PATH_MAX` of the root
+  folder). The guard already holds the same number as the longest path it resolves in a path
+  field of a file tool (sixth batch: a longer one is refused with a reason that names DEC-562). The cases take the
+  system's value at run time (`w1_02_limit_support.LIMIT`) and tie the two by behaviour: a path field of exactly
+  that length is still resolved, one character more is refused with the other reason.
+- **With or without the closing byte.** The system's number counts the closing byte, so a program opens a path of
+  at most 4095 bytes (checked on a made-up folder: 4095 opens, 4096 gives "File name too long"). Two readings
+  differ at exactly 4096. **Held: a string is past the limit when it holds more than 4096**, the reading under
+  which fewer strings are past it, and the one the guard's path fields already have. A string of exactly 4096 is
+  resolved as today.
+- **Characters or bytes.** **Held: characters.** A string of N characters has at least N bytes, so fewer strings
+  are past a limit counted in characters. A string of 4096 characters and more bytes than that, which reaches the
+  stand-in held-out folder stays refused.
+- **The limit of one name.** The limit of one file name (255 here) belongs to the file system, not to the system.
+  **Held: it plays no part.** A string under the path limit is resolved as today whatever its components: one
+  with a name of 300 characters that reaches the stand-in held-out folder through `..` stays refused.
+- **The session's folder.** The check resolves a relative string from the session's folder. **Held: the limit
+  counts the string, not the string joined to that folder.** A program in the session's folder opens a relative
+  path of up to the limit, whatever the absolute path's length (the cases through `..` at the limit hold it).
+- **Expansion.** The check as built expands the home folder's short form at the start of any string, and in a word
+  of a Bash command also every variable of the hook's environment (the home variable among them), before it
+  resolves. **Held: a string is past the limit only if it is past it both as written and as expanded.** Three
+  shapes, all refused today and held as refused: a Bash word over the limit as written that expands to a path
+  under it (seven hundred `${HOME}` with the root folder as the hook's home: about 5,000 characters written, under 900
+  expanded, and a shell opens the file); a Bash word under the limit as written and over it as expanded (`$HOME/`
+  with the stand-in home folder); the home folder's short form in a Write's content and in an unknown tool's
+  field, under as written and over as expanded. Over both ways: not refused by the held-out check (red today).
+  The one case with the root folder as home reads and writes nothing under it; no shorter stand-in home can be
+  made on a machine.
+
+#### Point 1 → `test_w1_02_path_limit_boundary.py`
+
+A string that reaches the stand-in held-out folder without holding its path, built to an exact length: an absolute
+path through a symbolic link padded with `./`, and a relative path from the session's folder through `..` padded
+with `x/../`.
+
+| Function | Cases | Today |
+| --- | --- | --- |
+| `test_a_string_at_or_under_the_limit_that_reaches_the_held_out_folder_is_refused` | 11: every field at the limit (7), every second field just under it (4) | green |
+| `test_a_string_just_over_the_limit_is_not_refused_by_the_held_out_check` | 9: every field, the Write's content and the Bash word in both forms | red |
+| `test_a_string_just_over_the_limit_is_decided_for_another_role_as_a_short_string_is` | 4 | red |
+| `test_a_string_at_the_limit_is_refused_for_another_role` | 2 | green |
+| `test_a_bash_word_over_the_limit_as_written_that_expands_to_a_path_under_it_stays_refused` | 1 | green |
+| `test_a_string_under_the_limit_as_written_and_over_it_as_expanded_stays_refused` | 3 | green |
+| `test_a_string_over_the_limit_as_written_and_as_expanded_is_not_refused_by_the_held_out_check` | 2 | red |
+| `test_a_string_at_the_limit_in_characters_and_over_it_in_bytes_stays_refused` | 2 | green |
+| `test_a_string_under_the_limit_with_one_name_longer_than_a_file_name_may_be_stays_refused` | 2 | green |
+| `test_a_path_field_longer_than_the_guard_resolves_stays_refused_with_a_reason_of_its_own` | 9: seven path fields just over the limit, two at a megabyte | green |
+| `test_a_path_field_at_the_limit_is_still_resolved_and_refused_by_the_held_out_check` | 2 | green |
+
+The fields that are no path field: a Write's content, an Edit's old string and its new string, a field of an
+unknown tool, a list and a mapping inside the input, a word of a Bash command.
+
+**What the guard decides as a whole for a string just over the limit** (measured on the guard as built with the
+resolution skipped in a scratch copy of the decision, nothing of it left in the tree): a Write or an Edit of a
+source file is the allow-list's (allowed for the orchestrator and for an engineer whose ticket names the file,
+denied for a session with no role, by the allow-list and not by the held-out check); a tool the guard does not
+know is allowed for every role; `cat <the long word>` writes nothing and is allowed for every role (the read rule
+does not refuse it). Each case holds that decision beside "not refused by the held-out check".
+
+A refusal of the held-out check is told by its reason, which the guard words as "the call names a held-out path"
+(the cases look for the words "held-out path"); it carries no path, and the cases hold that nothing the hook wrote
+carries the stand-in path, a way to it, or the held-out file's place.
+
+#### Point 2 → `test_w1_02_path_limit_unchanged.py`
+
+| Line of the order | Function | Cases | Today |
+| --- | --- | --- | --- |
+| a long string with a literal held-out path, anywhere, in any field | `test_a_long_string_that_holds_a_held_out_path_as_literal_text_is_refused` | 21: six fields at just over the limit, 100,000 characters and a megabyte; a Bash command at just over the limit, 20,000 and near its bound; the five positions turn | green |
+| the same for other roles | `test_a_long_string_with_a_literal_held_out_path_is_refused_for_another_role` | 3 | green |
+| the exception stays as it is | `test_an_edit_of_a_file_that_may_carry_the_path_is_not_refused_for_carrying_it_at_a_length_over_the_limit` (3), `test_the_usual_role_rules_still_apply_to_an_edit_over_the_limit_of_the_two_files` (1), `test_the_exception_is_for_the_two_files_only_at_a_length_over_the_limit` (1) | 5 | green |
+| at or under the limit as today | `test_a_string_of_ordinary_length_that_reaches_the_held_out_folder_is_refused_in_a_field_that_is_no_path` (5), `test_an_ordinary_string_that_reaches_nothing_held_out_stays_allowed` (3) | 8 | green |
+| a Bash command of many short words | `test_a_long_command_of_many_short_words_in_which_one_word_reaches_the_held_out_folder_is_refused` (9), `test_a_long_command_of_many_short_words_that_reach_nothing_stays_allowed` (3) | 12 | green |
+| a string of lines in another field | `test_a_string_of_lines_in_which_a_later_line_reaches_the_held_out_folder_is_decided_as_today` (3), `test_a_string_of_lines_under_the_limit_whose_first_line_reaches_the_held_out_folder_stays_refused` (2) | 5 | green |
+| the same, first line, over the limit | `test_a_string_of_lines_over_the_limit_whose_first_line_reaches_is_not_refused_by_the_held_out_check` | 2 | red |
+
+The five positions of a literal path: at the string's start, in its middle, at its end, on a line of its own,
+glued between other characters. The text around it is path-like (`a/` repeated), the worst the check reads.
+
+**The exception as built.** A Write or an Edit whose file path is one of the two files that may carry a held-out
+path is judged by that file path alone: nothing of its content or of its two strings is looked at, at any length
+(a literal path and a string that reaches the folder alike). The usual role rules then decide. W1-47 holds it at
+an ordinary length (`test_w1_47_oracle_naming.py`: `test_an_edit_to_a_file_that_holds_the_path_is_not_denied_for_carrying_it`,
+`test_the_usual_role_rules_still_apply_to_the_two_files`, `test_the_exception_is_for_the_two_files_only`,
+`test_the_exception_does_not_open_the_path_itself`); no case there is longer than a line, so the five cases here
+hold it at 100,000 characters.
+
+**At or under the limit: what W1-47 holds already.** `test_w1_47_oracle_naming.py`:
+`test_a_call_that_reaches_the_path_without_writing_it_out_is_denied` holds the relative path, `..`, the home
+folder's short form, the home variable and a symbolic link, in the path fields of the file tools and in a Bash
+command, for three roles; `test_a_call_that_holds_the_path_anywhere_in_its_input_is_denied` holds the literal path
+in every kind of field; `test_the_same_form_on_a_directory_that_is_not_held_out_is_allowed` and
+`test_w1_47_oracle_guard.py::test_a_call_that_names_another_path_stays_allowed` hold what stays open;
+`test_w1_47_oracle_guard.py::test_a_call_that_names_the_oracle_path_is_denied` holds paths below the folder.
+Missing there, added here: the forms that reach the folder without its path **in the fields that are no path
+field** (a Write's content, an Edit's strings, an unknown tool's field, a nested field), and ordinary strings in
+those fields that reach nothing.
+
+**How the check as built reads a long string of many short pieces.**
+
+- **A Bash command: word by word.** Words are separated by spaces, tabs, carriage returns, newlines and the
+  shell's punctuation `( ) ; < > | &`, with or without spaces around it; a quoted stretch is one word. An equals
+  sign, a colon and a comma do not separate words. Each word is expanded and resolved on its own, so a command
+  past the path limit made of short words is judged as today: one word that reaches the stand-in held-out folder
+  refuses the command (measured and held at a command length just over the limit and near the command bound, for
+  eight separators); many short words that reach nothing stay allowed.
+- **Any other string: as one path.** Only slashes separate; a newline or a space is a character of a name. A
+  string of many lines in which a **later** line reaches the folder is not refused today, under or over the limit:
+  read as one path, it names a file below the session's folder (measured at 2,000, 5,000 and 100,000 characters;
+  held). A string whose **first** line reaches the folder is refused today at every length: read as one path, it
+  lies below the held-out folder. Under the limit that stays refused (held, green); over it, it is the ordered
+  change of point 1 (held as not refused by the held-out check, red today).
+
+#### The forms that are refused today and become allowed by the held-out check
+
+Each is a string of more than 4096 characters that holds no held-out path as literal text. No program opens such a
+string as a path: the system refuses any path of 4096 bytes or more ("File name too long").
+
+1. A string past the limit that, resolved, reaches a held-out path through a symbolic link, through `..`, or as a
+   relative path from the session's folder, padded with `./`, with `x/../` or with slashes: in a Write's content,
+   an Edit's old or new string, a field of an unknown tool, a list or a mapping inside the input.
+2. The same as one word of a Bash command (a command stays under 32,768 characters).
+3. A string past the limit as written **and** as expanded that starts with the home folder's short form, or a Bash
+   word of that kind with a home variable, and that would reach a held-out path below the home folder.
+4. A string of lines (or of words separated by spaces, in a field that is no Bash command) past the limit whose
+   first line, up to its last slash, reaches a held-out path: read as one path it lies below the held-out folder.
+5. A megabyte or more of path-like text that reaches nothing: it was never refused, only not answered in time.
+
+What the guard as a whole decides for them is in point 1 above. See DP-11 for what a program can still do with
+forms 1 and 2.
+
+#### Point 3 → `test_w1_02_path_limit_time.py`
+
+**The bound** is the fifth batch's, unchanged: the hook ends with a decision within 5 s of its own time, start to
+exit (`w1_02_round_support.BOUND_S`); a case ends the hook's process at 8 s (`PROCESS_LIMIT_S`) and fails. Every
+case uses that support's "decided in time" assertion: a decision, never a hook error, never the limit.
+
+Measured on the guard as built, one hook process per input, by the orchestrator, on this machine (20 cores, load
+average 2 to 5 during the measuring):
+
+| Input | Time today | Decision today | Held |
+| --- | --- | --- | --- |
+| a Write whose content is a megabyte of `a/` repeated | 43.5 s | allowed | allowed in time: red |
+| the same with four megabytes | no answer in 240 s (ended there) | none | allowed in time: red |
+| an Edit with a megabyte of `a/` in each of its two strings | 73.7 s | allowed | allowed in time: red |
+| an unknown tool with a megabyte of `a/` in a field | 45.3 s | allowed | allowed in time: red |
+| the same in a nested field | 41.6 s | allowed | allowed in time: red |
+| a megabyte or four megabytes with a literal held-out path inside (a Write, an unknown tool's field, a nested field) | 0.04 to 0.18 s | refused by the held-out check | refused in time: green |
+| an Edit with a megabyte in each string and the literal path in the second | 41.5 s | refused by the held-out check | refused in time: red |
+| a string just over the limit (`a/` repeated, a Write's content) | 0.04 to 0.18 s | allowed | green |
+| a megabyte of text with no separator at all | 0.05 to 0.18 s | allowed | green |
+| a megabyte of short lines (`a/b` on each) | 28.8 s | allowed | red |
+| a megabyte of `../` | 4.6 to 5.4 s | allowed | at the bound: red in the run recorded here, green on a quiet machine |
+| a megabyte of the home folder's short form repeated | 40.9 s | allowed | red |
+| a Bash command near its bound made of one long word | 0.24 to 0.38 s | allowed | green |
+| a Bash command near its bound made of many short words | 0.24 to 0.38 s | allowed | green |
+| a Write of 200,000 characters of source text | 0.15 to 0.23 s | allowed where the role may write | green |
+| an Edit of 50,000 characters of source text | 0.05 to 0.18 s | allowed | green |
+| a commit with a message of 30,000 characters | 0.14 to 0.29 s | allowed (every role) | green |
+
+Each of the slow inputs is held as decided exactly as a short content is for the same role and file: allowed for
+the orchestrator and for an engineer whose ticket names the file; for a session with no role a Write is denied by
+the allow-list, in time. The source text of the ordinary cases is lines of code with paths and slashes in them.
+
+| Function | Cases | Today |
+| --- | --- | --- |
+| `test_an_input_that_takes_too_long_today_is_decided_within_the_bound` | 5 | red |
+| `test_a_megabyte_in_a_write_s_content_is_decided_within_the_bound_for_another_role` | 2 | red |
+| `test_the_same_size_with_a_held_out_path_as_literal_text_inside_is_refused_within_the_bound` | 5 | 4 green, the Edit red |
+| `test_a_megabyte_with_a_literal_held_out_path_is_refused_within_the_bound_for_a_session_with_no_role` | 1 | green |
+| `test_a_shape_near_the_limit_is_decided_within_the_bound` | 7 | 4 green, 3 red (short lines, `../`, the home folder's short form) |
+| `test_a_shape_near_the_limit_is_decided_within_the_bound_for_another_role` | 1 | red |
+| `test_ordinary_large_source_text_stays_allowed_within_the_bound` | 5 | green |
+
+**The serial list.** No case of this batch is added to `tests/acceptance/serial-only.txt`: after the change each
+input is answered in well under a second of the check's own time, against a bound of 5 s.
+
+#### The forms not held
+
+- The exact reading where a home folder of one character makes a string one character shorter as the guard expands
+  it and no shorter as a shell does (a string of 4097 characters that starts with the short form, the root folder
+  as home): refused today; no case either way.
+- A variable other than the home variable in a Bash word (the check expands every variable of the hook's
+  environment): held for the home variable only.
+- A string past the limit in a field of a tool the guard knows by another rule (an Agent's prompt, a WebFetch's
+  address, the description of a Bash call): the check treats every field that is not a Bash command alike; held
+  through an unknown tool's field and nested fields.
+- NotebookEdit: its path field is refused past the limit like the others (measured); no case.
+- The time of the hook under parallel load: the bound is generous and no case is listed as serial.
+
+#### Changes to the residual list
+
+Residuals 1 to 51 stand. Added:
+
+52. DEC-574: a string past the path limit that reaches a held-out path is no longer refused by the held-out
+    check. A program that makes a shorter path of it before opening it still reaches the file (DP-11).
+53. As built, not changed by this round: in a Bash command an equals sign, a colon and a comma do not separate
+    words for the held-out check, so `--option=<a relative path or a link that reaches a held-out path>` is not
+    refused unless it holds the path as literal text (measured: allowed). W1-47 holds the literal form only.
+54. As built: in a field that is no Bash command the check reads a string as one path, so a path that reaches a
+    held-out path on a later line, or after a space, of a longer text is not refused at any length (measured).
+55. As built: an edit of one of the two files that may carry a held-out path is not looked at beyond its file
+    path, so its content may also hold a string that reaches a held-out path (measured: allowed for a role that
+    may write the file).
+56. As built: the allow-list's denial of a write names the write's target, so a denied write of the held-out file
+    carries that file's path in its reason (the file's place, not a held-out path).
+57. A megabyte of `../` takes the check about 5 s today; after the change no string past the limit is resolved.
+    A string under the limit costs at most its 4096 characters; many such strings in one input (a list of ten
+    thousand short path-like fields, a Bash command of eight thousand words: under 0.4 s) are not held beyond the
+    cases named.
+
+#### Rewrites and cases of other suites
+
+None. No case of W1-47's suite holds a string longer than a line (searched its test files for a length or a
+repetition: none), so none holds as refused a form this decision allows; no line of that suite is changed. No
+earlier case of this suite asks the held-out check with a long string in a field that is no path (the sixth batch
+records it as "a finding, with no case").
+
 ### Rewrites
 
 Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
@@ -1510,6 +1757,9 @@ two latency cases are sensitive to load. On a machine with a load average of 13 
 in a run with the other W1-05 cases (p95 of 110 to 190 ms against 100 ms) and passed alone; in a second run alone a
 `Read` case of the same function, whose input is unchanged, failed the same way. The rewrite makes the search
 smaller, not larger.
+
+Eighth batch (DEC-574): none. It added three test files and `w1_02_limit_support.py`, and changed no line of an
+earlier file but this README; no line of another suite.
 
 ### Decision packages
 
@@ -1614,6 +1864,38 @@ names such a command as one that stays allowed.**
   write rule (a change of who may write what through which spelling), outside a stricter-only round.
 - Reversibility: high either way. Cost: (a) nothing; (b) a designer round and an engineer round on the write rule.
 - Recommendation: (a). Confidence: high.
+
+**DP-11 (eighth batch). A string past the path limit that a program shortens before it opens it.**
+- Question: DEC-574 lets the held-out check skip a string of more than 4096 characters because no program opens
+  such a string as a path. Some programs do not open it as written: they make a shorter path of it first. Is a
+  string past the limit that reads as a path and would reach a held-out path (a) left to the residual list, or
+  (b) refused or resolved in another way?
+- Why now: this is the one change of the round that allows what was refused, and the cases fix it. Checked on a
+  made-up folder with a symbolic link and a path of 4097 and of 20,000 characters padded with `./`: `cat`, `ls`,
+  `find` and a plain open fail ("File name too long"); `realpath` and `readlink -f` print the short resolved path;
+  `cat "$(realpath <the long word>)"`, `cd "$(dirname <the long word>)" && cat <the file>` and a one-line script
+  that normalises the path before it opens it all read the file. A tool the guard does not know that normalises a
+  path field itself (a file server behind MCP) would do the same with a long field. Today each of these is refused
+  (the word or the field is resolved); after DEC-574 as worded each is allowed for every role.
+- Options: (a) residual 52: the shape is deliberate (nobody types a path of 4097 characters), DEC-577 sends
+  deliberate shapes to the Wave 2 list, and the launcher's sandbox and the committed Read deny lines stay the
+  fence. (b) A string past the limit is not resolved through the file system but is still shortened as text in
+  one pass (repeated slashes, `./`, a name followed by `..`), and is resolved as today if what is left is under
+  the limit: bounded by the string's length. (c) A string past the limit that holds a slash is refused outright
+  in a Bash word and in an unknown tool's field, as a path field of a file tool already is.
+- Impact: (a) the held-out folder is reachable by a deliberately built long word, as it already is by other
+  deliberate shapes (a name made at run time, residual 53). (b) keeps every form of this package refused at a
+  cost of one pass over the text; a megabyte of `a/` shortens to itself and is skipped; taking a name and `..`
+  out as text is wrong where the name is a symbolic link, so it refuses a little more than today, never less
+  than (a). (c) refuses ordinary work: a commit message of 30,000 characters is one quoted word with slashes in
+  it, and a Write of source text is one string.
+- Reversibility: high in every option (a rule and a few cases). Cost: (a) none; (b) a designer round of about ten
+  cases and a few lines in the check, with a time case for the pass; (c) not recommended.
+- Recommendation: (a) for this round, as DEC-574 and DEC-577 word it; (b) as the Wave 2 entry. Confidence: medium.
+- Held under both (a) and (b): everything in the eighth batch but the fifteen red cases of
+  `test_w1_02_path_limit_boundary.py`, whose strings are padded with `./` or with `x/../` (under (b) those stay
+  refused and the cases would be rewritten by owner decision), and possibly the two red cases of
+  `test_w1_02_path_limit_unchanged.py`; the time cases hold under both.
 
 ## Not tested
 
