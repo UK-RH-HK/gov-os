@@ -1,8 +1,9 @@
 """The READY rule (CAP-31.c, CAP-31.d, CAP-34.e): which tickets may be started, and what holds the others.
 
-Tickets are read from the working tree, records from the store. The rule is a
-gate and does not fail open: a ticket whose file cannot be read is not READY,
-and no ticket is READY while the store cannot be read.
+Tickets are read from the working tree, records from the store, and the files
+the store holds no record of from ``HEAD`` (DEC-544). The rule is a gate and does
+not fail open: a ticket whose file cannot be read is not READY, and no ticket is
+READY while the store or ``HEAD`` cannot be read.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from pathlib import Path
 
 from gov import records
 from gov.cli.errors import GovError
+from gov.store import loader
 from gov.tasks.claims import CLAIMS_REL
 from gov.tasks.tickets import TICKETS_REL, frontmatter
 
@@ -38,6 +40,18 @@ def _has_tests(root: Path, named: str) -> bool:
     return folder.is_dir() and root.resolve() / "tests" / "acceptance" in folder.parents
 
 
+def _not_loaded(root: Path, loaded: frozenset[str]) -> list[tuple[str, list[str] | None]]:
+    """``(path, the tickets it constrains)`` of each constraining file of ``HEAD`` the store holds no record of
+    (DEC-544); None for the tickets where the frontmatter cannot be read, which holds every ticket (DEC-579)."""
+    found = []
+    for path, front, unreadable in loader.frontmatters(root, loaded):
+        names = None if unreadable else [str(item) for item in _list(front.get("constrains"))] \
+            if isinstance(front, dict) else []
+        if names is None or names:
+            found.append((path, names))
+    return found
+
+
 def _queue(root: Path) -> tuple[list[str], dict[str, list[str]]]:
     root = Path(root)
     tickets = {path.stem: frontmatter(path) or {} for path in sorted((root / TICKETS_REL).glob("*.md"))}
@@ -46,9 +60,10 @@ def _queue(root: Path) -> tuple[list[str], dict[str, list[str]]]:
         superseded = {edge["target"] for edge in records.edges(root, type="SUPERSEDES")}
         packages = {record["id"] for record in records.records(root, type="decision-package", status="PROPOSED")}
         waiting = {edge["target"] for edge in records.edges(root, type="CONSTRAINS") if edge["source"] in packages}
+        not_loaded = _not_loaded(root, frozenset(record["path"] for record in records.records(root)))
         store_read = True
     except (GovError, sqlite3.Error):
-        status, superseded, waiting, store_read = {}, set(), set(), False
+        status, superseded, waiting, not_loaded, store_read = {}, set(), set(), [], False
     ready, blocked = [], {}
     for ticket, front in tickets.items():
         if front.get("status") == "closed":
@@ -69,6 +84,7 @@ def _queue(root: Path) -> tuple[list[str], dict[str, list[str]]]:
             "DECISION_OPEN": ticket in waiting,
         }
         reasons = [reason for reason, held in holds.items() if held]
+        reasons += [f"DECISION_NOT_LOADED: {path}" for path, names in not_loaded if names is None or ticket in names]
         if front.get("status") == "open" and not reasons and store_read:
             ready.append(ticket)
         else:
