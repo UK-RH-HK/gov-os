@@ -6281,3 +6281,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.166 | 2026-10-09 | Owner: DEC-580 (P-29: the guard keeps its own deadline of 20 seconds; a 60-second time limit on the hook entries here, by the operator's 0894faab, and in the kernel template), DEC-581 (P-30: the probe gate refuses only for later commits inside the ticket's paths or its acceptance tests), DEC-582 (P-31: as built for Wave 1; the question to the Wave 2 list), DEC-583 (DEC-579 accepted), DEC-584 (the Wave 1 finish line: one more run plus probe for each running piece, classification before any new work, exit audit findings, the order to the end, a countdown in every report). Next free id: DEC-585. |
+
+## 167. Owner answer to P-32: what "CI" means in the Wave 1 exit criteria (register v0.167, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-585 — P-32: "close → CI → merge" on the clones means the CI gate W1-40 built, run locally; the hosted-CI items go to the exit package and the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-32 option (a); the first real run on GitHub (run 37959334612, commit `c7e5c3ed`) failed as W1-40's residuals said · **Under:** DEC-584, DEC-497, DEC-083, DEC-465
+- **Decision:**
+  - "Close → CI → merge" in exit criterion 1 (WBS §4) and in W1-42's first KPI line means the CI gate W1-40 built (`gov ci job`, the hooks and the evidence record), run locally in the a-dev and b-dev clones with this machine's tools. No GitHub-hosted run is needed for W1-42.
+  - The hosted-CI items are classified under DEC-584 b: none breaks a Wave 1 exit criterion and none is a fail-open (every failure of the run is red or "unmeasured"). No round is opened in Wave 1.
+  - **Exit package (owner actions):** the runner tools to approve, each with version and checksum (rulesync 24.0.0 and openspec 1.13.2 from the tool registry; pytest 9.0.3 has no registry entry and the openspec package's own integrity value is not recorded: both are taken at the approval, none is invented); `lefthook install` and pushing `refs/notes/gov-evidence` with each push; the commit id of the actions/checkout version that replaces the one on Node 20.
+  - **Wave 2 list:** the workflow installs the approved tools by checksum; a check is declared "local-only" and `gov ci job` reports it as "local-only", never as failed or green; the full history for the checks that read it; the actions/checkout bump in the workflow and its template; what CI runs of the project tests (with "fast feedback at scale", DEC-567).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.167 | 2026-10-09 | Owner: DEC-585 (P-32: "close → CI → merge" on the clones is the CI gate W1-40 built, run locally; no hosted run is needed for W1-42; the hosted-CI items go to the exit package and the Wave 2 list). Next free id: DEC-586. |
