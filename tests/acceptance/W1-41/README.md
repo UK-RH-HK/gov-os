@@ -11,8 +11,8 @@ rewritten.
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41 -q -p no:cacheprovider -rs`
 
-**153 cases in 8 files** (151 without the two `local_only` dev-tier cases): the 114 of the adoption tool, 3 rows
-for DEC-535, and 36 for the ninth success line. Standard library, PyYAML, pytest, W1-07's support, and W1-24's
+**156 cases in 8 files** (154 without the two `local_only` dev-tier cases): the 114 of the adoption tool, 3 rows
+for DEC-535, and 39 for the ninth success line. Standard library, PyYAML, pytest, W1-07's support, and W1-24's
 support for the context. No network, no model.
 
 **This ticket builds the tool. It adopts nothing.** Every case runs `gov adopt --lite` on a project the case
@@ -50,6 +50,11 @@ absence.
 - **36 cases of the ninth success line: 30 failed, 6 passed** in 5 s, against the context as W1-24 built it. The red
   reasons and the six that are green by design are in "Success 9". Run against a stand-in kept outside the tree
   (and not committed), all 36 pass: the cases can be satisfied together.
+
+**Added on `4c66d012`** (the context accepts listed ids; measured in the sandbox): **3 cases of a ticket whose
+declared ids are all external, all 3 failed**, the 36 before them passed (3 failed, 36 passed in 9 s). Each is red
+for its own reason: the context is built, exit code 0, with `mandatory: []`, `tokens: 0` and the ids under
+`external` (package P-13). Run against a stand-in kept outside the tree (and not committed), all 39 pass.
 
 ## Sources that could not be read
 
@@ -289,10 +294,10 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 
 ### Success 9 — the context and sources that live outside the repository [CAP-15.c; DEC-511, DEC-520]
 
-`test_w1_41_external_references.py`, 36 cases. Reached through the public interface only: the command
+`test_w1_41_external_references.py`, 39 cases. Reached through the public interface only: the command
 `gov context --json --root <project> [--brief] <ticket>` for the main rows, the function
-`gov.context.context(root, ticket, ...)` for five. Every case builds the "quay" project in its own temporary
-folder (a charter `CHARTER-H9`, a decision `ADR-H9-A`, a superseded decision `ADR-H9-OLD`, seven tickets, a path
+`gov.context.context(root, ticket, ...)` for six. Every case builds the "quay" project in its own temporary
+folder (a charter `CHARTER-H9`, a decision `ADR-H9-A`, a superseded decision `ADR-H9-OLD`, nine tickets, a path
 map written from the kernel's schema), commits it and loads its record store there, as W1-24's cases do. No index
 is built. Each point below is the cases' reading; the engineer may dispute any of them through the lead.
 
@@ -343,6 +348,16 @@ names is not reported. With `--brief` the summary has a line that names the id a
 defective file the error names the file by its path `governance/project/external-references.yaml`: anywhere in the
 error object of the command's envelope, and in the message for a caller of the function.
 
+**A ticket whose declared ids are all external is refused (held until the owner answers, package P-13).** Every id
+it declares is listed and none is a record of the store, so a packet for it would hold nothing that anybody read.
+The refusal is the same `BLOCKED` a ticket that declares no mandatory inputs gets today, never a packet. The error
+names the ticket and every external id the ticket declares, in the same places as the suite's other refusals:
+anywhere in the error object of the command's envelope, and in the message for a caller of the function. In both,
+the error's message holds the words "external" and "read" (whatever the case of the letters): it says that every
+declared input is external and none was read, which neither the refusal of a missing id nor that of a ticket
+without inputs says. A ticket that declares at least one record beside its external references is built, as the
+rows above hold.
+
 | Clause | Tests (`external_references`) | Against the context as it stands |
 |---|---|---|
 | a listed id is accepted: the context is built, the other declared ids are its mandatory inputs | `test_the_context_of_a_ticket_that_declares_a_listed_id_is_built` | red: `BLOCKED`, the listed id reported as not found in the store |
@@ -351,6 +366,7 @@ error object of the command's envelope, and in the message for a caller of the f
 | nothing of it counts into the packet's tokens | `test_an_external_reference_adds_nothing_to_the_packets_tokens` | red: the same |
 | the summary of `--brief` says the source was not read; the brief file is the packet | `test_the_brief_says_that_the_external_source_was_not_read` | red: the same |
 | the hash covers it: the same project gives the same packet twice; a change of the entry's `location` or `reason` changes the hash | `test_the_same_project_gives_the_same_hash_twice`, `test_a_change_of_the_listed_entry_changes_the_packets_hash` (2) | red: the same |
+| a ticket whose declared ids are all external is refused: `BLOCKED`, the ticket and every external id named, the message says that all are external and none was read (package P-13) | `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2: one external id; several), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` | red: the packet is built, exit code 0, with no mandatory item, 0 tokens and the ids under `external` |
 | unlisted stays blocked, the id named | `test_an_id_that_is_neither_a_record_nor_listed_stays_blocked` | **green, and stays green** |
 | … also beside a listed id | `test_an_unlisted_id_blocks_a_ticket_that_also_declares_a_listed_one` | red: the error names the listed id as missing and stops before the unlisted one |
 | the list never hides a record: a listed id that is a record stands among the mandatory inputs with its hash and is not reported as external | `test_a_listed_id_that_is_a_record_is_the_stores_record` | red: `BLOCKED` on the external id the ticket declares beside it |
@@ -379,8 +395,14 @@ error object of the command's envelope, and in the message for a caller of the f
   error names the file and the id. One row has the id as an entry of a register the path map names; the other has
   no register at all and is refused by the form alone (the stricter reading, package P-12). The id itself stays
   blocked in both until the store loads register decisions as records (DEC-521's follow-up).
-- **Left open, no case:** a ticket whose declared ids are all external (today a ticket that declares nothing is
-  blocked); whether the summary of `--brief` also gives the location; the exit code of the refusal (1 today).
+- **A ticket whose declared ids are all external is refused (the stricter reading, package P-13).** The ninth
+  success line and DEC-520 say that a listed id is accepted and reported as external, never as content; CAP-15.a
+  says a packet holds its mandatory inputs by id and sha256; neither says what a packet is when no declared id is
+  one. A ticket that declares nothing is blocked today, and DEC-454 keeps a close from standing on a context
+  that measured nothing. Held: such a ticket's context is not built, and the refusal says why. The other reading
+  (the packet is built and says that nothing was read) is option (b) of the package.
+- **Left open, no case:** whether the summary of `--brief` also gives the location; the exit code of the refusal
+  (1 today).
 
 ### Measured or refused (DEC-449, DEC-454)
 
@@ -391,6 +413,7 @@ error object of the command's envelope, and in the message for a caller of the f
 | the code graph cannot be read | `path_map`: `test_a_code_graph_that_cannot_be_read_refuses_and_records_no_importers` | "no importers", a move |
 | the project has no code graph (code intelligence is off in its path map) | `path_map`: `test_a_move_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_split_a_merge_or_an_extract_where_code_intelligence_is_off_is_refused_and_writes_nothing` (3), `test_a_move_among_retirements_is_refused_as_a_whole_where_code_intelligence_is_off`, `test_no_later_stage_moves_what_was_refused_where_code_intelligence_is_off` | "no importers", a move |
 | the external references file is there and cannot be read, is not YAML, or is not of the stated shape | `external_references`: `test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named` (13), `test_a_file_that_cannot_be_read_blocks_and_is_named`, `test_the_function_names_the_defective_file_in_its_message`, `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2), `test_a_listed_id_of_the_decision_registers_form_is_refused` (2) | "no external references", a missing id reported without the defect, a packet |
+| every id the ticket declares is an external reference: nothing was read | `external_references`: `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` | a packet with no mandatory input, a context hash for a close |
 | the verdict cannot be read | `verdict`: `test_a_verdict_that_cannot_be_read_moves_nothing` (4) | a pass, a move |
 | the backup ref no longer resolves | `migration`: `test_a_backup_ref_that_no_longer_resolves_stops_the_migration` | a move |
 | a legacy rule file cannot be read or parsed | `legacy`: the two cases above | a retirement |
@@ -406,7 +429,7 @@ error object of the command's envelope, and in the message for a caller of the f
 | CAP-06.b | `path_map` (the eight actions) |
 | CAP-06.c | `unknown` |
 | CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no MOVE, RENAME, SPLIT, MERGE or EXTRACT where code intelligence is off) |
-| CAP-15.c | `external_references` (a listed id is accepted and reported as external; an unlisted one, a superseded record and a defective file block) |
+| CAP-15.c | `external_references` (a listed id is accepted and reported as external; an unlisted one, a superseded record and a defective file block; a ticket whose ids are all external is refused) |
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
 | CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
@@ -432,7 +455,7 @@ error object of the command's envelope, and in the message for a caller of the f
 - **The six cases of DEC-517 and the three rows of DEC-535 run inside the sandbox.** Their project turns code
   intelligence off, so no code index is built or read: the moves are refused at A3, and the proposal that moves
   nothing needs no code graph.
-- **The 36 cases of the ninth success line run inside the sandbox.** They need no code index and no `gitleaks`:
+- **The 39 cases of the ninth success line run inside the sandbox.** They need no code index and no `gitleaks`:
   the record store of the case's own project is loaded, no index is built.
 - **b-dev.** A clone of `~/gov-os-workbench/synthetic/b-dev` into the session's temporary folder was made in this
   sandbox (149 tracked files; it tracks `AGENTS.md`, `.cursorrules` and `.windsurfrules`). The two dev-tier cases
@@ -458,3 +481,4 @@ error object of the command's envelope, and in the message for a caller of the f
 | P-10 | Where code intelligence is off, are SPLIT, MERGE and EXTRACT refused as MOVE and RENAME are? | **decided by DEC-535: refused.** One row per action, green as built |
 | P-11 | Does a defective external references file block every ticket's context, or only that of a ticket that declares an id the store does not hold? | every ticket (the stricter reading): `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) |
 | P-12 | Is a listed id of the form `DEC-<digits>` refused in every project, or only where it is an entry of the register the project names? | every project, by the form alone: the second row of `test_a_listed_id_of_the_decision_registers_form_is_refused` |
+| P-13 | A ticket whose declared ids are all external references (none is a record of the store): is its context refused, or built with a packet that says nothing was read? | refused (the stricter reading): `BLOCKED`, the ticket and the external ids named, the message says that all are external and none was read: `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` |

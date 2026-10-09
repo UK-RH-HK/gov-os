@@ -45,6 +45,8 @@ TICKETS = {
     TK_OLD: [support.CHARTER_ID, support.OLD_ADR_ID],
     TK_REGISTER: [support.CHARTER_ID, REGISTER_DECISION],
 }
+TK_ONLY, TK_ONLY_TWO = "TK-H9-ONLY", "TK-H9-ONLYTWO"       # every id they declare is listed, none is a record
+TICKETS.update({TK_ONLY: [EXT], TK_ONLY_TWO: [EXT, EXT_2]})
 
 
 def _listed():
@@ -201,6 +203,37 @@ def test_a_change_of_the_listed_entry_changes_the_packets_hash(api, quay, key, v
     after = _packet(api, project, TK_EXTERNAL)
     assert after[C.K_MANDATORY] == before[C.K_MANDATORY], "the case changed more than the listed entry"
     assert after[C.K_HASH] != before[C.K_HASH], f"the packet's hash does not cover the entry's `{key}`"
+
+
+# --------------------------------------------------------------------------
+# A ticket whose declared ids are all external: nothing was read, no context is built (README, package P-13)
+# --------------------------------------------------------------------------
+
+ALL_EXTERNAL = {"one external id": (TK_ONLY, (EXT,)), "several": (TK_ONLY_TWO, (EXT, EXT_2))}
+
+
+def _says_that_nothing_was_read(message, ticket):
+    """The refusal's own words, not those of another refusal: every input is external, none was read."""
+    said = str(message).lower()
+    assert "external" in said and "read" in said, \
+        f"the refusal of {ticket} does not say that every declared input is external and none was read: {message!r}"
+
+
+@pytest.mark.parametrize("ticket,external", list(ALL_EXTERNAL.values()), ids=list(ALL_EXTERNAL))
+def test_a_ticket_whose_declared_ids_are_all_external_is_refused(api, quay, ticket, external):
+    """A packet for it would hold nothing that anybody read. Refused as a ticket without mandatory inputs is: the
+    error names the ticket and every external id, and its message says that all are external and none was read.
+    The same project builds the context of the ticket that declares a record beside the same external id."""
+    project = quay()
+    error = _blocked(api, project, ticket, ticket, *external)
+    _says_that_nothing_was_read(error.get("message"), ticket)
+    assert _ids(_external(_packet(api, project, TK_EXTERNAL))) == [EXT], \
+        "the case's project does not list the id: the refusal above is not the one this case holds"
+
+
+def test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external(api, quay):
+    error = _blocked_by_the_function(api, quay(), TK_ONLY_TWO, TK_ONLY_TWO, EXT, EXT_2)
+    _says_that_nothing_was_read(error["message"], TK_ONLY_TWO)
 
 
 # --------------------------------------------------------------------------
