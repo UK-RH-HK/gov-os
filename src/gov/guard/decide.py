@@ -743,6 +743,38 @@ def lift_refusal(command) -> str:
                 "of the lift form of gov pause (--off): refused (DEC-409)")
 
 
+# -- an answer in bounded time (DEC-562) ---------------------------------------
+
+# The most the guard reads of a Bash command, and of what the command's
+# substitutions hold together, in characters.  Every check reads the
+# command word by word: beyond this no answer comes in bounded time.
+MOST_READ = 32768
+LONG_REFUSAL = ("the command, what its substitutions hold, its brace "
+                "expansions, or the paths and name filters of a search in "
+                "it, are more than the guard "
+                "reads in bounded time, so it is not known to be "
+                "free of what is refused: refused to every role (DEC-562)")
+# The most the guard resolves of a file tool's path or glob, in characters:
+# no file is opened by a longer path, and resolving one costs its length
+# times its folders.
+MOST_PATH = 4096
+LONG_PATH_REFUSAL = ("a path or a glob of the call is longer than the guard "
+                     "resolves in bounded time, so it is not known to be free "
+                     "of what is refused: refused to every role (DEC-562)")
+# The fields of a file tool's call that are resolved as a path or a glob.
+_PATH_FIELDS = {"Read": ("file_path",), "Grep": ("path", "glob"),
+                "Glob": ("path", "pattern"), "Write": ("file_path",),
+                "Edit": ("file_path",), "NotebookEdit": ("notebook_path",)}
+
+
+def _long_path(tool_name, tool_input: dict) -> bool:
+    """True when a path or a glob of a file tool's call is longer than the
+    guard resolves."""
+    fields = _PATH_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    return any(isinstance(tool_input.get(key), str)
+               and len(tool_input[key]) > MOST_PATH for key in fields)
+
+
 # -- main decision -------------------------------------------------------------
 
 def decide(
@@ -768,6 +800,15 @@ def decide(
     # CAP-62.a: no Bash call leaves the sandbox, whatever the role.
     if tool_name == "Bash" and tool_input.get("dangerouslyDisableSandbox"):
         return "deny", "dangerouslyDisableSandbox is denied to every role"
+
+    # DEC-562: no Bash call is longer than the guard reads in bounded time.
+    if tool_name == "Bash":
+        command = tool_input.get("command")
+        if isinstance(command, str) and len(command) > MOST_READ:
+            return "deny", LONG_REFUSAL
+    # Nor does a file tool's call hold a path longer than the guard resolves.
+    if _long_path(tool_name, tool_input):
+        return "deny", LONG_PATH_REFUSAL
 
     # DEC-409: no agent Bash call holds the lift form, whatever the role.
     if tool_name == "Bash":

@@ -161,7 +161,7 @@ def test_ticket_lead_may_read(project, sandbox, tool):
     if tool == "Glob":
         tool_input = {"pattern": "src/**/*.py", "path": str(project)}
     elif tool == "Grep":
-        tool_input = {"pattern": "def ", "path": str(project)}
+        tool_input = {"pattern": "def ", "path": str(project / "src")}
     else:
         tool_input = {"file_path": str(project / SRC_REL)}
     result = guard_support.run_hook(project, tool, tool_input, sandbox,

@@ -133,7 +133,7 @@ def test_role_less_session_can_still_read_with_file_tools(project, call):
     """Read-only is not "no access": the guard denies writes, not reads."""
     attempts = {
         "Read": {"file_path": str(project / "src/gov/guard/decide.py")},
-        "Grep": {"pattern": "VALUE", "path": str(project)},
+        "Grep": {"pattern": "VALUE", "path": str(project / "src")},
         "Glob": {"pattern": "**/*.py", "path": str(project)},
     }
     for tool_name, tool_input in attempts.items():

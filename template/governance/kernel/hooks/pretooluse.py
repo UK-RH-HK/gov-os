@@ -12,6 +12,13 @@ When the guard lets a Bash call through, takes a before-snapshot of
 
 Fail-closed: any internal error exits with code 2 and appends a finding
 to .gov-runtime/findings.jsonl (DEC-110).
+
+The program keeps its own deadline of 20 seconds from its start and
+answers "deny" when it reaches it (DEC-580): the harness ends a hook at
+its time limit and lets the call through.  The decision runs in a forked
+process in a session of its own; the process the harness started only
+waits for it, holds its output back, and passes it on unchanged when the
+decision ended in time.
 """
 
 from __future__ import annotations
@@ -19,9 +26,19 @@ from __future__ import annotations
 import json
 import os
 import select
+import signal
 import stat
 import sys
 import time
+
+# DEC-580: the deadline counts from the program's start, on a clock that
+# a change of the system's date does not move.  Its value is read from
+# nothing.
+_STARTED = time.monotonic()
+DEADLINE_S = 20.0
+DEADLINE_REASON = ("the guard could not decide on this call in time: its "
+                   "deadline of 20 seconds was reached, so the call is "
+                   "refused (DEC-580)")
 
 STDIN_DEADLINE_S = 3.0
 FINDINGS_REL = ".gov-runtime/findings.jsonl"
@@ -326,8 +343,123 @@ def main() -> None:
             _allow()
 
 
+def _end_decision(pid: int) -> None:
+    """End the decision's process and everything it started (DEC-580).
+
+    Only the session the decision was given is signalled, never the
+    group the hook itself was started in.  The wait is bounded.
+    """
+    for kill in (os.killpg, os.kill):
+        try:
+            kill(pid, signal.SIGKILL)
+        except OSError:
+            pass
+    until = time.monotonic() + 1.0
+    while time.monotonic() < until:
+        try:
+            if os.waitpid(pid, os.WNOHANG)[0]:
+                break
+        except OSError:
+            break
+        time.sleep(0.01)
+
+
+def _decide_within_deadline() -> None:
+    """Run the decision in a process of its own, under the deadline (DEC-580).
+
+    Returns only in the forked process, which goes on to ``main()``
+    with its stdout and stderr held back in pipes.  The process the
+    harness started reads no input and runs no rule, so that it stays
+    free to answer whatever the decision is busy with: it passes on the
+    decision's own answer when that ended in time, and denies at the
+    deadline.  Anything else is an internal failure (DEC-110).
+    """
+    out_r, out_w = os.pipe()
+    err_r, err_w = os.pipe()
+    pid = os.fork()
+    if pid == 0:
+        os.setsid()
+        os.dup2(out_w, 1)
+        os.dup2(err_w, 2)
+        for fd in (out_r, out_w, err_r, err_w):
+            if fd > 2:
+                os.close(fd)
+        return
+
+    try:
+        os.close(out_w)
+        os.close(err_w)
+        held: dict[int, list[bytes]] = {out_r: [], err_r: []}
+        open_fds = [out_r, err_r]
+        status = None
+        while True:
+            remaining = _STARTED + DEADLINE_S - time.monotonic()
+            if remaining <= 0:
+                break
+            if open_fds:
+                ready = select.select(open_fds, [], [],
+                                      min(remaining, 0.05))[0]
+                for fd in ready:
+                    chunk = os.read(fd, 65536)
+                    if chunk:
+                        held[fd].append(chunk)
+                    else:
+                        open_fds.remove(fd)
+            else:
+                time.sleep(min(remaining, 0.001))
+            done, ended = os.waitpid(pid, os.WNOHANG)
+            if done:
+                status = ended
+                break
+    except Exception:
+        _end_decision(pid)
+        raise
+
+    if status is None:
+        # The deadline: nothing of the decision's output is passed on,
+        # no file is opened and no finding is recorded.
+        _end_decision(pid)
+        try:
+            try:
+                _deny(DEADLINE_REASON)
+            except SystemExit:
+                sys.stdout.flush()
+        except Exception:
+            os._exit(2)
+        os._exit(0)
+
+    # The decision has ended: take what it left in the pipes without
+    # waiting for a program it started that still holds them.
+    for fd in open_fds:
+        os.set_blocking(fd, False)
+        try:
+            while True:
+                chunk = os.read(fd, 65536)
+                if not chunk:
+                    break
+                held[fd].append(chunk)
+        except BlockingIOError:
+            pass
+    code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else None
+    if code not in (0, 2):
+        raise RuntimeError(
+            f"the decision's process did not end as the program ends "
+            f"(wait status {status})")
+    try:
+        os.write(2, b"".join(held[err_r]))
+    except OSError:
+        pass
+    data = b"".join(held[out_r])
+    while data:
+        data = data[os.write(1, data):]
+    # Nothing is buffered here; the decision's process has done the
+    # interpreter's own ending, a second one would only cost time.
+    os._exit(code)
+
+
 if __name__ == "__main__":
     try:
+        _decide_within_deadline()
         main()
     except SystemExit:
         raise

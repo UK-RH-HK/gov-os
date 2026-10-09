@@ -14,7 +14,7 @@ import json
 import os
 import shlex
 
-from gov.guard.decide import _expand_token
+from gov.guard.decide import MOST_PATH, _expand_token
 
 CONFIG_REL = "governance/project/held-out.yaml"
 CONFIG_KEY = "held_out_paths"
@@ -92,12 +92,27 @@ def _words(command: str) -> list[str]:
         return command.split()
 
 
-def _reaches(text: str, cwd: str, bases: list[str], shell: bool) -> bool:
+def _path_limit() -> int:
+    """The system's limit for the length of a path; the guard's own
+    longest path when the system reports none."""
+    try:
+        limit = os.pathconf("/", "PC_PATH_MAX")
+    except (AttributeError, OSError, ValueError):
+        return MOST_PATH
+    return limit if limit > 0 else MOST_PATH
+
+
+def _reaches(text: str, cwd: str, bases: list[str], shell: bool,
+             limit: int = MOST_PATH) -> bool:
     """True when *text*, read as a path, resolves to a held-out path:
     relative to *cwd*, through ``..``, ``~`` or a symbolic link, and in a
     Bash word through ``$HOME`` (DEC-215)."""
     exp = _expand_token(text) if shell else os.path.expanduser(text)
     if not exp:
+        return False
+    # DEC-574: a string longer than a path may be, as written and as
+    # expanded, is opened by no program as a path: it is not resolved.
+    if len(text) > limit and len(exp) > limit:
         return False
     try:
         real = os.path.realpath(os.path.join(cwd, exp))
@@ -121,14 +136,15 @@ def names_held_out(tool_name: str, tool_input: dict, project_root: str,
                 tool_input = {"file_path": fp}
 
     bases = list({b for p in paths for b in (p, os.path.realpath(p))})
+    limit = _path_limit()
     for key, value in tool_input.items():
         for text in _strings(value):
             if any(p in text for p in paths):
                 return True
             if tool_name == "Bash" and key == "command":
-                if any(_reaches(w, cwd, bases, True) for w in _words(text)):
+                if any(_reaches(w, cwd, bases, True, limit) for w in _words(text)):
                     return True
-            elif _reaches(text, cwd, bases, False):
+            elif _reaches(text, cwd, bases, False, limit):
                 return True
     return False
 

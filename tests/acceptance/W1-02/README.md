@@ -387,7 +387,8 @@ A throwaway helper of about 30 lines passed all 12 cases; it lived in the sessio
 
 **Left open on purpose; the cases take no side:**
 
-- an unrestricted recursive search from the project root, through any tool (package DP-1);
+- an unrestricted recursive search from the project root, through any tool (package DP-1; *decided by DEC-557 and
+  held by the fifth batch*);
 - a deny line's bare path inside a hook command, in the helper's output (package DP-2);
 - a shell command that only mentions the settings file (a commit message, an `echo`), and git commands other than
   the two named ones that take the file as a path without printing it (`git add`, `git log --oneline --`): a guard
@@ -885,16 +886,1109 @@ acceptance cases and not this designer's to touch; they are returned by name (pa
 - `tests/unit/guard/test_protected.py::test_the_listing_redacts_an_absolute_path_a_deny_rule_carries`: with the
   rule `Read(~/w/**)`, `~/w` in a hook command is held as printing unchanged (DP-7 redacts it).
 
+### Fifth batch (2026-10-09): the round of DEC-557
+
+Four points, written before any code of the round exists: a search from the root with no path or glob (DEC-557),
+a shell search whose name filter takes either file in, an answer in bounded time, and a NUL byte (DEC-562). Every
+case asks the hook as a process, in the stand-in world of the fourth batch (`w1_02_folders_support.make_world`: the
+session's project with both stand-in files, a sibling checkout, a folder below the root, a stand-in home folder).
+`w1_02_round_support.py` holds what the four files share. No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_root_searches.py
+tests/acceptance/W1-02/test_w1_02_name_filters.py tests/acceptance/W1-02/test_w1_02_bounded_time.py
+tests/acceptance/W1-02/test_w1_02_nul_bytes.py -q -p no:cacheprovider -rs`
+
+| File | Cases | Red today | Green today | Time here |
+| --- | --- | --- | --- | --- |
+| `test_w1_02_root_searches.py` | 234 | 125 | 109 | 28 s |
+| `test_w1_02_name_filters.py` | 244 | 168 | 76 | 24 s |
+| `test_w1_02_bounded_time.py` | 59 | 27 | 32 | 3 min 45 s red (each red case waits for its limit) |
+| `test_w1_02_nul_bytes.py` | 128 | 82 | 46 | 15 s |
+| Together | 665 | 402 | 263 | |
+
+The whole suite, once, on the guard as built: 402 failed, 1953 passed in 8 min 20 s on a loaded machine (the 1690
+cases before this batch all pass; the 402 are the red cases above and no other).
+
+A refusal of points 1 and 2 is `deny` with exit code 0, and its reason names a decision of the read rule (DEC-508,
+DEC-525, DEC-548, DEC-553, DEC-557 or DEC-562; none of them required). Under all four points a refusal names a rule
+and a decision and carries no content of a file, no path (the file, a copy, `<P>`) and not the command.
+
+#### Point 1 → `test_w1_02_root_searches.py`
+
+Red, each because the guard answers `allow` (exit 0):
+
+- `test_a_search_tool_call_from_the_root_with_no_path_or_glob_is_refused` (12): the Grep tool with no `path` in a
+  session that stands in the root; the root as `path` (absolute, `.`, `./`, `src/..`, `..` from one folder below, a
+  trailing slash); a `type` filter and nothing else; an excluding glob (`!…`) and nothing else; both together.
+- `test_a_shell_search_from_the_root_with_no_path_is_refused` (40): `grep -r`, `-R`, `-rn`, `-Rn`, a cluster that
+  ends in `r`, `--recursive`, `--dereference-recursive`, the pattern after `-e`; `rg` (with no path, with `-n`, `-l`,
+  `--files`); `find` with no test on the name (no start, `.`, `./`, the absolute root, `-type f`); `ls -R`, `-lR`,
+  `-laR`; each with no path or with the root as its path (`.`, `./`, absolute, `..` from one folder below), after a
+  `cd` to the root, and with several paths of which one is the root.
+- `test_a_recursive_search_over_a_wildcard_word_from_the_root_is_refused` (2): `grep -r <word> *` and
+  `grep -rn <word> ./*`.
+- `test_a_search_from_a_copy_s_folder_with_no_path_or_glob_is_refused` (45): fifteen forms from each `<P>` (the
+  sibling checkout, the folder below the root, the stand-in home folder for the settings file).
+- `test_a_search_from_the_home_folder_as_a_shell_spells_it_is_refused` (5): `~`, `~/`, `$HOME`, a bare `cd`.
+- `test_a_search_with_no_path_or_glob_is_refused_for_every_role` (12) and
+  `test_a_search_tool_call_from_the_root_is_refused_for_a_role_subagent_too` (2).
+- `test_the_refusal_of_a_search_names_the_rule_and_no_path` (7).
+
+Green today, and held to stay so (the daily forms):
+
+| Daily form | Case |
+| --- | --- |
+| Grep with `path` = a source folder and no glob | `test_a_search_tool_call_with_a_source_folder_or_a_glob_for_source_files_stays_allowed` |
+| Grep from the root, or with no `path`, with a glob for source files (`*.py`, `**/*.py`, `src/**`) | the same case |
+| the same with a `type` and a glob | the same case |
+| the search tool forms, for every role and a role-less session | `test_the_daily_search_tool_forms_stay_allowed_for_every_role` |
+| `grep -rn <word> src tests`, `rg <word> src`, `find src -name '*.py'`, `ls -R src`, `git grep <word> -- src`, `grep <word> <named file>`, `ls`, `ls -la` at the root | `test_the_daily_shell_forms_stay_allowed` (8 forms, 4 actors) |
+| a search with no glob from a folder under which neither file nor a copy lies (the sibling checkout's source folder too) | `test_a_search_with_no_glob_from_a_folder_under_which_neither_file_lies_stays_allowed`, `test_a_search_with_no_glob_from_a_source_folder_stays_allowed_for_every_role` |
+| the daily forms from a copy's `<P>` | `test_the_daily_forms_stay_allowed_from_a_copy_s_folder` |
+
+No case either way, by the order: `find . -name '*.py'` (allowed today; so are `find . -iname '*.py'`,
+`find -name '*.py'` and `find . -name <a protected file's own name>`); `git grep <word>` with no path, `git log -p`
+and `git show` (all allowed today); a search that starts above `<P>` outside the project.
+
+#### Point 2 → `test_w1_02_name_filters.py`
+
+Red, each because the guard answers `allow` (exit 0):
+
+- `test_a_shell_search_from_the_root_whose_name_filter_takes_a_protected_file_in_is_refused` (80): ten spellings
+  (`--include=<f>`, quoted, `--include <f>`, with no path; `rg -g <f>`, `-g<f>`, `--glob=<f>`, `--glob <f>`,
+  `--iglob=<f>`, `--iglob <f>`) × four filters (the file's own name, by its extension, a part of its name, `*`) ×
+  the two files.
+- `test_a_case_insensitive_filter_in_another_case_takes_the_file_in` (4).
+- `test_the_root_as_the_search_s_path_in_another_spelling_is_refused` (8).
+- `test_with_several_filters_one_that_matches_is_enough` (8).
+- `test_a_shell_search_from_a_copy_s_folder_whose_name_filter_takes_the_copy_in_is_refused` (40) and
+  `test_a_name_filter_for_the_user_level_settings_file_from_the_home_folder_is_refused` (6).
+- `test_a_search_whose_only_filter_excludes_is_refused_as_a_search_with_no_filter` (8): point 1 through a filter.
+- `test_a_name_filter_that_takes_a_protected_file_in_is_refused_for_every_role` (9).
+- `test_the_refusal_of_a_name_filter_names_the_rule_and_neither_the_file_nor_the_start` (5).
+
+Green today, held to stay so: `test_a_search_with_a_filter_that_cannot_match_either_file_stays_allowed` (44: `*.py`
+and its spellings from the root and from each `<P>`), `test_a_search_from_the_root_with_a_source_filter_stays_allowed_for_every_role`
+(6), `test_a_filter_that_names_a_protected_file_in_a_search_of_a_source_folder_stays_allowed` (24) and
+`test_such_a_search_of_a_source_folder_by_its_relative_path_stays_allowed` (2).
+
+#### Point 3 → `test_w1_02_bounded_time.py`
+
+**The bound: the hook ends with a decision within 5 seconds of its own time** (`BOUND_S`); a case stops the process
+after 8 seconds (`PROCESS_LIMIT_S`) and fails. An ordinary call is answered in 0.05 to 0.13 s here, so the bound is
+some forty times an ordinary answer and far below the times measured; it is a bound on the answer, and no promise
+about what the harness does with a hook that runs past its own time limit (not established by this designer: no
+session could be started, and the settings file is not read).
+
+Measured on the guard as built, through the hook as a process, before the cases were written:
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| twelve or more glued star pairs and a tail that matches nothing (a Glob pattern, a Grep glob, a word after `cat`, a word after `echo`; from the root and from a sibling `<P>`) | over 30 s | none within it |
+| glued star pairs and a protected file's name (16 pairs for the settings file, 60 for the other) | over 30 s | none within it |
+| 60 pairs with slashes from `/` (40 pairs: over 12 s) | over 30 s | none within it |
+| pairs with slashes relative from the root; pairs with a letter between; `**/*` many times; glued pairs from `src` | under 1 s | allow |
+| pairs alone; pairs with slashes and the name or `*` | under 1 s | deny |
+| unclosed `$(`: 1000 / 3000 | 2 s / over 12 s | allow / none |
+| `$(echo a ` unclosed: 300 / 1000 | 2.5 s / over 12 s | allow / none |
+| `<(` unclosed: 3000 / 10000 | 3.4 s / over 12 s | allow / none |
+| 1000 nested closed substitutions | over 12 s | none |
+| 10000 closed substitutions; backticks | about 1 s | allow |
+| 200 KB of short words / 1 MB | 3.0 to 4.2 s (8 s once, under load) / about 15 s | allow |
+| 1 MB in one word | over 30 s | none |
+| 1 MB, then a read of a protected file | 14 s | deny |
+| a read of a protected file, then 1 MB | 6 to 7.5 s | deny |
+| a commit with a message of a few thousand characters; a test run that names forty files; a glob with two or three star pairs | 0.05 to 0.13 s | allow |
+
+Red (27), each because the hook gives no decision within the limit or gives it after the bound:
+
+- `test_a_glob_of_many_star_pairs_is_answered_within_the_bound` (8 of its shapes): shapes that take neither file
+  in; a decision in time is held, `allow` or a refusal.
+- `test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_refused_within_the_bound` (6): a refusal in time.
+- `test_a_long_run_of_substitutions_or_a_very_long_command_is_answered_within_the_bound` (6 of its shapes): 3000
+  unclosed `$(`, 1000 `$(echo a `, 10000 `<(`, 1000 nested, 1 MB of short words, 1 MB in one word.
+- `test_a_very_long_command_that_reads_a_protected_file_is_refused_within_the_bound` (4).
+- `test_the_bound_holds_for_every_role` (3).
+
+Green (32): the shapes of the same functions the guard answers in time today (among them 200 KB of short words at
+4.2 s: near the bound here, and it may fail on a slower or loaded machine before the change), and
+`test_an_ordinary_long_command_and_an_ordinary_glob_stay_allowed_within_the_bound` (14: seven ordinary shapes for
+the orchestrator and for a role-less session).
+
+No line was added to `tests/acceptance/serial-only.txt`: after the change every case is expected far under the
+bound, and the whole-suite run above shows no case of this file changing its result under load today. If the 200 KB
+case fails under parallel load after the change, a serial-only line for this file is the remedy, and it is a
+decision for whoever sees it.
+
+#### Point 4 → `test_w1_02_nul_bytes.py`
+
+Red (82), each `allow` with exit 0 today:
+
+- `test_a_nul_byte_in_a_path_or_a_glob_of_a_reading_tool_is_refused` (28): the byte in a Read path (start, middle,
+  end, beside either file's path), in a Grep path or glob, in a Glob path or pattern.
+- `test_a_nul_byte_anywhere_in_a_shell_command_is_refused` (18): in a word, a path, an option, a quoted text, a
+  commit message, beside either file's path, after a path below the home folder.
+- `test_a_nul_byte_in_a_reading_tool_is_refused_for_every_role` (16),
+  `test_a_nul_byte_in_a_shell_command_is_refused_for_every_role` (12),
+  `test_a_nul_byte_is_refused_while_the_project_is_frozen_too` (1).
+- `test_the_refusal_of_a_nul_byte_in_a_tool_call_names_the_rule_and_no_path` (4) and
+  `test_the_refusal_of_a_nul_byte_in_a_command_names_the_rule_and_does_not_echo_the_command` (3).
+
+Green (46):
+
+- `test_a_shell_command_the_guard_already_refuses_for_its_nul_byte_is_still_not_allowed` (3): a word that is `~`
+  and the byte (two commands) and the byte in the target of an output redirect. Today's shape is `deny` with exit
+  code 2 for all three; the cases hold "not allowed" and take no side on the shape.
+- `test_a_nul_byte_in_the_path_of_a_writing_tool_is_not_allowed` (27): Write, Edit and NotebookEdit, for the
+  orchestrator, an engineer and a role-less session. Today's shape is `deny` with exit code 2; no side on the shape.
+- `test_the_same_calls_with_no_nul_byte_stay_allowed` (16): the neighbours, and commands that only spell the byte
+  (`\0` in a pattern, `printf 'a\0b'`, `-z`).
+
+No case on a NUL byte in Grep's `pattern`, by the order.
+
+#### What the guard already refused before this batch
+
+- Point 1: nothing. Every form of the red cases is allowed, for every role, from the root and from each `<P>`.
+- Point 2: nothing. Every spelling and every filter is allowed; a search over the folder that holds the file was
+  refused before and still is (earlier batches).
+- Point 3: a glob of star pairs alone, and pairs with slashes that end in the file's name or `*`, are refused fast;
+  a run of unclosed substitutions followed by a read of a file is refused fast. Everything in the red list is not.
+- Point 4: the byte in the path of a writing tool, in a word that is `~` and the byte, and in the target of an
+  output redirect (all `deny`, exit code 2). Everywhere else it is allowed.
+
+#### Changes to the residual list
+
+Answered by this round, and no residual any more:
+
+- "an unrestricted recursive search from the project root, through any tool (package DP-1)" of the list left open
+  on purpose: decided by DEC-557, held by point 1. The Glob tool with a wildcard-only pattern was held by the fourth
+  batch.
+- "Grep with a `type` filter" and the "`~` and `$HOME` spellings" of the same list, as far as a search with no glob
+  from the root or from the home folder goes (point 1).
+- Residual 5, for `rg` with no path only. `git diff`, `git show`, `git log -p`, `git stash show -p`, `git grep` and
+  an archive of the root stand.
+- Residual 15, for the search from `<P>` itself with no glob ("follows DP-1"): held by point 1. The start above
+  `<P>` stands.
+- The shell search with a name filter (DEC-562 finding 1), the two time findings (DEC-562 finding 7) and the NUL
+  byte, which the residual list of the follow-up carried as found by the probe: points 2, 3 and 4.
+
+Residuals 1 to 4, 6 to 14 and 16 to 30 stand. Added (forms this designer could not hold; those a guard that reads a
+command line cannot see come first):
+
+31. A search started by something the command line does not show: a script or an alias that runs the search, a
+    search fed by `xargs` or `find -exec`, a `cd` into a folder known only at run time before a search with no path
+    (residuals 1 to 4 and 11, on a search).
+32. A shell search whose name filter is built at run time (a variable, a substitution), or given in a file
+    (`--exclude-from`, `rg --ignore-file`, a `.rgignore` or a `.ripgreprc` that lifts or sets a filter).
+33. A search from a folder between the root and a `<P>` below it (the parent of a nested copy's folder when it is
+    not the root): telling needs a walk of the tree. No case.
+34. A project root under which neither file lies: DEC-557's wording refuses the search there too; the engineer's
+    unit case `test_a_project_without_either_file_refuses_nothing` holds the opposite for the earlier rule. No case
+    either way (returned as a package of this round).
+35. `find` with a test on the name (`-name`, `-iname`, `-path`, `-regex`) from the root, whatever the name is: no
+    case either way, by the order. Today all are allowed, a test for a protected file's own name among them.
+36. A recursive search over a wildcard word other than the two plainest (`{root}/*`, `.*`, `*/`, `rg <word> *`,
+    `ls -R *`, braces): allowed today; not held one by one.
+37. Spellings of the held programs without a case of their own (`rg -t py` with no path, `ls --recursive`, the
+    pattern after `--`, an empty `glob` or `path` of the search tool): allowed today; and other programs that search or list a tree (`ag`, `ack`, `fd`, `tree`, `du -a`, `git ls-files`, `grep -d recurse`,
+    `grep --directories=recurse`, `ls` with `-R` hidden in an environment variable or an alias): no case.
+38. Name filters of other programs and other options (`grep --exclude` that leaves a file in, `rg -t`/`--type-add`,
+    `rg --files -g`, `find -name`, `fd -g`): only `--include`, `-g`, `--glob` and `--iglob` are held.
+39. Point 3: an input the bound cannot be shown on in a case of a few seconds (a command of tens of megabytes;
+    shapes of slow work not found by this designer's probe); and what the harness does with a hook that passes its
+    own time limit (DEC-110 records that a timeout does not block).
+40. Point 4: a NUL byte in a field of a tool the guard does not know (residual 9), in Grep's `pattern` (no case, by
+    the order), and in fields that are neither path nor command (`description`, `output_mode`).
+
+#### Cases of other suites found by the search
+
+Searched: `tests/acceptance`, `*.py`, for the Grep tool with the root as `path` or no `path`, for shell searches
+(`grep -r`, `rg`, `find`, `ls -R`), for name filters and for a NUL byte in a hook input. Besides the fourteen
+cases of the order, no acceptance case holds as allowed a form this round refuses: the other shell searches name a
+source folder or a stand-in folder (`grep -rn gov docs`, `grep -rn -- "--off" src/`, `rg … docs tests`), the Glob
+calls from the root carry a pattern for source files, and no suite puts a NUL byte into a hook input. No decision
+package comes from the search.
+
+### Sixth batch (2026-10-09): a search program on a pipe, and a very long path
+
+Two points the cases of the fifth batch do not hold, written before any code for them exists. Every case asks the
+hook as a process, in the same stand-in world, with the starts, the bound and the assertions of
+`w1_02_round_support.py` (no line of it changed). No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_search_on_a_pipe.py
+tests/acceptance/W1-02/test_w1_02_long_paths.py -q -p no:cacheprovider -rs`
+
+| File | Cases | Red today | Green today | Red reason | Time here |
+| --- | --- | --- | --- | --- | --- |
+| `test_w1_02_search_on_a_pipe.py` | 65 | 29 | 36 | the guard refuses an allowed form (`deny`, exit 0, the search refusal) | 3 s |
+| `test_w1_02_long_paths.py` | 33 | 27 | 6 | no answer within the bound (the hook is still running at the limit) | 3 min 40 s red (each red case waits for its limit) |
+| Together | 98 | 56 | 42 | | |
+
+With the fifth batch's four files, once, on the guard as built: 56 failed, 707 passed in 4 min 15 s (the 665 cases of
+the fifth batch all pass; the 56 are the red cases above and no other).
+
+#### Point A → `test_w1_02_search_on_a_pipe.py`
+
+**What the programs do, read on this machine.** `grep --help`: "With no FILE, read '.' if recursive, '-' otherwise";
+`man grep`: "If no FILE is given, recursive searches examine the working directory, and nonrecursive searches read
+standard input." So a recursive `grep` with no path on a pipe searches the folder, not the pipe: held as refused.
+The other search program is installed (14.1.1); its `--help` lists the usage `command | rg [OPTIONS] PATTERN`, names
+`-V, --version` and `-h, --help`, and says of `--files` "Print each file that would be searched without actually
+performing the search". Seen in a scratch folder that holds one file: on a pipe and with an input redirect, with no
+path, it prints the matching line of its standard input and none of the folder's file (also with `-g '*.py'`); on a
+pipe with `.` as its path, and with `--files`, it reads the folder; a recursive `grep` on a pipe prints the folder's
+file. As the first command of a pipeline with its input closed (`< /dev/null`) it searches the folder; with the
+standard input a session's shell gives it (no terminal) it waited on that input instead: held as refused all the
+same, by the order (nothing on the command line feeds it).
+
+Red (29), each because the guard answers `deny` with the search refusal:
+
+- `test_a_search_program_fed_by_a_pipe_or_an_input_redirect_stays_allowed_at_the_root` (11 of its 14): the reader of
+  a pipe from `git log --oneline`, from `ls`, from `cat <a named source file>` with `-n`, with the word after `-e`;
+  after `|&` and after `2>&1 |`; the second and the third command of three; an input redirect from a named source
+  file (with a space and glued); a filter that only excludes, on a pipe.
+- `test_a_search_program_fed_by_a_pipe_stays_allowed_for_every_role` (6): an engineer, the test designer and a
+  session with no role, two forms each.
+- `test_a_search_program_fed_by_a_pipe_stays_allowed_from_a_copy_s_folder` (7): from each `<P>` (sibling, nested,
+  home) the reader of a pipe and the third command of three; from the sibling an input redirect from a named file.
+- `test_the_search_program_asked_only_for_its_version_or_its_help_is_allowed_at_the_root` (4: `--version`, `-V`,
+  `--help`, `-h`) and `test_the_search_program_asked_only_for_its_version_is_allowed_for_a_session_with_no_role` (1).
+
+Checked before the cases were kept: each of the 24 pipe and redirect cases with a plain `grep` in the program's place is allowed
+today, so the red is the search program's and nothing else's.
+
+Green (36), held to stay so:
+
+- the other 3 of the first function: a name filter that includes (`-g '*.py'`, `--glob='*.py'`, `--iglob '*.PY'`)
+  on a pipe (allowed today already: such a filter keeps both files out of a search of the folder too).
+- `test_a_search_of_the_root_stays_refused_whatever_stands_before_it` (11): on a pipe with `.` or the absolute root
+  as its path; on a pipe with `--files`; the first command of a pipeline; after `||`, `&&`, `;`, and after a
+  pipeline that has ended; `grep -r`, `-rn`, `--recursive` with no path on a pipe.
+- `test_a_search_of_a_copy_s_folder_stays_refused_whatever_stands_before_it` (9: three of those forms from each
+  `<P>`), `test_a_search_of_the_root_stays_refused_for_other_roles` (2),
+  `test_the_refusal_of_a_search_on_a_pipe_with_a_path_names_the_rule_and_no_path` (1).
+- `test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_stays_refused` (8): `cat <the file> |`
+  and an input redirect, for both files, the file of the session's project and a copy in the sibling checkout; each
+  refusal says nothing of the file.
+- `test_in_a_folder_that_holds_a_protected_file_the_search_program_on_a_pipe_stays_refused` (2): as today, no change.
+
+What the guard as built decides, per form (the same from the root and from each `<P>`, for every role asked):
+
+| Form | Today |
+| --- | --- |
+| the program with no path as the reader of a pipe (`\|`, `\|&`, `2>&1 \|`, second or third of a pipeline, `-n`, `-e`) | refused |
+| the same with an input redirect from a named file | refused |
+| the same on a pipe with a filter that includes source files (`-g`, `--glob`, `--iglob`) | allowed |
+| the same on a pipe with a filter that only excludes; with `-t py` (no case) | refused |
+| `--version`, `-V`, `--help`, `-h` alone; with a word beside it (no case) | refused |
+| on a pipe with the root or `<P>` as its path; with `--files`; first of a pipeline; after `\|\|`, `&&`, `;` | refused |
+| a recursive `grep` with no path on a pipe | refused |
+| a pipe whose first command reads either file or a copy; an input redirect from either | refused (as a read) |
+| any of these in a session that stands in a folder that holds either file (version and help too) | refused |
+| a subshell as the reader of a pipe; a here-string; an input redirect from a process substitution; a background job | refused (no case) |
+| a group in braces as the reader of a pipe; `xargs`; the program behind `env` or `command`; `-` as its path; `--files` with a source filter on a pipe | allowed (no case) |
+
+#### Point B → `test_w1_02_long_paths.py`
+
+The bound and the limit are the fifth batch's (`BOUND_S` 5 s of the hook's own time, the process stopped at 8 s).
+
+Measured on the guard as built, through the hook as a process, before the cases were written:
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| 1 MB of `a/` repeated: Read path (relative and below the absolute root), Grep `path` with and without a glob, Glob `path`, Glob `pattern` before its wildcard, Write path | over 35 s | none within it |
+| 1 MB of `./` repeated: Read path, Grep `path` with a glob for source files, Glob `path`, Glob `pattern` | 13 to 14 s | allow |
+| 1 MB of `./` then a protected file's project-relative path, Read (both files) | 13 s | deny |
+| 1 MB of `./` as Grep `path` with no glob; as Glob `path` with a pattern over everything | 13 to 14 s | deny |
+| 1 MB of `./` then a file under `tests/acceptance/`, Write and Edit by an engineer | 19 to 20 s | deny (the refusal carries the resolved path) |
+| 4 MB of either (Read path; `./` then the settings file; `./` as Grep `path`) | over 35 s | none within it |
+| 64 KB / 256 KB of `a/` as a Read path | 0.4 s / 3.5 s | allow |
+| 64 KB / 256 KB of `./` as a Read path | 0.07 s / 0.6 s | allow |
+| a named file twenty folders down (Read, Grep `path`); a path with a few `./` and `../` | 0.04 to 0.18 s | allow |
+
+Red (27), each because the hook is still running at the limit:
+
+- `test_a_very_long_path_is_answered_within_the_bound` (16): 1 MB and 4 MB of a repeated folder name in each of the
+  five fields; 1 MB of the current folder repeated in four of them and 4 MB in two. A decision in time is held,
+  `allow` or a refusal.
+- `test_a_very_long_path_is_answered_within_the_bound_for_other_roles` (2).
+- `test_the_current_folder_repeated_and_then_a_protected_file_is_refused_within_the_bound` (3): both files at 1 MB,
+  the settings file at 4 MB; the refusal carries nothing of the path (a run of 64 characters of it is held absent).
+- `test_the_current_folder_repeated_as_the_start_of_a_search_is_refused_within_the_bound` (3).
+- `test_a_writing_tool_with_a_very_long_path_outside_the_role_s_paths_is_not_allowed_within_the_bound` (3): Write and
+  Edit by an engineer; "not allowed" in time, no side on the shape of the refusal.
+
+Green (6): `test_an_ordinary_deep_path_and_an_ordinary_path_with_dots_stay_allowed_within_the_bound`.
+
+No line was added to `tests/acceptance/serial-only.txt`, for the reason the fifth batch gives.
+
+**A finding, with no case (by the order): a very long string in a field that is no path.** Measured the same way,
+in the same stand-in project (it has a stand-in held-out file):
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| Write, content 1 MB of `a/` repeated (the orchestrator; an engineer on a path of its own ticket) | 42.6 s; 43.7 s | allow |
+| Write, content 4 MB of `a/` repeated | over 60 s | none within it |
+| Write, content 1 MB / 4 MB of ordinary source text | 0.05 s / 0.08 s | allow |
+| Write, content of one line | 0.04 s | allow |
+| Edit, old and new text 1 MB of `a/` repeated each | over 60 s | none within it |
+| a tool the guard does not know, one field 1 MB / 4 MB of `a/` repeated | 39.8 s / over 60 s | allow / none |
+
+The cost follows the text, not the field: a megabyte of a short folder name repeated costs about as much in the
+content of a Write as in a path, and a megabyte of source text costs nothing. It is another rule's time; whether a
+bound for it is built is not decided, and no case holds it.
+
+#### Changes to the residual list
+
+Residual 39 is narrowed: a very long path in the reading tool, the search tool and the Glob tool, and in a writing
+tool outside the role's paths, is held by point B. Residuals 1 to 38 and 40 stand. Added (those a guard that reads a
+command line cannot see come first):
+
+41. What feeds a program at run time: the first command of a pipeline, or a command after `;`, `&&` or `||`, reads
+    the standard input its shell has (in a session, no terminal: the program then waits on that input and searches
+    no folder); a script, an alias or a function that pipes into the program; `exec <file` before it. Held as
+    refused where no pipe or redirect stands on the command line.
+42. A subshell or a group as the reader of a pipe, `xargs`, a here-string or a here-document into the program,
+    process substitution, a background job: no case either way, by the order. Today's decisions are in the table.
+43. Further spellings on a pipe without a case: `-t`/`--type` (refused today), `-` as the path (allowed today), a
+    name filter that names a protected file's own name on a pipe (refused today; it selects nothing on standard
+    input, and no case takes a side), `--files` with a filter (allowed today), `--pre` and `-f <file>`, the
+    program behind `env`, `command`, `sudo` or a path (`/usr/bin/…`).
+44. Version or help with anything else on the command (`--version <word>`, `-V` in a cluster, a pipeline around
+    it), and the same in a folder that holds either file: refused today; no case, by the order.
+45. Point B: a very long string in a field that is no path (the finding above); a very long path a role may write
+    (no case, by the order); long paths of other makes (`../` repeated, a long single name, a long path in a shell
+    word: the fifth batch holds 1 MB in one word); sizes above 4 MB.
+
+#### Rewrites and cases of other suites
+
+None. Searched `tests/acceptance` and `tests/unit`, `*.py`, for the search program as the reader of a pipe, with an
+input redirect, and asked for its version or help: no case holds any of them, as refused or as allowed. The fifth
+batch's own forms of that program stand without a pipe (`rg VALUE`, `rg -n VALUE`, `rg --files`, after `cd … &&`).
+
+### Seventh batch (2026-10-09): the fix round of DEC-570
+
+Five points, written before any code of the fix round exists; each refuses more than today and none allows more.
+Every case asks the hook as a process, in the stand-in world of the fifth batch, with its starts, its bound and its
+assertions (`w1_02_round_support.py`, no line changed). `w1_02_fix_support.py` holds what the five files share: a
+shell form is asked in a session that stands in its start (the root; a copy's `<P>`: sibling, nested, home; or a
+folder of the session's project that holds a protected file), and a refusal is held as the read rule's own
+decision: `deny`, exit code 0, a reason that names a decision of the rule (DEC-508, DEC-525, DEC-548, DEC-553,
+DEC-557, DEC-562 or DEC-570; none of them required) and words beside it, with no protected file's path, folder or
+value, not the folder the session stands in, and not the command or its word. No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_numbered_redirects.py
+tests/acceptance/W1-02/test_w1_02_shell_keywords.py tests/acceptance/W1-02/test_w1_02_daily_spellings.py
+tests/acceptance/W1-02/test_w1_02_brace_bound.py -q -p no:cacheprovider -rs`, and the time file in a call of its
+own: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_fix_round_time.py -q -p no:cacheprovider -rs`
+
+| File | Point | Cases | Red today | Green today | Red reason | Time here |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_w1_02_numbered_redirects.py` | 1 | 70 | 50 | 20 | the guard allows a form that is refused | 6 s |
+| `test_w1_02_shell_keywords.py` | 2 | 49 | 28 | 21 | the same | 4 s |
+| `test_w1_02_daily_spellings.py` | 3 | 99 | 69 | 30 | the same | 8 s |
+| `test_w1_02_brace_bound.py` | 4 | 46 | 33 | 13 | the same | 4 s |
+| `test_w1_02_fix_round_time.py` | 5 | 45 | 12 | 33 | 8: no answer within the bound; 4: the guard allows a form that is refused | 1 min 25 s red (each of the 8 waits for its limit) |
+| Together | | 309 | 192 | 117 | | |
+
+Every one of the 180 red cases of points 1 to 4 fails with `decision=allow exit=0`. The fifth and sixth batches' six
+files, once, on the guard as built: 763 passed in 42 s.
+
+#### Point 1 → `test_w1_02_numbered_redirects.py`
+
+Red, each because the guard answers `allow`:
+
+- `test_a_search_with_no_path_and_a_numbered_redirect_is_refused_at_the_root` (20): the four kinds of a search with
+  no path (the other program with a word; `grep -rn <word>`; `ls -R`; the other program with its option that lists
+  files) × `2>/dev/null`, `2>&1 | head`, `2>/dev/null | head`, `1><a file in the scratch folder>`, `2>>/dev/null`.
+- `test_a_search_whose_name_filter_takes_a_protected_file_in_is_refused_with_a_numbered_redirect_too` (8): `--include`
+  (quoted, with `=`) and the other program's `-g` and `--glob=`, each for both files; the filter is the file's own
+  name or a glob over its extension, in turn.
+- `test_a_search_with_a_numbered_redirect_is_refused_from_a_copy_s_folder` (6): two forms from each `<P>`.
+- `test_a_numbered_input_redirect_that_does_not_feed_the_search_program_leaves_it_a_search_of_the_folder` (4): `0<&-`
+  and `3<<a named source file>`, at the root and in the sibling checkout.
+- `test_a_search_with_a_numbered_redirect_is_refused_in_a_folder_that_holds_a_protected_file` (6) and
+  `test_a_search_with_a_numbered_redirect_is_refused_for_every_role` (6).
+
+Green, as today: `test_a_search_of_a_source_folder_with_a_numbered_redirect_stays_allowed` (4) and `…_for_every_role`
+(3); `test_a_search_of_the_root_by_its_path_with_a_numbered_redirect_stays_refused` (3);
+`test_a_fed_search_program_and_an_ordinary_command_with_a_numbered_redirect_stay_allowed` (4), `…_for_every_role` (3)
+and `test_a_fed_search_program_with_a_numbered_redirect_stays_allowed_from_a_copy_s_folder` (3).
+
+No case either way, by the order: a digit as a word of its own, set apart from the redirect by a space; and
+`0<<a named file>` (it feeds the standard input by number; allowed today).
+
+#### Point 2 → `test_w1_02_shell_keywords.py`
+
+Red, each because the guard answers `allow`:
+
+- `test_a_search_of_the_root_after_a_shell_keyword_is_refused` (10): the ten forms of the order (`do`, `then`,
+  `else`, `elif`, `if`, `while`, `until`, `!`).
+- `test_a_search_after_a_shell_keyword_is_refused_from_a_copy_s_folder` (6),
+  `…_in_a_folder_that_holds_a_protected_file` (6), `…_for_every_role` (6).
+
+Green: `test_a_read_of_a_protected_file_after_a_shell_keyword_stays_refused` (8: after `then`, `do`, `!` and `else`,
+both files, the file and a copy; **measured: the guard refuses these today**, as the read it is, and the cases hold
+it); `test_a_search_of_a_source_folder_or_a_named_file_after_a_shell_keyword_stays_allowed` (7: the five forms of the
+order and two more) and `…_for_every_role` (6).
+
+#### Point 3 → `test_w1_02_daily_spellings.py`
+
+Red, each because the guard answers `allow`:
+
+- A comment: `test_a_search_with_no_path_and_a_comment_is_refused` (8: the three kinds at the root, one from each
+  `<P>`, the other program in each holding folder).
+- A digit in the option group: `test_a_recursive_option_group_that_holds_a_digit_is_refused_as_the_search_it_is` (11:
+  `ls -1R`, `ls -l1R`, `ls -1R .`, `grep -2r <word>`, `grep -2r <word> .`, `grep -A2r <word> .` at the root; one from
+  each `<P>`; `grep -2r <word>` in each holding folder).
+- `egrep` and `fgrep`: `test_the_other_names_of_grep_are_refused_as_grep_is` (9) and
+  `test_the_other_names_of_grep_with_a_name_filter_that_takes_a_protected_file_in_are_refused` (4).
+- A prefix: `test_a_search_of_the_root_behind_a_prefix_command_is_refused` (26: each of the nine prefixes before a
+  search with no path and before one with the root as its path, the two programs in turn; `ls -R` behind two; three
+  stacked pairs; one after `if`; two with a numbered redirect behind the search) and
+  `test_a_search_behind_a_prefix_command_is_refused_from_a_copy_s_folder_and_beside_a_protected_file` (5).
+- `test_a_daily_spelling_of_a_root_search_is_refused_for_every_role` (6).
+
+Green, as today: `test_a_search_of_a_source_folder_with_a_comment_or_a_hash_inside_a_word_stays_allowed` (5),
+`test_an_option_group_with_a_digit_and_no_search_of_the_root_stays_allowed` (5),
+`test_the_other_names_of_grep_stay_allowed_where_grep_is` (8),
+`test_an_ordinary_command_behind_a_prefix_command_stays_allowed` (6; among them
+`git log --oneline | timeout 5 <the other program> <word>`: **measured: allowed today**, so the case is written) and
+`test_the_daily_forms_of_these_spellings_stay_allowed_for_every_role` (6).
+
+No case either way, by the order: other options of a prefix; `sudo` as a prefix.
+
+#### Point 4 → `test_w1_02_brace_bound.py`
+
+**The bound, measured on the guard as built: one brace word is expanded to at most 256 words.** A word of a
+two-alternative group and doubling groups (`{<x>,zz}{,a}{,a}…`) with a protected file's path as `<x>`: at 64, 128 and
+256 words it is refused in all four places (a shell reader, the Glob tool's `pattern`, the Grep tool's `glob`, the
+other program's glob option); at 512 and at 4096 words it is allowed in all four.
+
+Red, each because the guard answers `allow`:
+
+- `test_a_brace_word_past_the_bound_whose_expansions_take_a_protected_file_in_is_refused` (16: four places × twice and
+  sixteen times the bound × both files).
+- `test_a_brace_word_past_the_bound_is_refused_also_where_no_expansion_names_a_protected_file` (8).
+- `test_a_brace_word_past_the_bound_that_takes_a_copy_in_is_refused` (4), `…_in_a_folder_that_holds_a_protected_file`
+  (2), `…_for_every_role` (3).
+
+Green: `test_a_brace_word_at_the_bound_whose_expansions_take_a_protected_file_in_stays_refused` (4),
+`test_an_ordinary_brace_word_stays_allowed` (8: `ls src/{a,b,c}.py`, a word of 64 source files, the Glob tool with
+`src/**/*.{py,md}`, the Grep tool with `*.{py,md}` and a source folder, the other program with the same) and
+`test_a_brace_word_in_a_write_target_is_decided_as_today_and_not_as_a_read` (1).
+
+**A form the order names as allowed and the guard denies today:** `mkdir -p <a scratch folder>/{a,b}/{x,y}`. It is
+denied for every role by the rule for a Bash write whose target the guard does not resolve (a brace word in a write
+target; the same command without braces is allowed), not by the read rule. Allowing it would loosen another rule,
+so the case holds only that the read rule is not what refuses it, before and after. See the packages.
+
+No case either way: a word of more than 64 and fewer than 512 words that takes neither file in.
+
+#### Point 5 → `test_w1_02_fix_round_time.py`
+
+**The bound is the fifth batch's, unchanged: 5 s of the hook's own time (`BOUND_S`); the process is stopped at 8 s.**
+No reason to change it was measured: an ordinary decision takes 0.04 to 0.25 s here, the new forms at the length
+bound take 0.2 to 0.7 s today, and the slow inputs take 9 s and more. Every input is under the round's length bounds
+(`test_every_input_is_under_the_round_s_length_bounds`, no process).
+
+The reviewer's thirteen inputs, measured on the guard as built through the hook as a process (load average about 11
+during the first seven, lower after):
+
+| # | Input | Time | Decision | Case today |
+| --- | --- | --- | --- | --- |
+| 1 | Grep, `path` = `a/` × 2047, `glob` = `x ` × 2047 | 14.5 s | allow | red |
+| 2 | Grep, `path` = `a/` × 1000, `glob` = `x ` × 500 | 1.5 s | allow | green |
+| 3 | Grep, `glob` = `{a,b}` × 8 + `/` + `a/` × 2000 + `*` | 1.7 s | allow | green |
+| 4 | Glob, the same string as `pattern` | 0.9 s | allow | green |
+| 5 | Glob, `path` = `a/` × 2048, `pattern` = `{a,b}` × 8 + `/*` | 0.9 s | allow | green |
+| 6 | `cat ` + `{a,b}` × 8 + `/` + `a/` × 16000 | 10.8 s | allow | red |
+| 7 | `cat ` + `{a,b}` × 4 + `/` + `a/` × 16000 | 0.9 s | allow | green |
+| 8 | `ln -s ` + `{a,b}` × 8 + `a/` × 15000 + ` b` | 9.4 s | allow | red |
+| 9 | the other program, 300 `-gx` filters, `V`, `a/` × 8000 | 10.4 s | allow | red |
+| 10 | the same with 3000 filters | over 90 s | none within it | red |
+| 11 | `grep -r`, 1000 `--include=x`, `V`, `a/` × 8000 | 32.0 s | allow | red |
+| 12 | `true ` + `\| <the other program> V ` × 1000 | 1.7 s | allow | green |
+| 13 | the same × 4000 | 20.2 s | allow | red |
+
+- `test_each_of_the_reviewer_s_inputs_is_decided_within_the_bound` (13: 7 red, 6 green and kept) and
+  `test_the_reviewer_s_inputs_are_decided_within_the_bound_for_other_roles` (3: inputs 2, 9 and 12; the one on input 9
+  is red). The six green inputs are within the bound by a factor of three to five only: the engineer's target of well
+  under a second is not held by a case.
+- `test_each_new_form_of_the_round_at_the_length_bound_is_decided_within_the_bound` (9, green today: the guard does not
+  judge them yet) and `…_for_other_roles` (3). Measured today, each `allow`: a prefix repeated 0.32 s; `env X=1`
+  repeated 0.48 s; `!` repeated 0.72 s; an `if` nested about 1775 times 0.33 s; a numbered redirect repeated 0.64 s;
+  short loops with a search each 0.40 s; a search and a very long comment 0.45 s; searches with a comment each on
+  lines of their own 0.54 s; `egrep -r` with 1000 filters and a path of 8000 folders 0.22 s.
+- `test_a_new_form_at_the_length_bound_that_searches_the_root_is_refused_within_the_bound` (4, red: `allow` in 0.3 to
+  0.7 s): a prefix repeated before a search of the root; many loops and then one that searches the root; a search
+  with no path and a very long comment; a search with no path and a numbered redirect repeated.
+- `test_a_new_form_at_the_length_bound_that_reads_a_protected_file_is_refused_within_the_bound` (4, green: `deny` in
+  0.25 s today): a nested `if` and a repeated prefix around a read of either file.
+- `test_an_ordinary_size_stays_allowed_within_the_bound` (8, green: 60 source paths with 60 filters 0.24 s; a commit
+  message of 30000 characters 0.22 s; `cat` of 200 named files 0.10 s; a pipeline of 20 `grep` filters 0.09 s; for
+  the orchestrator and a session with no role).
+
+No line was added to `tests/acceptance/serial-only.txt`: the bound is five to twenty times what each input is to
+take after the change, and none of the green cases changed its result in the runs here.
+
+#### What the guard as built decides, where it differs from what the order expects
+
+| Form | Order | Today |
+| --- | --- | --- |
+| every refused form of points 1 to 4 (root, `<P>`, holding folder, every role asked) | red: allowed | allowed, all 180 |
+| `if true; then cat <the file>; fi` and its like | measure | refused, as a read (exit 0) |
+| `git log --oneline \| timeout 5 <the other program> <word>` | measure | allowed: case written |
+| `mkdir -p <a scratch folder>/{a,b}/{x,y}` | stays allowed | denied by the write rule (unresolved target) |
+| the reviewer's inputs 2, 3, 4, 5, 7, 12 | red: no answer within the bound | answered in 0.9 to 1.7 s: green, kept |
+| the new forms at the length bound that search the root | refused in time | allowed in time: red for the decision |
+
+#### Changes to the residual list
+
+Residual 43 is narrowed: the other program behind `env` or `command` is held by point 3 (`sudo` and a path such as
+`/usr/bin/…` stand). Residual 36's "braces" is narrowed by point 4. Residuals 1 to 45 otherwise stand. Added, the
+forms a guard that reads a command line cannot see first:
+
+46. A search whose command, keyword or prefix is made at run time (a variable or a substitution as the command
+    word, `eval`, an alias or a function named like a prefix), and a search with a substitution as its path.
+47. A brace word made past the bound by something the command line does not show (a variable expanded inside the
+    braces, `eval`), and a sequence (`{1..1000}`).
+48. Not built by DEC-570, no case: `find` with a name test; valued options the rule does not list; a search in a
+    brace group, in a shell started with `-c`, or behind `xargs`; a file-tool path that is not text; a line of a
+    here-document's body that reads as a search (refused as built); the other program's option that lists its file
+    types; the type filter with no path (refused as built).
+49. No case either way, by the order: `sudo` as a prefix and other options of a prefix (`timeout -k`, `env -i`,
+    `env -u`, `nice --adjustment`, `time -p`, `command -p`); a digit as a word of its own before a redirect; a word
+    of 65 to 511 expansions that takes neither file in.
+50. Not held by this designer: further keywords and shapes (`case … in`, `select`, `{ …; }`, `( … )`, `function`,
+    `coproc`, `&&` or `||` between a keyword and the search); further prefixes (`stdbuf`, `ionice`, `setsid`,
+    `chronic`, `watch`, `strace`, `exec`, `builtin`); further names of the search programs (`zgrep`, `rgrep`, a
+    path such as `/usr/bin/grep`, which the guard as built judges by its last part); a comment after a `;` or
+    inside a substitution; numbered redirects of other shapes (`2>|`, `&>`, `>&2`, `{fd}>`); the input `0<<file>`.
+51. Point 5: the engineer's target of well under a second is not a case (the bound is 5 s); a slow input of a
+    shape neither the reviewer nor this designer found; what the harness does with a hook that passes its own time
+    limit (residual 39).
+
+#### Rewrites and cases of other suites
+
+None. Searched `tests`, `*.py`, for a search program with a numbered redirect, after a keyword, behind a prefix,
+with a digit in its option group, and for `egrep` and `fgrep`: no acceptance case of any suite holds as allowed a
+form this round refuses. Two unit cases of the guard (`tests/unit/guard/test_decide.py`: `ls -la 2>&1` and
+`ls 2>/dev/null`) hold a listing without recursion with a numbered redirect as allowed; that stays allowed at the
+root, and they are the engineer's.
+
+### Eighth batch (2026-10-09): the held-out check and the system path limit (DEC-574)
+
+DEC-574: "The held-out check skips path resolution for any string longer than the system path limit, and keeps the
+literal substring check." The rule is the older held-out check of W1-47 (DEC-162, DEC-215, DEC-218), which refuses
+any call whose input names a held-out path; it is not the read rule of this revision. Nothing else is built in this
+round (DEC-577).
+
+Every case asks the hook, run as a process on a hook input, in a temporary project with a stand-in held-out file
+that lists a stand-in held-out folder (`w1_02_limit_support.py`, on the project of `w1_02_protected_support.py`).
+The held-out file's path comes from the guard's constants and is never typed; no held-out path of this machine is
+used. The orchestrator asks every case; an engineer and a session with no role ask a share.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_path_limit_boundary.py \
+    tests/acceptance/W1-02/test_w1_02_path_limit_unchanged.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_path_limit_time.py -q -p no:cacheprovider -rs
+```
+
+| File | Cases | Red today | Green today | Why red |
+| --- | --- | --- | --- | --- |
+| `test_w1_02_path_limit_boundary.py` | 47 | 15 | 32 | the held-out check refuses a string past the limit that holds no literal held-out path |
+| `test_w1_02_path_limit_unchanged.py` | 56 | 2 | 54 | the same, for a string of lines whose first line reaches the folder |
+| `test_w1_02_path_limit_time.py` | 26 | 12 | 14 | no answer within the bound (11 ended at the process limit; 1 at the bound itself) |
+
+129 cases, 29 red and 100 green on the guard as built (code at `e34968df`). The red run of the time file takes
+about 96 s (each red case ends the hook's process at 8 s); the other two files take under 10 s together.
+
+#### The limit, and the readings chosen
+
+- **Where the value comes from.** The system reports 4096 for the length of a path (`PC_PATH_MAX` of the root
+  folder). The guard already holds the same number as the longest path it resolves in a path
+  field of a file tool (sixth batch: a longer one is refused with a reason that names DEC-562). The cases take the
+  system's value at run time (`w1_02_limit_support.LIMIT`) and tie the two by behaviour: a path field of exactly
+  that length is still resolved, one character more is refused with the other reason.
+- **With or without the closing byte.** The system's number counts the closing byte, so a program opens a path of
+  at most 4095 bytes (checked on a made-up folder: 4095 opens, 4096 gives "File name too long"). Two readings
+  differ at exactly 4096. **Held: a string is past the limit when it holds more than 4096**, the reading under
+  which fewer strings are past it, and the one the guard's path fields already have. A string of exactly 4096 is
+  resolved as today.
+- **Characters or bytes.** **Held: characters.** A string of N characters has at least N bytes, so fewer strings
+  are past a limit counted in characters. A string of 4096 characters and more bytes than that, which reaches the
+  stand-in held-out folder stays refused.
+- **The limit of one name.** The limit of one file name (255 here) belongs to the file system, not to the system.
+  **Held: it plays no part.** A string under the path limit is resolved as today whatever its components: one
+  with a name of 300 characters that reaches the stand-in held-out folder through `..` stays refused.
+- **The session's folder.** The check resolves a relative string from the session's folder. **Held: the limit
+  counts the string, not the string joined to that folder.** A program in the session's folder opens a relative
+  path of up to the limit, whatever the absolute path's length (the cases through `..` at the limit hold it).
+- **Expansion.** The check as built expands the home folder's short form at the start of any string, and in a word
+  of a Bash command also every variable of the hook's environment (the home variable among them), before it
+  resolves. **Held: a string is past the limit only if it is past it both as written and as expanded.** Three
+  shapes, all refused today and held as refused: a Bash word over the limit as written that expands to a path
+  under it (seven hundred `${HOME}` with the root folder as the hook's home: about 5,000 characters written, under 900
+  expanded, and a shell opens the file); a Bash word under the limit as written and over it as expanded (`$HOME/`
+  with the stand-in home folder); the home folder's short form in a Write's content and in an unknown tool's
+  field, under as written and over as expanded. Over both ways: not refused by the held-out check (red today).
+  The one case with the root folder as home reads and writes nothing under it; no shorter stand-in home can be
+  made on a machine.
+
+#### Point 1 → `test_w1_02_path_limit_boundary.py`
+
+A string that reaches the stand-in held-out folder without holding its path, built to an exact length: an absolute
+path through a symbolic link padded with `./`, and a relative path from the session's folder through `..` padded
+with `x/../`.
+
+| Function | Cases | Today |
+| --- | --- | --- |
+| `test_a_string_at_or_under_the_limit_that_reaches_the_held_out_folder_is_refused` | 11: every field at the limit (7), every second field just under it (4) | green |
+| `test_a_string_just_over_the_limit_is_not_refused_by_the_held_out_check` | 9: every field, the Write's content and the Bash word in both forms | red |
+| `test_a_string_just_over_the_limit_is_decided_for_another_role_as_a_short_string_is` | 4 | red |
+| `test_a_string_at_the_limit_is_refused_for_another_role` | 2 | green |
+| `test_a_bash_word_over_the_limit_as_written_that_expands_to_a_path_under_it_stays_refused` | 1 | green |
+| `test_a_string_under_the_limit_as_written_and_over_it_as_expanded_stays_refused` | 3 | green |
+| `test_a_string_over_the_limit_as_written_and_as_expanded_is_not_refused_by_the_held_out_check` | 2 | red |
+| `test_a_string_at_the_limit_in_characters_and_over_it_in_bytes_stays_refused` | 2 | green |
+| `test_a_string_under_the_limit_with_one_name_longer_than_a_file_name_may_be_stays_refused` | 2 | green |
+| `test_a_path_field_longer_than_the_guard_resolves_stays_refused_with_a_reason_of_its_own` | 9: seven path fields just over the limit, two at a megabyte | green |
+| `test_a_path_field_at_the_limit_is_still_resolved_and_refused_by_the_held_out_check` | 2 | green |
+
+The fields that are no path field: a Write's content, an Edit's old string and its new string, a field of an
+unknown tool, a list and a mapping inside the input, a word of a Bash command.
+
+**What the guard decides as a whole for a string just over the limit** (measured on the guard as built with the
+resolution skipped in a scratch copy of the decision, nothing of it left in the tree): a Write or an Edit of a
+source file is the allow-list's (allowed for the orchestrator and for an engineer whose ticket names the file,
+denied for a session with no role, by the allow-list and not by the held-out check); a tool the guard does not
+know is allowed for every role; `cat <the long word>` writes nothing and is allowed for every role (the read rule
+does not refuse it). Each case holds that decision beside "not refused by the held-out check".
+
+A refusal of the held-out check is told by its reason, which the guard words as "the call names a held-out path"
+(the cases look for the words "held-out path"); it carries no path, and the cases hold that nothing the hook wrote
+carries the stand-in path, a way to it, or the held-out file's place.
+
+#### Point 2 → `test_w1_02_path_limit_unchanged.py`
+
+| Line of the order | Function | Cases | Today |
+| --- | --- | --- | --- |
+| a long string with a literal held-out path, anywhere, in any field | `test_a_long_string_that_holds_a_held_out_path_as_literal_text_is_refused` | 21: six fields at just over the limit, 100,000 characters and a megabyte; a Bash command at just over the limit, 20,000 and near its bound; the five positions turn | green |
+| the same for other roles | `test_a_long_string_with_a_literal_held_out_path_is_refused_for_another_role` | 3 | green |
+| the exception stays as it is | `test_an_edit_of_a_file_that_may_carry_the_path_is_not_refused_for_carrying_it_at_a_length_over_the_limit` (3), `test_the_usual_role_rules_still_apply_to_an_edit_over_the_limit_of_the_two_files` (1), `test_the_exception_is_for_the_two_files_only_at_a_length_over_the_limit` (1) | 5 | green |
+| at or under the limit as today | `test_a_string_of_ordinary_length_that_reaches_the_held_out_folder_is_refused_in_a_field_that_is_no_path` (5), `test_an_ordinary_string_that_reaches_nothing_held_out_stays_allowed` (3) | 8 | green |
+| a Bash command of many short words | `test_a_long_command_of_many_short_words_in_which_one_word_reaches_the_held_out_folder_is_refused` (9), `test_a_long_command_of_many_short_words_that_reach_nothing_stays_allowed` (3) | 12 | green |
+| a string of lines in another field | `test_a_string_of_lines_in_which_a_later_line_reaches_the_held_out_folder_is_decided_as_today` (3), `test_a_string_of_lines_under_the_limit_whose_first_line_reaches_the_held_out_folder_stays_refused` (2) | 5 | green |
+| the same, first line, over the limit | `test_a_string_of_lines_over_the_limit_whose_first_line_reaches_is_not_refused_by_the_held_out_check` | 2 | red |
+
+The five positions of a literal path: at the string's start, in its middle, at its end, on a line of its own,
+glued between other characters. The text around it is path-like (`a/` repeated), the worst the check reads.
+
+**The exception as built.** A Write or an Edit whose file path is one of the two files that may carry a held-out
+path is judged by that file path alone: nothing of its content or of its two strings is looked at, at any length
+(a literal path and a string that reaches the folder alike). The usual role rules then decide. W1-47 holds it at
+an ordinary length (`test_w1_47_oracle_naming.py`: `test_an_edit_to_a_file_that_holds_the_path_is_not_denied_for_carrying_it`,
+`test_the_usual_role_rules_still_apply_to_the_two_files`, `test_the_exception_is_for_the_two_files_only`,
+`test_the_exception_does_not_open_the_path_itself`); no case there is longer than a line, so the five cases here
+hold it at 100,000 characters.
+
+**At or under the limit: what W1-47 holds already.** `test_w1_47_oracle_naming.py`:
+`test_a_call_that_reaches_the_path_without_writing_it_out_is_denied` holds the relative path, `..`, the home
+folder's short form, the home variable and a symbolic link, in the path fields of the file tools and in a Bash
+command, for three roles; `test_a_call_that_holds_the_path_anywhere_in_its_input_is_denied` holds the literal path
+in every kind of field; `test_the_same_form_on_a_directory_that_is_not_held_out_is_allowed` and
+`test_w1_47_oracle_guard.py::test_a_call_that_names_another_path_stays_allowed` hold what stays open;
+`test_w1_47_oracle_guard.py::test_a_call_that_names_the_oracle_path_is_denied` holds paths below the folder.
+Missing there, added here: the forms that reach the folder without its path **in the fields that are no path
+field** (a Write's content, an Edit's strings, an unknown tool's field, a nested field), and ordinary strings in
+those fields that reach nothing.
+
+**How the check as built reads a long string of many short pieces.**
+
+- **A Bash command: word by word.** Words are separated by spaces, tabs, carriage returns, newlines and the
+  shell's punctuation `( ) ; < > | &`, with or without spaces around it; a quoted stretch is one word. An equals
+  sign, a colon and a comma do not separate words. Each word is expanded and resolved on its own, so a command
+  past the path limit made of short words is judged as today: one word that reaches the stand-in held-out folder
+  refuses the command (measured and held at a command length just over the limit and near the command bound, for
+  eight separators); many short words that reach nothing stay allowed.
+- **Any other string: as one path.** Only slashes separate; a newline or a space is a character of a name. A
+  string of many lines in which a **later** line reaches the folder is not refused today, under or over the limit:
+  read as one path, it names a file below the session's folder (measured at 2,000, 5,000 and 100,000 characters;
+  held). A string whose **first** line reaches the folder is refused today at every length: read as one path, it
+  lies below the held-out folder. Under the limit that stays refused (held, green); over it, it is the ordered
+  change of point 1 (held as not refused by the held-out check, red today).
+
+#### The forms that are refused today and become allowed by the held-out check
+
+Each is a string of more than 4096 characters that holds no held-out path as literal text. No program opens such a
+string as a path: the system refuses any path of 4096 bytes or more ("File name too long").
+
+1. A string past the limit that, resolved, reaches a held-out path through a symbolic link, through `..`, or as a
+   relative path from the session's folder, padded with `./`, with `x/../` or with slashes: in a Write's content,
+   an Edit's old or new string, a field of an unknown tool, a list or a mapping inside the input.
+2. The same as one word of a Bash command (a command stays under 32,768 characters).
+3. A string past the limit as written **and** as expanded that starts with the home folder's short form, or a Bash
+   word of that kind with a home variable, and that would reach a held-out path below the home folder.
+4. A string of lines (or of words separated by spaces, in a field that is no Bash command) past the limit whose
+   first line, up to its last slash, reaches a held-out path: read as one path it lies below the held-out folder.
+5. A megabyte or more of path-like text that reaches nothing: it was never refused, only not answered in time.
+
+What the guard as a whole decides for them is in point 1 above. See DP-11 for what a program can still do with
+forms 1 and 2.
+
+#### Point 3 → `test_w1_02_path_limit_time.py`
+
+**The bound** is the fifth batch's, unchanged: the hook ends with a decision within 5 s of its own time, start to
+exit (`w1_02_round_support.BOUND_S`); a case ends the hook's process at 8 s (`PROCESS_LIMIT_S`) and fails. Every
+case uses that support's "decided in time" assertion: a decision, never a hook error, never the limit.
+
+Measured on the guard as built, one hook process per input, by the orchestrator, on this machine (20 cores, load
+average 2 to 5 during the measuring):
+
+| Input | Time today | Decision today | Held |
+| --- | --- | --- | --- |
+| a Write whose content is a megabyte of `a/` repeated | 43.5 s | allowed | allowed in time: red |
+| the same with four megabytes | no answer in 240 s (ended there) | none | allowed in time: red |
+| an Edit with a megabyte of `a/` in each of its two strings | 73.7 s | allowed | allowed in time: red |
+| an unknown tool with a megabyte of `a/` in a field | 45.3 s | allowed | allowed in time: red |
+| the same in a nested field | 41.6 s | allowed | allowed in time: red |
+| a megabyte or four megabytes with a literal held-out path inside (a Write, an unknown tool's field, a nested field) | 0.04 to 0.18 s | refused by the held-out check | refused in time: green |
+| an Edit with a megabyte in each string and the literal path in the second | 41.5 s | refused by the held-out check | refused in time: red |
+| a string just over the limit (`a/` repeated, a Write's content) | 0.04 to 0.18 s | allowed | green |
+| a megabyte of text with no separator at all | 0.05 to 0.18 s | allowed | green |
+| a megabyte of short lines (`a/b` on each) | 28.8 s | allowed | red |
+| a megabyte of `../` | 4.6 to 5.4 s | allowed | at the bound: red in the run recorded here, green on a quiet machine |
+| a megabyte of the home folder's short form repeated | 40.9 s | allowed | red |
+| a Bash command near its bound made of one long word | 0.24 to 0.38 s | allowed | green |
+| a Bash command near its bound made of many short words | 0.24 to 0.38 s | allowed | green |
+| a Write of 200,000 characters of source text | 0.15 to 0.23 s | allowed where the role may write | green |
+| an Edit of 50,000 characters of source text | 0.05 to 0.18 s | allowed | green |
+| a commit with a message of 30,000 characters | 0.14 to 0.29 s | allowed (every role) | green |
+
+Each of the slow inputs is held as decided exactly as a short content is for the same role and file: allowed for
+the orchestrator and for an engineer whose ticket names the file; for a session with no role a Write is denied by
+the allow-list, in time. The source text of the ordinary cases is lines of code with paths and slashes in them.
+
+| Function | Cases | Today |
+| --- | --- | --- |
+| `test_an_input_that_takes_too_long_today_is_decided_within_the_bound` | 5 | red |
+| `test_a_megabyte_in_a_write_s_content_is_decided_within_the_bound_for_another_role` | 2 | red |
+| `test_the_same_size_with_a_held_out_path_as_literal_text_inside_is_refused_within_the_bound` | 5 | 4 green, the Edit red |
+| `test_a_megabyte_with_a_literal_held_out_path_is_refused_within_the_bound_for_a_session_with_no_role` | 1 | green |
+| `test_a_shape_near_the_limit_is_decided_within_the_bound` | 7 | 4 green, 3 red (short lines, `../`, the home folder's short form) |
+| `test_a_shape_near_the_limit_is_decided_within_the_bound_for_another_role` | 1 | red |
+| `test_ordinary_large_source_text_stays_allowed_within_the_bound` | 5 | green |
+
+**The serial list.** No case of this batch is added to `tests/acceptance/serial-only.txt`: after the change each
+input is answered in well under a second of the check's own time, against a bound of 5 s.
+
+#### The forms not held
+
+- The exact reading where a home folder of one character makes a string one character shorter as the guard expands
+  it and no shorter as a shell does (a string of 4097 characters that starts with the short form, the root folder
+  as home): refused today; no case either way.
+- A variable other than the home variable in a Bash word (the check expands every variable of the hook's
+  environment): held for the home variable only.
+- A string past the limit in a field of a tool the guard knows by another rule (an Agent's prompt, a WebFetch's
+  address, the description of a Bash call): the check treats every field that is not a Bash command alike; held
+  through an unknown tool's field and nested fields.
+- NotebookEdit: its path field is refused past the limit like the others (measured); no case.
+- The time of the hook under parallel load: the bound is generous and no case is listed as serial.
+
+#### Changes to the residual list
+
+Residuals 1 to 51 stand. Added:
+
+52. DEC-574: a string past the path limit that reaches a held-out path is no longer refused by the held-out
+    check. A program that makes a shorter path of it before opening it still reaches the file (DP-11).
+53. As built, not changed by this round: in a Bash command an equals sign, a colon and a comma do not separate
+    words for the held-out check, so `--option=<a relative path or a link that reaches a held-out path>` is not
+    refused unless it holds the path as literal text (measured: allowed). W1-47 holds the literal form only.
+54. As built: in a field that is no Bash command the check reads a string as one path, so a path that reaches a
+    held-out path on a later line, or after a space, of a longer text is not refused at any length (measured).
+55. As built: an edit of one of the two files that may carry a held-out path is not looked at beyond its file
+    path, so its content may also hold a string that reaches a held-out path (measured: allowed for a role that
+    may write the file).
+56. As built: the allow-list's denial of a write names the write's target, so a denied write of the held-out file
+    carries that file's path in its reason (the file's place, not a held-out path).
+57. A megabyte of `../` takes the check about 5 s today; after the change no string past the limit is resolved.
+    A string under the limit costs at most its 4096 characters; many such strings in one input (a list of ten
+    thousand short path-like fields, a Bash command of eight thousand words: under 0.4 s) are not held beyond the
+    cases named.
+
+#### Rewrites and cases of other suites
+
+None. No case of W1-47's suite holds a string longer than a line (searched its test files for a length or a
+repetition: none), so none holds as refused a form this decision allows; no line of that suite is changed. No
+earlier case of this suite asks the held-out check with a long string in a field that is no path (the sixth batch
+records it as "a finding, with no case").
+
+### Ninth batch (2026-10-09): the guard's own deadline (DEC-580)
+
+DEC-580: "The guard's hook program keeps its own deadline of 20 seconds and answers "refuse" when it reaches it."
+Why: the harness ends a hook at its time limit and lets the call through (`docs/research/EXP-hook-time-limit.md`,
+observed for PreToolUse), and the hook entries carry a limit of 60 seconds. A decision still running at 20 seconds
+must end as a refusal by the guard's own hand. It is the last round of the wave on the guard (DEC-577, DEC-584).
+
+Files: `test_w1_02_deadline.py` (14 cases, red), `test_w1_02_deadline_in_time.py` (12 cases, green),
+`w1_02_deadline_support.py`. No earlier file is changed but this README.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_deadline.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_deadline_in_time.py -q -p no:cacheprovider -rs
+```
+
+#### What the program does today (from the sources and measured)
+
+- It reads its input with a bound of 3 seconds. An input left open is answered after 3 s with exit code 2 and one
+  finding of the guard (kind `empty_input`; `invalid_json` when half an object had arrived). Measured: 3.1 s.
+- Before any rule on the call it clears the pending entries of the same actor in its bookkeeping folder, reads the
+  freeze flag, and starts `git` once to find where the freeze mirror is kept. That start has no time limit.
+- After the rules have allowed a Bash call it notes the state of the tree for the check after the call: four more
+  starts of `git`, each with a limit of 10 s of its own, and a counter. After an allowed Write, Edit or
+  NotebookEdit it advances the counter only. Measured: `git` is started 5 times for an allowed Bash call, once for
+  any other call.
+- A refusal by a rule is exit code 0 with one JSON object on stdout: `hookSpecificOutput` with `hookEventName`
+  `PreToolUse`, `permissionDecision` `deny` and a `permissionDecisionReason`. A failure of its own is exit code 2
+  and one line in the findings file (DEC-110). The suite's classifier reads both as "deny".
+- **It keeps no deadline over the whole decision.** Measured with the stand-ins below: a first program that does
+  not end holds the hook until the stand-in ends (no answer at 32 s); a named pipe in the bookkeeping folder holds
+  it for as long as the pipe is there; program starts of 5.5 s each end in an allow after 27.9 s; an input that
+  comes after 2 s and a first program of 19.5 s end in an allow after 21.8 s.
+
+#### How a case makes a decision slow
+
+Never by a slow machine, by a weaker rule, or by a switch in the product: the cases need nothing from the code but
+the deadline itself, and where 20 seconds must pass they are waited out. Three stand-ins, all through what the suite
+already uses to reach the hook (its environment, its input, the temporary project):
+
+1. **A stand-in for the program the hook starts** (`git`), first on the search path of the hook's environment. It
+   writes its process id to a file of the case, may start a child of its own that does the same, sleeps for the
+   time the case names, and then runs the real program with the same arguments. Which start sleeps is named by
+   its number (the first, or every one), never by its arguments. Every stand-in ends by itself after 40 s.
+2. **A named pipe in the hook's bookkeeping folder** of the temporary project: among the pending entries (read
+   before the decision), or at the counter (advanced after the rules have allowed the call). The program as built
+   waits on a pipe for ever; no process is involved. The folder's and the counter's names are imported from the
+   guard's module, not typed. This is an input no rule bounds today (residual 59).
+3. **An input that arrives late**: the whole object after 2 s, inside the program's 3-second bound.
+
+All hook processes of a module are started side by side, each in a project of its own, and each case asserts on
+one of them afterwards, so **a module waits once**. The hook's output goes to files, not pipes, so that a process
+it leaves behind cannot hold a case. The hook is started as the suite starts it, in the test's own process group:
+a program that ended its whole group at the deadline would end the test run. When a module's fixture returns,
+every stand-in process has been ended and every pipe let go.
+
+#### The bounds held
+
+| Bound | Value | Why |
+| --- | --- | --- |
+| The answer is not there before | 19 s | "Not at once": the slow step was waited for. A second under the deadline, for a clock's grain. |
+| The answer is there by | 26 s | The deadline and 6 s for a loaded machine (the earlier time cases give 5 s to a decision of well under a second). Far under the harness's 60 s. |
+| The case ends the hook's process at | 32 s | So that a run cannot hang. A hook still running then has given no answer. |
+| A stand-in ends by itself after | 40 s | Well over 26 s, well under 60 s. |
+| What the hook started is gone within | 5 s after its answer | Its own process has ended (the case waited for it). |
+| A step that ends in time | 4 s, answered by 15 s | |
+| An input left open | answered between 2.5 s and 8 s | The program's bound is 3 s. |
+
+The times are the test's clock from the start of the hook's process to its end.
+
+#### The points → tests
+
+| Point | Held by | Cases | Today |
+| --- | --- | --- | --- |
+| 1. At the deadline the program refuses, in a refusal's form, with a reason that says it could not decide in time and names DEC-580; not before 19 s, by 26 s. The whole decision counts | `test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused` | 7 | red |
+| 1. The reason carries nothing of the call and neither protected file's path | `…::test_the_deadline_s_refusal_carries_nothing_of_the_call` (over all 12 hook processes) | 1 | red |
+| 1. Nothing the program started is left running | `…::test_nothing_the_hook_started_is_left_running_after_its_answer` (over the 10 with a stand-in program; one has a child of its own) | 1 | red |
+| 2. The program's own bound on reading its input stays | `test_w1_02_deadline_in_time.py::test_the_bound_on_reading_the_input_stays_as_it_is`; and the existing `test_w1_02_guard_failure.py::test_input_that_never_ends_is_denied_by_the_guard_s_own_deadline` | 2 | green |
+| 3. A slow step that ends in time leaves an allowed call allowed, its bookkeeping done | `…in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed` | 2 | green |
+| 3. … and a refused call refused with its own reason | `…::test_a_step_that_ends_before_the_deadline_leaves_a_refused_call_refused_with_its_own_reason` | 1 | green |
+| 3. A refusal reached in time is never the deadline's answer | `…::test_a_refusal_reached_in_time_is_never_the_deadline_s_answer` | 2 | green |
+| 3. An internal failure keeps its exit and its finding | `…::test_an_internal_failure_keeps_its_own_answer`; and the existing `test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2`, `…::test_unusable_input_leaves_one_finding` | 2 | green |
+| 3. An ordinary decision is not slowed down | the existing `test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms` (p95 under 100 ms over 40 hook processes), unchanged; nothing is added to it | (5) | green |
+| 3. Every earlier case stays as it is | no line of an earlier test file is changed | | |
+| 4. Nothing a session can set raises the deadline or switches it off | `test_w1_02_deadline.py::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off` | 5 | red |
+| 4. A tiny limit named stops no work | `…in_time.py::test_a_tiny_limit_named_stops_no_work` | 3 | green |
+
+**Where the slow step sits in the seven cases of point 1.** Each call is one the rules allow.
+
+| Case | Tool, who | Slow step | Place in the decision |
+| --- | --- | --- | --- |
+| first program does not end | Bash, engineer | stand-in 1, with a child of its own | before any rule on the call |
+| first program does not end | Write, orchestrator | stand-in 1 | before any rule on the call |
+| first program does not end | Read, a session with no role | stand-in 1 | before any rule on the call |
+| a pipe in the bookkeeping before the decision | Bash, engineer | stand-in 2 | before the decision starts |
+| a pipe in the bookkeeping after the rules allowed it | Write, engineer | stand-in 2 | **after the rules have allowed the call** |
+| every program takes a few seconds | Bash, orchestrator | stand-in 1, 5.5 s on every start | spread: one start before the rules, the others **after the rules have allowed the call**; no step is long, the fourth ends after 22 s |
+| the input comes late and the first program is slow | Bash, engineer | stand-in 3 (2 s) and stand-in 1 (19.5 s) | spread over reading the input and one step: neither reaches 20 s, together 21.5 s |
+
+So "a call the rules would allow, whose bookkeeping is still running at the deadline, is refused, not allowed" is
+held by the fifth and the sixth case, and "a time spread over several steps" by the sixth and the seventh. The last
+one also holds that the deadline counts from the start of the program, not from the end of reading the input: a
+deadline counted from the input's end would let the step finish and allow the call.
+
+**The reason.** It must name DEC-580 and carry one of: "in time", "deadline", "time limit", "too long", "timeout",
+"timed out". It must not carry the call's marker word, the command's first word, the project's path, the written
+file's path, the settings file's path, or the held-out file's path, name or folder (the last three from the guard's
+constant).
+
+**Point 4, what the cases prove and what they do not.** Each of the five is a Bash call by an engineer whose first
+program does not end, answered as in point 1:
+
+- fields `timeout`, `timeout_s`, `timeout_ms`, `deadline`, `deadline_s`, `time_limit`, `guard_deadline_s`,
+  `hook_timeout` (600) and `no_deadline` (true), once at the top of the hook input and once inside the tool input
+  (a real Bash call carries `timeout` there);
+- 29 variables named like a time limit (`GOV_GUARD_DEADLINE_S`, `GOV_HOOK_TIMEOUT_S`, `STDIN_DEADLINE_S`,
+  `CLAUDE_HOOK_TIMEOUT`, the product's own `GOV_PENDING_SNAPSHOT_TIMEOUT_S`, …; the list is `LIMIT_VARIABLES`) and
+  9 switches (`GOV_GUARD_NO_DEADLINE`, `GOV_TEST_MODE`, …; `SWITCH_VARIABLES`), once with 600 and the switches at
+  `1`, once with `0` and the switches at `true`;
+- 12 files a worker may write (6 under the scratch folder, 5 in the engineer ticket's source folder, and the
+  ticket's `pyproject.toml`), as JSON, TOML and a bare number, each naming 600.
+
+They prove that none of these names, in these places and with these values, moves the deadline. **They cannot prove
+that no name does**: a variable, a field or a file of another name is not held, and the engineer's code is the
+only place where that can be read. The reviewer of the round should read the change for any read of the
+environment, the input or a file that reaches the deadline's value. The three green cases hold the other side: the
+same carriers with 0.001 named leave an ordinary Bash call and an ordinary Write allowed, also with a 4-second
+step.
+
+#### Red and green today, and how long the batch takes
+
+| File | Cases | Today | Reason |
+| --- | --- | --- | --- |
+| `test_w1_02_deadline.py` | 14 | 14 red | The program keeps no deadline. 10 hook processes give no answer (ended by the case at 32 s), 2 allow the call (after 27.9 s and 21.8 s). The two cases over all processes are red for the same reason |
+| `test_w1_02_deadline_in_time.py` | 12 | 12 green | Stays green |
+
+Red (today): 34 s and 6 s. Green: about 22 s to 26 s for the first file (one wait for the deadline, then the look
+for what is left running) and 6 s for the second; checked outside the tree against a throwaway copy of the hook
+with a deadline, removed with the session: 26 passed in 28 s. Under a parallel runner each worker process that
+gets a case of a module starts that module's hook processes once.
+
+After the red run no stand-in process and no hook process was left running (looked for by the stand-in's and the
+hook's names in the process list: none).
+
+**The serial list.** None of these cases is added to `tests/acceptance/serial-only.txt`. The bound that is asserted
+is 6 s above the deadline and 5 s for what the hook started to be gone, on processes that sleep and use no
+processor; the earlier time cases of this revision hold 5 s unlisted. If the first file's window fails in a
+parallel close, DEC-372 applies (re-run alone) before any entry is added.
+
+#### The other hook programs (after a tool call, after a failed one)
+
+Not held by a case. From the sources (`posttooluse.py`, one program for both events), not measured:
+
+- They cannot refuse: the call has run. They answer nothing (exit 0), a report to the agent (exit 0 with
+  `additionalContext`), or a failure of their own (exit 2, the reason on stderr, one finding).
+- The same 3-second bound on reading the input. A call of another tool than Bash is answered at once.
+- For a Bash call the check starts `git` several times, each start with a limit of 10 s of its own. The first
+  (the state of the tree) ends the program with exit 2 and a finding when it passes its limit; two later ones are
+  passed over. Where the check puts an acceptance test back it starts `git` once or more per path. **There is no
+  bound over the whole check**, and it opens the entries of the bookkeeping folder the way the program before the
+  call does, so a named pipe there holds it too (by reading; residual 59).
+- What the harness does when one of these programs passes its limit of 60 s is **not known**: the evidence record
+  observed PreToolUse only and names "other hook events" among what it did not observe. If it does what it does for
+  PreToolUse, the program is ended and the session goes on with no word of it: the check's report does not reach
+  the agent, no finding is recorded, and a restore that was under way may be half done.
+
+DEC-580 speaks of "the guard's hook program" and of answering "refuse": these programs cannot refuse, so its words
+do not say what a deadline there would answer. Returned as DP-12, with no case.
+
+#### The forms not held
+
+- **One slow step in the bookkeeping for a Bash call that is let through.** Each such program start has a limit
+  of 10 s of its own today, after which the call is allowed with a finding and with nothing noted for the check
+  after the call (measured: allow after 10.3 s, one finding). That is a decision reached in time, as built; the
+  after-the-rules place is held through the spread of several steps and through the pipe at the counter instead.
+- **The premises of two forms.** The spread case rests on the program as built starting a program at least four
+  times for an allowed Bash call (five today); the pipe cases rest on its bookkeeping waiting on a pipe. A change
+  that removes either (not this round's order) would turn the case's premise false, not the behaviour.
+- **A slow step inside a rule on the call's own input.** The earlier rounds bound those inputs (5 s); no input was
+  found here that keeps a rule busy for 20 s, and none was searched for beyond what those rounds measured.
+- **The start of the interpreter and the loading of the guard's own code**: not reachable without a stand-in for
+  the package, which this suite does not use.
+- **A process of the hook's own that is not the stand-in** (a helper of the hook left waiting on a pipe after the
+  answer): not visible from outside without its process id. Held for the stand-in program and its child only.
+- **Whether the deadline's refusal leaves a finding**: neither asked nor forbidden (residual 58).
+- **What the bookkeeping holds after a refusal at the deadline** (an entry for the refused call or none).
+- **The `ask` answer** (an install by the orchestrator), a research role, a subagent, NotebookEdit, a search tool,
+  an unknown tool, a frozen project (by reading: the freeze refuses before any program is started).
+- **A clock that is moved** while the hook runs, and a hook the harness starts in a process group of its own.
+- **The exact second**: the window is 19 s to 26 s.
+
+#### Changes to the residual list
+
+Residuals 1 to 57 stand. Added:
+
+58. A refusal at the deadline is, in the form DEC-580 gives it, a refusal like any other: nothing is recorded
+    unless the engineer records it, and the session reads only the reason. A deadline that is reached is a sign of
+    a fault (a program that hangs, a pipe, a very large tree); recommended for the Wave 2 list: one finding of the
+    guard per refusal at the deadline.
+59. As built (measured): a named pipe among the entries of the hook's bookkeeping folder, or at its counter, holds
+    the hook program for as long as it is there, for every tool and role. Before this round that fails open at the
+    harness's limit; with DEC-580 every call in that project is refused after 20 s until the pipe is removed. The
+    folder is outside what a worker may write by a tool; a Bash command that makes a pipe there was not tried
+    against the guard.
+60. As built (measured): one program start in the bookkeeping for a Bash call that passes its own limit of 10 s
+    ends in an allow with a finding and nothing noted for the check after the call; the check then has no state
+    of the tree from before the call.
+61. As built: the hook program starts `git` by its name from the search path of its environment, and the start
+    that looks up the freeze mirror has no limit of its own. Whoever sets the hook's environment chooses the
+    program. The deadline bounds the time; it does not bound what that program does.
+62. The other hook programs keep no bound over their whole run, and what the harness does at their limit is not
+    observed (DP-12).
+
+#### Rewrites and cases of other suites
+
+None. No earlier case holds what DEC-580 changes: the earlier time cases accept a refusal or an allow within 5 s,
+`test_input_that_never_ends_is_denied_by_the_guard_s_own_deadline` holds the 3-second bound on the input, which
+stays, and no case of this suite waits for a hook past 20 s and expects an answer other than a refusal (the
+suite's own limit on a hook process is 20 s and reads a hook still running as no answer). The other suites were
+not searched for a case that keeps the hook program busy for 20 s and expects an allow; the lead's run of every
+suite shows it if one exists.
+
 ### Rewrites
 
-None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third batch (DEC-548) rewrote
-none either: it added five test files and `w1_02_copies_support.py`, and changed no line of an earlier file but this
-README. The fourth batch (DEC-553) rewrote none: it added three test files and `w1_02_folders_support.py`, and
-changed no line of an earlier file but this README (residuals 13 and 15 amended, this section and the packages).
+Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
+batch (DEC-548) rewrote none either: it added five test files and `w1_02_copies_support.py`, and changed no line of
+an earlier file but this README. The fourth batch (DEC-553) rewrote none: it added three test files and
+`w1_02_folders_support.py`, and changed no line of an earlier file but this README (residuals 13 and 15 amended,
+this section and the packages).
+
+Fifth batch: fourteen cases held as allowed a Grep call with the project root as its `path` and no glob, which
+DEC-557 refuses. Reason of every rewrite below: **owner decision P-23 (DEC-557)**. One line changed per suite; each
+case still holds that a read-only search is allowed, now over the project's `src` folder. All are green on the guard
+as built and stay green after the change.
+
+| Suite | Case | Old input | New input |
+| --- | --- | --- | --- |
+| W1-02 | `test_w1_02_role_less_session.py::test_role_less_session_can_still_read_with_file_tools` (its Grep call) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-50 | `test_w1_50_ticket_lead_role.py::test_ticket_lead_may_read[Grep]` | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-47 | `test_w1_47_oracle_guard.py::test_a_call_that_names_another_path_stays_allowed` (its 6 Grep cases; the `Grep` entry of `UNRELATED`, used by this function only) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+| W1-05 | `test_w1_05_live_hooks.py::test_a_read_only_tool_goes_through_the_hook_and_is_allowed` (its 6 Grep cases; the builder `read_input` of `w1_05_support.py`) | Grep, `path` = the project root | Grep, `path` = `<root>/src` |
+
+Beyond the fourteen: W1-05's builder `read_input` is shared, so the same change of input reaches four more cases of
+`test_w1_05_live_hooks.py`, each of which held the same root search as allowed (same reason):
+
+- `test_a_read_only_tool_is_allowed_while_frozen[Grep]`
+- `test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-no-role]`
+- `test_a_call_waits_under_100_ms_p95_for_the_hook[Grep-engineer]`
+- `test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over[Grep]`
+
+Run by node id on 2026-10-09: the fourteen pass (1 + 1 + 6 + 6), and so do the four beyond them, with one note: the
+two latency cases are sensitive to load. On a machine with a load average of 13 to 21, `[Grep-engineer]` failed once
+in a run with the other W1-05 cases (p95 of 110 to 190 ms against 100 ms) and passed alone; in a second run alone a
+`Read` case of the same function, whose input is unchanged, failed the same way. The rewrite makes the search
+smaller, not larger.
+
+Eighth batch (DEC-574): none. It added three test files and `w1_02_limit_support.py`, and changed no line of an
+earlier file but this README; no line of another suite.
+
+Ninth batch (DEC-580): none. It added two test files and `w1_02_deadline_support.py`, and changed no line of an
+earlier file but this README; no line of another suite and none of `tests/acceptance/serial-only.txt`.
 
 ### Decision packages
 
-**DP-1. An unrestricted recursive search from the project root.**
+**DP-1. An unrestricted recursive search from the project root.** *Decided by DEC-557 (2026-10-09): refused, for
+every role; the fourteen cases are rewritten (see "Rewrites") and the fifth batch holds it.*
 - Question: is a search from the project root with no glob that keeps both files out (Grep with `path` = the root
   or no `path`; `grep -r … .`, `find .`, `ls -R`; Glob `**/*`) refused?
 - Why now: the order lists "a recursive search from the project root" among the forms to refuse, and it also says
@@ -979,6 +2073,77 @@ changed no line of an earlier file but this README (residuals 13 and 15 amended,
 - Impact: (a) none beyond the two lines; (b) loses the neighbours the same cases hold; (c) would undo DEC-553.
 - Reversibility: high. Cost: two lines.
 - Recommendation: (a). Confidence: high. Not this designer's to edit (unit cases are the engineer's).
+
+**DP-10 (seventh batch). A brace word in a Bash write target is denied today, and the order of DEC-570's fix round
+names such a command as one that stays allowed.**
+- Question: is `mkdir -p <a scratch folder>/{a,b}/{x,y}` (a brace word of a few alternatives in a write target a
+  role may write) to be allowed?
+- Why now: the fix round's order lists it under "stays allowed, each held by a case". Measured on the guard as
+  built: denied for the orchestrator and for an engineer (`deny`, exit 0, by the rule for a Bash write whose target
+  the guard does not resolve), while the same command without braces is allowed. The read rule has no part in it.
+- Options: (a) it stays denied, and the line of the order is read as "not refused by the read rule" (the case as
+  written); (b) the write rule learns to expand a brace word of a few alternatives in a write target and judges
+  each expansion against the role's paths.
+- Impact: (a) none; the way round is one command per folder, or the folders named one by one. (b) loosens the
+  write rule (a change of who may write what through which spelling), outside a stricter-only round.
+- Reversibility: high either way. Cost: (a) nothing; (b) a designer round and an engineer round on the write rule.
+- Recommendation: (a). Confidence: high.
+
+**DP-11 (eighth batch). A string past the path limit that a program shortens before it opens it.**
+- Question: DEC-574 lets the held-out check skip a string of more than 4096 characters because no program opens
+  such a string as a path. Some programs do not open it as written: they make a shorter path of it first. Is a
+  string past the limit that reads as a path and would reach a held-out path (a) left to the residual list, or
+  (b) refused or resolved in another way?
+- Why now: this is the one change of the round that allows what was refused, and the cases fix it. Checked on a
+  made-up folder with a symbolic link and a path of 4097 and of 20,000 characters padded with `./`: `cat`, `ls`,
+  `find` and a plain open fail ("File name too long"); `realpath` and `readlink -f` print the short resolved path;
+  `cat "$(realpath <the long word>)"`, `cd "$(dirname <the long word>)" && cat <the file>` and a one-line script
+  that normalises the path before it opens it all read the file. A tool the guard does not know that normalises a
+  path field itself (a file server behind MCP) would do the same with a long field. Today each of these is refused
+  (the word or the field is resolved); after DEC-574 as worded each is allowed for every role.
+- Options: (a) residual 52: the shape is deliberate (nobody types a path of 4097 characters), DEC-577 sends
+  deliberate shapes to the Wave 2 list, and the launcher's sandbox and the committed Read deny lines stay the
+  fence. (b) A string past the limit is not resolved through the file system but is still shortened as text in
+  one pass (repeated slashes, `./`, a name followed by `..`), and is resolved as today if what is left is under
+  the limit: bounded by the string's length. (c) A string past the limit that holds a slash is refused outright
+  in a Bash word and in an unknown tool's field, as a path field of a file tool already is.
+- Impact: (a) the held-out folder is reachable by a deliberately built long word, as it already is by other
+  deliberate shapes (a name made at run time, residual 53). (b) keeps every form of this package refused at a
+  cost of one pass over the text; a megabyte of `a/` shortens to itself and is skipped; taking a name and `..`
+  out as text is wrong where the name is a symbolic link, so it refuses a little more than today, never less
+  than (a). (c) refuses ordinary work: a commit message of 30,000 characters is one quoted word with slashes in
+  it, and a Write of source text is one string.
+- Reversibility: high in every option (a rule and a few cases). Cost: (a) none; (b) a designer round of about ten
+  cases and a few lines in the check, with a time case for the pass; (c) not recommended.
+- Recommendation: (a) for this round, as DEC-574 and DEC-577 word it; (b) as the Wave 2 entry. Confidence: medium.
+- Held under both (a) and (b): everything in the eighth batch but the fifteen red cases of
+  `test_w1_02_path_limit_boundary.py`, whose strings are padded with `./` or with `x/../` (under (b) those stay
+  refused and the cases would be rewritten by owner decision), and possibly the two red cases of
+  `test_w1_02_path_limit_unchanged.py`; the time cases hold under both.
+
+**DP-12 (ninth batch). A deadline for the hook programs after a tool call and after a failed one.**
+- Question: do the programs that run after a Bash call keep a deadline of their own, and what do they answer when
+  they reach it?
+- Why now: DEC-580 gives the program before a call a deadline and the answer "refuse". The programs after a call
+  cannot refuse, keep no bound over their whole run (from the sources: several program starts of up to 10 s each,
+  more for each acceptance test put back; a named pipe in the bookkeeping folder), and what the harness does at
+  their limit of 60 s is not observed. If it ends them as it ends the program before a call, a check after a call
+  is lost with no word to the agent and no finding, and a restore may be half done.
+- Options: (a) nothing in Wave 1; a residual on the Wave 2 list, with an experiment first on what the harness does
+  at the limit for these two events. (b) the same deadline of 20 s now, in the stricter reading: the program ends
+  by its own hand, exits with code 2 and tells the agent that the check after the call could not be completed,
+  records one finding that names the call, starts no restore it cannot finish, and leaves nothing running; test
+  designer first. (c) as (b), with a shorter or a longer deadline chosen by the owner.
+- Impact: (a) leaves a check that may silently not happen where a tree is very large or a program hangs; no call
+  is let through by it that the guard refused, and the next call's check still sees the tree. (b) and (c) turn a
+  silent loss into a recorded one; they change W1-03's program, which is another ticket's, and need a reading of
+  what a half-done restore is.
+- Reversibility: high in every option. Cost: (a) none now; (b), (c) a designer round of about ten cases in W1-03's
+  suite and a change of that program, against DEC-577 and DEC-584 a ("no further guard rounds"; one more run).
+- Recommendation: (a), with the experiment and (b) as the Wave 2 entry. It is not a hole that lets a refused call
+  through, so DEC-584 b sends it to the Wave 2 list. Confidence: medium (the harness's behaviour for these events
+  is not known; if it blocked the session instead, the entry would matter less).
+- Held under every option: everything in the ninth batch.
 
 ## Not tested
 
