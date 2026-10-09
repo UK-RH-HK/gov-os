@@ -6045,3 +6045,52 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.156 | 2026-10-09 | Delegated: DEC-555 (the probe of W1-30's parallel-run follow-up judged pass without a fix round; five findings, two of them fail-open in deliberate shapes, go to the follow-up after W1-41; until then the orchestrator reads each close's test runs). Next free id: DEC-556. |
+
+## 157. Owner answers to P-22, P-23 and P-24, on the probe of W1-30's follow-up, on the outside sources of the adoption step, and one delegation (register v0.157, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-556 — P-22: open gate records in `gov status` go on the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-543
+- **Decision:** Showing open `gate` records in `gov status` is an item of the Wave 2 list. For Wave 1, DEC-543 stands as decided.
+
+### DEC-557 — P-23: the guard refuses a search from the project root that gives no path or glob, for every role
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-508, DEC-525, DEC-548, DEC-553
+- **Decision:** A search from the project root that gives no path or glob is refused by the guard, for every role. W1-02's current probe and merge are not held for it. It is built as one short round on W1-02 after that merge: the test designer first, who also rewrites the 14 cases in W1-02, W1-05, W1-47 and W1-50 that hold such a search as allowed (recorded as rewrites, reason "owner decision P-23"), then the engineer, then that round's own reviewer probe before its merge.
+
+### DEC-558 — P-24: three test-designer commits without `Implements:` are named exceptions; the pre-merge check is confirmed
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-476, DEC-492, DEC-516
+- **Decision:** The commits `a7eb9257` (merged, W1-35's follow-up), `15a0dbc4` and `56f1476d` (branch `w1/W1-02`) carry `Task:` and `Role:` and no `Implements:`. They are named exceptions at a close, listed for the exit auditor with the earlier history commits. No branch is rewritten. W1-35 closes under the current close rules. The orchestrator's check of `Implements:` on every commit of a branch before its merge, and the trailer line in every lead brief, are confirmed.
+
+### DEC-559 — The probe of W1-30's follow-up: DEC-555 is accepted
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-555, DEC-498
+- **Decision:** Building the two findings of deliberate shape (a serial case that ends its own process with exit code 0; a project file that stands in for the close's plugin) in the follow-up after W1-41, with that follow-up's own probe, is accepted. Until it merges, the orchestrator keeps reading the test runs of each close itself.
+
+### DEC-560 — Outside sources at this repository's adoption step: two kinds
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-511, DEC-520, DEC-522, DEC-551
+- **Decision:**
+  - Decisions and evidence the repository relies on (the `OWNER-…` ids; the evidence record of `EXP-001`) are imported as records, each with its origin path and its sha256 recorded.
+  - Ids of the research catalogues (`S0a-G-…`, and S0b2's `G-…`) are listed as external references (DEC-520).
+  - The orchestrator prepares the full list of the about 35 ids, sorted into the two kinds, and applies it in the adoption step. Only an id that fits neither kind is brought to the owner.
+
+### DEC-561 — Delegated: the long code-index daemon cases of W1-16 and W1-20
+- **Status:** ACCEPTED (owner, 2026-10-09; delegated to the orchestrator) · **Under:** DEC-527, DEC-554
+- **Decision:** In the follow-up after W1-41 the orchestrator has it found why the code-index daemon cases of W1-16 and W1-20 take 17 to 19 minutes when run alone (for example a daemon started for each case where one for a session would do), and has them shortened where that can be done without weakening what they test. The new serial time is reported to the owner.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.157 | 2026-10-09 | Owner: DEC-556 (gate records in status on the Wave 2 list), DEC-557 (a root search without path or glob is refused for every role; a short W1-02 round after the merge), DEC-558 (three commits without Implements are named exceptions; W1-35 closes; the pre-merge check confirmed), DEC-559 (DEC-555 accepted), DEC-560 (outside sources: decisions and evidence imported as records with origin and sha256, catalogue ids listed as external), DEC-561 (delegated: the W1-16 and W1-20 daemon cases). Next free id: DEC-562. |
+
+## 158. Delegated: the judgement of the probe of the guard follow-up on W1-02 (register v0.158, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-562 — The read rule for the two protected files: the probe is judged pass; the follow-up merges as probed and three findings join the round of DEC-557
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; stricter-only for what is built) · **Basis:** the probe's return (`log/W1-02-probe.json`, session `cc784d3e-ecb5-4176-8726-847f86f79cf6`, at `e9e6ee25`; eleven findings; no ordinary work newly stopped in about 170 daily calls; a shell command with a tilde and a NUL byte is refused, exit code 2) · **Under:** DEC-498, DEC-137, DEC-508, DEC-525, DEC-557
+- **Decision:**
+  - **The follow-up merges as probed.** The integration branch holds no read rule for the two files today, so the merge refuses more in every case and loosens nothing; the owner ordered a short round on W1-02 directly after this merge, with its own probe (DEC-557). The one finding in a shape ordinary work produces is built in that round, not in a round of its own before the merge.
+  - **Into the round of DEC-557, test designer first:**
+    - **Finding 1 (a read gets through, ordinary work produces it).** A search in the shell from the project root, or from a copy's folder, whose name filter names either file's name or matches it (`--include`, the other search program's glob option in each spelling) is refused, as the same search through the search tool with that glob is.
+    - **Finding 7 (no answer in time; whether it fails open is the harness's).** The rule answers every pattern and every command in bounded time: a pattern or a command the rule cannot answer within its bound is refused. The round establishes, without reading the settings file, what the harness does with a hook that passes its time limit, and returns it.
+    - **A NUL byte in a path or a command** is refused wherever it stands (today a NUL with no tilde before it is allowed and one with a tilde is refused).
+  - **Residuals, named in `bootstrap.md`** (each needs a deliberate or unusual shape): a `cd` that does not take effect (a subshell, a pipeline, a background job, a branch not taken, a folder that does not exist) is followed all the same, which lets a read through and refuses two ordinary listings; shell spellings the token expansion gives up on; a script on the command line with an operator glued to the name, and a here-string; search-tool globs with an escape, single braces or a comma; an in-place edit that prints, by a role that may write the file; the helper's unmatched rule shapes, a path held outside the deny list, the matcher and event printed as written, and the lesser spellings.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.158 | 2026-10-09 | Delegated: DEC-562 (the probe of the guard follow-up on W1-02 judged pass; it merges as probed; a shell search with a name filter, an answer in bounded time and a NUL byte join the round of DEC-557; the rest are residuals). Next free id: DEC-563. |
