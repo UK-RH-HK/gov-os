@@ -175,7 +175,7 @@ def run(root: Path, args, config: dict):
             found.append(f)
 
     if profile == "FULL":
-        gate(_check_probe, root, ticket, commits, others, inside, tickets)
+        gate(_check_probe, root, ticket, commits, others, inside, own, tickets)
     gate(_check_trailers, commits, ticket)
     gate(_check_unmeasured, ticket, others, own, tickets)
     gate(_check_containment, root, commits)
@@ -527,11 +527,15 @@ def _check_containment(root: Path, commits: list[dict]) -> None:
 # Probe gate (FULL-profile tickets, A5)
 # ---------------------------------------------------------------------------
 
-def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside,
+def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside, own,
                  tickets: frozenset[str]) -> None:
     """The probe record of a FULL-profile ticket is evidence only if the implementer could not have written
     it (DEC-137, DEC-487). ``others`` are the other commits of the ticket's range, ``inside`` says whether a
-    path is inside the ticket's allowed paths, ``tickets`` are the project's.
+    path is inside the ticket's allowed paths, ``own`` whether it is the ticket's work (``_work_of``),
+    ``tickets`` are the project's.
+
+    A commit of the ticket after the probed one refuses only for a path that is the ticket's work: inside its
+    allowed paths, one of its acceptance tests, or its own file (DEC-581).
 
     Every probe record of the ticket is read (DEC-500): each is asked everything, so one that does not say
     that the probe of the final code passed refuses whatever another says, and the close needs one."""
@@ -630,7 +634,7 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                                        "--name-only", probed, c["sha"]).split("\0"))
                     paths = [p for p in paths if p in differs]
                 for p in paths:
-                    if not p.startswith(("tests/", "docs/probes/")):
+                    if own(p):
                         raise invalid(f"ticket commit {sha} changes {p} "
                                       "after the probed commit", commit=sha, path=p)
         records += 1

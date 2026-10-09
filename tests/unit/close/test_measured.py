@@ -237,7 +237,7 @@ def _probe(repo, probed, *trailers, commit=True, **keys):
 
 def _gate(repo):
     commits = _ticket_commits(repo.root, TICKET)
-    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, TICKETS)
+    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _inside, TICKETS)
 
 
 def _refused(repo):

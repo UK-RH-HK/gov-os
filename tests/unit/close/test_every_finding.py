@@ -99,7 +99,7 @@ def test_the_probe_gate_ends_at_its_first_finding_and_says_what_it_did_not_ask(r
                 files={f"docs/probes/{TICKET}/PR.md": "---\nnot valid yaml: [[[broken\n---\n"})
     with pytest.raises(_Finding) as raised:
         command._check_probe(repo.root, TICKET, command._ticket_commits(repo.root, TICKET), [], lambda path: True,
-                             frozenset({TICKET}))
+                             lambda path: True, frozenset({TICKET}))
     assert raised.value.code == "PROBE_INVALID"
     [said] = raised.value.not_measured
     assert said.startswith(f"what the probe gate of {TICKET} asks after this finding: not measured")
