@@ -2129,3 +2129,12 @@ Not covered or not built, by name:
 - **KPI disputes:** six (four from the test designer, two from the lead's reading of the diff), all in
   package P-19. **Acceptance tests rewritten after implementation began:** none; eleven cases were added
   after the lead's diff reading (nine red first, two guards).
+- **At the close (2026-10-09):** gov close ran once at e57326e9 and refused with 31 findings
+  (.gov-runtime/scratch/orchestrator/log/close-W1-32.json): the governance checks red as at the closes of
+  W1-31, W1-39 and W1-40; two orchestrator commits of 2026-10-05 without an Implements trailer; the context
+  blocked on the outside source S0a-G-01; and two W1-05 latency cases that failed while five leads ran
+  (8787 passed, 2 failed, 29 skipped) and passed when W1-05 was run alone afterwards (99 passed, DEC-372).
+  Closed with the ticket tool under DEC-492, DEC-511, DEC-516, DEC-519 and DEC-541; listed for the exit
+  auditor. **A defect of gov close seen here:** it could not open its repair ticket (the ticket tool was
+  called with the whole finding text as one argument: Argument list too long), so the refusal named no
+  repair ticket; for the follow-up after W1-41 (DEC-521).
