@@ -63,6 +63,20 @@ def _home(repo, sandbox):
     return Path(support.one(repo.root, "home", [], sandbox))
 
 
+@pytest.fixture(scope="module")
+def answers(two, sandbox):
+    """What the two query cases ask of each repository, asked in one child process per repository: the code
+    tool's start is paid once for a repository (DEC-561). ``repository name -> (the run, call -> result)``."""
+    alpha, beta, _ = two
+    asked = {}
+    for repo, own, foreign in ((alpha, "alpha_only_helper", "beta_only_helper"),
+                               (beta, "beta_only_helper", "alpha_only_helper")):
+        run = support.codeintel(repo.root, [("definitions", [own]), ("definitions", [foreign]),
+                                            ("callers", [own]), ("dead_code", [])], sandbox)
+        asked[repo.root.name] = (run, dict(zip(run.calls, run.results)))
+    return asked
+
+
 def test_the_wrapper_offers_its_public_interface(module, sandbox):
     """The interface the README states: a Python interface in ``gov.codeintel``, as W1-09's ``gov.tasks`` is."""
     child = ("import json, gov.codeintel as api\n"
@@ -108,14 +122,15 @@ def test_list_projects_in_one_repository_shows_only_its_own_project(two, sandbox
 
 
 @pytest.mark.local_only
-def test_a_repository_answers_only_from_its_own_code(two, sandbox):
+def test_a_repository_answers_only_from_its_own_code(two, answers):
     alpha, beta, _ = two
     for repo, own, rel, foreign in ((alpha, "alpha_only_helper", "app/alpha.py", "beta_only_helper"),
                                     (beta, "beta_only_helper", "lib/beta.py", "alpha_only_helper")):
-        run = support.codeintel(repo.root, [("definitions", [own]), ("definitions", [foreign])], sandbox)
-        mine = support.entries(run.results[0], f"definitions({own})", repo.root)
+        run, asked = answers[repo.root.name]
+        mine = support.entries(asked[("definitions", (own,))], f"definitions({own})", repo.root)
         assert (rel, own) in mine, f"{repo.root.name} does not answer for its own code\n{run.describe()}"
-        assert run.results[1] == [], f"{repo.root.name} answers for the other repository's code\n{run.describe()}"
+        assert asked[("definitions", (foreign,))] == [], \
+            f"{repo.root.name} answers for the other repository's code\n{run.describe()}"
 
 
 @pytest.mark.local_only
@@ -127,11 +142,14 @@ def test_indexing_again_keeps_one_project(two, sandbox):
 
 
 @pytest.mark.local_only
-def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, sandbox):
+def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, answers, sandbox):
     """Failure 2. Index files are SQLite files, their side files and graph dumps, wherever a child could write."""
     alpha, beta, _ = two
     for repo in (alpha, beta):
-        support.codeintel(repo.root, [("callers", [f"{repo.root.name}_only_helper"]), ("dead_code", [])], sandbox)
+        # The run that asked ``callers`` and ``dead_code`` of this repository came before (``answers``).
+        _, asked = answers[repo.root.name]
+        assert {("callers", (f"{repo.root.name}_only_helper",)), ("dead_code", ())} <= set(asked), \
+            f"{repo.root.name}: the queries this check follows were not asked: {sorted(asked)}"
         outside = support.index_files(repo.root, skip=(".git", support.RUNTIME_REL))
         assert not outside, f"{repo.root.name}: index files in the repository, outside .gov-runtime/: {outside}"
         assert not (repo.root / ".codebase-memory").exists(), "the tool's persistence folder was written"

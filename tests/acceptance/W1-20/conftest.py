@@ -93,6 +93,24 @@ def indexed(built, indexed_wrapper):
 
 
 @pytest.fixture(scope="session")
+def asked(box):
+    """``asked(root, ids, depth)``: the checked result of ``gov closure --json --depth <depth> <ids>`` in ``root``
+    with the session's own PATH, asked once per session and kept (DEC-561: a closure over code pays the code
+    tool's start, about twelve seconds). For cases that ask the identical closure of a clone no case changes
+    (``indexed``, ``draft``). A case that runs a closure on purpose, as the determinism case does, does not use
+    it."""
+    kept = {}
+
+    def get(root, ids, depth):
+        key = (str(root), tuple(ids), depth)
+        if key not in kept:
+            kept[key] = support.ask(root, list(ids), box, depth=depth, path=box.full)
+        return kept[key]
+
+    return get
+
+
+@pytest.fixture(scope="session")
 def draft(built, tools, code_base, box, tmp_path_factory):
     """A clone whose working tree holds an uncommitted function, indexed as it stands (DEC-344)."""
     root = support.clone(code_base, tmp_path_factory.mktemp("w1-20-draft") / "repo")

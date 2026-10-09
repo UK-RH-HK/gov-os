@@ -559,7 +559,8 @@ How these tests decide:
   argument of `index_repository` (the path of the staged copy). There is no other way in. One case holds both:
   a repository whose folder is named `--ui=true`, indexed and asked, and `callers(root, "--ui=true")`, which
   answers an empty list.
-- **A setting left in the home.** After `index(root)` and three seconds (the daemon has ended), someone runs
+- **A setting left in the home.** After `index(root)` and once the daemon has ended (its end is waited for,
+  three seconds at most; see "Shorter daemon cases"), someone runs
   `config set ui_enabled true` in the repository's home; the tool then says `true` (checked). The wrapper's next
   call, `projects(root)` and then again `callers(root, name)`, leaves the three signs off.
 
@@ -568,6 +569,45 @@ no effect on a `cli` call; the lead reports the difference to DEC-362's wording)
 the UI on when the wrapper is called (the tool says a restart is needed: a residual the lead reports);
 `config.json` written by hand, or made unreadable; the setting `ui_port`; the note in the tool registry; the
 user's own home of the tool; the tool's server form; a machine without namespaces.
+
+## Shorter daemon cases (DEC-561)
+
+In the follow-up after W1-41 the daemon cases were shortened where nothing a case asserts is weakened. The count
+is unchanged by this: 71 functions, 166 cases, the same names and the same files.
+
+**Where the time goes** (measured by the lead; there is no sleep, poll or timeout in the wrapper). Each process
+of the tool costs about 1.4 s before it does anything. A call of the wrapper starts two (the UI setting, then
+the question): about 5.8 s. One load of the code graph makes two such calls, about 11.9 s, and is kept only for
+the life of one Python process: every child process that asks a question of the graph pays it again. An index
+of a small repository costs 9 to 15 s, of a dev tier about 27 s.
+
+**What was grouped.** Every assertion is made as before, on the answers to the same questions of the same
+repository.
+
+| File | Before | Now | Why nothing is weakened |
+|---|---|---|---|
+| `test_w1_16_secret_exclusion.py` | `test_no_planted_secret_comes_back_from_the_code_graph`, `test_a_file_with_a_secret_is_not_in_the_code_graph` and `test_the_clean_files_are_in_the_code_graph` each asked the shared planted repository in a child process of its own (three loads of the graph) | one module-scoped run (`answers`) asks the questions of all three, in the sandbox that indexed the repository; each case reads its own answers by call | The questions are the union of the three lists; the second case's questions were a part of the first's already. The first case still scans every result and the whole output (stdout and stderr) of the run that asked its questions; that run now also holds the answers about the clean files, so the text scanned for planted strings is larger, never smaller. The case holds first that each of its questions was asked. |
+| `test_w1_16_home.py` | `test_a_repository_answers_only_from_its_own_code` and `test_no_index_file_exists_outside_gov_runtime_after_a_run` each asked both repositories (four loads) | one module-scoped run per repository (`answers`) asks both definitions, the callers and the dead code (two loads) | The answers held are the same. The check of index files outside `.gov-runtime/` still follows the queries: the case takes the run as a fixture, holds that `callers` and `dead_code` were asked of each repository, and then looks. In the order of the file the second `index(root)` of the first repository now stands between the queries and the look, where the queries stood after it before; the look therefore also follows that index. No sentence of the case holds a query after a second index. |
+| `test_w1_16_ui_off.py` | `test_a_setting_left_in_the_home_is_turned_off_by_the_next_call` slept three seconds, twice, so that the daemon of the call before had ended | `support.wait_for_daemon_end(home)` waits for that end, three seconds at most | The premise is the same (no daemon of that home still runs when the setting is left on), and after three seconds the case goes on as it did. The wait looks at the processes of the machine: one whose environment names this home, or a process of the tool whose home cannot be told, counts as the daemon. So it can end later than the daemon, never before. **The time the port is watched after a command (1.5 s) is unchanged**: shortening it would weaken the cases. |
+
+**Left as they are.**
+
+- **The dev tiers** (`tier_runs`, about 155 s): two tiers, each indexed before and after the rename, each time
+  with all its questions in the same child process. That is four dev-tier indexes and four loads, and nothing
+  is repeated.
+- **`sequence` in `test_w1_16_ui_off.py`**: each step runs in a child of its own on purpose, the signs are read
+  after each.
+- **`daemons` in `test_w1_16_daemon_dir_and_names.py`** (about 41 s): two repositories, each indexed and asked
+  once, each with an environment and a shared default of its own. The five `daemon_dir` questions run no tool.
+- **Every case with a repository, an environment or a home of its own** (a secret added later, a product
+  namespace, the token rule at the index, the refused roots, the caller's UI variables, a repository named like
+  the switch): each asks its index and its questions in one child process already.
+
+**Not run by the designer.** The daemon cannot start in the designer's session (`/tmp` is read-only there).
+Run there: collection (166 cases, the same node ids), `py_compile` of every changed file, the five cases that
+need neither the daemon nor a sandbox, and the helper `wait_for_daemon_end` against stand-in processes (one whose
+environment names the home, one named like the tool with no home, one named like the tool with another home,
+and the bound). The lead runs the daemon cases outside the sandbox and times them.
 
 ## The W1-15 suite
 

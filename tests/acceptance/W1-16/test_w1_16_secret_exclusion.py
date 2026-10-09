@@ -79,6 +79,22 @@ def planted(module, cbm, shared_sandbox, tmp_path_factory):
     return repo
 
 
+# Every kind of question about every name of the planted files, and what is asked of the clean files.
+LEAK_CALLS = [(kind, [name]) for name in ONLY_IN_SECRET_FILES
+              for kind in ("definitions", "references", "callers", "impact")] + [("dead_code", [])]
+CLEAN_CALLS = [("definitions", [name]) for name in IN_CLEAN_FILES] + [("callers", ["clean_helper"])]
+
+
+@pytest.fixture(scope="module")
+def answers(planted, shared_sandbox):
+    """The questions of the three cases that only read the planted repository, asked in one child process: the
+    code tool's start is paid once for them (DEC-561). ``(the run, call -> result)``; the run's output is the
+    whole output of every question asked."""
+    run = support.codeintel(planted.root, LEAK_CALLS + CLEAN_CALLS, shared_sandbox)
+    assert len(run.results) == len(run.calls), f"not one result for each call\n{run.describe()}"
+    return run, dict(zip(run.calls, run.results))
+
+
 def test_the_tool_alone_would_index_a_planted_secret(cbm, sandbox, tmp_path):
     """Why the wrapper is needed. Passes before W1-16: it runs the tool, not the wrapper, on a planted folder."""
     tree = support.plant_tree(tmp_path / "tree", {**SECRET_FILES, **CLEAN_FILES})
@@ -112,35 +128,32 @@ def test_no_planted_secret_is_left_outside_the_repository(planted, shared_sandbo
         assert not found, f"planted secrets were left in {place}: {sorted(found)}"
 
 
-def test_no_planted_secret_comes_back_from_the_code_graph(planted, sandbox):
+def test_no_planted_secret_comes_back_from_the_code_graph(answers):
     """Failure 3: every kind of question, about every name of the planted files."""
-    calls = [(kind, [name]) for name in ONLY_IN_SECRET_FILES
-             for kind in ("definitions", "references", "callers", "impact")] + [("dead_code", [])]
-    run = support.codeintel(planted.root, calls, sandbox)
-    text = json.dumps(run.results) + run.output
+    run, asked = answers
+    assert all((kind, tuple(args)) in asked for kind, args in LEAK_CALLS), run.describe()
+    text = json.dumps(run.results) + run.output   # every result and the whole output of the run that asked
     leaked = [number for number, secret in enumerate(support.PLANTED) if secret in text]
     assert not leaked, f"{len(leaked)} planted secret(s) came back from the code graph"
 
 
-def test_a_file_with_a_secret_is_not_in_the_code_graph(planted, sandbox):
+def test_a_file_with_a_secret_is_not_in_the_code_graph(answers):
     """The indexer does not read the file: nothing defined in it is known, whatever the tool would have stored."""
+    run, asked = answers
     names = [name for name in ONLY_IN_SECRET_FILES]
-    run = support.codeintel(planted.root, [("definitions", [name]) for name in names] + [("dead_code", [])], sandbox)
-    known = {name: result for name, result in zip(names, run.results) if result}
+    known = {name: asked[("definitions", (name,))] for name in names if asked[("definitions", (name,))]}
     assert not known, f"names of files that hold a secret are in the graph: {sorted(known)}"
-    dead = support.entries(run.results[-1], "dead_code()")
+    dead = support.entries(asked[("dead_code", ())], "dead_code()")
     assert not [pair for pair in dead if pair[0] in SECRET_FILES], "a file that holds a secret is in the dead code answer"
 
 
-def test_the_clean_files_are_in_the_code_graph(planted, sandbox):
+def test_the_clean_files_are_in_the_code_graph(planted, answers):
     """Leaving everything out does not pass: the clean neighbours are indexed and answered, in all three languages."""
-    names = list(IN_CLEAN_FILES)
-    run = support.codeintel(planted.root, [("definitions", [name]) for name in names]
-                            + [("callers", ["clean_helper"])], sandbox)
-    for name, result in zip(names, run.results):
-        found = support.entries(result, f"definitions({name})", planted.root)
+    run, asked = answers
+    for name in IN_CLEAN_FILES:
+        found = support.entries(asked[("definitions", (name,))], f"definitions({name})", planted.root)
         assert (IN_CLEAN_FILES[name], name) in found, f"{name} is not answered\n{run.describe()}"
-    callers = support.entries(run.results[-1], "callers(clean_helper)", planted.root)
+    callers = support.entries(asked[("callers", ("clean_helper",))], "callers(clean_helper)", planted.root)
     assert ("app/clean.py", "clean_entry") in callers, run.describe()
 
 

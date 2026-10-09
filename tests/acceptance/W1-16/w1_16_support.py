@@ -30,6 +30,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -744,6 +745,57 @@ def daemon_log(home):
 def ui_served(home):
     """How many lines of the daemon log of ``home`` say that a daemon served the UI."""
     return sum(UI_SERVING in line for line in (daemon_log(home) or "").splitlines())
+
+
+def _proc_bytes(pid, name):
+    """The bytes of ``/proc/<pid>/<name>``: ``b""`` when the process is gone, None when it may not be read."""
+    try:
+        return Path(f"/proc/{pid}/{name}").read_bytes()
+    except (FileNotFoundError, ProcessLookupError):
+        return b""
+    except OSError:
+        return None
+
+
+def daemon_may_run(home):
+    """Whether a process of this machine may be the tool's daemon of ``home``. ``False`` only when none can be.
+
+    The daemon is started by the tool with the environment of the call, which names the home
+    (``CBM_CACHE_DIR``). A process counts when its environment names this home; and a process of the tool,
+    whoever owns it, counts unless its environment can be read and names another home. What cannot be told
+    counts as a daemon.
+    """
+    wanted = {os.fsencode(str(home)), os.fsencode(str(Path(home).resolve()))}
+    marker, tool_name = b"CBM_CACHE_DIR=", TOOL.encode()
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit() or int(entry) == os.getpid():
+            continue
+        command, comm = _proc_bytes(entry, "cmdline"), _proc_bytes(entry, "comm")
+        if command == b"" and comm == b"":
+            continue   # gone
+        of_the_tool = (command is None or comm is None or tool_name in command.split(b"\0")[0]
+                       or comm.strip() == tool_name[:15])
+        environment = _proc_bytes(entry, "environ")
+        if environment is None:
+            if of_the_tool:
+                return True
+            continue
+        homes = {item[len(marker):] for item in environment.split(b"\0") if item.startswith(marker)}
+        if homes & wanted or (of_the_tool and not homes):
+            return True
+    return False
+
+
+def wait_for_daemon_end(home, limit=DAEMON_ENDS_S):
+    """Wait until no process can be the tool's daemon of ``home``, at most ``limit`` seconds: the daemon ends
+    about a second after a call. Returns whether it was seen to have ended; after ``limit`` the caller goes on
+    as it did when it slept that long."""
+    deadline = time.monotonic() + limit
+    while daemon_may_run(home):
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.05)
+    return True
 
 
 # --------------------------------------------------------------------------
