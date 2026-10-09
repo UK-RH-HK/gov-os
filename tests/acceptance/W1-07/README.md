@@ -182,6 +182,24 @@ Readings the sources do not spell out, for this batch:
   the envelope fields, no write outside the act paths, the command exists, a valid path map is not reported as
   invalid — on a project that fits the time limit. No assertion weakened, no case removed.
 
+## Revision (DEC-554, point 2, reason "defect found by the parallel trial")
+
+- **The wait for a command is 180 s** (`COMMAND_TIMEOUT_S` in `w1_07_support.py`; it was 30 s). Under ten parallel
+  workers a read command (`gov status --json`) once did not end within 30 s and passed alone. The number is how long
+  a case waits for `gov` before it fails with "did not end within"; it is not a time the ticket promises, and no
+  case asserts it. It is the wait DEC-549 gave W1-27's commands. Only that one line of the support changed: no
+  assertion, no case's body, no invocation.
+- **Not changed: the one time a KPI names.** `test_help_answers_in_under_300_ms` holds the median of nine
+  `gov --help` runs under its own budget (`HELP_BUDGET_S`), measured on each run and not on the wait. It stays a
+  latency case (DEC-372).
+- **Who takes the wait from here.** Every suite that runs `gov` through this support's `run_gov` or
+  `run_gov_with_code` (W1-13, W1-25, W1-26, W1-32, W1-38, W1-39, and W1-41, W1-46 and W1-50 in part), and by the name
+  `COMMAND_TIMEOUT_S`: W1-25 (its shell commands), W1-27 (`run_python_snippet` only; its commands have their own
+  180 s) and W1-30 (`run_gov`, every close). None asserts the number. One case leaned on it without naming it:
+  W1-30's `test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument` told the project's
+  limit of 3 s from the default of 120 s only because the suite stopped waiting at 30 s; it now states that bound
+  itself (see `tests/acceptance/W1-30/README.md`).
+
 ## Decision package
 
 ### DP-1 — What does a minimal valid `path-map.yaml` look like, so that "naming the key" can be tested?

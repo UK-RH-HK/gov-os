@@ -325,6 +325,7 @@ def test_without_the_parallel_runner_a_setting_that_is_no_number_refuses_all_the
 # --------------------------------------------------------------------------
 
 SLOW = "import time\n\n\ndef test_slow():\n    time.sleep({seconds})\n"
+DEFAULT_TIME_LIMIT_S = 120.0   # of a close that is given no limit (README, rounds 11 and 12)
 
 
 def _with_a_slow_regression_test(project, seconds):
@@ -336,8 +337,9 @@ def _with_a_slow_regression_test(project, seconds):
 def test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument(project_with, sandbox,
                                                                                       interface):
     """``close_timeout: 3`` in the project's path map and a regression test that sleeps far longer: the close
-    without ``--timeout`` is refused for the time limit, a finding counted once, well inside the 30 s the suite
-    waits for a command (the default limit is 120 s)."""
+    without ``--timeout`` is refused for the time limit, a finding counted once, before the default limit of a
+    close (120 s) could have refused it. Until the suite's wait for a command grew past that default (DEC-554,
+    point 2) the wait of 30 s held this bound; the case now states it."""
     project = project_with({support.WORKERS_KEY: support.SUITE_WORKERS, support.TIME_LIMIT_KEY: 3})
     _with_a_slow_regression_test(project, 999)
 
@@ -345,6 +347,8 @@ def test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_arg
 
     error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
     assert "time limit" in support.error_text(error).lower(), f"the refusal is not for the time limit\n{run.describe()}"
+    assert run.seconds < DEFAULT_TIME_LIMIT_S, \
+        f"the close ended after {run.seconds:.0f} s: the default limit, not the project's, may have refused it"
     support.assert_not_closed(project, TICKET)
     assert support.iteration_count(project.root, TICKET) == 1, \
         f"the close over the project's time limit is not counted once\n{run.describe()}"

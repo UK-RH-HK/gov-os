@@ -1374,6 +1374,20 @@ a case that waits 30 s for a close can fail under `-n auto` for that wait alone 
 `test_a_declared_case_over_the_time_limit_is_a_finding`, whose close takes 20 s by design, did
 in one of this round's three whole runs.
 
+### After the longer wait of W1-07's support (rewritten, reason "defect found by the parallel trial")
+
+This suite's `run_gov` waits for a close as long as W1-07's support waits for a command, and that
+wait is 180 s since DEC-554, point 2 (it was 30 s). Wherever this file says "the 30 s the suite
+gives a command", read it as the wait of that time. One case leaned on the 30 s without naming it:
+`test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument` gives the
+project a limit of 3 s and no `--timeout`, and a close that ignored the project's limit was red
+only because the suite stopped waiting before the default limit of 120 s. With a wait of 180 s
+such a close would be refused "for the time limit" by the default and the case would pass. The case
+now asserts that bound itself: the close ended in under 120 s (`DEFAULT_TIME_LIMIT_S`). That is
+looser than the 30 s it held until now and keeps what the case tells apart; nothing else of the
+case changed, and no other case of this suite tells two limits apart by the wait (the others give
+`--timeout` and a test that sleeps 999 s, or assert a status).
+
 ## Covers ids
 
 | Covers id | Tests |

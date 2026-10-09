@@ -111,7 +111,7 @@ EVERY_INVOCATION = tuple(invocation(name) for name in RESERVED_COMMANDS) + (("ch
 NOT_IMPLEMENTED = "NOT_IMPLEMENTED"
 CONFIG_INVALID = "CONFIG_INVALID"
 
-COMMAND_TIMEOUT_S = 30.0
+COMMAND_TIMEOUT_S = 180.0  # a wait under parallel load, not a time the ticket promises (DEC-554, point 2)
 
 # Revised after implementation: W1-27's rebuild recreates the lexical index
 # through its owner and its secrets filter (DEC-440); the size of the copied
