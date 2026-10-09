@@ -6,11 +6,17 @@ Run as ``python3 -m gov.close.traceability`` (CAP-38.b).
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
 
 import yaml
+
+# DEC-482: an optional top-level key of the project's path map, a commit id, full or abbreviated. With it,
+# only the commits after that commit are judged.
+BASE_KEY = "trailers_base"
+COMMIT_ID = re.compile(r"[0-9a-fA-F]{4,64}")
 
 
 def _frontmatter(path: Path) -> dict | None:
@@ -116,7 +122,35 @@ def _record_ids(root: Path) -> set[str]:
     return ids
 
 
+def _after_base(root: Path) -> tuple[str, set[str]] | None:
+    """The trailers base the project's path map records, as the project holds it now, and the commits after
+    it (DEC-482, DEC-479); None with no base: the whole history is judged. ``ValueError`` where the value is
+    not the id, full or abbreviated, of one commit that ``HEAD`` descends from."""
+    from gov.config.loader import load_config
+
+    path_map = load_config(root).get("path-map.yaml", {})
+    if BASE_KEY not in path_map:
+        return None
+    base = path_map[BASE_KEY]
+
+    def asked(*args: str):
+        return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+
+    if isinstance(base, str) and COMMIT_ID.fullmatch(base):
+        commit = asked("rev-parse", "--verify", "--quiet", base + "^{commit}").stdout.strip()
+        # The id of the commit, not a branch or a tag named in hex digits.
+        if commit.startswith(base.lower()) and asked("merge-base", "--is-ancestor", commit, "HEAD").returncode == 0:
+            listed = asked("rev-list", f"{commit}..HEAD")
+            if listed.returncode != 0:
+                raise RuntimeError(f"git rev-list failed after {commit[:12]}: {listed.stderr.strip()[:200]}")
+            return commit, set(listed.stdout.split())
+    raise ValueError(f"the base commit {base!r} recorded under '{BASE_KEY}' is not one commit of the project "
+                     "that HEAD descends from: no commit is judged")
+
+
 def main() -> int:
+    from gov.cli.errors import GovError
+
     root = Path.cwd()
     findings = []
 
@@ -127,11 +161,21 @@ def main() -> int:
         return 2
 
     try:
+        after = _after_base(root)
+    except ValueError as exc:
+        print(json.dumps({"findings": [{"code": "TRAILERS_BASE_UNKNOWN", "message": str(exc)}]}))
+        return 1
+    except (GovError, RuntimeError) as exc:  # the base is not known: nothing is judged, and nothing passes
+        print(json.dumps({"unmeasured": True, "reason": getattr(exc, "message", str(exc))}))
+        return 1
+
+    try:
         known_ids = _record_ids(root)
     except RuntimeError as exc:
         print(json.dumps({"findings": [{"code": "STORE_ERROR", "message": str(exc)}]}))
         return 1
 
+    judged = 0
     for ticket in closed:
         ticket_id = ticket.get("id", "")
         if not ticket_id:
@@ -144,12 +188,15 @@ def main() -> int:
                 "message": str(exc),
             })
             continue
-        if not commits:
+        if not commits:  # with a base too: the base takes commits out of the judgement, not tickets
             findings.append({
                 "code": "NO_COMMITS",
                 "message": f"closed ticket {ticket_id} has no commits with Task: trailer",
             })
             continue
+        if after is not None:
+            commits = [c for c in commits if c["sha"] in after[1]]
+        judged += len(commits)
 
         for c in commits:
             task_vals = c["trailers"].get("Task", [])
@@ -178,6 +225,10 @@ def main() -> int:
 
     if findings:
         print(json.dumps({"findings": findings}))
+        return 1
+    if after is not None and not judged:  # nothing judged is not a clean history (DEC-479)
+        print(json.dumps({"unmeasured": True, "reason": f"no commit of a closed ticket after the base commit "
+                          f"{after[0][:12]} ('{BASE_KEY}'): nothing is judged"}))
         return 1
     return 0
 

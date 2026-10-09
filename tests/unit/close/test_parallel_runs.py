@@ -75,12 +75,12 @@ def test_a_declared_case_runs_afterwards_in_no_worker_and_a_case_named_alike_sta
 def test_without_the_parallel_plugin_the_run_is_serial_and_says_so(tmp_path, monkeypatch):
     commands = []
 
-    def fake_run(cmd, **keys):
+    def fake_run(root, cmd, env, timeout=None):
         commands.append(cmd)
         probe = cmd[1] == "-c"
         return SimpleNamespace(returncode=1 if probe else 0, stdout="" if probe else "2 passed in 0.01s\n", stderr="")
 
-    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    monkeypatch.setattr("gov.close.command._started", fake_run)
     tests = _project(tmp_path, "tests/unit/test_a.py\n", test_a="")
     stated = []
     assert _run_tests(tmp_path, tests, 60, stated=stated) == ([], ZERO | {"passed": 2})
@@ -119,11 +119,11 @@ def test_a_parallel_run_is_given_the_number_and_states_it_and_the_run_afterwards
                                                                                             workers):
     commands = []
 
-    def fake_run(cmd, **keys):
+    def fake_run(root, cmd, env, timeout=None):
         commands.append(cmd)
         return SimpleNamespace(returncode=0, stdout="" if cmd[1] == "-c" else "1 passed in 0.01s\n", stderr="")
 
-    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    monkeypatch.setattr("gov.close.command._started", fake_run)
     tests = _project(tmp_path, "tests/unit/test_a.py\n", test_a="")
     stated = []
     command._run_tests(tmp_path, tests, 60, stated=stated, workers=workers)

@@ -30,6 +30,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
@@ -353,6 +354,7 @@ EVERYTHING = {"everything": (["**"], "governance")}
 def path_map_text(namespaces):
     """A full path map (DEC-225): this repository's own, with ``namespaces`` in place of its namespaces."""
     document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    document.pop("decision_register", None)   # the project holds no register file, so its path map names none
     entries = {}
     for name, (patterns, memory_class) in namespaces.items():
         entries[name] = {"paths": list(patterns), "memory_class": memory_class, **_NAMESPACE_FIELDS}
@@ -746,6 +748,67 @@ def ui_served(home):
     return sum(UI_SERVING in line for line in (daemon_log(home) or "").splitlines())
 
 
+# The tool's log message of a daemon's start (version 0.11.0 holds ``daemon.start`` and ``daemon.stop``, and
+# longer names such as ``daemon.start_failed``, which are no start).
+DAEMON_START = re.compile(r"(?<![\w.])daemon\.start(?![\w.])")
+
+
+def daemon_starts(log_text):
+    """How many lines of a daemon log's text say that a daemon started."""
+    return sum(DAEMON_START.search(line) is not None for line in (log_text or "").splitlines())
+
+
+def _proc_bytes(pid, name):
+    """The bytes of ``/proc/<pid>/<name>``: ``b""`` when the process is gone, None when it may not be read."""
+    try:
+        return Path(f"/proc/{pid}/{name}").read_bytes()
+    except (FileNotFoundError, ProcessLookupError):
+        return b""
+    except OSError:
+        return None
+
+
+def daemon_may_run(home):
+    """Whether a process of this machine may be the tool's daemon of ``home``. ``False`` only when none can be.
+
+    The daemon is started by the tool with the environment of the call, which names the home
+    (``CBM_CACHE_DIR``). A process counts when its environment names this home; and a process of the tool,
+    whoever owns it, counts unless its environment can be read and names another home. What cannot be told
+    counts as a daemon.
+    """
+    wanted = {os.fsencode(str(home)), os.fsencode(str(Path(home).resolve()))}
+    marker, tool_name = b"CBM_CACHE_DIR=", TOOL.encode()
+    for entry in os.listdir("/proc"):
+        if not entry.isdigit() or int(entry) == os.getpid():
+            continue
+        command, comm = _proc_bytes(entry, "cmdline"), _proc_bytes(entry, "comm")
+        if command == b"" and comm == b"":
+            continue   # gone
+        of_the_tool = (command is None or comm is None or tool_name in command.split(b"\0")[0]
+                       or comm.strip() == tool_name[:15])
+        environment = _proc_bytes(entry, "environ")
+        if environment is None:
+            if of_the_tool:
+                return True
+            continue
+        homes = {item[len(marker):] for item in environment.split(b"\0") if item.startswith(marker)}
+        if homes & wanted or (of_the_tool and not homes):
+            return True
+    return False
+
+
+def wait_for_daemon_end(home, limit=DAEMON_ENDS_S):
+    """Wait until no process can be the tool's daemon of ``home``, at most ``limit`` seconds: the daemon ends
+    about a second after a call. Returns whether it was seen to have ended; after ``limit`` the caller goes on
+    as it did when it slept that long."""
+    deadline = time.monotonic() + limit
+    while daemon_may_run(home):
+        if time.monotonic() >= deadline:
+            return False
+        time.sleep(0.05)
+    return True
+
+
 # --------------------------------------------------------------------------
 # Files: listings, index files, and where a needle stands
 # --------------------------------------------------------------------------
@@ -791,6 +854,28 @@ def snapshot(root):
         except OSError:
             continue
         found[rel] = (stat.st_size, stat.st_mtime_ns)
+    return found
+
+
+# The index stores of a repository, under its ``.gov-runtime/``: where an indexing run writes. The code index is
+# the folder the wrapper builds anew at every ``index`` (its home for the tool and the files it stages for it);
+# the record store is one SQLite file, and the lexical index and the vectors are tables of that file. Everything
+# else in the folder (logs, checkpoints, locks, snapshots, scratch) belongs to whatever session wrote it.
+CODE_INDEX_REL = "codeintel"
+RECORD_STORE_REL = "store.db"
+
+
+def index_stores(runtime):
+    """The files of the index stores under the runtime folder ``runtime``, as relative paths: every file under
+    the code index's folder, and the record store's file. Empty when there is none, or no such folder.
+
+    The store's SQLite side files are not listed: they come and go with any session that opens the store, and
+    a run that wrote the store leaves the store's own file.
+    """
+    runtime = Path(runtime)
+    found = {f"{CODE_INDEX_REL}/{rel}" for rel in listing(runtime / CODE_INDEX_REL)}
+    if (runtime / RECORD_STORE_REL).exists():
+        found.add(RECORD_STORE_REL)
     return found
 
 

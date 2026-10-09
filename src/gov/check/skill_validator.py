@@ -6,6 +6,11 @@ token limits, and gov-command references.
 Usage::
 
     python3 -m gov.check.skill_validator <skill-folders-or-files...>
+    python3 -m gov.check.skill_validator --both-layouts template/<kernel-skill-folders...>
+
+With ``--both-layouts`` (DEC-521) a path under ``template/`` names a kernel skill in both places it can lie:
+as the template holds it, and as an installed kernel holds it (the same path without ``template/``). Each
+place whose skills folder exists is measured, and a skill absent from such a folder is unmeasured.
 """
 from __future__ import annotations
 
@@ -17,13 +22,15 @@ from pathlib import Path
 
 import yaml
 
-from gov.check.commands import RESERVED_COMMANDS
+from gov.check.commands import GOV_COMMANDS
 from gov.context import TOKEN_CHARS
 
 _MAX_DESC_TOKENS = 60
 _MAX_BODY_TOKENS = 2500
 _REQUIRED_FIELDS = ("name", "version", "description")
 _GOV_CMD_RE = re.compile(r"gov\s+(\w+)")
+_BOTH_LAYOUTS = "--both-layouts"
+_TEMPLATE_PREFIX = "template/"
 
 
 def _tokens(text: str) -> int:
@@ -132,7 +139,7 @@ def validate_file(path: Path) -> list[dict]:
     for code_text in _extract_code_text(body):
         for match in _GOV_CMD_RE.finditer(code_text):
             cmd = match.group(1)
-            if cmd not in RESERVED_COMMANDS:
+            if cmd not in GOV_COMMANDS:
                 findings.append({
                     "code": "SKILL_UNKNOWN_COMMAND",
                     "message": f"unknown gov command '{cmd}' in {label}",
@@ -152,6 +159,20 @@ def _unmeasured(reason: str) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = argv if argv is not None else sys.argv[1:]
+    both_layouts = _BOTH_LAYOUTS in args
+    args = [arg for arg in args if arg != _BOTH_LAYOUTS]
+
+    if both_layouts:
+        places: list[str] = []
+        for arg in args:
+            if not arg.startswith(_TEMPLATE_PREFIX):
+                places.append(arg)
+                continue
+            held = [place for place in (arg, arg[len(_TEMPLATE_PREFIX):]) if Path(place).parent.is_dir()]
+            if not held:
+                return _unmeasured(f"path does not exist in either layout: {arg}")
+            places.extend(held)
+        args = places
 
     if not args:
         return _unmeasured("no skill files or folders specified")

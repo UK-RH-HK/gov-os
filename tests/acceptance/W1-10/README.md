@@ -215,3 +215,170 @@ Each package's affected tests are written on its recommended option. Every other
   whole process, with interpreter start.
 - **Recommendation.** (a). **Confidence:** medium-high. The tiers are small (18 and 44 commits, about 150 files).
 - **Tests that depend on it:** the four cases of `test_w1_10_dev_tier.py`.
+
+## The register file: decisions of a named register as records (the follow-up after W1-41, piece 9)
+
+Added by a fresh Independent Test Designer on ticket `DAEO-2lwj` (W1-30, reopened; DEC-569), before any
+code. Sources: DEC-521 ("the record store loads decisions from the project's named register file (DEC-473)
+as decision records, one per heading"), DEC-473 (the heading grammar), DEC-479 (the key
+`decision_register` of the path map; a named register that cannot be read is never green and is named).
+File: `test_w1_10_register.py`, 25 cases. No case of the suite was rewritten; `w1_10_support.py` is
+unchanged. Covers CAP-13.a, CAP-08.a, CAP-09.b.
+
+Every project is the suite's fixture with one more commit: a register file `decisions/REGISTER.md` and a
+path map. One case reads the text of this repository's `docs/DECISION_REGISTER.md` in place, read-only,
+and commits it into a temporary project as that project's register; no path of this repository is asked
+of the kernel.
+
+### What the decisions leave open, as settled here (each proposed; a decision may replace it)
+
+1. **Where the key is read.** From the path map of `HEAD`, as every input of the store (the store's own
+   rule: the same commit gives the same store). A register named or edited only in the working tree
+   changes nothing.
+2. **The record of an entry.** `type` is `decision`; `id` is the heading's id; `path` is the register
+   file; `heading` is the heading line as written; `title` is the heading's text after the id and its
+   separator. `heading` and `title` are two fields the record query gains for these records.
+3. **The status line** is the first line of the entry that is not blank. It reads `**Status:**`, with or
+   without a list mark before it, and then a word; that word is the record's status, as written
+   (`ACCEPTED (owner, 2026-10-07)` gives `ACCEPTED`, `SUPERSEDED by DEC-048` gives `SUPERSEDED`). All
+   565 entries of this repository's register have this form.
+4. **An entry with no readable status** (no such line, the line not first, no word after the label, a
+   label not in bold, nothing under the heading) is no record. `invalid` holds an entry with the
+   register file as `path` and a `reason` that names the id. The other entries load.
+5. **Supersession.** A field `**Supersedes:**` of the status line whose value is decision ids and nothing
+   else gives one SUPERSEDES edge to each. The superseded decision keeps the status its own entry
+   states, as a record file does today. A `**Supersedes:**` field with other words (this repository
+   writes "the one-off limit of DEC-448 (its other parts stand)") gives no edge, and neither do
+   `**Amends:**`, `**Refines:**`, `**Under:**` and the other relations: the decision named still stands,
+   and the graph has no edge type for them. Kept as built; a residual by DEC-579 (was package P-9.2).
+6. **An id recorded as a decision file and as an entry** is one record, the file's. The entry is no
+   record; `invalid` names the register file, the id and the decision file.
+7. **The same id under two headings** is no record at all (neither heading is chosen); `invalid` names
+   the register file and the id.
+8. **A named register that cannot be read** (not a file of `HEAD`, there only in the working tree, not
+   UTF-8 text, a link, a folder, or a key that is not a path) refuses the load with the code
+   `STORE_REGISTER_UNREADABLE`; the refusal names the file (for a key that is no path, the key). It is
+   never an empty register. Decided by DEC-579 for the register that is not in the commit: the project
+   is refused, not read as a project without a register.
+9. **What then resolves.** A decision of the register that a record's edge or a commit's trailer cites is
+   no longer in the dangling references; an id that no entry records stays there.
+
+### Cases and why each is red (at `85066f4e`)
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_without_a_named_register_the_store_is_what_it_is_today` (2: no path map, a path map without the key) | the fixture's twelve records, its edges, nothing invalid, and the digest recorded before the behaviour was built | **green**: holds what stays |
+| `test_a_register_named_only_in_the_working_tree_is_not_loaded` | settlement 1, for the key | **green**: holds what stays |
+| `test_each_entry_of_the_named_register_is_a_decision_record` | six entries with the three separators of DEC-473: id, type, status, `path`, `heading`, `title`; the file records unchanged | red: "entries of the named register are no records" |
+| `test_a_register_record_answers_the_filters_of_the_record_query` | the `type` and `status` filters find the entries | red: no entry is a record |
+| `test_a_heading_that_is_no_entry_is_no_record` | in a fence, of level four, not at the start of its line, without a title, with an id that is not digits alone, and an id only cited | red: the register is not loaded (the case asks for the entries too) |
+| `test_the_named_register_changes_the_digest_and_loads_to_the_same_digest_twice` | the same commit twice gives one digest; another status gives another | red: the register is not loaded |
+| `test_the_register_is_read_from_the_commit` | settlement 1, for the file | red: the committed entry is not in the store |
+| `test_an_entry_that_supersedes_decisions_gives_the_edge` | settlement 5, the whole supersession | red: no edge |
+| `test_a_partial_supersession_and_the_other_relations_give_no_edge` | settlement 5, the rest: the entries give exactly one edge | red: the register is not loaded |
+| `test_an_entry_with_no_readable_status_is_no_record_and_is_named` (5) | settlement 4 | red, each: the other entries are not loaded |
+| `test_an_id_recorded_as_a_decision_file_and_as_an_entry_is_the_file_and_is_named` | settlement 6 | red: the other entries are not loaded |
+| `test_an_id_under_two_headings_of_the_register_is_no_record_and_is_named` | settlement 7 | red: the same |
+| `test_a_named_register_that_cannot_be_read_refuses_the_load` (6) | settlement 8 | red, each: "the load answered as if the project named no register" |
+| `test_a_decision_of_the_register_that_a_record_or_a_commit_cites_resolves` | settlement 9, against the same project without the key | red: the two citations still dangle |
+| `test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails` | this repository's register: every heading one record, nothing invalid, each with its heading and a status; DEC-473, DEC-038, the edges DEC-048 to DEC-038 and DEC-051 to DEC-048, and no edge to DEC-448 | red: 565 headings without a record |
+
+22 red, 3 green. Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-10 -q -p no:cacheprovider -rs`:
+101 cases, 79 passed (the 76 of before and the 3 above), 22 failed, none skipped, 9 s.
+
+### Names proposed
+
+| Name | What it is |
+|---|---|
+| `heading`, `title` | fields of a record of a register entry, in the answer of the record query |
+| `decision` | the `type` of such a record (the type a decision file states today) |
+| `STORE_REGISTER_UNREADABLE` | code of the governance error that refuses the load |
+| `**Status:**` and a word, on the first line that is not blank | the status line of an entry |
+| `**Supersedes:**` with ids alone | the field that gives SUPERSEDES edges |
+
+### The second run (DEC-579), at `d80597fd`
+
+Read again against DEC-579 by a fresh Independent Test Designer. Of the 25 cases 21 are green after the
+first run; 4 are red and wait on the build, and they are the specification of two decided pieces:
+
+| Piece | Red cases | Today |
+|---|---|---|
+| The records query returns a register entry's `heading` and `title` (settlement 2) | `test_each_entry_of_the_named_register_is_a_decision_record`, `test_every_heading_of_this_repositorys_register_is_one_record_and_none_fails` | red: the record carries `id`, `type`, `status` and `path` only |
+| A project whose path map names a register that is not in the commit is refused (settlement 8, DEC-579) | `test_a_named_register_that_cannot_be_read_refuses_the_load[not in the commit]` and `[in the working tree only]` | red, both: "the load answered as if the project named no register" |
+
+What must stay beside the second piece is held already, and green: a project that names no register loads
+as before (`test_without_a_named_register_the_store_is_what_it_is_today`, 2, by the recorded digests; and
+`test_a_register_named_only_in_the_working_tree_is_not_loaded`); a project whose named register is in the
+commit loads its entries (`test_a_register_record_answers_the_filters_of_the_record_query` and the other
+green cases of a named register). No case is added to this suite and none is rewritten.
+
+**Projects that name a register they do not hold.** The second piece could not be built while other
+projects named this repository's register without holding it: they would all be refused. Repaired in this
+run, each a fixture rewrite with its reason, no assertion changed: the support files of W1-15, W1-16,
+W1-17, W1-19, W1-21, W1-22 and W1-24 took this repository's path map whole, with its `decision_register`
+key, as the path map of temporary projects that hold no such file; their copy now leaves that key out.
+W1-08's `test_the_gov_cli_loads_the_committed_path_map` keeps the path map byte for byte, and its project
+now holds a file at the path the map names.
+
+**The retrieval check's own project (for the engineer; `src/gov/retrieval/retrieve_check.py` is in the
+second run's paths).** The retrieval-regression check builds a project of its own from each dev tier and
+gives it a path map taken from this repository's. Stated as behaviour: *the project the retrieval check
+measures names no register it does not hold*, so that the stricter rule does not refuse it and a dev tier
+that could be measured before is still measured. Without that, every tier's load is refused and the check
+answers "unmeasured: no dev tier could be indexed" on a machine where it measured before. Held by
+`tests/acceptance/W1-21/test_w1_21_check_project.py`, 1 case, through the declared check command, on a
+stand-in dev tier and the suite's stand-in embeddings endpoint (no model, no daemon, no network). It is
+**green today**, since no rule refuses yet: it cannot be made red before the rule exists, and it goes red
+as soon as the rule is built without the repair.
+
+### Packages of the first run, as decided (DEC-579)
+
+None is open. DEC-579 records all three as residuals, not built: the context hashes the whole register
+file for each decision (P-9.1); `Amends`, `Refines`, `Under` and a partial supersession give no edge
+(P-9.2, as built); whether a refused load leaves the earlier store readable (P-9.3). The texts below are
+kept as they were returned.
+
+**P-9.1. What the context reads for a decision of the register.**
+- *Question.* A ticket names `DEC-473` as a source and the record's `path` is the whole register file. Does
+  `gov context` hash and count the file or the entry?
+- *Why now.* Once entries are records, every ticket of this repository that names a decision resolves it
+  to one file of about 6,000 lines: the packet would count it once for each decision and pass any budget,
+  and every decision would carry the same hash, which changes with every new entry.
+- *Options.* (a) The entry's own lines are the content: its hash and tokens are those of the lines from
+  its heading to the next heading. (b) The whole file, as for any record. (c) Decisions of a register
+  are named in the packet and not counted.
+- *Impact.* (a) needs the store or the context to know an entry's extent; (b) makes the budget
+  meaningless here; (c) presents a source as read that was not counted.
+- *Reversibility.* High; packets are derived.
+- *Cost.* (a) about 30 lines and 4 cases in W1-24's suite.
+- *Recommendation.* (a). *Confidence:* medium-high. No case is written for it: no decision orders it,
+  and no stricter reading exists to build meanwhile.
+
+**P-9.2. Relations other than a whole supersession.**
+- *Question.* Do `**Amends:**`, `**Refines:**`, `**Under:**`, and a `**Supersedes:**` that names a part
+  of a decision, become edges?
+- *Why now.* This repository's register holds 54 `Amends`, 43 `Refines`, 321 `Under` and three partial
+  `Supersedes`. A SUPERSEDES edge for any of them would take standing decisions out of the ACTIVE set
+  and refuse the context of every ticket that names them.
+- *Options.* (a) No edge, as built here. (b) `Under` as DEPENDS_ON. (c) New edge types.
+- *Impact.* (c) changes the eight edge types of CAP-09.a.
+- *Reversibility.* High. *Cost.* (a) none.
+- *Recommendation.* (a). *Confidence:* high for partial supersession and `Amends`; medium for `Under`.
+  The case `test_a_partial_supersession_and_the_other_relations_give_no_edge` holds (a).
+
+**P-9.3. A refused load and the store an earlier load left.**
+- *Question.* After a load refused for an unreadable register, may the store of an earlier load still
+  be read?
+- *Why now.* The store has no freshness mark (W1-09's residual); readers would go on with the earlier
+  content.
+- *Options.* (a) The earlier store stays, as after any failed load today. (b) A refused load removes it.
+- *Recommendation.* (a) until the store has a freshness mark; `gov status` already says when the store
+  is not `HEAD`'s. *Confidence:* medium. No case holds either.
+
+### For the engineer's run
+
+Suites whose fixtures name a register and load the store (W1-26's decision-citations cases, W1-41's
+external references, W1-30's round 13 piece 6) will hold decision records where they held none. They
+were not run against a built store by the designer; a case of theirs that changes is a rewrite with its
+reason.
+

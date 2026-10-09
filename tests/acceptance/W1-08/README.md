@@ -268,3 +268,93 @@ this branch's `docs/DECISION_REGISTER.md`.
 - **Recommendation.** (a): an explicit `enabled` matches the KPI's word and batch 1's DP-1 option (a) ("a map of
   name to `enabled`"), and a disabled capability stays visible.
 - **Confidence.** Medium-high for the shape; medium for "both keys required".
+
+## The follow-up after W1-41 on W1-30's ticket (DEC-569): two pieces on the kernel's schemas
+
+Written by a test designer on ticket `DAEO-2lwj` (W1-30, reopened), before the schemas are changed. No earlier
+case of this suite is changed. The cases need `check-jsonschema`, as the suite's others do.
+
+### The probe record's schema (DEC-565; `test_w1_08_probe.py`, 7 cases)
+
+DEC-565: "the probe type is added to the kernel's record schema". A probe record is the file `gov close` reads
+for a FULL-profile ticket (DEC-137, DEC-487, DEC-490). The schema is found by the word `probe` in a file name
+under the kernel's schemas folder (reading 1); the full name is the engineer's.
+
+**Proposed: the fields and their shapes.** The worked example is the form of this repository's four probe
+records (three tickets' folders), which state the nine required fields and nothing else.
+
+| Field | Shape | Required |
+|---|---|---|
+| `type` | `probe` | yes |
+| `task` | a ticket id (the shared `ticket_id` grammar) | yes |
+| `reviewer_session` | text, not empty | yes |
+| `implementer_session` | text, not empty | yes |
+| `reviewer_wrote_nothing` | a truth value | yes |
+| `commissioned_by` | text, not empty | yes |
+| `judged_by` | text, not empty | yes |
+| `judgement` | `pass`, `passed`, `fail` or `failed` (the four words DEC-490 names) | yes |
+| `probed_commit` | forty lower-case hexadecimal characters: a full commit id, no abbreviation, no name that moves | yes |
+| `id`, `status`, `state_class` | as in the shared frontmatter where stated | no |
+
+What the schema does not ask, because the probe gate does: that the reviewer is not the implementer, that
+`commissioned_by` and `judged_by` are `orchestrator`, that `reviewer_wrote_nothing` is true and that the
+judgement passed. A record of a failed probe is a well-formed record; the gate refuses the close for it.
+The schema is the one record schema that does not require the shared frontmatter's `id`, `status` and
+`state_class`: the records `gov close` accepts today do not state them, and DEC-565 orders that those records
+stop being findings, not that they be rewritten.
+
+| Case | Holds | Red reason |
+|---|---|---|
+| `test_the_kernel_has_one_schema_for_the_probe_record` | one schema file with `probe` in its name, a JSON object | "no JSON Schema for the probe record" |
+| `test_the_probe_schema_names_no_path_of_a_project` | the file names no `docs/` and no `.tickets` path | the same |
+| `test_the_probe_schema_is_a_valid_json_schema` | the validator's metaschema check | the same |
+| `test_the_probe_schema_accepts_a_well_formed_record` | the nine fields; with the three shared fields added; each of the other three judgement words | the same |
+| `test_the_probe_schema_accepts_this_repository_s_probe_records` | the frontmatter of every file under `docs/probes/*/` here | the same |
+| `test_the_probe_schema_refuses_a_record_without_a_required_field` | each of the nine fields left out, each for itself | the same |
+| `test_the_probe_schema_refuses_a_field_of_a_wrong_type_or_value` | fifteen single changes (a judgement outside the words, in upper case, a truth value; a commit id abbreviated, a moving name, upper case, too long, a number; and one wrong shape of each other field) | the same |
+
+7 red. What the schema check (`core-schema`) reports for a probe record is held in W1-26's suite
+(`test_w1_26_probe_records.py`).
+
+Not held: a commit id of forty digits and no letter, which YAML reads as a number unless it is quoted.
+
+### The path-map schema names the optional keys the tools read (DEC-554, point 6; `test_w1_08_path_map_tool_keys.py`, 19 cases)
+
+DEC-554, point 6: "The kernel's path-map schema names neither key, nor DEC-479's two: it goes to the follow-up
+after W1-41 with DEC-521's items". The fifth key is the trailers base of DEC-482.
+
+No name is proposed here: each key is read by a tool today under the name below, and each shape is the one
+that tool accepts.
+
+| Key | Read by | Valid | Refused (each held) |
+|---|---|---|---|
+| `close_timeout` | `gov close` (DEC-554; W1-30's round 12, settlement 21) | a positive number of seconds: `7200`, `90.5` | `0`, `-5`, a word, a number in quotes, a truth value, a list, no value |
+| `close_workers` | `gov close` (DEC-549, DEC-554 point 5) | a positive whole number (`4`, `1`), or `auto` | `0`, `-2`, `1.5`, a word, a number in quotes, `AUTO`, a truth value, an empty text, no value |
+| `decision_register` | the citations check, the store, `gov close` (DEC-479) | a path as text, not empty | an empty text, a list, a number, a truth value, no value |
+| `decision_citations_base` | the citations check (DEC-479) | a commit id as text, full (40) or abbreviated (8) | an empty text, a number, `main`, a list, a truth value, no value |
+| `trailers_base` | the trailers check (DEC-482; named by W1-30's round 13, settlement 31, and read under that name today) | as the citations base | as the citations base |
+
+A commit id is hexadecimal characters; the cases hold a full id, one of eight characters, and that a name
+with other characters is refused. They do not fix the shortest abbreviation (the two checks take four
+characters or more today).
+
+The path map of the cases is a fixture (the required systems are read from the schema); this repository's own
+path map is held by the suite's earlier cases, unchanged, and must stay valid with the keys it has.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_the_path_map_schema_names_the_optional_key` (5) | the key is a top-level property of the schema, with a description | red, all five: "does not name the key" |
+| `test_an_optional_key_in_a_wrong_shape_is_refused` (5) | each wrong shape of the table is refused, each for itself, after the valid shape was accepted | red, all five: every wrong shape is accepted |
+| `test_an_optional_key_in_a_valid_shape_validates` (5) | each valid shape of the table | green; holds that naming the key refuses nothing a tool accepts |
+| `test_a_path_map_with_all_five_keys_validates` | the five together | green |
+| `test_a_path_map_without_the_optional_keys_validates_as_before` | none of the five | green; holds what stays |
+| `test_no_optional_key_is_required` | none of the five is among the schema's required keys | green; holds what stays |
+| `test_a_top_level_key_the_schema_does_not_know_is_no_finding_as_before` | an unknown top-level key validates | green: **today an unknown top-level key is no finding**, and this piece does not change that |
+
+10 red, 9 green.
+
+Not held: what `gov` itself answers for a path map with one of the keys in a wrong shape when it loads the
+project's configuration (`CONFIG_INVALID`). That validation is written by hand outside the kernel's schema
+file and does not read it; each tool refuses its own key today (`INVALID_TIMEOUT`, `INVALID_WORKERS`,
+`CITATIONS_CONFIG_INVALID`, `TRAILERS_BASE_UNKNOWN`). The decision orders the schema, and the cases hold the
+schema.

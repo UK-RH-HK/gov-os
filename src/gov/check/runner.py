@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.cli.checks import CHECKS_DIR, load_declarations
+from gov.cli.checks import CHECKS_DIRS, load_declarations
 
 VERSION = "1.0.0"
 
@@ -94,10 +94,12 @@ def _run_command(command: str, root: Path) -> tuple[int, str, str]:
 
 
 def _augment_declarations(declarations: list[dict], root: Path) -> None:
-    checks_dir = root / CHECKS_DIR
+    # both layouts of the kernel (DEC-579): the reader refuses one id declared differently in the two
     for decl in declarations:
-        yaml_path = checks_dir / f"{decl['id']}.yaml"
-        if yaml_path.is_file():
+        for checks_dir in CHECKS_DIRS:
+            yaml_path = root / checks_dir / f"{decl['id']}.yaml"
+            if not yaml_path.is_file():
+                continue
             try:
                 raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
             except (yaml.YAMLError, OSError):

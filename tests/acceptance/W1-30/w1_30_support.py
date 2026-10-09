@@ -134,10 +134,19 @@ SUITE_WORKERS = 2
 SUITE_SETTINGS = {WORKERS_KEY: SUITE_WORKERS}
 
 
+# The keys of a path map whose value is a commit id, full or abbreviated (DEC-479, DEC-482). An id is text
+# whatever its characters: one of digits only (``65534367``) written bare is a number to YAML, and the check
+# that reads it is handed no commit id. These values are therefore written quoted.
+COMMIT_ID_KEYS = ("trailers_base", "decision_citations_base")
+
+
 def path_map_text(settings):
     """The text of a path map that holds ``settings`` as top-level keys, one on a line, and no namespace (the
-    one key the loader requires of a path map)."""
-    return "namespaces: {}\n" + "".join(f"{key}: {value}\n" for key, value in settings.items())
+    one key the loader requires of a path map). A value is written as given, but for a key that holds a commit
+    id (``COMMIT_ID_KEYS``), whose value is written as quoted text."""
+    def written(key, value):
+        return json.dumps(str(value)) if key in COMMIT_ID_KEYS else value
+    return "namespaces: {}\n" + "".join(f"{key}: {written(key, value)}\n" for key, value in settings.items())
 
 
 # --------------------------------------------------------------------------
@@ -657,11 +666,12 @@ def build_ticket(project, ticket, wbs, failing=False, **ticket_keys):
     return trailers
 
 
-def run_close(project, sandbox, ticket, *extra_args, store=True):
+def run_close(project, sandbox, ticket, *extra_args, store=True, env=None):
     """Run ``gov close <ticket> --json`` and return the Run.
 
     The record store is loaded first (``store=False`` leaves it as it is), so that the ticket's context can be
-    built wherever the case did not break it on purpose.
+    built wherever the case did not break it on purpose. ``env`` replaces the environment of the close alone
+    (round 13: where the session logs are, another ``PATH``).
 
     DEC-453: ``gov close`` adds no exemption to W1-50's judgement of the ticket's commits. So in every case of
     this suite a close that succeeds had commits that judgement passes; where it finds something and the close
@@ -671,7 +681,7 @@ def run_close(project, sandbox, ticket, *extra_args, store=True):
         load_store(project, sandbox, check=False)
     commits = ticket_commits(project.root, ticket)
     findings = (judged_by_w1_50(project, sandbox, commits, check=False) or []) if commits else []
-    run = project.gov(sandbox, COMMAND, ticket, "--json", *extra_args)
+    run = project.gov(sandbox, COMMAND, ticket, "--json", *extra_args, env=env)
     try:
         closed = json.loads(run.stdout).get("ok") is True
     except (ValueError, AttributeError):

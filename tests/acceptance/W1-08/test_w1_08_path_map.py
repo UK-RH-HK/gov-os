@@ -208,6 +208,10 @@ def test_the_gov_cli_loads_the_committed_path_map(tmp_path):
     project = tmp_path / "project"
     (project / "governance" / "project").mkdir(parents=True)
     (project / support.PATH_MAP_REL).write_bytes(source.read_bytes())
+    register = support.load_path_map().get("decision_register")
+    if isinstance(register, str):  # the project holds the register file its path map names
+        (project / register).parent.mkdir(parents=True, exist_ok=True)
+        (project / register).write_text("# Decisions\n", encoding="utf-8")
     home = tmp_path / "home"
     home.mkdir()
     scripts = tomllib.loads((support.REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"]["scripts"]

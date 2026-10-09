@@ -24,14 +24,17 @@ def _ask(root, ids, box, depth):
 
 def test_the_wrapper_gives_the_callers_the_source_states(indexed_wrapper, box):
     """The premise, which passes before W1-20: the expected answers are the fixture's and the wrapper agrees."""
-    for name, expected in support.CALLERS.items():
-        answer = support.call("gov.codeintel", "callers", indexed_wrapper, box, name, path=box.full)
+    names = list(support.CALLERS)
+    answers = support.calls("gov.codeintel", indexed_wrapper, box, [("callers", [name]) for name in names],
+                            path=box.full)   # one process for the four questions (DEC-561)
+    for name, answer in zip(names, answers):
+        expected = support.CALLERS[name]
         assert sorted(entry["name"] for entry in answer) == expected, f"callers({name}) of the fixture"
 
 
-def test_a_symbol_is_resolved_and_its_callers_are_followed_to_the_depth(indexed, box):
+def test_a_symbol_is_resolved_and_its_callers_are_followed_to_the_depth(indexed, box, asked):
     """From the leaf: its two callers at one hop, the caller of one of them at two."""
-    near = _ask(indexed, [LEAF], box, 1)
+    near = asked(indexed, [LEAF], 1)
     assert support.ids(near, "symbol") == sorted([LEAF, MID, SIDE]) and support.ids(near, "record") == []
     assert near["stopping_reason"] == support.DEPTH_LIMIT
     assert support.gap_ids(near) == [TOP] and support.gap_reasons(near, TOP) == [support.GAP_DEPTH]
@@ -110,13 +113,13 @@ def test_a_closure_over_code_starts_no_ollama_and_asks_no_model(indexed, box, tm
 # The code side is the working tree as it was indexed (DEC-344)
 # --------------------------------------------------------------------------
 
-def test_an_uncommitted_function_in_the_index_is_in_the_closure(draft, box):
+def test_an_uncommitted_function_in_the_index_is_in_the_closure(draft, asked):
     """The caller sees the code as the index holds it: a caller that exists only in the working tree is there."""
-    found = _ask(draft, [LEAF], box, 1)
+    found = asked(draft, [LEAF], 1)
     assert support.ids(found, "symbol") == sorted([LEAF, MID, SIDE, DRAFT])
 
 
-def test_the_result_names_the_code_file_that_differs_from_head(draft, indexed, box):
+def test_the_result_names_the_code_file_that_differs_from_head(draft, indexed, asked):
     """Package DP-7: the file the two sides can disagree on is named; a clean tree names none."""
-    assert _ask(draft, [LEAF], box, 1)["uncommitted"] == [support.CODE_REL]
-    assert _ask(indexed, [LEAF], box, 1)["uncommitted"] == []
+    assert asked(draft, [LEAF], 1)["uncommitted"] == [support.CODE_REL]
+    assert asked(indexed, [LEAF], 1)["uncommitted"] == []

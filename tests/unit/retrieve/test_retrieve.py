@@ -36,6 +36,7 @@ def root(tmp_path, monkeypatch):
     (tmp_path / "governance/project").mkdir(parents=True)
     path_map = yaml.safe_load((REPO / "governance/project/path-map.yaml").read_text(encoding="utf-8"))
     path_map["namespaces"] = {"notes": {**next(iter(path_map["namespaces"].values())), "paths": ["**"]}}
+    path_map.pop("decision_register", None)   # the project holds no register file, so its path map names none
     (tmp_path / "governance/project/path-map.yaml").write_text(yaml.safe_dump(path_map), encoding="utf-8")
     shutil.copy2(REPO / "template/.gitleaks.toml", tmp_path / ".gitleaks.toml")
     (tmp_path / ".gitignore").write_text(".gov-runtime/\n", encoding="utf-8")

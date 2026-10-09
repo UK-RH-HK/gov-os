@@ -332,4 +332,27 @@ record of what was asked. All seven are decided:
 - **The two W1-17 residual lines that name W1-20** (`search` can raise; "every occurrence" holds for whole tokens
   only) concern the lexical index. A closure as the KPIs describe it does not call `gov.retrieval.lexical`, so this
   suite tests neither; they go on to W1-21 or W1-41.
-- **The W1-16 residual "the graph is cached per process"** does not reach these tests: every call is a new process.
+- **The W1-16 residual "the graph is cached per process"** does not reach the cases of `gov closure`: every
+  closure is a new process. Since the follow-up after W1-41 the premise case asks its four questions of the
+  wrapper in one process (see "Shorter daemon cases"); the index is not changed between them.
+
+## Shorter daemon cases (DEC-561)
+
+In the follow-up after W1-41 the ten `local_only` cases were shortened where nothing a case asserts is weakened.
+The count is unchanged: 38 functions, 51 cases, the same names. One load of the code graph costs about twelve
+seconds (two starts of the tool's question process) and is kept only for the life of one Python process.
+
+| Case | Before | Now | Why nothing is weakened |
+|---|---|---|---|
+| `test_the_wrapper_gives_the_callers_the_source_states` | one child process for each of the four `callers` questions (four loads) | `support.calls` asks the four in one child process (one load) | The four answers are held against the same four expectations of `support.CALLERS`, each under its own name. |
+| `test_an_uncommitted_function_in_the_index_is_in_the_closure` and `test_the_result_names_the_code_file_that_differs_from_head` | each ran `gov closure --json --depth 1 w20_leaf` in the `draft` clone | the session fixture `asked` runs that closure once and both read it | The same command on the same clone, which no case changes: the symbols are read by one case and `uncommitted` by the other, from one answer. |
+| `test_a_symbol_is_resolved_and_its_callers_are_followed_to_the_depth` and `test_the_result_names_the_code_file_that_differs_from_head` | each ran `gov closure --json --depth 1 w20_leaf` in the `indexed` clone | `asked` runs it once | The same command on the same clone with the same working tree and commit. **To note:** in the order of the file `test_repeated_runs_and_a_rebuilt_index_print_the_same_bytes` builds the index of that clone anew between the two cases, from the unchanged working tree. The second case now reads the answer given before that rebuild, where it asked again after it. Its sentence ("a clean tree names none") is about the working tree, which the rebuild does not change, and the determinism case itself holds that the rebuild changes no byte of a closure. If the lead reads this as a different repository state, the one line goes back to `_ask` at the cost of one load. |
+
+**Left as they are.** The determinism case runs its four closures on purpose and uses neither `asked` nor any
+kept answer. The three closures of `test_the_callees_of_a_symbol_are_followed` and the second closure of the
+symbol case differ in start id or depth. The no-model case, the unresolved-id case, the two-kinds case and the
+never-indexed case each ask a closure no other case asks, or have an environment or a clone of their own.
+
+**Not run by the designer** (the daemon cannot start in its session): the ten `local_only` cases. Run there:
+collection (51 cases, the same node ids), `py_compile`, the 41 cases that need no code tool (41 passed), and
+`support.calls` with two calls of the wrapper that run no tool.

@@ -46,6 +46,9 @@ SETTINGS_FILE = "path-map.yaml"
 TIMEOUT_KEY, WORKERS_KEY = "close_timeout", "close_workers"
 AUTO_WORKERS = "auto"
 NOT_MEASURED = "not measured"
+# The counter's three shares (DEC-495), as the close record and the result state them.
+SHARE_KEY, SHARE_PARTS = "governance_share", ("measured", "estimated", "total")
+REGISTER_KEY = "decision_register"  # DEC-479's key of the path map: the register an owner's decision may be in
 REVIEWER_ROLE = "independent-auditor"
 PROBE_ROLE = "orchestrator"
 PROBE_PASSED = ("pass", "passed")
@@ -104,6 +107,9 @@ def add_arguments(parser) -> None:
                         help="owner decision register id")
     parser.add_argument("--timeout", type=int, default=None,
                         help="test timeout in seconds")
+    parser.add_argument("--ticket-session", metavar="<session id>[=<role>]", action="append", default=[],
+                        help="a session of the ticket, as gov telemetry takes it, for the governance share "
+                             "the close record states; repeatable")
 
 
 def run(root: Path, args, config: dict):
@@ -150,7 +156,7 @@ def run(root: Path, args, config: dict):
     _check_tree(root, ticket)
     _check_store(root)
     if owner_decision:
-        state = _state.lift_escalation(root, ticket, owner_decision, state)
+        state = _state.lift_escalation(root, ticket, owner_decision, state, settings.get(REGISTER_KEY))
 
     commits = _ticket_commits(root, ticket)
     others = _commits_since(root, commits)
@@ -169,7 +175,7 @@ def run(root: Path, args, config: dict):
             found.append(f)
 
     if profile == "FULL":
-        gate(_check_probe, root, ticket, commits, others, inside, tickets)
+        gate(_check_probe, root, ticket, commits, others, inside, own, tickets)
     gate(_check_trailers, commits, ticket)
     gate(_check_unmeasured, ticket, others, own, tickets)
     gate(_check_containment, root, commits)
@@ -187,7 +193,7 @@ def run(root: Path, args, config: dict):
     packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
     if found:
-        _refuse_for(root, ticket, found, disposition, packet)
+        _refuse_for(root, ticket, found, disposition, packet, test_runs)
     test_counts = {key: test_counts[key] + counts[key] for key in test_counts}
 
     mandatory = packet["mandatory"]
@@ -207,8 +213,17 @@ def run(root: Path, args, config: dict):
         "commits": _commit_models(commits),
     }
     record.update(checked)
+    record[SHARE_KEY] = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
+    record["created"] = _now()  # one time of the record, whether or not it is written again with its share
 
     close_record_path, checkpoint_path = _record_and_close(root, ticket, record, commit_files)
+    # The record first, the share after it (DEC-495): the counter counts the close record itself.
+    share = _governance_share(root, ticket, getattr(args, "ticket_session", None) or [])
+    if share != record[SHARE_KEY]:
+        try:
+            _write_close_record(root, ticket, {**record, SHARE_KEY: share}, commit_files, checkpoint_path)
+        except OSError:  # the record stays as it was written: it says "not measured", and so does the answer
+            share = record[SHARE_KEY]
 
     # Reset iteration count on success (A6)
     if state["count"] or state.get("decision"):
@@ -217,7 +232,7 @@ def run(root: Path, args, config: dict):
         _write_count(root, ticket, reset)
 
     return {"ticket": ticket, "close_record": close_record_path,
-            "checkpoint": checkpoint_path, "test_runs": test_runs}
+            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share}
 
 
 def _time_limit(given, settings: dict):
@@ -248,10 +263,10 @@ def _workers(settings: dict):
 
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
-                packet: dict | None) -> None:
+                packet: dict | None, test_runs: list[dict] | None = None) -> None:
     """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
     order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
-    part under ``parts``."""
+    part under ``parts``. ``test_runs`` are the runs made, stated as a passed close states them (DEC-566)."""
     lines = list(dict.fromkeys(line for f in found for line in f.findings))
     not_measured = list(dict.fromkeys(part for f in found for part in f.not_measured))
     codes = sorted({f.code for f in found})
@@ -262,6 +277,7 @@ def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str
                    f"{len(lines)} findings refuse the close of {ticket} ({', '.join(codes)})")
         details = {"parts": [{"code": f.code, "message": f.message, **f.details} for f in found]}
     details["disposition"] = disposition or "unclassed"
+    details["test_runs"] = test_runs or []
     if not_measured:
         details["not_measured"] = not_measured
     context_reason = None
@@ -511,11 +527,15 @@ def _check_containment(root: Path, commits: list[dict]) -> None:
 # Probe gate (FULL-profile tickets, A5)
 # ---------------------------------------------------------------------------
 
-def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside,
+def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside, own,
                  tickets: frozenset[str]) -> None:
     """The probe record of a FULL-profile ticket is evidence only if the implementer could not have written
     it (DEC-137, DEC-487). ``others`` are the other commits of the ticket's range, ``inside`` says whether a
-    path is inside the ticket's allowed paths, ``tickets`` are the project's.
+    path is inside the ticket's allowed paths, ``own`` whether it is the ticket's work (``_work_of``),
+    ``tickets`` are the project's.
+
+    A commit of the ticket after the probed one refuses only for a path that is the ticket's work: inside its
+    allowed paths, one of its acceptance tests, or its own file (DEC-581).
 
     Every probe record of the ticket is read (DEC-500): each is asked everything, so one that does not say
     that the probe of the final code passed refuses whatever another says, and the close needs one."""
@@ -606,8 +626,15 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                 raise invalid(f"commit {sha} trailer names the reviewer session",
                               commit=sha)
             if c["sha"] in after:
-                for p in c["paths"]:
-                    if not p.startswith(("tests/", "docs/probes/")):
+                paths = c["paths"]
+                if probed in c["parents"][1:]:
+                    # DEC-505: the merge of the probed commit itself is not "after" it where what it brings is
+                    # the probed code: only a path that is not at the merge what it is there is judged.
+                    differs = set(_git(root, "-c", "core.quotePath=false", "diff-tree", "-r", "-z", "--no-renames",
+                                       "--name-only", probed, c["sha"]).split("\0"))
+                    paths = [p for p in paths if p in differs]
+                for p in paths:
+                    if own(p):
                         raise invalid(f"ticket commit {sha} changes {p} "
                                       "after the probed commit", commit=sha, path=p)
         records += 1
@@ -663,7 +690,10 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 
     A run over the time limit is a finding like a failing test (DEC-454).
     ``TEST_RUNNER_ABSENT`` when this interpreter has no pytest: nothing ran.
+    A list that is no UTF-8 text is ``SERIAL_ONLY_LIST_UNREADABLE``, and a file of the project that would be
+    loaded in the place of the plugin is a finding: in both no test is run (DEC-555).
     """
+    import importlib.machinery
     import importlib.util
     import os
     from gov.close.pytest_plugin import gov_close_serial_only as serial_only
@@ -693,21 +723,37 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
 
     # Asked of the interpreter of the run, in the run's environment: this process may have the plugin from
     # the caller's PYTHONPATH alone.
-    parallel = subprocess.run([sys.executable, "-c", _HAS_PARALLEL_RUNNER], capture_output=True, text=True,
-                              cwd=str(root), env=env).returncode == 0
+    parallel = _started(root, [sys.executable, "-c", _HAS_PARALLEL_RUNNER], env).returncode == 0
     if parallel:
         def within(entry: str, folder: Path | None) -> bool:
             return folder is not None and (entry.partition("::")[0] + "/").startswith(
                 folder.relative_to(root).as_posix() + "/")
 
-        declared = [entry for entry in serial_only.entries(root)
-                    if within(entry, test_path) and not within(entry, ignore)]
+        try:
+            listed = serial_only.entries(root)
+        except UnicodeDecodeError as e:  # nothing is read as "no list" (DEC-555)
+            raise _Finding("SERIAL_ONLY_LIST_UNREADABLE",
+                           f"the serial-only list {serial_only.LIST_REL} is not UTF-8 text ({e}): which cases it "
+                           "declares is not known, and no test was run",
+                           {"list": serial_only.LIST_REL},
+                           not_measured=[f"the test run of {rel}: not measured, the serial-only list cannot be read"])
+        declared = [entry for entry in listed if within(entry, test_path) and not within(entry, ignore)]
         runs = [("parallel", pytest + whole + options + ["-n", str(workers)], env, f"the test run of {rel}")]
         if declared:  # the plugin keeps them out of the parallel run; its folder holds nothing else
+            # A file of the project found under the plugin's name before the plugin's folder would be loaded in
+            # its place (DEC-555): the run's import path begins with the project's root and its src/.
+            before = importlib.machinery.PathFinder.find_spec(serial_only.PLUGIN, [str(root), env["PYTHONPATH"]])
+            if before is not None and before.origin:
+                return [f"the test run of {rel}: {os.path.relpath(before.origin, root)} of the project is named "
+                        f"like the plugin of the close ({serial_only.PLUGIN}) and would be loaded in its place: "
+                        "no test was run"], counts
             plugin_env = {**env, serial_only.ROOT_VARIABLE: str(root), "PYTHONPATH": os.pathsep.join(
                 [env["PYTHONPATH"], str(Path(serial_only.__file__).resolve().parent)])}
+            plugin_env.pop(serial_only.GIVEN_VARIABLE, None)  # a close inside a run afterwards is given its own
+            # In the run afterwards the plugin holds that every entry given names a case (DEC-549).
             runs = [("parallel", runs[0][1] + ["-p", serial_only.PLUGIN], plugin_env, runs[0][3]),
-                    ("serial-afterwards", pytest + declared + options, env,
+                    ("serial-afterwards", pytest + declared + options + ["-p", serial_only.PLUGIN],
+                     {**plugin_env, serial_only.GIVEN_VARIABLE: "\n".join(declared)},
                      f"the serial run afterwards of the declared cases of {rel}")]
     else:
         declared = []
@@ -739,6 +785,28 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     return findings, counts
 
 
+def _started(root: Path, cmd: list[str], env: dict, timeout: int | None = None):
+    """``cmd`` run to its end in the project's folder, in a process group of its own: its exit code and what it
+    printed. At the time limit the whole group is ended before ``subprocess.TimeoutExpired`` is raised, so no
+    worker of a parallel run lives on to write into the project (DEC-555); so it is when this command is
+    itself ended."""
+    import os
+    import signal
+
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=str(root),
+                               env=env, start_new_session=True)
+    try:
+        stdout, stderr = process.communicate(timeout=timeout)
+    except BaseException:
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except ProcessLookupError:
+            pass
+        process.wait()
+        raise
+    return subprocess.CompletedProcess(cmd, process.returncode, stdout, stderr)
+
+
 def _one_test_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str,
                   rel: str) -> tuple[list[str] | None, dict]:
     """One run of the test runner to its end: its findings (``None`` when it collected no test) and what the
@@ -749,8 +817,7 @@ def _one_test_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str
     ran = {"seconds": 0.0, "passed": 0, "failed": 0, "errors": 0, "skipped": 0}
     started = time.monotonic()
     try:
-        result = subprocess.run(cmd, capture_output=True, text=True,
-                                cwd=str(root), env=env, timeout=timeout)
+        result = _started(root, cmd, env, timeout)
     except subprocess.TimeoutExpired:
         ran["seconds"] = round(time.monotonic() - started, 2)
         return [f"{what} exceeded the time limit of {timeout}s"], ran
@@ -762,12 +829,16 @@ def _one_test_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str
         if any(found.values()):
             ran.update({key: int(m.group(1)) for key, m in found.items() if m})
             break
+    # The runner's last line of a run that came to its end: its counts, whatever they count, and its seconds.
+    stated = any(re.search(r"\b\d+ [a-z]+\b.* in \d[\d.]*s\b", line) for line in result.stdout.split("\n"))
 
     rc = result.returncode
     if rc == 1 and "No module named pytest" in result.stderr:  # this process had it from the caller's PYTHONPATH
         raise GovError("TEST_RUNNER_ABSENT",
                         f"pytest is not installed for {sys.executable} without the caller's PYTHONPATH: "
                         "no test was run", {"python": sys.executable})
+    if rc == 0 and not stated:  # a case that ended the runner's own process: no other run covers it (DEC-555)
+        return [f"{what} ended with exit code 0 and stated no result: nothing of it was measured"], ran
     if rc == 0:
         return [], ran
     if rc == 5:
@@ -897,6 +968,9 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
     details = {"findings": findings, **(details or {})}
     details["repair_ticket"] = _open_repair_ticket(
         root, ticket, findings, disposition, context_hash, context_reason, not_measured)
+    cut = len(findings) - _tool.findings_held(findings)
+    if cut and not details["repair_ticket"].startswith(_tool.NOT_OPENED):
+        details["repair_ticket_findings_cut"] = cut  # what the ticket leaves out, said in it too
     raise GovError(code, message, details, exit_code=exit_code)
 
 
@@ -921,24 +995,46 @@ def _collect_test_paths(root: Path, wbs: str, commit_files: list[str]) -> list[s
     return paths
 
 
+def _governance_share(root: Path, ticket: str, sessions: list[str]) -> dict:
+    """The three shares of the counter (``gov.telemetry``) for the sessions the caller names, each its figure
+    or "not measured" as the counter gave it (DEC-495). With no session named, and where the counter refuses
+    or cannot read, all three say "not measured": the share refuses no close. Counts only: nothing else of
+    the counter's record is taken."""
+    from gov.telemetry.counter import measure
+
+    unmeasured = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
+    if not sessions:
+        return unmeasured
+    try:
+        shares = measure(root, ticket, sessions)[SHARE_KEY]
+    except (GovError, OSError):
+        return unmeasured
+    return {part: shares[part] if type(shares.get(part)) in (int, float) else NOT_MEASURED for part in SHARE_PARTS}
+
+
 def _read_skill_versions(root: Path) -> list[dict]:
     """The kernel's skills with the version each ``SKILL.md`` states, and the
     vendored ones, which carry none. A skill file whose frontmatter cannot be
-    read is listed under its folder's name with "not measured"."""
+    read is listed under its folder's name with "not measured".
+
+    The kernel is the template's and the installed one (``governance/kernel/``), both where a project has
+    both: a skill the two hold with one version is listed once, and one whose versions differ with each."""
     from gov.tasks.tickets import frontmatter
 
-    kernel = root / "template" / "governance" / "kernel"
     versions = []
-    for files, versioned in ((sorted((kernel / "skills").glob("*/SKILL.md")), True),
-                             (sorted((kernel / "vendor").rglob("SKILL.md")), False)):
-        for skill_file in files:
-            front = frontmatter(skill_file)
-            if front is None:
-                versions.append({"name": skill_file.parent.name, "version": NOT_MEASURED})
-                continue
-            version = front.get("version") if versioned else None
-            versions.append({"name": str(front.get("name", skill_file.parent.name)),
-                             "version": str(version) if version else "no version"})
+    for kernel in (root / "template" / "governance" / "kernel", root / "governance" / "kernel"):
+        for files, versioned in ((sorted((kernel / "skills").glob("*/SKILL.md")), True),
+                                 (sorted((kernel / "vendor").rglob("SKILL.md")), False)):
+            for skill_file in files:
+                front = frontmatter(skill_file)
+                if front is None:
+                    listed = {"name": skill_file.parent.name, "version": NOT_MEASURED}
+                else:
+                    version = front.get("version") if versioned else None
+                    listed = {"name": str(front.get("name", skill_file.parent.name)),
+                              "version": str(version) if version else "no version"}
+                if listed not in versions:
+                    versions.append(listed)
     return versions
 
 
@@ -956,10 +1052,14 @@ def _close_record_rel(ticket: str) -> str:
     return f"docs/close/{ticket}/CL-{ticket}.md"
 
 
+def _now() -> str:
+    from datetime import datetime, timezone
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
 def _write_close_record(root: Path, ticket: str, record: dict,
                         commit_files: list[str], checkpoint_path: str) -> str:
     import yaml
-    from datetime import datetime, timezone
 
     close_id = f"CL-{ticket}"
     close_rel = _close_record_rel(ticket)
@@ -970,7 +1070,7 @@ def _write_close_record(root: Path, ticket: str, record: dict,
         "status": "ACTIVE",
         "state_class": "AUTHORITATIVE",
         "task": ticket,
-        "created": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "created": _now(),  # the record's own where it gives one
         "outputs": list(commit_files) + [close_rel, checkpoint_path],
         **record,
     }

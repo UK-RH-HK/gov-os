@@ -401,6 +401,7 @@ NAMESPACES = {
 def path_map_text(namespaces):
     """A full path map (DEC-225): this repository's own, with ``namespaces`` in place of its namespaces."""
     document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    document.pop("decision_register", None)   # the project holds no register file, so its path map names none
     document["namespaces"] = {
         name: {"paths": list(patterns), "memory_class": memory_class, **_NAMESPACE_FIELDS}
         for name, (patterns, memory_class) in namespaces.items()}

@@ -163,3 +163,79 @@ Source S0a-G-07 text: "`gov context`: authority block first, supplementary block
 4. **sha256** — `test_w1_24_packet.py::test_the_packet_carries_its_own_hash` and `test_w1_24_packet.py::test_the_packet_holds_every_mandatory_input_by_id_and_sha256` (S1)
 5. **file-path delivery** — `test_w1_24_brief.py::test_brief_delivers_a_file_path_and_a_summary` (S2)
 6. **≤ 2.5k-token summary** — `test_w1_24_brief.py::test_the_brief_summary_is_at_most_2500_tokens` (S2)
+
+## Sources that stand, files that cannot be read, a lookup that fails (the follow-up after W1-41, piece 11)
+
+Added by a fresh Independent Test Designer on ticket `DAEO-2lwj` (W1-30, reopened; DEC-569), before any
+code. Sources: DEC-552 (finding 10 goes to the follow-up; finding 6 for "stands"), DEC-568, and the W1-41
+section of the bootstrap ("`RETIRED` and `REJECTED` records satisfy a mandatory source in the context
+(only `SUPERSEDED` blocks); a mandatory record whose file cannot be read gets the hash of empty bytes and
+counts 0 tokens, so the packet presents it as read; any retrieval failure in the supplementary lookup
+becomes "index unavailable""). File: `test_w1_24_standing_sources.py`, 16 cases. No case of the suite was
+rewritten; `w1_24_support.py` is unchanged. Finding 9 is in W1-41's suite, which holds the external
+references.
+
+### As settled here (each proposed; a decision may replace it)
+
+1. **Only a record that stands satisfies a mandatory source.** "Stands" is DEC-552's finding 6 as
+   DEC-568 gives it: a record stands unless its status says it no longer does, and the statuses that say
+   so are `SUPERSEDED`, `RETIRED` and `REJECTED`. `ACTIVE`, `ACCEPTED`, `PROPOSED`, `DRAFT`, `DEPRECATED`
+   and a status the kernel does not know still stand and satisfy, as today. The status is compared as it
+   is compared today (the word in capitals); a record superseded by an edge alone is treated as today.
+2. **The refusal** is `BLOCKED`, and its message names the record and the status word (`RETIRED`,
+   `REJECTED`), as it names a superseded record today.
+3. **A mandatory record whose file cannot be read** (deleted from the working tree, a folder in its
+   place, no permission to read) is `BLOCKED`; the message names the file's path, and the refusal names
+   the record. No packet is built.
+4. **A failure of the supplementary lookup** leaves the packet built with no supplementary context and
+   an entry under `dropped` whose reason says what failed, in that failure's own words. The reason
+   holds the words "index unavailable" only where the index is what is unavailable. Two causes give two
+   statements, and so two packet hashes.
+
+### Cases and why each is red (at `85066f4e`)
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_source_that_no_longer_stands_does_not_satisfy_and_is_named_with_its_status` (2: `RETIRED`, `REJECTED`) | settlements 1 and 2 | red, both: "a RETIRED record satisfied a mandatory source: the context was built" |
+| `test_a_superseded_source_is_refused_and_named_with_its_status_as_today` | the form the two above take | **green**: holds what stays |
+| `test_a_source_that_stands_satisfies` (6: `ACTIVE`, `ACCEPTED`, `PROPOSED`, `DRAFT`, `DEPRECATED`, an unknown status) | settlement 1, the other side | **green**, each: holds what stays |
+| `test_a_mandatory_record_whose_file_cannot_be_read_is_refused_and_the_file_is_named` (3: deleted, a folder in its place, no permission to read) | settlement 3 | red, each: "the packet presents ADR-W24-STAND as read, with the hash of empty bytes" |
+| `test_a_mandatory_record_that_is_read_has_the_hash_of_its_file` | the hash of the file, not of empty bytes | **green**: holds what stays |
+| `test_a_lookup_that_fails_on_a_file_it_cannot_read_says_so_and_not_that_the_index_is_unavailable` | settlement 4: the index answers, a file it names cannot be read; the reason names that file | red: "a file that cannot be read is reported as an index that is unavailable" |
+| `test_a_lookup_that_fails_on_a_damaged_index_says_that_the_index_is_unavailable` | settlement 4, the failure that is an unavailable index (its table is gone) | **green**: holds what stays |
+| `test_the_two_failures_give_two_packets` | two causes, two statements, two hashes | red: both say "index unavailable" |
+
+7 red, 9 green. Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-24 -q -p no:cacheprovider -rs`:
+70 cases, 63 passed, 7 failed, none skipped, 23 s.
+
+The three cases of the lookup build a lexical index and skip without `gitleaks` on PATH, as the suite's
+other cases of the supplementary context do. The three cases that take a permission away skip for a
+user that permissions do not hold (root). The damaged index is made by removing one table of the
+index from the project's runtime store; if the index moves, that fixture step moves with it.
+
+### Names proposed
+
+None new. `BLOCKED` and the `dropped` entry with its `reason` are today's; the words of a reason other
+than "index unavailable" are the failure's own and are not fixed, beyond naming the file that could not
+be read.
+
+### Packages
+
+**P-11.2. An index that was never built says nothing.**
+- *Question.* In a project with no lexical index the packet has no supplementary context and an empty
+  `dropped` list: nothing says why. Should it say "index unavailable"?
+- *Why now.* DP-4 of this suite asked for the indicator; its case
+  (`test_the_packet_indicates_supplementary_is_unavailable_when_the_index_is_down`) passes on an empty
+  list because its last condition is always true. The follow-up orders the wording of a *failure*; a
+  lookup that answers "no index" is not one, so no case here changes it.
+- *Options.* (a) Leave it. (b) The packet says "index unavailable" under `dropped`; every packet of a
+  project without an index then changes its hash once, and the vacuous case is rewritten to hold it.
+- *Impact.* (b) changes the packet hash that close records of index-less projects hold.
+- *Reversibility.* High. *Cost.* (b) two lines and one rewrite.
+- *Recommendation.* (b), in its own step. *Confidence:* medium.
+
+**P-11.3. Status words in another letter case.** `superseded`, `Retired` and `rejected` satisfy a
+mandatory source today and after this piece, because the comparison is with the word in capitals.
+Options: (a) leave; (b) compare without regard to case. Recommendation (b), stricter, in the same
+change if the lead agrees; no case holds either. *Confidence:* medium.
+

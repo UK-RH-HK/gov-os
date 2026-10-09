@@ -5,15 +5,16 @@ CAP-12 (covers CAP-12.a, CAP-12.b) and CAP-03 (covers CAP-03.e), DEC-076, DEC-07
 DEC-299, DEC-322, DEC-324, DEC-325 and DEC-221 (profile FULL). Written before implementation; the later batches
 serve DEC-338, DEC-339, DEC-346, DEC-347 and DEC-362.
 
-The suite has **71 test functions, 166 cases** in eight files, a support module, a conftest and the question set
+The suite has **72 test functions, 167 cases** in nine files, a support module, a conftest and the question set
 `questions.yaml`. The fifth file, `test_w1_16_paths_and_roots.py` (7 functions, 8 cases), is a second batch written after
 the ticket went green, from behaviours a review described (DEC-136); see "The second batch" below. The sixth file,
 `test_w1_16_daemon_dir_and_names.py` (10 functions, 13 cases), is a third batch, added after implementation for the
 delegated decisions DEC-338 and DEC-339; see "The third batch" below. The seventh file,
 `test_w1_16_builtin_allowlist_and_daemon_secrets.py` (6 functions, 12 cases), is a fourth batch, added after
 implementation for the delegated decisions DEC-346 and DEC-347; see "The fourth batch" below. The eighth file,
-`test_w1_16_ui_off.py` (7 functions, 9 cases), is a fifth and last batch, added after implementation for the
-owner's decision DEC-362; see "The fifth batch" below. **No W1-15
+`test_w1_16_ui_off.py` (7 functions, 9 cases), is a fifth batch, added after implementation for the
+owner's decision DEC-362; see "The fifth batch" below. The ninth file, `test_w1_16_one_daemon.py` (1 function,
+1 case), is a sixth batch, added in the follow-up after W1-41 for DEC-561; see "The sixth batch" below. **No W1-15
 acceptance test was rewritten**: none asserts the old token rule (see "The W1-15 suite" below).
 
 ## Run
@@ -23,14 +24,15 @@ python3 -m pytest tests/acceptance/W1-16 -q -p no:cacheprovider
 ```
 
 Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About eight minutes with the ticket built (the tool
-takes 5 to 6 seconds per indexing run, and one runs at a time; the fifth batch adds about one minute). Run it
-alone: one test watches this repository's `.gov-runtime/`.
+takes 5 to 6 seconds per indexing run, and one runs at a time; the fifth batch adds about one minute). One test
+watches the index stores of this repository's `.gov-runtime/` (not the whole folder, since DEC-563): it can run
+beside sessions that write logs, checkpoints or locks there, and not beside one that indexes this repository.
 
 - **No secret is committed.** Every planted string (canaries in a string, a comment and an identifier, token-shaped
   strings, the seven dev-tier values) and every prefixed identifier is built at run time from parts in
   `w1_16_support.py`. None stands whole in a committed file, this README included.
 - **Every index is built in a temporary repository** (DEC-322). No test indexes this repository or writes its
-  `.gov-runtime/`; one test asserts that. The dev tiers are only cloned (`git clone --no-hardlinks`) into a temporary
+  `.gov-runtime/`; one test asserts it of the index stores there (see "This repository's index stores"). The dev tiers are only cloned (`git clone --no-hardlinks`) into a temporary
   directory; the clone is adopted, renamed in and indexed, never the tier.
 - **The code under test** is the repository's `src/`, put on `PYTHONPATH` of a child process. The child's
   environment is built from scratch: `PATH`, an empty temporary `HOME`, `TMPDIR`, `XDG_RUNTIME_DIR` and
@@ -125,7 +127,7 @@ cases: 1 error, 4 passed.
 | `test_a_token_shaped_string_is_still_flagged[16]` · `test_a_body_with_a_digit_or_with_mixed_case_is_flagged[12]` · `test_the_length_floor_of_sixteen_characters_stays[2]` · `test_every_file_holding_a_dev_canary_is_still_reported[4]` · `test_a_file_with_a_token_shaped_string_is_not_indexable[4]` | Keep true: what the old rule already flags and the repaired rule must still flag. |
 | `test_the_canary_rule_is_unchanged[2]` · `test_the_token_rule_carries_no_allowlist[2]` | Keep true: the canary rule is the one W1-15 delivered, and no rule of either file has an allowlist of its own. |
 
-## `local_only` (160 cases)
+## `local_only` (161 cases)
 
 Deselect with `-m "not local_only"` (6 cases remain: the interface test, the four that read the two gitleaks
 files as TOML, and the one that reads what the wrapper's source imports).
@@ -135,7 +137,8 @@ files as TOML, and the one that reads what the wrapper's source imports).
   `test_w1_16_code_answers.py`, the two index cases of `test_w1_16_token_rule.py`, all of
   `test_w1_16_paths_and_roots.py` but its premise, the daemon directory case of the fourth batch, and the nine
   cases of the fifth batch (`test_w1_16_ui_off.py`; they also need a user and network namespace, and are skipped
-  on a machine that gives none). Skipped when the binary is not on `PATH`.
+  on a machine that gives none), and the case of the sixth batch (`test_w1_16_one_daemon.py`). Skipped when the
+  binary is not on `PATH`.
 - **Run the `gitleaks` binary**, directly or through the filter: the other marked cases of
   `test_w1_16_token_rule.py`, the premise of `test_w1_16_paths_and_roots.py`, and the other eleven cases of the
   fourth batch. Skipped when the binary is not on `PATH`.
@@ -170,6 +173,34 @@ files as TOML, and the one that reads what the wrapper's source imports).
   dump. None may exist in the repository outside `.gov-runtime/` and `.git/`, nor in the child's `HOME`, `TMPDIR`,
   runtime directory or working directory. The child's `~/.cache/codebase-memory-mcp` must stay empty, and the
   user's own must not gain, lose or change a file.
+
+### This repository's index stores (DEC-322; rewritten, reason "owner decision P-25", DEC-563)
+
+`test_this_repository_is_not_indexed_by_the_run` lists the index stores of this repository before the two
+temporary repositories are indexed and again after every other case of the file, and fails when a file of them
+appeared or went. Until DEC-563 it listed the whole `.gov-runtime/` but `scratch/`, so a log, a checkpoint or a
+lock of any other session on this repository failed it, in a regression and in a close.
+
+- **The index stores** (`support.index_stores`) are the places an indexing run of this repository writes, read
+  from the code that writes them and stated here, not imported from it:
+  - `.gov-runtime/codeintel/`, every file under it: the code index. The wrapper removes and rebuilds that folder
+    at every `index`: the tool's home (`codeintel/home/`, one SQLite file per project, `_config.db`, `logs/`) and
+    the files it stages for the tool (`codeintel/files/`). (`src/gov/codeintel/`.)
+  - `.gov-runtime/store.db`: the record store (`src/gov/store/`). The lexical index and the semantic vectors are
+    tables of that same file (`src/gov/retrieval/`), so a lexical indexing run writes it too; `gov rebuild`
+    writes these two places and no other (`src/gov/rebuild/`).
+- **Not watched:** everything else under `.gov-runtime/` (snapshots, checkpoints, logs, locks, `scratch/`, the
+  notes of a synthesis), and the store's SQLite side files (`store.db-journal`, `-wal`, `-shm`), which come and
+  go with any session that opens the store; a run that wrote the store leaves `store.db` itself.
+- **What it still catches:** a run that indexes this repository where it had no code index or no record store
+  (the state of a worktree no orchestrator has rebuilt), and one that changes which files the code index holds.
+- **What it does not catch, as before:** the comparison is of names, as it always was. A run that rebuilt an
+  index already there, with the same files, changes no name. `test_no_index_file_exists_outside_gov_runtime_after_a_run`
+  and the temporary roots every call is given are what keep a run out of this repository; this case is the
+  check after the fact.
+- **Still not for every neighbour:** a session that indexes or rebuilds this repository while the file runs
+  (an orchestrator's `gov rebuild`, DEC-322) can create or remove a watched file. Then the case is re-run
+  alone, as a case of DEC-372.
 
 ### Secret exclusion (success 2, failure 3)
 
@@ -530,7 +561,8 @@ How these tests decide:
   argument of `index_repository` (the path of the staged copy). There is no other way in. One case holds both:
   a repository whose folder is named `--ui=true`, indexed and asked, and `callers(root, "--ui=true")`, which
   answers an empty list.
-- **A setting left in the home.** After `index(root)` and three seconds (the daemon has ended), someone runs
+- **A setting left in the home.** After `index(root)` and once the daemon has ended (its end is waited for,
+  three seconds at most; see "Shorter daemon cases"), someone runs
   `config set ui_enabled true` in the repository's home; the tool then says `true` (checked). The wrapper's next
   call, `projects(root)` and then again `callers(root, name)`, leaves the three signs off.
 
@@ -539,6 +571,95 @@ no effect on a `cli` call; the lead reports the difference to DEC-362's wording)
 the UI on when the wrapper is called (the tool says a restart is needed: a residual the lead reports);
 `config.json` written by hand, or made unreadable; the setting `ui_port`; the note in the tool registry; the
 user's own home of the tool; the tool's server form; a machine without namespaces.
+
+## Shorter daemon cases (DEC-561)
+
+In the follow-up after W1-41 the daemon cases were shortened where nothing a case asserts is weakened. The count
+is unchanged by this: 71 functions and 166 cases before and after, the same names and the same files (the sixth
+batch then adds one case in a file of its own).
+
+**Where the time goes** (measured by the lead; there is no sleep, poll or timeout in the wrapper). Each process
+of the tool costs about 1.4 s before it does anything. A call of the wrapper starts two (the UI setting, then
+the question): about 5.8 s. One load of the code graph makes two such calls, about 11.9 s, and is kept only for
+the life of one Python process: every child process that asks a question of the graph pays it again. An index
+of a small repository costs 9 to 15 s, of a dev tier about 27 s.
+
+**What was grouped.** Every assertion is made as before, on the answers to the same questions of the same
+repository.
+
+| File | Before | Now | Why nothing is weakened |
+|---|---|---|---|
+| `test_w1_16_secret_exclusion.py` | `test_no_planted_secret_comes_back_from_the_code_graph`, `test_a_file_with_a_secret_is_not_in_the_code_graph` and `test_the_clean_files_are_in_the_code_graph` each asked the shared planted repository in a child process of its own (three loads of the graph) | one module-scoped run (`answers`) asks the questions of all three, in the sandbox that indexed the repository; each case reads its own answers by call | The questions are the union of the three lists; the second case's questions were a part of the first's already. The first case still scans every result and the whole output (stdout and stderr) of the run that asked its questions; that run now also holds the answers about the clean files, so the text scanned for planted strings is larger, never smaller. The case holds first that each of its questions was asked. |
+| `test_w1_16_home.py` | `test_a_repository_answers_only_from_its_own_code` and `test_no_index_file_exists_outside_gov_runtime_after_a_run` each asked both repositories (four loads) | one module-scoped run per repository (`answers`) asks both definitions, the callers and the dead code (two loads) | The answers held are the same. The check of index files outside `.gov-runtime/` still follows the queries: the case takes the run as a fixture, holds that `callers` and `dead_code` were asked of each repository, and then looks. In the order of the file the second `index(root)` of the first repository now stands between the queries and the look, where the queries stood after it before; the look therefore also follows that index. No sentence of the case holds a query after a second index. |
+| `test_w1_16_ui_off.py` | `test_a_setting_left_in_the_home_is_turned_off_by_the_next_call` slept three seconds, twice, so that the daemon of the call before had ended | `support.wait_for_daemon_end(home)` waits for that end, three seconds at most | The premise is the same (no daemon of that home still runs when the setting is left on), and after three seconds the case goes on as it did. The wait looks at the processes of the machine: one whose environment names this home, or a process of the tool whose home cannot be told, counts as the daemon. So it can end later than the daemon, never before. **The time the port is watched after a command (1.5 s) is unchanged**: shortening it would weaken the cases. |
+
+**Left as they are.**
+
+- **The dev tiers** (`tier_runs`, about 155 s): two tiers, each indexed before and after the rename, each time
+  with all its questions in the same child process. That is four dev-tier indexes and four loads, and nothing
+  is repeated.
+- **`sequence` in `test_w1_16_ui_off.py`**: each step runs in a child of its own on purpose, the signs are read
+  after each.
+- **`daemons` in `test_w1_16_daemon_dir_and_names.py`** (about 41 s): two repositories, each indexed and asked
+  once, each with an environment and a shared default of its own. The five `daemon_dir` questions run no tool.
+- **Every case with a repository, an environment or a home of its own** (a secret added later, a product
+  namespace, the token rule at the index, the refused roots, the caller's UI variables, a repository named like
+  the switch): each asks its index and its questions in one child process already.
+
+**Not run by the designer.** The daemon cannot start in the designer's session (`/tmp` is read-only there).
+Run there: collection (166 cases, the same node ids), `py_compile` of every changed file, the five cases that
+need neither the daemon nor a sandbox, and the helper `wait_for_daemon_end` against stand-in processes (one whose
+environment names the home, one named like the tool with no home, one named like the tool with another home,
+and the bound). The lead runs the daemon cases outside the sandbox and times them.
+
+## The sixth batch: one question starts the daemon at most once
+
+`test_w1_16_one_daemon.py`, 1 test function, 1 case, marked `local_only` and named in
+`tests/acceptance/serial-only.txt`. A case added after implementation, reason "owner decision": DEC-561. No KPI
+line was added; the batch serves CAP-12.
+
+**The behaviour.** On an indexed temporary repository, answering one question that needs the code graph
+(`callers(root, name)`, in a child process of its own) starts the tool's daemon at most once, and the answer is
+what it was (the one caller of the fixture's function, and no other).
+
+**Red run: not run by the designer** (the daemon cannot start in its session). **Expected red reason today, for
+the lead to confirm outside the sandbox:**
+`callers(root, name) started the tool's daemon 2 times; one question of the code graph starts it at most once`.
+As built, one load of the code graph asks the tool twice (the nodes, then the edges), each time with a process
+and a daemon of its own. The other 166 cases are not touched by this batch.
+
+How the case decides:
+
+- **A start is a line of the tool's own daemon log**, `<home>/logs/cbm-daemon.log` in the home the wrapper names
+  (`support.daemon_log`, which the fifth batch reads already). The binary of version 0.11.0 holds the log
+  messages `daemon.start` and `daemon.stop`; the lead reports that each start and each stop of a daemon is a line
+  there. `support.daemon_starts` counts the lines with `daemon.start` as a whole name (`daemon.start_failed` is
+  no start).
+- **The premise, held in the case.** After `index(root)` the log holds at least one such line: the index ran the
+  tool, so the count works on the machine of the run. After the question the log still begins with the text it
+  had before: it was added to, not written anew, so the new lines are the question's. If either does not hold
+  the case fails and says that starts cannot be counted there; it never passes on a log that cannot show it.
+- **The daemon of the index is not the question's.** Its end is waited for before the log is read, three seconds
+  at most (`support.wait_for_daemon_end`), so that the question does not meet a daemon that still runs.
+- **At most once**, not exactly once: an answer that needs no daemon at all is not refused. The answer is
+  checked, so a wrapper that runs nothing does not pass.
+- **How the wrapper asks is not held**: no command line is read and no process is counted.
+
+**The UI stays off for that one session (DEC-362).** The existing cases of the fifth batch hold it for every call
+of the wrapper, by outcome and not by mechanism, so they hold it for a wrapper that answers in one session as
+well: `test_a_call_of_the_wrapper_leaves_the_ui_off[callers]` (the three signs after `callers(root, name)` in a
+child of its own), `test_a_second_index_keeps_the_ui_off`,
+`test_ui_variables_of_the_callers_environment_do_not_turn_the_ui_on`,
+`test_a_repository_and_a_symbol_named_like_the_switch_do_not_turn_the_ui_on`, and
+`test_a_setting_left_in_the_home_is_turned_off_by_the_next_call`, which holds that a setting left on in the home
+is turned off before the question's session starts. No new UI case was written. The new case reads two of the
+three signs beside its count, at no cost of a namespace: no line of the log says a daemon served the UI, and the
+tool, asked in the home, says `false`. The port is watched by the fifth batch.
+
+Not tested, on purpose: how many processes of the tool a question starts; the time a question takes (no time
+bound is asserted, on this machine or any other); `index(root)` and `projects(root)`, which ask the tool once
+already; several questions in one process (the graph is kept for the life of the process, as before); a
+closure of `gov closure` (W1-20's suite).
 
 ## The W1-15 suite
 

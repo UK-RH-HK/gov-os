@@ -441,3 +441,209 @@ revision of this file.
 - Running `openspec validate --strict` with the real `openspec` binary.
 - Whether gitleaks is installed (the secrets-indexing check, W1-15).
 - The seven families not yet registered: their checks are built by other tickets.
+
+## The follow-up after W1-41 on W1-30's ticket (DEC-569): pieces on the checks
+
+Written by a test designer on ticket `DAEO-2lwj` (W1-30, reopened), before the checks are changed. No earlier
+case of this suite is changed.
+
+### The probe type in the schema check (DEC-565; `test_w1_26_probe_records.py`, 43 cases)
+
+DEC-565: "The four findings each probe record adds to the schema check are accepted as known growth [...] In
+the follow-up after W1-41 the probe type is added to the kernel's record schema, so that the schema check
+returns to its recorded baseline."
+
+**The four findings a probe record gives today**, measured on each of this repository's four records (16 in
+all) and on a fixture of the same form:
+
+1. `SCHEMA_MISSING_FIELD`, field `id`
+2. `SCHEMA_MISSING_FIELD`, field `status`
+3. `SCHEMA_MISSING_FIELD`, field `state_class`
+4. `SCHEMA_UNKNOWN_TYPE`, type `probe`
+
+The engineer's work is measured by them: after it a well-formed probe record gives none of the four and no
+other.
+
+How the cases run: the `command` of the kernel's declaration `core-schema`, in the root of a temporary project
+(the suite's `raw_project`, which holds the kernel's schemas where the suite's projects hold them), with this
+worktree's code. The findings are the command's JSON; a finding belongs to a record when its `path` is the
+file. One case runs the command in this repository's root; it reads only.
+
+**The fields and their shapes (proposed)** are those of the schema, listed in full in W1-08's README, section
+"The probe record's schema": the nine required fields (`type`, `task`, `reviewer_session`,
+`implementer_session`, `reviewer_wrote_nothing`, `commissioned_by`, `judged_by`, `judgement`, `probed_commit`),
+with `id`, `status` and `state_class` not required.
+
+**The findings' codes (proposed).** A missing field keeps the check's code `SCHEMA_MISSING_FIELD`. A field of
+a wrong type or value is `SCHEMA_INVALID_FIELD`, a code the check does not have today. Both carry `path` (the
+file) and `field`. Only one case holds the codes; the others hold the file and the field.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_well_formed_probe_record_gives_no_finding` | the nine fields, this repository's form: no finding on the file | red: the four findings |
+| `test_each_judgement_word_is_well_formed` (4: `pass`, `passed`, `fail`, `failed`) | no finding; a failed probe is a true record, the gate refuses the close | red, all four: the four findings |
+| `test_a_probe_record_that_states_the_shared_fields_is_well_formed_too` | with `id`, `status`, `state_class` (the form of W1-30's fixtures): no finding | red: `SCHEMA_UNKNOWN_TYPE` |
+| `test_a_probe_record_is_known_by_its_type_not_by_where_it_lies` | a record under `docs/reviews/`: silent when well-formed, named with `judgement` when not | red: the four findings |
+| `test_two_records_of_one_ticket_are_each_judged` | two records in one ticket's folder (DEC-500): the good one silent, the one without `probed_commit` named | red: the good one has the four |
+| `test_a_probe_record_without_a_field_the_probe_gate_asks_for_is_a_finding` (8, one per field beside `type`) | a finding with the file and the field, and no finding about anything else | red, all eight: no finding names the field |
+| `test_a_field_of_a_wrong_type_or_value_is_a_finding` (21) | the same for one wrong shape or value: `judgement` (outside the words, upper case, a truth value, empty), `probed_commit` (abbreviated, `HEAD`, upper case, 41 characters, a number), `reviewer_wrote_nothing` (a word, a number), each session (empty, a list or a number), `commissioned_by` and `judged_by` (empty, a list or a truth value), `task` (a list, no ticket id) | red, all 21: no finding names the field |
+| `test_the_codes_of_a_probe_record_s_findings` | `SCHEMA_MISSING_FIELD` for a missing judgement, `SCHEMA_INVALID_FIELD` for `probed_commit: HEAD`, each once, with `path` | red |
+| `test_this_repository_s_probe_records_are_well_formed` | the frontmatter of every file under `docs/probes/*/` here, in a temporary project: no finding | red: four on each |
+| `test_no_finding_of_the_check_on_this_repository_names_a_probe_record` | the check on this repository: no finding whose path or message names a file under `docs/probes/`. It does not fix the check's total, so a later record of any type does not break it | red: 16 findings |
+| `test_a_record_of_an_unknown_type_is_still_a_finding` | `type: probing`: `SCHEMA_UNKNOWN_TYPE` | green; holds what stays |
+| `test_a_record_of_another_type_still_owes_the_shared_fields` | a decision record without `id`, `status`, `state_class`: each named | green; holds what stays |
+| `test_a_record_whose_type_is_no_text_is_still_a_finding` | `type` as a list | green; holds what stays |
+
+40 red, 3 green.
+
+### The four recorded commands in the checks (DEC-542; `test_w1_26_recorded_commands.py`, 10 cases)
+
+DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list". The lines and what
+"recorded" means for `lock` are in W1-07's README, section "The four commands of DEC-542". Two checks read the
+command list, and both hold the twelve only today.
+
+- **`core-commands`** holds for each of the four what it holds for the twelve: where the project holds no
+  module for the command, a finding carries the command's name under `command` (the code is the check's own,
+  `COMMAND_NO_MODULE`; the cases do not fix it). For `ci`, `launch` and `telemetry` the module is the command's
+  module file, as for the twelve. For `lock`, recorded as the module command `python3 -m gov.lock`, it is the
+  file that makes that command run. With every module present the check has no finding.
+- **The skill validator** (a reading: it is the second reader of the list, and a list that records `ci` while
+  a check calls `gov ci` unknown would contradict itself): a skill may name `gov ci`, `gov launch` and
+  `gov telemetry`. `gov lock` in a skill stays `SKILL_UNKNOWN_COMMAND`, because `gov` has no such command.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_recorded_command_without_its_module_is_a_finding_that_names_it` (4: `ci`, `launch`, `telemetry`, `lock`) | the module removed in the temporary project's copy: a finding with `command` the name, the family red, no finding about a command whose module is present | red, all four: the check has no finding |
+| `test_with_every_module_present_the_check_has_no_finding` | the twelve and the four each with their module: no finding, the family green | green; it holds that recording `lock` does not make the check report it for the form it has |
+| `test_a_skill_may_name_a_recorded_gov_command` (3) | a skill whose code names `gov ci`, `gov launch`, `gov telemetry`: no `SKILL_UNKNOWN_COMMAND`, exit code 0 | red, all three: "unknown gov command" |
+| `test_gov_lock_in_a_skill_stays_an_unknown_command` | `gov lock` in a skill is flagged | green; holds that no command is added |
+| `test_the_module_command_of_lock_in_a_skill_is_not_flagged` | `python3 -m gov.lock` in a skill | green; holds what stays |
+
+7 red, 3 green. The suite's two earlier cases on this check (`test_w1_26_planted_defects.py`) are unchanged.
+
+### The skill checks in both layouts (DEC-521; `test_w1_26_skill_checks_layouts.py`, 33 cases)
+
+DEC-521 orders for the follow-up "the declared check commands that name `template/` paths". Three declared
+checks call the skill validator with paths under `template/governance/kernel/skills/`: `skill-regression-a`
+(discovery, planning, test-design, change), `skill-regression-b1` (retrieval, audit, checkpoint, adopt) and
+`skill-regression-orchestration` (orchestration). In a project with an installed kernel the skills lie under
+`governance/kernel/skills/`; the paths of the commands do not exist there, and each check answers
+"unmeasured: path does not exist", whatever the skills hold.
+
+How the cases run: the `command` of the kernel's declaration, started by a shell in the root of a temporary
+project, as the runner of `gov check` starts it, with this worktree's code. The project holds only the skills
+the case writes (fixtures); no file and no path of this repository is given to the check. The cases of each
+check on this repository's own skills stay in W1-35's and W1-36's suites, unchanged.
+
+**What is held (the stricter reading where the decision is silent).**
+
+- Installed layout: measured; green on well-formed skills; a planted defect is a finding that names the
+  skill's file under `governance/kernel/skills/`; with one of the check's skills absent the check is never
+  green and its answer names the absent skill.
+- Template layout: as today.
+- Both layouts: both are measured, and a defect in either is a finding whatever the other holds (as the close
+  record lists the skills of both, W1-30's settlement 32: no skill a role could load is left out).
+- Neither layout, or a skills folder with none of the check's skills: the unmeasured answer
+  (`{"unmeasured": true, "reason": ...}`, exit code 1), which `gov check` reports as a finding of a hard-block
+  check. Never green without having measured.
+
+| Case (each ×3, one per check) | Holds | Today |
+|---|---|---|
+| `test_in_an_installed_project_the_check_measures_and_is_green_on_well_formed_skills` | exit code 0, `findings` empty | red, all three: unmeasured, "path does not exist: template/..." |
+| `test_in_an_installed_project_a_planted_defect_is_a_finding` | one skill without frontmatter: `SKILL_NO_FRONTMATTER` naming its installed file | red, all three: unmeasured, no finding |
+| `test_in_an_installed_project_an_absent_skill_is_never_green` | another skill is there, one of the check's is not: not green, the absent skill named | red for `a` and `b1` (not green, but the answer names the first template path, not the absent skill); green for `orchestration`, whose one skill the template path happens to name |
+| `test_with_both_layouts_a_defect_in_either_is_a_finding` (×2: the defect in the installed layout, in the template layout) | the finding names the file of the layout that holds the defect | the installed half red, all three: the check is green, the installed skills are not read; the template half green |
+| `test_in_the_template_layout_the_check_is_green_on_well_formed_skills` | as today | green |
+| `test_in_the_template_layout_a_planted_defect_is_a_finding` | as today | green |
+| `test_in_the_template_layout_an_absent_skill_is_never_green` | as today | green |
+| `test_with_both_layouts_well_formed_the_check_is_green` | no doubled finding, exit code 0 | green |
+| `test_in_a_project_with_neither_layout_the_check_is_unmeasured_and_never_green` | exit code 1, `unmeasured` with a reason, no finding | green; holds what stays |
+| `test_a_skills_folder_without_the_check_s_skills_is_unmeasured` | an installed kernel with a skill of no check only | green; holds what stays |
+
+33 cases: 11 red, 22 green.
+
+Not held, and returned as a package: that `gov check` in an installed project finds the declarations at all.
+The declarations are read from `template/governance/kernel/checks/` only, by code outside the paths of this
+follow-up; these cases run each declared command directly.
+
+Not held here: where an installed project holds the kernel's schemas. The schema check reads them from the
+template layout; the three declared checks that name `template/` paths are piece 15 below, and the schema
+check's own place for its schemas is named in no decision.
+
+### Checks in a project with an installed kernel (DEC-579; `test_w1_26_installed_kernel.py`, 31 cases)
+
+Written by a test designer on ticket `DAEO-2lwj`, in the second run of the follow-up, before the code is
+changed. It closes the two points the section above left open. No earlier case of this suite is changed.
+
+DEC-579: "`gov check` reads the check declarations, and the schema check reads the schemas, from the installed
+kernel as well as from the template layout: today an installed project runs no declared check."
+
+**Measured today**, on temporary projects: with the kernel under `governance/kernel/` only, `gov check --list`
+answers `{"checks": []}` and `gov check` runs the three checks that need no declaration and passes, whatever
+the installed declarations say, valid or not; the schema check finds no schema there (a ticket record without
+`kpis` gives no finding, a well-formed probe record gives `SCHEMA_UNREADABLE`).
+
+How the cases run: `gov check --json` and `gov check --list --json` through the suite's launcher, and the
+schema check as it is declared (the `command` of `core-schema`, started in the project's root). Every project
+is a temporary git repository built from scratch: a ticket record under `docs/records/`, a probe record where
+a case writes one, a small check of the cases' own (a script under the kernel's `bin/` that reads one file of
+the project and answers with a finding or with exit code 0), and five kernel files copied by name: the
+declarations `core-schema.yaml` and `skill-regression-orchestration.yaml`, the schemas `common`, `ticket` and
+`probe`. No project holds a copy of `src/`; no path of this repository is given to a check.
+
+**Settled for a project that holds both layouts** (the stricter reading; this repository holds the template
+layout only, so none of it changes its answer or its counts):
+
+- **Alike in both:** one check per declaration, run once; the list, the results, the findings and each
+  family's count are those of the template layout alone.
+- **A declaration file in one layout only is run.** A check is not dropped because the other layout lacks it:
+  dropping would let a check vanish silently.
+- **One check id declared differently in the two is refused**, for the run and for the list, before any check
+  is started: which of the two the project means is not known, and taking either silently would let one
+  layout loosen the other (another command; the not-applicable answer allowed in one copy only). The refusal
+  names both files. The comparison held is of the declaration's keys, the optional `allows-not-applicable`
+  among them.
+- **A declaration that is not valid in the installed layout is refused** even where the template layout holds
+  a valid file of the same name.
+- **A schema file that differs:** a record is held to the schemas of both layouts, and a finding under either
+  is a finding (as the skill checks measure both layouts, section above). With equal schemas no finding is
+  doubled.
+
+**Proposed** (names a user sees, each held by a case):
+
+- The refusal of one check id declared differently in the two layouts: the existing code
+  `CHECK_DECLARATION_INVALID`, exit code 1, with both files' paths in the error.
+- An installed declaration that is not valid: the existing code `CHECK_DECLARATION_INVALID` with
+  `details.file` the path `governance/kernel/checks/<file>` and `details.key` and the message as for the same
+  file in the template layout.
+
+No new finding code, field or option is proposed.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_an_installed_project_lists_its_declarations` | the list is the installed declarations, five fields each, in file-name order | red: the list is empty |
+| `test_an_installed_project_is_answered_as_the_same_kernel_in_the_template_layout` | the same kernel files and records in either layout, one record breaking its schema: the same checks, each once, the same statuses, findings and family counts | red: no declared check has a result |
+| `test_the_declared_command_of_an_installed_check_is_started_and_its_result_reported` (2: green, a finding) | the small check, whose command names a file of the installed kernel, is started in the project's root: green is reported green; its finding is reported as given, the check and its family red, exit code 3; the result carries provenance | red, both: no result for the check |
+| `test_a_kernel_declaration_whose_command_names_template_paths_measures_the_installed_kernel` (2: a well-formed skill, one without frontmatter) | the kernel's `skill-regression-orchestration`, copied as it is: green on the installed skill; `SKILL_NO_FRONTMATTER` naming `governance/kernel/skills/orchestration/SKILL.md` | red, both: no result for the check |
+| `test_in_an_installed_project_a_record_that_breaks_its_schema_is_a_finding` (2: a ticket without `kpis`; a probe record with a judgement outside the four words) | the schema check as declared: a finding with the file and the field, and none about anything else | red, both: no finding for the ticket; `SCHEMA_UNREADABLE` for the probe record |
+| `test_in_an_installed_project_records_that_keep_their_schemas_give_no_finding` | a complete ticket and a well-formed probe record: no finding | red: `SCHEMA_UNREADABLE` on the probe record |
+| `test_gov_check_in_an_installed_project_is_red_on_a_record_that_breaks_its_schema` | end to end: the one finding (file, `kpis`), the family `schema/invariants` red, exit code 3 | red: no result for `core-schema` |
+| `test_an_installed_kernel_without_a_record_s_schema_is_never_silent_about_it` | the installed kernel lacks the probe schema: the one finding `SCHEMA_UNREADABLE` on the record | green; holds what stays |
+| `test_a_project_with_neither_layout_answers_as_today` | the list is empty; `gov check` passes with exactly the three checks without a declaration (`openspec-validate`, `skill-version`, `readiness`), the 17 families, counts 1 for skill regression and 2 for product traceability and 0 elsewhere, each family without a check yellow with "no registered check"; the schema check gives the one `SCHEMA_UNREADABLE` on a probe record | green; pins today |
+| `test_with_both_layouts_alike_every_check_runs_once_as_with_the_template_alone` | list and answer equal those of the template layout alone, with a schema finding and a finding of the small check in them | green; holds what stays |
+| `test_this_repository_s_own_list_holds_each_declaration_of_its_template_once` | `gov check --list` on this repository (it reads only): one check per declaration file of its template, in file-name order | green; holds what stays |
+| `test_with_both_layouts_a_declaration_in_one_layout_only_is_run` (2: the template alone holds it, the installed alone) | listed once beside the shared ones, run once, green | the template half green; the installed half red: not listed |
+| `test_one_check_id_declared_differently_in_the_two_layouts_is_refused` (4: another command, the not-applicable answer allowed; each for the run and the list) | exit code 1, `CHECK_DECLARATION_INVALID`, both files named, no check started | red, all four: the template's declaration is taken silently |
+| `test_with_both_layouts_a_record_is_held_to_the_schemas_of_both` (2: the stricter ticket schema in the template, in the installed layout) | the one finding names the field only that schema asks for | the template half green; the installed half red: no finding |
+| `test_a_declaration_that_is_not_valid_is_refused_under_the_installed_layout_as_under_the_template` (8: a missing field, a severity outside the two, a list at the top level, no YAML; each for the run and the list) | the same file in a template project and in an installed one: the same code and key, the message equal but for the path, `details.file` the installed path, no check started | red, all eight: `gov check` passes, the list is empty |
+| `test_with_both_layouts_a_declaration_that_is_not_valid_in_the_installed_one_is_refused` | refused by the installed file's own path | red: the template's valid file is taken |
+
+31 cases: 25 red, 6 green.
+
+**Not held.** `gov ci` reads the declarations too (to choose what it runs); its answer in an installed project
+is not held here. Two declarations of one id that differ only in bytes (a comment, quoting) and not in any
+key; a schema file that only one of two layouts holds; two files of one layout that declare one id: none is
+fixed. The check that reads `template/governance/kernel/vendor/` for skill versions and the other declared
+checks' own readings of kernel paths are not part of this piece.
+
+**Packages:** none. The three choices above are stricter readings and each is reversible by changing its case.

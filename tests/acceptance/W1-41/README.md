@@ -444,7 +444,7 @@ here for a ticket without external ids: that is W1-24's.
 | the list never hides a record: a listed id that is a record stands among the mandatory inputs with its hash and is not reported as external | `test_a_listed_id_that_is_a_record_is_the_stores_record` | red: `BLOCKED` on the external id the ticket declares beside it |
 | … and a listed superseded record still blocks, named | `test_a_listed_id_that_is_a_superseded_record_still_blocks` | **green, and stays green** |
 | nothing fails open: a file that is not of the stated shape blocks and is named | `test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named` (13 rows, the list above but the register's form), `test_the_function_names_the_defective_file_in_its_message` | red: `BLOCKED` for the missing id, the file not named (it is not read) |
-| … a file that cannot be read | `test_a_file_that_cannot_be_read_blocks_and_is_named` (skipped for a user that permissions do not hold) | red: the same |
+| … a file that cannot be read | `test_a_file_that_cannot_be_read_blocks_and_is_named` (2: not text, a link to a file; rewritten in the follow-up after W1-41, see "Finding 9" below) | red: the same |
 | … for a ticket whose ids are all records too (package P-11) | `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) | red: the packet is built |
 | a project without the file: the packet has W1-24's eight keys and no other | `test_a_project_without_the_file_gives_the_packet_it_gave_before` | **green, and stays green** |
 | … a missing id blocks there, the id named (function and command) | `test_a_missing_id_blocks_in_a_project_without_the_file` | **green, and stays green** |
@@ -475,6 +475,67 @@ here for a ticket without external ids: that is W1-24's.
   (the packet is built and says that nothing was read) is option (b) of the package.
 - **Left open, no case:** whether the summary of `--brief` also gives the location; the exit code of the refusal
   (1 today).
+
+### Finding 9 of the probe: the file is read from the commit; id forms the repository holds (the follow-up after W1-41, piece 11)
+
+Added by a fresh Independent Test Designer on ticket `DAEO-2lwj` (W1-30, reopened; DEC-569), before any
+code. Source: DEC-552 (finding 9 goes to the follow-up), the W1-41 section of the bootstrap ("the external
+list is read from the working tree, so a ticket whose paths include the file can unblock its own mandatory
+source without a commit, and repository-held id forms other than a decision's (`CAP-…`) are accepted in
+it"), DEC-551 (P-11, P-12). File: `test_w1_41_external_follow_up.py`, 23 cases. Finding 10 and the two
+readings beside it are in W1-24's suite, which holds those behaviours.
+
+**9a. The file is read from the head commit of the checkout** (`HEAD`), never from the working tree or
+the index. As settled here:
+
+- A change that is in no commit does not count: an entry added, or the file created, written or staged.
+- The commit's file counts whatever the working tree holds at its path: deleted, defective, shortened.
+  A file deleted in the working tree and present in the commit gives the packet the commit gives.
+- The other side of the same reading: a defect that only the working tree holds blocks no ticket; a
+  defect the commit holds blocks every ticket, as before (DEC-551, P-11).
+- What the commit holds at the path must be a file of UTF-8 text. A link is not followed: it is refused
+  as a file that cannot be read.
+
+**9b. Forms refused in the list, in every project, as `DEC-<digits>` is today.** The file is defective
+for such an entry: every ticket's context is refused and the refusal names the file and the id.
+
+| Form | Whose | Example |
+|---|---|---|
+| `DEC-<digits>` | a decision of the register (refused before this piece) | `DEC-086` |
+| `ADR-<digits>` | a decision file (the kernel's decision id) | `ADR-0002` |
+| `CAP-<digits>`, `CAP-<digits>.<lower-case letters>` | a capability of the Contract and its items | `CAP-13`, `CAP-13.a` |
+| `MR-<digits>` | a must rule of the Contract | `MR-3` |
+| `L-<four or more digits>` | a lesson (the kernel's lesson id) | `L-0074` |
+| `W<digits>-<two or more digits>` | a work-breakdown id (the kernel's) | `W1-30` |
+
+**Left to the list:** the form of a ticket id (a prefix, a dash and four characters: `ISO-9001` has it)
+and the kernel's general record id (one to six capitals, a dash and a local part: `G-10`, `RFC-2119` and
+`FAIL-0001` all have it). Outside sources share both forms, so neither can be refused by its form. The
+list still never hides a record: an id that is a record of the store is the store's. Package P-15.
+
+| Case | Holds | Today (`85066f4e`) |
+|---|---|---|
+| `test_an_uncommitted_change_of_the_file_does_not_unblock_a_mandatory_source` (4: an entry added or the file created, written or staged) | the id stays missing | red, each: "the context … is built, with ['S0a-G-12'] as external" |
+| `test_the_same_change_committed_makes_the_id_an_external_reference` (2) | the commit is what was lacking | **green**: holds what stays |
+| `test_what_the_working_tree_does_to_the_committed_file_changes_nothing` (3: deleted, made defective, an entry taken out) | the same packet, its hash included | red, each: "the working tree's file was read, not the commit's" |
+| `test_the_commit_read_is_the_head_of_the_checkout` | listed by an earlier commit and by the working tree, not by the head: missing | red: the context is built |
+| `test_a_defect_of_the_working_trees_file_alone_blocks_no_ticket` | a ticket whose ids are all records keeps its packet | red: refused for a file that is in no commit |
+| `test_a_listed_id_of_a_form_the_repository_holds_is_refused` (7) | 9b, the file and the id named | red, each: "… is accepted as an external reference" |
+| `test_a_listed_id_of_such_a_form_blocks_a_ticket_that_does_not_declare_it` | as any defect of the file | red: the other ticket's context is built |
+| `test_an_id_of_a_form_outside_sources_share_is_still_accepted` (4) | `ISO-9001`, `RFC-2119.b`, `CAPE-13`, `S0a-CAP-13` | **green**: holds what stays |
+
+17 red, 6 green.
+
+**Rewritten, reason DEC-552 finding 9 (the file is read from the commit):**
+`test_a_file_that_cannot_be_read_blocks_and_is_named` of `test_w1_41_external_references.py` took the
+permission to read from the working tree's file, which the commit-reading context no longer opens. It
+now holds the same line for what a commit can hold: bytes that are no UTF-8 text (green today) and a
+link to a well-formed file (red today: the link is followed and the id accepted). It is no longer
+skipped for a user that permissions do not hold.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41/test_w1_41_external_follow_up.py
+tests/acceptance/W1-41/test_w1_41_external_references.py -q -p no:cacheprovider -rs`: 69 cases, 51
+passed, 18 failed, none skipped, 18 s.
 
 ### Measured or refused (DEC-449, DEC-454)
 
@@ -557,5 +618,6 @@ here for a ticket without external ids: that is W1-24's.
 | P-10 | Where code intelligence is off, are SPLIT, MERGE and EXTRACT refused as MOVE and RENAME are? | **decided by DEC-535: refused.** One row per action, green as built |
 | P-11 | Does a defective external references file block every ticket's context, or only that of a ticket that declares an id the store does not hold? | every ticket (the stricter reading): `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) |
 | P-12 | Is a listed id of the form `DEC-<digits>` refused in every project, or only where it is an entry of the register the project names? | every project, by the form alone: the second row of `test_a_listed_id_of_the_decision_registers_form_is_refused` |
+| P-15 | (the follow-up after W1-41) May an id of the form of a ticket id, or of the kernel's general record id (`FAIL-0001`, `DP-8`, `CP-…`, `RES-…`), be listed as external? Options: (a) left to the list, since outside ids share both forms; (b) refused where the prefix is one a record of the commit uses; (c) a list of prefixes in the kernel. Recommendation (a), confidence medium; (b) costs a read of the store's ids for each entry | left to the list: `test_an_id_of_a_form_outside_sources_share_is_still_accepted` (4). `MR-<digits>` and `L-<digits>` are refused, the stricter reading, though no must rule is a record today |
 | P-13 | A ticket whose declared ids are all external references (none is a record of the store): is its context refused, or built with a packet that says nothing was read? | refused (the stricter reading): `BLOCKED`, the ticket and the external ids named, the message says that all are external and none was read: `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` |
 | P-14 | A ticket whose sources are all external names, by `depends_on`, a record that is no ticket (W1-24 resolves the ids of `depends_on` as mandatory inputs): is it refused as beside a dependency ticket, or built because a record was read? | refused (the stricter reading; DEC-552: "a dependency that was read is not a source that was read"): the third row of `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` |

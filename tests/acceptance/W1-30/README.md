@@ -1374,6 +1374,635 @@ a case that waits 30 s for a close can fail under `-n auto` for that wait alone 
 `test_a_declared_case_over_the_time_limit_is_a_finding`, whose close takes 20 s by design, did
 in one of this round's three whole runs.
 
+### After the longer wait of W1-07's support (rewritten, reason "defect found by the parallel trial")
+
+This suite's `run_gov` waits for a close as long as W1-07's support waits for a command, and that
+wait is 180 s since DEC-554, point 2 (it was 30 s). Wherever this file says "the 30 s the suite
+gives a command", read it as the wait of that time. One case leaned on the 30 s without naming it:
+`test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument` gives the
+project a limit of 3 s and no `--timeout`, and a close that ignored the project's limit was red
+only because the suite stopped waiting before the default limit of 120 s. With a wait of 180 s
+such a close would be refused "for the time limit" by the default and the case would pass. The case
+now asserts that bound itself: the close ended in under 120 s (`DEFAULT_TIME_LIMIT_S`). That is
+looser than the 30 s it held until now and keeps what the case tells apart; nothing else of the
+case changed, and no other case of this suite tells two limits apart by the wait (the others give
+`--timeout` and a test that sleeps 999 s, or assert a status).
+
+## Round 13: the follow-up after W1-41, group A (DEC-569)
+
+Eight small pieces of `gov close`, each ordered by a decision; DEC-569 lists them. New files are
+named `test_w1_30_r13_*.py`; the support code gains a section "Round 13". Every case drives
+`gov close <ticket> --json` in a temporary project of its own, with the suite's two workers.
+A name a user or a project file sees that no source gives is a proposal of this round and is
+listed under "Names proposed in round 13" and in the settlements (24 onwards). Each piece below
+says which cases are red and why, and which are green because they hold what stays as today.
+
+### Piece 1. The probe gate: a merge of exactly the probed code (`test_w1_30_r13_probe_merge.py`, 9 cases)
+
+DEC-498: the reviewer probes the ticket's final code before the orchestrator merges it. So the
+probed commit is the head of the ticket's branch and the merge commit follows it. Today every
+commit of the ticket after the probed commit that changes anything outside `tests/` and
+`docs/probes/` refuses, the merge among them, since a merge is judged with the paths it brings to
+its first parent. DEC-505: "a merge bringing exactly the probed code no longer counts as 'after'
+the probed commit."
+
+**Settlement 24, what "exactly the probed code" means (the stricter reading).** A commit of the
+ticket after the probed commit does not count as "after" it when both hold:
+
+1. it is a merge commit and the probed commit itself is one of its parents other than the first
+   (the head that was merged is the probed commit, not a later head);
+2. every path the merge brings to its first parent, outside `tests/` and `docs/probes/`, is at
+   the merge byte for byte what it is at the probed commit; a path the probed commit does not
+   hold is not at the merge either.
+
+Nothing else of the gate changes. The projects make the ticket's work on a branch, probe its
+head, merge it into `main` with a merge commit that carries the ticket's trailers and the
+orchestrator's role, and commit the probe record after the merge, as this repository does.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_merge_that_brings_exactly_the_probed_code_does_not_refuse` (2: `main` stayed, `main` went on) | the ticket closes; the close record lists the merge among the ticket's commits | red, both: `PROBE_INVALID`, "ticket commit <merge> changes .tickets/PROJ-prmg.md after the probed commit" |
+| `test_the_orchestrators_notes_after_the_merge_that_name_no_ticket_do_not_refuse` | notes outside the ticket's paths, in a commit after the merge that names no ticket: the ticket closes | red, for the merge alone (the same finding); the notes commit refuses nothing today either |
+| `test_a_commit_after_the_merge_that_changes_the_tickets_code_refuses` | an engineer's commit after the merge: exit code 3, the probe gate, that commit named | green (as today) |
+| `test_a_merge_whose_result_is_not_the_probed_code_refuses` (2: a probed file changed in the merge, a file added in the merge) | what a conflict resolution or an edit in the merge leaves: the merge named | green (as today: the merge refuses whatever it brings). It is the case that must stay red-proof once rule 2 is built |
+| `test_a_merge_of_a_later_head_that_changed_the_code_refuses` | the engineer went on after the probe; the later commit or the merge named | green (as today) |
+| `test_a_merge_of_a_later_head_that_changed_only_tests_refuses` | rule 1: the head merged is not the probed commit, though its code is the probed code | green (as today); it holds the stricter reading against a rule that compared code alone |
+| `test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses` | package P-1 below, the stricter reading: the orchestrator's notes after the merge, in a commit that names the ticket, outside the ticket's paths | green (as today) |
+
+3 red, 6 green.
+
+**Package P-1 (round 13): the orchestrator's commits after the merge that name the ticket.**
+
+- *Question.* Does the gate still refuse a commit that follows the merge, carries `Task: <ticket>`
+  and changes only paths outside the ticket's code (the residual notes, a project setting)?
+  DEC-566 names such a commit (`ccac9506`) and says DEC-505 covers it until the tool is changed.
+- *Why now.* DEC-505 orders one change of the gate, for the merge. Read to the letter, that change
+  leaves `ccac9506`'s shape refused: every FULL ticket whose orchestrator writes its residuals in
+  a commit that names the ticket still ends in `PROBE_INVALID` and closes by exception.
+- *What my reading covers.* The merge of the probed commit: yes. The probe record committed after
+  the merge: yes, as today (`docs/probes/` never refused). Notes in a commit that names no
+  ticket: yes, as today (no commit of the ticket, no path inside its paths). Notes in a commit
+  that names the ticket: **left refused**, and held so by
+  `test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses`.
+- *Options.* (a) As built here: such a commit refuses; the orchestrator writes residual notes in
+  a commit without `Task:` (which W1-30's trailer rules allow for a commit that changes nothing
+  of the ticket's work), or before the probe. (b) A commit of the ticket after the probed commit
+  refuses only for a path inside the ticket's `allowed_paths` (its code), beside the merge rule;
+  a path outside them is either another role's own place or a containment finding of W1-50
+  already. (c) As (b), only for a commit that carries the orchestrator's role alone.
+- *Impact.* (b) and (c) let a ticket close with fewer refusals of this gate than today, which is
+  why it is not mine to decide. (a) keeps one exception of DEC-505 alive in practice.
+- *Reversibility.* Full: one rule of one gate, and one case to rewrite.
+- *Cost.* (a) none. (b) or (c): a small change of the gate; the last case of the table is
+  rewritten to "closes" and one case is added for a path inside the ticket's paths in such a
+  commit.
+- *Recommendation.* (b). The probe judges the ticket's code; what lies outside the ticket's
+  paths was never the reviewer's subject, and W1-50 already judges who may write there. (c) rests
+  on a role trailer where the path already decides.
+- *Confidence.* Medium: I have not read `ccac9506` itself, only DEC-566's description of it.
+
+A second, smaller reading is stated here and needs no decision unless the lead disagrees: rule 1
+refuses the merge of a later head whose later commits changed only tests. A rule that compared
+code alone would accept it; nothing in DEC-505 or DEC-498 asks for that, and DEC-498 has the
+probe at the head that is merged.
+
+### Piece 2. `gov close` calls the counter (`test_w1_30_r13_governance_share.py`, 7 cases)
+
+DEC-495, fourth point: the share reaches the close record through this follow-up. DEC-491: the
+caller names the ticket's sessions, and the close record's own tokens are counted by a measure
+after the close. The counter is W1-31's (`gov telemetry`, `tests/acceptance/W1-31/README.md`).
+
+**Settlement 25, how the caller names the sessions (proposed).** As it names them to
+`gov telemetry`: `gov close <ticket> --ticket-session <session id>[=<role>]`, once for each
+session. No command is added.
+
+**Settlement 26, the share in the close record and the output (proposed).** The key
+`governance_share`, in the close record's frontmatter and in the JSON `result` alike: a map with
+exactly `measured`, `estimated` and `total`, each the counter's figure (a fraction of 1) or the
+string `not measured`. With no session named, or where the counter refused or could not measure,
+all three say `not measured`; a part the counter gave as `not measured` beside a measured one is
+stated as given. The ticket closes with exit code 0 in every one of these: the share refuses no
+close.
+
+**The record first.** The counter says `not measured` of a ticket whose close record does not
+exist yet, so a measured share in the record is there only when the record was written before
+the measure. The lines that state the share are written into the record after it, so the counter
+asked again afterwards differs by those lines: the case accepts 0.02 of a share for them and
+holds the estimated part exactly.
+
+**No real session log.** Every close of this file runs with `HOME` and `CLAUDE_CONFIG_DIR` in
+temporary folders. The logs are the ones W1-31's support writes in the specimens' forms
+(`w1_31_support.full_logs`: two sessions of the ticket, one of other work), given to the close
+the way that suite gives them to `gov telemetry`; ccusage runs with its built-in prices. Every
+text of those logs carries `MARK-`. `support.run_close` gained `env=` for this (the close's
+environment alone).
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_the_close_record_states_the_share_of_the_sessions_the_caller_names` | closed; the three parts are fractions between 0 and 1; `total` is their sum; the estimate is the counter's own, the measured part the counter's within the record's own lines; the result states the same map | red: exit code 2, "unrecognized arguments: --ticket-session" |
+| `test_no_text_of_a_session_is_in_the_record_or_in_what_the_close_prints` (2: a close that passes, a close that is refused) | no `MARK-` in standard output, standard error, or any file of the project outside `src/` and `.git` | red, both: exit code 2 |
+| `test_without_a_session_named_the_share_is_not_measured_and_the_ticket_closes` | exit code 0, closed, the three parts say `not measured` | red: the close record has no `governance_share` |
+| `test_a_counter_that_cannot_measure_does_not_refuse_the_close` (2: ccusage not on `PATH`, a named session without a log) | the same, where the counter refuses (`CCUSAGE_ABSENT`, `SESSION_LOG_MISSING`) | red, both: exit code 2 |
+| `test_a_part_the_counter_did_not_measure_says_so_beside_the_part_it_measured` | sessions named without roles: `measured` a fraction, `estimated` and `total` say `not measured`; closed | red: exit code 2 |
+
+7 red. Five of the seven need ccusage and skip where this machine has none (it has: Node
+v22.23.3's, as the tool registry names it). Not held, as no decision names it: what a refused
+close states of the share (nothing is measured for it: there is no close record to count).
+
+### Piece 3. A refused close states each test run (`test_w1_30_r13_refused_runs.py`, 3 cases)
+
+DEC-566; DEC-555 has the orchestrator read the `test_runs` of every close. Today a refusal holds
+the totals (`tests_run`) where a test failed, and nothing of the runs where none did.
+
+**Settlement 27 (proposed).** The JSON of a refused close holds `test_runs` under
+`error.details`: the list a passed close holds under `result` and in its close record
+(settlements 19 and 22), an object for each run made, with `run`, `form`, `seconds`, the four
+counts, `workers` for a parallel run and `cases` for the run afterwards of the declared cases.
+It is there whether or not a test failed.
+
+Each project has one acceptance case that runs in parallel, one declared serial-only, and a unit
+test as the regression run, so three runs. The twin of a project is the same project without
+the finding; it closes.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_close_refused_for_a_failing_test_states_each_run` | a failing acceptance case and a commit without `Implements:`: the three runs, the parallel acceptance run with 1 passed and 1 failed and 2 workers, the run afterwards with its `cases` | red: "the refusal's details states no test runs under 'test_runs'" |
+| `test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close_does` (2: a commit without `Implements:`, a FULL ticket without a probe record) | every test green: the three runs, and they are the twin's runs, the seconds apart | red, both: the same |
+
+3 red.
+
+### Piece 4. Five findings of the probe of the parallel run (`test_w1_30_r13_probe_findings.py`, 9 cases)
+
+DEC-555 names the five (findings 1, 2, 3, 4 and the first shape of 7 of `log/W1-30-probe3.json`).
+The projects declare their serial-only cases as round 11's do.
+
+| Behaviour | Case | Holds | Today (`8ddc5330`) |
+|-----------|------|-------|--------------------|
+| 1. A run of the declared cases that ends with exit code 0 and no result is a finding, whatever the parallel run passed | `test_a_run_of_the_declared_cases_with_exit_code_0_and_no_result_refuses` (2: the only declared case ends its own process with 0; a failing declared case follows it in the same file and never runs) | exit code 3, the ticket's acceptance folder named, counted once, nothing closed | red, both: the ticket closes; the run afterwards is stated with 0 passed |
+| 2. A project file named like the close's own plugin does not replace it | `test_a_project_file_named_like_the_closes_plugin_keeps_no_failing_case_out` (2: at the project's root, under `src/`) | the ticket's own commit adds the file, which would keep the failing acceptance case out of the run; the close does not close (exit code 3 or 1) and names the failing case or the planted file | red, both: the ticket closes with a failing acceptance case (the parallel run states 2 passed: the planted file ran in the plugin's place) |
+| 3. A run cut at the time limit leaves no process and writes nothing afterwards | `test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project` | a case of the parallel run tells its process and its parent, sleeps 14 s and would then write a marker into the project; `--timeout 5`. After the close returned: neither process is alive (two seconds are given for an ended process to be reaped), and after the sleep would have ended the marker is not there | red: "still alive: the case's process". In this run the marker was not written afterwards; DEC-555 found that it can be |
+| 4. A list entry that names an existing file with no case in it refuses (DEC-549, fourth point) | `test_a_list_entry_that_names_a_file_without_a_case_refuses_the_close` (2: a test file without a test function, a helper module) | exit code 3, the entry named, counted once, nothing closed | red, both: the ticket closes; the run afterwards is stated with 0 passed |
+| 5. A byte in the list that is not UTF-8 is a finding of its own | `test_a_byte_in_the_list_that_is_not_utf8_is_a_finding_that_names_the_list` (2: in a comment, in an entry) | no traceback; exit code 3, `SERIAL_ONLY_LIST_UNREADABLE` and the list's path in the answer, counted once, nothing closed | red, both: a traceback (`UnicodeDecodeError`), exit code 1, no JSON |
+
+9 red.
+
+**Settlement 28 (proposed).** A serial-only list that cannot be read as UTF-8 text is the finding
+`SERIAL_ONLY_LIST_UNREADABLE`: exit code 3, counted, with a repair ticket, as every finding about
+the ticket's work (DEC-470); the list is among the project's tests, which a ticket's commits
+change. Nothing is read as "no list". The other four behaviours get no code of their own from
+this round: the cases hold exit code 3 and what the answer names.
+
+How behaviour 2 finds the plugin's name. The case first closes a scout project whose own
+`conftest.py` writes down the arguments and the plugin variable the test runner was given, and
+plants a module for every plugin name it saw (a dotted name with its packages), together with
+the name the close uses today (`gov_close_serial_only`, which any test of a project can read
+from its runner's arguments). So the case follows a plugin that is renamed. A plugin that
+reached the runner by no name a project's test can see would leave only today's name planted;
+the case then still holds that this file changes nothing. Not held: a file elsewhere on the
+import path than the root and `src/` (a project's own `pythonpath` setting of its test runner);
+the two places are the two the close itself puts on the run's import path.
+
+### Piece 5. The repair ticket of a refused close with long findings (`test_w1_30_r13_long_findings.py`, 4 cases)
+
+DEC-569 lists it. One acceptance file with 1200 failing cases, each with an id of 300
+characters: the findings are more than twice what one command-line argument carries on Linux
+(128 KiB). Three cases read what one refused close of that project left; the project's ticket
+tool is the kernel's behind a line that writes down what it was asked.
+
+**Settlement 29 (proposed).** Two whole numbers in the refusal's `details`, each 0 or absent when
+nothing was left out: `repair_ticket_findings_cut`, how many findings the repair ticket does not
+hold, and `findings_cut`, how many the answer's own `findings` do not hold. A repair ticket that
+leaves findings out says so in a line that holds the word "cut" and that number; one that holds
+every finding has no such line. A finding counts as held where its case's own name is in the
+text.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_a_refused_close_with_very_long_findings_opens_its_repair_ticket_through_the_ticket_tool` | one repair ticket, named in the answer; the project's ticket tool was asked to create it; by `tk dep tree` it depends on the refused ticket; counted once | red: "not opened: tk create cannot run: [Errno 7] Argument list too long" |
+| `test_what_the_repair_ticket_does_not_hold_of_the_findings_is_said_in_it_and_in_the_answer` | the number of findings the ticket leaves out is `repair_ticket_findings_cut` and stands in a "cut" line of the ticket; nothing of the kind where all are held | red: there is no repair ticket |
+| `test_the_answer_names_every_finding_or_says_how_many_it_left_out` | the number of findings the answer leaves out is `findings_cut` | green (as today: the answer names all 1200) |
+| `test_with_very_long_findings_and_a_failing_ticket_tool_no_ticket_file_is_written` | the tool fails: no ticket file, no file left in the project, the answer says no ticket was opened | green (as today for short findings); it holds that nothing writes a ticket in the tool's place, whatever carries the findings to it |
+
+2 red, 2 green.
+
+### Piece 6. The owner's decision as an entry of the register (`test_w1_30_r13_owner_decision_register.py`, 7 cases)
+
+DEC-483. After an escalation, `gov close <ticket> --owner-decision <id>` accepts a decision file
+as today, and also an entry of the register file the project names under `decision_register` in
+its path map (the existing key of DEC-479; the heading grammar of DEC-473). The register of the
+cases is `records/decision-log.md` of a temporary project; no file of this repository is read.
+
+**Settlement 30: how each rule for a decision file reads for an entry (the stricter reading
+throughout).**
+
+| The rule | A decision file (today) | A register entry |
+|----------|-------------------------|------------------|
+| it is one record | one committed decision record of that id under `docs/` or `governance/decisions/` | exactly one heading `### <id>` followed by a space, a colon or a dash, at the start of a line and outside fenced blocks, in the named register of the commit being closed. Two entries of one id are none. A heading of another level is none |
+| accepted | its status is ACTIVE | between its heading and the next heading the entry holds a status line (`**Status:**`, with or without a list dash) whose first word is `ACCEPTED`. No status line, `PROPOSED`, or `SUPERSEDED ...; was ACCEPTED` are not accepted |
+| the owner's | the commit that set it ACTIVE carries `Role: owner` and no other role | the commit that brought the entry's heading into the register carries `Role: owner` and no other role (package P-2) |
+| recorded after the escalation began | no record of that id at the commit at which the escalation began | the register of that commit does not hold the entry's heading |
+| not used before | not among the decisions that lifted an escalation of this ticket | the same |
+
+With no register named, decision files alone count: a file with the form of a register lifts
+nothing, and neither does an entry of a file other than the named one.
+
+"Lifted" in a case: the close given the decision runs the tests and is refused for the failing
+one (exit code 3). "Not lifted": exit code 4, and the close after it is blocked too.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_an_accepted_entry_the_owner_recorded_after_the_escalation_lifts_it` | an entry that meets all five rules lifts; the refusal after it is the first of a new count | red: exit code 4, "decision DEC-501 is no committed record under docs/ or governance/decisions/" |
+| `test_an_entry_that_lifted_one_escalation_lifts_no_second` | the same entry given at the second escalation lifts nothing | red: the same message at the first lift |
+| `test_an_entry_that_is_not_one_accepted_entry_of_the_owner_lifts_nothing` | ten ids in turn lift nothing: heading in a fenced block; PROPOSED; no status line; superseded; an id of two entries; a heading of level 4; recorded by the orchestrator's commit; by a commit with the owner's role and another; by a commit without a role; an id no entry carries. Then an entry as it must be lifts | red at its last step only: the ten are refused today, the good entry is too (the same message) |
+| `test_a_decision_file_lifts_the_escalation_of_a_project_that_names_a_register` | a decision file lifts although a register is named | green (as today) |
+| `test_with_no_register_named_an_entry_lifts_nothing` | no key in the path map: the entry lifts nothing | green (as today); it holds that the register is read only where it is named |
+| `test_an_entry_of_a_file_the_path_map_does_not_name_lifts_nothing` | an entry of another file than the named register | green (as today) |
+| `test_an_entry_recorded_before_the_escalation_began_lifts_none` | an accepted entry of the owner from before the ticket's first commit | green (as today) |
+
+3 red, 4 green.
+
+**Package P-2 (round 13): what makes a register entry the owner's.**
+
+- **Question.** A decision file is the owner's by a fact of a commit: the commit that set it
+  ACTIVE carries `Role: owner` alone. Which fact makes an entry of a register the owner's?
+- **Why now.** DEC-483 asks for the lookup; the rule "the owner's" is the one rule an entry
+  cannot state in the file's own form: an entry has no ACTIVE transition, and this repository's
+  own register is written by the orchestrator's commits, with the owner named in the text of
+  the status line ("ACCEPTED (owner, date)") beside entries that say "ACCEPTED (delegated ...)".
+- **Options.** (a) The commit that brought the heading into the register carries `Role: owner`
+  alone (built). (b) The status line names the owner, whoever committed it: this needs a
+  grammar for the status line that no decision defines, and any role that may write the
+  register could then lift its own escalation. (c) Both (a) and (b).
+- **Impact.** Under (a) no entry of this repository's register, as it is written today, lifts an
+  escalation: the owner would commit the entry (or a decision file, as today). Under (b) the
+  orchestrator's record of the owner's word lifts it.
+- **Reversibility.** High: one rule of the lookup and the cases `DEC-607` to `DEC-609` of one
+  case; (a) to (b) loosens, the other direction would refuse what closed before.
+- **Cost.** (a) none beyond the build. (b) a decision on the status grammar, and cases for it.
+- **Recommendation.** (a). The escalation exists so that the roles that failed three times cannot
+  continue on their own word; a text those roles can write must not lift it.
+- **Confidence.** Medium-high.
+
+A second point for the same decision, built stricter meanwhile: "accepted" is read as the first
+word `ACCEPTED` of the entry's status line. No decision defines the status line of a register
+entry (DEC-473 defines the heading only); if another word or place is meant, the case's forms
+`DEC-602` to `DEC-604` change with it.
+
+### Piece 7. A base commit for the trailers check (`test_w1_30_r13_trailers_base.py`, 12 cases)
+
+DEC-482. The check `product-traceability-trailers` is held in this suite
+(`test_w1_30_traceability.py`, ten cases, unchanged; W1-26's suite holds the citations check and
+no case of this one), so the cases are here. They run `gov check --json` in a temporary project
+and read the check's entry. This repository's own path map is not read and not changed.
+
+**Settlement 31 (proposed).**
+
+- The key is `trailers_base`, an optional top-level key of the project's path map beside
+  `decision_register` and `decision_citations_base`: a commit id, full or abbreviated (as
+  DEC-479 says of the other base). The citations base is no base of this check.
+- With a base, a commit of a closed ticket is judged only where it is after the base (reachable
+  from the checked commit and not from the base). A closed ticket whose commits all lie before
+  the base is no finding.
+- A closed ticket that no commit of the whole history names stays the finding it is today
+  (`NO_COMMITS`): the base takes commits out of the judgement, not tickets (stricter).
+- A base that is no commit of the project, a commit the checked commit does not descend from, or
+  a name that is no commit id (a branch named in hex digits) is a finding of its own,
+  `TRAILERS_BASE_UNKNOWN`, which names the key and the value. No commit is judged behind it and
+  the check is never green.
+- A base with no commit after it: the unmeasured answer (`"unmeasured": true` and a reason),
+  never green (DEC-479).
+- The path map read is the project's present one (DEC-479).
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_commits_before_the_base_are_not_judged` (full id; abbreviated id) | the old ticket's commits lack `Implements:`, the ticket closed after the base is right: GREEN | red ×2: RED, "commit ... of PROJ-olda lacks Implements: trailer" |
+| `test_a_commit_after_the_base_is_judged_and_one_before_it_is_not_named` | a commit after the base without `Implements:` is RED and named; the old one is not named | red: the old commits are named |
+| `test_an_id_that_resolves_to_no_record_is_judged_after_the_base_only` | an unresolved id is a finding for the later commit alone | red: "Implements: CAP-gone does not resolve" of the old commit |
+| `test_the_base_of_the_citations_check_is_no_base_of_the_trailers_check` | only `decision_citations_base` recorded: the whole history is judged | green (as today) |
+| `test_a_base_that_is_no_commit_before_the_head_is_a_finding_of_its_own` (no commit; a commit of another branch; a branch named `beef`) | every commit is right, and the check is not green: `TRAILERS_BASE_UNKNOWN` naming key and value | red ×3: GREEN |
+| `test_a_base_that_is_no_commit_does_not_hide_the_history_behind_one_green` | unknown base and a wrong history: RED with `TRAILERS_BASE_UNKNOWN` | red: no such finding |
+| `test_a_base_with_no_commit_after_it_gives_the_unmeasured_answer` | the base is the head (the path map is the working tree's): the unmeasured answer, not green, no old commit named | red: the old commits' findings, no unmeasured answer |
+| `test_a_base_after_which_no_closed_ticket_has_a_commit_is_never_green` | commits follow the base, none of a closed ticket: not green, no old commit named (package P-3) | red: the old commits are named |
+| `test_a_closed_ticket_without_any_commit_stays_a_finding_with_a_base` | `PROJ-bare` is a finding; the ticket whose commits lie before the base is none | red: the old ticket's commits are named |
+
+11 red, 1 green. With no base at all the whole history is judged: the ten existing cases hold
+that, in projects whose path map holds the suite's own setting only.
+
+**A defect of the fixture, repaired in the follow-up after W1-41.** The suite's temporary project
+copies product files, so its commit ids depend on their bytes. One state gave the abbreviated
+base `65534367`, digits only. `path_map_text` wrote it bare, YAML read a number, and the check
+answered `TRAILERS_BASE_UNKNOWN`:
+`test_commits_before_the_base_are_not_judged[an abbreviated id]` was green only by chance of a
+commit id. `path_map_text` now writes the value of a commit-id key (`trailers_base`,
+`decision_citations_base`) as quoted text; every other value is written as given, as before. No
+assertion changed. W1-26's suite writes its path map through `yaml.safe_dump`, which quotes such
+an id already (`65534367` and `1234e567` both read back as text), so it needed no change. What
+the product does with a base a project wrote bare and YAML read as a number is unchanged and not
+held by a case here: it answers `TRAILERS_BASE_UNKNOWN` (the citations check refuses it as no
+commit id: `CITATIONS_CONFIG_INVALID`, "a commit id of digits alone is written in quotes").
+
+**Package P-3 (round 13): a base after which no closed ticket has a commit.**
+
+- **Question.** A base is recorded and commits follow it, but none of them is a closed ticket's.
+  What does the check answer?
+- **Why now.** DEC-479 says "with a base recorded and no commit after it, the check gives the
+  unmeasured answer". For the citations check every commit is judged, so "no commit after it"
+  and "nothing judged" are one thing. The trailers check judges the commits of closed tickets
+  only, so the two differ: after an adoption that records the base, the first commits are the
+  path map's and the first ticket's, and that ticket is still open.
+- **Options.** (a) The unmeasured answer, as with no commit at all (strictest: the check is
+  `hard-block`, so it is red until the first ticket after the base is closed, and under DEC-480
+  a governance-changing ticket could not close on it unless the baseline holds that finding).
+  (b) The not-applicable answer of DEC-447, as with no closed ticket: a warning, never green,
+  never red. (c) Green.
+- **Impact.** (a) may block the first close after an adoption; (b) does not; (c) reports a pass
+  for nothing measured, against DEC-425.
+- **Reversibility.** High: one answer of the check and one case.
+- **Cost.** None beyond the build either way.
+- **Recommendation.** (b). The case holds what (a) and (b) share: never green, no commit before
+  the base named. It refuses (c).
+- **Confidence.** Medium.
+
+### Piece 8. The skills list in a project with an installed kernel (`test_w1_30_r13_installed_skills.py`, 6 cases)
+
+DEC-569 lists it. Today the close record lists the skills of the template layout only
+(`template/governance/kernel/skills/` with versions, `template/governance/kernel/vendor/` with
+"no version"); in an adopted project, whose kernel is installed under `governance/kernel/`, the
+list is empty. This repository has the template layout.
+
+**Settlement 32, what is listed.**
+
+- The skills of an installed kernel are listed as those of the template layout: each skill of
+  `governance/kernel/skills/` with the version its file states, each vendored one under
+  `governance/kernel/vendor/` with "no version", a skill file whose frontmatter cannot be read
+  under its folder's name with "not measured".
+- A project with both layouts lists the skills of both (the stricter reading: no skill a role
+  could have loaded is left out). A skill that both hold with one version is listed once. A skill
+  whose two layouts state different versions is listed with each version: neither is dropped and
+  the record shows that the two differ. The close is not refused for the difference.
+- The form is as today: `skill_versions`, a list of objects with `name` and `version`. No field
+  is added, so the record does not say which layout an entry is from; if that is wanted it is one
+  more field and a decision.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_the_skills_of_an_installed_kernel_are_listed_with_their_versions` | two installed skills, each with its version | red: the list is empty |
+| `test_a_vendored_skill_of_an_installed_kernel_is_listed_without_a_version` | an installed skill and an installed vendored one with "no version" | red: the list is empty |
+| `test_an_installed_skill_whose_frontmatter_cannot_be_read_is_listed_as_not_measured` | the folder's name with "not measured" beside a readable skill | red: the list is empty |
+| `test_a_project_with_both_layouts_lists_the_skills_of_both` | a skill and a vendored skill in each layout: all four | red: the template's two only |
+| `test_a_skill_whose_two_layouts_state_different_versions_is_listed_with_each` | `discovery` 1.1.0 in the template, 1.0.0 installed: both entries | red: the template's version only |
+| `test_a_skill_that_both_layouts_hold_with_one_version_is_listed_once` | one entry for the skill and one for the vendored skill | green (as today: the template's entries); it holds that the second layout doubles nothing |
+
+5 red, 1 green. The template layout alone and a project without skills stay with the three cases
+of `test_w1_30_close.py`, unchanged.
+
+### Names proposed in round 13
+
+Every name below is this round's proposal; the cases hold it and a decision may replace it.
+
+| Name | What it is | Piece |
+|------|------------|-------|
+| `--ticket-session <session id>[=<role>]` | option of `gov close`, once for each session, as `gov telemetry` takes it | 2 |
+| `governance_share` with `measured`, `estimated`, `total` | key of the close record's frontmatter and of the JSON `result` | 2 |
+| `test_runs` under `error.details` | the runs of a refused close, in the form of settlements 19 and 22 | 3 |
+| `SERIAL_ONLY_LIST_UNREADABLE` | finding code: the serial-only list is no UTF-8 text | 4 |
+| `repair_ticket_findings_cut`, `findings_cut` | whole numbers under `error.details` of a refusal | 5 |
+| a line with the word "cut" and the number | in a repair ticket that leaves findings out | 5 |
+| `**Status:** ACCEPTED` as the first word of the status line | what "accepted" is for a register entry | 6 |
+| `trailers_base` | optional top-level key of the path map | 7 |
+| `TRAILERS_BASE_UNKNOWN` | finding code of the trailers check | 7 |
+
+No name is proposed for pieces 1 and 8: piece 1 adds no key and no code (the existing
+`PROBE_INVALID` stays), piece 8 keeps `skill_versions`.
+
+### Cases of other suites and of earlier rounds
+
+None is rewritten. `run_close` of `w1_30_support.py` gained the keyword `env` (the environment of
+the close alone), used by piece 2; no case changed with it.
+
+Rewritten after the round was built, reason DEC-566 (a refused close states each test run, the
+cases set apart among them): `test_a_failing_case_of_the_parallel_run_is_named_as_before` of
+`test_w1_30_r11_parallel_runs.py` held that the declared case, which passed, is named nowhere in
+the refusal; it now holds that for the whole refusal (its code, its message, its findings and
+every other detail) except `test_runs`, where settlement 27 has the run afterwards name its cases.
+
+### Packages of round 13
+
+P-1 (piece 1): the orchestrator's commits after the merge that name the ticket. P-2 (piece 6):
+what makes a register entry the owner's, and what "accepted" reads. P-3 (piece 7): a base after
+which no closed ticket has a commit. Each stands in its piece's section, with the stricter
+reading built meanwhile.
+
+### The run of round 13
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rfEs --tb=no -n auto`,
+at `8ddc5330` plus this round's eight files: 412 cases in 43 files; 369 passed, 43 failed, none
+skipped, in 159 s; the same counts in three whole runs. The 355 cases of round 12 are green. Of
+this round's 57 cases 43 are red for the reasons above and 14 are green, each said above to hold
+what stays as today:
+
+| File | Cases | Red | Green |
+|------|-------|-----|-------|
+| `test_w1_30_r13_probe_merge.py` | 9 | 3 | 6 |
+| `test_w1_30_r13_governance_share.py` | 7 | 7 | 0 |
+| `test_w1_30_r13_refused_runs.py` | 3 | 3 | 0 |
+| `test_w1_30_r13_probe_findings.py` | 9 | 9 | 0 |
+| `test_w1_30_r13_long_findings.py` | 4 | 2 | 2 |
+| `test_w1_30_r13_owner_decision_register.py` | 7 | 3 | 4 |
+| `test_w1_30_r13_trailers_base.py` | 12 | 11 | 1 |
+| `test_w1_30_r13_installed_skills.py` | 6 | 5 | 1 |
+
+No case of the round needs a model, a daemon, the network or a session log of the machine: the
+cases of piece 2 read the fixture logs of W1-31's suite through the `ccusage` of the machine,
+offline. No other suite and no unit test was changed, and none was run for this round.
+
+## Round 14: which commits after the probed one refuse (DEC-581)
+
+One piece of the follow-up after W1-41 (DEC-569), on the owner's answer to package P-1 of round
+13. DEC-581: "The probe gate refuses only for commits after the probed one that change files
+inside the ticket's `allowed_paths` or its acceptance tests." It replaces what round 13 built
+for a commit of the ticket after the probed one (refused for every path outside `tests/` and
+`docs/probes/`). The rule moves the line in both directions:
+
+- **Looser.** A commit that names the ticket and changes only files outside the ticket's
+  allowed paths and outside its acceptance tests refuses nothing, whatever the file is: the
+  orchestrator's residual notes, the probe record itself, a register entry, a checkpoint record.
+- **Stricter.** "Its acceptance tests" are the folder the close runs for the ticket:
+  `tests/acceptance/<wbs>/`, `<wbs>` being the ticket's `wbs_id` (settlement 7). A commit of the
+  ticket after the probed one that changes a file there refuses. Until this round nothing under
+  `tests/` refused, so a test designer's commit could change the tests after the probe and the
+  ticket closed on tests the reviewer never saw.
+
+New cases: `test_w1_30_r14_probe_later_commits.py`, 13 cases. Each drives `gov close <ticket>
+--json` in a temporary project: a FULL ticket whose engineer's commit is probed, the later
+commits, then the orchestrator's probe record and checkpoint. The project's path map names a
+register file (`decision_register`, DEC-479). Every later commit is made by a role W1-50's
+judgement passes for its paths, and each case holds that before the close runs, so the probe
+gate is the only gate with a reason. The gate's finding is read where the close states it
+today: the refusal itself when its code is `PROBE_INVALID`, else the one entry of
+`error.details.parts` with that code.
+
+### The rule and its cases
+
+| Rule | Case | Holds | Today (`2cf1367b`) |
+|------|------|-------|--------------------|
+| 1. outside both does not refuse | `test_a_commit_of_the_ticket_after_the_probed_one_outside_its_work_does_not_refuse` (3: the orchestrator's notes `docs/residuals.md`, a register entry in the named register, a checkpoint record under `docs/checkpoints/<ticket>/`) | the ticket closes; the close record lists the later commit among the ticket's commits | red, all three: `PROBE_INVALID`, "ticket commit <id> changes <path> after the probed commit" |
+| 1 | `test_the_probe_record_in_a_commit_that_names_the_ticket_does_not_refuse` | the record committed with the orchestrator's role alone, in a commit that carries the ticket's `Task` and `Implements`: closes | green (`docs/probes/` never refused) |
+| 1, several in a row | `test_several_commits_of_the_ticket_after_the_probed_one_outside_its_work_do_not_refuse` | notes, a register entry, a checkpoint, the probe record, each in its own commit that names the ticket: closes, every one listed | red: the first of them refuses as above |
+| 2. inside refuses | `test_a_commit_of_the_ticket_after_the_probed_one_inside_its_allowed_paths_refuses` | the engineer's commit of `src/example/feature.py`: exit code 3, the probe gate's finding names the commit and the path | green (as today) |
+| 3. its acceptance tests refuse | `test_a_commit_of_the_ticket_after_the_probed_one_in_its_acceptance_tests_refuses` (2: a case added, a case changed) | the test designer's commit in `tests/acceptance/<wbs>/`: the probe gate's finding names the commit and the path | red, both: the ticket closes. The stricter half of the rule |
+| 4. one inside and one outside | `test_a_commit_that_changes_one_file_inside_and_one_outside_refuses_for_the_inside_file` | one commit changes the notes and the source: refused, the finding names the source file and does not name the notes | red: refused today, but the finding names `docs/residuals.md`, the first path of the commit outside `tests/` and `docs/probes/` |
+| 5. under `tests/`, neither inside nor the ticket's folder | `test_a_commit_of_the_ticket_in_another_acceptance_folder_does_not_refuse` | the test designer's commit, with this ticket's trailers, adds a case to another work package's acceptance folder: the ticket closes | green (as today). Package P-2 below |
+| settlement 33 | `test_a_commit_of_the_ticket_after_the_probed_one_that_changes_its_ticket_file_refuses` | the orchestrator's commit of the ticket changes `.tickets/<ticket>.md`: refused, commit and path named | green (as today). Package P-1 below |
+| settlement 34 | `test_a_merge_after_the_probed_commit_that_brings_only_files_outside_the_tickets_work_does_not_refuse` | a merge commit of the ticket that is not the merge of the probed commit and brings the notes alone: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
+| settlement 34 | `test_the_merge_of_the_probed_commit_with_a_file_outside_the_tickets_work_added_in_it_does_not_refuse` | DEC-505's merge, with the notes written into the merge itself: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
+
+13 cases: 9 red, 4 green.
+
+### Rewritten (`Rewrite-Reason: owner decision P-30`)
+
+One case, in `test_w1_30_r13_probe_merge.py`:
+`test_a_commit_of_the_ticket_after_the_merge_outside_its_code_refuses` held the stricter reading
+of round 13's package P-1 (the orchestrator's notes after the merge, in a commit that names the
+ticket: refused). It is now
+`test_a_commit_of_the_ticket_after_the_merge_outside_its_code_does_not_refuse`: the same project
+closes and the close record lists the notes commit. Red today (`PROBE_INVALID` for
+`docs/residuals.md`). The file's opening text points to this round for the rule.
+
+No other case of the acceptance suites refuses a commit of the ticket after the probed one for a
+path outside both: `test_ticket_commit_after_probed_commit_refused` (`test_w1_30_probe.py`) and
+`test_a_probed_commit_given_as_a_name_that_moves_refuses` (`test_w1_30_r8_probe_record.py`) change
+a file under `src/example/`, inside the ticket's allowed paths, and stand. Round 13's table and
+its settlement 24 are left as they were written; this section says how they read now.
+
+Not mine to change, for the engineer: the unit case
+`test_ticket_work_after_the_probed_commit_refuses_and_a_test_does_not` (`tests/unit/close/test_gates.py`)
+holds by its name that a test after the probed commit does not refuse; whatever of it changes
+the ticket's acceptance folder is reversed by rule 3.
+
+### What stays, and the case that holds it
+
+Every case named here is unchanged and green.
+
+| Stays | Case |
+|-------|------|
+| the merge that brings exactly the probed code does not refuse (DEC-505) | `test_a_merge_that_brings_exactly_the_probed_code_does_not_refuse` (2), `test_the_orchestrators_notes_after_the_merge_that_name_no_ticket_do_not_refuse` (r13 probe merge) |
+| a merge whose result is not the probed code refuses | `test_a_merge_whose_result_is_not_the_probed_code_refuses` (2) |
+| a merge of a later head that changed the code refuses | `test_a_merge_of_a_later_head_that_changed_the_code_refuses` |
+| a merge of a later head that changed only the ticket's tests refuses | `test_a_merge_of_a_later_head_that_changed_only_tests_refuses`: its later commit adds a case to the ticket's acceptance folder, so it stands under rule 3 as well as under settlement 24 |
+| a commit after the merge that changes the ticket's code refuses | `test_a_commit_after_the_merge_that_changes_the_tickets_code_refuses` |
+| a commit that names no task and changes the ticket's paths after the probed one refuses (DEC-490) | `test_a_commit_without_trailers_that_rewrites_the_source_after_the_probed_commit_refuses`, `test_a_merge_with_the_tickets_trailers_that_brings_a_source_rewrite_after_the_probed_commit_refuses` (r8 commits) |
+| no record | `test_full_ticket_requires_probe_record` (probe) |
+| a record not committed | `test_a_probe_record_that_is_written_and_not_committed_refuses` (r8 probe record) |
+| the wrong role | `test_a_probe_record_committed_without_the_orchestrators_role_refuses` (r8 probe record) |
+| a judgement that is not a pass | `test_a_judgement_that_is_neither_pass_nor_passed_refuses` (3), `test_probe_requires_judgement_present`, `test_a_failing_probe_record_beside_a_passing_one_refuses` (2) |
+| a record that names a commit that is none of HEAD's history, or a name that moves | `test_probed_commit_must_be_ancestor_of_head`, `test_probe_must_name_probed_commit`, `test_a_probed_commit_given_as_a_name_that_moves_refuses` (2) |
+| a reviewer's commit | `test_reviewer_commit_in_ticket_commits_refused`, `test_reviewer_commit_between_probed_and_head_refused`, the three reviewer cases of `test_w1_30_probe_commits.py`, `test_a_commit_with_the_reviewers_role_and_no_task_before_the_probed_commit_refuses` |
+
+On "a record that names another commit than one of the ticket's": the gate asks today that the
+probed commit is a full commit id and an ancestor of HEAD, not that it carries the ticket's
+trailers (`test_a_git_failure_while_the_probes_commits_are_read_refuses` probes the
+orchestrator's checkpoint commit in a project that otherwise closes). The cases above hold what
+exists; nothing in DEC-581 changes it, and no case is added for it.
+
+### Settlements of round 14 (the stricter reading where the words leave doubt)
+
+**33. The ticket's own ticket file.** By the words of DEC-581 `.tickets/<ticket>.md` is neither
+inside `allowed_paths` nor an acceptance test. DEC-490 counts it with the ticket's work for a
+commit that names no task, and it is the file that says what the ticket's allowed paths and its
+profile are. Held: a commit of the ticket after the probed one that changes it refuses, as
+today. The merge of the probed commit brings the ticket file as the probed commit has it and is
+not touched by this. Package P-1.
+
+**34. A merge commit of the ticket after the probed one** is judged by what it changes itself,
+with the rule's paths. One that is not the merge of the probed commit: by every path it brings
+to its first parent (so one that brings the notes alone does not refuse, one that brings a
+source rewrite refuses as before). The merge of the probed commit (DEC-505, settlement 24): its
+second condition now reads "every path inside the ticket's allowed paths or in its acceptance
+folder, and its ticket file, is at the merge what it is at the probed commit"; a file outside
+those, written into the merge, does not refuse. An acceptance test changed in a merge commit
+itself is refused today by W1-50's judgement, whoever made the merge (`CONTAINMENT_FINDING`, "a
+merge commit's own change to a ticket file or an acceptance test"; W1-50's suite holds it), so
+no case here asks the probe gate for a second finding.
+
+**35. Whose commits are judged** is unchanged: the ticket's own commits, by the rule; a commit
+that names no task, by DEC-490 (inside the ticket's allowed paths after the probed one). A
+commit that names another ticket "is that ticket's" (DEC-490) and is not judged; held by
+`test_a_commit_that_names_another_ticket_refuses_nothing`, unchanged. No case is added. Package
+P-3.
+
+### Packages of round 14
+
+**P-1: the ticket's own file after the probed commit.**
+- *Question.* Does a commit of the ticket that changes only `.tickets/<ticket>.md` after the
+  probed commit refuse the probe gate?
+- *Why now.* The owner's words name two kinds of path; the ticket file is neither, and today it
+  refuses. Building the words to the letter would lift a refusal the order did not list among
+  the kinds that no longer refuse.
+- *Options.* (a) It refuses, as built here. (b) It does not refuse: the words to the letter.
+  (c) It refuses only where `allowed_paths` or `profile` differ from the probed commit's.
+- *Impact.* (b) lets a ticket close after its paths were narrowed following the probe, so that a
+  later commit on the probed code is "outside" for this gate; W1-50's judgement would then be the
+  only answer. (a) refuses an orchestrator's note written into the ticket file after the probe
+  in a commit that names the ticket; in a commit that names no task the same change is refused
+  today by DEC-490's rule, so (a) adds no new way to be stuck.
+- *Reversibility.* Full: one case.
+- *Cost.* (a) none. (b) one case rewritten. (c) a comparison of two keys, two cases.
+- *Recommendation.* (a). *Confidence.* Medium.
+
+**P-2: a test outside the ticket's acceptance folder (rule 5).**
+- *Question.* Which gate answers for a commit that names this ticket and, after the probe,
+  changes a test that is neither in the ticket's folder nor inside its allowed paths?
+- *What the close answers today.* Another work package's acceptance folder, by the test
+  designer: no gate of this close answers. W1-50's judgement passes it (an acceptance test is the
+  test designer's place), the probe gate has no finding by the rule, the ticket closes; the case
+  of rule 5 holds that. The close of the ticket whose folder it is does not judge it either (a
+  commit that names another ticket is that ticket's). What does see it is the regression run of
+  every later close, which runs all of `tests/` but the closing ticket's own folder: a case that
+  fails there refuses, a case weakened so that it passes does not. Anywhere else under `tests/`
+  (seen for `tests/unit/`, by the test designer): W1-50's judgement refuses,
+  `CONTAINMENT_FINDING`, "committed path(s) outside allowed paths".
+- *Options.* (a) As the rule says and as built. (b) Any acceptance folder refuses the probe gate.
+  (c) Left to W1-50: a test designer's commit may change only the acceptance folder of the ticket
+  it names.
+- *Impact.* (b) and (c) refuse more than today; neither is ordered. *Reversibility.* Full.
+  *Cost.* (a) none; (c) is a change of W1-50, not of this ticket.
+- *Recommendation.* (a) for this piece; (c) to the Wave 2 list. *Confidence.* Medium.
+
+**P-3: a commit that names another ticket and changes this ticket's paths after the probe.**
+- *Question.* Is it judged by this ticket's probe gate?
+- *What the close answers today* (tried in a temporary project, no case kept): an engineer's
+  commit with another ticket's trailers that rewrites this ticket's probed source after the
+  probe. Where the other ticket's allowed paths hold the file too: no finding anywhere, this
+  ticket closes. Where they do not: W1-50's judgement has a finding for that commit ("committed
+  path(s) outside allowed paths"), but the close of this ticket judges this ticket's commits
+  only, and closes; the finding refuses the other ticket's close.
+- *Why now.* DEC-581's words ("commits after the probed one that change files inside the
+  ticket's `allowed_paths`") can be read to judge every commit. DEC-490 says a commit that names
+  another ticket is that ticket's, and an existing case holds that it refuses nothing here.
+- *Options.* (a) As today (held). (b) Every commit after the probed one that changes a file
+  inside the ticket's allowed paths or in its acceptance folder refuses, whoever's it is.
+  (c) As (b) only for a commit W1-50's judgement does not pass.
+- *Impact.* (a) leaves a way to change probed code and close on the old probe: name another
+  ticket whose paths overlap. (b) refuses two tickets with overlapping paths that work at the
+  same time; the one probed first must be closed first or probed again.
+- *Reversibility.* Full. *Cost.* (b) small in the gate; one existing case stays (its commit is
+  outside this ticket's paths), two cases added.
+- *Recommendation.* (b): the probe is of the code, not of the commits' names.
+  *Confidence.* Medium. It is a fail-open hole that ordinary work can produce where two tickets
+  share paths (DEC-584 b); it is older than this piece and not widened by it.
+
+### The run of round 14
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n 6`, at
+`2cf1367b` plus this round's file and the rewritten case: 425 cases; 415 passed, 10 failed, none
+skipped, in 210 s. The 10 red are the 9 of this round's file and the rewritten case of round 13,
+each for the reason in the tables above; the 4 green cases of this round and every other case of
+the suite are green.
+
+No case of the round needs a model, a daemon, the network or a session log of the machine. No
+other suite and no unit test was changed.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1391,6 +2020,8 @@ in one of this round's three whole runs.
 | DEC-500 | the five `test_w1_30_r10_*.py` files: 16 tests (probe records: 4; a task that names no ticket: 4; git: 3; the interpreter: 2; skips: 3) |
 | DEC-527, DEC-530 (CAP-13.a, CAP-38.a) | the three `test_w1_30_r11_*.py` files: 43 tests (the runs: 12; this repository's declaration: 29; a store rebuilt without embeddings: 2) |
 | DEC-549 (CAP-13.a, CAP-38.a) | `test_w1_30_r12_worker_setting.py`: 22 tests (the number of workers: 2; never which tests: 2; the stated number: 4; a setting that is none: 5; without the parallel runner: 2; the project's time limit: 5; a list entry that names no case: 2) |
+| DEC-569, round 13 | the eight `test_w1_30_r13_*.py` files: 57 tests. CAP-38.f: the probe and a merge (9). CAP-50.c, CAP-13.a: the governance share (7). CAP-38.a, CAP-13.a: the runs of a refused close (3); five findings of the probe of the parallel run (9). CAP-31.b, CAP-59.a: long findings (4); the owner's decision as a register entry (7). CAP-38.b: the trailers base (12). CAP-24.a: installed skills (6) |
+| DEC-581, round 14 (CAP-38.f) | `test_w1_30_r14_probe_later_commits.py`: 13 tests (outside both: 5; inside: 1; the acceptance folder: 2; inside and outside: 1; another acceptance folder: 1; the ticket file: 1; merges: 2); one case of `test_w1_30_r13_probe_merge.py` rewritten |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1423,6 +2054,18 @@ in one of this round's three whole runs.
 21. **Where a project writes its settings for `gov close`** (round 12, DEC-549): two optional top-level keys of `governance/project/path-map.yaml`: `close_workers` (a positive whole number, or `auto`; without it `auto`) and `close_timeout` (a positive number of seconds; without it the default). `--timeout` wins over `close_timeout`; there is no argument for the number of workers
 22. **The number of workers in the close record and the output** (round 12, DEC-549): the key `workers` in every object of `test_runs` (settlement 19) whose `form` is `parallel`, and in no other: the whole number the project wrote, or the string `auto` where it wrote `auto` or nothing (the number the runner then chose is not stated: the close does not choose it). A `serial-afterwards` run and the `serial` runs of a project without the parallel plugin had no worker and carry no `workers`
 23. **A setting that is none** (round 12, DEC-549; in the form of DEC-487's `INVALID_TIMEOUT`): `close_workers` that is not a positive whole number or `auto` (zero, a negative number, a fraction, another word, a truth value) is `INVALID_WORKERS`; `close_timeout` that is not a positive number is `INVALID_TIMEOUT`. Both: exit code 1, before anything runs, not counted against the ticket, no repair ticket; the message names the key; `details.argument` is the key and one value of `details` is the value as read, as text. Nothing falls back to `auto` or to a serial run. Without the parallel plugin a valid `close_workers` is accepted and changes nothing, an invalid one is refused all the same
+24. **"Exactly the probed code"** (round 13, DEC-505): a ticket commit after the probed commit is not "after" it when it is a merge whose parent other than the first is the probed commit itself and every path it brings outside `tests/` and `docs/probes/` is byte for byte the probed commit's. Full text in round 13, piece 1
+25. **How the caller of `gov close` names the ticket's sessions** (round 13, DEC-495; proposed): `--ticket-session <session id>[=<role>]`, once for each session, as for `gov telemetry`
+26. **The governance share in the close record and the output** (round 13, DEC-495; proposed): the key `governance_share`, a map with exactly `measured`, `estimated` and `total`, each the counter's fraction or `not measured`; the share refuses no close
+27. **The test runs of a refused close** (round 13, DEC-566; proposed): `test_runs` under `error.details`, in the form of settlements 19 and 22, whether or not a test failed
+28. **A serial-only list that is no UTF-8 text** (round 13, DEC-555; proposed): the finding `SERIAL_ONLY_LIST_UNREADABLE`, exit code 3, counted, with a repair ticket
+29. **Findings longer than a repair ticket or an answer carries** (round 13; proposed): `repair_ticket_findings_cut` and `findings_cut` under `error.details`, whole numbers, 0 or absent when nothing was left out; a repair ticket that leaves findings out has a line with the word "cut" and the number
+30. **An owner's decision as a register entry** (round 13, DEC-483): one heading of DEC-473's form in the register named by `decision_register`, a status line whose first word is `ACCEPTED`, brought into the register by a commit that carries `Role: owner` alone, absent from the register of the commit at which the escalation began, not used before. Full table in round 13, piece 6
+31. **The base commit of the trailers check** (round 13, DEC-482; proposed): the optional top-level key `trailers_base` of the path map; a base that is no commit the checked commit descends from is the finding `TRAILERS_BASE_UNKNOWN`; a base with no commit after it gives the unmeasured answer; a closed ticket no commit names stays `NO_COMMITS`. Full text in round 13, piece 7
+32. **The skills of an installed kernel in the close record** (round 13): `governance/kernel/skills/` and `governance/kernel/vendor/` are listed as the template layout is; a project with both layouts lists both, one entry for a skill both hold with one version, an entry for each version where they differ
+33. **The ticket's own file after the probed commit** (round 14, DEC-581; the stricter reading, package P-1): a commit of the ticket that changes `.tickets/<ticket>.md` after the probed one refuses, as before
+34. **A merge commit of the ticket after the probed one** (round 14, DEC-581): judged by what it changes itself, with the rule's paths; settlement 24's second condition reads with those paths. Full text in round 14
+35. **Whose commits the probe gate judges** (round 14, DEC-581): the ticket's own, and those that name no task (DEC-490); a commit that names another ticket is not judged (package P-3)
 
 ## Residuals
 

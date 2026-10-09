@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import sqlite3
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -21,25 +22,27 @@ DEFAULT_BUDGET = 6000
 TOKEN_CHARS = 4
 BRIEF_LIMIT = 2500
 EXTERNAL_REFERENCES_REL = "governance/project/external-references.yaml"
-_REGISTER_FORM = re.compile(r"DEC-\d+")  # DEC-473: the form of a register entry's id
+NO_LONGER_STANDS = ("SUPERSEDED", "RETIRED", "REJECTED")  # DEC-568: only these say a record no longer stands
+INDEX_UNAVAILABLE = "index unavailable"
+# id forms the repository itself holds, never an outside source's (DEC-551 P-12, DEC-552 finding 9): a decision of
+# the register, a decision file, a capability and its items, a must rule, a lesson, a work-breakdown id
+_HELD_FORM = re.compile(r"DEC-\d+|ADR-\d+|CAP-\d+(\.[a-z]+)?|MR-\d+|L-\d{4,}|W\d+-\d{2,}")
 
 
 def _tokens(text: str) -> int:
     return -(-len(text) // TOKEN_CHARS)
 
 
-def _record_content(root: Path, record: dict) -> str:
+def _read_record(root: Path, record: dict, ticket: str) -> tuple[str, str]:
+    """The sha256 and the text of a mandatory record's file; BLOCKED where it cannot be read (never read as empty)."""
     try:
-        return (root / record["path"]).read_text(encoding="utf-8")
-    except OSError:
-        return ""
-
-
-def _sha256_file(root: Path, record: dict) -> str:
-    try:
-        return hashlib.sha256((root / record["path"]).read_bytes()).hexdigest()
-    except OSError:
-        return hashlib.sha256(b"").hexdigest()
+        content = (root / record["path"]).read_bytes()
+        return hashlib.sha256(content).hexdigest(), content.decode("utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        reason = getattr(exc, "strerror", None) or "it is not UTF-8 text"
+        raise GovError("BLOCKED", f"mandatory input {record['id']!r}: its file {record['path']} cannot be read "
+                                  f"({reason})", {"ticket": ticket, "unreadable": record["id"],
+                                                "file": record["path"]}) from None
 
 
 def _store_query(root: Path, sql: str, params: tuple = ()) -> list:
@@ -87,22 +90,28 @@ def _ticket_source_ids(root: Path, ticket: str) -> list:
 def external_references(root: Path) -> dict:
     """The sources the project lists as living outside the repository: id -> its entry (W1-41; DEC-520).
 
-    A project without the file lists none. A file that is there and cannot be
+    The file is the one ``HEAD`` holds, never the working tree's or the index's
+    (DEC-552, finding 9): a change that is in no commit lists nothing. A project
+    whose commit has no such file lists none. A file that is there and cannot be
     read, is not valid YAML or is not of the stated shape is BLOCKED and named,
     never taken for an empty list (DEC-449, DEC-454).
     """
     import yaml
+    from gov.store.loader import _file, _tree
 
     def defect(why: str, **more) -> GovError:
         return GovError("BLOCKED", f"{EXTERNAL_REFERENCES_REL}: {why}",
                         {"file": EXTERNAL_REFERENCES_REL, **more})
 
     try:
-        text = (Path(root) / EXTERNAL_REFERENCES_REL).read_text(encoding="utf-8")
-    except FileNotFoundError:
+        tree = _tree(Path(root))
+    except GovError as exc:
+        raise defect(f"the commit that holds the file cannot be read: {exc.message}") from None
+    if EXTERNAL_REFERENCES_REL not in tree:
         return {}
-    except (OSError, UnicodeDecodeError) as exc:
-        raise defect(f"the file cannot be read: {exc}") from exc
+    text = _file(Path(root), tree, EXTERNAL_REFERENCES_REL)
+    if text is None:
+        raise defect("the file cannot be read: the commit does not hold it as a file of UTF-8 text")
     try:
         document = yaml.safe_load(text)
     except yaml.YAMLError as exc:
@@ -120,9 +129,9 @@ def external_references(root: Path) -> dict:
         rid = entry["id"]
         if rid in listed:
             raise defect(f"the id {rid!r} is listed twice", id=rid)
-        if _REGISTER_FORM.fullmatch(rid):
-            raise defect(f"{rid!r} is a decision of the register, which lives in the repository "
-                         f"and is never an external reference", id=rid)
+        if _HELD_FORM.fullmatch(rid):
+            raise defect(f"{rid!r} has the form of an id the repository itself holds (a decision, a capability, "
+                         f"a must rule, a lesson, a work-breakdown id) and is never an external reference", id=rid)
         listed[rid] = entry
     return listed
 
@@ -176,8 +185,19 @@ def _try_supplementary(root: Path, ticket: str, budget_remaining: int) -> tuple[
                     "reason": "budget exceeded",
                 })
         return supplementary, dropped
-    except Exception:
-        return [], [{"id": "supplementary", "reason": "index unavailable"}]
+    except Exception as exc:
+        return [], [{"id": "supplementary", "reason": _lookup_failure(root, exc)}]
+
+
+def _lookup_failure(root: Path, exc: Exception) -> str:
+    """What failed in the supplementary lookup, in the failure's own words; the index only where it is the index."""
+    if isinstance(exc, sqlite3.Error) or (isinstance(exc, GovError) and exc.code == "STORE_MISSING"):
+        return INDEX_UNAVAILABLE
+    if isinstance(exc, OSError) and exc.filename:
+        name = Path(exc.filename)
+        rel = name.relative_to(root) if name.is_relative_to(root) else name
+        return f"the lookup could not read {rel}: {exc.strerror}"
+    return f"the lookup failed: {' '.join(str(exc).split()) or type(exc).__name__}"
 
 
 def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None = None,
@@ -209,6 +229,11 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
             raise GovError("BLOCKED",
                            f"mandatory input {rid!r} is superseded and cannot satisfy a current requirement",
                            {"ticket": ticket, "superseded": rid})
+        if rec["status"] in NO_LONGER_STANDS:  # DEC-552 finding 10: only a record that stands satisfies
+            raise GovError("BLOCKED",
+                           f"mandatory input {rid!r} is {rec['status']}: it no longer stands and cannot satisfy "
+                           f"a current requirement", {"ticket": ticket, "no_longer_stands": rid,
+                                                      "status": rec["status"]})
         resolved.append(rec)
     # every source is external: no source was read, and a dependency that was read is not one (DEC-454, DEC-552);
     # a ticket that declares no source is judged on every id it declares, as before
@@ -245,8 +270,10 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
 
     # Build mandatory items sorted by precedence
     mandatory_items = []
+    mandatory_tokens = 0
     for rec in resolved:
-        sha = _sha256_file(root, rec)
+        sha, content = _read_record(root, rec, ticket)
+        mandatory_tokens += _tokens(content)
         mandatory_items.append(_make_item(rec, sha, "declared in sources"))
     mandatory_items.sort(key=lambda item: PRECEDENCE_RANK.get(item["authority"], 999))
 
@@ -259,12 +286,6 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         )
         if not superseded_by_another:
             authority_items.append(item)
-
-    # Token counting for mandatory
-    mandatory_tokens = 0
-    for item in mandatory_items:
-        content = _record_content(root, records[item["id"]])
-        mandatory_tokens += _tokens(content)
 
     budget_remaining = limit - mandatory_tokens
     dropped: list[dict] = []

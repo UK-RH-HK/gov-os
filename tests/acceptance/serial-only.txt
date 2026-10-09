@@ -40,6 +40,7 @@ tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from
 # --- W1-16: every case that runs the codebase-memory daemon (its `local_only` cases)
 tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py  # real-model-or-daemon: the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_code_answers.py  # real-model-or-daemon: the codebase-memory daemon
+tests/acceptance/W1-16/test_w1_16_one_daemon.py  # real-model-or-daemon: the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_paths_and_roots.py  # real-model-or-daemon: the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_secret_exclusion.py  # real-model-or-daemon: the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_ui_off.py  # real-model-or-daemon: the codebase-memory daemon

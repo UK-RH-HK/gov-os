@@ -10,7 +10,9 @@ is short, and one that is not the user's own is refused; a file whose path
 holds a secret is not
 staged; a root that is no top level of a git repository, or whose
 ``.gov-runtime`` is a link, is refused with nothing written or deleted; and a
-tool that reports an error is not an empty answer. The codebase-memory binary is not run: a stand-in script on
+tool that reports an error is not an empty answer; one load of the graph asks
+both queries, pages included, in one start of the tool, and a session that
+fails or hangs is a refusal (DEC-561). The codebase-memory binary is not run: a stand-in script on
 ``PATH`` records how it is called. Every repository is a temporary directory,
 and so is the place of the daemon directories: nothing is left in ``/tmp``.
 """
@@ -174,6 +176,80 @@ def test_an_error_of_the_tool_is_not_an_empty_answer(tmp_path, monkeypatch):
         codeintel.definitions(root, "clean")
     with pytest.raises(RuntimeError):
         codeintel.projects(root)
+
+
+# A stand-in that is also a server on its standard input and output: every start of it is a line of starts.txt.
+# It answers two rows at a time, so that a query of the graph has pages.
+SERVER = (f"#!{sys.executable}\n"
+          "import json, os, sys, time\n"
+          "here = os.path.dirname(os.path.abspath(__file__))\n"
+          "with open(here + '/starts.txt', 'a') as log:\n"
+          "    print(' '.join(sys.argv[1:]), os.environ['CBM_CACHE_DIR'], os.environ['CBM_RUNTIME_DIR'], sep='|', file=log)\n"
+          "if sys.argv[1:2] == ['config']:\n"
+          "    sys.exit(0)\n"
+          "if os.path.exists(here + '/refuse'):\n"
+          "    sys.exit(7)\n"
+          "with open(here + '/rows.json') as handle:\n"
+          "    rows = json.load(handle)\n"
+          "for line in sys.stdin:\n"
+          "    asked = json.loads(line)\n"
+          "    if 'id' not in asked:\n"
+          "        continue\n"
+          "    result = {'protocolVersion': asked['params'].get('protocolVersion'), 'capabilities': {}}\n"
+          "    if asked['method'] == 'tools/call':\n"
+          "        if os.path.exists(here + '/hang'):\n"
+          "            time.sleep(60)\n"
+          "        given = asked['params']['arguments']\n"
+          "        kind, at = 'edges' if 'type(r)' in given['query'] else 'nodes', given['offset']\n"
+          "        page = {'rows': rows[kind][at:at + 2], 'has_more': at + 2 < len(rows[kind])}\n"
+          "        result = {'isError': False, 'content': [{'type': 'text', 'text': json.dumps(page)}]}\n"
+          "    print(json.dumps({'jsonrpc': '2.0', 'id': asked['id'], 'result': result}), flush=True)\n")
+
+
+def _server(tmp_path, monkeypatch, root):
+    """The stand-in server on ``PATH``, with a graph of four functions of one staged file. Returns its folder."""
+    staged = root / codeintel.BASE_REL / "files/app/flow.py"
+    staged.parent.mkdir(parents=True)
+    staged.touch()
+    key = "code.app.flow."
+    rows = {"nodes": [[key + name, name, "Function", "app/flow.py"] for name in ("top", "mid", "leaf", "side")],
+            "edges": [[key + "top", "CALLS", key + "mid"], [key + "top", "CALLS", key + "leaf"],
+                      [key + "side", "CALLS", key + "leaf"]]}
+    tools = tmp_path / "tools"
+    tools.mkdir()
+    (tools / codeintel.TOOL).write_text(SERVER, encoding="utf-8")
+    (tools / codeintel.TOOL).chmod(0o755)
+    (tools / "rows.json").write_text(json.dumps(rows), encoding="utf-8")
+    monkeypatch.setenv("PATH", str(tools), prepend=":")
+    return tools
+
+
+def test_one_load_of_the_graph_asks_both_queries_and_their_pages_in_one_start_of_the_tool(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    tools = _server(tmp_path, monkeypatch, root)
+    monkeypatch.setenv("CBM_CACHE_DIR", str(tmp_path / "cache"))
+    monkeypatch.setenv("CBM_RUNTIME_DIR", str(tmp_path / "runtime"))
+    assert [entry["name"] for entry in codeintel.callers(root, "leaf")] == ["top", "side"]  # the second page of each
+    assert [entry["name"] for entry in codeintel.dead_code(root)] == ["top", "side"]  # kept by the process: no start
+    places = f"|{codeintel.home(root)}|{codeintel.daemon_dir(root)}"  # the repository's, not the caller's
+    # The UI is turned off first, then one server is started: no ``cli`` call, and no second server.
+    assert (tools / "starts.txt").read_text(encoding="utf-8").splitlines() == ["config set ui_enabled false" + places,
+                                                                               places]
+    assert not (tmp_path / "cache").exists() and not (tmp_path / "runtime").exists()
+
+
+def test_a_session_that_fails_or_hangs_is_a_refusal_and_no_answer_is_kept(tmp_path, monkeypatch):
+    root = _repository(tmp_path / "repo")
+    tools = _server(tmp_path, monkeypatch, root)
+    monkeypatch.setattr(codeintel, "_ANSWER_S", 0.5)
+    (tools / "refuse").touch()  # the server ends at once with exit code 7
+    with pytest.raises(RuntimeError, match=r"exit code 7\b"):
+        codeintel.callers(root, "leaf")
+    (tools / "refuse").rename(tools / "hang")  # the server answers no tool: it is killed after the time limit
+    with pytest.raises(RuntimeError, match=r"exit code -9\b"):
+        codeintel.callers(root, "leaf")
+    (tools / "hang").unlink()
+    assert [entry["name"] for entry in codeintel.callers(root, "leaf")] == ["top", "side"]
 
 
 def test_callees_are_the_functions_a_symbol_calls_in_the_form_of_callers(tmp_path, monkeypatch):

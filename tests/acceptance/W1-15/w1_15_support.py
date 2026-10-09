@@ -224,6 +224,7 @@ def path_map_text(namespaces):
     ``namespaces`` is ``name -> (patterns, memory_class)``; a ``memory_class`` of ``None`` leaves the key out.
     """
     document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    document.pop("decision_register", None)   # the project holds no register file, so its path map names none
     entries = {}
     for name, (patterns, memory_class) in namespaces.items():
         entry = {"paths": list(patterns)}

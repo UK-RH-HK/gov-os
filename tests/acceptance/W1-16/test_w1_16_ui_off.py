@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import subprocess
 import sys
-import time
 from pathlib import Path
 
 import pytest
@@ -221,7 +220,9 @@ def test_a_setting_left_in_the_home_is_turned_off_by_the_next_call(module, port,
     first = _asked(repo, [("index", [])], sandbox, tmp_path / "index.json")
     assert first.results is not None, f"gov.codeintel did not answer\n{first.describe()}"
     for function, args in (("projects", []), ("callers", [HELPER])):
-        time.sleep(support.DAEMON_ENDS_S)   # a daemon that still runs is not the case here: the next call starts one
+        # A daemon that still runs is not the case here: the next call starts one. Its end is waited for, three
+        # seconds at most (the time the case slept before; DEC-561).
+        support.wait_for_daemon_end(home)
         support.tool_config(home, sandbox, "set", support.UI_SETTING, "true")
         assert support.ui_setting(home, sandbox) == "true", "the premise does not hold: the setting was not left on"
         record, before = tmp_path / f"{function}.json", support.ui_served(home)

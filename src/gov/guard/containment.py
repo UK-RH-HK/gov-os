@@ -891,8 +891,91 @@ def _merge_own(commit) -> list:
             and p.startswith((".tickets/", ACCEPTANCE + "/"))]
 
 
+# DEC-572: the most commits that may have brought one version, and the
+# most git processes the lifts of one HEAD move (or of one call of
+# ``judge_commits``) may start, beyond ``MAX_MOVE_PROCESSES`` of the merge
+# reading: one ticket file with 50 merge commits on each side (608), or
+# a hundred with a few ordinary commits.  Beyond either nothing is
+# lifted: the path stays a finding.
+_LIFT_COMMITS = 50
+_LIFT_PROCESSES = 1000
+_LIFT_LEFT = "git processes left for the lifts"  # a key of *closes*
+
+
+def _lifted(root, commit, path, head, decide_fn, closes):
+    """``None`` when the ticket file *path*, a merge commit's own change
+    as ``read_merge`` reads it, is not its own change by DEC-572; else
+    the id of a commit that brought the version and does not pass, or
+    ``""`` where the check cannot tell.
+
+    Lifted: the merge commit has two parents with one merge base and
+    holds the file exactly as a parent has it (content and mode); that
+    version is not the merge base's; and every commit that brought it,
+    on each side that has it, is no finding when it is judged alone as
+    ``judge_commits`` judges it, a merge commit among them as merges
+    were read before DEC-572.  A commit brought the version when it is
+    in that parent's history and not in the merge base's, and its
+    content of the path differs from that of one of its parents.
+
+    At most 5 git processes, one more for each side that has the
+    version, one to read the commits that brought it and what
+    ``read_merge`` needs for each merge commit among them; all are
+    counted against ``_LIFT_PROCESSES``.
+    """
+    from gov.guard.containment_merge import processes, read_merge
+
+    def git(*args, cost=1, ok=(0,)):
+        closes[_LIFT_LEFT] = closes.get(_LIFT_LEFT, _LIFT_PROCESSES) - cost
+        if closes[_LIFT_LEFT] < 0:
+            raise _GitError("too many git processes for the lifts")
+        return _git(root, "--literal-pathspecs", *args, ok=ok) if args else ""
+
+    def held(rev):
+        return git("ls-tree", "-z", "--full-tree", rev, "--", path)
+
+    try:
+        parents = commit[1]
+        if len(parents) != 2 or parents[0] == parents[1]:
+            return ""
+        bases = git("merge-base", "--all", *parents, ok=(0, 1)).split()
+        mine = held(commit[0])
+        if len(bases) != 1 or not mine.endswith(f"\t{path}\0") or (
+                mine.split(" ")[1:2] != ["blob"] or mine == held(bases[0])):
+            return ""
+        brought: list = []
+        for p in [p for p in parents if held(p) == mine]:
+            # Every commit of the side is listed (--sparse), each with
+            # the path where it differs from a parent, any of them (-m).
+            found = list(dict.fromkeys(c[0] for c in _parse_log_output(git(
+                *_LOG_DEFAULTS, "-z", "-m", "--raw", "--no-abbrev",
+                "--full-history", "--sparse", _LOG_FORMAT,
+                f"{bases[0]}..{p}", "--", path)) if c[4]))
+            if not 0 < len(found) <= _LIFT_COMMITS:
+                return ""
+            brought += found
+        if not brought:
+            return ""
+        commits = _parse_log_output(git(
+            *_LOG_DEFAULTS, "-z", "-c", "--raw", "--no-abbrev", _LOG_FORMAT,
+            "--no-walk=unsorted", *brought))
+        if [c[0] for c in commits] != brought:
+            return ""
+        for c in commits:
+            if len(c[1]) > 1:
+                git(cost=processes(len(set(c[1]))))
+                c[4][:] = read_merge(root, c[0]).own
+            if _judge_commit(
+                    root, (c[0], c[1], sorted(c[2]), sorted(c[3]), c[4]),
+                    "orchestrator", None, None, True, head, decide_fn,
+                    closes, lift=False) is not None:
+                return c[0]
+        return None
+    except (_GitError, _NotARepo, ValueError):  # MergeReadError too
+        return ""
+
+
 def _judge_commit(root, commit, role, tid, sub, orch_own, head,
-                  decide_fn, closes):
+                  decide_fn, closes, lift=True):
     """``(paths, why)`` when *commit* of a forward move is a finding,
     else ``None`` (W1-50).
 
@@ -988,10 +1071,20 @@ def _judge_commit(root, commit, role, tid, sub, orch_own, head,
         bad = outside(c_role, c_task, None, fn)
     # DEC-410, DP-21 and DP-27: whatever the merge commit's trailers.
     merged = _merge_own(commit)
+    # DEC-572: but a ticket file it holds as one parent has it is not its
+    # own change when every commit that brought that version passes.
+    named = ""
+    for p in [p for p in merged if lift and p.startswith(".tickets/")]:
+        fails = _lifted(root, commit, p, head, decide_fn, closes)
+        if fails is None:
+            merged.remove(p)
+        elif fails:
+            named += (f"; commit {fails[:12]} brought the version of {p}"
+                      " and does not pass")
     if merged:
         return (bad + [p for p in merged if p not in bad],
                 "a merge commit's own change to a ticket file or an"
-                " acceptance test")
+                " acceptance test" + named)
     if tickets:
         return (bad + [p for p in tickets if p not in bad],
                 "a ticket file in a commit with a worker's Role trailer"

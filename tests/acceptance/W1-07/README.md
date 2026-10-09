@@ -182,6 +182,57 @@ Readings the sources do not spell out, for this batch:
   the envelope fields, no write outside the act paths, the command exists, a valid path map is not reported as
   invalid — on a project that fits the time limit. No assertion weakened, no case removed.
 
+## Revision (DEC-554, point 2, reason "defect found by the parallel trial")
+
+- **The wait for a command is 180 s** (`COMMAND_TIMEOUT_S` in `w1_07_support.py`; it was 30 s). Under ten parallel
+  workers a read command (`gov status --json`) once did not end within 30 s and passed alone. The number is how long
+  a case waits for `gov` before it fails with "did not end within"; it is not a time the ticket promises, and no
+  case asserts it. It is the wait DEC-549 gave W1-27's commands. Only that one line of the support changed: no
+  assertion, no case's body, no invocation.
+- **Not changed: the one time a KPI names.** `test_help_answers_in_under_300_ms` holds the median of nine
+  `gov --help` runs under its own budget (`HELP_BUDGET_S`), measured on each run and not on the wait. It stays a
+  latency case (DEC-372).
+- **Who takes the wait from here.** Every suite that runs `gov` through this support's `run_gov` or
+  `run_gov_with_code` (W1-13, W1-25, W1-26, W1-32, W1-38, W1-39, and W1-41, W1-46 and W1-50 in part), and by the name
+  `COMMAND_TIMEOUT_S`: W1-25 (its shell commands), W1-27 (`run_python_snippet` only; its commands have their own
+  180 s) and W1-30 (`run_gov`, every close). None asserts the number. One case leaned on it without naming it:
+  W1-30's `test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument` told the project's
+  limit of 3 s from the default of 120 s only because the suite stopped waiting at 30 s; it now states that bound
+  itself (see `tests/acceptance/W1-30/README.md`).
+
+## The four commands of DEC-542 (the follow-up after W1-41 on W1-30's ticket, DEC-569)
+
+DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list, each with one test-designer
+line." DEC-546: the lines are written by a test designer in the follow-up, "with the list itself".
+
+**The lines** are in `w1_07_support.py`, below the twelve: `RECORDED_GOV_COMMANDS` (`ci`, `launch`, `telemetry`)
+and `RECORDED_MODULE_COMMANDS` (`lock`). The twelve stay the twelve Wave 1 operations of the KPI line
+(CAP-28.b): no existing list, case or invocation of this suite changed, and only those lines were added to the
+support.
+
+**Where the command list is recorded, as found.** In three places: these lines of the suites; the registry of
+the command line, which is what `gov --help` offers (fifteen commands: the twelve, `ci`, `launch`, `telemetry`);
+and the list the check `core-commands` and the skill validator read, which holds the twelve only. The third is
+the one the engineer changes; W1-26's suite holds it (`test_w1_26_recorded_commands.py`).
+
+**What "recorded" means for `lock` (proposed, the stricter reading; returned as a package).** `lock` is no
+`gov` command today and never was: it is the module command `python3 -m gov.lock`, the Copier task of the
+template that writes `governance/framework.lock` (DEC-499: "The lock task stays `python3 -m gov.lock` in this
+ticket. A `gov lock` subcommand [...] is decided with W1-41 [...] residual until then"; no later decision
+orders the subcommand). So `lock` is recorded as that module command, and recording it adds no command:
+`gov --help` does not offer it and `gov lock` stays a usage error. The checks hold it as they hold the others
+(its module must exist), and a skill that tells a reader to run `gov lock` stays flagged.
+
+| Case (`test_w1_07_recorded_commands.py`) | Holds | Today |
+|---|---|---|
+| `test_the_recorded_commands_are_four_and_none_is_one_of_the_twelve` | the lines name exactly the four, apart from the twelve | green |
+| `test_a_recorded_gov_command_is_offered_and_answers_its_help` (3: `ci`, `launch`, `telemetry`; the one case of each) | `gov --help` offers the command and `gov <command> --help` ends with exit code 0 and names it. The command itself is not run: `launch` starts a session, `ci` runs gates | green, all three |
+| `test_lock_is_recorded_as_the_module_command_and_is_no_gov_command` (the one case of `lock`) | `gov --help` offers no `lock`; `gov lock` is a usage error (exit code 2); `python3 -m gov.lock` in a folder that is no installed project runs, ends with exit code 1, names `framework.lock` and writes nothing | green |
+
+5 cases, all green: the commands exist as found, and the cases hold them so that the list and the command
+line cannot part unseen. The red of this piece is in W1-26's suite. The command set as a whole (nothing beyond
+the twelve and the three) is W1-32's case, rewritten for DEC-542.
+
 ## Decision package
 
 ### DP-1 — What does a minimal valid `path-map.yaml` look like, so that "naming the key" can be tested?

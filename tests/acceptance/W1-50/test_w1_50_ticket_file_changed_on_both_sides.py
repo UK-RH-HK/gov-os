@@ -1,22 +1,30 @@
-"""W1-50 — a ticket file that both sides of a merge changed is the merge commit's own change.
+"""W1-50 — a ticket file that both sides of a merge changed: the helper's reading (DEC-421) and the
+judgement since DEC-572.
 
-Added after implementation; reason: owner decision, DEC-421.
+Added after implementation; reason: owner decision, DEC-421. One case (two parameters) rewritten after
+implementation; reason: owner decision, DEC-572.
 
 DEC-421 extends the both-sides rule of DEC-410 DP-24 to ``.tickets/**``:
 "under `.tickets/**` too, a path that more than one parent changed against
 the merge base is the merge commit's own, whichever side's content it
 holds. Stricter-only."
 
+DEC-572 (owner, later): "a merge commit's file is not its own change when it
+equals one parent's version and every commit that brought that version passes
+the check."
+
 **The shapes.** Since their one merge base, the ticket branch and ``main``
 each changed the same ticket file, each by an orchestrator's commit that
-passes by its own trailers. Whatever the merge commit holds for that path,
-the path is in ``read_merge(...).own`` and not in ``brought``, and the
-orchestrator's merge in its own call is a finding that names it:
+passes by its own trailers.
 
-- the merge commit holds the first parent's content of it whole;
-- it holds the second parent's content whole;
-- both sides made the identical change: the ticket file is in ``own`` (as
-  for acceptance tests, DP-24).
+- *The helper* (``read_merge``), unchanged: whatever the merge commit holds
+  for that path, the path is in ``own`` and not in ``brought``; also where
+  both sides made the identical change (as for acceptance tests, DP-24).
+- *The judgement* (the check in the orchestrator's own call), since DEC-572:
+  where the merge commit holds one parent's version whole, the merge is
+  silent. The cases of DEC-572, with the commits that do not pass and the
+  shapes where the check refuses, are in
+  ``test_w1_50_merge_commit_file_that_equals_one_parent_s_version.py``.
 
 **The other side.** A merge in which each side changed a *different* ticket
 file: ``own`` is empty and the merge is silent.
@@ -77,15 +85,15 @@ def _build(project, sandbox, shape):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("case", sorted(ONE_SIDE_WHOLE), ids=sorted(ONE_SIDE_WHOLE))
-def test_a_merge_that_takes_one_side_s_content_of_a_ticket_file_both_sides_changed_is_flagged(project, sandbox, call,
-                                                                                              case):
-    """DEC-421. A ticket file that more than one parent changed against the merge base is the merge commit's
-    own change, whichever side's content it holds. The ticket file is named."""
+def test_a_merge_that_takes_one_side_s_content_of_a_ticket_file_both_sides_changed_is_silent(project, sandbox, call,
+                                                                                             case):
+    """DEC-572 (rewritten; until then DEC-421 made it a finding). Both sides changed the ticket file by an
+    orchestrator's commit that passes, and the merge commit holds one parent's version whole: the file is not
+    the merge commit's own change. Silent."""
     holds = ONE_SIDE_WHOLE[case]
     shape = own_change.changed_on_both_sides(project, sandbox, TICKET_FILE, AS_ORCHESTRATOR, holds)
     result, left, what = _call(project, call, shape)
-    check_support.assert_caught(result, shape.path, what=what, action=check_support.FLAGGED)
-    check_support.assert_not_recorded(result, shape.also, what=what)
+    check_support.assert_silent(result, what)
     check_support.assert_left_as_the_call_left_it(project, left, what)
 
 

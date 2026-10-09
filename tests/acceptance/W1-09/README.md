@@ -347,3 +347,102 @@ Each package's affected tests are written on its recommended option. Every other
 - **Recommendation.** (a). **Confidence:** medium.
 - **Tests that depend on it:** none. The test uses a project whose only ticket has the lock, so it holds under (a)
   and (b).
+
+## A package the store could not load (the follow-up after W1-41, piece 10)
+
+Added by a fresh Independent Test Designer on ticket `DAEO-2lwj` (W1-30, reopened; DEC-569), before any
+code. Source: DEC-544 ("the READY rule treats a constraining package the store could not load as
+blocking"), which closes this suite's residual "packages that do not load block nothing" and W1-32's
+"a ticket constrained by a package whose record could not load is still listed `ready`". File:
+`test_w1_09_unloaded_package.py`, 10 cases. No case of the suite was rewritten; `w1_09_support.py` is
+unchanged. Covers CAP-34.e, CAP-31.c.
+
+The rule is asked as this suite asks it: `ready` and `blocked` of `gov.tasks`, after the project is
+committed and its store loaded. `gov status` gives the same lists under `tickets`; `gov readiness` judges
+a specification's rows and does not hold this rule.
+
+### As settled here (confirmed by DEC-579: settlements 2 and 3 are decided, no longer proposals)
+
+1. **Which file.** A Markdown file of the commit of which the store holds no record, and whose
+   frontmatter names the ticket under `constrains`: a required key (`id`, `type`, `status`) is absent
+   or is not text. What the file says of its own status is not trusted: the store did not take it.
+2. **What the ticket gets.** It is not READY. Its reasons hold `DECISION_NOT_LOADED: <the file's path>`,
+   one for each such file, beside the codes of today. A ticket the file does not name stays READY.
+3. **A frontmatter that cannot be read at all** (not valid YAML, not closed): the tickets it constrains
+   are not known, so every ticket is held by it and names it. This is the stricter reading, decided
+   by DEC-579.
+4. **What stays.** A package that loaded is judged by its status, as today: `PROPOSED` holds with
+   `DECISION_OPEN` and no file named; any other status holds nothing. A file the store could not load
+   whose readable frontmatter names no ticket holds nothing.
+
+### Cases and why each is red (at `85066f4e`)
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_package_the_store_could_not_load_blocks_the_ticket_it_names` (4: no status, a status that is not text, no type, no id) | settlements 1 and 2: the named ticket is not READY and names the file; the other ticket is READY | red, each: "a ticket constrained by a package the store could not load is READY" |
+| `test_a_package_whose_frontmatter_cannot_be_read_holds_every_ticket` (2: not valid YAML, not closed) | settlement 3 | red, both: both tickets are READY |
+| `test_the_ticket_is_ready_again_when_the_package_loads_and_is_closed` | the file repaired to a loaded `ACCEPTED` package releases the ticket | red: the ticket was READY before the repair |
+| `test_a_package_that_loads_and_is_open_gives_the_reason_of_today` | settlement 4 | **green**: holds what stays |
+| `test_a_package_that_loads_and_is_closed_does_not_block` | `ACCEPTED`, `REJECTED`, `SUPERSEDED` | **green**: holds what stays |
+| `test_a_file_the_store_could_not_load_that_constrains_nothing_blocks_nothing` | a record without `type` and no `constrains`; a package without `status` and an empty `constrains` | **green**: holds what stays |
+
+7 red, 3 green. Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-09 -q -p no:cacheprovider -rs`:
+87 cases, 79 passed, 8 failed. The eighth, `test_the_vendored_script_is_executable`, fails only in a
+launched session: the sandbox puts an unreadable placeholder at the worktree's `.gitconfig`, and the
+case runs git with the worktree as its home.
+
+### Names proposed
+
+| Name | What it is |
+|---|---|
+| `DECISION_NOT_LOADED: <path>` | a reason of `blocked`, the code and the file it names |
+
+### Packages of the first run, as decided (DEC-579)
+
+None is open. The three packages below are kept as they were returned; DEC-579 decides each:
+
+- **P-10.1:** option (a). The ticket's paths gain the tasks package and its unit tests for the second run.
+- **P-10.2:** option (a). A constraining package whose frontmatter cannot be read holds every ticket.
+- **P-10.3:** option (a). The reason names the file: `DECISION_NOT_LOADED: <path>`.
+
+The ten cases were read again against DEC-579 by a fresh Independent Test Designer in the second run (at
+`d80597fd`): nothing is added and nothing is rewritten; the same 7 are red and wait on the build.
+
+**P-10.1. The READY rule's code is outside the ticket's paths.**
+- *Question.* May the follow-up change the READY rule where it is held today?
+- *Why now.* DEC-569 adds `src/gov/readiness/**` for this piece; the rule is in the tasks package
+  (bootstrap, W1-32: "the READY rule in `src/gov/tasks/queue.py`, outside the paths"), and
+  `gov readiness` is the checker of a specification's rows. With the paths as they are the cases above
+  cannot be made green.
+- *Options.* (a) The ticket's paths gain the tasks package and its unit tests. (b) The rule is built a
+  second time under the readiness package and the queue calls it. (c) The piece moves to another ticket.
+- *Impact.* (a) one line of the ticket; (b) two places for one rule.
+- *Reversibility.* High. *Cost.* (a) none.
+- *Recommendation.* (a). *Confidence:* high.
+
+**P-10.2. A file whose frontmatter cannot be read.**
+- *Question.* Does it hold every ticket, or none?
+- *Why now.* DEC-544 says "a constraining package"; whether such a file constrains anything cannot be
+  read from it.
+- *Options.* (a) Every ticket is held and names the file, as built here. (b) It holds nothing; `gov
+  status` goes on naming it as not read. (c) Only files under a folder the project names for packages
+  count.
+- *Impact.* (a) one broken Markdown file anywhere in the commit empties the queue until it is repaired,
+  which is visible and names the file; this repository's commit holds none today (its three files that
+  do not load have a readable frontmatter and no `constrains`). (b) leaves the gap DEC-544 closes open
+  for the commonest defect. (c) needs a new key.
+- *Reversibility.* High. *Cost.* (a) the smallest.
+- *Recommendation.* (a). *Confidence:* medium. The case
+  `test_a_package_whose_frontmatter_cannot_be_read_holds_every_ticket` holds (a).
+
+**P-10.3. The form of the reason.**
+- *Question.* The answer of `blocked` is a list of codes; the decision's sense needs the file named.
+- *Options.* (a) `DECISION_NOT_LOADED: <path>` as one reason, as built here. (b) The bare code, and the
+  file named only by `gov status` under its packages.
+- *Recommendation.* (a): the reader of the queue sees which file to repair. *Confidence:* medium.
+
+### For the engineer's run
+
+W1-32's status cases with a package that does not load, and any case that matches the reasons of
+`blocked` against a closed list of codes, were not run against the built rule by the designer.
+

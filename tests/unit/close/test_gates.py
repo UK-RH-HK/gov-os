@@ -111,9 +111,13 @@ def _inside(path):
     return path.startswith("src/")
 
 
+def _own(path):
+    return _inside(path) or path == f".tickets/{TICKET}.md" or path.startswith(f"tests/acceptance/{TICKET}/")
+
+
 def _gate(repo):
     commits = _ticket_commits(repo.root, TICKET)
-    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, frozenset({TICKET}))
+    _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own, frozenset({TICKET}))
 
 
 def _refused(repo):
@@ -154,12 +158,18 @@ def test_a_ticket_commit_naming_the_reviewers_session_refuses(repo):
     assert "reviewer session" in _refused(repo).message
 
 
-def test_ticket_work_after_the_probed_commit_refuses_and_a_test_does_not(repo):
+@pytest.mark.parametrize("path", ["src/b.py", f"tests/acceptance/{TICKET}/test_a.py", f".tickets/{TICKET}.md"])
+def test_ticket_work_after_the_probed_commit_refuses_and_a_path_outside_it_does_not(repo, path):
+    """DEC-581: the ticket's allowed paths, its acceptance tests and its own file refuse; nothing else does."""
     _probe(repo, repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"}))
-    repo.commit("a test", *TRAILERS, files={"tests/unit/test_a.py": "def test_a(): pass\n"})
+    repo.commit("outside the ticket's work", *TRAILERS, files={
+        "docs/residuals.md": "n\n", "tests/unit/test_a.py": "def test_a(): pass\n",
+        f"tests/acceptance/{TICKET}0/test_a.py": "def test_a(): pass\n", ".tickets/T-0002.md": "t\n"})
     _gate(repo)
-    repo.commit("more work", *TRAILERS, files={"src/b.py": "b\n"})
-    assert "src/b.py" in _refused(repo).message
+    later = repo.commit("one inside, one outside", *TRAILERS, files={"docs/a-note.md": "n\n", path: "b\n"})
+    finding = _refused(repo)
+    assert finding.details["path"] == path and later[:12] in finding.message
+    assert "docs/a-note.md" not in finding.message
 
 
 def test_a_probed_commit_that_is_no_commit_or_no_ancestor_refuses(repo):
@@ -206,6 +216,6 @@ def test_a_git_failure_while_the_probes_commits_are_read_is_an_error_not_a_findi
         monkeypatch.setattr(command, "_git", counting)
         monkeypatch.setattr(close_repo, "git", counting)
         with pytest.raises(GovError) as raised:
-            _check_probe(repo.root, TICKET, commits, [], _inside, frozenset({TICKET}))
+            _check_probe(repo.root, TICKET, commits, [], _inside, _own, frozenset({TICKET}))
         assert raised.value.code == "GIT_FAILURE"
         assert sum(seen) == calls_before_the_failure + 1

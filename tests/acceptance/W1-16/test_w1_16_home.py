@@ -45,13 +45,12 @@ def sandbox(module_sandbox):
 
 @pytest.fixture(scope="module")
 def two(module, cbm, sandbox, tmp_path_factory):
-    """Two repositories, both indexed, and what stood in the tool's default home and this repository before."""
+    """Two repositories, both indexed, and what stood in the tool's default home and in this repository's index
+    stores before."""
     tmp_path = tmp_path_factory.mktemp("w1-16-home")
     before = {
         "default-home": support.snapshot(Path.home() / support.TOOL_DEFAULT_HOME_REL),
-        "this-repository": {rel for rel in support.listing(support.REPO_ROOT / support.RUNTIME_REL)
-                            if not rel.startswith("scratch/")}
-        if (support.REPO_ROOT / support.RUNTIME_REL).is_dir() else set(),
+        "this-repository": support.index_stores(support.REPO_ROOT / support.RUNTIME_REL),
     }
     alpha = _repository(tmp_path / "alpha", ALPHA)
     beta = _repository(tmp_path / "beta", BETA)
@@ -62,6 +61,20 @@ def two(module, cbm, sandbox, tmp_path_factory):
 
 def _home(repo, sandbox):
     return Path(support.one(repo.root, "home", [], sandbox))
+
+
+@pytest.fixture(scope="module")
+def answers(two, sandbox):
+    """What the two query cases ask of each repository, asked in one child process per repository: the code
+    tool's start is paid once for a repository (DEC-561). ``repository name -> (the run, call -> result)``."""
+    alpha, beta, _ = two
+    asked = {}
+    for repo, own, foreign in ((alpha, "alpha_only_helper", "beta_only_helper"),
+                               (beta, "beta_only_helper", "alpha_only_helper")):
+        run = support.codeintel(repo.root, [("definitions", [own]), ("definitions", [foreign]),
+                                            ("callers", [own]), ("dead_code", [])], sandbox)
+        asked[repo.root.name] = (run, dict(zip(run.calls, run.results)))
+    return asked
 
 
 def test_the_wrapper_offers_its_public_interface(module, sandbox):
@@ -109,14 +122,15 @@ def test_list_projects_in_one_repository_shows_only_its_own_project(two, sandbox
 
 
 @pytest.mark.local_only
-def test_a_repository_answers_only_from_its_own_code(two, sandbox):
+def test_a_repository_answers_only_from_its_own_code(two, answers):
     alpha, beta, _ = two
     for repo, own, rel, foreign in ((alpha, "alpha_only_helper", "app/alpha.py", "beta_only_helper"),
                                     (beta, "beta_only_helper", "lib/beta.py", "alpha_only_helper")):
-        run = support.codeintel(repo.root, [("definitions", [own]), ("definitions", [foreign])], sandbox)
-        mine = support.entries(run.results[0], f"definitions({own})", repo.root)
+        run, asked = answers[repo.root.name]
+        mine = support.entries(asked[("definitions", (own,))], f"definitions({own})", repo.root)
         assert (rel, own) in mine, f"{repo.root.name} does not answer for its own code\n{run.describe()}"
-        assert run.results[1] == [], f"{repo.root.name} answers for the other repository's code\n{run.describe()}"
+        assert asked[("definitions", (foreign,))] == [], \
+            f"{repo.root.name} answers for the other repository's code\n{run.describe()}"
 
 
 @pytest.mark.local_only
@@ -128,11 +142,14 @@ def test_indexing_again_keeps_one_project(two, sandbox):
 
 
 @pytest.mark.local_only
-def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, sandbox):
+def test_no_index_file_exists_outside_gov_runtime_after_a_run(two, answers, sandbox):
     """Failure 2. Index files are SQLite files, their side files and graph dumps, wherever a child could write."""
     alpha, beta, _ = two
     for repo in (alpha, beta):
-        support.codeintel(repo.root, [("callers", [f"{repo.root.name}_only_helper"]), ("dead_code", [])], sandbox)
+        # The run that asked ``callers`` and ``dead_code`` of this repository came before (``answers``).
+        _, asked = answers[repo.root.name]
+        assert {("callers", (f"{repo.root.name}_only_helper",)), ("dead_code", ())} <= set(asked), \
+            f"{repo.root.name}: the queries this check follows were not asked: {sorted(asked)}"
         outside = support.index_files(repo.root, skip=(".git", support.RUNTIME_REL))
         assert not outside, f"{repo.root.name}: index files in the repository, outside .gov-runtime/: {outside}"
         assert not (repo.root / ".codebase-memory").exists(), "the tool's persistence folder was written"
@@ -156,9 +173,11 @@ def test_the_tools_default_home_is_not_used(two, sandbox):
 
 @pytest.mark.local_only
 def test_this_repository_is_not_indexed_by_the_run(two):
-    """DEC-322: the tests build their indexes in temporary repositories; this repository's stores are not theirs."""
+    """DEC-322: the tests build their indexes in temporary repositories; this repository's stores are not theirs.
+
+    Only the index stores are watched (DEC-563): the rest of this repository's runtime folder is written by other
+    sessions while the suite runs."""
     before = two[2]
     runtime = support.REPO_ROOT / support.RUNTIME_REL
-    now = {rel for rel in support.listing(runtime) if not rel.startswith("scratch/")} if runtime.is_dir() else set()
-    changed = sorted(now ^ before["this-repository"])
-    assert not changed, f"files appeared or went under {runtime}: {changed}"
+    changed = sorted(support.index_stores(runtime) ^ before["this-repository"])
+    assert not changed, f"files of an index store appeared or went under {runtime}: {changed}"

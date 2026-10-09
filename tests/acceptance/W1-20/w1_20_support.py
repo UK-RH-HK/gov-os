@@ -260,6 +260,32 @@ def call(module, function, root, box, *args, path=None, env=None, **kwargs):
     return json.loads(lines[-1][len("W1-20-RESULT "):])
 
 
+_CHILD_SEVERAL = (
+    "import importlib, json, sys\n"
+    "from pathlib import Path\n"
+    "module, root, requests = json.loads(sys.argv[1])\n"
+    "module = importlib.import_module(module)\n"
+    "values = [getattr(module, function)(Path(root), *args) for function, args in requests]\n"
+    "print('W1-20-RESULT ' + json.dumps(values, default=str))\n"
+)
+
+
+def calls(module, root, box, requests, path=None):
+    """``module.function(Path(root), *args)`` for every ``(function, args)`` of ``requests``, one after the other
+    in one new process; the values in that order, through JSON. The code tool's start is paid per process that
+    loads the code graph (DEC-561): questions of one repository state that need no process of their own go here."""
+    request = json.dumps([module, str(root), [[function, list(args)] for function, args in requests]])
+    done = subprocess.run([sys.executable, "-c", _CHILD_SEVERAL, request], cwd=str(box.elsewhere),
+                          env=child_env(box, path), capture_output=True, text=True, timeout=TIMEOUT_S,
+                          stdin=subprocess.DEVNULL)
+    lines = [line for line in done.stdout.splitlines() if line.startswith("W1-20-RESULT ")]
+    assert done.returncode == 0 and lines, \
+        f"{module}: {requests} failed (exit code {done.returncode}):\n{done.stdout[-2000:]}\n{done.stderr[-3000:]}"
+    values = json.loads(lines[-1][len("W1-20-RESULT "):])
+    assert len(values) == len(requests), f"{module}: {len(requests)} calls gave {len(values)} values"
+    return values
+
+
 def load_store(root, box):
     """``gov.store.load(root)``: the store a closure reads, built in the temporary repository."""
     return call("gov.store", "load", root, box)

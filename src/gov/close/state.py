@@ -137,13 +137,93 @@ def decisions_used(state: dict, escalation: dict | None) -> list[str]:
     return sorted({str(item) for item in used})
 
 
-def lift_escalation(root: Path, ticket: str, dec_id: str, state: dict) -> dict:
+def _entries(root: Path, commit: str, register: str, dec_id: str) -> list[str] | None:
+    """The entries of ``dec_id`` in the file ``register`` of ``commit``, each the lines from its heading to the
+    next heading; None where that commit has no such file of text. The heading is DEC-473's, read as the
+    citations check reads it: of level 3, at the start of a line, outside fenced code blocks."""
+    from gov.check.citations import ENTRY, FENCE
+
+    held = git(root, "ls-tree", "-z", commit, "--", register).split("\0")[0].partition("\t")[0].split()
+    if len(held) != 3 or held[1] != "blob" or not held[0].startswith("100"):  # a file, not a link to one
+        return None
+    try:
+        text = git(root, "cat-file", "blob", held[2])
+    except UnicodeDecodeError:
+        return None
+    found, fence, at = [], None, None
+    for line in text.split("\n"):
+        mark = FENCE.match(line)
+        if fence is not None:
+            if mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
+                fence = None
+        elif mark:
+            fence = mark.group(1)
+        elif line.startswith("#"):
+            entry = ENTRY.match(line)
+            at = None
+            if entry and entry.group(1) == dec_id:
+                found.append("")
+                at = len(found) - 1
+        if at is not None:
+            found[at] += line + "\n"
+    return found
+
+
+def _owners_entry(root: Path, register: str, dec_id: str, began: str | None, lifts_nothing) -> None:
+    """Raise unless ``dec_id`` is one accepted entry of the register file the project names, the owner's, and
+    recorded after the escalation began: what is asked of a decision file, in the form an entry can state it.
+
+    Accepted: its status line begins with ``ACCEPTED``. The owner's: every commit that brought the entry's
+    heading into the register carries ``Role: owner`` and no other role."""
+    import re
+    from gov.close.repo import read_commits
+
+    def held(commit: str) -> bool:
+        return bool(_entries(root, commit, register, dec_id))
+
+    found = _entries(root, "HEAD", register, dec_id) if isinstance(register, str) and register.strip() else None
+    if found is None:
+        raise lifts_nothing(f"is no committed record under {' or '.join(DECISION_FOLDERS)}, and the register "
+                            f"the project names ({register!r}) is no file of text of the commit being closed")
+    if len(found) != 1:
+        raise lifts_nothing(f"is not one entry of the register {register}" if found else
+                            f"is no committed record under {' or '.join(DECISION_FOLDERS)} and no entry of "
+                            f"the register {register}")
+    status = re.search(r"^(?:[-*+][ \t]+)?\*\*Status:\*\*[ \t]*(\S*)", found[0], re.MULTILINE)
+    if status is None or not re.fullmatch(r"ACCEPTED\b.*", status.group(1)):
+        raise lifts_nothing(f"is not accepted by its entry of the register {register} (its status line: "
+                            f"{status.group(0) if status else 'none'})")
+    brought = [c for c in read_commits(root, "HEAD", "--", register)
+               if held(c["sha"]) and not any(held(parent) for parent in c["parents"])]
+    others = [c["sha"][:12] for c in brought if c["trailers"].get("Role") != ["owner"]]
+    if not brought or others:
+        raise lifts_nothing("is not confirmed as the owner's: its entry was not brought into the register "
+                            f"{register} by a commit with the owner's role alone ({', '.join(others) or 'none'})")
+    _recorded_after(root, began, lifts_nothing)
+    if held(str(began)):
+        raise lifts_nothing("was recorded before the escalation began")
+
+
+def _recorded_after(root: Path, began: str | None, lifts_nothing) -> None:
+    """Raise unless the commit at which the escalation began is recorded and in the history being closed."""
+    if not began:
+        raise lifts_nothing("cannot be shown to be later than the escalation: the commit at which the "
+                            "escalation began is not recorded")
+    if git(root, "merge-base", "--is-ancestor", str(began), "HEAD", ok=(0, 1), code=True):
+        raise lifts_nothing(f"cannot be shown to be later than the escalation: {str(began)[:12]}, where the "
+                            "escalation began, is not in the history of the commit being closed")
+
+
+def lift_escalation(root: Path, ticket: str, dec_id: str, state: dict, register: str | None = None) -> dict:
     """Lift the ticket's escalation by the owner's decision ``dec_id`` and return the new counter.
 
     The decision lifts it only if it is a decision record of the commit being closed, active, with no finding
     of W1-11's checker about it (the owner's approval fact among them), recorded after the escalation began,
     and not used for an escalation of this ticket before (DEC-487). Any other decision lifts nothing: the
     close stays blocked. The working tree is the commit when this is asked (``run`` refuses before).
+
+    Where no decision file has the id and the project names a register file (``register``, its path map's
+    key of DEC-479), an entry of that register is the record (DEC-483), held to the same rules.
     """
     from gov.decisions import check as check_decisions
     from gov.tasks.tickets import frontmatter
@@ -161,30 +241,27 @@ def lift_escalation(root: Path, ticket: str, dec_id: str, state: dict) -> dict:
 
     held = [path for path in git(root, "ls-tree", "-r", "-z", "--name-only", "HEAD").split("\0")
             if path.startswith(DECISION_FOLDERS) and path.rsplit("/", 1)[-1] == f"{dec_id}.md"]
-    if len(held) != 1:
-        raise lifts_nothing("is not one committed decision record" if held else
-                            "is no committed record under " + " or ".join(DECISION_FOLDERS))
-    front = frontmatter(root / held[0])
-    if front is None:
-        raise lifts_nothing("has no readable frontmatter")
-    if front.get("type") != "decision" or str(front.get("id", "")) != dec_id:
-        raise lifts_nothing("is not a decision record of that id")
-    if str(front.get("status", "")) != "ACTIVE":
-        raise lifts_nothing(f"is not in force (status: {front.get('status')})")
-    about = sorted({str(f.get("code")) for f in check_decisions(root)
-                    if dec_id in f.get("ids", []) or held[0] in f.get("paths", [])})
-    if about:
-        raise lifts_nothing(f"is not confirmed as the owner's and in force ({', '.join(about)})")
-
     began = state.get("escalated_at") or (escalation or {}).get("escalated_at")
-    if not began:
-        raise lifts_nothing("cannot be shown to be later than the escalation: the commit at which the "
-                            "escalation began is not recorded")
-    if git(root, "merge-base", "--is-ancestor", str(began), "HEAD", ok=(0, 1), code=True):
-        raise lifts_nothing(f"cannot be shown to be later than the escalation: {str(began)[:12]}, where the "
-                            "escalation began, is not in the history of the commit being closed")
-    if git(root, "ls-tree", "-z", "--name-only", str(began), "--", held[0]).strip("\0"):
-        raise lifts_nothing("was recorded before the escalation began")
+    if not held and register is not None:
+        _owners_entry(root, register, dec_id, began, lifts_nothing)
+    else:
+        if len(held) != 1:
+            raise lifts_nothing("is not one committed decision record" if held else
+                                "is no committed record under " + " or ".join(DECISION_FOLDERS))
+        front = frontmatter(root / held[0])
+        if front is None:
+            raise lifts_nothing("has no readable frontmatter")
+        if front.get("type") != "decision" or str(front.get("id", "")) != dec_id:
+            raise lifts_nothing("is not a decision record of that id")
+        if str(front.get("status", "")) != "ACTIVE":
+            raise lifts_nothing(f"is not in force (status: {front.get('status')})")
+        about = sorted({str(f.get("code")) for f in check_decisions(root)
+                        if dec_id in f.get("ids", []) or held[0] in f.get("paths", [])})
+        if about:
+            raise lifts_nothing(f"is not confirmed as the owner's and in force ({', '.join(about)})")
+        _recorded_after(root, began, lifts_nothing)
+        if git(root, "ls-tree", "-z", "--name-only", str(began), "--", held[0]).strip("\0"):
+            raise lifts_nothing("was recorded before the escalation began")
 
     lifted = {"count": 0, "last_failures": [], "outcomes": [],
               "decision": dec_id, "decisions": sorted({*used, dec_id})}

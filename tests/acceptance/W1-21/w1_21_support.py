@@ -583,6 +583,7 @@ NAMESPACES = {
 def adopt(project, namespaces):
     """Give ``project`` a path map and the kernel's gitleaks configuration (the two files the secret filter reads)."""
     document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    document.pop("decision_register", None)   # the project holds no register file, so its path map names none
     document["namespaces"] = {name: {"paths": list(patterns), "memory_class": "governance", **_NAMESPACE_FIELDS,
                                      "embedding_policy": policy} for name, (patterns, policy) in namespaces.items()}
     write(project, PATH_MAP_REL, yaml.safe_dump(document, sort_keys=False))

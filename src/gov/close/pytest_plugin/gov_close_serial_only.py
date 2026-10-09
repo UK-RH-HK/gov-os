@@ -10,6 +10,9 @@ the line's end, and a line that begins with ``#``, is a comment. A project witho
 folder alone added to the run's import path, since the project under test need not have ``gov``). The module
 imports nothing but the standard library. pytest's own ``--deselect`` cannot do this: it takes any id that
 begins with its argument, so ``file::test_a`` would take ``file::test_a_too`` with it.
+
+The serial run afterwards is given the module too, with the entries of that run: an entry that names no case
+ends the run with an error, where pytest itself passes over a file without a case (DEC-549).
 """
 
 from __future__ import annotations
@@ -21,6 +24,8 @@ LIST_REL = "tests/acceptance/serial-only.txt"
 PLUGIN = "gov_close_serial_only"
 # Names the project's root to the plugin, in the parallel run of a project that declares something.
 ROOT_VARIABLE = "GOV_CLOSE_SERIAL_ONLY_OF"
+# Names to the plugin, in the serial run afterwards, the entries that run was given, one on a line.
+GIVEN_VARIABLE = "GOV_CLOSE_SERIAL_ONLY_GIVEN"
 
 
 def entries(root: Path) -> list[str]:
@@ -37,17 +42,29 @@ def declares(entry: str, node: str) -> bool:
     return node == entry or (node.startswith(entry) and node[len(entry):].startswith(("::", "[", "/")))
 
 
+def _node(item, root: str) -> str:
+    """The id as the list gives it, relative to the project's root: pytest's own is relative to its rootdir."""
+    path = os.path.relpath(str(getattr(item, "path", None) or item.fspath), root).replace(os.sep, "/")
+    return path + "".join(item.nodeid.partition("::")[1:])
+
+
 def pytest_collection_modifyitems(config, items) -> None:
     root = os.environ.get(ROOT_VARIABLE)
+    given = os.environ.get(GIVEN_VARIABLE)
+    if root and given:  # the run afterwards: an entry that names an existing file without a case ends it
+        import pytest
+
+        nodes = [_node(item, root) for item in items]
+        empty = [entry for entry in given.split("\n") if not any(declares(entry, node) for node in nodes)]
+        if empty:
+            raise pytest.UsageError(f"no case is named by the entry of {LIST_REL}: {', '.join(empty)}")
+        return
     declared = entries(Path(root)) if root else []
     if not declared:
         return
     kept, apart = [], []
     for item in items:
-        # The id as the list gives it, relative to the project's root: pytest's own is relative to its rootdir.
-        path = os.path.relpath(str(getattr(item, "path", None) or item.fspath), root).replace(os.sep, "/")
-        node = path + "".join(item.nodeid.partition("::")[1:])
-        (apart if any(declares(entry, node) for entry in declared) else kept).append(item)
+        (apart if any(declares(entry, _node(item, root)) for entry in declared) else kept).append(item)
     if apart:
         config.hook.pytest_deselected(items=apart)
         items[:] = kept

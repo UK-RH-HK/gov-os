@@ -44,8 +44,32 @@ def test_a_ticket_file_that_cannot_be_read_is_not_ready(tmp_path, monkeypatch):
     (root / ".tickets" / "TST-a002.md").write_text("---\nid: [\n---\n", encoding="utf-8")
     monkeypatch.setattr("gov.records.records", lambda root, type=None, status=None: [])
     monkeypatch.setattr("gov.records.edges", lambda root, type=None: [])
+    monkeypatch.setattr("gov.store.loader.frontmatters", lambda root, but=frozenset(): [])
     assert tasks.ready(root) == ["TST-a001"]
     assert list(tasks.blocked(root)) == ["TST-a002"]
+
+
+def test_a_constraining_file_the_store_holds_no_record_of_holds_its_tickets(tmp_path, monkeypatch):
+    """DEC-544, DEC-579: the file is named; one whose frontmatter cannot be read holds every ticket; a file the
+    store holds a record of is not asked for; and nothing is READY while ``HEAD`` cannot be read."""
+    root = _project(tmp_path, "TST-a001", "TST-a002")
+    asked = []
+    files = [("gates/DP-1.md", {"id": "DP-1", "constrains": ["TST-a001"]}, None), ("notes.md", {"id": "N"}, None),
+             ("plain.md", None, None)]
+    monkeypatch.setattr("gov.records.records", lambda root, type=None, status=None: [
+        {"id": "R", "type": "requirement", "status": "ACTIVE", "path": "docs/R.md"}])
+    monkeypatch.setattr("gov.records.edges", lambda root, type=None: [])
+    monkeypatch.setattr("gov.store.loader.frontmatters", lambda root, but=frozenset(): asked.append(but) or files)
+    assert tasks.ready(root) == ["TST-a002"]
+    assert tasks.blocked(root) == {"TST-a001": ["DECISION_NOT_LOADED: gates/DP-1.md"]}
+    assert asked[0] == frozenset({"docs/R.md"})
+    files.append(("broken.md", None, "the frontmatter is not closed"))
+    assert tasks.ready(root) == []
+    assert tasks.blocked(root)["TST-a002"] == ["DECISION_NOT_LOADED: broken.md"]
+    monkeypatch.undo()
+    monkeypatch.setattr("gov.records.records", lambda root, type=None, status=None: [])
+    monkeypatch.setattr("gov.records.edges", lambda root, type=None: [])
+    assert tasks.ready(root) == []  # no git repository: what HEAD holds is not known
 
 
 def test_a_holder_still_being_written_is_waited_for(tmp_path):

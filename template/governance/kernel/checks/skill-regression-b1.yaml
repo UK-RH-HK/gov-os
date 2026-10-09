@@ -2,4 +2,4 @@ id: skill-regression-b1
 family: skill regression
 tier: G1
 severity: hard-block
-command: python3 -m gov.check.skill_validator template/governance/kernel/skills/retrieval template/governance/kernel/skills/audit template/governance/kernel/skills/checkpoint template/governance/kernel/skills/adopt
+command: python3 -m gov.check.skill_validator --both-layouts template/governance/kernel/skills/retrieval template/governance/kernel/skills/audit template/governance/kernel/skills/checkpoint template/governance/kernel/skills/adopt
