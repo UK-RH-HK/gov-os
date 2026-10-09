@@ -1648,6 +1648,68 @@ word `ACCEPTED` of the entry's status line. No decision defines the status line 
 entry (DEC-473 defines the heading only); if another word or place is meant, the case's forms
 `DEC-602` to `DEC-604` change with it.
 
+### Piece 7. A base commit for the trailers check (`test_w1_30_r13_trailers_base.py`, 12 cases)
+
+DEC-482. The check `product-traceability-trailers` is held in this suite
+(`test_w1_30_traceability.py`, ten cases, unchanged; W1-26's suite holds the citations check and
+no case of this one), so the cases are here. They run `gov check --json` in a temporary project
+and read the check's entry. This repository's own path map is not read and not changed.
+
+**Settlement 31 (proposed).**
+
+- The key is `trailers_base`, an optional top-level key of the project's path map beside
+  `decision_register` and `decision_citations_base`: a commit id, full or abbreviated (as
+  DEC-479 says of the other base). The citations base is no base of this check.
+- With a base, a commit of a closed ticket is judged only where it is after the base (reachable
+  from the checked commit and not from the base). A closed ticket whose commits all lie before
+  the base is no finding.
+- A closed ticket that no commit of the whole history names stays the finding it is today
+  (`NO_COMMITS`): the base takes commits out of the judgement, not tickets (stricter).
+- A base that is no commit of the project, a commit the checked commit does not descend from, or
+  a name that is no commit id (a branch named in hex digits) is a finding of its own,
+  `TRAILERS_BASE_UNKNOWN`, which names the key and the value. No commit is judged behind it and
+  the check is never green.
+- A base with no commit after it: the unmeasured answer (`"unmeasured": true` and a reason),
+  never green (DEC-479).
+- The path map read is the project's present one (DEC-479).
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_commits_before_the_base_are_not_judged` (full id; abbreviated id) | the old ticket's commits lack `Implements:`, the ticket closed after the base is right: GREEN | red ×2: RED, "commit ... of PROJ-olda lacks Implements: trailer" |
+| `test_a_commit_after_the_base_is_judged_and_one_before_it_is_not_named` | a commit after the base without `Implements:` is RED and named; the old one is not named | red: the old commits are named |
+| `test_an_id_that_resolves_to_no_record_is_judged_after_the_base_only` | an unresolved id is a finding for the later commit alone | red: "Implements: CAP-gone does not resolve" of the old commit |
+| `test_the_base_of_the_citations_check_is_no_base_of_the_trailers_check` | only `decision_citations_base` recorded: the whole history is judged | green (as today) |
+| `test_a_base_that_is_no_commit_before_the_head_is_a_finding_of_its_own` (no commit; a commit of another branch; a branch named `beef`) | every commit is right, and the check is not green: `TRAILERS_BASE_UNKNOWN` naming key and value | red ×3: GREEN |
+| `test_a_base_that_is_no_commit_does_not_hide_the_history_behind_one_green` | unknown base and a wrong history: RED with `TRAILERS_BASE_UNKNOWN` | red: no such finding |
+| `test_a_base_with_no_commit_after_it_gives_the_unmeasured_answer` | the base is the head (the path map is the working tree's): the unmeasured answer, not green, no old commit named | red: the old commits' findings, no unmeasured answer |
+| `test_a_base_after_which_no_closed_ticket_has_a_commit_is_never_green` | commits follow the base, none of a closed ticket: not green, no old commit named (package P-3) | red: the old commits are named |
+| `test_a_closed_ticket_without_any_commit_stays_a_finding_with_a_base` | `PROJ-bare` is a finding; the ticket whose commits lie before the base is none | red: the old ticket's commits are named |
+
+11 red, 1 green. With no base at all the whole history is judged: the ten existing cases hold
+that, in projects whose path map holds the suite's own setting only.
+
+**Package P-3 (round 13): a base after which no closed ticket has a commit.**
+
+- **Question.** A base is recorded and commits follow it, but none of them is a closed ticket's.
+  What does the check answer?
+- **Why now.** DEC-479 says "with a base recorded and no commit after it, the check gives the
+  unmeasured answer". For the citations check every commit is judged, so "no commit after it"
+  and "nothing judged" are one thing. The trailers check judges the commits of closed tickets
+  only, so the two differ: after an adoption that records the base, the first commits are the
+  path map's and the first ticket's, and that ticket is still open.
+- **Options.** (a) The unmeasured answer, as with no commit at all (strictest: the check is
+  `hard-block`, so it is red until the first ticket after the base is closed, and under DEC-480
+  a governance-changing ticket could not close on it unless the baseline holds that finding).
+  (b) The not-applicable answer of DEC-447, as with no closed ticket: a warning, never green,
+  never red. (c) Green.
+- **Impact.** (a) may block the first close after an adoption; (b) does not; (c) reports a pass
+  for nothing measured, against DEC-425.
+- **Reversibility.** High: one answer of the check and one case.
+- **Cost.** None beyond the build either way.
+- **Recommendation.** (b). The case holds what (a) and (b) share: never green, no commit before
+  the base named. It refuses (c).
+- **Confidence.** Medium.
+
 ## Covers ids
 
 | Covers id | Tests |
