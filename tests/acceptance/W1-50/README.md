@@ -1211,6 +1211,135 @@ The public function is expected to do the same.
 - **Concurrent changes.** The function reads from the git repository and the working tree. If another process
   changes them concurrently, the function's behaviour is not defined by these cases.
 
+## A merge commit's file that equals one parent's version, DEC-572 (fourteenth batch)
+
+Fourteenth batch, **added after implementation**; reason: "owner decision, DEC-572". The rule came to the test
+designer as the owner's words and a described shape, never as code; no test reads the check's code. 19 cases are
+added in 10 test functions, all in `test_w1_50_merge_commit_file_that_equals_one_parent_s_version.py`; one existing
+test function (2 cases) is rewritten. Run when they were written: **10 of the 19 failed, 9 passed**, and the 2
+rewritten cases failed. Every red case fails on its behaviour assertion, with the history built and the fixture's
+own guards passed. The suite then holds 685 cases; these 12 fail until the rule is built, and no other case changed
+its answer (in a sandboxed session two more cannot run, since each needs a real launched session:
+`test_a_launched_session_leaves_no_placeholder_at_the_flag_s_path` and
+`test_a_flag_put_over_the_placeholder_during_a_command_stays`).
+
+DEC-572 (owner): "a merge commit's file is not its own change when it equals one parent's version and every commit
+that brought that version passes the check. The existing rules stay as they are: a merge commit's own change under
+`tests/acceptance/**` or `.tickets/**` remains a finding, and so do both sides changing the same acceptance test
+(DEC-410)."
+
+**Interface.** Every case drives both public interfaces with one history: the post-command check around an
+orchestrator session's own Bash call that makes the merge commit, and `gov.guard.containment.judge_commits` for the
+merge commit alone (DEC-453), which `gov close` calls for a ticket's commits. "No finding" is: the call is silent,
+and the function returns an empty list. "A finding" is: the check flags the path and moves nothing, and the function
+returns one finding, for the merge commit, whose `paths` hold the path. The helper `read_merge` is not driven and
+its answers are not changed: a ticket file both sides changed stays in its `own` (DEC-421; the helper cases of
+`test_w1_50_ticket_file_changed_on_both_sides.py`, unchanged and green). DEC-572 is held as a rule of the judgement.
+
+### The settlement: what the cases hold
+
+1. **Which file is lifted.** A path under `.tickets/**` that the merge commit holds exactly as one parent has it
+   (content and mode), where the two parents have one merge base and that parent's version differs from the merge
+   base's. Before DEC-572 it was a finding where both sides had changed the path (DEC-421). It is no finding when
+   every commit that brought the version passes.
+2. **Which commits brought the version.** Every commit in that parent's history that is not in the merge base's,
+   whose content of the path differs from that of one of its own parents. For a merge commit among them: from any
+   of its parents. All of them count, not only the newest: a path that a worker's commit changed and an
+   orchestrator's commit then rewrote is brought by both.
+3. **What "passes the check" means.** Judged alone, as the judgement of a list of commits judges it, the commit is no
+   finding at all: a commit that is a finding for another path does not pass either. A merge commit among them
+   passes only when the path is not that merge commit's own change as the check read merges before DEC-572: the lift
+   is not applied inside the lift. An ordinary merge commit on that side, which holds the path as its first parent
+   has it, passes.
+4. **Where the merge commit holds the version of both parents** (both sides made the same change), every commit that
+   brought it on either side must pass.
+5. **Where the check cannot tell, it refuses: the path stays a finding.**
+   - The version is the merge base's own (that side never changed the path, or changed it and changed it back): no
+     commit brought it, and the merge commit drops what the other side changed (DEC-403, DEC-410 DP-21).
+   - The parents have several merge bases, or none: which commits brought a version is told against one merge base
+     (DEC-410, DP-23 stands).
+   - More than the bound of commits brought the version (below).
+6. **A finding for a commit that does not pass names that commit.** The path stays a finding of the merge commit,
+   and the finding's `reason` holds, beside the merge commit's id as today, the id of a commit that brought the
+   version and does not pass (in full or abbreviated to at least seven characters, as DEC-270 is read in this
+   suite). Through the check, one finding names the path, the merge commit and that commit together.
+
+**The bound.** The check runs in a hook with a time limit, so the walk of a side is bounded and the bound is stated
+as behaviour: a version that at most **50** commits brought is judged; with 51 the path is a finding, although each
+commit passes. The number is the test designer's proposal (`MOST_COMMITS` in the case file is the one place to
+change it). The integration side of commit `803f731c` holds four such commits, one of them an ordinary merge commit;
+on an integration branch every merge of another ticket's branch after the ticket file's change counts, so a bound
+near the number of changes of one file would be reached by ordinary work. The case at the bound is silent within the
+harness's hook limit (the 50 commits are commits of the move as well, and are judged in the same hook run).
+
+**Where the line runs between the lifted shape and DEC-410's both-sides rule.**
+
+| Path | Both sides changed it; the merge commit holds one side's version whole | Why |
+|---|---|---|
+| under `.tickets/**` | **no finding** when that side's commits pass; otherwise a finding named with the commit | DEC-572's second point. DEC-421 had made it a finding; DEC-572's third point keeps the both-sides rule for an acceptance test only |
+| under `tests/acceptance/**` | **a finding**, as before | DEC-572's third point, DEC-410 DP-24: "taking one side whole is a resolution, and a resolution of an acceptance test is a finding" |
+
+For a path under `tests/acceptance/**` DEC-572 therefore lifts nothing that was a finding: with one merge base, a
+test that one side alone changed and the merge commit holds as that side has it was brought already, and a test both
+sides changed stays a finding. Content no parent holds stays a finding under both folders (DP-21, DP-27), and so does
+git's own clean combination of two sides' edits: of an acceptance test by DP-26, of a ticket file because it equals
+no parent's version.
+
+**Commit `803f731c` is not the lifted shape.** DEC-572 names it and decides it as a named exception. Its ticket file
+(`.tickets/DAEO-cdoi.md`) holds the status line of its first parent and the path and KPI lines of its second: git's
+clean combination, equal to neither parent (`git diff 803f731c^2 803f731c -- .tickets/DAEO-cdoi.md` shows the status
+line; the combined diff is empty because every line is one parent's). By the rule's words it stays the merge commit's
+own change. The suite holds the words, the stricter reading; see package DP-29.
+
+### Cases
+
+| Holds | Test function | Cases | Run when written |
+|---|---|---|---|
+| 1. The lifted shape | `test_a_ticket_file_a_merge_commit_holds_as_one_parent_has_it_is_no_finding_when_its_commits_pass`: both sides changed the ticket file by orchestrator's commits. `one-commit-on-the-merged-side` (the second parent's version); `the-first-parent-s-version`; `several-commits-and-an-ordinary-merge-on-the-merged-side` (three orchestrator's commits and an ordinary merge commit that differs from one of its parents in the file, as on the integration side of `803f731c`); `as-many-commits-as-the-bound` (50) | 4 | **red**: flagged, "a merge commit's own change to a ticket file or an acceptance test" |
+| 1, 4. The same change on both sides | `test_a_ticket_file_both_sides_changed_in_the_same_way_is_no_finding_when_both_sides_commits_pass` | 1 | **red**: flagged, the same reason |
+| 4. A commit that does not pass | `test_a_version_brought_by_a_commit_that_does_not_pass_stays_a_finding_named_with_that_commit`: `a-worker-s-commit-brought-it` (an engineer's commit of the ticket file); `a-worker-s-commit-then-an-orchestrator-s` (the newest commit passes, an earlier one does not); `an-orchestrator-s-commit-that-also-changes-an-acceptance-test` (a finding for another path); `a-merge-commit-on-that-side-whose-own-change-it-is` (the merged side itself took a third branch's version of the file both had changed) | 4 | **red**: the path is a finding already, but no finding names the commit that does not pass |
+| 4. Both parents' version, one side does not pass | `test_the_same_change_on_both_sides_stays_a_finding_when_one_side_s_commit_does_not_pass`: an engineer's commit on the merged side, an orchestrator's on `main` | 1 | **red**: the finding does not name the engineer's commit |
+| Refused: the merge base's own version | `test_a_version_that_is_the_merge_base_s_own_stays_a_finding`: the merged side changed the file and changed it back; the merge commit holds that version and drops `main`'s change | 1 | **green**; must stay green |
+| Refused: the bound | `test_a_version_brought_by_more_commits_than_the_bound_stays_a_finding`: 51 orchestrator's commits, each passing | 1 | **green**; must stay green: a walk without the bound fails it |
+| Refused: several merge bases | `test_a_version_one_parent_brought_across_two_merge_bases_stays_a_finding`: a criss-cross merge that brings an orchestrator's change of a ticket file from one side | 1 | **green**; must stay green |
+| 2. Content no parent holds | `test_a_file_a_merge_commit_holds_as_no_parent_has_it_stays_a_finding`: a conflict resolved to new content, in a ticket file and in an acceptance test | 2 | **green**; must stay green |
+| 2. A clean combination | `test_a_clean_combination_of_two_sides_edits_of_a_ticket_file_stays_a_finding`: one side changed a line near the top, the other appended a line; git combined them | 1 | **green**; must stay green (package DP-29) |
+| The commit DEC-572 names | `test_the_merge_commit_decided_as_a_named_exception_equals_no_parent_s_version_and_stays_a_finding`: `803f731c` judged in place in this repository, read-only (`HEAD` and `git status` are compared before and after). Skipped where the repository does not hold the commit (a shallow copy) | 1 | **green** (package DP-29) |
+| 3. An acceptance test both sides changed | `test_an_acceptance_test_both_sides_changed_held_as_one_parent_has_it_stays_a_finding`: the first parent's version, the second parent's; test designer's commits that pass | 2 | **green**; must stay green: a lift that does not stop at `tests/acceptance/**` fails them |
+
+The case that judges `803f731c` in place does not depend on where `HEAD` is: the commit and the commits of its sides
+carry the orchestrator's trailers, which are judged the same on any ticket in any state (DEC-359). While the tree is
+paused every commit is a finding (thirteenth batch), which is the answer the case expects as well.
+
+### Existing case rewritten after implementation (reason: owner decision, DEC-572)
+
+| Test, as it was | File | It pinned | It pins now | Run when rewritten |
+|---|---|---|---|---|
+| `test_a_merge_that_takes_one_side_s_content_of_a_ticket_file_both_sides_changed_is_flagged` (2 cases), now `..._is_silent` | `test_w1_50_ticket_file_changed_on_both_sides.py` | Flagged, the ticket file named: an orchestrator's commit on each side changed the ticket file and the merge commit holds the first parent's version whole, or the second's (DEC-421) | Silent: exactly the shape DEC-572 lifts | **2 red**: flagged |
+
+No other existing case holds the lifted shape as a finding. What stays as before is held by existing cases, all
+unchanged: a merge commit's own change of a ticket file that equals no parent's version or drops a side's change
+(`test_w1_50_merge_commit_own_change_of_a_ticket_file.py`, 12 cases); the same for an acceptance test
+(`test_w1_50_merge_commit_own_change_of_an_acceptance_test.py`, 9 cases); an acceptance test both sides changed
+(`test_w1_50_acceptance_test_changed_on_both_sides.py`, 17 cases); the ordinary merges
+(`test_w1_50_integration_merge.py` and the cases listed under the eighth batch); the function's agreement with the
+check (`test_w1_50_judge_commits.py`, 24 cases); and the helper's reading of a ticket file both sides changed (5
+cases of `test_w1_50_ticket_file_changed_on_both_sides.py`). The sections of the tenth and twelfth batch above name
+the rewritten case by its old name and expectation; they are the record of those batches, and this table is what
+holds now.
+
+### Proposed by the test designer
+
+- The bound of 50 commits that brought one version.
+- No word of a finding's `reason` is proposed. The cases require only that the `reason` holds the id of a commit
+  that brought the version and does not pass, beside what it holds today.
+
+**Not pinned:** which of several commits that do not pass the `reason` names, and whether it names all; the words of
+the `reason`; a merge commit with more than two parents (the cases hold the rule for two; DP-25 and DP-28 stand);
+a path outside `.tickets/**` and `tests/acceptance/**`, where the merge commit's own change is judged by its
+trailers as before (DEC-269); a merge made in a worker's call, which stays flagged as a move (DEC-266); how the check
+walks a side or keeps its time.
+
 ## What the suite takes as given
 
 - **Not changed by W1-50.** The KPIs speak of a forward `HEAD` move. A reset, a checkout of another branch or
@@ -1241,7 +1370,9 @@ The public function is expected to do the same.
   `tests/acceptance/**` and `.tickets/**`: a merge commit's own change there is a finding whatever its trailers
   (DP-27, DP-21). A conflict resolved to one side's content is not such a change, except under `tests/acceptance/**`,
   where a path more than one parent changed against the merge base is the merge commit's own whichever side's
-  content it holds (DEC-410, DP-24). Which paths are the merge commit's own is read by the three-way rule (DEC-394 DP-18, as
+  content it holds (DEC-410, DP-24). Under `.tickets/**` DEC-421 made the same rule, and DEC-572 lifts it where the
+  merge commit holds one parent's version whole and every commit that brought that version passes (fourteenth
+  batch). Which paths are the merge commit's own is read by the three-way rule (DEC-394 DP-18, as
   amended by DEC-398; it replaces DEC-390's DP-15 rule): a path is brought by another parent only when the merge
   commit holds that parent's content of it and that content differs from the merge base of the first parent and that
   parent; with several merge bases, or none, nothing is brought. "Content" is the file's content with its mode, and
@@ -1280,7 +1411,8 @@ The public function is expected to do the same.
 
 ## Decision packages
 
-All twenty-eight packages are decided: the ten of the first two batches, DP-11 to DP-16 by DEC-390 (orchestrator,
+The first twenty-eight packages are decided (DP-29 to DP-32, of the fourteenth batch, are open and stand at the end
+of this section): the ten of the first two batches, DP-11 to DP-16 by DEC-390 (orchestrator,
 delegated under DEC-220, stricter-only), DP-17 and DP-18 by DEC-394 (the same), which also replaces DEC-390's DP-15
 rule, DP-19 and DP-20 by DEC-403 (delegated), which widens "against its first parent" in DEC-394 and DEC-398, and
 DP-21 to DP-28 by DEC-410 (delegated, stricter-only), which amends DEC-403. The owner's DEC-398 amends DEC-394, and
@@ -1310,7 +1442,7 @@ DEC-401 keeps DP-11 and DP-12 as built and accepts DEC-394.
 | DP-19 | An octopus merge in which the first parent has one merge base with one of the other parents and several, or none, with another | DEC-403 (delegated), option (a), as built: it fails closed as a whole. An octopus whose other parents cross only each other is read parent by parent, as built. Tests: `test_w1_50_read_merge_every_parent.py` |
 | DP-20 | A merge commit that keeps its first parent's content of a path and so drops what another parent changed (review finding) | DEC-403 (delegated), option (a): the symmetric rule, in the one helper. A path where the merge commit differs from any parent is its own change unless another parent brought it; with several merge bases, or none, every path that differs from any parent is its own. Tests: `test_w1_50_merge_that_drops_a_parent_s_change.py`, `test_w1_50_merge_that_takes_each_side_s_change.py`, `test_w1_50_read_merge_every_parent.py` |
 
-DP-21 to DP-28 are decided by DEC-410 (orchestrator, delegated under DEC-220, stricter-only). No package is open.
+DP-21 to DP-28 are decided by DEC-410 (orchestrator, delegated under DEC-220, stricter-only).
 
 | Id | Question | Decision |
 |---|---|---|
@@ -1322,6 +1454,65 @@ DP-21 to DP-28 are decided by DEC-410 (orchestrator, delegated under DEC-220, st
 | DP-26 | Git's own clean combination of two sides' edits of one acceptance test | DEC-410, option (a): stays flagged, as built. Tests: the two clean-combination cases of `test_w1_50_acceptance_test_changed_on_both_sides.py` |
 | DP-27 | A merge commit's own change under `tests/acceptance/**` with a test designer's trailers | DEC-410, option (b): a finding whatever its trailers. Tests: `test_w1_50_merge_commit_own_change_of_an_acceptance_test.py` and two rewritten cases |
 | DP-28 | A merge commit with very many parents | DEC-410, option (a): the helper refuses a merge commit with more than 24 distinct parents; the move is then a finding as a whole. Tests, unchanged: the ninth batch's cases with 150 parents and with nine. The move as a whole (review finding, eleventh batch): `test_w1_50_move_of_very_many_merge_commits.py` |
+
+Four packages are open since the fourteenth batch (DEC-572). In each the suite holds the stricter reading meanwhile.
+
+**DP-29: the commit DEC-572 names is not the shape its rule lifts.**
+- *Question:* is a ticket file that is git's own clean combination of both sides' edits (it equals no parent's
+  version) the merge commit's own change?
+- *Why now:* `803f731c` is that shape (the ticket's branch set the status line, the integration branch changed path
+  and KPI lines, git combined them). It is the daily shape: a ticket's start commit changes its ticket file on its
+  branch, the orchestrator changes other lines on the integration branch, and the next merge of the integration
+  branch combines them. By the rule's words each such merge stays a finding.
+- *Options:* (a) the words as they stand: a finding; each such merge is a named exception or is avoided by committing
+  ticket-file changes on one branch only. Held by the suite. (b) A ticket file that is exactly git's clean three-way
+  combination of the two parents' versions against their one merge base is not the merge commit's own change when
+  every commit that changed it on both sides passes. (c) As (b), and the orchestrator's own hand resolution of a
+  ticket file as well: this would undo DP-21 and is not proposed.
+- *Impact:* (b) lets two orchestrator's edits of one ticket file combine in silence; each edit is still judged as its
+  own commit, and an edit by a worker's commit stays a finding. Acceptance tests are not touched (DP-26 stands).
+- *Reversibility:* full; two cases change their answer (the clean combination and `803f731c` in place).
+- *Cost:* (b) needs the check to rebuild git's combination of one file for each such path, and both sides walked.
+- *Recommendation:* (b), for `.tickets/**` only, decided by the owner since it loosens DEC-421 further.
+  *Confidence:* medium.
+
+**DP-30: DEC-572 amends DEC-421 without naming it.**
+- *Question:* is "a ticket file both sides changed, held as one side has it" lifted, as the suite reads DEC-572?
+- *Why now:* DEC-572's third point keeps the both-sides rule for "the same acceptance test (DEC-410)" and is silent
+  on DEC-421, which made the same rule for ticket files; its second point and its description of `803f731c` speak of
+  a ticket file. One existing case is rewritten on this reading.
+- *Options:* (a) lifted for `.tickets/**`, kept for `tests/acceptance/**` (held); (b) kept for both, so DEC-572 lifts
+  nothing that is a finding today.
+- *Impact, reversibility, cost:* (b) would make the rule empty; the rewrite is two cases either way; no cost.
+- *Recommendation:* (a), and the register records DEC-572 as amending DEC-421. *Confidence:* high.
+
+**DP-31: the bound of the walk.**
+- *Question:* how many commits that brought one version does the check judge before it refuses, and does an ordinary
+  merge commit on that side count?
+- *Why now:* the check runs in a hook with a time limit; an unbounded walk can pass over a move in silence (the
+  eleventh batch's finding).
+- *Options:* (a) 50, counting every commit whose content of the path differs from one of its parents, merge commits
+  included (held); (b) another number; (c) count only commits that are not merge commits, and merge commits that
+  hold the path unlike every parent: fewer commits, but a merge commit on that side that dropped a change of the path
+  is then not looked at.
+- *Impact:* with (a) a long-lived integration branch can reach the bound by ordinary merges of other tickets'
+  branches; the merge is then a finding, never passed in silence.
+- *Reversibility:* full; one number in one case file. *Cost:* none beyond the walk.
+- *Recommendation:* (a) until a real history reaches it. *Confidence:* medium.
+
+**DP-32: the stricter readings of "every commit that brought that version passes the check".**
+- *Question:* three readings the decision's words leave open, each held in its stricter form: (1) a commit passes
+  only when it is no finding at all, not only no finding for the path; (2) the lift is not applied to a merge commit
+  among the commits that brought the version, so a version that reached the side through an earlier lifted merge
+  stays a finding, named with that merge commit, although that merge commit judged alone is none; (3) with several
+  merge bases, or none, nothing is lifted.
+- *Why now:* each decides cases of this batch.
+- *Options:* per point, the stricter form (held) or the wider: (1) no finding that names the path; (2) the merge
+  commit is judged as the check judges it, this rule included, to a bounded depth; (3) the side is every commit in
+  that parent's history that is in no other parent's.
+- *Impact:* (2) is the one ordinary work can meet: a ticket file changed again on both sides after an earlier lifted
+  merge was merged back. *Reversibility:* full. *Cost:* the wider form of (2) needs a bound on depth as well.
+- *Recommendation:* keep all three stricter forms; revisit (2) if it is met. *Confidence:* medium.
 
 ## Earlier suites
 
