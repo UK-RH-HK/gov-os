@@ -279,14 +279,169 @@ def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(tmp_path, a
             f"{rel}: the dependency proof records no citer although {kept} cites the store ({proof!r})"
 
 
-def test_a_record_that_is_not_active_does_not_keep_the_store(tmp_path, adopt_in):
-    """"No active record or rule cites it": a deprecated record's citation is no dependency."""
-    citer = support.record_text("DEC-401", "decision", "DEPRECATED", "An older vote rule.", depends_on=["LEG-002"])
-    project = support.build_project(tmp_path / "cited-by-deprecated", extra={"spec/decisions/dec-401.md": citer})
+# --- how a citation is written, and which records still stand (DEC-552) ---
+
+STORE_RECORD_FILE, STORE_INDEX = support.MEMORY_FILES[1], support.MEMORY_FILES[2]
+STORE_ID, OTHER_STORE_ID = support.MEMORY_DECISION_IDS
+KEPT_CITER = ".windsurfrules"
+FOLDER = "harbour"                       # the folder the project of each of these cases is built in
+SAME_NAME_ELSEWHERE = "docs/" + STORE_INDEX.split("/", 1)[1]       # another folder's file of the same name
+STATUS_CITER, STATUS_CITER_ID = "spec/decisions/dec-401.md", "DEC-401"
+NO_STATUS = None
+
+# What the dependency proof sees today, by the kind of citation: the refusals the new forms are held against.
+SEEN_TODAY = {
+    "path": f"Before a vote, read {STORE_INDEX}.\n",
+    "id": f"Before a vote, read {STORE_ID}.\n",
+}
+
+
+def _kept_rule_file_project(root, sentence, extra=None):
+    """The legacy project whose proposal does not retire ``KEPT_CITER``, which ends with ``sentence``."""
+    citing = support.RULE_FILES[KEPT_CITER] + sentence
+    project = support.build_project(root / FOLDER, extra={KEPT_CITER: citing, **(extra or {})})
+    entries = [item for item in support.legacy_proposal() if item["path"] != KEPT_CITER]
+    return project, entries, citing
+
+
+def _citing_record(status, by):
+    """A decision outside the store that cites it: by ``depends_on`` to one of its records, or by naming one of
+    its files in its text. ``NO_STATUS`` leaves the status out."""
+    if by == "depends_on":
+        text = support.record_text(STATUS_CITER_ID, "decision", status or "ACTIVE", "An older vote rule.",
+                                   depends_on=[OTHER_STORE_ID])
+    else:
+        text = support.record_text(STATUS_CITER_ID, "decision", status or "ACTIVE", f"See {STORE_INDEX}.")
+    if status is NO_STATUS:
+        front = support.frontmatter(text, STATUS_CITER)
+        del front["status"]
+        text = support.with_frontmatter(text, front)
+    return text
+
+
+@pytest.fixture(scope="module")
+def refusal_today(tmp_path_factory, interface):
+    """``refusal_today(kind)``: the error code and the exit code with which A8 refuses a citation it sees today,
+    measured once per kind in a project of its own, the citer named. The kinds: a kept rule file that writes the
+    bare path of a file of the store (``path``) or the bare id of one of its records (``id``); an ACTIVE record
+    that cites the store by ``depends_on`` or in its ``text``."""
+    measured = {}
+
+    def measure(kind):
+        if kind not in measured:
+            base = tmp_path_factory.mktemp("w1-41-refusal-today")
+            if kind in SEEN_TODAY:
+                project, entries, _ = _kept_rule_file_project(base, SEEN_TODAY[kind])
+                names, any_of = (KEPT_CITER,), ()
+            else:
+                project = support.build_project(base / FOLDER, extra={STATUS_CITER: _citing_record("ACTIVE", kind)})
+                entries, names, any_of = support.legacy_proposal(), (), (STATUS_CITER_ID, STATUS_CITER)
+            adoption = support.Adoption(project, support.make_sandbox(base / "sandbox"), interface)
+            adoption.through("A6", entries)
+            run = adoption.run("A8")
+            error = support.assert_refused(run, interface, *names, any_of=any_of)
+            measured[kind] = (error["code"], run.returncode)
+        return measured[kind]
+
+    return measure
+
+
+@pytest.mark.parametrize("kind", ["path", "id", "depends_on", "text"])
+def test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named(refusal_today, kind):
+    """What the cases below are held against. Green as built, and it stays green."""
+    code, exit_code = refusal_today(kind)
+    assert code and exit_code in support.REFUSAL_EXIT_CODES
+
+
+CITATION_FORMS = {
+    "the path behind ./": ("path", f"Before a vote, read ./{STORE_INDEX}.\n"),
+    "the path behind a leading / (a root-relative link)": ("path", f"Before a vote, read [memory](/{STORE_INDEX}).\n"),
+    "the path behind ../": ("path", f"Before a vote, read ../{STORE_RECORD_FILE}.\n"),
+    "the path behind a folder": ("path", f"Before a vote, read {FOLDER}/{STORE_INDEX}.\n"),
+    "a record id behind a folder": ("id", f"Before a vote, read decisions/{STORE_ID}.\n"),
+}
+
+
+@pytest.mark.parametrize("kind,sentence", list(CITATION_FORMS.values()), ids=list(CITATION_FORMS))
+def test_a_kept_rule_file_cites_the_store_however_it_writes_the_path(tmp_path, adopt_in, interface, refusal_today,
+                                                                     kind, sentence):
+    """A rule file the path map keeps names a file of the store as seen from the project's root, from a folder
+    of the project or from the folder above it, or names one of the store's records behind a folder. It is the
+    citation the bare path and the bare id are: A8 refuses as it refuses those, names the rule file, and every
+    file of the store stays."""
+    project, entries, citing = _kept_rule_file_project(tmp_path, sentence)
+    adoption, baseline = _before_a8(adopt_in, project, entries)
+    assert adoption.map_entries()[KEPT_CITER].get("action") == "KEEP", f"the path map does not keep {KEPT_CITER}"
+    run = adoption.run("A8")
+    _not_retired(run, project, interface, baseline, [*support.MEMORY_FILES, KEPT_CITER], KEPT_CITER)
+    error = support.assert_refused(run, interface, KEPT_CITER)
+    assert (error["code"], run.returncode) == refusal_today(kind), \
+        f"not the refusal a bare {kind} gets ({refusal_today(kind)})\n{run.describe()}"
+    assert (project / KEPT_CITER).read_text(encoding="utf-8") == citing, f"{KEPT_CITER}, which is kept, changed"
+
+
+NO_CITATION = {
+    "another folder's file of the same name": f"Before a vote, read {SAME_NAME_ELSEWHERE}.\n",
+    "a folder whose name only ends as the store's first folder does": f"Before a vote, read old{STORE_INDEX}.\n",
+    "an id that only begins with an id of the store": f"Before a vote, read {STORE_ID}1.\n",
+}
+
+
+@pytest.mark.parametrize("sentence", list(NO_CITATION.values()), ids=list(NO_CITATION))
+def test_a_longer_path_or_id_that_only_contains_the_stores_is_no_citation(tmp_path, adopt_in, sentence):
+    """The store's whole path is not the end of the path the kept rule file writes, counted in whole folders,
+    and the id it writes is another id. Nothing cites the store: it is retired, and the kept file stays."""
+    assert not any(("/" + SAME_NAME_ELSEWHERE).endswith("/" + rel) for rel in support.MEMORY_FILES)
+    project, entries, citing = _kept_rule_file_project(
+        tmp_path, sentence, extra={SAME_NAME_ELSEWHERE: "# Memory aids\n\nHow the tide tables are remembered.\n"})
+    adoption = adopt_in(project)
+    adoption.through("A8", entries)
+    left = [rel for rel in support.MEMORY_FILES if rel in support.tree(project) or (project / rel).exists()]
+    assert not left, f"the store was kept for a path or an id that is not its own: {left}"
+    assert (project / KEPT_CITER).read_text(encoding="utf-8") == citing, f"{KEPT_CITER}, which is kept, changed"
+
+
+# A record holds the store back unless its status says that it no longer stands. Three statuses say so.
+STILL_STANDS = {                         # status -> (how it cites, the kind of today's refusal it is held against)
+    "ACCEPTED": ("depends_on", "depends_on"),
+    "PROPOSED": ("text", "text"),
+    "DRAFT": ("depends_on", "depends_on"),
+    "DEPRECATED": ("depends_on", "depends_on"),
+    "no status": ("text", None),
+    "a status nobody knows": ("depends_on", None),
+}
+STATUS_OF_ROW = {"no status": NO_STATUS, "a status nobody knows": "LINGERING"}
+NO_LONGER_STANDS = {"SUPERSEDED": "depends_on", "RETIRED": "text", "REJECTED": "depends_on"}
+
+
+@pytest.mark.parametrize("row", list(STILL_STANDS))
+def test_a_record_that_still_stands_keeps_the_store(tmp_path, adopt_in, interface, refusal_today, row):
+    """"No active record or rule cites it", the stricter reading: every record counts whose status does not say
+    that it no longer stands. An accepted, a proposed, a draft and a deprecated record that cites the store make
+    A8 refuse as an ACTIVE one does; a record without a status, or with a status nobody knows, is never taken for
+    one that no longer stands (the refusal's code is left open for those two). The store stays, the record is
+    named."""
+    by, held_against = STILL_STANDS[row]
+    project = support.build_project(tmp_path / FOLDER,
+                                    extra={STATUS_CITER: _citing_record(STATUS_OF_ROW.get(row, row), by)})
+    adoption, baseline = _before_a8(adopt_in, project)
+    run = adoption.run("A8")
+    _not_retired(run, project, interface, baseline, list(support.MEMORY_FILES))
+    error = support.assert_refused(run, interface, any_of=(STATUS_CITER_ID, STATUS_CITER))
+    if held_against is not None:
+        assert (error["code"], run.returncode) == refusal_today(held_against), \
+            f"not the refusal an ACTIVE record gets ({refusal_today(held_against)})\n{run.describe()}"
+
+
+@pytest.mark.parametrize("status", list(NO_LONGER_STANDS))
+def test_a_record_that_no_longer_stands_does_not_keep_the_store(tmp_path, adopt_in, status):
+    """A superseded, a retired and a rejected record's citation is no dependency: the store is retired."""
+    project = support.build_project(tmp_path / FOLDER,
+                                    extra={STATUS_CITER: _citing_record(status, NO_LONGER_STANDS[status])})
     adoption = adopt_in(project)
     adoption.through("A8", support.legacy_proposal())
-    left = [rel for rel in support.MEMORY_FILES if rel in support.tree(project)]
-    assert not left, f"the store was kept for a record that is not active: {left}"
+    left = [rel for rel in support.MEMORY_FILES if rel in support.tree(project) or (project / rel).exists()]
+    assert not left, f"the store was kept for a record whose status ({status}) says it no longer stands: {left}"
 
 
 def test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency(tmp_path, adopt_in, interface):

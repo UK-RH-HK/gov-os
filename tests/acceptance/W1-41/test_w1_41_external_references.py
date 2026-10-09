@@ -237,6 +237,62 @@ def test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external(api, 
 
 
 # --------------------------------------------------------------------------
+# All-external sources beside dependencies: a dependency that was read is not a source that was read (DEC-552)
+# --------------------------------------------------------------------------
+
+TK_BESIDE = "TK-H9-BESIDE"               # written by the case: its sources, and what it depends on
+BESIDE = {                               # what the ticket names beside its sources: the key -> the ids
+    "a dependency ticket by depends_on": {"depends_on": [TK_RECORDS]},
+    "a dependency ticket by deps": {"deps": [TK_RECORDS]},
+    "a record that is no ticket by depends_on (package P-14)": {"depends_on": [support.ADR_ID]},
+}
+
+
+def _beside(api, project, sources, dependencies):
+    """Adds the ticket ``TK_BESIDE`` to the project, commits and loads the store again. Every id it depends on is
+    a record of the store that the context reads: the same ids, declared alone, give a packet that holds them."""
+    C.write(project, f".tickets/{TK_BESIDE}.md", C.ticket_file(TK_BESIDE, sources=sources, **dependencies))
+    C.write(project, ".tickets/TK-H9-ALONE.md", C.ticket_file("TK-H9-ALONE", **dependencies))
+    support.set_references(api, project, message="a ticket with dependencies")
+    named = sorted(item for ids in dependencies.values() for item in ids)
+    read = _ids(_packet(api, project, "TK-H9-ALONE")[C.K_MANDATORY])
+    assert sorted(read) == named, f"the case's dependencies {named} are not what the context reads: {read}"
+    return project
+
+
+@pytest.mark.parametrize("dependencies", list(BESIDE.values()), ids=list(BESIDE))
+def test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies(api, quay, dependencies):
+    """Its sources are all listed and none is a record; what it depends on exists and is read. The refusal is the
+    one the ticket gets without dependencies: BLOCKED, the ticket and every external id named, the message says
+    that all are external and none was read. From the command and from the function."""
+    project = _beside(api, quay(), [EXT, EXT_2], dependencies)
+    error = _blocked(api, project, TK_BESIDE, TK_BESIDE, EXT, EXT_2)
+    _says_that_nothing_was_read(error.get("message"), TK_BESIDE)
+    error = _blocked_by_the_function(api, project, TK_BESIDE, TK_BESIDE, EXT, EXT_2)
+    _says_that_nothing_was_read(error["message"], TK_BESIDE)
+
+
+@pytest.mark.parametrize("dependencies", [{}] + list(BESIDE.values())[:2],
+                         ids=["no dependency", "by depends_on", "by deps"])
+def test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies(api, quay, dependencies):
+    """One of its sources is a record, the others are external: the packet is built as it is today, the record
+    among its mandatory inputs with its content hash and the external ids under their own key, in the ticket's
+    order. Green as built, and it stays green."""
+    project = quay()
+    if dependencies:
+        _beside(api, project, [EXT, support.CHARTER_ID, EXT_2], dependencies)
+    else:
+        C.write(project, f".tickets/{TK_BESIDE}.md", C.ticket_file(TK_BESIDE, sources=[EXT, support.CHARTER_ID, EXT_2]))
+        support.set_references(api, project, message="a ticket without dependencies")
+    packet = _packet(api, project, TK_BESIDE)
+    assert _ids(_external(packet)) == [EXT, EXT_2], f"the external references of {TK_BESIDE}: {_external(packet)}"
+    (charter,) = [item for item in packet[C.K_MANDATORY] if item[C.M_ID] == support.CHARTER_ID]
+    assert charter[C.M_SHA] == hashlib.sha256((project / support.CHARTER_REL).read_bytes()).hexdigest()
+    assert not {EXT, EXT_2} & set(_ids(packet[C.K_MANDATORY])), "an external id stands among the mandatory inputs"
+    assert C.check_packet(api.context(project, TK_BESIDE)) == packet, "the function gives another packet"
+
+
+# --------------------------------------------------------------------------
 # An id that is neither a record nor listed blocks as before
 # --------------------------------------------------------------------------
 

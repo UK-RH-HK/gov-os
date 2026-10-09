@@ -6,13 +6,14 @@ CAP-44.b, CAP-44.c, CAP-44.d, CAP-44.e, CAP-44.j, and CAP-15.c for the ticket's 
 Written by the Independent Test Designer (MR-3, DEC-069) before implementation, from the ticket's KPI lines, the
 Contract items they cite, DEC-006, DEC-090, DEC-137, DEC-449, DEC-454, DEC-488, DEC-499, DEC-517, and the READMEs and
 code of the suites the stages stand on. The ninth success line and the rows of DEC-535 were added later, from
-DEC-473, DEC-511, DEC-519, DEC-520, DEC-521, DEC-523, DEC-535 and W1-24's README. No earlier ticket's test was
-rewritten.
+DEC-473, DEC-511, DEC-519, DEC-520, DEC-521, DEC-523, DEC-535 and W1-24's README. The cases of DEC-552 (the
+forms of a citation, the records that still stand, all-external sources beside dependencies) were added after the
+reviewer's probe. No earlier ticket's test was rewritten; one case of this suite was (below, "Success 5").
 
 Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-41 -q -p no:cacheprovider -rs`
 
-**156 cases in 8 files** (154 without the two `local_only` dev-tier cases): the 114 of the adoption tool, 3 rows
-for DEC-535, and 39 for the ninth success line. Standard library, PyYAML, pytest, W1-07's support, and W1-24's
+**182 cases in 8 files** (180 without the two `local_only` dev-tier cases): the 134 of the adoption tool (52 of
+them in `test_w1_41_legacy.py`), 3 rows for DEC-535, and 45 for the ninth success line. Standard library, PyYAML, pytest, W1-07's support, and W1-24's
 support for the context. No network, no model.
 
 **This ticket builds the tool. It adopts nothing.** Every case runs `gov adopt --lite` on a project the case
@@ -55,6 +56,23 @@ absence.
 declared ids are all external, all 3 failed**, the 36 before them passed (3 failed, 36 passed in 9 s). Each is red
 for its own reason: the context is built, exit code 0, with `mandatory: []`, `tokens: 0` and the ids under
 `external` (package P-13). Run against a stand-in kept outside the tree (and not committed), all 39 pass.
+
+**Added on `8463aeb5`, after the reviewer's probe (DEC-552; measured in the sandbox).** 27 rows added, one case
+rewritten; the suite went from 156 to 182 cases.
+
+- `test_w1_41_legacy.py`: **10 failed, 42 passed** in about 4 minutes. Red, each for a reason of its own (A8
+  reports success, exit code 0, and lists the three files of the store under `retired`): the 5 rows of
+  `test_a_kept_rule_file_cites_the_store_however_it_writes_the_path` (the answer does not name the kept rule
+  file), and the rows `ACCEPTED`, `PROPOSED`, `DRAFT`, `DEPRECATED` and "a status nobody knows" of
+  `test_a_record_that_still_stands_keeps_the_store` ("retired although it must not be"). Green as built, and they
+  stay green: the 4 rows of `test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named`, the 3 rows of
+  `test_a_longer_path_or_id_that_only_contains_the_stores_is_no_citation`, the row "no status" of
+  `test_a_record_that_still_stands_keeps_the_store`, and the 3 rows of
+  `test_a_record_that_no_longer_stands_does_not_keep_the_store`.
+- `test_w1_41_external_references.py`: **3 failed, 42 passed** in 8 s. Red: the 3 rows of
+  `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` (the packet is built, exit code
+  0, the dependency among its mandatory inputs with the reason "declared in sources", the ids under `external`).
+  Green, and they stay green: the 3 rows of `test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies`.
 
 ## Sources that could not be read
 
@@ -260,7 +278,11 @@ accepted. The project is the harbour project with `code_intelligence: {enabled: 
 `test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (2: `.windsurfrules`, `.cursorrules`; a legacy
 rule file the proposal does not retire, so the path map keeps it and it stays loaded after A8, that names a file of
 the store),
-`test_a_record_that_is_not_active_does_not_keep_the_store`,
+`test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named` (4),
+`test_a_kept_rule_file_cites_the_store_however_it_writes_the_path` (5),
+`test_a_longer_path_or_id_that_only_contains_the_stores_is_no_citation` (3),
+`test_a_record_that_still_stands_keeps_the_store` (6),
+`test_a_record_that_no_longer_stands_does_not_keep_the_store` (3),
 `test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency`,
 `test_the_retirement_of_the_memory_store_is_a_cit_e` (a committed record of type `change-execution-record`, the
 form of `docs/changes/S2-CIT-E.md`, that names every retired file),
@@ -270,6 +292,42 @@ In the "not retired" cases the stage's exit code is left open (it may retire the
 whole); what is held is that the files stay and the citer is named. In the kept-rule-file case
 the kept file stays as it was too, and where the stage reports success its record's `dependency_proof.citers` is not
 the empty list. Two of the five kinds are held, not every kind.
+
+**How a citation is written (DEC-552, finding 1).** A rule file the path map keeps (`.windsurfrules`) cites the
+store whatever stands before the store's path or before the id of one of its records. Each row's project is built
+in a folder named `harbour`.
+
+| The kept rule file writes | Held |
+|---|---|
+| `./legacy/memory/index.md` | a citation |
+| `[memory](/legacy/memory/index.md)` (a root-relative link) | a citation |
+| `../legacy/memory/decisions/leg-002.md` | a citation |
+| `harbour/legacy/memory/index.md` (the path as seen from the folder above the project) | a citation |
+| `decisions/LEG-001` (a record id behind a folder) | a citation |
+| `docs/memory/index.md` (another folder's file of the same name; the file exists in the project) | no citation: the store is retired |
+| `oldlegacy/memory/index.md` (the store's path ends it, but not at a folder's boundary) | no citation: the store is retired |
+| `LEG-0011` (an id that only begins with an id of the store) | no citation: the store is retired |
+
+For a citation, A8 **refuses**: `ok: false`, the rule file named in the error object, and the error code and the
+exit code are the ones A8 gives today for the bare path (`legacy/memory/index.md`) or the bare id (`LEG-001`) in
+the same rule file. The cases measure that refusal in a project of their own
+(`test_a_citation_the_proof_sees_today_is_refused_and_the_citer_named`) and name no code. Every file of the store
+and the kept file stay as they were. Here the exit code is not left open.
+
+**Which records count (DEC-552, finding 6; the stricter reading of "no active record").** A record outside the
+store that cites it (by `depends_on` to a record of the store, or by naming a file of the store in its text) holds
+the store back unless its status says that it no longer stands. Three statuses say so: `SUPERSEDED`, `RETIRED`,
+`REJECTED`; a record with one of them does not keep the store. Every other status keeps it: `ACCEPTED`,
+`PROPOSED`, `DRAFT` and `DEPRECATED` are refused as an `ACTIVE` record is (the same error code and exit code,
+measured as above; the record named by its id or its path in the error object). A record with no `status` key and
+one with a status nobody knows (`LINGERING`) keep the store too and are named; for those two the refusal's code is
+left open (the tool may refuse them as records it cannot judge).
+
+**Rewritten (Rewrite-Reason: stricter reading decided after the probe, DEC-552):**
+`test_a_record_that_is_not_active_does_not_keep_the_store` held that a `DEPRECATED` record's citation is no
+dependency. `DEPRECATED` is not one of the three statuses, so that record now keeps the store: the case became the
+row `DEPRECATED` of `test_a_record_that_still_stands_keeps_the_store`, and what it held for a record that no
+longer stands is held by `test_a_record_that_no_longer_stands_does_not_keep_the_store`.
 
 ### Success 6 — archive policy [CAP-42.c]
 
@@ -294,9 +352,9 @@ DELETE_FROM_ACTIVE_TREE), `test_an_unknown_artefact_blocks_the_whole_destructive
 
 ### Success 9 — the context and sources that live outside the repository [CAP-15.c; DEC-511, DEC-520]
 
-`test_w1_41_external_references.py`, 39 cases. Reached through the public interface only: the command
+`test_w1_41_external_references.py`, 45 cases. Reached through the public interface only: the command
 `gov context --json --root <project> [--brief] <ticket>` for the main rows, the function
-`gov.context.context(root, ticket, ...)` for six. Every case builds the "quay" project in its own temporary
+`gov.context.context(root, ticket, ...)` for twelve. Every case builds the "quay" project in its own temporary
 folder (a charter `CHARTER-H9`, a decision `ADR-H9-A`, a superseded decision `ADR-H9-OLD`, nine tickets, a path
 map written from the kernel's schema), commits it and loads its record store there, as W1-24's cases do. No index
 is built. Each point below is the cases' reading; the engineer may dispute any of them through the lead.
@@ -358,6 +416,18 @@ declared input is external and none was read, which neither the refusal of a mis
 without inputs says. A ticket that declares at least one record beside its external references is built, as the
 rows above hold.
 
+**All-external sources beside dependencies (DEC-552, finding 8).** A dependency that was read is not a source
+that was read. The ticket's `sources` are all listed and none is a record; beside them it names, by `depends_on`
+or by `deps`, a ticket of the project that exists and that the context reads (the case first asks for the context
+of a ticket that names the same dependency and no source, and finds the dependency among its mandatory inputs).
+The refusal is the one above, from the command and from the function: `BLOCKED`, the ticket and every external id
+named, the message holds "external" and "read". A third row holds the same where `depends_on` names a record that
+is no ticket (a decision): the stricter reading, package P-14. A ticket with at least one source that is a record
+is built as before, with or without dependencies: the record among its mandatory inputs with its content hash,
+the external ids under `external` in the ticket's order, none of them among the mandatory inputs, and the
+function gives the command's packet. What stands in `mandatory` beside the record is not held. Nothing is held
+here for a ticket without external ids: that is W1-24's.
+
 | Clause | Tests (`external_references`) | Against the context as it stands |
 |---|---|---|
 | a listed id is accepted: the context is built, the other declared ids are its mandatory inputs | `test_the_context_of_a_ticket_that_declares_a_listed_id_is_built` | red: `BLOCKED`, the listed id reported as not found in the store |
@@ -367,6 +437,8 @@ rows above hold.
 | the summary of `--brief` says the source was not read; the brief file is the packet | `test_the_brief_says_that_the_external_source_was_not_read` | red: the same |
 | the hash covers it: the same project gives the same packet twice; a change of the entry's `location` or `reason` changes the hash | `test_the_same_project_gives_the_same_hash_twice`, `test_a_change_of_the_listed_entry_changes_the_packets_hash` (2) | red: the same |
 | a ticket whose declared ids are all external is refused: `BLOCKED`, the ticket and every external id named, the message says that all are external and none was read (package P-13) | `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2: one external id; several), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` | red: the packet is built, exit code 0, with no mandatory item, 0 tokens and the ids under `external` |
+| … whether or not the ticket also names dependencies that were read (DEC-552; package P-14 for the third row) | `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` (3: a dependency ticket by `depends_on`; by `deps`; a record that is no ticket by `depends_on`) | red (measured after the row above was built): the packet is built, exit code 0, the dependency in `mandatory`, the ids under `external` |
+| … and a ticket with a source that was read is built beside them | `test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies` (3: no dependency; by `depends_on`; by `deps`) | **green as built, and stays green** |
 | unlisted stays blocked, the id named | `test_an_id_that_is_neither_a_record_nor_listed_stays_blocked` | **green, and stays green** |
 | … also beside a listed id | `test_an_unlisted_id_blocks_a_ticket_that_also_declares_a_listed_one` | red: the error names the listed id as missing and stops before the unlisted one |
 | the list never hides a record: a listed id that is a record stands among the mandatory inputs with its hash and is not reported as external | `test_a_listed_id_that_is_a_record_is_the_stores_record` | red: `BLOCKED` on the external id the ticket declares beside it |
@@ -420,6 +492,9 @@ rows above hold.
 | the chat database cannot be read | `legacy`: `test_a_chat_database_that_cannot_be_read_is_not_retired` | a retirement |
 | a record cannot be read | `legacy`: `test_a_record_that_cannot_be_read_is_no_proof_of_no_dependency` | "no citer", a retirement |
 | a rule file that stays in the tree lies outside `.rulesync/` (a kept legacy rule file) | `legacy`: `test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired` (2) | "no citer" about a rule file that was not read, a retirement |
+| a kept rule file writes the store's path behind `./`, `/`, `../` or a folder, or one of its ids behind a folder | `legacy`: `test_a_kept_rule_file_cites_the_store_however_it_writes_the_path` (5) | "no citer" because the citation is not written as the proof expects it, a retirement |
+| a record that cites the store has no status, or a status nobody knows | `legacy`: `test_a_record_that_still_stands_keeps_the_store` (the rows "no status" and "a status nobody knows") | "it no longer stands", a retirement |
+| the ticket's sources are all external and only its dependencies were read | `external_references`: `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` (3) | a packet that holds no source, a context hash for a close |
 | the plan (A4) is not the plan of the path map the verdict is about | `verdict`: `test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed` (2) | a pass for the plan, a move |
 
 ### Covers → tests
@@ -429,9 +504,9 @@ rows above hold.
 | CAP-06.b | `path_map` (the eight actions) |
 | CAP-06.c | `unknown` |
 | CAP-06.d | `path_map` (importers, references, consumers; the plan's handling; no MOVE, RENAME, SPLIT, MERGE or EXTRACT where code intelligence is off) |
-| CAP-15.c | `external_references` (a listed id is accepted and reported as external; an unlisted one, a superseded record and a defective file block; a ticket whose ids are all external is refused) |
+| CAP-15.c | `external_references` (a listed id is accepted and reported as external; an unlisted one, a superseded record and a defective file block; a ticket whose ids are all external is refused, and so is one whose sources are all external beside dependencies that were read) |
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
-| CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer; CIT-E; index refresh) |
+| CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer, in every form it writes the path or the id, and with every record that still stands as citer; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
 | CAP-44.b | `baseline`, `path_map` (A4), `unknown` (packages), `dev_tier` |
 | CAP-44.c | `verdict` (the verdict; the plan that is not the audited path map's) |
@@ -451,11 +526,12 @@ rows above hold.
   reaches A3 with a move (the eight actions, importers/references/consumers, the justified native move, A4's
   batches), and `test_an_unknown_artefact_blocks_the_whole_destructive_migration`.
 - **Everything else** (baseline, the A3 refusals, unknown artefacts, all of `legacy`, the dev tier) proposes no
-  move, or is refused before one is examined. The two kept-rule-file cases are among them: they run in the sandbox.
+  move, or is refused before one is examined. The two kept-rule-file cases and the cases of DEC-552 are among them:
+  they run in the sandbox.
 - **The six cases of DEC-517 and the three rows of DEC-535 run inside the sandbox.** Their project turns code
   intelligence off, so no code index is built or read: the moves are refused at A3, and the proposal that moves
   nothing needs no code graph.
-- **The 39 cases of the ninth success line run inside the sandbox.** They need no code index and no `gitleaks`:
+- **The 45 cases of the ninth success line run inside the sandbox.** They need no code index and no `gitleaks`:
   the record store of the case's own project is loaded, no index is built.
 - **b-dev.** A clone of `~/gov-os-workbench/synthetic/b-dev` into the session's temporary folder was made in this
   sandbox (149 tracked files; it tracks `AGENTS.md`, `.cursorrules` and `.windsurfrules`). The two dev-tier cases
@@ -482,3 +558,4 @@ rows above hold.
 | P-11 | Does a defective external references file block every ticket's context, or only that of a ticket that declares an id the store does not hold? | every ticket (the stricter reading): `test_a_defective_file_blocks_a_ticket_whose_ids_are_all_records_too` (2) |
 | P-12 | Is a listed id of the form `DEC-<digits>` refused in every project, or only where it is an entry of the register the project names? | every project, by the form alone: the second row of `test_a_listed_id_of_the_decision_registers_form_is_refused` |
 | P-13 | A ticket whose declared ids are all external references (none is a record of the store): is its context refused, or built with a packet that says nothing was read? | refused (the stricter reading): `BLOCKED`, the ticket and the external ids named, the message says that all are external and none was read: `test_a_ticket_whose_declared_ids_are_all_external_is_refused` (2), `test_the_function_refuses_a_ticket_whose_declared_ids_are_all_external` |
+| P-14 | A ticket whose sources are all external names, by `depends_on`, a record that is no ticket (W1-24 resolves the ids of `depends_on` as mandatory inputs): is it refused as beside a dependency ticket, or built because a record was read? | refused (the stricter reading; DEC-552: "a dependency that was read is not a source that was read"): the third row of `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` |
