@@ -6154,3 +6154,95 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.161 | 2026-10-09 | Delegated: DEC-569 (the follow-up after W1-41 runs on W1-30's ticket, reopened, FULL with its own probe; its pieces by decision; the paths it adds). Next free id: DEC-570. |
+
+## 162. Delegated: the probe of W1-02's root-search round (register v0.162, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-570 — W1-02's round of DEC-557: the probe is judged pass with one fix round, stricter-only
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only; told to the owner, who may replace it) · **Basis:** the probe's return (`log/W1-02-probe4.json`, session `ea1c1fed-b545-4461-b029-09dae6731851`, at `dc9fda16`, code `02d0b35b`; each finding reproduced on a stand-in project) · **Under:** DEC-498, DEC-137, DEC-557, DEC-562
+- **Decision:** DEC-498 orders a fix before the merge for a hole in a shape ordinary work produces. The probe found such shapes, so one fix round is built before the merge, test designer first, each point refusing more than today:
+  - **A root search with a numbered redirect** (`2>/dev/null`, `2>&1`, `1>file`) is refused like the same search without it: the number of a redirect is no path. (The probe's A1; ordinary work types it constantly.)
+  - **A search after a shell keyword** (`do`, `then`, `else`, `if`, `while`, `until`, and a `!` in front) is judged as the search it is. (A2.)
+  - **Daily spellings:** a comment after the search is no path; `ls` and `grep` option groups that hold a digit beside the recursive letter; `egrep` and `fgrep`; a search behind `timeout`, `command`, `env`, `nice`, `nohup` or `time`. (A3, and `time` of A4.)
+  - **A brace word that expands past the bound is refused**, not judged unexpanded. (A5; a deliberate shape, but one line.)
+  - **Time.** The harness lets a call through when the hook passes its time limit (DEC-110, DEC-179), so a slow decision fails open. The probe found decisions of 1 to 190 seconds for inputs under the round's bounds (long paths times many filters or expansions; many fed searches in one command). The rule's work is bounded by count times length, or the input is refused; the test designer states the bound as a time with a wide margin for a loaded machine.
+  - **Residuals, not built:** `find` with a name test (it prints names; what reads them is the run-time-name residual already recorded); valued options the rule does not list; a search in a brace group, in a shell started with `-c`, behind `xargs`, or with a substitution as its path; a file-tool path that is not text; a line of a here-document's body that reads as a search is refused (the way round is the file tool); `rg --type-list`.
+  - **Told to the owner, as built:** a type filter with no path (`rg -t py <word>` from the root) is refused, as DEC-557's wording "no path or glob" gives it; the refusal names the way round (`-g '*.py'`).
+  - **No second probe** if the fix round's product diff only adds refusals and is small enough for the lead and the orchestrator to read line by line (DEC-552's precedent); otherwise a second probe before the merge.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.162 | 2026-10-09 | Delegated, stricter-only: DEC-570 (the probe of W1-02's root-search round is judged pass with one fix round: numbered redirects, searches after shell keywords, daily spellings, a brace word past the bound, bounded decision time). Next free id: DEC-571. |
+
+## 163. Delegated: the fix round of W1-02's root-search round merges without a second probe (register v0.163, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-571 — W1-02's fix round after the probe: read line by line, stricter-only, no second probe
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only; the lead's reading and the orchestrator's agree) · **Basis:** the lead's return at `02f0294d` (`log/W1-02-lead-run5.json`: code at `10e6ef39`; 2762 cases in the suite, every acceptance suite and 1804 unit tests green; over three seeds of 420,000 random calls no call that was refused is now allowed; the probe's thirteen slow inputs answer in under 0.4 s) and the orchestrator's own reading of `git diff 033bbbca 02f0294d -- src/` · **Under:** DEC-570, DEC-498, DEC-552
+- **Decision:**
+  - DEC-570's condition holds: the product diff is 127 lines added and 22 removed in one file, and every changed line adds refusals or does the same work with the same answer. The one line that alone would loosen (a path is no longer resolved once a call's paths hold more than 131,072 folders) sets in the same statement the mark that refuses the call. No second probe.
+  - **Refused beyond what was ordered, kept as built (stricter):** a quoted word whose brace groups expand past the bound (inline JSON or a script with many brace groups: put it in a file); a digit word directly before a redirect in a search is read as the redirect's number; a call whose paths together hold more than 131,072 folders; `find` and `ls` behind a keyword or prefix.
+  - The designer's point on `mkdir -p` with a brace word under the scratch folder (denied today by the write rule, not by this round) changes nothing; allowing it would loosen the write rule and is not proposed.
+  - The residuals of the round (the lead's 36 to 51) go to `governance/project/bootstrap.md`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.163 | 2026-10-09 | Delegated, stricter-only: DEC-571 (W1-02's fix round after the probe is read line by line and merges without a second probe; four stricter behaviours kept as built). Next free id: DEC-572. |
+
+## 164. Owner answers to P-26, P-27 and P-28, on the type filter, on three delegated decisions, on the guard's scope for the rest of Wave 1, and a delegated experiment on a hook's time limit (register v0.164, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-572 — P-26: `803f731c` is a named exception and W1-41 closes; a merge commit's file that equals one parent's version is not its own change
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-26 option (a) (`log/close-W1-41.json`) · **Under:** DEC-492, DEC-519, DEC-522, DEC-410
+- **Decision:**
+  - Commit `803f731c` (the orchestrator's merge of `w1/integrate` into `w1/W1-41`, which brought the ticket file's path and KPI lines as they were committed on `w1/integrate`) is a named exception, listed for the exit auditor. W1-41 closes.
+  - In the running follow-up after W1-41, test designer first: a merge commit's file is not its own change when it equals one parent's version and every commit that brought that version passes the check.
+  - The existing rules stay as they are: a merge commit's own change under `tests/acceptance/**` or `.tickets/**` remains a finding, and so do both sides changing the same acceptance test (DEC-410).
+
+### DEC-573 — P-27: a root search is refused only where a protected file, or a copy of one, lies under the search start
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-27 option (b), as built · **Refines:** DEC-557
+- **Decision:** The guard refuses a root search only where a protected file, or a copy of one, lies under the search start. A project that holds neither refuses none.
+
+### DEC-574 — P-28: the held-out check skips path resolution for a string longer than the system path limit
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-28 option (a) (`log/W1-02-lead-run4.json`: a megabyte of path-like text in a field that is not a path takes 40 seconds and more to decide) · **Under:** DEC-570
+- **Decision:** The held-out check skips path resolution for any string longer than the system path limit, and keeps the literal substring check.
+
+### DEC-575 — A type filter with no path stays refused
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-557, DEC-570
+- **Decision:** `rg -t <type>` from the root with no path stays refused, as built; the refusal names `-g` as the way round.
+
+### DEC-576 — DEC-569, DEC-570 and DEC-571 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-09)
+- **Decision:** The orchestrator's delegated decisions DEC-569 (the follow-up after W1-41 on W1-30's ticket), DEC-570 (the probe of W1-02's root-search round, one fix round) and DEC-571 (the fix round merges without a second probe) are accepted.
+
+### DEC-577 — Guard scope for the rest of Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-498, DEC-557
+- **Decision:** After the current W1-02 round merges, there are no further guard rounds in Wave 1, except for a hole that ordinary work produces. Holes that need a deliberate shape become residuals on the Wave 2 list.
+
+### DEC-578 — Delegated experiment: what the harness does with a PreToolUse hook that passes its time limit; an explicit time limit for this repository's guard hooks
+- **Status:** ACCEPTED (owner, 2026-10-09; delegated to the orchestrator) · **Under:** DEC-102, DEC-110, DEC-179, DEC-570
+- **Decision:**
+  - Now, in a throwaway project under `/tmp`: register a PreToolUse hook that sleeps past its time limit, and record whether Claude Code allows the call, blocks it, or errors. The result is recorded as an evidence record.
+  - Then an explicit time limit is set for this repository's guard hooks in the settings, through the owner, as a line the operator applies.
+  - If a timed-out hook lets the call through, the orchestrator brings the owner one package on how the guard should fail closed.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.164 | 2026-10-09 | Owner: DEC-572 (P-26: 803f731c a named exception, W1-41 closes; a merge commit's file equal to one parent's version is not its own change), DEC-573 (P-27: a root search is refused only where a protected file or a copy lies under its start), DEC-574 (P-28: the held-out check skips path resolution for strings longer than the system path limit), DEC-575 (a type filter with no path stays refused), DEC-576 (DEC-569 to DEC-571 accepted), DEC-577 (no further guard rounds in Wave 1 except for a hole ordinary work produces), DEC-578 (delegated experiment on a hook's time limit; an explicit time limit for the guard hooks through the owner). Next free id: DEC-579. |
+
+## 165. Delegated: the packages of the follow-up after W1-41, first run (register v0.165, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-579 — The follow-up after W1-41: its packages as decided by the orchestrator, the paths of its second run, and what goes to the owner
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; as built or stricter in every point; told to the owner, who may replace it) · **Basis:** the lead's return at `2eeb9cf3` (`log/W1-30-lead-runG1.json`: 17 of 18 pieces built; units 1809 green; the whole of `tests/` green in the close's form except 11 cases that wait on packages; the serial-only entries green alone; validator ALL PASS) · **Under:** DEC-569, DEC-521, DEC-544, DEC-572, DEC-416
+- **Decision:**
+  - **Paths added for the second run:** `src/gov/tasks/**`, `tests/unit/tasks/**` (the READY rule, DEC-544); `src/gov/records/**`, `tests/unit/records/**` (the records query returns a register entry's heading and title); `src/gov/cli/checks.py`, `tests/unit/cli/**` (below); `src/gov/retrieval/retrieve_check.py` (below); `src/gov/guard/containment.py`, `tests/unit/containment/**` (DEC-572, and nothing else under the guard's paths).
+  - **READY rule (DEC-544), stricter as the designer wrote it:** a constraining package whose frontmatter cannot be read holds every ticket, since what it constrains is not known; the reason names the file (`DECISION_NOT_LOADED: <path>`).
+  - **A project whose path map names a register that is not in the commit is refused**, not read as "no register". The fixtures of the suites that copy this repository's path map into projects without the register file are repaired first by a test designer (a rewrite with its reason), with `retrieve_check.py`'s copy.
+  - **Checks in a project with an installed kernel.** `gov check` reads the check declarations, and the schema check reads the schemas, from the installed kernel as well as from the template layout: today an installed project runs no declared check. Built in the second run, test designer first. The skill validator's `--both-layouts` option is kept as built (an option of a check's module, no command).
+  - **`lock`** is recorded in the command list as the module command it is (DEC-542); no command is added.
+  - **The trailers base (DEC-482):** a base with no commit of a closed ticket after it reads as not measured, as the citations check does for its base; kept as built. An all-digit commit id written unquoted in a path map is refused; kept as built.
+  - **The two shortened daemon cases** the designer names (W1-20's case on the file that differs from `HEAD` reads its answer before the determinism case rebuilds; in W1-16's home case the second index stands between the queries and the look for index files) are accepted as not weakened; the probe looks at both.
+  - **The schema check's baseline is 11, not 15:** there were four probe records, not three. With the probe type in the schema the check stands at 11 and DEC-565 is met.
+  - **Residuals, not built:** the context hashes the whole register file for each decision; `Amends`, `Refines`, `Under` and a partial supersession give no edge; whether a refused load leaves the earlier store readable; ticket-id forms and general record-id forms are still accepted in the external list; a never-built index says nothing under `dropped`; lower-case status words still satisfy a mandatory source; the secrets scan starts about four processes per file (50 to 90 seconds of a close); and the lead's residual list.
+  - **To the owner, not decided here:** whether the probe gate refuses an orchestrator commit after the merge that names the ticket and lies outside its code (the lead's P-1); how an owner's decision in a register file is known to be the owner's (P-2: as built, only an entry brought by a commit whose only role is the owner's, which no entry of this repository's register is).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.165 | 2026-10-09 | Delegated: DEC-579 (the follow-up after W1-41, first run: paths for the second run; the READY rule's stricter readings; a named register absent from the commit refuses; checks and schemas read from an installed kernel; lock as a module command; the schema baseline is 11; residuals; two packages to the owner). Next free id: DEC-580. |
