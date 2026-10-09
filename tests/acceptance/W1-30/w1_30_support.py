@@ -123,6 +123,22 @@ PRODUCT_TRACEABILITY = "product traceability"
 
 TEMPLATE_OPENSPEC = REPO_ROOT / "template" / "openspec"
 
+# Where a project writes its settings for ``gov close`` (README, round 12, settlement 20): top-level keys of
+# its path map, the one project file every command is handed (DEC-185, DEC-479).
+PATH_MAP_REL = "governance/project/path-map.yaml"
+WORKERS_KEY = "close_workers"
+TIME_LIMIT_KEY = "close_timeout"
+# The projects of this suite set the number of parallel workers of a close small (DEC-549, P-2): a close
+# under test does not start as many workers as the machine gives inside a parallel run of the suite.
+SUITE_WORKERS = 2
+SUITE_SETTINGS = {WORKERS_KEY: SUITE_WORKERS}
+
+
+def path_map_text(settings):
+    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and no namespace (the
+    one key the loader requires of a path map)."""
+    return "namespaces: {}\n" + "".join(f"{key}: {value}\n" for key, value in settings.items())
+
 
 # --------------------------------------------------------------------------
 # The sandbox: its own home, the installed packages of the interpreter running the suite
@@ -353,13 +369,16 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
 class Project:
     """A temporary git repository that gov close can run in."""
 
-    def __init__(self, root, checks=None):
+    def __init__(self, root, checks=None, settings=SUITE_SETTINGS):
         """``checks`` is the project's own set of check declarations (``declared_check``); without it the
-        project holds a copy of the kernel's declarations."""
+        project holds a copy of the kernel's declarations. ``settings`` are the project's settings for
+        ``gov close``, written as a project writes them (``path_map_text``; a value is written as given, so
+        a case may give a wrong one); ``None`` is a project without a path map."""
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self._minute = 0
         self._checks = checks
+        self._settings = settings
         self._init_minimal()
 
     def _init_minimal(self):
@@ -370,6 +389,8 @@ class Project:
               (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         shutil.copytree(REPO_ROOT / "src", self.root / "src")
         self._copy_kernel_templates()
+        if self._settings is not None:
+            write(self.root, PATH_MAP_REL, path_map_text(self._settings))
         # The source every fixture ticket names (``sources: [DEC-000]``): without it the ticket's context
         # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
         write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
