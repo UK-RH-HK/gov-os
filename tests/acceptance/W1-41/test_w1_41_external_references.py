@@ -359,15 +359,28 @@ def test_a_file_that_is_not_of_the_stated_shape_blocks_and_is_named(api, quay, t
     _blocked(api, quay(text=text), TK_EXTERNAL, support.EXTERNAL_REFERENCES_REL)
 
 
-def test_a_file_that_cannot_be_read_blocks_and_is_named(api, quay, tmp_path):
-    if not support.can_be_made_unreadable(tmp_path):
-        pytest.skip("file permissions do not hold this user")
+def _not_text(path):
+    path.write_bytes(b"references:\n  - id: \xff\xfe\n    location: elsewhere\n    reason: kept\n")
+
+
+def _a_link(path):
+    """A link to a file of the stated shape that lists the id: followed, it would be accepted."""
+    real = path.with_name("external-references-real.yaml")
+    real.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    path.unlink()
+    path.symlink_to(real.name)
+
+
+@pytest.mark.parametrize("change", [_not_text, _a_link], ids=["not text", "a link to a file"])
+def test_a_file_that_cannot_be_read_blocks_and_is_named(api, quay, change):
+    """What the commit holds at the file's path cannot be read as the file: bytes that are no UTF-8 text, or a
+    link. (Until DEC-552's finding 9 the case took the permission to read from the working tree's file; the
+    file is read from the commit, where a permission is nothing.)"""
     project = quay()
-    restore = support.make_unreadable(project / support.EXTERNAL_REFERENCES_REL)
-    try:
-        _blocked(api, project, TK_EXTERNAL, support.EXTERNAL_REFERENCES_REL)
-    finally:
-        restore()
+    change(project / support.EXTERNAL_REFERENCES_REL)
+    C.commit(project, "the external references cannot be read")
+    api.build_store(project)
+    _blocked(api, project, TK_EXTERNAL, support.EXTERNAL_REFERENCES_REL)
 
 
 def test_the_function_names_the_defective_file_in_its_message(api, quay):
