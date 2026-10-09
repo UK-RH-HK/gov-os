@@ -1109,6 +1109,163 @@ source folder or a stand-in folder (`grep -rn gov docs`, `grep -rn -- "--off" sr
 calls from the root carry a pattern for source files, and no suite puts a NUL byte into a hook input. No decision
 package comes from the search.
 
+### Sixth batch (2026-10-09): a search program on a pipe, and a very long path
+
+Two points the cases of the fifth batch do not hold, written before any code for them exists. Every case asks the
+hook as a process, in the same stand-in world, with the starts, the bound and the assertions of
+`w1_02_round_support.py` (no line of it changed). No case needs the guard to walk a tree.
+
+Run: `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_search_on_a_pipe.py
+tests/acceptance/W1-02/test_w1_02_long_paths.py -q -p no:cacheprovider -rs`
+
+| File | Cases | Red today | Green today | Red reason | Time here |
+| --- | --- | --- | --- | --- | --- |
+| `test_w1_02_search_on_a_pipe.py` | 65 | 29 | 36 | the guard refuses an allowed form (`deny`, exit 0, the search refusal) | 3 s |
+| `test_w1_02_long_paths.py` | 33 | 27 | 6 | no answer within the bound (the hook is still running at the limit) | 3 min 40 s red (each red case waits for its limit) |
+| Together | 98 | 56 | 42 | | |
+
+With the fifth batch's four files, once, on the guard as built: 56 failed, 707 passed in 4 min 15 s (the 665 cases of
+the fifth batch all pass; the 56 are the red cases above and no other).
+
+#### Point A → `test_w1_02_search_on_a_pipe.py`
+
+**What the programs do, read on this machine.** `grep --help`: "With no FILE, read '.' if recursive, '-' otherwise";
+`man grep`: "If no FILE is given, recursive searches examine the working directory, and nonrecursive searches read
+standard input." So a recursive `grep` with no path on a pipe searches the folder, not the pipe: held as refused.
+The other search program is installed (14.1.1); its `--help` lists the usage `command | rg [OPTIONS] PATTERN`, names
+`-V, --version` and `-h, --help`, and says of `--files` "Print each file that would be searched without actually
+performing the search". Seen in a scratch folder that holds one file: on a pipe and with an input redirect, with no
+path, it prints the matching line of its standard input and none of the folder's file (also with `-g '*.py'`); on a
+pipe with `.` as its path, and with `--files`, it reads the folder; a recursive `grep` on a pipe prints the folder's
+file. As the first command of a pipeline with its input closed (`< /dev/null`) it searches the folder; with the
+standard input a session's shell gives it (no terminal) it waited on that input instead: held as refused all the
+same, by the order (nothing on the command line feeds it).
+
+Red (29), each because the guard answers `deny` with the search refusal:
+
+- `test_a_search_program_fed_by_a_pipe_or_an_input_redirect_stays_allowed_at_the_root` (11 of its 14): the reader of
+  a pipe from `git log --oneline`, from `ls`, from `cat <a named source file>` with `-n`, with the word after `-e`;
+  after `|&` and after `2>&1 |`; the second and the third command of three; an input redirect from a named source
+  file (with a space and glued); a filter that only excludes, on a pipe.
+- `test_a_search_program_fed_by_a_pipe_stays_allowed_for_every_role` (6): an engineer, the test designer and a
+  session with no role, two forms each.
+- `test_a_search_program_fed_by_a_pipe_stays_allowed_from_a_copy_s_folder` (7): from each `<P>` (sibling, nested,
+  home) the reader of a pipe and the third command of three; from the sibling an input redirect from a named file.
+- `test_the_search_program_asked_only_for_its_version_or_its_help_is_allowed_at_the_root` (4: `--version`, `-V`,
+  `--help`, `-h`) and `test_the_search_program_asked_only_for_its_version_is_allowed_for_a_session_with_no_role` (1).
+
+Checked before the cases were kept: each of the 24 pipe and redirect cases with a plain `grep` in the program's place is allowed
+today, so the red is the search program's and nothing else's.
+
+Green (36), held to stay so:
+
+- the other 3 of the first function: a name filter that includes (`-g '*.py'`, `--glob='*.py'`, `--iglob '*.PY'`)
+  on a pipe (allowed today already: such a filter keeps both files out of a search of the folder too).
+- `test_a_search_of_the_root_stays_refused_whatever_stands_before_it` (11): on a pipe with `.` or the absolute root
+  as its path; on a pipe with `--files`; the first command of a pipeline; after `||`, `&&`, `;`, and after a
+  pipeline that has ended; `grep -r`, `-rn`, `--recursive` with no path on a pipe.
+- `test_a_search_of_a_copy_s_folder_stays_refused_whatever_stands_before_it` (9: three of those forms from each
+  `<P>`), `test_a_search_of_the_root_stays_refused_for_other_roles` (2),
+  `test_the_refusal_of_a_search_on_a_pipe_with_a_path_names_the_rule_and_no_path` (1).
+- `test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_stays_refused` (8): `cat <the file> |`
+  and an input redirect, for both files, the file of the session's project and a copy in the sibling checkout; each
+  refusal says nothing of the file.
+- `test_in_a_folder_that_holds_a_protected_file_the_search_program_on_a_pipe_stays_refused` (2): as today, no change.
+
+What the guard as built decides, per form (the same from the root and from each `<P>`, for every role asked):
+
+| Form | Today |
+| --- | --- |
+| the program with no path as the reader of a pipe (`\|`, `\|&`, `2>&1 \|`, second or third of a pipeline, `-n`, `-e`) | refused |
+| the same with an input redirect from a named file | refused |
+| the same on a pipe with a filter that includes source files (`-g`, `--glob`, `--iglob`) | allowed |
+| the same on a pipe with a filter that only excludes; with `-t py` (no case) | refused |
+| `--version`, `-V`, `--help`, `-h` alone; with a word beside it (no case) | refused |
+| on a pipe with the root or `<P>` as its path; with `--files`; first of a pipeline; after `\|\|`, `&&`, `;` | refused |
+| a recursive `grep` with no path on a pipe | refused |
+| a pipe whose first command reads either file or a copy; an input redirect from either | refused (as a read) |
+| any of these in a session that stands in a folder that holds either file (version and help too) | refused |
+| a subshell as the reader of a pipe; a here-string; an input redirect from a process substitution; a background job | refused (no case) |
+| a group in braces as the reader of a pipe; `xargs`; the program behind `env` or `command`; `-` as its path; `--files` with a source filter on a pipe | allowed (no case) |
+
+#### Point B → `test_w1_02_long_paths.py`
+
+The bound and the limit are the fifth batch's (`BOUND_S` 5 s of the hook's own time, the process stopped at 8 s).
+
+Measured on the guard as built, through the hook as a process, before the cases were written:
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| 1 MB of `a/` repeated: Read path (relative and below the absolute root), Grep `path` with and without a glob, Glob `path`, Glob `pattern` before its wildcard, Write path | over 35 s | none within it |
+| 1 MB of `./` repeated: Read path, Grep `path` with a glob for source files, Glob `path`, Glob `pattern` | 13 to 14 s | allow |
+| 1 MB of `./` then a protected file's project-relative path, Read (both files) | 13 s | deny |
+| 1 MB of `./` as Grep `path` with no glob; as Glob `path` with a pattern over everything | 13 to 14 s | deny |
+| 1 MB of `./` then a file under `tests/acceptance/`, Write and Edit by an engineer | 19 to 20 s | deny (the refusal carries the resolved path) |
+| 4 MB of either (Read path; `./` then the settings file; `./` as Grep `path`) | over 35 s | none within it |
+| 64 KB / 256 KB of `a/` as a Read path | 0.4 s / 3.5 s | allow |
+| 64 KB / 256 KB of `./` as a Read path | 0.07 s / 0.6 s | allow |
+| a named file twenty folders down (Read, Grep `path`); a path with a few `./` and `../` | 0.04 to 0.18 s | allow |
+
+Red (27), each because the hook is still running at the limit:
+
+- `test_a_very_long_path_is_answered_within_the_bound` (16): 1 MB and 4 MB of a repeated folder name in each of the
+  five fields; 1 MB of the current folder repeated in four of them and 4 MB in two. A decision in time is held,
+  `allow` or a refusal.
+- `test_a_very_long_path_is_answered_within_the_bound_for_other_roles` (2).
+- `test_the_current_folder_repeated_and_then_a_protected_file_is_refused_within_the_bound` (3): both files at 1 MB,
+  the settings file at 4 MB; the refusal carries nothing of the path (a run of 64 characters of it is held absent).
+- `test_the_current_folder_repeated_as_the_start_of_a_search_is_refused_within_the_bound` (3).
+- `test_a_writing_tool_with_a_very_long_path_outside_the_role_s_paths_is_not_allowed_within_the_bound` (3): Write and
+  Edit by an engineer; "not allowed" in time, no side on the shape of the refusal.
+
+Green (6): `test_an_ordinary_deep_path_and_an_ordinary_path_with_dots_stay_allowed_within_the_bound`.
+
+No line was added to `tests/acceptance/serial-only.txt`, for the reason the fifth batch gives.
+
+**A finding, with no case (by the order): a very long string in a field that is no path.** Measured the same way,
+in the same stand-in project (it has a stand-in held-out file):
+
+| Input | Time | Decision |
+| --- | --- | --- |
+| Write, content 1 MB of `a/` repeated (the orchestrator; an engineer on a path of its own ticket) | 42.6 s; 43.7 s | allow |
+| Write, content 4 MB of `a/` repeated | over 60 s | none within it |
+| Write, content 1 MB / 4 MB of ordinary source text | 0.05 s / 0.08 s | allow |
+| Write, content of one line | 0.04 s | allow |
+| Edit, old and new text 1 MB of `a/` repeated each | over 60 s | none within it |
+| a tool the guard does not know, one field 1 MB / 4 MB of `a/` repeated | 39.8 s / over 60 s | allow / none |
+
+The cost follows the text, not the field: a megabyte of a short folder name repeated costs about as much in the
+content of a Write as in a path, and a megabyte of source text costs nothing. It is another rule's time; whether a
+bound for it is built is not decided, and no case holds it.
+
+#### Changes to the residual list
+
+Residual 39 is narrowed: a very long path in the reading tool, the search tool and the Glob tool, and in a writing
+tool outside the role's paths, is held by point B. Residuals 1 to 38 and 40 stand. Added (those a guard that reads a
+command line cannot see come first):
+
+41. What feeds a program at run time: the first command of a pipeline, or a command after `;`, `&&` or `||`, reads
+    the standard input its shell has (in a session, no terminal: the program then waits on that input and searches
+    no folder); a script, an alias or a function that pipes into the program; `exec <file` before it. Held as
+    refused where no pipe or redirect stands on the command line.
+42. A subshell or a group as the reader of a pipe, `xargs`, a here-string or a here-document into the program,
+    process substitution, a background job: no case either way, by the order. Today's decisions are in the table.
+43. Further spellings on a pipe without a case: `-t`/`--type` (refused today), `-` as the path (allowed today), a
+    name filter that names a protected file's own name on a pipe (refused today; it selects nothing on standard
+    input, and no case takes a side), `--files` with a filter (allowed today), `--pre` and `-f <file>`, the
+    program behind `env`, `command`, `sudo` or a path (`/usr/bin/…`).
+44. Version or help with anything else on the command (`--version <word>`, `-V` in a cluster, a pipeline around
+    it), and the same in a folder that holds either file: refused today; no case, by the order.
+45. Point B: a very long string in a field that is no path (the finding above); a very long path a role may write
+    (no case, by the order); long paths of other makes (`../` repeated, a long single name, a long path in a shell
+    word: the fifth batch holds 1 MB in one word); sizes above 4 MB.
+
+#### Rewrites and cases of other suites
+
+None. Searched `tests/acceptance` and `tests/unit`, `*.py`, for the search program as the reader of a pipe, with an
+input redirect, and asked for its version or help: no case holds any of them, as refused or as allowed. The fifth
+batch's own forms of that program stand without a pipe (`rg VALUE`, `rg -n VALUE`, `rg --files`, after `cd … &&`).
+
 ### Rewrites
 
 Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
