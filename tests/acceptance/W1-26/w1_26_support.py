@@ -286,6 +286,26 @@ class Project:
         if path.exists():
             path.unlink()
 
+    def reserved_command_module_files(self, command):
+        """The module files of one reserved command in this project's own copy of ``src/``."""
+        candidates = (
+            self.root / "src" / "gov" / command / "command.py",
+            self.root / "src" / "gov" / "cli" / "commands" / f"{command}.py",
+        )
+        return [path for path in candidates if path.is_file()]
+
+    def remove_reserved_command_module(self, command):
+        """Plant the defect: this project's copy holds no module file for the command.
+
+        Only the temporary project's copy is touched; the code that runs is
+        this worktree's ``src/``, which stays whole.
+        """
+        removed = self.reserved_command_module_files(command)
+        for path in removed:
+            assert REPO_ROOT not in path.resolve().parents, f"{path} is not in a temporary project"
+            path.unlink()
+        return [str(path.relative_to(self.root)) for path in removed]
+
     def add_ticket(self, ticket_id, wbs, **keys):
         write(self.root, ticket_path(ticket_id), ticket_text(ticket_id, wbs, **keys))
         tests_dir = self.root / "tests" / "acceptance" / wbs
