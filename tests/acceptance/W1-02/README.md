@@ -1724,6 +1724,227 @@ repetition: none), so none holds as refused a form this decision allows; no line
 earlier case of this suite asks the held-out check with a long string in a field that is no path (the sixth batch
 records it as "a finding, with no case").
 
+### Ninth batch (2026-10-09): the guard's own deadline (DEC-580)
+
+DEC-580: "The guard's hook program keeps its own deadline of 20 seconds and answers "refuse" when it reaches it."
+Why: the harness ends a hook at its time limit and lets the call through (`docs/research/EXP-hook-time-limit.md`,
+observed for PreToolUse), and the hook entries carry a limit of 60 seconds. A decision still running at 20 seconds
+must end as a refusal by the guard's own hand. It is the last round of the wave on the guard (DEC-577, DEC-584).
+
+Files: `test_w1_02_deadline.py` (14 cases, red), `test_w1_02_deadline_in_time.py` (12 cases, green),
+`w1_02_deadline_support.py`. No earlier file is changed but this README.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_deadline.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_deadline_in_time.py -q -p no:cacheprovider -rs
+```
+
+#### What the program does today (from the sources and measured)
+
+- It reads its input with a bound of 3 seconds. An input left open is answered after 3 s with exit code 2 and one
+  finding of the guard (kind `empty_input`; `invalid_json` when half an object had arrived). Measured: 3.1 s.
+- Before any rule on the call it clears the pending entries of the same actor in its bookkeeping folder, reads the
+  freeze flag, and starts `git` once to find where the freeze mirror is kept. That start has no time limit.
+- After the rules have allowed a Bash call it notes the state of the tree for the check after the call: four more
+  starts of `git`, each with a limit of 10 s of its own, and a counter. After an allowed Write, Edit or
+  NotebookEdit it advances the counter only. Measured: `git` is started 5 times for an allowed Bash call, once for
+  any other call.
+- A refusal by a rule is exit code 0 with one JSON object on stdout: `hookSpecificOutput` with `hookEventName`
+  `PreToolUse`, `permissionDecision` `deny` and a `permissionDecisionReason`. A failure of its own is exit code 2
+  and one line in the findings file (DEC-110). The suite's classifier reads both as "deny".
+- **It keeps no deadline over the whole decision.** Measured with the stand-ins below: a first program that does
+  not end holds the hook until the stand-in ends (no answer at 32 s); a named pipe in the bookkeeping folder holds
+  it for as long as the pipe is there; program starts of 5.5 s each end in an allow after 27.9 s; an input that
+  comes after 2 s and a first program of 19.5 s end in an allow after 21.8 s.
+
+#### How a case makes a decision slow
+
+Never by a slow machine, by a weaker rule, or by a switch in the product: the cases need nothing from the code but
+the deadline itself, and where 20 seconds must pass they are waited out. Three stand-ins, all through what the suite
+already uses to reach the hook (its environment, its input, the temporary project):
+
+1. **A stand-in for the program the hook starts** (`git`), first on the search path of the hook's environment. It
+   writes its process id to a file of the case, may start a child of its own that does the same, sleeps for the
+   time the case names, and then runs the real program with the same arguments. Which start sleeps is named by
+   its number (the first, or every one), never by its arguments. Every stand-in ends by itself after 40 s.
+2. **A named pipe in the hook's bookkeeping folder** of the temporary project: among the pending entries (read
+   before the decision), or at the counter (advanced after the rules have allowed the call). The program as built
+   waits on a pipe for ever; no process is involved. The folder's and the counter's names are imported from the
+   guard's module, not typed. This is an input no rule bounds today (residual 59).
+3. **An input that arrives late**: the whole object after 2 s, inside the program's 3-second bound.
+
+All hook processes of a module are started side by side, each in a project of its own, and each case asserts on
+one of them afterwards, so **a module waits once**. The hook's output goes to files, not pipes, so that a process
+it leaves behind cannot hold a case. The hook is started as the suite starts it, in the test's own process group:
+a program that ended its whole group at the deadline would end the test run. When a module's fixture returns,
+every stand-in process has been ended and every pipe let go.
+
+#### The bounds held
+
+| Bound | Value | Why |
+| --- | --- | --- |
+| The answer is not there before | 19 s | "Not at once": the slow step was waited for. A second under the deadline, for a clock's grain. |
+| The answer is there by | 26 s | The deadline and 6 s for a loaded machine (the earlier time cases give 5 s to a decision of well under a second). Far under the harness's 60 s. |
+| The case ends the hook's process at | 32 s | So that a run cannot hang. A hook still running then has given no answer. |
+| A stand-in ends by itself after | 40 s | Well over 26 s, well under 60 s. |
+| What the hook started is gone within | 5 s after its answer | Its own process has ended (the case waited for it). |
+| A step that ends in time | 4 s, answered by 15 s | |
+| An input left open | answered between 2.5 s and 8 s | The program's bound is 3 s. |
+
+The times are the test's clock from the start of the hook's process to its end.
+
+#### The points → tests
+
+| Point | Held by | Cases | Today |
+| --- | --- | --- | --- |
+| 1. At the deadline the program refuses, in a refusal's form, with a reason that says it could not decide in time and names DEC-580; not before 19 s, by 26 s. The whole decision counts | `test_w1_02_deadline.py::test_a_decision_still_running_at_the_deadline_is_refused` | 7 | red |
+| 1. The reason carries nothing of the call and neither protected file's path | `…::test_the_deadline_s_refusal_carries_nothing_of_the_call` (over all 12 hook processes) | 1 | red |
+| 1. Nothing the program started is left running | `…::test_nothing_the_hook_started_is_left_running_after_its_answer` (over the 10 with a stand-in program; one has a child of its own) | 1 | red |
+| 2. The program's own bound on reading its input stays | `test_w1_02_deadline_in_time.py::test_the_bound_on_reading_the_input_stays_as_it_is`; and the existing `test_w1_02_guard_failure.py::test_input_that_never_ends_is_denied_by_the_guard_s_own_deadline` | 2 | green |
+| 3. A slow step that ends in time leaves an allowed call allowed, its bookkeeping done | `…in_time.py::test_a_step_that_ends_before_the_deadline_leaves_an_allowed_call_allowed` | 2 | green |
+| 3. … and a refused call refused with its own reason | `…::test_a_step_that_ends_before_the_deadline_leaves_a_refused_call_refused_with_its_own_reason` | 1 | green |
+| 3. A refusal reached in time is never the deadline's answer | `…::test_a_refusal_reached_in_time_is_never_the_deadline_s_answer` | 2 | green |
+| 3. An internal failure keeps its exit and its finding | `…::test_an_internal_failure_keeps_its_own_answer`; and the existing `test_w1_02_guard_failure.py::test_unusable_input_is_denied_with_exit_code_2`, `…::test_unusable_input_leaves_one_finding` | 2 | green |
+| 3. An ordinary decision is not slowed down | the existing `test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms` (p95 under 100 ms over 40 hook processes), unchanged; nothing is added to it | (5) | green |
+| 3. Every earlier case stays as it is | no line of an earlier test file is changed | | |
+| 4. Nothing a session can set raises the deadline or switches it off | `test_w1_02_deadline.py::test_nothing_a_session_can_set_raises_the_deadline_or_switches_it_off` | 5 | red |
+| 4. A tiny limit named stops no work | `…in_time.py::test_a_tiny_limit_named_stops_no_work` | 3 | green |
+
+**Where the slow step sits in the seven cases of point 1.** Each call is one the rules allow.
+
+| Case | Tool, who | Slow step | Place in the decision |
+| --- | --- | --- | --- |
+| first program does not end | Bash, engineer | stand-in 1, with a child of its own | before any rule on the call |
+| first program does not end | Write, orchestrator | stand-in 1 | before any rule on the call |
+| first program does not end | Read, a session with no role | stand-in 1 | before any rule on the call |
+| a pipe in the bookkeeping before the decision | Bash, engineer | stand-in 2 | before the decision starts |
+| a pipe in the bookkeeping after the rules allowed it | Write, engineer | stand-in 2 | **after the rules have allowed the call** |
+| every program takes a few seconds | Bash, orchestrator | stand-in 1, 5.5 s on every start | spread: one start before the rules, the others **after the rules have allowed the call**; no step is long, the fourth ends after 22 s |
+| the input comes late and the first program is slow | Bash, engineer | stand-in 3 (2 s) and stand-in 1 (19.5 s) | spread over reading the input and one step: neither reaches 20 s, together 21.5 s |
+
+So "a call the rules would allow, whose bookkeeping is still running at the deadline, is refused, not allowed" is
+held by the fifth and the sixth case, and "a time spread over several steps" by the sixth and the seventh. The last
+one also holds that the deadline counts from the start of the program, not from the end of reading the input: a
+deadline counted from the input's end would let the step finish and allow the call.
+
+**The reason.** It must name DEC-580 and carry one of: "in time", "deadline", "time limit", "too long", "timeout",
+"timed out". It must not carry the call's marker word, the command's first word, the project's path, the written
+file's path, the settings file's path, or the held-out file's path, name or folder (the last three from the guard's
+constant).
+
+**Point 4, what the cases prove and what they do not.** Each of the five is a Bash call by an engineer whose first
+program does not end, answered as in point 1:
+
+- fields `timeout`, `timeout_s`, `timeout_ms`, `deadline`, `deadline_s`, `time_limit`, `guard_deadline_s`,
+  `hook_timeout` (600) and `no_deadline` (true), once at the top of the hook input and once inside the tool input
+  (a real Bash call carries `timeout` there);
+- 29 variables named like a time limit (`GOV_GUARD_DEADLINE_S`, `GOV_HOOK_TIMEOUT_S`, `STDIN_DEADLINE_S`,
+  `CLAUDE_HOOK_TIMEOUT`, the product's own `GOV_PENDING_SNAPSHOT_TIMEOUT_S`, …; the list is `LIMIT_VARIABLES`) and
+  9 switches (`GOV_GUARD_NO_DEADLINE`, `GOV_TEST_MODE`, …; `SWITCH_VARIABLES`), once with 600 and the switches at
+  `1`, once with `0` and the switches at `true`;
+- 12 files a worker may write (6 under the scratch folder, 5 in the engineer ticket's source folder, and the
+  ticket's `pyproject.toml`), as JSON, TOML and a bare number, each naming 600.
+
+They prove that none of these names, in these places and with these values, moves the deadline. **They cannot prove
+that no name does**: a variable, a field or a file of another name is not held, and the engineer's code is the
+only place where that can be read. The reviewer of the round should read the change for any read of the
+environment, the input or a file that reaches the deadline's value. The three green cases hold the other side: the
+same carriers with 0.001 named leave an ordinary Bash call and an ordinary Write allowed, also with a 4-second
+step.
+
+#### Red and green today, and how long the batch takes
+
+| File | Cases | Today | Reason |
+| --- | --- | --- | --- |
+| `test_w1_02_deadline.py` | 14 | 14 red | The program keeps no deadline. 10 hook processes give no answer (ended by the case at 32 s), 2 allow the call (after 27.9 s and 21.8 s). The two cases over all processes are red for the same reason |
+| `test_w1_02_deadline_in_time.py` | 12 | 12 green | Stays green |
+
+Red (today): 34 s and 6 s. Green: about 22 s to 26 s for the first file (one wait for the deadline, then the look
+for what is left running) and 6 s for the second; checked outside the tree against a throwaway copy of the hook
+with a deadline, removed with the session: 26 passed in 28 s. Under a parallel runner each worker process that
+gets a case of a module starts that module's hook processes once.
+
+After the red run no stand-in process and no hook process was left running (looked for by the stand-in's and the
+hook's names in the process list: none).
+
+**The serial list.** None of these cases is added to `tests/acceptance/serial-only.txt`. The bound that is asserted
+is 6 s above the deadline and 5 s for what the hook started to be gone, on processes that sleep and use no
+processor; the earlier time cases of this revision hold 5 s unlisted. If the first file's window fails in a
+parallel close, DEC-372 applies (re-run alone) before any entry is added.
+
+#### The other hook programs (after a tool call, after a failed one)
+
+Not held by a case. From the sources (`posttooluse.py`, one program for both events), not measured:
+
+- They cannot refuse: the call has run. They answer nothing (exit 0), a report to the agent (exit 0 with
+  `additionalContext`), or a failure of their own (exit 2, the reason on stderr, one finding).
+- The same 3-second bound on reading the input. A call of another tool than Bash is answered at once.
+- For a Bash call the check starts `git` several times, each start with a limit of 10 s of its own. The first
+  (the state of the tree) ends the program with exit 2 and a finding when it passes its limit; two later ones are
+  passed over. Where the check puts an acceptance test back it starts `git` once or more per path. **There is no
+  bound over the whole check**, and it opens the entries of the bookkeeping folder the way the program before the
+  call does, so a named pipe there holds it too (by reading; residual 59).
+- What the harness does when one of these programs passes its limit of 60 s is **not known**: the evidence record
+  observed PreToolUse only and names "other hook events" among what it did not observe. If it does what it does for
+  PreToolUse, the program is ended and the session goes on with no word of it: the check's report does not reach
+  the agent, no finding is recorded, and a restore that was under way may be half done.
+
+DEC-580 speaks of "the guard's hook program" and of answering "refuse": these programs cannot refuse, so its words
+do not say what a deadline there would answer. Returned as DP-12, with no case.
+
+#### The forms not held
+
+- **One slow step in the bookkeeping for a Bash call that is let through.** Each such program start has a limit
+  of 10 s of its own today, after which the call is allowed with a finding and with nothing noted for the check
+  after the call (measured: allow after 10.3 s, one finding). That is a decision reached in time, as built; the
+  after-the-rules place is held through the spread of several steps and through the pipe at the counter instead.
+- **The premises of two forms.** The spread case rests on the program as built starting a program at least four
+  times for an allowed Bash call (five today); the pipe cases rest on its bookkeeping waiting on a pipe. A change
+  that removes either (not this round's order) would turn the case's premise false, not the behaviour.
+- **A slow step inside a rule on the call's own input.** The earlier rounds bound those inputs (5 s); no input was
+  found here that keeps a rule busy for 20 s, and none was searched for beyond what those rounds measured.
+- **The start of the interpreter and the loading of the guard's own code**: not reachable without a stand-in for
+  the package, which this suite does not use.
+- **A process of the hook's own that is not the stand-in** (a helper of the hook left waiting on a pipe after the
+  answer): not visible from outside without its process id. Held for the stand-in program and its child only.
+- **Whether the deadline's refusal leaves a finding**: neither asked nor forbidden (residual 58).
+- **What the bookkeeping holds after a refusal at the deadline** (an entry for the refused call or none).
+- **The `ask` answer** (an install by the orchestrator), a research role, a subagent, NotebookEdit, a search tool,
+  an unknown tool, a frozen project (by reading: the freeze refuses before any program is started).
+- **A clock that is moved** while the hook runs, and a hook the harness starts in a process group of its own.
+- **The exact second**: the window is 19 s to 26 s.
+
+#### Changes to the residual list
+
+Residuals 1 to 57 stand. Added:
+
+58. A refusal at the deadline is, in the form DEC-580 gives it, a refusal like any other: nothing is recorded
+    unless the engineer records it, and the session reads only the reason. A deadline that is reached is a sign of
+    a fault (a program that hangs, a pipe, a very large tree); recommended for the Wave 2 list: one finding of the
+    guard per refusal at the deadline.
+59. As built (measured): a named pipe among the entries of the hook's bookkeeping folder, or at its counter, holds
+    the hook program for as long as it is there, for every tool and role. Before this round that fails open at the
+    harness's limit; with DEC-580 every call in that project is refused after 20 s until the pipe is removed. The
+    folder is outside what a worker may write by a tool; a Bash command that makes a pipe there was not tried
+    against the guard.
+60. As built (measured): one program start in the bookkeeping for a Bash call that passes its own limit of 10 s
+    ends in an allow with a finding and nothing noted for the check after the call; the check then has no state
+    of the tree from before the call.
+61. As built: the hook program starts `git` by its name from the search path of its environment, and the start
+    that looks up the freeze mirror has no limit of its own. Whoever sets the hook's environment chooses the
+    program. The deadline bounds the time; it does not bound what that program does.
+62. The other hook programs keep no bound over their whole run, and what the harness does at their limit is not
+    observed (DP-12).
+
+#### Rewrites and cases of other suites
+
+None. No earlier case holds what DEC-580 changes: the earlier time cases accept a refusal or an allow within 5 s,
+`test_input_that_never_ends_is_denied_by_the_guard_s_own_deadline` holds the 3-second bound on the input, which
+stays, and no case of this suite waits for a hook past 20 s and expects an answer other than a refusal (the
+suite's own limit on a hook process is 20 s and reads a hook still running as no answer). The other suites were
+not searched for a case that keeps the hook program busy for 20 s and expects an allow; the lead's run of every
+suite shows it if one exists.
+
 ### Rewrites
 
 Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
@@ -1760,6 +1981,9 @@ smaller, not larger.
 
 Eighth batch (DEC-574): none. It added three test files and `w1_02_limit_support.py`, and changed no line of an
 earlier file but this README; no line of another suite.
+
+Ninth batch (DEC-580): none. It added two test files and `w1_02_deadline_support.py`, and changed no line of an
+earlier file but this README; no line of another suite and none of `tests/acceptance/serial-only.txt`.
 
 ### Decision packages
 
@@ -1896,6 +2120,30 @@ names such a command as one that stays allowed.**
   `test_w1_02_path_limit_boundary.py`, whose strings are padded with `./` or with `x/../` (under (b) those stay
   refused and the cases would be rewritten by owner decision), and possibly the two red cases of
   `test_w1_02_path_limit_unchanged.py`; the time cases hold under both.
+
+**DP-12 (ninth batch). A deadline for the hook programs after a tool call and after a failed one.**
+- Question: do the programs that run after a Bash call keep a deadline of their own, and what do they answer when
+  they reach it?
+- Why now: DEC-580 gives the program before a call a deadline and the answer "refuse". The programs after a call
+  cannot refuse, keep no bound over their whole run (from the sources: several program starts of up to 10 s each,
+  more for each acceptance test put back; a named pipe in the bookkeeping folder), and what the harness does at
+  their limit of 60 s is not observed. If it ends them as it ends the program before a call, a check after a call
+  is lost with no word to the agent and no finding, and a restore may be half done.
+- Options: (a) nothing in Wave 1; a residual on the Wave 2 list, with an experiment first on what the harness does
+  at the limit for these two events. (b) the same deadline of 20 s now, in the stricter reading: the program ends
+  by its own hand, exits with code 2 and tells the agent that the check after the call could not be completed,
+  records one finding that names the call, starts no restore it cannot finish, and leaves nothing running; test
+  designer first. (c) as (b), with a shorter or a longer deadline chosen by the owner.
+- Impact: (a) leaves a check that may silently not happen where a tree is very large or a program hangs; no call
+  is let through by it that the guard refused, and the next call's check still sees the tree. (b) and (c) turn a
+  silent loss into a recorded one; they change W1-03's program, which is another ticket's, and need a reading of
+  what a half-done restore is.
+- Reversibility: high in every option. Cost: (a) none now; (b), (c) a designer round of about ten cases in W1-03's
+  suite and a change of that program, against DEC-577 and DEC-584 a ("no further guard rounds"; one more run).
+- Recommendation: (a), with the experiment and (b) as the Wave 2 entry. It is not a hole that lets a refused call
+  through, so DEC-584 b sends it to the Wave 2 list. Confidence: medium (the harness's behaviour for these events
+  is not known; if it blocked the session instead, the entry would matter less).
+- Held under every option: everything in the ninth batch.
 
 ## Not tested
 
