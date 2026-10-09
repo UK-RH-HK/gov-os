@@ -6014,3 +6014,19 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.154 | 2026-10-09 | Delegated, stricter-only: DEC-553 (the guard follow-up on W1-02: a wildcard-only glob from a copy's folder refused, a deny path spelled from the home folder redacted, a move or link of a holding folder refused as a read). Next free id: DEC-554. |
+
+## 155. Delegated: six points of the parallel-run follow-up's second run on W1-30 (register v0.155, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-554 — The close's time limit and worker count in the project's path map; a command wait in W1-07; four points as built
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; no ticket closes on fewer tests; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `c52de7c2` (`log/W1-30-lead-runF2.json`: two whole regressions in the close form, each green except one case that passed alone; a close of this repository takes about 16 to 20 minutes for the parallel part and 28 to 33 for the serial part) · **Under:** DEC-527, DEC-549, DEC-372
+- **Decision:**
+  1. **The time limit is a setting of the project, as built.** DEC-549's third point said "no code"; no project file could reach the limit, so the engineer moved its read: `close_timeout` and `close_workers` are optional top-level keys of `governance/project/path-map.yaml`, and the argument wins over the file. Kept. The orchestrator writes `close_timeout: 7200` there at the merge.
+  2. **W1-07's wait for a read command** (30 seconds; `gov status --json` passed it once under ten workers): until the follow-up after W1-41, a case that fails on that wait and passes alone is re-run alone and named, as a latency case is (DEC-372). In that follow-up a test designer gives W1-07's commands a longer wait in W1-07's own support, as DEC-549 did for W1-27, with the same reason. The worker count of this repository stays `auto`.
+  3. A project that gains a path map for these keys also gets what a path map brings in `gov rebuild` (the lexical index): accepted; the two rebuild-mode cases keep a project without one.
+  4. The record states `auto` where the project says `auto`, not the count the runner chose: as built.
+  5. The stricter readings of a worker count (a quoted number, a fraction, an empty value, another spelling of `auto` are refused): as built.
+  6. The kernel's path-map schema names neither key, nor DEC-479's two: it goes to the follow-up after W1-41 with DEC-521's items, as a product-spec line.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.155 | 2026-10-09 | Delegated: DEC-554 (the parallel-run follow-up on W1-30: the close's time limit and worker count are settings in the path map; W1-07's command wait is re-run alone until a designer lengthens it; four points as built). Next free id: DEC-555. |
