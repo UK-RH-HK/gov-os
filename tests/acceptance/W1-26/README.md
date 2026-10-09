@@ -521,6 +521,51 @@ command list, and both hold the twelve only today.
 
 7 red, 3 green. The suite's two earlier cases on this check (`test_w1_26_planted_defects.py`) are unchanged.
 
+### The skill checks in both layouts (DEC-521; `test_w1_26_skill_checks_layouts.py`, 33 cases)
+
+DEC-521 orders for the follow-up "the declared check commands that name `template/` paths". Three declared
+checks call the skill validator with paths under `template/governance/kernel/skills/`: `skill-regression-a`
+(discovery, planning, test-design, change), `skill-regression-b1` (retrieval, audit, checkpoint, adopt) and
+`skill-regression-orchestration` (orchestration). In a project with an installed kernel the skills lie under
+`governance/kernel/skills/`; the paths of the commands do not exist there, and each check answers
+"unmeasured: path does not exist", whatever the skills hold.
+
+How the cases run: the `command` of the kernel's declaration, started by a shell in the root of a temporary
+project, as the runner of `gov check` starts it, with this worktree's code. The project holds only the skills
+the case writes (fixtures); no file and no path of this repository is given to the check. The cases of each
+check on this repository's own skills stay in W1-35's and W1-36's suites, unchanged.
+
+**What is held (the stricter reading where the decision is silent).**
+
+- Installed layout: measured; green on well-formed skills; a planted defect is a finding that names the
+  skill's file under `governance/kernel/skills/`; with one of the check's skills absent the check is never
+  green and its answer names the absent skill.
+- Template layout: as today.
+- Both layouts: both are measured, and a defect in either is a finding whatever the other holds (as the close
+  record lists the skills of both, W1-30's settlement 32: no skill a role could load is left out).
+- Neither layout, or a skills folder with none of the check's skills: the unmeasured answer
+  (`{"unmeasured": true, "reason": ...}`, exit code 1), which `gov check` reports as a finding of a hard-block
+  check. Never green without having measured.
+
+| Case (each ×3, one per check) | Holds | Today |
+|---|---|---|
+| `test_in_an_installed_project_the_check_measures_and_is_green_on_well_formed_skills` | exit code 0, `findings` empty | red, all three: unmeasured, "path does not exist: template/..." |
+| `test_in_an_installed_project_a_planted_defect_is_a_finding` | one skill without frontmatter: `SKILL_NO_FRONTMATTER` naming its installed file | red, all three: unmeasured, no finding |
+| `test_in_an_installed_project_an_absent_skill_is_never_green` | another skill is there, one of the check's is not: not green, the absent skill named | red for `a` and `b1` (not green, but the answer names the first template path, not the absent skill); green for `orchestration`, whose one skill the template path happens to name |
+| `test_with_both_layouts_a_defect_in_either_is_a_finding` (×2: the defect in the installed layout, in the template layout) | the finding names the file of the layout that holds the defect | the installed half red, all three: the check is green, the installed skills are not read; the template half green |
+| `test_in_the_template_layout_the_check_is_green_on_well_formed_skills` | as today | green |
+| `test_in_the_template_layout_a_planted_defect_is_a_finding` | as today | green |
+| `test_in_the_template_layout_an_absent_skill_is_never_green` | as today | green |
+| `test_with_both_layouts_well_formed_the_check_is_green` | no doubled finding, exit code 0 | green |
+| `test_in_a_project_with_neither_layout_the_check_is_unmeasured_and_never_green` | exit code 1, `unmeasured` with a reason, no finding | green; holds what stays |
+| `test_a_skills_folder_without_the_check_s_skills_is_unmeasured` | an installed kernel with a skill of no check only | green; holds what stays |
+
+33 cases: 11 red, 22 green.
+
+Not held, and returned as a package: that `gov check` in an installed project finds the declarations at all.
+The declarations are read from `template/governance/kernel/checks/` only, by code outside the paths of this
+follow-up; these cases run each declared command directly.
+
 Not held here: where an installed project holds the kernel's schemas. The schema check reads them from the
 template layout; the three declared checks that name `template/` paths are piece 15 below, and the schema
 check's own place for its schemas is named in no decision.
