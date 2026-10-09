@@ -1,12 +1,17 @@
 """Builder tests for the command-module convention of ``gov.cli.main`` (DEC-317).
 
 Regression evidence only (DEC-136). A stand-in ``adopt`` module is written
-to a temporary package directory; ``src/gov/adopt/`` is not created. The
-stand-in was ``checkpoint`` until W1-25 built that command and ``pause`` until
-W1-28 did; it has to be a reserved command that is not built yet.
+to a temporary package directory and loaded in place of the built
+``src/gov/adopt/`` for the length of a case: the directory comes first on the
+path of the ``gov`` package, and the built ``gov.adopt`` modules leave
+``sys.modules`` until the case ends, when they are put back as they were. The
+stand-in was ``checkpoint`` until W1-25 built that command, ``pause`` until
+W1-28 did, and a reserved command not built yet as long as there was one;
+W1-41 built ``adopt``, the last of them (DEC-535).
 """
 from __future__ import annotations
 
+import importlib
 import json
 import sys
 from pathlib import Path
@@ -43,15 +48,29 @@ def run(root, args, config):
 
 @pytest.fixture
 def package(tmp_path, monkeypatch):
-    """A package directory beside ``src/gov``, with the files of the commands built today."""
+    """A package directory ahead of ``src/gov``, with the files of the commands the cases need built."""
     for rel in ("cli/commands/status.py", "cli/commands/check.py", "launch/command.py"):
         (tmp_path / rel).parent.mkdir(parents=True, exist_ok=True)
         (tmp_path / rel).write_text("", encoding="utf-8")
     monkeypatch.setattr(cli, "PACKAGE", tmp_path)
-    monkeypatch.setattr(gov, "__path__", [*gov.__path__, str(tmp_path)])
-    yield tmp_path
-    for name in [name for name in sys.modules if name.startswith("gov.adopt")]:
+    monkeypatch.setattr(gov, "__path__", [str(tmp_path), *gov.__path__])  # the stand-in before the built package
+    built, attribute = _adopt_modules(), vars(gov).get("adopt")
+    for name in built:
         del sys.modules[name]
+    importlib.invalidate_caches()
+    yield tmp_path
+    for name in _adopt_modules():
+        del sys.modules[name]
+    sys.modules.update(built)  # the built modules, the same objects, for every test after this one
+    if attribute is None:
+        vars(gov).pop("adopt", None)
+    else:
+        gov.adopt = attribute
+
+
+def _adopt_modules():
+    return {name: module for name, module in sys.modules.items()
+            if name == "gov.adopt" or name.startswith("gov.adopt.")}
 
 
 def _adopt(package, text):

@@ -6094,3 +6094,81 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.158 | 2026-10-09 | Delegated: DEC-562 (the probe of the guard follow-up on W1-02 judged pass; it merges as probed; a shell search with a name filter, an answer in bounded time and a NUL byte join the round of DEC-557; the rest are residuals). Next free id: DEC-563. |
+
+## 159. Owner answers to P-25, on EXP-001's evidence file, on the schema findings of probe records, on two findings of W1-30's close, and a Wave 2 item (register v0.159, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-563 — P-25: W1-16's case on this repository's runtime folder is re-run alone until a designer narrows it; W1-30 closes
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-372, DEC-322, DEC-527
+- **Decision:** Until it is fixed, W1-16's `test_this_repository_is_not_indexed_by_the_run` is treated like a case of DEC-372: when it fails in a regression or a close it is re-run alone, and it is named for the exit auditor. W1-30 closes now. In the follow-up after W1-41 a test designer narrows the case to watch only the index stores, not the whole runtime folder.
+
+### DEC-564 — EXP-001's evidence file: its place, and its import at the adoption step
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-152, DEC-560
+- **Decision:** EXP-001's evidence file is at `/home/usain/gov-os-workbench/spike-sandbox/EVIDENCE.md`. It is read by that exact path only; the folder is never listed. It is imported as a record at the adoption step, with its origin path and its sha256 (DEC-560). The orchestrator confirmed on 2026-10-09 that the file exists (266 lines; sha256 `84ce1d1390d40a25ae1b5a8af224db871132ebcd8d5b0842b64796f1e0ad7714`); the import checks the bytes against that value.
+
+### DEC-565 — The schema findings a probe record adds are known growth; the probe type enters the kernel's record schema in the follow-up after W1-41
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-467, DEC-481, DEC-505
+- **Decision:** The four findings each probe record adds to the schema check are accepted as known growth and are recorded with each probe record. In the follow-up after W1-41 the probe type is added to the kernel's record schema, so that the schema check returns to its recorded baseline. DEC-467's rule that a new finding in a baseline check blocks a merge applies to everything else as before.
+
+### DEC-566 — Two findings of W1-30's close: the probe gate on `ccac9506`, and the runs of a refused close
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-505, DEC-549, DEC-555
+- **Decision:** The probe gate's finding on the orchestrator's commit `ccac9506` (the residual notes and the project's close time limit, made after the probed commit) is covered by DEC-505. That a refused close prints the totals of its test runs and not each run is accepted as an item of the follow-up after W1-41.
+
+### DEC-567 — Wave 2 list: "fast feedback at scale", one item beside DEC-534's two; and its ranking
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-534, DEC-527 · **Scope:** the Wave 2 list only; nothing in Wave 1 changes
+- **Decision:** The Wave 2 list gains one item, "fast feedback at scale", beside impact-based test selection and language-agnostic test commands (DEC-534). Its parts:
+  - **Test result caching.** A test whose code, dependencies and data are unchanged since its last green run is not re-run; its earlier result is reused and named as reused.
+  - **A merge queue.** Several finished tickets are merged as one batch, the batch's combination is tested once, and a failing batch is split automatically to find the culprit.
+  - **Staged gates.** A ticket's close runs its own tests plus the tests impact selection names; the full suite runs nightly, at each wave's exit, and before any release.
+  - **The full suite on CI machines** rather than this one, where the project allows it.
+  - **Flaky-test quarantine.** A case that fails and then passes alone is marked flaky automatically, kept out of the gate with its record, and must be fixed or removed within a set time; the list of quarantined cases is visible in gov status.
+- **Ranking for Wave 2 planning:** language-agnostic test commands are a must-have before the Gov OS is adopted in any non-Python repository (UPIM, ASMO). They, impact-based selection and result caching stand at the top of Wave 2.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.159 | 2026-10-09 | Owner: DEC-563 (W1-16's runtime-folder case re-run alone and named until a designer narrows it; W1-30 closes), DEC-564 (EXP-001's evidence file, its exact path and sha256, imported at adoption), DEC-565 (a probe record's four schema findings are known growth; the probe type enters the schema in the follow-up after W1-41), DEC-566 (the probe gate on ccac9506 is covered by DEC-505; per-run figures on a refused close go to the follow-up), DEC-567 (Wave 2 list: fast feedback at scale - result caching, a merge queue, staged gates, the full suite on CI machines, flaky-test quarantine; language-agnostic test commands, impact selection and result caching rank at the top). Next free id: DEC-568. |
+
+## 160. Delegated, stricter-only: one package of W1-41's fix round (register v0.160, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-568 — All-external sources: refused whatever the ticket's dependencies name; a deprecated record holds a store back
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only, as built; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `868d72b9` (`log/W1-41-lead-run4.json`: the three behaviours of DEC-552 built, 182 cases green, every acceptance suite green) · **Under:** DEC-552, DEC-551, DEC-454
+- **Decision:**
+  - **P-14: (a).** A ticket is refused whenever every id under its `sources` is an external reference, whatever its `depends_on` or `deps` name (a ticket, a decision or another record). Listing a record as a dependency does not make a source read.
+  - A record with the status `DEPRECATED`, with no status or with an unknown one holds a legacy store back in the dependency proof, as DEC-552's wording gives it: only `SUPERSEDED`, `RETIRED` and `REJECTED` release. A record that is superseded by an edge alone, with its status unchanged, holds the store back too.
+  - No second probe (DEC-498): the fix round's diff is 17 lines added and 8 removed, each refusing more; the lead and the orchestrator read it.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.160 | 2026-10-09 | Delegated, stricter-only: DEC-568 (W1-41's fix round: an all-external ticket is refused whatever its dependencies name; only superseded, retired and rejected records release a legacy store). Next free id: DEC-569. |
+
+## 161. Delegated: the follow-up after W1-41, its ticket and its paths (register v0.161, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-569 — The follow-up after W1-41 runs on W1-30's ticket, reopened; its pieces and its paths
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible; told to the owner, who may replace it) · **Basis:** DEC-521 orders one short follow-up after W1-41 and names no ticket; most of its pieces change `gov close` · **Under:** DEC-521, DEC-416, DEC-498, DEC-532
+- **Decision:**
+  - **Ticket.** The follow-up runs on `DAEO-2lwj` (W1-30, `gov close`), reopened for it, profile FULL, with its own reviewer probe before the merge (DEC-498, DEC-559). A test designer comes first for every piece.
+  - **Pieces, each ordered by the decision named:** the trailers base commit (DEC-482); the owner-decision lookup from a register file (DEC-483); the record store loads the decisions of the project's named register file as decision records, one per heading (DEC-521, DEC-473); the close record's skills list in a project with an installed kernel, and the declared check commands that name `template/` paths (DEC-521); `gov close` calls the counter (DEC-495); the probe gate (DEC-505); the command-list lines for `ci`, `launch`, `telemetry` and `lock` (DEC-542); the READY rule on a constraining package the store could not load (DEC-544); the repair ticket of a refused close whose findings are too long for one argument; findings 9 and 10 of W1-41's probe with the two readings beside them (DEC-552); findings 1, 2, 3, 4 and the first shape of 7 of W1-30's probe (DEC-555); a refused close prints each test run (DEC-566); a longer command wait in W1-07's support and the path-map schema's keys (DEC-554); the probe type in the kernel's record schema (DEC-565); W1-16's runtime-folder case narrowed to the index stores (DEC-563); the code-index daemon cases of W1-16 and W1-20 (DEC-561).
+  - **Paths.** The ticket's `allowed_paths` gain, for this follow-up: `src/gov/check/**`, `tests/unit/check/**`, `src/gov/store/**`, `tests/unit/store/**`, `src/gov/readiness/**`, `tests/unit/readiness/**`, `src/gov/context/**`, `tests/unit/context/**`, `src/gov/telemetry/**`, `tests/unit/telemetry/**`, `src/gov/codeintel/**`, `tests/unit/codeintel/**`, `template/governance/kernel/schemas/**`, `template/governance/kernel/checks/**`. Nothing under the guard's paths is in it. A piece that needs another path comes back as a package.
+  - **This repository's own settings** (the trailers base `429815b5` of DEC-482, as a key of the path map) are written by the orchestrator at the merge, as `close_timeout` was (DEC-554).
+  - If the lead finds the follow-up too large for one round, it returns the pieces it built with the head named and lists the rest; nothing is dropped silently.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.161 | 2026-10-09 | Delegated: DEC-569 (the follow-up after W1-41 runs on W1-30's ticket, reopened, FULL with its own probe; its pieces by decision; the paths it adds). Next free id: DEC-570. |
+
+## 162. Delegated: the probe of W1-02's root-search round (register v0.162, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-570 — W1-02's round of DEC-557: the probe is judged pass with one fix round, stricter-only
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only; told to the owner, who may replace it) · **Basis:** the probe's return (`log/W1-02-probe4.json`, session `ea1c1fed-b545-4461-b029-09dae6731851`, at `dc9fda16`, code `02d0b35b`; each finding reproduced on a stand-in project) · **Under:** DEC-498, DEC-137, DEC-557, DEC-562
+- **Decision:** DEC-498 orders a fix before the merge for a hole in a shape ordinary work produces. The probe found such shapes, so one fix round is built before the merge, test designer first, each point refusing more than today:
+  - **A root search with a numbered redirect** (`2>/dev/null`, `2>&1`, `1>file`) is refused like the same search without it: the number of a redirect is no path. (The probe's A1; ordinary work types it constantly.)
+  - **A search after a shell keyword** (`do`, `then`, `else`, `if`, `while`, `until`, and a `!` in front) is judged as the search it is. (A2.)
+  - **Daily spellings:** a comment after the search is no path; `ls` and `grep` option groups that hold a digit beside the recursive letter; `egrep` and `fgrep`; a search behind `timeout`, `command`, `env`, `nice`, `nohup` or `time`. (A3, and `time` of A4.)
+  - **A brace word that expands past the bound is refused**, not judged unexpanded. (A5; a deliberate shape, but one line.)
+  - **Time.** The harness lets a call through when the hook passes its time limit (DEC-110, DEC-179), so a slow decision fails open. The probe found decisions of 1 to 190 seconds for inputs under the round's bounds (long paths times many filters or expansions; many fed searches in one command). The rule's work is bounded by count times length, or the input is refused; the test designer states the bound as a time with a wide margin for a loaded machine.
+  - **Residuals, not built:** `find` with a name test (it prints names; what reads them is the run-time-name residual already recorded); valued options the rule does not list; a search in a brace group, in a shell started with `-c`, behind `xargs`, or with a substitution as its path; a file-tool path that is not text; a line of a here-document's body that reads as a search is refused (the way round is the file tool); `rg --type-list`.
+  - **Told to the owner, as built:** a type filter with no path (`rg -t py <word>` from the root) is refused, as DEC-557's wording "no path or glob" gives it; the refusal names the way round (`-g '*.py'`).
+  - **No second probe** if the fix round's product diff only adds refusals and is small enough for the lead and the orchestrator to read line by line (DEC-552's precedent); otherwise a second probe before the merge.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.162 | 2026-10-09 | Delegated, stricter-only: DEC-570 (the probe of W1-02's root-search round is judged pass with one fix round: numbered redirects, searches after shell keywords, daily spellings, a brace word past the bound, bounded decision time). Next free id: DEC-571. |

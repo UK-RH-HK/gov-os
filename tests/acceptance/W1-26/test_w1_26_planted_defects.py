@@ -175,18 +175,79 @@ def test_planted_claims_defect_ticket_missing_required_field(project, sandbox, i
 # 7. command-contract consistency: reserved command with no module file
 # --------------------------------------------------------------------------
 
-def test_planted_commands_defect_reserved_command_no_module(project, sandbox, interface):
-    """A reserved command with no module file raises a finding."""
-    project.add_check_declaration("w1-26-cmd-check", "command-contract consistency",
+# revised after implementation: W1-41 builds ``gov adopt --lite``, the last
+# reserved command, so no reserved command lacks a module any more and the
+# case plants the defect in its own temporary project (planned: command
+# implemented).
+COMMANDS_FAMILY = "command-contract consistency"
+COMMANDS_CHECK_ID = "w1-26-cmd-check"
+UNBUILT_IN_PROJECT = "adopt"
+
+
+def _declare_commands_check(project):
+    project.add_check_declaration(COMMANDS_CHECK_ID, COMMANDS_FAMILY,
                                   severity="hard-block",
                                   command="python3 -m gov.check.commands")
+
+
+def _commands_check_findings(result):
+    """The findings of this case's declared check, as the result reports them."""
+    findings = []
+    for entry in support.checks_of(result):
+        if isinstance(entry, dict) and COMMANDS_CHECK_ID in (entry.get("id"), entry.get("check_id")):
+            findings.extend(entry.get("findings") or [])
+    return findings
+
+
+def test_planted_commands_defect_reserved_command_no_module(project, sandbox, interface):
+    """A reserved command with no module file raises a finding that names it."""
+    _declare_commands_check(project)
+    removed = project.remove_reserved_command_module(UNBUILT_IN_PROJECT)
+    assert removed, (
+        f"the defect was not planted: the project held no module file for "
+        f"{UNBUILT_IN_PROJECT!r} to remove"
+    )
+    assert not project.reserved_command_module_files(UNBUILT_IN_PROJECT)
     project.commit()
     run = support.run_check(project, sandbox)
     envelope = support.envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    status = support.family_status(result, "command-contract consistency")
+    status = support.family_status(result, COMMANDS_FAMILY)
     assert status in (support.RED, support.YELLOW), \
-        f"the command-contract check did not flag a missing module: {status}"
+        f"the command-contract check did not flag a missing module: {status}\n{run.describe()}"
+    findings = _commands_check_findings(result)
+    assert findings, f"the check reports no finding for the missing module\n{run.describe()}"
+    assert any(UNBUILT_IN_PROJECT in json.dumps(finding) for finding in findings), (
+        f"no finding of the command-contract check names the command "
+        f"{UNBUILT_IN_PROJECT!r}: {findings}"
+    )
+    for name in support.RESERVED_COMMANDS:
+        if name == UNBUILT_IN_PROJECT:
+            continue
+        assert not any(finding.get("command") == name for finding in findings
+                       if isinstance(finding, dict)), (
+            f"a finding names {name!r}, whose module file is present: {findings}"
+        )
+
+
+def test_commands_check_green_when_every_reserved_command_has_a_module(project, sandbox, interface):
+    """With a module file for each reserved command, the family is green for this declaration."""
+    _declare_commands_check(project)
+    for name in support.RESERVED_COMMANDS:
+        assert project.reserved_command_module_files(name), (
+            f"the project holds no module file for the reserved command {name!r}"
+        )
+    project.commit()
+    run = support.run_check(project, sandbox)
+    envelope = support.envelope_of(run, interface)
+    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    status = support.family_status(result, COMMANDS_FAMILY)
+    assert status == support.GREEN, (
+        f"every reserved command has a module file but {COMMANDS_FAMILY} is "
+        f"{status!r}\n{run.describe()}"
+    )
+    assert not _commands_check_findings(result), \
+        f"the check reports a finding with nothing planted\n{run.describe()}"
 
 
 # --------------------------------------------------------------------------
