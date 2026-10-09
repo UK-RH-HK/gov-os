@@ -4,7 +4,8 @@ Starts the CLI at ``~/.local/bin/claude`` (DEC-205) in the repository root with
 one ``--settings`` value built here: the strict sandbox block, the role's network
 profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
 ``GOV_TICKET`` and a per-session temp directory, removed when the session ends
-(DEC-386). Nothing fails open: whatever cannot be read or is not of the stated
+(DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
+(DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
 shape refuses the launch.
 
 No message of this module carries a held-out path.
@@ -12,11 +13,14 @@ No message of this module carries a held-out path.
 
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
 import shutil
+import signal
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -51,6 +55,10 @@ BYPASS_MODE = "bypassPermissions"
 ALLOWLIST_KEY = "hosts"
 KERNEL_ALLOWLIST_REL = "template/governance/kernel/launch/research-allowlist.yaml"
 PROJECT_ALLOWLIST_REL = "governance/project/research-allowlist.yaml"
+# DEC-392: these end the session and remove its folder, and the launcher then ends with INTERRUPT_EXIT.
+END_SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
+INTERRUPT_EXIT = 130
+END_WAIT_S = 5  # whole seconds a session that was asked to end may still run before it is killed
 _HOST = re.compile(r"(\*\.)?[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+")
 
 
@@ -243,6 +251,24 @@ def _check_cli_args(cli_args: list[str]) -> None:
                           "would have no guard hook")
 
 
+def _say(line: str) -> None:
+    """One line to stderr. A stderr that is closed or that nobody reads loses the line and nothing else (DEC-392):
+    the line goes past the stream's buffer, since what stays in it changes the exit code when the interpreter ends."""
+    stream = sys.stderr
+    if stream is None:  # the launcher was started without a stderr
+        return
+    try:
+        try:
+            descriptor = stream.fileno()
+        except io.UnsupportedOperation:  # a stream of the caller's that has no descriptor
+            stream.write(line)
+            return
+        stream.flush()
+        os.write(descriptor, line.encode(errors="replace"))
+    except (OSError, ValueError):
+        pass
+
+
 def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     """Start one worker session and return the CLI's exit code; raise ``GovError`` to refuse."""
     root = Path(os.path.realpath(root))
@@ -258,15 +284,55 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
-    # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
-    tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
-    settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-    settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}"]}
-    env = {**os.environ, **settings["env"]}
+    state = {"session": None, "ended": False, "asked": False}
+
+    def end(signum=None, frame=None):
+        """DEC-392: an interrupt, SIGTERM or SIGHUP ends the session. It is asked first, and killed when a second
+        signal arrives or it still runs END_WAIT_S later. Nothing is raised here, so no clean-up is cut short."""
+        session, asked = state["session"], state["asked"]
+        state["ended"] = True
+        if session is not None and session.poll() is None:
+            state["asked"] = True
+            if asked:
+                session.kill()
+            else:
+                session.terminate()
+                signal.alarm(END_WAIT_S)
+
+    previous = {number: signal.signal(number, end) for number in END_SIGNALS
+                if signal.getsignal(number) is not signal.SIG_IGN}  # a signal the caller ignores stays ignored
+    alarm, tmpdir, code = signal.signal(signal.SIGALRM, end), None, INTERRUPT_EXIT
     try:
-        return subprocess.run([str(cli), "--settings", json.dumps(settings), *cli_args], cwd=root, env=env).returncode
-    except OSError:
-        raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+        # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
+        tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
+        settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
+        settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}"]}
+        env = {**os.environ, **settings["env"]}
+        if not state["ended"]:  # a signal that came first: no session is started
+            try:
+                state["session"] = subprocess.Popen([str(cli), "--settings", json.dumps(settings), *cli_args],
+                                                    cwd=root, env=env)
+            except OSError:
+                raise _refuse(f"the CLI at ~/{CLI_REL} cannot be started (DEC-205)") from None
+            if state["ended"]:  # a signal that came while the session was started
+                end()
+            code = state["session"].wait()
+            if state["ended"]:
+                code = INTERRUPT_EXIT
+        return code
     finally:
+        session = state["session"]
+        if session is not None and session.poll() is None:  # only an error on the way here: no session is left
+            session.kill()
+            session.wait()
         # DEC-386: the folder goes when the session ends, whole; a link in it is removed as a link.
-        shutil.rmtree(tmpdir)
+        try:
+            if tmpdir is not None:
+                shutil.rmtree(tmpdir)
+        except OSError as error:  # DEC-392: the session's exit code is kept, and one line names what stayed
+            _say(f"gov launch: the temp folder {tmpdir} could not be removed and stays: "
+                 f"{' '.join(str(error).split())}\n")
+        for number, handler in previous.items():
+            signal.signal(number, handler or signal.SIG_DFL)
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, alarm or signal.SIG_DFL)
