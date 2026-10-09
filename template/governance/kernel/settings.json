@@ -5,7 +5,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -16,7 +17,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -27,7 +29,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+            "timeout": 60
           }
         ]
       }
