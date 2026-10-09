@@ -1585,6 +1585,69 @@ text.
 
 2 red, 2 green.
 
+### Piece 6. The owner's decision as an entry of the register (`test_w1_30_r13_owner_decision_register.py`, 7 cases)
+
+DEC-483. After an escalation, `gov close <ticket> --owner-decision <id>` accepts a decision file
+as today, and also an entry of the register file the project names under `decision_register` in
+its path map (the existing key of DEC-479; the heading grammar of DEC-473). The register of the
+cases is `records/decision-log.md` of a temporary project; no file of this repository is read.
+
+**Settlement 30: how each rule for a decision file reads for an entry (the stricter reading
+throughout).**
+
+| The rule | A decision file (today) | A register entry |
+|----------|-------------------------|------------------|
+| it is one record | one committed decision record of that id under `docs/` or `governance/decisions/` | exactly one heading `### <id>` followed by a space, a colon or a dash, at the start of a line and outside fenced blocks, in the named register of the commit being closed. Two entries of one id are none. A heading of another level is none |
+| accepted | its status is ACTIVE | between its heading and the next heading the entry holds a status line (`**Status:**`, with or without a list dash) whose first word is `ACCEPTED`. No status line, `PROPOSED`, or `SUPERSEDED ...; was ACCEPTED` are not accepted |
+| the owner's | the commit that set it ACTIVE carries `Role: owner` and no other role | the commit that brought the entry's heading into the register carries `Role: owner` and no other role (package P-2) |
+| recorded after the escalation began | no record of that id at the commit at which the escalation began | the register of that commit does not hold the entry's heading |
+| not used before | not among the decisions that lifted an escalation of this ticket | the same |
+
+With no register named, decision files alone count: a file with the form of a register lifts
+nothing, and neither does an entry of a file other than the named one.
+
+"Lifted" in a case: the close given the decision runs the tests and is refused for the failing
+one (exit code 3). "Not lifted": exit code 4, and the close after it is blocked too.
+
+| Case | Holds | Today (`8ddc5330`) |
+|------|-------|--------------------|
+| `test_an_accepted_entry_the_owner_recorded_after_the_escalation_lifts_it` | an entry that meets all five rules lifts; the refusal after it is the first of a new count | red: exit code 4, "decision DEC-501 is no committed record under docs/ or governance/decisions/" |
+| `test_an_entry_that_lifted_one_escalation_lifts_no_second` | the same entry given at the second escalation lifts nothing | red: the same message at the first lift |
+| `test_an_entry_that_is_not_one_accepted_entry_of_the_owner_lifts_nothing` | ten ids in turn lift nothing: heading in a fenced block; PROPOSED; no status line; superseded; an id of two entries; a heading of level 4; recorded by the orchestrator's commit; by a commit with the owner's role and another; by a commit without a role; an id no entry carries. Then an entry as it must be lifts | red at its last step only: the ten are refused today, the good entry is too (the same message) |
+| `test_a_decision_file_lifts_the_escalation_of_a_project_that_names_a_register` | a decision file lifts although a register is named | green (as today) |
+| `test_with_no_register_named_an_entry_lifts_nothing` | no key in the path map: the entry lifts nothing | green (as today); it holds that the register is read only where it is named |
+| `test_an_entry_of_a_file_the_path_map_does_not_name_lifts_nothing` | an entry of another file than the named register | green (as today) |
+| `test_an_entry_recorded_before_the_escalation_began_lifts_none` | an accepted entry of the owner from before the ticket's first commit | green (as today) |
+
+3 red, 4 green.
+
+**Package P-2 (round 13): what makes a register entry the owner's.**
+
+- **Question.** A decision file is the owner's by a fact of a commit: the commit that set it
+  ACTIVE carries `Role: owner` alone. Which fact makes an entry of a register the owner's?
+- **Why now.** DEC-483 asks for the lookup; the rule "the owner's" is the one rule an entry
+  cannot state in the file's own form: an entry has no ACTIVE transition, and this repository's
+  own register is written by the orchestrator's commits, with the owner named in the text of
+  the status line ("ACCEPTED (owner, date)") beside entries that say "ACCEPTED (delegated ...)".
+- **Options.** (a) The commit that brought the heading into the register carries `Role: owner`
+  alone (built). (b) The status line names the owner, whoever committed it: this needs a
+  grammar for the status line that no decision defines, and any role that may write the
+  register could then lift its own escalation. (c) Both (a) and (b).
+- **Impact.** Under (a) no entry of this repository's register, as it is written today, lifts an
+  escalation: the owner would commit the entry (or a decision file, as today). Under (b) the
+  orchestrator's record of the owner's word lifts it.
+- **Reversibility.** High: one rule of the lookup and the cases `DEC-607` to `DEC-609` of one
+  case; (a) to (b) loosens, the other direction would refuse what closed before.
+- **Cost.** (a) none beyond the build. (b) a decision on the status grammar, and cases for it.
+- **Recommendation.** (a). The escalation exists so that the roles that failed three times cannot
+  continue on their own word; a text those roles can write must not lift it.
+- **Confidence.** Medium-high.
+
+A second point for the same decision, built stricter meanwhile: "accepted" is read as the first
+word `ACCEPTED` of the entry's status line. No decision defines the status line of a register
+entry (DEC-473 defines the heading only); if another word or place is meant, the case's forms
+`DEC-602` to `DEC-604` change with it.
+
 ## Covers ids
 
 | Covers id | Tests |
