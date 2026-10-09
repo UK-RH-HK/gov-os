@@ -1688,6 +1688,19 @@ and read the check's entry. This repository's own path map is not read and not c
 11 red, 1 green. With no base at all the whole history is judged: the ten existing cases hold
 that, in projects whose path map holds the suite's own setting only.
 
+**A defect of the fixture, repaired in the follow-up after W1-41.** The suite's temporary project
+copies product files, so its commit ids depend on their bytes. One state gave the abbreviated
+base `65534367`, digits only. `path_map_text` wrote it bare, YAML read a number, and the check
+answered `TRAILERS_BASE_UNKNOWN`:
+`test_commits_before_the_base_are_not_judged[an abbreviated id]` was green only by chance of a
+commit id. `path_map_text` now writes the value of a commit-id key (`trailers_base`,
+`decision_citations_base`) as quoted text; every other value is written as given, as before. No
+assertion changed. W1-26's suite writes its path map through `yaml.safe_dump`, which quotes such
+an id already (`65534367` and `1234e567` both read back as text), so it needed no change. What
+the product does with a base a project wrote bare and YAML read as a number is unchanged and not
+held by a case here: it answers `TRAILERS_BASE_UNKNOWN` (the citations check refuses it as no
+commit id: `CITATIONS_CONFIG_INVALID`, "a commit id of digits alone is written in quotes").
+
 **Package P-3 (round 13): a base after which no closed ticket has a commit.**
 
 - **Question.** A base is recorded and commits follow it, but none of them is a closed ticket's.
