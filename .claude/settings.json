@@ -17,7 +17,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\""
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -28,7 +29,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\""
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -39,7 +41,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\""
+            "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -49,7 +52,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\"",
+            "timeout": 60
           }
         ]
       }
@@ -60,7 +64,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\""
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\"",
+            "timeout": 60
           }
         ]
       }
