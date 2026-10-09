@@ -613,6 +613,32 @@ an earlier full rebuild left in the store; no source says, and each case starts 
 eighth, `test_rebuild_codeintel_is_recreated_when_tool_answers` (round 4), fails only in the
 session's sandbox: the code-index tool writes under `/tmp/gov-cbm-1000`, which is read-only there.
 
+## The wait for a command (DEC-549, P-1)
+
+Rewritten after implementation, reason "defect found by the parallel trial". Two whole regressions
+of this repository in the parallel form (ten workers) were each red on three or four cases of this
+suite whose `gov rebuild` or `gov doctor` did not end within the 30 s for which W1-07's support
+waits (`test_rebuild_stores_hold_no_secret`, `test_rebuild_result_names_unreconstructed_stores`,
+`test_doctor_real_registry_every_entry_reported`, three cases of
+`test_w1_27_rebuild_r8_no_embeddings.py`). Alone they pass: one rebuild of a tiny project takes 10
+to 14 s alone and took 20 to 48 s under ten workers (load average 10 to 30). It is a wait under
+load, not a shared path, port, file or daemon.
+
+What changed: how long a case waits for the command, and nothing else. `w1_27_support.py` has its
+own `COMMAND_TIMEOUT_S = 180.0` (about four times the longest time measured) and its own
+`run_gov` and `run_gov_with_code`, which are W1-07's (the same launcher, environment and `Run`)
+with that wait; the `gov` fixture of `test_w1_27_rebuild_r8_no_embeddings.py` waits as long. Every
+`gov` command of this suite goes through one of the three. No assertion and no case's body
+changed; W1-07's support and every other suite's wait are as they were; the cases stay in the
+parallel run, and nothing was added to `tests/acceptance/serial-only.txt`.
+
+Not changed: `run_python_snippet` (it calls a function, no command) and the 30 s for which
+`test_w1_27_recovery_check_r2.py` waits for the recovery check's own command line; neither was
+among the cases the trial found.
+
+No case of this suite asserts a time: the ticket's KPI lines name none, and no case reads
+`Run.seconds`. So there was no case to leave untouched for that reason.
+
 ## Test count
 
 - **W1-27 new tests**: 49 (rounds 1–2) + 9 (round 3) + 5 (round 4) + 11 (round 5) + 7 (round 6) + 11 (round 7) + 7 (follow-up DEC-456) + 9 (round 8) = 108

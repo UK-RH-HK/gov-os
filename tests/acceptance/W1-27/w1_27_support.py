@@ -28,6 +28,7 @@ import shutil
 import stat
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 _W1_07_DIR = str(Path(__file__).resolve().parents[1] / "W1-07")
@@ -42,8 +43,6 @@ HELD_OUT_REL = base.HELD_OUT_REL
 CHECKS_REL = base.CHECKS_REL
 
 copy_working_tree = base.copy_working_tree
-run_gov = base.run_gov
-run_gov_with_code = base.run_gov_with_code
 make_sandbox = base.make_sandbox
 assert_envelope = base.assert_envelope
 assert_error = base.assert_error
@@ -55,6 +54,44 @@ snapshot = base.snapshot
 snapshot_difference = base.snapshot_difference
 label = base.label
 entry_point = base.entry_point
+
+# How long a case of this suite waits for a ``gov`` command (``gov rebuild``, ``gov doctor``) before it gives
+# up (DEC-549, P-1). It is a wait, not a time the ticket promises: no case asserts it. W1-07's 30 s did not
+# hold in a whole parallel regression: one rebuild of a tiny project takes 10 to 14 s alone and took 20 to
+# 48 s under ten workers (load average 10 to 30), so the wait is about four times the longest measured.
+COMMAND_TIMEOUT_S = 180.0
+
+
+def run_gov(project, sandbox, *args, cwd=None):
+    """Run ``gov <args>`` with the project as the working directory (or ``cwd``), using the project's own code:
+    W1-07's ``run_gov``, with this suite's wait."""
+    project = Path(project)
+    assert (project / base.PYPROJECT_REL).is_file(), \
+        f"{project} has no {base.PYPROJECT_REL}; use run_gov_with_code for a foreign project"
+    return run_gov_with_code(project, project, sandbox, *args, cwd=cwd)
+
+
+def run_gov_with_code(code_root, project, sandbox, *args, cwd=None):
+    """Run ``gov <args>`` in ``project`` with the ``gov`` package of ``code_root``: W1-07's
+    ``run_gov_with_code`` (the same launcher, the same environment, the same ``Run``), with this suite's
+    wait."""
+    launcher = base.write_launcher(code_root, sandbox)
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(sandbox.home),
+        "TMPDIR": str(sandbox.tmpdir),
+        "LC_ALL": "C.UTF-8",
+        "PYTHONPATH": str(Path(code_root) / "src"),
+        "PYTHONPYCACHEPREFIX": str(sandbox.pycache),
+    }
+    started = time.perf_counter()
+    try:
+        done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+                              capture_output=True, text=True, timeout=COMMAND_TIMEOUT_S, stdin=subprocess.DEVNULL)
+    except subprocess.TimeoutExpired:
+        raise AssertionError(f"gov {' '.join(args)} did not end within {COMMAND_TIMEOUT_S:.0f} s") from None
+    return base.Run(tuple(args), done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
+
 
 CONFIG_INVALID = base.CONFIG_INVALID
 NOT_IMPLEMENTED = base.NOT_IMPLEMENTED

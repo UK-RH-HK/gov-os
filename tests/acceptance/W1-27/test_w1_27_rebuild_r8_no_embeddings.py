@@ -156,7 +156,7 @@ def gov(tiny, sandbox, endpoint, program):
     def _gov(*args, project=None):
         started = time.perf_counter()
         done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(project or tiny), env=env,
-                              capture_output=True, text=True, timeout=base.COMMAND_TIMEOUT_S,
+                              capture_output=True, text=True, timeout=support.COMMAND_TIMEOUT_S,
                               stdin=subprocess.DEVNULL)
         return base.Run(tuple(args), done.returncode, done.stdout, done.stderr, time.perf_counter() - started)
 
