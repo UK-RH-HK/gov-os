@@ -5933,3 +5933,18 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.149 | 2026-10-09 | Delegated: DEC-547 (W1-35 named as a second provider of CAP-28 and CAP-28.a, the form of the move ordered in DEC-541). Next free id: DEC-548. |
+
+## 150. Delegated, stricter-only: four packages of the guard follow-up on W1-02 (register v0.150, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-548 — The guard's rule against reads of the settings file and the held-out file: redaction in the helper, second names, copies outside the project, and the refusals beyond the order
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; stricter-only: each point refuses more and blocks none of the owner's own actions; the lead's recommendation and the orchestrator's agree; reversible) · **Basis:** the lead's return at `c95bb271` (`log/W1-02-lead-run1.json`: 447 new cases green, every suite green) · **Under:** DEC-108, DEC-508, DEC-525
+- **Decision:**
+  - **DP-2.** The hook-listing helper redacts a whole deny value, as built, and also an absolute path that a deny rule carries wherever a hook command holds it bare.
+  - **DP-3.** A command that gives either file a second name is refused as a read, for every role: a move or rename of the file, a hard or symbolic link to it, a linking copy, and an in-place edit that leaves a backup copy. A plain write to the file by a role that may write it today stays as it is.
+  - **DP-4.** The rule covers the same two files outside the session's own project: any target whose path ends in either file's project-relative path, in another checkout or worktree or anywhere else, and the user-level settings file of the harness. If a suite reads such a copy through a tool call and goes red, the lead returns it by name; nothing is narrowed to make it pass.
+  - **DP-5.** The refusals beyond the order stand as built: a shell command that only mentions the settings file's path as text; a shell word that is a folder holding either file or a folder above it inside the project, also in a command that does not read; `git -C <dir> diff --stat <file>`. `git status` and `git diff --stat` with no other option stay allowed on both files. Every session writes "the settings file" in commit messages and command text, not its path.
+  - **DP-1 (a search from the project's root with nothing that keeps both files out) is with the owner (P-23).** Until the answer it stays as built: the search tool from the root is allowed, as four suites hold; a glob over everything from the root is refused.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.150 | 2026-10-09 | Delegated, stricter-only: DEC-548 (the guard follow-up on W1-02: helper redaction, second names refused, copies outside the project covered, the refusals beyond the order stand; the root search is with the owner). Next free id: DEC-549. |
