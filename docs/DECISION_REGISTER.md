@@ -6327,3 +6327,25 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.169 | 2026-10-09 | Delegated: DEC-587 (W1-02's last round: the probe judged pass, no fix round; the brace-list shape past the path limit and the lesser findings are residuals for Wave 2; no deadline for the hook programs after a call in Wave 1). Next free id: DEC-588. |
+
+## 170. Owner answers to P-33, on DEC-586 and DEC-587, and on the secrets-indexing check (register v0.170, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-588 — P-33: the clean combination of a ticket file stays a finding for Wave 1
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Basis:** OWNER, on package P-33 option (a) · **Under:** DEC-572, DEC-586, DEC-584
+- **Decision:** The clean combination of a ticket file (a merge commit's ticket file that equals neither parent) stays a finding for Wave 1. In the exit run the shape is avoided by not editing a ticket file on `w1/integrate` while that ticket's branch is open. Lifting clean combinations for ticket files goes on the Wave 2 list.
+
+### DEC-589 — DEC-586 is accepted
+- **Status:** ACCEPTED (owner, 2026-10-09)
+- **Decision:** The orchestrator's delegated decision DEC-586 (the packages of the follow-up after W1-41, second run) is accepted.
+
+### DEC-590 — DEC-587 is accepted; the brace-list shape is a deliberate-shape residual with a proposed fix for Wave 2
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-577, DEC-574
+- **Decision:** The orchestrator's delegated decision DEC-587 is accepted, including the brace-list shape that still reads a held-out folder from an unsandboxed session, as a deliberate-shape residual. It is on the Wave 2 list with the proposed fix: the guard refuses any shell word whose brace expansion would exceed a fixed number of alternatives, whatever its length.
+
+### DEC-591 — The secrets-indexing check is measured on a quiet machine before W1-42
+- **Status:** ACCEPTED (owner, 2026-10-09) · **Under:** DEC-579, DEC-584
+- **Decision:** The orchestrator's plan is confirmed: the `secrets-indexing` check, which times out at 60 seconds on a loaded machine, is measured on a quiet machine before W1-42 and is brought to the owner only if it still times out there.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.170 | 2026-10-09 | Owner: DEC-588 (P-33: the clean combination of a ticket file stays a finding for Wave 1; avoided in the exit run; lifting it to the Wave 2 list), DEC-589 (DEC-586 accepted), DEC-590 (DEC-587 accepted; the brace-list shape a deliberate-shape residual, Wave 2 fix: refuse a shell word whose brace expansion exceeds a fixed number of alternatives), DEC-591 (the secrets-indexing check measured on a quiet machine before W1-42). Next free id: DEC-592. |
