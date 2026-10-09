@@ -1275,6 +1275,105 @@ declared case in its two forms).
 The suite will take longer once the runs are parallel: every close of a temporary project then
 starts the parallel runner twice or three times (about a second each on this machine).
 
+## Round 12: the number of workers is a setting of the project (DEC-549)
+
+The lead's measurements of round 11 as built: every `gov close` under test started as many workers
+as the machine gives, inside a parallel run of the suite (this suite went from about 100 s to
+315 s under `-n auto`). DEC-549, P-2: "The number of parallel workers of a `gov close` is a
+setting of the project, default `auto`; the temporary projects of the suites set it small [...]
+The setting changes how many workers run, never which tests run."
+
+One new file, `test_w1_30_r12_worker_setting.py`, 22 cases; one new section of the support code
+("Round 12"); and one change to the support code every case runs through (below, "The projects of
+this suite").
+
+### Where a project writes its settings for `gov close` (settlement 21)
+
+Two optional top-level keys of `governance/project/path-map.yaml`:
+
+    close_workers: 4        # a positive whole number, or auto; without the line: auto
+    close_timeout: 7200     # a positive number of seconds; without the line: 120
+
+Why there. `gov close` already reads its time limit as "the argument's, else the project's, else
+the default" under the name `close_timeout`, but from the top level of the configuration it is
+handed, and that holds only the documents of the `governance/project/` files the loader knows,
+under their file names (today `path-map.yaml` alone). So no line of a project reaches
+`close_timeout` today, and no decision and no README says where it is written. The one precedent
+of settings a command reads from the project is DEC-479: `decision_register` and
+`decision_citations_base`, top-level keys of the path map, after DEC-185 refused a new overlay
+file. The path map is also the one place inside the engineer's bounds: the close is handed its
+document, and nothing outside `src/gov/close/**` has to change (the loader lets a top-level key it
+does not know pass, as it does for DEC-479's two).
+
+A project without a path map, or whose path map names neither key, closes as today. No argument
+and no command is added; nothing in W1-07's or W1-32's suite holds anything against it (W1-07 runs
+`gov close` only for a ticket that does not exist; W1-32 runs no close).
+
+Note for the lead: the path map must hold `namespaces` (the loader requires the key), so the one
+line is added to a path map a project already has; the kernel's schema file for the path map
+(`template/governance/kernel/schemas/path-map.schema.json`) does not name the two keys, as it
+does not name DEC-479's two. This repository's own line for P-3 is `close_timeout: 7200`.
+
+### The behaviours, the cases, and why each is red
+
+How a case sees the number of workers: every test of its project tells in which worker it ran
+(`support.telling_test`, as in round 11). Each run has twelve tests in twelve files, so the runner
+gives a test to every worker it starts; the workers are the distinct names told. No case reads
+the product's command line.
+
+| Case | Holds | Today (`8566ece4`) |
+|------|-------|--------------------|
+| `test_the_number_a_project_writes_is_the_number_of_workers_of_each_parallel_run` (2: 1, 3) | with `close_workers: N` the acceptance run and the regression run each ran in exactly `gw0`..`gw(N-1)`; every case once, in a worker | red, both: "the project sets 1 workers and the acceptance run had 10" (as many as the machine gives) |
+| `test_the_setting_never_changes_which_tests_run` | three projects with the same tests and one declared case (one worker, three, no setting): every case once, the declared one alone and afterwards; the totals and the stated runs (without `seconds` and `workers`) are equal | green: the setting is not read, so the three are alike; it holds the rule once it is |
+| `test_the_setting_never_changes_the_findings` | the same three with one failing case: exit code 3, the same `findings` and counts, counted once, the declared case still alone | green, for the same reason |
+| `test_each_parallel_run_states_its_number_of_workers` (4: a number, `auto` written, a path map without the key, no path map) | settlement 22, in the close record and the result alike | red, all four: "the parallel acceptance run does not state its number of workers under 'workers'" |
+| `test_a_setting_that_is_no_number_of_workers_refuses_the_close_before_anything_runs` (5: `0`, `-2`, `1.5`, `many`, `true`) | settlement 23: `INVALID_WORKERS`, exit code 1, the key named; no test ran, nothing counted, no repair ticket, nothing closed | red, all five: the close ran and was refused for the failing acceptance tests, exit code 3 |
+| `test_without_the_parallel_runner_a_number_of_workers_is_accepted_and_changes_nothing` | where the test runner has no parallel plugin, `close_workers: 3` closes serially as round 11 holds; no run states `workers` | green (skips where the plugin cannot be taken away, as round 11's case) |
+| `test_without_the_parallel_runner_a_setting_that_is_no_number_refuses_all_the_same` | `close_workers: 0` is refused there too, before anything runs | red: the close ran, exit code 3 |
+| `test_the_time_limit_a_project_writes_is_the_limit_of_a_close_without_the_argument` | `close_timeout: 3` and a regression test that sleeps: refused for the time limit, a finding, counted once | red: "gov close PROJ-work --json did not end within 30 s" (the limit was the default, 120 s) |
+| `test_the_argument_wins_over_the_time_limit_a_project_writes` | `close_timeout: 1`, a test of two seconds, `--timeout 60`: closed | green |
+| `test_a_time_limit_of_the_project_that_is_no_positive_number_is_refused_and_names_the_setting` (3: `0`, `-5`, `soon`) | `INVALID_TIMEOUT` as for the argument (DEC-487), with `close_timeout` named; nothing ran, nothing counted | red, all three: the close ran, exit code 3 |
+| `test_a_list_entry_that_names_no_case_refuses_the_close_with_a_finding` (2: a file, a function that does not exist) | DEC-549, P-4, as built: the run afterwards fails; exit code 3, the entry's case named, counted once, nothing closed; the cases that exist each ran once in a worker | green, both. Round 11 held this for no temporary project ("Not held, and why"); now it is held |
+
+16 red, 6 green.
+
+### The projects of this suite (rewritten, reason "defect found by the parallel trial")
+
+`support.Project` now writes `governance/project/path-map.yaml` into every temporary project, in
+its first commit: `namespaces: {}` and `close_workers: 2` (`support.SUITE_WORKERS`). So every
+close of this suite starts two workers for a parallel run, not as many as the machine gives. Two,
+not one: the parallel form stays what round 11's cases hold (a worker's name, more than one
+worker), and none of them needs a number of its own; none contradicts the setting.
+`Project(root, settings=None)` is a project without a path map, `settings={...}` one with other
+values.
+
+Until the setting is built the line changes nothing of a close: the loader accepts the path map
+(an empty `namespaces`, a top-level key it does not know), no commit of a ticket's range touches
+it, and the cases of round 11 pass with it (below).
+
+One existing file was rewritten for it, with the same reason and in a commit of its own: the two
+cases of `test_w1_30_r11_rebuild_mode.py` now build their project without a path map (a `project`
+fixture of the file, `settings=None`), as it was when they were written. A path map changes what
+`gov rebuild` does in a project: with one, the rebuild also builds the lexical index, which needs
+the project's `.gitleaks.toml` and reads every tracked file (the suite's projects hold a copy of
+`src/`), and both cases failed with `REBUILD_FAILED` ("`.gitleaks.toml` cannot be read"). They
+hold the store check of a close, not that index; nothing they assert changed. Their one close
+runs with `auto` workers.
+
+No other acceptance suite was changed. Looked at, for a temporary project whose `gov close`
+reaches a test run: W1-07 (only a ticket that does not exist), W1-13 (a function called `close`
+of another module), W1-26, W1-31 (writes a close record itself), W1-32 (none). None has one.
+
+### The run of round 12
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n auto`,
+at `6163b234` plus this round's file: 355 cases in 35 files; 339 passed, 16 failed, none skipped,
+in 313 s. The 333 cases of round 11 are green; the 16 red cases are this round's, red for the
+reasons above. As long as a close under test still starts as many workers as the machine gives,
+a case that waits 30 s for a close can fail under `-n auto` for that wait alone and pass alone:
+`test_a_declared_case_over_the_time_limit_is_a_finding`, whose close takes 20 s by design, did
+in one of this round's three whole runs.
+
 ## Covers ids
 
 | Covers id | Tests |
@@ -1291,6 +1390,7 @@ starts the parallel runner twice or three times (about a second each on this mac
 | DEC-492 | the two `test_w1_30_r9_*.py` files: 15 tests (every finding: 10; the ticket tool: 5) |
 | DEC-500 | the five `test_w1_30_r10_*.py` files: 16 tests (probe records: 4; a task that names no ticket: 4; git: 3; the interpreter: 2; skips: 3) |
 | DEC-527, DEC-530 (CAP-13.a, CAP-38.a) | the three `test_w1_30_r11_*.py` files: 43 tests (the runs: 12; this repository's declaration: 29; a store rebuilt without embeddings: 2) |
+| DEC-549 (CAP-13.a, CAP-38.a) | `test_w1_30_r12_worker_setting.py`: 22 tests (the number of workers: 2; never which tests: 2; the stated number: 4; a setting that is none: 5; without the parallel runner: 2; the project's time limit: 5; a list entry that names no case: 2) |
 | CAP-50.c | receipt: 16 tests |
 | DEC-460, DEC-470 | commit_models: 4 tests; context_failures: no store (5 tests) |
 | CAP-59.a | iteration: escalation, options, repair, outcomes |
@@ -1320,6 +1420,9 @@ starts the parallel runner twice or three times (about a second each on this mac
 18. **How a project declares its serial-only cases** (round 11, DEC-527): the list `tests/acceptance/serial-only.txt` of the project. One entry on a line: the beginning of a pytest node id relative to the project's root, either a test file (every case of it) or `file::function` (every parameter set of that function, and no function whose name merely begins with it). Text from ` #` to the line's end, and a line that begins with `#`, is a comment; blank lines count for nothing; a project without the list declares nothing. The list changes no line of any suite's files. In this repository each entry's comment begins with its kind: `latency`, `real-model-or-daemon`, `live-session` or `race`
 19. **The test runs in the close record and the output** (round 11, DEC-527): the key `test_runs`, in the close record's frontmatter and in the JSON `result` alike: a list of objects, each with `run` (`acceptance` or `regression`), `form` (`parallel`, `serial` or `serial-afterwards`), `seconds` (a number, not negative), and `passed`, `failed`, `errors`, `skipped` (whole numbers). An object of form `serial-afterwards` also has `cases`, the list's entries it ran; a run with nothing declared has no such object. Without the parallel runner the two runs have the form `serial` and a `note`, a string that says "parallel"; a run in the form asked for has no `note`. `tests_run` (settlement 16) stays and counts every case once
 20. **The rebuild without embeddings** (round 11, DEC-530): `gov rebuild --no-embeddings`; what its result says is settled in W1-27's README, round 8
+21. **Where a project writes its settings for `gov close`** (round 12, DEC-549): two optional top-level keys of `governance/project/path-map.yaml`: `close_workers` (a positive whole number, or `auto`; without it `auto`) and `close_timeout` (a positive number of seconds; without it the default). `--timeout` wins over `close_timeout`; there is no argument for the number of workers
+22. **The number of workers in the close record and the output** (round 12, DEC-549): the key `workers` in every object of `test_runs` (settlement 19) whose `form` is `parallel`, and in no other: the whole number the project wrote, or the string `auto` where it wrote `auto` or nothing (the number the runner then chose is not stated: the close does not choose it). A `serial-afterwards` run and the `serial` runs of a project without the parallel plugin had no worker and carry no `workers`
+23. **A setting that is none** (round 12, DEC-549; in the form of DEC-487's `INVALID_TIMEOUT`): `close_workers` that is not a positive whole number or `auto` (zero, a negative number, a fraction, another word, a truth value) is `INVALID_WORKERS`; `close_timeout` that is not a positive number is `INVALID_TIMEOUT`. Both: exit code 1, before anything runs, not counted against the ticket, no repair ticket; the message names the key; `details.argument` is the key and one value of `details` is the value as read, as text. Nothing falls back to `auto` or to a serial run. Without the parallel plugin a valid `close_workers` is accepted and changes nothing, an invalid one is refused all the same
 
 ## Residuals
 

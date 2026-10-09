@@ -123,7 +123,7 @@ PRODUCT_TRACEABILITY = "product traceability"
 
 TEMPLATE_OPENSPEC = REPO_ROOT / "template" / "openspec"
 
-# Where a project writes its settings for ``gov close`` (README, round 12, settlement 20): top-level keys of
+# Where a project writes its settings for ``gov close`` (README, round 12, settlement 21): top-level keys of
 # its path map, the one project file every command is handed (DEC-185, DEC-479).
 PATH_MAP_REL = "governance/project/path-map.yaml"
 WORKERS_KEY = "close_workers"
@@ -1212,6 +1212,31 @@ def the_run(runs, run, form):
     found = [entry for entry in runs if (entry["run"], entry["form"]) == (run, form)]
     assert len(found) <= 1, f"more than one {form} run of the {run} tests: {found}"
     return found[0] if found else None
+
+
+# --------------------------------------------------------------------------
+# Round 12 (DEC-549): the number of parallel workers of a close is a setting of the project
+# --------------------------------------------------------------------------
+
+# What the setting holds without a line of the project, and what a project may write beside a whole number.
+AUTO = "auto"
+# Where a parallel run states the number of workers it was given (settlement 22).
+WORKERS_FIELD = "workers"
+# The refusals of a setting that is none (settlement 23); the time limit's is DEC-487's.
+INVALID_WORKERS = "INVALID_WORKERS"
+INVALID_TIMEOUT = "INVALID_TIMEOUT"
+# The key of a refusal's details that names the argument or the setting refused, as the time limit's does.
+REFUSED_KEY = "argument"
+
+
+def workers_that_ran(ran, names):
+    """The workers of the parallel runner in which the telling tests ``names`` ran, each named once."""
+    return sorted({worker for name in names for worker, _ in ran.get(name, [])})
+
+
+def workers_named(number):
+    """The names the parallel runner gives ``number`` workers."""
+    return [f"gw{index}" for index in range(number)]
 
 
 def environment_without_parallel_runner(base, sandbox):
