@@ -2244,3 +2244,5 @@ From the probe (session `2e97ad0c-eee6-4500-baae-303e79f117f7`; record in `docs/
   (its child run's W1-02 p95) and passed alone.
 - **KPI disputes:** none. **Acceptance tests rewritten after implementation began:** five support or fixture
   commits, each "defect found by the parallel trial"; no assertion changed. Added: rounds 11 and 12.
+
+**W1-35 follow-up closed (2026-10-09)** with the ticket tool under DEC-492, DEC-516, DEC-536, DEC-550 and DEC-558. The close ran on the merge commit and refused as every close does before adoption; its output is kept (the orchestrator's log, close-W1-35F.json). No test failed in it, latency cases included. Its one finding that was not an adoption gap, the test designer's commit a7eb9257 without an Implements trailer, is a named exception (DEC-558). Listed for the exit auditor.
