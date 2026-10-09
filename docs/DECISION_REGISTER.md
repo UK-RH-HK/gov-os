@@ -5948,3 +5948,69 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.150 | 2026-10-09 | Delegated, stricter-only: DEC-548 (the guard follow-up on W1-02: helper redaction, second names refused, copies outside the project covered, the refusals beyond the order stand; the root search is with the owner). Next free id: DEC-549. |
+
+## 151. Delegated: six packages of the parallel-run follow-up on W1-30 (register v0.151, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-549 — The parallel run in `gov close`: W1-27's command bound, the worker count as a project setting, the time limit, a list entry that names no case, and the second W1-50 repair
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, test-side or as built; no ticket closes on fewer tests) · **Basis:** the lead's return at `33a1b1c5` (`log/W1-30-lead-runF1.json`: the four pieces built; two regressions of this repository in the parallel form each red on three or four W1-27 cases whose command did not end within 30 seconds under ten workers) · **Under:** DEC-527, DEC-529, DEC-532, DEC-372
+- **Decision:**
+  - **P-1.** A test designer gives the `gov rebuild` and `gov doctor` commands of W1-27's cases a longer bound in W1-27's own support (a rewrite with the reason "defect found by the parallel trial": the bound is how long the case waits for the command, not a time the ticket promises). The cases stay parallel. Where a case asserts a time the ticket's KPI names, nothing is changed. If the cases still do not hold under ten workers, declaring them serial-only changes which cases count as serial-only and is the owner's.
+  - **P-2.** The number of parallel workers of a `gov close` is a setting of the project, default `auto`; the temporary projects of the suites set it small, so that a close under test does not start ten workers inside a parallel run. The setting changes how many workers run, never which tests run.
+  - **P-3.** No code: a close of this repository is given a time limit of 7200 seconds, as the orchestrator has passed it until now; the project's own setting is written at the merge.
+  - **P-4.** A list entry that names no case: as built. The run afterwards fails and the close is refused with a finding. (The lead recommended a refusal that is not counted against the ticket; the stricter form already built is kept, and this repository's own case keeps such entries out of its list.)
+  - **P-5.** The stray untracked file under the worktree's `tests/acceptance/W1-27/` (a two-line comment, no test, in no commit) is not the orchestrator's to remove (MR-3); it goes with the worktree when the worktree is removed.
+  - **P-6.** The second W1-50 repair (`1e2ec82b`, the same missing import path in another file of that suite) stands, with its `Rewrite-Reason:`.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.151 | 2026-10-09 | Delegated: DEC-549 (the parallel-run follow-up on W1-30: a longer command bound in W1-27's support, the worker count as a project setting, the time limit, a list entry without a case stays a finding, the second W1-50 repair stands). Next free id: DEC-550. |
+
+## 152. Delegated: four packages of the orchestration-skill follow-up on W1-35 (register v0.152, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-550 — The orchestration skill: two known findings of the adapter check until the exit, and three points of wording as built
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, the lead's recommendation and the orchestrator's agree; wording and a known check state, nothing loosened) · **Basis:** the lead's return at `e2797b3b` (`log/W1-35-lead-runF1.json`: 54 new cases, every suite green) · **Under:** DEC-537, DEC-539, DEC-481, DEC-516
+- **Decision:**
+  - **P-1.** The adapter-portability check at this repository's root gains two findings (a rulesync source of the new skill that this repository does not hold, and the orchestrator subagent source that now differs from the template's), beside the 43 of DEC-481. They are known and of the same cause as the 43: this repository's rulesync sources and generated output are the owner's to apply at the exit (DEC-537). Until then they count with the baseline at a close (DEC-516). They are named in the exit package.
+  - **P-2.** A rule that only this repository's orchestrator prompt held is cited in the skill with DEC-537, which ordered it stated there; the skill's opening sentence says so. A decision that states those rules one by one may follow with a later register batch.
+  - **P-3.** After the second review of a FULL ticket the skill names fail-open holes and losses of work, with DEC-413's own words (silent changes to tests or ticket files) beside them: both stand.
+  - **P-4.** The skill states "confidence medium or higher" as the delegation rule, and the widening to medium-low for a P2 as one an owner may give, as in DEC-416: as built.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.152 | 2026-10-09 | Delegated: DEC-550 (the orchestration-skill follow-up on W1-35: two known adapter-check findings count with the baseline until the owner applies the output at the exit; three points of wording as built). Next free id: DEC-551. |
+
+## 153. Delegated, stricter-only: three packages of W1-41's third run and the judgement of its probe (register v0.153, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-551 — External references in the context: a defective file blocks every ticket, a register-shaped id is refused by its form, a ticket with only external sources is refused
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each is the form that refuses more, as built; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `920229dc` (`log/W1-41-lead-run3.json`: 156 cases green, every acceptance suite green) · **Under:** DEC-511, DEC-520, DEC-449, DEC-454
+- **Decision:**
+  - **P-11.** A defective `governance/project/external-references.yaml` (unreadable, not valid, wrong shape, a duplicate id) blocks every ticket's context and names the file, not only a ticket that declares an id the store lacks: a defect is seen at once.
+  - **P-12.** An entry whose id has the form of a register decision is refused by its form in every project, whether or not the project names a register: a decision is never made an outside source by a list.
+  - **P-13.** A ticket whose declared ids are all external references is refused, as a ticket that declares nothing is: no close stands on a context in which nothing was read.
+  - The outside sources that closed tickets cite and that are neither records nor listed (the lead's list in its return) are not listed by the orchestrator: which of them become records and which are listed belongs to this repository's adoption step (DEC-522) and is brought to the owner with it.
+
+### DEC-552 — W1-41's reviewer probe: judged pass with one fix round of three behaviours; the rest are residuals
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each fix refuses more) · **Basis:** the probe's return (`log/W1-41-probe.json`, session `2020c8c7-b490-4464-8b39-64fc3030412a`, at `920229dc`; ten findings, each reproduced; the ticket's four failure lines hold as observed) · **Under:** DEC-498, DEC-137, DEC-454, DEC-520
+- **Decision:** One fix round, test designer first, then one engineer; no second probe (DEC-498).
+  - **Finding 1 (fails open, ordinary work produces it).** The dependency proof sees a citation of a legacy memory store in a kept rule file when the path stands behind `./`, `/`, `../` or a folder (and an id behind a folder), as it sees the bare path and the bare id. A store so cited is not retired.
+  - **Finding 6 (the stricter reading of "active record").** In the dependency proof a record holds a store back unless its status says it no longer stands (superseded, retired, rejected). A record with the status ACCEPTED, PROPOSED or DRAFT counts: the decisions of this repository's own register carry ACCEPTED.
+  - **Finding 8 (the gap that P-13 above closes, one step further).** A ticket whose declared sources are all external references is refused whether or not it also names dependency tickets: a dependency that was read is not a source that was read.
+  - **Residuals, named in `bootstrap.md`:** findings 2 to 5, 7, 9 and 10 (no record of the completed batches after a failed one, and rollback refs reused by the next round; an interruption inside a batch; a move target in no namespace, refused only at A8; a flat package layout moved without the two grounds; four legacy shapes that cannot be adopted and fail closed; the external list read from the working tree, and repository-held id forms other than a decision's accepted in it; retired and rejected records satisfying a mandatory source). Findings 9 and 10 go to the follow-up after W1-41 with DEC-521's items; finding 4 and the first two shapes of finding 7 are read again before this repository's own adoption.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.153 | 2026-10-09 | Delegated, stricter-only: DEC-551 and DEC-552 (W1-41's external references: a defective file blocks every context, a register-shaped id is refused by form, an all-external ticket is refused; the unlisted outside sources go to the adoption step; the probe judged pass with one fix round: citations behind a path prefix, records that still stand, all-external sources beside dependencies). Next free id: DEC-553. |
+
+## 154. Delegated, stricter-only: three packages of the guard follow-up's second run on W1-02 (register v0.154, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-553 — The read rule for the two protected files: a wildcard-only glob from a copy's folder, a deny path spelled from the home folder, a move of the holding folder
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, stricter-only: each refuses or redacts more; the lead's recommendation and the orchestrator's agree) · **Basis:** the lead's return at `750d57fb` (`log/W1-02-lead-run2.json`: DEC-548's four points built, 331 new cases, every suite green; a comparison over 420,000 random calls found none that was refused before and is allowed now) · **Under:** DEC-508, DEC-525, DEC-548
+- **Decision:**
+  - **DP-6: (b).** A glob made of wildcards alone from the folder a copy lies under is refused as the same glob from the session's own root is: the two no longer differ. A glob or search from above that folder whose pattern names the file's own name or path is answered together with DP-1, which is with the owner (P-23); until then it is a residual.
+  - **DP-7: (b).** The helper also redacts a deny path that is spelled from the home folder, as written and with the home folder in its place. A project-relative spelling is not redacted (it would blank ordinary relative paths) and stays a residual.
+  - **DP-8: (b).** A move or a link of a folder that holds either file or a copy is a second name and is refused as a read, for every role. An in-place edit whose backup suffix is its own word without a dot, and a move or copy with an option the reader of operands cannot read, stay residuals.
+  - The lead's reading of DEC-548's fourth point is confirmed: an existing file at the same project-relative path under another folder is treated as the file is.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.154 | 2026-10-09 | Delegated, stricter-only: DEC-553 (the guard follow-up on W1-02: a wildcard-only glob from a copy's folder refused, a deny path spelled from the home folder redacted, a move or link of a holding folder refused as a read). Next free id: DEC-554. |
