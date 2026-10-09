@@ -1307,6 +1307,16 @@ own change. The suite holds the words, the stricter reading; see package DP-29.
 | The commit DEC-572 names | `test_the_merge_commit_decided_as_a_named_exception_equals_no_parent_s_version_and_stays_a_finding`: `803f731c` judged in place in this repository, read-only (`HEAD` and `git status` are compared before and after). Skipped where the repository does not hold the commit (a shallow copy) | 1 | **green** (package DP-29) |
 | 3. An acceptance test both sides changed | `test_an_acceptance_test_both_sides_changed_held_as_one_parent_has_it_stays_a_finding`: the first parent's version, the second parent's; test designer's commits that pass | 2 | **green**; must stay green: a lift that does not stop at `tests/acceptance/**` fails them |
 
+**The parameter `a-merge-commit-on-that-side-whose-own-change-it-is`, rewritten after implementation** (reason:
+fixture defect). It builds what it built: the merged side itself merged a third branch after both had changed the
+ticket file by orchestrator's commits, and that inner merge commit holds the third branch's version. Its guard
+asked that the inner merge commit, judged alone, be a finding. That was true only before the rule existed: judged
+alone it is the lifted shape (the same as `one-commit-on-the-merged-side`), so no product could pass both. The guard
+now tells from git's own answers that the file is the inner merge commit's own change as merges were read before
+DEC-572 (two parents, one merge base, both sides changed the file, it holds one side's version); the guard of the
+other three parameters and the behaviour assertion are unchanged. It is the one case that holds point 3's "the lift
+is not applied inside the lift" (package DP-32, point 2).
+
 The case that judges `803f731c` in place does not depend on where `HEAD` is: the commit and the commits of its sides
 carry the orchestrator's trailers, which are judged the same on any ticket in any state (DEC-359). While the tree is
 paused every commit is a finding (thirteenth batch), which is the answer the case expects as well.

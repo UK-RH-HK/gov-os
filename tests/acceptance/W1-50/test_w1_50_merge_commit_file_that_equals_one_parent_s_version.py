@@ -183,6 +183,25 @@ def _assert_holds(project, before, branch, path, holds, brought, base_s_own=Fals
         )
 
 
+def _assert_own_change_as_read_before(project, commit_id, path):
+    """Guard against an empty test, from git's own answers: ``commit_id`` is a merge commit of two parents with
+    one merge base, both parents changed ``path`` since that merge base and differ in it, and the merge commit
+    holds it as one of them has it. That is the merge commit's own change as the check read merges before
+    DEC-572 (DEC-421), and the shape DEC-572 lifts: judged alone the commit may be no finding, so the
+    judgement of the commit alone cannot tell that it does not pass."""
+    parents = support.parents_of(project, commit_id)
+    assert len(parents) == 2, f"the fixture is wrong: the commit {commit_id[:12]} has the parents {parents}"
+    bases = support.merge_bases(project, *parents)
+    assert len(bases) == 1, f"the fixture is wrong: the parents of {commit_id[:12]} have the merge bases {bases}"
+    held = support.content_at(project, commit_id, path)
+    at_base = support.content_at(project, bases[0], path)
+    at = [support.content_at(project, parent, path) for parent in parents]
+    assert at_base not in at and at[0] != at[1] and held is not None and held in at, (
+        f"the fixture is wrong: {path} is not the own change of the merge commit {commit_id[:12]} as merges "
+        f"were read before DEC-572 (both sides changed it and the merge commit holds one side's version)"
+    )
+
+
 def _merge_in_the_call(project, call, judge, command):
     """One call of the orchestrator makes the merge commit; the judgement of a list of commits then judges
     the merge commit alone. Returns (hook result, state after, merge commit id, the function's findings,
@@ -343,9 +362,11 @@ NOT_PASSING = {
 def test_a_version_brought_by_a_commit_that_does_not_pass_stays_a_finding_named_with_that_commit(
         project, sandbox, call, judge, case):
     """DEC-572: "every commit that brought that version passes the check". The merge commit holds the ticket
-    file exactly as its second parent has it, and one commit that brought that version is itself a finding
-    when it is judged alone. The ticket file stays a finding of the merge commit, and the finding names that
-    commit."""
+    file exactly as its second parent has it, and one commit that brought that version does not pass: it is
+    itself a finding when it is judged alone, or it is a merge commit whose own change the file is as merges
+    were read before DEC-572 (the lift is not applied inside the lift, so that one is told from git's own
+    answers: judged alone it is the lifted shape). The ticket file stays a finding of the merge commit, and
+    the finding names that commit."""
     side, nth = NOT_PASSING[case]
     _history(project, sandbox, *side)
     what = (f"a --no-ff merge of {BRANCH} into main after both changed {TICKET_FILE}; the merge commit holds the "
@@ -356,10 +377,13 @@ def test_a_version_brought_by_a_commit_that_does_not_pass_stays_a_finding_named_
     brought = _brought(project, branch, base, TICKET_FILE)
     _assert_holds(project, before, branch, TICKET_FILE, [SECOND], [len(brought)])
     fails = brought[nth]
-    alone = judge(project, [fails])
-    assert [f.commit for f in alone] == [fails], (
-        f"the fixture is wrong: judged alone, the commit {fails[:12]} is no finding: {alone}"
-    )
+    if support.is_merge(project, fails):
+        _assert_own_change_as_read_before(project, fails, TICKET_FILE)
+    else:
+        alone = judge(project, [fails])
+        assert [f.commit for f in alone] == [fails], (
+            f"the fixture is wrong: judged alone, the commit {fails[:12]} is no finding: {alone}"
+        )
     passing = [c for c in brought if c != fails]
     assert not passing or judge(project, passing) == [], (
         f"the fixture is wrong: another commit that brought the version is a finding too"
