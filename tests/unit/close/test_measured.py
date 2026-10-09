@@ -435,13 +435,13 @@ def test_options_of_the_callers_environment_do_not_reach_the_run(tmp_path, monke
 def test_nothing_else_of_the_callers_environment_is_taken_away(tmp_path, monkeypatch):
     seen = {}
 
-    def fake_run(cmd, **keys):
-        seen.update(keys["env"])
+    def fake_run(root, cmd, env, timeout=None):
+        seen.update(env)
         return SimpleNamespace(returncode=0, stdout="1 passed in 0.01s\n", stderr="")
 
     monkeypatch.setenv("PYTEST_ADDOPTS", "--collect-only")
     monkeypatch.setenv("PYTHONPATH", "/elsewhere")
-    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    monkeypatch.setattr("gov.close.command._started", fake_run)
     before = {key: value for key, value in os.environ.items()
               if key != "PYTEST_ADDOPTS" and (not key.startswith("PYTHON") or key in PLACES)}
     _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)

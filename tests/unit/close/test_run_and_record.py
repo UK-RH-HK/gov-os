@@ -66,8 +66,8 @@ def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_o
     where installed packages are and where compiled files go (DEC-500)."""
     seen = {}
 
-    def fake_run(cmd, **keys):
-        seen.update(keys["env"])
+    def fake_run(root, cmd, env, timeout=None):
+        seen.update(env)
         return SimpleNamespace(returncode=0, stdout="1 passed in 0.01s\n", stderr="")
 
     for name in [name for name in os.environ if name.startswith("PYTHON")]:
@@ -77,7 +77,7 @@ def test_the_environment_of_the_run_is_the_callers_with_the_projects_src_alone_o
                 "PYTHONHOME": "/another", "PYTHONSTARTUP": "/a/file.py", "PYTHONNOUSERSITE": "1"}
     for name, value in (places | switches).items():
         monkeypatch.setenv(name, value)
-    monkeypatch.setattr("gov.close.command.subprocess.run", fake_run)
+    monkeypatch.setattr("gov.close.command._started", fake_run)
     before = {name: value for name, value in os.environ.items() if name not in switches}
     _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
     assert seen == before | {"PYTHONPATH": str(tmp_path / "src")}
@@ -105,7 +105,7 @@ def test_skipped_tests_are_counted_and_are_no_finding(tmp_path):
 
 
 def test_a_test_runner_this_process_had_from_the_callers_path_alone_is_absent_not_a_finding(tmp_path, monkeypatch):
-    monkeypatch.setattr("gov.close.command.subprocess.run", lambda cmd, **keys: SimpleNamespace(
+    monkeypatch.setattr("gov.close.command._started", lambda root, cmd, env, timeout=None: SimpleNamespace(
         returncode=1, stdout="", stderr="/usr/bin/python3: No module named pytest\n"))
     with pytest.raises(GovError) as raised:
         _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
@@ -114,7 +114,7 @@ def test_a_test_runner_this_process_had_from_the_callers_path_alone_is_absent_no
 
 def test_an_interpreter_without_pytest_is_an_error_and_no_test_is_run(tmp_path, monkeypatch):
     monkeypatch.setattr("importlib.util.find_spec", lambda name: None)
-    monkeypatch.setattr("gov.close.command.subprocess.run", lambda *a, **k: pytest.fail("a test run was started"))
+    monkeypatch.setattr("gov.close.command._started", lambda *a, **k: pytest.fail("a test run was started"))
     with pytest.raises(GovError) as raised:
         _run_tests(tmp_path, _tests(tmp_path, test_a=""), 60)
     assert (raised.value.code, raised.value.exit_code) == ("TEST_RUNNER_ABSENT", 1)

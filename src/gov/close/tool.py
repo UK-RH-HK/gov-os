@@ -16,6 +16,9 @@ from gov.cli.errors import GovError
 from gov.close import state as _state
 
 TOOL_NAME = "tk"
+NOT_OPENED = "not opened"  # how the answer begins where the tool opened no repair ticket
+# What a repair ticket holds of the findings: under what one argument of a command carries (128 KiB on Linux).
+FINDINGS_BYTES = 96 * 1024
 
 
 def find(root: Path) -> Path:
@@ -71,6 +74,17 @@ def close(root: Path, ticket: str) -> None:
                         {"command": "close", "tool": str(find(root))})
 
 
+def findings_held(findings: list[str]) -> int:
+    """How many of ``findings``, from the first on, a repair ticket holds: the findings go to the tool as one
+    argument, and those that would take it beyond ``FINDINGS_BYTES`` are left out, whole."""
+    room = FINDINGS_BYTES
+    for held, finding in enumerate(findings):
+        room -= len(finding.encode("utf-8")) + len("- \n")
+        if room < 0:
+            return held
+    return len(findings)
+
+
 def open_repair_ticket(root: Path, ticket: str, findings: list[str],
                        disposition: str | None = None,
                        context_hash: str | None = None,
@@ -83,9 +97,13 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     """
     from gov.tasks.tickets import TICKETS_REL
 
+    held = findings_held(findings)
     description = [f"Findings of the refused close of {ticket} "
                    f"(disposition: {disposition or 'unclassed'}):"]
-    description += [f"- {finding}" for finding in findings]
+    description += [f"- {finding}" for finding in findings[:held]]
+    if held < len(findings):
+        description.append(f"Cut: {len(findings) - held} of the {len(findings)} findings are not in this ticket, "
+                           "which holds the first of them; the answer of the refused close names every one.")
     if not_measured:
         description.append("Not measured by that close:")
         description += [f"- {part}" for part in not_measured]
@@ -95,7 +113,7 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
         created = tk(root, "create", f"Repair {ticket}: {findings[0][:60]}",
                      "--parent", ticket, "-d", "\n".join(description))
     except GovError as e:
-        return f"not opened: {e.message}"
+        return f"{NOT_OPENED}: {e.message}"
     repair_id = created.strip().split("\n")[-1]
     path = Path(root) / TICKETS_REL / f"{repair_id}.md"
 
