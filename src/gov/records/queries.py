@@ -29,9 +29,11 @@ def _edges(rows) -> list[dict]:
 
 
 def records(root: Path, type: str | None = None, status: str | None = None) -> list[dict]:
-    """The records whose frontmatter matches every filter given."""
-    rows = _rows(root, "SELECT id, type, status, path FROM records", type=type, status=status)
-    return [dict(zip(("id", "type", "status", "path"), row)) for row in rows]
+    """The records whose frontmatter matches every filter given; a register entry with its heading and title."""
+    rows = _rows(root, "SELECT records.id, type, status, path, heading, title FROM records"
+                       " LEFT JOIN register_entries ON register_entries.id = records.id", type=type, status=status)
+    return [dict(zip(("id", "type", "status", "path"), row)) if row[4] is None
+            else dict(zip(("id", "type", "status", "path", "heading", "title"), row)) for row in rows]
 
 
 def active(root: Path, type: str | None = None) -> list[str]:
