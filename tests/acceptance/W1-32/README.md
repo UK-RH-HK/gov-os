@@ -141,12 +141,23 @@ Red today for the same reason as success 2.
 | Half | Cases |
 |---|---|
 | A natural-language question is routed to `gov status --json` | None: package P-2 |
-| The command set stays at the Wave 1 list | `test_status_is_one_of_the_wave_1_operations`, `test_this_ticket_adds_no_command`, `test_status_has_no_sub_command_and_no_argument_that_acts` |
+| The command set stays at the Wave 1 list | `test_status_is_one_of_the_wave_1_operations`, `test_the_command_set_is_the_twelve_and_the_three_recorded_ones`, `test_status_has_no_sub_command_and_no_argument_that_acts` |
 
 All three pass today and are guards: this ticket fills a reserved command and
-adds none. `test_this_ticket_adds_no_command` pins the three commands found
-beyond the twelve reserved ones (`ci`, `launch`, `telemetry`) as found; see
-package P-3.
+adds none.
+
+**Rewritten in the follow-up after W1-41 (DEC-569; `Rewrite-Reason: DEC-542`).**
+`test_this_ticket_adds_no_command` pinned the three commands found beyond the
+twelve (`ci`, `launch`, `telemetry`) "as found, not approved" (package P-3).
+The owner answered P-3 in DEC-542: the three and `lock` are recorded in the
+command list. The case is now
+`test_the_command_set_is_the_twelve_and_the_three_recorded_ones`: the three
+are read from the recorded lines of W1-07's support, the command set is held
+exactly (every command `gov` offers is recorded, every recorded `gov` command
+is offered), and `lock`, recorded as the module command `python3 -m gov.lock`,
+is not a `gov` command. Green before and after: the rewrite changes what the
+case says about the three, not what `gov` offers. The cases of the four
+commands are in W1-07's suite (`test_w1_07_recorded_commands.py`).
 
 ## Cases added after implementation
 
@@ -202,6 +213,9 @@ whose reading end is closed.
 
 None. No earlier case pins the present answer of `gov status` (`root`,
 `config_files`).
+
+A case of this suite was itself rewritten later, in the follow-up after W1-41
+(reason: DEC-542): see "CAP-28.a" above.
 
 ## Packages returned with this suite
 

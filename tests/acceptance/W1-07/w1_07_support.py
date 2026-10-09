@@ -45,6 +45,12 @@ CHECKS_REL = "template/governance/kernel/checks"
 RESERVED_COMMANDS = ("status", "check", "readiness", "doctor", "rebuild", "context", "closure", "retrieve",
                      "checkpoint", "close", "adopt", "pause")
 
+# DEC-542: four commands are recorded in the command list beside the twelve, one line each (DEC-546). The first
+# three are ``gov`` commands. ``lock`` is no ``gov`` command: it is the module command ``python3 -m gov.lock``, the
+# template's Copier task (DEC-499), and recording it adds none. Cases: ``test_w1_07_recorded_commands.py``.
+RECORDED_GOV_COMMANDS = ("ci", "launch", "telemetry")
+RECORDED_MODULE_COMMANDS = ("lock",)
+
 # What W1-07 builds: a minimal ``status`` and ``check --list`` (ticket text, DEC-186).
 # Every other reserved command, and ``check`` without ``--list``, is not built yet.
 # Planned revision (DEC-190, "planned: command implemented"): W1-25 builds ``checkpoint``; its cases are in

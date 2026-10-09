@@ -496,6 +496,31 @@ file) and `field`. Only one case holds the codes; the others hold the file and t
 
 40 red, 3 green.
 
+### The four recorded commands in the checks (DEC-542; `test_w1_26_recorded_commands.py`, 10 cases)
+
+DEC-542: "`ci`, `launch`, `telemetry` and `lock` are recorded in the command list". The lines and what
+"recorded" means for `lock` are in W1-07's README, section "The four commands of DEC-542". Two checks read the
+command list, and both hold the twelve only today.
+
+- **`core-commands`** holds for each of the four what it holds for the twelve: where the project holds no
+  module for the command, a finding carries the command's name under `command` (the code is the check's own,
+  `COMMAND_NO_MODULE`; the cases do not fix it). For `ci`, `launch` and `telemetry` the module is the command's
+  module file, as for the twelve. For `lock`, recorded as the module command `python3 -m gov.lock`, it is the
+  file that makes that command run. With every module present the check has no finding.
+- **The skill validator** (a reading: it is the second reader of the list, and a list that records `ci` while
+  a check calls `gov ci` unknown would contradict itself): a skill may name `gov ci`, `gov launch` and
+  `gov telemetry`. `gov lock` in a skill stays `SKILL_UNKNOWN_COMMAND`, because `gov` has no such command.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_recorded_command_without_its_module_is_a_finding_that_names_it` (4: `ci`, `launch`, `telemetry`, `lock`) | the module removed in the temporary project's copy: a finding with `command` the name, the family red, no finding about a command whose module is present | red, all four: the check has no finding |
+| `test_with_every_module_present_the_check_has_no_finding` | the twelve and the four each with their module: no finding, the family green | green; it holds that recording `lock` does not make the check report it for the form it has |
+| `test_a_skill_may_name_a_recorded_gov_command` (3) | a skill whose code names `gov ci`, `gov launch`, `gov telemetry`: no `SKILL_UNKNOWN_COMMAND`, exit code 0 | red, all three: "unknown gov command" |
+| `test_gov_lock_in_a_skill_stays_an_unknown_command` | `gov lock` in a skill is flagged | green; holds that no command is added |
+| `test_the_module_command_of_lock_in_a_skill_is_not_flagged` | `python3 -m gov.lock` in a skill | green; holds what stays |
+
+7 red, 3 green. The suite's two earlier cases on this check (`test_w1_26_planted_defects.py`) are unchanged.
+
 Not held here: where an installed project holds the kernel's schemas. The schema check reads them from the
 template layout; the three declared checks that name `template/` paths are piece 15 below, and the schema
 check's own place for its schemas is named in no decision.

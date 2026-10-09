@@ -6,11 +6,16 @@ item)."
 The Wave 1 list is the twelve governance operations the registry reserves
 (CAP-28.b; W1-07's ``RESERVED_COMMANDS``, which its suite holds present and
 this file reads from there). W1-07's suite does not hold the other direction:
-nothing there fails when a thirteenth command appears. Three have appeared
-before this ticket: ``launch`` (CAP-61 names it), ``ci`` and ``telemetry``
-(no contract item names either as a command: package P-3, README). They are
-named here as found, not approved; this file holds that ``gov status`` and its
-ticket add nothing more.
+nothing there fails when a thirteenth command appears. Three appeared before
+this ticket: ``launch``, ``ci`` and ``telemetry`` (package P-3, README).
+
+Rewritten in the follow-up after W1-41 (reason: DEC-542). The owner's answer
+to P-3: "``ci``, ``launch``, ``telemetry`` and ``lock`` are recorded in the
+command list". The three are no longer pinned "as found, not approved": they
+are read from the recorded lines of W1-07's support, and the command set is
+held exactly, the twelve and the three. ``lock`` is recorded as the module
+command ``python3 -m gov.lock`` and is no ``gov`` command: recording it adds
+none, and a ``gov lock`` fails this file.
 
 The first half of the line, a status question asked in natural language, needs
 a file outside this ticket's paths (package P-2, README) and has no case.
@@ -24,8 +29,9 @@ import w1_32_support as support
 
 cli_support = support.cli_support
 
-# Found in ``gov --help`` at this ticket's start, beside the twelve; see the module text and package P-3.
-ADDED_BEFORE_W1_32 = ("ci", "launch", "telemetry")
+# The ``gov`` commands recorded beside the twelve (DEC-542), and the recorded command that is none of ``gov``'s.
+RECORDED = cli_support.RECORDED_GOV_COMMANDS
+NO_GOV_COMMAND = cli_support.RECORDED_MODULE_COMMANDS
 
 
 def _commands(run):
@@ -44,12 +50,18 @@ def test_status_is_one_of_the_wave_1_operations(empty_project, sandbox):
     assert support.COMMAND in _commands(run), f"gov --help does not name status\n{run.describe()}"
 
 
-def test_this_ticket_adds_no_command(empty_project, sandbox):
+def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
+    """Rewritten (DEC-542) from ``test_this_ticket_adds_no_command``, which pinned the three as found. Every
+    command ``gov`` offers is in the command list, every ``gov`` command of the list is offered, and the
+    recorded module command is not among them."""
+    assert tuple(RECORDED) == ("ci", "launch", "telemetry") and tuple(NO_GOV_COMMAND) == ("lock",)
     run = support.gov(empty_project, sandbox, "--help")
     commands = _commands(run)
     assert set(cli_support.RESERVED_COMMANDS) <= set(commands), f"a Wave 1 operation is gone\n{run.describe()}"
-    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(ADDED_BEFORE_W1_32))
-    assert not extra, f"gov has commands outside the Wave 1 list and the three found at this ticket's start: {extra}"
+    gone = sorted(set(RECORDED) - set(commands))
+    assert not gone, f"a recorded command is gone from gov --help: {gone}\n{run.describe()}"
+    extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(RECORDED))
+    assert not extra, f"gov has commands the command list does not record: {extra}"
 
 
 def test_status_has_no_sub_command_and_no_argument_that_acts(empty_project, sandbox):
