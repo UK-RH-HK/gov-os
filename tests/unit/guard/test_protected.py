@@ -363,6 +363,7 @@ def test_a_copy_is_refused_as_the_file_is(project, site, rel):
         ("Grep", {"pattern": "x", "path": str(site), "glob": name}, None),
         ("Glob", {"pattern": f"**/{name}", "path": str(site)}, None),
         ("Glob", {"pattern": f"{folder}/*"}, None),
+        ("Glob", {"pattern": "**/*", "path": str(site)}, None),
         ("Bash", {"command": f"cat {copy}"}, None),
         ("Bash", {"command": f"cd {site} && cat {rel}"}, None),
         ("Bash", {"command": f"wc -c < {copy}"}, None),
@@ -391,7 +392,6 @@ def test_what_is_beside_or_above_a_copy_is_let_through(project, site, rel):
         ("Grep", {"pattern": "x", "path": str(site)}),
         ("Grep", {"pattern": "x", "path": str(site), "glob": "*.py"}),
         ("Grep", {"pattern": "x", "path": str(site / "src")}),
-        ("Glob", {"pattern": "**/*", "path": str(site)}),
         ("Glob", {"pattern": "**/*.py", "path": str(site)}),
         ("Bash", {"command": f"ls -la {site}"}),
         ("Bash", {"command": f"grep -rn x {site}"}),
@@ -427,6 +427,56 @@ def test_a_plain_write_or_a_second_name_for_another_file_is_no_read(project, rel
         f"mv {beside} docs/b", f"ln {beside} docs/b", f"sed -i.bak s/a/b/ {beside}",
         "mv", "ln", "cp -l", "sed -i", "mv --t", "mv -t",
     ):
+        assert not _refused(project, "Bash", {"command": command}), command
+
+
+# -- wildcards alone from a copy's folder, a holding folder's second name (DEC-553) --
+
+def test_wildcards_alone_from_a_copy_s_folder_are_refused_as_from_the_root(project, site):
+    home = os.environ["HOME"]
+    depth = "/".join("*" * len(SETTINGS_REL.split("/")))
+    for start in (project, site, home):
+        for tool_name, tool_input in (
+            ("Glob", {"pattern": "**/*", "path": str(start)}),
+            ("Glob", {"pattern": f"{start}/{depth}"}),
+            ("Grep", {"pattern": "x", "path": str(start), "glob": "*"}),
+            ("Grep", {"pattern": "x", "path": str(start), "glob": f"/{depth}"}),
+            ("Bash", {"command": f"cat {start}/**"}),
+            ("Bash", {"command": f"cd {start} && ls -d */**"}),
+        ):
+            assert _refused(project, tool_name, tool_input), (tool_name, tool_input)
+        for tool_name, tool_input in (
+            ("Glob", {"pattern": "*", "path": str(start)}),
+            ("Glob", {"pattern": "*/*/*/*/*/*", "path": str(start)}),
+            ("Glob", {"pattern": "**/*", "path": f"{start}/src"}),
+            ("Bash", {"command": f"ls {start}/*"}),
+            ("Bash", {"command": f"cat {start}/src/**/*"}),
+        ):
+            assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
+    for command in ("cat ~/**/*", "cat $HOME/**", "cd && cat */*"):
+        assert _refused(project, "Bash", {"command": command}), command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_a_second_name_for_a_holding_folder_is_a_read(project, site, rel):
+    parts = rel.split("/")
+    for root in (project, site):
+        for n in range(1, len(parts)):
+            folder = "/".join([str(root)] + parts[:n])
+            for command in (
+                f"mv {folder} docs/moved", f"mv {folder}/ docs/moved", f"mv -t docs {folder}",
+                f"mv {folder} {folder}-renamed", f"ln {folder} docs/second",
+                f"ln -s {folder} docs/second", f"cp -rl {folder} docs/linked",
+                f"cp -al {folder} docs/linked", f"cp -r --link {folder} docs/linked",
+                f"cd {root} && mv {'/'.join(parts[:n])} moved",
+            ):
+                assert _refused(project, "Bash", {"command": command}), command
+    for command in (f"mv ~/{_folder(SETTINGS_REL)} docs/moved",
+                    f'cp -al "${{HOME}}/{_folder(SETTINGS_REL)}" docs/linked'):
+        assert _refused(project, "Bash", {"command": command}), command
+    for command in ("mv docs src/docs", "ln -s docs src/docs", "cp -al src docs/src",
+                    "mv -t docs src", f"mv {site}/src docs/moved", f"ln {site} docs/second",
+                    f"mv {site} docs/moved", "mv ~ docs/moved", "git mv docs src/docs"):
         assert not _refused(project, "Bash", {"command": command}), command
 
 
@@ -500,9 +550,35 @@ def test_the_listing_redacts_an_absolute_path_a_deny_rule_carries():
     assert commands(["Read(//w/held/**)", "Read(//w/held-two/**)"],
                     "ls /w/held-two /w/held") == [f"ls {REDACTED} {REDACTED}"]
     for rule in ("Bash(ls:*)", "Read(./w/**)", "Read(**/*.key)", "Read(//)", "Read(//**)",
-                 "Read(/w/held/**)", "Read(~/w/**)", "Read", "(//w)"):
+                 "Read(/w/held/**)", "Read(~)", "Read(~/)", "Read(~/**)", "Read", "(//w)"):
         assert commands([rule], f"ls w /w/held ./w **/*.key / {rule} ~/w") == [
             f"ls w /w/held ./w **/*.key / {REDACTED} ~/w"], rule
+
+
+def test_the_listing_redacts_a_path_a_deny_rule_spells_from_the_home_folder(monkeypatch):
+    def commands(deny, *held):
+        return [row["command"] for row in listing({
+            "permissions": {"deny": deny},
+            "hooks": {"Stop": [{"hooks": [{"command": c} for c in held]}]}})]
+
+    monkeypatch.setenv("HOME", "/h/me")
+    for rule in ("Read(~/w/**)", "Read(~/w)", "Read(~/w/)", "Read( ~/w/**)", "Edit(~/w/**)"):
+        assert commands([rule], f"ls w /w/held ./w **/*.key / {rule} ~/w") == [
+            f"ls w /w/held ./w **/*.key / {REDACTED} {REDACTED}"], rule
+        assert commands([rule], "cat ~/w /h/me/w x", "ls ~ /h/me ~/other /h/me/other /w w") == [
+            f"cat {REDACTED} {REDACTED} x", "ls ~ /h/me ~/other /h/me/other /w w"], rule
+    assert commands(["Read(~/w/**)", "Read(~/w-two/**)"], "ls /h/me/w-two ~/w-two ~/w") == [
+        f"ls {REDACTED} {REDACTED} {REDACTED}"]
+    assert commands(["Read(~/a)"], "ls ~/a /h/me/a a /a") == [
+        f"ls {REDACTED} {REDACTED} a /a"]
+    # No home folder, an empty one, the root: the path as written only.
+    for home in (None, "", "/", "//"):
+        if home is None:
+            monkeypatch.delenv("HOME")
+        else:
+            monkeypatch.setenv("HOME", home)
+        assert commands(["Read(~/w/**)", "Read(~/**)"], "ls ~/w /w / /h/me/w ~") == [
+            f"ls {REDACTED} /w / /h/me/w ~"], home
 
 
 @pytest.mark.parametrize("settings", [

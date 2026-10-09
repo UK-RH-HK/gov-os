@@ -5,8 +5,8 @@ the two files, for every role: the file named, a folder above it inside
 the project, or a glob that matches it.  A write to either file is not a
 read and stays with the allow-list.  A copy of either file under another
 folder is refused as the file is, with that folder in the project root's
-part, and so is a command that gives a file or a copy a second name
-(DEC-548).
+part, and so is a command that gives a file, a copy or a folder that holds
+one a second name (DEC-548, DEC-553).
 
 Nothing is listed or opened here: there are two known files, and the
 question is whether a target takes one of them in.  No message of this
@@ -137,7 +137,8 @@ def _copies(target: str | None) -> list[tuple[str, str]]:
 
 
 def _second_names(name: str, args: list[str]) -> list[str]:
-    """The words of a command whose files get a second name (DEC-548): the
+    """The words of a command whose files and folders get a second name
+    (DEC-548, DEC-553): the
     sources of a move, of a link and of a linking copy, and the files of an
     in-place edit that leaves a backup."""
     if name in ("ln", "link"):
@@ -195,10 +196,7 @@ class _Protected:
             return self.taken_by(base)
         rest = "/".join(parts[n:])
         rx = _glob_rx(rest)
-        for f, root in self.near(base):
-            # From a copy's own <P>, wildcards alone select no file.
-            if root == base != self.root and not rest.strip("*/"):
-                continue
+        for f, _ in self.near(base):
             if base and (f.startswith(base + "/") or base == "/") and (
                     rx.match(f[len(base.rstrip("/")) + 1:])
                     or (by_name and rx.match(os.path.basename(f)))):
@@ -266,9 +264,10 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
                 continue
             found = [hit for one in _braces(exp)
                      if (hit := prot.read_by(one, ecwd or "/"))]
-            # DEC-548: a second name for a file is a read of it, also by a
-            # role that may write it.
-            if word in second and any(prot.holds(hit) for hit in found):
+            # DEC-548, DEC-553: a second name for a file, or for a folder
+            # that holds one, is a read of it, also by a role that may
+            # write it.
+            if word in second and found:
                 return True
             hits += found
             pieces = [p for p in _PIECE_RE.split(exp) if p and p != exp]
