@@ -5964,3 +5964,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.151 | 2026-10-09 | Delegated: DEC-549 (the parallel-run follow-up on W1-30: a longer command bound in W1-27's support, the worker count as a project setting, the time limit, a list entry without a case stays a finding, the second W1-50 repair stands). Next free id: DEC-550. |
+
+## 152. Delegated: four packages of the orchestration-skill follow-up on W1-35 (register v0.152, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-550 — The orchestration skill: two known findings of the adapter check until the exit, and three points of wording as built
+- **Status:** ACCEPTED (delegated to the orchestrator, 2026-10-09; P3, reversible, the lead's recommendation and the orchestrator's agree; wording and a known check state, nothing loosened) · **Basis:** the lead's return at `e2797b3b` (`log/W1-35-lead-runF1.json`: 54 new cases, every suite green) · **Under:** DEC-537, DEC-539, DEC-481, DEC-516
+- **Decision:**
+  - **P-1.** The adapter-portability check at this repository's root gains two findings (a rulesync source of the new skill that this repository does not hold, and the orchestrator subagent source that now differs from the template's), beside the 43 of DEC-481. They are known and of the same cause as the 43: this repository's rulesync sources and generated output are the owner's to apply at the exit (DEC-537). Until then they count with the baseline at a close (DEC-516). They are named in the exit package.
+  - **P-2.** A rule that only this repository's orchestrator prompt held is cited in the skill with DEC-537, which ordered it stated there; the skill's opening sentence says so. A decision that states those rules one by one may follow with a later register batch.
+  - **P-3.** After the second review of a FULL ticket the skill names fail-open holes and losses of work, with DEC-413's own words (silent changes to tests or ticket files) beside them: both stand.
+  - **P-4.** The skill states "confidence medium or higher" as the delegation rule, and the widening to medium-low for a P2 as one an owner may give, as in DEC-416: as built.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.152 | 2026-10-09 | Delegated: DEC-550 (the orchestration-skill follow-up on W1-35: two known adapter-check findings count with the baseline until the owner applies the output at the exit; three points of wording as built). Next free id: DEC-551. |
