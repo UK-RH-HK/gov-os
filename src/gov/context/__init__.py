@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -19,6 +20,8 @@ PRECEDENCE_RANK = {kind: i for i, kind in enumerate(PRECEDENCE)}
 DEFAULT_BUDGET = 6000
 TOKEN_CHARS = 4
 BRIEF_LIMIT = 2500
+EXTERNAL_REFERENCES_REL = "governance/project/external-references.yaml"
+_REGISTER_FORM = re.compile(r"DEC-\d+")  # DEC-473: the form of a register entry's id
 
 
 def _tokens(text: str) -> int:
@@ -72,6 +75,49 @@ def _ticket_mandatory_ids(root: Path, ticket: str) -> list:
                 ids.append(s)
                 seen.add(s)
     return ids
+
+
+def external_references(root: Path) -> dict:
+    """The sources the project lists as living outside the repository: id -> its entry (W1-41; DEC-520).
+
+    A project without the file lists none. A file that is there and cannot be
+    read, is not valid YAML or is not of the stated shape is BLOCKED and named,
+    never taken for an empty list (DEC-449, DEC-454).
+    """
+    import yaml
+
+    def defect(why: str, **more) -> GovError:
+        return GovError("BLOCKED", f"{EXTERNAL_REFERENCES_REL}: {why}",
+                        {"file": EXTERNAL_REFERENCES_REL, **more})
+
+    try:
+        text = (Path(root) / EXTERNAL_REFERENCES_REL).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return {}
+    except (OSError, UnicodeDecodeError) as exc:
+        raise defect(f"the file cannot be read: {exc}") from exc
+    try:
+        document = yaml.safe_load(text)
+    except yaml.YAMLError as exc:
+        raise defect(f"the file is not valid YAML: {exc}") from exc
+    entries = document.get("references") if isinstance(document, dict) else None
+    if not isinstance(entries, list):
+        raise defect("the file is not a mapping with a list `references`")
+    listed: dict = {}
+    for number, entry in enumerate(entries, 1):
+        if not isinstance(entry, dict):
+            raise defect(f"entry {number} is not a mapping")
+        for key in ("id", "location", "reason"):
+            if not isinstance(entry.get(key), str) or not entry[key].strip():
+                raise defect(f"entry {number} has no `{key}` that is text and not empty")
+        rid = entry["id"]
+        if rid in listed:
+            raise defect(f"the id {rid!r} is listed twice", id=rid)
+        if _REGISTER_FORM.fullmatch(rid):
+            raise defect(f"{rid!r} is a decision of the register, which lives in the repository "
+                         f"and is never an external reference", id=rid)
+        listed[rid] = entry
+    return listed
 
 
 def _make_item(record: dict, sha: str, reason: str) -> dict:
@@ -139,10 +185,16 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
 
     records = _record_map(root)
     sup_edges = _supersedes_edges(root)
-    # Step 3: resolve mandatory inputs
+    listed = external_references(root)  # a defective file blocks every ticket's context
+    # Step 3: resolve mandatory inputs; the store is asked first, the list never hides a record
     resolved = []
+    external = []
     for rid in declared_ids:
         rec = records.get(rid)
+        if rec is None and rid in listed:
+            external.append({"id": rid, "location": listed[rid]["location"],
+                             "reason": listed[rid]["reason"], "read": False})
+            continue
         if rec is None:
             raise GovError("BLOCKED", f"mandatory input {rid!r} not found in the store",
                            {"ticket": ticket, "missing": rid})
@@ -219,7 +271,9 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         "tokens": total_tokens,
         "budget": budget_info,
     }
-    canonical = json.dumps(packet_for_hash, sort_keys=True, separators=(",", ":"))
+    if external:  # absent where the ticket declares none: the packet and its hash stay W1-24's
+        packet_for_hash["external"] = external
+    canonical =json.dumps(packet_for_hash, sort_keys=True, separators=(",", ":"))
     packet_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
     packet = {
@@ -232,11 +286,15 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
         "tokens": total_tokens,
         "budget": budget_info,
     }
+    if external:
+        packet["external"] = external
 
     if brief:
         summary_parts = [f"Context for {ticket}:"]
         for item in mandatory_items:
             summary_parts.append(f"  {item['id']} ({item['authority']}, {item['lifecycle']})")
+        for item in external:
+            summary_parts.append(f"  {item['id']} (external, not read)")
         if supplementary:
             summary_parts.append(f"  + {len(supplementary)} supplementary items")
         if dropped:

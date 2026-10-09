@@ -1,0 +1,10 @@
+# Sources that tickets declare and that live outside this repository. `gov context` accepts a listed id and
+# reports it as external, never as content (DEC-520). A decision of the register is never listed here: it lives
+# in the repository (DEC-519, DEC-521).
+references:
+  - id: S0a-G-12
+    location: "S0a STACK_OPTIONS §3, item S0a-G-12 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "its text is not in this repository's tree: no tracked file holds it; docs/ only names the id"
+  - id: S0a-G-13
+    location: "S0a STACK_OPTIONS §3, item S0a-G-13 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "its text is not in this repository's tree: no tracked file holds it; docs/ only names the id"
