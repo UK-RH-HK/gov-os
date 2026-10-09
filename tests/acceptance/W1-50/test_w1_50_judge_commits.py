@@ -41,8 +41,18 @@ NEW_TEST = support.NEW_TEST
 NOTES = support.NOTES
 BOOTSTRAP = support.BOOTSTRAP
 
+SOURCES = check_support.REPO_ROOT / check_support.GOV_PACKAGE_PARENT_REL
+
 
 # ── helpers ──────────────────────────────────────────────────────────
+
+
+@pytest.fixture(autouse=True)
+def _sources_on_the_import_path(monkeypatch):
+    """``gov`` is imported from this repository's ``src`` for the length of a case, as the other W1-50 files
+    set their path (``test_w1_50_read_merge_helper.py``). Without it the file found ``gov`` only when another
+    file of the run had imported it first, or when the caller's ``PYTHONPATH`` named ``src``."""
+    monkeypatch.syspath_prepend(str(SOURCES))
 
 
 def _judge(project, commit_ids):

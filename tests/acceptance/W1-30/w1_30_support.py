@@ -123,6 +123,22 @@ PRODUCT_TRACEABILITY = "product traceability"
 
 TEMPLATE_OPENSPEC = REPO_ROOT / "template" / "openspec"
 
+# Where a project writes its settings for ``gov close`` (README, round 12, settlement 21): top-level keys of
+# its path map, the one project file every command is handed (DEC-185, DEC-479).
+PATH_MAP_REL = "governance/project/path-map.yaml"
+WORKERS_KEY = "close_workers"
+TIME_LIMIT_KEY = "close_timeout"
+# The projects of this suite set the number of parallel workers of a close small (DEC-549, P-2): a close
+# under test does not start as many workers as the machine gives inside a parallel run of the suite.
+SUITE_WORKERS = 2
+SUITE_SETTINGS = {WORKERS_KEY: SUITE_WORKERS}
+
+
+def path_map_text(settings):
+    """The text of a path map that holds ``settings`` as top-level keys, one on a line, and no namespace (the
+    one key the loader requires of a path map)."""
+    return "namespaces: {}\n" + "".join(f"{key}: {value}\n" for key, value in settings.items())
+
 
 # --------------------------------------------------------------------------
 # The sandbox: its own home, the installed packages of the interpreter running the suite
@@ -353,13 +369,16 @@ def probe_record(ticket_id, reviewer_session="reviewer-001",
 class Project:
     """A temporary git repository that gov close can run in."""
 
-    def __init__(self, root, checks=None):
+    def __init__(self, root, checks=None, settings=SUITE_SETTINGS):
         """``checks`` is the project's own set of check declarations (``declared_check``); without it the
-        project holds a copy of the kernel's declarations."""
+        project holds a copy of the kernel's declarations. ``settings`` are the project's settings for
+        ``gov close``, written as a project writes them (``path_map_text``; a value is written as given, so
+        a case may give a wrong one); ``None`` is a project without a path map."""
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self._minute = 0
         self._checks = checks
+        self._settings = settings
         self._init_minimal()
 
     def _init_minimal(self):
@@ -370,6 +389,8 @@ class Project:
               (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
         shutil.copytree(REPO_ROOT / "src", self.root / "src")
         self._copy_kernel_templates()
+        if self._settings is not None:
+            write(self.root, PATH_MAP_REL, path_map_text(self._settings))
         # The source every fixture ticket names (``sources: [DEC-000]``): without it the ticket's context
         # cannot be built (W1-24: a missing mandatory input is BLOCKED), and no ticket could close (DEC-454).
         write(self.root, f"docs/adr/{BASE_SOURCE}.md", decision(BASE_SOURCE, "ACTIVE", title="The base decision"))
@@ -1090,3 +1111,154 @@ def says_not_measured(error, what):
 
 
 NOT_MEASURED_WORDS = "not measured"
+
+
+# --------------------------------------------------------------------------
+# Round 11 (DEC-527): the test runs in parallel, the declared cases alone afterwards
+# --------------------------------------------------------------------------
+
+# The list a project owns of its cases that cannot hold under parallel load (README, round 11, settlement 18).
+SERIAL_ONLY_REL = "tests/acceptance/serial-only.txt"
+# The kinds an entry of this repository's list names in its comment.
+SERIAL_ONLY_KINDS = ("latency", "real-model-or-daemon", "live-session", "race")
+
+# Where the close record and the result state the test runs, and the forms a run has (settlement 19).
+TEST_RUNS_KEY = "test_runs"
+PARALLEL, SERIAL, SERIAL_AFTERWARDS = "parallel", "serial", "serial-afterwards"
+ACCEPTANCE_RUN, REGRESSION_RUN = "acceptance", "regression"
+RUN_COUNTS = ("passed", "failed", "errors", "skipped")
+
+# What a worker of the installed parallel runner (pytest-xdist) has in its environment, and no other test process.
+WORKER_VARIABLE = "PYTEST_XDIST_WORKER"
+NO_WORKER = "none"
+_PARALLEL_RUNNER_NAMES = ("xdist",)
+_PARALLEL_RUNNER_PREFIXES = ("pytest_xdist", "pytest-xdist")
+
+
+def telling_test(name, told, body="assert True", decorator="", arguments=""):
+    """The text of a test file with one test function, ``name``, that tells how it ran: at every run it adds a
+    line to a file of its own under ``told``, outside the project, with the parallel worker it ran in
+    (``NO_WORKER`` when it ran in none) and the time. The file is named as the case is in its node id
+    (``name``, or ``name[set]`` for a parameter set). ``body`` is what the test does after that; ``decorator``
+    stands before the function and ``arguments`` are its own."""
+    return (
+        "import os\nimport time\n\nimport pytest\n\n\n"
+        f"{decorator}"
+        f"def {name}({arguments}):\n"
+        "    case = os.environ['PYTEST_CURRENT_TEST'].split('::')[-1].split(' ')[0]\n"
+        f"    with open(os.path.join({str(told)!r}, case), 'a', encoding='utf-8') as told:\n"
+        f"        told.write(os.environ.get({WORKER_VARIABLE!r}, {NO_WORKER!r}) + ' ' + repr(time.time()) + '\\n')\n"
+        f"    {body}\n"
+    )
+
+
+def told_by(told):
+    """What the telling tests told: ``{name: [(worker, time), ...]}``, one pair for each time the test ran."""
+    runs = {}
+    for path in sorted(Path(told).iterdir()):
+        lines = path.read_text(encoding="utf-8").splitlines()
+        runs[path.name] = [(line.split()[0], float(line.split()[1])) for line in lines]
+    return runs
+
+
+def ran_in_a_worker(runs):
+    """Whether a telling test ran exactly once, in a worker of the parallel runner."""
+    return len(runs) == 1 and re.fullmatch(r"gw\d+", runs[0][0]) is not None
+
+
+def ran_alone(runs):
+    """Whether a telling test ran exactly once, in no worker."""
+    return len(runs) == 1 and runs[0][0] == NO_WORKER
+
+
+def serial_only_entries(path):
+    """The entries of a serial-only list, as ``[(entry, comment)]``: one on a line, the beginning of a node id;
+    what follows `` #`` (or a ``#`` that begins the line) is the comment; empty lines hold nothing."""
+    entries = []
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        entry, _, comment = (" " + line).partition(" #")
+        if entry.strip():
+            entries.append((entry.strip(), comment.strip()))
+    return entries
+
+
+def declared_serial_only(node_id, entries):
+    """Whether a node id is named by one of the entries: it is the entry, or begins with it at a boundary of
+    the id (``::`` after a file, ``[`` after a function)."""
+    return any(node_id == entry or (node_id.startswith(entry) and node_id[len(entry):].startswith(("::", "[", "/")))
+               for entry in entries)
+
+
+def runs_stated_by(holder, where):
+    """The test runs ``holder`` (the close record's frontmatter, or the result) states under ``test_runs``,
+    each checked for its form: ``run``, ``form``, ``seconds`` and the four counts."""
+    runs = holder.get(TEST_RUNS_KEY)
+    assert isinstance(runs, list) and runs, f"{where} states no test runs under {TEST_RUNS_KEY!r}: {sorted(holder)}"
+    for run in runs:
+        assert isinstance(run, dict), f"{where}: a test run is not an object: {run!r}"
+        assert run.get("run") in (ACCEPTANCE_RUN, REGRESSION_RUN), f"{where}: a test run names no run: {run!r}"
+        assert run.get("form") in (PARALLEL, SERIAL, SERIAL_AFTERWARDS), f"{where}: a test run names no form: {run!r}"
+        seconds = run.get("seconds")
+        assert isinstance(seconds, (int, float)) and not isinstance(seconds, bool) and seconds >= 0, \
+            f"{where}: a test run does not say how long it took: {run!r}"
+        for key in RUN_COUNTS:
+            assert isinstance(run.get(key), int) and not isinstance(run.get(key), bool), \
+                f"{where}: a test run does not count {key}: {run!r}"
+    return runs
+
+
+def the_run(runs, run, form):
+    """The one test run of ``runs`` that is ``run`` in ``form``; None when there is none."""
+    found = [entry for entry in runs if (entry["run"], entry["form"]) == (run, form)]
+    assert len(found) <= 1, f"more than one {form} run of the {run} tests: {found}"
+    return found[0] if found else None
+
+
+# --------------------------------------------------------------------------
+# Round 12 (DEC-549): the number of parallel workers of a close is a setting of the project
+# --------------------------------------------------------------------------
+
+# What the setting holds without a line of the project, and what a project may write beside a whole number.
+AUTO = "auto"
+# Where a parallel run states the number of workers it was given (settlement 22).
+WORKERS_FIELD = "workers"
+# The refusals of a setting that is none (settlement 23); the time limit's is DEC-487's.
+INVALID_WORKERS = "INVALID_WORKERS"
+INVALID_TIMEOUT = "INVALID_TIMEOUT"
+# The key of a refusal's details that names the argument or the setting refused, as the time limit's does.
+REFUSED_KEY = "argument"
+
+
+def workers_that_ran(ran, names):
+    """The workers of the parallel runner in which the telling tests ``names`` ran, each named once."""
+    return sorted({worker for name in names for worker, _ in ran.get(name, [])})
+
+
+def workers_named(number):
+    """The names the parallel runner gives ``number`` workers."""
+    return [f"gw{index}" for index in range(number)]
+
+
+def environment_without_parallel_runner(base, sandbox):
+    """The environment of ``sandbox_env`` in which the interpreter running the suite finds every installed
+    package but the parallel runner; None where that cannot be arranged.
+
+    ``gov close`` gives its test runs no ``PYTHONPATH`` of the caller, and passes on where the per-user folder
+    of installed packages is (``PYTHONUSERBASE``). So the runner is taken away there: a per-user folder of
+    links to everything in the real one but the parallel runner. Where the runner is installed elsewhere (or
+    there is no per-user folder), this fixture cannot take it away.
+    """
+    if not site.ENABLE_USER_SITE:
+        return None
+    real = Path(site.getusersitepackages())
+    if not real.is_dir():
+        return None
+    mirror = Path(base) / "userbase" / real.relative_to(site.getuserbase())
+    mirror.mkdir(parents=True)
+    for entry in real.iterdir():
+        name = entry.name.lower()
+        if name in _PARALLEL_RUNNER_NAMES or name.startswith(_PARALLEL_RUNNER_PREFIXES) or name.endswith(".pth"):
+            continue
+        (mirror / entry.name).symlink_to(entry)
+    env = {**sandbox_env(sandbox), "PYTHONUSERBASE": str(Path(base) / "userbase")}
+    return None if can_import("xdist", sandbox, env=env) else env
