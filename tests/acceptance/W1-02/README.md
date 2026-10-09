@@ -465,9 +465,205 @@ command that only mentions the file; how far the helper redacts (DP-2).
 
 No earlier case was changed and the support module is as it was. No decision package comes with this batch.
 
+### Third batch (2026-10-09): the four points of DEC-548
+
+DEC-548 decided four of the points the second batch left open: DP-2 (the helper also redacts a deny rule's absolute
+path held bare in a hook command), DP-3 (a second name is a read), DP-4 (the same two files outside the session's
+own project, and the user-level settings file), DP-5 (the refusals beyond the order stand as built). DP-1 (a search
+from the root) is still with the owner: no case here takes a side on it and none of the cases that hold a root
+search as allowed was touched.
+
+Written before any code. Five test files and one support module (`w1_02_copies_support.py`), all new; 331 cases.
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_hook_listing_paths.py \
+  tests/acceptance/W1-02/test_w1_02_second_names.py tests/acceptance/W1-02/test_w1_02_copies.py \
+  tests/acceptance/W1-02/test_w1_02_copies_open.py tests/acceptance/W1-02/test_w1_02_refusals_beyond_the_order.py \
+  -q -p no:cacheprovider -rs
+```
+
+Red first, 2026-10-09: **198 failed, 133 passed** in about 30 s. The whole of `tests/acceptance/W1-02`, once:
+198 failed, 1109 passed (1307 cases, 4 min 31 s); the 198 are these and no other, the latency case passed in the
+whole run, nothing was skipped.
+
+| File | Point | Cases | Red | Green | Why red today |
+|---|---|---|---|---|---|
+| `test_w1_02_hook_listing_paths.py` | DP-2 | 23 | 18 | 5 | the helper prints a deny rule's path when a hook command holds it without the rule around it |
+| `test_w1_02_second_names.py` | DP-3 | 120 | 54 | 66 | a move, a rename, a hard link, a linking copy and `sed` in place with a backup suffix are decided as writes only: allowed for a role that may write the file (40 cases), denied by the allow-list and not by the rule for the others (14) |
+| `test_w1_02_copies.py` | DP-4 | 126 | 126 | 0 | every read of a copy is allowed, and so is a symbolic link to one and a second name below `template/` by the orchestrator (114); a second name of a copy outside the project is denied by the allow-list only (12) |
+| `test_w1_02_copies_open.py` | DP-4 | 30 | 0 | 30 | — (what keeps working) |
+| `test_w1_02_refusals_beyond_the_order.py` | DP-5 | 32 | 0 | 32 | — (as built) |
+
+Every red case fails on the decision itself: `decision=allow`, or a denial whose reason names none of DEC-508,
+DEC-525, DEC-548 (the allow-list's), or a helper output that still carries the path. None fails on an import, a
+fixture or a crash.
+
+**The world of the cases** (`w1_02_copies_support.make_world`): one temporary session project with both stand-in
+files (the fixture of the revision), and copies of them at the same project-relative path under other folders
+`<P>`: a sibling checkout (a git repository of its own), a folder that is no repository, a git worktree of the
+session project, `template/` below the project's root, and the `HOME` of the hook's environment (the settings file
+only). The real home folder is never read: `~` and `$HOME` in a command are the stand-in. No file of this repository
+is opened and the held-out file's path is imported, never typed.
+
+**How "refused by the rule" is told from a denied write** (`assert_refused_by_the_rule`): `deny`, exit code 0, and
+a reason that names one of DEC-508, DEC-525, DEC-548. The allow-list's denial of a write names no decision, so it
+does not pass: DP-3 says "refused as a read, for every role". If the implementer words the refusal under another
+recorded decision, that line of the support module is the one to discuss, not the cases.
+
+#### The reading before the cases (DP-4: "if a suite reads such a copy through a tool call")
+
+Read for hook calls that name either file, a copy of one, the user-level settings file, another checkout or a
+worktree: `tests/unit/guard` and the acceptance suites W1-01, W1-03, W1-04, W1-05, W1-07, W1-28, W1-29, W1-38, W1-45,
+W1-46, W1-47, W1-49 and W1-50. Found:
+
+- Every hook call in another suite that names either file is in the session's own project and is a **write**:
+  W1-05 `test_the_engineer_writes_only_inside_the_ticket_paths`; W1-47
+  `test_an_edit_to_a_file_that_holds_the_path_is_not_denied_for_carrying_it`,
+  `test_the_usual_role_rules_still_apply_to_the_two_files`, `test_the_exception_is_for_the_two_files_only`,
+  `test_the_exception_does_not_open_the_path_itself` (held as denied); W1-46
+  `test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard` and the research role's writes; the
+  `echo changed >> …` and Write cases of W1-45 and W1-03. DP-3 leaves a plain write as it is: no conflict.
+- No case reads a copy in a second project, a sibling or a parent folder; none names the main tree's file from a
+  worktree; none reads the user-level settings file through a tool call. The `HOME` cases of W1-47 name a stand-in
+  held-out folder below a stand-in home, not a settings folder.
+- The root searches of W1-05, W1-50 and W1-47 are DP-1: untouched.
+- The unit case `test_a_project_without_either_file_refuses_nothing` uses files that do not exist and a glob over
+  everything: both are points on which this batch takes no side.
+
+**No suite goes red by DP-4 as these cases hold it; nothing is returned by name.**
+
+#### DP-2 → `test_w1_02_hook_listing_paths.py`
+
+An absolute path in a deny rule is the argument that starts with two slashes (`Tool(//<abs>…)`), as the harness
+writes one; its tail may be `/**`, `/` or nothing, a blank may follow the bracket, the tool may be any.
+
+- `test_a_deny_rule_s_absolute_path_held_bare_in_a_hook_command_is_redacted` (6 spellings of the rule): the path
+  alone in a hook command prints as `[redacted]`, the rest of the command unchanged.
+- `test_the_path_with_the_rule_s_wildcard_part_or_inside_a_word_is_redacted` (5): with `/**` or `/` after it,
+  quoted, after `=`, inside a longer word.
+- `test_the_path_as_the_start_of_a_longer_path_is_redacted` (4): a file below the path; only "the deny path is
+  gone" is asserted, not what becomes of the tail (residual 14).
+- `test_every_place_a_command_holds_the_path_is_redacted`, `test_the_paths_of_several_deny_rules_are_all_redacted`,
+  `test_a_path_that_starts_like_another_rule_s_path_is_redacted_whole` (1 each).
+- Green before and after (5): `test_the_argument_of_a_deny_rule_that_is_no_absolute_path_is_not_blanked` (3: a
+  Bash prefix rule, a relative `./` glob, a bare relative glob: ordinary words of a command stay),
+  `test_a_hook_command_that_holds_no_deny_path_prints_unchanged`,
+  `test_a_whole_deny_value_with_an_absolute_path_is_still_redacted_as_one` (as built).
+
+A failure message never prints the path it looks for (positions only).
+
+#### DP-3 → `test_w1_02_second_names.py`
+
+- `test_a_second_name_for_a_protected_file_is_refused_as_a_read` (20 forms × 2 files, by the orchestrator, which may
+  write both): move (relative, absolute, `-t`), rename in the folder, hard link (`ln`, absolute, `link`), symbolic
+  link (`-s` absolute and relative, `--symbolic`), linking copy (`-l`, `--link`, `-al`, `-s`, `--symbolic-link`),
+  in-place edit with a backup (`sed -i.bak`, `sed -i .bak`, `sed --in-place=.bak`, `perl -i.bak`, `perl -pi.bak`).
+  26 red, 14 green.
+- `test_a_second_name_is_refused_as_a_read_whether_or_not_the_role_may_write_the_file` (8 forms × 2 files × an
+  engineer whose ticket names the file and one whose ticket does not): 24 red, 8 green.
+- `test_the_refusal_of_a_second_name_names_the_rule_and_nothing_of_the_file` (4, red).
+- Green before and after: `test_a_plain_write_to_a_protected_file_is_decided_as_today` (Write, Edit, `>`, the file
+  as the destination of `cp` and of `mv`, `sed -i`, `sed --in-place` × 2 files × 3 actors = 42: allowed for the
+  orchestrator and for the engineer whose ticket names the file, denied for the other engineer);
+  `test_an_interpreter_in_place_with_no_backup_is_decided_as_today` (2: `perl -pi -e` is refused today for naming
+  the file, and stays so).
+
+#### DP-4 → `test_w1_02_copies.py` (refused) and `test_w1_02_copies_open.py` (keeps working)
+
+Refused, all red today:
+
+- `test_a_read_of_a_copy_in_another_checkout_is_refused` (24 forms × 2 files): Read by the absolute path, relative
+  with the working folder in the copy's site, relative from the project, with `..`, through a symbolic link; Grep in
+  the copy, over its folder, from `<P>` with a glob that matches and with the bare name; Glob in its folder, by name
+  from `<P>`, by an absolute pattern over its folder; `cat` in the same five spellings and after `cd`; `<`; `cp`
+  with the copy as source; an inline script; a listing, a recursive search and a shell glob over its folder.
+- `test_a_search_for_the_file_s_name_from_a_folder_between_is_refused` (1).
+- `test_a_read_of_a_copy_anywhere_else_or_in_a_worktree_is_refused` (4 forms × 2 sites × 2 files).
+- `test_a_read_of_a_copy_below_the_project_s_root_is_refused` (7 forms × 2 files; `template/` as `<P>`).
+- `test_a_read_of_the_user_level_settings_file_is_refused` (11: absolute, through a link, `~`, `$HOME`,
+  `"${HOME}"`, `<`, `cp`, Grep and Glob over its folder, a listing of `~/<folder>`).
+- `test_a_read_of_a_copy_is_refused_for_every_role` (the 11 actors of the revision);
+  `test_a_read_of_the_user_level_settings_file_is_refused_for_every_role` (3).
+- DP-3 on a copy: `test_a_second_name_for_a_copy_in_another_checkout_is_refused_as_a_read` (5 × 2),
+  `…_below_the_project_s_root_…` (2 × 2), `test_a_second_name_for_the_user_level_settings_file_is_refused_as_a_read`
+  (2).
+- `test_the_refusal_for_a_copy_names_neither_the_copy_nor_its_folder` (6): no path of the copy, no folder of it, not
+  `<P>`, no value of the file.
+
+Every one names the copy, its folder, or a glob with a literal start at or below `<P>`: none needs the guard to walk
+a tree.
+
+Keeps working, green before and after:
+
+- `test_another_file_of_a_copy_s_folder_named_alone_is_still_read` (10): Read and `cat` of a neighbour, in another
+  checkout, below `template/`, beside the user-level settings file.
+- `test_the_rest_of_a_copy_s_site_is_still_read` (7): a file at the root of another checkout, a source file and a
+  source folder of it; a file and a folder **below** the folder that holds the user-level settings file (where the
+  harness keeps its own records).
+- `test_a_plain_write_to_a_copy_is_decided_as_today` (6) and
+  `test_a_plain_write_to_the_user_level_settings_file_is_decided_as_today` (1): outside the project a write is
+  denied for every role, below `template/` the allow-list decides.
+- `test_git_status_and_diff_stat_stay_allowed_on_a_copy` (6).
+
+No case, by the brief: a search from `<P>` with nothing that selects the file, or from a folder above `<P>` (DP-1's
+question, on a copy); a path that ends in the file's project-relative path and names no existing file.
+
+#### DP-5 → `test_w1_02_refusals_beyond_the_order.py` (all green today)
+
+- `test_a_command_that_only_mentions_the_settings_file_s_path_is_refused` (3 forms × 2 actors): a commit message,
+  an `echo`, an `echo` of a sentence.
+- `test_a_folder_that_holds_either_file_is_refused_in_a_command_that_does_not_read` (4 × 2 files): `git add` of the
+  folder (relative, absolute), `test -d`, `git log -- <folder>`.
+- `test_a_folder_above_the_held_out_file_inside_the_project_is_refused_in_a_command_that_does_not_read` (2).
+- `test_git_diff_stat_with_a_folder_option_is_refused` (2 × 2 files): `git -C <project>` and `git -C .`.
+- Allowed: `test_git_status_and_diff_stat_with_no_other_option_stay_allowed` (5 × 2 files),
+  `test_git_status_and_diff_stat_with_no_file_stay_allowed` (2).
+
+#### What the guard already refused before this batch
+
+Found by running the hook as a process on these calls (no file of this repository opened):
+
+- DP-2: a whole deny value inside a hook command (as built). Not the bare path.
+- DP-3: as reads, for every role: a symbolic link to either file (`ln -s`, `-sf`, `--symbolic`), `cp -s` and
+  `cp --symbolic-link`, `perl -i.bak`, `perl -pi.bak`, `ruby -i.bak`, and `perl -pi -e` with no backup. As writes
+  only: `mv` with the file as source, `ln`, `link`, `cp -l`, `cp --link`, `cp -al`, `sed -i.bak`,
+  `sed --in-place=.bak` (allowed for a role that may write the file). A rename inside the folder and `sed -i .bak`
+  (the suffix as a word of its own) were allowed for the orchestrator only.
+- DP-4: nothing. Every read of a copy was allowed at all five sites, for every actor asked. A write to a copy
+  outside the project was denied by the allow-list; `ln -s <copy>` was allowed.
+- DP-5: all of it, as the decision says.
+
+#### Added to the residual list
+
+13. The helper (DP-2): a deny rule's path written in a spelling that is not the absolute one (from the home folder
+    with `~/`, or project-relative with one slash) and then held bare in a hook command. No case either way
+    (package DP-7).
+14. The helper (DP-2): the tail of a longer path that starts with a deny rule's path. The deny path is gone; whether
+    the tail prints is not held.
+15. A copy reached by a glob or a search whose start is above `<P>` (`**/<name>` from the folder that holds several
+    checkouts, from the home folder, from `/`): telling needs a walk of the tree, or a refusal by pattern alone
+    (package DP-6). The same search from `<P>` itself with nothing that selects the file follows DP-1.
+16. A path that ends in either file's project-relative path and names no existing file (a copy made later in the
+    same command, a folder that exists only at run time). No case either way, by the brief.
+17. A copy under another name or at another relative path (the file copied to `notes.txt`, a backup an editor left,
+    an archive that holds it). DP-4 covers a path that ends in the file's project-relative path.
+18. `git -C <another checkout>` with a path relative to that checkout, and a `cd` into `<P>` that exists only at
+    run time, followed by the relative path (as residual 11, on a copy).
+19. A second name made by a program the guard does not know as one (`rsync --link-dest`, `install`, `cp --reflink`,
+    `git mv`, `tar`, an editor's own backup), or by a script (residuals 1 to 3).
+20. An in-place option the guard cannot tell from a backup suffix without knowing the program's version
+    (`sed -i .bak` is a suffix on BSD and a script on GNU); held here as a second name. Other programs' in-place
+    options with a suffix (`ruby -i.bak` is refused today; `awk -i inplace -v inplace::suffix=`) are not held.
+21. A user-level settings file that is not at `$HOME` of the hook's environment (a harness told by an environment
+    variable to keep its folder elsewhere, another user's home).
+
+Residuals 1 to 12 stand.
+
 ### Rewrites
 
-None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`).
+None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third batch (DEC-548) rewrote
+none either: it added five test files and `w1_02_copies_support.py`, and changed no line of an earlier file but this
+README.
 
 ### Decision packages
 
@@ -504,6 +700,42 @@ None. No earlier case was changed; `conftest.py` gained one fixture (`guarded`).
   of a command.
 - Reversibility: high. Cost: (b) a few lines and two cases.
 - Recommendation: (b) for arguments that are absolute paths only. Confidence: medium.
+- Decided by DEC-548 as recommended; held by `test_w1_02_hook_listing_paths.py`.
+
+**DP-6 (third batch). A copy reached by a glob or a search that starts above its site.**
+- Question: DP-4 covers "any target whose path ends in either file's project-relative path". Is a glob or a search
+  whose start is a folder above a copy's site `<P>` and outside the session's project (the folder that holds several
+  checkouts, the home folder, `/`), with a pattern that could take a copy in (`**/<the file's name>`, `**/*<ext>`,
+  a recursive `grep` or `find` with the name), refused?
+- Why now: the cases for DP-4 are written before the code and fix what the engineer builds. The brief rules out any
+  case that needs the guard to walk a tree, and the guard cannot know where copies lie without one.
+- Options: (a) residual: the guard refuses a copy that is named, its folder, and a glob with a literal start at or
+  below `<P>` (held by the cases); a wide search from above is left to the harness's own deny lines. (b) refuse by
+  pattern alone: any glob or recursive search outside the project whose pattern can end in either file's name or
+  project-relative path, wherever it starts. (c) walk the tree below the start, with a bound.
+- Impact: (a) one search from the home folder can return the user-level settings file or a sibling checkout's
+  held-out file: the incident class of DEC-508, one folder up. (b) refuses ordinary searches outside the project
+  (`**/*.json` in another checkout), for every role. (c) costs time in a hook with a 100 ms budget, and a refusal
+  then tells that a copy exists below the start.
+- Reversibility: high (a rule and a few cases). Cost: (a) none; (b) one rule, about 10 cases; (c) a rule, a bound,
+  a latency risk.
+- Recommendation: (b) for a pattern that names the file's own name or its project-relative path; (a) for a pattern
+  by extension only. Confidence: medium-low: it meets DP-1, which is with the owner, and should be answered with it.
+- No case either way in this batch (residual 15).
+
+**DP-7 (third batch). Other spellings of a deny rule's path in the helper.**
+- Question: DEC-548 has the helper redact "an absolute path that a deny rule carries". A deny rule may also carry a
+  path from the home folder (`Tool(~/…)`) or a project-relative one (one slash). Does the helper redact those when a
+  hook command holds them bare, and in which spelling (as written, or resolved to the absolute path)?
+- Why now: the cases fix the interface; the decision's word is "absolute", and the cases hold only the two-slash
+  spelling as absolute.
+- Options: (a) absolute (two slashes) only, as held. (b) also `~/…`, matched both as written and with the home
+  folder in its place. (c) also project-relative, matched as written and resolved against the project.
+- Impact: (a) a held-out path below the home folder, written with `~/` in a deny rule, prints if a hook command
+  names it. (b) and (c) redact more; (c) can blank ordinary relative paths of a command (`src/**`).
+- Reversibility: high. Cost: (b) a few lines and about four cases; (c) the same and a risk of blanking.
+- Recommendation: (b), not (c). Confidence: medium.
+- No case either way in this batch (residual 13).
 
 ## Not tested
 
