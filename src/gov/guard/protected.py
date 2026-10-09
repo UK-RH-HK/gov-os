@@ -3,7 +3,10 @@
 The guard refuses any agent tool call whose file targets take in one of
 the two files, for every role: the file named, a folder above it inside
 the project, or a glob that matches it.  A write to either file is not a
-read and stays with the allow-list.
+read and stays with the allow-list.  A copy of either file under another
+folder is refused as the file is, with that folder in the project root's
+part, and so is a command that gives a file or a copy a second name
+(DEC-548).
 
 Nothing is listed or opened here: there are two known files, and the
 question is whether a target takes one of them in.  No message of this
@@ -16,7 +19,7 @@ import os
 import re
 import shlex
 
-from gov.guard.decide import (_ASSIGN_RE, _expand_token,
+from gov.guard.decide import (_ASSIGN_RE, _cp_operands, _expand_token,
                               _extract_bash_write_targets, _has_glob, _is_punct)
 from gov.guard.heldout import CONFIG_REL, SETTINGS_REL, _words
 
@@ -34,6 +37,8 @@ _BRACE_RE = re.compile(r"\{([^{}]*,[^{}]*)\}")
 _RECURSIVE_RE = re.compile(r"-[A-Za-z]*[rR]|--(dereference-)?recursive\Z")
 # The options with which git diff and git status print no line of a file.
 _GIT_QUIET = frozenset({"--", "--stat", "--short", "-s", "--porcelain"})
+# The two files' project-relative paths, in parts.
+_RELS = [rel.split("/") for rel in (CONFIG_REL, SETTINGS_REL)]
 
 
 def _real(path: str, cwd: str) -> str | None:
@@ -117,6 +122,41 @@ def _takes_folder(name: str, args: list[str]) -> bool:
         name == "grep" and any(_RECURSIVE_RE.match(a) for a in args)))
 
 
+def _copies(target: str | None) -> list[tuple[str, str]]:
+    """The copies of the two files at or below *target*, each with its
+    folder <P>: an existing file at <P>/<the file's project-relative path>,
+    where *target* is <P>, a folder between the two, or the copy (DEC-548)."""
+    parts = target.split("/") if target else []
+    out: list[tuple[str, str]] = []
+    for rel in (_RELS if parts else ()):
+        for k in range(len(rel) + 1):
+            f = "/".join(parts + rel[k:])
+            if parts[len(parts) - k:] == rel[:k] and os.path.lexists(f):
+                out.append((f, "/".join(parts[:len(parts) - k])))
+    return out
+
+
+def _second_names(name: str, args: list[str]) -> list[str]:
+    """The words of a command whose files get a second name (DEC-548): the
+    sources of a move, of a link and of a linking copy, and the files of an
+    in-place edit that leaves a backup."""
+    if name in ("ln", "link"):
+        plain = [a for a in args if not a.startswith("-")]
+        return plain[:-1] or plain
+    if name == "sed":
+        backup = any((a.startswith("-i") and len(a) > 2)
+                     or a.startswith("--in-place=")
+                     or (a == "-i" and b.startswith("."))
+                     for a, b in zip(args, args[1:] + [""]))
+        return args if backup else []
+    short = "".join(a for a in args if a.startswith("-") and not a.startswith("--"))
+    if name == "mv" or (name == "cp" and (
+            "l" in short or any(a.startswith("--l") for a in args))):
+        operands, dirs = _cp_operands(args) or ([], [])
+        return operands if dirs else operands[:-1]
+    return []
+
+
 class _Protected:
     """The two files of one project, those that exist."""
 
@@ -126,12 +166,21 @@ class _Protected:
                       for rel in (CONFIG_REL, SETTINGS_REL)
                       if os.path.lexists(os.path.join(project_root, rel))]
 
+    def near(self, target: str | None) -> list[tuple[str, str]]:
+        """The files *target* may take in, each with the folder that plays
+        the project root's part for it: the project's, and the copies."""
+        return [(f, self.root) for f in self.files] + _copies(target)
+
+    def holds(self, target: str | None) -> bool:
+        """True when *target* is one of the files, or a copy of one."""
+        return any(target == f for f, _ in self.near(target))
+
     def taken_by(self, target: str | None) -> str | None:
         """*target* when it is one of the files, or a folder above one
         inside the project; the project root and what is above it are not."""
-        for f in self.files:
+        for f, root in self.near(target):
             if target == f or (target and f.startswith(target + "/")
-                               and target.startswith(self.root + "/")):
+                               and target.startswith(root + "/")):
                 return target
         return None
 
@@ -144,8 +193,12 @@ class _Protected:
         base = _real("/".join(parts[:n]) or ("/" if pattern[:1] == "/" else "."), cwd)
         if n == len(parts):
             return self.taken_by(base)
-        rx = _glob_rx("/".join(parts[n:]))
-        for f in self.files:
+        rest = "/".join(parts[n:])
+        rx = _glob_rx(rest)
+        for f, root in self.near(base):
+            # From a copy's own <P>, wildcards alone select no file.
+            if root == base != self.root and not rest.strip("*/"):
+                continue
             if base and (f.startswith(base + "/") or base == "/") and (
                     rx.match(f[len(base.rstrip("/")) + 1:])
                     or (by_name and rx.match(os.path.basename(f)))):
@@ -160,7 +213,7 @@ class _Protected:
 def _search_reads(prot: _Protected, path, globs: list[str], cwd: str) -> bool:
     """A Grep call: its path, narrowed by its glob when it has one."""
     base = _real(path if isinstance(path, str) and path else ".", cwd)
-    if not base or base in prot.files:
+    if not base or prot.holds(base):
         return bool(base)
     # A glob that only excludes narrows nothing here.
     globs = [g for g in globs if not g.startswith("!")]
@@ -171,7 +224,7 @@ def _search_reads(prot: _Protected, path, globs: list[str], cwd: str) -> bool:
     return any(prot.matched_by(g, base, by_name="/" not in g)
                or prot.matched_by(g.lstrip("/"), base)
                or any(g == os.path.basename(f) and f.startswith(base + "/")
-                      for f in prot.files)
+                      for f, _ in prot.near(base))
                for glob in globs for g in _braces(glob))
 
 
@@ -206,16 +259,22 @@ def _command_reads(prot: _Protected, command: str, cwd: str) -> bool:
                 and prot.taken_by(_real(".", ecwd))):
             return True
         hits: list[str] = []
+        second = _second_names(name, args)
         for word in args:
             exp = _expand_token(word) or word
             if ecwd is None and not os.path.isabs(exp):
                 continue
-            hits += [hit for one in _braces(exp)
+            found = [hit for one in _braces(exp)
                      if (hit := prot.read_by(one, ecwd or "/"))]
+            # DEC-548: a second name for a file is a read of it, also by a
+            # role that may write it.
+            if word in second and any(prot.holds(hit) for hit in found):
+                return True
+            hits += found
             pieces = [p for p in _PIECE_RE.split(exp) if p and p != exp]
             if _GLUED_RE.match(exp):
                 pieces.append(exp[2:])
-            if any(_real(p, ecwd or "/") in prot.files for p in pieces
+            if any(prot.holds(_real(p, ecwd or "/")) for p in pieces
                    if ecwd is not None or os.path.isabs(p)):
                 return not _git_quiet(name, args)
         if not hits or _git_quiet(name, args):
@@ -259,8 +318,6 @@ def read_refusal(tool_name: str, tool_input: dict, project_root: str,
     """Why a call is refused as a read of the settings file or of the
     held-out file, or ``""`` when its targets take neither in."""
     prot = _Protected(project_root)
-    if not prot.files:
-        return ""
 
     def text(key: str) -> str:
         value = tool_input.get(key)

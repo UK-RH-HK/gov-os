@@ -337,6 +337,121 @@ def test_the_same_spellings_beside_the_files_are_let_through(project, rel):
     assert not _refused(project, "Bash", {"command": "ls -la"}, cwd=project / "src")
 
 
+# -- copies and second names (DEC-548) -----------------------------------------
+
+@pytest.fixture()
+def site(project, tmp_path):
+    """A folder beside the project, and the stand-in home, with copies."""
+    site = tmp_path / "site"
+    for root, rels in ((site, FILES), (tmp_path / "home", (SETTINGS_REL,))):
+        for rel in rels:
+            (root / rel).parent.mkdir(parents=True, exist_ok=True)
+            (root / rel).write_text("x\n", encoding="utf-8")
+            (root / rel).with_name("neighbour.md").write_text("x\n", encoding="utf-8")
+    (site / "src").mkdir()
+    return site
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_a_copy_is_refused_as_the_file_is(project, site, rel):
+    copy, folder, name = site / rel, site / _folder(rel), os.path.basename(rel)
+    for tool_name, tool_input, cwd in (
+        ("Read", {"file_path": str(copy)}, None),
+        ("Read", {"file_path": rel}, site),
+        ("Grep", {"pattern": "x", "path": str(folder)}, None),
+        ("Grep", {"pattern": "x", "path": str(site), "glob": f"*{_ext(rel)}"}, None),
+        ("Grep", {"pattern": "x", "path": str(site), "glob": name}, None),
+        ("Glob", {"pattern": f"**/{name}", "path": str(site)}, None),
+        ("Glob", {"pattern": f"{folder}/*"}, None),
+        ("Bash", {"command": f"cat {copy}"}, None),
+        ("Bash", {"command": f"cd {site} && cat {rel}"}, None),
+        ("Bash", {"command": f"wc -c < {copy}"}, None),
+        ("Bash", {"command": f"ls -la {folder}"}, None),
+        ("Bash", {"command": f"python3 -c \"open('{copy}')\""}, None),
+        ("Bash", {"command": f"mv {copy} docs/moved"}, None),
+    ):
+        assert _refused(project, tool_name, tool_input, cwd), (tool_name, tool_input)
+
+
+def test_the_user_level_settings_file_is_a_copy(project, site):
+    for command in (f"cat ~/{SETTINGS_REL}", f"cat $HOME/{SETTINGS_REL}",
+                    f"ls ~/{_folder(SETTINGS_REL)}", f"ln -s ~/{SETTINGS_REL} docs/second"):
+        assert _refused(project, "Bash", {"command": command}), command
+    for command in ("ls ~", f"cat ~/{_folder(SETTINGS_REL)}/neighbour.md",
+                    f"echo x > ~/{SETTINGS_REL}"):
+        assert not _refused(project, "Bash", {"command": command}), command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_what_is_beside_or_above_a_copy_is_let_through(project, site, rel):
+    copy = site / rel
+    for tool_name, tool_input in (
+        ("Read", {"file_path": str(copy.with_name("neighbour.md"))}),
+        ("Read", {"file_path": str(copy.with_name("missing")) + "/" + rel}),
+        ("Grep", {"pattern": "x", "path": str(site)}),
+        ("Grep", {"pattern": "x", "path": str(site), "glob": "*.py"}),
+        ("Grep", {"pattern": "x", "path": str(site / "src")}),
+        ("Glob", {"pattern": "**/*", "path": str(site)}),
+        ("Glob", {"pattern": "**/*.py", "path": str(site)}),
+        ("Bash", {"command": f"ls -la {site}"}),
+        ("Bash", {"command": f"grep -rn x {site}"}),
+        ("Bash", {"command": f"cd {site} && ls && git status --short"}),
+        ("Bash", {"command": f"git diff --stat {copy}"}),
+        ("Bash", {"command": f"echo x > {copy}"}),
+        ("Write", {"file_path": str(copy), "content": "x"}),
+    ):
+        assert not _refused(project, tool_name, tool_input), (tool_name, tool_input)
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_a_second_name_for_a_file_is_a_read(project, rel):
+    for command in (
+        f"mv {rel} docs/moved", f"mv -t docs {rel}", f"mv {project / rel} docs",
+        f"mv {_folder(rel)}/* docs", f"ln {rel} docs/second", f"link {rel} docs/second",
+        f"ln -s {project / rel} docs/second", f"cp -l {rel} docs/linked",
+        f"cp --link {rel} docs/linked", f"cp -al {rel} docs/linked",
+        f"sed -i.bak s/a/b/ {rel}", f"sed -i .bak s/a/b/ {rel}",
+        f"sed --in-place=.bak s/a/b/ {rel}", f"echo $(mv {rel} docs/moved)",
+    ):
+        assert _refused(project, "Bash", {"command": command}), command
+
+
+@pytest.mark.parametrize("rel", FILES)
+def test_a_plain_write_or_a_second_name_for_another_file_is_no_read(project, rel):
+    beside = f"{_folder(rel)}/neighbour.md"
+    for command in (
+        f"mv docs/new {rel}", f"cp docs/new {rel}", f"cp -l docs/new {rel}",
+        f"sed -i s/a/b/ {rel}", f"sed --in-place s/a/b/ {rel}", f"echo x > {rel}",
+        "mv docs/a docs/b", "git mv docs/a docs/b", "ln -s docs/a docs/b", "ln docs/a",
+        "cp -al docs src/copy", "sed -i.bak s/a/b/ docs/a", "sed -i .bak s/a/b/ docs/a",
+        f"mv {beside} docs/b", f"ln {beside} docs/b", f"sed -i.bak s/a/b/ {beside}",
+        "mv", "ln", "cp -l", "sed -i", "mv --t", "mv -t",
+    ):
+        assert not _refused(project, "Bash", {"command": command}), command
+
+
+@pytest.mark.parametrize("tool_input", [
+    {"file_path": "a\x00b", "path": "a\x00b", "pattern": "a\x00b/*", "command": "cat a\x00b"},
+    {"file_path": "\udcff/x", "path": "\udcff", "pattern": "\udcff/*", "glob": "\udcff",
+     "command": "mv \udcff docs/b"},
+    {"file_path": "x" * 70000, "path": "x/" * 9000, "pattern": "x" * 70000 + "/*",
+     "command": "ln " + "x" * 70000 + " docs/b"},
+    {"file_path": 1, "path": None, "pattern": [], "glob": {}, "command": 2},
+    {"command": "mv 'a docs/b"}, {"command": "sed -i.bak ((( $("}, {},
+])
+def test_an_odd_input_is_decided_without_an_error_with_or_without_a_home(
+        tmp_path, monkeypatch, tool_input):
+    for home in (str(tmp_path / "missing"), None):
+        if home is None:
+            monkeypatch.delenv("HOME")
+        else:
+            monkeypatch.setenv("HOME", home)
+        for tool_name in ("Read", "Grep", "Glob", "Bash", "Write"):
+            assert not _refused(tmp_path, tool_name, tool_input)
+        for command in ("cd && ls", "cat ~/notes.md", "ls $HOME"):
+            assert not _refused(tmp_path, "Bash", {"command": command})
+
+
 # -- the decision --------------------------------------------------------------
 
 @pytest.mark.parametrize("role", [None, "developer", "orchestrator", "engineer"])
@@ -370,6 +485,24 @@ def test_the_listing_holds_the_hooks_with_a_deny_value_redacted(project):
     settings = json.loads((project / SETTINGS_REL).read_text(encoding="utf-8"))
     assert listing(settings) == [
         {"event": "Stop", "matcher": "", "command": f"echo {REDACTED} x"}]
+
+
+def test_the_listing_redacts_an_absolute_path_a_deny_rule_carries():
+    def commands(deny, *held):
+        return [row["command"] for row in listing({
+            "permissions": {"deny": deny},
+            "hooks": {"Stop": [{"hooks": [{"command": c} for c in held]}]}})]
+
+    for rule in ("Read(//w/held/**)", "Read(//w/held)", "Read(//w/held/)",
+                 "Read( //w/held/**)", "Edit(//w/held/**)"):
+        assert commands([rule], "cat /w/held x", "ls /w/held/a /w/held", "ls /w /w/other") == [
+            f"cat {REDACTED} x", f"ls {REDACTED}/a {REDACTED}", "ls /w /w/other"]
+    assert commands(["Read(//w/held/**)", "Read(//w/held-two/**)"],
+                    "ls /w/held-two /w/held") == [f"ls {REDACTED} {REDACTED}"]
+    for rule in ("Bash(ls:*)", "Read(./w/**)", "Read(**/*.key)", "Read(//)", "Read(//**)",
+                 "Read(/w/held/**)", "Read(~/w/**)", "Read", "(//w)"):
+        assert commands([rule], f"ls w /w/held ./w **/*.key / {rule} ~/w") == [
+            f"ls w /w/held ./w **/*.key / {REDACTED} ~/w"], rule
 
 
 @pytest.mark.parametrize("settings", [
