@@ -441,3 +441,61 @@ revision of this file.
 - Running `openspec validate --strict` with the real `openspec` binary.
 - Whether gitleaks is installed (the secrets-indexing check, W1-15).
 - The seven families not yet registered: their checks are built by other tickets.
+
+## The follow-up after W1-41 on W1-30's ticket (DEC-569): pieces on the checks
+
+Written by a test designer on ticket `DAEO-2lwj` (W1-30, reopened), before the checks are changed. No earlier
+case of this suite is changed.
+
+### The probe type in the schema check (DEC-565; `test_w1_26_probe_records.py`, 43 cases)
+
+DEC-565: "The four findings each probe record adds to the schema check are accepted as known growth [...] In
+the follow-up after W1-41 the probe type is added to the kernel's record schema, so that the schema check
+returns to its recorded baseline."
+
+**The four findings a probe record gives today**, measured on each of this repository's four records (16 in
+all) and on a fixture of the same form:
+
+1. `SCHEMA_MISSING_FIELD`, field `id`
+2. `SCHEMA_MISSING_FIELD`, field `status`
+3. `SCHEMA_MISSING_FIELD`, field `state_class`
+4. `SCHEMA_UNKNOWN_TYPE`, type `probe`
+
+The engineer's work is measured by them: after it a well-formed probe record gives none of the four and no
+other.
+
+How the cases run: the `command` of the kernel's declaration `core-schema`, in the root of a temporary project
+(the suite's `raw_project`, which holds the kernel's schemas where the suite's projects hold them), with this
+worktree's code. The findings are the command's JSON; a finding belongs to a record when its `path` is the
+file. One case runs the command in this repository's root; it reads only.
+
+**The fields and their shapes (proposed)** are those of the schema, listed in full in W1-08's README, section
+"The probe record's schema": the nine required fields (`type`, `task`, `reviewer_session`,
+`implementer_session`, `reviewer_wrote_nothing`, `commissioned_by`, `judged_by`, `judgement`, `probed_commit`),
+with `id`, `status` and `state_class` not required.
+
+**The findings' codes (proposed).** A missing field keeps the check's code `SCHEMA_MISSING_FIELD`. A field of
+a wrong type or value is `SCHEMA_INVALID_FIELD`, a code the check does not have today. Both carry `path` (the
+file) and `field`. Only one case holds the codes; the others hold the file and the field.
+
+| Case | Holds | Today |
+|---|---|---|
+| `test_a_well_formed_probe_record_gives_no_finding` | the nine fields, this repository's form: no finding on the file | red: the four findings |
+| `test_each_judgement_word_is_well_formed` (4: `pass`, `passed`, `fail`, `failed`) | no finding; a failed probe is a true record, the gate refuses the close | red, all four: the four findings |
+| `test_a_probe_record_that_states_the_shared_fields_is_well_formed_too` | with `id`, `status`, `state_class` (the form of W1-30's fixtures): no finding | red: `SCHEMA_UNKNOWN_TYPE` |
+| `test_a_probe_record_is_known_by_its_type_not_by_where_it_lies` | a record under `docs/reviews/`: silent when well-formed, named with `judgement` when not | red: the four findings |
+| `test_two_records_of_one_ticket_are_each_judged` | two records in one ticket's folder (DEC-500): the good one silent, the one without `probed_commit` named | red: the good one has the four |
+| `test_a_probe_record_without_a_field_the_probe_gate_asks_for_is_a_finding` (8, one per field beside `type`) | a finding with the file and the field, and no finding about anything else | red, all eight: no finding names the field |
+| `test_a_field_of_a_wrong_type_or_value_is_a_finding` (21) | the same for one wrong shape or value: `judgement` (outside the words, upper case, a truth value, empty), `probed_commit` (abbreviated, `HEAD`, upper case, 41 characters, a number), `reviewer_wrote_nothing` (a word, a number), each session (empty, a list or a number), `commissioned_by` and `judged_by` (empty, a list or a truth value), `task` (a list, no ticket id) | red, all 21: no finding names the field |
+| `test_the_codes_of_a_probe_record_s_findings` | `SCHEMA_MISSING_FIELD` for a missing judgement, `SCHEMA_INVALID_FIELD` for `probed_commit: HEAD`, each once, with `path` | red |
+| `test_this_repository_s_probe_records_are_well_formed` | the frontmatter of every file under `docs/probes/*/` here, in a temporary project: no finding | red: four on each |
+| `test_no_finding_of_the_check_on_this_repository_names_a_probe_record` | the check on this repository: no finding whose path or message names a file under `docs/probes/`. It does not fix the check's total, so a later record of any type does not break it | red: 16 findings |
+| `test_a_record_of_an_unknown_type_is_still_a_finding` | `type: probing`: `SCHEMA_UNKNOWN_TYPE` | green; holds what stays |
+| `test_a_record_of_another_type_still_owes_the_shared_fields` | a decision record without `id`, `status`, `state_class`: each named | green; holds what stays |
+| `test_a_record_whose_type_is_no_text_is_still_a_finding` | `type` as a list | green; holds what stays |
+
+40 red, 3 green.
+
+Not held here: where an installed project holds the kernel's schemas. The schema check reads them from the
+template layout; the three declared checks that name `template/` paths are piece 15 below, and the schema
+check's own place for its schemas is named in no decision.

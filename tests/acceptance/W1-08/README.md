@@ -268,3 +268,52 @@ this branch's `docs/DECISION_REGISTER.md`.
 - **Recommendation.** (a): an explicit `enabled` matches the KPI's word and batch 1's DP-1 option (a) ("a map of
   name to `enabled`"), and a disabled capability stays visible.
 - **Confidence.** Medium-high for the shape; medium for "both keys required".
+
+## The follow-up after W1-41 on W1-30's ticket (DEC-569): two pieces on the kernel's schemas
+
+Written by a test designer on ticket `DAEO-2lwj` (W1-30, reopened), before the schemas are changed. No earlier
+case of this suite is changed. The cases need `check-jsonschema`, as the suite's others do.
+
+### The probe record's schema (DEC-565; `test_w1_08_probe.py`, 7 cases)
+
+DEC-565: "the probe type is added to the kernel's record schema". A probe record is the file `gov close` reads
+for a FULL-profile ticket (DEC-137, DEC-487, DEC-490). The schema is found by the word `probe` in a file name
+under the kernel's schemas folder (reading 1); the full name is the engineer's.
+
+**Proposed: the fields and their shapes.** The worked example is the form of this repository's four probe
+records (three tickets' folders), which state the nine required fields and nothing else.
+
+| Field | Shape | Required |
+|---|---|---|
+| `type` | `probe` | yes |
+| `task` | a ticket id (the shared `ticket_id` grammar) | yes |
+| `reviewer_session` | text, not empty | yes |
+| `implementer_session` | text, not empty | yes |
+| `reviewer_wrote_nothing` | a truth value | yes |
+| `commissioned_by` | text, not empty | yes |
+| `judged_by` | text, not empty | yes |
+| `judgement` | `pass`, `passed`, `fail` or `failed` (the four words DEC-490 names) | yes |
+| `probed_commit` | forty lower-case hexadecimal characters: a full commit id, no abbreviation, no name that moves | yes |
+| `id`, `status`, `state_class` | as in the shared frontmatter where stated | no |
+
+What the schema does not ask, because the probe gate does: that the reviewer is not the implementer, that
+`commissioned_by` and `judged_by` are `orchestrator`, that `reviewer_wrote_nothing` is true and that the
+judgement passed. A record of a failed probe is a well-formed record; the gate refuses the close for it.
+The schema is the one record schema that does not require the shared frontmatter's `id`, `status` and
+`state_class`: the records `gov close` accepts today do not state them, and DEC-565 orders that those records
+stop being findings, not that they be rewritten.
+
+| Case | Holds | Red reason |
+|---|---|---|
+| `test_the_kernel_has_one_schema_for_the_probe_record` | one schema file with `probe` in its name, a JSON object | "no JSON Schema for the probe record" |
+| `test_the_probe_schema_names_no_path_of_a_project` | the file names no `docs/` and no `.tickets` path | the same |
+| `test_the_probe_schema_is_a_valid_json_schema` | the validator's metaschema check | the same |
+| `test_the_probe_schema_accepts_a_well_formed_record` | the nine fields; with the three shared fields added; each of the other three judgement words | the same |
+| `test_the_probe_schema_accepts_this_repository_s_probe_records` | the frontmatter of every file under `docs/probes/*/` here | the same |
+| `test_the_probe_schema_refuses_a_record_without_a_required_field` | each of the nine fields left out, each for itself | the same |
+| `test_the_probe_schema_refuses_a_field_of_a_wrong_type_or_value` | fifteen single changes (a judgement outside the words, in upper case, a truth value; a commit id abbreviated, a moving name, upper case, too long, a number; and one wrong shape of each other field) | the same |
+
+7 red. What the schema check (`core-schema`) reports for a probe record is held in W1-26's suite
+(`test_w1_26_probe_records.py`).
+
+Not held: a commit id of forty digits and no letter, which YAML reads as a number unless it is quoted.
