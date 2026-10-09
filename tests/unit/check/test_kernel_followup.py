@@ -75,6 +75,23 @@ def test_a_probe_record_is_never_silent_where_its_schema_cannot_be_read(tmp_path
     assert {f["code"] for f in check(root)} == {"SCHEMA_INVALID_FIELD"}
 
 
+def test_a_record_is_held_to_the_schemas_of_both_layouts_and_no_finding_is_doubled(tmp_path):
+    """DEC-579: the installed kernel's schemas are read as the template's are."""
+    from gov.check.schema import check
+    root = _with_schemas(tmp_path / "project", "probe.schema.json", "common.schema.json")
+    installed = root / "governance/kernel/schemas"
+    shutil.copytree(root / SCHEMAS_REL, installed)
+    _write(root, RECORD, _probe(commit="HEAD"))
+    assert [(f["code"], f["field"]) for f in check(root)] == [("SCHEMA_INVALID_FIELD", "probed_commit")]
+    schema = json.loads((installed / "probe.schema.json").read_text(encoding="utf-8"))
+    schema["required"] = [*schema["required"], "review_note"]
+    (installed / "probe.schema.json").write_text(json.dumps(schema), encoding="utf-8")
+    assert [(f["code"], f["field"]) for f in check(root)] == [
+        ("SCHEMA_INVALID_FIELD", "probed_commit"), ("SCHEMA_MISSING_FIELD", "review_note")]
+    shutil.rmtree(root / SCHEMAS_REL)   # the installed layout alone
+    assert [f["field"] for f in check(root)] == ["review_note", "probed_commit"]
+
+
 # --------------------------------------------------------------------------
 # commands check: the recorded commands (DEC-542)
 # --------------------------------------------------------------------------

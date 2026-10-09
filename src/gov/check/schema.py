@@ -11,6 +11,8 @@ VERSION = "1.0.0"
 
 RECORD_PATHS = (".tickets", "docs")
 SCHEMA_DIR = "template/governance/kernel/schemas"
+# The kernel's two layouts (DEC-579): a record is held to the schemas of each layout the project holds.
+SCHEMA_DIRS = (SCHEMA_DIR, "governance/kernel/schemas")
 
 SCHEMA_MAP = {
     "task": "ticket.schema.json",
@@ -46,18 +48,14 @@ def _frontmatter(text: str) -> dict | None:
     return front if isinstance(front, dict) else None
 
 
-def _load_schema(root: Path, schema_file: str) -> dict | None:
-    path = root / SCHEMA_DIR / schema_file
+def _load_schema(root: Path, schema_dir: str, schema_file: str) -> dict | None:
+    path = root / schema_dir / schema_file
     if not path.is_file():
         return None
     try:
         return json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return None
-
-
-def _load_common(root: Path) -> dict | None:
-    return _load_schema(root, "common.schema.json")
 
 
 def _validate(front: dict, schema: dict, common: dict | None, rel: str) -> list[dict]:
@@ -120,7 +118,6 @@ def _validate_shapes(front: dict, schema: dict, common: dict | None, rel: str) -
 def check(root: Path) -> list[dict]:
     root = Path(root)
     findings = []
-    common = _load_common(root)
     for record_dir in RECORD_PATHS:
         base = root / record_dir
         if not base.is_dir():
@@ -147,12 +144,20 @@ def check(root: Path) -> list[dict]:
                                          "message": f"{rel}: missing required field '{field}'"})
             schema_file = SCHEMA_MAP.get(record_type)
             if schema_file:
-                schema = _load_schema(root, schema_file)
-                if schema:
-                    findings.extend(_validate(front, schema, common, rel))
+                measured, held = False, []
+                for schema_dir in SCHEMA_DIRS:
+                    schema = _load_schema(root, schema_dir, schema_file)
+                    if not schema:
+                        continue
+                    measured = True
+                    common = _load_schema(root, schema_dir, "common.schema.json")
+                    found = _validate(front, schema, common, rel)
                     if standalone:
-                        findings.extend(_validate_shapes(front, schema, common, rel))
-                elif standalone:
+                        found.extend(_validate_shapes(front, schema, common, rel))
+                    # a finding under either layout is a finding; one both layouts give is not doubled
+                    held += [finding for finding in found if finding not in held]
+                findings.extend(held)
+                if standalone and not measured:
                     findings.append({"code": "SCHEMA_UNREADABLE", "path": rel, "type": record_type,
                                      "message": f"{rel}: unmeasured, the schema {schema_file} cannot be read"})
             else:

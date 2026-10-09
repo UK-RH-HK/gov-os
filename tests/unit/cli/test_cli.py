@@ -15,7 +15,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
-from gov.cli.checks import CHECKS_DIR  # noqa: E402
+from gov.cli.checks import CHECKS_DIR, INSTALLED_CHECKS_DIR  # noqa: E402
 from gov.cli.main import COMMANDS, main  # noqa: E402
 
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -65,6 +65,28 @@ def test_an_invalid_check_declaration_is_refused_not_listed(tmp_path, capsys, te
     code, envelope = _run(capsys, tmp_path, "check", "--list")
     assert code == 1 and envelope["error"]["code"] == "CHECK_DECLARATION_INVALID"
     assert envelope["error"]["details"] == {"file": f"{CHECKS_DIR}/a.yaml", "key": key}
+
+
+DECLARATION = 'id: "a"\nfamily: "f"\ntier: "G1"\nseverity: "warning"\ncommand: "true"\n'
+
+
+def test_the_declarations_of_both_layouts_are_listed_each_check_once(tmp_path, capsys):
+    """DEC-579: alike in the two layouts is one check; a file that one layout alone holds is listed."""
+    _write(tmp_path, f"{CHECKS_DIR}/a.yaml", DECLARATION)
+    _write(tmp_path, f"{INSTALLED_CHECKS_DIR}/a.yaml", DECLARATION)
+    _write(tmp_path, f"{INSTALLED_CHECKS_DIR}/b.yaml", DECLARATION.replace('"a"', '"b"'))
+    code, envelope = _run(capsys, tmp_path, "check", "--list")
+    assert code == 0 and [each["id"] for each in envelope["result"]["checks"]] == ["a", "b"]
+
+
+def test_one_check_id_declared_differently_in_the_two_layouts_is_refused(tmp_path, capsys):
+    _write(tmp_path, f"{CHECKS_DIR}/a.yaml", DECLARATION)
+    _write(tmp_path, f"{INSTALLED_CHECKS_DIR}/a.yaml", DECLARATION + 'allows-not-applicable: "true"\n')
+    code, envelope = _run(capsys, tmp_path, "check", "--list")
+    error = envelope["error"]
+    assert code == 1 and error["code"] == "CHECK_DECLARATION_INVALID"
+    assert error["details"] == {"file": f"{INSTALLED_CHECKS_DIR}/a.yaml", "key": "allows-not-applicable"}
+    assert error["message"].startswith(f"{CHECKS_DIR}/a.yaml and {INSTALLED_CHECKS_DIR}/a.yaml: ")
 
 
 def test_the_read_commands_are_those_of_cap_27():
