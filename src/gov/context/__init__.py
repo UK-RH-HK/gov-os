@@ -77,6 +77,13 @@ def _ticket_mandatory_ids(root: Path, ticket: str) -> list:
     return ids
 
 
+def _ticket_source_ids(root: Path, ticket: str) -> list:
+    """The ids the ticket declares as ``sources``, its dependencies left out (W1-41)."""
+    from gov.tasks.tickets import frontmatter
+    front = frontmatter(root / ".tickets" / f"{ticket}.md") or {}
+    return [str(item) for item in (front.get("sources") or [])]
+
+
 def external_references(root: Path) -> dict:
     """The sources the project lists as living outside the repository: id -> its entry (W1-41; DEC-520).
 
@@ -203,10 +210,13 @@ def context(root: Path, ticket: str, *, brief: bool = False, budget: int | None 
                            f"mandatory input {rid!r} is superseded and cannot satisfy a current requirement",
                            {"ticket": ticket, "superseded": rid})
         resolved.append(rec)
-    if not resolved:  # every declared id is external: nothing was read, no packet stands on it (DEC-454)
+    # every source is external: no source was read, and a dependency that was read is not one (DEC-454, DEC-552);
+    # a ticket that declares no source is judged on every id it declares, as before
+    sources = _ticket_source_ids(root, ticket) or declared_ids
+    if not any(rec["id"] in sources for rec in resolved):
         ids = [item["id"] for item in external]
         raise GovError("BLOCKED",
-                       f"ticket {ticket!r}: every declared mandatory input is an external reference "
+                       f"ticket {ticket!r}: every declared source is an external reference "
                        f"({', '.join(repr(i) for i in ids)}) and none was read",
                        {"ticket": ticket, "external": ids})
 

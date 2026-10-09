@@ -37,6 +37,14 @@ def test_a_ticket_whose_declared_ids_are_all_external_is_blocked(tmp_path, monke
     assert all(rid in message for rid in declared)
 
 
+def test_a_dependency_that_was_read_is_not_a_source_that_was_read(tmp_path, monkeypatch):
+    project = _project(tmp_path, monkeypatch, ["S0a-G-12", "G-10", "CH-1"], [CHARTER])
+    monkeypatch.setattr(ctx, "_ticket_source_ids", lambda root, ticket: ["S0a-G-12", "G-10"])
+    with pytest.raises(GovError) as raised:
+        ctx.context(project, "TK-1")
+    assert (raised.value.code, raised.value.details) == ("BLOCKED", {"ticket": "TK-1", "external": ["S0a-G-12", "G-10"]})
+
+
 def test_a_record_beside_the_external_ids_is_still_built(tmp_path, monkeypatch):
     project = _project(tmp_path, monkeypatch, ["S0a-G-12", "CH-1", "G-10"], [CHARTER])
     packet = ctx.context(project, "TK-1")

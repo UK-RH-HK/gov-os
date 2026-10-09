@@ -30,6 +30,7 @@ RULES, TIME_LIMIT = ".rulesync/rules", 120  # seconds, for the one rulesync call
 LOADED = (".rulesync/", ".claude/", ".cursor/")  # with the names below: where a rule that may cite the store stands
 LOADED_NAMES = ("CLAUDE.md", "AGENTS.md", ".cursorrules", ".windsurfrules")  # a legacy rule file that is kept stays loaded
 CIT_E = f"{FOLDER}/CIT-E-ADOPT-A8.md"
+NO_LONGER_STANDS = ("SUPERSEDED", "RETIRED", "REJECTED")  # the only statuses that release a store from a citing record
 
 
 def _rule(source: str, body: str, **more) -> str:
@@ -136,11 +137,9 @@ def _rulesync(run, plan: dict, texts: dict) -> dict[str, str]:
 def _proof(run, store: list[str], retiring: set, rule_files: list[str]) -> dict:
     """The dependency proof of the memory store: what was read, and every active record and rule that cites it."""
     records, edges = project.record_graph(run.root)
-    from gov.records import active
-
-    ids = sorted({record["id"] for record in records if record["path"] in store})
-    live, citers = set(active(run.root)), []
-    read = [record for record in records if record["id"] in live and record["path"] not in retiring
+    ids, citers = sorted({record["id"] for record in records if record["path"] in store}), []
+    # a record counts unless its status says it no longer stands: any other status, or none, holds the store back
+    read = [record for record in records if record["status"] not in NO_LONGER_STANDS and record["path"] not in retiring
             and not record["path"].startswith(FOLDER + "/")]
     for record in read:
         text = project.blob(run.root, run.tracked[record["path"]]).decode("utf-8", "replace")
@@ -153,7 +152,7 @@ def _proof(run, store: list[str], retiring: set, rule_files: list[str]) -> dict:
                    .union(rule_files, declared & set(run.tracked)) - set(store))
     for rel in rules:
         text = project.blob(run.root, run.tracked[rel]).decode("utf-8", "replace")
-        cited = [name for name in (*store, *ids) if re.search(rf"(?<![\w/-]){re.escape(name)}(?![\w-])", text)]
+        cited = [name for name in (*store, *ids) if re.search(rf"(?<![\w-]){re.escape(name)}(?![\w-])", text)]
         if cited:
             citers.append({"rule": rel, "cites": cited})
     proof = {"store": store, "ids": ids, "records_read": [record["id"] for record in read], "rules_read": rules,

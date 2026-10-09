@@ -247,10 +247,15 @@ def test_a_plan_changed_after_a4_is_not_the_audited_path_maps_plan_and_is_not_ex
 STORE = "legacy/memory/index.md"
 
 
-@pytest.mark.parametrize("kept", [".windsurfrules", ".cursorrules", ".cursor/rules/vote.mdc"])
-def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept):
+@pytest.mark.parametrize("kept,cited,record", [
+    (".windsurfrules", STORE, None), (".cursorrules", f"./{STORE}", None), (".cursor/rules/vote.mdc", f"x/{STORE}", None),
+    (".windsurfrules", f"[m](/{STORE})", None), (".cursorrules", f"../{STORE}", None),
+    (".windsurfrules", f"old{STORE}", "ACCEPTED"), (".windsurfrules", f"old{STORE}", "LINGERING")])
+def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept, cited, record):
     write(root, STORE, "# Legacy memory\n")
-    write(root, kept, f"Before a vote, read {STORE}.\n")
+    write(root, kept, f"Before a vote, read {cited}.\n")
+    if record:  # the rule file cites nothing: a record that still stands does
+        write(root, "docs/dec-9.md", f"---\nid: DEC-9\ntype: decision\nstatus: {record}\n---\n\nSee {STORE}.\n")
     commit(root, "a store, and a legacy rule file that cites it")
     conf = config(paths=(*PATHS, "legacy/**", ".windsurfrules", ".cursorrules", ".cursor/**", "governance/**"))
     for name in ("A0", "A1", "A2"):
@@ -262,7 +267,8 @@ def test_a_memory_store_a_kept_legacy_rule_file_cites_is_not_retired(root, kept)
     stage(root, "A6", conf=conf)
     tree = project.tree(root)
     error = refused("STORE_STILL_CITED", root, "A8", conf=conf)
-    assert kept in error.details["rules_read"] and {"rule": kept, "cites": [STORE]} in error.details["citers"]
+    citer = {"record": "DEC-9", "path": "docs/dec-9.md", "cites": [STORE]} if record else {"rule": kept, "cites": [STORE]}
+    assert kept in error.details["rules_read"] and error.details["citers"] == [citer]
     assert project.tree(root) == tree and project.dirty(root) == [] and (root / STORE).is_file()
 
 
