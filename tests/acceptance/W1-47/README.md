@@ -229,6 +229,46 @@ were rewritten for the owner's answers; 22 to 27 are new.
 - **Recommendation.** Option 1.
 - **Confidence.** Medium.
 
+## The guard hooks' time limit (DEC-580, the follow-up after W1-41)
+
+Added on ticket `DAEO-2lwj` by a fresh Independent Test Designer, before the template's file was changed.
+DEC-580: "The kernel template's settings carry `"timeout": 60` on every guard hook entry, so that every adopted
+project gets it." The reason is `docs/research/EXP-hook-time-limit.md`: a hook still running at its time limit is
+ended and the call goes through, so the harness's limit has to lie above the guard's own deadline of 20 seconds.
+
+`test_w1_47_template_hook_time_limit.py` (13 cases), with `w1_47_hook_time_limit.py`, which states the words once
+for this suite and for W1-39's case of a created project.
+
+| Rule | Cases | Red reason |
+|---|---|---|
+| Every guard hook entry of the template's file carries the number 60 under `timeout` | `test_every_guard_hook_entry_of_the_template_carries_the_time_limit` | `template/governance/kernel/settings.json: a guard hook entry without "timeout": 60 (DEC-580)`, then one line for each of the three entries: `PreToolUse[0] (no matcher) hooks[0]`, `PostToolUse[0] (matcher 'Bash') hooks[0]`, `PostToolUseFailure[0] (matcher 'Bash') hooks[0]`, each `carries no timeout` |
+| The walk judges the entries the earlier cases hold | `test_the_walk_finds_the_template_s_guard_hook_entry_under_each_event` × 3 | Green: they keep the case above from passing on an empty walk |
+| An entry added later without the limit, a limit that is not the number 60, a limit on the matcher group alone | `test_one_guard_hook_entry_without_the_number_is_found` × 8: no limit, a string, another number, zero, on the matcher group only, a second entry in the same group, a second matcher group under the same event, an entry under an event added later | Green: the template's registration is changed in memory, one thing at a time, and exactly one entry is reported |
+| A hook entry that is not the guard's is left as it is | `test_a_hook_entry_that_runs_no_kernel_hook_is_left_as_it_is` | Green |
+| A project made from the template has it | `tests/acceptance/W1-39/test_w1_39_hook_time_limit.py` | See that suite's README |
+
+**Readings** (the stricter one where DEC-580's words leave doubt; both are returned as packages):
+
+- **A guard hook entry** is a hook entry whose command runs a program of the kernel's hooks folder: the guard
+  before a call (`pretooluse`) and the containment check after it (`posttooluse`), under every event and every
+  matcher group, and any other kernel hook a later release registers in this file. DEC-580 counts this
+  repository's entries the same way ("all five entries"). Where one event holds several matcher groups, or one
+  group several entries, each entry is judged by itself.
+- **The limit sits on the hook entry itself**, the object that holds `type` and `command`: that is where the
+  harness reads a hook's time limit, in seconds. A limit on the matcher group alone does not count. The value is
+  the JSON number 60: not a string, not another number, not zero, not `true`, not `60.0`.
+- **Entries that are not the guard's.** The template's file registers none today. The rule does not speak of
+  them: a hook entry that runs no kernel hook program is left as it is, with a limit of its own or without one.
+
+**Nothing else of the file changes.** That is held by the cases that were here before, unchanged: the 30 cases of
+`test_w1_47_kernel_template.py` (PreToolUse for every tool, commands through `$CLAUDE_PROJECT_DIR`, the guard's
+and the containment check's behaviour through the file's commands), the template cases of
+`test_w1_47_failed_commands.py` (both post-command events for Bash, the same check on both) and of
+`test_w1_47_settings_rules.py` (no install rule), and W1-46's
+`test_this_repositorys_settings_carry_no_sandbox_block`. No case, manifest, lock or fixture under
+`tests/acceptance` pins the file's content or a hash of it, so no case was rewritten. W1-39's manifest cases
+compute the installed file's hash at run time.
+
 ## Earlier tests
 
 No earlier acceptance test is changed, and none is made wrong by this ticket's KPIs as far as their text shows:
