@@ -1,7 +1,0 @@
-{
- "schema": "govbridge-reads-extract/1",
- "reads": [
-  {"path": "runtime/src/somewhere_not_declared.rs", "commit": "0000000000000000000000000000000000000000"}
- ],
- "sweep_commands": []
-}
