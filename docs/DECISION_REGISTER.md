@@ -6417,3 +6417,27 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.173 | 2026-10-10 | Owner: DEC-594 (P-36: the escalation of DAEO-2lwj lifted by DEC-593, the close re-run), DEC-595 (P-37: one fix round on W1-15, the secrets-indexing scan in parallel and a time limit a declaration may state), DEC-596 (P-34 widened: the template's rulesync hooks source gets the 60-second limit and the entry for a failed tool call), DEC-597 (P-35: a named residual), DEC-598 (DEC-592 accepted), DEC-599 (the clean-close proof uses a ticket with no refused closes). Delegated: DEC-600 (the round runs on DAEO-7nne reopened, paths added). Next free id: DEC-601. |
+
+## 174. The W1-15 round: the probe judged, what it leaves (register v0.174, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-601 — The W1-15 round of DEC-595 and DEC-596 merges as built at `cddf5ee3`; its residuals
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-584, DEC-595, DEC-596, DEC-600, DEC-498, DEC-558
+- **Decision:**
+  - **Probe: pass.** A fresh reviewer (session `75fd8431-f637-4ba7-828e-4144e74a7e80`, wrote nothing) probed `cddf5ee3`. No secret gets through and no file is left unscanned: the parallel scan answers as the serial form did on thirteen planted shapes at 1, 2, 7, 64 and the default number of workers, and every failure shape (a file that cannot be read, a folder that cannot be entered, a dangling link, a link loop, gitleaks failing, killed or past its limit in one worker, a file deleted after the walk) raises and never answers an empty list. A check killed at its time limit is red whatever it printed. The branch merges directly at the probed head.
+  - **The `"matcher": "Bash"` on the hooks source's `postToolUse` entry, built without a decision, stands.** The containment program ends silently for every call that is not a Bash call before it does anything (`template/governance/kernel/hooks/posttooluse.py`, "Only process Bash calls"), the pre-call program takes its snapshot for Bash calls only, and the kernel template's settings have always registered it so. No check is lost; a hook process is no longer started after other calls. Read by the orchestrator and reproduced by the reviewer.
+  - **Named residuals (Wave 2 list), none a fail-open hole of ordinary work:**
+    - one gitleaks run can pass the module's own 60-second limit on a slow or loaded machine with a large store (fails closed); the figure comes from the orchestrator's measurement on this repository's real store;
+    - a stated limit above about 2,147,483 seconds is accepted and then ends `gov check` with a traceback and no envelope (fails closed, a deliberate shape): the declaration reader gets an upper bound;
+    - YAML spellings of the limit (`0x10`, `010`, `1_0`, `1:30` read as 90; the key written twice, the last wins; a misspelt key is ignored and the check keeps 60);
+    - `gov check --list` entries carry a sixth key when the limit is stated;
+    - the commit hook waits for the whole scan in a project with a large store (before the round the same commit was refused at 60 seconds); whether an agent's commit through Bash outlives its own tool limit there is not measured;
+    - a file deleted between the walk and its read, or a dangling link under the runtime folder, makes the check red (fails closed; unchanged by the round, the parallel form shortens the window);
+    - the `PYTHONPATH` prefix of the hooks source's command lines puts the product's `src` ahead of the installed package: a product package named `gov` there silences containment (a deliberate or unusual shape; older than the round);
+    - those already named in the round: a check killed at its limit may leave child processes; no worker count is set; both large stores are held in memory at once; the figure 60 for a declaration without the key is held by no case; the adapter-portability check does not read the template's hooks source.
+  - **The relative command lines of the hooks source** (every one of the seven entries; older than the round; from a subfolder each exits 2, so containment does not run and every later call is blocked) go to the owner as package P-38: it may be a fail-open hole ordinary work produces, depending on the working directory the harness gives a hook, which the orchestrator measures on an adopted dev-tier clone. No further run starts on it without the owner's answer.
+  - **Two commits of the round carry no `Implements:` trailer:** the test designer's `ac979053` and `7112564a`. They lie under later commits and no branch is rewritten (DEC-558): named for the exit auditor and in the ticket's close note, with the exceptions of DEC-522.
+  - **A citation finding on the orchestrator's own commit `abcb3095`:** its close note cites DEC-594 one commit before the register recorded it (`01db697a`). A warning; named for the exit auditor.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.174 | 2026-10-10 | Delegated: DEC-601 (the W1-15 round's probe judged a pass, the branch merges as built; the Bash matcher on the post-call entry stands; named residuals; the relative command lines of the hooks source go to the owner as P-38; two designer commits without `Implements:` named). Next free id: DEC-602. |
