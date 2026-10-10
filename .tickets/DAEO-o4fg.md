@@ -51,7 +51,6 @@ sources:
 - DEC-174
 - DEC-179
 - DEC-083
-- EXP-001
 - CAP-25
 - CAP-49
 - CAP-58

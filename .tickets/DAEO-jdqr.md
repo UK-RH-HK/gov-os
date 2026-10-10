@@ -70,7 +70,6 @@ sources:
 - DEC-172
 - DEC-174
 - DEC-180
-- EXP-001
 - CAP-49
 - CAP-58
 - CAP-61
