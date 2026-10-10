@@ -37,6 +37,9 @@ tests/acceptance/W1-21/test_w1_21_dev_tier.py  # real-model-or-daemon: the embed
 tests/acceptance/W1-09/test_w1_09_claims.py::test_claims_raced_from_separate_processes_give_exactly_one_holder  # race: claims raced from separate processes
 tests/acceptance/W1-09/test_w1_09_review.py::test_releases_and_claims_raced_from_separate_processes_never_remove_another_holders_claim  # race: releases and claims raced from separate processes
 
+# --- W1-15, the round of DEC-595: the secrets-indexing scan on a stand-in runtime folder
+tests/acceptance/W1-15/test_w1_15_parallel_scan.py::test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder  # latency: the check on 60 small files and one large SQLite store within 15 s
+
 # --- W1-16: every case that runs the codebase-memory daemon (its `local_only` cases)
 tests/acceptance/W1-16/test_w1_16_builtin_allowlist_and_daemon_secrets.py  # real-model-or-daemon: the codebase-memory daemon
 tests/acceptance/W1-16/test_w1_16_code_answers.py  # real-model-or-daemon: the codebase-memory daemon
