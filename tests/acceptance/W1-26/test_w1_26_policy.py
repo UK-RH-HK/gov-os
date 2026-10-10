@@ -29,20 +29,51 @@ def _uncovered(project, sandbox, interface):
                   if isinstance(finding, dict) and finding.get("code") == NOT_COVERED), run
 
 
+def _declarations(project):
+    """Every check declaration this project holds, read from its own files: id -> mapping."""
+    import yaml
+    held = {}
+    for path in sorted((project.root / support.CHECKS_REL).glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            held[path.stem] = data
+    return held
+
+
+def _stated(declarations):
+    """The policy keys the declarations state under ``enforces``."""
+    return {key for data in declarations.values() for key in data.get("enforces") or []}
+
+
 def test_every_policy_key_maps_to_a_check_or_is_informational(project, sandbox, interface):
-    """A key maps to a check when a declared check states it under ``enforces`` (DEC-620); the name of a family
-    or of a result maps nothing. With the kernel's thirteen keys: the nine that are not informational are each
-    reported while no declaration states them, and none is once a declared check states them."""
-    owed = sorted(key for key, strength in support.POLICIES.items() if strength != "informational")
+    """A key maps to a check when, and only when, a declared check of the project states it under ``enforces``
+    (DEC-613, DEC-620); the name of a family or of a result maps nothing. A project of this suite holds the kernel
+    template's declarations, some of which state keys, and the core declarations as this suite writes them, which
+    state none. So, of the nine keys that are not informational: exactly those no declaration of this project
+    states are reported, and none is once a declared check states the remaining ones."""
+    not_informational = {key for key, strength in support.POLICIES.items() if strength != "informational"}
     project.add_core_declarations()
     project.add_path_map({"all": ["**/*"]})
+    declarations = _declarations(project)
+    stated = _stated(declarations)
+    owed = sorted(not_informational - stated)
+    # the premises, each read from the project's own files: a stated key and an unstated one both exist, and one
+    # unstated key is contained in the family name of a declaration that states nothing
+    assert stated & not_informational, \
+        "no declaration of this project states a policy key: nothing shows a stated key is not reported"
+    assert "human_gate" in owed, f"a declaration of this project states human_gate: {sorted(declarations)}"
+    named = declarations.get("core-authority") or {}
+    assert "authority" in str(named.get("family")) and not named.get("enforces") and "authority" in owed, \
+        f"this project holds no family named after a key it does not state: {named}, stated {sorted(stated)}"
     reported, run = _uncovered(project, sandbox, interface)
     assert reported == owed, \
-        f"policy keys no declaration states are not each reported: {reported}, owed {owed}\n{run.describe()}"
+        (f"the policy keys reported are not exactly those no declaration of this project states: {reported}, "
+         f"owed {owed}, stated {sorted(stated)}\n{run.describe()}")
     project.add_check_declaration(STATES_THE_KEYS, "graph integrity")
     declared = project.root / support.CHECKS_REL / f"{STATES_THE_KEYS}.yaml"
     declared.write_text(declared.read_text(encoding="utf-8").rstrip("\n") + f"\nenforces: [{', '.join(owed)}]\n",
                         encoding="utf-8")
+    assert _stated(_declarations(project)) >= not_informational
     reported, run = _uncovered(project, sandbox, interface)
     assert not reported, f"policy keys a declared check states under enforces are reported: {reported}\n{run.describe()}"
 
