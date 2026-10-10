@@ -568,3 +568,136 @@ def bash_call_in(project, settings, sandbox, folder, command, literal=False, rol
                        if text)
     return FolderCall(before, decision, bash.returncode, event, after, report,
                       tuple(check_support.finding_lines(project)[seen:]))
+
+
+# --------------------------------------------------------------------------
+# The command line of an entry, against the kernel template's (DEC-608)
+# --------------------------------------------------------------------------
+#
+# DEC-608: the seven command lines of the source are the kernel template's form exactly. Nothing of that form
+# is written here: the kernel template's command lines are read from its settings file, and the form is what
+# such a command line is with the file name of its program taken out.
+
+PROGRAM_PLACE = "<the program's file name>"
+
+
+def own_programs(command, programs):
+    """The kernel hook programs a command line names by their whole file name (``stop.py`` is not named by a
+    command line that names ``subagentstop.py``)."""
+    if not isinstance(command, str):
+        return []
+    def of_a_name(char):
+        return bool(char) and (char.isalnum() or char in "._-")
+
+    found = []
+    for name in programs:
+        start = command.find(name)
+        while start >= 0:
+            end = start + len(name)
+            if not of_a_name(command[start - 1:start]) and not of_a_name(command[end:end + 1]):
+                found.append(name)
+            start = command.find(name, end)
+    return found
+
+
+def own_program(command, programs, where):
+    """The one program a command line names; a failure when it names none or more than one."""
+    found = own_programs(command, programs)
+    assert len(found) == 1, f"{where}: the command line `{command}` names {found or 'no kernel hook program'}; one is expected"
+    return found[0]
+
+
+def kernel_command_line(event, programs):
+    """The one command line the kernel template's settings register under ``event``, as that file holds it."""
+    commands = registered_commands(kernel_settings(), programs, event)
+    assert len(commands) == 1 and isinstance(commands[0], str), (
+        f"{KERNEL_SETTINGS_REL} registers {len(commands)} guard hook entries under {event}; one is expected: {commands}"
+    )
+    return commands[0]
+
+
+def kernel_forms(programs):
+    """``{event: form}`` for each event under which the kernel template's settings register a guard hook entry:
+    its command line with the file name of its program exchanged for ``PROGRAM_PLACE``."""
+    forms = {}
+    for event in guard_events(kernel_settings(), programs):
+        command = kernel_command_line(event, programs)
+        program = own_program(command, programs, f"{KERNEL_SETTINGS_REL}, {event}")
+        assert command.count(program) == 1 and PROGRAM_PLACE not in command, (
+            f"{KERNEL_SETTINGS_REL}, {event}: `{command}` holds `{program}` more than once"
+        )
+        forms[event] = command.replace(program, PROGRAM_PLACE)
+    return forms
+
+
+def kernel_form(programs):
+    """The one form the kernel template's command lines share. A failure when they do not share one: the form
+    of the entries the kernel template does not hold could then not be read from it."""
+    forms = kernel_forms(programs)
+    distinct = sorted(set(forms.values()))
+    assert len(distinct) == 1, (
+        f"the command lines of {KERNEL_SETTINGS_REL} do not share one form once the program's file name is taken "
+        f"out: {forms}"
+    )
+    return distinct[0]
+
+
+def expected_command_line(event, command, programs, where):
+    """What DEC-608 makes the command line of the entry under ``event``, whose present command line is ``command``.
+
+    Under an event the kernel template's settings hold: the kernel template's command line for that event, the
+    same string. Under another event: the kernel template's form with the entry's own program in the place of
+    the program's file name; the entry's own program is the one its present command line names.
+    """
+    if event in guard_events(kernel_settings(), programs):
+        return kernel_command_line(event, programs)
+    return kernel_form(programs).replace(PROGRAM_PLACE, own_program(command, programs, where))
+
+
+def source_command_lines(source=None):
+    """``{event: [command, ...]}`` of a hooks source, as written, under the harness's names of the events."""
+    source = load_source() if source is None else source
+    block = source.get("hooks") if isinstance(source.get("hooks"), dict) else {}
+    return {key[:1].upper() + key[1:]: [entry.get("command") for entry in listed if isinstance(entry, dict)]
+            for key, listed in block.items() if isinstance(listed, list)}
+
+
+# --------------------------------------------------------------------------
+# A product's own package named ``gov`` under the project's ``src`` (DEC-608; shape C of the README)
+# --------------------------------------------------------------------------
+
+PRODUCT_GOV_FILES = {
+    "src/gov/__init__.py": '"""The product\'s own package: a speed governor for a pump. Not the governance package."""\n'
+                           "\nMAX_RPM = 3000\n",
+    "src/gov/limits.py": "from gov import MAX_RPM\n\n\ndef within(rpm):\n    return 0 <= rpm <= MAX_RPM\n",
+}
+GOVERNANCE_MODULE = "gov.guard"      # a module the kernel's hook programs import and a product's package lacks
+
+
+def add_product_package_named_gov(project):
+    """Give the project, under its own ``src``, a product package named ``gov``, and commit it."""
+    project = Path(project)
+    for rel, text in PRODUCT_GOV_FILES.items():
+        path = project / rel
+        assert not path.exists(), f"{rel} is already in the project"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    check_support.git(project, "add", "-A")
+    check_support.git(project, "commit", "-q", "-m", "the product's own package named gov")
+    return project
+
+
+def gov_as_imported(project, sandbox, first=None):
+    """What ``import gov`` gives a program started as a hook is, outside the project, with ``first`` (a folder)
+    ahead of the installed packages when given: ``(the package's folder, whether it holds the guard)``."""
+    code = ("import importlib.util, json, os, gov\n"
+            f"print(json.dumps([os.path.dirname(os.path.abspath(gov.__file__)), "
+            f"importlib.util.find_spec({GOVERNANCE_MODULE!r}) is not None]))")
+    env = live_support.command_environment(project, sandbox)
+    if first is not None:
+        env["PYTHONPATH"] = str(first)
+    proc = subprocess.run(["python3", "-c", code], capture_output=True, text=True, cwd=str(sandbox.tmpdir), env=env,
+                          timeout=COMMAND_TIMEOUT_S, check=False)
+    assert proc.returncode == 0, f"`import gov` failed in the stand-in session: {proc.stderr.strip()[:300]}"
+    folder, has_guard = json.loads(proc.stdout)
+    return Path(folder), has_guard

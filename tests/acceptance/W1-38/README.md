@@ -16,8 +16,14 @@ the engineer's work. See the section "The round of DEC-596" below.
 
 **The second run on `DAEO-7nne` (2026-10-10, DEC-603, DEC-607)** added 40 cases in
 `test_w1_38_hooks_any_folder.py` and changed no other case: **145 cases; 114 green, 31 red, 0 skipped** as run
-before the engineer's work. Two behaviours of the run have no case yet and wait for package P-7 (the `PYTHONPATH`
-prefix). See the section "The second run" below.
+before the engineer's work. Two behaviours of the run had no case then and waited for package P-7 (the
+`PYTHONPATH` prefix). See the section "The second run" below.
+
+**The addition after DEC-608 (2026-10-10, same run, a second designer)** answered P-7 (option a: no prefix, the
+kernel template's form exactly) and added 19 cases in `test_w1_38_hooks_command_line.py` for those two
+behaviours; it changed, rewrote and removed no other case: **164 cases in 28 classes; 116 green, 48 red,
+0 skipped** as run before the engineer's work (the 31 red of the paragraph above, and 17 of the 19). See "The
+addition after DEC-608" in the section "The second run".
 
 Two rules hold for every case:
 
@@ -231,7 +237,9 @@ measurement on an adopted dev-tier clone, with the adoption step and W1-42.
 
 **P-6. The command line of the source's guard entries.** (answered by DEC-603: option a, the source's command
 lines take the kernel template's form; the cases are in "The second run", below. The part of option a that
-compares the whole command line waits for package P-7.)
+compares the whole command line waited for package P-7; DEC-608 answered that one, and the comparison is held by
+the cases of "The addition after DEC-608". The sentence above, "the command line around the program is not
+compared", stays true of the cases of this round and is no longer true of the suite.)
 - Question: must the command of a guard entry in the hooks source be the command the kernel template's settings
   register (`python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`), or may it stay as it is
   (`PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 governance/kernel/hooks/<program>`)?
@@ -266,7 +274,8 @@ of the hook's input. The four folders: the project's root; a subfolder (`src/app
 paths); a deep subfolder (`docs/one/two/three/four/five`, made empty for the case); a folder outside the project.
 The stand-in home holds the `gov` package as an installed one (the path file of the last round) and the project
 holds no `gov` of its own: a command line with the `PYTHONPATH` prefix and one without it both run there, so no
-case of this run chooses between them (package P-7).
+case of this file chooses between them (package P-7, since answered; the cases that do are in "The addition after
+DEC-608").
 
 ### How a started program is told from the interpreter's "can't open file"
 
@@ -298,8 +307,8 @@ program does not start. Every failure message prints the registered command and 
 | 2. A call the guard refuses from the root is refused in a subfolder too | `::test_a_call_the_guard_refuses_from_the_root_is_refused_in_a_subfolder_too` | red in the subfolder: the call is blocked there too, but by the interpreter's exit 2, not by the guard's written refusal, which the case requires in both folders |
 | 5. A project folder whose name holds a space | `TestAProjectFolderWithASpace::test_the_registered_command_starts_from_a_subfolder[<event>]` × 7 | 7 red, for the relative path. Once the path holds the variable, an unquoted `$CLAUDE_PROJECT_DIR` keeps these seven red and nothing else (measured with a throwaway form in the temporary project) |
 | 4. Unchanged from DEC-596: the limit of 60 on every entry, the Bash matcher, the failed-call entry, the agreement with the kernel template's settings on matcher, program and limit | the cases of the last round, in `test_w1_38_hooks_source.py`, none rewritten | green, and they stay green |
-| 3. The agreement with the kernel template's settings covers the command line | **no case written**: package P-7 | |
-| 6. A product package named `gov` under a project's `src` does not silence the containment check | **no case written**: package P-7 (the form without the prefix brings it; a case would choose the form) | |
+| 3. The agreement with the kernel template's settings covers the command line | the 15 cases of "The addition after DEC-608", below (`TestGeneratedCommandLines` × 7, the source × 7, the form × 1) | 14 red, 1 green |
+| 6. A product package named `gov` under a project's `src` does not silence the containment check | `TestAProductPackageNamedGov`, 4 cases, below | 3 red, 1 green |
 
 Checked before the commit, in temporary projects only (a plug-in outside this tree changed the temporary
 project's copy of the source; nothing under `template/` was touched): with the kernel template's form, and with
@@ -319,10 +328,69 @@ in an adopted project, in which after a `cd` into a subfolder the containment ch
 and an ordinary call is not blocked: the orchestrator's measurement on an adopted dev-tier clone after the merge
 (DEC-607). This repository's own hooks source and settings are not read by any case here.
 
+### The addition after DEC-608: the command line is the kernel template's, and a product's `gov` silences nothing
+
+Cases in `test_w1_38_hooks_command_line.py`, helpers in the last two parts of `w1_38_hooks_support.py`. DEC-608
+(on P-7, option a): "the seven command lines of the template's rulesync hooks source are the kernel template's
+form exactly, `python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`, with no prefix."
+
+**How the form is derived.** No command line is written in the test file or the helpers. Each case reads
+`template/governance/kernel/settings.json`:
+
+- **For an event the kernel template's settings hold** (`PreToolUse`, `PostToolUse`, `PostToolUseFailure`): the
+  expected command line is that file's command line under the event, the same string.
+- **For the four other events** (`SessionStart`, `Stop`, `PreCompact`, `SubagentStop`): the kernel template's
+  command line with the file name of its program taken out is the form; the expected command line is the form
+  with the entry's own program put in. The entry's own program is the kernel hook program its present command
+  line names by its whole file name (`stop.py` is not named by a line that names `subagentstop.py`). That each
+  event's program is the right one is held by the cases of "every entry starts from any folder", which require
+  each program's own answer.
+- **The three kernel command lines share that form**: taken out of each, the program's file name leaves the same
+  string. A case holds it (green), with the count of three and four; were they ever to differ, the form of the
+  four could not be read from the file and that case says so.
+
+Everything else of a command line is compared as it stands: the interpreter, the quoting, the variable, the
+folder, and that nothing stands before or after.
+
+| Behaviour | Test | Before the engineer's work |
+|---|---|---|
+| The form is one, read from the kernel template's settings | `test_the_kernel_template_s_command_lines_share_one_form` | green: it keeps the reading honest |
+| 3. The generated command line is the kernel template's, for the three events both hold | `TestGeneratedCommandLines::test_the_generated_command_line_is_the_kernel_template_s[<event>]` × 3 | 3 red: the generated line names its program by a relative path and carries the `PYTHONPATH` prefix |
+| 3. The generated command line of the four other entries has the same form | `TestGeneratedCommandLines::test_the_generated_command_line_has_the_kernel_template_s_form[<event>]` × 4 | 4 red, the same reason |
+| 3. The same on the source itself, the seven command strings as the file holds them | `test_the_source_s_command_line_is_the_kernel_template_s_form[<event>]` × 7 | 7 red, the same reason |
+| 6. The fixture is shape C of the table below | `TestAProductPackageNamedGov::test_the_fixture_holds_a_product_package_and_the_installed_governance_package` | green: with the project's `src` first, `gov` is the product's package and has no `gov.guard`; for the stand-in home alone it is this worktree's governance package |
+| 6. A failed command that changed a file outside the ticket's paths is followed by the containment check, which reports and records it | `::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded` | red: the registered `PreToolUse` command ends with exit 2 and nothing written (the prefix puts the product's `gov` first, the guard cannot import its own package), so the call is not let through and no check follows |
+| 6. A call the guard lets through is let through by its own answer | `::test_a_call_the_guard_lets_through_is_let_through_by_its_own_answer` | red: the same exit 2 blocks an in-scope call |
+| 6. A call the guard refuses is refused by its written refusal | `::test_a_call_the_guard_refuses_is_refused_by_its_written_refusal` | red: the call is blocked, but by the same exit 2 that answers every call, not by the guard's refusal (exit 0 and `permissionDecision: deny`), which the case requires |
+
+The project of `TestAProductPackageNamedGov` is the generated product of the cases above with two more committed
+files, `src/gov/__init__.py` and `src/gov/limits.py`: a product's own code (a speed governor), with none of the
+governance package's modules. The governance package is importable exactly as before: the path file in the
+stand-in home's user site folder. Each call is one whole Bash call of the engineer from the project's root
+through the generated commands (`bash_call_in`). "By its own answer": the guard's program ends with 0 and writes
+no refusal, the command then runs, and the check after it ends with 0; for the in-scope call it stays silent and
+nothing is recorded.
+
+Checked before the commit, in temporary projects only (a plug-in outside this tree gave each case's temporary
+project a copy of the source in the decided form, and gave the cases that read the source as written the same
+object; nothing under `template/` was touched): with the decided form **all 164 cases of the suite pass**, among
+them all 19 of `test_w1_38_hooks_command_line.py`, all 40 of `test_w1_38_hooks_any_folder.py` and all 18 of
+`test_w1_38_hooks_source.py`. No existing case of this suite goes red with it.
+
+**Not held by the addition, and why.**
+- A project that holds `gov` only under its own `src`, with none installed for the user (shape B: this
+  repository on a fresh machine), is blocked at every call with the decided form. It fails closed; it is the
+  named residual of DEC-608, and no case is written for it.
+- That `gov` is installed for the user who runs a project's sessions is a precondition (DEC-608), stated in the
+  adoption notes and the exit package, not checked by a case.
+- A real session in an adopted project is the orchestrator's measurement after the merge (DEC-607), as above.
+- This repository's own hooks source and its own generated settings are read by no case.
+
 ### Package
 
-**P-7. The `PYTHONPATH` prefix of the source's command lines.** (open; found by the measurement DEC-607 asks for;
-no case written that depends on it)
+**P-7. The `PYTHONPATH` prefix of the source's command lines.** (answered by DEC-608: option a, no prefix, the
+kernel template's form exactly; option c is not built and goes on the Wave 2 list. The cases are in "The addition
+after DEC-608", above. Kept below as raised.)
 - Question: do the seven command lines lose the prefix `PYTHONPATH="$CLAUDE_PROJECT_DIR/src"` (the kernel
   template's form as it stands), or keep it in front of the kernel template's path?
 - Measured, in four temporary projects generated from the template, each of the seven commands run from the
