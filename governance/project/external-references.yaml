@@ -8,3 +8,96 @@ references:
   - id: S0a-G-13
     location: "S0a STACK_OPTIONS §3, item S0a-G-13 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
     reason: "its text is not in this repository's tree: no tracked file holds it; docs/ only names the id"
+  - id: S0a-G-01
+    location: "S0a STACK_OPTIONS §3, item S0a-G-01 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-02
+    location: "S0a STACK_OPTIONS §3, item S0a-G-02 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-03
+    location: "S0a STACK_OPTIONS §3, item S0a-G-03 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-04
+    location: "S0a STACK_OPTIONS §3, item S0a-G-04 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-06
+    location: "S0a STACK_OPTIONS §3, item S0a-G-06 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-07
+    location: "S0a STACK_OPTIONS §3, item S0a-G-07 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-09
+    location: "S0a STACK_OPTIONS §3, item S0a-G-09 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-10
+    location: "S0a STACK_OPTIONS §3, item S0a-G-10 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-11
+    location: "S0a STACK_OPTIONS §3, item S0a-G-11 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: S0a-G-15
+    location: "S0a STACK_OPTIONS §3, item S0a-G-15 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0a, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-01
+    location: "S0b2 GLUE_REQUIREMENTS, item G-01 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-02
+    location: "S0b2 GLUE_REQUIREMENTS, item G-02 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-03
+    location: "S0b2 GLUE_REQUIREMENTS, item G-03 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-04
+    location: "S0b2 GLUE_REQUIREMENTS, item G-04 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-05
+    location: "S0b2 GLUE_REQUIREMENTS, item G-05 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-06
+    location: "S0b2 GLUE_REQUIREMENTS, item G-06 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-07
+    location: "S0b2 GLUE_REQUIREMENTS, item G-07 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-08
+    location: "S0b2 GLUE_REQUIREMENTS, item G-08 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-09
+    location: "S0b2 GLUE_REQUIREMENTS, item G-09 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-10
+    location: "S0b2 GLUE_REQUIREMENTS, item G-10 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-11
+    location: "S0b2 GLUE_REQUIREMENTS, item G-11 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-12
+    location: "S0b2 GLUE_REQUIREMENTS, item G-12 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-14
+    location: "S0b2 GLUE_REQUIREMENTS, item G-14 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-15
+    location: "S0b2 GLUE_REQUIREMENTS, item G-15 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-17
+    location: "S0b2 GLUE_REQUIREMENTS, item G-17 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-18
+    location: "S0b2 GLUE_REQUIREMENTS, item G-18 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-19
+    location: "S0b2 GLUE_REQUIREMENTS, item G-19 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-20
+    location: "S0b2 GLUE_REQUIREMENTS, item G-20 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-21
+    location: "S0b2 GLUE_REQUIREMENTS, item G-21 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-22
+    location: "S0b2 GLUE_REQUIREMENTS, item G-22 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
+  - id: G-25
+    location: "S0b2 GLUE_REQUIREMENTS, item G-25 (named in docs/plan/WAVE_1_WBS.md, the table of source items)"
+    reason: "research catalogue of stage S0b2, kept outside the repository; its requirement is restated in the citing ticket's KPI lines"
