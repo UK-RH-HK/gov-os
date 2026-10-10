@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.cli.checks import CHECKS_DIRS, load_declarations
+from gov.cli.checks import CHECKS_DIRS, TIMEOUT_FIELD, load_declarations
 
 VERSION = "1.0.0"
 
@@ -39,6 +39,7 @@ FAMILIES = (
 RED, YELLOW, GREEN = "RED", "YELLOW", "GREEN"
 NA_FIELD = "allows-not-applicable"
 EXIT_NOT_APPLICABLE = 2
+TIMEOUT_S = 60  # the limit of a check whose declaration states none (DEC-595)
 
 
 def _normalise_family(name: str) -> str:
@@ -72,7 +73,8 @@ def _provenance(check_id: str, commit: str, version: str = VERSION) -> dict:
     }
 
 
-def _run_command(command: str, root: Path) -> tuple[int, str, str]:
+def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[int | None, str, str]:
+    """The exit code, output and error output of ``command``. The exit code is None when it passed ``timeout`` seconds."""
     env = dict(os.environ)
     pythonpath = env.get("PYTHONPATH", "")
     src = str(root / "src")
@@ -84,10 +86,12 @@ def _run_command(command: str, root: Path) -> tuple[int, str, str]:
     try:
         result = subprocess.run(
             command, shell=True, capture_output=True, text=True,
-            cwd=str(root), env=env, timeout=60,
+            cwd=str(root), env=env, timeout=timeout,
         )
         return result.returncode, result.stdout, result.stderr
-    except (subprocess.TimeoutExpired, OSError) as exc:
+    except subprocess.TimeoutExpired:
+        return None, "", ""  # what it printed before the limit is no answer
+    except OSError as exc:
         return 1, "", str(exc)
     finally:
         shutil.rmtree(xdg_tmp, ignore_errors=True)
@@ -115,7 +119,8 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
     command = decl["command"]
     allows_na = decl.get(NA_FIELD) == "true"
 
-    exit_code, stdout, stderr = _run_command(command, root)
+    limit = decl.get(TIMEOUT_FIELD, TIMEOUT_S)
+    exit_code, stdout, stderr = _run_command(command, root, limit)
 
     if exit_code == EXIT_NOT_APPLICABLE and allows_na and stdout.strip():
         try:
@@ -145,7 +150,10 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
             if exit_code != 0:
                 findings = [{"code": "CHECK_FAILED", "message": stdout.strip()[:200]}]
 
-    if exit_code != 0 and not findings:
+    if exit_code is None:
+        findings = [{"code": "CHECK_FAILED",
+                     "message": f"{check_id} did not end within its time limit of {limit} seconds"}]
+    elif exit_code != 0 and not findings:
         findings = [{"code": "CHECK_FAILED", "message": f"{check_id} exited with code {exit_code}",
                       "stderr": stderr.strip()[:200] if stderr.strip() else None}]
 

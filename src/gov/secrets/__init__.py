@@ -154,4 +154,7 @@ def stores_with_secrets(root: Path) -> list[str]:
     files = sorted(Path(folder) / name
                    for folder, _, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True)
                    for name in names)
-    return [path.relative_to(root).as_posix() for path in files if _holds_secret(rules, _store_content(path))]
+    # Every file is read and scanned, several at a time; the first that cannot be decided raises.
+    with ThreadPoolExecutor() as pool:
+        verdicts = list(pool.map(lambda path: _holds_secret(rules, _store_content(path)), files))
+    return [path.relative_to(root).as_posix() for path, verdict in zip(files, verdicts) if verdict]
