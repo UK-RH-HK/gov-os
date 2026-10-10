@@ -4,37 +4,52 @@
     "preToolUse": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/pretooluse.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/pretooluse.py",
+        "timeout": 60
       }
     ],
     "postToolUse": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/posttooluse.py"
+        "matcher": "Bash",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/posttooluse.py",
+        "timeout": 60
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "matcher": "Bash",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/posttooluse.py",
+        "timeout": 60
       }
     ],
     "sessionStart": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/sessionstart.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/sessionstart.py",
+        "timeout": 60
       }
     ],
     "stop": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/stop.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/stop.py",
+        "timeout": 60
       }
     ],
     "preCompact": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/precompact.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/precompact.py",
+        "timeout": 60
       }
     ],
     "subagentStop": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/subagentstop.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/subagentstop.py",
+        "timeout": 60
       }
     ]
   }

@@ -7,7 +7,8 @@ DEC-225 and DEC-221 (profile FULL). Written before implementation. No earlier ti
 The suite has **53 test functions, 92 cases**: 36 functions and 59 cases written before implementation, 14
 functions and 21 cases of the second batch (below), written after green from behaviours a review described
 (DEC-136), and 3 functions and 12 cases of the third batch (below), written after implementation from a probe
-finding (DEC-298).
+finding (DEC-298). The fourth batch (below, the round of DEC-595 on the reopened ticket) adds **15 functions and
+32 cases**, written before that round's implementation: **68 test functions, 124 cases** in all.
 
 ## Run
 
@@ -16,7 +17,7 @@ python3 -m pytest tests/acceptance/W1-15 -q -p no:cacheprovider
 ```
 
 Standard library, `pytest` and PyYAML only. Nothing is installed. No network. About 20 seconds once the ticket is
-built.
+built (the first three batches; the fourth adds about 45 seconds once its round is built).
 
 - **No secret is committed.** Every planted string (the canary of the first KPI line, the seven dev-tier values, a
   private key block, an access token) is built at run time from parts in `w1_15_support.py`. None stands whole in a
@@ -187,9 +188,113 @@ DP-7); the older `[allowlist]` and `[rules.allowlist]` spellings of the same she
 `targetRules`, `condition` and `regexTarget`; inline `gitleaks:allow` comments and a `.gitleaksignore` file; that the
 check stays green on clean stores under a sheltering file.
 
+## Fourth batch: the scan in parallel, and a time limit a declaration may state (DEC-595, DEC-600)
+
+Files `test_w1_15_parallel_scan.py` (5 functions, 8 cases) and `test_w1_15_check_time_limit.py` (10 functions,
+24 cases), written before the round's implementation. No earlier case was changed or rewritten; the support module
+is unchanged (the new helpers stand in the two files). One line was added to `tests/acceptance/serial-only.txt`.
+
+**What was measured (DEC-591, DEC-595).** In the main repository the check's command did not end in 300 seconds,
+twice, on a quiet machine: its runtime folder holds 238 MB in 2,575 files, the scan takes one file after another
+with up to two gitleaks runs for each, and the check runner gives every check 60 seconds. DEC-595: "the
+secrets-indexing scan runs its files in parallel, as the module already does for the indexer, and a check's
+declaration may state its own time limit. No rule is loosened; every file is still scanned." Scanning only changed
+files and caching results are on the Wave 2 list: no case here asks for either, and none would pass by either
+alone (every case builds its stores anew).
+
+### The key: `timeout-seconds`
+
+A declaration may carry `timeout-seconds`: a positive whole number of seconds, written as a YAML number, in the
+style of the declaration's one other optional key (`allows-not-applicable`). Without it a check keeps the runner's
+60 seconds.
+
+Where it is to be accepted. Declarations are read and validated in one place today, `src/gov/cli/checks.py`:
+`_read` refuses a file that is not valid with `CHECK_DECLARATION_INVALID`, and `load_declarations` is the reader of
+`gov check`, `gov check --list` and `gov ci` (`src/gov/ci/command.py`). Two things of today's code matter to
+whoever builds it, both seen through the commands: the reader hands on the five required fields only, so the key
+does not reach the runner today (`src/gov/check/runner.py` reads `allows-not-applicable` from the files a second
+time, and holds the limit as a constant of 60); and the reader already refuses one check id whose two layouts
+differ in any key, this one included.
+
+"Refused as an invalid declaration" is held to what it means for another key today (the premise case below pins
+it for `severity`): exit code 1, `error.code` `CHECK_DECLARATION_INVALID`, `error.details` naming `file` (the path
+in the project) and `key`, a message that begins `<file>: key '<key>' must be `, for the run and for the list
+alike, and no check of the project started.
+
+### Behaviour → cases → red reason today
+
+Red run on `w1/W1-15` at `108df093` plus this batch: **20 failed, 12 passed** of the 32 new cases. Each failure is
+the case's own assertion on behaviour; no fixture fails and nothing is red for being absent, except the last line
+of the table, whose subject is a line the template does not hold yet. Against a throwaway stand-in outside the
+repository (the reader accepting and handing on the key, the runner using it, the scan mapped over a thread pool:
+about 15 changed lines) 31 of the 32 passed; the 32nd reads the template's declaration.
+
+| Behaviour | Cases | Today |
+|---|---|---|
+| **S1.** Every file is still scanned and the answer is the same list in the same order, whatever the machine gives | `test_every_planted_file_among_many_is_reported_once_in_the_order_of_the_paths[2]` (every processor; one processor) · `test_the_check_names_every_planted_file_among_many_in_that_order` | green (keep true): the serial scan gives this list |
+| **S2.** A planted secret in any one file among many is found: the first, the last, a SQLite row, a large file | the three cases of S1 (six planted files among 20 clean ones) · `test_a_canary_in_the_last_row_of_a_large_database_store_is_found` | green (keep true) |
+| **S3.** A file that cannot be read, a folder that cannot be entered or a gitleaks run that fails still raises; one such file among many fails the whole check | `test_one_file_that_cannot_be_decided_among_many_gives_no_list_and_no_green_check[3]` | green (keep true) |
+| **S4.** Time: the check ends within the bound on the stand-in | `test_the_check_ends_within_the_bound_on_the_stand_in_runtime_folder` | **red**: "the check did not end within 15 s on 60 small files and one large SQLite store" |
+| **L1.** A check over its stated limit is red and says which limit; both layouts alike | `test_a_check_over_its_stated_limit_is_red_and_its_finding_names_that_limit[2]` · `test_a_limit_stated_alike_in_both_layouts_is_the_limit_of_the_one_check` | **red** (3): the check is GREEN, "the stated limit was not applied" |
+| **L2.** A check that ends inside its stated limit is judged by its own answer | `test_a_check_that_ends_inside_its_stated_limit_is_judged_by_its_own_answer[2]` | green (keep true) |
+| **L3.** A declaration without the key keeps its own limit | in the two cases of L1: the check beside the red one states nothing, runs three seconds and is GREEN | red with L1 |
+| **L4.** A value that is no positive whole number is refused as an invalid declaration, not ignored | `test_a_stated_limit_that_is_no_positive_whole_number_is_refused_as_an_invalid_declaration[7]` (zero, negative, a fraction, a word, a number written as a string, a truth value, nothing after the key) · `test_the_refusal_is_the_same_for_the_list_and_under_the_installed_layout[6]` · premise: `test_a_key_that_is_not_valid_is_refused_today_in_the_words_the_limit_s_refusal_is_held_to` | **red** (13): "gov check --json was not refused with exit code 1" (the value is ignored). The premise case is green |
+| **L5.** One check id with two limits in the two layouts is refused | `test_a_limit_stated_differently_in_the_two_layouts_is_refused[2]` | green (keep true): today's rule for any key |
+| **L6.** `gov ci job` gets the same through the reader | `test_gov_ci_job_holds_a_check_to_its_stated_limit` · `test_gov_ci_job_refuses_a_stated_limit_that_is_no_positive_whole_number` | **red** (2): the job gives GREEN to the check; the job is not refused with `CHECK_DECLARATION_INVALID` |
+| **D1.** The secrets-indexing declaration states its limit | `test_the_secrets_indexing_declaration_states_a_limit_above_the_default_and_under_the_ceiling` | **red**: "template/governance/kernel/checks/secrets-indexing.yaml states no time limit (key 'timeout-seconds')" |
+
+### How these cases decide
+
+- **S1, S2.** Six files with a planted secret stand among 20 without one under `.gov-runtime/`: the file that
+  sorts first, the file that sorts last, a text file of 2 MB with the canary at its end, a SQLite store with a
+  private key in its last row, and one file in each of the folders `pair/` and `pair-b/`. The expected list is the
+  six, each once, in the order the scan has today: paths compared name by name (`pair/x.md` before `pair-b/x.md`;
+  compared as text the two would swap). The function `gov.secrets.stores_with_secrets` is asked in a child
+  process, once as the machine runs it and once pinned to one processor (`taskset -c 0`; skipped without the
+  tool). No case names a setting for the number of workers: none exists, and the cases fix none. On Python 3.13
+  and later the pinning changes the default number of workers; on 3.12 it changes only how they take turns. The
+  third case reads the command's output: one line for each planted file, in that order, no secret in it.
+- **S3.** The same 20 clean files, one file with a canary that sorts first, and one obstacle: a file of mode 0, a
+  folder of mode 0 (both skipped for a user who reads them all the same), or a stand-in `gitleaks` first on `PATH`
+  that exits 1 for the one content holding a mark and hands every other content to the real binary (the case
+  needs the binary and is skipped without it). Held: the function gives no list (it raises), so neither a list
+  without the file nor the list of what was found before it; and the command's exit code is not 0.
+- **S4, the time case.** The stand-in: 60 files of 4 KiB and one SQLite store of 9.7 MB (about 2,350 rows), none with
+  a secret, about 10 MB in 61 files. Measured on this machine (20 processors, load about 1): the present scan,
+  one file after another, **30.3 s**; the same scan mapped over a thread pool, **4.3 s**, and **9.6 s** when
+  held to four processors. The bound is **15 s**: half the serial time, three and a half times the parallel
+  one. Nearly all of the time is the start of gitleaks (about 0.24 s a run, two runs a file); the large store
+  alone takes 1.6 s. The case gives the command 15 s and no longer, so its red run costs 15 s. It asserts a time
+  bound and is declared in `tests/acceptance/serial-only.txt` (kind `latency`); it is the only such case of the
+  batch.
+- **L1 to L6.** Every project is a temporary git repository with declarations of its own and nothing else of a
+  kernel; `gov` is W1-07's launcher over this worktree's `src/`. The slow check is `exec sleep 12` with
+  `timeout-seconds: 2`: it exits 0 when let run, so only a time limit makes it red. "Names the limit" means the
+  check's findings hold the number of seconds with its unit ("2 s", "2 seconds", "2.0 seconds"), anywhere in them,
+  and do not hold 60 so. No case waits for the default limit.
+- **D1, and the ceiling.** The value is the engineer's, from a measurement on a stand-in of the main repository's
+  size. Held: the key is there, a whole number, above 60 and **at most 1800**. Why 1800: `gov close` adds no limit
+  of its own to a check (W1-30's README, settlement 13), so a hung check holds a close for the whole of the
+  check's limit. The close's limits are those of its test runs: 120 seconds by default and `close_timeout: 7200`
+  in this repository (settlement 21). The default cannot be the ceiling (the serial scan already passed 300 s and
+  the limit is to leave room on a loaded machine), so the ceiling is a quarter of the one limit this repository
+  writes for a close.
+
+### Not held in this batch, on purpose
+
+- **The figure 60 for a declaration without the key.** Seeing it needs a case that waits a minute. Held instead:
+  a check that states nothing is not bound by its neighbour's two seconds.
+- **A stated limit above 60 letting a check run longer than 60 seconds**: the same wait.
+- **A gitleaks run that passes its own limit** (60 seconds in the module): the same wait, and no public way to
+  set it. The stand-in scanner covers the run that fails.
+- Whether `gov check --list` shows the key, and whether a declaration may carry keys nobody reads.
+- `5.0`, and other spellings of a whole number that YAML reads as a fraction.
+- The number of workers, memory while several large stores are read at once, and the time on the real store
+  (measured afterwards by the orchestrator, DEC-595).
+
 ## `local_only` (21 cases)
 
-Deselect with `-m "not local_only"` (71 cases remain).
+Deselect with `-m "not local_only"` (103 cases remain).
 
 - **Run the `gitleaks` binary directly** (18 cases): `test_the_canary_is_detected[4]`,
   `test_the_gitleaks_defaults_alone_miss_the_canary[2]`, `test_a_secret_the_defaults_find_is_still_detected[4]`,

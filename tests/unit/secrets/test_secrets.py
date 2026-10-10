@@ -140,3 +140,15 @@ def test_a_project_without_a_gitleaks_configuration_is_refused(project):
     clean = _write(project, "notes/clean.md", "Ordinary text.\n")
     with pytest.raises(RuntimeError):
         secrets.indexable(project, [clean])
+
+
+def test_the_parallel_scan_reads_every_store_file_once_and_keeps_the_order_of_the_paths(project, monkeypatch):
+    rels = [_write(project, f".gov-runtime/{folder}/{number:02d}.md", f"{folder} {number} ordinary text.\n")
+            for folder in ("pair", "pair-b", "store") for number in range(12)]
+    planted = [_write(project, f".gov-runtime/{name}", f"The value is {PLANTED} today.\n")
+               for name in ("pair/zz.md", "pair-b/00a.md")]
+    scanned = []
+    real = secrets._holds_secret
+    monkeypatch.setattr(secrets, "_holds_secret", lambda rules, content: scanned.append(content) or real(rules, content))
+    assert secrets.stores_with_secrets(project) == planted
+    assert sorted(scanned) == sorted((project / rel).read_bytes() for rel in rels + planted)

@@ -246,3 +246,36 @@ def test_run_checks_returns_families_and_checks(tmp_path):
     for fam_name in runner.FAMILIES:
         assert fam_name in families
         assert families[fam_name]["status"] in ("RED", "YELLOW", "GREEN")
+
+
+# --------------------------------------------------------------------------
+# a time limit a declaration may state (DEC-595, DEC-600)
+# --------------------------------------------------------------------------
+
+def _declare(root, check_id, command, extra=""):
+    return _write(root, f"template/governance/kernel/checks/{check_id}.yaml",
+                  f"id: {check_id}\nfamily: graph integrity\ntier: G1\nseverity: hard-block\ncommand: {command}\n{extra}")
+
+
+def test_a_stated_time_limit_reaches_the_runner_and_its_finding_names_it(tmp_path):
+    from gov.cli.checks import load_declarations
+    _declare(tmp_path, "slow", "exec sleep 5", "timeout-seconds: 1\n")
+    _declare(tmp_path, "plain", "exit 0")
+    plain, slow = load_declarations(tmp_path)
+    assert slow["timeout-seconds"] == 1 and "timeout-seconds" not in plain
+    result = runner._run_declared_check(slow, tmp_path, "abc123")
+    assert result["status"] == "RED"
+    assert result["findings"] == [{"code": "CHECK_FAILED",
+                                   "message": "slow did not end within its time limit of 1 seconds"}]
+    assert runner._run_declared_check(plain, tmp_path, "abc123")["status"] == "GREEN"
+
+
+@pytest.mark.parametrize("value", ["0", "true", "1.0", ""])
+def test_a_time_limit_that_is_no_positive_whole_number_is_refused(tmp_path, value):
+    from gov.cli.checks import load_declarations
+    from gov.cli.errors import GovError
+    _declare(tmp_path, "bad", "exit 0", f"timeout-seconds: {value}\n")
+    with pytest.raises(GovError) as refused:
+        load_declarations(tmp_path)
+    assert refused.value.code == "CHECK_DECLARATION_INVALID"
+    assert refused.value.details["key"] == "timeout-seconds"
