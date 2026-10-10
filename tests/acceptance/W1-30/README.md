@@ -2003,6 +2003,124 @@ the suite are green.
 No case of the round needs a model, a daemon, the network or a session log of the machine. No
 other suite and no unit test was changed.
 
+## Round 15: the fix round before adoption (DEC-612, DEC-613, DEC-614, DEC-616, DEC-620)
+
+Files `test_w1_30_r15_*.py`, support `w1_30_r15_support.py`, fixture `scratch` in `conftest.py`. A round 15
+project is a temporary git repository that holds only what its case writes; a kernel declaration or schema is
+copied as the single file it is. "Pin" marks a case that passes before the round and holds what must stay.
+
+### Piece 1: the context check measures the tickets the store holds (`test_w1_30_r15_context_tickets.py`)
+
+| Case | Holds | Before the round |
+|---|---|---|
+| `test_the_check_is_green_where_every_ticket_s_context_reproduces` | the declared command, in a store of two `type: task` tickets | red: "unmeasured: no tickets in the store" |
+| `test_gov_check_reports_the_check_green_in_a_project_with_tickets` | the same through `gov check` | red: the entry is RED |
+| `test_the_check_is_red_and_names_the_ticket_whose_context_does_not_reproduce` | the failing ticket is named, not "no tickets" | red: "no tickets" |
+
+Settlement: W1-24's cases write tickets of type `ticket` and stay as they are, so both types are measured after
+the round.
+
+### Piece 2: a command that succeeds is not a finding (`test_w1_30_r15_command_success.py`)
+
+| Case | Holds | Before the round |
+|---|---|---|
+| success form, exit code 0 | GREEN | red: the envelope is read as a finding |
+| the kernel's `fresh-agent-reconstruction` declaration, a ticket with a checkpoint | GREEN | red, same reason |
+| success form, exit code 1 | RED | pin |
+| refusal form, exit code 0 and 1 | RED, the refusal shown | pin |
+| three other objects with exit code 0 (unmeasured, a finding object, `{"ok": true}` without `result`) | still a finding | pin |
+
+### Piece 3: the record types in use (`test_w1_30_r15_record_types.py`)
+
+Five types: `change-execution-record`, `change-impact-proposal`, `capability`, `specification`, `plan`.
+
+| Case | Holds | Before the round |
+|---|---|---|
+| `..._that_holds_the_shared_frontmatter_passes` (5) | no finding | red: `SCHEMA_UNKNOWN_TYPE` |
+| `..._without_state_class_is_a_finding` (5) | the one finding is `SCHEMA_MISSING_FIELD` `state_class` | red: `SCHEMA_UNKNOWN_TYPE` beside it |
+| `test_a_type_nobody_knows_is_still_an_unknown_type` | `SCHEMA_UNKNOWN_TYPE` | pin |
+| `test_a_capability_id_passes_...` (2: `CAP-38`, `CAP-38.b`) | schema check and graph check | red on the schema check; the graph check passes today |
+| `test_the_type_has_a_schema_file_...` (5) | one schema file whose `type` is the constant; refers to the shared frontmatter; requires nothing more; an id grammar it gives accepts `S2-CIT-E`, `S2-CIT-P`, `CAP-38`, `CAP-38.b` | red: no such file |
+
+Notes for the engineer: W1-08's suite finds a record's schema file by a word in its name and forbids an id
+`pattern` outside `common.schema.json`; the shared `record_id` grammar refuses `S2-CIT-E` (a digit in the prefix).
+
+### Piece 4: the retrieval-regression limit (`test_w1_30_r15_retrieval_limit.py`)
+
+Two cases, both red before the round (no `timeout-seconds`): the declaration states 600 and its five other
+fields are unchanged; `gov check --list` shows it with the limit.
+
+### Piece 5: a check declares the policy it enforces
+
+The rule (`test_w1_30_r15_enforces.py`): covered under `enforces` in either layout (2, red); the same without
+the field reported as today (pin); covered only by the stating check (red); a family name no longer covers
+(red); informational key passes (pin); new hard-block key red (pin); `gov check --list` shows the field (red);
+five values that are no list of keys refused with `CHECK_DECLARATION_INVALID` naming file and key, no check
+started (5, red); the same refusal for the list (red).
+
+The evidence (`test_w1_30_r15_policy_pairs.py`): one case per pair plants one violation in a temporary project
+and holds the check GREEN before it and not GREEN after it. An evidence case passes before the round where the
+check already works; the two marked * are red before the round because the check is red before the violation
+too (pieces 1 and 2).
+
+| Key | Check | Planted violation | Not caught by this check |
+|---|---|---|---|
+| security | `secrets-indexing` | canary `tier-form` in a packet under `.gov-runtime/` | secrets in tracked files, sensitivity classes, permissions |
+| authority | `core-authority` | a ticket cites a research record under `sources` | who may approve; role limits on writes |
+| test | `core-mutation` | an engineer's ticket whose `allowed_paths` cover `tests/acceptance/` | failing or missing acceptance tests; an actual write |
+| change | `core-claims` | the last commit changes the readiness taxonomy, no change-execution record | any other governed file; any record satisfies it |
+| tool | `adapter-portability` | the registry pins another rulesync version than the installed one | every other tool; installs; unregistered tools |
+| context * | `context-reproducibility` | a ticket names a source the store does not hold | ceilings, superseded inputs, contradictions |
+| checkpoint * | `fresh-agent-reconstruction` | the latest checkpoint has no `next_action` | no checkpoint at all (green); stale checkpoints |
+| memory | `index-freshness` | a file committed after the index was built | retrieval quality, the semantic index, the record store |
+
+Beside them: `test_the_kernel_declaration_of_the_check_states_the_key_it_is_proved_to_enforce` (8, red: nothing
+is stated), `test_every_key_a_kernel_declaration_states_is_a_policy_key` (pin),
+`test_the_kernel_template_states_exactly_the_pairs_that_are_proved` (red).
+
+Examined and not declared: `core-decision-citations` for `authority` (severity `warning`: a violation gives
+YELLOW, never the red a hard-block key owes; `authority` is proved by `core-authority`);
+`product-traceability-trailers` for `change` (package below); `retrieval-regression` for `memory` (needs the dev
+tiers and a model: no case of this suite can plant and run it). `human_gate` has no check: it stays red
+(`policy-human_gate`, `POLICY_NOT_COVERED`) and goes to the owner.
+
+Rewritten in W1-26's suite: `test_every_policy_key_maps_to_a_check_or_is_informational`
+(`Rewrite-Reason:` trailer; red before the round: `authority` and `context` are covered by family names).
+
+### Piece 6: this repository's rulesync sources (`test_w1_30_r15_own_sources.py`)
+
+No case held this repository's own `.rulesync/` before. One case, red before the round: `SOURCE_DIFFERS`
+`.rulesync/subagents/orchestrator.md`, `SOURCE_MISSING` `.rulesync/skills/orchestration/SKILL.md`. It runs the
+portability program read-only with a rulesync that does not exist, so only sources are compared.
+
+### `depends_on` in either form (`test_w1_30_r15_depends_on_forms.py`, W1-01's suite)
+
+W1-01's `test_no_install_is_recorded_before_w1_05` is rewritten to take either id of the ticket (it is skipped
+since W1-05 closed); `test_a_dependency_is_read_in_either_form_of_the_id` (3, green) holds the reading on ticket
+files written by the case. `test_the_ticket_schema_accepts_a_dependency_in_either_form_of_the_id` is red before
+the round: the ticket schema allows only work-breakdown ids, and W1-08's case over the committed tickets would
+turn red with the rewrite of the tickets.
+
+### Packages of round 15
+
+1. **`change` and the trailers check.** Is a commit without its trailers a violation of the `change` policy?
+   (a) no: trailers are traceability (CAP-13), `change` is stated by `core-claims` only; (b) yes: add the pair
+   with an evidence case. Recommendation (a); confidence medium. Cases written for (a).
+2. **`human_gate`.** No check of the kernel template enforces it; the key stays red in every project until the
+   owner decides (a check is built, or the key's strength is the owner's to change; DEC-613 forbids setting it
+   informational to pass).
+3. **The ticket schema and `depends_on`.** (a) the schema accepts either form in this round (the case above);
+   (b) the schema changes with the tickets' rewrite, and the case above is removed. Recommendation (a);
+   confidence medium-high.
+
+### The run of round 15
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n 8`: 490 cases, 442
+passed, 48 failed, none skipped, 166 s. The 48 red are this round's, each for the reason above. W1-26: 413
+cases, 411 passed, 1 failed (the rewritten case), 1 skipped. W1-01: 77 cases, 49 passed, 28 skipped.
+
+Not run by any case: a real model, the dev tiers, a real session.
+
 ## Covers ids
 
 | Covers id | Tests |
