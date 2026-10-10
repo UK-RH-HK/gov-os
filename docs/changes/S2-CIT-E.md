@@ -11,6 +11,7 @@ audit: S2-A, a fresh Independent Auditor (DEC-088)
 decisions_recorded: [DEC-150, DEC-151, DEC-152, DEC-153, DEC-154, DEC-155, DEC-156, DEC-157, DEC-158, DEC-159, DEC-160, DEC-161, DEC-162, DEC-163, DEC-164, DEC-165, DEC-166, DEC-167, DEC-168, DEC-169, DEC-170, DEC-171, DEC-172, DEC-173, DEC-174]
 repair: after the S2-A round-1 audit (ACCEPT_WITH_FINDINGS), §6; after the round-2 audit (ACCEPT_WITH_FINDINGS), §7; the round-3 closure check, §8
 decisions_carried: [DEC-102, DEC-103, DEC-104, DEC-105, DEC-106, DEC-119, DEC-136, DEC-137, DEC-138, DEC-147]
+state_class: EVIDENCE
 ---
 
 # S2 — Change-execution record (CIT-E) on the Gov OS specification

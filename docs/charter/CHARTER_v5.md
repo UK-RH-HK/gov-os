@@ -3,6 +3,8 @@ id: CHARTER-v5
 status: PROPOSED
 supersedes_in_part: [Framework v4.1.2, Adoption Protocol v3.0, Distribution Protocol v1.2]
 decisions: [DEC-039, DEC-044, DEC-058, DEC-064, DEC-065, DEC-066, DEC-075, DEC-083, DEC-085, DEC-088, DEC-089, DEC-093, DEC-094, DEC-096, DEC-163, DEC-165, DEC-173]
+type: specification
+state_class: AUTHORITATIVE
 ---
 
 # Governance OS — Charter v5

@@ -8,6 +8,7 @@ depends_on: []
 decisions: [DEC-039, DEC-075, DEC-007, DEC-046, DEC-083, DEC-095, DEC-096, DEC-152, DEC-156, DEC-161, DEC-163]
 supersedes: []
 constrains: [CHARTER-v5, CONTRACT-v4, ADR-0002]
+state_class: AUTHORITATIVE
 ---
 
 # ADR-0001 — Threat model
