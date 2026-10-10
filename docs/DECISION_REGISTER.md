@@ -6441,3 +6441,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.174 | 2026-10-10 | Delegated: DEC-601 (the W1-15 round's probe judged a pass, the branch merges as built; the Bash matcher on the post-call entry stands; named residuals; the relative command lines of the hooks source go to the owner as P-38; two designer commits without `Implements:` named). Next free id: DEC-602. |
+
+## 175. The close of the W1-15 round; what the secrets-indexing check found on this repository's real store (register v0.175, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-602 — W1-15 closes with the ticket tool after its round; the check's three findings in the orchestrator's scratch folder go to the owner
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-522, DEC-536, DEC-584, DEC-595, DEC-601
+- **Decision:**
+  - **The measurement of DEC-595 on this repository's real store** (241 MiB, 2,609 files, twenty processors, the machine loaded at 24 after a rebuild): `python3 -m gov.secrets` ended in 179 seconds, inside its stated limit of 900, with 2.5 GiB peak memory. No single gitleaks run passed the module's own 60-second limit. The round did what it was ordered to do: the check ends and answers.
+  - **Its answer is red, and rightly:** three files in the orchestrator's own scratch folder under the runtime folder hold strings the rules find. Two briefs of W1-15 name the development canary in full; one lead's return log of W1-16 holds a string the project's token rule matches. Nothing was printed. The check was never able to say this before the round, because it never ended on this store.
+  - **`gov close DAEO-7nne` on the merge (`8daab5e3`) refused, as every close does until adoption.** Its tests are all green: acceptance 124 passed; regression 11,835 passed and 29 skipped in parallel, 262 serial-only passed; no case failed. No probe-gate finding, no containment finding, no stale checkpoint. Findings: the thirteen red checks of the baseline with `secrets-indexing` in the place of its earlier time-out; ten commits without `Implements:` (eight of 2026-10-04, before DEC-476, and the two designer commits named in DEC-601); `478a8ed0` without a task; the context blocked on `G-12`. The ticket is closed with the ticket tool under DEC-492, DEC-505, DEC-516, DEC-519, DEC-522, DEC-536 and DEC-601. The repair ticket the refused close opened is not committed.
+  - **The three findings are not removed by the orchestrator.** A change to a kept log is the owner's to order: package P-39. Until it is answered `secrets-indexing` stays red on this repository, which the adoption step and W1-42's `gov check` meet.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.175 | 2026-10-10 | Delegated: DEC-602 (W1-15 closes with the ticket tool after its round; the check ends in 179 s on the real store and finds three strings in the orchestrator's scratch folder, to the owner as P-39). Next free id: DEC-603. |
