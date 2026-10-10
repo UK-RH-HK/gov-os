@@ -1,6 +1,6 @@
 ---
 id: DAEO-03pw
-status: open
+status: in_progress
 deps: [DAEO-gjjf]
 links: []
 created: 2026-09-30T22:49:59Z
