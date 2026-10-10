@@ -2565,3 +2565,13 @@ Probed head `8e5c71a8`, merged directly. Built: the context-reproducibility chec
 - `src/gov/ci/command.py` still passes family names to the policy rule, which no longer reads them. `core-pathmap` reads `namespaces` as a list where path maps hold a map, by the test designer's reading (not checked): Wave 2 list.
 - **For the owner's applied adapter output:** one more generated file differs, `.claude/skills/orchestration/SKILL.md` (44 generated files in all).
 - Cases: 73 added in eight files of W1-30's suite and 3 in W1-01's; two cases rewritten (W1-26's policy case twice, W1-01's install case), each with its reason.
+
+## W1-30 closed after the fix round before adoption (2026-10-11; for the exit auditor; DEC-622, DEC-623)
+
+`gov close DAEO-2lwj` at `7fc8d1d9` (the merge `361acb98` and the three data fixes of DEC-614 after it) refused, as every close does until adoption (DEC-522); its output is kept by the orchestrator. Closed with the ticket tool under DEC-492, DEC-505, DEC-516, DEC-522, DEC-536, DEC-622 and DEC-623:
+
+- **Tests:** acceptance 490 passed; regression 11,604 passed, 30 skipped in parallel; serial-only 263 passed. No test failed.
+- **Probe gate:** "ticket commit `361acb98` changes `.rulesync/skills/orchestration/SKILL.md` after the probed commit". The merge brings exactly this round's probed head `8e5c71a8`; the gate asks the earlier records too. The named residual of a reopened FULL ticket with earlier probe records.
+- **Red checks: five, from the thirteen of the baseline.** `adapter-portability` (44 generated files differ; the owner applies the generated output, DEC-616), `retrieval-regression` (the dev tiers variable is not set, the owner's; run with it by the orchestrator: green in 108 s), `product-traceability-trailers` (18 commits without `Implements:`, none unresolved; the base moves at adoption, DEC-615), `policy-human_gate` (no check enforces it; with the owner, DEC-613), `context-reproducibility` (missing inputs, supplied as data after this close under DEC-623; and the kernel's template ticket `PROJ-0000`, which the check takes for a ticket of the project: with the owner). The schema check and the graph check report nothing.
+- **Trailers:** 23 commits of the ticket lack `Implements:`, the same commits as at its earlier closes; every commit of this round carries all three. **Work without a task:** `7674efde`, `478a8ed0`, `e0572d12`, as before. **Containment:** two merge commits (`148f7584` of 2026-10-06, `29af0646` of 2026-10-07) that carry a W1-07 support file. **Context blocked** on `MR-3` (supplied after this close).
+- **Repair ticket** `DAEO-6qt1` opened by the refused close: not committed, kept by the orchestrator.
