@@ -10,6 +10,10 @@ cases of round 3b green): **76 green, 11 red, 0 skipped**. Round 4 added 20 case
 reasons are in the section "Round 4" below; the "Red reason" columns of the older tables are those of round 3 and
 3b, kept as the record of what was red then.
 
+**The round of DEC-596 (2026-10-10, ticket `DAEO-7nne`, W1-15 reopened by DEC-600)** added 18 cases in
+`test_w1_38_hooks_source.py` and changed no other case: **105 cases; 96 green, 9 red, 0 skipped** as run before
+the engineer's work. See the section "The round of DEC-596" below.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -134,6 +138,109 @@ package P-5.
 Order of the engineer's work that these cases imply: once the check compares tools as sets, the freshly generated
 project is not green until the auditor's source carries the kernel's eight tools
 (`test_gov_check_is_green_on_a_clean_generated_project`). Both are inside the ticket's paths.
+
+## The round of DEC-596: the hooks source carries the time limit and the entry for a failed tool call
+
+Ticket `DAEO-7nne` (W1-15, reopened by DEC-600). Cases in `test_w1_38_hooks_source.py`, helpers in
+`w1_38_hooks_support.py`. DEC-596: "The template's rulesync hooks source (`template/.rulesync/hooks.jsonc`) gets
+`"timeout": 60` on every guard hook entry, and the missing PostToolUseFailure entry for the containment check.
+Without it an adopted project runs no containment after a failed command, which ordinary work meets."
+
+### What rulesync 24.0.0 does (measured before any case was written)
+
+In a temporary project outside this tree, with a changed copy of the template's hooks source and
+`rulesync generate --targets claudecode --features hooks`:
+
+| In the source (an entry is one object of the list under an event name) | In the generated `.claude/settings.json` |
+|---|---|
+| `"timeout": 60` on an entry | `"timeout": 60` on the hook entry (the object that holds `type` and `command`) |
+| `"timeout": 60.0` | `"timeout": 60`: the fraction is lost, so only the source can show it |
+| `"timeout": "60"` | nothing is generated: rulesync refuses the source ("expected number, received string") |
+| no `timeout` | no `timeout` |
+| an entry under `postToolUseFailure` | a matcher group under `PostToolUseFailure` |
+| `"matcher": "Bash"` on an entry | `"matcher": "Bash"` on the entry's matcher group |
+
+`rulesync generate --check` is clean afterwards. So both parts of DEC-596 can be delivered through the source,
+with no hand edit of a generated file.
+
+### What the words are taken to mean
+
+- **A hook entry of the source**: one object of the list an event name holds under `hooks` (and under `hooks` of
+  a block that overrides one tool, if the source ever has one).
+- **A guard hook entry** (DEC-592): every hook entry that runs a program of the kernel's hooks folder: its command
+  names `governance/kernel/hooks` or one of that folder's programs by file name. In the template's source today
+  that is all six entries (`preToolUse`, `postToolUse`, `sessionStart`, `stop`, `preCompact`, `subagentStop`), and
+  the entry for a failed tool call once it is there. In `template/governance/kernel/settings.json` it is the three
+  entries under `PreToolUse`, `PostToolUse` and `PostToolUseFailure`.
+- **Carries the limit** (DEC-592): the entry itself holds `timeout` with the whole number 60. Not `60.0`, not
+  `"60"`, not another number, not `true`, not absent. The source is read as written (JSON with comments), so
+  `60.0` is told from `60` there. The generated settings are judged by W1-47's module
+  (`tests/acceptance/W1-47/w1_47_hook_time_limit.py`), the same words that hold the kernel template's settings
+  (W1-47) and a created project's (W1-39).
+- **The program of an entry**: the file of the kernel's hooks folder its command names. **The containment
+  program**: the one the kernel template's settings register for a failed Bash call (read from that file by the
+  case; today `posttooluse.py`).
+- **Agrees with the kernel template's settings**: compared, under each of the three events, for every guard hook
+  entry: the matcher of its matcher group as written (or none), the program, and the value under `timeout`. The
+  command line around the program (how Python is called, how the path is written) is **not** compared; see
+  package P-6.
+
+### The cases
+
+| Behaviour | Test | Red reason (before the engineer's work) |
+|---|---|---|
+| The source carries the limit on every guard hook entry | `test_every_guard_hook_entry_of_the_source_carries_the_time_limit` | red: all six entries of `template/.rulesync/hooks.jsonc` carry no `timeout` |
+| Only the whole number 60 counts, on the source | `test_one_source_entry_without_the_whole_number_60_is_found[<kind>]` × 5 (`absent`, `as-a-fraction-60.0`, `as-a-string`, `another-number`, `true`); `test_a_limit_written_as_a_fraction_in_the_source_file_is_found` (the file's text, with a comment); `test_a_source_entry_that_runs_no_kernel_hook_is_left_as_it_is` | green: they judge the template's own source object with the limit put on every entry in memory and one thing changed; they keep the reading honest |
+| The generated settings carry the limit on every guard hook entry | `TestGeneratedGuardHooks::test_every_guard_hook_entry_of_the_generated_settings_carries_the_time_limit` | red: the six generated entries carry no `timeout` |
+| The generated settings carry the entry for a failed tool call, with the containment program | `TestGeneratedGuardHooks::test_the_generated_settings_run_the_containment_program_after_a_failed_bash_call` | red: no `PostToolUseFailure` command is generated |
+| The generated settings register what the kernel template's settings register (matcher, program, limit) | `TestGeneratedGuardHooks::test_the_generated_settings_register_what_the_kernel_template_s_settings_register[<event>]` × 3; `test_the_three_events_compared_are_the_kernel_template_s_guard_events` (green: no guard event of the kernel template is left out) | 3 red. `PreToolUse`: generated `(none, pretooluse.py, none)`, kernel `(none, pretooluse.py, 60)`. `PostToolUse`: generated `(none, posttooluse.py, none)`, kernel `("Bash", posttooluse.py, 60)`: the limit **and the matcher** differ. `PostToolUseFailure`: nothing generated, kernel `("Bash", posttooluse.py, 60)` |
+| rulesync 24.0.0 passes both through | `TestRulesyncPassesBothThrough::test_a_limit_and_a_failed_tool_call_entry_of_the_source_reach_the_generated_settings` | green. A measurement of the registered tool, not of the template: the project's copy of the source is given the limit and a `postToolUseFailure` entry (rulesync's name, measured), and generated again. It turns red if a later rulesync drops either |
+| In a project made from the template, a failed command is followed by the containment check | `TestFailedCommandInAGeneratedProject::test_a_change_left_out_of_scope_by_a_failed_command_is_reported_and_recorded`, `::test_an_acceptance_test_changed_by_a_failed_command_is_restored`, `::test_a_failed_command_that_stays_in_scope_is_left_alone` | 3 red, each with: the generated settings register no `PostToolUseFailure` command for Bash |
+
+The measuring case changes the project's copy of the hooks source. That copy is the tool's input being measured,
+not a stand-in for the template: the rule "no source text is a stand-in written for the test" holds for every case
+that judges the template.
+
+### How far the failed-command behaviour is held
+
+As far as W1-05's live-hook cases reach, and no further. In the generated project, with a product's files and one
+engineer ticket (`src/app/**`, `tests/unit/**`), a case makes one whole Bash call the way a session does: the
+commands the generated settings register for `PreToolUse` and Bash, then the command for real (it writes and then
+fails), then the commands registered for `PostToolUseFailure` and Bash, each run through the shell exactly as
+registered, with the JSON the harness gives (for the failed call: `error`, `error_type`, `is_interrupt`,
+`is_timeout`, the same `tool_use_id`). Which commands the harness would run is decided by W1-05's reading of
+matchers. Held: an out-of-scope change is reported to the agent and recorded in `.gov-runtime/findings.jsonl`; a
+changed acceptance test is restored from HEAD; an in-scope change is left alone.
+
+The `gov` package is not installed by any test. The stand-in home of the case holds a path file in its user site
+folder that names this worktree's `src`, which is how an editable install makes a package importable; a registered
+command that sets `PYTHONPATH` itself still finds it. The project holds no `gov` package of its own.
+
+**Not held here, and why.** That the harness itself reads the generated settings, raises `PostToolUseFailure`
+after a failed command and runs the entry, in which working directory and with which environment, needs a real
+session in an adopted project. No suite starts such a session: W1-46's live sessions are launched in a wired copy
+of this repository, through this repository's settings. DEC-596 and DEC-600 name it as the orchestrator's
+measurement on an adopted dev-tier clone, with the adoption step and W1-42.
+
+### Package
+
+**P-6. The command line of the source's guard entries.** (open; no case written)
+- Question: must the command of a guard entry in the hooks source be the command the kernel template's settings
+  register (`python3 "$CLAUDE_PROJECT_DIR/governance/kernel/hooks/<program>"`), or may it stay as it is
+  (`PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 governance/kernel/hooks/<program>`)?
+- Why now: DEC-596 names the limit and the missing entry, not the command. Measured with the source's command
+  form in a generated project: run with a subfolder of the project as working directory, the registered command
+  for `PreToolUse` ends with exit 2, "can't open file" (measured); the entries after a call name their program
+  by the same relative path, so the containment check would not run there either (not run separately). From the
+  project's root it works. Whether a real session ever runs a hook with another
+  working directory than the project's root was not measured. The `PYTHONPATH` prefix points at `src` of the
+  project, where an adopted project holds no `gov`; it is harmless only while the package is installed.
+- Options: (a) the source's commands become the kernel template's, and the agreement case compares the whole
+  command; (b) as now, and the orchestrator's measurement on the dev-tier clone includes a failed command made
+  after the session changed its working directory; (c) as now, no measurement.
+- Impact: (a) seven command strings in one file and one more compared field here; this repository's own generated
+  settings are not touched by it. (b) nothing here. Reversibility: high.
+- Recommendation: (a). Confidence: medium (the harness's working directory for hooks is not measured).
 
 ## The one tolerated difference between a source file and its generated file
 
