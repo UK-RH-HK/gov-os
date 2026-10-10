@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "plan",
+  "description": "Frontmatter of a plan, as a wave's work breakdown is (DEC-620): the shared frontmatter and nothing more.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/document_id" },
+    "type": { "const": "plan" }
+  }
+}

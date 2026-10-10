@@ -12,7 +12,7 @@ from pathlib import Path
 
 import yaml
 
-from gov.cli.checks import CHECKS_DIRS, TIMEOUT_FIELD, load_declarations
+from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
 
 VERSION = "1.0.0"
 
@@ -144,6 +144,8 @@ def _run_declared_check(decl: dict, root: Path, commit: str) -> dict:
             parsed = json.loads(stdout)
             if isinstance(parsed, list):
                 findings = parsed
+            elif exit_code == 0 and isinstance(parsed, dict) and parsed.get("ok") is True and "result" in parsed:
+                findings = []  # the success form of a gov command is no finding (DEC-612)
             elif isinstance(parsed, dict):
                 findings = parsed.get("findings", [parsed])
         except json.JSONDecodeError:
@@ -322,6 +324,8 @@ def _check_readiness(root: Path, commit: str) -> dict:
 
 
 def _check_policy_enforcement(root: Path, commit: str, check_families: set[str]) -> list[dict]:
+    # a key is covered by a declaration that states it under ``enforces`` and by nothing else: a family
+    # name that contains the key covers nothing (DEC-620), so ``check_families`` is not read
     results = []
     path_map = root / PATH_MAP_REL
     if not path_map.is_file():
@@ -337,11 +341,11 @@ def _check_policy_enforcement(root: Path, commit: str, check_families: set[str])
     if not isinstance(policies, dict):
         return results
 
+    enforced = {key for decl in load_declarations(root) for key in decl.get(ENFORCES_FIELD, ())}
     for key, strength in policies.items():
         if strength == "informational":
             continue
-        covered = key in check_families or any(key in fam for fam in check_families)
-        if not covered:
+        if key not in enforced:
             severity = HARD_BLOCK if strength == "hard-block" else WARNING
             results.append({
                 "id": f"policy-{key}",

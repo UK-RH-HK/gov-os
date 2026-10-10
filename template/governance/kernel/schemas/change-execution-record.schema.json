@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "change-execution-record",
+  "description": "Frontmatter of a change-execution record (DEC-612): the shared frontmatter and nothing more.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/document_id" },
+    "type": { "const": "change-execution-record" }
+  }
+}

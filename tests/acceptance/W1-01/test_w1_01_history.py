@@ -87,6 +87,25 @@ def test_implementer_commits_stay_inside_allowed_paths(bootstrap_text, repo_root
     )
 
 
+def _depends_on(fields, wbs_id, root):
+    """Whether a ticket's ``depends_on`` names the ticket ``wbs_id``, by its W1 id or by its ticket id: a ticket
+    file holds either form (DEC-620)."""
+    named = support.ticket(wbs_id, root) or {}
+    return bool({wbs_id, named.get("id")} & set(fields.get("depends_on", [])))
+
+
+@pytest.mark.parametrize("named_as", ["W1-05", "PROJ-aaaa", None], ids=["the W1 id", "the ticket id", "not named"])
+def test_a_dependency_is_read_in_either_form_of_the_id(named_as, tmp_path):
+    """Two ticket files written here, W1-06's ``depends_on`` in each form and without the dependency."""
+    tickets = tmp_path / ".tickets"
+    tickets.mkdir()
+    (tickets / "PROJ-aaaa.md").write_text("---\nid: PROJ-aaaa\nwbs_id: W1-05\nstatus: open\n---\n", encoding="utf-8")
+    listed = f"depends_on:\n- {named_as}\n- W1-02\n" if named_as else "depends_on:\n- W1-02\n- PROJ-zzzz\n"
+    (tickets / "PROJ-bbbb.md").write_text(f"---\nid: PROJ-bbbb\nwbs_id: W1-06\nstatus: open\n{listed}---\n",
+                                          encoding="utf-8")
+    assert _depends_on(support.ticket("W1-06", tmp_path), "W1-05", tmp_path) is (named_as is not None)
+
+
 def test_no_install_is_recorded_before_w1_05(interim, repo_root, deny_rules):
     """KPI failure 3: installs stay denied, and W1-06 (the first install) waits for W1-05."""
     tool, target = INSTALL_PROBE
@@ -95,7 +114,7 @@ def test_no_install_is_recorded_before_w1_05(interim, repo_root, deny_rules):
     )
     w1_06 = support.ticket("W1-06", repo_root)
     assert w1_06 is not None, "no ticket with wbs_id W1-06 in .tickets/"
-    assert "W1-05" in w1_06.get("depends_on", []), "W1-06 no longer depends on W1-05"
+    assert _depends_on(w1_06, "W1-05", repo_root), "W1-06 no longer depends on W1-05"
     assert w1_06.get("status") == "open", (
         f"W1-06 (tool installs) is {w1_06.get('status')} while W1-05 is not closed"
     )

@@ -63,3 +63,14 @@ def project_with_checks(built, tmp_path):
         return support.Project(tmp_path / "project", checks=list(checks))
     return make
 
+
+@pytest.fixture()
+def scratch(tmp_path):
+    """Round 15: builds a temporary git repository that holds only what its case writes
+    (``w1_30_r15_support.Scratch``): ``scratch()`` or ``scratch(name)``."""
+    import w1_30_r15_support as r15
+
+    def make(name="scratch"):
+        return r15.Scratch(tmp_path / name)
+    return make
+

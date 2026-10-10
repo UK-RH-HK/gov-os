@@ -64,7 +64,7 @@ Observed 2026-10-06: `1 skipped, 90 errors`.
 | `test_w1_26_taxonomy.py` | 4 | S4 |
 | `test_w1_26_skill.py` | 4 | S6 |
 | `test_w1_26_authority.py` | 5 | S8 |
-| `test_w1_26_policy.py` | 3 | S2 |
+| `test_w1_26_policy.py` | 3 | S2 (the first case rewritten under DEC-620: a key maps to a check only where a declaration states it under `enforces`) |
 | `test_w1_26_derived.py` | 6 | F-2 |
 | `test_w1_26_openspec.py` | 5 | S1 |
 | `test_w1_26_readiness.py` | 4 | S1 |

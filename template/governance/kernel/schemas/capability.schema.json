@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "capability",
+  "description": "Frontmatter of a capability record, a capability or one of its covers items, as in CAP-38 or CAP-38.b (DEC-620): the shared frontmatter and nothing more.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/record_id" },
+    "type": { "const": "capability" }
+  }
+}

@@ -279,3 +279,49 @@ def test_a_time_limit_that_is_no_positive_whole_number_is_refused(tmp_path, valu
         load_declarations(tmp_path)
     assert refused.value.code == "CHECK_DECLARATION_INVALID"
     assert refused.value.details["key"] == "timeout-seconds"
+
+
+# --------------------------------------------------------------------------
+# the fix round before adoption (DEC-612, DEC-620)
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("printed, exit_code, status", [
+    ('{"ok": true, "result": {"briefs": []}}', 0, "GREEN"),
+    ('{"ok": true, "result": {"briefs": []}}', 1, "RED"),
+    ('{"ok": true}', 0, "RED"),
+    ('{"ok": false, "result": {}}', 0, "RED"),
+])
+def test_only_the_success_form_with_exit_code_0_is_no_finding(tmp_path, printed, exit_code, status):
+    decl = {"id": "answers", "family": "graph integrity", "severity": "hard-block",
+            "command": f"printf '%s' '{printed}'; exit {exit_code}"}
+    result = runner._run_declared_check(decl, tmp_path, "abc123")
+    assert result["status"] == status
+    assert bool(result["findings"]) == (status == "RED")
+
+
+def test_a_policy_key_is_covered_by_enforces_and_never_by_a_family_name(tmp_path):
+    _write(tmp_path, runner.PATH_MAP_REL, "namespaces: {}\npolicies:\n  security: hard-block\n  context: warning\n")
+    _declare(tmp_path, "states-it", "exit 0", "enforces: [security]\n")
+    families = set(runner.FAMILIES)  # holds "context reproducibility"
+    reported = runner._check_policy_enforcement(tmp_path, "abc123", families)
+    assert [(entry["id"], entry["status"]) for entry in reported] == [("policy-context", "YELLOW")]
+
+
+@pytest.mark.parametrize("value", ["security", "[security, 42]", '[""]', ""])
+def test_an_enforces_value_that_is_no_list_of_keys_is_refused(tmp_path, value):
+    from gov.cli.checks import load_declarations
+    from gov.cli.errors import GovError
+    _declare(tmp_path, "bad", "exit 0", f"enforces: {value}\n")
+    with pytest.raises(GovError) as refused:
+        load_declarations(tmp_path)
+    assert refused.value.code == "CHECK_DECLARATION_INVALID"
+    assert refused.value.details["key"] == "enforces"
+
+
+def test_a_record_type_in_use_owes_the_shared_frontmatter_once(tmp_path):
+    from gov.check import schema
+    for name in ("common.schema.json", "capability.schema.json"):
+        _write(tmp_path, f"{schema.SCHEMA_DIR}/{name}", (REPO / schema.SCHEMA_DIR / name).read_text(encoding="utf-8"))
+    _write(tmp_path, "docs/CAP-38.b.md", "---\nid: CAP-38.b\ntype: capability\nstatus: ACTIVE\n---\n")
+    assert [(finding["code"], finding["field"]) for finding in schema.check(tmp_path)] == \
+        [("SCHEMA_MISSING_FIELD", "state_class")]

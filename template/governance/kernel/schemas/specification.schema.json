@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "specification",
+  "description": "Frontmatter of a specification, as the Charter and the Contract are (DEC-620): the shared frontmatter and nothing more.",
+  "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/document_id" },
+    "type": { "const": "specification" }
+  }
+}
