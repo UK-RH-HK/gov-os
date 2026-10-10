@@ -30,7 +30,7 @@ kpis:
 profile: LITE
 sources:
 - DEC-084
-- DEC-074 Q9
+- DEC-074
 - CAP-58
 - CAP-03
 est_loc: 30
