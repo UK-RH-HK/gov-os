@@ -43,7 +43,7 @@ profile: FULL
 sources:
 - G-12
 - G-18
-- DEC-074 Q8
+- DEC-074
 - CAP-03
 - CAP-38
 est_loc: 70

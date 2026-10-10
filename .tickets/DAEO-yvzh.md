@@ -28,7 +28,7 @@ kpis:
 profile: LITE
 sources:
 - G-25
-- DEC-074 Q5
+- DEC-074
 - DEC-076
 - CAP-24
 - CAP-38

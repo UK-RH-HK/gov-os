@@ -33,7 +33,7 @@ kpis:
 profile: STANDARD
 sources:
 - G-17
-- DEC-074 R1
+- DEC-074
 - DEC-080
 - CAP-10
 - CAP-18

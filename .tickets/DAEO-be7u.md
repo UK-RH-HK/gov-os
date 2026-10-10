@@ -34,7 +34,7 @@ kpis:
 profile: FULL
 sources:
 - G-04
-- DEC-074 D2
+- DEC-074
 - DEC-046
 - CAP-21
 - CAP-51

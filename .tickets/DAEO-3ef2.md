@@ -40,8 +40,7 @@ sources:
 - G-11
 - G-15
 - DEC-022
-- DEC-074 Q6
-- DEC-074 Q7
+- DEC-074
 - CAP-52
 - CAP-38
 - MR-5

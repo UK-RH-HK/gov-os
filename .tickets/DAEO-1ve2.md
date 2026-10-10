@@ -30,7 +30,7 @@ kpis:
 profile: STANDARD
 sources:
 - G-22
-- DEC-074 Q4
+- DEC-074
 est_loc: 40
 acceptance_tests:
   path: tests/acceptance/W1-18/
