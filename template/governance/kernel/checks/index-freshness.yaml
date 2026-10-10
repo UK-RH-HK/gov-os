@@ -6,3 +6,4 @@ family: index-freshness
 tier: G1
 severity: hard-block
 command: python3 -m gov.retrieval.lexical
+enforces: [memory]

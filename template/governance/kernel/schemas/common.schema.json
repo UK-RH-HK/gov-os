@@ -28,6 +28,11 @@
       "type": "string",
       "pattern": "^[A-Z]{1,6}-[A-Za-z0-9._-]+$"
     },
+    "document_id": {
+      "description": "The id of a record of a type in use beside those above (a change record, a specification, a plan): an upper-case prefix that may hold digits and a local part, as in S2-CIT-E (DEC-620).",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*-[A-Za-z0-9._-]+$"
+    },
     "commit_id": {
       "description": "A commit id, full or abbreviated: hexadecimal characters, four or more, as the tools that take a base commit read it (DEC-479, DEC-482).",
       "type": "string",

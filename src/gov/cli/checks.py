@@ -2,7 +2,8 @@
 
 A declaration is a map with the five string fields below. A ticket registers a
 check for the component it builds by adding a file. Running checks is W1-26.
-A declaration may state its own time limit, ``timeout-seconds`` (DEC-595).
+A declaration may state its own time limit, ``timeout-seconds`` (DEC-595), and
+the policy keys it enforces, ``enforces`` (DEC-620).
 
 A project holds its kernel in the template layout, in the installed layout or in both (DEC-579). The
 declarations of both are read: a check declared alike in the two is one check, a file that only one of them
@@ -21,6 +22,7 @@ INSTALLED_CHECKS_DIR = "governance/kernel/checks"
 CHECKS_DIRS = (CHECKS_DIR, INSTALLED_CHECKS_DIR)
 FIELDS = ("id", "family", "tier", "severity", "command")
 TIMEOUT_FIELD = "timeout-seconds"  # optional: the check's own time limit (DEC-595); without it the runner's applies
+ENFORCES_FIELD = "enforces"  # optional: the policy keys the check enforces (DEC-620); a key is covered by this alone
 SEVERITIES = ("hard-block", "warning")
 INVALID = "CHECK_DECLARATION_INVALID"
 
@@ -40,6 +42,11 @@ def _read(path: Path, rel: str) -> dict:
         if type(value) is not int or value <= 0:
             raise GovError(INVALID, f"{rel}: key '{TIMEOUT_FIELD}' must be a positive whole number of seconds",
                            {"file": rel, "key": TIMEOUT_FIELD})
+    if ENFORCES_FIELD in document:
+        value = document[ENFORCES_FIELD]
+        if not isinstance(value, list) or not all(isinstance(key, str) and key for key in value):
+            raise GovError(INVALID, f"{rel}: key '{ENFORCES_FIELD}' must be a list of policy keys",
+                           {"file": rel, "key": ENFORCES_FIELD})
     return document
 
 
@@ -63,5 +70,5 @@ def load_declarations(root: Path) -> list[dict]:
                                    {"file": rel, "key": key})
                 continue  # declared alike in both layouts: one check
             read.append((path.name, rel, document))
-    return [{field: document[field] for field in (*FIELDS, TIMEOUT_FIELD) if field in document}
+    return [{field: document[field] for field in (*FIELDS, TIMEOUT_FIELD, ENFORCES_FIELD) if field in document}
             for _, _, document in sorted(read, key=lambda each: each[0])]

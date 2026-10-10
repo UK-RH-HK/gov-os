@@ -17,7 +17,8 @@ def main() -> int:
         conn = connect(root)
         try:
             tickets = conn.execute(
-                "SELECT id FROM records WHERE type = 'ticket'"
+                # the ticket tool writes type ``task``; both names are measured (DEC-612)
+                "SELECT id FROM records WHERE type IN ('ticket', 'task')"
             ).fetchall()
         finally:
             conn.close()

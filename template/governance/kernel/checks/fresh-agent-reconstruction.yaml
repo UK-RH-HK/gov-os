@@ -6,3 +6,4 @@ family: fresh-agent-reconstruction
 tier: G1
 severity: hard-block
 command: gov checkpoint --resume --json
+enforces: [checkpoint]

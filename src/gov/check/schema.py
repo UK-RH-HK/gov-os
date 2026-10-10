@@ -23,6 +23,12 @@ SCHEMA_MAP = {
     "lesson": "lesson.schema.json",
     "checkpoint": "checkpoint.schema.json",
     "probe": "probe.schema.json",
+    # the record types in use beside them (DEC-612, DEC-620): each owes the shared frontmatter and nothing more
+    "change-execution-record": "change-execution-record.schema.json",
+    "change-impact-proposal": "change-impact-proposal.schema.json",
+    "capability": "capability.schema.json",
+    "specification": "specification.schema.json",
+    "plan": "plan.schema.json",
 }
 
 # A type whose schema stands alone (DEC-565): the shared frontmatter is not owed by its records, and each
@@ -137,14 +143,15 @@ def check(root: Path) -> list[dict]:
                                  "message": f"{rel}: 'type' field is missing or not a string"})
                 continue
             standalone = record_type in STANDALONE_TYPES
+            owed = []
             if not standalone:
                 for field in ("id", "type", "status", "state_class"):
                     if field not in front:
-                        findings.append({"code": "SCHEMA_MISSING_FIELD", "path": rel, "field": field,
-                                         "message": f"{rel}: missing required field '{field}'"})
+                        owed.append({"code": "SCHEMA_MISSING_FIELD", "path": rel, "field": field,
+                                     "message": f"{rel}: missing required field '{field}'"})
             schema_file = SCHEMA_MAP.get(record_type)
             if schema_file:
-                measured, held = False, []
+                measured, held = False, owed  # a shared field the schema asks for too is one finding
                 for schema_dir in SCHEMA_DIRS:
                     schema = _load_schema(root, schema_dir, schema_file)
                     if not schema:
@@ -161,6 +168,7 @@ def check(root: Path) -> list[dict]:
                     findings.append({"code": "SCHEMA_UNREADABLE", "path": rel, "type": record_type,
                                      "message": f"{rel}: unmeasured, the schema {schema_file} cannot be read"})
             else:
+                findings.extend(owed)
                 findings.append({"code": "SCHEMA_UNKNOWN_TYPE", "path": rel,
                                  "type": record_type,
                                  "message": f"{rel}: unknown record type '{record_type}'"})

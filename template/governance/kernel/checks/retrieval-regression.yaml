@@ -6,3 +6,4 @@ family: retrieval-regression
 tier: G1
 severity: hard-block
 command: python3 -m gov.retrieval.retrieve_check
+timeout-seconds: 600
