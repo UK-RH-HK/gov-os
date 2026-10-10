@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-03
+- DAEO-8qvp
 allowed_paths:
 - src/gov/guard/containment*
 - template/governance/kernel/hooks/posttooluse*

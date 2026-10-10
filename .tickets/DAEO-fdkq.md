@@ -15,9 +15,9 @@ class: config
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-22
-- W1-26
-- W1-30
+- DAEO-8nue
+- DAEO-fygv
+- DAEO-2lwj
 allowed_paths:
 - lefthook.yml
 - template/lefthook.yml.jinja

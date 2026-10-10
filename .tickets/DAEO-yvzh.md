@@ -15,7 +15,7 @@ class: config
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-06
+- DAEO-ipqy
 allowed_paths:
 - template/governance/kernel/skills/superpowers/**
 kpis:

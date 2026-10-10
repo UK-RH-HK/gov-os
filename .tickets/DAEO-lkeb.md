@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-15
+- DAEO-7nne
 allowed_paths:
 - src/gov/codeintel/**
 - tests/unit/codeintel/**

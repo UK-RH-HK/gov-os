@@ -15,7 +15,7 @@ class: schema
 state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
-- W1-08
+- DAEO-uudf
 allowed_paths:
 - template/openspec/schemas/**
 - template/openspec/config.yaml

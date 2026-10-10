@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-07
-- W1-08
+- DAEO-drvn
+- DAEO-uudf
 allowed_paths:
 - src/gov/store/**
 - src/gov/records/**

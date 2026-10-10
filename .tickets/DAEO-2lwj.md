@@ -15,11 +15,11 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-03
-- W1-09
-- W1-24
-- W1-25
-- W1-26
+- DAEO-8qvp
+- DAEO-topz
+- DAEO-wk2v
+- DAEO-rrxp
+- DAEO-fygv
 allowed_paths:
 - src/gov/close/**
 - tests/unit/close/**

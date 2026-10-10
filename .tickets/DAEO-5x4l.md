@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-19
-- W1-20
+- DAEO-t6hf
+- DAEO-jozo
 allowed_paths:
 - src/gov/retrieval/retrieve*
 - src/gov/retrieval/bundle*

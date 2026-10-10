@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-10
-- W1-16
+- DAEO-4yyl
+- DAEO-lkeb
 allowed_paths:
 - src/gov/closure/**
 - tests/unit/closure/**

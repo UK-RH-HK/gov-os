@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-05
+- DAEO-m7u4
 allowed_paths:
 - template/governance/kernel/hooks/precompact*
 - template/governance/kernel/hooks/sessionstart*

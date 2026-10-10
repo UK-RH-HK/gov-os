@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-07
-- W1-47
-- W1-48
+- DAEO-drvn
+- DAEO-o4fg
+- DAEO-0qs5
 allowed_paths:
 - src/gov/launch/**
 - src/gov/cli/**

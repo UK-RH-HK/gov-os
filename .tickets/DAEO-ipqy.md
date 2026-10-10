@@ -15,7 +15,7 @@ class: ops
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
-- W1-05
+- DAEO-m7u4
 allowed_paths:
 - governance/project/tool-registry.yaml
 - template/governance/kernel/vendor/superpowers/**

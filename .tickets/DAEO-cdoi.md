@@ -15,10 +15,10 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-27
-- W1-33
-- W1-38
-- W1-39
+- DAEO-xw3k
+- DAEO-xog0
+- DAEO-3ef2
+- DAEO-5ylr
 allowed_paths:
 - src/gov/adopt/**
 - tests/unit/adopt/**

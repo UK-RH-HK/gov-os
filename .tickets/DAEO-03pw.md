@@ -15,7 +15,7 @@ class: audit
 state_class: AUTHORITATIVE
 role: independent-auditor
 depends_on:
-- W1-42
+- DAEO-gjjf
 allowed_paths:
 - docs/audit/wave-1/**
 kpis:

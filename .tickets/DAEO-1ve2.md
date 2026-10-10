@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-07
+- DAEO-drvn
 allowed_paths:
 - src/gov/retrieval/ollama*
 - src/gov/retrieval/__init__.py

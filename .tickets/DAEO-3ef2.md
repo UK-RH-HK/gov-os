@@ -15,12 +15,12 @@ class: config
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-04
-- W1-29
-- W1-33
-- W1-35
-- W1-36
-- W1-37
+- DAEO-78bn
+- DAEO-zsvl
+- DAEO-xog0
+- DAEO-0i6h
+- DAEO-skiy
+- DAEO-yvzh
 allowed_paths:
 - template/.rulesync/**
 - .rulesync/**

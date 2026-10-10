@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-22
+- DAEO-8nue
 allowed_paths:
 - src/gov/retrieval/synthesis*
 - tests/unit/synthesis/**

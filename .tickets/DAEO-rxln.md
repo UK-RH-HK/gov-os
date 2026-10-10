@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-10
-- W1-15
+- DAEO-4yyl
+- DAEO-7nne
 allowed_paths:
 - src/gov/retrieval/lexical*
 - src/gov/retrieval/chunking*

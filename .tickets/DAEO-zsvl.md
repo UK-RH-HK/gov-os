@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-09
-- W1-24
-- W1-25
+- DAEO-topz
+- DAEO-wk2v
+- DAEO-rrxp
 allowed_paths:
 - template/governance/kernel/hooks/**
 - src/gov/hooks/**

@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-09
-- W1-11
-- W1-13
+- DAEO-topz
+- DAEO-be7u
+- DAEO-w616
 allowed_paths:
 - src/gov/check/**
 - tests/unit/check/**

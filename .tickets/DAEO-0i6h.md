@@ -15,13 +15,13 @@ class: skill
 state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
-- W1-12
-- W1-13
-- W1-14
-- W1-21
-- W1-26
-- W1-33
-- W1-34
+- DAEO-lc4q
+- DAEO-w616
+- DAEO-w9l3
+- DAEO-5x4l
+- DAEO-fygv
+- DAEO-xog0
+- DAEO-egm9
 allowed_paths:
 - template/governance/kernel/skills/discovery/**
 - template/governance/kernel/skills/planning/**

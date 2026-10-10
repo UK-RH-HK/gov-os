@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-21
+- DAEO-5x4l
 allowed_paths:
 - src/gov/retrieval/validate*
 - src/gov/retrieval/canary*

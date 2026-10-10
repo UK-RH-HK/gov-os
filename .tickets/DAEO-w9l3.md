@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-09
-- W1-12
+- DAEO-topz
+- DAEO-lc4q
 allowed_paths:
 - src/gov/tasks/bridge*
 - tests/unit/bridge/**

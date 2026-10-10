@@ -15,7 +15,7 @@ class: template
 state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
-- W1-08
+- DAEO-uudf
 allowed_paths:
 - template/governance/kernel/templates/decision-package*
 - template/governance/kernel/templates/decision-record*

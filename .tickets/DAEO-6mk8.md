@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-06
-- W1-29
-- W1-30
+- DAEO-ipqy
+- DAEO-zsvl
+- DAEO-2lwj
 allowed_paths:
 - src/gov/telemetry/**
 - tests/unit/telemetry/**

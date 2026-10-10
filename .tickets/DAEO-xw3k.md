@@ -15,10 +15,10 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-04
-- W1-16
-- W1-17
-- W1-22
+- DAEO-78bn
+- DAEO-lkeb
+- DAEO-rxln
+- DAEO-8nue
 allowed_paths:
 - src/gov/doctor/**
 - src/gov/rebuild/**

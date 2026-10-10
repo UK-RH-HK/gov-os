@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-02
+- DAEO-emkd
 allowed_paths:
 - src/gov/guard/containment*
 - template/governance/kernel/hooks/posttooluse*

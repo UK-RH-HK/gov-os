@@ -15,7 +15,7 @@ class: ops
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
-- W1-06
+- DAEO-ipqy
 allowed_paths:
 - governance/project/tool-registry.yaml
 kpis:

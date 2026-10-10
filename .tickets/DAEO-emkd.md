@@ -15,7 +15,7 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-01
+- DAEO-dtv3
 allowed_paths:
 - src/gov/guard/**
 - template/governance/kernel/hooks/pretooluse*

@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-07
-- W1-08
-- W1-10
+- DAEO-drvn
+- DAEO-uudf
+- DAEO-4yyl
 allowed_paths:
 - template/governance/kernel/bin/tk
 - src/gov/tasks/**

@@ -15,8 +15,8 @@ class: documentation
 state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
-- W1-08
-- W1-21
+- DAEO-uudf
+- DAEO-5x4l
 allowed_paths:
 - docs/lessons/**
 kpis:

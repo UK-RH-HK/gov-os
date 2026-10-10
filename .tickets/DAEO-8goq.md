@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-13
-- W1-28
-- W1-31
+- DAEO-w616
+- DAEO-9279
+- DAEO-6mk8
 allowed_paths:
 - src/gov/status/**
 - tests/unit/status/**

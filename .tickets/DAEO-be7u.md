@@ -15,9 +15,9 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-08
-- W1-10
-- W1-34
+- DAEO-uudf
+- DAEO-4yyl
+- DAEO-egm9
 allowed_paths:
 - src/gov/decisions/**
 - template/governance/kernel/schemas/madr*

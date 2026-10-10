@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-27
-- W1-38
+- DAEO-xw3k
+- DAEO-3ef2
 allowed_paths:
 - copier.yml
 - template/.copier-answers.yml*

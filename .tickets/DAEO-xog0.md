@@ -15,7 +15,7 @@ class: role-definition
 state_class: AUTHORITATIVE
 role: product-spec
 depends_on:
-- W1-05
+- DAEO-m7u4
 allowed_paths:
 - template/governance/kernel/roles/**
 - governance/project/roster.yaml

@@ -15,9 +15,9 @@ class: config
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
-- W1-02
-- W1-03
-- W1-04
+- DAEO-emkd
+- DAEO-8qvp
+- DAEO-78bn
 allowed_paths:
 - .claude/settings.json
 - governance/project/bootstrap.md

@@ -15,15 +15,15 @@ class: integration
 state_class: AUTHORITATIVE
 role: orchestrator
 depends_on:
-- W1-23
-- W1-32
-- W1-35
-- W1-36
-- W1-40
-- W1-41
-- W1-44
-- W1-46
-- W1-47
+- DAEO-9i8e
+- DAEO-8goq
+- DAEO-0i6h
+- DAEO-skiy
+- DAEO-fdkq
+- DAEO-cdoi
+- DAEO-wqd6
+- DAEO-jdqr
+- DAEO-o4fg
 allowed_paths:
 - docs/plan/wave-1-exit/**
 kpis:

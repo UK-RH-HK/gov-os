@@ -15,8 +15,8 @@ class: implementation
 state_class: AUTHORITATIVE
 role: engineer
 depends_on:
-- W1-17
-- W1-18
+- DAEO-rxln
+- DAEO-1ve2
 allowed_paths:
 - src/gov/retrieval/semantic*
 - src/gov/retrieval/fusion*
