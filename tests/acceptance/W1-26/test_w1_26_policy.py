@@ -14,24 +14,37 @@ import w1_26_support as support
 # Every policy key maps to a check or is informational
 # --------------------------------------------------------------------------
 
-def test_every_policy_key_maps_to_a_check_or_is_informational(project, sandbox, interface):
-    """Every policy key in path-map.yaml maps to a check or is declared informational."""
-    project.add_core_declarations()
-    project.add_path_map({"all": ["**/*"]})
+NOT_COVERED = "POLICY_NOT_COVERED"
+STATES_THE_KEYS = "states-the-policy-keys"
+
+
+def _uncovered(project, sandbox, interface):
+    """The policy keys ``gov check`` reports as covered by no check, and the run."""
     project.commit()
     run = support.run_check(project, sandbox)
     envelope = support.envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    families = support.families_of(result)
-    check_ids = set()
-    for entry in support.checks_of(result):
-        if isinstance(entry, dict) and "id" in entry:
-            check_ids.add(entry["id"])
-    for key, strength in support.POLICIES.items():
-        if strength == "informational":
-            continue
-        assert key in families or any(key in str(fam) for fam in families), \
-            f"policy key {key!r} (strength {strength}) is not covered by a check or family"
+    return sorted(finding.get("policy") for entry in support.checks_of(result) if isinstance(entry, dict)
+                  for finding in entry.get("findings") or []
+                  if isinstance(finding, dict) and finding.get("code") == NOT_COVERED), run
+
+
+def test_every_policy_key_maps_to_a_check_or_is_informational(project, sandbox, interface):
+    """A key maps to a check when a declared check states it under ``enforces`` (DEC-620); the name of a family
+    or of a result maps nothing. With the kernel's thirteen keys: the nine that are not informational are each
+    reported while no declaration states them, and none is once a declared check states them."""
+    owed = sorted(key for key, strength in support.POLICIES.items() if strength != "informational")
+    project.add_core_declarations()
+    project.add_path_map({"all": ["**/*"]})
+    reported, run = _uncovered(project, sandbox, interface)
+    assert reported == owed, \
+        f"policy keys no declaration states are not each reported: {reported}, owed {owed}\n{run.describe()}"
+    project.add_check_declaration(STATES_THE_KEYS, "graph integrity")
+    declared = project.root / support.CHECKS_REL / f"{STATES_THE_KEYS}.yaml"
+    declared.write_text(declared.read_text(encoding="utf-8").rstrip("\n") + f"\nenforces: [{', '.join(owed)}]\n",
+                        encoding="utf-8")
+    reported, run = _uncovered(project, sandbox, interface)
+    assert not reported, f"policy keys a declared check states under enforces are reported: {reported}\n{run.describe()}"
 
 
 def test_a_new_policy_key_with_no_check_and_not_informational_is_red(project, sandbox, interface):

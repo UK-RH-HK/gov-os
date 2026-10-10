@@ -56,7 +56,8 @@ every reading:
 - **`docs/source`** is checked by behaviour: Read and Edit under `docs/source/**` stay denied. The rule text may change.
 - **Failure 1** treats every commit that touches `tests/acceptance/**` without the trailer
   `Role: independent-test-designer` as an implementer commit.
-- **Failure 3** checks what the repository can show: the deny rule is in force, W1-06 still depends on W1-05 and is
+- **Failure 3** checks what the repository can show: the deny rule is in force, W1-06 still depends on W1-05 (named
+  by its W1 id or by its ticket id; `test_a_dependency_is_read_in_either_form_of_the_id`, DEC-620) and is
   `open`, and `governance/project/tool-registry.yaml` does not exist. An install that leaves no record in the
   repository is beyond a deterministic test.
 - **Gates.** The three failure-KPI tests and the over-blocking test first assert that W1-01's rules are in place, and
