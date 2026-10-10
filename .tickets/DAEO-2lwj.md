@@ -1,6 +1,6 @@
 ---
 id: DAEO-2lwj
-status: closed
+status: in_progress
 deps: [DAEO-8qvp, DAEO-topz, DAEO-rrxp, DAEO-fygv, DAEO-wk2v]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -52,6 +52,8 @@ allowed_paths:
 - tests/unit/containment/**
 - template/governance/kernel/settings.json
 - tests/unit/retrieve/test_retrieve.py
+- .rulesync/subagents/orchestrator.md
+- .rulesync/skills/orchestration/**
 kpis:
   success:
   - 'Runs tests/acceptance/<ticket>/ and the regression tests, requires Implements: and Task: trailers, runs the containment check, writes a checkpoint and the close record with skill versions [CAP-13.a,
