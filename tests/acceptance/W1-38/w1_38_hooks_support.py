@@ -333,3 +333,371 @@ def failed_bash_call(project, settings, sandbox, command, changed=(), role=ENGIN
     )
     return FailedCall(tuple(commands), tuple(after), report,
                       tuple(check_support.finding_lines(project)[seen:]), bash.returncode)
+
+
+# --------------------------------------------------------------------------
+# A registered command started from any folder (DEC-603, DEC-607)
+# --------------------------------------------------------------------------
+#
+# The harness starts every hook in the session's current folder, with the project's folder in
+# ``CLAUDE_PROJECT_DIR`` (measured by the orchestrator on harness 2.1.288, DEC-603). So a registered command
+# is run here through the shell exactly as registered, with the folder asked for as working directory, that
+# same folder as ``cwd`` of the hook's input, and the project's folder in ``CLAUDE_PROJECT_DIR``.
+
+ORCHESTRATOR = check_support.ORCHESTRATOR
+OUT_OF_SCOPE_FILE = "docs/notes.md"          # a file of the product outside the ticket's paths
+SUBFOLDER_REL = "src/app"                    # a folder of the product, inside the ticket's paths
+DEEP_SUBFOLDER_REL = "docs/one/two/three/four/five"
+NOT_STARTED = "can't open file"              # what the interpreter says when it does not find the program
+
+
+def source_events(source=None):
+    """The harness's names of the events under which the template's hooks source holds an entry: rulesync's
+    key with its first letter in upper case (measured; held by a case against what rulesync generates)."""
+    source = load_source() if source is None else source
+    block = source.get("hooks") if isinstance(source.get("hooks"), dict) else {}
+    return tuple(key[:1].upper() + key[1:] for key in block)
+
+
+def registered_commands(settings, programs, event):
+    """The commands of the guard hook entries a settings object registers under ``event``."""
+    return [entry.get("command") for where, _group, entry in limit.guard_entries(settings, programs)
+            if where.startswith(f"{event}[")]
+
+
+def folder_of(project, kind, outside=None):
+    """The working directory of one kind: the project's root, a subfolder, a deep subfolder, a folder outside."""
+    project = Path(project)
+    folder = {"root": project, "subfolder": project / SUBFOLDER_REL, "deep-subfolder": project / DEEP_SUBFOLDER_REL,
+              "outside": outside}[kind]
+    assert folder is not None, "no folder outside the project was given"
+    folder = Path(folder)
+    folder.mkdir(parents=True, exist_ok=True)      # an empty folder is no change of the working tree
+    return folder
+
+
+FOLDER_KINDS = ("root", "subfolder", "deep-subfolder", "outside")
+
+
+def run_registered(command, stdin, project, sandbox, folder, role=None, ticket=None):
+    """One registered command, through the shell as registered, started in ``folder``."""
+    stdin = dict(stdin, cwd=str(folder))
+    try:
+        proc = subprocess.run(["sh", "-c", command], input=json.dumps(stdin), capture_output=True, text=True,
+                              cwd=str(folder), env=live_support.command_environment(project, sandbox, role, ticket),
+                              timeout=COMMAND_TIMEOUT_S, check=False)
+    except subprocess.TimeoutExpired:
+        return live_support.CommandResult(command, None, "", "timed out")
+    return live_support.CommandResult(command, proc.returncode, proc.stdout, proc.stderr)
+
+
+def _json(text):
+    try:
+        data = json.loads(text.strip() or "null")
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _specific(result):
+    specific = _json(result.stdout).get("hookSpecificOutput")
+    return specific if isinstance(specific, dict) else {}
+
+
+def refused_by_the_program(result):
+    """The guard's program itself answered "refuse": it ended with 0 and wrote the refusal. An exit 2 is not
+    that: the interpreter ends with 2 too when it does not find the program."""
+    return result.returncode == 0 and _specific(result).get("permissionDecision") == "deny"
+
+
+def _runtime_files(project):
+    runtime = Path(project) / ".gov-runtime"
+    return {str(path.relative_to(project)) for path in runtime.rglob("*") if path.is_file()} if runtime.is_dir() \
+        else set()
+
+
+def refused_call(project):
+    """A Bash call the guard refuses for the engineer whatever the current folder: it writes a file outside the
+    ticket's paths, named by its whole path."""
+    return {"command": f"echo changed >> {Path(project) / OUT_OF_SCOPE_FILE}", "description": "W1-38 acceptance call"}
+
+
+@dataclass(frozen=True)
+class Started:
+    event: str
+    result: object          # live_support.CommandResult of the registered command
+    own_answer: str         # what only the program itself gives; empty when it was not seen
+    expected: str           # the answer the case looks for, in words
+
+    def describe(self):
+        return f"expected {self.expected}; got {self.result.describe()}"
+
+
+def start_entry(event, command, project, sandbox, folder, settings):
+    """Start one registered command in ``folder`` and look for an answer only its program gives.
+
+    The exit code is never taken as that answer: the interpreter that does not find the program ends with 2,
+    as the guard does on an internal failure and as the return-contract program does on an incomplete return.
+
+    - ``PreToolUse``: a call the guard refuses; the program's written refusal (exit 0, ``permissionDecision``).
+    - ``PostToolUse``, ``PostToolUseFailure``: one whole call whose pre-call part ran from the project's root
+      (where every form of the command starts); the command changed a file outside the ticket's paths; the
+      check's report names that file.
+    - ``SessionStart``: the orchestrator's session; the context the program writes under its own event name.
+    - ``PreCompact``: the orchestrator's session without a checkpoint; the program's own message.
+    - ``Stop``: the engineer's session on its ticket; the checkpoint the program writes for the ticket.
+    - ``SubagentStop``: an incomplete return; the program's written refusal under its own event name.
+    """
+    project = Path(project)
+    number = next(_CALLS)
+    base = {"session_id": f"w1-38-any-folder-{number:04d}", "hook_event_name": event,
+            "transcript_path": str(sandbox.home / ".claude" / "projects" / "product" / "session.jsonl"),
+            "permission_mode": "default"}
+    if event == "PreToolUse":
+        stdin = live_support.hook_input(project, sandbox, event, "Bash", refused_call(project),
+                                        tool_use_id=f"toolu_w1_38_any_{number:04d}")
+        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
+        return Started(event, result, "refused" if refused_by_the_program(result) else "",
+                       "the guard's written refusal of a write outside the ticket's paths (exit 0)")
+    if event in ("PostToolUse", FAILED_CALL_EVENT):
+        tool_use_id = f"toolu_w1_38_any_{number:04d}"
+        tool_input = {"command": "bash tools/step.sh", "description": "W1-38 acceptance call"}
+        before = [run_registered(registered, live_support.hook_input(project, sandbox, "PreToolUse", "Bash",
+                                                                     tool_input, tool_use_id=tool_use_id),
+                                 project, sandbox, project, ENGINEER, TICKET_ID)
+                  for registered in live_support.hook_commands(settings, "PreToolUse", "Bash")]
+        assert before and all(check_support._guard_decision(r.returncode, r.stdout) == "allow" for r in before), (
+            f"from the project's root the registered PreToolUse commands did not let the fixture call through: "
+            + ("; ".join(r.describe() for r in before) or "none is registered")
+        )
+        with (project / OUT_OF_SCOPE_FILE).open("a", encoding="utf-8") as handle:
+            handle.write("changed by the call\n")
+        stdin = live_support.hook_input(project, sandbox, event, "Bash", tool_input, tool_use_id=tool_use_id)
+        result = run_registered(command, stdin, project, sandbox, folder, ENGINEER, TICKET_ID)
+        report = check_support.agent_text(result.returncode, result.stdout, result.stderr)
+        seen = result.returncode == 0 and OUT_OF_SCOPE_FILE in report
+        return Started(event, result, report if seen else "",
+                       f"the containment check's report naming {OUT_OF_SCOPE_FILE} (exit 0)")
+    if event == "SessionStart":
+        result = run_registered(command, dict(base, source="startup"), project, sandbox, folder, ORCHESTRATOR)
+        seen = result.returncode == 0 and _specific(result).get("hookEventName") == event
+        return Started(event, result, "context" if seen else "",
+                       "the context the program writes for the orchestrator under its event name (exit 0)")
+    if event == "PreCompact":
+        result = run_registered(command, dict(base, trigger="manual"), project, sandbox, folder, ORCHESTRATOR)
+        message = _json(result.stdout).get("systemMessage")
+        seen = result.returncode == 0 and isinstance(message, str) and "PreCompact" in message
+        return Started(event, result, message if seen else "",
+                       "the program's message that no state block was appended, there being no checkpoint (exit 0)")
+    if event == "Stop":
+        had = _runtime_files(project)
+        result = run_registered(command, base, project, sandbox, folder, ENGINEER, TICKET_ID)
+        written = sorted(rel for rel in _runtime_files(project) - had if TICKET_ID in rel)
+        seen = result.returncode == 0 and bool(written)
+        return Started(event, result, ", ".join(written) if seen else "",
+                       f"a checkpoint written for {TICKET_ID} under the project's runtime folder (exit 0)")
+    if event == "SubagentStop":
+        result = run_registered(command, dict(base, last_assistant_message="done"), project, sandbox, folder,
+                                ENGINEER, TICKET_ID)
+        seen = _specific(result).get("hookEventName") == event and NOT_STARTED not in result.stderr
+        return Started(event, result, "incomplete return refused" if seen else "",
+                       "the program's written refusal of an incomplete return under its event name")
+    raise AssertionError(f"no case knows what the program registered under {event} answers")
+
+
+# --------------------------------------------------------------------------
+# One whole Bash call made in a folder the session changed to
+# --------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class FolderCall:
+    before: tuple           # one CommandResult for each registered PreToolUse command
+    decision: str           # allow | deny | ask | error | timeout, as the harness reads the pre-call results
+    bash_exit: object       # the command's exit code; None when the call was not let through
+    event: str              # the event raised after the command; empty when the call was not let through
+    after: tuple            # one CommandResult for each command registered for that event
+    report: str             # the text that reaches the agent after the command
+    new_findings: tuple     # the lines added to the findings file since the call began
+
+    def describe(self):
+        return ("before: " + ("; ".join(r.describe() for r in self.before) or "no command is registered")
+                + " | after: " + ("; ".join(r.describe() for r in self.after) or "no command ran"))
+
+
+def bash_call_in(project, settings, sandbox, folder, command, literal=False, role=ENGINEER, ticket=TICKET_ID):
+    """One whole Bash call of a session whose current folder is ``folder``, through the commands ``settings``
+    register: the PreToolUse commands for Bash; if they let it through, the command for real in ``folder``; then
+    the commands registered for the event that follows (the failed-call event when the command failed), every
+    registered command started in ``folder``. ``literal``: the guard is shown the command itself, not a script.
+    """
+    project, folder = Path(project), Path(folder)
+    number = next(_CALLS)
+    tool_use_id = f"toolu_w1_38_{number:04d}"
+    call = command
+    if not literal:
+        directory = sandbox.home.parent / "calls"
+        directory.mkdir(exist_ok=True)
+        script = directory / f"call-{number:04d}.sh"
+        script.write_text(command + "\n", encoding="utf-8")
+        call = f"bash {script}"
+    tool_input = {"command": call, "description": "W1-38 acceptance call"}
+    seen = len(check_support.finding_lines(project))
+
+    def run(event, extra=None):
+        stdin = live_support.hook_input(project, sandbox, event, "Bash", tool_input, tool_use_id=tool_use_id)
+        stdin.update(extra or {})
+        return tuple(run_registered(registered, stdin, project, sandbox, folder, role, ticket)
+                     for registered in live_support.hook_commands(settings, event, "Bash"))
+
+    before = run("PreToolUse")
+    assert before, f"{GENERATED_REL} registers no PreToolUse command for Bash"
+    decisions = [check_support._guard_decision(result.returncode, result.stdout) for result in before]
+    decision = next((d for d in decisions if d != "allow"), "allow")
+    if decision != "allow":
+        return FolderCall(before, decision, None, "", (), "", tuple(check_support.finding_lines(project)[seen:]))
+    env = live_support.command_environment(project, sandbox)
+    env.update({"GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull})
+    bash = subprocess.run(["bash", "-c", call], cwd=str(folder), env=env, capture_output=True, text=True,
+                          timeout=COMMAND_TIMEOUT_S, check=False)
+    if bash.returncode != 0:
+        event, extra = FAILED_CALL_EVENT, {"error": f"Exit code {bash.returncode}\n{bash.stderr}".strip()}
+    else:
+        event, extra = "PostToolUse", None
+    after = run(event, extra)
+    report = "\n".join(text for text in (check_support.agent_text(r.returncode, r.stdout, r.stderr) for r in after)
+                       if text)
+    return FolderCall(before, decision, bash.returncode, event, after, report,
+                      tuple(check_support.finding_lines(project)[seen:]))
+
+
+# --------------------------------------------------------------------------
+# The command line of an entry, against the kernel template's (DEC-608)
+# --------------------------------------------------------------------------
+#
+# DEC-608: the seven command lines of the source are the kernel template's form exactly. Nothing of that form
+# is written here: the kernel template's command lines are read from its settings file, and the form is what
+# such a command line is with the file name of its program taken out.
+
+PROGRAM_PLACE = "<the program's file name>"
+
+
+def own_programs(command, programs):
+    """The kernel hook programs a command line names by their whole file name (``stop.py`` is not named by a
+    command line that names ``subagentstop.py``)."""
+    if not isinstance(command, str):
+        return []
+    def of_a_name(char):
+        return bool(char) and (char.isalnum() or char in "._-")
+
+    found = []
+    for name in programs:
+        start = command.find(name)
+        while start >= 0:
+            end = start + len(name)
+            if not of_a_name(command[start - 1:start]) and not of_a_name(command[end:end + 1]):
+                found.append(name)
+            start = command.find(name, end)
+    return found
+
+
+def own_program(command, programs, where):
+    """The one program a command line names; a failure when it names none or more than one."""
+    found = own_programs(command, programs)
+    assert len(found) == 1, f"{where}: the command line `{command}` names {found or 'no kernel hook program'}; one is expected"
+    return found[0]
+
+
+def kernel_command_line(event, programs):
+    """The one command line the kernel template's settings register under ``event``, as that file holds it."""
+    commands = registered_commands(kernel_settings(), programs, event)
+    assert len(commands) == 1 and isinstance(commands[0], str), (
+        f"{KERNEL_SETTINGS_REL} registers {len(commands)} guard hook entries under {event}; one is expected: {commands}"
+    )
+    return commands[0]
+
+
+def kernel_forms(programs):
+    """``{event: form}`` for each event under which the kernel template's settings register a guard hook entry:
+    its command line with the file name of its program exchanged for ``PROGRAM_PLACE``."""
+    forms = {}
+    for event in guard_events(kernel_settings(), programs):
+        command = kernel_command_line(event, programs)
+        program = own_program(command, programs, f"{KERNEL_SETTINGS_REL}, {event}")
+        assert command.count(program) == 1 and PROGRAM_PLACE not in command, (
+            f"{KERNEL_SETTINGS_REL}, {event}: `{command}` holds `{program}` more than once"
+        )
+        forms[event] = command.replace(program, PROGRAM_PLACE)
+    return forms
+
+
+def kernel_form(programs):
+    """The one form the kernel template's command lines share. A failure when they do not share one: the form
+    of the entries the kernel template does not hold could then not be read from it."""
+    forms = kernel_forms(programs)
+    distinct = sorted(set(forms.values()))
+    assert len(distinct) == 1, (
+        f"the command lines of {KERNEL_SETTINGS_REL} do not share one form once the program's file name is taken "
+        f"out: {forms}"
+    )
+    return distinct[0]
+
+
+def expected_command_line(event, command, programs, where):
+    """What DEC-608 makes the command line of the entry under ``event``, whose present command line is ``command``.
+
+    Under an event the kernel template's settings hold: the kernel template's command line for that event, the
+    same string. Under another event: the kernel template's form with the entry's own program in the place of
+    the program's file name; the entry's own program is the one its present command line names.
+    """
+    if event in guard_events(kernel_settings(), programs):
+        return kernel_command_line(event, programs)
+    return kernel_form(programs).replace(PROGRAM_PLACE, own_program(command, programs, where))
+
+
+def source_command_lines(source=None):
+    """``{event: [command, ...]}`` of a hooks source, as written, under the harness's names of the events."""
+    source = load_source() if source is None else source
+    block = source.get("hooks") if isinstance(source.get("hooks"), dict) else {}
+    return {key[:1].upper() + key[1:]: [entry.get("command") for entry in listed if isinstance(entry, dict)]
+            for key, listed in block.items() if isinstance(listed, list)}
+
+
+# --------------------------------------------------------------------------
+# A product's own package named ``gov`` under the project's ``src`` (DEC-608; shape C of the README)
+# --------------------------------------------------------------------------
+
+PRODUCT_GOV_FILES = {
+    "src/gov/__init__.py": '"""The product\'s own package: a speed governor for a pump. Not the governance package."""\n'
+                           "\nMAX_RPM = 3000\n",
+    "src/gov/limits.py": "from gov import MAX_RPM\n\n\ndef within(rpm):\n    return 0 <= rpm <= MAX_RPM\n",
+}
+GOVERNANCE_MODULE = "gov.guard"      # a module the kernel's hook programs import and a product's package lacks
+
+
+def add_product_package_named_gov(project):
+    """Give the project, under its own ``src``, a product package named ``gov``, and commit it."""
+    project = Path(project)
+    for rel, text in PRODUCT_GOV_FILES.items():
+        path = project / rel
+        assert not path.exists(), f"{rel} is already in the project"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    check_support.git(project, "add", "-A")
+    check_support.git(project, "commit", "-q", "-m", "the product's own package named gov")
+    return project
+
+
+def gov_as_imported(project, sandbox, first=None):
+    """What ``import gov`` gives a program started as a hook is, outside the project, with ``first`` (a folder)
+    ahead of the installed packages when given: ``(the package's folder, whether it holds the guard)``."""
+    code = ("import importlib.util, json, os, gov\n"
+            f"print(json.dumps([os.path.dirname(os.path.abspath(gov.__file__)), "
+            f"importlib.util.find_spec({GOVERNANCE_MODULE!r}) is not None]))")
+    env = live_support.command_environment(project, sandbox)
+    if first is not None:
+        env["PYTHONPATH"] = str(first)
+    proc = subprocess.run(["python3", "-c", code], capture_output=True, text=True, cwd=str(sandbox.tmpdir), env=env,
+                          timeout=COMMAND_TIMEOUT_S, check=False)
+    assert proc.returncode == 0, f"`import gov` failed in the stand-in session: {proc.stderr.strip()[:300]}"
+    folder, has_guard = json.loads(proc.stdout)
+    return Path(folder), has_guard
