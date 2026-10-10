@@ -6503,3 +6503,22 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.177 | 2026-10-10 | Delegated: DEC-608 (the hooks source's command lines carry no `PYTHONPATH` prefix, the kernel template's form exactly; `gov` must be installed for the user who runs a project's sessions). Next free id: DEC-609. |
+
+## 178. The second run on W1-15: the probe judged (register v0.178, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-609 — The second run on W1-15 merges as built at `ca734550`; its residuals
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-10; the owner's acceptance is asked) · **Under:** DEC-584, DEC-603, DEC-607, DEC-608, DEC-498
+- **Decision:**
+  - **Probe: pass.** A fresh reviewer (session `12aef0c5-8d9e-4115-a1c7-843ec440d978`, wrote nothing) probed `ca734550`: no fail-open hole that ordinary work produces, nothing that breaks an exit criterion. The seven generated command strings equal the kernel template's form byte for byte; each starts its program from the root, a subfolder and a folder outside, in a plain project, one reached through a link, and projects whose names hold a space, quotes, a dollar sign, backticks, non-ASCII letters and a newline (252 starts, none failed). A whole call from a subfolder is guarded, checked and recorded from the project's root. The branch merges directly at the probed head.
+  - **Correction to DEC-608:** the residual of DEC-601 (a product's own package named `gov` under `src`) is ended for the guard, the containment check and the stop program only. The session-start and pre-compaction programs put the project's `src` first themselves and still import such a package: no checkpoint before a compaction, no resume part at a session's start, and its code runs. A deliberate or unusual shape, older than the run; on the Wave 2 list beside the lead's option (c).
+  - **Named residuals (Wave 2 list):**
+    - a session whose environment carries a relative `PYTHONPATH=src` brings the same shape back from the project's root only; in this repository's worktrees, which `gov` a hook runs then depends on the current folder;
+    - with `CLAUDE_PROJECT_DIR` unset or empty all seven exit 2 (the harness always sets it; the pre-call entry fails closed);
+    - where `gov` is not importable the stop program ends 0 and silent with no checkpoint, and the pre-call program blocks with a finding but no reason on its error output;
+    - whether the harness gives the variable to the shell or puts it into the command text is not verifiable in a case: the orchestrator's measurement on an adopted clone uses a project path with a space;
+    - `gov doctor` on a generated project was read, not run, by the reviewer.
+  - **The lead's one unexplained difference** (in the worktree the trailers check has one more finding than in the main tree, on commit `cf84b1b2` of `DAEO-2lwj`) is looked at by the orchestrator in its own check run before the merge and named in the close note.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.178 | 2026-10-10 | Delegated: DEC-609 (the second run on W1-15: probe judged a pass, the branch merges as built; a correction to DEC-608 on the session-start and pre-compaction programs; named residuals). Next free id: DEC-610. |
