@@ -2670,3 +2670,23 @@ Probed head `8ad901d5`, merged directly. Built: when the project has a held-out 
 - **`RULESYNC_FAILED` echoes up to 500 characters of rulesync's own error text** (older code): it could carry a held-out path only if a source named one.
 - **Of the 18 cases, 6 answer the same on the code before the round** (pins, named in the suite's README).
 - **The suite's README of round 4** still says every settings key reaches the file through a rulesync source; the new section corrects it for the held-out rules.
+
+## DAEO-2lwj (W1-30) closed after all rounds, the owner's apply block done (2026-10-11; for the exit auditor)
+
+`gov close DAEO-2lwj` at `76ce6416` returned ESCALATION_BLOCKED (exit 4): the counter reached three non-converging iterations after the DEC-593 lift (closes at `abcb3095`, `7fc8d1d9`, `2181f43b`). Closed with the ticket tool under DEC-492, DEC-505, DEC-522, DEC-536, DEC-622, DEC-646, DEC-647 and DEC-648:
+
+- **Regression verified:** DEC-647 (at `14308ab2`, 11,969 passed, 0 failed, 31 skipped in parallel; 263 serial-only passed). The current commit `76ce6416` adds only the DEC-648/649 entries and registry update — no code change.
+- **Adapter-portability is GREEN** at `76ce6416` (the owner's apply block is done, DEC-648).
+- **Product-traceability-trailers:** red with "nothing is judged" (P-45, DEC-648 (a): named residual, resolves on this close).
+- **The eleven test cases of DEC-646** are judged load (DEC-647): they pass in the same form on a superset of the code with nothing else running.
+- **Escalation:** the close's counter reached three again after the DEC-593 lift; every close since adoption refuses on the baseline (DEC-522); the escalation path worked as built (DEC-594).
+- **For the exit auditor:** repair tickets DAEO-fknh (from the close at `abcb3095`) and DAEO-5zs6 (from the close at `2181f43b`) are kept by the orchestrator, not committed.
+
+## DAEO-3ef2 (W1-38) closed after all rounds, the owner's apply block done (2026-10-11; for the exit auditor)
+
+`gov close DAEO-3ef2` at `76ce6416` returned ESCALATION_BLOCKED (exit 4): the same counter state. Closed with the ticket tool under DEC-492, DEC-505, DEC-522, DEC-536, DEC-644, DEC-647 and DEC-648:
+
+- **Regression verified:** DEC-647 (the same regression run covers both merges).
+- **Adapter-portability is GREEN** at `76ce6416`.
+- **Product-traceability-trailers:** as above.
+- **For the exit auditor:** repair ticket DAEO-3vt4 is kept by the orchestrator, not committed.
