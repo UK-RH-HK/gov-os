@@ -25,6 +25,11 @@ behaviours; it changed, rewrote and removed no other case: **164 cases in 28 cla
 0 skipped** as run before the engineer's work (the 31 red of the paragraph above, and 17 of the 19). See "The
 addition after DEC-608" in the section "The second run".
 
+**The round of DEC-635 (2026-10-11, ticket `DAEO-3ef2` reopened by DEC-641)** added 18 cases in five classes in
+`test_w1_38_heldout_step.py` and changed, rewrote and removed no other case: **182 cases in 33 classes; 170 green,
+12 red, 0 skipped** as run before the engineer's work (the 164 older cases all green). See the section "The round
+of DEC-635" below.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -429,6 +434,94 @@ after DEC-608", above. Kept below as raised.)
   measurement. Confidence: medium (whether any project of shape B is meant to run without an installed `gov` is
   not known to the designer).
 
+## The round of DEC-635: the held-out step after generation
+
+File: `test_w1_38_heldout_step.py`. Sources: DEC-162 (a project's settings hold one `Read` deny rule per held-out
+path), DEC-218 (the held-out file, its key, its stated shape; the rule is written by a script), DEC-635 (the rule
+is never in a rulesync source; it is added after generation by the existing generator, in the owner's apply
+procedure and inside the adapter check's temporary generation), DEC-641 (what is built: the step is applied when
+and only when the project has a held-out file; a held-out file that cannot be read is not green; no message
+carries a held-out path; the generator is not changed).
+
+This round replaces one sentence of the section "Round 4" above ("a key that another owner needs in the committed
+settings … reaches the file through a rulesync source, or it is a finding"): for the held-out `Read` deny rules,
+and for them only, the source is the project's held-out file through the generator's step. No case of round 4
+named such a key, so no case of round 4 changes.
+
+### How a case is built
+
+- **The project** is the suite's stand-in project (`generated_project`: the template's sources, the kernel, the
+  tool registry, the check's declaration, the real `rulesync generate` run in it). rulesync is found as everywhere
+  in the suite (`support.RULESYNC_BIN`); every case of the file is marked `needs_rulesync` and is skipped without it.
+- **The held-out file** is a stand-in the case writes into the stand-in project, at the place and under the key the
+  generator's module states (`CONFIG_REL`, `CONFIG_KEY`, `SETTINGS_REL` of `src/gov/guard/heldout.py`, read in a
+  fresh interpreter with this worktree's `src` first; the file asserts that this worktree's code answered). It
+  names two absolute paths invented under the case's temporary folder, outside the project. Nothing exists at
+  them. No real held-out path, and neither of this repository's two protected files, is read or named.
+- **"Generated, then the step"** is produced as the owner's apply procedure produces it: `rulesync generate` in
+  the stand-in project, then `python3 -m gov.guard.heldout` run in that project with this worktree's code. The
+  rules the step added are taken as the difference of the deny list before and after it (one for each stand-in
+  path, asserted); no case retypes the form of a rule.
+- **`CLAUDE_PROJECT_DIR`** is set to the stand-in project for the generator and for the declared command. The
+  generator reads that variable before the working folder; a designer's or lead's session may carry it for this
+  repository, and no case may let a run reach this repository's own files. Every helper also asserts that the
+  project is outside this repository. `gov check` is run as the suite runs it (its own environment, no such
+  variable, the project as working folder).
+- **The outcome** is read from the declared command's exit code and its standard output (one JSON object with a
+  list `findings`, as `gov check` reads it), and from `gov check --json`. "Names the settings file" is
+  `support.named_files` over the findings, as in round 4. No finding code is asserted.
+- **No path printed:** every case with a held-out file asserts that none of the stand-in paths is in the command's
+  standard output and standard error together. A failing assertion says which entry of the stand-in file was
+  carried, by its number, never the text.
+
+### The cases
+
+"Red before" is the result with the check as it is at `09207f4d` (it does not look at the held-out file).
+
+| Behaviour | Test | Measures | Red before the engineer's work |
+|---|---|---|---|
+| settings "generated, then the step" are green | `TestSettingsAfterTheHeldOutStep::test_generated_then_the_step_is_green` | no finding names the project's settings file; exit 0 and no finding at all; no stand-in path printed | red: a finding names the settings file (the check compares with what rulesync alone generates) |
+| a lost rule is caught | `…::test_step_never_run_is_red_on_the_settings` | the project has a held-out file, its settings are what rulesync alone generates: exit not 0, the findings name the settings file and no other | red: exit 0, no finding (the check does not know that rules are owed) |
+| | `…::test_one_rule_lost_is_red_on_the_settings` | after the step, one of the two rules is removed by hand: the same | green already, for a weaker reason (any difference from rulesync's output is a finding); it must stay green for the right one |
+| a rule the held-out file does not give | `…::test_rule_the_held_out_file_does_not_give_is_red_on_the_settings` | after the step, a third `Read` deny rule in the generator's own form for a path the file does not name: exit not 0, the settings file named | green already, same weaker reason |
+| no held-out file: as before | `TestProjectWithoutAHeldOutFile::test_generated_settings_are_green` | no held-out file (asserted), settings as generated: exit 0, no finding | green already: this is today's behaviour; it guards against a check that demands the step everywhere |
+| | `…::test_stray_read_deny_rule_is_red_on_the_settings` | the step's rules are in the settings and the held-out file is taken away: exit not 0, the settings file named | green already (round 4's rule); it guards against a check that tolerates `Read` deny rules as such |
+| a broken held-out file | `TestBrokenHeldOutFile::test_broken_file_is_not_green_and_no_path_is_printed[<form>]` × 7 | the settings are what rulesync alone generates, so the comparison without the step would be green; exit not 0, at least one finding in the printed result (a traceback is not a finding), no stand-in path in standard output and standard error | 7 red: exit 0 (the file is not read) |
+| the step repeated | `TestStepRepeated::test_second_run_of_the_step_leaves_the_settings_as_they_are` | the generator run twice: the settings file is byte for byte the same | green already: the generator's own behaviour, not changed by this round; kept because the apply procedure relies on it |
+| | `…::test_project_is_still_green_after_the_second_run` | after the second run the check is green as in the first row | red: as the first row |
+| | `…::test_whole_procedure_repeated_is_still_green` | `rulesync generate`, the step, and both once more: the settings are byte for byte the same (green today, measured: rulesync leaves the `Read` rules where they are) and the check is green | red: as the first row |
+| through `gov check --json` | `TestHeldOutStepThroughGovCheck::test_gov_check_is_green_after_the_apply_procedure` | check and family `GREEN`; no stand-in path in what `gov check` prints | red: `RED`, `RED` |
+| | `…::test_gov_check_is_red_when_a_rule_is_lost` | one rule removed after the step: `RED`, `RED`, the findings name the settings file and no other; no stand-in path printed | green already, the weaker reason again |
+
+The seven broken forms. Six hold a stand-in path as text, so "no path printed" is a real assertion for them:
+
+| Form | The held-out file | Kind |
+|---|---|---|
+| `unparsable-yaml` | the key, then a quoted path whose quote is never closed and an open bracket | cannot be read (a parser's own message would quote the line) |
+| `not-utf-8` | the key and one path, then bytes that are not UTF-8 | cannot be read |
+| `a-folder-in-its-place` | a folder at the file's place | cannot be read (holds no path) |
+| `stated-key-missing` | the two paths under another key | not of its stated shape |
+| `not-a-list` | one path as a plain value under the key | not of its stated shape |
+| `entry-not-an-absolute-path` | one stand-in path and one relative path | not of its stated shape |
+| `key-written-twice` | the key twice, one path under each | not of its stated shape (the generator refuses it: a reader that kept the last value would drop the first) |
+
+**12 red, 6 green** before the engineer's work. The six green ones are named above with their reason; none of them
+describes something still to be built on its own, and each must stay green afterwards.
+
+### What is not held, and what was not decided here
+
+- **An empty list under the key.** The generator refuses it; DEC-218 says "a list of absolute paths" and does not
+  say whether an empty one is of the stated shape. No case. A check that applies the generator's step gets the
+  generator's answer.
+- **`CLAUDE_PROJECT_DIR` naming another folder than the working folder.** The generator, run by hand, takes the
+  variable first; the check today takes the working folder. Which of the two the check's step follows when they
+  differ is not stated. Every case sets both to the stand-in project, so no case depends on it. See the designer's
+  return (package).
+- **A held-out file that exists and cannot be opened for lack of rights** has no case: the suite may run as a user
+  for whom every file opens. `a-folder-in-its-place` and `not-utf-8` hold "cannot be read".
+- **The order of the rules** in the deny list is held only as far as the byte-for-byte comparison holds it: the
+  project's file is what the procedure writes.
+
 ## The one tolerated difference between a source file and its generated file
 
 rulesync rewrites the frontmatter (key order, quoting, folded lines) and **drops the blank lines between the closing
@@ -519,7 +612,7 @@ its family, its command; the module exists).
 |---|---|
 | CAP-52.a | `TestUnsourcedFile` (skill, command), `TestSettingsHandEdit`, `TestSkillGeneration`, `TestVendoredSkillRegistration`, `TestClaudeMdAndAgentsMd`, `TestOpenSpecCommands`, `TestOpenSpecSkills`, `TestRulesyncVersion`, `TestHookStubs`, `TestGenerateCheck`, `TestDeleteProtection`, `TestHandEditDetected` (CLAUDE.md, AGENTS.md, skill), `TestSourceChangeDetected`, `TestMissingFileDetected::test_missing_agents_md_fails_check` |
 | CAP-52.b | `TestUnsourcedFile` (role), `TestRoleToolsAgainstKernel::test_source_tools_are_the_kernel_role_s`, `TestRoleFieldAgreement`, `TestHandEditDetected::test_hand_edit_role_file` |
-| CAP-38.b | `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging`, `TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read` |
+| CAP-38.b | `TestSettingsAfterTheHeldOutStep`, `TestProjectWithoutAHeldOutFile`, `TestBrokenHeldOutFile`, `TestStepRepeated`, `TestHeldOutStepThroughGovCheck` (the round of DEC-635), `TestRoleToolsAgainstKernel` (the two changed-source cases), `TestRegisteredFamilyCheck`, `TestKernelAgainstAdapterSource`, `TestFindings`, `TestMissingFileDetected::test_portability_check_fails_on_missing_agents_md`, `TestToolAbsentOrHanging`, `TestRulesyncVersion::test_gov_check_is_red_when_the_version_cannot_be_read` |
 
 ## Tools the cases need
 
