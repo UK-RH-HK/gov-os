@@ -1,6 +1,6 @@
 ---
 id: DAEO-3ef2
-status: in_progress
+status: closed
 deps: [DAEO-78bn, DAEO-zsvl, DAEO-xog0, DAEO-0i6h, DAEO-skiy, DAEO-yvzh]
 links: []
 created: 2026-09-30T22:49:59Z
