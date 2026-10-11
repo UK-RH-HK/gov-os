@@ -6891,3 +6891,21 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.195 | 2026-10-11 | Delegated: DEC-647 (the close on the W1-38 merge: regression clean on both merges, refused for known reasons; the eleven cases of DEC-646 judged load; P-45 to the owner: the trailers check is red just after adoption until a first ticket is closed). Next free id: DEC-648. |
+
+## 196. Owner answers: P-45, acceptance of DEC-643 to DEC-647, and Claude Code 2.1.292 (register v0.196, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-648 — Owner answers: P-45 (a) named residual; DEC-643 to DEC-647 accepted; core-authority "decision checker could not run" on the Wave 2 list
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:**
+  - **P-45 (a):** `product-traceability-trailers` being red with "nothing is judged" right after adoption is a named residual on the Wave 2 list. Here it resolves itself once `DAEO-2lwj` and `DAEO-3ef2` are closed with the ticket tool (their commits after the trailers base carry all three trailers). No round is opened.
+  - **DEC-643 to DEC-647 accepted:** the orchestrator's delegated decisions DEC-643 (the round on P-42 and P-43 merges as built), DEC-644 (the round on W1-38 merges as built), DEC-645 (the adapter output is applied by script), DEC-646 (the close on the earlier merge refused, eleven cases failed and pass alone) and DEC-647 (the close on the W1-38 merge, regression clean, eleven cases judged load) are accepted, including DEC-645 (applying the generated output by script).
+  - **The residual that `core-authority` reads "the decision checker could not run" as green:** on the Wave 2 list, given that `human_gate` now rests on it. The check declares `enforces: [authority, human_gate]` and the decision checker's own gate findings (`GATE_NOT_AUTHORISING`, `TICKET_WAITS_ON_DEAD_GATE`) carry the `human_gate` enforcement; if the checker cannot run, those findings are absent and the check reports green for both keys.
+  - **The apply block (A3 steps 1 to 8) is done** through the operator with nothing refused or unexpected: the env names are `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`, `CLAUDE_CODE_SUBAGENT_MODEL` in the owner's user-level settings; the dry run and real run both reported "deny rules: in force 8, generated 8, lost 0, added 0" and "generated files: 44 (new 37, changed 7)"; adapter-portability returned findings `[]`, exit 0 (kernel files 29, generated files 44); commit `8bb34efe` with 45 paths (37 added, 8 modified) and trailers `Task: DAEO-gjjf`, `Role: owner`, `Implements: CAP-44.b`; Claude Code CLI 2.1.292 installed, sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`.
+
+### DEC-649 — Claude Code CLI raised to 2.1.292 (DEC-197, DEC-637)
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-197, DEC-203, DEC-637
+- **Decision:** The Claude Code CLI pin is raised to 2.1.292. The binary at `~/.local/share/claude/versions/2.1.292` has sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`. The registry entry is updated. This session runs on the new binary.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.196 | 2026-10-11 | Owner: DEC-648 (P-45 (a) named residual on the Wave 2 list; DEC-643 to DEC-647 accepted; core-authority "decision checker could not run" on the Wave 2 list; the apply block done through the operator), DEC-649 (Claude Code CLI raised to 2.1.292, registry updated). Next free id: DEC-650. |

@@ -139,13 +139,13 @@ tools:
 
   # --- Recorded by W1-48 (DAEO-0qs5): the Claude Code pin and the sandbox prerequisites, all owner installs ---
   - name: claude code
-    version: "2.1.288"
-    sha256: "0298068b686e7fdbaf9402a7a587bb7f49c0b0e084de09f69145a0719207640c"
-    install: "$HOME/.local/bin/claude install 2.1.288"
-    uninstall: "ln -sfn $HOME/.local/share/claude/versions/2.1.284 $HOME/.local/bin/claude && rm -f $HOME/.local/share/claude/versions/2.1.288"
-    date: "2026-10-03"
-    approved_by: "DEC-203"
-    note: "The CLI used for headless runs is the single-file binary ~/.local/bin/claude, a link to ~/.local/share/claude/versions/2.1.288; sha256 of that binary. The VS Code extension anthropic.claude-code bundles the same binary at version 2.1.288, under resources/native-binary/claude in its folder. Installed by the owner from the operator console, outside every agent session (DEC-203). The uninstall command goes back to the version before it. Headless workers are started with the absolute path, never a bare claude, because a Windows-side copy is later on PATH (DEC-205). Raising the pin needs a new register entry that names the new version (DEC-197)."
+    version: "2.1.292"
+    sha256: "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3"
+    install: "$HOME/.local/bin/claude install 2.1.292"
+    uninstall: "ln -sfn $HOME/.local/share/claude/versions/2.1.288 $HOME/.local/bin/claude && rm -f $HOME/.local/share/claude/versions/2.1.292"
+    date: "2026-10-11"
+    approved_by: "DEC-649"
+    note: "The CLI used for headless runs is the single-file binary ~/.local/bin/claude, a link to ~/.local/share/claude/versions/2.1.292; sha256 of that binary. Installed by the owner through the operator (DEC-637, DEC-649). The uninstall command goes back to the version before it. Headless workers are started with the absolute path, never a bare claude, because a Windows-side copy is later on PATH (DEC-205). Raising the pin needs a new register entry that names the new version (DEC-197)."
   - name: bubblewrap
     version: "0.9.0"
     sha256: "2461f1beee9cb04c8942739fe1a2b37e7b7c2a3d518f0779dc75f9245baa3094"
