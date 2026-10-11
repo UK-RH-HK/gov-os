@@ -4,37 +4,39 @@
     "preToolUse": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/pretooluse.py"
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\"",
+        "timeout": 60
       }
     ],
     "postToolUse": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/posttooluse.py"
+        "matcher": "Bash",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+        "timeout": 60
       }
     ],
-    "sessionStart": [
+    "postToolUseFailure": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/sessionstart.py"
-      }
-    ],
-    "stop": [
-      {
-        "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/stop.py"
+        "matcher": "Bash",
+        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+        "timeout": 60
       }
     ],
     "preCompact": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/precompact.py"
+        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\"",
+        "timeout": 60
       }
     ],
-    "subagentStop": [
+    "sessionStart": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 governance/kernel/hooks/subagentstop.py"
+        "matcher": "compact|clear|resume",
+        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\"",
+        "timeout": 60
       }
     ]
   }
