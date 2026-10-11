@@ -6,6 +6,8 @@ Three comparisons, each a finding when it fails or cannot be made:
    with its source's ``claudecode.tools`` (DEC-471);
 3. the generated files, byte for byte, with what rulesync generates from the sources into an empty
    temporary folder; a file of the generated folders that rulesync does not write has no source.
+   When the project has a held-out file, the held-out generator's step (``gov.guard.heldout``) is
+   applied to the generated settings before the comparison, as the apply procedure does (DEC-635).
 
 Prints ``{"findings": [...], "compared": {...}}`` and exits 0 only without findings.
 """
@@ -22,6 +24,8 @@ import tempfile
 from pathlib import Path
 
 import yaml
+
+from gov.guard import heldout
 
 REGISTRY = "governance/project/tool-registry.yaml"
 KERNEL_ROOTS = ("governance/kernel", "template/governance/kernel")  # adopted project, this repository
@@ -158,13 +162,21 @@ def _generated_findings(root: Path, binary: str) -> tuple[list[dict], int]:
     """Comparison 3: ``(findings, number of files compared)``. rulesync generates from the project's
     sources into an empty temporary folder; each file it writes there is compared byte for byte with the
     project's, and a file of the generated folders that it did not write is a file without a source.
-    Without a root rule rulesync has no source for CLAUDE.md and AGENTS.md and would not write them."""
+    Without a root rule rulesync has no source for CLAUDE.md and AGENTS.md and would not write them.
+    A project with a held-out file has the generator's Read deny rules written into the generated
+    settings first (DEC-635); a step that fails is a finding of fixed text, and nothing is compared."""
     rules = sorted((root / SOURCES / "rules").glob("*.md"))
     if not any(isinstance(front := _split(rule)[0], dict) and front.get("root") is True for rule in rules):
         return [_finding("ROOT_RULE_ABSENT", f"{SOURCES}/rules/ holds no rule marked root: true: "
                          "CLAUDE.md and AGENTS.md have no source; the generated files were not compared")], 0
     with tempfile.TemporaryDirectory() as fresh:
         code, out, err = _run(binary, *GENERATE, str((root / SOURCES).resolve()), cwd=Path(fresh))
+        if code == 0 and os.path.lexists(root / heldout.CONFIG_REL):
+            try:
+                heldout.write_read_rules(str(root), os.path.join(fresh, heldout.SETTINGS_REL))
+            except Exception as exc:  # its text may quote the held-out file: the type only
+                return [_finding("HELD_OUT_STEP_FAILED", "the held-out step could not be applied to the generated "
+                                 f"settings ({type(exc).__name__}); the generated files were not compared")], 0
         made = {str(path.relative_to(fresh)): path.read_bytes()
                 for path in sorted(Path(fresh).rglob("*")) if path.is_file()}
     if code != 0 or not made:
