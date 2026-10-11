@@ -3,4 +3,4 @@ family: "authority/role limits"
 tier: "G1"
 severity: "hard-block"
 command: "python3 -m gov.check.authority"
-enforces: [authority]
+enforces: [authority, human_gate]
