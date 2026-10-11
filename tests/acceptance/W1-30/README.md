@@ -2121,6 +2121,87 @@ cases, 411 passed, 1 failed (the rewritten case), 1 skipped. W1-01: 77 cases, 49
 
 Not run by any case: a real model, the dev tiers, a real session.
 
+## Round 16: the round on P-42 and P-43 (DEC-627, DEC-628, DEC-633, DEC-634)
+
+Support: `w1_30_r16_support.py`, beside round 15's. A project is round 15's temporary repository. The kernel's
+template ticket is placed in it as a copy of the one named file, at `governance/kernel/templates/ticket.md`, and
+the store is loaded through `gov.store.load`; what the store then holds is read with `gov.records.records`.
+"Pin" marks a case that passes before the round.
+
+### Piece 1: the authority check declares `human_gate` as well (DEC-627, DEC-613)
+
+Decided: the kernel template's declaration of `core-authority` states both keys, `authority` and `human_gate`.
+Nothing else gains a key. The gate rule the check already holds: a record that cites, under `approval`, a
+decision package that is not accepted is reported.
+
+`test_w1_30_r16_human_gate.py`:
+
+| Case | Holds | Before the round |
+|---|---|---|
+| `test_the_authority_check_is_green_where_the_cited_package_is_accepted` | the declared command and `gov check`: green where a ticket cites an ACCEPTED package of its CIT | green: the proof the declaration rests on |
+| `test_the_authority_check_is_red_and_names_the_record_that_cites_a_package_that_is_not_accepted` (4: PROPOSED, DECLINED, REVOKED, STALE) | the same project with the package not accepted: red, the ticket and the package named | green: the proof the declaration rests on |
+| `test_gov_check_reports_no_human_gate_finding_where_the_kernel_s_authority_check_is_declared` | a project with the thirteen keys at the kernel minimum and the kernel's `core-authority` declaration alone: `security` is still reported, `authority` and `human_gate` are not | red: `policy-human_gate`, RED, `POLICY_NOT_COVERED` |
+
+`test_w1_30_r15_policy_pairs.py`, rewritten (`Rewrite-Reason:` trailer): round 15 held `human_gate` to be stated
+by no check. Now nine pairs.
+
+| Case | Holds | Before the round |
+|---|---|---|
+| `test_a_ticket_that_cites_a_package_that_is_not_accepted_turns_the_authority_check_red` (new evidence case) | GREEN with the package ACCEPTED, not GREEN with it PROPOSED | green: the proof the declaration rests on |
+| `test_the_kernel_declaration_of_the_check_states_the_key_it_is_proved_to_enforce[human_gate:core-authority]` | the declaration states the key | red: it states `['authority']` |
+| `test_the_kernel_template_states_exactly_the_pairs_that_are_proved` | the proved pairs are the nine decided ones and exactly those are declared | red: `(human_gate, core-authority)` proved and not declared |
+| `test_no_policy_key_that_is_not_informational_is_left_without_a_check` (in place of "the key no check enforces is stated by none") | every hard-block or warning key of the kernel minimum is stated | red: `human_gate` |
+
+Not caught by `core-authority` for `human_gate` (the Wave 2 list, DEC-627): a decision set active without the
+owner's approval trailer; a gate never written as a package.
+
+No other case of `tests/acceptance` holds `human_gate` to be undeclared in the kernel template or
+`policy-human_gate` to be red. W1-26's `test_every_policy_key_maps_to_a_check_or_is_informational` expects
+`human_gate` among the keys owed in its own project, whose `core-authority` declaration is the one that suite
+writes (it states no key): it stands.
+
+### Piece 2: the context check measures the project's own tickets only (DEC-628)
+
+Decided: the check measures the tickets of the project's ticket folder (`.tickets/`), whatever name their type
+has, and no other record of the store. `test_w1_30_r16_context_own_tickets.py`; every project but one holds the
+template ticket, and each case first holds that the store has it as a ticket record.
+
+| Case | Holds | Before the round |
+|---|---|---|
+| `test_a_project_that_holds_the_template_ticket_and_sound_tickets_is_green` | the declared command: exit 0, `PROJ-0000` not named | red: "ERROR: PROJ-0000: ticket 'PROJ-0000' not found" |
+| `test_gov_check_reports_the_check_green_in_a_project_that_holds_the_template_ticket` | the same through `gov check`: GREEN, no finding | red: RED, the finding names `PROJ-0000` |
+| `test_a_project_ticket_with_a_missing_input_is_red_and_only_that_ticket_is_named` | red; the broken ticket named; the sound tickets and the template not named; also through `gov check` | red: `PROJ-0000` is named as failing |
+| `test_a_project_whose_only_ticket_record_is_the_template_reads_unmeasured` | not green, "unmeasured", `PROJ-0000` not named | red: `PROJ-0000` is named as an error |
+| `test_a_project_with_no_ticket_record_at_all_reads_unmeasured` | not green, "unmeasured" | pin |
+| `test_a_broken_project_ticket_is_red_and_named_whatever_its_type_is_called` (3: `task`, `ticket`, `story`) | red, the ticket named | `task`, `ticket`: pin. `story`: red, the ticket is not measured |
+| `test_a_ticket_file_the_store_does_not_hold_is_named_and_the_check_is_not_green` (3) | a file of `.tickets/` that is no record of the store is named and the check is not green: frontmatter that is no YAML; a ticket with no `type` and a missing input; a ticket with a missing input written after the load | red: the file is not looked at |
+| `test_a_record_of_a_ticket_s_type_outside_the_ticket_folder_is_not_measured` (2: `task`, `ticket`) | a record under `docs/` is not named; the project is green | red: "ticket 'PROJ-eeee' not found" |
+
+Settlement: a ticket file the check cannot measure is "named" when the output holds the file's name without
+`.md` (the ticket's id, which is also part of its path). The second and third forms of the unread file have a
+missing input on purpose: a check that reads the file itself and measures it is red on the input, a check that
+cannot read it names it; either way it is not green.
+
+W1-24's cases (`test_w1_24_family_check.py`) and round 15's (`test_w1_30_r15_context_tickets.py`) hold the
+check in projects without the template ticket and whose tickets all lie in `.tickets/`: none contradicts
+DEC-628, none is changed.
+
+### Piece 3: this repository's hooks source (DEC-634)
+
+No case of `tests/acceptance` holds this repository's own `.rulesync/hooks.jsonc` to any form, so none is
+rewritten and none is added (the lead measures the piece with the adapter check). W1-38's cases read the
+template's source (`template/.rulesync/hooks.jsonc`) or the copy of it in a temporary project built from the
+template. Round 15's `test_w1_30_r15_own_sources.py` runs the portability program in this repository with no
+rulesync, where it compares the role and skill sources with the kernel and not the hooks source.
+
+### The run of round 16
+
+`env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs -n 8`: 512 cases, 498
+passed, 14 failed, none skipped, 170 s. The 14 red are this round's, each for the reason above (piece 1: 4;
+piece 2: 10). Of the 22 cases the round adds, 13 are red and 9 are green before it (piece 1: the six of the
+proof; piece 2: the three pins); the fourteenth red is the rewritten exact-set case. W1-24's family check and
+W1-26's policy cases: 11 passed.
+
 ## Covers ids
 
 | Covers id | Tests |

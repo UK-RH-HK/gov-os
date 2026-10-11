@@ -10,8 +10,11 @@ So a pair (policy key, check) is declared by evidence, never by name. Each evide
 project that holds the one check as the kernel template declares it, shows the check GREEN there, plants one
 violation of the policy and shows the same check not GREEN (``gov check --json``, the runner's own status). The
 GREEN before the violation is part of the evidence: a check that is red whatever the project holds proves
-nothing. The pairs these cases prove are the only pairs the kernel template may state; the last two cases hold
+nothing. The pairs these cases prove are the only pairs the kernel template may state; the last cases hold
 the template to exactly that set.
+
+Round 16 (DEC-627, the owner's words: "``core-authority`` declares ``human_gate`` as well, proven by a
+planted-violation case (DEC-613)"): the set is nine pairs. Round 15 held ``human_gate`` to be stated by no check.
 
 What each policy asks is taken from the Contract capability the source map ties its key to (README, round 15,
 piece 5): the per-key text of the framework itself is not among the files a test designer may read.
@@ -104,6 +107,30 @@ def test_a_research_record_cited_as_a_ticket_s_source_turns_the_authority_check_
                   r15.ticket_text(TICKET, "W9-01").replace(f"- {support.BASE_SOURCE}", "- RES-0001"))
     after, _, run = r15.status_of(project, sandbox, "core-authority")
     _assert_turns(before, after, "authority", "core-authority", "a research record cited as a source", run)
+
+
+# --------------------------------------------------------------------------
+# human_gate: a decision package that is not accepted authorises nothing (CAP-01.c; DEC-627)
+# --------------------------------------------------------------------------
+
+GATE, GATE_CIT = "DP-0001", "CIT-0001"
+GATE_REL = f"docs/decisions/packages/{GATE}.md"
+
+
+@proves("human_gate", "core-authority")
+def test_a_ticket_that_cites_a_package_that_is_not_accepted_turns_the_authority_check_red(scratch, sandbox):
+    """Planted: the decision package a ticket cites under ``approval`` is PROPOSED, not ACCEPTED (round 16,
+    DEC-627; the same project with the package ACCEPTED is green). Not caught by this check: a decision set
+    active without the owner's approval trailer; a gate never written as a package."""
+    project = scratch()
+    project.base_source()
+    project.write(f".tickets/{TICKET}.md", r15.ticket_text(TICKET, "W9-01", approval=[GATE], cit=GATE_CIT))
+    project.write(GATE_REL, support.decisions_support.package(GATE, "ACCEPTED", GATE_CIT))
+    project.declare_as_the_kernel_does("core-authority")
+    before, _, run = r15.status_of(project, sandbox, "core-authority")
+    project.write(GATE_REL, support.decisions_support.package(GATE, "PROPOSED", GATE_CIT))
+    after, _, run = r15.status_of(project, sandbox, "core-authority")
+    _assert_turns(before, after, "human_gate", "core-authority", "a ticket cites a package that is not accepted", run)
 
 
 # --------------------------------------------------------------------------
@@ -276,8 +303,11 @@ def test_a_tracked_file_the_index_does_not_hold_turns_the_index_freshness_check_
 # --------------------------------------------------------------------------
 
 PAIRS = sorted(EVIDENCE)
-# Hard-block keys no check of the kernel template enforces: they stay red and go to the owner (DEC-613).
-NO_CHECK = ("human_gate",)
+# Round 16 (DEC-627): nine pairs. ``human_gate``, which no check stated in round 15, is stated by core-authority;
+# no key that is not informational is left without a check.
+DECIDED = [("authority", "core-authority"), ("change", "core-claims"), ("checkpoint", "fresh-agent-reconstruction"),
+           ("context", "context-reproducibility"), ("human_gate", "core-authority"), ("memory", "index-freshness"),
+           ("security", "secrets-indexing"), ("test", "core-mutation"), ("tool", "adapter-portability")]
 
 
 def _stated():
@@ -309,11 +339,18 @@ def test_every_key_a_kernel_declaration_states_is_a_policy_key():
 
 
 def test_the_kernel_template_states_exactly_the_pairs_that_are_proved():
-    """A pair declared without an evidence case, or proved and not declared, is red; and the key no check
-    enforces is stated by none. Red before the round: nothing is stated."""
+    """A pair declared without an evidence case, or proved and not declared, is red; the proved pairs are the
+    nine decided ones (DEC-627). Red before round 16: (human_gate, core-authority) is proved and not declared."""
     stated, proved = _stated(), set(PAIRS)
+    assert PAIRS == DECIDED, f"the evidence cases of this module prove {PAIRS}; decided are {DECIDED}"
     assert stated - proved == set(), \
         f"declared without a case that plants a violation and holds the check not green: {sorted(stated - proved)}"
     assert proved - stated == set(), f"proved by a case and not declared: {sorted(proved - stated)}"
-    assert not [key for key, _ in stated if key in NO_CHECK], \
-        f"a declaration states a key no check of the kernel template enforces ({NO_CHECK})"
+
+
+def test_no_policy_key_that_is_not_informational_is_left_without_a_check():
+    """Every key of the kernel minimum that is hard-block or warning is stated by a declaration of the kernel
+    template (round 16, DEC-627). Red before round 16: ``human_gate`` is stated by none."""
+    owed = {key for key, strength in r15.POLICIES.items() if strength != r15.INFORMATIONAL}
+    left = sorted(owed - {key for key, _ in _stated()})
+    assert not left, f"no declaration of the kernel template states: {left}"
