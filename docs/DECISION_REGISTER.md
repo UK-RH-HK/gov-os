@@ -6846,3 +6846,34 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.193 | 2026-10-11 | Delegated: DEC-643 (the round on P-42 and P-43: probe judged a pass, the branch merges as built at `249d67e3`; named residuals to the Wave 2 list). Next free id: DEC-644. |
+
+## 194. The round on W1-38 judged; how the adapter output is applied; the close on the earlier merge (register v0.194, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-644 — The round on `DAEO-3ef2` (the held-out step in the adapter check): the probe is judged a pass, the branch merges as built
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked) · **Basis:** the lead's return (`log/W1-38-lead-runL.json`, head `8ad901d5`, session `510489f0-473e-4313-991d-f1caa175fe3b`: the whole of `tests/` in the close's form 12,124 passed and 31 skipped; of the serial part two timing cases of W1-05 failed under the other worktree's load and passed alone), the orchestrator's own run at that head (W1-38 182 passed, the adapters' unit tests 93, the validator ALL PASS, the trailers of the five commits), the reviewer's probe at `8ad901d5` (`log/W1-38-probeL.json`, session `2f6dc4ca-08b6-4809-b699-7df67b8cbf01`) · **Under:** DEC-498, DEC-584, DEC-635, DEC-641
+- **Decision:**
+  - **The probe is a pass.** On stand-in projects: with a held-out file, "generated, then the step" is green and every deviation of the settings is red (the step never run, a rule lost, a rule the file does not give, the rule under another list or tool, another pattern form, duplicated, reordered, another byte form). Without a held-out file the check answers byte for byte as before the round. Every broken state of the held-out file (some twenty) is red, and none falls back to a comparison without the step. Nothing the check prints holds a stand-in path. The step writes only in the temporary folder. The branch merges at `8ad901d5`.
+  - **Named residuals (Wave 2 list), none a hole:** a project with a held-out file and no settings source can never be green (fail-closed); the finding on the settings does not tell an owner who forgot the step to run it; one finding code covers a broken held-out file and missing generated settings; the check judges the folder it runs in while the generator run by hand prefers `CLAUDE_PROJECT_DIR`; the pins among the cases.
+  - **Not judged by the probe, by its brief:** this repository's own settings. That is the second comparison and the owner's apply block (DEC-640).
+
+### DEC-645 — How the adapter output is applied here: by a script that does what the check does, not by generating in place
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked: it changes the form of two steps of DEC-640) · **Basis:** a measurement in a temporary folder with stand-in values (`try-regenerate-over-existing.py`): rulesync 24.0.0 generating over an existing settings file keeps an env block, keys it does not know and Read deny rules it has no source for (moved to the end of the list), and removes a hook event and an Edit rule without a source · **Under:** DEC-616, DEC-635, DEC-640
+- **Decision:**
+  - A plain `rulesync generate` in this repository would therefore leave settings that are not what the adapter check compares with (a generation into an empty folder, then the held-out step), and the check would stay red.
+  - **The owner's apply step is one script the operator runs,** `python3 docs/plan/wave-1-exit/apply_adapter_output.py` (with `--dry-run` first): it generates into an empty temporary folder, applies the held-out step there through the existing generator, and copies each generated file over the repository's. It prints file names' counts only. It replaces "rulesync generate" and "the post-generation held-out step" of DEC-640 as two hand steps; the held-out rules are still written by the generator from the held-out file, and no rulesync source names a held-out path.
+  - The env entry is not in the result (DEC-636: it moves to the owner's user-level settings first).
+  - The second comparison (`compare-adapter-second.py`, counts only) measures exactly what the script would write.
+
+### DEC-646 — The close of `DAEO-2lwj` on the merge of the round on P-42 and P-43: refused; what it measured
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11) · **Basis:** `log/close-W1-30K.json` at `2181f43b`; the eleven cases and the secrets check run alone afterwards · **Under:** DEC-536, DEC-622
+- **Decision:**
+  - The ticket stays open; its close is repeated after the owner's apply block, when the adapter check can be green.
+  - **Measured:** acceptance 512 passed; regression in parallel 11,597 passed, 11 failed, 31 skipped; the serial part 263 passed.
+  - **The eleven failed cases** (ten unit cases of the close's own test runner in `tests/unit/close/`, one W1-38 case on a key added by hand) pass alone in the main tree, with and without the dev tiers variable. During the close the orchestrator ran the W1-38 suite and a reviewer session on the same machine. **The cause is not established.** The next close runs with nothing else running; if they fail again, that is a finding before W1-42, not load.
+  - **Red checks:** `adapter-portability` (44 files, as expected); `product-traceability-trailers` (nothing to judge after the new base, reported red by the close); `secrets-indexing` ended with an error inside the close and is green run alone afterwards (the orchestrator was writing scratch files while it scanned; cause not established, same rule as the eleven cases).
+  - The trailer, containment, work-without-task and probe-gate findings are the ticket's history, as at its earlier closes, plus the adoption auditor's commit `b87ac775` read as a reviewer's commit in the ticket's range.
+  - Repair ticket `DAEO-5zs6`: not committed, kept by the orchestrator.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.194 | 2026-10-11 | Delegated: DEC-644 (the round on W1-38: probe judged a pass, merges as built at `8ad901d5`), DEC-645 (the adapter output is applied by a script that generates into an empty folder, applies the held-out step and copies), DEC-646 (the close on the earlier merge refused: eleven cases failed in the parallel part and pass alone, cause not established). Next free id: DEC-647. |
