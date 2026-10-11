@@ -6705,3 +6705,50 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.187 | 2026-10-11 | Delegated: DEC-626 (corrects DEC-624: the adoption verdict moves unchanged out of the audit-report folder, where the audit-report check read it as a report and went red; `gov check` and `gov doctor` on the adopted repository). Next free id: DEC-627. |
+
+## 188. Owner answers after the adoption: P-42, P-43, the adapter output, the exit checklist (register v0.188, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-627 — P-42: `core-authority` declares `human_gate` as well
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-42 · **Under:** DEC-613
+- **Decision:** Option (a). `core-authority` declares `human_gate` as well, proven by a planted-violation case (DEC-613). The two gaps it does not catch (a decision set active without the owner's approval trailer; a gate never written as a package) go on the Wave 2 list, with the owner-signed decisions of P-31.
+
+### DEC-628 — P-43: the context check measures the project's own tickets only; one short round for P-42 and P-43
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-43 · **Under:** DEC-584, DEC-612
+- **Decision:** Option (a). The context-reproducibility check measures the project's own tickets only, not the kernel's template ticket. One short round on a reopened `DAEO-2lwj` covers both P-42 and P-43, test designer first, with a probe.
+
+### DEC-629 — DEC-620 to DEC-626 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:** The orchestrator's delegated decisions DEC-620, DEC-621, DEC-622, DEC-623, DEC-624, DEC-625 and DEC-626 are accepted.
+
+### DEC-630 — The dev tiers variable is set by the operator; the running orchestrator session passes it explicitly
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-616
+- **Decision:** `GOV_DEV_TIERS` is set to `/home/usain/gov-os-workbench/synthetic` in the env block of the local settings file under `.claude/`, through the operator. Sessions started after it see it. The orchestrator's session started before it, so it passes `GOV_DEV_TIERS=/home/usain/gov-os-workbench/synthetic` explicitly on any command it runs itself (`gov check` included) until its next fresh session.
+
+### DEC-631 — The adapter output is not applied blind: a settings comparison first, with no deny value displayed
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-442, DEC-444, DEC-616
+- **Decision:** The adapter output (operator step 1) is not applied blind. First the orchestrator generates it into a temporary folder, as the adapter-portability check does, and reports a settings comparison without displaying any deny value:
+  - hook events, and entries per event, before and after;
+  - whether every guard hook entry keeps `"timeout": 60`;
+  - whether the held-out Read deny rule survives (count only);
+  - whether the env block keeps `CLAUDE_CODE_AUTO_COMPACT_WINDOW`;
+  - whether Stop or SubagentStop entries would become active (they must not before W1-42's step that activates them, DEC-444);
+  - any other key added or removed.
+  If anything would be lost or switched on early, the rulesync source is fixed in the round first. Then the orchestrator brings the exact operator steps for applying it, in a main-tree quiet window it announces.
+
+### DEC-632 — The exit package is consolidated into one numbered checklist of every owner step
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:** One numbered checklist of every owner step, split into "before W1-42" and "at or after W1-43", with exact commands, saved as one file whose path the owner is given. It must include: the adapter output; `lefthook install` and pushing the notes ref; the six stale state entries; the CI runner tools to approve, with checksums; the `actions/checkout` bump; the Stop and SubagentStop activation lines; the Claude Code version to re-record (the extension is at 2.1.292, the CLI at 2.1.288); the `pytest-xdist` registry checksum mismatch; the manual freeze, pause and lift check; starting the external audit.
+- **Order from here:** the round, the adapter comparison, then W1-42.
+
+### DEC-633 — The round for P-42 and P-43: how it runs
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked) · **Basis:** the code as built (`src/gov/check/authority.py` passes on the gate findings of `src/gov/decisions/checker.py`, among them `GATE_NOT_AUTHORISING` and `TICKET_WAITS_ON_DEAD_GATE`; `src/gov/context/context_check.py` selects every store record of type `ticket` or `task`) · **Under:** DEC-498, DEC-584, DEC-588, DEC-627, DEC-628, DEC-631
+- **Decision:**
+  - `DAEO-2lwj` is reopened; a worktree `~/gov-os-worktrees/W1-30` on a new branch `w1/W1-30` from `w1/integrate`. One lead run: the test designer's cases first and red, one engineer, then the reviewer's probe at the branch's final head before the merge (FULL).
+  - **Piece 1 (DEC-627):** the declaration `template/governance/kernel/checks/core-authority.yaml` states `enforces: [authority, human_gate]`. The designer's case plants a violation of the gate rule in a stand-in project (a record that cites under `approval` a decision package that is not accepted) and holds that `core-authority` goes red and that `policy-human_gate` is then no finding; the exact-set case of the first round is brought to the new set by the designer.
+  - **Piece 2 (DEC-628):** the context check measures the tickets of the project's ticket folder (`.tickets/`), whatever their type name, and no other record of the store. The designer's cases hold: a project that holds the kernel's template ticket and whose own tickets are sound is green; a project ticket with a missing input is still red and named; a project with no ticket reads unmeasured, not green.
+  - **Piece 3, only if the comparison of DEC-631 asks for it:** a correction of a rulesync source of this repository and of the template, in the same round, under the ticket's paths as widened by DEC-620. The lead is told by the orchestrator before its engineer starts, or the piece runs as the round's one further run.
+  - The ticket's paths gain nothing new; `src/gov/context/**` and the declarations are inside them since the first round.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.188 | 2026-10-11 | Owner: DEC-627 (P-42 (a): `core-authority` declares `human_gate`, by a planted-violation case; two gaps to the Wave 2 list), DEC-628 (P-43 (a): the context check measures the project's own tickets only; one short round on a reopened `DAEO-2lwj`), DEC-629 (DEC-620 to DEC-626 accepted), DEC-630 (the dev tiers variable set by the operator; the orchestrator passes it explicitly), DEC-631 (the adapter output is compared before it is applied, no deny value displayed), DEC-632 (one consolidated exit checklist). Delegated: DEC-633 (how the round runs). Next free id: DEC-634. |
