@@ -6877,3 +6877,17 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.194 | 2026-10-11 | Delegated: DEC-644 (the round on W1-38: probe judged a pass, merges as built at `8ad901d5`), DEC-645 (the adapter output is applied by a script that generates into an empty folder, applies the held-out step and copies), DEC-646 (the close on the earlier merge refused: eleven cases failed in the parallel part and pass alone, cause not established). Next free id: DEC-647. |
+
+## 195. The close on the W1-38 merge; package P-45 (register v0.195, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-647 — The close of `DAEO-3ef2` on the merge of its round: refused for known reasons, the regression is clean; the eleven cases of DEC-646 are judged load; P-45 goes to the owner
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11) · **Basis:** `log/close-W1-38L.json` at `14308ab2`, run with nothing else running on the machine · **Under:** DEC-536, DEC-584, DEC-646
+- **Decision:**
+  - **Measured:** acceptance 182 passed; regression in parallel 11,969 passed, 0 failed, 31 skipped; the serial part 263 passed. This head holds both rounds' merges, so it is the regression on both.
+  - **The eleven cases of DEC-646 are judged load:** they pass here in the same form, on a superset of the code, and the secrets check is green inside this close. Named residual (Wave 2 list): the close's own test-runner cases and the secrets scan fail when other sessions run or write on the machine during a close.
+  - **Refused for:** `adapter-portability` (44 files, until the owner's apply block); `product-traceability-trailers` (below); the ticket's history (twelve commits of its earlier rounds without `Implements:`, one containment finding of an earlier merge). The ticket stays open until after the apply block. Repair ticket `DAEO-3vt4`: not committed, kept by the orchestrator.
+  - **P-45, to the owner (DEC-584: classified before any work is opened).** `product-traceability-trailers` (hard-block) is red with "nothing is judged" whenever a project has closed tickets and a trailers base, and no closed ticket has a commit after the base (DEC-479). Every project is in that state just after adoption with imported closed tickets; the first ticket closed after adoption therefore meets a red hard-block check that only its own close could turn green. Here it resolves itself when `DAEO-2lwj` and `DAEO-3ef2` are closed with the ticket tool (their commits after the base carry all three trailers), before W1-42's clean close. No round is opened by the orchestrator.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.195 | 2026-10-11 | Delegated: DEC-647 (the close on the W1-38 merge: regression clean on both merges, refused for known reasons; the eleven cases of DEC-646 judged load; P-45 to the owner: the trailers check is red just after adoption until a first ticket is closed). Next free id: DEC-648. |
