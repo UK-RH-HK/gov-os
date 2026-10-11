@@ -15,6 +15,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "..", "src"))
 
 from gov.adapters import portability
+from gov.guard import heldout
 
 ROLE = "- **Purpose:** build one ticket.\n- **Tools:** Read, Grep and\n  Bash. No installs.\n- **Network:** none.\n"
 ROLE_SOURCE = "---\nname: engineer\nclaudecode:\n  tools: [{tools}]\n---\n\n" + ROLE
@@ -370,6 +371,84 @@ class TestGeneratedFindings:
         findings, count = portability._generated_findings(root, _binary(tmp_path, files={}))
         assert self._codes(findings) == [("RULESYNC_FAILED", None)] and count == 0
         assert "0 files written" in findings[0]["message"]
+
+
+class TestHeldOutStep:
+    """DEC-635: with a held-out file the generated settings get the generator's step before the comparison.
+    The held-out file is a stand-in naming invented paths."""
+    SETTINGS = heldout.SETTINGS_REL
+
+    @pytest.fixture()
+    def paths(self, tmp_path):
+        return [str(tmp_path / "invented" / name) for name in ("first", "second")]
+
+    @pytest.fixture()
+    def root(self, tmp_path, paths):
+        root = tmp_path / "project"
+        _write(root / ".rulesync/rules/governance.md", "---\nroot: true\n---\n\n# Rules\n")
+        _write(root / heldout.CONFIG_REL, "".join([f"{heldout.CONFIG_KEY}:\n", *(f"  - {path}\n" for path in paths)]))
+        return _generate(root)
+
+    def _codes(self, findings):
+        return [(f["code"], f.get("file")) for f in findings]
+
+    def test_generated_then_the_step_has_no_finding(self, root, tmp_path):
+        assert heldout.write_read_rules(str(root)) == 2
+        assert portability._generated_findings(root, _binary(tmp_path)) == ([], len(GENERATED))
+
+    def test_settings_without_the_step_are_a_finding_and_no_path_is_carried(self, root, tmp_path, paths):
+        findings, count = portability._generated_findings(root, _binary(tmp_path))
+        assert self._codes(findings) == [("GENERATED_DIFFERS", self.SETTINGS)] and count == len(GENERATED)
+        assert not any(path in json.dumps(findings) for path in paths)
+
+    def test_one_rule_lost_is_a_finding(self, root, tmp_path):
+        heldout.write_read_rules(str(root))
+        settings = json.loads((root / self.SETTINGS).read_text(encoding="utf-8"))
+        settings["permissions"]["deny"].pop()
+        _write(root / self.SETTINGS, json.dumps(settings, indent=2) + "\n")
+        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
+            ("GENERATED_DIFFERS", self.SETTINGS)]
+
+    def test_rules_without_a_held_out_file_are_a_finding(self, root, tmp_path):
+        heldout.write_read_rules(str(root))
+        (root / heldout.CONFIG_REL).unlink()
+        assert self._codes(portability._generated_findings(root, _binary(tmp_path))[0]) == [
+            ("GENERATED_DIFFERS", self.SETTINGS)]
+
+    def test_the_step_writes_nothing_in_the_project(self, root, tmp_path):
+        before = {path: path.read_bytes() for path in root.rglob("*") if path.is_file()}
+        portability._generated_findings(root, _binary(tmp_path))
+        assert {path: path.read_bytes() for path in root.rglob("*") if path.is_file()} == before
+
+    @pytest.mark.parametrize("text", [
+        '{key}:\n  - "{path}\n  - [\n', "not_{key}:\n  - {path}\n", "{key}: {path}\n",
+        "{key}:\n  - {path}\n  - invented/relative\n", "{key}:\n  - {path}\n{key}:\n  - {path}\n",
+    ])
+    def test_broken_held_out_file_is_one_finding_without_a_path_and_nothing_is_compared(
+            self, root, tmp_path, paths, text):
+        _write(root / heldout.CONFIG_REL, text.format(key=heldout.CONFIG_KEY, path=paths[0]))
+        findings, count = portability._generated_findings(root, _binary(tmp_path))
+        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+        assert not any(path in json.dumps(findings) for path in paths)
+
+    def test_folder_in_place_of_the_held_out_file_is_a_finding(self, root, tmp_path):
+        (root / heldout.CONFIG_REL).unlink()
+        (root / heldout.CONFIG_REL).mkdir()
+        findings, count = portability._generated_findings(root, _binary(tmp_path))
+        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+
+    def test_generation_without_settings_is_a_finding_not_a_match(self, root, tmp_path):
+        files = {rel: text for rel, text in GENERATED.items() if rel != self.SETTINGS}
+        findings, count = portability._generated_findings(root, _binary(tmp_path, files=files))
+        assert self._codes(findings) == [("HELD_OUT_STEP_FAILED", None)] and count == 0
+
+    def test_main_is_not_green_and_prints_no_path(self, project, tmp_path, paths, monkeypatch, capsys):
+        _write(project / heldout.CONFIG_REL, f"{heldout.CONFIG_KEY}: {paths[0]}\n")
+        monkeypatch.chdir(project)
+        monkeypatch.setenv("RULESYNC_BIN", _binary(tmp_path))
+        code, printed = portability.main(), capsys.readouterr()
+        assert code == 1 and [f["code"] for f in json.loads(printed.out)["findings"]] == ["HELD_OUT_STEP_FAILED"]
+        assert paths[0] not in printed.out + printed.err
 
 
 class TestMain:
