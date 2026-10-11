@@ -1,16 +1,5 @@
 {
-  "permissions": {
-    "deny": [
-      "Read(./docs/source/**)",
-      "Edit(./docs/source/**)",
-      "Edit(**/.env*)",
-      "Edit(**/*.pem)",
-      "Edit(**/*.key)",
-      "Edit(config/secrets*)",
-      "Bash(sudo:*)",
-      "Read(//home/usain/gov-os-workbench/qualification-oracle/**)"
-    ]
-  },
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "hooks": {
     "PreToolUse": [
       {
@@ -71,7 +60,16 @@
       }
     ]
   },
-  "env": {
-    "CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000"
+  "permissions": {
+    "deny": [
+      "Bash(sudo:*)",
+      "Edit(**/*.key)",
+      "Edit(**/*.pem)",
+      "Edit(**/.env*)",
+      "Edit(./docs/source/**)",
+      "Edit(config/secrets*)",
+      "Read(./docs/source/**)",
+      "Read(//home/usain/gov-os-workbench/qualification-oracle/**)"
+    ]
   }
 }

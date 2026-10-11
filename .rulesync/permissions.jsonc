@@ -1,13 +1,17 @@
 {
   "permission": {
+    "read": {
+      "./docs/source/**": "deny"
+    },
     "edit": {
-      ".tickets/**": "deny",
-      "tests/acceptance/**": "deny"
+      "./docs/source/**": "deny",
+      "**/.env*": "deny",
+      "**/*.pem": "deny",
+      "**/*.key": "deny",
+      "config/secrets*": "deny"
     },
     "bash": {
-      "npm install*": "deny",
-      "pip install*": "deny",
-      "sudo *": "deny"
+      "sudo:*": "deny"
     }
   }
 }
