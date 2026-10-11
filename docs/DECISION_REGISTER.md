@@ -6752,3 +6752,25 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.188 | 2026-10-11 | Owner: DEC-627 (P-42 (a): `core-authority` declares `human_gate`, by a planted-violation case; two gaps to the Wave 2 list), DEC-628 (P-43 (a): the context check measures the project's own tickets only; one short round on a reopened `DAEO-2lwj`), DEC-629 (DEC-620 to DEC-626 accepted), DEC-630 (the dev tiers variable set by the operator; the orchestrator passes it explicitly), DEC-631 (the adapter output is compared before it is applied, no deny value displayed), DEC-632 (one consolidated exit checklist). Delegated: DEC-633 (how the round runs). Next free id: DEC-634. |
+
+## 189. The settings comparison of DEC-631, and what the round fixes of it (register v0.189, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-634 — The generated adapter output would lose protections; the hooks source is corrected in the round; the permissions source and the env block go to the owner as P-44
+- **Status:** ACCEPTED (delegated, DEC-102; recorded by the W1 orchestrator, 2026-10-11; the owner's acceptance is asked) · **Basis:** the comparison run as DEC-631 orders (`compare-adapter.py`, output `log/compare-adapter-2.txt`: generated into a temporary folder by the adapter check's own call; names of keys and counts only, no rule, command or value printed), the registered hooks as `python3 -m gov.guard.hooks` lists them, a trial of a corrected stand-in source in a temporary folder (`try-rulesync-source.py`) · **Refines:** DEC-633 (piece 3) · **Under:** DEC-442, DEC-444, DEC-616, DEC-631
+- **What the comparison shows (before = this repository's settings, after = generated from this repository's sources):**
+  - **Hook events:** before five (PreToolUse, PostToolUse, PostToolUseFailure, PreCompact, SessionStart), one entry each; after six (the same without PostToolUseFailure, with **Stop and SubagentStop**), one entry each. Stop and SubagentStop would be switched on early.
+  - **Timeouts:** before every entry has `"timeout": 60`; after none has a timeout.
+  - **Matchers:** before PostToolUse and PostToolUseFailure are on `Bash` and SessionStart on `compact|clear|resume`; after no entry has a matcher.
+  - **Deny rules:** before 8 (Bash 1, Edit 5, Read 2); after 5 (Bash 3, Edit 2); no rule is the same text on both sides. **No Read deny rule survives:** the held-out rule and the oracle rule would be lost.
+  - **Env block:** before it holds `CLAUDE_CODE_AUTO_COMPACT_WINDOW`; after there is no env block.
+  - **Other keys:** `$schema` added; nothing else.
+  - The other 43 generated files: six role files change, 37 files are new (29 skill files, six commands, `CLAUDE.md`, `AGENTS.md`).
+- **Cause:** this repository's hooks source is an early form (it names six events, no matcher, no timeout, and the hooks at a path this repository does not have); its permissions source is the template's and was never brought to this repository's settings.
+- **Decision:**
+  - **The output is not applied as it stands.**
+  - **Piece 3 of the round (DEC-633): this repository's hooks source `.rulesync/hooks.jsonc` is corrected** so that it generates exactly the five registered entries: their events, matchers and commands as the guard's own listing gives them, each with `"timeout": 60`, and neither Stop nor SubagentStop (they are added at W1-42's activation step, DEC-444, with a new generation). The trial shows rulesync carries matchers, timeouts and the PostToolUseFailure event. The ticket's paths gain `.rulesync/hooks.jsonc`. The template's source is not changed.
+  - **To the owner as P-44, because no agent may see a deny value:** the permissions source of this repository must generate the eight live deny rules, the two Read rules among them (the trial shows rulesync generates Read deny rules from a `read` block); and the env block, which rulesync does not write, needs another home.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.189 | 2026-10-11 | Delegated: DEC-634 (the settings comparison of DEC-631: the generated output would switch on Stop and SubagentStop, drop every timeout, the matchers, PostToolUseFailure, both Read deny rules and the env block; the hooks source is corrected in the round; the permissions source and the env block to the owner as P-44). Next free id: DEC-635. |
