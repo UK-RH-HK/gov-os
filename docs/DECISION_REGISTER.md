@@ -6822,3 +6822,13 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.191 | 2026-10-11 | Delegated: DEC-641 (the post-generation held-out step and the adapter check's comparison change run as their own short round on `DAEO-3ef2` reopened, beside the round on `DAEO-2lwj`; the generator is not changed). Next free id: DEC-642. |
+
+## 192. Owner: DEC-641 accepted (register v0.192, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-642 — DEC-641 is accepted
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:** The orchestrator's delegated decision DEC-641 is accepted.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.192 | 2026-10-11 | Owner: DEC-642 (DEC-641 accepted). Next free id: DEC-643. |
