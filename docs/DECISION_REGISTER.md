@@ -6774,3 +6774,37 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.189 | 2026-10-11 | Delegated: DEC-634 (the settings comparison of DEC-631: the generated output would switch on Stop and SubagentStop, drop every timeout, the matchers, PostToolUseFailure, both Read deny rules and the env block; the hooks source is corrected in the round; the permissions source and the env block to the owner as P-44). Next free id: DEC-635. |
+
+## 190. Owner answers on P-44 and the checklist (register v0.190, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-635 — P-44, deny rules: option (d): the held-out Read deny rule is added after generation by the existing generator; every other deny rule goes into this repository's permissions source
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-44; none of (a) to (c) · **Under:** DEC-218, DEC-631, DEC-634
+- **Decision:**
+  - The held-out Read deny rule is never written into any rulesync source. After rulesync generation, it is added to the generated settings from the held-out file by the existing generator (W1-47, DEC-218), as a post-generation step. That step is part of the owner's apply procedure, and adapter-portability runs the same step inside its temporary generation, so the comparison stays exact.
+  - Every other deny rule (the secret-file Edit rules, the sudo rule, the `docs/source` rules) goes into this repository's `.rulesync/permissions.jsonc`, written by a small script the orchestrator writes and the operator runs, printing counts only. None of those rules names a held-out or oracle path.
+  - The post-generation step, and the comparison change, are built in the running round if the paths allow; otherwise as its own short round, test designer first, with a probe. The oracle's path then stays only in the held-out file and the settings file, both guarded.
+
+### DEC-636 — P-44, env block: the auto-compact entry moves to the owner's user-level settings
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Basis:** OWNER, on package P-44
+- **Decision:** `CLAUDE_CODE_AUTO_COMPACT_WINDOW` (300000) moves to the env block of the owner's user-level settings under `~/.claude/`, beside `CLAUDE_CODE_SUBAGENT_MODEL`, so every adopted repository on this machine gets it. It is brought as an operator step. "rulesync writes no env block" goes on the Wave 2 list, with a way for adopted projects on other machines to get it.
+
+### DEC-637 — Checklist A4: the Claude Code pin is raised to 2.1.292
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-197, DEC-203
+- **Decision:** The Claude Code pin is raised to 2.1.292 and the CLI is updated to match (`claude install 2.1.292`, through the operator); then its registry entry is re-recorded. It is done before W1-42's measurements, at a quiet moment the orchestrator announces.
+
+### DEC-638 — Checklist A6: the `pytest-xdist` checksum mismatch is a Wave 2 residual
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:** The `pytest-xdist` checksum mismatch that `gov doctor` reports is a Wave 2 residual, with no step now.
+
+### DEC-639 — DEC-633 and DEC-634 are accepted
+- **Status:** ACCEPTED (owner, 2026-10-11)
+- **Decision:** The orchestrator's delegated decisions DEC-633 and DEC-634 are accepted.
+
+### DEC-640 — After the round: the second comparison, then one operator block
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-631, DEC-635, DEC-636, DEC-637
+- **Decision:** After the round merges, the orchestrator runs the second settings comparison. It brings the apply steps (the operator script for the permissions source, rulesync generate, the post-generation held-out step, the env move, the CLI update) as one operator block, in a main-tree quiet window, only when the comparison shows nothing lost and nothing switched on early.
+- **Order from here:** the round, the second comparison, the owner's apply block, then W1-42.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.190 | 2026-10-11 | Owner: DEC-635 (P-44 (d): the held-out Read deny rule is added after generation by the existing generator, in the apply procedure and inside the adapter check's temporary generation; every other deny rule into this repository's permissions source by an operator-run script), DEC-636 (the auto-compact env entry moves to the owner's user-level settings; the missing env block to the Wave 2 list), DEC-637 (the Claude Code pin raised to 2.1.292), DEC-638 (the `pytest-xdist` mismatch a Wave 2 residual), DEC-639 (DEC-633 and DEC-634 accepted), DEC-640 (second comparison, then one operator block). Next free id: DEC-641. |
