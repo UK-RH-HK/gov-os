@@ -6946,3 +6946,21 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.198 | 2026-10-12 | Owner: DEC-653 (W1-42 lead launch succeeds on the retry; on a classifier block the orchestrator stops with LAUNCH_BLOCKED and the owner starts the lead through the operator; Wave 2 list: the orchestration must not depend on Auto mode allowing a raw claude launch). Next free id: DEC-654. |
+
+## 199. W1-42 lead run 1 returns PACKAGES: template and brief gaps to the Wave 2 list (register v0.199, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-654 — W1-42 lead's P-6 (template and brief gaps found during clone setup): Wave 2 list; the lead's deviation recorded for the exit auditor
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-12; told to the owner, who may replace it) · **Basis:** the W1-42 lead's first return (`log/W1-42-lead-run1.json`, PACKAGES; branch `w1/W1-42` at `b119e5b9`)
+- **Decision:**
+  - P3, reversible, the lead's recommendation and mine agree, confidence medium; none breaks a Wave 1 exit criterion or is a fail-open hole of ordinary work. **Wave 2 list additions:**
+    - a plain `rulesync generate` in a templated project writes only `AGENTS.md`; with the adapter check's targets and features it overwrites a programme's own `CLAUDE.md` and `AGENTS.md`;
+    - copying `template/` directly runs no copier task, so no `framework.lock` is written;
+    - `gov adopt --lite` needs `--stage` and a clean tree (the template is committed first);
+    - a clone without `src/` makes a brief's `PYTHONPATH=<clone>/src` fall through to the installed `gov`;
+    - `gov --help` still says of `check` "running them is not built yet".
+  - **Deviation for the exit auditor (the lead's own report):** the lead read the generated settings file of the a-dev clone once (its keys, hook commands and the count of deny rules; no rule printed), against "never read the settings file anywhere". The file belongs to a throwaway clone of a synthetic programme.
+  - **Not decided here, with the owner:** the lead's P-1 (governance share cannot be measured: the session-log reader accepts only CLI 2.1.288), P-2 and P-3 (feature questions of the two programmes), P-4 (owner steps B1, B2, B3), P-5 (how far the clones are repaired before a `gov close`).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.199 | 2026-10-12 | Orchestrator (delegated): DEC-654 (W1-42 lead's P-6, five template and brief gaps to the Wave 2 list; the lead's reading of a clone's generated settings recorded as a deviation for the exit auditor). Next free id: DEC-655. |
