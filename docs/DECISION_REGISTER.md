@@ -6964,3 +6964,58 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.199 | 2026-10-12 | Orchestrator (delegated): DEC-654 (W1-42 lead's P-6, five template and brief gaps to the Wave 2 list; the lead's reading of a clone's generated settings recorded as a deviation for the exit auditor). Next free id: DEC-655. |
+
+## 200. Owner answers to the W1-42 lead's packages P-1 to P-5 (register v0.200, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-655 — P-1: one follow-up round on W1-31; the session-log reader accepts any Claude Code version whose log format it can parse
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-086, DEC-106, DEC-649 · **Basis:** the W1-42 lead's P-1 (`log/W1-42-lead-run1.json`): `gov telemetry` refuses every session with `SESSION_LOG_VERSION`, the reader accepting only 2.1.288 while the CLI is 2.1.292
+- **Decision:** option (a), widened.
+  - One follow-up round on W1-31 (DAEO-6mk8), the test designer first, with a probe.
+  - The session-log reader accepts any Claude Code version whose log format it can parse, checked against a fresh specimen made with the current version (2.1.292 now; the extension is already at 2.1.296), and records the version it read.
+  - A log it cannot parse is "not measured" with its reason, never a guessed share.
+  - No exact-version pin.
+
+### DEC-656 — P-2: the ORION (a-dev) feature answers
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Basis:** the W1-42 lead's P-2 (specification `ORION-sp01`, 9 required rows open, gap tickets `ORION-gp01` to `gp09`)
+- **Decision:** all of the lead's recommendations are accepted:
+  - subtraction follows addition;
+  - the existing `Dimension` carries the rule;
+  - a violation raises `TypeError` naming both dimensions;
+  - the "Type rules" section of the provisional MATH-SPEC-003 is accepted;
+  - a bare number as a dimensionless operand is out of scope;
+  - row 15 (interfaces) stays as is.
+
+### DEC-657 — P-3: the ARGUS (b-dev) feature answers
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Basis:** the W1-42 lead's P-3 (specification `ARGUS-sp01`, 13 required rows open, gap tickets `ARGUS-gp01` to `gp13`)
+- **Decision:** all of the lead's recommendations are accepted:
+  - raw data and final images only;
+  - the caller states the kind from a fixed list;
+  - the 90 days count from `created_at` in 24-hour UTC days; exactly 90 days is still kept; the caller passes "now"; a missing timestamp is an error;
+  - a kind with no retention period is refused with an error;
+  - the result is one of two named values, in `pyargus/src/pyargus/core/retention.py`.
+
+### DEC-658 — P-5: both clones adopted fully where one round allows; the clean `gov close` proof on a-dev's implementation ticket; spec and audit tickets closed with `tk close`
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-511 · **Basis:** the W1-42 lead's P-5
+- **Decision:** options (a) and (c).
+  - The a-dev clone is adopted fully (stages A3 to A8), with a worker repairing its legacy decision records. The clean `gov close` proof (DEC-511) uses a-dev's implementation ticket.
+  - The b-dev clone is adopted fully as well, if that takes no more than one worker round; otherwise b-dev is reported as adopted to A2, with the reason.
+  - In both clones the spec and audit tickets are closed with `tk close`, and why is recorded.
+  - **Wave 2 list addition, ranked near the top:** "`gov close` judges a ticket by its class (a spec ticket by its closed readiness record, an audit ticket by its report), instead of requiring acceptance tests from every ticket."
+
+### DEC-659 — `gov doctor`'s exit 3 is checked against DEC-210 (drift is reported, not a failure)
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-210
+- **Decision:** the orchestrator checks whether the doctor's exit 3 comes partly from the Claude Code version drift (CLI 2.1.292, extension 2.1.296). If the doctor fails on drift, that contradicts DEC-210 and comes to the owner as a package. Otherwise the orchestrator lists what makes it unhealthy.
+
+### DEC-660 — P-4: how the owner steps B1, B2 and B3 are handed over
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-409, DEC-428, DEC-442, DEC-444
+- **Decision:**
+  - B1 and B3 come to the owner as one paste-ready operator block, in a main-tree quiet window the orchestrator announces, with what each command should print.
+  - B2 (the manual freeze, pause and lift check) comes as plain-terminal steps for the owner himself, on the `a-dev-exit` throwaway clone, with the expected output of each step. The operator cannot lift a freeze, by design (DEC-409).
+
+### DEC-661 — DEC-654 accepted
+- **Status:** ACCEPTED (owner, 2026-10-12)
+- **Decision:** the owner accepts the orchestrator's delegated DEC-654 (the lead's P-6 on the Wave 2 list; the lead's deviation recorded for the exit auditor).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.200 | 2026-10-12 | Owner: DEC-655 (P-1 (a) widened: W1-31 follow-up round with a probe, the session-log reader accepts any parsable version against a fresh specimen, records the version, no pin), DEC-656 (ORION answers), DEC-657 (ARGUS answers), DEC-658 (P-5 (a) and (c): a-dev fully adopted, b-dev if within one round, spec and audit tickets by tk close; Wave 2 list near the top: gov close judges a ticket by its class), DEC-659 (doctor exit checked against DEC-210), DEC-660 (hand-over of B1, B3 and B2), DEC-661 (DEC-654 accepted). Next free id: DEC-662. |
