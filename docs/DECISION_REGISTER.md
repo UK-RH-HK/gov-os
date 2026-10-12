@@ -6933,3 +6933,16 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.197 | 2026-10-12 | Owner: DEC-650 (lead launch permission: auto mode classifier blocks claude CLI launches, owner adds two rules to settings.local.json), DEC-651 (ratifies the two ESCALATION_BLOCKED closes of DAEO-2lwj and DAEO-3ef2 after the fact; deviation for the exit auditor; new rule: ESCALATION_BLOCKED always stops for the owner; Wave 2 list: gov close counts adoption-gap refusals toward escalation), DEC-652 (all-green gov check noted at `93bcb247`). Next free id: DEC-653. |
+
+## 198. Owner action: lead launch retried; Wave 2 item on how leads are started (register v0.198, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-653 — The W1-42 lead launch succeeds on the retry; Wave 2 item: the orchestration must not depend on Auto mode allowing a raw `claude` launch
+- **Status:** ACCEPTED (owner, 2026-10-12) · **Under:** DEC-650
+- **Decision:**
+  - **Retry:** in a fresh orchestrator session that had read the two allow rules of DEC-650, the W1-42 lead (DAEO-gjjf) was started once, as prepared: brief `briefs/W1-42-A5-run1.md`, worktree `/home/usain/gov-os-worktrees/W1-42` (branch `w1/W1-42` at `93bcb247`; `w1/integrate` at `4b18d562`), in the background, with the absolute path `~/.local/bin/claude` and its identity in `--settings`. Auto mode's classifier did not block it.
+  - **The owner's instruction for a block:** if the classifier blocks a lead launch, the orchestrator does not look for another way round it. It stops with "LAUNCH_BLOCKED"; the owner starts the lead through the operator with the orchestrator's exact command and gives it the process id; the orchestrator then follows the lead through its log file and its process.
+  - **Wave 2 list addition:** "the orchestration must not depend on Auto mode allowing a raw `claude` launch." Leads are started through the launcher (already on the Wave 2 list) or another approved mechanism.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.198 | 2026-10-12 | Owner: DEC-653 (W1-42 lead launch succeeds on the retry; on a classifier block the orchestrator stops with LAUNCH_BLOCKED and the owner starts the lead through the operator; Wave 2 list: the orchestration must not depend on Auto mode allowing a raw claude launch). Next free id: DEC-654. |
