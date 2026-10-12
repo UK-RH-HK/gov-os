@@ -7,9 +7,14 @@ rewrites are listed at the end).
 
 Run: `PATH="$HOME/.nvm/versions/node/v22.23.3/bin:$PATH" env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-31 -q -p no:cacheprovider -rs`
 
-131 cases: 27 in `test_w1_31_share_counter.py`, 51 in `test_w1_31_measured_and_estimated.py`, 19 in
-`test_w1_31_second_specimen.py`, 34 in `test_w1_31_third_specimen.py`. Support: `w1_31_support.py`,
-`conftest.py`.
+161 cases: 27 in `test_w1_31_share_counter.py`, 51 in `test_w1_31_measured_and_estimated.py`, 19 in
+`test_w1_31_second_specimen.py`, 34 in `test_w1_31_third_specimen.py`, 30 in
+`test_w1_31_fourth_specimen.py` (DEC-655). Support: `w1_31_support.py`, `conftest.py`.
+
+**DEC-655 (this version): no Claude Code version is pinned.** The reader accepts a log of any version whose
+forms it can parse, the record names the version that was read, and a log it cannot parse is "not measured"
+with its reason, never a guessed share. The forms are those of four specimens now; the fourth was written by
+Claude Code 2.1.292.
 
 **A result is measured or it is refused (DEC-449, DEC-454).** No case accepts a share, a count, a cost or a
 field that is 0, empty, a default or present when its source was absent, unreadable or of a form no
@@ -61,8 +66,13 @@ close (DEC-495). No case needs `src/gov/close/` to change.
     `test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the_case_computes`).
   - 3 (declared in `EXIT_CODES`): the record is returned (`ok: true`) and at least one of the three share
     figures is `"not measured"`.
-  - 1 with `ok: false`: a refusal. Pinned: an unknown ticket; ccusage absent; a log of another Claude Code
-    version than 2.1.288, with the version named in the error.
+  - 1 with `ok: false`: a refusal. Pinned: an unknown ticket; ccusage absent. **A log's version alone is no
+    reason to refuse it (DEC-655)**: a log of any version in the specimens' forms is measured.
+  - **A log the reader cannot parse** (a line of a type no specimen shows, a line that is not of its type's
+    form, a hook line of a form no specimen shows, no line that carries a version), at any version: the cases
+    accept the record at exit code 3 in which every source the line could belong to, the measured total, the
+    measured share and the sum say `"not measured"` and `not_measured` names each such source with its
+    reason, or a refusal whose error gives its reason. Never exit code 0, never a number, no text of the log.
   - Where the sessions' tokens could not be measured (no session named, a named session without a log, no log
     folder, a ccusage that fails or answers with something else, **ccusage's figures differing from the own
     assistant lines of the session's file and of its sub-agents' files**), the cases accept a refusal, or the
@@ -96,7 +106,7 @@ The record (`result` of the envelope) is plain data that survives the YAML front
 | `model` | a map with exactly `session_logs` (the models of the named sessions' assistant lines, their sub-agents' among them) and `commits` (one entry per commit of the ticket, `commit` and `model`: its `Co-Authored-By` line as read, `"not measured"` without one; the whole list is `"not measured"` when the commits cannot be read) |
 | `role`, `skill_versions`, `tool_versions`, `packet_id`, `retrieval_queries`, `retrieval_hits`, `files_written`, `tests`, `retries`, `handoffs`, `decisions`, `owner_interventions` | the other P1 fields: a measured value or `"not measured"`, never null or empty text |
 | `latency` | **DEC-501.** A map with exactly `harness_api_duration_ms`: the sum of the sessions' `harness_api_duration_ms`, in milliseconds; `"not measured"` when any named session has none (never 0, never the others' sum). The key names what it is: the harness's summed API duration, not a wall-clock time |
-| `agent` | **DEC-501.** A map with exactly `harness` (the string `"Claude Code"`) and `version` (the `version` of the log's lines: `"2.1.288"`, the one version the counter accepts, so one value for any number of sessions) |
+| `agent` | **DEC-501.** A map with exactly `harness` (the string `"Claude Code"`) and `version` (**DEC-655: the version that was read**, the `version` the lines of the named sessions' logs carry, whatever it is: `"2.1.292"` for a log that version wrote, `"2.1.296"`, `"2.1.288"`; never the version of a log that was not named, never a version the counter assumes). **No new key**: the place is the one DEC-501 gave it. What it holds when the named logs carry more than one version is not decided (package G, no case) |
 | `provider`, `files_read` | `"not measured"`: no specimen shows a source |
 | `learning_metrics` | a map with exactly `kpi_disputes`, `acceptance_tests_rewritten`, `governance_share` (the same map as the record's) |
 | `sandbox_system_prompt_tokens` | a line of its own, in no share figure; `"not measured"` until a measurement is recorded (its place and form are W1-42's, DEC-501); never the constant 3,250 |
@@ -132,6 +142,9 @@ the commits' roles and models (`commits`), `skill_versions`, `tests_run` and `te
 `decisions_applied`, `requirements_implemented`, `packet_hash` and `inputs`, the files written (`outputs`).
 In the counter's record the P1 fields of those names may say `"not measured"`; no case asks for more.
 
+**New or changed with DEC-655:** no key is new and none changes its shape. `agent.version` holds the version
+that was read instead of one fixed value, and the refusal by version is gone.
+
 ## What is counted, form by form (DEC-495, DEC-501, DEC-502)
 
 | Form in the log | Counted as | Case |
@@ -152,6 +165,15 @@ In the counter's record the P1 fields of those names may say `"not measured"`; n
 | The result of a Bash call in which `gov` runs beside other commands (`&&`, `;`), through a pipe or with a redirection | `gov_output`: the whole result (it over-counts); one in `gov_results_counted_whole` | `test_gov_beside_other_commands_is_counted_whole_and_the_record_says_so` (4) |
 | The lines of a sub-agent's file of a named session | with that session, by the rows above; its messages are in the session's tokens | `test_a_subagents_lines_and_tokens_belong_to_the_named_session`, `test_a_subagent_of_a_session_that_was_not_named_is_never_counted` |
 | The summary, the local command's three `user` lines after a compaction boundary (the last holds the PreCompact hook's output), prompts, answers, results of other commands | nothing | `test_the_sessionstart_packet_is_counted_each_time_it_is_given`, `test_a_command_that_only_names_gov_is_not_gov_output` |
+| **DEC-655, fourth specimen.** The result of a Bash call whose command runs `gov` behind a `cd <folder>;` or `cd <folder> &&` that the harness kept in the logged command, with or without more commands and pipes | `gov_output`: the whole result; one in `gov_results_counted_whole` (`gov` runs beside another command: the row above, DEC-501) | `test_gov_behind_a_cd_the_harness_kept_is_counted_whole` (5) |
+| **DEC-655.** The result of a Bash call behind a `cd` whose command does not run `gov` (a list, a loop over files whose paths name `gov`, a program whose arguments hold `gov status`, a commit the harness notes as `gitOperation`) | nothing, no note | `test_a_command_behind_a_cd_that_does_not_run_gov_counts_nothing` |
+| **DEC-655.** The results of Read, Grep, Write and Edit (a result block without `is_error`, a `toolUseResult` of the tool's own form), whatever their input names | nothing (the tool is not Bash: "results of other commands") | `test_tools_that_are_not_bash_count_nothing` |
+| **DEC-655.** One message with several tool calls, each result line right after its call's line | each `gov` result among them by the rows above; the message's tokens once | `test_several_calls_of_one_message_are_each_counted_and_the_message_once` |
+| **DEC-655.** An attachment line that is no hook's, of one of the fifteen types the specimens show (below), held by its type alone or with a full line's fields | nothing; the sources stay measured | `test_attachment_lines_that_are_no_hooks_count_nothing` (2) |
+| **DEC-655.** `last-prompt`, `ai-title`, `atis-latch`, `file-history-snapshot`, `file-history-delta` lines | nothing; the sources stay measured | `test_the_lines_between_turns_and_the_file_history_lines_count_nothing` |
+| **DEC-655.** The `system` line after the Stop hooks that says a hook ran without output (`hasOutput: false`, no error, no added context), with no run line before it | 0; the source stays measured (DEC-501: a successful run without added context adds nothing) | `test_a_stop_hook_that_printed_nothing_counts_zero` |
+| **DEC-655.** A totals line that names a model no assistant line carries | not a model of the record (`model.session_logs` is the assistant lines'); the latency is the line's API duration | `test_the_models_are_the_assistant_lines_whatever_the_totals_line_names` |
+| **DEC-655.** All of the fourth specimen's forms in one session, at 2.1.292 and at 2.1.296, 2.1.288 and 2.2.0; the first, second and third specimens' forms at another version | every count, the two notes, the estimate and the three share figures as numbers, exit code 0, `agent.version` the version read | `test_every_count_of_a_session_in_the_fourth_specimens_form_is_the_number_the_case_computes`, `test_the_fourth_specimens_forms_are_measured_at_any_version` (3), `test_the_earlier_specimens_forms_are_measured_at_any_version` (2), `test_a_log_of_another_claude_code_version_is_measured_and_its_version_recorded` |
 | All of the above in one session | every count, the two notes and the three share figures as numbers, exit code 0 | `test_every_count_of_a_session_in_the_second_specimens_form_is_the_number_the_case_computes`, `test_every_count_of_a_session_in_the_third_specimens_form_is_the_number_the_case_computes` |
 
 ## The session logs the cases write
@@ -275,6 +297,56 @@ block). Every finding below was read in the specimen; the fixtures write each wi
   `hook_success` line of `SubagentStop` with plain output. The `.meta.json` has S2's keys.
 - **One totals line** at the end, with two models (`totalAPIDuration` 20,350 ms).
 
+Shown by the **fourth** specimen only (S4, 165 lines, no sub-agent: a launched worker session of Claude Code
+**2.1.292**, given its brief through the SDK; 98 lines carry `version: 2.1.292`, 67 carry none). Every line
+type, every attachment type and every form of `user`, `assistant` and `system` line of it was read; the
+fixtures write each with the cases' own texts (`support.fourth_session`):
+
+- **A line type: `file-history-delta`.** The specimen holds such a line by its type, `sessionId: null` and its
+  length; its content was not kept. The other bare lines are those of the earlier specimens
+  (`queue-operation`, `last-prompt`, `ai-title`, `atis-latch`, `file-history-snapshot`).
+- **Three attachment types: `instructions`, `sandbox_instructions`, `silent_turn_reminder`**, beside twelve
+  the earlier specimens show (`environment`, `model`, `deferred_tools_delta`, `deferred_tools_record`,
+  `session_context`, `date`, `credential_org`, `remote_session_change` and the others of
+  `support.ATTACHMENTS_4_*`). All attachment lines that are no hook's are held by their type and length
+  alone, without `version`: **whether the harness's line carries a version the specimen does not show**.
+- **Hook lines of SessionStart only**: one `hook_success` whose `stdout` is the hook's JSON answer and one
+  `hook_additional_context` (S1's form). The hook's command is the kernel's, by `"$CLAUDE_PROJECT_DIR"`.
+  **No PreToolUse or PostToolUse line** although those hooks ran at every call: a hook that added nothing
+  left no line.
+- **A Stop hook that printed nothing**: only the `system` line `stop_hook_summary`, with the hook's command,
+  `hasOutput: false`, `hookErrors: []`, `preventedContinuation: false`; **no run line before it** (S2 and S3
+  show a run line with the hook's plain output).
+- **The prompt** is one `user` line whose content is one text, with `promptSource: "sdk"`, `turnOrigin` and
+  `turnPosition`; there is no `permissionMode` line of an interactive session before it.
+- **Assistant lines of the session's own file carry `advisorModel` and `effort`**, and `perTurnEffort:
+  "high"` (the earlier specimens: `perTurnEffort: null`, `effort` in a sub-agent's file only); the usage
+  holds `inference_geo: "global"`.
+- **Messages of many lines**: up to nine `tool_use` lines of one message id, with or without a `thinking`
+  and a `text` line before them, and **each call's result line right after its call's line**, before the
+  next call's line (S2 and S3: one call per message, or the calls first). A first message of one line.
+- **Tools that are not Bash: Read, Grep, Write, Edit.** Their result block has **no `is_error` key**; the
+  line's `toolUseResult` is a map of the tool's own form (`file`, `filenames`, `structuredPatch` and so on);
+  Edit's logged input holds `replace_all`, which its `wireToolInputs` entry does not. Read was used on the
+  ticket's file and on kernel skill files.
+- **`gov` behind a `cd` the harness kept**: all four `gov` commands are logged as `cd <the project's
+  folder>; …`, with other commands beside them (`;`, `&&`, `echo "exit=$?"`, another program with `PATH=…`
+  before it), three of them through a pipe. S2 showed `cd … &&` taken off by the harness; a command behind
+  a `cd` that was kept was "seen in no specimen" until now. Other commands behind the same `cd`: lists,
+  `for … do … done` loops, a commit (`toolUseResult.gitOperation` beside `stdout` and `stderr`).
+- **A hook's denial of a Bash call by its answer**, in S3's form (`is_error: true`, `PreToolUse:Bash hook
+  error: <reason>`, `toolDenialKind: "permission-rule"`).
+- **The totals line names two models**; one of them, with input tokens only, is on no assistant line.
+
+What these count is stated by the nearest decided sentence, since DEC-655 names no count:
+`file-history-delta` and the attachment lines that are no hook's are neither a hook's run or added context
+nor a tool's result, so they count nothing, like the bare lines and the prompts of the earlier specimens (the
+instruction files are DEC-507's estimate; the sandbox's instructions are the line apart of DEC-491, measured
+by W1-42); the Stop summary without a run line counts 0 (DEC-501: a successful run without added context
+adds nothing); `gov` behind a kept `cd` runs beside another command and is counted whole and noted
+(DEC-501); results of tools that are not Bash count nothing (DEC-495: `gov` output is the results of Bash
+calls). What is not settled is in packages G, H and I below.
+
 Established with ccusage 20.0.26 on logs written by the fixtures, in temporary folders: it reads the forms
 above and counts each message once; with a sub-agent's file in its place it prints **one row for the session
 that holds the sub-agent's messages** (the row names both models), and without the file the session's own
@@ -320,6 +392,8 @@ Each is `"not measured"` (or a refusal), never a number, and the reason is named
 
 | What | Case |
 |---|---|
+| **DEC-655, at any version (2.1.292, 2.1.296).** A line of a type no specimen shows; an attachment of a type no specimen shows; a `system` line of a subtype no specimen shows; a `user` line whose content is neither a text nor a list; a line that is no object; a last line cut off before its end; a hook run of a type no specimen shows; a SessionStart run line with another exit code | `test_a_log_the_reader_cannot_parse_is_not_measured_at_any_version` (10): the same session is measured without the line, with its version recorded, and with it each source the line could belong to is never a number |
+| **DEC-655.** A log in which no line carries a version (every full line of every specimen carries one) | `test_a_log_in_which_no_line_carries_a_version_is_not_measured`: the three log sources "not measured" by name and the version "not measured", or a refusal with its reason |
 | A successful run line with another exit code than 0 (`hook_success`, `exitCode` 2), of SessionStart or another event | `test_a_form_the_specimen_does_not_show_is_not_measured` (`hook_output`, `sessionstart_packet`) |
 | A hook attachment of a type no specimen shows (`hook_blocking_error`), in the session's file or in a sub-agent's | same case |
 | Added context in another form (`content` not a list of texts) | same case |
@@ -359,7 +433,7 @@ A session in the specimens' forms that holds no hook and no command was read: it
 - **A shortened result is counted as logged**: the count of a `gov` command's over-long output is that of
   the result line (about 2 KB of preview and the harness's words), which is what reached the session.
 - **Seen in no specimen, and without a case:** a line with `isSidechain: true` in the session's own file; a
-  sub-agent of a sub-agent; a `gov` command behind a leading `cd` that the harness did not take off; a denial
+  sub-agent of a sub-agent; (a `gov` command behind a leading `cd` that the harness did not take off is shown by the fourth specimen and has its case now;) a denial
   of a tool that is not Bash (package E); a `tool-results` folder in a sub-agent's folder.
 
 ## KPI lines and covers ids
@@ -379,7 +453,32 @@ A session in the specimens' forms that holds no hook and no command was read: it
 For failure 1 the counter's part is this: it never ends with exit code 0 without three share figures that are
 numbers. That `gov close` refuses on it is the W1-30 follow-up (DEC-495).
 
-## Expected red against the counter as built (commit `5f7764c7`)
+**The cases of DEC-655 by KPI line** (all in `test_w1_31_fourth_specimen.py` but the rewritten one):
+
+| Line | Cases |
+|---|---|
+| Success 1 [CAP-04.b] | every case of the file; the counts by form: `test_gov_behind_a_cd_the_harness_kept_is_counted_whole` (5), `test_a_command_behind_a_cd_that_does_not_run_gov_counts_nothing`, `test_tools_that_are_not_bash_count_nothing`, `test_several_calls_of_one_message_are_each_counted_and_the_message_once`, `test_attachment_lines_that_are_no_hooks_count_nothing` (2), `test_the_lines_between_turns_and_the_file_history_lines_count_nothing`, `test_a_stop_hook_that_printed_nothing_counts_zero` |
+| Success 2, failure 2 | `test_every_count_of_a_session_in_the_fourth_specimens_form_is_the_number_the_case_computes` (878,100 cache reads, in no share figure), `test_the_fourth_specimens_forms_are_measured_at_any_version` (3), `test_the_earlier_specimens_forms_are_measured_at_any_version` (2), `test_a_log_of_another_claude_code_version_is_measured_and_its_version_recorded` |
+| Success 3 [CAP-40.a]: the agent | the five above (`agent.version` is the version read), `test_the_models_are_the_assistant_lines_whatever_the_totals_line_names` |
+| Failure 1: a ticket closes without a share figure; DEC-449, DEC-454 | `test_a_log_the_reader_cannot_parse_is_not_measured_at_any_version` (10), `test_a_log_in_which_no_line_carries_a_version_is_not_measured` |
+
+## Expected red against the counter as built (commit `35904984`, as at this branch's head) — DEC-655
+
+**31 failed, 130 passed**, as run. The 31 are the 30 cases of `test_w1_31_fourth_specimen.py` and the one
+rewritten case; the 130 untouched cases are green. Every failure is the same assertion of a case about the
+command's answer: the case asks for the record and the command refuses with exit code 1 and the error code
+`SESSION_LOG_VERSION` ("the log of session … is not in the form of Claude Code 2.1.288"). None is a crash of
+a case or of a fixture; where a case checks its fixture against ccusage, that check comes first and passes.
+
+| Red | Why, as run |
+|---|---|
+| `test_every_count_of_a_session_in_the_fourth_specimens_form_is_the_number_the_case_computes`; `test_the_fourth_specimens_forms_are_measured_at_any_version[a later version]`, `[a later minor version]`; `test_the_earlier_specimens_forms_are_measured_at_any_version` (2); `test_a_log_of_another_claude_code_version_is_measured_and_its_version_recorded` | refused: "line 2 is of version 2.1.292" (2.1.296, 2.2.0, 2.1.999). The built counter accepts 2.1.288 only |
+| `test_the_fourth_specimens_forms_are_measured_at_any_version[the earlier specimens' version]` | refused: "line 5 names no version". At the accepted version the built counter refuses an attachment line that is no hook's and carries no version, as the specimens hold them |
+| `test_attachment_lines_that_are_no_hooks_count_nothing` (2), `test_the_lines_between_turns_and_the_file_history_lines_count_nothing` | refused by the version, 2.1.292. Tried once at 2.1.288, outside the suite: the first is refused the same way ("names no version"), the second gives a record in which `sessionstart_packet` and `hook_output` are "not measured" ("an attachment line of a type the specimens do not show"), the third one in which the three log sources are ("a log line of a type the specimens do not show": `file-history-delta`). These three stay red for a counter that only drops the pin |
+| `test_gov_behind_a_cd_the_harness_kept_is_counted_whole` (5), `test_a_command_behind_a_cd_that_does_not_run_gov_counts_nothing`, `test_tools_that_are_not_bash_count_nothing`, `test_several_calls_of_one_message_are_each_counted_and_the_message_once`, `test_a_stop_hook_that_printed_nothing_counts_zero`, `test_the_models_are_the_assistant_lines_whatever_the_totals_line_names` | refused by the version, 2.1.292, and for nothing else: tried once at 2.1.288, outside the suite, the built counter gives each of these nine the numbers the case computes |
+| `test_a_log_the_reader_cannot_parse_is_not_measured_at_any_version` (10), `test_a_log_in_which_no_line_carries_a_version_is_not_measured` | the first half of each fails: the session in the specimens' forms at 2.1.292 or 2.1.296 is refused by its version, where the case asks for the record with the version read. (The second half, the log that cannot be parsed, the built counter already answers with "not measured" or a refusal.) |
+
+### The earlier round: against commit `5f7764c7` (DEC-502, DEC-507); all of it is green now
 
 **44 failed, 87 passed**, as run. Every failure is an assertion of the case about the record or the exit
 code; none is a crash of a case or of a fixture (where a case checks its fixture against ccusage, that check
@@ -448,11 +547,43 @@ case (AD-4); the harness's totals are not used for tokens (AD-5); the KPI disput
 - **F. The instruction files of a sub-agent** (DEC-507 leaves them undecided): not in the estimate, not
   measured, **no case**.
 
+- **G. A ticket whose named logs carry more than one version** (DEC-655), in one log (the harness was
+  updated and the session resumed) or across the ticket's sessions (the first under 2.1.292, the next under
+  2.1.296). DEC-655 says the reader "records the version it read", one version; `agent.version` is one
+  text. Whether the record then names each version (and where: a new key would be public interface), the
+  last one, or says "not measured" is not decided. **No case.** Every fixture of the suite has one version
+  in the named sessions' logs.
+- **H. Attachment lines that are no hook's, and `file-history-delta`.** The specimens hold them by type and
+  length alone. Pinned by the nearest decided sentence: the fifteen types the specimens show count nothing,
+  with or without a full line's fields; a type no specimen shows makes `sessionstart_packet` and
+  `hook_output` "not measured" (the standing rule; the built counter's answer). Not shown and not pinned:
+  whether such a line of the harness carries `version`, and what a `file-history-delta` line holds. The cost
+  of the standing rule under DEC-655: four patch versions brought three new attachment types and one new
+  line type, so a later version is likely to bring a type no specimen shows, and every log of that version
+  is then "not measured" until a specimen of it is read.
+- **I. `instructions` and `sandbox_instructions` in the log.** The harness logs that it gave the instruction
+  files and the sandbox's instructions as attachment lines. Their content is not in the specimen. They
+  could one day be a measured source in place of DEC-507's estimate and beside W1-42's sandbox record; for
+  now they count nothing (DEC-507, DEC-491). Likewise a Read of a kernel skill file counts nothing (DEC-086
+  counts five sources and DEC-507 the instruction files; a skill read by a tool is in neither). **No case
+  beyond "counts nothing".**
+
 The packages are in the designer's return message in full.
 
 ## Rewrites after implementation began (commit trailer `Rewrite-Reason:`)
 
-Brought to DEC-502 and DEC-507 (this version):
+Brought to DEC-655 (this version):
+
+| Case | What changed | Decision |
+|---|---|---|
+| `test_a_log_of_another_claude_code_version_is_refused_by_its_version`, now `test_a_log_of_another_claude_code_version_is_measured_and_its_version_recorded` | it expected a refusal that names the version of a log another version than 2.1.288 wrote. Now the two named sessions' logs of the first fixture are written by 2.1.999 in the same forms, and the case expects every count as at 2.1.288, exit code 0 and `agent.version` `"2.1.999"`. Reason: the owner ordered that the reader accept any version whose log it can parse and record the version it read; no exact version is pinned | DEC-655 |
+
+It was the only case that expected the refusal of another version. No other case was changed or removed:
+`test_the_agent_is_the_harness_and_its_version` stays as it is (a log of 2.1.288 gives `"2.1.288"`). Added:
+the 30 cases of `test_w1_31_fourth_specimen.py`. In `w1_31_support.py` only additions (the fourth specimen's
+forms, a log at another version, a last line cut off); the logs of the earlier fixtures are written as before.
+
+Brought to DEC-502 and DEC-507 (the version before):
 
 | Case | What changed | Decision |
 |---|---|---|
