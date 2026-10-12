@@ -38,6 +38,20 @@
         "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\"",
         "timeout": 60
       }
+    ],
+    "stop": [
+      {
+        "type": "command",
+        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py\"",
+        "timeout": 60
+      }
+    ],
+    "subagentStop": [
+      {
+        "type": "command",
+        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py\"",
+        "timeout": 60
+      }
     ]
   }
 }
