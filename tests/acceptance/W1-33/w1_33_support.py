@@ -29,7 +29,10 @@ Nothing here imports ``src/gov`` and nothing names a held-out path.
 from __future__ import annotations
 
 import hashlib
+import os
 import re
+import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -66,9 +69,17 @@ NOT_ORCHESTRATOR = tuple(role for role in ROLES if role != ORCHESTRATOR)
 EMPTY_PROFILE_ROLES = (ENGINEER, TEST_DESIGNER, AUDITOR)   # DEC-158: launched workers with an empty allowlist
 NOT_LAUNCHED = (ORCHESTRATOR,)   # the launcher refuses it (W1-46). Owner decision, DEC-386: product-spec is launched
 
-# The research role's files, as W1-46 and the owner (DEC-312) committed them. KPI success 5: W1-33 leaves them.
+# The research role file, as W1-46 committed it. KPI success 5: W1-33 leaves it.
 RESEARCH_ROLE_FILE_SHA256 = "60f9092f37430a096eeb932907b5814661585afaf38c52a045c3d775c933e678"
-RESEARCH_AGENT_SHA256 = "259f33483263f98c1d654bf3fc6a0ded09bc4832eea61c567db66a756c7f2acb"
+# The research definition is the generated file since the owner's apply block of 2026-10-11 (DEC-665): what
+# rulesync writes from this repository's adapter source of the role. The hash of the file the owner committed by
+# hand (DEC-312) is no longer asserted.
+ADAPTER_SOURCES_REL = ".rulesync/subagents"
+TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"
+# The installed rulesync, found as the W1-38 suite finds it: ``RULESYNC_BIN``, or the path the registry's install
+# line puts it at.
+RULESYNC_BIN = Path(os.environ.get("RULESYNC_BIN", str(Path.home() / ".local/bin/rulesync")))
+RULESYNC_TIMEOUT_S = 60.0
 RESEARCH_ROSTER_ENTRY = {
     "role_file": "template/governance/kernel/roles/research.md",
     "agent": ".claude/agents/research.md",
@@ -146,6 +157,69 @@ def body(text):
             rest = text[end + 4:]
             return rest.split("\n", 1)[1] if "\n" in rest else ""
     return text
+
+
+def adapter_source_rel(role):
+    return f"{ADAPTER_SOURCES_REL}/{role}.md"
+
+
+def rulesync_version():
+    """What the installed rulesync answers to ``--version``, or None when it is not installed or does not answer."""
+    if not RULESYNC_BIN.is_file():
+        return None
+    try:
+        done = subprocess.run([str(RULESYNC_BIN), "--version"], capture_output=True, text=True, timeout=10,
+                              check=False)
+    except (subprocess.TimeoutExpired, OSError):
+        return None
+    return done.stdout.strip() if done.returncode == 0 else None
+
+
+def registered_rulesync_version(root=REPO_ROOT):
+    """The rulesync version this repository's tool registry records (DEC-127)."""
+    data = yaml.safe_load(read_committed(TOOL_REGISTRY_REL, root))
+    tools = data.get("tools") if isinstance(data, dict) else None
+    versions = [str(tool.get("version")) for tool in tools or [] if isinstance(tool, dict)
+                and tool.get("name") == "rulesync"]
+    assert len(versions) == 1, f"{TOOL_REGISTRY_REL} holds {len(versions)} rulesync entries"
+    return versions[0]
+
+
+def copy_adapter_source(project, role=RESEARCH, root=REPO_ROOT):
+    """The copy step (DEC-675): the adapter source of ``role``, that one file, from ``root`` into ``project``.
+
+    It is the only step that reads the repository, and it needs nothing but the file system: W1-28's fixture-copy
+    check finds it by its ``root`` parameter and runs it on its synthetic repository (DEC-385).
+    """
+    source = Path(root) / adapter_source_rel(role)
+    assert source.is_file(), f"{adapter_source_rel(role)} does not exist: the definition of {role} has no source"
+    target = Path(project) / adapter_source_rel(role)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+    return Path(project)
+
+
+def generate_definition(role, work):
+    """The bytes rulesync writes as the role's definition from this repository's adapter source of the role.
+
+    The generation runs in a temporary project under ``work`` that holds that one source file (the copy step
+    above) and nothing else of the repository, with a home of its own: nothing is written in the repository and
+    the user's home is not read. It takes no root parameter: what it generates from is what the copy step brought.
+    """
+    project, home = copy_adapter_source(Path(work) / "project", role), Path(work) / "home"
+    home.mkdir()
+    done = subprocess.run(
+        [str(RULESYNC_BIN), "generate", "--targets", "claudecode", "--features", "subagents"],
+        cwd=project, env={**os.environ, "HOME": str(home)}, capture_output=True, text=True,
+        timeout=RULESYNC_TIMEOUT_S, check=False,
+    )
+    assert done.returncode == 0, (
+        f"rulesync generate ended with {done.returncode} for {adapter_source_rel(role)}: "
+        f"{(done.stderr or done.stdout)[-300:]!r}"
+    )
+    generated = project / agent_rel(role)
+    assert generated.is_file(), f"rulesync wrote no {agent_rel(role)} from {adapter_source_rel(role)}"
+    return generated.read_bytes()
 
 
 def load_roster(root=REPO_ROOT):

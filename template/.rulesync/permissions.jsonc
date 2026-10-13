@@ -1,8 +1,7 @@
 {
   "permission": {
     "edit": {
-      ".tickets/**": "deny",
-      "tests/acceptance/**": "deny"
+      ".tickets/**": "deny"
     },
     "bash": {
       "npm install*": "deny",

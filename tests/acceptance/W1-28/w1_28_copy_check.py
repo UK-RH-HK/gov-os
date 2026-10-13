@@ -50,6 +50,8 @@ SYNTHETIC_FILES = {
     "src/gov/w1_28_marker.py": MARKER,
     "template/governance/kernel/hooks/w1_28_marker.py": MARKER,
     "governance/project/w1_28_marker.yaml": "marker: true\n",
+    # The place of the adapter source of the research definition, which W1-33's copy step reads (DEC-675).
+    ".rulesync/subagents/research.md": MARKER,
 }
 
 _UNWRAPPED = {"str", "Path", "fspath", "realpath", "abspath", "resolve"}
