@@ -16,8 +16,31 @@ KNOWN_ROLES = frozenset({
     "research",  # DEC-163: held to its ticket's allowed_paths, like engineer
     "ticket-lead",  # DEC-434: may write only scratch/checkpoint; no path patterns
 })
-WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit"})
+WRITE_TOOLS = frozenset({"Edit", "Write", "NotebookEdit",
+                         "MultiEdit"})  # DEC-685: judged exactly like Edit
 READ_TOOLS = frozenset({"Read", "Grep", "Glob"})
+# DEC-685: the tools let through without a path judgement, each with its
+# reason.  With the read tools, the write tools and Bash these are the tools
+# the guard knows: every other name is refused, compared as it was sent.
+LISTED_TOOLS = {
+    "Agent": "starts a subagent; writes no file and runs no command itself, and every call of the subagent reaches the guard on its own",
+    "Task": "the earlier name of the same subagent tool",
+    "Skill": "loads a skill's instructions into the session; writes no file, runs no command",
+    "ToolSearch": "returns the definitions of tools; writes no file, runs no command",
+    "WebFetch": "fetches a web page; writes no file of the project, runs no command",
+    "WebSearch": "searches the web; writes no file of the project, runs no command",
+    "ListAgents": "lists the session's agents; reads and writes no file",
+    "SendMessage": "sends a message to an agent, whose own calls reach the guard",
+    "TaskStop": "stops a background task of the session; writes no file, runs no command",
+    "TodoWrite": "keeps the session's to-do list, which the harness holds; no file of the project",
+    "TaskCreate": "adds to the session's task list, which the harness holds; no file of the project",
+    "TaskUpdate": "changes the session's task list, which the harness holds; no file of the project",
+    "TaskList": "reads the session's task list, which the harness holds; no file of the project",
+    "TaskGet": "reads one task of the session's task list, which the harness holds; no file of the project",
+    "AskUserQuestion": "asks the user a question; writes no file, runs no command",
+    "EnterPlanMode": "switches the session's plan mode on; writes no file of the project, runs no command",
+    "ExitPlanMode": "switches the session's plan mode off; writes no file of the project, runs no command",
+}
 FREEZE_FLAG = ".gov-runtime/freeze"
 FREEZE_MARKER = b"FROZEN"  # DEC-402: the word of a real flag's marker line
 _FREEZE_HEAD = 65536       # the most that is read of a flag
@@ -764,7 +787,8 @@ LONG_PATH_REFUSAL = ("a path or a glob of the call is longer than the guard "
 # The fields of a file tool's call that are resolved as a path or a glob.
 _PATH_FIELDS = {"Read": ("file_path",), "Grep": ("path", "glob"),
                 "Glob": ("path", "pattern"), "Write": ("file_path",),
-                "Edit": ("file_path",), "NotebookEdit": ("notebook_path",)}
+                "Edit": ("file_path",), "MultiEdit": ("file_path",),
+                "NotebookEdit": ("notebook_path",)}
 
 
 def _long_path(tool_name, tool_input: dict) -> bool:
@@ -835,7 +859,7 @@ def decide(
     if refusal:
         return "deny", refusal
 
-    if tool_name in READ_TOOLS:
+    if tool_name in READ_TOOLS or tool_name in LISTED_TOOLS:
         return "allow", ""
 
     # Collect write targets.
@@ -857,7 +881,9 @@ def decide(
             return "allow", ""
         write_targets = [ap]
     else:
-        return "allow", ""
+        # DEC-685: default-deny, for every role, frozen or not.
+        return "deny", (f"the tool '{tool_name}' is not known to the guard: "
+                        "refused to every role (DEC-685)")
 
     # Frozen: deny all writes.
     if frozen:

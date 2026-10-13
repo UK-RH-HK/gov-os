@@ -59,7 +59,7 @@ def _calls(project, text):
     return [
         ("Write", {"file_path": str(project / "docs" / "notes.md"), "content": text}),
         ("Edit", {"file_path": str(project / "docs" / "notes.md"), "old_string": text, "new_string": "x"}),
-        ("mcp__notes__add", {"note": {"body": ["a first note", text]}}),
+        ("TodoWrite", {"note": {"body": ["a first note", text]}}),
         ("Bash", {"command": "cat " + text}),
     ]
 
@@ -133,8 +133,8 @@ def test_a_system_that_reports_no_limit_gives_the_guard_s_own(world, monkeypatch
     monkeypatch.setattr(os, "pathconf", pathconf)
     assert heldout._path_limit() == MOST_PATH
     at, over = (_padded(f"{link.parent}/", n) for n in (MOST_PATH, MOST_PATH + 1))
-    assert _decide(project, "mcp__notes__add", {"note": at}) == ("deny", HELD_OUT)
-    assert _decide(project, "mcp__notes__add", {"note": over}) == ("allow", "")
+    assert _decide(project, "TodoWrite", {"note": at}) == ("deny", HELD_OUT)
+    assert _decide(project, "TodoWrite", {"note": over}) == ("allow", "")
 
 
 def test_the_limit_is_the_system_s_and_is_asked_once_for_a_decision(world, monkeypatch):
@@ -142,7 +142,7 @@ def test_the_limit_is_the_system_s_and_is_asked_once_for_a_decision(world, monke
     asked = []
     monkeypatch.setattr(os, "pathconf", lambda path, name: asked.append(name) or 64)
     call = {"notes": ["docs/a", "docs/b", f"{link}/answers.md".rjust(65, "/")], "more": "docs/c"}
-    assert _decide(project, "mcp__notes__add", call) == ("allow", "")
+    assert _decide(project, "TodoWrite", call) == ("allow", "")
     assert asked == ["PC_PATH_MAX"]
 
 

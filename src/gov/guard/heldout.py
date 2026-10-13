@@ -19,7 +19,7 @@ from gov.guard.decide import MOST_PATH, _expand_token
 CONFIG_REL = "governance/project/held-out.yaml"
 CONFIG_KEY = "held_out_paths"
 SETTINGS_REL = ".claude/settings.json"
-_EDIT_TOOLS = frozenset({"Write", "Edit"})
+_EDIT_TOOLS = frozenset({"Write", "Edit", "MultiEdit"})
 
 
 class HeldOutError(Exception):
