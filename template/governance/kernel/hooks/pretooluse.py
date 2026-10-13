@@ -204,7 +204,7 @@ def _note_tool_call(project_root: str, data: dict) -> None:
 def _note_write_tool(project_root: str) -> None:
     """Increment the sequence counter for a write-tool call (DEC-124).
 
-    When a Write/Edit/NotebookEdit is allowed, the seq counter
+    When a Write/Edit/NotebookEdit/MultiEdit is allowed, the seq counter
     advances so that any running Bash call's check sees overlap and
     does not revert the write-tool's work.
     """
@@ -335,7 +335,7 @@ def main() -> None:
                 _record()
                 _take_snapshot(project_root, data, flag)
                 _allow()
-        elif tool_name in ("Write", "Edit", "NotebookEdit"):
+        elif tool_name in ("Write", "Edit", "NotebookEdit", "MultiEdit"):
             _record()
             _note_write_tool(project_root)
             _allow()
