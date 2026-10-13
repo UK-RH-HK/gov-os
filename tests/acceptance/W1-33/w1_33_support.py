@@ -185,18 +185,29 @@ def registered_rulesync_version(root=REPO_ROOT):
     return versions[0]
 
 
-def generate_definition(role, work, root=REPO_ROOT):
-    """The bytes rulesync writes as the role's definition from this repository's adapter source of the role.
+def copy_adapter_source(project, role=RESEARCH, root=REPO_ROOT):
+    """The copy step (DEC-675): the adapter source of ``role``, that one file, from ``root`` into ``project``.
 
-    The generation runs in a temporary project under ``work`` that holds that one source file and nothing else of
-    the repository, with a home of its own: nothing is written in the repository and the user's home is not read.
+    It is the only step that reads the repository, and it needs nothing but the file system: W1-28's fixture-copy
+    check finds it by its ``root`` parameter and runs it on its synthetic repository (DEC-385).
     """
     source = Path(root) / adapter_source_rel(role)
     assert source.is_file(), f"{adapter_source_rel(role)} does not exist: the definition of {role} has no source"
-    project, home = Path(work) / "project", Path(work) / "home"
-    (project / ADAPTER_SOURCES_REL).mkdir(parents=True)
+    target = Path(project) / adapter_source_rel(role)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+    return Path(project)
+
+
+def generate_definition(role, work):
+    """The bytes rulesync writes as the role's definition from this repository's adapter source of the role.
+
+    The generation runs in a temporary project under ``work`` that holds that one source file (the copy step
+    above) and nothing else of the repository, with a home of its own: nothing is written in the repository and
+    the user's home is not read. It takes no root parameter: what it generates from is what the copy step brought.
+    """
+    project, home = copy_adapter_source(Path(work) / "project", role), Path(work) / "home"
     home.mkdir()
-    shutil.copyfile(source, project / adapter_source_rel(role))
     done = subprocess.run(
         [str(RULESYNC_BIN), "generate", "--targets", "claudecode", "--features", "subagents"],
         cwd=project, env={**os.environ, "HOME": str(home)}, capture_output=True, text=True,

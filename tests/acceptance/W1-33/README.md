@@ -72,8 +72,11 @@ reopened). No case was added or removed: the suite holds 113 cases before and af
 Reason: the owner's apply block of 2026-10-11 (commit `8bb34efe`) applied this repository's generated adapter output,
 which replaced the hand-committed definition; the case was red on the integration branch from then on.
 
-How it compares: a temporary project under pytest's `tmp_path` receives that one source file and nothing else of the
-repository; `rulesync generate --targets claudecode --features subagents` runs there with a home of its own; the
+How it compares, in two steps (DEC-675). The copy step, `copy_adapter_source(project, role, root=REPO_ROOT)`, puts
+that one source file and nothing else of the repository into a temporary project under pytest's `tmp_path`; it is
+the step W1-28's fixture-copy check finds and runs on its synthetic repository (DEC-385), and it needs nothing but
+the file system. The generation step, `generate_definition(role, work)`, takes no root parameter: it calls the copy
+step and then `rulesync generate --targets claudecode --features subagents` runs there with a home of its own; the
 file it writes is compared with the committed one. Nothing is written in the repository and the user's home is not
 read. rulesync is found as the W1-38 suite finds it: `RULESYNC_BIN`, or `~/.local/bin/rulesync` (the registry's
 install line). Without it the case is skipped with that reason: "not compared", not a pass. The version it answers

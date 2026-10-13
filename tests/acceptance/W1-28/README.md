@@ -236,8 +236,10 @@ W1-18 (file names only).
 - *By running.* Every module-level function under `tests/acceptance/` that has a parameter with the default
   `REPO_ROOT` and makes a copy call is run with a synthetic repository as its root: a temporary git repository with a
   made-up `governance/project/held-out.yaml`, once tracked and once untracked. No file of that path may be under what
-  the fixture produced. Today that is five fixtures; a later suite's fixture of the same form is run without a
-  change here.
+  the fixture produced. Today that is six: the five fixtures of the earlier suites and W1-33's copy step
+  `copy_adapter_source`, which copies one named file, the adapter source of the research definition. For it the
+  synthetic repository holds one more made-up file at that place, `.rulesync/subagents/research.md`, with the
+  marker text (DEC-675). A later suite's fixture of the same form is run without a change here.
 - *By reading.* A function that copies the whole tree (an unlimited `git ls-files`, a walk or `rglob` of the root
   with a copy call; `copytree`, `git clone`, `git archive`, `git worktree add`, `cp -r`, `rsync`, `tar` given the
   bare root) and takes no root parameter fails the check: it cannot be run on a synthetic root.
