@@ -1,5 +1,5 @@
 """The governance share of a ticket (W1-31; DEC-086, DEC-106, DEC-170, DEC-491, DEC-495, DEC-501, DEC-502,
-DEC-507).
+DEC-507, DEC-655).
 
 ``measure(root, ticket, sessions)`` returns the record ``gov telemetry`` prints, and writes nothing.
 
@@ -271,6 +271,7 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
     shares = {"measured": share(counted["total"], denominator), "estimated": share(estimate["total"], denominator),
               "total": share(_total((counted["total"], estimate["total"])), denominator)}
     commits = _commits(root, ticket)
+    versions = list(dict.fromkeys(version for log in logs for version in log["versions"] or [None]))
     profile = str(front.get("profile")).upper()
     return {
         "ticket": ticket,
@@ -291,8 +292,9 @@ def measure(root: Path, ticket: str, sessions: list[str]) -> dict:
                       for commit, trailers in commits]},
         **dict.fromkeys(UNDECIDED, NOT_MEASURED),
         "latency": {API_DURATION: _total(entry[API_DURATION] for entry in entries)},
-        "agent": {"harness": HARNESS,  # every log read is of this version, or the counter refused
-                  "version": sessionlog.VERSION if all(log["versioned"] for log in logs) else NOT_MEASURED},
+        # DEC-655: the version that was read. Not decided (package G): logs that carry more than one version,
+        # in one log or across the sessions. None is picked: the version is then "not measured".
+        "agent": {"harness": HARNESS, "version": versions[0] if len(versions) == 1 else NOT_MEASURED},
         "learning_metrics": {"kpi_disputes": _disputes(root, ticket),
                              "acceptance_tests_rewritten": NOT_MEASURED if commits is None else _rewrites(commits),
                              "governance_share": dict(shares)},

@@ -184,18 +184,20 @@ def test_a_form_the_specimen_does_not_show_is_not_measured(project, sandbox, log
         assert named in reason, f"the reason does not name {named}: {reason!r}"
 
 
-def test_a_log_of_another_claude_code_version_is_refused_by_its_version(project, sandbox, logs, ccusage):
-    """The log form is the specimen's (Claude Code 2.1.288) and nothing else. A session whose log another
-    version wrote is refused, the refusal says which version, and no figure is given for the ticket."""
-    first, second, other = support.full_logs()
-    second.version = "2.1.999"
-    for line in second.lines:
-        line["version"] = "2.1.999"
-    for log in (first, second, other):
-        log.write(logs)
-    run = support.run_telemetry(project, sandbox, logs, SESSION_A, SESSION_B)
-    error = support.refusal(run)
-    assert "2.1.999" in json.dumps(error), f"the refusal does not say which version the log is from: {error}"
+def test_a_log_of_another_claude_code_version_is_measured_and_its_version_recorded(project, sandbox, logs,
+                                                                                     ccusage):
+    """DEC-655: no version is pinned. The ticket of the first fixture, its sessions' logs written by another
+    version of Claude Code in the same forms: every count is the number it is at the specimens' version,
+    the exit code is 0, and the record names the version that was read. The version alone refuses no log."""
+    expected = support.full_fixture(project, logs, change=lambda first, second: (first.at("2.1.999"),
+                                                                               second.at("2.1.999")))
+    run = support.run_telemetry(project, sandbox, logs, *support.ROLED)
+    result = support.record(run)
+    assert result["governance_tokens"] == {**expected["counts"], "total": sum(expected["counts"].values())}, \
+        f"each source is the number the case computes: {expected['counts']}\n{run.describe()}"
+    assert run.returncode == EXIT_OK and result["not_measured"] == [], run.describe()
+    assert support.agent(result) == "2.1.999", \
+        f"the record names the version that was read: {result['agent']!r}"
     assert support.MARK not in printed(run), f"text of the log is printed\n{run.describe()}"
 
 

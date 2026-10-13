@@ -21,7 +21,7 @@ from gov.telemetry import command, counter, sessionlog  # noqa: E402
 from gov.telemetry.counter import NOT_MEASURED  # noqa: E402
 
 TICKET, SESSION = "PROJ-aaaa", "11111111-1111-4111-8111-111111111111"
-FULL = {"isSidechain": False, "sessionId": SESSION, "version": sessionlog.VERSION}
+FULL = {"isSidechain": False, "sessionId": SESSION, "version": "2.1.288"}
 SECRET = "SECRET-TEXT"  # in every text of a log line: it may reach no reason and no refusal
 PACKET, ADDED, OUTPUT = SECRET + " packet.", SECRET + " added by a hook", SECRET + " output of gov..."
 
@@ -145,7 +145,7 @@ def test_a_log_in_the_specimens_form_is_counted_each_message_once(tmp_path):
     log = read(tmp_path, specimen_form())
     assert log["usage"] == (20, 40, 60, 80) and log["models"] == ["claude-opus-5-5"] and log["missing"] == {}
     assert log["counts"] == {"sessionstart_packet": 5, "hook_output": 7, "gov_output": 7}
-    assert log["notes"] == dict.fromkeys(sessionlog.NOTES, 0) and log["versioned"]
+    assert log["notes"] == dict.fromkeys(sessionlog.NOTES, 0) and log["versions"] == ["2.1.288"]
     assert log["duration"] is None, "its totals line names no API duration"
 
 
@@ -272,14 +272,42 @@ def test_a_subagents_file_in_another_form_or_a_folder_nobody_read_refuses(tmp_pa
         remove.rmdir() if remove.is_dir() else remove.unlink()
 
 
-@pytest.mark.parametrize("version, named", [("2.1.999", "2.1.999"), (SECRET, "names no version"), (None, "no version")])
-def test_a_log_of_another_version_is_refused_and_only_a_version_is_named(tmp_path, version, named):
+@pytest.mark.parametrize("version", [SECRET, None])
+def test_a_full_line_that_names_no_version_is_refused_and_no_text_of_it_is_named(tmp_path, version):
     lines = specimen_form()
     lines[2] = {**lines[2], "version": version}
     with pytest.raises(GovError) as refusal:
         read(tmp_path, lines)
-    assert refusal.value.code == "SESSION_LOG_VERSION"
-    assert named in refusal.value.message and SECRET not in refusal.value.message + json.dumps(refusal.value.details)
+    assert refusal.value.code == "SESSION_LOG_VERSION" and "names no version" in refusal.value.message
+    assert SECRET not in refusal.value.message + json.dumps(refusal.value.details)
+
+
+def test_a_log_of_any_version_in_the_specimens_forms_is_read_with_the_versions_its_lines_carry(tmp_path):
+    """DEC-655: no version is pinned. The fourth specimen's line type and attachment types are passed over."""
+    fourth = [{"type": "file-history-delta", "sessionId": None},
+              *({"type": "attachment", "sessionId": SESSION, "attachment": {"type": kind}}
+                for kind in ("instructions", "sandbox_instructions", "silent_turn_reminder"))]
+    later = [{**line, "version": "2.1.292"} if "version" in line else line for line in specimen_form()]
+    log = read(tmp_path, later + fourth)
+    assert log["versions"] == ["2.1.292"] and log["missing"] == {}
+    assert log["counts"] == {"sessionstart_packet": 5, "hook_output": 7, "gov_output": 7}
+    mixed = read(tmp_path, later + specimen_form()[3:4])
+    assert mixed["versions"] == ["2.1.292", "2.1.288"] and mixed["missing"] == {}, "each version read, none picked"
+    bare = read(tmp_path, [{"type": "queue-operation", "sessionId": SESSION}])
+    assert bare["versions"] == [] and list(bare["missing"]) == list(sessionlog.LOG_SOURCES), "no version was read"
+
+
+def test_the_record_names_one_version_only_when_every_named_log_carries_that_one(project):
+    """Not decided (package G): more than one version, in one log or across the sessions. None is picked."""
+    other = "22222222-2222-4222-8222-222222222222"
+    lines = [{**line, "sessionId": other, **({"version": "2.1.292"} if "version" in line else {})}
+             for line in specimen_form()]
+    dump(project.parent / "config" / "projects" / "-work-project" / f"{other}.jsonl", lines)
+    report(project, row(), row(sessionId=other))
+    for sessions, version in (([other], "2.1.292"), ([SESSION, other], NOT_MEASURED)):
+        record, _code = command.run(project, argparse.Namespace(ticket=TICKET, ticket_session=sessions), {})
+        assert record["agent"] == {"harness": "Claude Code", "version": version}
+        assert record["governance_tokens"]["gov_output"] == 7 * len(sessions), "the counts stay measured"
 
 
 def test_the_record_of_a_bare_project_and_the_commands_exit_code(project):

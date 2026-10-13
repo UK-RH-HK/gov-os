@@ -1,9 +1,11 @@
 """What the counter reads from the harness's session log of one session (W1-31, DEC-495, DEC-501, DEC-502).
 
-The forms are those of the three specimens, written by Claude Code 2.1.288, and nothing else: a log of another
-version is refused, and whatever a log holds that no specimen shows makes the source it concerns
-"not measured", with the reason named. A sub-agent's file belongs to the session (DEC-501). **Counts only,
-never content**: no text of a log line reaches a count's reason or a refusal, the Claude Code version excepted.
+The forms are those of the four specimens (three written by Claude Code 2.1.288, the fourth by 2.1.292) and
+nothing else. No version is pinned (DEC-655): a log of any version in these forms is read, and the versions
+its lines carry are returned. Whatever a log holds that no specimen shows makes the source it concerns
+"not measured", with the reason named, at any version. A sub-agent's file belongs to the session (DEC-501).
+**Counts only, never content**: no text of a log line reaches a count's reason or a refusal, the Claude Code
+version excepted.
 """
 
 from __future__ import annotations
@@ -17,19 +19,21 @@ from pathlib import Path
 from gov.cli.errors import GovError
 from gov.context import _tokens
 
-VERSION = "2.1.288"
+VERSION = re.compile(r"\d+(\.\d+){1,3}")  # what a line's version looks like: nothing else of a line is given out
 LOG_SOURCES = PACKET, HOOKS, GOV = ("sessionstart_packet", "hook_output", "gov_output")
 # DEC-501: what was counted although it over-counts. Counts of texts, beside the counts of tokens.
 NOTES = LARGER, WHOLE = ("larger_reading_hook_texts", "gov_results_counted_whole")
 LINE_TYPES = frozenset({"queue-operation", "attachment", "user", "assistant", "file-history-snapshot", "atis-latch",
-                        "last-prompt", "ai-title", "cost-state", "system", "mode"})
+                        "last-prompt", "ai-title", "cost-state", "system", "mode",
+                        "file-history-delta"})  # the last one is the fourth specimen's
 FULL = ("attachment", "user", "assistant", "system")  # the lines that carry the version and the side-chain mark
 SYSTEM = ("stop_hook_summary", "compact_boundary")
 # The specimens' attachment lines that are no hook's: passed over.
 ATTACHMENTS = frozenset({"environment", "model", "deferred_tools_delta", "agent_listing_delta", "skill_listing",
                          "total_tokens_reminder", "session_context", "date", "credential_org",
                          "remote_session_change", "prompt_snapshot", "mcp_instructions_delta",
-                         "deferred_tools_record"})
+                         "deferred_tools_record",
+                         "instructions", "sandbox_instructions", "silent_turn_reminder"})  # the fourth specimen's
 HOOK_LINES = ("hook_success", "hook_additional_context", "hook_non_blocking_error")
 # How the result of a call begins that a PreToolUse hook blocked or denied by its answer (DEC-501, DEC-502).
 HOOK_DENIAL = re.compile(r"PreToolUse:\w+ hook error: ")
@@ -83,7 +87,7 @@ def subagent_files(path: Path, session: str) -> list:
     if names is None or not SESSION_FOLDER.issuperset(held) or not all(SUBAGENT_FILE.fullmatch(name)
                                                                        for name in names):
         raise GovError("SESSION_LOG_FORM", f"the folder of session {session} holds something else than its "
-                       f"sub-agents' logs as Claude Code {VERSION} keeps them: the session was not measured",
+                       "sub-agents' logs as the specimens show them: the session was not measured",
                        {"session": session})
     return [folder / SUBAGENTS / name for name in names if name.endswith(".jsonl")]
 
@@ -129,10 +133,12 @@ def read(path: Path, session: str) -> dict:
     ``models`` (those lines' models), ``counts`` (the tokens of the three log sources), ``notes`` (how many
     texts were counted by the larger reading, how many ``gov`` results whole), ``missing`` (``{source:
     [reasons]}`` for a source that is not measured, whose count is then void), ``duration`` (``totalAPIDuration``
-    of the last totals line of the session's own file; None without one) and ``versioned`` (whether a line
-    named the version). Refuses a log it cannot read, of another version, or whose lines are of another form."""
+    of the last totals line of the session's own file; None without one) and ``versions`` (the Claude Code
+    versions the lines carry, each once, in the order read; DEC-655: none is refused). A log none of whose
+    lines carries a version has its three sources "not measured". Refuses a log it cannot read, with a full
+    line that names no version, or whose lines are of another form."""
     def refuse(what, code="SESSION_LOG_FORM"):
-        raise GovError(code, f"the log of session {session} is not in the form of Claude Code {VERSION} "
+        raise GovError(code, f"the log of session {session} is not in a form the specimens show "
                        f"({what}): the session was not measured", {"session": session})
 
     missing: dict[str, list] = {}
@@ -143,7 +149,7 @@ def read(path: Path, session: str) -> dict:
                 missing[source].append(reason)
 
     usage, models, counts, notes = {}, [], dict.fromkeys(LOG_SOURCES, 0), dict.fromkeys(NOTES, 0)
-    duration, versioned = None, False
+    duration, versions = None, []
     start = set()  # what the SessionStart hook lines that follow one another gave: plain output, added context
 
     def hook(attachment):
@@ -214,11 +220,10 @@ def read(path: Path, session: str) -> dict:
                 refuse(f"{where} {number} is of another session")
             if "version" in line or full:
                 version = line.get("version")
-                if version != VERSION:
-                    named = version if isinstance(version, str) and re.fullmatch(r"\d+(\.\d+){1,3}", version) else None
-                    refuse(f"{where} {number} is of version {named}" if named else f"{where} {number} names no version",
-                           "SESSION_LOG_VERSION")
-                versioned = True
+                if not isinstance(version, str) or not VERSION.fullmatch(version):
+                    refuse(f"{where} {number} names no version", "SESSION_LOG_VERSION")
+                if version not in versions:
+                    versions.append(version)
             if full and line.get("isSidechain") is not side:  # the session's own lines are not, a sub-agent's are
                 not_measured(LOG_SOURCES, "a line whose side-chain mark is not the one of its file")
             if kind not in LINE_TYPES:
@@ -309,6 +314,8 @@ def read(path: Path, session: str) -> dict:
             not_measured((HOOKS,), "the feedback of a blocking Stop hook without the line the specimen shows after it")
         if not side and type(totals) is int and totals >= 0:
             duration = totals
+    if not versions:  # every full line of every specimen carries one: there is no version to record
+        not_measured(LOG_SOURCES, "a log none of whose lines names a Claude Code version")
     return {"usage": tuple(sum(each[at] for each in usage.values()) for at in range(len(USAGE))),
             "models": models, "counts": counts, "notes": notes, "missing": missing, "duration": duration,
-            "versioned": versioned}
+            "versions": versions}
