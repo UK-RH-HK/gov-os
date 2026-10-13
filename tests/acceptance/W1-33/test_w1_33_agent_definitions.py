@@ -90,10 +90,28 @@ def test_there_is_one_definition_per_role_and_the_research_one():
     assert all(len(paths) == 1 for paths in found.values()), f"a subagent type name is defined twice: {found}"
 
 
-def test_the_research_definition_is_unchanged():
-    """Green before implementation; it must stay green (DEC-163, DEC-312)."""
-    assert support.sha256(support.agent_rel(support.RESEARCH)) == support.RESEARCH_AGENT_SHA256, (
-        ".claude/agents/research.md is not the file the owner committed (DEC-312)"
+def test_the_research_definition_is_the_generated_one(tmp_path):
+    """Rewritten after implementation (DEC-665). Until the owner's apply block of 2026-10-11 this case,
+    ``test_the_research_definition_is_unchanged``, held the hash of the file the owner committed by hand (DEC-312).
+    The definition is now the generated file: byte for byte what the registered rulesync writes from this
+    repository's adapter source of the research role. The role stays in place (DEC-163): it is still defined, once,
+    under its own name."""
+    rel, source_rel = support.agent_rel(support.RESEARCH), support.adapter_source_rel(support.RESEARCH)
+    installed = support.rulesync_version()
+    if installed is None:
+        pytest.skip(f"rulesync is not installed at {support.RULESYNC_BIN} (set RULESYNC_BIN): not compared")
+    registered = support.registered_rulesync_version()
+    assert installed == registered, (
+        f"the installed rulesync is {installed}, the tool registry records {registered}: its output is not the "
+        "generated file"
+    )
+    committed = (support.REPO_ROOT / rel)
+    assert committed.is_file(), f"{rel} does not exist: the research role is not left in place (DEC-163)"
+    pairs = support.live_support.frontmatter(committed.read_text(encoding="utf-8")) or {}
+    assert pairs.get("name") == support.RESEARCH, f"{rel} declares name {pairs.get('name')!r}"
+    assert committed.read_bytes() == support.generate_definition(support.RESEARCH, tmp_path), (
+        f"{rel} is not the generated file: it differs from what rulesync {installed} writes from {source_rel} "
+        "(DEC-665)"
     )
 
 

@@ -6,8 +6,8 @@ DEC-069) from the ticket's KPI lines, CAP-37 and DEC-248, DEC-208, DEC-237, DEC-
 Run: `python3 -m pytest tests/acceptance/W1-49 -q -p no:cacheprovider`
 Without the real session and the CLI: add `-m "not local_only"`.
 
-105 tests: 95 deterministic with no network, 10 marked `local_only` (9 share one real session, 1 runs
-`claude --help`). Their history:
+105 tests: 94 deterministic with no network, 11 marked `local_only` (9 share one real session, 1 runs
+`claude --help`, 1 reads the environment a session gives its commands, since batch 5). Their history:
 
 | Batch | When | Tests |
 |---|---|---|
@@ -15,8 +15,9 @@ Without the real session and the CLI: add `-m "not local_only"`.
 | 2 | After it, from a review's findings (DEC-136) | 3 added: 65 |
 | 3 | After it, on the owner's decisions DEC-263 and DEC-264 | 15 rewritten and 2 removed (reason "owner decision, DEC-264"), 30 added (reason "owner decision"): 93 |
 | 4 | After it, from a review's findings (DEC-136): the written part is never lost | 12 added in `test_w1_49_written_part.py`: 105. No existing test was changed. |
+| 5 | After it, 2026-10-13, on the owner's decision DEC-665 (the pass of DEC-669, inside the W1-38 round) | 2 rewritten in `test_w1_49_threshold.py` (reason: the window is set in the owner's user-level settings since the apply block of 2026-10-11, DEC-636, DEC-665), none added, none removed: 105. |
 
-Batch 3 by name is in section 2.1, batch 4 in section 2.2.
+Batch 3 by name is in section 2.1, batch 4 in section 2.2, batch 5 in section 2.4.
 
 ## 1. What the engineer builds (the interface these tests fix)
 
@@ -63,7 +64,7 @@ pending owner decisions: not known to the hook; see the written part of this che
 | RESUME HERE section | The heading whose text begins with `RESUME HERE` (any level, more text may follow on the line) and everything up to the next heading of the same or a higher level, or the end of the written part. Sub-headings belong to it. A line inside a fenced code block (three backticks, with or without a language name) is not a heading: it neither starts the section nor ends it. |
 | The cap | The injection is the instruction, the warning if there is one, and the section, inside 10,000 characters. The warning is a fixed short text and is never cut. A section too large is cut from its end, and the injection then contains the word `truncated` (say how much is shown and that the rest is in the checkpoint file). |
 | SessionStart: what it could not do | A missing checkpoint: exit 0, inside the cap, no content demanded. A checkpoint it can't read, or a directory in its place: exit 0, and the injection still carries the prompt path, the checkpoint's path and the instruction. Input it can't read: any exit code but 2. |
-| Auto-compact window | `"CLAUDE_CODE_AUTO_COMPACT_WINDOW": "300000"` in the `env` key of `.claude/settings.json`: a string of digits, 270000 to 330000. |
+| Auto-compact window (batch 5, DEC-636, DEC-665) | `CLAUDE_CODE_AUTO_COMPACT_WINDOW` is **not** in the `env` key of `.claude/settings.json` (rulesync writes that file and writes no env block). It is set, `"300000"`, in the env block of the owner's user-level settings, which no test reads. The environment a session on this machine gives its commands carries it: a string of digits, 270000 to 330000. Until batch 5 this row asked for the entry in the project's `env` key. |
 
 The estimate is 120 LOC, 154 are used, and W1-29 replaces both files, so nothing beyond these tables is asked for
 (DEC-135). A throwaway reference pair that satisfies every deterministic test took 159 lines together, blank lines included. The
@@ -85,7 +86,7 @@ Red, as observed on 2026-10-04 against the implementation as it stands at commit
 | Success 6 [CAP-37.g]: the injection is role-specific (DEC-263) | `test_w1_49_sessionstart.py`: in the main tree the injection is the orchestrator's; in a worktree it tells the session it is the ticket lead (ticket, appendix A5, prompt path, lead checkpoint path, the lead's section, nothing of the orchestrator's); without `GOV_TICKET` it says so | Failed, 2 of 3: "the injection does not say `you are the ticket lead for LD-4242`: 'Read now, before anything else: .gov-runtime/scratch/lead/CHECKPOINT.md. …'"; "without GOV_TICKET the injection does not say it is a ticket lead whose GOV_TICKET is not set". The main-tree test is green already. |
 | Success 2 [CAP-37.g]: SessionStart on compact, clear and resume injects, within the cap, the prompt path and RESUME HERE, with the instruction to read both now | `test_w1_49_registration.py`: SessionStart registered for the three sources. `test_w1_49_sessionstart.py`: paths + whole section + instruction + cap (compact, clear, resume); heading variant; lead's section in a worktree (3) | Green (batch 1; not touched). |
 | Failure 3: injects more than the cap, or leaves out the prompt path or the section | `test_w1_49_sessionstart.py`: long checkpoint doesn't push the section out; a section over the cap is cut and said so; no RESUME HERE section still gives both paths; missing checkpoint (3); plain startup; unreadable input; a worktree without a lead checkpoint gets nothing of the orchestrator's; the three code-block tests of batch 2; a checkpoint that can't be read (directory, unreadable file) *(batch 3)* | Green: batches 1 and 2 are not touched, and the two batch 3 cases are green already. |
-| Success 3: the threshold is about 300k tokens if it can be configured; a test proves whether it can | `test_w1_49_threshold.py` (3, one `local_only`). `test_w1_49_live_session.py`: `/autocompact` reports the window and its origin (`local_only`) | Green (not touched). |
+| Success 3: the threshold is about 300k tokens if it can be configured; a test proves whether it can | `test_w1_49_threshold.py` (3, one `local_only`; since batch 5 two `local_only`, section 2.4). `test_w1_49_live_session.py`: `/autocompact` reports the window and its origin (`local_only`) | Green (not touched). |
 | Success 4 [CAP-37.g], failure 4, and failure 1 in a real session: after a forced compaction the next action shows the tickets, the open owner decisions and the loop counts, without restating; the compaction over an old checkpoint is not blocked | `test_w1_49_live_session.py` (`local_only`): the forced compaction over a checkpoint three days old is not blocked and the hooks fired around it; it left the state block in the checkpoint; the reply names 2 tickets, 2 decisions, 2 loop counts | Failed, 2 of 9: "the forced compaction did not complete: 'Compaction blocked by PreCompact hook: […]: CHECKPOINT NOT CURRENT: … is missing or older than 30 minutes. Update it, then compact again.'; hook events [('SessionStart', 'startup'), ('SessionStart', 'resume'), ('PreCompact', 'manual'), ('SessionStart', 'resume'), ('SessionStart', 'resume')]"; "the real session's PreCompact hook appended no state block". The six reply tests are green although the compaction was blocked: each `--resume` call fires SessionStart with the source `resume`, and that injection carries the section (section 3, point 4). |
 | Edge: the guard hooks stay registered | `test_w1_49_registration.py::test_the_guard_hooks_stay_registered` (7) | Green; must stay green. |
 | DEC-259: worker sessions | `test_w1_49_precompact.py`: a worker's compaction is not blocked and appends nothing (3). `test_w1_49_sessionstart.py`: a worker is not given the lead's checkpoint (3) | Green already: DEC-259 is implemented, and a hook that writes nothing appends nothing. |
@@ -169,6 +170,42 @@ the file is read, the checkpoint written in place): the 12 tests of this batch a
 threshold files were not run against it (they read this repository's settings file). The reference was not
 committed and is not the design.
 
+### 2.4 Batch 5: where the auto-compact window is set (DEC-665)
+
+The owner's apply block of 2026-10-11 (commit `8bb34efe`) made `.claude/settings.json` rulesync's output. rulesync
+writes no env block, and the window moved to the env block of the owner's user-level settings (DEC-636). Two cases of
+`test_w1_49_threshold.py` read the project's `env` key and were red on the integration branch from then on. The
+owner decided a rewrite to the decided state (DEC-665), as a separate designer pass inside the W1-38 round (DEC-669,
+ticket `DAEO-3ef2`; `DAEO-32n6` is not reopened).
+
+**Rewritten after the implementation, reason "owner decision, DEC-665": 2 cases. Added: none. Removed: none.**
+
+| Before | Now | Decided state it holds | Fails when |
+|---|---|---|---|
+| `test_the_settings_set_the_auto_compact_window_as_an_env_key` | `test_the_project_settings_set_no_auto_compact_window_of_their_own` | rulesync writes no env block: the project's settings do not set the window (DEC-636), so no project entry is read in place of the user-level one (DEC-665) | the `env` key of the project's settings sets the variable; the settings file is missing or is not valid JSON |
+| `test_the_auto_compact_window_is_about_300k_tokens` | `test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens` (`local_only`) | the window is set for every session on this machine, at about 300k, and not by the project (DEC-636, DEC-665) | run from a session: the variable is not in the environment, is not a plain integer, is outside 270000 to 330000, or the project's `env` key sets it |
+
+What the two read: the `env` key through `load_hooks_and_env` (as before: the `hooks` and `env` keys and nothing else of
+the settings file), and the process environment. Neither reads anything under the user's home.
+
+Limits of the second case, stated so that nobody reads more into a green:
+
+- It shows the value a session's commands are given and that the project does not supply it. It does not show which
+  file supplies it: the user-level settings are not read. A value exported by a shell profile or handed down by a
+  launching session would pass as well.
+- It is skipped, with the reason, when the suite is not run from a Claude Code session (`CLAUDECODE` is not `1`):
+  the env block of a settings file reaches a session's commands only. A skip is "not measured", not a pass.
+- It is `local_only`: the entry is this machine's. "A way for adopted projects on other machines to get it" is on
+  the Wave 2 list (DEC-636); when that way exists these two cases are rewritten to it.
+
+Bite, tried on 2026-10-13 by calling each case with the state taken away: a project `env` key that sets the variable
+fails both; the variable absent, `300k`, `100000` and `1000000` each fail the second.
+
+Not rewritten, and it reads the same key: `test_w1_49_live_session.py` builds its temporary project's settings with
+the window taken from this repository's `env` key, which no longer holds it, so that project sets no window. Its
+`/autocompact` case then depends on what the CLI of the real session reads by itself. That file is outside this
+pass (DEC-671).
+
 ### 2.3 The earlier red records
 
 - Batch 1, before the implementation, 2026-10-04: 9 failed, 8 passed, 45 errors (the hooks did not exist and were
@@ -226,7 +263,8 @@ number serves both. The tests assert 10,000 characters.
 | Compaction fires a little below the window (the window minus a summary buffer). | The CLI's own schema text; not measured. |
 
 DEC-248 allows the ticket "hook registration and any env key" in the settings file, so the env key is the form the
-tests assert, not the top-level `autoCompactWindow` key. **No residual goes to `bootstrap.md` for KPI line 3: the
+tests assert, not the top-level `autoCompactWindow` key. (Since batch 5 the variable is set in the owner's user-level
+settings and not in the project's, DEC-636: section 2.4.) **No residual goes to `bootstrap.md` for KPI line 3: the
 `CONTEXT_CHECKPOINT` stop can go when the ticket closes (DEC-250).** Not proved here: that a compaction really starts
 near 300k tokens on a 1M model. That needs a session of 300k tokens; the tests prove the key is read and reported.
 The key applies to every session in the repository; on a 200k model it is capped by the model and changes nothing.

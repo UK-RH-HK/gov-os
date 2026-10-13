@@ -16,7 +16,7 @@ the definitions describe. No session is started, no network is used, nothing is 
 | `test_w1_33_kernel_role_files.py` | 52 | `template/governance/kernel/roles/<role>.md` |
 | `test_w1_33_roster.py` | 13 | `governance/project/roster.yaml`, the `role:` of every ticket |
 | `test_w1_33_guard_and_launcher.py` | 17 | the guard's decisions and the launcher's built settings (W1-46's support code) |
-| `test_w1_33_agent_definitions.py` | 33 | `.claude/agents/<role>.md`, and each one's kernel role file |
+| `test_w1_33_agent_definitions.py` | 33 | `.claude/agents/<role>.md`, and each one's kernel role file; for research, `.rulesync/subagents/research.md` and the installed rulesync (rewrite of 2026-10-13) |
 | `w1_33_support.py`, `conftest.py` | | the field reader, the checks, the fixtures |
 
 `test_w1_33_agent_definitions.py` holds every test that reads `.claude/agents/`. A headless session may be refused a
@@ -31,7 +31,7 @@ this file's result apart from the other three.
 | **Success 2**: only the test designer pattern includes `tests/acceptance/**`; the auditor is read-only; only the orchestrator may install, after owner approval (DEC-083), except research (DEC-163) | `kernel_role_files`: `test_the_test_designer_pattern_includes_the_acceptance_tests`, `test_no_other_pattern_includes_the_acceptance_tests[role]`, `test_the_auditor_is_read_only_except_its_ticket_s_report_path`, `test_the_orchestrator_may_install_only_after_owner_approval`, `test_no_other_role_may_install[class-role]`, `test_the_research_exception_is_stated_by_the_research_role_file_alone` · `guard_and_launcher`: `test_only_the_test_designer_may_write_the_acceptance_tests[role]`, `test_the_auditor_writes_only_the_report_path_of_its_own_ticket`, `test_an_install_asks_for_the_orchestrator_and_is_denied_to_every_other_role[role]` · `agent_definitions`: `test_the_definition_states_what_the_kpis_require_of_the_role[role]` |
 | **Success 3** [CAP-58.b]: the permission classes; the launcher's network profile, named by the definition | `kernel_role_files`: `test_the_role_maps_every_permission_class[role]`, `test_the_role_maps_the_classes_as_the_contract_says[role]`, `test_a_launched_worker_names_the_launcher_s_empty_network_profile[role]`, `test_the_research_role_file_names_the_research_allowlist` · `roster`: `test_a_launched_worker_s_entry_names_its_session_and_the_empty_profile[role]`, `test_a_role_the_launcher_does_not_start_has_no_launched_session[role]` · `guard_and_launcher`: `test_the_launcher_gives_the_role_an_empty_network_profile[role]`, `test_the_launcher_starts_no_session_for_a_role_that_is_not_a_worker[role]` · `agent_definitions`: `test_the_definition_states_what_the_kpis_require_of_the_role[role]` |
 | **Success 4** [CAP-22.a]: the generated definitions replace the minimal ones; the orchestrator definition states its write scope (DEC-156) | `agent_definitions`: `test_the_definition_is_no_longer_the_minimal_one[role]`, `test_the_definition_keeps_the_subagent_type_name_of_the_role[role]`, `test_the_definition_agrees_with_its_kernel_role_file[role]`, `test_the_orchestrator_definition_states_its_write_scope`, `test_there_is_one_definition_per_role_and_the_research_one` · `kernel_role_files`: `test_the_orchestrator_role_file_states_its_write_scope` · `guard_and_launcher`: `test_the_orchestrator_may_write_anywhere_else_in_the_repository` |
-| **Success 5**: the research role of W1-46 is left in place (DEC-163) | `kernel_role_files`: `test_the_research_role_file_is_unchanged` · `roster`: `test_the_research_entry_is_unchanged` · `agent_definitions`: `test_the_research_definition_is_unchanged` |
+| **Success 5**: the research role of W1-46 is left in place (DEC-163) | `kernel_role_files`: `test_the_research_role_file_is_unchanged` · `roster`: `test_the_research_entry_is_unchanged` · `agent_definitions`: `test_the_research_definition_is_the_generated_one` (until 2026-10-13 `test_the_research_definition_is_unchanged`; see "Rewritten after implementation") |
 | **Failure 1**: a role lacks any required field | `kernel_role_files`: `test_a_role_file_without_one_required_field_is_found[role]`, `test_a_required_field_with_no_text_is_found[role]` · `agent_definitions`: `test_a_definition_without_one_required_field_is_found[role]` |
 | **Failure 2**: an implementer role pattern covers `tests/acceptance/**` | `kernel_role_files`: `test_an_implementer_pattern_that_covers_the_acceptance_tests_is_found[pattern-role]`, and `test_no_other_pattern_includes_the_acceptance_tests[engineer]`, `[product-spec]` · `guard_and_launcher`: `test_only_the_test_designer_may_write_the_acceptance_tests[engineer]`, `[product-spec]` |
 
@@ -55,9 +55,36 @@ Green before implementation, and they must stay green:
 - the 17 tests of `test_w1_33_guard_and_launcher.py`: W1-02, W1-04, W1-45 and W1-46 built these decisions. A
   definition grants nothing by itself, so the suite checks the statement and the decision it describes together;
 - the three "unchanged" tests of KPI success 5, and the three tests that read the research role file in the form
-  these tests use;
+  these tests use (one of the three "unchanged" tests was rewritten on 2026-10-13, see "Rewritten after
+  implementation");
 - `test_the_definition_keeps_the_subagent_type_name_of_the_role[role]` (5) and
   `test_there_is_one_definition_per_role_and_the_research_one`: W1-05's definitions already have the right names.
+
+## Rewritten after implementation (2026-10-13, DEC-665)
+
+One case, in a separate designer pass inside the W1-38 round (DEC-669, ticket `DAEO-3ef2`; `DAEO-xog0` is not
+reopened). No case was added or removed: the suite holds 113 cases before and after.
+
+| Before | Now | Decided state it holds | Fails when |
+|---|---|---|---|
+| `test_the_research_definition_is_unchanged`: the hash of the file the owner committed by hand (DEC-312) | `test_the_research_definition_is_the_generated_one` | `.claude/agents/research.md` is the generated file: byte for byte what the registered rulesync writes from this repository's adapter source `.rulesync/subagents/research.md` (DEC-665). The role is still in place under its own name (DEC-163). | the definition is missing, declares another `name`, or differs by one byte from the generation (edited by hand, the hand-committed file put back, or the source changed without generating again); the source is missing; rulesync fails; the installed rulesync is not the version the tool registry records |
+
+Reason: the owner's apply block of 2026-10-11 (commit `8bb34efe`) applied this repository's generated adapter output,
+which replaced the hand-committed definition; the case was red on the integration branch from then on.
+
+How it compares: a temporary project under pytest's `tmp_path` receives that one source file and nothing else of the
+repository; `rulesync generate --targets claudecode --features subagents` runs there with a home of its own; the
+file it writes is compared with the committed one. Nothing is written in the repository and the user's home is not
+read. rulesync is found as the W1-38 suite finds it: `RULESYNC_BIN`, or `~/.local/bin/rulesync` (the registry's
+install line). Without it the case is skipped with that reason: "not compared", not a pass. The version it answers
+must be the one `governance/project/tool-registry.yaml` records (24.0.0).
+
+Bite, tried on 2026-10-13: with one line added to a copy of the source the generation differs from the committed
+file; without the source the case fails and names it. The whole of `.claude/` against its sources is the
+adapter-portability check's (W1-38); this case holds the one file KPI success 5 names.
+
+`RESEARCH_AGENT_SHA256` left `w1_33_support.py` with the case that read it. The two other "unchanged" cases (the
+research role file, the roster entry) were not touched.
 
 ## The form the tests read
 
