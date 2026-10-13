@@ -145,7 +145,7 @@ tools:
     uninstall: "ln -sfn $HOME/.local/share/claude/versions/2.1.288 $HOME/.local/bin/claude && rm -f $HOME/.local/share/claude/versions/2.1.292"
     date: "2026-10-11"
     approved_by: "DEC-649"
-    note: "The CLI used for headless runs is the single-file binary ~/.local/bin/claude, a link to ~/.local/share/claude/versions/2.1.292; sha256 of that binary. Installed by the owner through the operator (DEC-637, DEC-649). The uninstall command goes back to the version before it. Headless workers are started with the absolute path, never a bare claude, because a Windows-side copy is later on PATH (DEC-205). Raising the pin needs a new register entry that names the new version (DEC-197)."
+    note: "The CLI used for headless runs is the single-file binary ~/.local/bin/claude, a link to ~/.local/share/claude/versions/2.1.292; sha256 of that binary. The VS Code extension anthropic.claude-code bundles its own binary at version 2.1.296, under resources/native-binary/claude in its folder; it need not equal the pin (DEC-210). Installed by the owner through the operator (DEC-637, DEC-649). The uninstall command goes back to the version before it. Headless workers are started with the absolute path, never a bare claude, because a Windows-side copy is later on PATH (DEC-205). Raising the pin needs a new register entry that names the new version (DEC-197)."
   - name: bubblewrap
     version: "0.9.0"
     sha256: "2461f1beee9cb04c8942739fe1a2b37e7b7c2a3d518f0779dc75f9245baa3094"
