@@ -6903,7 +6903,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
   - **The apply block (A3 steps 1 to 8) is done** through the operator with nothing refused or unexpected: the env names are `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`, `CLAUDE_CODE_SUBAGENT_MODEL` in the owner's user-level settings; the dry run and real run both reported "deny rules: in force 8, generated 8, lost 0, added 0" and "generated files: 44 (new 37, changed 7)"; adapter-portability returned findings `[]`, exit 0 (kernel files 29, generated files 44); commit `8bb34efe` with 45 paths (37 added, 8 modified) and trailers `Task: DAEO-gjjf`, `Role: owner`, `Implements: CAP-44.b`; Claude Code CLI 2.1.292 installed, sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`.
 
 ### DEC-649 — Claude Code CLI raised to 2.1.292 (DEC-197, DEC-637)
-- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-197, DEC-203, DEC-637
+- **Status:** ACCEPTED (owner, 2026-10-11) · **Under:** DEC-083, DEC-197, DEC-203, DEC-637 (DEC-083 added to this line on 2026-10-13 under DEC-665: the record lacked it)
 - **Decision:** The Claude Code CLI pin is raised to 2.1.292. The binary at `~/.local/share/claude/versions/2.1.292` has sha256 `a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3`. The registry entry is updated. This session runs on the new binary.
 
 | Version | Date | Change |
@@ -7019,3 +7019,115 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 | Version | Date | Change |
 |---|---|---|
 | 0.200 | 2026-10-12 | Owner: DEC-655 (P-1 (a) widened: W1-31 follow-up round with a probe, the session-log reader accepts any parsable version against a fresh specimen, records the version, no pin), DEC-656 (ORION answers), DEC-657 (ARGUS answers), DEC-658 (P-5 (a) and (c): a-dev fully adopted, b-dev if within one round, spec and audit tickets by tk close; Wave 2 list near the top: gov close judges a ticket by its class), DEC-659 (doctor exit checked against DEC-210), DEC-660 (hand-over of B1, B3 and B2), DEC-661 (DEC-654 accepted). Next free id: DEC-662. |
+
+## 201. W1-42 lead run 2 returns PACKAGES and the W1-31 round returns DONE: delegated decisions (register v0.201, appended by the W1 orchestrator on branch `w1/integrate`)
+
+Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree (the B1 apply) was open; appended on 2026-10-13 after the owner reported the apply done (`71ae763f`).
+
+### DEC-662 — W1-42 lead's run 2 packages 2, 3 (names), 4, 6, 7 and 8, and its Wave 2 items
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-12; told to the owner, who may replace it) · **Basis:** the W1-42 lead's second return (`log/W1-42-lead-run2.json`, PACKAGES; branch `w1/W1-42` at `129b81c4`; a-dev clone at `8e517f9`, b-dev clone at `132ca2d`)
+- **Decision** (each P3, reversible, on a throwaway clone of a synthetic programme; the lead's recommendation and mine agree; confidence medium or higher):
+  - **Package 2, ORION:** the `TypeError` message names each of the two dimensions by its `repr`.
+  - **Package 3, ARGUS, the names only:** `retention_decision(kind, created_at, now)`; kinds `"raw"` and `"final_image"`; results `"keep"` and `"expire"`; `ValueError` for both refusals; timezone-aware datetimes, a naive one refused. **Not decided: "now" before `created_at`** (the lead's confidence is low and my recommendation differs: with the owner).
+  - **Package 4, a-dev:** `research/experiments/.notebook-export.env` and `research/experiments/deploy-key.pem` get a namespace of their own, `memory_class: product`, never indexed; A6 and A8 then run.
+  - **Package 5 needs no decision:** DEC-658 already says b-dev is reported as adopted to A2 with the reason when one worker round is not enough. No second round. ARGUS's `gov close` is attempted once and its refusal reported.
+  - **Package 6, a-dev records:** none blocks the cycle; left as the repair worker made them. Wave 2 list: the template's path map ships `paths` only (no `state_class`, `capabilities`, `policies`, `systems`, no `memory_class`, no `tests/**` namespace).
+  - **Package 7:** a product-spec round gives the A5 verdict record a type the schema knows; commits in a clone cite in `Implements:` only ids the clone's store holds. History is not rewritten: what the earlier commits leave red is reported with the close.
+  - **Package 8, the W1-42 test designer's three readings:** kept (a cycle table's "close: done" means a `gov close` whose answer has `ok` true, a `tk close` is "not reached"; the hit@5 figures are held to a truthful comparison with the baseline, no gate at 85; the clean-close ticket is the ORION implementation ticket).
+  - **Wave 2 list additions:** `core-claims` and `gov readiness` disagree on which rows need a gap ticket; `gov rebuild` and the whole `gov check` cannot be used inside a launched session; `checker.close` writes an audit ticket citing DEC-088 and MR-4, which a project's own register does not hold; the adoption auditor could not reproduce the A3 `proposal_sha256`.
+  - **Deviations of run 2, for the exit auditor:** the lead wrote clone ticket files and the a-dev path map itself; it wrote the all-KEEP A3 proposal; a-dev had two repair rounds; gap and adoption tickets were closed with `tk close` and a note; one b-dev worker ran a Bash here-document; the containment hook flagged the W1-42 designer's four test files in the lead's session and left them in place.
+  - **With the owner at the time (answered in DEC-664 and DEC-666):** package 1 (the template's permission source denies every edit of `tests/acceptance/**`, the test designer's included) and package 3's "now" before `created_at`.
+
+### DEC-663 — The W1-31 round's packages G, H and I
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-12; told to the owner, who may replace it) · **Under:** DEC-655, DEC-584 · **Basis:** the W1-31 round lead's return (`log/W1-31b-lead-run1.json`, DONE at `065f9b83` on `w1/W1-31b`) and the probe (`docs/probes/DAEO-6mk8/PR-DAEO-6mk8-round-DEC-655.md`, pass)
+- **Decision** (each P3, reversible; confidence medium):
+  - **G, a ticket whose sessions are of more than one Claude Code version:** stays as built. `agent.version` is "not measured" and the sessions are still counted. A named residual and a Wave 2 item (each session's own version in the record). No further round (finish line, DEC-584). The lead recommended a new public key per session; that is the Wave 2 item, so the two recommendations agree on the end state and differ only on when.
+  - **H, attachment types and line types no specimen shows:** the standing rule is kept: a form no specimen shows is "not measured" by name. A fresh specimen is read at each CLI update. Wave 2 list: under this rule every log is "not measured" after an update until the new specimen is read.
+  - **I, `instructions` and `sandbox_instructions` lines:** they count nothing today. Whether they replace the estimate is on the Wave 2 list.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.201 | 2026-10-13 | Orchestrator, delegated: DEC-662 (W1-42 lead's run 2 packages 2, 3 names, 4, 6, 7, 8; Wave 2 items; run 2's deviations for the exit auditor), DEC-663 (W1-31 round's packages G, H, I: as built, standing rule kept, Wave 2 items). Decided 2026-10-12, appended after the owner's B1 apply. Next free id: DEC-664. |
+
+## 202. Owner answers of 2026-10-13: the template's test-folder rule, the six red cases, ARGUS, the doctor; owner steps B1 and B2 part 1 (register v0.202, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-664 — The template's deny rule on `tests/acceptance/**` is taken out by one W1-38 round; the same edit goes into the two exit clones now
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-315, DEC-584 · **Basis:** the W1-42 lead's run 2 package 1 (`log/W1-42-lead-run2.json`); the orchestrator's finding that `template/.rulesync/permissions.jsonc` denies every edit of `tests/acceptance/**`, the independent test designer's included, while this repository's own source holds no such line
+- **Decision:** option (a).
+  - One round on W1-38 (DAEO-3ef2), the test designer first, with a probe, takes the test-folder line out of the template's permission source.
+  - The same edit is made in the two exit clones now, so that the W1-42 lead is not waiting for the round.
+  - Reason: in this repository the guard has decided who may write acceptance tests since the switch-over, and the template follows it. MR-3 is held by the launcher and the guard, not by a deny rule that also stops the test designer.
+
+### DEC-665 — The six red cases on the integration branch: the orchestrator corrects its two records, and one test-designer pass rewrites the three cases
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-083, DEC-312, DEC-635, DEC-649 · **Basis:** the orchestrator's finding of 2026-10-12: six acceptance cases fail on `w1/integrate` itself (W1-48 three, W1-49 two, W1-33 one), all from the apply block `8bb34efe` and the DEC-649 records of 2026-10-11
+- **Decision:** option (a).
+  - The orchestrator corrects its two records: DEC-649 is recorded under DEC-083, and the tool registry's Claude Code entry names the VS Code extension version. That clears the three W1-48 cases.
+  - One test-designer pass rewrites the three other cases to the decided state: the two W1-49 cases (the auto-compact window is set in the user-level settings since the apply block, DEC-635) and the one W1-33 case (`.claude/agents/research.md` is the generated file). Each is recorded as a rewrite after implementation, with its reason.
+  - For the record: the close notes of W1-30 and W1-38 said "no code change since the clean regression of DEC-647". That was wrong: the apply commit lay between, and no suite was run after it.
+
+### DEC-666 — ARGUS: a "now" earlier than `created_at` is refused with `ValueError`
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-657 · **Basis:** the W1-42 lead's run 2 package 3, the part left open by DEC-662 (the lead: keep, low confidence; the orchestrator: refuse)
+- **Decision:** `retention_decision` refuses a "now" earlier than `created_at` with `ValueError`, as it refuses a missing timestamp.
+
+### DEC-667 — `gov doctor` exiting 3 on version drift goes to the Wave 2 list, named for the exit auditor
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-210, DEC-659, DEC-584 · **Basis:** the orchestrator's package under DEC-659: `src/gov/doctor/command.py` makes the doctor unhealthy when a section's status is "drift", so drift alone gives exit 3, against DEC-210 as the owner reads it
+- **Decision:** option (b).
+  - No round in Wave 1. Wave 2 list: the doctor reports drift without failing on it (DEC-210).
+  - The exit report names this for the exit auditor, so that a red doctor caused by drift alone is not misread.
+
+### DEC-668 — Owner steps: B1 done, B2 part 1 done on a throwaway copy, B3 deferred
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-409, DEC-428, DEC-442, DEC-444, DEC-660 · **Basis:** the owner's report of 2026-10-13
+- **Decision and record:**
+  - **B1 (Stop and SubagentStop, DEC-442) is done**, through the operator. Dry run and real run: "held-out step: rules written 1", "deny rules: in force 8, generated 8, lost 0, added 0", "generated files: 44 (new 0, changed 1, already the same 43)"; the one changed file is `.claude/settings.json`. Portability: `"findings": []`, exit 0. Commit `71ae763fa244976ed0eebfda8ac787c782943c52` on `w1/integrate` (Task: DAEO-gjjf, Role: owner, Implements: CAP-37.b, CAP-37.d); tree clean, nothing pushed.
+  - **SubagentStop is active** from now on in sessions started in the main tree. Every brief the orchestrator writes asks subagents for the twelve-field return (task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action).
+  - **B2 part 1 (the manual freeze, pause and lift check; W1-42's KPI line "The owner freezes, pauses and lifts from a plain terminal, on a throwaway repository and on this one, and the results are recorded", DEC-428) is done on the throwaway repository.** The owner ran it himself in a plain Ubuntu terminal on a copy of the `a-dev-exit` clone (`~/gov-b2-throwaway`, since deleted). Output, in order:
+    - status before: `"pause": {"paused": false, "flag": "absent", "mirror": false}`
+    - pause: `{"ok": true, "command": "pause", "result": {"paused": true}, "session": ""}`
+    - status while frozen: `"pause": {"paused": true, "flag": "frozen", "mirror": true, "by": "owner", "since": "2026-10-13T13:56:14Z"}`
+    - lift: `type LIFT-5786 to lift the freeze: LIFT-5786`, then `{"paused": false}`
+    - status after: `"pause": {"paused": false, "flag": "absent", "mirror": false}`
+  - **B2 part 2 (the freeze on this repository) is still open**, so the KPI line is half met.
+  - **B3 (the lefthook install) is deferred** until both W1-42's lead and the W1-31 round have finished, because git hooks are shared with their worktrees. The orchestrator tells the owner when that moment comes, together with B2 part 2.
+  - **Stale state entries (exit checklist A5):** six removed by the owner (five old freeze markers of 2026-10-06, one empty); the last one, keyed to the throwaway copy, is removed after B2 part 1. `~/.local/state/gov-os/` is empty. The main-tree quiet window is released.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.202 | 2026-10-13 | Owner: DEC-664 (template deny rule on the test folder: (a), one W1-38 round with a probe, same edit in the two clones now), DEC-665 (six red cases: (a), two records corrected, one test-designer pass rewrites three cases), DEC-666 (ARGUS: "now" before `created_at` refused with ValueError), DEC-667 (doctor exit 3 on drift: (b), Wave 2 list, named for the exit auditor), DEC-668 (B1 done at `71ae763f`, SubagentStop active, B2 part 1 recorded, B3 deferred). Next free id: DEC-669. |
+
+## 203. Owner answers of 2026-10-13, second set: where the DEC-665 pass runs, B3's timing, the W1-49 live-session case, W1-31's close, durable backups of the exit clones (register v0.203, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-669 — The DEC-665 test-designer pass runs as a separate designer session inside the W1-38 round
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-664, DEC-665, DEC-491 · **Basis:** the orchestrator's question: the three cases belong to W1-49 (DAEO-32n6, two cases) and W1-33 (DAEO-xog0, one case), both closed, and `gov launch` starts a designer only on an `in_progress` ticket
+- **Decision:** option (a).
+  - The pass runs as a separate designer session inside the W1-38 round (DAEO-3ef2), with its own commit.
+  - Each of the three cases (two of W1-49, one of W1-33) carries a `Rewrite-Reason:` trailer.
+  - DAEO-32n6 and DAEO-xog0 are not reopened.
+
+### DEC-670 — B3 waits for W1-42's lead, the W1-31 round and the W1-38 round
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-660, DEC-668
+- **Decision:** B3 (the lefthook install) waits until W1-42's lead, the W1-31 round and the W1-38 round have all finished, because git hooks are shared with their worktrees. The orchestrator tells the owner then, together with B2 part 2 (the freeze on this repository). This widens DEC-668's line on B3 by the W1-38 round.
+
+### DEC-671 — The W1-49 live-session case is run three more times alone
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-232, DEC-372, DEC-442 · **Basis:** the regression at `9495bf3a`: in the serial run `tests/acceptance/W1-49/test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_loop_counts[23]` failed (the reply after the compaction named loop count 17 and not 23); the file passed when run alone once (9 passed)
+- **Decision:**
+  - The orchestrator runs the case three more times on its own, serially.
+  - If it fails again, it comes to the owner as a package, with the Stop hook (active since `71ae763f`) as a possible cause.
+  - If it passes all three, it is named for the exit auditor as a flaky live-model case.
+
+### DEC-672 — W1-31 is closed by `gov close` only; if the close refuses on the three DEC-665 cases, one more close follows the designer pass
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-651, DEC-655, DEC-665, DEC-669
+- **Decision:**
+  - If `gov close DAEO-6mk8` refuses on the three DEC-665 cases, the ticket is not closed with `tk close`.
+  - It is closed after the designer pass has merged, with one more `gov close`.
+  - If an escalation blocks, the orchestrator stops for the owner (DEC-651).
+
+### DEC-673 — Durable backups of the W1-42 exit clones are made by the operator, outside the repository
+- **Status:** ACCEPTED (owner, 2026-10-13) · **Under:** DEC-604, DEC-611 · **Basis:** the orchestrator's report: the two safety copies of the exit clones stood under `.gov-runtime/scratch/orchestrator/`, where the secrets-indexing check found the synthetic programmes' planted secrets in them (ten files) and went red; the orchestrator moved them to its session scratchpad under `/tmp`, so the live clones and their copies are all under `/tmp` now
+- **Decision:**
+  - In its next report the orchestrator gives the owner the exact paths of the two live clones and of the two safety copies.
+  - The operator copies them to `~/gov-os-workbench/archive/w1-42-exit-clones/`, outside the repository and outside any scanned folder.
+  - No clone and no programme file is put under `.gov-runtime/` again.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.203 | 2026-10-13 | Owner: DEC-669 (the DEC-665 designer pass runs as a separate session inside the W1-38 round, Rewrite-Reason on each of the three cases), DEC-670 (B3 waits for W1-42's lead, the W1-31 round and the W1-38 round; told with B2 part 2), DEC-671 (W1-49 live-session case: three more runs alone; package if it fails, named as flaky if not), DEC-672 (W1-31 closed by gov close only, one more close after the designer pass if the first refuses on the three cases), DEC-673 (the operator makes durable backups of the exit clones outside the repository; no clone under the runtime folder). Next free id: DEC-674. |

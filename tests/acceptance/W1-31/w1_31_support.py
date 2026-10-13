@@ -44,7 +44,9 @@ TICKET, OTHER_TICKET = "PROJ-aaaa", "PROJ-bbbb"
 WBS = "T-01"
 MODEL = "claude-opus-5-5"
 OTHER_MODEL = "claude-haiku-4-5-20251001"
-VERSION = "2.1.288"                    # the Claude Code version of the specimen: the one log form there is
+VERSION = "2.1.288"                    # the Claude Code version of the first three specimens
+VERSION_4 = "2.1.292"                  # the fourth specimen's (DEC-649, DEC-655)
+LATER_VERSION = "2.1.296"              # a later one: no version is pinned (DEC-655)
 SESSION_A = "11111111-1111-4111-8111-111111111111"
 SESSION_B = "22222222-2222-4222-8222-222222222222"
 SESSION_OTHER = "33333333-3333-4333-8333-333333333333"
@@ -213,6 +215,70 @@ def feedback_text(text, event="Stop"):
     return "Stop hook feedback:\n" + feedback_errors(text, event)
 
 
+# The fourth specimen's hooks are the kernel's scripts, one per event, called from the project's folder.
+HOOK_COMMAND_4 = "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/{}\" --MARK-HYRAX"
+
+
+def _step(name, tool_input, content, use_result, *, wire=None, error=None, denial=None):
+    """One tool call of a message with several (``Log.turn``): the tool, its input, the text of its result
+    and what the result line carries as ``toolUseResult``. ``error``: None, the result block has no
+    ``is_error`` (the fourth specimen's Read, Grep, Write and Edit results); False, it says
+    ``is_error: false`` (Bash); True, the result is marked as an error and ``toolUseResult`` is a text."""
+    return {"name": name, "input": tool_input, "content": content, "use_result": use_result, "wire": wire,
+            "error": error, "denial": denial}
+
+
+def bash_step(command, output, *, committed=None):
+    """A command through the Bash tool. ``committed``: the harness noted a commit the command made, beside
+    the output (the fourth specimen's last command)."""
+    use_result = {"stdout": output, "stderr": "", "interrupted": False, "isImage": False,
+                  "noOutputExpected": False}
+    if committed:
+        use_result["gitOperation"] = {"commit": {"sha": committed, "kind": "committed", "branch": "main"}}
+    return _step("Bash", {"command": command, "description": "run the command"}, output, use_result, error=False)
+
+
+def denied_step(command, content):
+    """A command a PreToolUse hook denied by its answer (``hook_denial_text``), in the third specimen's
+    form, which the fourth shows again."""
+    return _step("Bash", {"command": command, "description": "run the command"}, content, None, error=True,
+                 denial="permission-rule")
+
+
+def read_step(path, text):
+    """The Read tool: the result's text is the file with line numbers; no ``is_error``."""
+    rows = text.splitlines()
+    numbered = "\n".join(f"{number}\t{row}" for number, row in enumerate(rows, 1))
+    return _step("Read", {"file_path": path}, numbered, {"type": "text", "file": {
+        "filePath": path, "content": text, "numLines": len(rows), "startLine": 1, "totalLines": len(rows)}})
+
+
+def grep_step(pattern, found):
+    """The Grep tool: the result's text is what was found; no ``is_error``."""
+    return _step("Grep", {"pattern": pattern, "path": "src", "glob": "*.py", "output_mode": "content"}, found,
+                 {"mode": "content", "numFiles": 0, "filenames": [], "content": found,
+                  "numLines": found.count("\n") + 1, "totalLines": found.count("\n") + 1})
+
+
+def write_step(path, text):
+    """The Write tool: the result's text is the harness's own sentence; no ``is_error``."""
+    return _step("Write", {"file_path": path, "content": text}, f"File created successfully at: {path}",
+                 {"type": "create", "filePath": path, "content": text, "structuredPatch": [],
+                  "originalFile": None, "userModified": False})
+
+
+def edit_step(path, old, new, original):
+    """The Edit tool: the input as logged has ``replace_all``, the input as sent has not; the result's
+    text is the harness's own sentence; no ``is_error``."""
+    sent = {"file_path": path, "old_string": old, "new_string": new}
+    return _step("Edit", {"replace_all": False, **sent},
+                 f"The file {path} has been updated successfully.",
+                 {"filePath": path, "oldString": old, "newString": new, "originalFile": original,
+                  "structuredPatch": [{"oldStart": 1, "oldLines": 1, "newStart": 1, "newLines": 1,
+                                       "lines": [f"-{old}", f"+{new}"]}],
+                  "userModified": False, "replaceAll": False}, wire=sent)
+
+
 def shortened_text(full, folder, session, *, mark="b5u4ggt"):
     """The result of a command whose output was too long, as the third specimen's result line holds it: the
     harness's words, the path of the file in the session's ``tool-results`` folder that holds the full
@@ -242,6 +308,9 @@ class Log:
 
     failing_first = False   # the session's own lines: the failing hook's line comes after the added context
     use_result = True       # the session's own tool-result lines carry ``toolUseResult``
+    effort = None           # the fourth specimen: the session's own assistant lines carry an effort and a model
+    totals_model = None     # the fourth specimen: its totals line names a model no assistant line carries
+    unfinished = None       # no specimen: text after the last line, cut off before its end
 
     def __init__(self, session, *, cwd="/work/project", model=MODEL, version=VERSION):
         self.session, self.cwd, self.model, self.version = session, cwd, model, version
@@ -313,12 +382,15 @@ class Log:
     # -- the model's messages ----------------------------------------------
 
     def _message(self, usage, block, stop, *, model=None, sidechain=False, preface=None, thinking=True,
-                 first_output=None, wire=None):
+                 first_output=None, wire=None, more=(), wires=None, after=None):
         """The lines of one message, one per content block: ``thinking`` (unless ``thinking`` is false), a
         text ``preface`` when given, then ``block``. Each carries the message's whole usage; with
         ``first_output`` the first line carries an earlier, smaller usage instead (that many output tokens
         and no stop reason), as the first message of the second specimen's sub-agent does. ``wire`` is the
-        tool input as the model sent it, where the harness logged another ``input`` (a leading ``cd``)."""
+        tool input as the model sent it, where the harness logged another ``input`` (a leading ``cd``).
+        The fourth specimen: ``more`` are further blocks of the same message, after ``block``; ``wires``
+        gives the input as sent for each tool-use id; ``after(block, line)`` is called when a block's line
+        is written, before the next block's (a call's result line comes before the next call's line)."""
         fresh_in, out, created, read = usage
         number = len(self.messages) + 1
         model = model or self.model
@@ -340,7 +412,9 @@ class Log:
                 "speed": "standard", "fallback_credit": None}
         made = []
         blocks = ([{"type": "thinking", "thinking": "", "signature": "c2lnbmF0dXJl"}] if thinking else []) \
-            + ([{"type": "text", "text": preface}] if preface is not None else []) + [block]
+            + ([{"type": "text", "text": preface}] if preface is not None else []) + [block, *more]
+        tail = {"perTurnEffort": None} if self.effort is None else {
+            "advisorModel": model, "effort": self.effort, "perTurnEffort": self.effort}
         for index, content in enumerate(blocks):
             partial = first_output is not None and index == 0 and len(blocks) > 1
             message = {"model": model, "id": f"msg_{self.tag}_{number:03d}", "type": "message",
@@ -352,12 +426,15 @@ class Log:
             if content["type"] == "thinking":
                 head["thinkingDurationMs"] = 900
             elif content["type"] == "tool_use":
-                head["wireToolInputs"] = {content["id"]: wire or content["input"]}
+                head["wireToolInputs"] = {content["id"]: (wires or {}).get(content["id"]) or wire
+                                          or content["input"]}
                 if wire:
                     head["wireIngestContext"] = {content["id"]: {"cwd": self.cwd}}
             made.append(self.add({**head, "apiBlockIndex": index,
                                   "requestId": f"req_{self.tag}_{number:03d}", "type": "assistant"},
-                                 sidechain=sidechain, perTurnEffort=None))
+                                 sidechain=sidechain, **tail))
+            if after:
+                after(content, made[-1])
         return made[-1]
 
     def say(self, usage, text="done", **how):
@@ -404,15 +481,18 @@ class Log:
                   "type": "attachment"})
         return run_id
 
-    def stop_summary(self, run_id=None, *, added=(), errors=(), prevented=False, command=f"{HOOK_COMMAND_2} Stop"):
+    def stop_summary(self, run_id=None, *, added=(), errors=(), prevented=False, command=f"{HOOK_COMMAND_2} Stop",
+                     has_output=True):
         """The ``system`` line after the Stop hooks ran. After a run that succeeded it names the run and its
         duration and holds no error; after a hook that blocked (the third specimen) it holds the hook's
         command and text in ``hookErrors``, no duration, and an id of its own. ``added`` and ``prevented``
-        are what no specimen's line carries."""
+        are what no specimen's line carries. The fourth specimen: after a Stop hook that printed nothing
+        the line says ``hasOutput: false`` and no run line comes before it (``quiet_stop``)."""
         info = {"command": command} if errors else {"command": command, "durationMs": 17}
         self.add({"type": "system", "subtype": "stop_hook_summary", "hookCount": 1, "hookInfos": [info],
                   "hookErrors": list(errors), "hookAdditionalContext": list(added),
-                  "preventedContinuation": prevented, "stopReason": "", "hasOutput": True, "level": "suggestion"},
+                  "preventedContinuation": prevented, "stopReason": "", "hasOutput": has_output,
+                  "level": "suggestion"},
                  toolUseID=run_id or self._uuid())
         return self
 
@@ -476,6 +556,92 @@ class Log:
         self.call(command, content, usage, kept=(full, str(self.folder(logs) / self.session / "tool-results" / name)),
                   **how)
         return content
+
+    # -- the forms the fourth specimen adds (README, "The session logs the cases write") ------------------
+
+    def at(self, version):
+        """This log and its sub-agents' as another Claude Code version wrote them: every line that carries
+        a version carries ``version`` (DEC-655: no version is pinned)."""
+        for log in (self, *self.subagents):
+            log.version = version
+            for line in log.lines:
+                if "version" in line:
+                    line["version"] = version
+        return self
+
+    def brief(self, text):
+        """The prompt of a launched worker session, as the fourth specimen holds it: one text, given
+        through the SDK."""
+        self.add({"promptId": f"prompt-{self.session[:8]}", "type": "user",
+                  "message": {"role": "user", "content": text}}, permissionMode="acceptEdits",
+                 promptSource="sdk", turnOrigin="sdk", turnPosition={"promptIndex": 0, "turnIndex": 1})
+        return self
+
+    def mark(self, *kinds, full=False):
+        """Attachment lines that are no hook's, as the specimens hold them: reduced to the attachment's
+        type, with the session and nothing else (no ``version``). What else the harness's line holds, the
+        specimens do not show; with ``full`` the line also ends with the fields every full line ends with
+        (a ``version`` among them), as a hook's attachment line does."""
+        for kind in kinds:
+            if full:
+                self.add({"attachment": {"type": kind}, "type": "attachment"})
+            else:
+                self.lines.append({"type": "attachment", "sessionId": self.session, "attachment": {"type": kind}})
+        return self
+
+    def marks(self):
+        """The three lines the harness writes between turns (the specimens hold them by their type)."""
+        for kind in ("last-prompt", "ai-title", "atis-latch"):
+            self.bare(kind)
+        return self
+
+    def file_history(self, count=1):
+        """``file-history-delta`` lines, which only the fourth specimen shows: by their type, without a
+        session id (``file-history-snapshot`` is held the same way)."""
+        for _ in range(count):
+            self.bare("file-history-delta", sessionId=None)
+        return self
+
+    def turn(self, usage, steps, *, thinking=True, preface=None):
+        """One message of the model with several tool calls, as the fourth specimen shows it: a line per
+        content block (``thinking`` unless it is false, a text ``preface`` when given, then one
+        ``tool_use`` line per entry of ``steps``), all with the message's id and whole usage; **each
+        call's result line comes right after that call's line**, before the next call's. ``steps`` are
+        made by ``bash_step``, ``read_step``, ``grep_step``, ``write_step``, ``edit_step`` and
+        ``denied_step``."""
+        number = len(self.messages) + 1
+        by_id = {f"toolu_{self.tag}{number:03d}{'abcdefghijklm'[index]}": each for index, each in enumerate(steps)}
+        blocks = [{"type": "tool_use", "id": tool_id, "name": each["name"], "input": each["input"],
+                   "caller": {"type": "direct"}} for tool_id, each in by_id.items()]
+
+        def after(block, line):
+            each = by_id.get(block.get("id"))
+            if each is None:
+                return
+            if each["error"]:
+                result = {"type": "tool_result", "content": each["content"], "is_error": True,
+                          "tool_use_id": block["id"]}
+                tail = {"toolUseResult": "Error: " + each["content"]}
+            else:
+                result = {"tool_use_id": block["id"], "type": "tool_result", "content": each["content"]}
+                if each["error"] is False:
+                    result["is_error"] = False
+                tail = {"toolUseResult": each["use_result"]}
+            if each["denial"]:
+                tail["toolDenialKind"] = each["denial"]
+            self.add({"promptId": f"prompt-{self.session[:8]}", "type": "user",
+                      "message": {"role": "user", "content": [result]}}, **tail,
+                     sourceToolAssistantUUID=line["uuid"])
+
+        self._message(usage, blocks[0], "tool_use", thinking=thinking, preface=preface, more=blocks[1:],
+                      wires={tool_id: each["wire"] for tool_id, each in by_id.items() if each["wire"]},
+                      after=after)
+        return self
+
+    def quiet_stop(self, command=None):
+        """A Stop hook that printed nothing, as the fourth specimen shows it: no run line, only the
+        ``system`` line, which names the hook's command and its duration and says ``hasOutput: false``."""
+        return self.stop_summary(command=command or HOOK_COMMAND_4.format("stop.py"), has_output=False)
 
     def failing(self, event, stderr, *, name, tool_use_id, **other):
         """The line of a hook that failed without blocking: an attachment of a type of its own, whose
@@ -623,6 +789,10 @@ class Log:
                 sums["outputTokens"] += out
                 sums["cacheReadInputTokens"] += read
                 sums["cacheCreationInputTokens"] += created
+        if self.totals_model:
+            usage = {self.totals_model: {"inputTokens": 2992, "outputTokens": 19, "thinkingTokens": 0,
+                                         "cacheReadInputTokens": 0, "cacheCreationInputTokens": 0,
+                                         "webSearchRequests": 0, "costUSD": 0.003}, **usage}
         return {"type": "cost-state", "sessionId": self.session, "totalCostUSD": 0.01 * len(usage),
                 "totalAPIDuration": api_duration, "totalAPIDurationWithoutRetries": api_duration - 31,
                 "totalToolDuration": 100, "totalLinesAdded": 0, "totalLinesRemoved": 0,
@@ -654,7 +824,11 @@ class Log:
             kept = folder / self.session / "tool-results" / name
             kept.parent.mkdir(parents=True, exist_ok=True)
             kept.write_text(text, encoding="utf-8")
-        return self._dump(folder / f"{self.session}.jsonl", lines, 1)
+        path = self._dump(folder / f"{self.session}.jsonl", lines, 1)
+        if self.unfinished is not None:   # a last line the harness did not finish: no line end, no whole object
+            with path.open("a", encoding="utf-8") as handle:
+                handle.write(self.unfinished)
+        return path
 
 
 class SubLog(Log):
@@ -1106,6 +1280,167 @@ def third_fixture(project, logs, *, change=None):
     return {"counts": counts, "usage": usage, "logs": (first, second, other), "shortened": first.shortened,
             "notes": {LARGER_READING: 5, COUNTED_WHOLE: 1}, "latency": API_DURATION_3 + API_DURATION_B,
             "estimate": project.estimate(ROLE_A, ROLE_B)}
+
+
+# --------------------------------------------------------------------------
+# The fourth fixture: every form the fourth specimen shows (DEC-655)
+# --------------------------------------------------------------------------
+
+PACKET_4 = pad("MARK-ADDAX PROJ-aaaa [P1][in_progress] - the fixture's ticket, as the kernel's hook gives it")
+GOV4_1 = pad("MARK-ORIBI usage: gov readiness [-h] [--json] [--root <path>]\n4.2.0\nREADME.md\nsrc\nOK")
+GOV4_2 = pad("MARK-KUDU {\"ok\": false, \"command\": \"readiness\", \"result\": {}}\ncontract\nkernel")
+GOV4_3 = pad("MARK-GERENUK {\n    \"ok\": false,\n    \"command\": \"readiness\",\n    \"result\": {}\n}")
+GOV4_4 = pad("MARK-DIKDIK {\"ok\": false, \"command\": \"readiness\"}\nexit=1\nChange is valid\nexit=0")
+HOOK_DENY_4 = hook_denial_text("MARK-SITATUNGA the call reads a file that is refused to every role")
+FILE_4 = "MARK-TOPI ---\nid: PROJ-aaaa\nstatus: in_progress\n---\n# the ticket, read with the Read tool\n"
+FOUND_4 = "src/example/a.py:1:VALUE = 1  # MARK-BONTEBOK"
+WRITTEN_4 = "MARK-NYALA # the record the session wrote\n\nrows:\n  - id: R-01\n    gap_ticket: null\n"
+RETURN_4 = "MARK-GECKO # Return: the record is committed; nine rows are open"
+ROOT_4 = "/work/project"
+NODE_4 = "PATH=$HOME/.nvm/versions/node/v22.23.3/bin:$PATH"
+# The attachment lines of the fourth specimen that are no hook's, by their type, in its order: those after
+# SessionStart's two lines, those after the first prompt, and those between later turns.
+ATTACHMENTS_4_START = ("sandbox_instructions", "environment", "model", "deferred_tools_delta",
+                       "agent_listing_delta", "mcp_instructions_delta", "skill_listing")
+ATTACHMENTS_4_PROMPT = ("instructions", "session_context", "date", "credential_org", "remote_session_change",
+                        "prompt_snapshot")
+ATTACHMENTS_4_LATER = ("environment", "silent_turn_reminder", "deferred_tools_record")
+# The four ``gov`` commands of the fourth specimen: each behind a ``cd`` the harness kept, beside other
+# commands; three of them through a pipe.
+GOV4_COMMANDS = (
+    f"cd {ROOT_4}; gov readiness --help 2>&1 | head -40; {NODE_4} openspec --version 2>&1 | head -5; ls; "
+    "cd python && python3 -m unittest example.tests.test_a 2>&1 | tail -5",
+    f"cd {ROOT_4}; gov readiness --specification MARK-KAKAPO --json 2>&1 | head -60; "
+    f"ls governance governance/contract | head -40; {NODE_4} openspec new change --help 2>&1 | head -20",
+    f"cd {ROOT_4}; gov readiness --specification MARK-KAKAPO --json 2>&1 | python3 -m json.tool",
+    f"cd {ROOT_4}; gov readiness --specification MARK-KAKAPO --json; echo \"exit=$?\"; "
+    f"{NODE_4} openspec validate a-change --strict; echo \"exit=$?\"")
+# Its commands that do not run ``gov``: a list of commands, a loop behind a ``cd``, a program behind a
+# ``cd`` and ``&&``, a commit whose message and trailers hold words of the governance.
+OTHER4_COMMANDS = (
+    "printenv GOV_ROLE GOV_TICKET; git rev-parse --show-toplevel --abbrev-ref HEAD",
+    "git show --stat HEAD; ls -la src/gov src/gov/* 2>&1 | head -80",
+    f"cd {ROOT_4}; for f in src/gov/a.py src/gov/cli/main.py docs/gov.md; do echo \"=== $f\"; cat -n $f; done",
+    f"cd {ROOT_4}/python && python3 -B -c \"\nfrom example.a import *\nprint(VALUE, 'MARK-DUGONG gov status')\n\"",
+    f"cd {ROOT_4}; git add docs && git status --short && git commit -m \"MARK-DUGONG the record of gov "
+    "readiness\" --trailer \"Task: PROJ-aaaa\" --trailer \"Role: product-spec\" 2>&1 | tail -15; "
+    "git log -1 --stat --format='%H%n%B'")
+DENIED4_COMMAND = (f"cd {ROOT_4}; cat -n .github/workflows/ci.yml tests/ci.yaml; "
+                   "grep -rn \"MARK-DUGONG\" . --exclude-dir=governance -l 2>/dev/null | head")
+API_DURATION_4 = 330000
+
+
+def fourth_session(session, *, cwd=ROOT_4, version=VERSION_4, packet=PACKET_4, results=None, denial=HOOK_DENY_4):
+    """One session in the fourth specimen's forms, in its order, not yet written. ``results`` are the
+    results of its four ``gov`` commands.
+
+    SessionStart's run and the packet it added; the brief, one text given through the SDK; attachment lines
+    that are no hook's, a ``file-history-snapshot`` line and the lines between turns, each by its type; a
+    first message of one line, a command; a message of a ``thinking`` line and three calls (two Read, one
+    Bash), each call's result line right after its call; a message of two calls without a ``thinking``
+    line (a loop behind a ``cd`` the harness kept, a Read); a message with a Grep and a ``gov`` command
+    behind a ``cd``, beside other commands and through a pipe; a message of a text line and a ``gov``
+    command; a command a PreToolUse hook denies by its answer; ``file-history-delta`` lines; Write and
+    Grep; a message of ``thinking``, a text, a Write and a ``gov`` command through a pipe; a message of
+    three Edit calls (logged with a key the model did not send); a program behind ``cd`` and ``&&``; a
+    Write, an Edit and the fourth ``gov`` command in one message; a commit, whose result line notes it; a
+    last message of one text line; the ``system`` line of a Stop hook that printed nothing, with no run
+    line; a totals line that names a model no assistant line carries. No PreToolUse and no PostToolUse
+    line: the kernel's hooks printed nothing. No sub-agent. Every assistant line carries ``effort`` and
+    ``advisorModel``."""
+    results = results or (GOV4_1, GOV4_2, GOV4_3, GOV4_4)
+    path = f"{cwd}/docs/record.yaml"
+    log = Log(session, cwd=cwd, version=version)
+    log.effort, log.totals_model = "high", OTHER_MODEL
+    log.hook("SessionStart", packet, name="SessionStart:startup", command=HOOK_COMMAND_4.format("sessionstart.py"))
+    log.brief("MARK-WOMBAT # Brief: a worker of the fixture\n\nDo the work of the ticket.")
+    log.mark(*ATTACHMENTS_4_START).bare("file-history-snapshot", sessionId=None)
+    log.bare("atis-latch")
+    log.mark(*ATTACHMENTS_4_PROMPT).marks()
+    log.turn((2, 125, 47000, 0), [bash_step(OTHER4_COMMANDS[0], OTHER_OUT)], thinking=False)
+    log.mark("prompt_snapshot").marks()
+    log.turn((2, 880, 230, 47000), [read_step(f"{cwd}/.tickets/{TICKET}.md", FILE_4),
+                                    read_step(f"{cwd}/governance/kernel/skills/discovery/SKILL.md", FILE_4),
+                                    bash_step(OTHER4_COMMANDS[1], OTHER_OUT)])
+    log.marks()
+    log.turn((2, 650, 6100, 47200), [bash_step(OTHER4_COMMANDS[2], OTHER_OUT),
+                                     read_step(f"{cwd}/README.md", FILE_4)], thinking=False)
+    log.marks()
+    log.turn((2, 760, 14100, 53300), [grep_step("(?i)MARK-DUGONG|gov status", FOUND_4),
+                                      bash_step(GOV4_COMMANDS[0], results[0])])
+    log.mark("environment", "environment", "silent_turn_reminder").marks()
+    log.turn((2, 400, 3900, 67400), [bash_step(GOV4_COMMANDS[1], results[1])], thinking=False,
+             preface="MARK-GECKO the readiness command is there; I ask it about the record")
+    log.marks()
+    log.turn((2, 5900, 650, 71300), [denied_step(DENIED4_COMMAND, denial)])
+    log.marks().file_history()
+    log.turn((2, 2400, 4500, 71900), [write_step(path, WRITTEN_4), grep_step("MARK-DUGONG", FOUND_4)])
+    log.mark("silent_turn_reminder").marks().file_history()
+    log.turn((2, 3700, 2700, 76400), [write_step(f"{cwd}/docs/proposal.md", WRITTEN_4),
+                                      bash_step(GOV4_COMMANDS[2], results[2])],
+             preface="MARK-GECKO the record is written; I ask the command again")
+    log.marks()
+    log.turn((2, 2500, 4700, 79100), [edit_step(path, "gap_ticket: null", f"gap_ticket: MARK-{number}", WRITTEN_4)
+                                      for number in range(3)])
+    log.marks().mark("deferred_tools_record")
+    log.turn((2, 1800, 3900, 83800), [bash_step(OTHER4_COMMANDS[3], OTHER_OUT)])
+    log.mark("environment").file_history(4)
+    log.turn((2, 11600, 2200, 87700), [write_step(f"{cwd}/docs/design.md", WRITTEN_4),
+                                       edit_step(path, "id: R-01", "id: R-02", WRITTEN_4),
+                                       bash_step(GOV4_COMMANDS[3], results[3])])
+    log.marks().mark("environment", "deferred_tools_record")
+    log.turn((2, 630, 13200, 89900), [bash_step(OTHER4_COMMANDS[4], OTHER_OUT, committed="11308f8")])
+    log.say((2, 4000, 1500, 103100), RETURN_4, thinking=False).quiet_stop()
+    log.api_duration = API_DURATION_4
+    return log
+
+
+def fourth_logs(version=VERSION_4):
+    """The logs of the fourth fixture, not yet written, as Claude Code ``version`` wrote them. The first
+    session is in the fourth specimen's forms (``fourth_session``). The second is in the first specimen's
+    forms, at the same version. The third is other work in the fourth specimen's forms, written by yet
+    another version: nothing of it is the ticket's, its version neither."""
+    first = fourth_session(SESSION_A, version=version)
+    second = Log(SESSION_B, version=version).session_start(PACKET_B).prompt()
+    second.bash(gov_command("doctor"), GOV_3, (400, 100, 500, 0), hook=HOOK_3).say((30, 20, 0, 0))
+    second.api_duration = API_DURATION_B
+    other = fourth_session(SESSION_OTHER, cwd="/work/other", version="2.1.290", packet=PACKET_OTHER,
+                           results=(GOV_OTHER,) * 4, denial=hook_denial_text(HOOK_OTHER))
+    return first, second, other
+
+
+def fourth_fixture(project, logs, *, version=VERSION_4, change=None):
+    """A ticket of which every source can be measured or estimated, with a session in the fourth specimen's
+    forms, written by Claude Code ``version``. Returns what the case computes itself: ``counts`` (each
+    measured source: the packet of each session; the hook's denial and the second session's added context;
+    the four ``gov`` results of the first session, each whole, and the second session's), ``notes`` (one
+    hook text by the larger reading: the denial; four ``gov`` results counted whole), ``usage``,
+    ``latency``, ``estimate`` (the two sessions named with their roles, ``ROLED``) and ``version``."""
+    first, second, other = fourth_logs(version)
+    if change:
+        change(first, second)
+    for log in (first, second, other):
+        log.write(logs)
+    counts = {"sessionstart_packet": tokens(PACKET_4) + tokens(PACKET_B),
+              "hook_output": tokens(HOOK_DENY_4) + tokens(HOOK_3),
+              "gov_output": sum(tokens(text) for text in (GOV4_1, GOV4_2, GOV4_3, GOV4_4, GOV_3)),
+              "checkpoint_records": project.add_checkpoint(1), "close_records": project.add_close()}
+    project.add_instructions()
+    project.commit("governance files", "Role: orchestrator")
+    usage = tuple(a + b for a, b in zip(first.usage(), second.usage()))
+    return {"counts": counts, "usage": usage, "logs": (first, second, other), "version": version,
+            "notes": {LARGER_READING: 1, COUNTED_WHOLE: 4}, "latency": API_DURATION_4 + API_DURATION_B,
+            "estimate": project.estimate(ROLE_A, ROLE_B)}
+
+
+def agent(result):
+    """The record's ``agent``: a map with exactly the harness and the Claude Code version that was read
+    (DEC-501, DEC-655)."""
+    said = result.get("agent")
+    assert isinstance(said, dict) and sorted(said) == ["harness", "version"], \
+        f"agent is {said!r}: a map with exactly the harness and the version that was read"
+    assert said["harness"] == HARNESS, said
+    return said["version"]
 
 
 # --------------------------------------------------------------------------
