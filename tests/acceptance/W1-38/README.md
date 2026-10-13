@@ -30,6 +30,11 @@ addition after DEC-608" in the section "The second run".
 12 red, 0 skipped** as run before the engineer's work (the 164 older cases all green). See the section "The round
 of DEC-635" below.
 
+**The round of DEC-664 (2026-10-13, ticket `DAEO-3ef2` reopened for one round)** added 19 cases in four classes
+in `test_w1_38_test_folder_rule.py` and changed, rewrote and removed no other case: **201 cases in 37 classes;
+197 green, 4 red, 0 skipped** as run before the engineer's work (the 182 older cases all green). See the section
+"The round of DEC-664" below.
+
 Two rules hold for every case:
 
 - **Nothing is called a match that was not compared.** Each comparing case names what it compares.
@@ -521,6 +526,117 @@ describes something still to be built on its own, and each must stay green after
   for whom every file opens. `a-folder-in-its-place` and `not-utf-8` hold "cannot be read".
 - **The order of the rules** in the deny list is held only as far as the byte-for-byte comparison holds it: the
   project's file is what the procedure writes.
+
+## The round of DEC-664: the template's deny rule on the acceptance-test folder is taken out
+
+File: `test_w1_38_test_folder_rule.py`. Sources: MR-3 and DEC-069 (acceptance tests are written only by the
+independent test designer; the guard holds it), DEC-315 (the settings the launcher builds carry `Edit` deny rules
+for `tests/acceptance/**` for every role but the independent test designer), DEC-664 (the test-folder line is
+taken out of the template's permission source; "MR-3 is held by the launcher and the guard, not by a deny rule
+that also stops the test designer").
+
+**How it is before the engineer's work.** `template/.rulesync/permissions.jsonc` gives five rules: the edit rules
+`.tickets/**` and `tests/acceptance/**`, and the Bash rules `npm install*`, `pip install*` and `sudo *`, all
+`deny`. rulesync 24.0.0 turns them into five deny rules of the generated settings (measured: `Bash(npm install*)`,
+`Bash(pip install*)`, `Bash(sudo *)`, `Edit(.tickets/**)`, `Edit(tests/acceptance/**)`; no `ask` or `allow` list).
+
+**The decided state is reachable** (measured in a temporary stand-in project whose own copy of the source had the
+line removed; nothing of the template was changed): the generated deny list is the four other rules, `rulesync
+generate --check` ends with 0 and the declared command of the adapter check ends with 0.
+
+### How a case is built
+
+- **The project** is the suite's stand-in project (`generated_project`), as everywhere in the suite; rulesync is
+  found as everywhere (`support.RULESYNC_BIN`), and every case that needs it is marked `needs_rulesync`. For the
+  cases of behaviour 3 it gets a product's files and the engineer's ticket (`hooks.add_product_work`, as the cases
+  of DEC-596 build it), one ticket in progress for each other role, and the research ticket's experiment folder.
+- **What a rule covers** is decided by W1-46's reading (`w1_46_support.covers`: the rule's own pattern or a folder
+  above the path), over five paths: the folder itself, a file that exists, a new file, a file directly under the
+  folder, a nested one. No case compares the spelling of the removed rule.
+- **The guard** is asked through the PreToolUse commands the generated settings register, run through the shell
+  as registered, in the project's root, with `GOV_ROLE` and `GOV_TICKET` of the session and a stand-in home in
+  which this worktree's `gov` package is importable (`hooks.make_session_sandbox`). No tool call is made. A
+  refusal counts only when it is the program's own (exit 0 and its written refusal); an allowance is exit 0 with no
+  refusal and no question.
+- **The launcher**: `gov launch <role> <ticket>` is run in the stand-in project with this worktree's code and a
+  stand-in home whose CLI is W1-46's recording stand-in (`w1_46_support.install_stand_in_cli`): no session is
+  started, and the settings the session would be started with are read from what the stand-in recorded.
+- **What binds a launched session** is taken to be the settings the launcher builds and the project's own
+  generated settings together: a deny rule of either one stops the write. That is how the line stopped the test
+  designer although the launcher's settings leave the folder open to it.
+- **Nothing of this repository** but the template's files and the named tool registry is read. Neither of this
+  repository's two protected files is read, named or copied: the stand-in project has no held-out file and its
+  settings are the ones rulesync generated in the temporary folder.
+
+### The cases
+
+| Behaviour | Test | Measures | Before the engineer's work |
+|---|---|---|---|
+| 1. the rule is gone from the source | `TestTheRuleIsGone::test_the_templates_source_holds_no_edit_rule_on_the_acceptance_test_folder` | no rule under `permission.edit` of the template's source, whatever its value, covers a path of the folder | **red**: the source holds `tests/acceptance/**` as an edit deny rule |
+| 1. and from the generated settings | `…::test_the_generated_settings_hold_no_deny_rule_on_the_acceptance_test_folder` | no `Edit` deny rule of the settings generated from the template covers a path of the folder | **red**: `Edit(tests/acceptance/**)` is generated |
+| | `…::test_the_generated_settings_hold_no_rule_of_a_write_tool_on_the_folder_in_any_list` | no rule of `Edit`, `Write`, `MultiEdit` or `NotebookEdit` in the deny, ask or allow list covers it | **red**: the same rule |
+| 2. the removal takes one rule | `TestEveryOtherRuleStays::test_the_templates_source_gives_the_four_other_rules_and_nothing_else` | the source's rules that are not on the folder are exactly the ticket-folder edit rule and the two install rules and the sudo rule, each `deny` | green before implementation; it must stay green |
+| | `…::test_the_four_other_deny_rules_are_still_generated_and_nothing_else` | the generated permission rules that are not on the folder are exactly the four deny rules, each once; no other list holds a rule | green before implementation; it must stay green |
+| | `…::test_the_generated_settings_still_close_the_ticket_folder` | an `Edit` deny rule covers a ticket file that exists and a new one | green before implementation; it must stay green |
+| 3. the guard, the test designer | `TestTheGuardInAProjectMadeFromTheTemplate::test_the_test_designer_on_its_ticket_is_allowed_a_write_under_the_folder` | Write and Edit on an existing and a new file under the folder, and a Bash redirect: every registered command allows | green before implementation; it must stay green |
+| | `…::test_the_test_designer_is_still_refused_outside_the_folder` | Write and Edit on a file of the ticket's own paths, a unit test, the ticket file: the program's own refusal | green before implementation; it must stay green (the allowance is a decision, not a guard that lets everything through) |
+| 3. the guard, every other role | `…::test_every_other_role_is_refused_a_write_under_the_folder[<role>]` × 5 (engineer, product-spec, research, independent-auditor, orchestrator) | the same five calls by the role on a ticket of its own: the program's own refusal each time; no file changed | 5 green before implementation; they must stay green |
+| | `…::test_the_engineer_is_let_through_inside_its_ticket` | Write and Edit on a file inside the engineer's ticket paths are allowed | green before implementation; it must stay green (the refusals are about the folder) |
+| 3. the launcher's rules | `TestALaunchedSessionInAProjectMadeFromTheTemplate::test_the_launchers_settings_close_the_folder_for_every_other_role[<role>]` × 3 (engineer, product-spec, independent-auditor) | the settings `gov launch` builds in the stand-in project, alone, cover all five paths with an `Edit` deny rule | 3 green before implementation; they must stay green (after the removal these are the only deny rules left for those sessions) |
+| | `…::test_the_launchers_settings_leave_the_folder_to_the_test_designer` | the built settings of the test designer cover none of the five paths, and still close a ticket file and the project's settings | green before implementation; it must stay green |
+| 3. the decided state for the test designer | `…::test_no_settings_of_a_launched_test_designer_close_the_folder` | neither the launcher's built settings nor the project's generated settings hold a rule that covers the folder | **red**: the project's generated settings hold `Edit(tests/acceptance/**)` (the launcher's settings cover nothing there) |
+
+**4 red, 15 green** before the engineer's work. The four red ones are red for one reason: the line is still in
+the template's source and in what rulesync generates from it. The guard's decision in a project made from the
+template is already what DEC-664 states (allowed for the independent test designer, refused for each of the five
+other roles): no finding stops the removal.
+
+### Behaviour 4: the adapter check with the line gone
+
+The template commits no generated output (there is no `template/.claude/`, `template/CLAUDE.md` or
+`template/AGENTS.md`), so the suite has no case on "the template's own sources and committed output", and none
+was written. The cases that generate from the template's sources in the stand-in project and then run the check
+are the ones that hold this, unchanged: `TestGenerateCheck::test_check_clean_after_generate`,
+`TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project` and
+`TestProjectWithoutAHeldOutFile::test_generated_settings_are_green`. Each is green before implementation; it must
+stay green.
+
+### Behaviour 5: existing cases that expected the rule
+
+None. No case of the suite expected the test-folder deny rule in the template's output: no case was rewritten,
+and no `Rewrite-Reason:` trailer is owed for this round.
+
+### Cases of other suites that are named here, not written again
+
+| What | Where it is held |
+|---|---|
+| the guard refuses engineer, orchestrator and product-spec under the folder (file tools, indirect paths), also on a ticket that names the folder | `tests/acceptance/W1-02/test_w1_02_test_independence.py`: `test_engineer_cannot_write_under_acceptance_tests`, `test_engineer_cannot_reach_acceptance_tests_indirectly`, `test_no_ticket_role_can_write_under_acceptance_tests`, `test_a_ticket_that_names_acceptance_tests_still_gives_no_access` |
+| the guard allows the test designer there, by file tools and Bash, and nowhere else, whatever the ticket | the same file: `test_test_designer_can_write_under_acceptance_tests`, `test_test_designer_cannot_write_anywhere_else`, `test_test_designer_scope_does_not_depend_on_the_ticket_paths`, `test_test_designer_bash_write_under_acceptance_tests_is_allowed`, `test_test_designer_bash_write_elsewhere_is_denied` |
+| the guard refuses the auditor there | the same file: `test_auditor_cannot_write_into_another_role_s_work` |
+| the kernel template's guard refuses the engineer's Bash write there | `tests/acceptance/W1-47/test_w1_47_kernel_template.py::test_the_template_s_guard_denies_a_bash_write_to_an_acceptance_test` |
+| the launcher's built `Edit` deny rules for every worker role but the test designer (the research session's among them), none for the test designer, kept on a ticket that names the folder | `tests/acceptance/W1-46/test_w1_46_protected_trees.py`: `test_the_built_settings_deny_edits_of_the_acceptance_tests`, `test_the_test_designers_settings_carry_no_rule_for_the_acceptance_tests`, `test_the_test_designer_on_another_roles_ticket_keeps_its_own_rules`, `test_a_ticket_that_names_a_path_under_the_three_trees_keeps_the_rules`, `test_a_file_tool_write_to_the_three_trees_is_refused_by_the_guard` |
+| research and the folder: the launch refused on a ticket that names it, the guard's refusals | `tests/acceptance/W1-46/test_w1_46_experiment_folder.py`: `test_a_research_ticket_on_the_acceptance_tests_refuses_the_launch`, `test_the_guard_refuses_a_research_write_to_an_acceptance_test_on_a_ticket_that_names_them`, `test_the_guard_refuses_a_research_bash_write_to_an_acceptance_test_on_a_ticket_that_names_them` |
+| the orchestrator's session is not launched | `tests/acceptance/W1-46/test_w1_46_sandbox_settings.py::test_only_the_four_worker_roles_are_launched` |
+| an acceptance test changed by the engineer's failed command is restored, in a generated project | this suite: `TestFailedCommandInAGeneratedProject::test_an_acceptance_test_changed_by_a_failed_command_is_restored` |
+
+Those suites work on a project built from this repository's own files or by hand. What no suite held, and is
+written here: the same decisions in a project made from the template, through the commands and settings rulesync
+generates from the template's sources.
+
+### What is not held
+
+- **A launched research session in a project made from the template.** In the suite's stand-in project `gov launch
+  research <ticket>` is refused: the launcher reads a research allowlist the stand-in project does not carry
+  (measured; the refusal names `template/governance/kernel/launch/research-allowlist.yaml`). No allowlist is
+  written for the test. The guard's refusal for research is held here; the research session's built rules by
+  W1-46 (table above).
+- **An opaque Bash write** (an interpreter one-liner) under the folder by another role in a live session: it needs
+  a session (W1-46's live cases). For those sessions the launcher's `Edit` deny rules are, after the removal, the
+  only rule that binds such a write at the OS level; the three cases on the launcher's settings hold that they are
+  built in a project made from the template.
+- **A session that is not started by `gov launch`** in a project made from the template (a plain session with a
+  role set by hand) is bound by the guard alone after the removal. That is the decided state (DEC-664); the guard
+  cases hold it.
 
 ## The one tolerated difference between a source file and its generated file
 
