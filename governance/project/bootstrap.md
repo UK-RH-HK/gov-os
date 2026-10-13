@@ -2706,3 +2706,16 @@ Probed head `065f9b83`, merged directly at `9495bf3a`. Built: the reader of the 
 - **The harness's identity rests on the log's form and on ccusage only.**
 - **Not probed:** a real session log, a real 2.1.296 log, `gov close` end to end. The lead measured one real exit-run session (ORION-sp01, 2.1.292) through the command without a refusal.
 - **The round's first checkpoint record is numbered `CP-DAEO-6mk8-0002`** in the round's worktree; no `0001` was written there.
+
+## W1-38 round: the template's deny rule on the acceptance-test folder taken out; the designer pass on three cases (2026-10-13; DEC-664, DEC-665, DEC-669, DEC-675)
+
+Probed head `c579c932`, merged directly at `99fbb546`. Built: `template/.rulesync/permissions.jsonc` no longer holds the edit deny rule on the acceptance-test folder (`74d83913`), so a project made from the template lets its independent test designer write acceptance tests; who may write there is decided by the guard and the launcher (MR-3). 19 acceptance cases added (4 red before the change, 15 pins on the guard and the launcher, labelled). The designer pass rewrote three cases that were red since the owner's apply of the generated adapter output (two of W1-49's threshold file, one of W1-33's agent definitions; `9dd9c052`, reason DEC-665), then split W1-33's generation helper and gave W1-28's synthetic repository one more made-up file (`6ce6e8eb`, three rewrite trailers, reason DEC-675). Source lines: +1 −2 against an estimate of 50. KPI disputes 0, rewrites 6, packages 1 (DEC-675). Probe: pass (`docs/probes/DAEO-3ef2/PR-DAEO-3ef2-round-DEC-664.md`). Residuals, all on the Wave 2 list:
+
+- **A worker-role session not started by the launcher can spawn a test-designer subagent that writes under the acceptance-test folder** (medium-low). With the role set by hand to engineer or auditor, the guard allows a subagent of type `independent-test-designer` to write there; before the round the template rule stopped the file tools in that shape. Not ordinary work: workers are launched, and the launcher's rules cover the folder. A possible guard rule: the designer subagent only in an orchestrator session.
+- **The guard does not know `MultiEdit`** and answers allow for every role, though the generated settings register the hook for it (low; before the round). Whether the pinned CLI has that tool was not confirmed. A possible rule: an unknown write-tool name is denied.
+- **Bash writes the guard cannot read are restored after the fact, not prevented**, in a session without the launcher's sandbox rules (low; before the round).
+- **The W1-33 case on the research definition skips where rulesync is absent**; the fixed-hash case it replaced never skipped.
+- **The W1-49 session case skips outside a session**, and inside one cannot tell a shell export from the user-level entry.
+- **W1-28's list of known copying helpers does not name W1-33's `copy_adapter_source`**, so a later rename of it, or the loss of its root parameter, would not be flagged by the earlier-suites case.
+- **A helper that copies only the one adapter source file now counts as exercised** by W1-28's check: the decided effect of DEC-675.
+- **Not probed:** a real CLI session (whether the launcher's rules bind subagents and the sandbox); a research launch.
