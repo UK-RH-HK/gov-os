@@ -201,10 +201,12 @@ FIELDS = {
         lambda w, text: ("Edit", {"file_path": _source(w), "old_string": text, "new_string": "VALUE = 2"}),
     "an-Edit-s-new-string":
         lambda w, text: ("Edit", {"file_path": _source(w), "old_string": "VALUE = 1", "new_string": text}),
-    "a-field-of-an-unknown-tool": lambda w, text: ("ToolAddedAfterThisTicket", {"target": text}),
-    "a-list-inside-the-input": lambda w, text: ("mcp__notes__add", {"notes": ["a first note", text]}),
+    # DEC-685: a tool the guard does not know is refused whatever it carries, so the three carriers of free text
+    # are tools the guard lets through without a path judgement (README, tenth batch, "Rewrites").
+    "a-field-of-a-listed-tool": lambda w, text: ("Agent", {"description": "a brief", "prompt": text}),
+    "a-list-inside-the-input": lambda w, text: ("TodoWrite", {"todos": ["a first note", text]}),
     "a-mapping-inside-the-input":
-        lambda w, text: ("mcp__notes__add", {"note": {"title": "a note", "body": {"text": text}}}),
+        lambda w, text: ("SendMessage", {"to": "a-worker", "message": {"title": "a note", "body": {"text": text}}}),
 }
 BASH_WORD = "a-word-of-a-Bash-command"
 BASH_COMMAND = "a-Bash-command"
@@ -221,7 +223,8 @@ def call(world, field, text):
 
 # What the guard decides as a whole for a call the held-out check does not refuse: (field kind, role) -> decision.
 # A Write or an Edit of the source file is the allow-list's: the two roles that may write it are allowed, a
-# session with no role is denied. A tool the guard does not know and a command that writes nothing are allowed.
+# session with no role is denied. A tool the guard lets through without a path judgement (DEC-685) and a command
+# that writes nothing are allowed.
 def as_a_whole(tool_name, who):
     return "deny" if tool_name in ("Write", "Edit") and who == NO_ROLE else "allow"
 

@@ -61,7 +61,8 @@ def _assert_decided_in_time_as_a_short_content_is(result, tool_name, who, what):
 # The inputs that take too long today
 # --------------------------------------------------------------------------
 
-# label -> builder(world, a megabyte of path-like text) -> (tool, input)
+# label -> builder(world, a megabyte of path-like text) -> (tool, input). The two that are no file tool are tools
+# the guard lets through without a path judgement (DEC-685; before the round: a tool it did not know).
 TOO_LONG_TODAY = {
     "a-Write-whose-content-is-a-megabyte-of-a-short-folder-name-repeated":
         lambda w, mb: ("Write", {"file_path": _source(w), "content": mb}),
@@ -69,10 +70,11 @@ TOO_LONG_TODAY = {
         lambda w, mb: ("Write", {"file_path": _source(w), "content": mb * 4}),
     "an-Edit-with-a-megabyte-of-it-in-each-of-its-two-strings":
         lambda w, mb: ("Edit", {"file_path": _source(w), "old_string": mb, "new_string": mb}),
-    "an-unknown-tool-with-a-megabyte-of-it-in-a-field":
-        lambda w, mb: ("ToolAddedAfterThisTicket", {"target": mb}),
-    "an-unknown-tool-with-a-megabyte-of-it-in-a-nested-field":
-        lambda w, mb: ("mcp__notes__add", {"note": {"title": "a note", "body": ["a first line", mb]}}),
+    "a-listed-tool-with-a-megabyte-of-it-in-a-field":
+        lambda w, mb: ("Agent", {"description": "a brief", "prompt": mb}),
+    "a-listed-tool-with-a-megabyte-of-it-in-a-nested-field":
+        lambda w, mb: ("SendMessage", {"to": "a-worker",
+                                       "message": {"title": "a note", "body": ["a first line", mb]}}),
 }
 
 
@@ -110,10 +112,11 @@ WITH_A_LITERAL_PATH = {
     "an-Edit-with-a-megabyte-in-each-string-and-the-path-in-the-second":
         lambda w: ("Edit", {"file_path": _source(w), "old_string": PATH_LIKE * (MB // 2),
                             "new_string": _around(w, MB)}),
-    "an-unknown-tool-with-a-megabyte-in-a-field":
-        lambda w: ("ToolAddedAfterThisTicket", {"target": _around(w, MB)}),
-    "an-unknown-tool-with-a-megabyte-in-a-nested-field":
-        lambda w: ("mcp__notes__add", {"note": {"title": "a note", "body": ["a first line", _around(w, MB)]}}),
+    "a-listed-tool-with-a-megabyte-in-a-field":
+        lambda w: ("Agent", {"description": "a brief", "prompt": _around(w, MB)}),
+    "a-listed-tool-with-a-megabyte-in-a-nested-field":
+        lambda w: ("SendMessage", {"to": "a-worker",
+                                   "message": {"title": "a note", "body": ["a first line", _around(w, MB)]}}),
 }
 
 

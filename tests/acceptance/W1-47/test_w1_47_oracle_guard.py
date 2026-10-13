@@ -199,7 +199,11 @@ UNRELATED = {
     "Bash-ls": ("Bash", lambda project, tmp: support.bash_input("ls -la")),
     "Bash-cat": ("Bash", lambda project, tmp: support.bash_input(f"cat {project}/README.md")),
     "Read-elsewhere": ("Read", lambda project, tmp: {"file_path": f"{tmp}/other.md"}),
-    "MCP": ("mcp__filesystem__read_file", lambda project, tmp: {"path": f"{project}/README.md"}),
+    # DEC-685: a tool the guard does not know (an MCP tool included) is refused whatever it names, so the tool
+    # that is no file tool is one the guard lets through without a path judgement. Before: an MCP read of the file.
+    "a-brief-for-a-subagent": ("Agent", lambda project, tmp: {
+        "description": "summarise a file", "subagent_type": "general-purpose",
+        "prompt": f"Read {project}/README.md and tell me what it says."}),
 }
 
 
