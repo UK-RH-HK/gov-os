@@ -58,6 +58,28 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py\"",
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py\"",
+            "timeout": 60
+          }
+        ]
+      }
     ]
   },
   "permissions": {
