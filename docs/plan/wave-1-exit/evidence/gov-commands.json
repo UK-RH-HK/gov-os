@@ -1,0 +1,1815 @@
+{
+ "status": {
+  "argv": [
+   "gov",
+   "status",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "this worktree, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "status",
+   "result": {
+    "root": "/home/usain/gov-os-worktrees/W1-42",
+    "config_files": [
+     "path-map.yaml"
+    ],
+    "tickets": {
+     "ready": {
+      "read": false,
+      "reason": "the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it"
+     },
+     "blocked": {
+      "read": false,
+      "reason": "the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it"
+     },
+     "claimed": [
+      {
+       "id": "DAEO-03pw",
+       "holder": null
+      },
+      {
+       "id": "DAEO-6mk8",
+       "holder": null
+      },
+      {
+       "id": "DAEO-gjjf",
+       "holder": null
+      }
+     ]
+    },
+    "decision_packages": {
+     "read": false,
+     "reason": "the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it"
+    },
+    "readiness": [],
+    "governance_share": {
+     "share": "not measured",
+     "reason": "no session of a ticket is recorded (DEC-491), so the counter is asked with none named, ticket by ticket; no figure across tickets exists",
+     "tickets": [
+      {
+       "ticket": "DAEO-03pw",
+       "share": "not measured",
+       "reason": "no session of the ticket is named (--ticket-session): the sessions' tokens were not measured"
+      },
+      {
+       "ticket": "DAEO-6mk8",
+       "share": "not measured",
+       "reason": "no session of the ticket is named (--ticket-session): the sessions' tokens were not measured"
+      },
+      {
+       "ticket": "DAEO-gjjf",
+       "share": "not measured",
+       "reason": "no session of the ticket is named (--ticket-session): the sessions' tokens were not measured"
+      }
+     ]
+    },
+    "pause": {
+     "paused": false,
+     "flag": "absent",
+     "mirror": false
+    },
+    "doctor": {
+     "healthy": false,
+     "parts": {
+      "tools": "fail",
+      "hooks": "pass",
+      "path_map": "pass",
+      "path_compliance": "fail",
+      "index_freshness": "fail",
+      "canaries": "unmeasured",
+      "framework_lock": "unmeasured",
+      "isolation": "pass",
+      "claude_code": "drift",
+      "held_out": "pass",
+      "adoption_level": "pass"
+     }
+    },
+    "not_read": [
+     "tickets.ready: the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it",
+     "tickets.blocked: the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it",
+     "decision_packages: the record store (.gov-runtime/store.db) is older than HEAD (e08d042df41a): what was committed since its last load is not in it"
+    ]
+   },
+   "session": ""
+  }
+ },
+ "check": {
+  "argv": [
+   "gov",
+   "check",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "this worktree at 93bcb247, the start of the exit run, 2026-10-12 (gov-check.json)",
+  "answer": {
+   "ok": true,
+   "command": "check",
+   "result": {
+    "families": {
+     "schema/invariants": {
+      "status": "GREEN",
+      "family": "schema/invariants",
+      "check_count": 1
+     },
+     "graph integrity": {
+      "status": "GREEN",
+      "family": "graph integrity",
+      "check_count": 1
+     },
+     "index freshness": {
+      "status": "GREEN",
+      "family": "index freshness",
+      "check_count": 1
+     },
+     "retrieval regression": {
+      "status": "GREEN",
+      "family": "retrieval regression",
+      "check_count": 1
+     },
+     "authority/role limits": {
+      "status": "YELLOW",
+      "family": "authority/role limits",
+      "check_count": 2
+     },
+     "mutation scope": {
+      "status": "GREEN",
+      "family": "mutation scope",
+      "check_count": 1
+     },
+     "path-map compliance": {
+      "status": "GREEN",
+      "family": "path-map compliance",
+      "check_count": 1
+     },
+     "context reproducibility": {
+      "status": "GREEN",
+      "family": "context reproducibility",
+      "check_count": 1
+     },
+     "concurrency/claims": {
+      "status": "GREEN",
+      "family": "concurrency/claims",
+      "check_count": 1
+     },
+     "adapter/model portability": {
+      "status": "GREEN",
+      "family": "adapter/model portability",
+      "check_count": 1
+     },
+     "skill regression": {
+      "status": "GREEN",
+      "family": "skill regression",
+      "check_count": 4
+     },
+     "command-contract consistency": {
+      "status": "GREEN",
+      "family": "command-contract consistency",
+      "check_count": 1
+     },
+     "secrets indexing": {
+      "status": "GREEN",
+      "family": "secrets indexing",
+      "check_count": 1
+     },
+     "recovery/rebuild": {
+      "status": "GREEN",
+      "family": "recovery/rebuild",
+      "check_count": 1
+     },
+     "fresh-agent reconstruction": {
+      "status": "GREEN",
+      "family": "fresh-agent reconstruction",
+      "check_count": 1
+     },
+     "product traceability": {
+      "status": "YELLOW",
+      "family": "product traceability",
+      "check_count": 3
+     },
+     "audit reproducibility": {
+      "status": "YELLOW",
+      "family": "audit reproducibility",
+      "reason": "not applicable until the first audit",
+      "check_count": 1
+     }
+    },
+    "checks": [
+     {
+      "id": "adapter-portability",
+      "family": "adapter/model portability",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "cdcccf9c54a38457"
+      }
+     },
+     {
+      "id": "audit-reproducibility",
+      "family": "audit reproducibility",
+      "severity": "hard-block",
+      "status": "YELLOW",
+      "reason": "not applicable until the first audit",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "769c77f8649ab973"
+      }
+     },
+     {
+      "id": "context-reproducibility",
+      "family": "context-reproducibility",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "041214055628a392"
+      }
+     },
+     {
+      "id": "core-authority",
+      "family": "authority/role limits",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "b27c6f3685d74751"
+      }
+     },
+     {
+      "id": "core-claims",
+      "family": "concurrency/claims",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "fbd59ee7d4fc2f14"
+      }
+     },
+     {
+      "id": "core-commands",
+      "family": "command-contract consistency",
+      "severity": "warning",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "d22af35b7a3e3b8d"
+      }
+     },
+     {
+      "id": "core-decision-citations",
+      "family": "authority/role limits",
+      "severity": "warning",
+      "status": "YELLOW",
+      "findings": [
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "abcb3095d267d88c93d19115e9c06ba0fd9fad6f",
+        "decision": "DEC-594",
+        "message": "commit abcb3095d267 cites DEC-594, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "a1c03c5b76cfdb31f7c5076fcc71a758cc8d4083",
+        "decision": "DEC-480",
+        "message": "commit a1c03c5b76cf cites DEC-480, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "be2e8c142ec2cc2b0eccaa6a8335b799ed493895",
+        "decision": "DEC-480",
+        "message": "commit be2e8c142ec2 cites DEC-480, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "5505ba57e163427559c47fddc9a8f0e441df1fa7",
+        "decision": "DEC-476",
+        "message": "commit 5505ba57e163 cites DEC-476, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "5505ba57e163427559c47fddc9a8f0e441df1fa7",
+        "decision": "DEC-480",
+        "message": "commit 5505ba57e163 cites DEC-480, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "4b84321d595f0772fc72ce463b2c252acafc6490",
+        "decision": "DEC-480",
+        "message": "commit 4b84321d595f cites DEC-480, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "fd7ad4f0561aeb8f8d85a32b87926d947f5e77b6",
+        "decision": "DEC-476",
+        "message": "commit fd7ad4f0561a cites DEC-476, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "569bdcd3a728ec597d04d9968112b801d21725ca",
+        "decision": "DEC-471",
+        "message": "commit 569bdcd3a728 cites DEC-471, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "7439c6d004853cdaa434a7c1e56a478008c2de0b",
+        "decision": "DEC-470",
+        "message": "commit 7439c6d00485 cites DEC-470, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "495cff52caba357724ab5e6933dd49442d57a0ed",
+        "decision": "DEC-470",
+        "message": "commit 495cff52caba cites DEC-470, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "d2c2d6ff1a1e4c3c052dd63505f61f74a6475da5",
+        "decision": "DEC-468",
+        "message": "commit d2c2d6ff1a1e cites DEC-468, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "e0b438501e856ee65078fe4c8eaa9af1bd7ed8ce",
+        "decision": "DEC-468",
+        "message": "commit e0b438501e85 cites DEC-468, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "af6fe34ec733fd676f37e194754e21373ad92ebd",
+        "decision": "DEC-453",
+        "message": "commit af6fe34ec733 cites DEC-453, which its tree does not record"
+       },
+       {
+        "code": "DECISION_UNRECORDED",
+        "commit": "af6fe34ec733fd676f37e194754e21373ad92ebd",
+        "decision": "DEC-454",
+        "message": "commit af6fe34ec733 cites DEC-454, which its tree does not record"
+       }
+      ],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "a5a9b94241340423"
+      }
+     },
+     {
+      "id": "core-graph",
+      "family": "graph integrity",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "82e70bc5be909a78"
+      }
+     },
+     {
+      "id": "core-mutation",
+      "family": "mutation scope",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "7e274d2dc1b115ae"
+      }
+     },
+     {
+      "id": "core-pathmap",
+      "family": "path-map compliance",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "6218844a8a69ddb3"
+      }
+     },
+     {
+      "id": "core-schema",
+      "family": "schema/invariants",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "eb2f12189b39dad2"
+      }
+     },
+     {
+      "id": "fresh-agent-reconstruction",
+      "family": "fresh-agent-reconstruction",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "265d4235aa288aa5"
+      }
+     },
+     {
+      "id": "index-freshness",
+      "family": "index-freshness",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "d6b7df3a384ccc18"
+      }
+     },
+     {
+      "id": "product-traceability-trailers",
+      "family": "product traceability",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "e901ba0b2849f649"
+      }
+     },
+     {
+      "id": "recovery-rebuild",
+      "family": "recovery/rebuild",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "fccb36d2629d3ab5"
+      }
+     },
+     {
+      "id": "retrieval-regression",
+      "family": "retrieval-regression",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "f01610285774364e"
+      }
+     },
+     {
+      "id": "secrets-indexing",
+      "family": "secrets-indexing",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "6978aa144f80d4f5"
+      }
+     },
+     {
+      "id": "skill-regression-a",
+      "family": "skill regression",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "cac0e5d68925dcf9"
+      }
+     },
+     {
+      "id": "skill-regression-b1",
+      "family": "skill regression",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "0126c12343ea2f9b"
+      }
+     },
+     {
+      "id": "skill-regression-orchestration",
+      "family": "skill regression",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "ed7638ecdc5ba12e"
+      }
+     },
+     {
+      "id": "openspec-validate",
+      "family": "product traceability",
+      "severity": "hard-block",
+      "status": "YELLOW",
+      "findings": [
+       {
+        "code": "OPENSPEC_NO_SPECS",
+        "message": "openspec: nothing to validate"
+       }
+      ],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "a4bff1f89f83d75f"
+      }
+     },
+     {
+      "id": "skill-version",
+      "family": "skill regression",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "8bbcb749386d27b8"
+      }
+     },
+     {
+      "id": "readiness",
+      "family": "product traceability",
+      "severity": "hard-block",
+      "status": "GREEN",
+      "findings": [],
+      "provenance": {
+       "commit": "93bcb247990552c07dfbe9a20c685830b47e46d2",
+       "check_version": "1.0.0",
+       "inputs_hash": "c61ae9ec4d2562df"
+      }
+     }
+    ]
+   },
+   "session": ""
+  }
+ },
+ "readiness": {
+  "argv": [
+   "gov",
+   "readiness",
+   "--specification",
+   "ORION-SPEC-DIMADD",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "a-dev exit clone, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "readiness",
+   "result": {
+    "specification": "ORION-SPEC-DIMADD",
+    "profile": "STANDARD",
+    "closed": true,
+    "open": []
+   },
+   "session": ""
+  }
+ },
+ "doctor": {
+  "argv": [
+   "gov",
+   "doctor",
+   "--json"
+  ],
+  "exit_code": 3,
+  "where": "this worktree, 2026-10-13",
+  "answer": {
+   "ok": false,
+   "command": "doctor",
+   "result": {},
+   "session": "",
+   "error": {
+    "code": "DOCTOR_UNHEALTHY",
+    "message": "one or more health checks failed or reported drift: tools; path_compliance; index_freshness; claude_code",
+    "details": {
+     "healthy": false,
+     "tools": {
+      "status": "fail",
+      "tools": [
+       {
+        "name": "node",
+        "pinned_version": "v22.23.3",
+        "found_version": "v22.23.3",
+        "sha256_match": true,
+        "ok": true,
+        "location": "/home/usain/.nvm/versions/node/v22.23.3/bin"
+       },
+       {
+        "name": "uv",
+        "pinned_version": "0.12.21",
+        "found_version": "0.12.21",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "rulesync",
+        "pinned_version": "24.0.0",
+        "found_version": "24.0.0",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "openspec",
+        "pinned_version": "1.13.2",
+        "found_version": "1.13.2",
+        "sha256_match": true,
+        "ok": true,
+        "location": "/home/usain/.nvm/versions/node/v22.23.3/bin"
+       },
+       {
+        "name": "codebase-memory-mcp",
+        "pinned_version": "0.11.0",
+        "found_version": "0.11.0",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "copier",
+        "pinned_version": "9.18.2",
+        "found_version": "9.18.2",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "lefthook",
+        "pinned_version": "2.1.15",
+        "found_version": "2.1.15",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "check-jsonschema",
+        "pinned_version": "0.38.2",
+        "found_version": "0.38.2",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "ollama",
+        "pinned_version": "0.35.0",
+        "found_version": "0.35.0",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "ticket",
+        "pinned_version": "v0.3.2",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "gitleaks",
+        "pinned_version": "8.30.1",
+        "found_version": "8.30.1",
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "pyyaml",
+        "pinned_version": "6.0.1",
+        "found_version": "6.0.1",
+        "sha256_match": false,
+        "ok": true
+       },
+       {
+        "name": "ccusage",
+        "pinned_version": "20.0.26",
+        "found_version": "20.0.26",
+        "sha256_match": false,
+        "ok": true,
+        "location": "/home/usain/.nvm/versions/node/v22.23.3/bin"
+       },
+       {
+        "name": "superpowers",
+        "pinned_version": "v6.4.2",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "bubblewrap",
+        "pinned_version": "0.9.0",
+        "found_version": "0.9.0",
+        "sha256_match": false,
+        "ok": true
+       },
+       {
+        "name": "qwen3-embedding",
+        "pinned_version": "0.6b",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "sqlite-vec",
+        "pinned_version": "0.1.9",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "reranker-venv",
+        "pinned_version": "sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "reranker",
+        "pinned_version": "Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       },
+       {
+        "name": "socat",
+        "pinned_version": "1.8.0.0",
+        "found_version": "1.8.0.0",
+        "sha256_match": false,
+        "ok": true
+       },
+       {
+        "name": "pytest-xdist",
+        "pinned_version": "3.8.0",
+        "found_version": null,
+        "sha256_match": false,
+        "ok": false
+       },
+       {
+        "name": "gov",
+        "pinned_version": "0.1.0",
+        "found_version": null,
+        "sha256_match": true,
+        "ok": true
+       }
+      ]
+     },
+     "hooks": {
+      "status": "pass",
+      "config_present": true,
+      "binary_installed": true
+     },
+     "path_map": {
+      "status": "pass",
+      "unclassified_count": 0,
+      "unclassified": []
+     },
+     "path_compliance": {
+      "status": "fail",
+      "moved_references": [
+       {
+        "old_path": "docs/audit/wave-1/adoption-path-map-verdict.md",
+        "new_path": "docs/adoption/adoption-path-map-verdict.md",
+        "referenced_in": "governance/adoption/A5-independent-review-of-the-path-map.md"
+       }
+      ],
+      "historical_excluded": 158
+     },
+     "index_freshness": {
+      "status": "fail",
+      "index_status": "stale",
+      "stale": [
+       ".claude/settings.json",
+       ".rulesync/hooks.jsonc",
+       ".tickets/DAEO-6mk8.md",
+       "docs/DECISION_REGISTER.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0005.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0007.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0009.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0011.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0014.md",
+       "docs/checkpoints/DAEO-3ef2/CP-DAEO-3ef2-0015.md",
+       "docs/checkpoints/DAEO-6mk8/CP-DAEO-6mk8-0002.md",
+       "docs/checkpoints/DAEO-6mk8/CP-DAEO-6mk8-0003.md",
+       "docs/checkpoints/DAEO-6mk8/CP-DAEO-6mk8-0004.md",
+       "docs/checkpoints/DAEO-6mk8/CP-DAEO-6mk8-0005.md",
+       "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0002.md",
+       "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0004.md",
+       "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0005.md",
+       "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0008.md",
+       "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0010.md",
+       "docs/probes/DAEO-3ef2/PR-DAEO-3ef2-round-DEC-664.md",
+       "docs/probes/DAEO-6mk8/PR-DAEO-6mk8-round-DEC-655.md",
+       "governance/project/bootstrap.md",
+       "governance/project/tool-registry.yaml",
+       "src/gov/telemetry/counter.py",
+       "src/gov/telemetry/sessionlog.py",
+       "template/.rulesync/permissions.jsonc",
+       "tests/acceptance/W1-28/README.md",
+       "tests/acceptance/W1-28/w1_28_copy_check.py",
+       "tests/acceptance/W1-31/README.md",
+       "tests/acceptance/W1-31/test_w1_31_fourth_specimen.py",
+       "tests/acceptance/W1-31/test_w1_31_measured_and_estimated.py",
+       "tests/acceptance/W1-31/w1_31_support.py",
+       "tests/acceptance/W1-33/README.md",
+       "tests/acceptance/W1-33/test_w1_33_agent_definitions.py",
+       "tests/acceptance/W1-33/w1_33_support.py",
+       "tests/acceptance/W1-38/README.md",
+       "tests/acceptance/W1-38/test_w1_38_test_folder_rule.py",
+       "tests/acceptance/W1-42/README.md",
+       "tests/acceptance/W1-42/conftest.py",
+       "tests/acceptance/W1-42/test_w1_42_exit_report.py",
+       "tests/acceptance/W1-42/w1_42_support.py",
+       "tests/acceptance/W1-49/README.md",
+       "tests/acceptance/W1-49/test_w1_49_threshold.py",
+       "tests/unit/telemetry/test_counter.py"
+      ]
+     },
+     "canaries": {
+      "status": "unmeasured",
+      "indices": {
+       "lexical": {
+        "passed": false,
+        "status": "FACET_UNAVAILABLE",
+        "misses": [
+         "juniper lantern protocol sentinel"
+        ]
+       },
+       "semantic": {
+        "passed": false,
+        "status": "FACET_UNAVAILABLE",
+        "misses": [
+         "juniper lantern protocol sentinel"
+        ]
+       }
+      }
+     },
+     "framework_lock": {
+      "status": "unmeasured",
+      "match": "MISSING",
+      "reason": "no framework.lock"
+     },
+     "isolation": {
+      "status": "pass",
+      "isolated": true,
+      "method": "runtime_parent_matches_git_root",
+      "git_root": "/home/usain/gov-os-worktrees/W1-42"
+     },
+     "claude_code": {
+      "status": "drift",
+      "drift": true,
+      "cli_version": "2.1.292",
+      "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+      "extension_version": "2.1.296",
+      "extension_binary_sha256": "24972e3bc859fab2b46ed4c1e51f7d6130f06d3bd550811a114640de3370d0de",
+      "pinned_version": "2.1.292",
+      "pinned_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+      "issues": [
+       {
+        "type": "drift",
+        "detail": "CLI 2.1.292 differs from extension 2.1.296"
+       },
+       {
+        "type": "drift",
+        "detail": "extension 2.1.296 newer than registry 2.1.292"
+       }
+      ]
+     },
+     "held_out": {
+      "status": "pass",
+      "missing": false
+     },
+     "adoption_level": {
+      "status": "pass",
+      "level": "INTERMEDIATE",
+      "systems_identified": 15,
+      "systems_total": 22
+     }
+    }
+   }
+  }
+ },
+ "rebuild": {
+  "argv": [
+   "gov",
+   "rebuild",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "a-dev exit clone, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "rebuild",
+   "result": {
+    "digest": "b50ca2570d646e9a25a05b253c511203770468a8e65aa364dd5192557f978569",
+    "store": {
+     "digest": "b50ca2570d646e9a25a05b253c511203770468a8e65aa364dd5192557f978569",
+     "invalid": []
+    },
+    "stores": {
+     "lexical": {
+      "status": "recreated"
+     },
+     "semantic": {
+      "status": "recreated"
+     },
+     "codeintel": {
+      "status": "recreated"
+     }
+    },
+    "timing": {
+     "lexical_s": 0.0
+    }
+   },
+   "session": ""
+  }
+ },
+ "context": {
+  "argv": [
+   "gov",
+   "context",
+   "DAEO-gjjf",
+   "--dry-run",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "this worktree, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "context",
+   "result": {
+    "ticket": "DAEO-gjjf",
+    "authority": [
+     {
+      "id": "DEC-080",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-086",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-088",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-089",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-091",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-106",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-161",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-235",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-1",
+      "sha256": "8f18f37b91ee1876340152e0d35b1bb4c348bd98c54c353dba42a14df6823e80",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "8f18f37b91ee1876340152e0d35b1bb4c348bd98c54c353dba42a14df6823e80",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-2",
+      "sha256": "561f832c0f60dd6870ce19a920221e327a7107f9b72ab481b44f96ca2b8ad7c5",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "561f832c0f60dd6870ce19a920221e327a7107f9b72ab481b44f96ca2b8ad7c5",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-3",
+      "sha256": "89573fadfec33d2a8f4b50d560c5aefacf8bba6b502f328d7907ae81776b8b2d",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "89573fadfec33d2a8f4b50d560c5aefacf8bba6b502f328d7907ae81776b8b2d",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-4",
+      "sha256": "f39284a4ae269becb6dc7fec1240156aebc888348c26e3a69bb1864ff65a209a",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "f39284a4ae269becb6dc7fec1240156aebc888348c26e3a69bb1864ff65a209a",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-6",
+      "sha256": "07790ee91f0282f7e0baef836ce8d9c669818243b2f27fc96cca34677ea7b423",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "07790ee91f0282f7e0baef836ce8d9c669818243b2f27fc96cca34677ea7b423",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-28",
+      "sha256": "f155d8a626f091055c4141497039a944a55ffd9935dcd6ce14ff235ae52ba42f",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "f155d8a626f091055c4141497039a944a55ffd9935dcd6ce14ff235ae52ba42f",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-38",
+      "sha256": "46eaf746f516b1143a8bf7594caa5ffe7a052f869650ef553cde012c9c04d91f",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "46eaf746f516b1143a8bf7594caa5ffe7a052f869650ef553cde012c9c04d91f",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-40",
+      "sha256": "c4382c0b7c667703f14e8c3708325a50589fb830b5eda110cb5d47c350d42be1",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "c4382c0b7c667703f14e8c3708325a50589fb830b5eda110cb5d47c350d42be1",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-23",
+      "sha256": "e1b0f93941b031a1fb13ac1fb15d78f95a98b9cceff515627852e4e58be824e4",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "e1b0f93941b031a1fb13ac1fb15d78f95a98b9cceff515627852e4e58be824e4",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-9i8e",
+      "sha256": "b8ea05e0d743de627689b1143f4717c78ec822349b5e5b4c55e779fb61634543",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "b8ea05e0d743de627689b1143f4717c78ec822349b5e5b4c55e779fb61634543",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-8goq",
+      "sha256": "e435db1d6378f259a6e213951f522a9745748eb03bcb7b374da3b0a0ebfdb510",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "e435db1d6378f259a6e213951f522a9745748eb03bcb7b374da3b0a0ebfdb510",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-0i6h",
+      "sha256": "f2475d2c88f3aa10f33f870a018576d801774c3ef18bb1077129880cd20aae3b",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "f2475d2c88f3aa10f33f870a018576d801774c3ef18bb1077129880cd20aae3b",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-skiy",
+      "sha256": "129d59ab59c6190627a90aed78def6e894b2a5a4728c4c600c58f1e1e33a3dce",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "129d59ab59c6190627a90aed78def6e894b2a5a4728c4c600c58f1e1e33a3dce",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-fdkq",
+      "sha256": "f851c6d047c6775ca2e4d2048d26c0c3e04e26b7a03dcb32443b854156583e2b",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "f851c6d047c6775ca2e4d2048d26c0c3e04e26b7a03dcb32443b854156583e2b",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-cdoi",
+      "sha256": "2a1bda5c0ce8dcd0d6c2620f35646f3027fc26711b349829a20ab2b632fed8c6",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "2a1bda5c0ce8dcd0d6c2620f35646f3027fc26711b349829a20ab2b632fed8c6",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-wqd6",
+      "sha256": "78bb2d7650a859e265f5b91abf8cc61b4e8cd4f42ac4d6daa4abd6d68ee6d0d9",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "78bb2d7650a859e265f5b91abf8cc61b4e8cd4f42ac4d6daa4abd6d68ee6d0d9",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-jdqr",
+      "sha256": "4f5f1c85f9d601d51c0439421c033c8296793b106714d6fc88473cda7aa7e8fd",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "4f5f1c85f9d601d51c0439421c033c8296793b106714d6fc88473cda7aa7e8fd",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-o4fg",
+      "sha256": "44a94c6e774087b1957d8f1267336a0b70e37e3bf449c490e9f8a142235315dd",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "44a94c6e774087b1957d8f1267336a0b70e37e3bf449c490e9f8a142235315dd",
+      "reason": "declared in sources"
+     }
+    ],
+    "mandatory": [
+     {
+      "id": "DEC-080",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-086",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-088",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-089",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-091",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-106",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-161",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DEC-235",
+      "sha256": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "authority": "decision",
+      "lifecycle": "ACCEPTED",
+      "constraint": "8448f4fcfe2db6df29722c5c87c79b68ad2bfb1fdcdf8782f321082e92c67bd0",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-1",
+      "sha256": "8f18f37b91ee1876340152e0d35b1bb4c348bd98c54c353dba42a14df6823e80",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "8f18f37b91ee1876340152e0d35b1bb4c348bd98c54c353dba42a14df6823e80",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-2",
+      "sha256": "561f832c0f60dd6870ce19a920221e327a7107f9b72ab481b44f96ca2b8ad7c5",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "561f832c0f60dd6870ce19a920221e327a7107f9b72ab481b44f96ca2b8ad7c5",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-3",
+      "sha256": "89573fadfec33d2a8f4b50d560c5aefacf8bba6b502f328d7907ae81776b8b2d",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "89573fadfec33d2a8f4b50d560c5aefacf8bba6b502f328d7907ae81776b8b2d",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-4",
+      "sha256": "f39284a4ae269becb6dc7fec1240156aebc888348c26e3a69bb1864ff65a209a",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "f39284a4ae269becb6dc7fec1240156aebc888348c26e3a69bb1864ff65a209a",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "MR-6",
+      "sha256": "07790ee91f0282f7e0baef836ce8d9c669818243b2f27fc96cca34677ea7b423",
+      "authority": "specification",
+      "lifecycle": "PROPOSED",
+      "constraint": "07790ee91f0282f7e0baef836ce8d9c669818243b2f27fc96cca34677ea7b423",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-28",
+      "sha256": "f155d8a626f091055c4141497039a944a55ffd9935dcd6ce14ff235ae52ba42f",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "f155d8a626f091055c4141497039a944a55ffd9935dcd6ce14ff235ae52ba42f",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-38",
+      "sha256": "46eaf746f516b1143a8bf7594caa5ffe7a052f869650ef553cde012c9c04d91f",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "46eaf746f516b1143a8bf7594caa5ffe7a052f869650ef553cde012c9c04d91f",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-40",
+      "sha256": "c4382c0b7c667703f14e8c3708325a50589fb830b5eda110cb5d47c350d42be1",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "c4382c0b7c667703f14e8c3708325a50589fb830b5eda110cb5d47c350d42be1",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "CAP-23",
+      "sha256": "e1b0f93941b031a1fb13ac1fb15d78f95a98b9cceff515627852e4e58be824e4",
+      "authority": "capability",
+      "lifecycle": "PROPOSED",
+      "constraint": "e1b0f93941b031a1fb13ac1fb15d78f95a98b9cceff515627852e4e58be824e4",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-9i8e",
+      "sha256": "b8ea05e0d743de627689b1143f4717c78ec822349b5e5b4c55e779fb61634543",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "b8ea05e0d743de627689b1143f4717c78ec822349b5e5b4c55e779fb61634543",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-8goq",
+      "sha256": "e435db1d6378f259a6e213951f522a9745748eb03bcb7b374da3b0a0ebfdb510",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "e435db1d6378f259a6e213951f522a9745748eb03bcb7b374da3b0a0ebfdb510",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-0i6h",
+      "sha256": "f2475d2c88f3aa10f33f870a018576d801774c3ef18bb1077129880cd20aae3b",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "f2475d2c88f3aa10f33f870a018576d801774c3ef18bb1077129880cd20aae3b",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-skiy",
+      "sha256": "129d59ab59c6190627a90aed78def6e894b2a5a4728c4c600c58f1e1e33a3dce",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "129d59ab59c6190627a90aed78def6e894b2a5a4728c4c600c58f1e1e33a3dce",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-fdkq",
+      "sha256": "f851c6d047c6775ca2e4d2048d26c0c3e04e26b7a03dcb32443b854156583e2b",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "f851c6d047c6775ca2e4d2048d26c0c3e04e26b7a03dcb32443b854156583e2b",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-cdoi",
+      "sha256": "2a1bda5c0ce8dcd0d6c2620f35646f3027fc26711b349829a20ab2b632fed8c6",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "2a1bda5c0ce8dcd0d6c2620f35646f3027fc26711b349829a20ab2b632fed8c6",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-wqd6",
+      "sha256": "78bb2d7650a859e265f5b91abf8cc61b4e8cd4f42ac4d6daa4abd6d68ee6d0d9",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "78bb2d7650a859e265f5b91abf8cc61b4e8cd4f42ac4d6daa4abd6d68ee6d0d9",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-jdqr",
+      "sha256": "4f5f1c85f9d601d51c0439421c033c8296793b106714d6fc88473cda7aa7e8fd",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "4f5f1c85f9d601d51c0439421c033c8296793b106714d6fc88473cda7aa7e8fd",
+      "reason": "declared in sources"
+     },
+     {
+      "id": "DAEO-o4fg",
+      "sha256": "44a94c6e774087b1957d8f1267336a0b70e37e3bf449c490e9f8a142235315dd",
+      "authority": "task",
+      "lifecycle": "closed",
+      "constraint": "44a94c6e774087b1957d8f1267336a0b70e37e3bf449c490e9f8a142235315dd",
+      "reason": "declared in sources"
+     }
+    ],
+    "supplementary": [],
+    "dropped": [],
+    "hash": "639c398399d0d694f822e1223e0ed8c38f9e385da698d096ce4b9075803bc5a6",
+    "tokens": 1542221,
+    "budget": {
+     "limit": 6000,
+     "used": 1542221
+    }
+   },
+   "session": ""
+  }
+ },
+ "closure": {
+  "argv": [
+   "gov",
+   "closure",
+   "DEC-511",
+   "--depth",
+   "1",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "this worktree, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "closure",
+   "result": {
+    "start": [
+     "DEC-511"
+    ],
+    "depth": 1,
+    "stopping_reason": "CLOSURE_COMPLETE",
+    "closure": [
+     {
+      "id": "DEC-511",
+      "kind": "record"
+     }
+    ],
+    "gaps": [],
+    "facets": {
+     "code": "not_asked"
+    },
+    "uncommitted": [
+     "docs/plan/wave-1-exit/evidence/"
+    ]
+   },
+   "session": ""
+  }
+ },
+ "retrieve": {
+  "argv": [
+   "gov",
+   "retrieve",
+   "Which rule decides whether two dimensions may be added or subtracted, where is the named dimension for acceleration defined, and which decision accepted it?",
+   "--ticket",
+   "ORION-im02",
+   "--id",
+   "ADR-011",
+   "--id",
+   "MATH-SPEC-003",
+   "--radius",
+   "1",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "a-dev exit clone, 2026-10-13",
+  "note": "evidence text taken out of the kept copy",
+  "answer": {
+   "ok": true,
+   "command": "retrieve",
+   "result": {
+    "stopping_reason": "FACET_UNAVAILABLE",
+    "evidence": [
+     {
+      "id": "ADR-011",
+      "sha256": "b4ade811ca0bff05c398d01c751ca1453d526270505f5d3f9d727b1c1c91e8ba",
+      "path": "decisions/adr-011.md",
+      "start_line": 15,
+      "end_line": 27,
+      "chunk_id": "7815fe0fc7bcc120256fec36",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 574
+     },
+     {
+      "id": "ORION-im02",
+      "sha256": "c236ef32b75445a176bca1e3384afa5eb60c73826d1586204f971e2575739caa",
+      "path": ".tickets/ORION-im02.md",
+      "start_line": 45,
+      "end_line": 51,
+      "chunk_id": "9c3bf05584f576ad968b0a2f",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 947
+     },
+     {
+      "id": "ADR-011",
+      "sha256": "4e64a343c087f81f5dd2429b21c1a533fccfa8827f2d89e18103a5f919dcf61f",
+      "path": "decisions/adr-011.md",
+      "start_line": 28,
+      "end_line": 38,
+      "chunk_id": "7ccedb68cf4f4478b6c412cf",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 605
+     },
+     {
+      "id": "ORION-im02",
+      "sha256": "0d0ae7999312d6952660e3305cd7961d5e4b46c5c4cfbeddd93a9eddc6732ad0",
+      "path": ".tickets/ORION-im02.md",
+      "start_line": 1,
+      "end_line": 44,
+      "chunk_id": "72809aa856729d8d606c8846",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 1786
+     },
+     {
+      "id": "ADR-011",
+      "sha256": "6f665847833db7446d973e6b10f84246a717f7fae664cbe0621892d47eb769fa",
+      "path": "decisions/adr-011.md",
+      "start_line": 1,
+      "end_line": 12,
+      "chunk_id": "ffe8c91807313b59a000c500",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 223
+     },
+     {
+      "id": "ADR-011",
+      "sha256": "69045a711608a08ebec930b8cafd115f2c947efe69252981d250dfc847637c6e",
+      "path": "decisions/adr-011.md",
+      "start_line": 39,
+      "end_line": 43,
+      "chunk_id": "54f384d918f6269eafd303bc",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 296
+     },
+     {
+      "id": "ADR-011",
+      "sha256": "a11eb3b05319e6bc28cc6a17dc5ab8b1d5b6adac6c99de545b08cf4e862e62f4",
+      "path": "decisions/adr-011.md",
+      "start_line": 13,
+      "end_line": 14,
+      "chunk_id": "d63ff449be16b73b7ffb0bcf",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 62
+     },
+     {
+      "id": "ORION-im02",
+      "sha256": "9742a00cbb367c549ca8c1cd1cb5e52a8a00d6559268afdcf4a5bae1eb0cdb26",
+      "path": ".tickets/ORION-im02.md",
+      "start_line": 1,
+      "end_line": 30,
+      "chunk_id": "695351548729dd53bbf24c13",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 1199
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "7d266ad972ecf1ee76698b40def34dbd08a1d7401fdf03d666ea4ea77091cd22",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 27,
+      "end_line": 32,
+      "chunk_id": "75a62c712a686d126438ec5b",
+      "routes": [
+       "closure"
+      ],
+      "batch": 2,
+      "text_removed_chars": 221
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "5b3e1f18f50e11e8c4399e094fed388d1c528eed4227a6dc182c8bf472845156",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 19,
+      "end_line": 26,
+      "chunk_id": "197afd1b2ec41ba1027a60ae",
+      "routes": [
+       "closure"
+      ],
+      "batch": 2,
+      "text_removed_chars": 168
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "41a5ed260185cdaa5d1fade199035930f71e97a7b4c08c620642c96c8712c117",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 14,
+      "end_line": 18,
+      "chunk_id": "a899979988d5dbebe09d4295",
+      "routes": [
+       "closure"
+      ],
+      "batch": 2,
+      "text_removed_chars": 108
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "d04347eb1035f6085696102457141e69e2950ad0cf38d6fbcf172ed3ad8f4029",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 12,
+      "end_line": 13,
+      "chunk_id": "fa2ea6815e967396d1d45c83",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 24
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "0da08fb0d5af739cc8dae71b8980de72d157ee8983d4985cde152eb76a659b2b",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 1,
+      "end_line": 11,
+      "chunk_id": "007d374522b9b36c818572ab",
+      "routes": [
+       "closure"
+      ],
+      "batch": 1,
+      "text_removed_chars": 205
+     },
+     {
+      "id": "MATH-SPEC-003",
+      "sha256": "9f84f71b591b7e504f6be978dc25ef379c883b0ad2b8f2f53139376eb0900474",
+      "path": "specs/math/dimensional-analysis.md",
+      "start_line": 33,
+      "end_line": 37,
+      "chunk_id": "860052ebd1b04e2f406e4bfd",
+      "routes": [
+       "closure"
+      ],
+      "batch": 2,
+      "text_removed_chars": 171
+     }
+    ],
+    "batches": [
+     {
+      "size": 10
+     },
+     {
+      "size": 4
+     }
+    ],
+    "merge": {
+     "candidates": 14,
+     "duplicates": 0,
+     "dropped": [],
+     "reranked": true
+    },
+    "expansions": [
+     {
+      "chunk_id": "72809aa856729d8d606c8846",
+      "parent_id": "37e5919e0f666b584af442b7",
+      "path": ".tickets/ORION-im02.md",
+      "start_line": 1,
+      "end_line": 44
+     }
+    ],
+    "gaps": [],
+    "facets": {
+     "lexical": {
+      "available": true,
+      "reason": null
+     },
+     "semantic": {
+      "available": false,
+      "reason": "empty"
+     },
+     "closure": {
+      "available": true,
+      "reason": null
+     }
+    },
+    "budget": {
+     "bundle": {
+      "limit": 6000,
+      "used": 1652
+     },
+     "rounds": {
+      "limit": 1,
+      "used": 1
+     }
+    },
+    "continuation": null
+   },
+   "session": ""
+  }
+ },
+ "checkpoint": {
+  "argv": [
+   "gov",
+   "checkpoint",
+   "--ticket",
+   "DAEO-gjjf",
+   "--role",
+   "orchestrator",
+   "--trigger",
+   "ticket-transition",
+   "--next",
+   "Write docs/plan/wave-1-exit/EXIT-REPORT.md and its evidence, commit, then run the W1-42 suite and every earlier suite",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "this worktree, 2026-10-13",
+  "answer": {
+   "ok": true,
+   "command": "checkpoint",
+   "result": {
+    "path": "docs/checkpoints/DAEO-gjjf/CP-DAEO-gjjf-0012.md",
+    "id": "CP-DAEO-gjjf-0012"
+   },
+   "session": ""
+  }
+ },
+ "close": {
+  "argv": [
+   "gov",
+   "close",
+   "ORION-im02",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "a-dev exit clone, 2026-10-13",
+  "argv_note": "the one call of run 5; no --disposition and no --owner-decision was passed; the exact command line was not kept beside the answer",
+  "answer": {
+   "ok": true,
+   "command": "close",
+   "result": {
+    "ticket": "ORION-im02",
+    "close_record": "docs/close/ORION-im02/CL-ORION-im02.md",
+    "checkpoint": "docs/checkpoints/ORION-im02/CP-ORION-im02-0004.md",
+    "test_runs": [
+     {
+      "run": "acceptance",
+      "form": "parallel",
+      "seconds": 5.82,
+      "passed": 43,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "workers": "auto"
+     },
+     {
+      "run": "regression",
+      "form": "parallel",
+      "seconds": 0.89,
+      "passed": 84,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "workers": "auto"
+     }
+    ],
+    "governance_share": {
+     "measured": "not measured",
+     "estimated": "not measured",
+     "total": "not measured"
+    }
+   },
+   "session": ""
+  }
+ },
+ "adopt": {
+  "argv": [
+   "gov",
+   "adopt",
+   "--lite",
+   "--stage",
+   "A8",
+   "--session",
+   "w1-42-lead-run3",
+   "--json"
+  ],
+  "exit_code": 0,
+  "where": "a-dev exit clone, run 3, 2026-10-13",
+  "argv_note": "rebuilt from the answer (stage A8, the session it carries) and run 3's return (exit 0); the exact command line was not kept beside the answer",
+  "answer": {
+   "ok": true,
+   "command": "adopt",
+   "result": {
+    "stage": "A8",
+    "record": "governance/adoption/A8-legacy-import-and-retirement.md",
+    "next_step": "rulesync generate --targets claudecode,agentsmd --features rules,hooks,permissions,subagents,commands,skills",
+    "retired": [],
+    "rebuild": {
+     "lexical": {
+      "status": "recreated"
+     },
+     "semantic": {
+      "status": "recreated"
+     },
+     "codeintel": {
+      "status": "recreated"
+     }
+    }
+   },
+   "session": "w1-42-lead-run3"
+  }
+ },
+ "pause": {
+  "argv": [
+   "gov",
+   "pause"
+  ],
+  "exit_code": 0,
+  "where": "the owner's own plain terminal, on a throwaway copy of the a-dev exit clone, 2026-10-13 (step B2 part 1); no agent runs gov pause anywhere",
+  "argv_note": "the answer is quoted from the decision register (DEC-668), which quotes the owner's output; the exit code is read from ok true and was not itself recorded",
+  "answer": {
+   "ok": true,
+   "command": "pause",
+   "result": {
+    "paused": true
+   },
+   "session": ""
+  }
+ }
+}

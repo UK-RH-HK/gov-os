@@ -1,0 +1,210 @@
+[
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "30d80992-696a-4d46-8448-a8356594b330",
+  "ticket": "ORION-sp01",
+  "launch_record": "a-spec",
+  "lead_run": 1
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "d6e1b5d3-6323-4202-8bd6-e2f0beb6f856",
+  "ticket": "ORION-ad01",
+  "launch_record": "a-adopt",
+  "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "1ddd5332-9094-473d-b2f4-201bdf5825b9",
+  "ticket": "ORION-ad01",
+  "launch_record": "a-adopt2",
+  "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-auditor",
+  "session_id": "374ba416-f86b-4312-8343-28996934868d",
+  "ticket": "ORION-ad02",
+  "launch_record": "a-a5",
+  "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "cd685872-3076-4747-98f2-54ac15c436f1",
+  "ticket": "ORION-sp01",
+  "launch_record": "a-spec2",
+  "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-test-designer",
+  "session_id": "32ce12c8-8873-4b69-8b30-3fc24d408468",
+  "ticket": "ORION-gp09",
+  "launch_record": "a-tests",
+  "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "c1a6303a-e685-4ed6-9882-90a7fa09a930",
+  "ticket": "ORION-ad03",
+  "launch_record": "a-ad3a",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "dfc527f1-75ac-4ca0-b440-b644138b5904",
+  "ticket": "ORION-ad03",
+  "launch_record": "a-ad3b",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-test-designer",
+  "session_id": "11cbaf5d-ca3f-4000-aed9-628ec50dbca4",
+  "ticket": "ORION-gp09",
+  "launch_record": "a-tests2",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "2f843e1f-73d1-4097-bdad-2b0d0663b386",
+  "ticket": "ORION-sp01",
+  "launch_record": "a-row25",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-auditor",
+  "session_id": "3bc91ae2-bb4e-4517-8a6a-3483abbb6e78",
+  "ticket": "ade-0y1v",
+  "launch_record": "a-audit",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "02231527-05b5-41d3-9df7-e73b2997def3",
+  "ticket": "ORION-sp01",
+  "launch_record": "a-open6",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-auditor",
+  "session_id": "bcbec398-48e2-4df7-8287-d9288680cb3b",
+  "ticket": "ade-0y1v",
+  "launch_record": "a-audit2",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-auditor",
+  "session_id": "54c09049-eb6d-4223-963d-d976966b1168",
+  "ticket": "ade-0y1v",
+  "launch_record": "a-audit3",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "engineer",
+  "session_id": "17ddef8f-89b7-4d3f-85ec-ab88bdcfc863",
+  "ticket": "ORION-im01",
+  "launch_record": "a-eng",
+  "lead_run": 3
+ },
+ {
+  "programme": "ORION",
+  "role": "independent-test-designer",
+  "session_id": "c337eafb-07c1-40ce-bc76-3c316f2ce064",
+  "ticket": "ORION-im02",
+  "launch_record": "a-im02-tests",
+  "lead_run": 5
+ },
+ {
+  "programme": "ORION",
+  "role": "engineer",
+  "session_id": "1ba66f99-d833-4034-aafa-5b1d659a510e",
+  "ticket": "ORION-im02",
+  "launch_record": "a-im02-eng",
+  "lead_run": 5
+ },
+ {
+  "programme": "ARGUS",
+  "role": "product-spec",
+  "session_id": "1522beaf-6e63-44ef-872f-2c6452797298",
+  "ticket": "ARGUS-sp01",
+  "launch_record": "b-spec",
+  "lead_run": 1
+ },
+ {
+  "programme": "ARGUS",
+  "role": "product-spec",
+  "session_id": "94619988-2d84-4359-b2c4-3d22e2eb1c36",
+  "ticket": "ARGUS-ad01",
+  "launch_record": "b-adopt",
+  "lead_run": 2
+ },
+ {
+  "programme": "ARGUS",
+  "role": "product-spec",
+  "session_id": "f2ef7e58-9588-4239-8cec-10cce0de1e5e",
+  "ticket": "ARGUS-sp01",
+  "launch_record": "b-spec2",
+  "lead_run": 2
+ },
+ {
+  "programme": "ARGUS",
+  "role": "product-spec",
+  "session_id": "90d133da-4a93-4338-862d-67a9fb7e7e31",
+  "ticket": "ARGUS-sp01",
+  "launch_record": "b-spec3",
+  "lead_run": 3
+ },
+ {
+  "programme": "ARGUS",
+  "role": "independent-test-designer",
+  "session_id": "066cf469-c1ce-475a-ba66-849109e7e86e",
+  "ticket": "ARGUS-gp13",
+  "launch_record": "b-tests",
+  "lead_run": 3
+ },
+ {
+  "programme": "ARGUS",
+  "role": "product-spec",
+  "session_id": "37d131ef-63a0-4a4b-a179-1173839da13a",
+  "ticket": "ARGUS-sp01",
+  "launch_record": "b-row25",
+  "lead_run": 3
+ },
+ {
+  "programme": "ARGUS",
+  "role": "independent-auditor",
+  "session_id": "739d9266-24ef-48b9-bb77-971a1f90af8c",
+  "ticket": "bde-c1yl",
+  "launch_record": "b-audit",
+  "lead_run": 3
+ },
+ {
+  "programme": "ARGUS",
+  "role": "engineer",
+  "session_id": "721df431-f0c8-4a4f-9635-012517224284",
+  "ticket": "ARGUS-im01",
+  "launch_record": "b-eng",
+  "lead_run": 3
+ },
+ {
+  "programme": "this repository",
+  "role": "independent-test-designer",
+  "session_id": "824751db-712e-4b49-b0c8-396fd2f8360b",
+  "ticket": "DAEO-gjjf",
+  "launch_record": "w1-42-tests",
+  "lead_run": 2
+ }
+]

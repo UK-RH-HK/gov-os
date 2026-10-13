@@ -1,0 +1,54 @@
+{
+ "session_id": "32ce12c8-8873-4b69-8b30-3fc24d408468",
+ "programme": "ORION",
+ "repository": "/tmp/claude-1000/-home-usain-gov-os-worktrees-W1-42/1be98491-a02b-4f3c-accf-41da4cc96c6b/scratchpad/clones/a-dev-exit",
+ "role": "independent-test-designer",
+ "ticket": "ORION-gp09",
+ "lead_run": 2,
+ "started_through": "gov launch",
+ "argv": [
+  "gov",
+  "launch",
+  "independent-test-designer",
+  "ORION-gp09",
+  "--",
+  "--model",
+  "claude-opus-5-5",
+  "-p",
+  "--output-format",
+  "json",
+  "--permission-mode",
+  "acceptEdits",
+  "--allowedTools",
+  "Bash",
+  "Read",
+  "Edit",
+  "Write",
+  "Grep",
+  "Glob"
+ ],
+ "argv_note": "the form of the lead's helper launch.sh; the brief went in on standard input",
+ "sandbox": {
+  "enabled": true,
+  "failIfUnavailable": true,
+  "allowUnsandboxedCommands": false,
+  "source": "the launcher's own --settings value (src/gov/launch/launcher.py, build_settings); the launcher refuses to start a session whose settings fail these"
+ },
+ "network_profile": {
+  "strictAllowlist": true,
+  "allowedDomains": [],
+  "note": "no host: only a research ticket gets an allowlist"
+ },
+ "launcher_exit": "0",
+ "is_error": false,
+ "terminal_reason": "completed",
+ "num_turns": 19,
+ "duration_ms": 129324,
+ "total_cost_usd": 0.7480994,
+ "models": [
+  "claude-haiku-4-5-20251001",
+  "claude-opus-5-5"
+ ],
+ "permission_denials": 5,
+ "kept_from": ".gov-runtime/scratch/lead/log/a-tests.json (the session's result envelope; its return text is not copied here)"
+}

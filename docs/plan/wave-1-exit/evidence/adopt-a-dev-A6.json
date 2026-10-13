@@ -1,0 +1,1 @@
+{"ok": true, "command": "adopt", "result": {"stage": "A6", "record": "governance/adoption/A6-controlled-migration.md", "rebuild": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "recreated"}}}, "session": "w1-42-lead-run3"}

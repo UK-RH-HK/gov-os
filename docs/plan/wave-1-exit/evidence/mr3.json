@@ -1,0 +1,41 @@
+{
+ "breaches": [],
+ "checked": [
+  {
+   "repository": "a-dev",
+   "check": "which commits change anything under tests/",
+   "method": "git log --format='%h %(trailers:key=Role) %(trailers:key=Task)' -- tests/ on the feature branch at 30996b6",
+   "result": "two commits, both Role independent-test-designer: 930b197 (ORION-gp09) and f49924a (ORION-im02)"
+  },
+  {
+   "repository": "a-dev",
+   "check": "the guard's findings file of the clone",
+   "method": "read .gov-runtime/findings.jsonl of the clone, 2026-10-13",
+   "result": "7 entries, all of 2026-10-12, role product-spec, ticket ORION-ad01, tool Bash: 5 'reverted, acceptance test restored from HEAD' on tests/acceptance (the post-command check undid the effect; nothing of it is in history) and 2 'flagged, change outside allowed paths' on home-directory dot files; none by an engineer, none since"
+  },
+  {
+   "repository": "a-dev",
+   "check": "the engineers' commits",
+   "method": "git show --stat of c7b4818 (ORION-im01) and 6a78498 (ORION-im02)",
+   "result": "each changes python/orion_ref/dimensions.py and nothing else"
+  },
+  {
+   "repository": "b-dev",
+   "check": "which commits change anything under tests/",
+   "method": "git log --format='%h %(trailers:key=Role) %(trailers:key=Task)' -- tests/ on the feature branch at fc28272",
+   "result": "one commit, Role independent-test-designer: 2db35a4 (ARGUS-gp13)"
+  },
+  {
+   "repository": "b-dev",
+   "check": "the guard's findings file of the clone",
+   "method": "read .gov-runtime/findings.jsonl of the clone, 2026-10-13",
+   "result": "8 entries, all of 2026-10-12, role product-spec, ticket ARGUS-ad01, tool Bash: 6 'reverted, acceptance test restored from HEAD' on tests/acceptance and 2 'flagged, change outside allowed paths' on home-directory dot files; none by an engineer, none since"
+  },
+  {
+   "repository": "b-dev",
+   "check": "the engineer's commit",
+   "method": "the lead's check of 7b0e68d in run 3 (git show --stat)",
+   "result": "pyargus/src/pyargus/core/retention.py and the README, nothing under tests/"
+  }
+ ]
+}
