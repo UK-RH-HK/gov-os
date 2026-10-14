@@ -1,6 +1,6 @@
 ---
 id: DAEO-cdoi
-status: closed
+status: in_progress
 deps: [DAEO-xw3k, DAEO-3ef2, DAEO-5ylr, DAEO-xog0]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -26,6 +26,11 @@ allowed_paths:
 - tests/unit/context/**
 - governance/project/external-references.yaml
 - tests/unit/launch/test_command_modules.py
+- src/gov/doctor/**
+- tests/unit/doctor/**
+- src/gov/rebuild/**
+- tests/unit/rebuild/**
+- template/governance/kernel/skills/adopt/SKILL.md
 kpis:
   success:
   - 'On b-dev, stages A0-A4, A5, A6 and A8 each write an evidence record: A0 clean tree and backup ref; A1 inventory; A2 classification; A3 target path map with KEEP/MOVE/RENAME/SPLIT/MERGE/EXTRACT/RETIRE/DELETE_FROM_ACTIVE_TREE
