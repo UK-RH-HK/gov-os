@@ -30,8 +30,8 @@ VERDICT = "audit/a5-verdict.md"
 PATHS = ("lib/**", "scripts/**", "docs/**", "audit/**", "pkg/**", "README.md", ".gitignore")
 
 
-def config(code_intelligence=True, paths=PATHS):
-    return {"path-map.yaml": {"namespaces": {"all": {"paths": list(paths)}},
+def config(code_intelligence=True, paths=PATHS, policy="embedded"):
+    return {"path-map.yaml": {"namespaces": {"all": {"paths": list(paths), "embedding_policy": policy}},
                               "capabilities": {"code_intelligence": {"enabled": code_intelligence}}}}
 
 
@@ -151,6 +151,23 @@ def test_no_move_is_recorded_where_code_intelligence_is_off(root):
         stage(root, name)
     head = sh(root, "rev-parse", "HEAD")
     refused("CODE_INTELLIGENCE_OFF", root, "A3", conf=config(False), map=proposal(root, MOVES[0]))
+    assert sh(root, "rev-parse", "HEAD") == head and not (root / project.record_path("A3")).exists()
+
+
+@pytest.mark.parametrize("policy", ["Embedded", None, "not embedded"])
+def test_a3_records_no_path_map_whose_namespace_states_another_policy_or_none_embedded(root, policy):
+    """DEC-694, DEC-700: exactly ``embedded`` or ``not embedded``, and one ``embedded``; a missing field is another.
+    The one namespace is not embedded in each case, so each message says so."""
+    for name in ("A0", "A1", "A2"):
+        stage(root, name)
+    head, conf = sh(root, "rev-parse", "HEAD"), config(policy=policy)
+    if policy is None:
+        del conf["path-map.yaml"]["namespaces"]["all"]["embedding_policy"]
+    error = refused("EMBEDDING_POLICY", root, "A3", conf=conf,
+                    map=proposal(root, {"path": "README.md", "action": "KEEP"}))
+    assert ("`embedded`" in error.message and "`not embedded`" in error.message
+            and "no namespace is embedded" in error.message)
+    assert error.details["namespaces"] == ([] if policy == "not embedded" else ["all"])
     assert sh(root, "rev-parse", "HEAD") == head and not (root / project.record_path("A3")).exists()
 
 
