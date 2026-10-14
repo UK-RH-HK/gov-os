@@ -834,6 +834,11 @@ def run(root: Path, args, config: dict) -> dict | tuple:
         "held_out": _check_held_out(root),
     }
     sections["adoption_level"] = _check_adoption_level(root, config, sections)
+    from gov.rebuild.command import none_embedded
+    semantic = sections["canaries"].get("indices", {}).get("semantic")
+    note = none_embedded(config)
+    if note and isinstance(semantic, dict):  # beside the canary's answer, which stays as given: no failure added
+        semantic["embedding"] = note
 
     healthy = all(
         s.get("status") not in ("fail", "drift")

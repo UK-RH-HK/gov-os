@@ -18,6 +18,7 @@ import yaml
 from gov.adopt import project
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
+from gov.retrieval.semantic import EMBEDDED
 
 ACTIONS = ("KEEP", *MOVING, "RETIRE", "DELETE_FROM_ACTIVE_TREE")  # CAP-06.b
 EXECUTED = ("MOVE", "RENAME", "DELETE_FROM_ACTIVE_TREE")  # what an A6 batch does; none changes a file's content
@@ -26,6 +27,7 @@ AUDITOR = "independent-auditor"
 # A native package layout: a package manifest, and what lies under the ``src/`` folder beside it (CAP-44.j).
 MANIFESTS = ("pyproject.toml", "setup.py", "setup.cfg", "package.json", "Cargo.toml", "pom.xml", "build.gradle")
 REFS = "refs/gov/adoption"
+POLICIES = (EMBEDDED, "not embedded")  # the two values of a namespace's embedding_policy (DEC-388, DEC-694)
 
 
 @dataclass
@@ -226,7 +228,30 @@ def _dependents(run: Run, moving: list[dict]) -> None:
         entry["consumers"] = consumers
 
 
+def _embedding_policies(config: dict) -> None:
+    """Refuse a path map in which a namespace states no value of POLICIES, exactly, or none says ``embedded``
+    (DEC-694, DEC-700). Outside adoption such a namespace is read as not embedded; here it is not recorded."""
+    from gov.rebuild.command import none_embedded
+
+    path_map = config.get("path-map.yaml")
+    spaces = path_map.get("namespaces") if isinstance(path_map, dict) else None
+    if not isinstance(spaces, dict):
+        return  # no path map with namespaces: the stage's own refusal (NO_PATH_MAP) names it
+    faults = {name: space.get("embedding_policy") if isinstance(space, dict) else None
+              for name, space in spaces.items()
+              if not isinstance(space, dict) or space.get("embedding_policy") not in POLICIES}
+    none = none_embedded(config)
+    if faults or none:
+        said = [f"namespace `{name}` states " + ("no embedding_policy" if value is None else repr(value))
+                for name, value in faults.items()] + ([none] if none else [])
+        raise refuse("EMBEDDING_POLICY", "the path map is not recorded: " + "; ".join(said)
+                     + f"; every namespace states its embedding_policy as `{POLICIES[0]}` or `{POLICIES[1]}`, written "
+                     f"exactly so, and at least one says `{EMBEDDED}`", namespaces=list(faults), valid=list(POLICIES),
+                     none_embedded=bool(none))
+
+
 def a3(run: Run) -> dict:
+    _embedding_policies(run.config)
     proposal = _proposal(run.args.map)
     inventory = {item["path"]: item for item in run.records["A1"]["artefacts"]}
     unknown, entries, claimed, problems = project.unknown(run.config, run.tracked), {}, {}, []

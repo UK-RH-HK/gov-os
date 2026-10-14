@@ -274,3 +274,19 @@ class TestIsHistorical:
 
     def test_nested_cli_is_not_historical(self):
         assert self._fn("src/gov/cli/sub/module.py") is False
+
+
+@pytest.mark.parametrize("policy, said", [("embedded", False), ("not embedded", True), ("Embedded", True)])
+def test_the_semantic_canary_says_where_no_namespace_is_embedded_and_adds_no_failure(tmp_path, policy, said):
+    """DEC-694: the words stand beside the canary's answer for the semantic index, which stays as it is given."""
+    from gov.doctor import command
+
+    canary = {"passed": False, "status": "FACET_UNAVAILABLE", "misses": ["q"]}
+    config = {"path-map.yaml": {"namespaces": {"all": {"paths": ["**"], "embedding_policy": policy}}}}
+    checks = {name: (lambda *a, **k: {"status": "pass"}) for name in vars(command) if name.startswith("_check_")}
+    checks["_check_canaries"] = lambda root: {"status": "unmeasured", "indices": {"semantic": dict(canary)}}
+    with mock.patch.multiple(command, **checks):
+        result = command.run(tmp_path, None, config)
+    semantic = result["canaries"]["indices"]["semantic"]
+    assert result["healthy"] is True and ("no namespace is embedded" in semantic.pop("embedding", "")) == said
+    assert semantic == canary

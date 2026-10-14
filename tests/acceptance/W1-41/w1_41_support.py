@@ -29,6 +29,7 @@ import hashlib
 import json
 import os
 import re
+import socket
 import sqlite3
 import stat
 import subprocess
@@ -145,17 +146,35 @@ NAMESPACE_PATHS = (
 )
 
 
-def path_map(patterns=NAMESPACE_PATHS, code_intelligence=True):
-    """A path map valid against the kernel's schema, written from that schema."""
+# The two values of ``embedding_policy`` (DEC-388); adoption's stage A3 refuses any other, and a namespace without
+# the field (DEC-694, DEC-700). ``ABSENT`` leaves the field out of a namespace.
+EMBEDDED, NOT_EMBEDDED = "embedded", "not embedded"
+ABSENT = object()
+NO_NAMESPACE_EMBEDDED = "no namespace is embedded"     # the words of DEC-694; README, "The embedding policies"
+
+
+def namespace(patterns, embedding_policy=EMBEDDED):
+    """One namespace of the path map, with every field the kernel's schema asks for."""
+    made = {
+        "paths": list(patterns), "memory_class": "governance", "sensitivity": "internal",
+        "permitted_roles": ["orchestrator", "engineer", "independent-auditor"],
+        "retention": "kept in git history", "export_policy": "allowed", "embedding_policy": embedding_policy,
+        "provenance": "written by the W1-41 tests", "deletion_rebuild": "authoritative; restored from git only",
+    }
+    if embedding_policy is ABSENT:
+        del made["embedding_policy"]
+    return made
+
+
+def path_map(patterns=NAMESPACE_PATHS, code_intelligence=True, embedding_policy=EMBEDDED, namespaces=None):
+    """A path map valid against the kernel's schema, written from that schema. One namespace, ``harbour``, holds
+    ``patterns``; ``namespaces`` (name -> (patterns, embedding_policy)) gives several instead. Since DEC-694 the
+    harbour project's namespace says ``embedded``, so that stage A3 goes on."""
     capability = {"enabled": True, "languages": ["python"]} if code_intelligence else {"enabled": False}
+    spaces = namespaces or {"harbour": (patterns, embedding_policy)}
     return {
         "state_class": "AUTHORITATIVE",
-        "namespaces": {"harbour": {
-            "paths": list(patterns), "memory_class": "governance", "sensitivity": "internal",
-            "permitted_roles": ["orchestrator", "engineer", "independent-auditor"],
-            "retention": "kept in git history", "export_policy": "allowed", "embedding_policy": "not embedded",
-            "provenance": "written by the W1-41 tests", "deletion_rebuild": "authoritative; restored from git only",
-        }},
+        "namespaces": {name: namespace(paths, policy) for name, (paths, policy) in spaces.items()},
         "capabilities": {"code_intelligence": capability, "research_corpus": {"enabled": False}},
         "policies": {**{key: "hard-block" for key in _HARD}, **{key: "warning" for key in _SOFT}},
         "systems": {name: {"status": "absent", "reason": "a legacy project before adoption"} for name in _SYSTEMS},
@@ -248,16 +267,18 @@ def head(project):
 
 
 def build_project(destination, extraction=True, without=(), extra=None, patterns=NAMESPACE_PATHS,
-                  path_map_file=True, code_intelligence=True):
+                  path_map_file=True, code_intelligence=True, namespaces=None):
     """The legacy project, committed, as a git repository of its own. Returns its root.
 
     ``without`` names files left out, ``extra`` maps further paths to their content, ``extraction`` adds the record
-    that holds what was extracted from the chat database, citing it by path and content hash.
+    that holds what was extracted from the chat database, citing it by path and content hash. ``namespaces`` gives
+    the path map several namespaces (``path_map``).
     """
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     files = base_files()
-    files[PATH_MAP_REL] = yaml.safe_dump(path_map(patterns, code_intelligence), sort_keys=False)
+    files[PATH_MAP_REL] = yaml.safe_dump(path_map(patterns, code_intelligence, namespaces=namespaces),
+                                         sort_keys=False)
     if not path_map_file:
         del files[PATH_MAP_REL]
     for rel, text in files.items():
@@ -380,11 +401,23 @@ def path_without(commands, farm):
     return os.pathsep.join(kept)
 
 
+def dead_endpoint():
+    """A loopback address where nothing listens: the embedding endpoint is out of reach (as W1-30's round 11)."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        return f"127.0.0.1:{probe.getsockname()[1]}"
+
+
 def environment(sandbox, without=()):
+    """No model is ever loaded: the embedding endpoint is a loopback address where nothing listens, and its program
+    (``GOV_OLLAMA_BIN``) is a path where no program is, so none is started. A rebuild (``gov rebuild``, and the index
+    refresh of A6 and A8) builds no vector, whatever the path map embeds."""
     folders = [str(Path(sys.executable).parent), *os.environ.get("PATH", "/usr/bin:/bin").split(os.pathsep)]
     path = path_without(tuple(without), Path(sandbox.elsewhere) / "path-without") if without \
         else os.pathsep.join(folders)
     return {
+        "OLLAMA_HOST": dead_endpoint(),
+        "GOV_OLLAMA_BIN": str(Path(sandbox.elsewhere) / "no-embedding-program" / "ollama"),
         "PATH": path,
         "HOME": str(sandbox.home),
         "TMPDIR": str(sandbox.tmpdir),
@@ -736,7 +769,7 @@ def context_project(api, destination, tickets, references=None, text=None, regis
     destination = Path(destination)
     destination.mkdir(parents=True, exist_ok=True)
     assert_own_project(destination)
-    document = path_map(CONTEXT_PATTERNS, code_intelligence=False)
+    document = path_map(CONTEXT_PATTERNS, code_intelligence=False, embedding_policy=NOT_EMBEDDED)  # as before DEC-694
     if register is not None:
         document[REGISTER_KEY] = REGISTER_REL
         write(destination, REGISTER_REL, register)
