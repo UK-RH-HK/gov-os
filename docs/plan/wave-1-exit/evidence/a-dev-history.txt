@@ -1,3 +1,11 @@
+0aef4b9 | 2026-10-14T02:51:24+01:00 | Merge feature/dimension-checked-addition into main: the path map's trailers base and embedding policies (ADR-012), the repair ticket ade-5rcs closed | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+c063857 | 2026-10-14T02:42:01+01:00 | Ticket ade-5rcs closed (tk close) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+2864195 | 2026-10-14T02:42:01+01:00 | Repair ticket ade-5rcs completed: role, allowed paths, KPIs and source (the trailers base of ADR-012 settles its subject) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+4b16fb5 | 2026-10-14T02:42:01+01:00 | Ticket ORION-ad04 closed (tk close) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+426dd51 | 2026-10-14T02:38:20+01:00 | Path map: the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace (ADR-012) | Task: ORION-ad04 | Role: product-spec | Implements: ADR-012
+9c7afa2 | 2026-10-14T02:36:37+01:00 | Ticket ORION-ad04 started: the path map's trailers base and embedding policies | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+8386e8f | 2026-10-14T02:36:37+01:00 | Ticket ORION-ad04: the path map's trailers base and embedding policies (ADR-012) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+8efdecc | 2026-10-14T02:36:37+01:00 | ADR-012: the answers of 2026-10-14 on the path map, the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace | Task: ORION-ad04 | Role: orchestrator | Implements: ADOPT-A8
 2d3d098 | 2026-10-13T22:55:50+01:00 | Merge feature/dimension-checked-addition into main: dimension-checked addition and subtraction (ORION-im01, open, its close refused) and the named dimension ACCELERATION (ORION-im02, closed by gov close) | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003, ORION-SPEC-DIMADD
 30996b6 | 2026-10-13T22:50:28+01:00 | Close record CL-ORION-im02 and checkpoint CP-ORION-im02-0004, written by gov close ORION-im02 | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
 94cceae | 2026-10-13T22:50:28+01:00 | Ticket ORION-im02 closed by gov close | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
@@ -87,9 +95,9 @@ c810545 | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp03: readiness row 6 (da
 11308f8 | 2026-10-12T09:53:02+01:00 | Discovery and specification record of dimension-checked addition | Task: ORION-sp01 | Role: product-spec | Implements: MATH-SPEC-003
 bf10af6 | 2026-10-12T09:47:22+01:00 | Ticket ORION-sp01: discovery and specification of dimension-checked addition | Task: ORION-sp01 | Role: orchestrator | Implements: 
 72ce4df | 2026-10-12T09:41:57+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
-9d0daf6 | 2026-10-12T09:41:56+01:00 | Gov OS template applied (copier) and adapter output generated (rulesync) | Task:  | Role: orchestrator | Implements: 
 802e83f | 2026-10-12T09:41:56+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
 5c0e79d | 2026-10-12T09:41:56+01:00 | gov adopt --lite A0: safety baseline | Task:  | Role:  | Implements: 
+9d0daf6 | 2026-10-12T09:41:56+01:00 | Gov OS template applied (copier) and adapter output generated (rulesync) | Task:  | Role: orchestrator | Implements: 
 d65c26f | 2025-02-24T14:00:00+00:00 | Add IR examples, benchmarks, docs, NFR specs, CI stub | Task:  | Role:  | Implements: 
 90e7315 | 2025-02-24T10:00:00+00:00 | Add examples, extra tests, project config, test vectors | Task:  | Role:  | Implements: 
 b40c188 | 2025-02-23T10:00:00+00:00 | Add partial readiness matrix (many gaps) | Task:  | Role:  | Implements: 

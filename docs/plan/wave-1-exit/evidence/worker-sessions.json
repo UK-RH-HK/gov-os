@@ -206,5 +206,21 @@
   "ticket": "DAEO-gjjf",
   "launch_record": "w1-42-tests",
   "lead_run": 2
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "1b37aa95-9d2b-4e1b-9205-640752476d73",
+  "ticket": "ORION-ad04",
+  "launch_record": "a-ad4",
+  "lead_run": 6
+ },
+ {
+  "programme": "stand-in project",
+  "role": "product-spec",
+  "session_id": "eb8038a4-661c-4302-a777-1d9b82986ac9",
+  "ticket": "DAEO-zz42",
+  "launch_record": "p4-probe",
+  "lead_run": 6
  }
 ]

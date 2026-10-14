@@ -1,0 +1,310 @@
+{
+ "query_id": "RETR-X-02",
+ "questions": [
+  "What does DEC-9999 decide? (the id that exists nowhere)",
+  "the question of retrieval-a-dev-feature.json (three locations: ADR-011, MATH-SPEC-003, the ticket)"
+ ],
+ "argv": [
+  [
+   "gov",
+   "retrieve",
+   "What does DEC-9999 decide?",
+   "--id",
+   "DEC-9999",
+   "--radius",
+   "1",
+   "--json"
+  ],
+  "see retrieval-a-dev-feature.json"
+ ],
+ "repository": "a-dev exit clone, feature branch at 30996b6",
+ "bundles": [
+  {
+   "stopping_reason": "FACET_UNAVAILABLE",
+   "evidence": [],
+   "batches": [
+    {
+     "size": 0
+    }
+   ],
+   "merge": {
+    "candidates": 0,
+    "duplicates": 0,
+    "dropped": [],
+    "reranked": false
+   },
+   "expansions": [],
+   "gaps": [
+    {
+     "id": "DEC-9999",
+     "reason": "UNRESOLVED"
+    }
+   ],
+   "facets": {
+    "lexical": {
+     "available": true,
+     "reason": null
+    },
+    "semantic": {
+     "available": false,
+     "reason": "empty"
+    },
+    "closure": {
+     "available": true,
+     "reason": null
+    }
+   },
+   "budget": {
+    "bundle": {
+     "limit": 6000,
+     "used": 0
+    },
+    "rounds": {
+     "limit": 1,
+     "used": 0
+    }
+   },
+   "continuation": null
+  },
+  {
+   "stopping_reason": "FACET_UNAVAILABLE",
+   "evidence": [
+    {
+     "id": "ADR-011",
+     "sha256": "b4ade811ca0bff05c398d01c751ca1453d526270505f5d3f9d727b1c1c91e8ba",
+     "path": "decisions/adr-011.md",
+     "start_line": 15,
+     "end_line": 27,
+     "chunk_id": "7815fe0fc7bcc120256fec36",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 574
+    },
+    {
+     "id": "ORION-im02",
+     "sha256": "c236ef32b75445a176bca1e3384afa5eb60c73826d1586204f971e2575739caa",
+     "path": ".tickets/ORION-im02.md",
+     "start_line": 45,
+     "end_line": 51,
+     "chunk_id": "9c3bf05584f576ad968b0a2f",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 947
+    },
+    {
+     "id": "ADR-011",
+     "sha256": "4e64a343c087f81f5dd2429b21c1a533fccfa8827f2d89e18103a5f919dcf61f",
+     "path": "decisions/adr-011.md",
+     "start_line": 28,
+     "end_line": 38,
+     "chunk_id": "7ccedb68cf4f4478b6c412cf",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 605
+    },
+    {
+     "id": "ORION-im02",
+     "sha256": "0d0ae7999312d6952660e3305cd7961d5e4b46c5c4cfbeddd93a9eddc6732ad0",
+     "path": ".tickets/ORION-im02.md",
+     "start_line": 1,
+     "end_line": 44,
+     "chunk_id": "72809aa856729d8d606c8846",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 1786
+    },
+    {
+     "id": "ADR-011",
+     "sha256": "6f665847833db7446d973e6b10f84246a717f7fae664cbe0621892d47eb769fa",
+     "path": "decisions/adr-011.md",
+     "start_line": 1,
+     "end_line": 12,
+     "chunk_id": "ffe8c91807313b59a000c500",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 223
+    },
+    {
+     "id": "ADR-011",
+     "sha256": "69045a711608a08ebec930b8cafd115f2c947efe69252981d250dfc847637c6e",
+     "path": "decisions/adr-011.md",
+     "start_line": 39,
+     "end_line": 43,
+     "chunk_id": "54f384d918f6269eafd303bc",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 296
+    },
+    {
+     "id": "ADR-011",
+     "sha256": "a11eb3b05319e6bc28cc6a17dc5ab8b1d5b6adac6c99de545b08cf4e862e62f4",
+     "path": "decisions/adr-011.md",
+     "start_line": 13,
+     "end_line": 14,
+     "chunk_id": "d63ff449be16b73b7ffb0bcf",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 62
+    },
+    {
+     "id": "ORION-im02",
+     "sha256": "9742a00cbb367c549ca8c1cd1cb5e52a8a00d6559268afdcf4a5bae1eb0cdb26",
+     "path": ".tickets/ORION-im02.md",
+     "start_line": 1,
+     "end_line": 30,
+     "chunk_id": "695351548729dd53bbf24c13",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 1199
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "7d266ad972ecf1ee76698b40def34dbd08a1d7401fdf03d666ea4ea77091cd22",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 27,
+     "end_line": 32,
+     "chunk_id": "75a62c712a686d126438ec5b",
+     "routes": [
+      "closure"
+     ],
+     "batch": 2,
+     "text_removed_chars": 221
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "5b3e1f18f50e11e8c4399e094fed388d1c528eed4227a6dc182c8bf472845156",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 19,
+     "end_line": 26,
+     "chunk_id": "197afd1b2ec41ba1027a60ae",
+     "routes": [
+      "closure"
+     ],
+     "batch": 2,
+     "text_removed_chars": 168
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "41a5ed260185cdaa5d1fade199035930f71e97a7b4c08c620642c96c8712c117",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 14,
+     "end_line": 18,
+     "chunk_id": "a899979988d5dbebe09d4295",
+     "routes": [
+      "closure"
+     ],
+     "batch": 2,
+     "text_removed_chars": 108
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "d04347eb1035f6085696102457141e69e2950ad0cf38d6fbcf172ed3ad8f4029",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 12,
+     "end_line": 13,
+     "chunk_id": "fa2ea6815e967396d1d45c83",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 24
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "0da08fb0d5af739cc8dae71b8980de72d157ee8983d4985cde152eb76a659b2b",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 1,
+     "end_line": 11,
+     "chunk_id": "007d374522b9b36c818572ab",
+     "routes": [
+      "closure"
+     ],
+     "batch": 1,
+     "text_removed_chars": 205
+    },
+    {
+     "id": "MATH-SPEC-003",
+     "sha256": "9f84f71b591b7e504f6be978dc25ef379c883b0ad2b8f2f53139376eb0900474",
+     "path": "specs/math/dimensional-analysis.md",
+     "start_line": 33,
+     "end_line": 37,
+     "chunk_id": "860052ebd1b04e2f406e4bfd",
+     "routes": [
+      "closure"
+     ],
+     "batch": 2,
+     "text_removed_chars": 171
+    }
+   ],
+   "batches": [
+    {
+     "size": 10
+    },
+    {
+     "size": 4
+    }
+   ],
+   "merge": {
+    "candidates": 14,
+    "duplicates": 0,
+    "dropped": [],
+    "reranked": true
+   },
+   "expansions": [
+    {
+     "chunk_id": "72809aa856729d8d606c8846",
+     "parent_id": "37e5919e0f666b584af442b7",
+     "path": ".tickets/ORION-im02.md",
+     "start_line": 1,
+     "end_line": 44
+    }
+   ],
+   "gaps": [],
+   "facets": {
+    "lexical": {
+     "available": true,
+     "reason": null
+    },
+    "semantic": {
+     "available": false,
+     "reason": "empty"
+    },
+    "closure": {
+     "available": true,
+     "reason": null
+    }
+   },
+   "budget": {
+    "bundle": {
+     "limit": 6000,
+     "used": 1652
+    },
+    "rounds": {
+     "limit": 1,
+     "used": 1
+    }
+   },
+   "continuation": null
+  }
+ ],
+ "validator_errors": [],
+ "packet_ceiling_exceeded": false,
+ "synthesis_notes": [],
+ "note": "bundle 0 names DEC-9999 as a gap (UNRESOLVED) and holds no evidence; bundle 1 is the one real retrieval of the run. The case of the suite that reads this file stays red on bundle 0."
+}

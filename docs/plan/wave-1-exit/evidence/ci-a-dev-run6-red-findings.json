@@ -1,0 +1,57 @@
+{
+ "where": "a-dev exit clone, feature branch at c063857, 2026-10-14",
+ "remote": {
+  "name": "ci-local",
+  "path": "target/ci-remote.git under the clone's own folder (a bare repository)",
+  "kept_out_of_git_status_by": "the first line of the clone's own .gitignore, target/",
+  "pushed": [
+   "refs/notes/gov-evidence (by gov ci push)",
+   "feature/dimension-checked-addition at c063857",
+   "main at 0aef4b9"
+  ],
+  "note": "the clone's remote origin (the synthetic programme's source folder) was not pushed to"
+ },
+ "gates": {
+  "checks G1 G2": {
+   "exit_code": 3,
+   "code": "CHECK_FAILED"
+  },
+  "job": {
+   "exit_code": 1,
+   "code": "CI_NOT_MEASURED"
+  },
+  "staged-secrets": {
+   "exit_code": 0
+  },
+  "push ci-local": {
+   "exit_code": 0
+  },
+  "record": {
+   "exit_code": 0
+  }
+ },
+ "red": {
+  "core-schema": {
+   "findings": 1,
+   "code": "SCHEMA_UNKNOWN_TYPE",
+   "message": "docs/close/ORION-im02/CL-ORION-im02.md: unknown record type 'close'",
+   "cause": "the close record gov close wrote for ORION-im02 in run 5 carries a record type the clone's schemas do not know; the check first ran after that close in run 6 (run 5's kept check is from before the close)"
+  },
+  "context-reproducibility": {
+   "findings": 2,
+   "output": [
+    "FAIL: ORION-gp01: d2d9f759bc3a99e920874368c47d1c02ff869ec0253a4e18f7739a2e62dc537d != 5fdcf8ab32fa500f614f102ee8a6cbeb8a061c4a89a294df79c823c7598c5dad",
+    "FAIL: ade-5rcs: d2d694973748f461ecae05f526491fee6da1e5029e541b5c597ea12726883f1c != b25e14f938b1f10f5fe4c5026e0058b81bb9cfdcf762aa36aaf2b85729232bf2",
+    "context-reproducibility: 2 ticket(s) failed, 0 error(s)"
+   ],
+   "cause": "new with the live semantic index: of three computations of one ticket's context in one process, the first differs from the second and third, which agree. The difference is the order of supplementary items that rank next to each other (ORION-gp01: positions 5 and 6 swap; ade-5rcs: three items from position 10 on change places, and the budget used differs by 39 tokens). The same two tickets and the same hashes on two runs of the check. 19 of 21 tickets are stable. Read by the lead as shapes only (ids, paths, token counts)."
+  }
+ },
+ "unmeasured": {
+  "openspec-validate": "openspec is not on the runner"
+ },
+ "green_now_and_red_in_run_5": [
+  "product-traceability-trailers (43 findings in run 5; the trailers base)",
+  "core-claims (3 findings on ade-5rcs in run 5; the ticket is completed and closed)"
+ ]
+}

@@ -9,49 +9,387 @@
   "1",
   "--json"
  ],
- "repository": "a-dev exit clone, feature branch at 30996b6, after gov rebuild (full)",
+ "exit_code": 0,
+ "repository": "a-dev exit clone, feature branch at c063857, after the path map's embedding policies (ADR-012 of the clone) and a full gov rebuild, 2026-10-14",
  "bundles": [
   {
-   "stopping_reason": "FACET_UNAVAILABLE",
-   "evidence": [],
+   "stopping_reason": "BUDGET_EXHAUSTED_WITH_GAPS",
+   "evidence": [
+    {
+     "id": "06649987dc38895ea9c50b77",
+     "sha256": "792d8077ad43c84d07e22b35d3c74c0164c54a4c61a13fb297432287a3d2eca7",
+     "path": "benchmarks/bench_integrators.py",
+     "start_line": 13,
+     "end_line": 21,
+     "chunk_id": "06649987dc38895ea9c50b77",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 326
+    },
+    {
+     "id": "7aa541957f8eb24e2d23b422",
+     "sha256": "55175e642cb00e9ca38ab685ac3fcf01a3feb3270d2d8293321bce36fa056609",
+     "path": "crates/orion-runtime/src/integrators.rs",
+     "start_line": 1,
+     "end_line": 96,
+     "chunk_id": "7aa541957f8eb24e2d23b422",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 2840
+    },
+    {
+     "id": "c3c4e26c9d0184c82a3e7cf9",
+     "sha256": "e3e187fa773158becd6ca7f0ec556780317575362fadf516dd3382b50b4a53a0",
+     "path": "python/orion_ref/integrators.py",
+     "start_line": 12,
+     "end_line": 31,
+     "chunk_id": "c3c4e26c9d0184c82a3e7cf9",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 553
+    },
+    {
+     "id": "EXP-001",
+     "sha256": "0bfc3d261e27f97114196da25f561150f140e7e1465fb6f851559e4a72faac68",
+     "path": "research/experiments/exp-001.md",
+     "start_line": 15,
+     "end_line": 19,
+     "chunk_id": "90686cc4147fe5f316e31492",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 113
+    },
+    {
+     "id": "EXP-004",
+     "sha256": "36e011ccaa309bea577653b636d4a563c1d81add86c44bbdbe1c56f6ccca7c31",
+     "path": "research/experiments/exp-004-plan.md",
+     "start_line": 15,
+     "end_line": 19,
+     "chunk_id": "72789ff550ee0aa1a912016e",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 163
+    },
+    {
+     "id": "5af996cf0add81f2897d5b26",
+     "sha256": "f7d0078c361bc56d99babf7c9a359f2ffbbe26148d6d6c8c4c34f17430571640",
+     "path": "python/orion_ref/tests/test_integrator_convergence.py",
+     "start_line": 1,
+     "end_line": 52,
+     "chunk_id": "5af996cf0add81f2897d5b26",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 1798
+    },
+    {
+     "id": "38e2464c2d475b578a1de143",
+     "sha256": "c1ef77a71fe143b53fb5df98b890431dc44a4dab2112ff276e51e04bdf78dd5e",
+     "path": "benchmarks/bench_integrators.py",
+     "start_line": 1,
+     "end_line": 37,
+     "chunk_id": "38e2464c2d475b578a1de143",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 1126
+    },
+    {
+     "id": "ADR-008",
+     "sha256": "9e49ed0a5043a51822c2e412554a2819ed9f0a553202d740af6d650566ee147d",
+     "path": "decisions/adr-008.md",
+     "start_line": 17,
+     "end_line": 20,
+     "chunk_id": "dbb2a2a73e399ebb012878a3",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 124
+    },
+    {
+     "id": "EXP-004",
+     "sha256": "069a89e6b3298e29f20f8746c08c0e01104709f8eeecb2749ba67145174ea513",
+     "path": "research/experiments/exp-004-plan.md",
+     "start_line": 1,
+     "end_line": 12,
+     "chunk_id": "5cc27cdd942744fa6d3343cd",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 234
+    },
+    {
+     "id": "b9e3194c272e0d9cf0a868d9",
+     "sha256": "0c071089ea6dee50a755f1a72430c72db86ea8264499e9073ea4203f10c25513",
+     "path": "python/orion_ref/tests/test_kepler.py",
+     "start_line": 17,
+     "end_line": 30,
+     "chunk_id": "b9e3194c272e0d9cf0a868d9",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 575
+    },
+    {
+     "id": "1bc8045a20c0828117f767ee",
+     "sha256": "87e36a1acb4f62007232b4018d65428517eb3d83e5c472fe4609e970c9a61d40",
+     "path": "research/investigations/note-001.md",
+     "start_line": 30,
+     "end_line": 33,
+     "chunk_id": "1bc8045a20c0828117f767ee",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 160
+    },
+    {
+     "id": "MATH-SPEC-002",
+     "sha256": "3ce5e9370a51c15f36aa1b1d33474b1a24b4cecae8c2589d7846154688e3328c",
+     "path": "specs/math/integrator-formulations.md",
+     "start_line": 15,
+     "end_line": 24,
+     "chunk_id": "511b1832ef3a358108c9380c",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 241
+    },
+    {
+     "id": "61d3804dded9553e58415aa2",
+     "sha256": "11e1539d9814dce11354393dc8c554169061424bd506f5cfa90919bf1546c40a",
+     "path": "python/orion_ref/tests/test_cross_validation.py",
+     "start_line": 16,
+     "end_line": 32,
+     "chunk_id": "61d3804dded9553e58415aa2",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 706
+    },
+    {
+     "id": "EXP-003",
+     "sha256": "11a5e042165d5e2353b79141c1d81051657ca161fa15d78552e84dda64d1d1e3",
+     "path": "research/experiments/exp-003-plan.md",
+     "start_line": 20,
+     "end_line": 28,
+     "chunk_id": "c73739b98dbfaef20753f588",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 223
+    },
+    {
+     "id": "35764ce377e201c4ea23f467",
+     "sha256": "30959c21261381d61beae4256c0065cf6b916f4fafeaa10932909033bdae11e6",
+     "path": "python/orion_ref/tests/test_harmonic.py",
+     "start_line": 18,
+     "end_line": 30,
+     "chunk_id": "35764ce377e201c4ea23f467",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 539
+    },
+    {
+     "id": "MATH-SPEC-002",
+     "sha256": "d8f96ee068b96a3fdf2022040dc243340d4bfe8be18e7bd40975fd5238f35502",
+     "path": "specs/math/integrator-formulations.md",
+     "start_line": 38,
+     "end_line": 45,
+     "chunk_id": "4c1e102ca4d0b962f7449514",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 217
+    },
+    {
+     "id": "544406253531db63107649f7",
+     "sha256": "06ade135fd920097d3501aeb55ad519d94a07562e4f1b04c17e35b983c50390c",
+     "path": "research/investigations/note-005.md",
+     "start_line": 8,
+     "end_line": 17,
+     "chunk_id": "544406253531db63107649f7",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 480
+    },
+    {
+     "id": "53a544a35aca85e02ac4f87e",
+     "sha256": "0cf9d322fea26052424c04d52021af9b6467a1ffa593cf2fdeb6688816599ed2",
+     "path": "research/investigations/note-003.md",
+     "start_line": 17,
+     "end_line": 27,
+     "chunk_id": "53a544a35aca85e02ac4f87e",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 518
+    },
+    {
+     "id": "35d2a77a47ec4a82e79c9ba1",
+     "sha256": "a8eb467516029d4635d2944585d3371b61fe17b730baa3d4f6936ac4a7315592",
+     "path": "research/investigations/note-003.md",
+     "start_line": 28,
+     "end_line": 32,
+     "chunk_id": "35d2a77a47ec4a82e79c9ba1",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 162
+    },
+    {
+     "id": "ADR-004",
+     "sha256": "86eb9eb33f28a964f5367e26b423681fe3205eb23fc4e6fe735ff8491bef8a43",
+     "path": "decisions/adr-004.md",
+     "start_line": 15,
+     "end_line": 16,
+     "chunk_id": "5fbf87aa32ff2ffb6a0c3cf4",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 52
+    }
+   ],
    "batches": [
     {
-     "size": 0
+     "size": 10
+    },
+    {
+     "size": 10
     }
    ],
    "merge": {
-    "candidates": 0,
+    "candidates": 20,
     "duplicates": 0,
     "dropped": [],
-    "reranked": false
+    "reranked": true
    },
-   "expansions": [],
-   "gaps": [],
+   "expansions": [
+    {
+     "chunk_id": "7aa541957f8eb24e2d23b422",
+     "parent_id": "98d17c71b5208f8e95c7b911",
+     "path": "crates/orion-runtime/src/integrators.rs",
+     "start_line": 1,
+     "end_line": 96
+    },
+    {
+     "chunk_id": "5af996cf0add81f2897d5b26",
+     "parent_id": "0664bafeb359ce462fdaeca0",
+     "path": "python/orion_ref/tests/test_integrator_convergence.py",
+     "start_line": 1,
+     "end_line": 52
+    },
+    {
+     "chunk_id": "38e2464c2d475b578a1de143",
+     "parent_id": "0fd99c9b19554b34ef91fe87",
+     "path": "benchmarks/bench_integrators.py",
+     "start_line": 1,
+     "end_line": 37
+    }
+   ],
+   "gaps": [
+    {
+     "path": "docs/glossary-extended.md",
+     "chunk_id": "378b60029f73d852297792bc",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "python/orion_ref/tests/test_integrator_convergence.py",
+     "chunk_id": "4218f7c812e638cf320009ae",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "research/experiments/exp-002.md",
+     "chunk_id": "d842b20339a0a4d71b2fa374",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "benchmarks/bench_integrators.py",
+     "chunk_id": "a298c7887f682d6b0371ab16",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "research/experiments/exp-001.md",
+     "chunk_id": "c085e93a28e59d8d4ba16197",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "python/orion_ref/tests/test_cross_validation.py",
+     "chunk_id": "ed72ac47f38361327e3e47fe",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "research/investigations/note-003.md",
+     "chunk_id": "815f76116518769fe339d4ae",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "research/literature/hairer2006-notes.md",
+     "chunk_id": "001b5d24d9cea129b784db29",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "research/investigations/note-001.md",
+     "chunk_id": "187da10c1f11fdba8c5efd07",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "decisions/adr-004.md",
+     "chunk_id": "461340b8c92cde3c0e253599",
+     "reason": "NOT_GATHERED"
+    }
+   ],
    "facets": {
     "lexical": {
      "available": true,
      "reason": null
     },
     "semantic": {
-     "available": false,
-     "reason": "empty"
+     "available": true,
+     "reason": null
     }
    },
    "budget": {
     "bundle": {
      "limit": 6000,
-     "used": 0
+     "used": 2795
     },
     "rounds": {
      "limit": 1,
-     "used": 0
+     "used": 1
     }
    },
-   "continuation": null
+   "continuation": "eyJiYiI6bnVsbCwiYnMiOjEwLCJpIjpbXSwibyI6MjAsInEiOiJXaGljaCBmaWxlcyBpbXBsZW1lbnQgdGhlIGxlYXBmcm9nIGludGVncmF0b3I_IiwiciI6MSwidCI6bnVsbH0="
   }
  ],
  "validator_errors": [],
  "packet_ceiling_exceeded": false,
  "synthesis_notes": [],
- "note": "kept as gov retrieve returned it: one batch of size 0, no evidence, FACET_UNAVAILABLE (the semantic index of the clone is empty; the lexical facet matches the question as a phrase). The case of the suite that reads this file stays red for that reason."
+ "note": "asked once in run 6; kept as gov retrieve returned it, less the text of each evidence item and expansion (id, sha256, path and lines stay). 2,795 of 6,000 bundle tokens used: the packet ceiling was not exceeded, so no synthesis note. Run 5's answer is RETR-A-04-before-the-embedding-policies.json."
 }

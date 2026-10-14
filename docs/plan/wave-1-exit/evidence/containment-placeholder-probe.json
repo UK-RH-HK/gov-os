@@ -1,0 +1,33 @@
+{
+ "question": "DEC-693's reading of the eleven restores of 2026-10-12: where the acceptance-test folder does not exist, does the sandbox put an entry at its place while a command runs, which the post-command check then reports as a restore?",
+ "result": "not reproduced",
+ "project": "a stand-in project in the lead's session temp folder, built as the W1-46 suite builds its own (its support module: this worktree's gov, kernel template, agent definitions and settings), then tests/acceptance taken out of HEAD and off the disk by one commit, and one in-progress ticket DAEO-zz42 of role product-spec added",
+ "session": {
+  "id": "eb8038a4-661c-4302-a777-1d9b82986ac9",
+  "role": "product-spec",
+  "ticket": "DAEO-zz42",
+  "started_through": "gov launch",
+  "model": "claude-opus-5-5",
+  "turns": 5,
+  "is_error": false
+ },
+ "commands_of_the_worker": [
+  "printenv GOV_ROLE GOV_TICKET",
+  "cat README.md",
+  "git log --oneline -3",
+  "head -5 docs/notes.md"
+ ],
+ "before": {
+  "tests/acceptance at HEAD": false,
+  "tests/acceptance on disk": false,
+  "git status --short": "",
+  "findings": 0
+ },
+ "after": {
+  "tests/acceptance on disk": false,
+  "git status --short": "",
+  "findings": 0
+ },
+ "also_seen_in_run_6": "the product-spec session of ORION-ad04 in the a-dev clone (which holds an acceptance-test folder) reported eleven untracked dot-files at the clone's root in its own git status (shell and editor files it did not create); after the session the clone's tree was clean and its findings file had no new entry (7 as before, all of 2026-10-12)",
+ "limits": "one session, three read commands, today's guard (after the W1-02 round of DEC-685) and CLI 2.1.292; the sessions of 2026-10-12 ran under the guard and launcher of that day"
+}
