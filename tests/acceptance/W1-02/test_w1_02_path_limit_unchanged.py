@@ -110,7 +110,7 @@ def test_a_long_string_that_holds_a_held_out_path_as_literal_text_is_refused(wor
 
 LITERAL_BY_ROLE = [
     ("a-Write-s-content", "a-megabyte", "in-its-middle", limit.ENGINEER),
-    ("a-field-of-an-unknown-tool", "100000-characters", "at-its-end", limit.NO_ROLE),
+    ("a-field-of-a-listed-tool", "100000-characters", "at-its-end", limit.NO_ROLE),
     (limit.BASH_COMMAND, "near-the-command-bound", "glued-between-other-characters", limit.ENGINEER),
 ]
 
@@ -179,7 +179,7 @@ REACHED = {
     "a-path-through-dot-dot":
         ("an-Edit-s-new-string", lambda w: f"{w.elsewhere}/detour/../{w.listed.name}/{limit.FILE_NAME}"),
     "the-home-folder-s-short-form":
-        ("a-field-of-an-unknown-tool", lambda w: f"~/{limit.LINK_NAME}/{limit.FILE_NAME}"),
+        ("a-field-of-a-listed-tool", lambda w: f"~/{limit.LINK_NAME}/{limit.FILE_NAME}"),
     "a-symbolic-link": ("a-list-inside-the-input", lambda w: f"{w.link}/{limit.FILE_NAME}"),
     "a-path-below-the-held-out-folder":
         ("an-Edit-s-old-string", lambda w: f"{w.link}/cases/deeper/test_hidden.py"),
@@ -187,7 +187,7 @@ REACHED = {
 # label -> (field, builder(world) -> an ordinary string that reaches nothing held out)
 NOT_REACHED = {
     "a-file-of-a-folder-that-is-not-held-out": ("a-Write-s-content", lambda w: f"{w.other}/{limit.FILE_NAME}"),
-    "a-source-path-of-the-project": ("a-field-of-an-unknown-tool", lambda w: "src/app/main.py"),
+    "a-source-path-of-the-project": ("a-field-of-a-listed-tool", lambda w: "src/app/main.py"),
     "prose-with-slashes-in-it":
         ("an-Edit-s-new-string", lambda w: "see docs/notes.md and/or src/app/main.py for the rest"),
 }
@@ -285,7 +285,7 @@ def _lines(world, where, length, reaching):
 LATER_LINES = [
     ("a-Write-s-content", "in-the-middle", "under-the-limit"),
     ("a-Write-s-content", "in-the-middle", "over-the-limit"),
-    ("a-field-of-an-unknown-tool", "last", "100000-characters"),
+    ("a-field-of-a-listed-tool", "last", "100000-characters"),
 ]
 
 
@@ -301,7 +301,7 @@ def test_a_string_of_lines_in_which_a_later_line_reaches_the_held_out_folder_is_
         f"a string of lines {size} with a line that reaches the stand-in held-out folder {where}, in {field},")
 
 
-FIRST_LINE_FIELDS = ("a-Write-s-content", "a-field-of-an-unknown-tool")
+FIRST_LINE_FIELDS = ("a-Write-s-content", "a-field-of-a-listed-tool")
 
 
 @pytest.mark.parametrize("field", FIRST_LINE_FIELDS)

@@ -45,7 +45,7 @@ FIELD_FORMS = [
     ("a-Write-s-content", "through-a-symbolic-link"),
     ("an-Edit-s-old-string", "through-dot-dot-from-the-session-s-folder"),
     ("an-Edit-s-new-string", "through-a-symbolic-link"),
-    ("a-field-of-an-unknown-tool", "through-dot-dot-from-the-session-s-folder"),
+    ("a-field-of-a-listed-tool", "through-dot-dot-from-the-session-s-folder"),
     ("a-list-inside-the-input", "through-a-symbolic-link"),
     ("a-mapping-inside-the-input", "through-dot-dot-from-the-session-s-folder"),
     (limit.BASH_WORD, "through-a-symbolic-link"),
@@ -92,7 +92,7 @@ def test_a_string_just_over_the_limit_is_not_refused_by_the_held_out_check(world
     """Point 1: no program opens such a string as a path. Red today: refused by the held-out check.
 
     The guard as a whole then allows each of these for the orchestrator: a write
-    of a source file it may write, a tool the guard does not know, a command
+    of a source file it may write, a tool the guard lets through (DEC-685), a command
     that writes nothing.
     """
     tool_name, _, result = _ask(world, field, form, length)
@@ -105,7 +105,7 @@ def test_a_string_just_over_the_limit_is_not_refused_by_the_held_out_check(world
 OVER_BY_ROLE = [
     ("a-Write-s-content", "through-a-symbolic-link", limit.ENGINEER),
     ("a-Write-s-content", "through-dot-dot-from-the-session-s-folder", limit.NO_ROLE),
-    ("a-field-of-an-unknown-tool", "through-a-symbolic-link", limit.NO_ROLE),
+    ("a-field-of-a-listed-tool", "through-a-symbolic-link", limit.NO_ROLE),
     (limit.BASH_WORD, "through-dot-dot-from-the-session-s-folder", limit.ENGINEER),
 ]
 AT_BY_ROLE = [
@@ -152,7 +152,7 @@ def test_a_bash_word_over_the_limit_as_written_that_expands_to_a_path_under_it_s
 UNDER_AS_WRITTEN = {
     "a-home-variable-in-a-word-of-a-Bash-command": (limit.BASH_WORD, "$HOME/"),
     "the-home-folder-s-short-form-in-a-Write-s-content": ("a-Write-s-content", "~/"),
-    "the-home-folder-s-short-form-in-a-field-of-an-unknown-tool": ("a-field-of-an-unknown-tool", "~/"),
+    "the-home-folder-s-short-form-in-a-field-of-a-listed-tool": ("a-field-of-a-listed-tool", "~/"),
 }
 
 
@@ -199,7 +199,7 @@ def test_a_string_at_the_limit_in_characters_and_over_it_in_bytes_stays_refused(
         result, world, f"a string at the limit in characters and over it in bytes, in {field},")
 
 
-@pytest.mark.parametrize("field", ("a-field-of-an-unknown-tool", limit.BASH_WORD))
+@pytest.mark.parametrize("field", ("a-field-of-a-listed-tool", limit.BASH_WORD))
 def test_a_string_under_the_limit_with_one_name_longer_than_a_file_name_may_be_stays_refused(world, field):
     """A string under the path limit is resolved as today whatever its components. Green today, stays green."""
     text = limit.holds_no_literal(world, "x" * 300 + f"/../{world.relative}/{limit.FILE_NAME}")

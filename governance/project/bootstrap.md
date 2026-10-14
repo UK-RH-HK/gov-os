@@ -2729,3 +2729,36 @@ Probed head `c579c932`, merged directly at `99fbb546`. Built: `template/.rulesyn
 - **The regression at `44f5bded` is green:** 12,203 passed in parallel, 263 in the serial run, validator ALL PASS.
 - **Every commit of the round carries all three trailers.**
 - **Wave 2 list (already there, DEC-651):** `gov close` counts adoption-gap refusals toward escalation, against DEC-492.
+
+## W1-02 round: the guard refuses a tool it does not know; `MultiEdit` judged like `Edit` (2026-10-14; DEC-685)
+
+Probed head `d430db17`, merged directly. Built: `MultiEdit` is a write tool, judged by its file path as `Edit` is, for every role; the guard holds one explicit list of 17 known tools that write no project file and run no command (`Agent`, `Task`, `Skill`, `ToolSearch`, `WebFetch`, `WebSearch`, `ListAgents`, `SendMessage`, `TaskStop`, `TodoWrite`, `TaskCreate`, `TaskUpdate`, `TaskList`, `TaskGet`, `AskUserQuestion`, `EnterPlanMode`, `ExitPlanMode`), each with its reason in `src/gov/guard/decide.py`; every other tool name is refused with a reason that names it, where it was allowed before. **The owner's question:** the installed CLI (2.1.292) offers no `MultiEdit`, so no launched worker and no lead can call it today; the launcher adds no tool. 736 acceptance cases added (326 red before the change, 410 pins), 38 rewritten before implementation (reason DEC-685: they carried free text in a tool the round refuses). Source lines: +33 −7 against 60. KPI disputes 0. Probe: pass (`docs/probes/DAEO-emkd/PR-DAEO-emkd-round-DEC-685.md`). Residuals, all on the Wave 2 list:
+
+- **A skill's text can carry inline shell execution** that the CLI runs with its own permission check and, as read from the binary, without a Bash tool call that reaches the guard (medium; not tried; not new with the round). No skill source of the kernel or of this repository uses it. The CLI has a setting that switches it off; the list's reason for `Skill` ("runs no command") is not strictly true.
+- **The launcher's wiring check accepts a hook matcher that covers the three write tools only** (medium). With such a matcher unknown tools would never reach the guard. The kernel registers no matcher.
+- **The guard does not judge `WebFetch`'s URL against the read rule of the two protected files.** Today the tool itself refuses a `file://` URL; a later CLI could change that. A URL that spells a held-out path is refused.
+- **`Agent` with worktree isolation creates a git worktree by itself; `SendMessage` reaches other sessions on the machine** (low). The other session's guard still judges its calls.
+- **An extra, unjudged path field of `Edit` or `MultiEdit` is ignored** by the guard and by the tool (as before the round).
+- **Harmless tools are refused in every guarded session:** `Monitor` (it runs a command; refused rather than judged like Bash), `Artifact`, `Workflow`, the scheduling, notification and worktree tools, `ReportFindings`, and every `mcp__` name, the read-only ones included. A lead's `Monitor` allowance is dead; leads wait with Bash. The owner may list a tool with a reason.
+- **A tool the harness adds or renames later is refused until listed;** the list should be rechecked against the tool descriptions at each CLI version change. Nine listed names come from literals in the installed binary, not from a live session.
+- **Which reason answers first when an unknown tool also meets an older rule (the designer's DP-13):** accepted as built; no order turns a deny into an allow.
+- **The containment's count of an allowed `MultiEdit` is held by a unit case only.**
+- **Not probed:** a real `MultiEdit` call, a real subagent start, a real skill with inline shell.
+
+## DAEO-6mk8 (W1-31) closed after the round of DEC-655, with the ticket tool, by the owner's decision (2026-10-14; for the exit auditor; DEC-672, DEC-689)
+
+Two `gov close` runs, neither exit 4 (outputs kept by the orchestrator):
+
+- **First, at `e5ef7475` (2026-10-13):** exit 3 on the three cases that were red on the integration branch since the owner's apply of the generated adapter output (DEC-665), and on a stale checkpoint. The three cases were rewritten in the W1-38 round and merged at `99fbb546`.
+- **The one further close, at `44f5bded` (DEC-672):** exit 3, `CHECK_FAILED` on one case of 12,305: `tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist`, for one host of the list, in the serial run. It is a live network connection. Run alone straight afterwards the case gave 17 passed, that host included, and it passed in the full regression at the same head an hour earlier. The ticket's own suite gave 161 passed; no other finding.
+- **Closed with `tk close` by the owner's decision (DEC-689).** The round's probe passed (`docs/probes/DAEO-6mk8/PR-DAEO-6mk8-round-DEC-655.md`).
+- **Learning metrics of the round:** KPI disputes 0; 1 case rewritten (reason DEC-655); 30 cases added; source lines +31 −20 against 150.
+
+## DAEO-emkd (W1-02) closed after the round of DEC-685, with the ticket tool, by the owner's decision (2026-10-14; for the exit auditor; DEC-690)
+
+`gov close DAEO-emkd` at `2588fd12` returned exit 3, `CHECK_FAILED`, on 13 findings (output kept by the orchestrator):
+
+- **All 13 are on commits of 2026-10-01 to 2026-10-11, from before this round:** three commits without a trailer (`15a0dbc4`, `56f1476d`, `d6bb6d5a`), six commits that name no task (`478a8ed0`, `3d58265d`, `d33cb33c`, `0645ec3d`, `e91924da`, `a4e66919`), two containment findings on early commits that hold the ticket file beside a worker's work (`7d9ab30e`, `cd233578`), and one commit in the ticket's range that carries the reviewer's role (`b87ac775`).
+- **Every test run of the close was green:** the ticket's suite 3,648 and 5 passed, the regression 9,472 and 258 passed; the validator ALL PASS. By DEC-536 this is the post-merge regression of the round.
+- **The round's own commits carry all three trailers; its probe passed** (`docs/probes/DAEO-emkd/PR-DAEO-emkd-round-DEC-685.md`).
+- **Closed with `tk close` by the owner's decision (DEC-690).**

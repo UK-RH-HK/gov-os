@@ -1945,6 +1945,287 @@ suite's own limit on a hook process is 20 s and reads a hook still running as no
 not searched for a case that keeps the hook program busy for 20 s and expects an allow; the lead's run of every
 suite shows it if one exists.
 
+### Tenth batch (2026-10-13): `MultiEdit` is judged like `Edit`; a tool the guard does not know is refused (DEC-685)
+
+DEC-685: "`MultiEdit` is not a deliberate shape. It is an ordinary Claude Code tool that writes files, and the guard
+answering allow for a tool it does not know breaks its default-deny design (W1-02) … `MultiEdit` is judged exactly
+like `Edit`, by its file path, for every role. Any tool the guard does not know is refused (default-deny), unless it
+is a known read-only tool." One short round, the test designer first; written before any code of the round.
+
+Files: `test_w1_02_multiedit.py` (179 cases), `test_w1_02_listed_tools.py` (308), `test_w1_02_unknown_tools.py`
+(228), `test_w1_02_unknown_tools_failure.py` (21), `w1_02_tools_support.py`. Rewritten: the three carriers of
+`w1_02_limit_support.py` and four entries of `test_w1_02_path_limit_time.py`, and two files of W1-47 (see "Rewrites").
+
+```
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_multiedit.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_listed_tools.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_unknown_tools.py -q -p no:cacheprovider -rs
+env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-02/test_w1_02_unknown_tools_failure.py -q -p no:cacheprovider -rs
+```
+
+Every case asks the hook, run as a process on a hook input, in a temporary project with a stand-in settings file
+and a stand-in held-out file (the project of `w1_02_protected_support`, with three more tickets and a symbolic link
+to the stand-in held-out folder). A tool is known to a case by its name in the hook input only; nothing of the
+guard's code is named or imported by the new files.
+
+#### What the guard does today (measured through the hook)
+
+- For every tool name that is not `Read`, `Grep`, `Glob`, `Edit`, `Write`, `NotebookEdit` or `Bash` it answers
+  allow, for every role, frozen or not, unless the call names a held-out path. So `MultiEdit` is allowed on an
+  acceptance test for an engineer, on any file for a session with no role, and while frozen; and `edit`, `Edit `,
+  ` Read`, `Edit` with a trailing newline or NUL byte, a name of one space, `Monitor` and every `mcp__` name are
+  allowed.
+- A hook input with an empty tool name, with none, or with a name that is no string is answered with exit code 2
+  and a finding (the guard's report of its own failure).
+- An `Edit` with no file path, an empty one or `null` is refused by a rule; with a path that is a list or a
+  number it is answered with exit code 2.
+- An `Edit` of the settings file or of the held-out file that carries the held-out path in its text is allowed for
+  the orchestrator (DEC-215's exception) and refused for an engineer by the allow-list. A `MultiEdit` of the same
+  file with the same text is refused for both, by the held-out rule: the exception is for the file tools the guard
+  knows.
+- One decision takes about 0.05 s.
+
+#### The owner's lines → cases
+
+**Line 1. `MultiEdit` is judged exactly like `Edit`, by its `file_path`, for every role.** Every case of
+`test_w1_02_multiedit.py` asks twice, the `Edit` of a file by an actor and the `MultiEdit` of the same file by the
+same actor, and holds two things: `Edit` gets the answer the case names (the case's premise; a failure there says
+"the case's premise does not hold"), and `MultiEdit` gets that answer. The `MultiEdit` input is `file_path` and
+`edits`, a list of two edits.
+
+| What the line names | Function of `test_w1_02_multiedit.py` | Cases | Today |
+| --- | --- | --- | --- |
+| Inside and outside the ticket's allowed paths, for every role: eleven actors (the seven roles, research and ticket-lead among them; no role; an unknown role; a role subagent; a subagent that is no role) on six targets (a source file, a file no ticket names, an acceptance test, the same through a link in the ticket's folder, the scratch folder, a file outside the repository) | `test_multiedit_gets_the_answer_edit_gets_for_every_actor` | 66 | 53 red |
+| … another role's ticket, no ticket, a ticket that does not exist, the installed guard's file, the freeze flag, the rest of the runtime folder, a path that leaves the ticket's folder by `..` | `test_multiedit_follows_the_active_ticket_as_edit_does` | 13 | 10 red |
+| … a relative path | `test_multiedit_with_a_relative_path_is_judged_as_edit_is` | 3 | 2 red |
+| Under the acceptance-test folder: a ticket that names the folder gives no role but the test designer a write there (engineer, orchestrator, product-spec) | `test_a_ticket_that_names_the_acceptance_tests_gives_no_multiedit_there` | 3 | 3 red |
+| … the independent test designer alone, and nowhere else | `test_the_test_designer_s_multiedit_is_allowed_under_the_acceptance_tests_only` | 5 | 3 red |
+| In the scratch set (the scratch folder is in the first row; here the system's temporary folder) | `test_multiedit_in_the_system_s_temporary_folder_is_judged_as_edit_is` | 4 | 2 red |
+| While frozen: the write each role could otherwise make, before, while and after | `test_the_freeze_refuses_the_multiedit_each_role_could_otherwise_make` | 5 | 5 red |
+| … the scratch set; the flag itself | `test_the_freeze_closes_the_scratch_set_to_multiedit` · `test_no_multiedit_lifts_the_freeze` | 2 | 2 red |
+| With no path (none, empty, `null`, a list, a number) | `test_multiedit_with_no_usable_path_is_refused` | 10 | 10 red |
+| … a path given only inside one of the edits | `test_a_path_inside_an_edit_of_the_list_is_no_file_path` | 1 | red |
+| With a path longer than the guard resolves (one character past the system path limit; a megabyte), in time | `test_multiedit_with_a_path_longer_than_the_guard_resolves_is_refused` | 4 | 4 red |
+| On a path the held-out rule refuses (a file of the folder, a new file, through a link, by a relative path); nothing of the path in the refusal | `test_multiedit_on_a_path_the_held_out_rule_refuses_is_refused` | 12 | green |
+| Carrying a held-out path in its text (a new string, an old string; the last of two edits) | `test_multiedit_that_carries_a_held_out_path_in_its_text_is_refused` | 6 | green |
+| … in an edit of one of the two files that hold the path: decided as `Edit` is (allowed for the orchestrator, refused for an engineer and a session with no role) | `test_multiedit_of_a_file_that_holds_the_held_out_path_is_decided_as_edit_is` | 6 | 2 red |
+| … a plain edit of those two files | `test_a_plain_multiedit_of_a_file_that_holds_the_held_out_path_is_decided_as_edit_is` | 6 | 4 red |
+| A session with no role (no ticket, an engineer's, the orchestrator's) | `test_a_session_with_no_role_gets_no_multiedit_from_any_ticket` | 3 | 3 red |
+| An unknown role (six names, a source file and the scratch folder) | `test_an_unknown_role_s_multiedit_is_refused` | 12 | 12 red |
+| Inside a subagent: a role subagent's role governs (DEC-117), also against the session's wider role; a subagent that is not a role is read-only (DEC-113); a role subagent in a session with no role or an unknown role (DEC-125) | `test_multiedit_inside_a_subagent_is_judged_as_edit_is` | 17 | 12 red |
+| Nothing on disk changes by a decision | `test_decisions_on_multiedit_change_nothing_on_disk` | 1 | green |
+
+**The count of an allowed write for the containment (DEC-124).** Not held. After an allowed `Write`, `Edit` or
+`NotebookEdit` the guard notes the write in its bookkeeping folder, so that the check after a running Bash call does
+not undo it. This suite has no public way to observe that note: the only cases that look into the bookkeeping
+folder (the ninth batch's two pipes) take the folder's and the counter's names from the guard's module, which a
+case of this round may not do (DEC-462). Where it shows through the hook's public behaviour is W1-03's suite (the
+check after a Bash call), which this round does not touch. Left for the engineer's unit cases and the probe: an
+allowed `MultiEdit` during a running Bash call of the same session must not be undone by that call's check.
+
+**Line 2. Any tool the guard does not know is refused, for every role, the orchestrator included, frozen or not,
+with a reason that names the tool and says it is not known to the guard.**
+
+| What the line names | File and function | Cases | Today |
+| --- | --- | --- | --- |
+| The listed tools pass for every role, no role, an unknown role and inside any subagent (17 tools, 11 actors); the free text of every call names an acceptance test and a shell write | `test_w1_02_listed_tools.py::test_a_listed_tool_is_let_through_for_every_actor` | 187 | green |
+| … with an empty input | `…::test_a_listed_tool_with_no_input_is_let_through` | 17 | green |
+| … while frozen (orchestrator, engineer, no role, a subagent that is no role) | `…::test_a_listed_tool_is_let_through_while_frozen` · `…::test_the_frozen_project_refuses_a_write_and_lets_a_read_through` | 68 + 1 | green |
+| A call of a listed tool that names a held-out path is refused whatever the tool, by a rule, and discloses nothing | `…::test_a_listed_tool_that_names_a_held_out_path_is_refused` · `…_for_another_actor` · `…_while_frozen` · `…::test_a_web_fetch_of_a_held_out_file_is_refused` | 17 + 12 + 3 + 1 | green |
+| The list is the seventeen names, each with its reason | `…::test_the_list_is_the_seventeen_tools_of_the_round` | 1 | green |
+| Nothing on disk changes by a decision on a listed tool | `…::test_decisions_on_listed_tools_change_nothing_on_disk` | 1 | green |
+| A made-up name (`ToolAddedAfterTheRound`) is refused for every actor whatever its input holds: a file path the role may write, a command, nothing | `test_w1_02_unknown_tools.py::test_a_made_up_tool_is_refused_whatever_its_input_holds` · premise: `…::test_the_file_path_of_the_made_up_tool_s_case_is_one_the_role_may_edit` | 33 + 1 | 33 red |
+| Every name that begins `mcp__` (the three of the order, for every actor) | `…::test_a_tool_of_an_mcp_server_is_refused` | 33 | red |
+| … `mcp__` alone and `mcp__` before a known tool's name | `…::test_an_mcp_name_that_ends_in_a_known_tool_s_name_is_refused` | 4 | red |
+| A tool that runs a command or takes a path and is not judged is refused by name (16 forms of 15 tools; orchestrator, engineer, no role) | `…::test_a_tool_that_runs_a_command_or_takes_a_path_and_is_not_judged_is_refused` | 48 | red |
+| … `Monitor` with a harmless command, for the eight other actors | `…::test_monitor_with_a_harmless_command_is_refused_for_every_role` · premise: `…::test_the_same_command_and_the_same_file_are_let_through_with_the_judged_tools` | 8 + 1 | 8 red |
+| A name that differs from a known one by case, by a leading or trailing space, or by more letters | `…::test_a_name_that_differs_from_a_known_one_by_case_space_or_letters_is_refused` | 33 | red |
+| … by a trailing newline, NUL byte or tab; a name of one space or one newline | `…::test_a_name_with_a_trailing_newline_or_nul_byte_is_refused` · premise: `…::test_the_inputs_of_the_near_names_are_let_through_under_the_known_names` | 21 + 1 | 21 red |
+| An empty name, none, or a name that is no string is not let through | `…::test_a_call_with_no_usable_tool_name_is_not_let_through` | 15 | green |
+| Refused whether frozen or not | `…::test_a_tool_the_guard_does_not_know_is_refused_while_frozen` | 15 | red |
+| With a held-out path in the call: refused, and nothing of the path in the answer | `…::test_a_tool_the_guard_does_not_know_that_names_a_held_out_path_is_refused_and_discloses_nothing` | 14 | green |
+| Nothing on disk changes by a decision on an unknown tool | `…::test_decisions_on_tools_the_guard_does_not_know_change_nothing_on_disk` | 1 | green |
+| A guard that fails does not let the call through: an input it cannot use, for a made-up tool, an `mcp__` tool, `Monitor` and `MultiEdit` | `test_w1_02_unknown_tools_failure.py::test_an_input_the_guard_cannot_use_is_not_let_through` | 12 | green |
+| … a ticket file it cannot use | `…::test_a_ticket_file_the_guard_cannot_use_lets_no_tool_of_the_round_through` | 3 | red |
+| A guard that runs out of time does not let the call through: the first program the hook starts does not end (five hook processes side by side, one wait) | `…::test_a_decision_that_cannot_end_is_a_refusal_for_a_tool_of_the_round` · `…::test_the_refusal_of_a_decision_that_cannot_end_carries_nothing_of_the_call` | 5 + 1 | green |
+
+**A session with no role, or an unknown role, stays read-only** is held inside the rows above: `no-role`,
+`unknown-role` and the subagent that is no role are three of the eleven actors of the `MultiEdit` matrix, of the
+listed tools, of the made-up tool, of the `mcp__` tools and of `Monitor`.
+
+#### The known list: let through without a path judgement
+
+`w1_02_tools_support.LISTED`, each with the input the tool takes. The rules that apply to every call still apply.
+
+| Tool name | Why it is on the list |
+| --- | --- |
+| `Agent` | starts a subagent; it writes no file and runs no command itself, and every call of the subagent reaches the guard on its own |
+| `Task` | the earlier name of the same subagent tool |
+| `Skill` | loads a skill's instructions into the session; writes no file, runs no command |
+| `ToolSearch` | returns the definitions of tools; writes no file, runs no command |
+| `WebFetch` | fetches a web page; writes no file of the project, runs no command |
+| `WebSearch` | searches the web; writes no file of the project, runs no command |
+| `ListAgents` | lists the session's agents; reads and writes no file |
+| `SendMessage` | sends a message to an agent, whose own calls reach the guard |
+| `TaskStop` | stops a background task of the session; writes no file, runs no command |
+| `TodoWrite` | keeps the session's to-do list, which the harness holds; no file of the project |
+| `TaskCreate`, `TaskUpdate`, `TaskList`, `TaskGet` | the session's task list, which the harness holds; no file of the project |
+| `AskUserQuestion` | asks the user a question; writes no file, runs no command |
+| `EnterPlanMode`, `ExitPlanMode` | switch the session's plan mode; write no file of the project, run no command |
+
+Judged as before the round: `Read`, `Grep`, `Glob`; `Edit`, `Write`, `NotebookEdit`, and now `MultiEdit`; `Bash`.
+
+#### Refused by name
+
+- a made-up name: `ToolAddedAfterTheRound`;
+- every name that begins `mcp__`: `mcp__filesystem__write_file`, `mcp__notes__add`, `mcp__github__create_issue`;
+  `mcp__`, `mcp__Read`, `mcp__claude__Edit`, `mcp__guard__Agent`; `mcp__filesystem__read_file` with a held-out path;
+- the tools of the installed CLI that are not on the list (`w1_02_tools_support.REFUSED_BY_NAME`): `Monitor` (a
+  shell command from a `command` field, here `echo ready`), `Artifact` (a local file by a `file_path`), `Workflow`
+  (a script given inline, and given by a path), `EnterWorktree`, `ExitWorktree`, `ArtifactComments`,
+  `ArtifactData`, `CronCreate`, `CronDelete`, `CronList`, `DesignSync`, `PushNotification`, `RemoteTrigger`,
+  `ReportFindings`, `ScheduleWakeup`;
+- names near a known one (`NEAR_MISSES`, `NEAR_MISSES_UNPRINTABLE`): `edit`, `READ`, `agent`, `multiedit`, `bash`;
+  `Edit` and `Agent` with a trailing space, `Read` after a leading space; `Editor`, `ReadFile`, `TodoWriteAll`;
+  `Edit` and `Agent` with a trailing newline, `Read` and `Bash` with a trailing NUL byte, `MultiEdit` with a
+  trailing tab; one space; one newline. Each is sent with the input the known tool is let through with for the
+  same actor (a premise case holds that);
+- no usable name: an empty string, `null`, a number, a list, a mapping.
+
+#### What a refusal as not known says, and where the cases ask for it
+
+`w1_02_tools_support.assert_refused_as_not_known`: a refusal in a rule's form (exit code 0, `permissionDecision`
+`deny`), whose `permissionDecisionReason` holds the tool's name as it was sent and the words "not known" or
+"unknown" (not as part of "unknown role"). No exact sentence is asked for.
+
+- **Asked for** where a session with a declared role (the seven roles on the main thread, and a role subagent) calls
+  a made-up tool, an `mcp__` tool, a tool refused by name, or a name near a known one that an id and a reason can
+  show (case, space, more letters), when nothing is frozen.
+- **Only the refusal is asked for** (a rule's refusal or exit code 2): for a session with no role or an unknown
+  role and for a subagent that is no role (the order says such a session "stays read-only" and that an unknown
+  tool does not pass for it; which rule answers first is the engineer's); while frozen; for a name with a
+  trailing newline, NUL byte or tab or made of white space alone (what a reason shows of such a name is left
+  open); for no usable name (the guard's report of its own failure stands); and with a held-out path in the call
+  (the order leaves the reason open there; the cases hold that nothing of the path is in anything the hook wrote).
+
+#### The tools whose answer the round does not change: the existing cases
+
+Not written again. Unchanged files, every case green before and after:
+
+| Tool | Existing cases (file · function) |
+| --- | --- |
+| `Read`, `Grep`, `Glob` | `test_w1_02_role_less_session.py` · `test_role_less_session_can_still_read_with_file_tools`; `test_w1_02_unknown_role.py` · `test_unknown_role_can_still_read`; `test_w1_02_subagent.py` · `test_a_subagent_can_still_read`; `test_w1_02_freeze.py` · `test_reads_stay_open_while_frozen`; `test_w1_02_test_independence.py` · `test_auditor_can_still_read`; `test_w1_02_protected_reads_open.py` · `test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed`, `test_another_file_of_the_same_folder_named_alone_stays_readable`; the refusals of `test_w1_02_protected_reads.py`, `test_w1_02_root_searches.py`, `test_w1_02_long_paths.py` |
+| `Edit`, `Write` | `test_w1_02_allow_list.py` (all); `test_w1_02_test_independence.py` (all); `test_w1_02_scratch.py` (all); `test_w1_02_freeze.py` · `test_freeze_denies_the_write_each_role_could_otherwise_make`; `test_w1_02_role_less_session.py` · `test_role_less_session_cannot_edit_or_write`; `test_w1_02_unknown_role.py` · `test_unknown_role_cannot_edit_or_write`; `test_w1_02_subagent.py` (all); `test_w1_02_protected_reads_open.py` · `test_a_write_to_the_settings_file_is_decided_as_today` |
+| `NotebookEdit` | `test_w1_02_allow_list.py` · `test_engineer_notebook_edits_follow_the_same_list`; `test_w1_02_freeze.py` · `test_freeze_denies_notebook_edits`; `test_w1_02_role_less_session.py` · `test_role_less_session_cannot_edit_a_notebook`; `test_w1_02_unknown_role.py` · `test_unknown_role_cannot_edit_a_notebook` |
+| `Bash` | `test_w1_02_bash_writes.py` (all); `test_w1_02_target_resolution.py` (all); `test_w1_02_freeze.py` · `test_freeze_denies_bash_writes`; `test_w1_02_role_less_session.py` · `test_role_less_session_cannot_write_through_bash`, `test_role_less_session_can_still_read_through_bash` |
+| The guard's failure, its deadline, its latency | `test_w1_02_guard_failure.py` (all); `test_w1_02_deadline.py`, `test_w1_02_deadline_in_time.py` (all); `test_w1_02_guard_hook.py` · `test_decision_p95_is_under_100_ms`. No new latency case: the order says the decision for an unknown tool is as quick as for a read tool |
+
+Beside them the premise half of every `MultiEdit` case holds `Edit`'s answer in 179 places, and three premise cases
+of `test_w1_02_unknown_tools.py` hold `Edit`, `Read`, `Bash`, `Agent` and `TodoWrite` as let through with the very
+inputs the refused names carry.
+
+#### Red and green today
+
+Run on 2026-10-13 against the guard as built, each file to its end, in the foreground:
+
+| File | Functions | Cases | Red | Green | Red reason | Green reason |
+| --- | --- | --- | --- | --- | --- | --- |
+| `test_w1_02_multiedit.py` | 20 | 179 | 128 | 51 | 125: the guard answers allow for `MultiEdit` where `Edit` is refused (allow-list, acceptance tests, no role, unknown role, subagent, freeze, no path, long path). 2: it refuses the orchestrator's `MultiEdit` of a file that holds the held-out path, where `Edit` is allowed. 1: a `MultiEdit` with no file path of its own is allowed | `Edit` is allowed there, or the held-out rule refuses whatever the tool; nothing changes on disk |
+| `test_w1_02_listed_tools.py` | 10 | 308 | 0 | 308 | | The guard lets through every tool it does not judge, and refuses a held-out path whatever the tool. The file holds what the round must keep |
+| `test_w1_02_unknown_tools.py` | 14 | 228 | 195 | 33 | The guard answers allow for a made-up name, an `mcp__` name, the tools refused by name, and every name near a known one | No usable name (exit code 2); a held-out path in the call; the three premise cases; nothing changes on disk |
+| `test_w1_02_unknown_tools_failure.py` | 4 | 21 | 3 | 18 | With a ticket file it cannot use the guard still answers allow for the three unknown tools and for `MultiEdit` | Its report of its own failure (exit code 2, one finding) and its deadline already refuse |
+| **New** | **48** | **736** | **326** | **410** | | |
+| `test_w1_02_path_limit_boundary.py` (rewritten carriers) | | 47 | 0 | 47 | | as before the rewrite |
+| `test_w1_02_path_limit_unchanged.py` (rewritten carriers) | | 56 | 0 | 56 | | as before the rewrite |
+| `test_w1_02_path_limit_time.py` (rewritten carriers) | | 26 | 0 | 26 | | as before the rewrite |
+| W1-47 `test_w1_47_oracle_guard.py` (one entry rewritten) | | 281 | 0 | 281 | | as before the rewrite |
+| W1-47 `test_w1_47_oracle_naming.py` (one case rewritten) | | 181 | 1 | 180 | `test_the_same_form_sent_by_a_tool_the_guard_does_not_know_is_refused[MCP-free-text]`: the guard answers allow for `mcp__notes__add` | |
+
+Times: under 35 s for each of the four new files (the last waits once for the guard's deadline); 82 s and
+52 s for the two files of W1-47. No stand-in process and no hook process was left running after the last file.
+The new cases were not run against an implementation of the round: none exists, and none was made.
+
+None of the new cases is added to `tests/acceptance/serial-only.txt`: the only times asserted are 5 s on a
+decision of 0.05 s and 26 s on the deadline of 20 s, on processes that sleep.
+
+#### Choices the engineer should know
+
+- **`MultiEdit` and DEC-215's exception.** "Exactly like `Edit`" is held in both directions: the orchestrator's
+  `MultiEdit` of the settings file or of the held-out file that carries the held-out path is allowed as its `Edit`
+  is (2 cases, red today because it is refused), and an engineer's is refused by the allow-list as its `Edit` is.
+- **A `file_path` that is a list or a number.** `Edit` answers it with exit code 2 today; the cases ask for a
+  refusal of either form for `MultiEdit`.
+- **A refusal as not known is a rule's refusal** (exit code 0 and a reason the agent reads) for a session with a
+  declared role, not the guard's report of its own failure: a tool that is not on the list is no failure of the
+  guard, and W1-47's cases already ask for a rule's refusal when such a tool names a held-out path.
+- **The name is compared as it was sent**: no change of case, no stripping of white space or of a trailing
+  character, no match on the first letters. `mcp__` before a known tool's name is an `mcp__` name.
+- **A listed tool gets no path judgement, and still every rule that applies to every call**: the held-out check on
+  every string of its input (the rewritten carriers of the eighth batch now ride on `Agent`, `TodoWrite` and
+  `SendMessage`, and ask for the held-out check's own reason there), the freeze as for a read tool, the deadline.
+- **The bookkeeping on a later call.** W1-05 holds, in a case this round leaves as it is
+  (`test_w1_05_live_hooks.py::test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over[mcp__github__create_issue]`),
+  that an `mcp__` call of the orchestrator reaches the hook without a hook error and that the actor's unfinished
+  Bash call is over afterwards. After the round that call is refused. The case stays green only if a refused call
+  of an unknown tool still clears the actor's pending entries, as every call does today (ninth batch: the entries
+  are cleared before any rule). A guard that refused an unknown tool before that step would turn it red.
+
+#### Rewrites and cases of other suites
+
+Counted under "Rewrites" below: 38 cases (31 in this suite, 7 in W1-47). Looked at and left as they are:
+
+- **Expect a refusal, which the round keeps** (W1-47): `test_w1_47_oracle_guard.py` ·
+  `test_a_call_that_names_the_oracle_path_is_denied[MCP-…]` and `[a-tool-added-later-…]` (30 cases) and
+  `…_is_denied_wherever_the_path_is[…MCP-read-file-…]` (4); `test_w1_47_oracle_naming.py` ·
+  `test_a_call_that_holds_the_path_anywhere_in_its_input_is_denied[MCP-free-text-…]` (3). Each asks for a rule's
+  refusal and for no reason in particular, so either order of the two rules passes.
+- **Ask whether the settings register a hook for a tool name, not what the guard answers**: W1-05
+  `test_w1_05_live_hooks.py::test_a_hook_runs_before_every_tool` (the names of `w1_05_support.OTHER_TOOLS`, an
+  `mcp__` name and `ToolAddedAfterTheSwitchOver` among them) and W1-47
+  `test_w1_47_kernel_template.py::test_the_template_registers_the_guard_before_every_tool`
+  (`ToolAddedAfterThisTicket`). Unchanged; `w1_05_support.py` is not touched.
+- **Ask that a call reached the hook without a hook error**: W1-05
+  `…::test_a_later_call_of_any_tool_shows_the_actor_s_unfinished_call_is_over[Agent]` and
+  `[mcp__github__create_issue]` (see the last choice above).
+- **A listed tool already**: `test_w1_02_protected_reads_open.py::test_text_that_mentions_the_settings_file_is_not_a_read[a-brief-for-a-subagent]`
+  (`Agent`); W1-47 `test_w1_47_oracle_naming.py` · `[Agent-prompt]`, `[WebFetch-url]`, `[TodoWrite-nested-text]`.
+- W1-07's shared lists were not opened. The search: `mcp__`, `ToolAdded`, `TodoWrite`, `WebFetch`, `WebSearch`,
+  `"Agent"`, `"Task"`, `"Skill"`, `MultiEdit`, `AskUserQuestion`, `ExitPlanMode` over `tests/acceptance/**/*.py`,
+  and every capitalised quoted word of those files read for a tool name. A suite that builds a tool name at run
+  time was not looked for.
+
+#### The forms not held
+
+- The count of an allowed `MultiEdit` for the containment (above).
+- **Every other name.** The cases name 17 listed tools, 16 forms of 15 tools refused by name, 8 `mcp__` names, one
+  made-up name and 18 near names. "Any tool the guard does not know" cannot be listed; a guard that refused
+  exactly these names and allowed the next one would pass. The reviewer of the round should read the change for
+  one list of known names and a refusal of everything else.
+- **A listed tool with a field named like a path or a command** (`file_path`, `command`) outside its free text:
+  the order says "without a path judgement"; the cases put such text into the tool's own free-text field only.
+- **The reason while frozen, for a session with no role, and with a held-out path** (above; DP-13).
+- **`NotebookEdit` near names, `Write` near names, a name in another script** (a Cyrillic letter in `Edit`), a
+  name of several thousand characters.
+- **`MultiEdit` with `edits` that is no list, or with an edit that is no mapping**: the tool's own input check;
+  the guard judges the file path.
+- **`MultiEdit` to a notebook, by the `ask` answer for an install, in every permission mode.**
+- **A hook input whose tool name and whose event disagree**, and the other hook events.
+- **Whether a refusal as not known leaves a finding**: neither asked nor forbidden.
+- **The latency of the decision for a tool of the round** (the order asks for no new case).
+
+#### Changes to the residual list
+
+Residuals 1 to 62 stand. Added:
+
+63. As built before the round (measured): the guard answers allow for every tool name it does not judge, so a
+    name of one space, a known name in another case or with a trailing character, and every `mcp__` tool pass
+    for every role, frozen or not. Closed by DEC-685; the cases above hold it.
+64. After the round a tool the harness adds later is refused in every session until the list names it or the
+    guard judges it. That is the order's intent (default-deny); the cost is one decision per new tool. The first
+    sign is a refusal whose reason names the tool.
+65. An `mcp__` tool that only reads (a documentation search) is refused with every other. A project that needs
+    one needs a decision of its own; none is prepared here.
+
 ### Rewrites
 
 Before the fifth batch: none. No earlier case was changed; `conftest.py` gained one fixture (`guarded`). The third
@@ -1984,6 +2265,49 @@ earlier file but this README; no line of another suite.
 
 Ninth batch (DEC-580): none. It added two test files and `w1_02_deadline_support.py`, and changed no line of an
 earlier file but this README; no line of another suite and none of `tests/acceptance/serial-only.txt`.
+
+Tenth batch (DEC-685): **38 cases, 31 in this suite and 7 in W1-47; none in W1-05.** Reason of every rewrite:
+**owner decision DEC-685, a tool the guard does not know is refused.** The eighth batch carried free text to the
+guard in the input of a made-up tool and of an `mcp__` tool, because the guard let both through; the round refuses
+both whatever they carry. Each case keeps what it holds and changes its carrier to a tool of the known list. Of the
+31, 9 expected allow for the carrier (rewritten because the round refuses it) and 22 expected the held-out check's
+own reason for it (rewritten because the order leaves open which of the two refusals answers first). All 31 were
+green before the rewrite and are green after it on the guard as built.
+
+| Carrier (`w1_02_limit_support.FIELDS`) | Old tool and input | New tool and input |
+| --- | --- | --- |
+| `a-field-of-an-unknown-tool`, now `a-field-of-a-listed-tool` | `ToolAddedAfterThisTicket`, `target` | `Agent`, `prompt` |
+| `a-list-inside-the-input` | `mcp__notes__add`, a list under `notes` | `TodoWrite`, a list under `todos` |
+| `a-mapping-inside-the-input` | `mcp__notes__add`, a mapping under `note` | `SendMessage`, a mapping under `message` |
+
+| File | Function | Case ids (as they are now) | Expected |
+| --- | --- | --- | --- |
+| `test_w1_02_path_limit_boundary.py` | `test_a_string_at_or_under_the_limit_that_reaches_the_held_out_folder_is_refused` | `[a-list-inside-the-input-through-a-symbolic-link-just-under-the-limit]`, `[a-field-of-a-listed-tool-through-dot-dot-from-the-session-s-folder-at-the-limit]`, `[a-list-inside-the-input-through-a-symbolic-link-at-the-limit]`, `[a-mapping-inside-the-input-through-dot-dot-from-the-session-s-folder-at-the-limit]` | refused, the held-out reason |
+| | `test_a_string_just_over_the_limit_is_not_refused_by_the_held_out_check` | `[a-field-of-a-listed-tool-through-dot-dot-from-the-session-s-folder-just-over-the-limit]`, `[a-list-inside-the-input-through-a-symbolic-link-just-over-the-limit]`, `[a-mapping-inside-the-input-through-dot-dot-from-the-session-s-folder-just-over-the-limit]` | allowed |
+| | `test_a_string_just_over_the_limit_is_decided_for_another_role_as_a_short_string_is` | `[a-field-of-a-listed-tool-through-a-symbolic-link-no-role]` | allowed |
+| | `test_a_string_at_the_limit_is_refused_for_another_role` | `[a-list-inside-the-input-through-dot-dot-from-the-session-s-folder-engineer]` | refused |
+| | `test_a_string_under_the_limit_as_written_and_over_it_as_expanded_stays_refused` | `[the-home-folder-s-short-form-in-a-field-of-a-listed-tool]` | refused |
+| | `test_a_string_under_the_limit_with_one_name_longer_than_a_file_name_may_be_stays_refused` | `[a-field-of-a-listed-tool]` | refused |
+| `test_w1_02_path_limit_unchanged.py` | `test_a_long_string_that_holds_a_held_out_path_as_literal_text_is_refused` | the nine ids that begin `a-field-of-a-listed-tool-`, `a-list-inside-the-input-` and `a-mapping-inside-the-input-` | refused |
+| | `test_a_long_string_with_a_literal_held_out_path_is_refused_for_another_role` | `[a-field-of-a-listed-tool-100000-characters-at-its-end-no-role]` | refused |
+| | the two functions over `REACHED` and `NOT_REACHED` | `[the-home-folder-s-short-form]`, `[a-symbolic-link]` (refused), `[a-source-path-of-the-project]` (allowed); ids unchanged, carrier changed | as named |
+| | `test_a_string_of_lines_in_which_a_later_line_reaches_the_held_out_folder_is_decided_as_today` | `[a-field-of-a-listed-tool-last-100000-characters]` | allowed |
+| | `test_a_string_of_lines_under_the_limit_whose_first_line_reaches_the_held_out_folder_stays_refused` | `[a-field-of-a-listed-tool]` | refused |
+| | `test_a_string_of_lines_over_the_limit_whose_first_line_reaches_is_not_refused_by_the_held_out_check` | `[a-field-of-a-listed-tool]` | allowed |
+| `test_w1_02_path_limit_time.py` | `test_an_input_that_takes_too_long_today_is_decided_within_the_bound` | `[a-listed-tool-with-a-megabyte-of-it-in-a-field]` (`Agent`), `[a-listed-tool-with-a-megabyte-of-it-in-a-nested-field]` (`SendMessage`); were `an-unknown-tool-…` | allowed, in time |
+| | `test_the_same_size_with_a_held_out_path_as_literal_text_inside_is_refused_within_the_bound` | `[a-listed-tool-with-a-megabyte-in-a-field]`, `[a-listed-tool-with-a-megabyte-in-a-nested-field]`; were `an-unknown-tool-…` | refused, in time |
+
+11 + 16 + 4 = 31. Ids with `a-field-of-a-listed-tool` were `a-field-of-an-unknown-tool`; the others kept their id.
+
+W1-47, 7 cases, the same reason:
+
+| File | Function | Case ids | Change |
+| --- | --- | --- | --- |
+| `test_w1_47_oracle_guard.py` | `test_a_call_that_names_another_path_stays_allowed` | `[a-brief-for-a-subagent-<who>]` for engineer, independent-auditor, independent-test-designer, no-role, orchestrator, product-spec (6; were `[MCP-<who>]`) | The entry `MCP` of `UNRELATED` (an `mcp__` tool that names another path, expected allowed) is now an `Agent` brief that names the same path; still expected allowed. Green before and after |
+| `test_w1_47_oracle_naming.py` | `test_the_same_form_on_a_directory_that_is_not_held_out_is_allowed` → `test_the_same_form_sent_by_a_tool_the_guard_does_not_know_is_refused` | `[MCP-free-text]` (1) | The form `MCP-free-text` (`mcp__notes__add`) on a directory that is not held out was expected allowed; it leaves that function and is expected refused in the new one. Red today |
+
+Files run after the rewrite, each once: 47, 56 and 26 passed in the three files of this suite; 281 passed in
+`test_w1_47_oracle_guard.py`; 180 passed and 1 failed (the case above) in `test_w1_47_oracle_naming.py`.
 
 ### Decision packages
 
@@ -2145,7 +2469,28 @@ names such a command as one that stays allowed.**
   is not known; if it blocked the session instead, the entry would matter less).
 - Held under every option: everything in the ninth batch.
 
+**DP-13 (tenth batch). Which refusal answers first when a tool the guard does not know is called by a session that
+is refused for another reason too.**
+- Question: for a session with no role or an unknown role, for a subagent that is no role, while frozen, and with a
+  held-out path in the call, must the reason of the refusal still name the tool and say it is not known?
+- Why now: DEC-685 asks for that reason "for every role, the orchestrator included, frozen or not"; for a session
+  with no role it says only that the session stays read-only, and with a held-out path it asks only that the path is
+  not disclosed. The guard has rules for each of these that give their own reason today.
+- Options: (a) leave the order of the rules to the engineer; the reason is asked for where no other rule refuses.
+  (b) the unknown-tool reason always, except with a held-out path. (c) the unknown-tool reason always.
+- Impact: none on what is let through: the call is refused under every option. (b) and (c) fix the place of the
+  check in the guard, and (c) puts it before the held-out check, which W1-47's unchanged cases allow.
+- Reversibility: high. Cost: (a) none; (b), (c) about fifty cases tightened from "refused" to "refused with this
+  reason", no new case.
+- Recommendation: (a). The reason is for the agent that must do something else; an agent in a session with no role
+  is told the more useful thing by either rule. Confidence: medium-high.
+- Held under every option: every case of the tenth batch (the cases that would tighten ask for the refusal only).
+
 ## Not tested
+
+Tenth batch (DEC-685), each with its reason under "The forms not held" there: the count of an allowed `MultiEdit`
+for the containment (no public way to observe it in this suite); every tool name beyond those the cases name; the
+reason of the refusal where another rule refuses too (DP-13); the latency of a decision for a tool of the round.
 
 With the owner (`~/gov-os-workbench/w1-tests/decision-packages/W1-02-kpi-disputes.md`):
 

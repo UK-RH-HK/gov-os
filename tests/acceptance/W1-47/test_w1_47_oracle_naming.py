@@ -157,8 +157,13 @@ def test_a_call_that_reaches_the_path_without_writing_it_out_is_denied(project, 
 # The same forms on a directory that is not held out stay open
 # --------------------------------------------------------------------------
 
+# DEC-685: a tool the guard does not know is refused whatever its input names; the form sent by one is held below.
+NOT_KNOWN_TO_THE_GUARD = ("MCP-free-text",)
+
+
 @pytest.mark.parametrize("name", sorted(name for name, form in FORMS.items()
-                                        if form[1] not in ("Write", "Edit") and "Bash-after-a-colon" != name))
+                                        if form[1] not in ("Write", "Edit") and "Bash-after-a-colon" != name
+                                        and name not in NOT_KNOWN_TO_THE_GUARD))
 def test_the_same_form_on_a_directory_that_is_not_held_out_is_allowed(project, sandbox, guard, name):
     """The rule is about the configured path: the same call on another directory is as open as before.
 
@@ -170,6 +175,21 @@ def test_the_same_form_on_a_directory_that_is_not_held_out_is_allowed(project, s
     support.configure_stand_in(project, support.make_stand_in(sandbox.elsewhere / "what-is-held-out"))
     result = guard(project, tool_name, build(at), ORCHESTRATOR)
     support.assert_allowed(result, f"{name} ({tool_name}) on a directory the configuration does not name")
+
+
+@pytest.mark.parametrize("name", NOT_KNOWN_TO_THE_GUARD)
+def test_the_same_form_sent_by_a_tool_the_guard_does_not_know_is_refused(project, sandbox, guard, name):
+    """DEC-685: the path is not held out, and the call is refused all the same: the guard does not know the tool.
+
+    Before the round this form was held as allowed; the same free text in a tool
+    the guard lets through stays held as allowed above (``TodoWrite-nested-text``,
+    ``Agent-prompt``).
+    """
+    where, tool_name, build = FORMS[name]
+    at = _places(where, project, sandbox)
+    support.configure_stand_in(project, support.make_stand_in(sandbox.elsewhere / "what-is-held-out"))
+    result = guard(project, tool_name, build(at), ORCHESTRATOR)
+    support.assert_stopped(result, f"{name} ({tool_name}) on a directory the configuration does not name")
 
 
 # --------------------------------------------------------------------------

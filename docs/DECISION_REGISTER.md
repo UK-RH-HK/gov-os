@@ -7250,3 +7250,74 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 | Version | Date | Change |
 |---|---|---|
 | 0.207 | 2026-10-13 | Owner: DEC-682 (ORION-im02 = `ACCELERATION`, MATH-SPEC-003 "Compound dimensions" accepted for that constant, by the book, one `gov close`), DEC-683 (DAEO-3ef2 closed with the ticket tool under ESCALATION_BLOCKED, history only, named for the exit auditor), DEC-684 (pre-authorisation for DAEO-6mk8 on an exit 4 from history alone), DEC-685 (guard: `MultiEdit` judged like `Edit`, unknown tools refused; one W1-02 round with a probe). Next free id: DEC-686. |
+
+## 208. Owner answers of 2026-10-14: the empty semantic index, ORION's cycle and ARGUS as reported, the containment restores, two closes, the backup, the W1-42 merge (register v0.208, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-686 — The empty semantic index in the adopted a-dev clone: one read-only diagnostic, then one round with a probe
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-380, DEC-388, DEC-584 · **Basis:** the W1-42 lead's exit report at `1708868a`: in the adopted a-dev clone both scenario retrievals return no evidence and the semantic canary misses; the semantic index stays empty after a full `gov rebuild`
+- **Decision:** option (a).
+  - One read-only diagnostic first, then one round on what it shows, with a probe.
+  - Then the two scenario retrievals and the semantic canary are re-run, and the exit report is corrected.
+  - **Checked first:** whether the clone's path map gives its namespaces a valid `embedding_policy`. Under DEC-380 and DEC-388 a namespace whose policy is missing or unknown is read as "not embedded", so a path map written by adoption without valid policies would leave the semantic index empty, with no error.
+
+### DEC-687 — ORION's cycle is completed in a-dev: a trailers base at the real adoption boundary, a local bare remote, `gov ci` and the merge re-run; ARGUS stays as reported
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-482, DEC-585, DEC-674, DEC-678
+- **Decision:**
+  - **a-dev:** the trailers base is set in a-dev's path map at a-dev's real adoption boundary, its A8 commit (`bb1852e`), the way DEC-482 set this repository's base at its adoption commit. The commits of runs 1 and 2 came before it. Not at `540004a`, and not at any commit chosen to pass over a finding.
+  - The a-dev clone gets a local bare remote under the clone's own folder, so that `gov ci push` and the evidence note work as the local gate of DEC-585.
+  - Then ORION's `gov ci` and the merge are re-run.
+  - **b-dev stays as reported:** adopted to A2, ARGUS's close refused, no CI and no merge, named in the exit report with its reason. The owner weighs it at the exit decision.
+
+### DEC-688 — The eleven containment restores of acceptance-test files during adoption on 2026-10-12 are traced
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** MR-3, DEC-686
+- **Decision:**
+  - They are traced read-only, together with the diagnostic of DEC-686: which call changed each file, under which role, and why containment restored it.
+  - Criterion 3 (MR-3) needs them explained, not only named.
+  - If the trace finds a real MR-3 breach, it comes to the owner as a package.
+
+### DEC-689 — DAEO-6mk8 is closed with the ticket tool
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-646, DEC-647, DEC-672 · **Basis:** the one further `gov close DAEO-6mk8` at `44f5bded` returned exit 3 on one case of 12,305 (a live network connection of W1-46, for one host), which passed alone straight afterwards (17 passed)
+- **Decision:** option (a). It is closed with `tk close`, named for the exit auditor.
+
+### DEC-690 — DAEO-emkd is closed with the ticket tool
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-651, DEC-683, DEC-685 · **Basis:** `gov close DAEO-emkd` at `2588fd12` returned exit 3 on 13 findings, all on commits of 2026-10-01 to 2026-10-11, from before this round; every test run of the close was green
+- **Decision:** option (a). It is closed with `tk close`, named for the exit auditor.
+
+### DEC-691 — The a-dev clone holding ORION-im02 and its merge is backed up; the copy goes into the exit report's evidence list
+- **Status:** ACCEPTED (owner, 2026-10-14) · **Under:** DEC-673, DEC-681
+- **Decision and record:** the a-dev clone, now holding ORION-im02 and its merge, is backed up through the operator to `~/gov-os-workbench/archive/w1-42-exit-clones/live-run4-a-dev-exit/`. It is added to the exit report's evidence list.
+  - The owner's message left the heads of the copy as a placeholder ("operator's heads"). The live clone stood at `30996b6` on its feature branch and `2d3d098` on its main when the lead of run 4 returned; the orchestrator asks the owner for the operator's figures and records them when given.
+
+### DEC-692 — `w1/W1-42` is not merged into the integration branch until its red cases are resolved
+- **Status:** ACCEPTED (owner, 2026-10-14)
+- **Decision:** `w1/W1-42` is not merged into `w1/integrate` until its red cases are resolved or the owner decides otherwise.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.208 | 2026-10-14 | Owner: DEC-686 (empty semantic index in adopted a-dev: diagnostic, then one round with a probe; embedding policies of the path map checked first), DEC-687 (a-dev: trailers base at `bb1852e`, a local bare remote, `gov ci` and merge re-run; b-dev as reported), DEC-688 (the eleven containment restores traced), DEC-689 (DAEO-6mk8 closed with the ticket tool), DEC-690 (DAEO-emkd closed with the ticket tool), DEC-691 (backup of the a-dev clone with ORION-im02), DEC-692 (`w1/W1-42` not merged until its red cases are resolved). Next free id: DEC-693. |
+
+## 209. The diagnostic of DEC-686 and the trace of DEC-688: what they show, and one delegated decision on a-dev's embedding policies (register v0.209, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-693 — a-dev's namespaces get valid embedding policies in the exit clone; the diagnostic's and the trace's results are recorded
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-14; told to the owner, who may replace it) · **Under:** DEC-380, DEC-381, DEC-388, DEC-686, DEC-688 · **Basis:** the orchestrator's read-only diagnostic of the a-dev exit clone at `30996b6` and of `src/gov/retrieval/semantic.py`, `src/gov/adopt/`, the adopt skill and the path-map schema; the two clones' containment findings files (`trace-restores.py`)
+- **The diagnostic's result (DEC-686): the owner's reading is confirmed.**
+  - In a-dev's path map, 20 of 21 namespaces say `embedding_policy: not stated by the programme`, and the namespace of the secret-named files says that nothing of them is embedded. No namespace says `embedded`.
+  - The semantic index embeds only the chunks of a file whose every namespace says exactly `embedded` (DEC-381); any other value is "not embedded". So a rebuild embeds nothing there, answers "semantic: recreated", and retrieval answers `FACET_UNAVAILABLE` with an empty facet. No error and no finding is given anywhere.
+  - The path map was written by the adoption repair worker (role product-spec, clone commits `9882a63` and `9b08f6f`). Nothing in `gov adopt`, in the adopt skill or in the path-map schema says which values the field takes: the schema asks for a text, and the field is optional in the loader.
+  - **The product gap for the round of DEC-686:** adoption leaves a path map without one embedded namespace, and no check, stage or doctor section says so. The round's scope is put to the owner (it changes a kernel skill or a check, CAP-33).
+- **The trace's result (DEC-688): no MR-3 breach; the eleven restores changed no acceptance test.**
+  - Eleven findings "reverted: acceptance test restored from HEAD": five in a-dev (session `d6e1b5d3…`, role product-spec, ticket ORION-ad01), six in b-dev (session `94619988…`, role product-spec, ticket ARGUS-ad01), all between 09:27 and 09:40 UTC on 2026-10-12, all on Bash calls.
+  - Each names one path, the folder `tests/acceptance` itself, never a file in it.
+  - At that time neither clone held an acceptance test: the first ones were committed on 2026-10-13 (`930b197` in a-dev, `2db35a4` in b-dev). There was no acceptance test to change and none to restore.
+  - Nine of the eleven commands only read (`cat`, `head`, `git log`, a listing, a search). The other two, in b-dev, edit files under `docs/` and commit the path map, the tool registry and legacy records; neither names the test folder.
+  - Each clone's findings file also holds two "flagged" entries of the same sessions that name eleven dot-files of the project root (shell and editor files) as changes outside the allowed paths: the same names the reviewer of the W1-02 round saw appear in its worktree and took for the sandbox's mount points.
+  - **Reading (not reproduced):** the launcher's rules deny a product-spec worker the acceptance-test folder; where that folder does not exist, the sandbox puts an empty entry at its place while a command runs, as it does for the dot-files. The post-command check sees a new path under the test folder, attributes it to the call and removes it. The lead of the next run confirms or refutes this in a stand-in project.
+  - **Residual for the Wave 2 list:** the post-command check reports the sandbox's own placeholders as a worker's changes (as restores of acceptance tests, and as changes outside the allowed paths).
+- **Decision** (P3, a synthetic programme's throwaway clone, reversible; confidence medium-high):
+  - In the a-dev exit clone the namespaces that hold what a question in plain words is asked about say `embedded`: the programme's code, its specifications, its decisions, its documents, its interfaces, examples, benchmarks' and research's text, the tickets and the adoption records. The namespaces of the kernel, the project configuration, the generated agent files, CI, data sets and the root files say `not embedded`. The namespace of the secret-named files stays as it is (DEC-679).
+  - The edit is made by the role the product's method gives the path map to, under a ticket, with the three trailers; the lead of the next run states which namespaces got which value.
+  - Then `gov rebuild` with embeddings, the two scenario retrievals and the semantic canary are re-run (DEC-686).
+
+| Version | Date | Change |
+|---|---|---|
+| 0.209 | 2026-10-14 | Orchestrator: DEC-693 (the diagnostic of DEC-686: no a-dev namespace says `embedded`, the adoption gives no valid value and nothing reports it; the trace of DEC-688: the eleven restores name the then non-existent test folder itself, on read commands, no MR-3 breach; delegated: valid embedding policies in the a-dev exit clone). Next free id: DEC-694. |
