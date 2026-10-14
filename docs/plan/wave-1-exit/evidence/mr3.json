@@ -4,14 +4,14 @@
   {
    "repository": "a-dev",
    "check": "which commits change anything under tests/",
-   "method": "git log --format='%h %(trailers:key=Role) %(trailers:key=Task)' -- tests/ on the feature branch at c063857 (run 6; the same answer as at 30996b6)",
+   "method": "git log --format='%h %(trailers:key=Role) %(trailers:key=Task)' -- tests/ on the feature branch at a0820d4 (run 7; the same answer as at 30996b6)",
    "result": "two commits, both Role independent-test-designer: 930b197 (ORION-gp09) and f49924a (ORION-im02)"
   },
   {
    "repository": "a-dev",
    "check": "the guard's findings file of the clone",
-   "method": "read .gov-runtime/findings.jsonl of the clone, 2026-10-13 and again 2026-10-14 after the product-spec session of ORION-ad04",
-   "result": "7 entries, all of 2026-10-12, role product-spec, ticket ORION-ad01, tool Bash: 5 'reverted, acceptance test restored from HEAD', each naming the folder tests/acceptance itself, which did not exist then (the first acceptance test of the clone is 930b197 of 2026-10-13), on commands that only read (DEC-693); and 2 'flagged, change outside allowed paths' on dot-files of the root; none by an engineer, none since, none from run 6"
+   "method": "read .gov-runtime/findings.jsonl of the clone, 2026-10-13, and on 2026-10-14 in run 7 after the product-spec session of ORION-ad04 (the clone restored from the archive, DEC-699)",
+   "result": "7 entries, all of 2026-10-12, role product-spec, ticket ORION-ad01, tool Bash: 5 'reverted, acceptance test restored from HEAD', each naming the folder tests/acceptance itself, which did not exist then (the first acceptance test of the clone is 930b197 of 2026-10-13), on commands that only read (DEC-693); and 2 'flagged, change outside allowed paths' on dot-files of the root; none by an engineer, none since, none from run 7"
   },
   {
    "repository": "a-dev",
@@ -29,7 +29,7 @@
    "repository": "b-dev",
    "check": "the guard's findings file of the clone",
    "method": "read .gov-runtime/findings.jsonl of the clone, 2026-10-13",
-   "result": "8 entries, all of 2026-10-12, role product-spec, ticket ARGUS-ad01, tool Bash: 6 'reverted, acceptance test restored from HEAD', each naming the folder tests/acceptance itself, which did not exist then (the first acceptance test of the clone is 2db35a4 of 2026-10-13; four of the six commands only read, two edit files under docs/ and commit, DEC-693); and 2 'flagged, change outside allowed paths' on dot-files of the root; none by an engineer, none since. Not read again in run 6: nothing is run in b-dev (DEC-687)"
+   "result": "8 entries, all of 2026-10-12, role product-spec, ticket ARGUS-ad01, tool Bash: 6 'reverted, acceptance test restored from HEAD', each naming the folder tests/acceptance itself, which did not exist then (the first acceptance test of the clone is 2db35a4 of 2026-10-13; four of the six commands only read, two edit files under docs/ and commit, DEC-693); and 2 'flagged, change outside allowed paths' on dot-files of the root; none by an engineer, none since. Not read again in runs 6 and 7: nothing is run in b-dev (DEC-687)"
   },
   {
    "repository": "b-dev",

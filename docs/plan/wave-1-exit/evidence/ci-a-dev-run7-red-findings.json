@@ -1,0 +1,73 @@
+{
+ "where": "a-dev exit clone, feature branch at a0820d4, 2026-10-14, run 7; findings read from gov check --json at the same head (gov-check-a-dev-run7-ci-head.json), since gov ci names the red checks only",
+ "remote": {
+  "name": "ci-local",
+  "path": "target/ci-remote.git under the clone's own folder (a bare repository, made with git init --bare)",
+  "kept_out_of_git_status_by": "the first line of the clone's own .gitignore, target/",
+  "pushed": [
+   "refs/notes/gov-evidence (by gov ci push)",
+   "feature/dimension-checked-addition at a0820d4",
+   "main at 736669f"
+  ],
+  "note": "the clone's remote origin (the synthetic programme's source folder) was not pushed to"
+ },
+ "gates": {
+  "checks G1 G2": {
+   "exit_code": 3,
+   "code": "CHECK_FAILED"
+  },
+  "job": {
+   "exit_code": 1,
+   "code": "CI_NOT_MEASURED"
+  },
+  "staged-secrets": {
+   "exit_code": 0
+  },
+  "push ci-local": {
+   "exit_code": 0
+  },
+  "record": {
+   "exit_code": 0
+  }
+ },
+ "red": {
+  "core-claims": {
+   "findings": 3,
+   "code": "TICKET_MISSING_FIELD",
+   "message": ".tickets/ade-ke2y.md: missing required field 'role', 'allowed_paths', 'kpis'",
+   "cause": "the repair ticket gov close wrote on ORION-im01's refusal in run 7, as it wrote ade-5rcs in run 3: without role, allowed paths and KPIs. New in run 7; run 6 had no refused close."
+  },
+  "core-schema": {
+   "findings": 4,
+   "codes": {
+    "SCHEMA_MISSING_FIELD": 3,
+    "SCHEMA_UNKNOWN_TYPE": 1
+   },
+   "message": [
+    "the same three missing fields of .tickets/ade-ke2y.md",
+    "docs/close/ORION-im02/CL-ORION-im02.md: unknown record type 'close'"
+   ],
+   "cause": "the repair ticket above; and the close record gov close wrote for ORION-im02 in run 5, whose record type the clone's schemas do not know (as in run 6)"
+  },
+  "context-reproducibility": {
+   "findings": 1,
+   "tickets_failing": {
+    "at 36d8ec3": [
+     "ORION-gp01",
+     "ade-5rcs"
+    ],
+    "at a0820d4": [
+     "ORION-gp01"
+    ]
+   },
+   "output_at_a0820d4": "FAIL: ORION-gp01: d2d9f759bc3a99e920874368c47d1c02ff869ec0253a4e18f7739a2e62dc537d != 5fdcf8ab32fa500f614f102ee8a6cbeb8a061c4a89a294df79c823c7598c5dad",
+   "cause": "with the live semantic index the first computation of a ticket's context in a process can differ from the later ones in the order of supplementary items that rank next to each other (run 6's reading, not measured again in run 7). ORION-gp01 fails with the same two hashes as in run 6; ade-5rcs failed at 36d8ec3 with another hash than in run 6 (its file is worded again) and passed at a0820d4."
+  }
+ },
+ "unmeasured": {
+  "openspec-validate": "openspec is not on the runner"
+ },
+ "green": [
+  "product-traceability-trailers (the trailers base at bb1852e; 43 findings in run 5)"
+ ]
+}

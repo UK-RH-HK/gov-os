@@ -1,11 +1,13 @@
-0aef4b9 | 2026-10-14T02:51:24+01:00 | Merge feature/dimension-checked-addition into main: the path map's trailers base and embedding policies (ADR-012), the repair ticket ade-5rcs closed | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
-c063857 | 2026-10-14T02:42:01+01:00 | Ticket ade-5rcs closed (tk close) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
-2864195 | 2026-10-14T02:42:01+01:00 | Repair ticket ade-5rcs completed: role, allowed paths, KPIs and source (the trailers base of ADR-012 settles its subject) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
-4b16fb5 | 2026-10-14T02:42:01+01:00 | Ticket ORION-ad04 closed (tk close) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
-426dd51 | 2026-10-14T02:38:20+01:00 | Path map: the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace (ADR-012) | Task: ORION-ad04 | Role: product-spec | Implements: ADR-012
-9c7afa2 | 2026-10-14T02:36:37+01:00 | Ticket ORION-ad04 started: the path map's trailers base and embedding policies | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
-8386e8f | 2026-10-14T02:36:37+01:00 | Ticket ORION-ad04: the path map's trailers base and embedding policies (ADR-012) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
-8efdecc | 2026-10-14T02:36:37+01:00 | ADR-012: the answers of 2026-10-14 on the path map, the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace | Task: ORION-ad04 | Role: orchestrator | Implements: ADOPT-A8
+736669f | 2026-10-14T06:07:39+01:00 | Merge feature/dimension-checked-addition into main: the path map's trailers base and embedding policies (ADR-012), the repair ticket ade-5rcs closed, ORION-im01's checkpoint and the repair ticket ade-ke2y of its further refused close | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+a0820d4 | 2026-10-14T05:56:45+01:00 | Repair ticket ade-ke2y, written by gov close ORION-im01 on its refusal (TRAILER_MISSING) | Task: ade-ke2y | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+c3a9625 | 2026-10-14T05:54:04+01:00 | Checkpoint CP-ORION-im01-0003: before the further close of ORION-im01 | Task: ORION-im01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+36d8ec3 | 2026-10-14T05:46:56+01:00 | Ticket ade-5rcs closed (tk close) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+dc92b68 | 2026-10-14T05:46:55+01:00 | Ticket ORION-ad04 closed (tk close) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+4d103ce | 2026-10-14T05:46:55+01:00 | Repair ticket ade-5rcs completed: role, allowed paths, KPIs and source (the trailers base of ADR-012 settles its subject) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+e043bb9 | 2026-10-14T05:45:55+01:00 | Path map: the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace (ADR-012) | Task: ORION-ad04 | Role: product-spec | Implements: ADR-012
+cc21b70 | 2026-10-14T05:44:35+01:00 | Ticket ORION-ad04 started: the path map's trailers base and embedding policies | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+da45aae | 2026-10-14T05:44:35+01:00 | Ticket ORION-ad04: the path map's trailers base and embedding policies (ADR-012) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+cb9fd57 | 2026-10-14T05:44:35+01:00 | ADR-012: the answers of 2026-10-14 on the path map, the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace | Task: ORION-ad04 | Role: orchestrator | Implements: ADOPT-A8
 2d3d098 | 2026-10-13T22:55:50+01:00 | Merge feature/dimension-checked-addition into main: dimension-checked addition and subtraction (ORION-im01, open, its close refused) and the named dimension ACCELERATION (ORION-im02, closed by gov close) | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003, ORION-SPEC-DIMADD
 30996b6 | 2026-10-13T22:50:28+01:00 | Close record CL-ORION-im02 and checkpoint CP-ORION-im02-0004, written by gov close ORION-im02 | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
 94cceae | 2026-10-13T22:50:28+01:00 | Ticket ORION-im02 closed by gov close | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003

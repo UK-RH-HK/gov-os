@@ -222,5 +222,13 @@
   "ticket": "DAEO-zz42",
   "launch_record": "p4-probe",
   "lead_run": 6
+ },
+ {
+  "programme": "ORION",
+  "role": "product-spec",
+  "session_id": "16a6b9ff-8816-4e50-a417-074405944314",
+  "ticket": "ORION-ad04",
+  "launch_record": "a-ad4-r7",
+  "lead_run": 7
  }
 ]

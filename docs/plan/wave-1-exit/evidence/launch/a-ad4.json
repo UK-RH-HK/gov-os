@@ -50,5 +50,6 @@
   "claude-opus-5-5"
  ],
  "permission_denials": 0,
- "kept_from": ".gov-runtime/scratch/lead/log/a-ad4.json (the session's result envelope; its return text is not copied here)"
+ "kept_from": ".gov-runtime/scratch/lead/log/a-ad4.json (the session's result envelope; its return text is not copied here)",
+ "after_the_restart": "the session's commit 426dd51 was lost with the clone when the machine was restarted on 2026-10-14 (DEC-699); the session itself ran as recorded here. Run 7 redid the edit in session 16a6b9ff-8816-4e50-a417-074405944314 (launch/a-ad4-r7.json)"
 }

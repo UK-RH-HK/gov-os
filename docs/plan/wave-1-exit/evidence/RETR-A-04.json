@@ -10,7 +10,7 @@
   "--json"
  ],
  "exit_code": 0,
- "repository": "a-dev exit clone, feature branch at c063857, after the path map's embedding policies (ADR-012 of the clone) and a full gov rebuild, 2026-10-14",
+ "repository": "a-dev exit clone, feature branch at a0820d4, after the path map's embedding policies (ADR-012 of the clone, e043bb9) and a full gov rebuild, 2026-10-14, run 7",
  "bundles": [
   {
    "stopping_reason": "BUDGET_EXHAUSTED_WITH_GAPS",
@@ -38,7 +38,7 @@
      "routes": [
       "semantic"
      ],
-     "batch": 2,
+     "batch": 1,
      "text_removed_chars": 2840
     },
     {
@@ -220,7 +220,7 @@
      "routes": [
       "semantic"
      ],
-     "batch": 1,
+     "batch": 2,
      "text_removed_chars": 217
     },
     {
@@ -391,5 +391,5 @@
  "validator_errors": [],
  "packet_ceiling_exceeded": false,
  "synthesis_notes": [],
- "note": "asked once in run 6; kept as gov retrieve returned it, less the text of each evidence item and expansion (id, sha256, path and lines stay). 2,795 of 6,000 bundle tokens used: the packet ceiling was not exceeded, so no synthesis note. Run 5's answer is RETR-A-04-before-the-embedding-policies.json."
+ "note": "asked once in run 7, in the clone restored after the restart (DEC-699) and brought back to run 6's state; kept as gov retrieve returned it, less the text of each evidence item and expansion (id, sha256, path and lines stay). 2,795 of 6,000 bundle tokens used: the packet ceiling was not exceeded, so no synthesis note. The evidence list, the expansions and the gaps are the same, item for item, as run 6's answer (this branch at 42add8c9). Run 5's answer is RETR-A-04-before-the-embedding-policies.json."
 }

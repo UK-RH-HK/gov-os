@@ -12,7 +12,7 @@
   "--json"
  ],
  "exit_code": 0,
- "repository": "a-dev exit clone, feature branch at c063857, after the path map's embedding policies (ADR-012 of the clone) and a full gov rebuild, 2026-10-14",
+ "repository": "a-dev exit clone, feature branch at a0820d4, after the path map's embedding policies (ADR-012 of the clone, e043bb9) and a full gov rebuild, 2026-10-14, run 7",
  "bundles": [
   {
    "stopping_reason": "BUDGET_EXHAUSTED_WITH_GAPS",
@@ -329,11 +329,6 @@
      "reason": "NOT_GATHERED"
     },
     {
-     "path": "governance/adoption/packages/DP-ADOPT-a54ff182.md",
-     "chunk_id": "18027af5af20567b3e1a820b",
-     "reason": "NOT_GATHERED"
-    },
-    {
      "path": "governance/adoption/packages/DP-ADOPT-e22edba6.md",
      "chunk_id": "18abce45e7c090948a32f69f",
      "reason": "NOT_GATHERED"
@@ -346,6 +341,11 @@
     {
      "path": "governance/adoption/packages/DP-ADOPT-6892cb7e.md",
      "chunk_id": "1bff67dbdd17e888b300aa45",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-d0461c37.md",
+     "chunk_id": "2099144be13d56e222b34a59",
      "reason": "NOT_GATHERED"
     }
    ],
@@ -379,5 +379,5 @@
  "validator_errors": [],
  "packet_ceiling_exceeded": false,
  "synthesis_notes": [],
- "note": "asked once in run 6; kept as gov retrieve returned it, less the evidence text. Two batches, 20 items cited by id and hash, the missing id named as a gap (UNRESOLVED), no parent expansion: the case of the suite that reads this file stays red on the missing parent expansion. 404 of 6,000 bundle tokens used. Run 5's file (two bundles, the second the feature retrieval) is RETR-X-02-before-the-embedding-policies.json."
+ "note": "asked once in run 7; kept as gov retrieve returned it, less the evidence text. Two batches, 20 items cited by id and hash, the missing id named as a gap (UNRESOLVED), no parent expansion: the case of the suite that reads this file stays red on the missing parent expansion. 404 of 6,000 bundle tokens used. The evidence list and the expansions are the same as run 6's answer; of the 10 gaps NOT_GATHERED one differs (another adoption package not gathered). Run 5's file (two bundles, the second the feature retrieval) is RETR-X-02-before-the-embedding-policies.json."
 }
