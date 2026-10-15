@@ -1,0 +1,138 @@
+{
+ "kpi": "The owner freezes, pauses and lifts from a plain terminal, on a throwaway repository and on this one, and the results are recorded (DEC-428); met (DEC-707)",
+ "note": "Written by W1-42's lead (run 8, 2026-10-15) from the owner's own reports as the decision register quotes them: DEC-668 (the throwaway repository, 2026-10-13) and DEC-707 (this repository, 2026-10-15). No agent ran any of these commands. The owner reported each command's output, not the command lines: the commands are read from those outputs (the envelope with \"command\": \"pause\" is gov pause; the \"pause\": {...} lines are gov status; the prompt 'type LIFT-... to lift the freeze' is gov pause --off, src/gov/pause/command.py). 'reported' is each output word for word as the register quotes it; 'answer' is the same output parsed: a gov status answer was reported as its \"pause\" line alone, so 'answer' holds that line alone, and gov pause --off's answer is its prompt with the code typed, then its output. Not given by the records and left out: the exact command lines and their flags, the rest of each gov status answer, the time of each step but the freeze's 'since', the commit each repository stood at, the path of this repository's checkout the owner ran in, and any write tried on the throwaway repository while it was frozen.",
+ "throwaway": {
+  "repository": "~/gov-b2-throwaway, a copy of the a-dev exit clone, since deleted",
+  "terminal": "plain",
+  "terminal_as_reported": "a plain Ubuntu terminal",
+  "run_by": "the owner",
+  "record": "DEC-668 in docs/DECISION_REGISTER.md (owner's report of 2026-10-13)",
+  "status_before": {
+   "command": "gov status",
+   "answer": {
+    "pause": {
+     "paused": false,
+     "flag": "absent",
+     "mirror": false
+    }
+   },
+   "reported": "\"pause\": {\"paused\": false, \"flag\": \"absent\", \"mirror\": false}"
+  },
+  "steps": [
+   {
+    "command": "gov pause",
+    "answer": {
+     "ok": true,
+     "command": "pause",
+     "result": {
+      "paused": true
+     },
+     "session": ""
+    },
+    "reported": "{\"ok\": true, \"command\": \"pause\", \"result\": {\"paused\": true}, \"session\": \"\"}"
+   },
+   {
+    "command": "gov status",
+    "answer": {
+     "pause": {
+      "paused": true,
+      "flag": "frozen",
+      "mirror": true,
+      "by": "owner",
+      "since": "2026-10-13T13:56:14Z"
+     }
+    },
+    "reported": "\"pause\": {\"paused\": true, \"flag\": \"frozen\", \"mirror\": true, \"by\": \"owner\", \"since\": \"2026-10-13T13:56:14Z\"}"
+   },
+   {
+    "command": "gov pause --off",
+    "answer": [
+     "type LIFT-5786 to lift the freeze: LIFT-5786",
+     {
+      "paused": false
+     }
+    ],
+    "reported": "type LIFT-5786 to lift the freeze: LIFT-5786, then {\"paused\": false}"
+   },
+   {
+    "command": "gov status",
+    "answer": {
+     "pause": {
+      "paused": false,
+      "flag": "absent",
+      "mirror": false
+     }
+    },
+    "reported": "\"pause\": {\"paused\": false, \"flag\": \"absent\", \"mirror\": false}"
+   }
+  ]
+ },
+ "this": {
+  "repository": "this repository (the Gov OS repository of DEC-707)",
+  "terminal": "plain",
+  "terminal_as_reported": "a plain Ubuntu terminal (the standalone Ubuntu app, not an editor terminal)",
+  "run_by": "the owner",
+  "record": "DEC-707 in docs/DECISION_REGISTER.md (owner's report of 2026-10-15)",
+  "status_before": {
+   "command": "gov status",
+   "answer": {
+    "pause": {
+     "paused": false,
+     "flag": "absent",
+     "mirror": false
+    }
+   },
+   "reported": "\"pause\": {\"paused\": false, \"flag\": \"absent\", \"mirror\": false}"
+  },
+  "steps": [
+   {
+    "command": "gov pause",
+    "answer": {
+     "ok": true,
+     "command": "pause",
+     "result": {
+      "paused": true
+     },
+     "session": ""
+    },
+    "reported": "{\"ok\": true, \"command\": \"pause\", \"result\": {\"paused\": true}, \"session\": \"\"}"
+   },
+   {
+    "command": "gov status",
+    "answer": {
+     "pause": {
+      "paused": true,
+      "flag": "frozen",
+      "mirror": true,
+      "by": "owner",
+      "since": "2026-10-15T18:33:47Z"
+     }
+    },
+    "reported": "\"pause\": {\"paused\": true, \"flag\": \"frozen\", \"mirror\": true, \"by\": \"owner\", \"since\": \"2026-10-15T18:33:47Z\"}"
+   },
+   {
+    "command": "gov pause --off",
+    "answer": [
+     "type LIFT-2656 to lift the freeze: LIFT-2656",
+     {
+      "paused": false
+     }
+    ],
+    "reported": "type LIFT-2656 to lift the freeze: LIFT-2656, then {\"paused\": false}"
+   },
+   {
+    "command": "gov status",
+    "answer": {
+     "pause": {
+      "paused": false,
+      "flag": "absent",
+      "mirror": false
+     }
+    },
+    "reported": "\"pause\": {\"paused\": false, \"flag\": \"absent\", \"mirror\": false}"
+   }
+  ],
+  "refused_write": "PreToolUse:Write hook error: frozen: all writes denied",
+  "refused_write_on": "the orchestrator's one harmless write while frozen, between the freeze and the lift: a Write tool call creating .gov-runtime/scratch/orchestrator/b2-probe.txt, refused by the guard; the file was not created; nothing else was tried, recorded or committed until the lift (DEC-707)"
+ }
+}
