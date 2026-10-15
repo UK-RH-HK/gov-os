@@ -15,6 +15,23 @@ CLASS = "act"
 HELP = "rebuild derived state"
 EXIT_CODES = {}
 NO_EMBEDDINGS = "--no-embeddings"
+NONE_EMBEDDED = "no namespace is embedded"
+
+
+def none_embedded(config: dict) -> str | None:
+    """What a rebuild and ``gov doctor`` say where the project's path map has no namespace whose ``embedding_policy``
+    is exactly ``embedded`` (DEC-694); None without a path map, or where one is."""
+    from gov.retrieval.semantic import EMBEDDED  # the value retrieval embeds, read as retrieval reads it
+
+    path_map = config.get("path-map.yaml")
+    if not isinstance(path_map, dict):
+        return None
+    spaces = path_map.get("namespaces")
+    if any(isinstance(space, dict) and space.get("embedding_policy") == EMBEDDED
+           for space in (spaces.values() if isinstance(spaces, dict) else ())):
+        return None
+    return (f"{NONE_EMBEDDED}: no namespace of the path map says `embedding_policy: {EMBEDDED}`, so no file "
+            "reaches the semantic vectors")
 
 
 def add_arguments(parser) -> None:
@@ -86,6 +103,9 @@ def run(root: Path, args, config: dict) -> dict:
                 }
         except Exception as exc:
             stores["semantic"] = {"status": "not_recreated", "reason": str(exc)}
+    note = none_embedded(config)
+    if note:
+        stores["semantic"]["embedding"] = note
 
     try:
         from gov.codeintel import index as codeintel_index

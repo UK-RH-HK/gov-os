@@ -2762,3 +2762,41 @@ Two `gov close` runs, neither exit 4 (outputs kept by the orchestrator):
 - **Every test run of the close was green:** the ticket's suite 3,648 and 5 passed, the regression 9,472 and 258 passed; the validator ALL PASS. By DEC-536 this is the post-merge regression of the round.
 - **The round's own commits carry all three trailers; its probe passed** (`docs/probes/DAEO-emkd/PR-DAEO-emkd-round-DEC-685.md`).
 - **Closed with `tk close` by the owner's decision (DEC-690).**
+
+## DAEO-cdoi (W1-41): the round of DEC-694, residuals for the Wave 2 list (2026-10-14; DEC-694, DEC-700, DEC-702)
+
+Merged at `945643ec` after a probe PASS (`docs/probes/DAEO-cdoi/PR-DAEO-cdoi-round-DEC-694.md`). Adoption's stage A3 refuses (`ADOPT_EMBEDDING_POLICY`, nothing written) a project path map whose namespaces state another `embedding_policy` than `embedded` or `not embedded`, or none, or in which no namespace is embedded; `gov rebuild` and `gov doctor` say "no namespace is embedded". The two rulesync sources of the adopt skill were brought to the kernel skill (`a8cf8867`); the generated copy under `.claude/skills/` is applied by the operator (DEC-616).
+
+- **A3 checks what namespaces state, not what retrieval embeds** (medium). A map whose embedded namespace is overlapped by a not-embedded catch-all, matches no tracked file, or (template-style) has no `paths` passes A3 with no file embedded, and rebuild and doctor stay silent. Fix: count the files the retrieval's per-file rule would embed, in A3 and in `none_embedded()`.
+- **A3 does not pin the project path map's hash** (low): A6 and A8 go on after a later edit that embeds nothing; the rebuild's words in A6 and A8 say it.
+- **The doctor's words sit only under its semantic canary's answer** (low): absent when the canary raises or gives no semantic entry.
+- **A3's embedding check answers before its `--map` check** (info).
+- **Sandbox placeholders seen during a sandboxed session** (info; DEC-693, DEC-697): eleven root dot-files as character devices `1,3` owned by `nobody`, and `docs/source`, in the worktree's status while the reviewer's session ran; gone after it; no containment finding.
+- **Containment attribution during test design** (info; DEC-253, DEC-254): two `flagged` entries on the designer's two new files against the lead's waiting commands.
+- **Learning metrics of the round:** KPI disputes 0; 119 W1-41 cases rewritten before implementation ("planned: behaviour ordered", one support default); 36 cases added, 12 of them controls that pass on the old code; 0 rewritten after implementation; source lines +50 against 80.
+
+## DAEO-gjjf (W1-42) run 7: residuals for the Wave 2 list (2026-10-14; DEC-695, DEC-699)
+
+- **`gov close`'s own trailer gate does not read `trailers_base`** (`src/gov/close/command.py`, `_check_trailers`; only `src/gov/close/traceability.py` reads it): the base clears `gov check` but not `gov close`. ORION-im01's second close (count 2 of 3) refused with `TRAILER_MISSING` on `540004a` alone, before a-dev's base `bb1852e`; DEC-690's close of DAEO-emkd refused on three commits all before this repository's base `1c33dd28`. With the owner as a package.
+- **The repair ticket `ade-ke2y`** that the second close wrote in a-dev is open and incomplete; it turns a-dev's claims and schema checks red.
+- **Context reproducibility with a live semantic index** (run 6, measured again in run 7): the context of a ticket differs between the first and later computations in one process (a-dev: ORION-gp01, ade-5rcs); `gov ci` is red on it.
+- **The restart of 2026-10-14 (DEC-699):** live clones under `/tmp` are lost on a reboot; the operator backs them up after every run that changes one (DEC-698).
+
+## DAEO-cdoi (W1-41) closed after the round of DEC-694, with the ticket tool, by the owner's decision (2026-10-14; for the exit auditor; DEC-703)
+
+`gov close DAEO-cdoi` at `718738d6` refused (exit 3, `CHECK_FAILED`, log `close-W1-41R.json`) on three parts:
+
+- `PROBE_INVALID` on `b87ac775` (2026-10-11), before this repository's trailers base `1c33dd28`, the same finding as DAEO-emkd's close (DEC-690);
+- a containment finding on the merge `803f731c` (2026-10-09), before the base;
+- adapter-portability RED on `.claude/skills/adopt/SKILL.md` (`GENERATED_DIFFERS`): the generated copy waiting for the operator's apply (DEC-616). The operator applied it at `75b57d40`. At `de9389fc`, after `gov rebuild --no-embeddings`, `gov check` exited 0 with adapter-portability GREEN and no RED family (yellow: decision citations, openspec, audit reproducibility, as before; log `check-W1-41-close.json`). A first `gov check` without the rebuild and the close script's environment was red on index freshness, secrets indexing and recovery/rebuild (the index stale after two commits), and green on adapter-portability.
+
+Its repair ticket (DAEO-52q7) was moved out of `.tickets/` to the orchestrator's scratch log, as earlier repair tickets of pre-base refusals were.
+
+- **Tests:** every test run of the close green (acceptance 242; regression 12,926 parallel and 263 serial); the regression after the merge `945643ec` green (13,168 and 263, validator ALL PASS); the 127 rulesync-pair cases green after `a8cf8867`.
+- **Probe:** PASS, `docs/probes/DAEO-cdoi/PR-DAEO-cdoi-round-DEC-694.md` (reviewer `687d031c…`, probed commit `dc14bf4e`).
+- **Learning metrics of the round:** KPI disputes 0; 119 cases rewritten before implementation, 0 after; 36 cases added (12 controls); source lines +50 against an estimate of 80.
+- The worktree `W1-41` and its branch `w1/W1-41` were removed after the close.
+
+## The pre-commit hook after B3: Wave 2 list, ranked high (2026-10-15; DEC-706, DEC-709)
+
+- **The pre-commit tier holds only fast checks** (high). The first commit after the lefthook install was refused: `gov ci checks G1 G2` failed on index-freshness and recovery-rebuild, after 290 s, because the index was older than three tracked files. Until Wave 2 every commit runs `gov rebuild --no-embeddings` after staging (DEC-709). Fix: index-freshness and recovery-rebuild move to pre-push (G3) or CI; the commit-time re-index (CAP-17.b, a Wave 2 contract item) is built first, so no rebuild by hand is needed before a commit.

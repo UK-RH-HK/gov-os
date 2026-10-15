@@ -1,6 +1,6 @@
 ---
 id: DAEO-cdoi
-status: in_progress
+status: closed
 deps: [DAEO-xw3k, DAEO-3ef2, DAEO-5ylr, DAEO-xog0]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -67,3 +67,9 @@ acceptance_tests:
 # W1-41 gov adopt --lite and legacy importer
 
 Progressive adoption and legacy retirement.
+
+## Notes
+
+**2026-10-14T12:56:37Z**
+
+Closed with tk close by the owner's decision of 2026-10-14 (DEC-703), named for the exit auditor: gov close refused on PROBE_INVALID b87ac775 and a containment finding on 803f731c, both before the trailers base 1c33dd28, and on adapter-portability, green after the operator's apply 75b57d40 (gov check exit 0 at de9389fc). Every test green; probe PASS.

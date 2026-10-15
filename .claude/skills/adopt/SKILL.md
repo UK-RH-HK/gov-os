@@ -27,10 +27,19 @@ Wave 1 delivers `gov adopt --lite`, covering stages A0–A4, A6, A8 and A5:
 
 Each stage writes an evidence record. `gov doctor` reports the current adoption level (CAP-54).
 
+## Embedding policy (DEC-694, DEC-700)
+
+Every namespace of the target path map states its `embedding_policy`, as one of two values, written exactly so:
+
+- `embedded` — the chunks of the namespace's files reach the semantic vectors.
+- `not embedded` — the namespace's files are found by the lexical route only; nothing of them is embedded.
+
+Stage A3 refuses a path map in which a namespace states another value or none, or in which no namespace is `embedded`; it records nothing. Outside adoption an unknown or missing value is read as `not embedded` (DEC-388), and `gov rebuild` and `gov doctor` say "no namespace is embedded" where none is.
+
 ## Independent gates (Wave 3)
 
 The independent gates A7 (independent migration verification), A10 (independent memory verification) and A11 (full audit) are Wave 3, together with CAP-47. The final verdict — `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS` or `NOT_ADOPTED_HEALTHY` — is issued from Wave 3 (DEC-090).
 
 ## Governing sources
 
-DEC-006, DEC-090, CAP-44, CAP-54.
+DEC-006, DEC-090, DEC-388, DEC-694, DEC-700, CAP-44, CAP-54.

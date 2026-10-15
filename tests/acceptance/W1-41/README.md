@@ -74,6 +74,121 @@ rewritten; the suite went from 156 to 182 cases.
   0, the dependency among its mandatory inputs with the reason "declared in sources", the ids under `external`).
   Green, and they stay green: the 3 rows of `test_a_ticket_with_a_source_that_was_read_is_built_beside_dependencies`.
 
+## The embedding policies (the round of DEC-694; DEC-700)
+
+Added by a fresh Independent Test Designer on `DAEO-cdoi`, before any code of the round, from DEC-694, DEC-700,
+DEC-686, DEC-693, DEC-380, DEC-381, DEC-388, the kernel's path-map schema and adopt skill, and the answers
+`gov rebuild --json` and `gov doctor --json` give today. File: `test_w1_41_embedding_policy.py`, **36 cases**. With
+it the suite has **242 cases in 10 files**.
+
+A namespace's `embedding_policy` decides whether its files reach the semantic vectors: only a file whose every
+namespace says exactly `embedded` does; any other value, a missing field and a file in no namespace are "not
+embedded" (DEC-380, DEC-381, DEC-388). An adoption could end with no namespace embedded and nothing said why the
+semantic index stayed empty (DEC-686, DEC-693).
+
+### The interface the cases hold (settled here; the engineer may dispute any point through the lead)
+
+1. **The two values** are `embedded` and `not embedded`, compared as written (no change of case, no trimming):
+   `Embedded`, `embedded ` (a trailing space) and `not_embedded` are other values.
+2. **Stage A3 refuses** a path map with a namespace whose value is another one, a namespace without the field
+   (DEC-700), or no namespace that says `embedded`. A0 to A2 go on with such a map (settled from the code for this
+   round: they move and retire nothing, and every later stage stands on A3's record). The refusal has the form of
+   the stage's other refusals ("The interface", point 4): `ok: false`, exit code 1, 3 or 4, and an error code of
+   the stage's own family, which today is every code that begins with `ADOPT_` (`ADOPT_EMBEDDING_POLICY` would
+   fit; only the prefix is held). It writes nothing: the files, HEAD, every ref and the tracked tree are as before,
+   and the tree is clean.
+3. **The refusal's message** (the error's `message`) names each namespace at fault by its name and both valid
+   values, each between quotes or backticks (`'embedded'`, `` `not embedded` ``, …). Where no namespace says
+   `embedded`, the message holds the words `no namespace is embedded` (any case of the letters).
+4. **A value that is no text** (a YAML boolean, an empty value, an empty text) is refused today by the project's
+   configuration for every command (`CONFIG_INVALID`, exit code 1, at A0, naming
+   `namespaces.<name>.embedding_policy`; `src/gov/config/` is not in this ticket's paths). Held: adoption is
+   refused at A3 or a stage before it, the refusing stage writes nothing and names the namespace anywhere in its
+   error object, and A3 never records such a map. Its code is not held.
+5. **`gov rebuild`** with a path map in which no namespace says exactly `embedded`: the words
+   `no namespace is embedded` (any case) stand somewhere in the semantic part of its result, that is anywhere under
+   a key `semantic` (today `result.stores.semantic`; a key of its own beside `status` and `reason` would do). The
+   rest is as for the same project with one embedded namespace: `ok: true`, exit code 0, the lexical index
+   `recreated`, and the same `status` for every store. Held in the full rebuild (the endpoint out of reach) and with
+   `--no-embeddings`. The full rebuild still asks the endpoint as today (W1-27's round 8 holds that).
+6. **`gov doctor`** with such a path map: the words stand somewhere in its semantic part, under a key `semantic`
+   at any depth (`canaries.indices.semantic` today, or a section of its own named `semantic`). Held against the
+   same project with one embedded namespace (both rebuilt with `--no-embeddings` first, no vectors either way): the
+   same exit code, `ok` and `healthy`; the same sections with the same `status`; the canary's answer for the
+   semantic index (`passed`, `status`, `misses`) the same. So it adds no failure, and a section of its own must be
+   there with the same status where a namespace is embedded too.
+7. **Where one namespace says `embedded`**, neither the rebuild (either mode) nor the doctor has the words anywhere
+   in what it prints, whatever the other namespaces say.
+8. **A project with no path map** is not this round's: no case.
+9. **The skill** (`template/governance/kernel/skills/adopt/SKILL.md`, read as text): it names the field
+   `embedding_policy` and the two values, each between quotes or backticks; it says what the policy decides (the
+   words "semantic" or "vector"); and it says that every namespace states one ("every namespace" or "each
+   namespace").
+
+**No model.** Every W1-41 case now runs `gov` with `OLLAMA_HOST` at a loopback port where nothing listens and
+`GOV_OLLAMA_BIN` at a path where no program is (`support.environment`, as W1-30's round 11 keeps the endpoint
+out of reach), so nothing is started and no vector is built, here or outside the sandbox, whatever the path map
+embeds. The full rebuild's semantic store then answers `not_recreated` (in this sandbox because `sqlite_vec`
+cannot be loaded, elsewhere because the endpoint is down); the cases hold only that it is the same with and
+without an embedded namespace.
+
+### Behaviours → cases (`embedding_policy`)
+
+| Behaviour | Cases | Red reason today |
+|---|---|---|
+| 1. the skill names the two values | `test_the_adopt_skill_names_the_two_valid_embedding_policies`, `test_the_adopt_skill_says_what_embedded_means`, `test_the_adopt_skill_says_every_namespace_states_one` | red: the skill does not name `embedding_policy` |
+| 2. A3 refuses another value, named, both values named, nothing written | `test_a_namespace_with_another_value_is_refused_at_a3` (4: `not stated by the programme`, `Embedded`, `embedded `, `not_embedded`; the other namespace says `embedded`) | red: "expected a refusal, but the tool reports success" |
+| … a namespace without the field (DEC-700) | `test_a_namespace_without_the_field_is_refused_at_a3` | red: the same |
+| … two namespaces at fault, both named | `test_two_namespaces_at_fault_are_both_named` (a free text and a missing field) | red: the same |
+| … no namespace says `embedded`, and the message says so | `test_a_path_map_where_every_namespace_says_not_embedded_is_refused_at_a3` (2: two namespaces; the one namespace of the harbour project as it was before this round) | red: the same |
+| … a value that is no text | `test_a_value_that_is_no_text_is_refused_before_a3_goes_on` (3: `true`, empty, `''`) | **green**: `CONFIG_INVALID` at A0 (point 4); stays green |
+| goes on: each namespace states one of the two, one or more `embedded` | `test_a_path_map_whose_namespaces_each_state_a_valid_value_goes_on` (3: one of two embedded; one of three; all), through A4 | **green, and stays green** |
+| after a refusal, a corrected path map committed runs A3 and goes on | `test_a_corrected_path_map_committed_after_the_refusal_goes_on` (A3, then A4) | red: the first A3 is not refused |
+| 3. the rebuild says it, its stores recreated as with an embedded namespace | `test_the_rebuild_says_no_namespace_is_embedded` (8: four maps × full and `--no-embeddings`; the maps: every namespace `not embedded`, a free text, no field, `Embedded`) | red: "the rebuild's answer for the semantic store does not say 'no namespace is embedded'" |
+| … the doctor says it and adds no failure (comparative) | `test_the_doctor_says_no_namespace_is_embedded_and_adds_no_failure` (4: the same maps) | red: "the doctor's semantic part does not say …" |
+| … neither says it where a namespace is embedded | `test_neither_says_it_where_a_namespace_is_embedded` (6: beside `not embedded`, beside a free text × rebuild full, rebuild `--no-embeddings`, doctor) | **green, and stays green** |
+| 4. outside adoption nothing is refused for it (DEC-380, DEC-388 stay) | W1-19: `test_no_text_of_a_namespace_that_is_not_embedded_is_sent_to_be_embedded_or_returned` and `test_only_the_namespace_that_says_embedded_reaches_the_vectors` (`tests/acceptance/W1-19/test_w1_19_embedding_policy.py`; its fixture's namespaces say `embedded`, `not embedded`, an unknown value and nothing); not written again here | held there |
+
+Measured in this sandbox before any code of the round: **24 failed, 12 passed** in 93 s, each red for the reason
+of the table.
+
+### Rewritten (Rewrite-Reason: the stand-in's path map states its embedding policy, DEC-694, DEC-700)
+
+The harbour project's one namespace said `embedding_policy: not embedded`, so every case whose project reaches
+stage A3 would now be refused there. `path_map()` in `w1_41_support.py` now gives the namespace `embedded` (one
+namespace, every artefact in it, so the A2 classification the cases read is unchanged), and the b-dev clone's path
+map, which the dev-tier cases write with the same function, says `embedded` too. Planned: behaviour ordered. The
+119 cases whose project reaches A3 (counted by a trace of the suite's `gov` calls, the cases of the two module
+fixtures included):
+
+| File | Cases |
+|---|---|
+| `test_w1_41_legacy.py` | all 52 |
+| `test_w1_41_path_map.py` | all 31 |
+| `test_w1_41_verdict.py` | all 19 |
+| `test_w1_41_migration.py` | all 7 |
+| `test_w1_41_unknown.py` | 6: `test_a_path_map_that_moves_or_deletes_the_unknown_artefact_is_refused` (4), `test_an_unknown_artefact_blocks_retirement_too`, `test_an_unknown_artefact_blocks_the_whole_destructive_migration` |
+| `test_w1_41_baseline.py` | 2: `test_stages_a0_to_a4_each_leave_their_own_evidence_record`, `test_a_stage_without_the_record_of_the_stage_before_it_refuses[A3]` |
+| `test_w1_41_dev_tier.py` | both (`local_only`) |
+
+No assertion of these cases changed. The context project of the ninth success line keeps `not embedded`, byte for
+byte as before (it is never adopted). Measured after the change, the new file left out: **34 failed, 172 passed**,
+as before it: the 34 are the move cases that stop at A3 in the sandbox with `ADOPT_CODE_GRAPH_UNREADABLE` ("Where
+the cases can run"; the lead runs them).
+
+### Other suites
+
+- **W1-27** (`w1_27_support.py`): its stand-ins' one namespace says `not embedded`, so after the round their rebuild
+  and doctor say "no namespace is embedded". Round 8's
+  `test_the_mode_says_the_semantic_store_was_not_built_because_it_was_not_asked_for` holds that the `--no-embeddings`
+  reason names the argument and reads as no endpoint failure, and
+  `test_a_rebuild_without_the_argument_asks_the_endpoint_as_today` that the full rebuild still asks the endpoint:
+  the words must be added beside that reason, and a project without an embedded namespace must not skip the
+  endpoint. Its doctor cases do not fail on an added key.
+- **W1-36** holds the kernel skills' form (frontmatter, at most 2,500 tokens of body, no permission keys, a
+  governing source): the skill's addition must keep it.
+- No other suite runs `gov adopt --lite` on a project; W1-26's command-contract case plants its own reserved command.
+
 ## Sources that could not be read
 
 - **S0a-G-13 and G-10** (the ticket's first two sources) are not in the readable tree: `docs/source/` is closed to
@@ -557,6 +672,8 @@ passed, 18 failed, none skipped, 18 s.
 | a record that cites the store has no status, or a status nobody knows | `legacy`: `test_a_record_that_still_stands_keeps_the_store` (the rows "no status" and "a status nobody knows") | "it no longer stands", a retirement |
 | the ticket's sources are all external and only its dependencies were read | `external_references`: `test_a_ticket_whose_sources_are_all_external_is_refused_beside_dependencies` (3) | a packet that holds no source, a context hash for a close |
 | the plan (A4) is not the plan of the path map the verdict is about | `verdict`: `test_a_plan_that_is_not_the_audited_path_maps_plan_is_not_executed` (2) | a pass for the plan, a move |
+| a namespace's embedding policy is another value or missing, or no namespace says `embedded` (DEC-694, DEC-700) | `embedding_policy`: the A3 refusals above | a recorded path map whose semantic index stays empty unexplained |
+| no namespace says `embedded` at a rebuild or a doctor run | `embedding_policy`: `test_the_rebuild_says_no_namespace_is_embedded` (8), `test_the_doctor_says_no_namespace_is_embedded_and_adds_no_failure` (4) | an empty semantic index with no word of why |
 
 ### Covers → tests
 
@@ -569,7 +686,7 @@ passed, 18 failed, none skipped, 18 s.
 | CAP-42.a | `legacy` (import, nothing stays loaded, zero ACTIVE decisions) |
 | CAP-42.b | `legacy` (chat database; dependency proof, with a kept legacy rule file as citer, in every form it writes the path or the id, and with every record that still stands as citer; CIT-E; index refresh) |
 | CAP-42.c | `legacy` (reachable, disposition) |
-| CAP-44.b | `baseline`, `path_map` (A4), `unknown` (packages), `dev_tier` |
+| CAP-44.b | `baseline`, `path_map` (A4), `unknown` (packages), `dev_tier`, `embedding_policy` (A3 refuses an embedding policy that is not one of the two, or no namespace embedded; the doctor and the rebuild say it; DEC-694) |
 | CAP-44.c | `verdict` (the verdict; the plan that is not the audited path map's) |
 | CAP-44.d | `migration` |
 | CAP-44.e | `legacy` |
