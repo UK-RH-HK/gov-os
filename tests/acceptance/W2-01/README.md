@@ -136,8 +136,12 @@ content in the merge is that of neither parent", too weak and too strict at once
   merge after the probed commit, the probed code is what it is at the probed commit; a merge where it is not
   refuses and is named, whichever parent's version it took: a conflict on a probed file resolved to the
   integration side's version, a probed file the ticket added removed, a merge-back made from the integration
-  side with git's `ours` strategy (none of the ticket's code reaches the closed head). A commit that names
-  another ticket stays that ticket's (DEC-490).
+  side with git's `ours` strategy (none of the ticket's code reaches the closed head).
+- Restated in the second batch after implementation began (DEC-136, DEC-739): **the merge-back that brings the
+  probed commit into the closed branch is measured by the probed code whatever task it names**: the ticket's
+  `Task:`, another ticket's `Task:`, or none (a plain `git merge`, as git writes it, with no trailer). One that
+  drops or replaces the probed code refuses, and the refusal names it. A commit that names another ticket stays
+  that ticket's (DEC-490) for every other commit, not for this merge-back.
 - **Rounds (KPI 5).** Of several probe records, the record of the final code decides (its probed commit is the
   latest, nothing of the probed code changed after it). An earlier round's record (its probed commit an
   ancestor of the later one) neither passes nor refuses, in whichever order the files' names sort. A failing
@@ -221,6 +225,7 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 | `test_probed_then_merged_with_the_integration_branch_and_back_closes[every trailer]` | red: `PROBE_INVALID`, "ticket commit … changes src/example/feature.py after the probed commit" |
 | `…[the merge form]` | red: `PROBE_INVALID` as above and `TRAILER_MISSING` on the inward merge |
 | `test_probed_then_merged_with_the_integration_branch_closes_on_the_branch` | passes today (guard: the inward merge alone, closed on the branch) |
+| *added (DEC-136, DEC-739):* `test_a_plain_merge_back_of_the_unchanged_probed_code_closes[merged back only]`, `[merged in, then back]` (the merge-back a plain `git merge`, no trailer) | red at `d582aee6` (both): refused with `PROBE_INVALID`, "commit … names no task and changes src/example/feature.py after the probed commit: the probe is stale", and `WORK_WITHOUT_TASK`, "… work on PROJ-prbk that no ticket measured", on the merge-back (judged against its first parent; see package P-4) |
 
 ### KPI 9 (failure) — a hand-resolved merge changing probed code refuses the probe gate
 
@@ -230,6 +235,7 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 | `test_a_merge_back_that_changes_probed_code_by_hand_refuses[a probed file changed]`, `[a file added inside the ticket's paths]` | passes today (guard) |
 | *added (DEC-136):* `test_a_merge_back_that_drops_probed_code_refuses_and_names_the_merge_back[<how>-<layout>]`: how ∈ {`a conflict on a probed file resolved to the integration side`, `a probed file the ticket added removed`, `made from the integration side with the ours strategy`} × layout ∈ {`merged back only`, `merged in, then back`} (KPI 4's layout); the wrong merge is always the merge-back | red at `4204b89d` (all six): the close succeeds ("gov close was not refused") |
 | *added:* `test_a_merge_into_the_branch_resolved_to_the_integration_side_refuses` (inward, then merged back) | passes at `4204b89d` (guard for "inward") |
+| *added (DEC-136, DEC-739):* `test_a_merge_back_naming_no_task_or_another_that_drops_probed_code_refuses_and_names_it[<names>-<how>-<layout>]`: names `no task` (a plain `git merge`, no trailer) × the three ways above × both layouts (6); names `another ticket's task` (`Task: PROJ-othr`) × the three ways, `merged back only` (3), and with the `ours` strategy, `merged in, then back` (1); the wrong merge is always the merge-back | red at `d582aee6` (all ten): the close succeeds ("gov close was not refused") |
 
 ### KPI 5 — a reopened FULL ticket with an earlier-round record and a passing later one passes [W2-M209, W2-L111]
 
@@ -285,6 +291,29 @@ them, within the KPI lines, without reading `src/`; red run against the implemen
 gained two helpers on new lines (`merge_by_hand`: a merge that may also remove paths or use git's `ours`
 strategy; `content_at`: a file's text at a commit); no earlier line of it changed.
 
+### Second batch: the merge-back that names no task, or another ticket's (DEC-136, DEC-739)
+
+The second and last review (`docs/probes/DAEO-g0ip/PR-DAEO-g0ip.md`, probed `f74b361b`, judgement fail) found
+that a merge-back naming no task, or another ticket's task, that drops or replaces the probed code passes the
+close. The owner allowed one extra round for it (DEC-739, beyond DEC-413). A fresh test designer added it as
+described behaviour, within KPI 4 and KPI 9, without reading `src/`; red run against the implementation at
+`d582aee6`.
+
+| Added | KPI line | Reason | Red at `d582aee6` |
+|---|---|---|---|
+| `test_a_merge_back_naming_no_task_or_another_that_drops_probed_code_refuses_and_names_it` (10 cases) | 9 (failure), alone and in 4's layout | DEC-739; the second review's first finding | 10 red: the close succeeds |
+| `test_a_plain_merge_back_of_the_unchanged_probed_code_closes` (2 cases) | 4 (guard) | DEC-739: KPI 4's success line in the most common merge layout (131 of the last 300 merges on `main` carry no `Task:`) | 2 red: `PROBE_INVALID` and `WORK_WITHOUT_TASK` on the merge-back (package P-4) |
+
+12 tests added: all 12 red. The suite now holds 81 tests; the 69 earlier ones all still pass at `d582aee6`.
+
+**Forms changed, each with its reason:** *the probe gate* (above): the sentence "A commit that names another
+ticket stays that ticket's (DEC-490)" is restated so that it holds for every commit but the merge-back that
+brings the probed commit into the closed branch, which is measured by the probed code whatever task it names.
+Reason: DEC-739.
+
+**Existing tests changed:** none. `test_w2_01_probe_merge_back.py` gained the two tests and one helper
+(`_merged_back_naming`) on new lines; `w2_01_support.py` is unchanged.
+
 ## Packages for the lead
 
 - **P-1 — the creating commit after the base, and a clone with no base (KPI 6).** Reading A: the
@@ -301,6 +330,16 @@ strategy; `content_at`: a file's text at a commit); no earlier line of it change
   in the check command's own output, and only the status (GREEN/RED) through `gov check`. Showing the listing
   in `gov check --json` needs a runner change outside this ticket's paths; recommend a follow-up in the runner's
   ticket.
+- **P-4 — the task-less rule and a plain merge-back of the unchanged probed code (second batch).** DEC-490
+  says a commit naming no task that changes a path inside the ticket's allowed paths refuses (work no ticket
+  measured) and, after the probed commit, makes the probe stale. Today a plain merge-back is judged against its
+  first parent, so bringing the probed code unchanged counts as such a change, and KPI 4's guard is refused. The
+  guard holds that the merge-back of exactly the probed code is measured (by the probe) and not "after" it
+  (DEC-505, DEC-739). Option (a): the task-less rule measures a merge-back that brings the probed commit by the
+  probed code, as the probe gate does (the guard as written; the rule stands for every other task-less commit).
+  Option (b): a plain merge-back refuses until it carries the ticket's `Task:` (the guard is dropped; 131 of the
+  last 300 merges on `main` would refuse). Recommendation: (a), confidence medium-high. Reversible: the guard
+  is one test; cost of (a) is inside the fix the ten refusal cases already ask for.
 
 ## Not held
 

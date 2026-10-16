@@ -218,3 +218,87 @@ def test_a_merge_into_the_branch_resolved_to_the_integration_side_refuses(projec
         f"the probe gate does not refuse the merge {inward[:12]} resolved to the integration side, or its " \
         f"merge-back {back[:12]}\n{run.describe()}"
     support.base.assert_not_closed(project, TICKET)
+
+
+# --------------------------------------------------------------------------
+# Added after implementation began (DEC-136, DEC-739; the second review's first finding): the merge-back that
+# brings the probed commit into the closed branch is measured by the probed code whatever task it names. A
+# plain ``git merge`` (no trailer, the message git writes) or a merge naming another ticket's task that drops
+# or replaces the probed code refuses, naming the merge-back. DEC-490 ("a commit that names another ticket is
+# that ticket's") holds for the other commits, not for this merge-back.
+# --------------------------------------------------------------------------
+
+PLAIN_MERGE = "Merge branch 'work'"
+NAMES = {"no task": (), "another ticket's task": support.trailers_of(OTHER, role="orchestrator")}
+TASKLESS_DROPS = ([("no task", wrong, layout) for wrong in WRONG_MERGE_BACKS for layout in LAYOUTS]
+                  + [("another ticket's task", wrong, LAYOUTS[0]) for wrong in WRONG_MERGE_BACKS]
+                  + [("another ticket's task", WRONG_MERGE_BACKS[2], LAYOUTS[1])])
+
+
+def _merged_back_naming(project, names, wrong=None):
+    """The merge-back onto ``main``, naming ``names`` (a plain ``git merge`` for no task); made in the
+    ``wrong`` way, or bringing the branch unchanged when ``wrong`` is ``None``."""
+    project.checkout("main")
+    if wrong == WRONG_MERGE_BACKS[0]:
+        how = dict(edit={FEATURE: INTEGRATION_FEATURE})
+    elif wrong == WRONG_MERGE_BACKS[1]:
+        how = dict(remove=(FEATURE,))
+    elif wrong == WRONG_MERGE_BACKS[2]:
+        how = dict(strategy="ours")
+    else:
+        how = {}
+    message = PLAIN_MERGE if names == "no task" else "merge the ticket's branch"
+    return support.merge_by_hand(project, BRANCH, NAMES[names], message=message, **how)
+
+
+@pytest.mark.parametrize("names, wrong, layout", TASKLESS_DROPS,
+                         ids=[f"{names}-{wrong}-{layout}" for names, wrong, layout in TASKLESS_DROPS])
+def test_a_merge_back_naming_no_task_or_another_that_drops_probed_code_refuses_and_names_it(
+        names, wrong, layout, project, sandbox, interface):
+    probed = _probed_branch(project)
+    first = True
+    if layout == "merged in, then back":
+        _integration_changes(project, {"src/other/part.py": "# part\n"}, first=True)
+        project.checkout(BRANCH)
+        _merged_in(project)
+        first = False
+    if wrong == WRONG_MERGE_BACKS[0]:
+        _integration_changes(project, {FEATURE: INTEGRATION_FEATURE}, first=first)
+    elif first:
+        _integration_changes(project, {"src/other/part.py": "# part\n"}, first=True)
+    back = _merged_back_naming(project, names, wrong)
+    _recorded(project, probed)
+    message = support.git(project, "log", "-1", "--format=%B", back)
+    assert f"Task: {TICKET}" not in message, "the fixture is wrong: the merge-back names the ticket's task"
+    assert support.content_at(project, back, FEATURE) != support.content_at(project, probed, FEATURE), \
+        "the fixture is wrong: the merge-back holds the probed code"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface)
+    said = _probe_gate_findings(error)
+    assert said and any(back[:7] in text for text in said), \
+        f"the probe gate does not refuse the merge-back {back[:12]} naming {names} ({wrong}) whose probed code " \
+        f"is not the probed commit's\n{run.describe()}"
+    support.base.assert_not_closed(project, TICKET)
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+def test_a_plain_merge_back_of_the_unchanged_probed_code_closes(layout, project, sandbox, interface):
+    """KPI 4's success line with the merge-back as git writes it (no trailer): it still closes."""
+    probed = _probed_branch(project)
+    _integration_goes_on(project)
+    if layout == "merged in, then back":
+        _merged_in(project)
+    back = _merged_back_naming(project, "no task")
+    _recorded(project, probed)
+    assert support.git(project, "log", "-1", "--format=%B", back).strip() == PLAIN_MERGE, \
+        "the fixture is wrong: the merge-back is not a plain git merge"
+    assert support.git(project, "diff", "--name-only", probed, "HEAD", "--", "src/example", "tests/acceptance/W1-prbk",
+                       ".tickets/PROJ-prbk.md").strip() == "", "the fixture is wrong: the probed code changed"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    assert not _probe_gate_findings(run.envelope().get("error") or {}), \
+        f"the probe gate refuses the plain merge-back {back[:12]} of the unchanged probed code\n{run.describe()}"
+    support.closed(run, interface)
