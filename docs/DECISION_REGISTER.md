@@ -7558,3 +7558,97 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 | Version | Date | Change |
 |---|---|---|
 | 0.219 | 2026-10-16 | Owner: DEC-717 (DAEO-gjjf closed with `tk close`, its 22 findings named for the exit auditor; the W1-43 audit stands in for the missing probe; the lost lead scratch folder a named deviation; `w1/W1-42` kept for DEC-711; the auditor reads the clones from the archive). Next free id: DEC-718. |
+
+## 220. The owner's exit decision of 2026-10-16: Wave 1 passes with accepted exceptions (register v0.220, prepared by the W1 orchestrator on branch `w1/integrate`, committed by the owner)
+
+### DEC-718 — Wave 1 passes with accepted exceptions: every finding of the exit audit and every exception of DEC-714 is named with what closes it and its Wave 2 owner; the adoption-readiness block passes before any pilot adoption
+- **Status:** ACCEPTED (owner, 2026-10-16; committed by the owner with `Role: owner`) · **Under:** DEC-412, DEC-465, DEC-565, DEC-584, DEC-626, DEC-704, DEC-712, DEC-714, DEC-715, DEC-716, DEC-717 · **Basis:** the W1-43 exit audit, `docs/audit/wave-1/W1-43-wave-1-exit-audit.md` with its context pack beside it. The owner committed both in a plain terminal as `82459573`, after the auto-mode classifier had refused the auditor's commit and then the operator's, and after the owner had the lefthook hooks uninstalled again (F-M13). The verdict is FAIL as the record stands at `60ea6924`, with no BLOCKER. It has 13 MAJOR findings (F-M1 to F-M13) and 10 MINOR (F-m1 to F-m10). The auditor's option (a): one owner decision, committed with `Role: owner`, accepts the findings as named exceptions, each with what closes it and a Wave 2 owner on one consolidated Wave 2 list. That turns the verdict into PASS WITH ACCEPTED EXCEPTIONS without further audit work. Since the audit the owner has switched auto mode off (`permissions.disableAutoMode`) and made accept-edits the default mode, with an owner-curated allow list; agents may not `git push`.
+- **Decision:**
+  1. **Wave 1 passes with accepted exceptions** (the auditor's option (a)). The exit verdict is PASS WITH ACCEPTED EXCEPTIONS. Every finding below is an accepted exception, named with what closes it and its Wave 2 owner.
+     - "Wave 2 owner" names the role that does the work. The orchestrator coordinates every item; *owner* marks the owner's own acts.
+     - The items stand in **one consolidated Wave 2 list, `docs/plan/WAVE_2_LIST.md`** (F-M8), committed with this entry. It gathers `bootstrap.md`'s Wave 2 sections and residuals, the exit report's block and residuals, the decisions that put items on the list, and this audit. Each item has a severity, an owner and what closes it, and the adoption-readiness block comes first. New Wave 2 items go into that file from now on; `bootstrap.md` points to it.
+     - At this entry the list holds the block AR-1 to AR-10 and EXP-003's plan, then 791 open items (53 high, 356 medium, 341 low, 41 info) and 42 rows closed or superseded in the record. Rows are carried as their sources recorded them. Rows that name one problem from two places may remain, and each row's state is re-checked when a ticket picks it up.
+  2. **The adoption-readiness block.** It passes before any pilot adoption of an owner repository, in this order. It takes in DEC-714's block and DEC-712's FIRST item. Each line is a row of the list's first section, with its severity *adoption-blocking*.
+     1. **AR-1 (F-M5):** decisions become records of their own, each with its own hash. `gov context` holds its budget and never drops the ticket's own text. When the mandatory inputs exceed the ceiling, it refuses instead of reporting success. *Owners:* product-spec (the decision record), engineer (`gov context`).
+     2. **AR-2 (DEC-712's first item):** every check that runs git clears the `GIT_*` variables. The sweep is done, and lefthook's re-sort of `.claude/settings.json` is fixed. *Owner:* engineer.
+     3. **AR-3 (F-M13):** an audit-report record type the schema knows, and accepted history no longer blocking later commits, so the hooks can come back on. When they do, F-M4's case is restated. *Owners:* product-spec (the record type), engineer (the traceability check), independent test designer (F-M4's case).
+     4. **AR-4 (F-M7):** `SubagentHandback` joins the guard's known list through the CIT-P route, and a `gov doctor` check compares the guard's list with the installed CLI's tools at every version change. *Owner:* engineer; the guard change needs owner approval (CAP-33).
+     5. **AR-5 (F-M12):** refusals say they are final for that call, and briefs stop after two identical refusals. *Owners:* engineer (the refusal text), product-spec (the briefs and the orchestration skill).
+     6. **AR-6 (the owner's note on the SubagentStop refusals; beside F-M7 and F-M12): guardrails explain themselves and never loop.**
+        1. The SubagentStop and Stop hooks name the missing fields and the expected form in their refusal text, so the agent sees why.
+        2. They block at most once. When Claude Code reports that the stop hook has already blocked this stop (`stop_hook_active`), the hook lets the agent stop and records a "return without the contract fields" finding instead of blocking again.
+        3. The rule states where a machine-readable payload goes: after the twelve fields.
+        4. The same standard, "say why, refuse once, then record", applies to the guard's refusals (F-M7, F-M12).
+        - *The orchestrator's reading of the code, not measured:* `src/gov/hooks/subagentstop.py` does not read `stop_hook_active`, while `stop.py` does. On a block it writes its reason to standard output with exit 2, where Claude Code shows the agent only standard error. An exception inside it also exits 2. This may be why the helpers of this session and of the W1-43 audit saw no reason and retried.
+        - *Owners:* engineer (the hooks, the guard's refusals, the finding), product-spec (the rule's text, the brief templates and the orchestration skill).
+        - *Until it passes:* every subagent brief lists the twelve fields by name and requires them first, as labelled lines, with any payload after them. It tells the helper to stop and say so if its return is refused twice. A helper refused twice is stopped by its caller, and its result is taken from its transcript (the owner, 2026-10-16).
+     7. **AR-7 (F-M6):** register acceptances become owner git facts, or the owner's reading is stated. *Owners:* owner, with engineer for the approval gate.
+     8. **AR-8 (F-M3):** after DEC-704's trailer-gate fix, the first Wave 2 ticket in this repository closes through a clean `gov close`, as the proof that the method holds here. *Owners:* orchestrator, with engineer for DEC-704's fix.
+     9. **AR-9 (DEC-714):** ARGUS's full cycle, the a-dev reds, and RETR-X-02. ARGUS's full cycle includes its measured governance share. *Owners:* orchestrator (the runs), engineer (the product fixes), owner (the RETR-X-02 ruling).
+     10. **AR-10:** EXP-003, `gov update` (CAP-45.a), the language-agnostic test commands (DEC-534, DEC-567), and DEC-716's accept-edits mode with its first tested lead launch (beside DEC-715's stable launch command). Accept-edits mode is now in place. *Owners:* research (EXP-003), engineer (`gov update`, the test commands, the launch command), orchestrator (the tested launch).
+  3. **EXP-003, retrieval and indexing on small and big repositories** (AR-10). It is planned in Wave 2 and not run yet; the list holds its plan. *Owner:* research.
+     - **Corpora:** the dev tiers; `~/EXAMIN APP`, read-only and on a copy; `~/workspace`.
+     - **Indexing:** time, RAM and incremental update, measured against the Contract's envelope (DEC-078's scale probe).
+     - **Retrieval:** four modes, compared: lexical only, semantic only, fused, and fused plus reranker.
+     - **Accuracy:** a defined metric with the owner's goal of 99 %, measured on the evidence the stacked context must contain.
+     - **Stacking:** a question that needs about 24k tokens, retrieved in 8k batches and assembled complete with no duplicates.
+     - **Granularity:** decision-level, after AR-1's fix.
+  4. **The MAJOR findings, each an accepted exception:**
+     - **F-M1, the governance share per programme (ORION not measured, no exception yet):** accepted. *Closes:* a measured share of at most 15 % on each programme's run (ORION and ARGUS) in `governance-share.json`, from the counter after clean closes with every part measured, and W1-42's share case green. ARGUS's half is in AR-9. *Owners:* research (the measurement), engineer (a measured share for ticket-tool closes).
+     - **F-M2, `gov doctor` not green on this repository:** accepted. It has four causes:
+       - the pytest-xdist reading. *Closes:* the doctor reads the installed version. *Owner:* engineer.
+       - path compliance. **It stays a named exception.** Adoption records are evidence and keep their pinned hashes, as the evidence snapshots do (the owner, 2026-10-16). So the A5 review record (`governance/adoption/A5-independent-review-of-the-path-map.md`) keeps naming the old path, as DEC-626 said, and the A5→A6→A8 `stands_on` chain stays intact. The three evidence snapshots (`gov-commands.json`, `gov-doctor-run1.json`, `gov-doctor.json`) are kept unchanged, and so is the audit report, which quotes the old path in its own finding. *Closes (Wave 2 item):* the doctor doesn't judge citations inside adoption records or evidence snapshots. *Owner:* engineer.
+       - the semantic canary. **Closed.** The orchestrator ran a full `gov rebuild` with embeddings (exit 0, 4 min 35 s) and then `gov doctor`. Canaries pass: lexical and semantic are both `AVAILABLE`, with no misses. The audit's miss (`FACET_UNAVAILABLE`) came from the `--no-embeddings` rebuilds of DEC-709. *Wave 2 item (medium, engineer):* the doctor says "semantic index not built" in place of a canary miss after a `--no-embeddings` rebuild.
+       - the drift. Already on the list (DEC-667).
+       - *Closes as a whole:* `gov doctor` exits 0 on this repository.
+     - **F-M3, no Wave 1 ticket closed through a clean `gov close`:** accepted. It is AR-8. W1-30's close `6eff3a00`, made past an escalation stop and ratified the next morning by DEC-651, stays named.
+     - **F-M4, the unnamed red case `test_no_lefthook_hook_is_installed_in_this_repository` (W1-40):** accepted. The hooks have been uninstalled again since the audit, and the case passes. *Closes:* with AR-3, when the hooks come back on, the independent test designer restates or retires the case (MR-3, DEC-136), so that installed hooks are the expected state. *Owner:* independent test designer.
+     - **F-M5:** AR-1.
+     - **F-M6:** AR-7. This entry, committed with `Role: owner`, is its first owner git fact for an exit.
+     - **F-M7:** AR-4, with AR-6 for its refusal text.
+     - **F-M8, no consolidated Wave 2 list:** closed by `docs/plan/WAVE_2_LIST.md`, committed with this entry. *Owner:* orchestrator, who keeps the list.
+     - **F-M9, outward actions after 2026-10-07 unrecorded:** item 5 records them. By the auditor's own terms that makes it MINOR, and the record closes it.
+     - **F-M10, W1-43's own acceptance tests missing:** item 6 below.
+     - **F-M11, FULL tickets with no probe or review record:** item 7 below.
+     - **F-M12:** AR-5, with AR-6 for the stop hooks.
+     - **F-M13:** AR-3. Until AR-3 passes, the hooks stay uninstalled. Commits run `gov rebuild --no-embeddings` after staging (DEC-709).
+  5. **The owner's answer on F-M9 (the record DEC-465 made for the earlier pushes):** the pushes of `w1/integrate` were the owner's, through the operator:
+     - `c7e5c3ed` on 2026-10-09 at 17:28;
+     - `3acc863f` on 2026-10-10 at 07:54;
+     - `60ea6924` on 2026-10-16 at 09:43.
+
+     So was every lefthook install and uninstall of Wave 1. Among them are the install of B3 (DEC-706), the uninstall of DEC-712, the reinstall of 2026-10-16 at 09:42 and the uninstall before `82459573` (F-M13). No agent pushed. *Wave 2 item (low, orchestrator):* each outward action is recorded when it is made.
+  6. **The owner's answer on F-M10:** DAEO-03pw (W1-43) closes with `tk close` under this decision. Its tests go on the Wave 2 list: `tests/acceptance/W1-43/` for the W1-43 part of CAP-59.a and CAP-59.b, the audit→repair loop. *Owners:* independent test designer (the tests), orchestrator (the first run of the loop).
+  7. **The owner's answer on F-M11:** W1-16 (DAEO-lkeb) and W1-21 (DAEO-5x4l) closed before the probe rule, and are accepted as named exceptions.
+     - The audit also names three follow-up closes of 2026-10-07 with no probe record: W1-26's `80ddf4d5` and `b355fa24`, and W1-50's `f270e3c9`. All three come before the probe rule (DEC-565, 2026-10-09).
+     - The owner confirmed on 2026-10-16 that the answer covers these three as well. They are accepted as named exceptions with W1-16 and W1-21.
+  8. **Standing rule from now on (DEC-412, F-m4):** no commit on `w1/integrate`, merges included, is ever amended or rewritten. A correction is a new commit.
+  9. **Applied with this entry, in the owner's commit:**
+     - **F-m9:** the frontmatter `status` of `docs/charter/CHARTER_v5.md`, `docs/contract/CONTRACT_v4.md` and `docs/plan/WAVE_1_WBS.md` changes from PROPOSED to ACCEPTED. No other text changes. The owner's commit makes them owner git facts.
+     - No adoption record and no evidence snapshot is edited (item 4, F-M2).
+  10. **The MINOR findings, each an accepted exception:**
+      - **F-m1 (the W1-43 brief did not state DEC-430):** *Closes:* the audit brief in the orchestration skill states DEC-430. *Owner:* product-spec.
+      - **F-m2 (CAP-10 at 85 against DEC-414's 80; measured 83.33):** *Closes:* the owner's choice under DEC-105 at the start of Wave 2: apply (reach 85), defer, or re-baseline CAP-10. EXP-003 gives the figures. The exit report's single-class "callers/impact 100.0" is reported beside the 87.5 for all classes. *Owners:* owner (the choice), research (EXP-003).
+      - **F-m3 (CAP-56's transcript acceptance untested):** *Closes:* a test that reads a main session's transcript on RETR-X-02 and finds the bundle and no intermediate batch. *Owner:* independent test designer.
+      - **F-m4 (19 amends of merges on `w1/integrate`, 2026-10-07 to 2026-10-14; none pushed before its amend):** accepted as history, not rewritten. *Closes:* the standing rule of item 8. *Owner:* orchestrator.
+      - **F-m5 (`COMPLIANCE.md` stale since 2026-10-07):** *Closes:* the compliance report brought up to date at the start of Wave 2, or retired in favour of the exit audit, by the owner's choice. *Owner:* orchestrator.
+      - **F-m6 (trailer findings outside DEC-717):** accepted as history; history is never rewritten. *Closes:* AR-8, with the trailers base honoured by `gov close` (DEC-704), so no new one is made. *Owner:* engineer.
+      - **F-m7 (the main session records under the closed ticket DAEO-6cc2; leads run as role orchestrator, DEC-434 unbuilt):** *Closes:* DEC-434's lead role is built, and the main session records under an id of its own. *Owner:* engineer.
+      - **F-m8 (repair tickets DAEO-52q7 and DAEO-ldvk moved to the orchestrator's scratch log):** *Closes:* `gov close` writes complete repair tickets that stay tracked (DEC-674's residual). *Owner:* engineer.
+      - **F-m9:** closed by item 9.
+      - **F-m10 (ORION's merge `736669f` in the a-dev clone was the lead's, after a red CI):** accepted: for Wave 1's exit run, the lead's merge stands for criterion 1's merge. *Closes:* in AR-9, programme merges are the owner's, after green CI. *Owner:* owner.
+  11. **DEC-714's exceptions, each accepted:** all four are in AR-9. *Closes:* each line's condition as the exit report's block states it.
+      - ARGUS's incomplete cycle;
+      - a-dev's three reds: context reproducibility (ORION-gp01), claims, and schema (ade-ke2y's fields, and the `close` record type of ORION-im02);
+      - RETR-X-02;
+      - ARGUS's governance share.
+- **Next:**
+  - After the owner's commit, the orchestrator closes DAEO-03pw with `tk close`, citing this entry, in a commit of its own (`Task: DAEO-03pw`).
+  - Then it records the close in `bootstrap.md` and updates its checkpoint. Wave 1 is then closed.
+  - Wave 2 starts with the adoption-readiness block, in order, under the owner's ranking of the list.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.220 | 2026-10-16 | Owner: DEC-718. Wave 1 passes with accepted exceptions (the W1-43 auditor's option (a)). F-M1 to F-M13, F-m1 to F-m10 and DEC-714's four exceptions are named, each with what closes it and its Wave 2 owner. The adoption-readiness block AR-1 to AR-10 passes before any pilot adoption, in that order; its AR-6 (guardrails explain themselves and never loop) is the owner's note on the SubagentStop refusals. The consolidated Wave 2 list is `docs/plan/WAVE_2_LIST.md` (F-M8). EXP-003 is planned. F-M9's pushes and hook installs were the owner's. W1-16 and W1-21 are named probe exceptions, and so are the follow-up closes `80ddf4d5`, `b355fa24` and `f270e3c9`. DAEO-03pw closes with `tk close`. No commit on `w1/integrate` is ever amended. Charter v5, Contract v4 and the Wave 1 WBS have status ACCEPTED. Adoption records, like evidence snapshots, keep their pinned hashes: the A5 citation stays, and the doctor's path compliance is a named exception. Next free id: DEC-719. |
+
+---

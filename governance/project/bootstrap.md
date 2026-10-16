@@ -2840,3 +2840,9 @@ Its repair ticket (DAEO-ldvk) was moved out of `.tickets/` to the orchestrator's
   - no run 8c, so there is no lead checkpoint or lead return for the final pass (DEC-716);
   - the lead's scratch folder was removed with the worktree, and its helper scripts, logs, uncommitted worker briefs and older checkpoints were lost. What was kept is in the exit report's "Deviations of every run".
 - **Kept:** the branch `w1/W1-42`, whose reflog reaches the foreign commits `4b051fde` and `dc6aa34c` (DEC-711); it is deleted only on the owner's word. The exit clones are read from `~/gov-os-workbench/archive/w1-42-exit-clones/` (a-dev `live-run7b-a-dev-exit`, `127227c`; b-dev `live-run7/b-dev-exit`, `fc28272`).
+
+## The Wave 2 list is consolidated in `docs/plan/WAVE_2_LIST.md` (2026-10-16; DEC-718)
+
+- **One list (F-M8 of the W1-43 exit audit):** every Wave 2 item recorded in this file, in the register, in the exit report and in the exit audit now stands in `docs/plan/WAVE_2_LIST.md`. Each item has a severity, an owner and what closes it, and the adoption-readiness block AR-1 to AR-10 comes first.
+- **The Wave 2 sections above** (DEC-709, DEC-712, DEC-714, DEC-715, DEC-716) and every ticket's residuals stay as history. Each is cited from the list by its line (`B:<line>`).
+- **New Wave 2 items go into the list, not into this file.**
