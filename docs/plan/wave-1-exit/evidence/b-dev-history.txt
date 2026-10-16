@@ -1,0 +1,110 @@
+fc28272 | 2026-10-13T17:58:02+01:00 | Repair ticket bde-0kr6, written by gov close ARGUS-im01 on its refusal (CONTEXT_FAILED) | Task: bde-0kr6 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+80b9fad | 2026-10-13T17:57:31+01:00 | Checkpoint CP-ARGUS-im01-0002: before the close of ARGUS-im01 | Task: ARGUS-im01 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+7b0e68d | 2026-10-13T17:55:02+01:00 | The data retention rule | Task: ARGUS-im01 | Role: engineer | Implements: ARGUS-SPEC-RETENTION
+f3e8831 | 2026-10-13T17:54:21+01:00 | Ticket ARGUS-im01 started: the implementation of the data retention rule | Task: ARGUS-im01 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+6e1b7cc | 2026-10-13T17:54:21+01:00 | Ticket bde-c1yl closed (tk close) | Task: bde-c1yl | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+908f7ec | 2026-10-13T17:54:21+01:00 | Ticket ARGUS-sp01 closed (tk close) | Task: ARGUS-sp01 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+2aedadc | 2026-10-13T17:54:21+01:00 | Ticket ARGUS-gp13 closed (tk close) | Task: ARGUS-gp13 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+c6db58c | 2026-10-13T17:53:36+01:00 | Independent audit of the closure of specification ARGUS-SPEC-RETENTION | Task: bde-c1yl | Role: independent-auditor | Implements: ARGUS-SPEC-RETENTION
+ac332e2 | 2026-10-13T17:51:11+01:00 | Specification ARGUS-SPEC-RETENTION closed: no required readiness row open | Task: ARGUS-sp01 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+c8685b9 | 2026-10-13T17:51:11+01:00 | Audit ticket bde-c1yl: the closure of specification ARGUS-SPEC-RETENTION; sources name only records this repository holds | Task: bde-c1yl | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+c7ec62d | 2026-10-13T17:50:25+01:00 | Readiness row 25: the acceptance tests exist | Task: ARGUS-sp01 | Role: product-spec | Implements: ARGUS-SPEC-RETENTION
+2db35a4 | 2026-10-13T17:49:28+01:00 | Acceptance tests of the data retention rule | Task: ARGUS-gp13 | Role: independent-test-designer | Implements: ARGUS-SPEC-RETENTION
+0b0a9b4 | 2026-10-13T17:45:47+01:00 | Ticket ARGUS-gp13 started: the acceptance tests of the feature | Task: ARGUS-gp13 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+d77f362 | 2026-10-13T17:45:47+01:00 | Ticket ARGUS-im01: The data retention rule in the Python package | Task: ARGUS-im01 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+0b373dd | 2026-10-13T17:45:47+01:00 | Ticket ARGUS-gp09 closed (tk close) | Task: ARGUS-gp09 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+67ca745 | 2026-10-13T17:43:03+01:00 | Specification of the data retention rule: the interface closed on the owner's answers | Task: ARGUS-sp01 | Role: product-spec | Implements: ARGUS-SPEC-RETENTION
+ded2094 | 2026-10-13T17:37:22+01:00 | Permission source: the deny rule on the acceptance-test folder taken out (DEC-664 of the Gov OS register); generated settings brought to the sources | Task: ARGUS-gp13 | Role: orchestrator | Implements: ARGUS-SPEC-RETENTION
+132ca2d | 2026-10-12T11:12:52+01:00 | Ticket ARGUS-gp12 closed (tk close) | Task: ARGUS-gp12 | Role: orchestrator | Implements: 
+efdfb97 | 2026-10-12T11:12:52+01:00 | Ticket ARGUS-gp11 closed (tk close) | Task: ARGUS-gp11 | Role: orchestrator | Implements: 
+b8d5c99 | 2026-10-12T11:12:52+01:00 | Ticket ARGUS-gp10 closed (tk close) | Task: ARGUS-gp10 | Role: orchestrator | Implements: 
+1612e1e | 2026-10-12T11:12:52+01:00 | Ticket ARGUS-gp08 closed (tk close) | Task: ARGUS-gp08 | Role: orchestrator | Implements: 
+699e78e | 2026-10-12T11:12:52+01:00 | Ticket ARGUS-gp07 closed (tk close) | Task: ARGUS-gp07 | Role: orchestrator | Implements: 
+9eae770 | 2026-10-12T11:12:51+01:00 | Ticket ARGUS-gp06 closed (tk close) | Task: ARGUS-gp06 | Role: orchestrator | Implements: 
+c09a3ff | 2026-10-12T11:12:51+01:00 | Ticket ARGUS-gp05 closed (tk close) | Task: ARGUS-gp05 | Role: orchestrator | Implements: 
+5fd1cb1 | 2026-10-12T11:12:48+01:00 | Ticket ARGUS-gp04 closed (tk close) | Task: ARGUS-gp04 | Role: orchestrator | Implements: 
+e6645f7 | 2026-10-12T11:12:48+01:00 | Ticket ARGUS-gp03 closed (tk close) | Task: ARGUS-gp03 | Role: orchestrator | Implements: 
+1392830 | 2026-10-12T11:12:48+01:00 | Ticket ARGUS-gp02 closed (tk close) | Task: ARGUS-gp02 | Role: orchestrator | Implements: 
+3864603 | 2026-10-12T11:12:47+01:00 | Ticket ARGUS-gp01 closed (tk close) | Task: ARGUS-gp01 | Role: orchestrator | Implements: 
+19f5e4e | 2026-10-12T11:02:58+01:00 | Specification of the data retention rule closed on the owner's answers | Task: ARGUS-sp01 | Role: product-spec | Implements: REQ-004
+379dcec | 2026-10-12T10:30:13+01:00 | Adoption repair: path map, tool registry, legacy record types | Task: ARGUS-ad01 | Role: product-spec | Implements: CAP-06, CAP-44
+75f0190 | 2026-10-12T10:23:43+01:00 | Ticket ARGUS-ad02: Adoption stage A5: independent review of the path map | Task: ARGUS-ad02 | Role: orchestrator | Implements: 
+a26195d | 2026-10-12T10:23:43+01:00 | Ticket ARGUS-ad01: Adoption repair: path map, tool registry and the legacy records | Task: ARGUS-ad01 | Role: orchestrator | Implements: 
+e6b951b | 2026-10-12T10:23:43+01:00 | Ticket ARGUS-sp01: sources name the records by id | Task: ARGUS-sp01 | Role: orchestrator | Implements: 
+8926643 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-sp01: sources name only records this repository holds | Task: ARGUS-sp01 | Role: orchestrator | Implements: 
+40f9842 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp13: sources name only records this repository holds | Task: ARGUS-gp13 | Role: orchestrator | Implements: 
+f342f84 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp12: sources name only records this repository holds | Task: ARGUS-gp12 | Role: orchestrator | Implements: 
+4afa2b5 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp11: sources name only records this repository holds | Task: ARGUS-gp11 | Role: orchestrator | Implements: 
+aa95b97 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp10: sources name only records this repository holds | Task: ARGUS-gp10 | Role: orchestrator | Implements: 
+3385aa2 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp09: sources name only records this repository holds | Task: ARGUS-gp09 | Role: orchestrator | Implements: 
+797d41a | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp08: sources name only records this repository holds | Task: ARGUS-gp08 | Role: orchestrator | Implements: 
+5c29915 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp07: sources name only records this repository holds | Task: ARGUS-gp07 | Role: orchestrator | Implements: 
+38e32a5 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp06: sources name only records this repository holds | Task: ARGUS-gp06 | Role: orchestrator | Implements: 
+6aa797a | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp05: sources name only records this repository holds | Task: ARGUS-gp05 | Role: orchestrator | Implements: 
+9b7b64c | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp04: sources name only records this repository holds | Task: ARGUS-gp04 | Role: orchestrator | Implements: 
+a7bbdff | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp03: sources name only records this repository holds | Task: ARGUS-gp03 | Role: orchestrator | Implements: 
+028b265 | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp02: sources name only records this repository holds | Task: ARGUS-gp02 | Role: orchestrator | Implements: 
+c70c25b | 2026-10-12T10:22:39+01:00 | Ticket ARGUS-gp01: sources name only records this repository holds | Task: ARGUS-gp01 | Role: orchestrator | Implements: 
+ac074b5 | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp13: readiness row 25 (acceptance_tests) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp13 | Role: orchestrator | Implements: DEC-089
+46b41fa | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp12: readiness row 24 (failure) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp12 | Role: orchestrator | Implements: DEC-089
+ad02a9d | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp11: readiness row 23 (success) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp11 | Role: orchestrator | Implements: DEC-089
+5e6971b | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp10: readiness row 16 (security) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp10 | Role: orchestrator | Implements: DEC-089
+e995719 | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp09: readiness row 15 (interfaces) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp09 | Role: orchestrator | Implements: DEC-089
+6965add | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp08: readiness row 13 (backend) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp08 | Role: orchestrator | Implements: DEC-089
+29776d7 | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp07: readiness row 9 (outputs) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp07 | Role: orchestrator | Implements: DEC-089
+84f37a7 | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp06: readiness row 8 (processing) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp06 | Role: orchestrator | Implements: DEC-089
+f612f8c | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp05: readiness row 7 (test_data) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp05 | Role: orchestrator | Implements: DEC-089
+45a0c9b | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp04: readiness row 6 (data_model) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp04 | Role: orchestrator | Implements: DEC-089
+99cd41f | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp03: readiness row 5 (inputs) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp03 | Role: orchestrator | Implements: DEC-089
+2cc8a05 | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp02: readiness row 4 (scenarios) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp02 | Role: orchestrator | Implements: DEC-089
+adcfc4f | 2026-10-12T09:54:29+01:00 | Gap ticket ARGUS-gp01: readiness row 2 (actor) of ARGUS-SPEC-RETENTION | Task: ARGUS-gp01 | Role: orchestrator | Implements: DEC-089
+b27a157 | 2026-10-12T09:52:32+01:00 | Discovery and specification record of the data retention rule | Task: ARGUS-sp01 | Role: product-spec | Implements: REQ-004
+ad1def1 | 2026-10-12T09:47:22+01:00 | Ticket ARGUS-sp01: discovery and specification of the data retention rule | Task: ARGUS-sp01 | Role: orchestrator | Implements: 
+65bb69e | 2026-10-12T09:41:57+01:00 | Gov OS template applied (copier) and adapter output generated (rulesync) | Task:  | Role: orchestrator | Implements: 
+3b1ad56 | 2026-10-12T09:41:57+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
+6f1b58a | 2026-10-12T09:41:57+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
+dfa212e | 2026-10-12T09:41:57+01:00 | gov adopt --lite A0: safety baseline | Task:  | Role:  | Implements: 
+503156f | 2025-02-23T10:00:00+00:00 | Update API client configuration | Task:  | Role:  | Implements: 
+789583c | 2025-02-20T10:00:00+00:00 | Fix calibration solver convergence for edge cases | Task:  | Role:  | Implements: 
+c8ffdac | 2025-02-18T10:00:00+00:00 | Update imaging tests (now stale — asserts old behavior) | Task:  | Role:  | Implements: 
+f137e65 | 2025-02-17T10:00:00+00:00 | Update vector index | Task:  | Role:  | Implements: 
+35dc764 | 2025-02-16T10:00:00+00:00 | Stale backup files from refactoring | Task:  | Role:  | Implements: 
+c8ca068 | 2025-02-15T10:00:00+00:00 | Create spec backup before edits | Task:  | Role:  | Implements: 
+e2dccf1 | 2025-01-27T10:00:00+00:00 | Add staging deploy key | Task:  | Role:  | Implements: 
+d37a927 | 2025-01-26T16:00:00+00:00 | Add production environment config | Task:  | Role:  | Implements: 
+a05ae0a | 2025-02-14T10:00:00+00:00 | Add abandoned Gov OS migration attempt | Task:  | Role:  | Implements: 
+b8ecb0d | 2025-02-08T16:00:00+00:00 | Add tool registry and MCP configuration | Task:  | Role:  | Implements: 
+56b1e7c | 2025-02-05T10:00:00+00:00 | Add export control documentation | Task:  | Role:  | Implements: 
+c3cc190 | 2025-02-04T10:00:00+00:00 | Add participant study data (CONFIDENTIAL) | Task:  | Role:  | Implements: 
+06fcf79 | 2025-02-12T10:00:00+00:00 | Add Windsurf rules | Task:  | Role:  | Implements: 
+31cde2b | 2025-02-11T10:00:00+00:00 | Add Copilot instructions | Task:  | Role:  | Implements: 
+947c030 | 2025-02-10T14:00:00+00:00 | Add Cursor directory rules | Task:  | Role:  | Implements: 
+23d1d42 | 2025-02-10T10:00:00+00:00 | Add Cursor rules and AGENTS.md | Task:  | Role:  | Implements: 
+2fa4a7b | 2025-02-09T10:00:00+00:00 | Add argus-core CLAUDE.md | Task:  | Role:  | Implements: 
+cf38185 | 2025-02-08T10:00:00+00:00 | Add root CLAUDE.md | Task:  | Role:  | Implements: 
+2772770 | 2025-02-07T10:00:00+00:00 | Add project waivers | Task:  | Role:  | Implements: 
+8962a84 | 2025-01-29T10:00:00+00:00 | Add requirements specifications | Task:  | Role:  | Implements: 
+e882e72 | 2025-01-28T10:00:00+00:00 | Add technical specifications | Task:  | Role:  | Implements: 
+e71399e | 2025-02-06T10:00:00+00:00 | Add project decisions | Task:  | Role:  | Implements: 
+c529b2d | 2025-01-26T10:00:00+00:00 | Add architecture decision records | Task:  | Role:  | Implements: 
+0339ae6 | 2025-02-03T10:00:00+00:00 | Add draft paper and references | Task:  | Role:  | Implements: 
+38cfc2b | 2025-02-01T10:00:00+00:00 | Add reference datasets | Task:  | Role:  | Implements: 
+57e5270 | 2025-01-31T10:00:00+00:00 | Add experiment logs | Task:  | Role:  | Implements: 
+be811c6 | 2025-02-02T10:00:00+00:00 | Add research notes | Task:  | Role:  | Implements: 
+f1b9c9c | 2025-01-25T10:00:00+00:00 | Add Go metrics exporter service | Task:  | Role:  | Implements: 
+04ea449 | 2025-01-24T10:00:00+00:00 | Add database schema and migrations | Task:  | Role:  | Implements: 
+255239f | 2025-01-23T10:00:00+00:00 | Add operational scripts | Task:  | Role:  | Implements: 
+eb37b60 | 2025-01-22T10:00:00+00:00 | Add API client package | Task:  | Role:  | Implements: 
+9c2d61f | 2025-01-20T15:00:00+00:00 | Add dashboard UI components | Task:  | Role:  | Implements: 
+f4aa6de | 2025-01-21T10:00:00+00:00 | Add Python unit tests | Task:  | Role:  | Implements: 
+a03fa8a | 2025-01-20T10:00:00+00:00 | Add utility modules | Task:  | Role:  | Implements: 
+767952c | 2025-01-19T10:00:00+00:00 | Add spectral analysis module | Task:  | Role:  | Implements: 
+9b9ee0e | 2025-01-18T10:00:00+00:00 | Add imaging module with gridder and deconvolver | Task:  | Role:  | Implements: 
+09a3324 | 2025-01-17T10:00:00+00:00 | Add calibration module | Task:  | Role:  | Implements: 
+731a4e5 | 2025-01-16T10:00:00+00:00 | Add Python data pipeline modules | Task:  | Role:  | Implements: 
+4e9e08e | 2025-01-14T14:00:00+00:00 | Set up Python package skeleton | Task:  | Role:  | Implements: 
+dda3145 | 2025-01-14T10:00:00+00:00 | Add Python FFI bindings crate | Task:  | Role:  | Implements: 
+41e6126 | 2025-01-12T10:00:00+00:00 | Add pipeline orchestration crate | Task:  | Role:  | Implements: 
+d879d90 | 2025-01-10T10:00:00+00:00 | Add correlator crate | Task:  | Role:  | Implements: 
+d986bb5 | 2025-01-08T10:00:00+00:00 | Add core signal processing crate | Task:  | Role:  | Implements: 
+1d0e70b | 2025-01-06T10:00:00+00:00 | Initial project structure | Task:  | Role:  | Implements: 

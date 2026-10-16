@@ -1,0 +1,36 @@
+{
+ "dev_query_set": {
+  "mean_hit_at_5": 83.33,
+  "baseline": 85,
+  "queries": 52,
+  "method": "W1-19's measure on the dev tiers, mean of the 10 classes (run 1, 2026-10-12)",
+  "pass_line": 80,
+  "through_gov_retrieval_retrieve": 81.67,
+  "forbidden_citations_in_first_five": 2,
+  "forbidden_citations_baseline": 2,
+  "records": [
+   "docs/plan/wave-1-exit/evidence/retrieval-w1-19-method.txt",
+   "docs/plan/wave-1-exit/evidence/retrieval-w1-21-dev-tier.txt"
+  ]
+ },
+ "code_classes": {
+  "callers_impact_hit_at_5": 100.0,
+  "baseline": 60,
+  "classes": [
+   "tests",
+   "callers-impact",
+   "where-defined"
+  ],
+  "per_class": {
+   "tests": 80.0,
+   "callers-impact": 100.0,
+   "where-defined": 83.3
+  },
+  "queries": 16,
+  "hits": 14,
+  "all_code_classes_hit_at_5": 87.5,
+  "all_code_classes_baseline": 75,
+  "baseline_source": "~/gov-os-workbench/s0b2/sandbox/_reports/codeintel.md",
+  "note": "same query set and matcher as S0b2, measured through gov's retrieval and not through the code-intelligence wrapper"
+ }
+}

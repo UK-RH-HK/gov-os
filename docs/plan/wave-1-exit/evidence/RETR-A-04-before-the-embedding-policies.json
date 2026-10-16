@@ -1,0 +1,57 @@
+{
+ "query_id": "RETR-A-04",
+ "question": "Which files implement the leapfrog integrator?",
+ "argv": [
+  "gov",
+  "retrieve",
+  "Which files implement the leapfrog integrator?",
+  "--radius",
+  "1",
+  "--json"
+ ],
+ "repository": "a-dev exit clone, feature branch at 30996b6, after gov rebuild (full)",
+ "bundles": [
+  {
+   "stopping_reason": "FACET_UNAVAILABLE",
+   "evidence": [],
+   "batches": [
+    {
+     "size": 0
+    }
+   ],
+   "merge": {
+    "candidates": 0,
+    "duplicates": 0,
+    "dropped": [],
+    "reranked": false
+   },
+   "expansions": [],
+   "gaps": [],
+   "facets": {
+    "lexical": {
+     "available": true,
+     "reason": null
+    },
+    "semantic": {
+     "available": false,
+     "reason": "empty"
+    }
+   },
+   "budget": {
+    "bundle": {
+     "limit": 6000,
+     "used": 0
+    },
+    "rounds": {
+     "limit": 1,
+     "used": 0
+    }
+   },
+   "continuation": null
+  }
+ ],
+ "validator_errors": [],
+ "packet_ceiling_exceeded": false,
+ "synthesis_notes": [],
+ "note": "kept as gov retrieve returned it: one batch of size 0, no evidence, FACET_UNAVAILABLE (the semantic index of the clone is empty; the lexical facet matches the question as a phrase). The case of the suite that reads this file stays red for that reason."
+}

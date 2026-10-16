@@ -1,0 +1,383 @@
+{
+ "query_id": "RETR-X-02",
+ "question": "What does DEC-9999 decide? (the id that exists nowhere)",
+ "argv": [
+  "gov",
+  "retrieve",
+  "What does DEC-9999 decide?",
+  "--id",
+  "DEC-9999",
+  "--radius",
+  "1",
+  "--json"
+ ],
+ "exit_code": 0,
+ "repository": "a-dev exit clone, feature branch at a0820d4, after the path map's embedding policies (ADR-012 of the clone, e043bb9) and a full gov rebuild, 2026-10-14, run 7",
+ "bundles": [
+  {
+   "stopping_reason": "BUDGET_EXHAUSTED_WITH_GAPS",
+   "evidence": [
+    {
+     "id": "DP-ADOPT-629f9e7f",
+     "sha256": "4ab38153ad5f9f9848e273f73610cd4d748909c0b37a1bbe45a463419f8c439f",
+     "path": "governance/adoption/packages/DP-ADOPT-629f9e7f.md",
+     "start_line": 1,
+     "end_line": 10,
+     "chunk_id": "10130e65bb6c0083d0c0d03b",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 185
+    },
+    {
+     "id": "DP-ADOPT-51c6c948",
+     "sha256": "3eeb5c41bf01d0a3b361836e20e5ed22db8332326f99a647d0ca96f88cc94b87",
+     "path": "governance/adoption/packages/DP-ADOPT-51c6c948.md",
+     "start_line": 1,
+     "end_line": 10,
+     "chunk_id": "5ef0407c21144846934c023e",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 185
+    },
+    {
+     "id": "DP-ADOPT-36691776",
+     "sha256": "aae913a06b043caa0d93bab77098c568e876acbeed02e735f10944f12f0071d8",
+     "path": "governance/adoption/packages/DP-ADOPT-36691776.md",
+     "start_line": 1,
+     "end_line": 10,
+     "chunk_id": "b6eb661c4d97612aa7ffb144",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 185
+    },
+    {
+     "id": "DP-ADOPT-690608ac",
+     "sha256": "6cf87728c4aea8511542e318383ea25c3a24fd9a0b95b2391a5819e433a718b4",
+     "path": "governance/adoption/packages/DP-ADOPT-690608ac.md",
+     "start_line": 1,
+     "end_line": 10,
+     "chunk_id": "6d34690a506d452b2c4ca603",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 185
+    },
+    {
+     "id": "DP-ADOPT-a4da49b2",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-a4da49b2.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "06d31b964234d67b9dbcc46b",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-b97a0096",
+     "sha256": "1172010656c8106f0c0579f316dd40f6a71de8f90212b413a6353d05276e9b8d",
+     "path": "governance/adoption/packages/DP-ADOPT-b97a0096.md",
+     "start_line": 11,
+     "end_line": 12,
+     "chunk_id": "f61b0211eaea44f6e000a9fc",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 79
+    },
+    {
+     "id": "DP-ADOPT-b2a5fc10",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-b2a5fc10.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "01ff831d3560f3d5166ce4df",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-fbdebc9f",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-fbdebc9f.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "0a46a6409fb82b27286c6d47",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-e0c25e92",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-e0c25e92.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "0cd92a030bf72febdfd8d18d",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-36691776",
+     "sha256": "508255d32ff94f5555641074a87c863b8338240919ce512bbfb321c88e575c69",
+     "path": "governance/adoption/packages/DP-ADOPT-36691776.md",
+     "start_line": 11,
+     "end_line": 12,
+     "chunk_id": "6b759316619d5970f35f2536",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 79
+    },
+    {
+     "id": "DP-ADOPT-1ffbd487",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-1ffbd487.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "114a4791388bd5c5942ab46b",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-f412c0a8",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-f412c0a8.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "0499a6e217e2d1348e2ac79d",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-aa9f3343",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-aa9f3343.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "05bbffb14fb1952521b50d61",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-2a84287a",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-2a84287a.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "075af109622438d5e3ea0e95",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-1a45bd93",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-1a45bd93.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "13c19dc52cf81f217642299f",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-3a353916",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-3a353916.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "0af31e5b9ac24738be1281e0",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-71e47486",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-71e47486.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "02c7811354db4a8eea356b41",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-51c6c948",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-51c6c948.md",
+     "start_line": 54,
+     "end_line": 57,
+     "chunk_id": "11855fa4751ac31d5058e9e9",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 2,
+     "text_removed_chars": 47
+    },
+    {
+     "id": "DP-ADOPT-690608ac",
+     "sha256": "11fe0dc63c300d98bc8e7cfab5ca31f6101d68f81060626e31b87abee2bf264c",
+     "path": "governance/adoption/packages/DP-ADOPT-690608ac.md",
+     "start_line": 11,
+     "end_line": 12,
+     "chunk_id": "ebf93849ab39b3d7d38aecfa",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 79
+    },
+    {
+     "id": "DP-ADOPT-596b7ca4",
+     "sha256": "f1d0f7a2e8619102e1d6d0267fb6ff69af4cbf448e490cfcd77bc337f996133e",
+     "path": "governance/adoption/packages/DP-ADOPT-596b7ca4.md",
+     "start_line": 55,
+     "end_line": 58,
+     "chunk_id": "02d7542aad9f3581b24989a3",
+     "routes": [
+      "semantic"
+     ],
+     "batch": 1,
+     "text_removed_chars": 47
+    }
+   ],
+   "batches": [
+    {
+     "size": 10
+    },
+    {
+     "size": 10
+    }
+   ],
+   "merge": {
+    "candidates": 20,
+    "duplicates": 0,
+    "dropped": [],
+    "reranked": true
+   },
+   "expansions": [],
+   "gaps": [
+    {
+     "id": "DEC-9999",
+     "reason": "UNRESOLVED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-d366eb7b.md",
+     "chunk_id": "14000304e091d5dda879fb60",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-4698e030.md",
+     "chunk_id": "146a13cc8fdfc4efa92ddf0f",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-7fa5dc10.md",
+     "chunk_id": "14b0cf1e817bedaf7d3842d1",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-532c86c5.md",
+     "chunk_id": "154164d065ee371f4a7b467a",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-e03305d7.md",
+     "chunk_id": "15834f3a4f793da7cf6b35d7",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-3ad73f51.md",
+     "chunk_id": "1664f4df10193ac5cc52c977",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-e22edba6.md",
+     "chunk_id": "18abce45e7c090948a32f69f",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-043c96a0.md",
+     "chunk_id": "19dfe075207f468cde431cee",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-6892cb7e.md",
+     "chunk_id": "1bff67dbdd17e888b300aa45",
+     "reason": "NOT_GATHERED"
+    },
+    {
+     "path": "governance/adoption/packages/DP-ADOPT-d0461c37.md",
+     "chunk_id": "2099144be13d56e222b34a59",
+     "reason": "NOT_GATHERED"
+    }
+   ],
+   "facets": {
+    "lexical": {
+     "available": true,
+     "reason": null
+    },
+    "semantic": {
+     "available": true,
+     "reason": null
+    },
+    "closure": {
+     "available": true,
+     "reason": null
+    }
+   },
+   "budget": {
+    "bundle": {
+     "limit": 6000,
+     "used": 404
+    },
+    "rounds": {
+     "limit": 1,
+     "used": 1
+    }
+   },
+   "continuation": "eyJiYiI6bnVsbCwiYnMiOjEwLCJpIjpbIkRFQy05OTk5Il0sIm8iOjIwLCJxIjoiV2hhdCBkb2VzIERFQy05OTk5IGRlY2lkZT8iLCJyIjoxLCJ0IjpudWxsfQ=="
+  }
+ ],
+ "validator_errors": [],
+ "packet_ceiling_exceeded": false,
+ "synthesis_notes": [],
+ "note": "asked once in run 7; kept as gov retrieve returned it, less the evidence text. Two batches, 20 items cited by id and hash, the missing id named as a gap (UNRESOLVED), no parent expansion: the case of the suite that reads this file stays red on the missing parent expansion. 404 of 6,000 bundle tokens used. The evidence list and the expansions are the same as run 6's answer; of the 10 gaps NOT_GATHERED one differs (another adoption package not gathered). Run 5's file (two bundles, the second the feature retrieval) is RETR-X-02-before-the-embedding-policies.json."
+}

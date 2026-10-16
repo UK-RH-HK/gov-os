@@ -1,0 +1,35 @@
+{
+ "argv": [
+  "gov",
+  "rebuild",
+  "--json"
+ ],
+ "where": "a-dev exit clone, feature branch at 127227c, run by the lead outside any sandbox, 2026-10-15, run 8; run because gov check said the lexical index was stale (gov-check-a-dev-run8-stale-store.json)",
+ "exit_code": 0,
+ "answer": {
+  "ok": true,
+  "command": "rebuild",
+  "result": {
+   "digest": "1036e3563288b28cb706902940f807b8bfc7dbcc162a5153a34abf284734ff52",
+   "store": {
+    "digest": "1036e3563288b28cb706902940f807b8bfc7dbcc162a5153a34abf284734ff52",
+    "invalid": []
+   },
+   "stores": {
+    "lexical": {
+     "status": "recreated"
+    },
+    "semantic": {
+     "status": "recreated"
+    },
+    "codeintel": {
+     "status": "recreated"
+    }
+   },
+   "timing": {
+    "lexical_s": 0.5
+   }
+  },
+  "session": ""
+ }
+}

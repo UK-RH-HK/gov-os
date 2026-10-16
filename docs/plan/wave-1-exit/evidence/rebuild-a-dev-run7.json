@@ -1,0 +1,144 @@
+{
+ "argv": [
+  "gov",
+  "rebuild",
+  "--json"
+ ],
+ "where": "a-dev exit clone, run by the lead outside any sandbox, 2026-10-14, run 7",
+ "rebuilds": [
+  {
+   "at": "36d8ec3 (after the path-map edit e043bb9 and the closes of ORION-ad04 and ade-5rcs)",
+   "exit_code": 0,
+   "answer": {
+    "ok": true,
+    "command": "rebuild",
+    "result": {
+     "digest": "9ed64939aa0542398848f4f6e8b21b37242a367f3b9c1a56a6042cafaa3e950f",
+     "store": {
+      "digest": "9ed64939aa0542398848f4f6e8b21b37242a367f3b9c1a56a6042cafaa3e950f",
+      "invalid": []
+     },
+     "stores": {
+      "lexical": {
+       "status": "recreated"
+      },
+      "semantic": {
+       "status": "recreated"
+      },
+      "codeintel": {
+       "status": "recreated"
+      }
+     },
+     "timing": {
+      "lexical_s": 29.2
+     }
+    },
+    "session": ""
+   },
+   "semantic_index": {
+    "vectors": 3378,
+    "chunks": 5432,
+    "method": "count of the rows of the semantic vector table and of the lexical chunk table of the clone's store, read by the lead after the rebuild"
+   }
+  },
+  {
+   "at": "c3a9625 (after ORION-im01's checkpoint, before its close, so that the close found a fresh store)",
+   "exit_code": 0,
+   "answer": {
+    "ok": true,
+    "command": "rebuild",
+    "result": {
+     "digest": "76dc31f6ff244098a5179b7cf80c4098254419fbc011be8faa0bc817240f6f95",
+     "store": {
+      "digest": "76dc31f6ff244098a5179b7cf80c4098254419fbc011be8faa0bc817240f6f95",
+      "invalid": []
+     },
+     "stores": {
+      "lexical": {
+       "status": "recreated"
+      },
+      "semantic": {
+       "status": "recreated"
+      },
+      "codeintel": {
+       "status": "recreated"
+      }
+     },
+     "timing": {
+      "lexical_s": 0.9
+     }
+    },
+    "session": ""
+   }
+  },
+  {
+   "at": "a0820d4 (after the close's repair ticket, before gov ci)",
+   "exit_code": 0,
+   "answer": {
+    "ok": true,
+    "command": "rebuild",
+    "result": {
+     "digest": "38571f857638a2862d60ff60a349901c7e151d0b3fb7a732bb6aa636e10f2fb8",
+     "store": {
+      "digest": "38571f857638a2862d60ff60a349901c7e151d0b3fb7a732bb6aa636e10f2fb8",
+      "invalid": []
+     },
+     "stores": {
+      "lexical": {
+       "status": "recreated"
+      },
+      "semantic": {
+       "status": "recreated"
+      },
+      "codeintel": {
+       "status": "recreated"
+      }
+     },
+     "timing": {
+      "lexical_s": 1.0
+     }
+    },
+    "session": ""
+   }
+  }
+ ],
+ "before_the_embedding_policies": "empty: no namespace of the path map said 'embedded' (DEC-693)",
+ "run_6": "two rebuilds, 3,377 vectors for 5,431 chunks and then 3,379 for 5,433 (lost with the clone, DEC-699); run 7's figures differ by one or two because ADR-012 and the completed repair ticket are worded again",
+ "embedder": "qwen3-embedding:0.6b",
+ "reranker": "Qwen/Qwen3-Reranker-0.6B",
+ "embedding_policies": {
+  "embedded": [
+   "code",
+   "orion-specifications",
+   "specification",
+   "decisions",
+   "documents",
+   "interfaces",
+   "examples",
+   "benchmarks",
+   "research",
+   "tickets",
+   "adoption-records"
+  ],
+  "not embedded": [
+   "kernel",
+   "project",
+   "generated-agent-files",
+   "ci",
+   "datasets",
+   "root",
+   "adapters",
+   "repository",
+   "tests"
+  ],
+  "unchanged": [
+   "research-key-and-environment-files"
+  ],
+  "note": "adapters, repository and tests are not named by DEC-693; they are none of the namespaces it lists for 'embedded' and took the other value (the lead's reading, recorded in the clone's ADR-012)"
+ },
+ "trailers_base": {
+  "value": "bb1852e",
+  "commit": "e043bb9 (product-spec, ticket ORION-ad04)",
+  "check_alone": "python3 -m gov.close.traceability in the clone: no output, exit 0 (the worker's check)"
+ }
+}

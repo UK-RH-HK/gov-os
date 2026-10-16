@@ -1,0 +1,122 @@
+127227c | 2026-10-14T13:45:15+01:00 | Ticket ade-ke2y closed (tk close) | Task: ade-ke2y | Role: orchestrator | Implements: MATH-SPEC-003
+5fb754d | 2026-10-14T13:45:15+01:00 | Ticket ORION-im01 closed (tk close) | Task: ORION-im01 | Role: orchestrator | Implements: MATH-SPEC-003
+736669f | 2026-10-14T06:07:39+01:00 | Merge feature/dimension-checked-addition into main: the path map's trailers base and embedding policies (ADR-012), the repair ticket ade-5rcs closed, ORION-im01's checkpoint and the repair ticket ade-ke2y of its further refused close | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+a0820d4 | 2026-10-14T05:56:45+01:00 | Repair ticket ade-ke2y, written by gov close ORION-im01 on its refusal (TRAILER_MISSING) | Task: ade-ke2y | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+c3a9625 | 2026-10-14T05:54:04+01:00 | Checkpoint CP-ORION-im01-0003: before the further close of ORION-im01 | Task: ORION-im01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+36d8ec3 | 2026-10-14T05:46:56+01:00 | Ticket ade-5rcs closed (tk close) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+dc92b68 | 2026-10-14T05:46:55+01:00 | Ticket ORION-ad04 closed (tk close) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+4d103ce | 2026-10-14T05:46:55+01:00 | Repair ticket ade-5rcs completed: role, allowed paths, KPIs and source (the trailers base of ADR-012 settles its subject) | Task: ade-5rcs | Role: orchestrator | Implements: ADR-012
+e043bb9 | 2026-10-14T05:45:55+01:00 | Path map: the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace (ADR-012) | Task: ORION-ad04 | Role: product-spec | Implements: ADR-012
+cc21b70 | 2026-10-14T05:44:35+01:00 | Ticket ORION-ad04 started: the path map's trailers base and embedding policies | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+da45aae | 2026-10-14T05:44:35+01:00 | Ticket ORION-ad04: the path map's trailers base and embedding policies (ADR-012) | Task: ORION-ad04 | Role: orchestrator | Implements: ADR-012
+cb9fd57 | 2026-10-14T05:44:35+01:00 | ADR-012: the answers of 2026-10-14 on the path map, the trailers base at the adoption boundary bb1852e and an embedding policy for every namespace | Task: ORION-ad04 | Role: orchestrator | Implements: ADOPT-A8
+2d3d098 | 2026-10-13T22:55:50+01:00 | Merge feature/dimension-checked-addition into main: dimension-checked addition and subtraction (ORION-im01, open, its close refused) and the named dimension ACCELERATION (ORION-im02, closed by gov close) | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003, ORION-SPEC-DIMADD
+30996b6 | 2026-10-13T22:50:28+01:00 | Close record CL-ORION-im02 and checkpoint CP-ORION-im02-0004, written by gov close ORION-im02 | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+94cceae | 2026-10-13T22:50:28+01:00 | Ticket ORION-im02 closed by gov close | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+82affc9 | 2026-10-13T22:46:34+01:00 | Checkpoint CP-ORION-im02-0003: before the close of ORION-im02 | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+6a78498 | 2026-10-13T22:45:53+01:00 | ORION-im02: the named dimension ACCELERATION = LENGTH / (TIME * TIME) in the Python numerical reference (ADR-011) | Task: ORION-im02 | Role: engineer | Implements: MATH-SPEC-003
+f49924a | 2026-10-13T22:44:29+01:00 | Acceptance tests of ORION-im02: a named dimension for acceleration (W1-34), red before the implementation | Task: ORION-im02 | Role: independent-test-designer | Implements: MATH-SPEC-003
+47febd0 | 2026-10-13T22:41:51+01:00 | Ticket ORION-im02 started: a named dimension for acceleration | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+6c32d15 | 2026-10-13T22:41:51+01:00 | Ticket ORION-im02: a named dimension for acceleration in the Python numerical reference (ADR-011) | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+418913b | 2026-10-13T22:41:17+01:00 | ADR-011: the owner's answer of 2026-10-13, a named dimension for acceleration; the section Compound dimensions of MATH-SPEC-003 accepted for that one constant | Task: ORION-im02 | Role: orchestrator | Implements: MATH-SPEC-003
+82dca10 | 2026-10-13T18:07:20+01:00 | Repair ticket ade-5rcs, written by gov close ORION-im01 on its refusal (TRAILER_MISSING) | Task: ade-5rcs | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+07fa6aa | 2026-10-13T18:03:13+01:00 | Checkpoint CP-ORION-im01-0002: before the close of ORION-im01 | Task: ORION-im01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+c7b4818 | 2026-10-13T18:02:47+01:00 | Dimension-checked addition and subtraction | Task: ORION-im01 | Role: engineer | Implements: ORION-SPEC-DIMADD, MATH-SPEC-003
+9205c46 | 2026-10-13T18:02:18+01:00 | Ticket ORION-im01 started: the implementation of dimension-checked addition and subtraction | Task: ORION-im01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+070ffcc | 2026-10-13T18:02:18+01:00 | Ticket ade-0y1v closed (tk close) | Task: ade-0y1v | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+4c17004 | 2026-10-13T18:02:18+01:00 | Ticket ORION-sp01 closed (tk close) | Task: ORION-sp01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+b6d07d3 | 2026-10-13T18:02:18+01:00 | Ticket ORION-gp09 closed (tk close) | Task: ORION-gp09 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+c4a3f2d | 2026-10-13T18:01:51+01:00 | Audit reports of ORION-SPEC-DIMADD brought to the form of the audit skill | Task: ade-0y1v | Role: independent-auditor | Implements: ORION-SPEC-DIMADD
+2d766bc | 2026-10-13T17:59:22+01:00 | Second independent audit of the closure of specification ORION-SPEC-DIMADD | Task: ade-0y1v | Role: independent-auditor | Implements: ORION-SPEC-DIMADD
+f59aa0e | 2026-10-13T17:56:15+01:00 | Specification: the owner's answer on how the error message names a dimension recorded | Task: ORION-sp01 | Role: product-spec | Implements: ORION-SPEC-DIMADD
+b89a8ae | 2026-10-13T17:53:33+01:00 | Independent audit of the closure of specification ORION-SPEC-DIMADD | Task: ade-0y1v | Role: independent-auditor | Implements: ORION-SPEC-DIMADD
+fb1104a | 2026-10-13T17:50:24+01:00 | Specification ORION-SPEC-DIMADD closed: no required readiness row open | Task: ORION-sp01 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+69dc1b5 | 2026-10-13T17:50:24+01:00 | Audit ticket ade-0y1v: the closure of specification ORION-SPEC-DIMADD; sources name only records this repository holds | Task: ade-0y1v | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+954c9b3 | 2026-10-13T17:48:43+01:00 | Readiness row 25: the acceptance tests exist | Task: ORION-sp01 | Role: product-spec | Implements: ORION-SPEC-DIMADD
+930b197 | 2026-10-13T17:47:20+01:00 | Acceptance tests of dimension-checked addition and subtraction | Task: ORION-gp09 | Role: independent-test-designer | Implements: MATH-SPEC-003
+e4e8a8d | 2026-10-13T17:45:09+01:00 | Ticket ORION-ad03 closed (tk close) | Task: ORION-ad03 | Role: orchestrator | Implements: ADOPT-A2
+de09965 | 2026-10-13T17:44:07+01:00 | A5 verdict record: a record type the schemas know | Task: ORION-ad03 | Role: product-spec | Implements: ADOPT-A5
+bb1852e | 2026-10-13T17:41:39+01:00 | gov adopt --lite A8: legacy import and retirement | Task:  | Role:  | Implements: 
+1aadf0e | 2026-10-13T17:39:57+01:00 | gov adopt --lite A6: controlled migration | Task:  | Role:  | Implements: 
+4c21058 | 2026-10-13T17:39:42+01:00 | Path map: a namespace of their own for the two files under research/experiments that no namespace held, memory class product | Task: ORION-ad03 | Role: product-spec | Implements: ADOPT-A2
+9773262 | 2026-10-13T17:38:58+01:00 | Ticket ORION-ad03: Adoption: a namespace for the two files no namespace holds, and a known type for the A5 verdict record | Task: ORION-ad03 | Role: orchestrator | Implements: ADOPT-A2
+c7df8bc | 2026-10-13T17:37:22+01:00 | Permission source: the deny rule on the acceptance-test folder taken out (DEC-664 of the Gov OS register); generated settings brought to the sources | Task: ORION-gp09 | Role: orchestrator | Implements: ORION-SPEC-DIMADD
+8e517f9 | 2026-10-12T11:12:18+01:00 | Path map: a namespace for the acceptance tests the feature adds | Task: ORION-gp09 | Role: orchestrator | Implements: CAP-06
+4155a70 | 2026-10-12T11:12:01+01:00 | Ticket ORION-gp09 started: the acceptance tests of the feature | Task: ORION-gp09 | Role: orchestrator | Implements: 
+5a74305 | 2026-10-12T11:12:01+01:00 | Ticket ORION-gp08 closed (tk close) | Task: ORION-gp08 | Role: orchestrator | Implements: 
+b877e16 | 2026-10-12T11:12:01+01:00 | Ticket ORION-gp07 closed (tk close) | Task: ORION-gp07 | Role: orchestrator | Implements: 
+6bd5bc1 | 2026-10-12T11:12:01+01:00 | Ticket ORION-gp06 closed (tk close) | Task: ORION-gp06 | Role: orchestrator | Implements: 
+f05f719 | 2026-10-12T11:12:01+01:00 | Ticket ORION-gp05 closed (tk close) | Task: ORION-gp05 | Role: orchestrator | Implements: 
+dcf878a | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp04 closed (tk close) | Task: ORION-gp04 | Role: orchestrator | Implements: 
+73988dd | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp03 closed (tk close) | Task: ORION-gp03 | Role: orchestrator | Implements: 
+154d8b6 | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp02 closed (tk close) | Task: ORION-gp02 | Role: orchestrator | Implements: 
+fd1c9c5 | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp01 closed (tk close) | Task: ORION-gp01 | Role: orchestrator | Implements: 
+540004a | 2026-10-12T11:12:00+01:00 | Ticket ORION-im01: Dimension-checked addition and subtraction in the Python numerical reference | Task: ORION-im01 | Role: orchestrator | Implements: 
+8a49670 | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp12: Gap: readiness row 26 (docs_ops) of ORION-SPEC-DIMADD is open | Task: ORION-gp12 | Role: orchestrator | Implements: 
+18eefda | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp11: Gap: readiness row 18 (devops) of ORION-SPEC-DIMADD is open | Task: ORION-gp11 | Role: orchestrator | Implements: 
+b3c4dff | 2026-10-12T11:12:00+01:00 | Ticket ORION-gp10: Gap: readiness row 15 (interfaces) of ORION-SPEC-DIMADD is open | Task: ORION-gp10 | Role: orchestrator | Implements: 
+789e5f1 | 2026-10-12T11:10:43+01:00 | Specification of dimension-checked addition closed on the owner's answers | Task: ORION-sp01 | Role: product-spec | Implements: MATH-SPEC-003
+7a9461d | 2026-10-12T11:05:58+01:00 | Ticket ORION-ad02 closed (tk close): A5 verdict recorded | Task: ORION-ad02 | Role: orchestrator | Implements: 
+45bca02 | 2026-10-12T11:05:58+01:00 | Ticket ORION-ad01 closed (tk close): adoption repair done | Task: ORION-ad01 | Role: orchestrator | Implements: 
+fe1018f | 2026-10-12T11:05:46+01:00 | gov adopt --lite A5: independent review of the path map | Task:  | Role:  | Implements: 
+56b8b69 | 2026-10-12T11:05:10+01:00 | Adoption stage A5: independent verdict on the path map | Task: ORION-ad02 | Role: independent-auditor | Implements: CAP-44
+73624d5 | 2026-10-12T11:03:01+01:00 | gov adopt --lite A4: batched plan | Task:  | Role:  | Implements: 
+f3aabe0 | 2026-10-12T11:03:00+01:00 | gov adopt --lite A3: target path map | Task:  | Role:  | Implements: 
+04d01ca | 2026-10-12T11:03:00+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
+1406079 | 2026-10-12T11:02:59+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
+6de2223 | 2026-10-12T11:02:48+01:00 | Ticket ORION-ad02 started: adoption stage A5 | Task: ORION-ad02 | Role: orchestrator | Implements: 
+8ce28d8 | 2026-10-12T11:02:19+01:00 | gov adopt --lite A4: batched plan | Task:  | Role:  | Implements: 
+844b879 | 2026-10-12T11:02:15+01:00 | gov adopt --lite A3: target path map | Task:  | Role:  | Implements: 
+62ad4d2 | 2026-10-12T11:02:14+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
+c7be732 | 2026-10-12T11:02:14+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
+9b08f6f | 2026-10-12T10:59:07+01:00 | Adoption repair: record types and state classes, namespace fields | Task: ORION-ad01 | Role: product-spec | Implements: CAP-03, CAP-06, CAP-44
+c604650 | 2026-10-12T10:55:35+01:00 | Ticket ORION-ad01: second round, the legacy records without a type and the namespace fields | Task: ORION-ad01 | Role: orchestrator | Implements: 
+92ca47e | 2026-10-12T10:53:39+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
+c5f3d80 | 2026-10-12T10:53:39+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
+9882a63 | 2026-10-12T10:40:19+01:00 | Adoption repair: path map, tool registry, ADR-010 frontmatter | Task: ORION-ad01 | Role: product-spec | Implements: CAP-06, CAP-44
+a85933c | 2026-10-12T10:23:32+01:00 | Ticket ORION-ad02: Adoption stage A5: independent review of the path map | Task: ORION-ad02 | Role: orchestrator | Implements: 
+77f4206 | 2026-10-12T10:23:32+01:00 | Ticket ORION-ad01: Adoption repair: path map, tool registry and the unreadable decision record | Task: ORION-ad01 | Role: orchestrator | Implements: 
+3e8e26e | 2026-10-12T10:23:32+01:00 | Ticket ORION-sp01: sources name the records by id | Task: ORION-sp01 | Role: orchestrator | Implements: 
+9350716 | 2026-10-12T10:22:39+01:00 | Ticket ORION-sp01: sources name only records this repository holds | Task: ORION-sp01 | Role: orchestrator | Implements: 
+bf97bc0 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp09: sources name only records this repository holds | Task: ORION-gp09 | Role: orchestrator | Implements: 
+22ab402 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp08: sources name only records this repository holds | Task: ORION-gp08 | Role: orchestrator | Implements: 
+fcc0dbb | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp07: sources name only records this repository holds | Task: ORION-gp07 | Role: orchestrator | Implements: 
+08cdba3 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp06: sources name only records this repository holds | Task: ORION-gp06 | Role: orchestrator | Implements: 
+367817a | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp05: sources name only records this repository holds | Task: ORION-gp05 | Role: orchestrator | Implements: 
+228384e | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp04: sources name only records this repository holds | Task: ORION-gp04 | Role: orchestrator | Implements: 
+173dde5 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp03: sources name only records this repository holds | Task: ORION-gp03 | Role: orchestrator | Implements: 
+d0e7526 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp02: sources name only records this repository holds | Task: ORION-gp02 | Role: orchestrator | Implements: 
+3dbbdf3 | 2026-10-12T10:22:39+01:00 | Ticket ORION-gp01: sources name only records this repository holds | Task: ORION-gp01 | Role: orchestrator | Implements: 
+29ff08f | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp09: readiness row 25 (acceptance_tests) of ORION-SPEC-DIMADD | Task: ORION-gp09 | Role: orchestrator | Implements: DEC-089
+e28e5df | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp08: readiness row 24 (failure) of ORION-SPEC-DIMADD | Task: ORION-gp08 | Role: orchestrator | Implements: DEC-089
+28e42bc | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp07: readiness row 23 (success) of ORION-SPEC-DIMADD | Task: ORION-gp07 | Role: orchestrator | Implements: DEC-089
+67ece2e | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp06: readiness row 9 (outputs) of ORION-SPEC-DIMADD | Task: ORION-gp06 | Role: orchestrator | Implements: DEC-089
+e432303 | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp05: readiness row 8 (processing) of ORION-SPEC-DIMADD | Task: ORION-gp05 | Role: orchestrator | Implements: DEC-089
+20a840d | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp04: readiness row 7 (test_data) of ORION-SPEC-DIMADD | Task: ORION-gp04 | Role: orchestrator | Implements: DEC-089
+c810545 | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp03: readiness row 6 (data_model) of ORION-SPEC-DIMADD | Task: ORION-gp03 | Role: orchestrator | Implements: DEC-089
+14b49c6 | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp02: readiness row 5 (inputs) of ORION-SPEC-DIMADD | Task: ORION-gp02 | Role: orchestrator | Implements: DEC-089
+87f7247 | 2026-10-12T09:54:29+01:00 | Gap ticket ORION-gp01: readiness row 4 (scenarios) of ORION-SPEC-DIMADD | Task: ORION-gp01 | Role: orchestrator | Implements: DEC-089
+11308f8 | 2026-10-12T09:53:02+01:00 | Discovery and specification record of dimension-checked addition | Task: ORION-sp01 | Role: product-spec | Implements: MATH-SPEC-003
+bf10af6 | 2026-10-12T09:47:22+01:00 | Ticket ORION-sp01: discovery and specification of dimension-checked addition | Task: ORION-sp01 | Role: orchestrator | Implements: 
+72ce4df | 2026-10-12T09:41:57+01:00 | gov adopt --lite A2: classification | Task:  | Role:  | Implements: 
+802e83f | 2026-10-12T09:41:56+01:00 | gov adopt --lite A1: inventory | Task:  | Role:  | Implements: 
+5c0e79d | 2026-10-12T09:41:56+01:00 | gov adopt --lite A0: safety baseline | Task:  | Role:  | Implements: 
+9d0daf6 | 2026-10-12T09:41:56+01:00 | Gov OS template applied (copier) and adapter output generated (rulesync) | Task:  | Role: orchestrator | Implements: 
+d65c26f | 2025-02-24T14:00:00+00:00 | Add IR examples, benchmarks, docs, NFR specs, CI stub | Task:  | Role:  | Implements: 
+90e7315 | 2025-02-24T10:00:00+00:00 | Add examples, extra tests, project config, test vectors | Task:  | Role:  | Implements: 
+b40c188 | 2025-02-23T10:00:00+00:00 | Add partial readiness matrix (many gaps) | Task:  | Role:  | Implements: 
+b0ec15a | 2025-02-21T10:00:00+00:00 | Add ADR-007 through ADR-010, supersede ADR-003 | Task:  | Role:  | Implements: 
+6b13e2b | 2025-02-19T10:00:00+00:00 | Rename research/notes to research/investigations | Task:  | Role:  | Implements: 
+65a7897 | 2025-02-17T10:00:00+00:00 | Add cross-language interface specs: IR JSON schema, test vectors | Task:  | Role:  | Implements: 
+6c9bcd0 | 2025-02-13T10:00:00+00:00 | Add experiment notes on integrator comparison | Task:  | Role:  | Implements: 
+b4a588e | 2025-02-09T10:00:00+00:00 | Add reference datasets: harmonic oscillator, kepler, pendulum | Task:  | Role:  | Implements: 
+85bd7c8 | 2025-02-05T10:00:00+00:00 | Add TypeScript IR viewer and CLI tool | Task:  | Role:  | Implements: 
+d17076d | 2025-02-01T10:00:00+00:00 | Add Python numerical reference and unit tests | Task:  | Role:  | Implements: 
+7075e0c | 2025-01-28T10:00:00+00:00 | Implement physics runtime core: state vectors, integrators | Task:  | Role:  | Implements: 
+8f5f2ef | 2025-01-24T10:00:00+00:00 | Add Rust crates: lexer, parser, ir, runtime stubs | Task:  | Role:  | Implements: 
+02f44d2 | 2025-01-20T10:00:00+00:00 | Supersede ADR-002 (IR format) with ADR-006 (typed IR) | Task:  | Role:  | Implements: 
+e417098 | 2025-01-16T10:00:00+00:00 | Add architecture decisions ADR-001 through ADR-005 | Task:  | Role:  | Implements: 
+cafbf03 | 2025-01-14T10:00:00+00:00 | Add Orion DSL language specification (draft) | Task:  | Role:  | Implements: 
+59f4692 | 2025-01-11T10:00:00+00:00 | Add mathematical specifications for physics kernels | Task:  | Role:  | Implements: 
+7f6b390 | 2025-01-09T10:00:00+00:00 | Add research notes and evidence | Task:  | Role:  | Implements: 
+5bda03b | 2025-01-06T10:00:00+00:00 | Initial project structure: README, brief, glossary | Task:  | Role:  | Implements: 

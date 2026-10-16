@@ -1,0 +1,1 @@
+{"ok": false, "command": "close", "result": {}, "session": "w1-42-lead-run3", "error": {"code": "STORE_STALE", "message": "the record store is not of the commit being closed; run gov rebuild, then close again", "details": {"head": "80b9fad70171901189a80b68001cd868feb88fad"}}}
