@@ -7651,4 +7651,117 @@ Decided 2026-10-12 about 11:35, while the owner's quiet window in the main tree 
 |---|---|---|
 | 0.220 | 2026-10-16 | Owner: DEC-718. Wave 1 passes with accepted exceptions (the W1-43 auditor's option (a)). F-M1 to F-M13, F-m1 to F-m10 and DEC-714's four exceptions are named, each with what closes it and its Wave 2 owner. The adoption-readiness block AR-1 to AR-10 passes before any pilot adoption, in that order; its AR-6 (guardrails explain themselves and never loop) is the owner's note on the SubagentStop refusals. The consolidated Wave 2 list is `docs/plan/WAVE_2_LIST.md` (F-M8). EXP-003 is planned. F-M9's pushes and hook installs were the owner's. W1-16 and W1-21 are named probe exceptions, and so are the follow-up closes `80ddf4d5`, `b355fa24` and `f270e3c9`. DAEO-03pw closes with `tk close`. No commit on `w1/integrate` is ever amended. Charter v5, Contract v4 and the Wave 1 WBS have status ACCEPTED. Adoption records, like evidence snapshots, keep their pinned hashes: the A5 citation stays, and the doctor's path compliance is a named exception. Next free id: DEC-719. |
 
+## 221. The owner's standing rule of 2026-10-16 on rebuilds while the hooks are off (register v0.221, prepared by the W2 orchestrator on branch `w1/integrate`, for the owner's commit)
+
+### DEC-719 — DEC-709 is suspended while the hooks are off: rebuilds are full rebuilds only; the commit-time re-index joins AR-2 and replaces DEC-709 for good
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-706, DEC-709, DEC-712, DEC-718 · **Basis:** DEC-709 made every commit run `gov rebuild --no-embeddings` after staging, so that the pre-commit hook's index-freshness and recovery-rebuild checks passed honestly. A `--no-embeddings` rebuild empties the semantic index: the W1-43 auditor's semantic canary miss (`FACET_UNAVAILABLE`, F-M2) came from those rebuilds, and the full `gov rebuild` with embeddings of 2026-10-16 (exit 0, 4 min 35 s) cleared it, with lexical and semantic both `AVAILABLE`. The hooks are uninstalled until AR-3 passes (DEC-718, F-M13), so no pre-commit check needs the rebuild before a commit. The owner gave the rule on 2026-10-16, and `governance/project/bootstrap.md` has recorded it since `a26f555c`; this entry makes it a register entry.
+- **Decision:**
+  1. **DEC-709 is suspended** while the hooks are off. No session runs `gov rebuild --no-embeddings` before a commit, or at any other time.
+  2. **When a rebuild is needed, it is a full `gov rebuild`,** with embeddings. Until the commit-time re-index lands, the orchestrator runs one before each `gov close` and before each planning or audit step that reads the index. A rebuild never runs in a tree while a worker's command runs there.
+  3. **The commit-time re-index replaces DEC-709 for good.** The re-index (CAP-17.b, Wave 2 list W2-H041) and the fast pre-commit tier (W2-H039, W2-H040), whose index-freshness and recovery-rebuild checks move to pre-push (G3) or CI, are taken into **AR-2** with the hook's git environment, because all three are the hook's own behaviour. They are delivered by the Wave 2 ticket that builds them (W2-05 and W2-06 in `docs/plan/WAVE_2_WBS.md`, if the owner approves that plan).
+  4. **DEC-709 ends** when the hooks are back on under AR-3 (W2-08 in that plan). From then on a commit made straight after staging, with no hand rebuild, passes the pre-commit hook. DEC-709 is not revived in between.
+- **Next:** the owner commits this entry with `Role: owner`, beside the Wave 2 plan. Next free id: DEC-720.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.221 | 2026-10-16 | Owner: DEC-719 (DEC-709 suspended while the hooks are off; rebuilds are full `gov rebuild` only; the commit-time re-index and the fast pre-commit tier join AR-2 and replace DEC-709 for good, which ends when the hooks are back on under AR-3). Next free id: DEC-720. |
+
+## 222. The owner's review of the Wave 2 plan, 2026-10-16 (register v0.222, prepared by the W2 orchestrator on branch `w1/integrate`, for the owner's commit with DEC-719)
+
+The orchestrator's planning report of 2026-10-16 put five packages (P-W2-1 to P-W2-5) and the proposed `docs/plan/WAVE_2_WBS.md` to the owner. The owner answered the packages and changed the plan in one review. These entries record the answers and the changes; the plan itself stays PROPOSED until the owner approves it.
+
+### DEC-720 — Wave 2 branches from `main`, fast-forwarded to `wave-1-exit` (P-W2-1 (a))
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-412, DEC-711, DEC-718 · **Basis:** origin `main` is at `8f458d82`, an ancestor of the tag `wave-1-exit` (`a26f555c`), so a fast-forward needs no merge; agents never push.
+- **Decision:**
+  1. The owner fast-forwards `main` to `wave-1-exit` and pushes it, from a plain terminal.
+  2. The orchestrator cuts `w2/integrate` from `main` in the main tree; the owner pushes it.
+  3. `w1/integrate` is frozen as history. `w1/W1-42` is kept until the owner says otherwise (DEC-711).
+  4. Ticket branches are `w2/<W2 id>`, cut from `w2/integrate`, in worktrees under `~/gov-os-worktrees/`. No commit on `w2/integrate` is ever amended or rewritten, merges included.
+  5. At Wave 2's exit the owner fast-forwards `main` to the exit tag again.
+
+### DEC-721 — The adoption-readiness block is built with W2-01 first and shown to pass in order (P-W2-2 (a))
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-522 · **Basis:** DEC-718 says AR-1 to AR-10 pass "in this order". The owner's Wave 2 exit criterion 1 needs every Wave 2 close to be a clean `gov close`, which needs AR-8's close fixes first.
+- **Decision:** DEC-718's order is the order in which AR-1 to AR-10 are shown to pass, at the Track A gate run (W2-24). The build order is W2-01 (AR-8's close fixes) first and alone; the rest of the block runs in parallel by its dependencies.
+
+### DEC-722 — Contract v4.2 brings two Wave 3 items into Wave 2, lite; signed release tags stay in Wave 3 (P-W2-3, in part)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-105, DEC-718, CAP-33 · **Basis:** the Wave 2 brief asks for an EXAMIN adoption with a healthy verdict and for immutable, pinned releases; the Contract places CAP-44.f and CAP-44.h, CAP-43.b and CAP-02.c in Wave 3. Under DEC-105 the orchestrator offered apply now, defer, or re-baseline.
+- **Decision:**
+  1. **Apply now, lite, by a CIT-P to Contract v4.2:** CAP-44.h (the adoption verdict: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS, NOT_ADOPTED_HEALTHY) with the A7 and A10 gates of CAP-44.f, lite; and CAP-43.b, lite (release contents: a manifest and file hashes). The CIT-P goes through independent review and the owner's approval (CAP-33); ticket W2-49 carries it.
+  2. **CAP-02.c (signed release tags) stays in Wave 3,** as the Contract says. Wave 2 releases are pinned and hash-verified, not signed.
+  3. **Exit criterion 6 reads:** "EXAMIN runs a pinned, hash-verified Gov OS release."
+  4. The queued package for an owner signing key (Q-5) is dropped.
+
+### DEC-723 — The EXAMIN profile runs early and read-only on a copy the owner makes; agents never write, list, glob or search in `~/gov-os-workbench` (P-W2-4 (a))
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-525 · **Basis:** EXAMIN's size, languages and test runner decide whether Track B waits for the language-agnostic test commands and the check runner's scale work; measuring them early sizes that work before it is built. In the planning session, a listing of the workbench folder printed a protected folder's name (nothing in it was read).
+- **Decision:**
+  1. W2-26 (the EXAMIN profile, EXP-003's EXAMIN leg) runs early, beside Track A, read-only.
+  2. **The owner makes the copy** at `~/gov-os-workbench/examin/` in a plain terminal and gives the orchestrator its exact path.
+  3. **Agents never write in `~/gov-os-workbench`.** Work that writes (indexing, test runs, adoption on a copy) runs on a clone the agent makes outside it, under `~/gov-os-runs/<W2 id>/`, from the exact path the owner gave.
+  4. **Agents never list, glob or search `~/gov-os-workbench`.** They name a file there explicitly, or ask the owner.
+
+### DEC-724 — Owner acceptances are owner git facts: `Role: owner`, batched, and a `gov approve` command (P-W2-5 (a), refined)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-409, DEC-718 (AR-7, F-M6) · **Basis:** F-M6 found register entries set ACCEPTED in commits the orchestrator made, with no git fact of the owner's approval.
+- **Decision:**
+  1. From now on, the owner commits every owner register entry with `Role: owner`. The orchestrator drafts and stages; it never commits an owner entry.
+  2. **Owner decisions are staged in batches:** at most one owner commit per session break.
+  3. **W2-12 adds `gov approve`,** which the owner runs in a plain terminal. It commits the staged register entries with `Role: owner` after a typed one-time code, as the freeze lift does (DEC-409), and refuses when run from any agent session (a Claude Code ancestor, a launched session's identity, or no interactive terminal).
+  4. W2-12's core-authority gate then reads an entry as the owner's only from that git fact. Signed owner commits may come later, by decision.
+
+### DEC-725 — A ranked lexical route comes into Wave 2; EXP-003 runs in two passes
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-414, DEC-718 (AR-10, EXP-003) · **Basis:** today the lexical route matches exact strings only, so the fusion has one working route, and EXP-003 could not show lexical, semantic and reranking working together. The ranked lexical route was on the list as a later-wave item (W2-M102, W2-L233).
+- **Decision:**
+  1. **W2-13 becomes "RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5)",** taking W2-M102 and W2-L233 out of Wave 3.
+  2. **EXP-003 runs in two passes.** W2-15a is a baseline after W2-03, W2-04 and W2-13. Bounded improvements (ranked-lexical tuning, chunking, the hit@5 85 row) follow in W2-32. W2-15b is the final measurement against the owner's 99 % goal, with the stacking test and the scale probe.
+  3. Both passes stay under the finish line: each improvement is bounded to one run plus its probe, and what remains becomes a named residual.
+
+### DEC-726 — Test-result caching at close comes forward as its own ticket
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-083, DEC-522 · **Basis:** every clean close runs the full regression, about an hour, one close at a time; about 50 hours of main-tree time over the wave (W2-M153).
+- **Decision:**
+  1. W2-38's safe part becomes ticket W2-48, in layer 2: **test-result caching at close, keyed on exact input hashes** (the test files, the source they import, fixtures, configuration). Unchanged tests are reused and labelled as reused; they are never skipped on a guess.
+  2. W2-48 evaluates pytest-testmon against a small built-in cache; any install comes as a package under DEC-083.
+  3. The full, uncached regression still runs at W2-24 and W2-46.
+  4. Impact-selected tests (the rest of W2-38) stay where they are.
+
+### DEC-727 — EXAMIN adoption on the copy starts on the safety-critical subset; the real repository stays gated
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718, DEC-722, DEC-723 · **Basis:** a copy can be thrown away, so its adoption needs only the tickets that keep a repository and its sessions safe; the real repository needs the whole adoption-readiness block and the final retrieval figures.
+- **Decision:**
+  1. W2-27 (adoption on the copy) depends only on W2-01, W2-03, W2-04, W2-05, W2-06, W2-08, W2-09, W2-10, W2-18 (with W2-16's hash-pinned release), W2-20, W2-21 and W2-23, plus W2-19 only if W2-26 shows that EXAMIN's tests are not pytest.
+  2. W2-28 (the independent verdict on the copy) follows on the copy.
+  3. W2-29 (the real repository) stays gated by W2-25 (Track A's audit) and by W2-15b's results, and needs the owner's go.
+- **Next:** the owner commits DEC-719 to DEC-729 (§223) with `Role: owner`, in one commit, beside the Wave 2 plan. Next free id: DEC-728.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.222 | 2026-10-16 | Owner: DEC-720 to DEC-727, the review of the Wave 2 plan. `main` fast-forwarded to `wave-1-exit` and `w2/integrate` cut from it (720); AR block built with W2-01 first and shown in order (721); Contract v4.2 lite for CAP-44.h with A7 and A10 and for CAP-43.b, signed tags stay in Wave 3 (722); the EXAMIN profile early, on the owner's copy, and no agent writes, lists, globs or searches `~/gov-os-workbench` (723); owner acceptances as `Role: owner` commits, batched, with `gov approve` (724); a ranked lexical route in Wave 2 and EXP-003 in two passes (725); test-result caching at close as its own ticket (726); EXAMIN on a copy starts on the safety-critical subset (727). Next free id: DEC-728. |
+
+## 223. The owner's approval of the Wave 2 plan, 2026-10-16 (register v0.223, prepared by the W2 orchestrator on branch `w1/integrate`, for the owner's commit with DEC-719 to DEC-727)
+
+The orchestrator reported revision 2 of `docs/plan/WAVE_2_WBS.md` with one open package (P-W2-6). The owner approved the plan, answered the package, and added one ticket.
+
+### DEC-728 — `~/gov-os-runs/` is one durable scratch root; a session writes only in its own ticket's folder there (W2-50)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-723, DEC-159, CAP-33 · **Basis:**
+  - DEC-723 moves writing work to clones under `~/gov-os-runs/<W2 id>/`, but nothing lets a session write there.
+  - In Wave 1 both the guard and the launcher's sandbox refused writes outside the repository except in the temp folder (`src/gov/guard/decide.py`; the launcher's sandbox write list holds only the session's temp folder).
+  - Clones under `/tmp` are lost on a reboot (W2-M355).
+- **Decision:**
+  1. **A Track A ticket, W2-50, in layer 2** (FULL, engineer; the independent test designer first; a probe after green). It makes `~/gov-os-runs/` one durable scratch root, in the guard and in the launcher's sandbox write list.
+  2. **A session of any role writes only under `~/gov-os-runs/<its own ticket>/`.** Another ticket's folder, the root itself, and any path outside it stay refused.
+  3. **Nothing there is ever indexed** by this repository's stores, and the secrets-indexing check never scans it. A product clone adopted there keeps its own store inside the clone; that store is not this repository's (W2-27).
+  4. `~/gov-os-workbench` and `~/gov-os-worktrees` stay refused as before (DEC-723).
+  5. **The change loosens the guard,** so it goes through CIT-P with the owner's approval (CAP-33), like W2-09's change. This entry is the owner decision behind it.
+  6. **Every ticket that clones into `~/gov-os-runs` depends on W2-50:** W2-14, W2-15a (and through it W2-15b), W2-24 and W2-27.
+  7. **Until W2-50 closes, W2-26 clones into its session's scratch folder under `/tmp`.** Its results are committed to `docs/research/EXP-003/examin/`, so only the throwaway clone is volatile.
+
+### DEC-729 — The Wave 2 plan is approved; the main session records under a coordination ticket, W2-00 (P-W2-6 (a))
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-718 (F-m7), DEC-720 to DEC-728 · **Basis:** the main session has recorded under DAEO-6cc2, the closed W1-45 ticket (F-m7).
+- **Decision:**
+  1. **The plan is approved:** `docs/plan/WAVE_2_WBS.md` revision 2, with W2-50 added (DEC-728), and `docs/plan/WAVE_2_TRIAGE.md`. Both are ACCEPTED when the owner commits them.
+  2. **P-W2-6 (a):** straight after that commit, the orchestrator creates the coordination ticket W2-00 with `tk`, before any other ticket, and gives the owner its `tk` id. The owner sets `GOV_TICKET` to it in `.claude/settings.local.json` (owner act O-3).
+  3. Main-session commits that belong to no other ticket carry W2-00's id. W2-00 closes last, with `gov close`, after the owner's exit decision.
+- **Next:** the owner commits DEC-719 to DEC-729 with `Role: owner`, in one commit, beside the Wave 2 plan. Next free id: DEC-730.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.223 | 2026-10-16 | Owner: DEC-728 (`~/gov-os-runs/` one durable scratch root, a session writing only in its own ticket's folder, never indexed here; W2-50 in layer 2 through CIT-P; W2-26 on `/tmp` until then), DEC-729 (the Wave 2 plan approved; P-W2-6 (a), W2-00 created first). Next free id: DEC-730. |
+
 ---
