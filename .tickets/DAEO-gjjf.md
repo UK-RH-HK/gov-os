@@ -1,6 +1,6 @@
 ---
 id: DAEO-gjjf
-status: in_progress
+status: closed
 deps: [DAEO-9i8e, DAEO-8goq, DAEO-0i6h, DAEO-skiy, DAEO-fdkq, DAEO-cdoi, DAEO-wqd6, DAEO-jdqr, DAEO-o4fg]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -73,3 +73,9 @@ acceptance_tests:
 # W1-42 Wave 1 exit run on the dev tiers
 
 The Wave 1 exit criteria run (WAVE_1_WBS section 4).
+
+## Notes
+
+**2026-10-16T08:19:16Z**
+
+Closed with tk close by the owner's decision of 2026-10-16 (DEC-717), named for the exit auditor: gov close at ca426ca9 refused (exit 3) on 22 findings: the two named red cases RETR-X-02 and the governance share (DEC-713, DEC-714); 15 trailer findings (six commits before the trailers base 1c33dd28, seven merges in the merge form, the claim 93bcb247); one change without a task (76ce6416); two containment findings on the operator's Role: owner adapter commits (8bb34efe, 71ae763f); no probe (the W1-43 exit audit stands in); a stale checkpoint (no run 8c, DEC-716). Merged at ccc32181; regression 13,190 + 263 passed, 2 failed (the named cases); validator ALL PASS.
