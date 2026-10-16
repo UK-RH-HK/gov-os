@@ -29,11 +29,22 @@ SCHEMA_MAP = {
     "capability": "capability.schema.json",
     "specification": "specification.schema.json",
     "plan": "plan.schema.json",
+    # the record types of W2-02: the close record gov close writes, an audit report in DEC-441's form, and the
+    # adoption verdict of CAP-44.h (DEC-722); a decision entry (register-entry) has a schema and no record file
+    # (DEC-274)
+    "close": "close.schema.json",
+    "audit-report": "audit-report.schema.json",
+    "adoption-verdict": "adoption-verdict.schema.json",
 }
 
-# A type whose schema stands alone (DEC-565): the shared frontmatter is not owed by its records, and each
-# field a record states is held to the shape the schema gives.
-STANDALONE_TYPES = ("probe",)
+# A type whose schema stands alone (DEC-565): its records owe what the schema requires, the shared frontmatter
+# only where the schema takes it in, and each field a record states is held to the shape the schema gives. The
+# audit report's form has no shared frontmatter (DEC-441); the adoption verdict is held to its three verdicts.
+STANDALONE_TYPES = ("probe", "audit-report", "adoption-verdict")
+
+# The audit-report folder (DEC-626, the audit-reproducibility declaration): a record there that states no `type`
+# is an audit report.
+AUDIT_REPORT_DIR, AUDIT_REPORT_TYPE = "docs/audit", "audit-report"
 
 _JSON_TYPES = {"string": str, "boolean": bool}
 _SHAPE_KEYWORDS = {"description", "const", "enum", "type", "minLength", "pattern"}
@@ -137,7 +148,8 @@ def check(root: Path) -> list[dict]:
             front = _frontmatter(text)
             if front is None:
                 continue
-            record_type = front.get("type")
+            in_audit_dir = md_file.is_relative_to(root / AUDIT_REPORT_DIR)
+            record_type = front.get("type", AUDIT_REPORT_TYPE if in_audit_dir else None)
             if not isinstance(record_type, str):
                 findings.append({"code": "SCHEMA_INVALID_TYPE", "path": str(rel),
                                  "message": f"{rel}: 'type' field is missing or not a string"})
@@ -164,7 +176,7 @@ def check(root: Path) -> list[dict]:
                     # a finding under either layout is a finding; one both layouts give is not doubled
                     held += [finding for finding in found if finding not in held]
                 findings.extend(held)
-                if standalone and not measured:
+                if not measured:
                     findings.append({"code": "SCHEMA_UNREADABLE", "path": rel, "type": record_type,
                                      "message": f"{rel}: unmeasured, the schema {schema_file} cannot be read"})
             else:
