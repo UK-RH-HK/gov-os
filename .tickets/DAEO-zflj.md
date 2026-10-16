@@ -36,6 +36,7 @@ sources:
 - DEC-441
 - CAP-44.h
 - DEC-730
+- DEC-741
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-02/
@@ -85,3 +86,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-02), as approved (DEC-729). The list row
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
   - The `wbs_id` grammar accepts an id with one lower-case letter suffix (`W2-15a`) and still refuses any other form (`W2-15`, `W2-15ab`, `W2-15A`, `W2-1`) [DEC-730]. The grammar's one definition is `template/governance/kernel/schemas/common.schema.json`.
 - **KPIs, failure:** an audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still `SCHEMA_INVALID_TYPE`.
+- **The adoption verdict (DEC-741, I (ii), 2026-10-17):** the three CAP-44.h values, and a list of named conditions, each with its source item and its state (met, not met, accepted by an owner entry). W2-02 closes on its own; W2-52's stage records are read as conditions later.

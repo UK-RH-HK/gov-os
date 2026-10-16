@@ -37,6 +37,7 @@ profile: FULL
 sources:
 - DEC-715
 - DEC-434
+- DEC-743
 est_loc: 220
 acceptance_tests:
   path: tests/acceptance/W2-21/
@@ -85,6 +86,7 @@ list_rows:
 - W2-M275
 - W2-M291
 - W2-M339
+- W2-M359
 ---
 # W2-21 Stable launch: gov launch lead, the ticket-lead role, launch records
 
@@ -104,3 +106,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-21), as approved (DEC-729). The list row
 ## Row added after the plan's approval (DEC-732, 2026-10-16)
 
 - **W2-H054 (high):** a ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree. Until this ticket lands, the rule is kept by hand: every lead and worker brief sets `PYTHONPATH` to the worktree's absolute `src` path per command, and each verification shows `gov.__file__` pointing into the worktree. The launcher is where the mechanism belongs; it sets the code path for test runs and gov commands, not for the guard's own hooks, which keep running the code the session started under.
+- **Row W2-M359 (DEC-743 §6.3, 2026-10-17):** the launch work shows whether a launched worker's Write and Edit reach its own folder under `~/gov-os-runs`, and either they do or the launch states that only Bash writes there.

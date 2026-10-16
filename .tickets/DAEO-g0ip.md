@@ -37,6 +37,8 @@ profile: FULL
 sources:
 - DEC-704
 - DEC-436
+- DEC-738
+- DEC-739
 est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W2-01/
@@ -58,7 +60,6 @@ list_rows:
 - W2-M238
 - W2-M250
 - W2-M251
-- W2-M263
 - W2-M266
 - W2-M353
 ---
@@ -80,3 +81,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-01), as approved (DEC-729). The list row
   - A merge that adds its own change outside the merged side still refuses.
   - A hand-resolved merge that changes probed code still refuses the probe gate.
   - An accepted-history entry without an ACCEPTED owner decision is refused.
+- **Round 3 (DEC-739, 2026-10-17):** the owner allows one review round beyond DEC-413 and no fourth: a merge-back that names no task, or another ticket's task, and drops or replaces probed code refuses, naming the merge. Row W2-M263 left this ticket for W2-07 (DEC-738 item 4).

@@ -33,6 +33,7 @@ profile: FULL
 sources:
 - CAP-33
 - DEC-685
+- DEC-743
 est_loc: 90
 acceptance_tests:
   path: tests/acceptance/W2-09/
@@ -42,6 +43,7 @@ closes:
 - AR-4
 - F-M7
 list_rows:
+- W2-H055
 - W2-I015
 - W2-L203
 - W2-M016
@@ -59,3 +61,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-09), as approved (DEC-729). The list row
   - `gov doctor` compares the guard's known list with the installed CLI's tool list at every CLI version change, and names each difference [AR-4, W2-M236].
   - The read-only tools the owner lists (for example Monitor and read-only MCP tools) are judged, not refused as unknown [W2-M016, W2-I015].
 - **KPIs, failure:** an unknown tool is still refused by default (DEC-685); a tool on the list with a write effect is judged like Bash.
+- **Row W2-H055 (DEC-743 §6.2, 2026-10-17):** a `git clone` destination is judged as a write target for every role; a clone into another ticket's folder, the `~/gov-os-runs` root or the workbench is refused with the guard's reason. This ticket edits `decide.py` after W2-50.
