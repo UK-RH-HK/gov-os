@@ -1,7 +1,8 @@
 """Shared readers for the W2-49 acceptance tests (Contract v4.2, lite; DEC-722).
 
 The tests read public documents only: the CIT-P and CIT-E records under
-``docs/changes/`` and the two Contract files under ``docs/contract/``.  Every
+``docs/changes/``, the two Contract files under ``docs/contract/`` and the
+capability records under ``docs/contract/capabilities/`` (DEC-741 K).  Every
 path is found from this file's own location, so the suite reads the files of
 the tree it sits in (DEC-732), never the main tree or an installed package.
 
@@ -295,3 +296,55 @@ def together(text: str, *patterns: str) -> bool:
 
 def covers_ids(text: str) -> set[str]:
     return set(re.findall(r"CAP-\d+\.[a-z0-9]+(?![\w])", clean(text)))
+
+
+# --------------------------------------------------------------------------
+# Added for the owner's answers to the CIT-P (DEC-741)
+
+CAPABILITIES = "docs/contract/capabilities"
+
+# Question A (a1): the new ids that carry the Wave 3 rest of a split item.
+NEW_SPLIT_IDS = ("CAP-43.d", "CAP-44.k", "CAP-44.l")
+
+
+def frontmatter(text: str) -> tuple[dict, str]:
+    """A Markdown file's YAML frontmatter and the body after it."""
+    m = re.match(r"^---\n(.*?)\n---\n?(.*)$", text, re.DOTALL)
+    if not m:
+        return {}, text
+    return (yaml.safe_load(m.group(1)) or {}), m.group(2)
+
+
+def contract_status(source: str) -> str:
+    if source == "yaml":
+        return str(load_yaml_text(read_doc(CONTRACT_YAML)).get("status"))
+    return str(frontmatter(read_doc(CONTRACT_MD))[0].get("status"))
+
+
+def cap_wave_note(source: str, cap: str) -> str:
+    """A capability's wave note: ``wave_note`` in the YAML, the ``Wave:`` line in the Markdown."""
+    if source == "yaml":
+        for c in load_yaml_text(read_doc(CONTRACT_YAML)).get("capabilities", []):
+            if c["id"] == cap:
+                return _flatten(c.get("wave_note"))
+        return ""
+    inside = False
+    for line in read_doc(CONTRACT_MD).splitlines():
+        m = _MD_CAP.match(line)
+        if m:
+            inside = m.group(1) == cap
+            continue
+        if inside and _MD_WAVE.match(line):
+            return line
+    return ""
+
+
+def record_path(cap_id: str) -> Path:
+    return ROOT / CAPABILITIES / f"{cap_id}.md"
+
+
+def read_record(cap_id: str) -> tuple[dict, str]:
+    path = record_path(cap_id)
+    if not path.is_file():
+        pytest.fail(f"{CAPABILITIES}/{cap_id}.md does not exist")
+    return frontmatter(path.read_text(encoding="utf-8"))
