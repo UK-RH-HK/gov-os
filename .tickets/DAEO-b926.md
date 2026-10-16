@@ -47,3 +47,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-29), as approved (DEC-729). The list row
 ## Queued owner package Q-16 (recorded 2026-10-16)
 
 EXAMIN's real repository carries 9 uncommitted entries (6 modified, 3 untracked; the owner's copy, made from it, shows the same at head `a7cf346`). An adoption works from a commit, so before W2-29 starts the owner decides what happens to them: for example, commit them on EXAMIN's own branch first, stash or move them aside and restore them after the adoption, or leave them and let the adoption's A0 backup and the untracked-file rules (W2-23) carry them. The package is raised when W2-29 is next, with W2-26's list of the entries.
+
+**The 9 entries, by path (given by the owner, 2026-10-16).** The decision on them still comes at W2-29.
+- Modified (6): `.gitignore`, `CLAUDE.md`, `archive/plans/PLAN_C.md`, `archive/plans/PLAN_D.md`, `archive/plans/PLAN_V3.md`, `product/data/cpc_subclasses.txt`.
+- Untracked (3): `AGENTS.md`, `TRANSFER-2026-09-18.md`, `spec/audits/`.
+- Note for the package: `CLAUDE.md` (modified) and `AGENTS.md` (untracked) are files the adoption's generation must preserve (W2-H050, W2-23).
