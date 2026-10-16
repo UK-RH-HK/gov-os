@@ -52,6 +52,7 @@ list_rows:
 - W2-H001
 - W2-H012
 - W2-H046
+- W2-H054
 - W2-I012
 - W2-I031
 - W2-L006
@@ -99,3 +100,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-21), as approved (DEC-729). The list row
   - Launched sessions can run `gov check`, `gov rebuild` and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181].
   - The kernel template's settings carry one narrow allow rule, `Bash(gov launch:*)` [DEC-715].
 - **KPIs, failure:** a raw `claude` launch stays unallowed in the template.
+
+## Row added after the plan's approval (DEC-732, 2026-10-16)
+
+- **W2-H054 (high):** a ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree. Until this ticket lands, the rule is kept by hand: every lead and worker brief sets `PYTHONPATH` to the worktree's absolute `src` path per command, and each verification shows `gov.__file__` pointing into the worktree. The launcher is where the mechanism belongs; it sets the code path for test runs and gov commands, not for the guard's own hooks, which keep running the code the session started under.
