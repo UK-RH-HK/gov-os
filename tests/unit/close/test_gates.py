@@ -16,6 +16,7 @@ from gov.guard.containment import ContainmentError
 
 TICKET = "T-0001"
 TRAILERS = (f"Task: {TICKET}", "Role: engineer", "Implements: CAP-01")
+NO_HISTORY = {"after": None, "accepted": {}}  # no trailers base, no accepted history
 Judged = namedtuple("Judged", "commit paths reason")
 
 
@@ -79,9 +80,9 @@ def test_the_tickets_commits_are_those_whose_task_trailer_is_the_ticket(repo):
 
 def test_missing_trailers_are_findings():
     with pytest.raises(_Finding):
-        _check_trailers([], TICKET)
+        _check_trailers("/p", [], TICKET, NO_HISTORY)
     with pytest.raises(_Finding):
-        _check_trailers([{"sha": "a" * 40, "trailers": {"Task": [TICKET]}}], TICKET)
+        _check_trailers("/p", [{"sha": "a" * 40, "parents": [], "trailers": {"Task": [TICKET]}}], TICKET, NO_HISTORY)
 
 
 def test_each_commit_is_listed_with_its_role_and_the_model_of_its_line_as_read(repo):

@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import state as _state, tool as _tool
+from gov.close import history as _history, state as _state, tool as _tool
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -158,6 +158,14 @@ def run(root: Path, args, config: dict):
     if owner_decision:
         state = _state.lift_escalation(root, ticket, owner_decision, state, settings.get(REGISTER_KEY))
 
+    # What the trailer gate judges: the base, the accepted history, a move of the base (DEC-704, DEC-734)
+    try:
+        history = _history.judged_history(root, settings)
+    except ValueError as e:
+        raise GovError("TRAILERS_BASE_UNKNOWN", str(e), {"ticket": ticket, _history.BASE_KEY:
+                                                         str(settings.get(_history.BASE_KEY))})
+    report = history["report"]
+
     commits = _ticket_commits(root, ticket)
     others = _commits_since(root, commits)
     tickets = _tickets_of_head(root)  # a Task: that names none of them names no task (DEC-500)
@@ -176,7 +184,8 @@ def run(root: Path, args, config: dict):
 
     if profile == "FULL":
         gate(_check_probe, root, ticket, commits, others, inside, own, tickets)
-    gate(_check_trailers, commits, ticket)
+    gate(_check_trailers, root, commits, ticket, history)
+    gate(_check_accepted_history, history["refused"])
     gate(_check_unmeasured, ticket, others, own, tickets)
     gate(_check_containment, root, commits)
     # Acceptance tests, then the regression tests (A2): all of tests/ except
@@ -193,7 +202,7 @@ def run(root: Path, args, config: dict):
     packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
     if found:
-        _refuse_for(root, ticket, found, disposition, packet, test_runs)
+        _refuse_for(root, ticket, found, disposition, packet, test_runs, report)
     test_counts = {key: test_counts[key] + counts[key] for key in test_counts}
 
     mandatory = packet["mandatory"]
@@ -232,7 +241,7 @@ def run(root: Path, args, config: dict):
         _write_count(root, ticket, reset)
 
     return {"ticket": ticket, "close_record": close_record_path,
-            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share}
+            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report}
 
 
 def _time_limit(given, settings: dict):
@@ -263,10 +272,12 @@ def _workers(settings: dict):
 
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
-                packet: dict | None, test_runs: list[dict] | None = None) -> None:
+                packet: dict | None, test_runs: list[dict] | None = None, report: dict | None = None) -> None:
     """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
     order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
-    part under ``parts``. ``test_runs`` are the runs made, stated as a passed close states them (DEC-566)."""
+    part under ``parts``. ``test_runs`` are the runs made, stated as a passed close states them (DEC-566);
+    ``report`` is what the trailer gate judged by (the base, the accepted history), stated as a passed close
+    states it."""
     lines = list(dict.fromkeys(line for f in found for line in f.findings))
     not_measured = list(dict.fromkeys(part for f in found for part in f.not_measured))
     codes = sorted({f.code for f in found})
@@ -278,6 +289,7 @@ def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str
         details = {"parts": [{"code": f.code, "message": f.message, **f.details} for f in found]}
     details["disposition"] = disposition or "unclassed"
     details["test_runs"] = test_runs or []
+    details.update(report or {})
     if not_measured:
         details["not_measured"] = not_measured
     context_reason = None
@@ -466,21 +478,39 @@ def _commit_models(commits: list[dict]) -> list[dict]:
 # Verification helpers
 # ---------------------------------------------------------------------------
 
-def _check_trailers(commits: list[dict], ticket: str) -> None:
+def _check_trailers(root: Path, commits: list[dict], ticket: str, history: dict) -> None:
     """Every commit of the ticket is somebody's and implements something (DEC-487): each trailer a commit
-    lacks is a finding. Without a commit, what is judged of the ticket's commits was not measured."""
+    lacks is a finding. Without a commit, what is judged of the ticket's commits was not measured.
+
+    Judged are the commits after the project's trailers base (DEC-704) that no owner's decision accepted as
+    history (DEC-734); a merge with nothing of its own needs no ``Implements:`` (DEC-436's merge form)."""
     if not commits:
         raise _Finding("TRAILER_MISSING",
                        f"no commits found with Task: {ticket} trailer",
                        {"ticket": ticket},
                        not_measured=[f"the containment of the commits of {ticket}: not measured, it has no commit"])
-    lacking = [(c["sha"][:12], key) for c in commits for key in ("Implements", "Role")
-               if not c["trailers"].get(key)]
+    judged = [c for c in commits if (history["after"] is None or c["sha"] in history["after"])
+              and c["sha"] not in history["accepted"]]
+    if not judged:  # nothing judged is not a clean history (DEC-479)
+        raise _Finding("TRAILER_MISSING",
+                       f"no commit of {ticket} is after the trailers base and outside the accepted history: "
+                       "its trailers were not measured", {"ticket": ticket})
+    lacking = [(c["sha"][:12], key) for c in judged for key in ("Implements", "Role")
+               if not c["trailers"].get(key)
+               and not (key == "Implements" and len(c["parents"]) > 1 and _history.adds_nothing(root, c["sha"]))]
     if lacking:
         lines = [f"commit {sha} lacks {key}: trailer" for sha, key in lacking]
         raise _Finding("TRAILER_MISSING", "; ".join(lines),
                        {"commit": lacking[0][0], "commits": sorted({sha for sha, _ in lacking}), "ticket": ticket},
                        lines)
+
+
+def _check_accepted_history(refused: list[dict]) -> None:
+    """An entry of the accepted history without an ACCEPTED owner decision that names its commit refuses
+    (DEC-734); its commit stays judged."""
+    if refused:
+        lines = [entry["message"] for entry in refused]
+        raise _Finding(_history.REFUSED, "; ".join(lines), {"refused": refused}, lines)
 
 
 def _check_unmeasured(ticket: str, others: list[dict], own, tickets: frozenset[str]) -> None:
@@ -558,13 +588,27 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             raise invalid(f"commit {c['sha'][:12]} in the range of the ticket carries the "
                           f"reviewer's role ({REVIEWER_ROLE})", commit=c["sha"][:12])
 
-    records = 0
+    found = []
     for path in sorted(probe_dir.glob("*.md")):
         pf = frontmatter(path)
         if pf is None:
             raise invalid(f"probe file {path.name} has no readable YAML frontmatter",
                           file=path.name)
-        if pf.get("type") != "probe" or pf.get("task") != ticket:
+        if pf.get("type") == "probe" and pf.get("task") == ticket:
+            found.append((path, pf))
+    # W2-M209: a record whose probed commit (a full id) is an ancestor of another record's is of an earlier
+    # round; it neither passes nor refuses. The record of the final code decides.
+    probed_of = {path: _full_id(root, str(pf.get("probed_commit") or "")) for path, pf in found}
+    rounds = set(filter(None, probed_of.values()))
+
+    def earlier_round(path) -> bool:
+        mine = probed_of[path]
+        return bool(mine) and any(other != mine and not _git(root, "merge-base", "--is-ancestor", mine, other,
+                                                             ok=(0, 1), code=True) for other in rounds)
+
+    records = 0
+    for path, pf in found:
+        if earlier_round(path):
             continue
 
         # Committed, and by the orchestrator: every commit that wrote the record carries that role alone.
@@ -627,11 +671,11 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                               commit=sha)
             if c["sha"] in after:
                 paths = c["paths"]
-                if probed in c["parents"][1:]:
-                    # DEC-505: the merge of the probed commit itself is not "after" it where what it brings is
-                    # the probed code: only a path that is not at the merge what it is there is judged.
-                    differs = set(_git(root, "-c", "core.quotePath=false", "diff-tree", "-r", "-z", "--no-renames",
-                                       "--name-only", probed, c["sha"]).split("\0"))
+                if len(c["parents"]) > 1:
+                    # DEC-505, W2-H047: a merge after the probed commit (of it, of the integration branch into
+                    # the ticket's branch, or the merge back) is judged only on the paths that are not at the
+                    # merge what they are at the probed commit: one that brings the probed code changes none.
+                    differs = set(_history.differing(root, probed, c["sha"]))
                     paths = [p for p in paths if p in differs]
                 for p in paths:
                     if own(p):
@@ -643,6 +687,12 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
         raise _Finding("PROBE_MISSING",
                        f"FULL-profile ticket {ticket} has no valid probe record",
                        {"ticket": ticket})
+
+
+def _full_id(root: Path, given: str) -> str | None:
+    """``given`` where it is the full id of a commit; None otherwise."""
+    commit = _history.commit_of(root, given)
+    return commit if commit == given else None
 
 
 # ---------------------------------------------------------------------------
