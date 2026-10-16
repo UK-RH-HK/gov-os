@@ -41,11 +41,13 @@ kpis:
   - gov doctor and gov check are green.
   - 'One LITE ticket goes through the full cycle: test designer, red, implement, green, then gov close at exit 0 with EXAMIN''s own test command.'
   - Its governance share is measured and ≤ 15 %.
+  - At the first full gov rebuild after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler, against DEC-078's envelope; a figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735].
   failure: []
 profile: FULL
 sources:
 - DEC-727
 - DEC-728
+- DEC-735
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -67,3 +69,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-27), as approved (DEC-729). The list row
   - `gov doctor` and `gov check` are green.
   - One LITE ticket goes through the full cycle: test designer, red, implement, green, then `gov close` at exit 0 with EXAMIN's own test command.
   - Its governance share is measured and ≤ 15 %.
+  - At the first full `gov rebuild` after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler (`docs/research/EXP-003/examin/`), against DEC-078's envelope. A figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735]. W2-19 does not join them: EXAMIN's tests are pytest (W2-26).
