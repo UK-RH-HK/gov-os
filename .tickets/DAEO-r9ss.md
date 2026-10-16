@@ -35,6 +35,7 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-729
+- DEC-738
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -66,6 +67,7 @@ list_rows:
 - W2-M248
 - W2-M249
 - W2-M252
+- W2-M263
 - W2-M276
 - W2-M286
 - W2-M348
@@ -89,3 +91,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list row
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
 - **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+- **Row W2-M263 (DEC-738 item 4, 2026-10-17):** re-triaged from W2-01. RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.
