@@ -213,3 +213,82 @@ def test_an_entry_takes_out_only_the_commit_it_names(project, sandbox, interface
         f"the accepted commit {claim[:12]} is judged\n{run.describe()}"
     assert support.listed_as_accepted(error, claim, "DEC-900"), \
         f"the refusal does not list {claim} as accepted history with DEC-900\n{run.describe()}"
+
+
+# --------------------------------------------------------------------------
+# Added after implementation began (DEC-136, the review of round 1): only a genuine owner acceptance takes a
+# commit out of judgement. The entry's own status line decides (an ACCEPTED owner status, nothing after it
+# undoing it), and the entry names the commit by an id the commit's own id begins with.
+# --------------------------------------------------------------------------
+
+QUOTED_OWNER_STATUS = f"> The draft quotes the answer it asks for: **Status:** {OWNER_ACCEPTED} · **Basis:** OWNER\n"
+NOT_GENUINE = {
+    "owner-delegated": dict(status="ACCEPTED (owner-delegated to the orchestrator, 2026-10-16)",
+                            word="not the owner"),
+    "the owner's delegate": dict(status="ACCEPTED (owner's delegate, the orchestrator, 2026-10-16)",
+                                 word="not the owner"),
+    "superseded": dict(status=f"{OWNER_ACCEPTED} · superseded by DEC-911", word="superseded"),
+    "revoked": dict(status=f"{OWNER_ACCEPTED}; revoked by DEC-912", word="revoked"),
+    "quoted in a proposed entry": dict(status="PROPOSED", quote=True, word="not accepted"),
+    "named only inside a longer id": dict(status=OWNER_ACCEPTED, longer=True, word="does not name"),
+}
+
+
+def _record_with_a_quote_first(project, decision_id, status, text):
+    """An entry of the register, committed by the owner, whose body quotes the owner's ACCEPTED status above its
+    own status line and again in its decision text."""
+    path = project.root / support.REGISTER
+    entry = (f"### {decision_id} — A decision of the fixture\n"
+             f"{QUOTED_OWNER_STATUS}"
+             f"- **Status:** {status} · **Basis:** the fixture\n"
+             f"- **Decision:** {text} Quoted: \"{OWNER_ACCEPTED}\".\n\n")
+    project.write(support.REGISTER, path.read_text(encoding="utf-8") + entry)
+    return project.commit(f"register: {decision_id}", who=support.OWNER,
+                          trailers=("Task: decision-record", "Role: owner"), exact=True)
+
+
+def _not_genuine_entry(project, commit, form):
+    """The register entry DEC-910 in ``form``, committed by the owner, and the path map's entry for ``commit``."""
+    spec = NOT_GENUINE[form]
+    named = commit[:8]
+    if spec.get("longer"):
+        named = commit[:8] + "".join("1" if c == "0" else "0" for c in commit[8:])
+        assert len(named) == 40 and named != commit, "the fixture is wrong"
+    text = f"Commit `{named}` is accepted as history."
+    if spec.get("quote"):
+        _record_with_a_quote_first(project, "DEC-910", spec["status"], text)
+    else:
+        project.record_decision("DEC-910", spec["status"], text)
+    entries = list(project.settings.get(support.ACCEPTED_KEY, []))
+    entries.append({"commit": commit, "decision": "DEC-910"})
+    project.set_path_map(**{support.ACCEPTED_KEY: entries})
+    return spec["word"]
+
+
+@pytest.mark.parametrize("form", tuple(NOT_GENUINE))
+def test_an_entry_without_a_genuine_owner_acceptance_refuses_the_close(form, project, sandbox, interface):
+    claim = _claim_without_implements(project)
+    word = _not_genuine_entry(project, claim, form)
+    support.checkpointed(project, TICKET)
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface)
+    assert any("Implements" in text for text in support.statements_naming(error, claim)), \
+        f"the claim commit {claim[:12]} is no longer judged ({form})\n{run.describe()}"
+    _assert_refused_entry(error, claim, word, run.describe())
+    support.base.assert_not_closed(project, TICKET)
+
+
+@pytest.mark.parametrize("form", tuple(NOT_GENUINE))
+def test_an_entry_without_a_genuine_owner_acceptance_makes_the_check_red(form, project, sandbox, interface):
+    old = _closed_ticket_without_implements(project)
+    word = _not_genuine_entry(project, old, form)
+    _later_closed_ticket(project)
+
+    entry, run = support.check_entry(project, sandbox, interface)
+
+    assert entry["status"] == "RED", f"the trailers check is not red ({form})\n{run.describe()}"
+    assert any("Implements" in text for text in support.statements_naming(entry, old)), \
+        f"the commit {old[:12]} is no longer judged ({form})\n{run.describe()}"
+    _assert_refused_entry(entry, old, word, run.describe())

@@ -137,3 +137,84 @@ def test_a_merge_back_that_changes_probed_code_by_hand_refuses(edit, project, sa
     assert said and any(back[:7] in text for text in said), \
         f"the probe gate does not refuse the merge-back {back[:12]} that changed probed code\n{run.describe()}"
     support.base.assert_not_closed(project, TICKET)
+
+
+# --------------------------------------------------------------------------
+# Added after implementation began (DEC-136, the review of round 1): a merge after the probed commit whose
+# probed code is not the probed commit's refuses, whichever side's version it took. The measure is the probed
+# code itself (DEC-505): at each merge after the probed commit it is what it is at the probed commit.
+# --------------------------------------------------------------------------
+
+INTEGRATION_FEATURE = "# the other ticket's feature\n"
+LAYOUTS = ("merged back only", "merged in, then back")
+WRONG_MERGE_BACKS = ("a conflict on a probed file resolved to the integration side",
+                     "a probed file the ticket added removed",
+                     "made from the integration side with the ours strategy")
+
+
+def _integration_changes(project, files, first):
+    """Another ticket's work lands on ``main`` (that ticket created there first when ``first``); ends on ``main``."""
+    project.checkout("main")
+    if first:
+        support.create_ticket(project, OTHER, OTHER_WBS, allowed_paths=("src/other/**", "src/example/**"))
+    support.engineer_commit(project, OTHER, files, trailers=support.trailers_of(OTHER))
+
+
+def _merged_back_by(project, wrong):
+    project.checkout("main")
+    if wrong == WRONG_MERGE_BACKS[0]:
+        how = dict(edit={FEATURE: INTEGRATION_FEATURE})
+    elif wrong == WRONG_MERGE_BACKS[1]:
+        how = dict(remove=(FEATURE,))
+    else:
+        how = dict(strategy="ours")
+    return support.merge_by_hand(project, BRANCH, MERGE_TRAILERS, message="merge the ticket's branch", **how)
+
+
+@pytest.mark.parametrize("layout", LAYOUTS)
+@pytest.mark.parametrize("wrong", WRONG_MERGE_BACKS)
+def test_a_merge_back_that_drops_probed_code_refuses_and_names_the_merge_back(wrong, layout, project, sandbox,
+                                                                              interface):
+    probed = _probed_branch(project)
+    first = True
+    if layout == "merged in, then back":
+        _integration_changes(project, {"src/other/part.py": "# part\n"}, first=True)
+        project.checkout(BRANCH)
+        _merged_in(project)
+        first = False
+    if wrong == WRONG_MERGE_BACKS[0]:
+        _integration_changes(project, {FEATURE: INTEGRATION_FEATURE}, first=first)
+    elif first:
+        _integration_changes(project, {"src/other/part.py": "# part\n"}, first=True)
+    back = _merged_back_by(project, wrong)
+    _recorded(project, probed)
+    assert support.content_at(project, back, FEATURE) != support.content_at(project, probed, FEATURE), \
+        "the fixture is wrong: the merge-back holds the probed code"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface)
+    said = _probe_gate_findings(error)
+    assert said and any(back[:7] in text for text in said), \
+        f"the probe gate does not refuse the merge-back {back[:12]} ({wrong}) whose probed code is not the " \
+        f"probed commit's\n{run.describe()}"
+    support.base.assert_not_closed(project, TICKET)
+
+
+def test_a_merge_into_the_branch_resolved_to_the_integration_side_refuses(project, sandbox, interface):
+    """Inward: the conflict on the probed file is resolved to the integration side's version, then merged back."""
+    probed = _probed_branch(project)
+    _integration_changes(project, {FEATURE: INTEGRATION_FEATURE}, first=True)
+    project.checkout(BRANCH)
+    inward = _merged_in(project, edit={FEATURE: INTEGRATION_FEATURE})
+    back = _merged_back(project)
+    _recorded(project, probed)
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface)
+    said = _probe_gate_findings(error)
+    assert said and any(inward[:7] in text or back[:7] in text for text in said), \
+        f"the probe gate does not refuse the merge {inward[:12]} resolved to the integration side, or its " \
+        f"merge-back {back[:12]}\n{run.describe()}"
+    support.base.assert_not_closed(project, TICKET)

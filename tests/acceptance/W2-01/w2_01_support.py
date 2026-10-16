@@ -194,6 +194,33 @@ class Project(base.Project):
         return merge
 
 
+def merge_by_hand(project, head, trailers, edit=None, remove=(), strategy=None, who=ORCHESTRATOR, message="merge"):
+    """Like ``Project.merge``, and the merge may also remove ``remove`` (paths) or be made with git's merge
+    ``strategy`` (``"ours"``). Returns the merge commit. (Added after implementation began, DEC-136.)"""
+    text = message + "\n\n" + "\n".join(trailers) + "\n"
+    args = ["merge", "-q", "--no-ff", "--no-commit", "--no-gpg-sign"] + (["-s", strategy] if strategy else [])
+    done = git(project, *args, head, who=who, check=False)
+    for rel, content in (edit or {}).items():
+        project.write(rel, content)
+    for rel in remove:
+        git(project, "rm", "-q", "-f", "--", rel, who=who)
+    git(project, "add", "-A", who=who)
+    unmerged = git(project, "diff", "--name-only", "--diff-filter=U").strip()
+    assert not unmerged, f"the fixture left a conflict unresolved: {unmerged}\n{done}"
+    git(project, "commit", "-q", "--no-gpg-sign", "-m", text, who=who)
+    merge = head_of(project)
+    assert len(git(project, "rev-list", "--parents", "-n", "1", merge).split()) == 3, \
+        "the fixture is wrong: the merge is not a merge commit"
+    return merge
+
+
+def content_at(project, commit, rel):
+    """The text of ``rel`` at ``commit``, or ``None`` when the commit does not hold it."""
+    if git(project, "ls-tree", "--name-only", commit, "--", rel).strip() != rel:
+        return None
+    return git(project, "show", f"{commit}:{rel}")
+
+
 # --------------------------------------------------------------------------
 # A ticket's life
 # --------------------------------------------------------------------------

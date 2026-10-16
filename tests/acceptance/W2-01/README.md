@@ -65,6 +65,17 @@ accepted_history:                  # DEC-734
 - An entry is **accepted** when the register the path map names (`decision_register`) holds `### DEC-nnn — …`
   whose status line reads `ACCEPTED (owner, …)` and whose text names the entry's commit (its first eight
   characters suffice).
+- Made exact after implementation began (DEC-136; the review of round 1), so that only a genuine owner
+  acceptance takes a commit out of judgement:
+  - **The entry's own status line** is the line `- **Status:** …` of the entry. Text anywhere else in the entry
+    (a quote above or below it, the decision text) is never its status: a PROPOSED entry that quotes
+    `ACCEPTED (owner, …)` is not accepted.
+  - **The owner** is the word `owner` alone, first in the parentheses: `ACCEPTED (owner-delegated to …)` and
+    `ACCEPTED (owner's delegate, …)` are not the owner's acceptance.
+  - **Nothing after it undoes it**: a status line `ACCEPTED (owner, …)` that goes on to say the decision is
+    superseded or revoked (`… · superseded by DEC-nnn`, `…; revoked by DEC-nnn`) is not accepted.
+  - **Names the commit**: the text holds a hexadecimal id (at least eight characters) that the commit's full id
+    begins with. The commit's first characters inside a longer, different id do not name it.
 - An accepted commit is not judged by the trailer gate of `gov close` nor by the trailers check, and it is
   **listed**: under the key `accepted_history`, a list of `{"commit": <full id>, "decision": "DEC-nnn"}`, in
   `gov close`'s result (or in its error's details when the close refuses for something else), and in the JSON
@@ -78,6 +89,11 @@ accepted_history:                  # DEC-734
   | the decision is in the register, not ACCEPTED (e.g. PROPOSED) | `not accepted` |
   | accepted by delegation (`ACCEPTED (orchestrator, delegated …)`) | `not the owner` |
   | the owner's ACCEPTED decision names another commit | `does not name` |
+  | *added (DEC-136):* `ACCEPTED (owner-delegated to …)`, `ACCEPTED (owner's delegate, …)` | `not the owner` |
+  | *added:* the owner's ACCEPTED status only quoted in an entry whose own status line is PROPOSED | `not accepted` |
+  | *added:* `ACCEPTED (owner, …)` then superseded by another decision | `superseded` |
+  | *added:* `ACCEPTED (owner, …)` then revoked by another decision | `revoked` |
+  | *added:* the commit's first characters only inside a longer, different id | `does not name` |
 
   The refused entry's commit stays judged, and the close refuses (or the check is red).
 - Nothing else takes a commit out of judgement: an entry takes out only the commit it names.
@@ -95,10 +111,18 @@ accepted_history:                  # DEC-734
 
 ### The merge form (DEC-436)
 
-A merge commit carrying `Task: <ticket>` and `Role: …` and no `Implements:`, whose tree is the result of
-merging its parents with nothing of its own, passes the trailer gate. It is listed in the close record's
-`commits` like any other commit. A merge that adds its own change (a path whose content in the merge is that
-of neither parent) is judged like any commit and refuses without `Implements:`.
+Restated after implementation began (DEC-136; the review of round 1 found the earlier definition, "a path whose
+content in the merge is that of neither parent", too weak and too strict at once):
+
+- A merge commit carrying `Task: <ticket>` and `Role: …` and no `Implements:` **carries nothing of its own when
+  its tree is the tree that merging its parents gives** (git's own merge of the two parents, without a
+  conflict). Such a merge passes the trailer gate, and is listed in the close record's `commits` like any other
+  commit. Both sides changing different lines of one file, merged by git without a conflict, is such a merge.
+- Any other merge is judged like any commit and refuses without `Implements:`: one that adds or changes a path
+  (as before), one that removes a path the merge of its parents keeps, and one that keeps one side's whole
+  version of a file both sides changed (dropping the other side's change).
+- **A merge whose parents conflict** has no tree that merging its parents gives: its resolution is its own,
+  whichever side's version it took. It is judged like any commit and refuses without `Implements:`.
 
 ### The probe gate
 
@@ -108,6 +132,12 @@ of neither parent) is judged like any commit and refuses without `Implements:`.
 - After a merge of the integration branch into the ticket's branch and the merge-back, with the probed code
   unchanged, the gate passes. A merge that changes probed code (by hand resolution, inward or back) refuses,
   and the refusal names that merge.
+- Made exact after implementation began (DEC-136): the measure is the probed code itself (DEC-505). At each
+  merge after the probed commit, the probed code is what it is at the probed commit; a merge where it is not
+  refuses and is named, whichever parent's version it took: a conflict on a probed file resolved to the
+  integration side's version, a probed file the ticket added removed, a merge-back made from the integration
+  side with git's `ours` strategy (none of the ticket's code reaches the closed head). A commit that names
+  another ticket stays that ticket's (DEC-490).
 - **Rounds (KPI 5).** Of several probe records, the record of the final code decides (its probed commit is the
   latest, nothing of the probed code changed after it). An earlier round's record (its probed commit an
   ancestor of the later one) neither passes nor refuses, in whichever order the files' names sort. A failing
@@ -153,6 +183,7 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 |---|---|
 | `test_a_merge_of_the_integration_branch_in_the_merge_form_passes_the_trailer_gate[one merge]`, `[two merges]` | red: `TRAILER_MISSING`, "commit … lacks Implements: trailer" on each merge |
 | `test_the_merge_form_after_more_work_on_the_branch_still_passes` | red: same |
+| *added (DEC-136):* `test_a_conflict_free_merge_where_both_sides_changed_one_file_passes` | red at `4204b89d`: refused with `TRAILER_MISSING`, "commit … lacks Implements: trailer" on the merge (judged as a merge with a change of its own) |
 
 ### KPI 8 (failure) — a merge adding its own change outside the merged side refuses
 
@@ -161,6 +192,9 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 | `test_a_merge_in_the_merge_form_that_adds_its_own_change_still_refuses[a file added inside the ticket's paths]` | passes today (guard) |
 | `…[a file changed outside both sides]` (README.md) | passes today (guard) |
 | `…[a file of the integration side changed]` | passes today (guard) |
+| *added:* `test_a_merge_in_the_merge_form_that_removes_a_file_the_ticket_added_refuses` | red at `4204b89d`: the close succeeds ("gov close was not refused") |
+| *added:* `test_a_merge_in_the_merge_form_that_keeps_one_sides_whole_file_refuses` | red at `4204b89d`: the close succeeds |
+| *added:* `test_a_merge_in_the_merge_form_whose_parents_conflict_refuses` (resolved to the branch's version) | red at `4204b89d`: the close succeeds |
 
 ### KPI 3 — accepted history is listed with its DEC id and fails neither close nor check [AR-3, W2-M147, W2-L235]
 
@@ -177,6 +211,8 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 | `test_a_refused_entry_refuses_the_close_and_its_commit_stays_judged[no decision]`, `[not accepted]`, `[accepted by delegation]`, `[names another commit]` | red: the close refuses, but with no `ACCEPTED_HISTORY_REFUSED` finding |
 | `test_a_refused_entry_makes_the_check_red_and_its_commit_stays_judged[…the same four…]` | red: the check is red, but with no `ACCEPTED_HISTORY_REFUSED` finding |
 | `test_an_entry_takes_out_only_the_commit_it_names` | red: the accepted claim commit is judged too |
+| *added (DEC-136):* `test_an_entry_without_a_genuine_owner_acceptance_refuses_the_close[owner-delegated]`, `[the owner's delegate]`, `[superseded]`, `[revoked]`, `[quoted in a proposed entry]`, `[named only inside a longer id]` | red at `4204b89d`: the close succeeds; the entry is taken as accepted |
+| *added:* `test_an_entry_without_a_genuine_owner_acceptance_makes_the_check_red[…the same six…]` | red at `4204b89d`: `gov check` reports the trailers check GREEN |
 
 ### KPI 4 — probed, merged with integration and merged back passes the probe gate when the probed code is unchanged [W2-H047, W2-M202]
 
@@ -192,6 +228,8 @@ a clone with no base, are package P-1: not tested beyond "the output names the b
 |---|---|
 | `test_a_hand_resolved_merge_into_the_branch_that_changes_probed_code_refuses` | passes today (guard) |
 | `test_a_merge_back_that_changes_probed_code_by_hand_refuses[a probed file changed]`, `[a file added inside the ticket's paths]` | passes today (guard) |
+| *added (DEC-136):* `test_a_merge_back_that_drops_probed_code_refuses_and_names_the_merge_back[<how>-<layout>]`: how ∈ {`a conflict on a probed file resolved to the integration side`, `a probed file the ticket added removed`, `made from the integration side with the ours strategy`} × layout ∈ {`merged back only`, `merged in, then back`} (KPI 4's layout); the wrong merge is always the merge-back | red at `4204b89d` (all six): the close succeeds ("gov close was not refused") |
+| *added:* `test_a_merge_into_the_branch_resolved_to_the_integration_side_refuses` (inward, then merged back) | passes at `4204b89d` (guard for "inward") |
 
 ### KPI 5 — a reopened FULL ticket with an earlier-round record and a passing later one passes [W2-M209, W2-L111]
 
@@ -212,6 +250,40 @@ reversed and stands. No earlier ticket's test is reversed by these KPI lines; no
 46 tests: 33 red, 13 pass today (the guards listed above, and one ordering of KPI 5's failing-later case).
 By file: trailers base 11 red / 4 pass; merge form 3 / 3; accepted history 13 / 0; probe merge-back 2 / 4;
 probe rounds 4 / 2.
+
+## Added after implementation began (DEC-136)
+
+The independent review of round 1 (`dbdb4d4e`) found behaviours the tests missed. A fresh test designer added
+them, within the KPI lines, without reading `src/`; red run against the implementation at `4204b89d`.
+
+| Added | KPI line | Red at `4204b89d` |
+|---|---|---|
+| `test_a_merge_back_that_drops_probed_code_refuses_and_names_the_merge_back` (6 cases) | 9 (failure), 4's layout | 6 red: the close succeeds |
+| `test_a_merge_into_the_branch_resolved_to_the_integration_side_refuses` | 9 (failure) | passes (guard) |
+| `test_a_conflict_free_merge_where_both_sides_changed_one_file_passes` | 2 | red: `TRAILER_MISSING` on the merge |
+| `test_a_merge_in_the_merge_form_that_removes_a_file_the_ticket_added_refuses` | 8 (failure) | red: the close succeeds |
+| `test_a_merge_in_the_merge_form_that_keeps_one_sides_whole_file_refuses` | 8 (failure) | red: the close succeeds |
+| `test_a_merge_in_the_merge_form_whose_parents_conflict_refuses` | 8 (failure) | red: the close succeeds |
+| `test_an_entry_without_a_genuine_owner_acceptance_refuses_the_close` (6 cases) | 10 (failure) | 6 red: the close succeeds |
+| `test_an_entry_without_a_genuine_owner_acceptance_makes_the_check_red` (6 cases) | 10 (failure) | 6 red: the check is GREEN |
+
+23 tests added: 22 red, 1 guard. The suite now holds 69 tests; the 46 earlier ones all still pass at `4204b89d`.
+
+**Forms changed, each with its reason:**
+
+- *The merge form* (above): restated as "its tree is the tree that merging its parents gives", and a merge whose
+  parents conflict is judged like any commit. Reason: behaviours 2 and 3 of the review; the earlier wording
+  passed a merge that removed the ticket's file or dropped one side's change, and refused a conflict-free merge
+  where both sides changed one file.
+- *Accepted history* (above): the entry's own status line, the word `owner` alone, nothing after it undoing it,
+  naming by a prefix of the commit's id; four reason words added (`not the owner` and `not accepted` for new
+  forms, `superseded`, `revoked`). Reason: behaviour 4 of the review.
+- *The probe gate* (above): the measure is the probed code at each merge after the probed commit, whichever
+  parent's version a merge took. Reason: behaviour 1 of the review.
+
+**Existing tests changed:** none; no earlier assertion is reversed by the restated forms. `w2_01_support.py`
+gained two helpers on new lines (`merge_by_hand`: a merge that may also remove paths or use git's `ours`
+strategy; `content_at`: a file's text at a commit); no earlier line of it changed.
 
 ## Packages for the lead
 
