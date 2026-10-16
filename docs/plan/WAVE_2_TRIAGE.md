@@ -18,12 +18,12 @@ decisions: [DEC-105, DEC-136, DEC-718, DEC-722, DEC-725, DEC-726, DEC-728, DEC-7
 | Severity | Wave 2 | Wave 3 | backlog | Total |
 |---|---|---|---|---|
 | high | 48 | 6 | 0 | 54 |
-| medium | 309 | 32 | 15 | 356 |
+| medium | 309 | 33 | 15 | 357 |
 | low | 170 | 40 | 131 | 341 |
 | info | 11 | 7 | 23 | 41 |
-| **all** | **538** | **85** | **169** | **792** |
+| **all** | **538** | **86** | **169** | **793** |
 
-The counts include W2-H054, added by the owner after the plan's approval (DEC-732); the 791 rows named elsewhere are the rows at approval.
+The counts include the rows added after the plan's approval: W2-H054 (DEC-732) and W2-M357 (DEC-735). The 791 rows named elsewhere are the rows at approval.
 
 **Rows per Wave 2 ticket:** W2-01 14 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 26 · W2-08 6 · W2-09 5 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 36 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 1 · W2-50 1.
 
@@ -452,6 +452,7 @@ The counts include W2-H054, added by the owner after the plan's approval (DEC-73
 | W2-M354 | Repair ticket ade-ke2y in a-dev open and incomplete, turning checks red | medium | W2-07 | Named in W2-07's KPIs (close by ticket class, repair tickets, share). |
 | W2-M355 | Live clones under /tmp lost on reboot | medium | W2-50 | Named in W2-50's KPIs (durable scratch root). |
 | W2-M356 | Mechanise rules the compliance report shows as instruction-only | medium | W2-11 | Named in W2-11's KPIs (briefs and orchestration skill). |
+| W2-M357 | gov rebuild exits 0 with "ok": true when no index is built | medium | Wave 3 | Finish line (w2 prompt §13; DEC-735): breaks no Wave 2 exit criterion and is no fail-open in ordinary work (an adopted repository has its path map, so its indexes build); the owner accepted Wave 3. |
 | W2-L001 | Held-out path itself is visible to agents | low | Wave 3 | Held-out and oracle hardening; Wave 3, before qualification runs (CAP-49). |
 | W2-L002 | No LICENSE in vendored superpowers copy | low | W2-16 | Named in W2-16's KPIs (hash-pinned releases). |
 | W2-L003 | Decision-package choices sources do not fix | low | backlog | Low edge case; no Wave 2 exit criterion depends on it; taken up when its module is touched. |

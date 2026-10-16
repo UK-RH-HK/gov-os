@@ -178,7 +178,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 
 ## 3. The rest of the list, by severity
 
-791 open items: 53 high, 356 medium, 341 low, 41 info. One item was added after the Wave 2 plan's approval, W2-H054 (DEC-732), so 792 are open, 54 of them high. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
+791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732) and W2-M357 (DEC-735), so 793 are open, 54 of them high and 357 medium. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
 
 - **How the list was made:** helpers read every line of `bootstrap.md` and the register, and gave one row per item. The orchestrator added the exit report's residuals and the audit's findings, and merged rows with the same title (2 merged).
 - **What remains to check:** a row is carried as the source recorded it. Rows that name one problem from two places may remain; the source references join them. Before a ticket picks a row up, its state is re-checked against the code at that time, because a later commit may have fixed it unrecorded.
@@ -243,7 +243,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-H053 | Governance share not measured per programme (ORION); ARGUS's half is in AR-9 | research | A measured share of at most 15 % on each programme's run (ORION and ARGUS) in governance-share.json, from the counter after clean closes with every part measured; W1-42's share case green. | A F-M1 (DEC-086, DEC-713, DEC-714, DEC-718) |
 | W2-H054 | A ticket worktree's tests and gov commands import the editable install's main-tree `src/`, not the worktree's own code | engineer | A ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree; shown by the import path of `gov` in the worktree's verification. | W2-01 lead run 1, 2026-10-16 (DEC-732) |
 
-### 3.2 medium (356)
+### 3.2 medium (357)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -603,6 +603,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M354 | Repair ticket ade-ke2y in a-dev open and incomplete, turning checks red | orchestrator | ade-ke2y completed or removed, and a-dev claims and schema green | B:2781 (DEC-695) |
 | W2-M355 | Live clones under /tmp lost on reboot | orchestrator | Live clones are kept outside /tmp | B:2783 (DEC-698, DEC-699) |
 | W2-M356 | Mechanise rules the compliance report shows as instruction-only | orchestrator | A re-classified list exists in the exit package, and each item is either mechanised or has a ticket. | R:5115 (DEC-466) |
+| W2-M357 | `gov rebuild` exits 0 with `"ok": true` when no index is built (every store `not_recreated` on an unadopted repository) | engineer | `gov rebuild` exits non-zero, or warns by name, when an index it is expected to build is not built; callers no longer need to read `stores.*.status` to know. | W2-26 lead run 2, 2026-10-16 (DEC-735) |
 
 ### 3.3 low (341)
 

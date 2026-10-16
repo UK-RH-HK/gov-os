@@ -7827,3 +7827,25 @@ The first leads of Wave 2, W2-01 (DAEO-g0ip) and W2-26 (DAEO-2ds6), started in t
 | 0.225 | 2026-10-16 | Owner: DEC-731 (leads start workers with the Bash tool's background run, never a trailing `&`; P-W2-7 (a)), DEC-732 (a worktree's tests and gov commands run its own `src/`, shown in each verification; a full rebuild in the worktree before verification; W2-H054 into W2-21), DEC-733 (the lead commits the probe record under `docs/probes/<ticket id>/`), DEC-734 (accepted history as a path-map list of commit and DEC id, checked ACCEPTED by the owner). Next free id: DEC-735. |
 
 ---
+
+## 226. W2-26's packages after its research round, 2026-10-16 (register v0.226, by the W2 orchestrator on branch `w2/integrate`)
+
+W2-26's lead (run 2) returned its research round with two packages: P-1, where the indexing measure comes from, and P-2, `gov rebuild` reporting ok when no index is built. The orchestrator decided both under the delegation and the finish line, and the owner accepted both on 2026-10-16.
+
+### DEC-735 — EXAMIN's per-index time and peak RSS are measured in W2-27 after adoption; `gov rebuild`'s ok without an index is a Wave 3 row (W2-M357)
+- **Status:** ACCEPTED (orchestrator, delegated under MR-6 and the w2 prompt §7; the owner accepted it on 2026-10-16) · **Under:** DEC-078, DEC-723, DEC-727, DEC-728 · **Basis:**
+  - W2-26's record (`docs/research/EXP-003/examin/`, branch `w2/W2-26` at `62c4e477`) measured the clone of the owner's copy at `a7cf346`: 1,442 tracked files, 382,795 lines, 24.7 MB tracked, 392 commits.
+  - On an unadopted clone `gov rebuild` builds no index. The lexical index needs the path map; every index goes through the secrets filter, which needs `.gitleaks.toml`. EXAMIN tracks neither. Measuring there would mean writing adoption's files into the clone, which is a configuration adoption has not chosen, and a way round.
+  - DEC-078's own probe of the real repository found 24,665 nodes and 81,356 edges, about 30 % of the envelope. So the risk that W2-45 must join W2-27 (DEC-727) is low.
+  - That same rebuild exited 0 with `"ok": true` while every store was `not_recreated`.
+- **Decision:**
+  1. **P-1 (a):** the time, peak RSS and node and edge counts of each index on EXAMIN are measured in W2-27, at the first full `gov rebuild` after the copy's adoption, with W2-26's method and RSS sampler. W2-27's ticket (DAEO-h4rh) takes that KPI line in a commit of its own. If a figure exceeds DEC-078's envelope, W2-27 stops and W2-45 joins its dependencies (DEC-727).
+  2. W2-26's indexing KPI is a named gap that points to W2-27, not a new round (finish line). EXAMIN's tests are pytest, so **W2-19 does not join W2-27** (DEC-727).
+  3. **P-2:** `gov rebuild` exiting 0 with `"ok": true` when an expected index is not built becomes row **W2-M357** (medium), **triaged to Wave 3.** It breaks no Wave 2 exit criterion and is no fail-open in ordinary work, because an adopted repository has its path map and its indexes build. Until it is fixed, callers read `stores.*.status`, never the exit code alone.
+- **Next:** the W2-27 KPI line, in its own commit. Next free id: DEC-736.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.226 | 2026-10-16 | Orchestrator, delegated; accepted by the owner: DEC-735 (EXAMIN's per-index measures in W2-27 after adoption; W2-19 does not join W2-27; W2-M357 `gov rebuild` ok without an index, Wave 3). Next free id: DEC-736. |
+
+---
