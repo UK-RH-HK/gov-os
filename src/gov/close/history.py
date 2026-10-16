@@ -24,8 +24,10 @@ PATH_MAP_REL = "governance/project/path-map.yaml"
 COMMIT_ID = re.compile(r"[0-9a-fA-F]{4,64}")
 _ENTRY = re.compile(r"#{2,6} +([A-Z]+-\d+)\b")  # DEC-473's heading of a register entry
 _HEADING = re.compile(r"#{1,6} ")
-_STATUS = re.compile(r"\*\*Status:\*\*\s*(.*)")
-_OWNER_ACCEPTED = re.compile(r"ACCEPTED \(owner\b")
+_STATUS = re.compile(r"- \*\*Status:\*\*\s*(.*)")  # the entry's own status line, never a quote of one
+_OWNER_ACCEPTED = re.compile(r"ACCEPTED \(owner[,;)\s]")  # the word owner alone, not owner-delegated or owner's
+_UNDONE = re.compile(r"\b(superseded|revoked)\b", re.IGNORECASE)
+_NAMED_ID = re.compile(r"(?<![0-9a-fA-F])[0-9a-fA-F]{8,64}(?![0-9a-fA-F])")
 
 
 def commit_of(root: Path, given) -> str | None:
@@ -52,16 +54,16 @@ def trailers_base(root: Path, path_map: dict) -> tuple[str | None, set[str] | No
 
 
 def adds_nothing(root: Path, sha: str) -> bool:
-    """Whether ``sha`` is a merge with nothing of its own (DEC-436's merge form, W2-M165): every path is, in
-    the merge, what it is in one of its parents."""
+    """Whether ``sha`` is a merge with nothing of its own (DEC-436's merge form, W2-M165): its tree is the tree
+    git's own merge of its two parents gives without a conflict. A merge whose parents conflict, or of more
+    than two parents, has a resolution of its own."""
     parents = git(root, "rev-list", "--parents", "-n", "1", sha).split()[1:]
-    if len(parents) < 2:
+    if len(parents) != 2:
         return False
-    own = None
-    for parent in parents:
-        differs = set(differing(root, parent, sha))
-        own = differs if own is None else own & differs
-    return not own
+    # Exit code 1 is git's answer "the parents conflict", and the conflicted paths follow the tree; any other
+    # failure is an error.
+    merged = git(root, "merge-tree", "--write-tree", "--no-messages", "--name-only", *parents, ok=(0, 1)).split()
+    return len(merged) == 1 and merged[0] == git(root, "rev-parse", f"{sha}^{{tree}}").strip()
 
 
 def differing(root: Path, older: str, newer: str) -> list[str]:
@@ -70,7 +72,7 @@ def differing(root: Path, older: str, newer: str) -> list[str]:
                            "--name-only", older, newer).split("\0") if p]
 
 
-def _register(root: Path, rel) -> dict[str, list[str]] | str:
+def register_entries(root: Path, rel) -> dict[str, list[str]] | str:
     """The entries of the register the path map names, by id, each its text from its heading to the next; the
     reason as text where there is no register to read."""
     if not isinstance(rel, str) or not rel:
@@ -94,8 +96,9 @@ def _register(root: Path, rel) -> dict[str, list[str]] | str:
 
 
 def _refused_because(commit: str | None, decision, register) -> str | None:
-    """Why an entry is not accepted history (DEC-734), or None: its decision is one entry of the register,
-    ACCEPTED by the owner (not delegated), whose text names the commit by its first eight characters."""
+    """Why an entry is not accepted history (DEC-734), or None: its decision is one entry of the register whose
+    own status line is ACCEPTED by the owner (not delegated), not undone after it, and whose text names the
+    commit by an id of at least eight characters that the commit's id begins with."""
     if not commit:
         return "it names no commit of the project"
     if isinstance(register, str):
@@ -103,12 +106,15 @@ def _refused_because(commit: str | None, decision, register) -> str | None:
     texts = register.get(decision, []) if isinstance(decision, str) else []
     if len(texts) != 1:
         return f"the register holds {'no entry' if not texts else f'{len(texts)} entries'} {decision}"
-    status = next((m.group(1).strip() for m in map(_STATUS.search, texts[0].splitlines()) if m), "no status")
+    status = next((m.group(1).strip() for m in map(_STATUS.match, texts[0].splitlines()) if m), "no status")
     if not status.startswith("ACCEPTED"):
         return f"{decision} is not accepted (its status: {status})"
     if not _OWNER_ACCEPTED.match(status):
         return f"{decision} is accepted, but not by the owner: not the owner's decision (its status: {status})"
-    if commit[:8] not in texts[0].lower():
+    undone = _UNDONE.search(status)
+    if undone:
+        return f"{decision} was accepted by the owner, then {undone.group(1).lower()} (its status: {status})"
+    if not any(commit.startswith(named.lower()) for named in _NAMED_ID.findall(texts[0])):
         return f"{decision} does not name the commit {commit[:12]}"
     return None
 
@@ -117,7 +123,7 @@ def accepted_history(root: Path, path_map: dict) -> tuple[dict[str, str], list[d
     """``(accepted, refused)`` of the path map's accepted history (DEC-734): each accepted commit's full id with
     its decision, and a finding for each other entry, whose commit stays judged."""
     entries = path_map.get(ACCEPTED_KEY) or []
-    register = _register(root, path_map.get(REGISTER_KEY)) if entries else {}
+    register = register_entries(root, path_map.get(REGISTER_KEY)) if entries else {}
     accepted, refused = {}, []
     for entry in entries if isinstance(entries, list) else [entries]:
         given, decision = (entry.get("commit"), entry.get("decision")) if isinstance(entry, dict) else (entry, None)

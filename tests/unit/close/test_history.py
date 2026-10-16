@@ -3,6 +3,8 @@ nothing of its own (DEC-436's merge form) and a move of the base (W2-M266). Buil
 only (MR-3)."""
 from __future__ import annotations
 
+import subprocess
+
 import pytest
 
 from gov.close import history
@@ -35,6 +37,11 @@ def test_an_entry_the_owner_accepted_takes_its_commit_out_and_lists_it(repo):
     ("ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-16)", "commit `{c}`", "not the owner"),
     ("ACCEPTED (delegated, DEC-102; recorded by the orchestrator)", "commit `{c}`", "not the owner"),
     ("ACCEPTED (owner, 2026-10-16)", "commit `0000000a`", "does not name"),
+    ("ACCEPTED (owner-delegated to the orchestrator)", "commit `{c}`", "not the owner"),
+    ("ACCEPTED (owner's delegate, the orchestrator)", "commit `{c}`", "not the owner"),
+    ("ACCEPTED (owner, 2026-10-16) · superseded by DEC-911", "commit `{c}`", "superseded"),
+    ("ACCEPTED (owner, 2026-10-16); revoked by DEC-912", "commit `{c}`", "revoked"),
+    ("ACCEPTED (owner, 2026-10-16)", "commit `{c}ffff0000`", "does not name"),  # inside a longer id
 ])
 def test_any_other_entry_is_refused_and_says_why(repo, status, body, words):
     old = repo.commit("old work", "Task: T-0001")
@@ -43,6 +50,15 @@ def test_any_other_entry_is_refused_and_says_why(repo, status, body, words):
     assert accepted == {} and len(refused) == 1
     assert refused[0]["code"] == history.REFUSED and words in refused[0]["message"]
     assert old[:12] in refused[0]["message"] and "DEC-900" in refused[0]["message"]
+
+
+def test_only_the_entrys_own_status_line_is_its_status(repo):
+    old = repo.commit("old work", "Task: T-0001")
+    (repo.root / "docs").mkdir(exist_ok=True)
+    (repo.root / REGISTER).write_text(f"### DEC-900 — A decision\n> quoted: **Status:** ACCEPTED (owner, 2026-10-16)\n"
+                                      f"- **Status:** PROPOSED\n- **Decision:** commit `{old[:8]}`\n", encoding="utf-8")
+    accepted, refused = history.accepted_history(repo.root, _entries(repo, old))
+    assert accepted == {} and "not accepted" in refused[0]["message"]
 
 
 def test_an_entry_refuses_without_a_register_or_a_commit(repo):
@@ -78,6 +94,36 @@ def test_a_merge_with_nothing_of_its_own_adds_nothing(repo):
     repo.git("checkout", "-q", "main")
     repo.git("merge", "-q", "--no-ff", "--no-commit", "side2")
     repo.commit("merge with its own change", files={"a.txt": "changed in the merge\n"})
+    assert not history.adds_nothing(repo.root, repo.git("rev-parse", "HEAD").strip())
+
+
+def _two_sides_of_one_file(repo, side_line, main_line):
+    repo.commit("start", files={"f.txt": "a\nb\nc\nd\ne\n"})
+    repo.git("checkout", "-q", "-b", "side")
+    repo.commit("side", files={"f.txt": side_line})
+    repo.git("checkout", "-q", "main")
+    repo.commit("main", files={"f.txt": main_line})
+
+
+def test_a_conflict_free_merge_of_one_file_both_sides_changed_adds_nothing(repo):
+    _two_sides_of_one_file(repo, "A\nb\nc\nd\ne\n", "a\nb\nc\nd\nE\n")
+    repo.git("merge", "-q", "--no-ff", "--no-edit", "side")
+    assert history.adds_nothing(repo.root, repo.git("rev-parse", "HEAD").strip())
+
+
+def test_a_merge_keeping_one_sides_whole_file_or_resolving_a_conflict_has_its_own_change(repo):
+    _two_sides_of_one_file(repo, "A\nb\nc\nd\ne\n", "a\nb\nc\nd\nE\n")
+    repo.git("merge", "-q", "--no-ff", "--no-commit", "-s", "ours", "side")
+    repo.commit("merge keeping main's whole file")
+    assert not history.adds_nothing(repo.root, repo.git("rev-parse", "HEAD").strip())
+    repo.git("checkout", "-q", "-b", "conflict", "side")
+    repo.commit("side again", files={"f.txt": "Z\nb\nc\nd\ne\n"})
+    repo.git("checkout", "-q", "main")
+    repo.commit("main again", files={"f.txt": "Y\nb\nc\nd\nE\n"})
+    with pytest.raises(subprocess.CalledProcessError):  # the merge stops on the conflict
+        repo.git("merge", "-q", "--no-ff", "--no-commit", "conflict")
+    repo.git("checkout", "--ours", "--", "f.txt")
+    repo.commit("conflict resolved to main's side")
     assert not history.adds_nothing(repo.root, repo.git("rev-parse", "HEAD").strip())
 
 

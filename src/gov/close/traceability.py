@@ -120,7 +120,7 @@ def _record_ids(root: Path) -> set[str]:
 
 def main() -> int:
     from gov.cli.errors import GovError
-    from gov.close.history import adds_nothing, judged_history
+    from gov.close.history import REGISTER_KEY, adds_nothing, judged_history, register_entries
     from gov.config.loader import load_config
 
     root = Path.cwd()
@@ -133,7 +133,8 @@ def main() -> int:
 
     # The base, the accepted history (DEC-734) and a move of the base are read once, as gov close reads them
     try:
-        history = judged_history(root, load_config(root).get("path-map.yaml", {}))
+        path_map = load_config(root).get("path-map.yaml", {})
+        history = judged_history(root, path_map)
     except ValueError as exc:
         print(json.dumps({"findings": [{"code": "TRAILERS_BASE_UNKNOWN", "message": str(exc)}]}))
         return 1
@@ -148,6 +149,9 @@ def main() -> int:
     except RuntimeError as exc:
         print(json.dumps({"findings": [{"code": "STORE_ERROR", "message": str(exc)}]}))
         return 1
+    register = register_entries(root, path_map.get(REGISTER_KEY))  # W2-L175: a decision resolves without a store too
+    if isinstance(register, dict):
+        known_ids |= set(register)
 
     judged = 0
     for ticket in closed:

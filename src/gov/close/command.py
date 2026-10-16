@@ -672,11 +672,10 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             if c["sha"] in after:
                 paths = c["paths"]
                 if len(c["parents"]) > 1:
-                    # DEC-505, W2-H047: a merge after the probed commit (of it, of the integration branch into
-                    # the ticket's branch, or the merge back) is judged only on the paths that are not at the
-                    # merge what they are at the probed commit: one that brings the probed code changes none.
-                    differs = set(_history.differing(root, probed, c["sha"]))
-                    paths = [p for p in paths if p in differs]
+                    # DEC-505, W2-H047: at a merge after the probed commit (of it, of the integration branch into
+                    # the ticket's branch, or the merge back) the probed code is what it is at the probed commit,
+                    # whichever parent's version the merge took: the paths judged are those that are not.
+                    paths = _history.differing(root, probed, c["sha"])
                 for p in paths:
                     if own(p):
                         raise invalid(f"ticket commit {sha} changes {p} "
