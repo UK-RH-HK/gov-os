@@ -1,6 +1,6 @@
 ---
 id: CONTRACT-v4
-status: PROPOSED
+status: ACCEPTED
 version: "4.1"
 revised: 2026-10-03
 depends_on: [CHARTER-v5, ADR-0001, ADR-0002]
