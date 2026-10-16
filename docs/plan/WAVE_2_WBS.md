@@ -877,6 +877,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
 - **Q-13** pytest-testmon, if W2-48's comparison chooses it (an install under DEC-083).
 - **Q-14** The approval of Contract v4.2 (W2-49's CIT-P).
 - **Q-15** The approval of W2-50's CIT-P, the guard and sandbox change behind DEC-728 (CAP-33).
+- **Q-16** (added 2026-10-16, with O-1) EXAMIN's real repository carries 9 uncommitted entries (6 modified, 3 untracked; the owner's copy shows the same at head `a7cf346`, and a clone sees only that commit). What happens to them before W2-29 adopts the real repository? Raised when W2-29 is next, with W2-26's list of the entries (ticket W2-29).
 
 ## 8. Branching (DEC-720; nothing done yet)
 
