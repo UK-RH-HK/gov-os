@@ -2846,3 +2846,17 @@ Its repair ticket (DAEO-ldvk) was moved out of `.tickets/` to the orchestrator's
 - **One list (F-M8 of the W1-43 exit audit):** every Wave 2 item recorded in this file, in the register, in the exit report and in the exit audit now stands in `docs/plan/WAVE_2_LIST.md`. Each item has a severity, an owner and what closes it, and the adoption-readiness block AR-1 to AR-10 comes first.
 - **The Wave 2 sections above** (DEC-709, DEC-712, DEC-714, DEC-715, DEC-716) and every ticket's residuals stay as history. Each is cited from the list by its line (`B:<line>`).
 - **New Wave 2 items go into the list, not into this file.**
+
+## DAEO-03pw (W1-43) closed with the ticket tool: Wave 1 closed (2026-10-16; DEC-718)
+
+- **The audit:** the W1-43 exit audit report and its context pack, `82459573`, were committed by the owner in a plain terminal with the hooks uninstalled (F-M13). The verdict was FAIL as the record stood, with no BLOCKER: 13 MAJOR findings (F-M1 to F-M13) and 10 MINOR (F-m1 to F-m10).
+- **The exit decision:** DEC-718 (`6d62744a`, `Role: owner`) takes the auditor's option (a).
+  - Wave 1 passes with accepted exceptions. Every finding and every exception of DEC-714 is named, with what closes it and its Wave 2 owner.
+  - The consolidated Wave 2 list is `docs/plan/WAVE_2_LIST.md`. It opens with the adoption-readiness block AR-1 to AR-10.
+  - The Charter v5, the Contract v4 and the Wave 1 WBS took status ACCEPTED in `a77f8704` (`Role: owner`, frontmatter only).
+- **The close:** `d2faf82c` closed the ticket with `tk close`, with a note citing DEC-718. No `gov close` was run, because `tests/acceptance/W1-43/` does not exist (F-M10). Its tests, the audit→repair loop, are on the Wave 2 list. All 50 Wave 1 tickets are closed.
+- **Standing rules (the owner, 2026-10-16):**
+  - No commit on `w1/integrate`, merges included, is ever amended or rewritten (DEC-412, DEC-718).
+  - **DEC-709 is suspended.** While the hooks are off, `gov rebuild --no-embeddings` is not run before a commit, because it empties the semantic index. When a rebuild is needed, it is a full `gov rebuild`. The commit-time re-index in the adoption-readiness block replaces DEC-709 for good.
+  - Every subagent brief requires the twelve return fields first, as labelled lines, with any payload after them, and tells the helper to stop if its return is refused twice (AR-6).
+- **The hooks** stay uninstalled until AR-3 passes. Adoption records, like evidence snapshots, keep their pinned hashes and are not edited.
