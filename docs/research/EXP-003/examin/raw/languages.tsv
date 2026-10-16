@@ -1,0 +1,18 @@
+# Tracked files and lines by file extension at a7cf346, from the numstat above (lower-cased extension of the file name; "(none)" = no extension)
+# extension	files	lines	binary_files
+.py	542	209570	0
+.md	848	154605	2
+.json	16	10945	0
+.sql	1	2726	0
+.html	3	2360	0
+.txt	5	1130	0
+.jsonl	15	712	0
+(none)	4	243	0
+.css	1	174	0
+.js	1	131	0
+.bat	1	108	0
+.toml	1	71	0
+.example	1	20	0
+.jpeg	1	0	1
+.png	1	0	1
+.pptx	1	0	1

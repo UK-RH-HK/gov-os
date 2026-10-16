@@ -1,0 +1,31 @@
+# Size of the committed tree at a7cf346 (R=/tmp/gov-os-W2-26/examin; the same lines were run with R="/tmp/gov-os-W2-26/EXAMIN APP", quoted, with identical output)
+
+$ git -C $R ls-files | wc -l
+1442
+
+$ git -C $R rev-list --count HEAD
+392
+
+$ git -C $R ls-files -z | (cd $R && xargs -0 stat -c %s) | awk '{s+=$1} END{print s}'      (working-tree bytes of the tracked files)
+24667921
+
+$ git -C $R ls-tree -r -l HEAD | awk '$4!="-"{s+=$4} END{print s}'                          (blob bytes at HEAD)
+24667813
+
+$ git -C $R ls-tree -r HEAD | awk '$2=="commit"' | wc -l        (submodules)
+0
+$ git -C $R ls-tree -r HEAD | awk '$1=="120000"' | wc -l        (symbolic links)
+0
+$ ... git check-attr filter ... | grep -c ': filter: lfs'           (LFS-filtered files)
+0
+
+# Lines. git's own binary detection: a numstat diff of HEAD against the empty tree gives "-" for a binary file.
+$ git -C $R diff --numstat 4b825dc642cb6eb9a060e54bf8d69288fbee4904 HEAD > numstat.tsv
+$ awk -F'\t' '$1=="-"{b++} $1!="-"{t++; l+=$1} END{print "text files:",t," binary files:",b," lines in text files:",l}' numstat.tsv
+text files: 1437  binary files: 5  lines in text files: 382795
+
+$ git -C $R ls-files -z | (cd $R && xargs -0 cat) | wc -l       (for comparison: newlines in every tracked file, binaries included)
+384108
+
+$ cmp numstat.tsv numstat_space.tsv          (the spaced clone's numstat against the first clone's)
+numstat identical
