@@ -1,6 +1,6 @@
 ---
 id: DAEO-03pw
-status: in_progress
+status: closed
 deps: [DAEO-gjjf]
 links: []
 created: 2026-09-30T22:49:59Z
@@ -45,3 +45,9 @@ acceptance_tests:
 # W1-43 Wave 1 exit audit
 
 Independent wave-exit audit against Contract v4 (DEC-070).
+
+## Notes
+
+**2026-10-16T14:45:42Z**
+
+Closed with tk close by the owner's exit decision of 2026-10-16 (DEC-718, committed by the owner as 6d62744a, Role: owner). The exit audit report and its context pack are 82459573: verdict FAIL as the record stood, no BLOCKER, F-M1 to F-M13 and F-m1 to F-m10. DEC-718 accepts every finding as a named exception (the auditor's option a), so Wave 1 passes with accepted exceptions. No gov close was run: tests/acceptance/W1-43/ does not exist (F-M10), and its tests (the W1-43 part of CAP-59.a and CAP-59.b, the audit-to-repair loop) are on the Wave 2 list, docs/plan/WAVE_2_LIST.md. The loop did not run: the owner's decision replaced it.
