@@ -7765,3 +7765,65 @@ The orchestrator reported revision 2 of `docs/plan/WAVE_2_WBS.md` with one open 
 | 0.223 | 2026-10-16 | Owner: DEC-728 (`~/gov-os-runs/` one durable scratch root, a session writing only in its own ticket's folder, never indexed here; W2-50 in layer 2 through CIT-P; W2-26 on `/tmp` until then), DEC-729 (the Wave 2 plan approved; P-W2-6 (a), W2-00 created first). Next free id: DEC-730. |
 
 ---
+
+## 224. The owner's answer on the letter-suffixed ticket ids, 2026-10-16 (register v0.224, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+When it created the Wave 2 tickets (`4190c39e`), the orchestrator asked the owner how W2-15a and W2-15b should carry their `wbs_id`. The owner answered (b).
+
+### DEC-730 — The kernel's `wbs_id` grammar takes a letter suffix (W2-15a, W2-15b); W2-02 widens it within its own paths
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-725, DEC-729, DEC-724 · **Basis:**
+  - DEC-725 splits EXP-003 into W2-15a and W2-15b. The kernel's grammar for `wbs_id`, `^W[0-9]+-[0-9]{2,}$` in `template/governance/kernel/schemas/common.schema.json` (its only definition in `src/`, `schemas/`, `template/governance/kernel/schemas/` and `docs/plan/tools/`), refuses the suffix.
+  - So DAEO-rd0g (W2-15a) and DAEO-swdu (W2-15b) carry their W2 number in `external-ref` only, and `gov close` falls back to it.
+  - The options put to the owner: (a) keep them on `external-ref` only; (b) widen the grammar to a single lower-case letter suffix; (c) renumber them.
+- **Decision (b):**
+  1. **W2-02 widens the kernel's `wbs_id` grammar to allow one lower-case letter after the number** (for example `^W[0-9]+-[0-9]{2,}[a-z]?$`), within its own allowed paths (`template/governance/kernel/schemas/**`). It is a schema change, so it rides with W2-02's record types; no other ticket's paths change.
+  2. **W2-02's ticket takes one more success KPI line,** made by the orchestrator in a commit of its own with `Task: DAEO-zflj` after this entry is committed and before W2-02 starts: "The `wbs_id` grammar accepts an id with one lower-case letter suffix (`W2-15a`) and still refuses any other form (`W2-15`, `W2-15ab`, `W2-15A`, `W2-1`) [DEC-730]."
+  3. **After W2-02 closes,** the orchestrator adds `wbs_id: W2-15a` and `wbs_id: W2-15b` to DAEO-rd0g and DAEO-swdu, each in a commit of its own with that ticket's `Task:`.
+  4. Nothing else changes: the numbering, the dependencies and the critical path stay as approved (DEC-729).
+- **Next:** the owner commits this entry with `Role: owner` in the next batch (DEC-724). Next free id: DEC-731.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.224 | 2026-10-16 | Owner: DEC-730 (the kernel's `wbs_id` grammar takes one lower-case letter suffix; W2-02 widens it within its own paths and takes one more KPI line; W2-15a and W2-15b get their `wbs_id` after W2-02 closes). Next free id: DEC-731. |
+
+---
+
+## 225. The owner's answers after layer 1's first launch, 2026-10-16 (register v0.225, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+The first leads of Wave 2, W2-01 (DAEO-g0ip) and W2-26 (DAEO-2ds6), started in the owner's launch form (DEC-715) with no denial. Both returned LAUNCH_BLOCKED at their first worker launch. W2-01's lead also found that a worktree's tests import the main tree's code, and it raised two points of method. The orchestrator put package P-W2-7 and these findings to the owner, who answered all five.
+
+### DEC-731 — Leads start workers with the Bash tool's own background run, never a trailing `&` (P-W2-7 (a))
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-715, DEC-716, DEC-371 · **Basis:** Both leads' worker launches in the form of `w2-orchestrator.md` §4 and brief A5 were refused by the headless session's permission check, with the text "This command uses the `&` background operator, which defers execution past approval-time safety checks. Approve only if you trust it." A headless lead cannot approve it. Options put: (a) the same form without the trailing `&`, started by the Bash tool's background run; (b) workers through `gov launch` (DEC-371, sandboxed; W2-26's clone then in the session's temp folder); (c) the owner starts each worker through the operator.
+- **Decision (a):**
+  1. **Until W2-21 closes, a lead starts each worker with the Bash tool's own background run** (`run_in_background`), with the launch form of `w2-orchestrator.md` §4 otherwise unchanged: an absolute `cd` path, `~/.local/bin/claude` first, the model, the identity in `--settings` only, literal paths. **The command never ends with `&`.**
+  2. Every lead brief, the resume briefs included, carries the corrected form.
+  3. **A launch still denied is a LAUNCH_BLOCKED stop to the owner** with the exact denial text; no other form is tried.
+  4. The orchestrator's own launches of leads keep the DEC-715 form, which this session runs without a denial.
+  5. Where `w2-orchestrator.md` §4 and brief A5 show the trailing `&` for workers, this entry holds until the owner brings the prompt's text in line (only the owner changes it).
+
+### DEC-732 — In a ticket worktree, tests and gov commands run that worktree's own `src/` (owner ruling; W2-H054)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-236, DEC-719, DEC-722 · **Basis:** `gov` is an editable install of the main tree's `src/`. W2-01's lead found that `env -u PYTHONPATH python3 -c 'import gov'` in a worktree loads the main tree's code, so a suite run in the prescribed form tests the main tree, not the ticket's change, unless the suite sets `PYTHONPATH` itself. The orchestrator checked that `PYTHONPATH=<worktree>/src` takes precedence over the editable install (`gov.__file__` then points into the worktree).
+- **Decision:**
+  1. **In a ticket worktree, every test run and every `gov` command used for verification runs that worktree's own `src/`:** `PYTHONPATH` is set, per command, to the worktree's absolute `src` path.
+  2. **Each lead's verification shows it,** for example with `python3 -c "import gov; print(gov.__file__)"` under the same `PYTHONPATH`, pointing into the worktree; the output goes in the lead's return.
+  3. **The rule is in every lead brief and every worker brief.** It is set per command, not in a session's environment, so the guard's own hooks keep running the code the session started under.
+  4. **One full `gov rebuild` in the worktree before its verification**, under the same `PYTHONPATH`, with no worker running there (DEC-719: never `--no-embeddings`).
+  5. **A Wave 2 row, W2-H054 (high), triaged into W2-21:** "a ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree". Added to `docs/plan/WAVE_2_LIST.md` §3.1 and `docs/plan/WAVE_2_TRIAGE.md` with this entry. It goes into W2-21's `list_rows` in a commit of its own (`Task: DAEO-1ahb`) once this entry is committed.
+
+### DEC-733 — The lead commits the probe record under `docs/probes/<ticket id>/`
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-137, DEC-498, DEC-236 · **Basis:** `gov close`'s probe gate reads `docs/probes/<ticket id>/*.md`, committed with `Role: orchestrator`; the orchestrator's lead brief said the lead writes nothing under `docs/`.
+- **Decision:** a FULL ticket's lead commits the reviewer's probe record under `docs/probes/<ticket id>/`, with `Task: <ticket id>`, `Implements:` and `Role: orchestrator`. It is the one path under `docs/` a lead writes; every other file under `docs/`, `src/`, `template/` and `tests/` stays a worker's.
+
+### DEC-734 — The form of an accepted-history entry (W2-01)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-704, DEC-718, DEC-724, AR-3 · **Basis:** W2-01's KPI "history commits that an ACCEPTED owner decision names are accepted history" does not fix where the commits are tied to the decision. W2-01's lead proposed a form (confidence medium).
+- **Decision:**
+  1. **Accepted history is a list in the project's path map;** each entry names one commit and one DEC id.
+  2. **Each entry is checked against the decision register:** the decision is ACCEPTED by the owner (not delegated) and names that commit. Any other entry is refused, and the output says why.
+  3. **The test designer may settle the details in its README** (the key names, the output's wording). If the form is contested, it comes to the owner as a package.
+- **Next:** the owner commits DEC-731 to DEC-734 with `Role: owner` in the next batch, with DEC-730 and the rows of DEC-732 (DEC-724). Next free id: DEC-735.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.225 | 2026-10-16 | Owner: DEC-731 (leads start workers with the Bash tool's background run, never a trailing `&`; P-W2-7 (a)), DEC-732 (a worktree's tests and gov commands run its own `src/`, shown in each verification; a full rebuild in the worktree before verification; W2-H054 into W2-21), DEC-733 (the lead commits the probe record under `docs/probes/<ticket id>/`), DEC-734 (accepted history as a path-map list of commit and DEC id, checked ACCEPTED by the owner). Next free id: DEC-735. |
+
+---

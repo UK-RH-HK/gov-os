@@ -178,13 +178,13 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 
 ## 3. The rest of the list, by severity
 
-791 open items: 53 high, 356 medium, 341 low, 41 info. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
+791 open items: 53 high, 356 medium, 341 low, 41 info. One item was added after the Wave 2 plan's approval, W2-H054 (DEC-732), so 792 are open, 54 of them high. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
 
 - **How the list was made:** helpers read every line of `bootstrap.md` and the register, and gave one row per item. The orchestrator added the exit report's residuals and the audit's findings, and merged rows with the same title (2 merged).
 - **What remains to check:** a row is carried as the source recorded it. Rows that name one problem from two places may remain; the source references join them. Before a ticket picks a row up, its state is re-checked against the code at that time, because a later commit may have fixed it unrecorded.
 - **Where to read more:** the full text of each item is at its source line. Item ids are stable once committed; new items take the next free id of their severity.
 
-### 3.1 high (53)
+### 3.1 high (54)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -241,6 +241,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-H051 | Delivered tasks.md template is refused by the bridge | product-spec | Template produces a task block the bridge accepts | B:847 (DEC-355, DEC-350) |
 | W2-H052 | Harness hook time limit not measured; a hook past its limit lets the call through | research | The harness behaviour at the hook limit is measured and the guard's deadline sits below it | B:2417 (DEC-110, DEC-179, DEC-580) |
 | W2-H053 | Governance share not measured per programme (ORION); ARGUS's half is in AR-9 | research | A measured share of at most 15 % on each programme's run (ORION and ARGUS) in governance-share.json, from the counter after clean closes with every part measured; W1-42's share case green. | A F-M1 (DEC-086, DEC-713, DEC-714, DEC-718) |
+| W2-H054 | A ticket worktree's tests and gov commands import the editable install's main-tree `src/`, not the worktree's own code | engineer | A ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree; shown by the import path of `gov` in the worktree's verification. | W2-01 lead run 1, 2026-10-16 (DEC-732) |
 
 ### 3.2 medium (356)
 

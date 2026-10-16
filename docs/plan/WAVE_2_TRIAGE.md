@@ -17,13 +17,15 @@ decisions: [DEC-105, DEC-136, DEC-718, DEC-722, DEC-725, DEC-726, DEC-728, DEC-7
 
 | Severity | Wave 2 | Wave 3 | backlog | Total |
 |---|---|---|---|---|
-| high | 47 | 6 | 0 | 53 |
+| high | 48 | 6 | 0 | 54 |
 | medium | 309 | 32 | 15 | 356 |
 | low | 170 | 40 | 131 | 341 |
 | info | 11 | 7 | 23 | 41 |
-| **all** | **537** | **85** | **169** | **791** |
+| **all** | **538** | **85** | **169** | **792** |
 
-**Rows per Wave 2 ticket:** W2-01 14 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 26 · W2-08 6 · W2-09 5 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 35 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 1 · W2-50 1.
+The counts include W2-H054, added by the owner after the plan's approval (DEC-732); the 791 rows named elsewhere are the rows at approval.
+
+**Rows per Wave 2 ticket:** W2-01 14 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 26 · W2-08 6 · W2-09 5 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 36 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 1 · W2-50 1.
 
 **Wave 3 groups.** Held-out and oracle hardening (before qualification, CAP-49); risks resting on the unsandboxed orchestrator session or the install rule's spellings (Wave 3, or a non-goal under CAP-25.c); pause and freeze hardening; `gov status` accuracy; rows whose own source says Wave 3. **Backlog groups.** Test-quality debt (taken up when a ticket touches the suite, DEC-136); low edge cases no exit criterion depends on; observations; by-design items.
 
@@ -93,6 +95,7 @@ decisions: [DEC-105, DEC-136, DEC-718, DEC-722, DEC-725, DEC-726, DEC-728, DEC-7
 | W2-H051 | Delivered tasks.md template is refused by the bridge | high | W2-34 | Named in W2-34's KPIs (gov readiness --generate). |
 | W2-H052 | Harness hook time limit not measured; a hook past its limit lets the call through | high | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
 | W2-H053 | Governance share not measured per programme (ORION); ARGUS's half is in AR-9 | high | W2-14 | Named in W2-14's KPIs (ARGUS cycle and share). |
+| W2-H054 | A ticket worktree's tests and gov commands import the editable install's main-tree src/, not the worktree's own code | high | W2-21 | Added by the owner (DEC-732): the launcher builds every lead and worker session in a worktree; until it lands, the rule is kept by hand in every brief. |
 | W2-M001 | No test against real Ollama; embedding model registry row missing | medium | W2-32 | Named in W2-32's KPIs (retrieval components and bounded improvements). |
 | W2-M002 | Canary near spellings missed; canary count unconfirmed | medium | W2-43 | Fits W2-43's paths and KPIs (CI and secret floor); its builder takes it. |
 | W2-M003 | gitleaks on CI is an owner install | medium | W2-43 | Named in W2-43's KPIs (CI and secret floor). |
