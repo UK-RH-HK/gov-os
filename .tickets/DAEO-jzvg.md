@@ -30,6 +30,9 @@ kpis:
   - A Rust fixture and a TypeScript fixture each close a ticket with their own command [AR-10].
   - A run that collects or passes nothing counts as unmeasured or failed, never passed [W2-H026, W2-M162].
   - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
+  - A ratchet baseline of known reds. Each red test at adoption is listed by its exact id, with an owner, a cause class and how it shrinks. A new red refuses the close. A listed test that turns green leaves
+    the list, and the output says so. The list never grows without the project owner's decision [DEC-736].
+  - A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed [DEC-736, W2-H026].
   failure:
   - An undeclared language in a project with no test command is a named refusal, not a silent pytest run.
 profile: FULL
@@ -38,7 +41,8 @@ sources:
 - DEC-567
 - DEC-083
 - DEC-727
-est_loc: 240
+- DEC-736
+est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-19/
   author: independent-test-designer (MR-3); written before implementation
@@ -77,5 +81,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-19), as approved (DEC-729). The list row
   - A Rust fixture and a TypeScript fixture each close a ticket with their own command [AR-10].
   - A run that collects or passes nothing counts as unmeasured or failed, never passed [W2-H026, W2-M162].
   - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
+  - A ratchet baseline of known reds. Each red test at adoption is listed by its exact id, with an owner, a cause class (for example environment, uncommitted entries, defect) and how it shrinks. A new red refuses the close. A listed test that turns green leaves the list, and the output says so. The list never grows without the project owner's decision [DEC-736].
+  - A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed [DEC-736, W2-H026].
 - **KPIs, failure:** an undeclared language in a project with no test command is a named refusal, not a silent pytest run.
-- **On EXAMIN's path only if** W2-26 shows its tests are not pytest (DEC-727).
+- **On EXAMIN's path (DEC-736, correcting DEC-735 item 2):** `gov close` runs its regression only over `tests/`, and EXAMIN's suites are in `product/tests` and `governance/scripts/tests`. W2-27's close with EXAMIN's own test command therefore needs this ticket's declared test commands. The estimate is 300 lines with the ratchet baseline (DEC-736).
