@@ -23,10 +23,13 @@ kpis:
   success:
   - 'A fresh auditor gives the copy''s verdict against the lite conditions of Contract v4.2''s CAP-44.h: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY. Anything short of ADOPTED_HEALTHY
     goes to the owner before W2-29.'
+  - The verdict checks that nothing of the owner's was lost from EXAMIN's own CLAUDE.md, AGENTS.md and .claude/commands/, each migrated into EXAMIN's rulesync sources or kept in place, never silently overwritten
+    [DEC-736].
   failure: []
 profile: FULL
 sources:
 - CAP-44.h
+- DEC-736
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its report and the audit validator'
@@ -40,3 +43,4 @@ list_rows: []
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-28), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
 - A fresh auditor gives the copy's verdict against the lite conditions of Contract v4.2's CAP-44.h: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY. Anything short of ADOPTED_HEALTHY goes to the owner before W2-29.
+- The verdict checks that nothing of the owner's was lost from EXAMIN's own `CLAUDE.md`, `AGENTS.md` and `.claude/commands/`. Each is migrated into EXAMIN's rulesync sources or kept in place, never silently overwritten [DEC-736].
