@@ -28,12 +28,14 @@ kpis:
     an adoption verdict: the three CAP-44.h verdicts and the conditions behind them, in the lite form Contract v4.2 states; the close record type that gov close writes'
   - Core-schema reads docs/audit/wave-1/W1-43-wave-1-exit-audit.md and the exit report as valid, and is green on this repository [F-M13, W2-M301, W2-M309, W2-M310, W2-L243].
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
+  - The wbs_id grammar accepts an id with one lower-case letter suffix (W2-15a) and still refuses any other form (W2-15, W2-15ab, W2-15A, W2-1) [DEC-730].
   failure:
   - An audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still SCHEMA_INVALID_TYPE.
 profile: STANDARD
 sources:
 - DEC-441
 - CAP-44.h
+- DEC-730
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-02/
@@ -81,4 +83,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-02), as approved (DEC-729). The list row
     - the `close` record type that `gov close` writes.
   - core-schema reads `docs/audit/wave-1/W1-43-wave-1-exit-audit.md` and the exit report as valid, and is green on this repository [F-M13, W2-M301, W2-M309, W2-M310, W2-L243].
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
+  - The `wbs_id` grammar accepts an id with one lower-case letter suffix (`W2-15a`) and still refuses any other form (`W2-15`, `W2-15ab`, `W2-15A`, `W2-1`) [DEC-730]. The grammar's one definition is `template/governance/kernel/schemas/common.schema.json`.
 - **KPIs, failure:** an audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still `SCHEMA_INVALID_TYPE`.
