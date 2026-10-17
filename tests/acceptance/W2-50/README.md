@@ -4,7 +4,7 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**233 cases in 8 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**305 cases in 9 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
 file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
@@ -12,7 +12,10 @@ added after implementation, from the review (DEC-136)** (red run of the whole su
 **34 failed, 174 passed**, about 1.5 minutes; see the section below), and 25 cases in `test_w2_50_last_review.py`
 for the last review's findings, **tests added after implementation, from the last review (DEC-136, DEC-751)**, with
 80 earlier cases rewritten to make the own folder by a launch (red run of the whole suite at `21ac28b7` plus these
-changes: **15 failed, 218 passed, 0 skipped**, about 3 minutes; see the last section).
+changes: **15 failed, 218 passed, 0 skipped**, about 3 minutes; see its section), and 72 cases in
+`test_w2_50_extra_review.py` for the extra review's findings, **tests added after implementation, from the extra
+review (DEC-136, DEC-758)**, no earlier case rewritten (red run of the whole suite at `19a4e9fd` plus that file and
+this README: **38 failed, 267 passed, 0 skipped**, about 5.5 minutes; see the last section).
 
 ## Run
 
@@ -265,6 +268,57 @@ ticket's test was changed.
 - **The record lies in a folder its session may write.** The ticket's own session may remove or change what the
   launcher wrote there, and so close its own folder; it cannot open another repository's (it writes nowhere else). No
   source says the record is protected from its own session; not tested.
+
+## The extra review's findings: tests added after implementation, from the extra review (DEC-136, DEC-758)
+
+An extra independent review found two behaviours the suite missed. The owner decided them (DEC-758 item 1,
+2026-10-17; staged for the owner's commit, not yet in this worktree's register): **F1**, every copy or install into a
+folder is judged as each file it writes, `<folder>/<name>`, under the same link and hard-link rule as a direct write
+(rows W2-H056 and W2-L349); **F2**, a project whose real root is inside `~/gov-os-runs` gets no own folder. They are
+tested in `extra` = `test_w2_50_extra_review.py`, through the guard's hook with the call on stdin and `gov launch`
+with the stand-in CLI, as the rest of the suite. A FIFO in the marker's place is row W2-L350, not this round's: no
+test. No earlier test file, support module or conftest was changed; no earlier ticket's test conflicts.
+
+**How the cases are built.** The sources of the copies are files of the test's own in `elsewhere/` (`payload.py`,
+`first.py`, `s/payload.py`); the destination folder `d` already holds, at the source's name `payload.py`, the entry
+of the case. Each refusal case first asks the guard for a direct Write on that same file (`d/payload.py`, or
+`d/s/payload.py` for a linked folder, or the marker by its name) and expects it refused: that is the premise that the
+direct write is refused today, so the copy's refusal is the same rule's. No allowed command is ever run: the guard is
+only asked. **The marker's name** is not taken from code: right after `gov launch` made the own folder, the case lists
+that folder and takes its one entry (a premise asserts there is exactly one, a regular file). Its content is never
+read or written (DEC-462). **A project under the root** (F2) is made inside MAIN's own folder `~/gov-os-runs/W2-90`,
+after the first project (the fixture worktree, outside the root) launched MAIN and OTHER, which made and marked
+`W2-90` and `W2-91`; each such project also holds a forged `in_progress` ticket `DAEO-zz77` (external-ref `W2-77`,
+a folder that does not exist).
+
+| Behaviour | New cases | Red reason today (`19a4e9fd`) | Green today, and why |
+|---|---|---|---|
+| **F1. A copy or install into a folder of the own folder that lands on an entry leading out is refused**, with the guard's reason | `extra::test_a_copy_into_an_own_folder_folder_that_lands_on_an_entry_leading_out_is_refused` × 13: `d/payload.py` a symbolic link to the project's acceptance test `tests/acceptance/W2-90/test_kpi.py` × the 7 forms `cp X d/`, `cp X d`, `install X d/`, `cp -r s/. d/`, `cp first.py X d/` (only the second lands on the link), `cp -t d X`, `cp --target-directory=d X`; a symbolic link to `W2-91/theirs.py` × `cp X d/`, `install X d/`, `cp a b d/`; a hard link to the project's `docs/notes.md` × `cp X d`, `install X d/`, `cp -r s/. d/` | "Bash `cp …/elsewhere/payload.py …/gov-os-runs/W2-90/d/` (…; d holds payload.py, <entry>) was not refused: decision=allow" (11): the guard judges the folder `d`, which lies in the own folder | the two `-t` forms (2): the guard refuses them today; they must stay refused |
+| F1 — a folder copy onto a link to a folder outside | `extra::test_a_folder_copy_onto_a_link_to_a_folder_outside_is_refused` × 2 targets (`W2-91`, the project's `tests/acceptance/W2-90/`) × `cp -r s d/`, `cp -r s d` | "Bash `cp -r …/elsewhere/s …/W2-90/d/` (…/d/s links to …) was not refused: decision=allow" (4) | — |
+| F1 — control: the same forms into a folder of the own folder that holds no such entry are allowed | `extra::test_an_ordinary_copy_into_an_own_folder_folder_is_allowed` × 6 (`cp X d/`, `cp X d`, `install X d/`, `cp -r s/. d/`, `cp a b d/`, `cp -r s d/`) | none | pass (6): the controls; a fix that refuses every copy into a folder turns them red |
+| F1 — control: a copy over an ordinary file of the same name in the own folder is allowed | `extra::test_a_copy_over_an_ordinary_file_of_the_same_name_in_the_own_folder_is_allowed` × `cp X d/`, `install X d/` | none | pass (2): the controls; a fix that refuses any existing entry turns them red |
+| **F1 — inside the repository, for every ticket (W2-H056)**: a copy or install into a folder of the role's paths that lands on a symbolic link to the acceptance test is refused, as the direct write is | `extra::test_a_copy_into_a_repository_folder_that_lands_on_a_link_to_the_acceptance_test_is_refused` × 2 sessions (the engineer on DAEO-zz90 in `src/app/drop/`; product-spec on DAEO-zz92 in `docs/spec/drop/`) × `cp X d/`, `install X d/` | "Bash `cp …/elsewhere/payload.py …/W2-90/src/app/drop/` by engineer on DAEO-zz90 (…/drop/payload.py links to …/tests/acceptance/W2-90/test_kpi.py) was not refused: decision=allow" (4) | — |
+| F1 — control: the same into an allowed folder of the repository with no such entry | `extra::test_an_ordinary_copy_into_an_allowed_repository_folder_is_allowed` × the same 2 sessions × `cp X d/`, `install X d/`, `cp -r s/. d/` | none | pass (6): the controls |
+| **F1 — the own folder's marker (W2-L349)**: premise, the marker named directly is refused (Write; `cp` and `mv` onto it by its name; CIT-E difference 15) | `extra::test_the_marker_named_directly_is_refused` | none | passes: the premise of the next row; it must stay green |
+| F1 — a file named like the marker, copied, installed or moved into the own folder, is refused | `extra::test_a_copy_install_or_move_of_a_file_named_like_the_marker_into_the_own_folder_is_refused` × `cp f W2-90/`, `cp f W2-90`, `install f W2-90/`, `cp -r staging/. W2-90/`, `mv f W2-90/` (the file in `W2-90/staging/`) | "Bash `cp …/W2-90/staging/<marker> …/W2-90/` (lands on the marker …/W2-90/<marker>) was not refused: decision=allow" (5). The `mv` form is allowed today though `mv` onto the marker named directly is refused, so it is a red case, as the brief asks | — |
+| F1 — control: an ordinary file copied, installed or moved into the own folder is allowed | `extra::test_an_ordinary_file_copied_or_moved_into_the_own_folder_is_allowed` × `cp f W2-90/`, `install f W2-90/`, `mv f W2-90/` | none | pass (3): the controls |
+| **F2. A project whose real root lies under the root gets nothing in any folder under the root outside itself**: Write, Edit, a Bash redirect and `rm -rf` refused with the guard's reason, whatever ticket it names | `extra::test_a_project_under_the_root_gets_nothing_in_a_folder_under_the_root` × 4 forms × 4 folders. Forms: (a) a project written at `W2-90/forged` whose `.git` is a file naming the first project's `.git`; (b) a `git worktree add` of the first project at `W2-90/wt`; (c) a `git clone` of it at `W2-90/clone`; (d) a worktree at `W2-90/wt-linked` reached through the link `~/projects/via-link`. Folders: `W2-91`, made by the first project (session on DAEO-zz91; control in the same case: the first project's session on DAEO-zz91 keeps it); `W2-90`, the own ticket's folder that holds the project, marked (session on DAEO-zz90, target `W2-90/work/README.md` outside the project); `W2-77` made by hand, not marked (session on DAEO-zz77); `W2-77` after `gov launch` of DAEO-zz77 from the project | `W2-91` in (a), (b), (d) (3): "Write on …/gov-os-runs/W2-91/work/README.md by the engineer on DAEO-zz91 of the project … under the root (…) was not refused: decision=allow" — the project names the first project's common directory, which marked `W2-91`. `W2-77` after the launch, all 4 forms (4): the same, for `W2-77`: today's launch from the project makes and marks `W2-77` (with the first project's common directory, or the clone's). After the fix the launch makes nothing, so this case's refusal is then also the folder's absence; the guard's own half is held by the `W2-91` cases | `W2-91` in (c) (1): the clone is another repository (DEC-751). `W2-90` (4): the own folder outside a project inside it gives nothing (the first review's finding 1). `W2-77` by hand (4): a folder no launch made gives nothing (DEC-751). All must stay green |
+| F2 — control: writes the project under the root makes inside its own tree are judged as before | `extra::test_a_project_under_the_root_keeps_its_in_project_writes` × the 4 forms (Write and Edit on `src/app/main.py` by the engineer on DAEO-zz90). Held already, for a project built at `W2-90/clone`, by `review::test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-*]` and `review::test_a_project_inside_the_own_folder_keeps_what_its_rules_allow[inside-the-own-folder-*]` | none | pass (4): the controls; a fix that refuses the whole project turns them red |
+| F2 — `gov launch` from such a project adds no entry at, under or above the root, makes nothing and changes nothing under the root outside the project (by name, kind, size and modification time, no file read), and keeps the temp folder | `extra::test_a_launch_from_a_project_under_the_root_adds_makes_and_writes_nothing_there` × 4 forms × 2 tickets (DAEO-zz91, whose `W2-91` the first project made; DAEO-zz77, whose `W2-77` is not there yet). Control in the same case for DAEO-zz91: a later launch of DAEO-zz91 in the first project keeps `W2-91` in its write list | DAEO-zz91 in (a), (b), (d) (3): "the sandbox of a session on DAEO-zz91 in the project … under the root (…) may write at or under the root through ['//…/gov-os-runs/W2-91']"; DAEO-zz77 in all 4 forms (4): "… through ['//…/gov-os-runs/W2-77']" (the launch makes and marks it) | DAEO-zz91 in (c) (1): the clone is another repository (DEC-751); it must stay green |
+| F2 — control: the first project, outside the root, keeps its own folder | in the cases above (the first project's Write in `W2-91`, its later launch of DAEO-zz91), and `last::test_the_launching_repositorys_session_keeps_its_folder`, `last::test_a_later_launch_in_the_same_repository_keeps_the_folder_its_content_and_its_entry`, `last::test_a_second_worktree_of_the_same_repository_gets_the_same_folder` (a worktree outside the root) | none | pass |
+
+**Red run (whole suite, at `19a4e9fd` plus the new file and this README): 38 failed, 267 passed, 0 skipped**, about
+5.5 minutes. Every earlier case still passes (233). The new file: 38 red, 34 green. Red: F1 own folder 11 + linked folder 4 + repository 4 + marker 5; F2 guard 7 + launch 7. Green:
+the two `-t` forms, 8 own-folder controls, 6 repository controls, the marker premise, 3 marker controls, 9 F2 guard
+cases already refused, 4 in-project controls and 1 clone launch.
+
+### Discoveries of this round (no test)
+
+- **The marker's name is only public through a listing.** No document a test may read names it outside the CIT-E's
+  record of the code; the cases take it from the one entry the launch leaves in the folder it makes. A launch that one
+  day leaves a second entry there fails the marker cases' premise, not their behaviour.
+- **`cp` and `install` forms the brief does not name** (`cp -a`, `cp -R`, `install -t d`, `install -D`) fall under
+  the same rule in F1's words ("every copy or install into a folder"), but only the named forms are tested (DEC-221).
 
 ## Readings chosen where a KPI line admits more than one
 
