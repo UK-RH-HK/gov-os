@@ -4,8 +4,10 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**139 cases in 5 files** (55 test functions with their parameters). Red run on `w2/W2-50` at `689bd17e` plus this
-suite: **48 failed, 91 passed**, about 1.5 to 5 minutes.
+**154 cases in 6 files** (67 test functions with their parameters): the first 139 cases in 5 files, written before
+the change proposal (red run on `w2/W2-50` at `689bd17e` plus that suite: **48 failed, 91 passed**), and 15 cases in
+`test_w2_50_owner_answers.py` for the owner's answers to it (DEC-743; see the section below). Red run of the whole
+suite on `w2/W2-50` at `a5ef3c69` plus the new file: **55 failed, 99 passed**, about 1.5 to 5 minutes.
 
 ## Run
 
@@ -100,6 +102,41 @@ still pass once the own-folder cases are green.
 ### Also
 
 `test_w2_50_code_under_test.py::test_a_child_process_imports_this_worktrees_gov` (DEC-732): passes when run as above.
+
+## The owner's answers (DEC-743, 2026-10-17)
+
+The owner approved the change proposal (`docs/changes/W2-50-CIT-P.md`, its closing section) with answers that fix
+behaviour the first suite left open. They are tested in `answers` = `test_w2_50_owner_answers.py`, as described
+behaviour (DEC-136), written before the implementation. No file of the first suite was changed. For each answer the
+first suite's cases that already hold part of it are named; only what was missing was added (DEC-221).
+
+| Answer | KPI line it holds | Already held by | New cases | Red reason today |
+|---|---|---|---|---|
+| **1. R7 is scoped to the root**: `rmdir` of `~/gov-os-runs` is refused, in each spelling of the root | failure: the root itself (… or removing it) | `ref::test_removing_or_moving_the_root_is_refused[rmdir]` (plain) | `answers::test_rmdir_of_the_root_is_refused_in_each_spelling` (`root/`, `root/.`, `root/W2-90/..`) | "Bash `rmdir …/home/gov-os-runs/` was not refused: decision=allow" (likewise `/.` and `/W2-90/..`): the guard does not judge `rmdir` |
+| 1 — `rmdir` is not judged everywhere: inside the repository, outside the role's paths, it stays as today | failure: the root itself; DEC-743 1 (scope) | none | `answers::test_rmdir_of_an_empty_folder_in_the_repository_outside_the_paths_stays_as_today` | passes today: measured at `a5ef3c69`, the guard **allows** `rmdir` of an empty `docs/empty` for the engineer (paths `src/app/**`); the case holds that decision, so judging `rmdir` everywhere turns it red |
+| 1 — `rmdir` of the own folder's empty sub-folder stays allowed once the folder is open | success 2 (Bash targets there) | none | `answers::test_rmdir_of_an_empty_folder_inside_the_own_folder_stays_allowed` | passes today (`rmdir` is not judged); must stay green once the rule judges the root |
+| **2. R2's step**: the launcher makes the root and the own folder before the session starts, leaves what is there alone, makes no other folder under the root | success 2 (created on first use) | `launch::test_the_own_folder_exists_when_the_session_starts` (own made, W2-91 not), `launch::test_a_launch_keeps_what_the_folder_already_holds`, `launch::test_a_launch_of_another_ticket_leaves_the_folder_alone` | `answers::test_the_first_launch_makes_the_root_with_the_own_folder_and_nothing_else` (the session finds the root holding exactly `[W2-90]`), `answers::test_a_launch_into_an_existing_root_makes_only_the_own_folder_and_leaves_the_rest_alone` (a root with `W2-77/` and `W2-91/clone/`: it then holds those and `W2-90`, the rest unchanged) | "the root … held None, not exactly the own folder ['W2-90']" and "the root held ['W2-77', 'W2-91'], not ['W2-77', 'W2-90', 'W2-91']": the launcher makes no folder today |
+| **3. The link rule (§6.1 (i))**: the check does not follow a link from `.gov-runtime/` into `~/gov-os-runs` | success 4 (the check never scans it) | `index::test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder` (a folder link to the own folder, a file link to a file in it) | `answers::test_the_check_does_not_scan_the_root_through_a_link_to_the_root_itself` (a folder link to the root, not to a folder under it) | "the repository's check scanned ~/gov-os-runs through a link to the root itself": the check reports "secret found in derived store: .gov-runtime/scratch/runs-root/W2-90/clone/.gov-runtime/store.txt" |
+| 3 — a linked folder elsewhere is still followed (W1-15's B4 stays green) | success 4; DEC-743 3 | W1-15's own suite only | `answers::test_the_check_still_follows_a_linked_folder_elsewhere` (a link to `elsewhere/shared-store` with a secret; the root exists too) | passes today (the check follows every link); the check must still go red after the change, so "follow no link out of the project" fails this case |
+| 3 — a near name of the root (`~/gov-os-runs-old`) is elsewhere | success 4; R1's near-name reading for the root | none | `answers::test_the_check_follows_a_link_to_a_folder_whose_name_only_starts_with_the_roots` | passes today; turns red if the exclusion matches the root's name as a prefix |
+| **4. §6.4**: the own folder is open only while the ticket is `in_progress` | success 2 (resolved from `GOV_TICKET`); failure: a session with no ticket | none (every fixture ticket is `in_progress`) | `answers::test_the_folder_of_a_ticket_that_is_not_in_progress_is_closed` (`open`, `closed`: Write, Edit, Bash redirect, `mkdir -p`), with the control `answers::test_the_same_ticket_in_progress_opens_its_folder` | the refusals pass today (everything outside is refused); the control is red: "Write on …/gov-os-runs/W2-95/notes.txt by the engineer on DAEO-zz95 (in_progress) was not allowed: … denied for role 'engineer'" |
+| **5. §6.5**: `ticket-lead` is not among "any role" | success 2 ("any role", R4); failure: any path outside | none (R4's six roles only) | `answers::test_a_ticket_lead_may_not_write_in_its_tickets_folder` (Write, Edit, Bash redirect, `mkdir -p`), with the control `answers::test_a_ticket_lead_keeps_its_scratch_in_the_repository` | both pass today: the guard knows `ticket-lead` (its scratch is allowed) and refuses the folder like any place outside, "Write to '…/gov-os-runs/W2-90/notes.txt' denied for role 'ticket-lead'". The refusal must still hold once the folder opens for the six roles |
+
+**The fixture ticket of answer 4.** `DAEO-zz95` (engineer, W2 id `W2-95`, folder `~/gov-os-runs/W2-95`), written into
+the fixture project by the case from the suite's own ticket text with only its `status` line changed, and committed.
+The control writes it `in_progress` the same way, so a refusal for `open` or `closed` is the status's, not a fault of
+the ticket file.
+
+**Red run (whole suite, at `a5ef3c69` plus the new file): 55 failed, 99 passed.** The new file: 7 red (the three
+`rmdir` spellings, the two launcher cases, the link to the root itself, the `in_progress` control) and 8 green (the
+two `rmdir` controls, the two followed links, the two refusals of answer 4 and the two cases of answer 5).
+
+### Discoveries of this round (no test)
+
+- **`rmdir` under the root but not of it.** With R7 scoped to the root, `rmdir ~/gov-os-runs/W2-91` (another ticket's
+  empty folder) stays unjudged, as today, though the failure line refuses "another ticket's folder". And
+  `rmdir -p ~/gov-os-runs/W2-90/sub` removes the root too when it is otherwise empty. Neither is a spelling of the
+  root, so neither is tested; the owner's scope is kept. Both are W2-09's to judge with the guard's Bash forms.
 
 ## Readings chosen where a KPI line admits more than one
 
