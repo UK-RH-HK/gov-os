@@ -302,3 +302,175 @@ def test_a_plain_merge_back_of_the_unchanged_probed_code_closes(layout, project,
     assert not _probe_gate_findings(run.envelope().get("error") or {}), \
         f"the probe gate refuses the plain merge-back {back[:12]} of the unchanged probed code\n{run.describe()}"
     support.closed(run, interface)
+
+
+# --------------------------------------------------------------------------
+# Added after implementation began (DEC-136, DEC-750; the third review's first two findings). The merge-back is
+# the merge after the probed commit whose first parent lacks the probed commit and whose other parent holds it.
+# Every later merge that holds the probed commit and changes probed code refuses, whatever task it names, and
+# the refusal names it. A merge that holds the probed commit on neither side (another ticket's merge on the
+# integration branch) is judged as before: it is not the merge-back and does not by itself refuse.
+# --------------------------------------------------------------------------
+
+OTHER_BRANCH = "other"
+SECOND, SECOND_WBS = "PROJ-scnd", "W1-scnd"
+SECOND_FEATURE = "src/second/feature.py"
+LATER_DROPS = ("a probed file the ticket added removed", "a probed file replaced in the merge")
+LATER_DROP_CASES = ((LATER_DROPS[0], LAYOUTS[0]), (LATER_DROPS[1], LAYOUTS[0]), (LATER_DROPS[0], LAYOUTS[1]))
+OTHER_MERGES = ((LAYOUTS[0], "with that ticket's trailers"), (LAYOUTS[1], "a plain git merge"))
+
+
+def _holds(project, commit, merge):
+    """Whether ``merge`` holds ``commit`` (``commit`` is ``merge`` or one of its ancestors)."""
+    return commit in support.git(project, "rev-list", merge).split()
+
+
+def _parents(project, merge):
+    return support.git(project, "rev-list", "--parents", "-n", "1", merge).split()[1:]
+
+
+def _unchanged(project, probed):
+    return support.git(project, "diff", "--name-only", probed, "HEAD", "--", "src/example", "tests/acceptance/W1-prbk",
+                       ".tickets/PROJ-prbk.md").strip() == ""
+
+
+def _notes_on_the_branch(project):
+    """More work on the ticket's branch after the merge-back: a task-less notes commit outside the ticket's paths
+    (DEC-490: it refuses nothing). Ends on the branch."""
+    project.checkout(BRANCH)
+    project.write("docs/notes/PROJ-prbk.md", "# notes after the merge-back\n")
+    return project.commit("notes", who=support.ORCHESTRATOR, trailers=("Role: orchestrator",), exact=True)
+
+
+def _other_ticket_branch(project):
+    """Another ticket is created on ``main`` and worked on its own branch ``other``, inside its own paths only.
+    Ends on ``main``."""
+    project.checkout("main")
+    support.create_ticket(project, OTHER, OTHER_WBS, allowed_paths=("src/other/**",))
+    project.checkout(OTHER_BRANCH, create=True)
+    support.engineer_commit(project, OTHER, {"src/other/part.py": "# part\n"}, trailers=support.trailers_of(OTHER))
+    project.checkout("main")
+
+
+def _other_ticket_merged(project, plain):
+    """The other ticket's branch merged into ``main``: a plain ``git merge`` (no trailer) or with that ticket's
+    trailers. Returns the merge."""
+    project.checkout("main")
+    if plain:
+        return support.merge_by_hand(project, OTHER_BRANCH, (), message=f"Merge branch '{OTHER_BRANCH}'")
+    return support.merge_by_hand(project, OTHER_BRANCH, support.trailers_of(OTHER, role="orchestrator"),
+                                 message="merge the other ticket's branch")
+
+
+@pytest.mark.parametrize("wrong, layout", LATER_DROP_CASES, ids=[f"{wrong}-{layout}" for wrong, layout in LATER_DROP_CASES])
+def test_a_later_merge_back_naming_another_ticket_that_drops_probed_code_refuses_and_names_it(
+        wrong, layout, project, sandbox, interface):
+    """The ticket is merged back with the probed code unchanged; after more work on the branch it is merged back
+    a second time, that merge naming another ticket's task and dropping or replacing the probed code."""
+    probed = _probed_branch(project)
+    _integration_goes_on(project)
+    if layout == "merged in, then back":
+        _merged_in(project)
+    first = _merged_back(project)
+    _notes_on_the_branch(project)
+    project.checkout("main")
+    how = dict(remove=(FEATURE,)) if wrong == LATER_DROPS[0] else dict(edit={FEATURE: INTEGRATION_FEATURE})
+    later = support.merge_by_hand(project, BRANCH, NAMES["another ticket's task"],
+                                  message="merge the ticket's branch again", **how)
+    _recorded(project, probed)
+    assert support.content_at(project, first, FEATURE) == support.content_at(project, probed, FEATURE), \
+        "the fixture is wrong: the first merge-back does not hold the probed code"
+    assert all(_holds(project, probed, parent) for parent in _parents(project, later)), \
+        "the fixture is wrong: the later merge-back does not hold the probed commit on both sides"
+    assert f"Task: {OTHER}" in support.git(project, "log", "-1", "--format=%B", later), \
+        "the fixture is wrong: the later merge-back does not name another ticket's task"
+    assert support.content_at(project, later, FEATURE) != support.content_at(project, probed, FEATURE), \
+        "the fixture is wrong: the later merge-back holds the probed code"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    error = support.refused(run, interface)
+    said = _probe_gate_findings(error)
+    assert said and any(later[:7] in text for text in said), \
+        f"the probe gate does not refuse the later merge-back {later[:12]} naming {OTHER} ({wrong}) whose probed " \
+        f"code is not the probed commit's\n{run.describe()}"
+    support.base.assert_not_closed(project, TICKET)
+
+
+def test_a_later_merge_holding_the_probed_commit_that_leaves_the_probed_code_closes(project, sandbox, interface):
+    """Boundary (guard): after the merge-back, another ticket's branch is merged into ``main`` (a plain git merge)
+    touching only its own paths. The merge holds the probed commit and leaves the probed code as it was."""
+    probed = _probed_branch(project)
+    _other_ticket_branch(project)
+    _merged_back(project)
+    later = _other_ticket_merged(project, plain=True)
+    _recorded(project, probed)
+    assert _holds(project, probed, _parents(project, later)[0]), \
+        "the fixture is wrong: the later merge's first parent does not hold the probed commit"
+    assert _unchanged(project, probed), "the fixture is wrong: the probed code changed"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    assert not _probe_gate_findings(run.envelope().get("error") or {}), \
+        f"the probe gate refuses the later merge {later[:12]} that leaves the probed code as it was\n{run.describe()}"
+    support.closed(run, interface)
+
+
+@pytest.mark.parametrize("layout, form", OTHER_MERGES, ids=[f"{layout}-{form}" for layout, form in OTHER_MERGES])
+def test_another_tickets_merge_on_the_integration_branch_is_not_the_merge_back(layout, form, project, sandbox,
+                                                                              interface):
+    """After the ticket branched, another ticket reaches ``main`` through its own branch and a merge, which holds
+    the probed commit on neither side; then the ticket's branch is merged back with the probed code unchanged."""
+    probed = _probed_branch(project)
+    _other_ticket_branch(project)
+    others = _other_ticket_merged(project, plain=form == "a plain git merge")
+    if layout == "merged in, then back":
+        project.checkout(BRANCH)
+        _merged_in(project)
+    back = _merged_back(project)
+    _recorded(project, probed)
+    assert not any(_holds(project, probed, parent) for parent in _parents(project, others)), \
+        "the fixture is wrong: the other ticket's merge holds the probed commit"
+    assert not _holds(project, probed, _parents(project, back)[0]) and _holds(project, probed, back), \
+        "the fixture is wrong: the ticket's merge-back is not the merge that brings the probed commit"
+    assert _unchanged(project, probed), "the fixture is wrong: the probed code changed"
+
+    run = support.run_close(project, sandbox, TICKET)
+
+    assert not _probe_gate_findings(run.envelope().get("error") or {}), \
+        f"the probe gate refuses: the other ticket's merge {others[:12]} ({form}) is not the merge-back " \
+        f"{back[:12]}\n{run.describe()}"
+    support.closed(run, interface)
+
+
+def test_a_later_full_ticket_closes_after_an_earlier_ones_merge_back(project, sandbox, interface):
+    """KPI 4 seen from the next ticket: one FULL ticket is probed, merged back and closed; a second FULL
+    ticket, probed with its probed code unchanged, is merged back after it and closes. The first ticket's
+    merge-back holds the second ticket's probed commit on neither side."""
+    support.create_ticket(project, SECOND, SECOND_WBS, profile="FULL", allowed_paths=("src/second/**",))
+    probed = _probed_branch(project)
+    project.checkout("main")
+    project.checkout("second", create=True)
+    second_probed = support.engineer_commit(project, SECOND, {SECOND_FEATURE: "# second\n"},
+                                            trailers=support.trailers_of(SECOND))
+    first_back = _merged_back(project)
+    _recorded(project, probed)
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+    if project.waiting_paths():
+        project.commit(f"{TICKET} closed", who=support.ORCHESTRATOR,
+                       trailers=support.trailers_of(TICKET, role="orchestrator"), exact=True)
+    second_back = project.merge("second", support.trailers_of(SECOND, role="orchestrator"),
+                                message="merge the second ticket's branch")
+    support.probe_recorded(project, SECOND, second_probed)
+    support.checkpointed(project, SECOND)
+    assert not any(_holds(project, second_probed, parent) for parent in _parents(project, first_back)), \
+        "the fixture is wrong: the first ticket's merge-back holds the second ticket's probed commit"
+    assert support.content_at(project, "HEAD", SECOND_FEATURE) == "# second\n", \
+        "the fixture is wrong: the second ticket's probed code changed"
+
+    run = support.run_close(project, sandbox, SECOND)
+
+    assert not _probe_gate_findings(run.envelope().get("error") or {}), \
+        f"the probe gate refuses the second ticket: the first ticket's merge-back {first_back[:12]} is not its " \
+        f"merge-back {second_back[:12]}\n{run.describe()}"
+    support.closed(run, interface)
