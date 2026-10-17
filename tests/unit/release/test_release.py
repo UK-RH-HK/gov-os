@@ -72,6 +72,48 @@ def test_an_unclean_tree_or_another_branch_is_refused(tmp_path):
     assert not (repo / RELEASES_REL).exists()
 
 
+def _commit(repo, message):
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "add", "-A")
+    _git(repo, "-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-q", "--allow-empty", "-m", message)
+
+
+@pytest.mark.parametrize("how", ("older head", "record removed", "build metadata"))
+def test_a_version_the_repository_already_knows_is_refused(tmp_path, how):
+    repo = _repo(tmp_path)
+    first = _git(repo, "rev-parse", "HEAD").strip()
+    build(repo, "1.4.0")
+    _commit(repo, "record")
+    version = "1.4.0"
+    if how == "older head":
+        _git(repo, "checkout", "-q", "--detach", first)
+    elif how == "record removed":
+        _git(repo, "rm", "-q", "-r", "--", f"{RELEASES_REL}/1.4.0")
+        _commit(repo, "removed")
+    else:
+        version = "1.4.0+build.2"
+    with pytest.raises(ReleaseError, match="immutable"):
+        build(repo, version)
+    assert not (repo / RELEASES_REL / version).exists()
+
+
+def test_a_version_an_existing_tag_names_is_refused(tmp_path):
+    repo = _repo(tmp_path)
+    _git(repo, "tag", "v1.4.0")
+    _commit(repo, "later")
+    with pytest.raises(ReleaseError, match="the tag v1.4.0"):
+        build(repo, "1.4.0")
+    assert not (repo / RELEASES_REL).exists()
+
+
+def test_the_files_are_hashed_as_the_commit_holds_them(tmp_path):
+    repo = _repo(tmp_path)
+    rel = "template/governance/kernel/schemas/ticket.schema.json"
+    (repo / rel).write_text("{ }\n", encoding="utf-8")
+    _git(repo, "update-index", "--assume-unchanged", "--", rel)
+    manifest = json.loads((build(repo, "1.4.0") / MANIFEST_NAME).read_bytes())
+    assert manifest["files"]["governance/kernel/schemas/ticket.schema.json"] == hashlib.sha256(b"{}\n").hexdigest()
+
+
 @pytest.mark.parametrize("how", ("changed", "added", "removed", "manifest hash"))
 def test_verify_refuses_a_release_that_does_not_match_its_hashes(tmp_path, how):
     repo = _repo(tmp_path)

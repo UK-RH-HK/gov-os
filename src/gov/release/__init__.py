@@ -5,7 +5,8 @@ clean commit that ``w2/integrate`` contains: ``manifest.json`` (the version, the
 ``template/`` with its sha256, the wheel's sha256, the CLI version, the schema versions, the vendored skills'
 version and licence, release notes) and ``manifest.sha256``, the manifest's own hash. It neither commits,
 tags nor signs: the owner commits the record and tags the release commit, unsigned (CAP-02.c stays in Wave 3).
-A version that has a record is never built again (CAP-43).
+A version the repository already knows (a record in the tree or in any ref's history, or a tag), build
+metadata aside, is never built again (CAP-43); the files are hashed as the commit holds them.
 
 ``verify`` is the one check of a release against its hashes, for every install path: the template's Copier
 task (``lock_from``) today, ``gov install`` and ``gov update`` when they exist (W2-18, W2-17).
@@ -50,6 +51,66 @@ def _git(repo: Path, *args: str) -> str:
     if done.returncode:
         raise ReleaseError(f"git {' '.join(args)}: {done.stderr.strip()}")
     return done.stdout
+
+
+def _blobs(repo: Path, commit: str, folder: str) -> dict[str, bytes]:
+    """Every file under ``folder`` as ``commit`` holds it (a link as its target), by path; never the work tree's
+    bytes, which ``--assume-unchanged`` or ``--skip-worktree`` can hide from ``git status``."""
+    entries = []
+    for entry in _git(repo, "ls-tree", "-r", "-z", "--full-tree", commit, "--", folder).split("\0"):
+        if not entry:
+            continue
+        meta, rel = entry.split("\t", 1)
+        kind, oid = meta.split()[1:3]
+        if kind != "blob":
+            raise ReleaseError(f"{rel} at {commit} is a {kind}, not a file: it cannot be hashed")
+        entries.append((rel, oid))
+    done = subprocess.run(["git", "-C", str(repo), "cat-file", "--batch"], capture_output=True,
+                          input="".join(f"{oid}\n" for _, oid in entries).encode())
+    if done.returncode:
+        raise ReleaseError(f"the files of {folder}/ at {commit} cannot be read: {done.stderr.decode().strip()}")
+    out, at, blobs = done.stdout, 0, {}
+    for rel, oid in entries:
+        end = out.find(b"\n", at)
+        header = out[at:end].split() if end >= 0 else []
+        if len(header) != 3 or header[0].decode() != oid or header[1] != b"blob":
+            raise ReleaseError(f"{rel} at {commit} cannot be read")
+        size = int(header[2])
+        blobs[rel] = out[end + 1:end + 1 + size]
+        at = end + 1 + size + 1
+    return blobs
+
+
+def _precedence(version: str) -> str:
+    """A version without its build metadata: two versions with the same one are the same version (semver.org §10)."""
+    return version.split("+", 1)[0]
+
+
+def _known(repo: Path, version: str) -> str | None:
+    """Where the repository already knows ``version`` (build metadata aside), or ``None``: a record folder in the
+    tree, a record path in the history of any of its refs (a record removed later, or one an older HEAD lacks),
+    or a tag ``v<version>`` or ``<version>``. A place that cannot be read refuses (``ReleaseError``)."""
+    key = _precedence(version)
+    same = lambda name: bool(SEMVER.fullmatch(name)) and _precedence(name) == key  # noqa: E731
+    releases = repo / RELEASES_REL
+    if lock._present(releases / version):
+        return f"{RELEASES_REL}/{version}"
+    try:
+        names = os.listdir(releases) if lock._present(releases) else []
+    except OSError as exc:
+        raise ReleaseError(f"{RELEASES_REL}/ cannot be listed: {exc}") from None
+    for name in names:
+        if same(name):
+            return f"{RELEASES_REL}/{name}"
+    history = _git(repo, "log", "--all", "--format=", "--name-only", "-z", "--", RELEASES_REL)
+    for rel in history.replace("\n", "\0").split("\0"):
+        parts = rel.split("/")
+        if len(parts) > 3 and same(parts[2]):
+            return f"{rel}, in the history of the repository"
+    for tag in _git(repo, "for-each-ref", "--format=%(refname:lstrip=2)", "refs/tags").splitlines():
+        if same(tag[1:] if tag.startswith("v") else tag):
+            return f"the tag {tag}"
+    return None
 
 
 def _hash(path: Path) -> str | None:
@@ -110,16 +171,17 @@ def build(repo: Path, version: str) -> Path:
         raise ReleaseError(f"HEAD {commit} is not a commit of {INTEGRATION_BRANCH}")
     releases = repo / RELEASES_REL
     folder = releases / version
-    if lock._present(folder):
-        raise ReleaseError(f"release {version} exists ({RELEASES_REL}/{version}): a release is immutable")
-    listed = [rel for rel in _git(repo, "ls-tree", "-r", "-z", "--name-only", commit, "--", TEMPLATE_REL).split("\0")
-              if rel]
-    files = {rel[len(TEMPLATE_REL) + 1:]: _hash(repo / rel) for rel in listed}
-    if not files or None in files.values():
+    known = _known(repo, version)
+    if known:
+        raise ReleaseError(f"release {_precedence(version)} exists ({known}): a release is immutable")
+    blobs = {rel[len(TEMPLATE_REL) + 1:]: data for rel, data in _blobs(repo, commit, TEMPLATE_REL).items()}
+    files = {rel: hashlib.sha256(data).hexdigest() for rel, data in blobs.items()}
+    if not files:
         raise ReleaseError(f"cannot hash the shipped files of {TEMPLATE_REL}/")
     try:
-        cli_version = tomllib.loads((repo / "pyproject.toml").read_text(encoding="utf-8"))["project"]["version"]
-    except (OSError, ValueError, KeyError, TypeError):
+        pyproject = _blobs(repo, commit, "pyproject.toml")["pyproject.toml"].decode("utf-8")
+        cli_version = tomllib.loads(pyproject)["project"]["version"]
+    except (ReleaseError, UnicodeDecodeError, ValueError, KeyError, TypeError):
         raise ReleaseError("pyproject.toml declares no project version (the CLI version)") from None
     schemas = {rel.rsplit("/", 1)[1].removesuffix(".schema.json"): digest for rel, digest in files.items()
                if rel.startswith(SCHEMAS_REL + "/") and rel.endswith(".schema.json")}
@@ -128,13 +190,12 @@ def build(repo: Path, version: str) -> Path:
         parts = rel.split("/")
         if rel.startswith(f"{lock.KERNEL_REL}/skills/") and len(parts) == 5 and parts[4] == "vendored.yaml":
             name = parts[3]
-            licence = repo / TEMPLATE_REL / lock.KERNEL_REL / "vendor" / name / "LICENSE"
+            licence = f"{lock.KERNEL_REL}/vendor/{name}/LICENSE"
             try:
-                record = yaml.safe_load((repo / TEMPLATE_REL / rel).read_text(encoding="utf-8"))
+                record = yaml.safe_load(blobs[rel].decode("utf-8"))
                 vendored[name] = {"version": str(record["version"]), "skills": sorted(record.get("token_sizes") or ()),
-                                  "licence_file": f"{lock.KERNEL_REL}/vendor/{name}/LICENSE",
-                                  "licence": licence.read_text(encoding="utf-8")}
-            except (OSError, UnicodeDecodeError, yaml.YAMLError, KeyError, TypeError):
+                                  "licence_file": licence, "licence": blobs[licence].decode("utf-8")}
+            except (UnicodeDecodeError, yaml.YAMLError, KeyError, TypeError, AttributeError):
                 raise ReleaseError(f"the vendored skills {name} have no readable version or licence") from None
     previous = _previous(releases)
     subjects = _git(repo, "log", "--max-count=100", "--format=%s", f"{previous}..{commit}" if previous else commit)
