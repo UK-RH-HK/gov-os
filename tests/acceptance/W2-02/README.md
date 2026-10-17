@@ -2,6 +2,8 @@
 
 Written by a fresh independent test designer (MR-3, DEC-136) before the implementation, from the ticket's KPI lines and sources: DEC-441, DEC-446, DEC-447, CAP-44.h, DEC-722, DEC-730, DEC-624, DEC-626, DEC-714, DEC-718, DEC-274, DEC-466, DEC-448. Profile STANDARD (DEC-221): each KPI line's success and failure, and the key edge cases.
 
+Run 2 (2026-10-17): a second fresh test designer added the verdict's named conditions (DEC-741 I (ii)) and revised the run-1 cases that held them open. Each revision is in a commit with a `Rewrite-Reason:` trailer (DEC-491). The same batch revised one assertion of W1-26 (DEC-746, P-B); see the end of this file.
+
 ## How the suite runs, and the code it runs (DEC-732)
 
 From this worktree's root:
@@ -32,8 +34,8 @@ A defined type is one core-schema measures: a well-formed record of it passes, a
 |---|---|---|
 | `test_an_audit_report_in_dec_441_form_passes_core_schema` | A report with `milestone`, `commit`, `pack_sha256` and its `item`/`class`/`evidence` table, at `docs/audit/wave-9/…`, with no `type` key (DEC-441's form has none): no finding, exit 0 | red: `SCHEMA_INVALID_TYPE` ('type' field is missing) |
 | `test_one_kernel_schema_states_the_three_verdicts_of_cap_44_h` | Exactly one kernel schema file has a property whose values are exactly `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS` and `NOT_ADOPTED_HEALTHY`, and it states a constant `type` | red: 0 such files |
-| `test_each_of_the_three_verdicts_is_a_well_formed_verdict` (3) | A record of that type with each verdict: no finding names the verdict field, and no `SCHEMA_UNKNOWN_TYPE` | red: 0 such files |
-| `test_a_verdict_record_without_one_of_the_three_verdicts_is_refused` (4: `ADOPTED`, `pass`, lower case, missing) | A finding on the file names the verdict field; exit ≠ 0 | red: 0 such files |
+| `test_each_of_the_three_verdicts_is_a_well_formed_verdict` (3) | **Rewritten in run 2 (DEC-741 I (ii)).** A record of that type with each verdict and a list of named conditions that agrees with it (all `met`; `met` and one `accepted` by `DEC-741`; `met`, `not met` and `accepted`): no finding on the file, exit 0. This is the "valid list of conditions passes" case | run 1: red, 0 such files. Run 2: red, the verdict schema types no list of conditions (0 list properties whose items have a state of exactly the three words) |
+| `test_a_verdict_record_without_one_of_the_three_verdicts_is_refused` (4: `ADOPTED`, `pass`, lower case, missing) | A finding on the file names the verdict field; exit ≠ 0. **Revised in run 2 (DEC-741 I (ii)):** the record carries a well-formed list of conditions, so the verdict is its one defect | run 1: red, 0 such files. Run 2: red, as the row above |
 | `test_one_kernel_schema_is_a_decision_entry_with_id_status_owner_date_and_its_own_span` | Exactly one kernel schema file requires `id`, `status`, `owner`, `date` and a span field (a required field whose name holds `span`), states its type, and gives `id` a grammar that takes `DEC-730` and refuses any text | red: 0 such files |
 | `test_the_kernel_has_one_schema_of_the_close_type` | One kernel schema file whose `type` is the constant `close` | red: 0 |
 | `test_the_close_record_gov_close_writes_passes_core_schema` | The record a real `gov close` wrote (`docs/close/PROJ-aaaa/CL-PROJ-aaaa.md`), unchanged, in a project with the kernel's schemas: no finding, exit 0 | red: `SCHEMA_UNKNOWN_TYPE` (unknown record type 'close') |
@@ -42,11 +44,38 @@ A defined type is one core-schema measures: a well-formed record of it passes, a
 Readings taken:
 
 - **The audit report is found where audit reports lie.** It has no `type` key, and W1-43's report has none either. The cases put it under `docs/audit/<milestone>/`. That is where the repository keeps reports, and where the audit-reproducibility check reads every file with frontmatter as a report (DEC-626).
-- **The verdict field and the verdict type are found by content.** The field is the property whose values are exactly the three CAP-44.h verdicts. The type is that schema's constant `type`. The implementer names both.
+- **The verdict field and the verdict type are found by content.** The field is the property whose values are exactly the three CAP-44.h verdicts. The type is that schema's constant `type`. The implementer names both. The keys of the conditions are found the same way; see the next section.
 - **The decision entry's fields are the KPI's words:** `id`, `status`, `owner`, `date`, and a field whose name holds `span`.
 - **The close record is the one this worktree's `gov close` writes,** run for real. Its frontmatter at this commit: `id`, `type: close`, `status: ACTIVE`, `state_class: AUTHORITATIVE`, `task`, `created`, `outputs`, `packet_hash`, `inputs`, `requirements_implemented`, `decisions_applied`, `tests_produced`, `tests_run`, `test_runs`, `deviations`, `skill_versions`, `commits`, `governance_share`.
   - No field the close type needs waits for W2-01.
   - `task` is the field the refusal case removes. It names the ticket closed, and W1-30's suite finds a close record by `type: close` and `task`.
+
+### Success 1, the adoption verdict's named conditions [AR-9, W2-M317; DEC-741 I (ii)] (run 2)
+
+DEC-741 I (ii) types the verdict: its three CAP-44.h values and **a required list of named conditions**. Each condition has its name, its source item and its state: `met`, `not met` or `accepted`. An `accepted` condition names the owner entry, a DEC id, that accepts it (DEC-741 answer F). The schema states the shape only. Whether the verdict agrees with its conditions is W2-52's and W2-28's, and no case here holds it. The valid records still agree with their verdicts, so a later agreement rule leaves them valid.
+
+"Invalid" means: a finding on that file names the conditions field, and core-schema is not green. A finding names it when its `field` is the conditions key or starts with it followed by a mark that is not a letter, digit, `_` or `-` (as in `conditions[1].state` or `conditions/1/state`), or when the key is a word of its message. Today's check names a top-level field in `field` and in its message (seen on its findings for other types, and for this type).
+
+Each failure case writes the well-formed twin (`docs/adoption/AV-0001.md`) beside the broken record (`docs/adoption/AV-0002.md`) in one project. It holds that the twin has no finding, so a check that refuses every list of conditions cannot pass the case.
+
+| Test (`test_w2_02_verdict_conditions.py`) | Holds | Today (run 2) |
+|---|---|---|
+| (valid case) `test_w2_02_record_types.py::test_each_of_the_three_verdicts_is_a_well_formed_verdict` (3) | A valid list of conditions passes: no finding on the file, exit 0. Its `ADOPTED_WITH_ACCEPTED_EXCEPTIONS` and `NOT_ADOPTED_HEALTHY` records each hold an `accepted` condition with `DEC-741` | red: the verdict schema types no list of conditions |
+| `test_the_verdict_schema_types_its_list_of_named_conditions` | The verdict schema has the list (the keys are found, below) and requires it | red: no list property whose items have a state of exactly the three words |
+| `test_a_verdict_record_without_its_list_of_conditions_is_refused` (2: missing, a text `all met`) | Invalid. A text is the "optional, unconstrained field" the decision rules out | red, as above |
+| `test_a_condition_missing_its_name_source_item_or_state_is_refused` (3: name, source item, state) | The first (`met`) condition of a `NOT_ADOPTED_HEALTHY` record without that part: invalid | red, as above |
+| `test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused` (3: `waived`, `not_met`, `Met`) | A state outside `met`, `not met`, `accepted`: invalid. `not_met` and `Met` are the near misses | red, as above |
+| `test_an_accepted_condition_without_its_owner_entry_is_refused` (2: missing, `the owner said so`) | The `accepted` condition of an `ADOPTED_WITH_ACCEPTED_EXCEPTIONS` record without its owner entry, or with one that is no DEC id: invalid. Its twin, with `DEC-741`, has no finding | red, as above |
+
+**How the cases find the keys** (`w2_02_support.the_condition_keys`). The brief and the decision name no key, only the words. Each key is read from the one adoption-verdict schema (the file found by its three verdicts, as above). Inline shapes, shared definitions of `common.schema.json`, and the schema's own `#/$defs/…` are all resolved.
+
+- **The conditions list:** the one property that is a list (`type: array`) whose items have a property with values exactly `met`, `not met`, `accepted`.
+- **The state:** that property of an item.
+- **The name:** the one item property whose key, split on `_` and `-`, holds the word `name` (`name`, `condition_name`).
+- **The source item:** the one item property whose key holds the word `source` (`source`, `source_item`).
+- **The owner entry:** the one item property, other than the state, whose grammar (`pattern`, through a `$ref` too) takes `DEC-741` and refuses `the owner said so`. Its key is free (`owner_entry`, `accepted_by`, `decision`).
+- The records give each condition the source item `CAP-44.h` and a name from DEC-741 answer G's lite healthy conditions. A grammar on the source item that refuses a Contract item id would turn the valid case red. That would be a reading to settle, not a defect of the case.
+- An owner entry on a `met` or `not met` condition is held in neither direction.
 
 ### Success 2: core-schema reads the W1-43 report and the exit report as valid, and is green here [F-M13, W2-M301, W2-M309, W2-M310, W2-L243]
 
@@ -104,6 +133,8 @@ Notes on these cases:
 
 **Totals at the commit that added the suite:** 42 cases. 26 fail, each for the reason given above. 16 pass, each a "still" case, a guard, or the DEC-732 case.
 
+**Totals at run 2's commit, against run 1's implementation:** 53 cases. 18 fail, all for one reason: `adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']`. These are the 11 new cases and the 7 revised verdict cases. The other 35 pass. The valid-list case does not pass today: its keys come from the schema, and today's schema states none.
+
 ## Packages (proposed decisions; no case holds what they leave open)
 
 **P-1: is `W2-15` (two digits, no suffix) accepted?**
@@ -122,18 +153,7 @@ Notes on these cases:
 - Cost: (a) one KPI wording fix; (b) renumbering the waves.
 - **Recommendation: (a). Confidence: high.**
 
-**P-2: what "the conditions behind them, in the lite form Contract v4.2 states" are.**
-- Question: Contract v4.2 is W2-49's, which is still open. This worktree's contract has CAP-44.h in its Wave 3 form: "with the ten ADOPTED_HEALTHY conditions" (Adoption Protocol v3.0 §20). DEC-722 brings in CAP-44.h lite with the A7 and A10 gates. No lite list of conditions exists yet.
-- Why now: the verdict type is defined in this ticket.
-- Options:
-  - (a) W2-02 defines the type with the three verdicts and a conditions field in a form of its own choosing. A test of the conditions is added once W2-49 states them.
-  - (b) W2-02 waits for W2-49.
-  - (c) The ten conditions of the protocol are taken now.
-- Impact: (a) may need a schema change after W2-49; (b) delays Track A's critical path; (c) may contradict the lite form.
-- Reversibility: (a) and (c) are reversible as schema changes.
-- Cost: low for (a); days for (b).
-- **Recommendation: (a). Confidence: medium.**
-- The tests hold only the three verdicts, not the conditions. A well-formed verdict record is checked only on its verdict field, never "no finding at all".
+**P-2: decided by DEC-741 I (ii) (owner, 2026-10-17), applied by DEC-746 (P-2).** The package asked what "the conditions behind them, in the lite form Contract v4.2 states" are. The answer: W2-02 types the verdict with its three values and a list of named conditions. Each condition has its source item and its state (met, not met, accepted by an owner entry), and the ticket closes on its own. The KPI's "in the lite form Contract v4.2 states" is read as that form. Run 1's limitation is lifted: the cases now hold the conditions and a well-formed verdict record is checked for "no finding at all". See "the adoption verdict's named conditions" above.
 
 **P-3: how a decision entry reaches core-schema.**
 - Question: a register entry is a `### DEC-nnn` heading, not a file with frontmatter. W2-03 makes each entry a record of the store. The ticket allows only "the type map" in `src/gov/check/schema.py`.
@@ -162,4 +182,18 @@ Notes on these cases:
 ## Risks
 
 - **Earlier suites that run core-schema in a project with no schema files.** Once unmeasured types are reported, a case in another suite that expects such a project to be silent may turn red. The suites seen here (W1-26, W1-30 round 15) copy the kernel's schemas into their projects.
+- **The check must measure a list of maps in the verdict type** (seen in run 2, through the public command only). In a temporary project, the kernel's verdict schema was swapped for a scratch one with a typed `conditions` list. For this type, today's check then gives `SCHEMA_INVALID_FIELD` ("field 'conditions' has a shape the check cannot measure") for every non-text value. That held for a list of maps, a list of strings, a map and an empty list, the valid ones included. The same `allowed_paths` shape in a `task` record gives no finding.
+  - So typing the schema alone may not turn the valid case green.
+  - The ticket allows `src/gov/check/schema.py` for "the type map only". Whether measuring the list fits inside that is the lead's question, not these cases'.
+  - Each failure case's twin keeps such a check from passing it for the wrong reason.
 - **The close fixture depends on `gov close` succeeding** in a minimal project. W2-01 is changing the close path. If a later close refuses this project, the three close cases fail with the close's own output in the message. That is a fixture failure, not a schema one.
+- **The key words.** The cases expect the name's key to hold the word `name` and the source item's key to hold the word `source` (see "How the cases find the keys"). A schema that calls the source item only `item` would fail the key lookup, with the lookup's own message.
+
+## W1-26, revised in run 2 (DEC-746 item 2, P-B (a))
+
+`tests/acceptance/W1-26/test_w1_26_installed_kernel.py::test_a_project_with_neither_layout_answers_as_today`: one assertion revised, its last, on the schema check's findings. Nothing else in that file changed.
+
+- Before: the findings were exactly `[("SCHEMA_UNREADABLE", <probe record>)]`.
+- Now: they are exactly the probe record and the task record (`docs/records/PROJ-0001.md`, type `task`), each `SCHEMA_UNREADABLE`, compared without order. This is stricter: both records are reported and nothing is green. It follows from this ticket's KPI line 3 (a type with no schema file is reported unmeasured).
+- Its own commit carries a `Rewrite-Reason:` trailer.
+- It passes against run 1's implementation.

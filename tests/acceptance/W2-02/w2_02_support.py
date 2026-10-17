@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import site
 import subprocess
 import sys
@@ -269,6 +270,100 @@ def the_verdict_type():
     record_type = type_of(schema)
     assert record_type, f"{name} says no record type (no constant `type` property)"
     return record_type, field
+
+
+# --------------------------------------------------------------------------
+# The verdict's named conditions (DEC-741 I (ii)), found by content in the verdict type's schema
+# --------------------------------------------------------------------------
+
+# DEC-741 I (ii): a condition's state is one of these three words.
+CONDITION_STATES = ("met", "not met", "accepted")
+
+# The owner entry that accepts a condition, and the source item a condition comes from, in the records the cases
+# build (DEC-741 answer F: only the owner accepts an exception, in an owner entry).
+OWNER_ENTRY = "DEC-741"
+SOURCE_ITEM = "CAP-44.h"
+
+
+def _resolved_in(schema, entry):
+    """``entry``, or what its ``$ref`` names: a shared definition, or a definition of ``schema`` itself."""
+    ref = entry.get("$ref") if isinstance(entry, dict) else None
+    if isinstance(ref, str) and ref.startswith("#/$defs/"):
+        return (schema.get("$defs") or {}).get(ref.rsplit("/", 1)[1], {})
+    return _resolved(entry)
+
+
+def _words(key):
+    return key.lower().replace("_", " ").replace("-", " ").split()
+
+
+def _one(found, what, name):
+    assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+    return found[0]
+
+
+def the_condition_keys():
+    """The keys of the verdict's conditions, read from the one adoption-verdict schema:
+
+    - ``conditions``: the property that is a list whose items have a property with exactly the three states;
+    - ``state``: that property of an item;
+    - ``name`` and ``source``: the item's properties whose names hold the words "name" and "source";
+    - ``owner_entry``: the item's property whose grammar takes a register id (``DEC-741``) and refuses other text.
+
+    Fails the case when the schema states no such list."""
+    found = verdict_schemas()
+    assert len(found) == 1, f"{len(found)} adoption-verdict schema files; one is expected: {sorted(found)}"
+    name, (schema, _) = next(iter(found.items()))
+    lists = {}
+    for key, shape in properties_of(schema).items():
+        shape = _resolved_in(schema, shape)
+        item = _resolved_in(schema, shape.get("items")) if shape.get("type") == "array" else {}
+        for part_key, part in properties_of(item).items():
+            part = _resolved_in(schema, part)
+            if isinstance(part.get("enum"), list) and set(part["enum"]) == set(CONDITION_STATES):
+                lists[key] = (item, part_key)
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+                      name)
+    item, state = lists[conditions]
+    parts = properties_of(item)
+    names = _one([key for key in parts if "name" in _words(key)], "condition properties named for its name", name)
+    sources = _one([key for key in parts if "source" in _words(key)],
+                   "condition properties named for its source item", name)
+    owners = []
+    for key, part in parts.items():
+        pattern = _resolved_in(schema, part).get("pattern")
+        if key != state and isinstance(pattern, str) and re.search(pattern, OWNER_ENTRY) \
+                and not re.search(pattern, "the owner said so"):
+            owners.append(key)
+    owner_entry = _one(owners, "condition properties with a decision id's grammar (the owner entry)", name)
+    return {"conditions": conditions, "state": state, "name": names, "source": sources, "owner_entry": owner_entry}
+
+
+def condition(keys, name, state, owner_entry=None):
+    """One condition: its name, its source item, its state and, where given, the owner entry that accepts it."""
+    found = {keys["name"]: name, keys["source"]: SOURCE_ITEM, keys["state"]: state}
+    if owner_entry is not None:
+        found[keys["owner_entry"]] = owner_entry
+    return found
+
+
+def conditions_for(keys, verdict):
+    """A list of conditions that agrees with ``verdict``: all met; met and one accepted by an owner entry; or met,
+    not met and accepted. The names are DEC-741 answer G's lite healthy conditions."""
+    doctor = condition(keys, "gov doctor is green", "met")
+    if verdict == "ADOPTED_HEALTHY":
+        return [doctor, condition(keys, "gov check has no RED", "met")]
+    if verdict == "ADOPTED_WITH_ACCEPTED_EXCEPTIONS":
+        return [doctor, condition(keys, "a first gov close exits 0", "accepted", OWNER_ENTRY)]
+    return [doctor, condition(keys, "gov check has no RED", "not met"),
+            condition(keys, "a first gov close exits 0", "accepted", OWNER_ENTRY)]
+
+
+def names_field_or_part(finding, field):
+    """The finding names ``field`` or a part of it: its ``field`` key is ``field`` or begins with it (as in
+    ``conditions[1].state``), or ``field`` is a word of its message."""
+    named = str(finding.get("field", ""))
+    return names_field(finding, field) or re.match(rf"{re.escape(field)}(?![\w-])", named) is not None
 
 
 # --------------------------------------------------------------------------

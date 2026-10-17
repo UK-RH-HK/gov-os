@@ -3,8 +3,9 @@ report in DEC-441's form, an adoption verdict (the three CAP-44.h verdicts) and 
 ``gov close`` writes. A defined type is one core-schema measures: a well-formed record of it passes, and a record
 missing what the type requires is refused.
 
-What package P-2 (the conditions of the adoption verdict) and P-3 (how a decision entry reaches the check) leave
-open is not held here; see the README.
+The adoption verdict's named conditions are typed by DEC-741 I (ii); their refusals are in
+``test_w2_02_verdict_conditions.py``. What package P-3 (how a decision entry reaches the check) leaves open is not
+held here; see the README.
 """
 
 from __future__ import annotations
@@ -50,32 +51,43 @@ def test_one_kernel_schema_states_the_three_verdicts_of_cap_44_h():
     support.the_verdict_type()
 
 
-def _verdict_record(record_type, field, value):
+def _verdict_record(record_type, field, value, conditions):
+    """A verdict record with ``value`` in the verdict field (none where ``value`` is None) and its list of named
+    conditions (DEC-741 I (ii): the list is required, so a well-formed record holds one)."""
     front = support.shared("AV-0001", record_type, status="ACCEPTED", state_class="EVIDENCE")
     if value is not None:
         front[field] = value
+    front.update(conditions)
     return support.markdown(front, "# The adoption verdict\n\nThe conditions behind it.\n")
 
 
 @pytest.mark.parametrize("verdict", support.VERDICTS)
 def test_each_of_the_three_verdicts_is_a_well_formed_verdict(project, verdict):
-    """A verdict record with that verdict: no finding names the verdict field.
-    Red today: no kernel schema states the verdicts (the case fails at finding the type)."""
+    """A verdict record with that verdict and a list of named conditions that agrees with it, each with its name,
+    source item and state, an ``accepted`` one with its owner entry (DEC-741 I (ii)): no finding on the file, and
+    the check is green. Rewritten under DEC-741 I (ii): run 1 held only the verdict field, the conditions being open.
+    Red today: the verdict schema types no list of conditions (the case fails at finding its keys)."""
     record_type, field = support.the_verdict_type()
-    rel = project.write("docs/adoption/AV-0001.md", _verdict_record(record_type, field, verdict))
-    _, findings = project.core_schema()
-    found = [finding for finding in support.about(findings, rel) if support.names_field(finding, field)
-             or finding.get("code") == support.UNKNOWN_TYPE]
-    assert not found, f"the verdict {verdict} is refused: {found}"
+    keys = support.the_condition_keys()
+    conditions = {keys["conditions"]: support.conditions_for(keys, verdict)}
+    rel = project.write("docs/adoption/AV-0001.md", _verdict_record(record_type, field, verdict, conditions))
+    code, findings = project.core_schema()
+    found = support.about(findings, rel)
+    assert not found, f"the verdict {verdict} with its conditions is a finding: {found}"
+    assert code == 0, f"core-schema exits {code} on a project whose one record is a well-formed verdict"
 
 
 @pytest.mark.parametrize("verdict", ("ADOPTED", "pass", "adopted_healthy", None),
                          ids=("not-one-of-the-three", "the-A5-word", "lower-case", "missing"))
 def test_a_verdict_record_without_one_of_the_three_verdicts_is_refused(project, verdict):
-    """A word outside the three, or no verdict at all: a finding on the file names the verdict field, and the
-    check is not green. Red today: no kernel schema states the verdicts."""
+    """A word outside the three, or no verdict at all, in a record whose conditions are well formed: a finding on
+    the file names the verdict field, and the check is not green. Revised under DEC-741 I (ii): the record carries
+    its required conditions, so the verdict is its one defect. Red today: the verdict schema types no list of
+    conditions (the case fails at finding its keys)."""
     record_type, field = support.the_verdict_type()
-    rel = project.write("docs/adoption/AV-0001.md", _verdict_record(record_type, field, verdict))
+    keys = support.the_condition_keys()
+    conditions = {keys["conditions"]: support.conditions_for(keys, "NOT_ADOPTED_HEALTHY")}
+    rel = project.write("docs/adoption/AV-0001.md", _verdict_record(record_type, field, verdict, conditions))
     code, findings = project.core_schema()
     found = [finding for finding in support.about(findings, rel) if support.names_field(finding, field)]
     assert found, f"a verdict record with verdict {verdict!r} is not refused on {field!r}: {findings}"
