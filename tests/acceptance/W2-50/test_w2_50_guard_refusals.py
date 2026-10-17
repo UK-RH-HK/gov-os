@@ -51,8 +51,13 @@ def _file_tools_and_bash(guard, sandbox, target, what, role=ENGINEER, ticket=MAI
 
 
 def _populate(sandbox):
-    """The root with MAIN's and OTHER's folders, a file in each, and a file elsewhere."""
-    own, other = sandbox.own(MAIN), sandbox.own(OTHER)
+    """The root with MAIN's and OTHER's folders, a file in each, and a file elsewhere.
+
+    Rewritten under DEC-751: both folders are made by ``gov launch`` of the
+    fixture project, so they are this repository's and MAIN's is open; each
+    refusal below is then the rule's, not that of a folder no launch made.
+    """
+    own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
     support.write(own / "mine.txt", "mine\n")
     (own / "dir").mkdir(parents=True, exist_ok=True)
     support.write(other / "theirs.txt", "theirs\n")

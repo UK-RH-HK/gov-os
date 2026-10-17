@@ -50,8 +50,12 @@ def _refused(result, what, sandbox, *paths):
 
 
 def _populate(sandbox):
-    """The root with MAIN's and OTHER's folders and a file in each, as the refusal cases build it."""
-    own, other = sandbox.own(MAIN), sandbox.own(OTHER)
+    """The root with MAIN's and OTHER's folders and a file in each, as the refusal cases build it.
+
+    Rewritten under DEC-751: both folders are made by ``gov launch`` of the
+    fixture project, never by hand (``support.open_own_folder``).
+    """
+    own, other = support.open_own_folder(sandbox, MAIN), support.open_own_folder(sandbox, OTHER)
     support.write(own / "mine.txt", "mine\n")
     support.write(other / "theirs.txt", "theirs\n")
     return own, other
@@ -227,9 +231,12 @@ def _add_ticket(project, ticket, status):
 
 
 def test_the_same_ticket_in_progress_opens_its_folder(guard, sandbox, project):
-    """The control of the two refusals below: the ticket written the same way, ``in_progress``, opens its folder."""
+    """The control of the two refusals below: the ticket written the same way, ``in_progress``, opens its folder.
+
+    Rewritten under DEC-751: the folder is made by ``gov launch`` of the ticket.
+    """
     _add_ticket(project, STATUS_TICKET, "in_progress")
-    target = sandbox.own(STATUS_TICKET) / "notes.txt"
+    target = support.open_own_folder(sandbox, STATUS_TICKET) / "notes.txt"
     support.write(target, "a\n")
     for tool_name in ("Write", "Edit"):
         support.assert_allowed(guard(tool_name, target, ENGINEER, STATUS_TICKET.tk),
@@ -240,7 +247,14 @@ def test_the_same_ticket_in_progress_opens_its_folder(guard, sandbox, project):
 
 @pytest.mark.parametrize("status", ("open", "closed"))
 def test_the_folder_of_a_ticket_that_is_not_in_progress_is_closed(guard, sandbox, project, status):
-    """DEC-743 6: a session whose GOV_TICKET names a ticket in another status may not write in its folder."""
+    """DEC-743 6: a session whose GOV_TICKET names a ticket in another status may not write in its folder.
+
+    Rewritten under DEC-751 (the expectation unchanged): the folder is made by a
+    launch while the ticket is ``in_progress``, then the ticket's status changes;
+    the refusal is then the status's, not that of a folder no launch made.
+    """
+    _add_ticket(project, STATUS_TICKET, "in_progress")
+    support.open_own_folder(sandbox, STATUS_TICKET)
     _add_ticket(project, STATUS_TICKET, status)
     _writes_refused(guard, sandbox, sandbox.own(STATUS_TICKET), f"by the engineer on {STATUS_TICKET.tk} ({status})",
                     ENGINEER, STATUS_TICKET.tk)
@@ -251,7 +265,12 @@ def test_the_folder_of_a_ticket_that_is_not_in_progress_is_closed(guard, sandbox
 # --------------------------------------------------------------------------
 
 def test_a_ticket_lead_may_not_write_in_its_tickets_folder(guard, sandbox):
-    """DEC-743 7: a ``ticket-lead`` session on MAIN (``in_progress``) may not write in ``~/gov-os-runs/W2-90``."""
+    """DEC-743 7: a ``ticket-lead`` session on MAIN (``in_progress``) may not write in ``~/gov-os-runs/W2-90``.
+
+    Rewritten under DEC-751 (the expectation unchanged): the folder is made by a
+    launch of MAIN first, so it is open to MAIN's engineer and the refusal is the role's.
+    """
+    support.open_own_folder(sandbox, MAIN)
     _writes_refused(guard, sandbox, sandbox.own(MAIN), f"by {TICKET_LEAD} on {MAIN.tk}", TICKET_LEAD, MAIN.tk)
 
 

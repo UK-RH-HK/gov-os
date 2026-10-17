@@ -12,6 +12,11 @@ The root is the temporary HOME's ``gov-os-runs``; HOME is not inside the temp
 folder the guard sees, so no case is allowed because of the temp folder rule.
 The refusals of the same KPI ("writes *only* under") are in
 ``test_w2_50_guard_refusals.py``.
+
+Rewritten under DEC-751 (DEC-491): a folder belongs to the one repository
+whose launch made it, so each case that expects a write allowed first makes
+the folder by ``gov launch`` of the fixture project
+(``support.open_own_folder``), never by hand.
 """
 
 from __future__ import annotations
@@ -44,7 +49,7 @@ BASH_FORMS = ("redirect", "append", "tee", "touch", "mkdir-p", "cp-into", "mv-wi
 
 
 def _prepare_own(sandbox):
-    own = sandbox.own(MAIN)
+    own = support.open_own_folder(sandbox, MAIN)     # DEC-751: made by a launch, not by hand
     (own / "old").mkdir(parents=True, exist_ok=True)
     support.write(own / "first.txt", "first\n")
     support.write(own / "existing.txt", "a\n")
@@ -60,7 +65,7 @@ def _prepare_own(sandbox):
 def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
     """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
     ticket = support.TICKET_OF[role]
-    own = sandbox.own(ticket)
+    own = support.open_own_folder(sandbox, ticket)     # DEC-751: made by a launch of the ticket
     target = own / "notes" / "existing.txt"
     support.write(target, "a\n")
     support.assert_allowed(guard(tool_name, target, role, ticket.tk),
@@ -70,7 +75,7 @@ def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, r
 @pytest.mark.parametrize("role", support.ROLES)
 def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
     ticket = support.TICKET_OF[role]
-    target = sandbox.own(ticket) / "bash.txt"
+    target = support.open_own_folder(sandbox, ticket) / "bash.txt"     # DEC-751
     command = f"echo written > {q(target)}"
     support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
 
@@ -89,7 +94,7 @@ def test_a_clone_into_the_own_folder_is_allowed(guard, sandbox, project):
 
 
 def test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed(guard, sandbox):
-    own = sandbox.own(MAIN)
+    own = support.open_own_folder(sandbox, MAIN)     # DEC-751
     target = own / "clone" / "src" / "pkg" / "module.py"
     support.write(target, "VALUE = 1\n")
     for tool_name in ("Write", "Edit"):
@@ -103,7 +108,8 @@ def test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed(guard, sandbox
 # --------------------------------------------------------------------------
 
 def test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id(guard, sandbox):
-    target = sandbox.root / support.NO_W2_ID.tk / "notes.txt"
+    target = support.open_own_folder(sandbox, support.NO_W2_ID) / "notes.txt"     # DEC-751
+    assert target.parent == sandbox.root / support.NO_W2_ID.tk
     support.assert_allowed(guard("Write", target, support.ENGINEER, support.NO_W2_ID.tk),
                            f"Write on {target} by the engineer on {support.NO_W2_ID.tk}, which has no external-ref")
     command = f"echo written > {q(target)}"
@@ -112,14 +118,15 @@ def test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id(guard,
 
 def test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written(guard, sandbox):
     """``external-ref: W2-99a`` -> ``~/gov-os-runs/W2-99a/`` (as for worktrees, e.g. W2-15a)."""
-    target = sandbox.root / support.SUFFIXED.wbs / "notes.txt"
+    target = support.open_own_folder(sandbox, support.SUFFIXED) / "notes.txt"     # DEC-751
+    assert target.parent == sandbox.root / support.SUFFIXED.wbs
     support.assert_allowed(guard("Write", target, support.ENGINEER, support.SUFFIXED.tk),
                            f"Write on {target} by the engineer on {support.SUFFIXED.tk} ({support.SUFFIXED.wbs})")
 
 
 def test_the_folder_follows_gov_ticket_not_the_worktree(guard, sandbox):
     """Resolved from the session's GOV_TICKET: in the W2-90 worktree, a session on W2-91 has W2-91's folder."""
-    target = sandbox.own(support.OTHER) / "notes.txt"
+    target = support.open_own_folder(sandbox, support.OTHER) / "notes.txt"     # DEC-751: launched in this worktree
     support.assert_allowed(guard("Write", target, support.ENGINEER, support.OTHER.tk),
                            f"Write on {target} by the engineer on {support.OTHER.tk}")
 
@@ -129,8 +136,15 @@ def test_the_folder_follows_gov_ticket_not_the_worktree(guard, sandbox):
 # --------------------------------------------------------------------------
 
 def test_the_first_write_is_allowed_when_neither_the_root_nor_the_folder_exists(guard, sandbox):
-    """"The folder is created on first use": the guard does not ask for the folder to exist first."""
+    """"The folder is created on first use": by the first launch, then the session's first write there is allowed.
+
+    Rewritten under DEC-751: neither the root nor the folder exists before the
+    first launch; the launch makes them (R2's step, DEC-743 1), and the first
+    write in the made folder is allowed. A folder that does not exist yet gives
+    no session anything (``test_w2_50_last_review.py``).
+    """
     assert not sandbox.root.exists(), "the fixture's HOME already holds the root"
+    support.open_own_folder(sandbox, MAIN)
     target = sandbox.own(MAIN) / "first.txt"
     support.assert_allowed(guard("Write", target), f"Write on {target}, the first use")
     command = f"mkdir -p {q(sandbox.own(MAIN) / 'clone')}"

@@ -41,6 +41,11 @@ named, created, listed or written.
 ``.claude/settings.json`` written here that registers the copied guard, and a
 git history of one commit. Nothing of this repository is copied but single
 named files (the guard, ``template/.gitleaks.toml``).
+
+**An own folder is made by a launch** (DEC-751): ``open_own_folder`` runs
+``gov launch`` of the ticket in the fixture project, the one public way a
+folder under the root becomes a repository's. A folder made by hand gives no
+session anything; the cases that expect writes there allowed open it first.
 """
 
 from __future__ import annotations
@@ -547,6 +552,27 @@ def launch(sandbox, cli, role, ticket):
     before = len(calls(cli))
     run = run_gov(sandbox, sandbox.project, "launch", role, ticket.tk if isinstance(ticket, Ticket) else ticket)
     return Launch(run, tuple(calls(cli)[before:]))
+
+
+def open_own_folder(sandbox, ticket=MAIN, role=None, folder=None):
+    """Make a ticket's own folder the one public way: ``gov launch`` of the ticket in ``sandbox.project``.
+
+    DEC-751: a folder under the root belongs to the one repository whose launch
+    made it; a folder made by hand, or not made yet, gives no session anything.
+    The launch runs with the stand-in CLI (installed here; it starts no
+    session). ``ticket`` is a ``Ticket`` or a tk id; for a tk id, ``role`` and
+    ``folder`` (the folder's name under the root) are given. The launcher's
+    record is never named or read here. Returns the folder.
+    """
+    if isinstance(ticket, Ticket):
+        role, folder = role or ticket.role, folder or ticket.folder
+    cli = install_stand_in_cli(sandbox)
+    result = launch(sandbox, cli, role, ticket)
+    result.session()
+    path = sandbox.root / folder
+    assert path.is_dir() and not path.is_symlink(), (
+        f"the launch of {ticket.tk if isinstance(ticket, Ticket) else ticket} did not make {path}\n{result.describe()}")
+    return path
 
 
 def entry_path(entry, sandbox):

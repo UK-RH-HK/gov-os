@@ -255,8 +255,12 @@ def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, cas
 
 
 def test_a_plain_folder_name_with_dot_and_underscore_names_the_folder(sandbox):
-    """The control: a ticket written the same way, with a plain name, has its folder."""
+    """The control: a ticket written the same way, with a plain name, has its folder.
+
+    Rewritten under DEC-751: the folder is made by ``gov launch`` of the ticket first.
+    """
     project = _named_project(sandbox, PLAIN)
+    support.open_own_folder(sandbox, NAMED.tk, ENGINEER, PLAIN)
     _all_allowed(sandbox, project, sandbox.root / PLAIN / "notes.txt",
                  f"by the engineer on {NAMED.tk} (external-ref {PLAIN!r})", ENGINEER, NAMED.tk)
 
@@ -335,8 +339,12 @@ def test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_bot
 
 
 def test_a_ticket_whose_name_no_other_shares_keeps_its_folder(sandbox):
-    """The control, in the same project: OTHER's W2-91 is named by no other ticket, so its folder stays open."""
+    """The control, in the same project: OTHER's W2-91 is named by no other ticket, so its folder stays open.
+
+    Rewritten under DEC-751: the folder is made by ``gov launch`` of OTHER first.
+    """
     project = _sharing_project(sandbox)
+    support.open_own_folder(sandbox, OTHER)
     _all_allowed(sandbox, project, sandbox.own(OTHER) / "notes.txt", f"by the engineer on {OTHER.tk}", ENGINEER,
                  OTHER.tk)
 

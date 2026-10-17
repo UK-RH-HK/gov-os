@@ -4,12 +4,15 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**208 cases in 7 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**233 cases in 8 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
-file: **55 failed, 99 passed**), and 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
+file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
 added after implementation, from the review (DEC-136)** (red run of the whole suite at `d0c6be04` plus that file:
-**34 failed, 174 passed**, about 1.5 minutes; see the section below).
+**34 failed, 174 passed**, about 1.5 minutes; see the section below), and 25 cases in `test_w2_50_last_review.py`
+for the last review's findings, **tests added after implementation, from the last review (DEC-136, DEC-751)**, with
+80 earlier cases rewritten to make the own folder by a launch (red run of the whole suite at `21ac28b7` plus these
+changes: **15 failed, 218 passed, 0 skipped**, about 3 minutes; see the last section).
 
 ## Run
 
@@ -191,6 +194,77 @@ behaviours 2 and 3). Every earlier case still passes (154).
   unquoted, as `tk` does.
 - **A name holding `/`** (`external-ref: W2-91/sub`) is refused by the guard and given nothing by the launcher
   today; behaviour 2 holds it too (a `/` is not allowed in a plain name). Not tested beyond `..`.
+
+## The last review's findings: tests added after implementation, from the last review (DEC-136, DEC-751)
+
+The second and last review found two behaviours the suite missed. The orchestrator decided them (DEC-751,
+2026-10-17, delegated, stricter only): P-A (a), the launcher writes a record in the own folder naming the
+repository's git common directory, and the guard and the launcher refuse a folder whose record is missing or names
+another repository; P-B (a), the secrets walk follows a link whose target stays inside the repository being scanned,
+even under the root (W1-15's B4 stays green). They are tested in `last` = `test_w2_50_last_review.py`, through the
+guard's hook, `gov launch` with the stand-in CLI and the secrets-indexing check, as the rest of the suite.
+
+**How the record is made.** Only the public way: `gov launch` with the stand-in CLI in the project whose folder it is
+(`support.open_own_folder`, or the new file's fixture `first`). No case writes, names or reads the record, or assumes
+its file name or form (DEC-462). Where a case asks that a launch "changes nothing" in a folder, it compares the
+folder's entries by name, kind, size and modification time, reading no file. "Another repository" is a project whose
+git common directory differs: one built apart from scratch, or a `git clone` of the fixture project made inside the
+test's own folder. "The same repository" is the fixture project or a `git worktree add` of it, inside the test's own
+folder.
+
+| Behaviour | New cases | Red reason today (`21ac28b7`) | Green today, and why |
+|---|---|---|---|
+| **1. A folder belongs to the one repository whose launch made it** — control: the launching repository's session keeps its folder (Write, Edit, Bash redirect, `mkdir -p`, `rm -rf` of a sub-folder) | `last::test_the_launching_repositorys_session_keeps_its_folder` | none | passes: the control; it must stay green |
+| 1 — control: a later launch in the same repository keeps the folder, the test's own file in it, and exactly its entry under the root; the guard still allows | `last::test_a_later_launch_in_the_same_repository_keeps_the_folder_its_content_and_its_entry` | none | passes: the control |
+| 1 — control: a second worktree of the same repository (its ticket `in_progress`) gets the same folder, in the guard and in its launch's write list | `last::test_a_second_worktree_of_the_same_repository_gets_the_same_folder` | none | passes: the control; a record that named the worktree instead of the common directory turns it red |
+| 1 — another repository's session, its `in_progress` ticket of the same name, gets nothing there: Write, Edit, a Bash redirect, `mkdir -p` and `rm -rf` of the folder refused with the guard's reason; the first project's session keeps the folder (control in the same case) | `last::test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made` × 3 forms: (a) `a-project-built-apart-outside-the-root` (`~/projects/second`, ticket W2-91), (b) `a-clone-inside-the-first-projects-own-folder` (`~/gov-os-runs/W2-90/clone`, ticket W2-91), (c) `a-clone-of-the-first-project-outside-the-root` (`~/clones/third`, ticket W2-90) | "Write on …/gov-os-runs/<W2-91 or W2-90>/work/README.md by the engineer on <tk> of another repository <project> (<form>) was not refused: decision=allow" (3) | — |
+| 1 — `gov launch` in that other repository adds no entry at, under or above the root, changes nothing the folder holds (the record included), and keeps the temp folder | `last::test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder` × the same 3 forms | "the sandbox of a session on <tk> in another repository <project> (<form>) may write at or under the root through ['//…/gov-os-runs/<W2-91 or W2-90>']" (3) | — |
+| 1 — a folder made by hand gives no session anything (Write, Edit, Bash redirect, `mkdir -p`, `rm -rf` refused with the guard's reason) | `last::test_a_folder_made_by_hand_gives_no_session_anything` × `before-any-launch`, `beside-a-launched-folder` (OTHER's W2-91 launched, W2-90 by hand) | "Write on …/gov-os-runs/W2-90/work/README.md (a folder made by hand, <layout>) was not refused: decision=allow" (2) | — |
+| 1 — a folder that does not exist yet gives no session anything (Write, Edit, Bash redirect, `mkdir -p`) | `last::test_a_folder_that_does_not_exist_yet_gives_no_session_anything` × the same 2 layouts | "Write on …/gov-os-runs/W2-90/notes.txt (the own folder does not exist yet, <layout>) was not refused: decision=allow" (2): R2's guard half, now replaced | — |
+| 1 — a launch neither adds nor records a folder that was there before any launch: no entry at or under the root, the folder's entries unchanged (an empty folder stays empty), the temp folder kept, and the guard still refuses a Write there | `last::test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record` × `empty`, `holding-a-file` | "the launch added a folder that no launch made (<content>) through ['//…/gov-os-runs/W2-90']" (2) | — |
+| **2. A project's own secrets check follows a link that stays inside the project, also under the root** — a link in its `.gov-runtime/` to a folder or file of the same project outside `.gov-runtime/` holding a planted secret: red. Premise in each case: with no link, the check is green (it scans only `.gov-runtime/`) | `last::test_a_projects_own_check_follows_a_link_that_stays_inside_the_project` × 2 locations (`outside-the-root`: the fixture worktree; `a-clone-under-the-root`: its `git clone` at `~/gov-os-runs/W2-90/clone`) × 3 links (`.gov-runtime/packets` → `shared-store/`; `.gov-runtime/scratch/kept` → `kept-store/`; the file link `.gov-runtime/store.txt` → `kept/store.txt`) | `a-clone-under-the-root` (3): "the check of the project …/gov-os-runs/W2-90/clone (a-clone-under-the-root) did not follow <link> …, a place of the same project that holds a secret: it is green" (CIT-E difference 10) | `outside-the-root` (3): the same layout outside the root is red today (the check follows a link elsewhere, W1-15's B4); they must stay green |
+| 2 — control: from the clone's `.gov-runtime/`, a link to a place under the root but outside the clone is still not followed (DEC-743 3): green, the secret not printed | `last::test_a_link_under_the_root_but_outside_the_project_is_still_not_followed` × `a-sibling-in-the-same-own-folder` (`W2-90/sibling-store`), `another-tickets-folder` (`W2-91/store`), `the-root-itself` (secret in `W2-77/store`) | none | passes (3): the control; "follow every link from a project under the root" turns it red |
+| 2 — control: this repository's check (the worktree outside the root) does not follow a link into a folder of a clone under the root | `last::test_this_repositorys_check_does_not_follow_a_link_into_a_clone_under_the_root` | none | passes: the target lies inside *a* project, but not the scanned one; "follow a link into any repository" turns it red. The other forms are held by `index::test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder` and `answers::test_the_check_does_not_scan_the_root_through_a_link_to_the_root_itself` |
+
+**Red run (whole suite, at `21ac28b7` plus these changes): 15 failed, 218 passed, 0 skipped.** The new file: 15 red,
+10 green (the 3 controls of behaviour 1, the 3 outside-the-root links and the 4 controls of behaviour 2). Every
+earlier case still passes (208), the 80 rewritten among them. W1-15's suite, run to its end: **124 passed**.
+
+### Earlier cases rewritten (DEC-491; `Rewrite-Reason:` names DEC-751)
+
+Behaviour 1 makes a folder that no launch made give no session anything, so each earlier case that made the own
+folder by hand (or not at all) and expects a write there allowed now makes it by `gov launch` of the fixture project
+first. The expectation of every case is unchanged. Refusal cases whose setup built the own folder by hand are made by
+a launch too, so that each refusal stays the rule's, not that of a folder no launch made (before DEC-751 a folder made
+by hand was open, so those refusals were judged against an open folder; this keeps them so).
+
+| File | Change | Cases |
+|---|---|---|
+| `w2_50_support.py` | new public helper `open_own_folder(sandbox, ticket, role, folder)`: `gov launch` of the ticket with the stand-in CLI, asserting the folder made; a docstring paragraph | — |
+| `own` | `test_every_role_may_write_a_file_in_its_own_tickets_folder` (12), `test_every_role_may_write_through_bash_in_its_own_tickets_folder` (6), `test_judged_bash_forms_into_the_own_folder_are_allowed` (8, through `_prepare_own`), `test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed`, `test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id`, `test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written`, `test_the_folder_follows_gov_ticket_not_the_worktree` (OTHER launched in the W2-90 worktree): the folder made by a launch of the ticket | 30 |
+| `own` | `test_the_first_write_is_allowed_when_neither_the_root_nor_the_folder_exists`: neither exists before the first launch; the launch makes them (R2's step), then the first write in it is allowed. The guard half of R2 ("an unlaunched session makes it with its first write") is replaced by DEC-751; the refusal of a folder that does not exist yet is in `last` | 1 |
+| `ref` | `_populate` makes MAIN's and OTHER's folders by a launch (setup only): the cases that call it — another ticket's folder (7), a file in the root (1), removing the root (6), `..` (5), the symbolic links (5), the hard links (8), the moves (7) | 39 |
+| `answers` | `_populate` by a launch: the `rmdir` spellings of the root (3) and `rmdir` inside the own folder (1); `test_the_same_ticket_in_progress_opens_its_folder` (launch of DAEO-zz95); `test_the_folder_of_a_ticket_that_is_not_in_progress_is_closed` (launched while `in_progress`, then its status changed and committed; 2); `test_a_ticket_lead_may_not_write_in_its_tickets_folder` (MAIN launched first) | 8 |
+| `review` | `test_a_plain_folder_name_with_dot_and_underscore_names_the_folder` (DAEO-zz80 launched), `test_a_ticket_whose_name_no_other_shares_keeps_its_folder` (OTHER launched) | 2 |
+
+**Not changed, and why.** `own::test_a_clone_into_the_own_folder_is_allowed` passes either way (the guard does not
+judge a clone's destination). `launch::test_a_launch_keeps_what_the_folder_already_holds` makes the folder by hand and
+asks that the session find exactly `['earlier']` and the file kept: DEC-751 keeps that (a launch writes no record
+into a folder that exists without one). `launch::test_a_launch_of_another_ticket_leaves_the_folder_alone` and the two
+launch cases of `answers` hold nothing a record changes (the record lies inside the made folder). The other refusal
+cases (`review`'s names that are not plain, shared names, the folder beside a project inside it; `ref`'s cases that
+build no folder) keep their folders as they were: no launch can make those folders, or none is needed. No earlier
+ticket's test was changed.
+
+### Discoveries of this round (no test)
+
+- **An unlaunched session no longer makes the own folder.** R2's guard half (DEC-743's approved reading) let an
+  unlaunched session (the orchestrator) make the folder with its first write. Under DEC-751 the orchestrator writes
+  there only after a launch of the ticket made the folder. Tested as described (a folder that does not exist yet gives
+  nothing); the orchestrator's own way in is the lead's to confirm with the owner.
+- **The record lies in a folder its session may write.** The ticket's own session may remove or change what the
+  launcher wrote there, and so close its own folder; it cannot open another repository's (it writes nowhere else). No
+  source says the record is protected from its own session; not tested.
 
 ## Readings chosen where a KPI line admits more than one
 
