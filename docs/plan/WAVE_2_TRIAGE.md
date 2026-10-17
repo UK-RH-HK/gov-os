@@ -428,7 +428,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732), 
 | W2-M329 | W1-46 live-session cases error when run beside other suites | medium | backlog | Test-quality debt; taken up when a ticket touches that suite (DEC-136). |
 | W2-M330 | Cross-process ordering of the supplementary block untested | medium | W2-04 | Fits W2-04's paths and KPIs (gov context bounded); its builder takes it. |
 | W2-M331 | W1-35 and W1-36 suites cannot be collected in one pytest run | medium | backlog | Test-quality debt; taken up when a ticket touches that suite (DEC-136). |
-| W2-M332 | p95 latency and time-limit cases fail under machine load | medium | backlog | Load-sensitive timing cases; W2-20's machine-wide gate lowers the load; otherwise test debt (DEC-136). |
+| W2-M332 | p95 latency and time-limit cases fail under machine load | medium | Wave 3 | The fix of `load_sensitive`'s three p95 entries: robust under load, or run serially (DEC-762). |
 | W2-M333 | W1-43's acceptance tests (tests/acceptance/W1-43/) do not exist; the audit-to-repair loop is untested | medium | W2-47 | Named in W2-47's KPIs (Wave 2 exit audit). |
 | W2-M334 | File-tool Read/Edit/Write run outside the sandbox | medium | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
 | W2-M335 | Hooks and MCP servers run outside the sandbox | medium | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |

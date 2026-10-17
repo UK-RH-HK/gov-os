@@ -396,6 +396,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `framework.lock` records the release version and manifest hash, at copy as well as at update. A missing lock fails, and a project cannot silence the lock comparison [W2-L227, W2-H029 (the silencing part), W2-M174, W2-M175].
   - The vendored skills carry their licence and version in the release [W2-L002, W2-L014].
 - **KPIs, failure:** a release whose files or manifest do not match their hashes is refused by `gov install`, `gov update` and `gov doctor`.
+- **DEC-761 (owner, 2026-10-17; P-W2-21 (a)), one more round after the failed last review, tests first:** `gov release --lock-from` refuses once the lock records a release, and when the source holds no release record; a lock whose release block was deleted fails; a version tag from a source with no records is refused; `gov release` refuses unless the role is orchestrator (or the owner in a plain terminal), so engineers and auditors never cut or rewrite a release; W1-39's no-files case and W1-32's command list are revised as recorded rewrites with their reasons. Then one review of that change only.
 
 #### W2-17 `gov update` (FULL, engineer)
 - **Allowed paths:** `src/gov/update/**` (new), `src/gov/adapters/**` (regeneration only), `tests/unit/update/**`.
@@ -431,6 +432,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
 - **KPIs, failure:** an undeclared language in a project with no test command is a named refusal, not a silent pytest run.
 - **On EXAMIN's path (DEC-736):** `gov close` runs its regression only over `tests/`, and EXAMIN's suites are elsewhere, so W2-27 needs the declared test commands. It also builds the ratchet baseline of known reds (estimate 300).
+- **The ratchet's shrink rule for `load_sensitive` (DEC-762):** the ratchet core W2-53 built reads each `load_sensitive` entry's `fixed_by` (a ticket or a Wave 3 row) and refuses an entry without one; the close of the ticket an entry names refuses while that entry is still listed.
 
 #### W2-20 Machine-wide resource gate (STANDARD, engineer)
 - **The values (DEC-742):** at least 4 GiB available, 1-minute load below `nproc`, heavy sessions counting double, at most 8 Gov OS sessions on the machine; taken as configuration, in one place.

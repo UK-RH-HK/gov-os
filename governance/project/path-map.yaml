@@ -230,83 +230,114 @@ accepted_reds:
     reason: "The governance share is not measured per programme yet (DEC-713)"
     fixed_by: W2-14
 # gov close's named load-sensitive tests (DEC-757): a listed test that fails counts only if it passes in an
-# isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry.
+# isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
+# names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
 load_sensitive:
   - test: "tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms"
     decision: DEC-757
     reason: "p95 latency under parallel load (DEC-372)"
+    fixed_by: W2-M332
   - test: "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook"
     decision: DEC-757
     reason: "p95 latency under parallel load (DEC-372)"
+    fixed_by: W2-M332
   - test: "tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95"
     decision: DEC-757
     reason: "p95 latency under parallel load (DEC-372)"
+    fixed_by: W2-M332
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_bash_write_to_a_sibling_directory_fails"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_install_outside_the_repository_fails_at_the_write_fence"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_each_session_uses_a_temp_directory_of_its_own"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_research_allowlist_refuses_a_domain_that_is_not_on_it"
     decision: DEC-760
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[api.github.com]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[arxiv.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[codeload.github.com]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[crates.io]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[developer.mozilla.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.python.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.readthedocs.io]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.rs]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[export.arxiv.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[files.pythonhosted.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[github.com]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[huggingface.co]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[objects.githubusercontent.com]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[pypi.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[raw.githubusercontent.com]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[registry.npmjs.org]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
   - test: "tests/acceptance/W1-46/test_w1_46_live_sessions.py::test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io]"
-    decision: DEC-760
+    decision: DEC-762
     reason: "a live session fails at setup under parallel load and passes alone (W2-03 run 2: 23 setup errors; 36 passed alone)"
+    fixed_by: W2-M364
+  - test: "tests/unit/close/test_follow_up.py::test_at_the_time_limit_the_processes_a_run_started_are_ended_with_it"
+    decision: DEC-762
+    reason: "fails once under parallel load (-n 8) and passes alone (W2-53's review, 2026-10-17)"
+    fixed_by: W2-L352
