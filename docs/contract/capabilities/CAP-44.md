@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-44: gov init and gov adopt lifecycle
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can install the Gov OS into a new repository, or adopt an existing one through the staged A0–A11 transaction with one evidence record per stage, ending in a verdict.
 - **Acceptance:** On b-dev, `gov adopt` produces the evidence tree with one record per stage A0–A11; no move happens before an A5 verdict; a failed batch rolls back to its recorded point; the run ends with ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS or NOT_ADOPTED_HEALTHY.

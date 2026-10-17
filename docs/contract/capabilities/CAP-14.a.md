@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-14.a: Failed approaches recorded and surfaced before a retry
 
-A covers item of CAP-14 (Failure memory). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-14 (Failure memory). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Failed approaches recorded and surfaced before a retry
 - **Wave:** W1

@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-17: Incremental indexing and freshness
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent never receives stale evidence silently: changed files are re-indexed before the next retrieval, or the facet is reported unavailable.
 - **Acceptance:** After one decision file is edited, the next `gov retrieve` returns the edited content, or reports the facet FACET_UNAVAILABLE; it never returns the old text as current.

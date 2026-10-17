@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-19.b: Evidence-driven model selection (bake-off, per-repository benchmark)
 
-A covers item of CAP-19 (Retrieval component separation and model selection). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-19 (Retrieval component separation and model selection). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Evidence-driven model selection (bake-off, per-repository benchmark)
 - **Wave:** W3

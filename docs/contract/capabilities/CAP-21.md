@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-21: Owner-only approval facts (lite of L0-L5 authority levels)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can trust that no agent makes a decision ACTIVE on its own.
 - **Acceptance:** `gov check` (and CI) fails a change that sets a decision ACTIVE unless the change carries an owner approval fact from git.
