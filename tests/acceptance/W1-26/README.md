@@ -100,6 +100,16 @@ before and after.
 
 ## Revised cases
 
+- `test_a_heading_after_a_closed_fence_records_its_id` (`test_w1_26_decision_register_and_base.py`): the fixture's
+  heading after the fence gains `- **Status:** ACCEPTED`. Revised under DEC-755 (item 1): W2-03's KPI line 3 and
+  W2-L221, "a register entry needs a heading and a status line to count". The case keeps its purpose (the fence
+  ends where it is closed) and its expectation.
+- `test_a_decision_file_records_its_id[no-type-id-in-grammar]` (`test_w1_26_decision_citations.py`): the form
+  leaves the parametrisation and becomes `test_a_file_with_only_an_id_in_its_frontmatter_does_not_satisfy_a_citation`:
+  the same file (an `id` in the grammar, no `type: decision`), and the commit citing the id is flagged. Revised
+  under DEC-755 (item 2): W2-M267, "only a schema-valid decision record satisfies a citation", and W2-M145. The
+  file's case count stays 45. In the row "The decision register in a project" of the section "A commit citing
+  an unrecorded decision" below, the words "or an `id` in the `decision_id` grammar" are superseded by this case.
 - `test_planted_commands_defect_reserved_command_no_module` (`test_w1_26_planted_defects.py`): the case removes the module file of one reserved command (`adopt`) from its temporary project's own copy of `src/`, then holds what it held before: the command-contract consistency family is not green, and a finding of the case's declared check names that command and no command whose module is present. Until W1-41 the project showed this defect without anything planted, because `adopt` was the one reserved command not built; revised after implementation: W1-41 builds `gov adopt --lite`, so every reserved command has a module ("planned: command implemented"). The code that runs stays this worktree's `src/`, which the case does not touch. One case added beside it for the other side, `test_commands_check_green_when_every_reserved_command_has_a_module`: with nothing removed, the family is green for the same declaration and the check reports no finding. Support: `Project.reserved_command_module_files()` and `Project.remove_reserved_command_module()`, added.
 - `test_no_check_family_reason`, `test_check_count_zero_for_uncovered_families`: derived uncovered families from the runner's `check_count` field instead of a fixed list of uncovered families; another ticket registered one (W1-24, `context-reproducibility`).
 - `test_lifecycle`, `test_opted_in_family_is_yellow`, `test_not_applicable_never_green_json`, `test_not_applicable_never_green_text`, `test_family_only_red_check_not_green`: each case removes the kernel's `audit-reproducibility` declaration from the temporary project so the family status reflects only the case's own check; revised after implementation: W1-36's kernel declaration of the audit-reproducibility check is now in every project built from the template (DEC-447).
@@ -254,7 +264,7 @@ not pass it.
 | The declaration | 3 | family; severity `warning`; no `allows-not-applicable` |
 | An unrecorded citation is flagged | 8 | in the subject, the body, a trailer (3); exit 1; an `ADR-` id; two ids are two findings and a repeated id one; the unrecorded id alone beside a recorded one; every citing commit, not the last alone |
 | At that commit | 6 | a clean history is clean (exit 0, no finding); record and citation in one commit; recorded by a later commit; removed later; cited after removal; a merged branch's commit by its own tree |
-| What the register is | 4 | a typed file in `docs/adr/`, a typed file in another folder, a file with no `type` and an id in the grammar (3); an id named in prose or in another decision's `supersedes` is not recorded |
+| What the register is | 4 | a typed file in `docs/adr/`, a typed file in another folder (2); a file with no `type` and an id in the grammar does not satisfy a citation, the citing commit is flagged (DEC-755, W2-M267, W2-M145; until then a third form of the first case, which expected it to record); an id named in prose or in another decision's `supersedes` is not recorded |
 | What a citation is | 14 | thirteen id-like words that are no decision id; an id in the changed text alone |
 | Fail-opens | 6 | no repository; no commit; a stand-in `git` that fails; a missing commit object; a decision file with frontmatter not closed or not YAML (2) |
 | Through `gov check` | 4 | YELLOW with a flagged commit; GREEN on a clean history; the family YELLOW; never GREEN over an unreadable register |
@@ -381,7 +391,7 @@ records nothing.
 
 | Group | Cases | What | Red reason (observed 2026-10-07) |
 |---|---|---|---|
-| The heading grammar: an entry | 4 | the three separators (3); a heading after a closed fence | the recorded ids are flagged: the register is not read |
+| The heading grammar: an entry | 4 | the three separators (3); a heading after a closed fence, with its status line (DEC-755, W2-L221: a heading alone is no entry; until then the fixture had no status line) | the recorded ids are flagged: the register is not read |
 | The heading grammar: no entry | 8 | another level (3); not at the start of a line (2); nothing after the id; a longer id; inside a fence | the control `DEC-200`, recorded by a well-formed heading, is flagged |
 | Both forms, and the file the project names | 5 | a decision file beside a named register; no register named (2: no configuration file, a configuration without the entry); only the named file; a register named later | the control or the entry is flagged; the 2 cases with no register named stop at the fixture `register_is_read`: `the check does not read the register file that governance/project/path-map.yaml names under 'decision_register' (DEC-473)` |
 | "At that commit" | 3 | an entry added later; an entry and its citation in one commit; an entry removed later | the control or the entry is flagged |
