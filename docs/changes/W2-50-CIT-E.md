@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135]
+decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135]
 state_class: EVIDENCE
 ---
 
@@ -32,6 +32,8 @@ R7 scoped to the root, R2's launcher step, §6.1 (i), the own folder open only w
 | `91200c82` | engineer | The implementation: the guard, the new module, the launcher, the secrets check, and builder tests |
 | `72263054` | independent-test-designer | 54 acceptance cases for the review's findings (`tests/acceptance/W2-50/test_w2_50_review_findings.py`), tests added after implementation (DEC-136); 34 red at that commit |
 | `86aa805c` | engineer | The repair round (§6): a project inside the own folder, plain folder names, one folder per ticket |
+| `e58081be` | independent-test-designer | 25 acceptance cases for the last review's findings (`tests/acceptance/W2-50/test_w2_50_last_review.py`, DEC-751), 15 red; 80 earlier cases made the folder by a launch (DEC-491) |
+| `df5f1e50` | engineer | The repair round after the last review (§7): the own folder's repository marker, links inside the scanned project |
 
 Every commit carries `Task: DAEO-kl5e` and `Implements: DEC-728`. The files changed by `91200c82` are all in the
 ticket's `allowed_paths`, as DEC-743 left them: `src/gov/guard/runs.py` (new), `src/gov/guard/decide.py`,
@@ -242,7 +244,7 @@ The code is within the estimate of 120 LOC (`est_loc`): 100 lines added, 93 net.
 | `rmdir` under the root but not of it (another ticket's empty folder; `rmdir -p` that removes an otherwise empty root), README discoveries | W2-09, with the guard's Bash forms; the owner's root-only scope was kept |
 | Difference 5: an unresolvable `rmdir` argument is allowed, so `rmdir` of a variable that holds the root is not refused | W2-09, with the item above |
 | Difference 7: a launch whose own folder cannot be named or made starts without it, silently | W2-21 (it edits `launcher.py` next), or an owner answer: refuse, announce, or keep |
-| Difference 10: the secrets check run inside a clone under the root scans the clone's own store; no test holds it | The test designer of a later ticket that adopts a clone under the root (W2-14, W2-15a), or W2-06 |
+| Difference 10: the secrets check run inside a clone under the root scans the clone's own store; no test holds it | Closed in §7 (DEC-751 2): held by the last review's tests |
 | W2-06 builds on `secrets-indexing.yaml` unchanged (difference 9) | W2-06; nothing to merge from W2-50 in that file |
 | Difference 13: a ticket file in `.tickets/` that cannot be read closes every own folder of the project | Kept as the guard's default deny; an owner answer if it is found too strict |
 
@@ -342,3 +344,121 @@ exist.
 
 With the first round's 100 code lines, the change's code is 149 lines added and 12 removed, 137 net, above the
 estimate of 120 LOC (`est_loc`) by 17 lines.
+
+## 7. The repair round after the last review (DEC-751)
+
+The last review of the repaired change found two behaviours the suite did not hold. The orchestrator decided them on
+2026-10-17 (DEC-751, delegated, stricter only; staged for the owner's commit, not yet in this worktree's register):
+P-A (a) and P-B (a), fixes after the review that DEC-413 allows. The test designer added them as
+`tests/acceptance/W2-50/test_w2_50_last_review.py` at `e58081be`, tests added after implementation (DEC-136), and
+rewrote 80 earlier cases to make the own folder by a launch (DEC-491). The suite at `e58081be`: 15 failed, 218
+passed. The findings the new tests hold (the README's section "The last review's findings"):
+
+1. **A folder belongs to the one repository whose launch made it.** `gov launch` records in the folder it makes the
+   repository's git common directory, so every worktree of one repository is the same repository and a clone is
+   another. Another repository's session whose `in_progress` ticket gives the same name gets nothing there (a project
+   built apart, a clone inside the first project's own folder, a clone outside the root: 3 red), and its launch
+   neither adds the folder nor changes it (3 red). A folder made by hand (2 red) and a folder that does not exist yet
+   (2 red) give no session anything; a launch neither adds nor records a folder that was there before any launch
+   (2 red).
+2. **A project's own secrets check follows a link that stays inside the project, also under the root.** A clone at
+   `~/gov-os-runs/W2-90/clone` whose `.gov-runtime/` links to a folder or file of the same clone holding a secret goes
+   red, as the same layout outside the root does (3 red). A link from it to a place under the root but outside the
+   clone is still not followed (DEC-743 3).
+
+### What the repair changed, file by file
+
+- **`src/gov/guard/runs.py`** — the marker, and the rule on it:
+  - `MARKER = ".gov-os-repository"`: a regular file in the own folder holding the real path of the git common
+    directory of the repository whose launch made the folder, and a newline.
+  - `common_dir(project_root)`: that real path, read from the project's `.git` without running git — `.git` a
+    folder gives itself; `.git` a file gives its `gitdir:` line, then that folder's `commondir` when there is one.
+    Anything else, or a folder that is not there, gives `None`.
+  - `_marked(own, project_root)`: true only when `own` is a folder (not a link) and its marker, opened without
+    following a link, is a regular file whose bytes are exactly the project's common directory and a newline. A
+    marker missing, unreadable, not a regular file or naming another repository, or a common directory that cannot be
+    found, gives false.
+  - `folder(...)` is the former `own_folder` body: the path a ticket's own folder has, whether or not it is there.
+    `own_folder(...)` is now `folder(...)` when `_marked`, else `None`: every case that refused before still refuses.
+  - `make(own, project_root)`: makes the root when needed, then the own folder with `mkdir` (never one that is
+    there), then the marker with `O_CREAT | O_EXCL | O_NOFOLLOW` (never a rewrite). Nothing is made when the common
+    directory is unknown; an error leaves at most a folder without a marker, which gives nothing.
+  - `holds(own, real)` no longer holds the marker itself, so the guard refuses Write, Edit and judged Bash on it.
+- **`src/gov/launch/launcher.py`** — the launch makes and marks the folder only when nothing is at its path
+  (`runs.make`), then opens what `runs.own_folder` gives. A folder there without this repository's marker (made by
+  hand, there before any launch, or marked by another repository), a link, or a file, is left as it is and not added
+  to the sandbox's write list. This replaces the `makedirs(..., exist_ok=True)` and the link and folder checks, which
+  `_marked` now makes.
+- **`src/gov/secrets/__init__.py`** (the link rule only) — `followed` also follows a path whose real path stays inside
+  the project being scanned (`os.path.realpath(root)`), even under the root. A link from it to a place under the root
+  but outside the project, and from a project outside the root into a clone under it, is still not followed.
+- **`src/gov/guard/decide.py`** — not changed: it asks `runs.own_folder` as before, so the marker rule reaches the
+  guard through it. The marker is read only when a write target lies outside the project (§6), a few system calls.
+- **`tests/unit/guard/test_runs.py`**, **`tests/unit/launch/test_runs.py`** — builder tests, regression evidence
+  only: the fixture projects get a `.git` folder; the cases that open the folder make it with `runs.make`; new cases
+  for a folder missing, made by hand (and not marked by `make`), marked by this repository, refused to another
+  repository and its marker refused to its own session; a worktree's `.git` file giving its repository's common
+  directory; a later launch keeping the folder; a folder already there, empty or not, neither marked nor added.
+- **Not changed:** `template/governance/kernel/checks/secrets-indexing.yaml`, every acceptance test.
+
+### New differences from the CIT-P
+
+14. **A session writes in its own folder only after a launch of its ticket has made it.** R2's guard half ("the
+    folder need not exist", so an unlaunched session's first write made it, §2 3(a)) is gone: a folder that does not
+    exist yet, or that no launch of this repository made, gives nothing. The orchestrator, which is not launched, can
+    write in a ticket's folder only once that ticket has been launched. DEC-751 1; tested.
+15. **The marker is refused to its own session in the guard, not in the sandbox.** The guard refuses Write, Edit and
+    every judged Bash form on the marker; the sandbox's write list still holds the whole folder, so a command whose
+    target the guard cannot see could change it. A session that does so closes or hands over its own folder only,
+    never opens another's. No source asks for it; it costs one comparison.
+
+**Difference 10 is closed.** A clone under the root now has its own check over its own store and over links that stay
+inside it, held by `last::test_a_projects_own_check_follows_a_link_that_stays_inside_the_project` and the three
+controls beside it (§5's row for difference 10 is done).
+
+### Verification of the repair round after the last review
+
+At `df5f1e50`'s tree, each run with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-50/src` (DEC-732), in the
+foreground, never with `-x`:
+
+| Run | Result |
+|---|---|
+| `tests/acceptance/W2-50` | **233 passed** (15 failed, 218 passed at `e58081be`) |
+| W1-02 (incl. `test_decision_p95_is_under_100_ms`) | 3653 passed |
+| W1-03 | 363 passed, 1 skipped (the interpreter finds `gov` without `PYTHONPATH`) |
+| W1-04 | 336 passed |
+| W1-05 (incl. `test_a_call_waits_under_100_ms_p95_for_the_hook`) | 99 passed |
+| W1-15 (B4 included) | 124 passed |
+| W1-16 | 167 passed |
+| W1-27, `test_w1_27_rebuild_r4.py` (the only file that calls `stores_with_secrets`) | 5 passed |
+| W1-28 | 151 passed |
+| W1-30 | 512 passed |
+| W1-32 | 81 passed |
+| W1-38 | 201 passed |
+| W1-46, `-m "not local_only"` | 457 passed, 36 deselected |
+| W1-48 | 172 passed |
+| W1-50, `-m "not local_only"` | 683 passed, 2 deselected |
+| Builder tests `tests/unit` | **2130 passed, 1 skipped** |
+
+The machine was under load from other sessions (load average about 12); the two latency cases passed as part of
+their suites.
+
+The `local_only` live-launch cases were not run, as in §3; the real `~/gov-os-runs` still does not exist.
+
+### Size of the repair after the last review
+
+`git show --shortstat df5f1e50`: 5 files, 139 insertions, 24 deletions.
+
+| Part | Added | Removed |
+|---|---|---|
+| `src/gov/guard/runs.py` | 71 | 5 |
+| `src/gov/launch/launcher.py` | 8 | 11 |
+| `src/gov/secrets/__init__.py` | 4 | 3 |
+| **Code** | **83** | **19** |
+| `tests/unit/guard/test_runs.py` | 40 | 4 |
+| `tests/unit/launch/test_runs.py` | 16 | 1 |
+| **Builder tests** | **56** | **5** |
+
+The code is 64 lines net, within the brief's estimate of 50 to 70 lines; 83 lines added, above it, about a third of
+them docstrings. With the earlier rounds the change's code is 232 lines added and 31 removed, 201 net, above the
+estimate of 120 LOC (`est_loc`) by 81 lines.
