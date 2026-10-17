@@ -21,6 +21,7 @@ allowed_paths:
 - src/gov/guard/decide.py
 - src/gov/launch/launcher.py
 - template/governance/kernel/checks/secrets-indexing.yaml
+- src/gov/secrets/__init__.py
 - tests/unit/guard/test_runs*
 - tests/unit/launch/test_runs*
 - docs/changes/W2-50-CIT-P.md
@@ -47,6 +48,8 @@ sources:
 - DEC-723
 - DEC-159
 - CAP-33
+- DEC-738
+- DEC-743
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-50/
@@ -69,9 +72,10 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-50), as approved (DEC-729). The list row
 - **Route:** the change loosens the guard, so it goes through CIT-P with the owner's approval (CAP-33), like W2-09. DEC-728 is the owner decision behind it. The lead returns the CIT-P as a package before the engineer starts (queued Q-15). The test designer goes first, and a probe follows green.
 - **Allowed paths:**
   - `src/gov/guard/runs.py` (new);
-  - `src/gov/guard/decide.py` (the outside-repository rule only);
-  - `src/gov/launch/launcher.py` (the sandbox write list only);
+  - `src/gov/guard/decide.py` (the outside-repository rule, and `rmdir` of the root, R7);
+  - `src/gov/launch/launcher.py` (the sandbox write list, and making the own folder before the session starts, R2);
   - `template/governance/kernel/checks/secrets-indexing.yaml` (the exclusion only);
+  - `src/gov/secrets/__init__.py` (the link rule only: a link from `.gov-runtime/` into `~/gov-os-runs` is not followed; DEC-743 §6.1 (i));
   - `tests/unit/guard/test_runs*`, `tests/unit/launch/test_runs*`;
   - `docs/changes/W2-50-CIT-P.md`, `docs/changes/W2-50-CIT-E.md`.
 - **KPIs, success:**
@@ -91,3 +95,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-50), as approved (DEC-729). The list row
   - a session with no ticket;
   - any path outside the repository other than the temp folder and the session's own folder.
   - `~/gov-os-workbench` and `~/gov-os-worktrees` (other than the session's own worktree) stay refused as before.
+- **CIT-P approved (DEC-743, 2026-10-17)** within DEC-728: R1 to R8 as written (R7 scoped to the root only), §6.1 (i), the own folder open only while the ticket is `in_progress`, `ticket-lead` not among "any role". The engineer commits the CIT-P word for word before any code, and the CIT-E after (DEC-738 item 1). A session writes only under its own ticket's folder; nothing there is indexed or scanned; the workbench and other worktrees stay refused.

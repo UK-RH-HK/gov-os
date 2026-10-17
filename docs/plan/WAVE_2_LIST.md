@@ -178,13 +178,13 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 
 ## 3. The rest of the list, by severity
 
-791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732) and W2-M357 (DEC-735), so 793 are open, 54 of them high and 357 medium. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
+791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), and W2-L343 (DEC-741), so 798 are open, 55 of them high, 359 medium and 343 low. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
 
 - **How the list was made:** helpers read every line of `bootstrap.md` and the register, and gave one row per item. The orchestrator added the exit report's residuals and the audit's findings, and merged rows with the same title (2 merged).
 - **What remains to check:** a row is carried as the source recorded it. Rows that name one problem from two places may remain; the source references join them. Before a ticket picks a row up, its state is re-checked against the code at that time, because a later commit may have fixed it unrecorded.
 - **Where to read more:** the full text of each item is at its source line. Item ids are stable once committed; new items take the next free id of their severity.
 
-### 3.1 high (54)
+### 3.1 high (55)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -242,8 +242,9 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-H052 | Harness hook time limit not measured; a hook past its limit lets the call through | research | The harness behaviour at the hook limit is measured and the guard's deadline sits below it | B:2417 (DEC-110, DEC-179, DEC-580) |
 | W2-H053 | Governance share not measured per programme (ORION); ARGUS's half is in AR-9 | research | A measured share of at most 15 % on each programme's run (ORION and ARGUS) in governance-share.json, from the counter after clean closes with every part measured; W1-42's share case green. | A F-M1 (DEC-086, DEC-713, DEC-714, DEC-718) |
 | W2-H054 | A ticket worktree's tests and gov commands import the editable install's main-tree `src/`, not the worktree's own code | engineer | A ticket worktree's tests and gov commands run that worktree's code, never the editable install's main tree; shown by the import path of `gov` in the worktree's verification. | W2-01 lead run 1, 2026-10-16 (DEC-732) |
+| W2-H055 | The guard does not judge `git clone` destinations: a session without a sandbox (orchestrator, lead) can clone into another ticket's folder, the `~/gov-os-runs` root or `~/gov-os-workbench` | engineer | A `git clone` destination is judged as a write target like any other, for every role; a clone into another ticket's folder, the root or the workbench is refused with the guard's reason. | W2-50 CIT-P §6.2, 2026-10-16 (DEC-743) |
 
-### 3.2 medium (357)
+### 3.2 medium (359)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -604,8 +605,10 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M355 | Live clones under /tmp lost on reboot | orchestrator | Live clones are kept outside /tmp | B:2783 (DEC-698, DEC-699) |
 | W2-M356 | Mechanise rules the compliance report shows as instruction-only | orchestrator | A re-classified list exists in the exit package, and each item is either mechanised or has a ticket. | R:5115 (DEC-466) |
 | W2-M357 | `gov rebuild` exits 0 with `"ok": true` when no index is built (every store `not_recreated` on an unadopted repository) | engineer | `gov rebuild` exits non-zero, or warns by name, when an index it is expected to build is not built; callers no longer need to read `stores.*.status` to know. | W2-26 lead run 2, 2026-10-16 (DEC-735) |
+| W2-M358 | EXAMIN's product suite has no reproducible environment of its own (10 packages, a bundled Postgres) | orchestrator | A Docker Compose environment (or the like) runs EXAMIN's whole product suite, the `slow` Postgres tests included, from one declared command. | P-W2-8 (b), 2026-10-16 (DEC-736) |
+| W2-M359 | A launched session's Write and Edit tools may not reach its own folder under `~/gov-os-runs` (Claude Code's own check of paths outside the working folder; DEC-313 refuses `--add-dir`), leaving Bash only | engineer | W2-21's launch work shows whether a launched worker's Write and Edit reach its own folder, and either they do or the launch states that only Bash writes there. | W2-50 CIT-P §6.3, 2026-10-16 (DEC-743) |
 
-### 3.3 low (341)
+### 3.3 low (343)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -950,6 +953,8 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L339 | 19 amends of merge commits on w1/integrate (2026-10-07 to 2026-10-14); standing rule: never amend | orchestrator | The standing rule holds: no commit on w1/integrate is amended or rewritten; a correction is a new commit. | A F-m4 (DEC-718 item 8) (DEC-412, DEC-718) |
 | W2-L340 | COMPLIANCE.md stale since 2026-10-07, with wrong base counts | orchestrator | The compliance report is brought up to date at the start of Wave 2, or retired in favour of the exit audit, by the owner's choice. | A F-m5 (DEC-718) |
 | W2-L341 | ORION's programme test test_exact_agreement fails before and after ORION-im02 | orchestrator | A ticket of its own in a-dev settles it (the engineer's recommendation: leave it). | X (run 5) |
+| W2-L342 | CAP-58's acceptance and CAP-58.d name neither the temp folder nor a session's own folder under `~/gov-os-runs` among the places a launched worker's Bash may write outside the repository | product-spec | The next Contract version's CAP-58 text names both places. | W2-50 CIT-P §6.6, 2026-10-16 (DEC-743) |
+| W2-L343 | `docs/contract/contract.yaml` says `status: PROPOSED` while `CONTRACT_v4.md` says ACCEPTED | product-spec | Both files state the same status for Contract v4.2. | W2-49 lead run 1, 2026-10-16 (DEC-741) |
 
 ### 3.4 info (41)
 

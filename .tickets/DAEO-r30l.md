@@ -18,6 +18,7 @@ depends_on:
 - DAEO-g0ip
 allowed_paths:
 - src/gov/resources/**
+- src/gov/check/commands.py
 - src/gov/launch/gate*
 - tests/unit/resources/**
 kpis:
@@ -30,6 +31,8 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-729
+- DEC-742
+- DEC-747
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-20/
@@ -47,10 +50,11 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-20), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Needs first:** the owner's values (queued Q-7). Proposed: at least 4 GiB available, 1-minute load below `nproc`, heavy sessions counting double, at most 8 Gov OS sessions on the machine.
+- **The values (DEC-742, 2026-10-17):** at least 4 GiB available, 1-minute load below `nproc`, heavy sessions counting double, at most 8 Gov OS sessions on the machine; taken as configuration, in one place.
 - **Allowed paths:** `src/gov/resources/**` (new), `src/gov/launch/gate*`, `tests/unit/resources/**`.
 - **KPIs, success:**
   - `gov resources` reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under `~/.gov-os/machine/`, whichever repository started it.
   - The gate opens or shuts with a named reason.
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
 - **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
+- **DEC-747 (delegated, 2026-10-17):** `src/gov/check/commands.py` is in the paths for the one line that records `resources` (P-A). "At most 8 sessions" holds after the start: the start check adds the new session's weight (P-B). DEC-742's load value stands (P-C).

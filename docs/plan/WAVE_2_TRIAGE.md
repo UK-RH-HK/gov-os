@@ -17,15 +17,15 @@ decisions: [DEC-105, DEC-136, DEC-718, DEC-722, DEC-725, DEC-726, DEC-728, DEC-7
 
 | Severity | Wave 2 | Wave 3 | backlog | Total |
 |---|---|---|---|---|
-| high | 48 | 6 | 0 | 54 |
-| medium | 309 | 33 | 15 | 357 |
-| low | 170 | 40 | 131 | 341 |
+| high | 49 | 6 | 0 | 55 |
+| medium | 310 | 34 | 15 | 359 |
+| low | 171 | 41 | 131 | 343 |
 | info | 11 | 7 | 23 | 41 |
-| **all** | **538** | **86** | **169** | **793** |
+| **all** | **541** | **88** | **169** | **798** |
 
-The counts include the rows added after the plan's approval: W2-H054 (DEC-732) and W2-M357 (DEC-735). The 791 rows named elsewhere are the rows at approval.
+The counts include the rows added after the plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), and W2-L343 (DEC-741). The 791 rows named elsewhere are the rows at approval.
 
-**Rows per Wave 2 ticket:** W2-01 14 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 26 · W2-08 6 · W2-09 5 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 36 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 1 · W2-50 1.
+**Rows per Wave 2 ticket:** W2-01 13 · W2-02 23 · W2-03 9 · W2-04 13 · W2-05 8 · W2-06 19 · W2-07 27 · W2-08 6 · W2-09 6 · W2-10 8 · W2-11 9 · W2-12 18 · W2-13 8 · W2-14 8 · W2-15a 6 · W2-15b 5 · W2-16 6 · W2-17 1 · W2-18 14 · W2-19 17 · W2-20 3 · W2-21 37 · W2-22 18 · W2-23 37 · W2-24 1 · W2-26 1 · W2-32 11 · W2-33 6 · W2-34 25 · W2-35 1 · W2-36 1 · W2-37 5 · W2-38 4 · W2-39 8 · W2-40 19 · W2-41 23 · W2-42 29 · W2-43 33 · W2-44 19 · W2-45 26 · W2-46 3 · W2-47 2 · W2-48 2 · W2-49 2 · W2-50 1.
 
 **Wave 3 groups.** Held-out and oracle hardening (before qualification, CAP-49); risks resting on the unsandboxed orchestrator session or the install rule's spellings (Wave 3, or a non-goal under CAP-25.c); pause and freeze hardening; `gov status` accuracy; rows whose own source says Wave 3. **Backlog groups.** Test-quality debt (taken up when a ticket touches the suite, DEC-136); low edge cases no exit criterion depends on; observations; by-design items.
 
@@ -96,6 +96,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732) a
 | W2-H052 | Harness hook time limit not measured; a hook past its limit lets the call through | high | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
 | W2-H053 | Governance share not measured per programme (ORION); ARGUS's half is in AR-9 | high | W2-14 | Named in W2-14's KPIs (ARGUS cycle and share). |
 | W2-H054 | A ticket worktree's tests and gov commands import the editable install's main-tree src/, not the worktree's own code | high | W2-21 | Added by the owner (DEC-732): the launcher builds every lead and worker session in a worktree; until it lands, the rule is kept by hand in every brief. |
+| W2-H055 | The guard does not judge git clone destinations | high | W2-09 | The owner's answer to P-W2-10 §6.2 (DEC-743): a fail-open for sessions without a sandbox; W2-09 edits `decide.py` next, after W2-50. |
 | W2-M001 | No test against real Ollama; embedding model registry row missing | medium | W2-32 | Named in W2-32's KPIs (retrieval components and bounded improvements). |
 | W2-M002 | Canary near spellings missed; canary count unconfirmed | medium | W2-43 | Fits W2-43's paths and KPIs (CI and secret floor); its builder takes it. |
 | W2-M003 | gitleaks on CI is an owner install | medium | W2-43 | Named in W2-43's KPIs (CI and secret floor). |
@@ -358,7 +359,7 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732) a
 | W2-M260 | Type with absent schema file not reported unmeasured | medium | W2-02 | Named in W2-02's KPIs (record types). |
 | W2-M261 | rulesync writes no env block; adopted projects elsewhere lack auto-compact window | medium | W2-23 | Named in W2-23's KPIs (adoption safety). |
 | W2-M262 | Close's test-runner cases and secrets scan fail under concurrent machine load | medium | W2-20 | Named in W2-20's KPIs (machine-wide resource gate). |
-| W2-M263 | product-traceability-trailers red 'nothing is judged' right after adoption | medium | W2-01 | Named in W2-01's KPIs (gov close and traceability). |
+| W2-M263 | product-traceability-trailers red 'nothing is judged' right after adoption | medium | W2-07 | Re-triaged from W2-01 (DEC-738 item 4): RED stays when nothing comes after the base (DEC-479; W1-30's test); W2-07 owns the close's telemetry and reporting. |
 | W2-M264 | gov doctor reports version drift without failing on it | medium | W2-22 | Named in W2-22's KPIs (gov doctor green). |
 | W2-M265 | Runner reports an absent tool of a hard-block check as red? | medium | W2-45 | Named in W2-45's KPIs (check runner semantics). |
 | W2-M266 | Moving the citations base takes earlier commits out of judgement unreported | medium | W2-01 | Named in W2-01's KPIs (gov close and traceability). |
@@ -453,6 +454,8 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732) a
 | W2-M355 | Live clones under /tmp lost on reboot | medium | W2-50 | Named in W2-50's KPIs (durable scratch root). |
 | W2-M356 | Mechanise rules the compliance report shows as instruction-only | medium | W2-11 | Named in W2-11's KPIs (briefs and orchestration skill). |
 | W2-M357 | gov rebuild exits 0 with "ok": true when no index is built | medium | Wave 3 | Finish line (w2 prompt §13; DEC-735): breaks no Wave 2 exit criterion and is no fail-open in ordinary work (an adopted repository has its path map, so its indexes build); the owner accepted Wave 3. |
+| W2-M358 | EXAMIN's product suite has no reproducible environment of its own | medium | Wave 3 | The owner's answer to P-W2-8 (b) (DEC-736): in Wave 2 the product suite is measured through a pinned install package into the clone's venv; Docker Compose is Wave 3. |
+| W2-M359 | A launched session's Write and Edit may not reach its own folder under ~/gov-os-runs | medium | W2-21 | The owner's answer to P-W2-10 §6.3 (DEC-743): a residual of W2-50, shown by W2-21's launch work. |
 | W2-L001 | Held-out path itself is visible to agents | low | Wave 3 | Held-out and oracle hardening; Wave 3, before qualification runs (CAP-49). |
 | W2-L002 | No LICENSE in vendored superpowers copy | low | W2-16 | Named in W2-16's KPIs (hash-pinned releases). |
 | W2-L003 | Decision-package choices sources do not fix | low | backlog | Low edge case; no Wave 2 exit criterion depends on it; taken up when its module is touched. |
@@ -794,6 +797,8 @@ The counts include the rows added after the plan's approval: W2-H054 (DEC-732) a
 | W2-L339 | 19 amends of merge commits on w1/integrate (2026-10-07 to 2026-10-14); standing rule: never amend | low | backlog | Held by the standing rule (DEC-718 item 8; plan rule 2): no commit on an integration branch is amended. |
 | W2-L340 | COMPLIANCE.md stale since 2026-10-07, with wrong base counts | low | W2-46 | Fits W2-46's paths and KPIs (Wave 2 exit run); its builder takes it. |
 | W2-L341 | ORION's programme test test_exact_agreement fails before and after ORION-im02 | low | W2-14 | Named in W2-14's KPIs (ARGUS cycle and share). |
+| W2-L342 | CAP-58's text names neither the temp folder nor the own folder | low | Wave 3 | The owner's answer to P-W2-10 §6.6 (DEC-743): for the next Contract version. |
+| W2-L343 | contract.yaml PROPOSED, CONTRACT_v4.md ACCEPTED | low | W2-49 | DEC-741: W2-49 edits both files in its apply round. |
 | W2-I001 | Sandbox cost and whether its tokens count toward the governance share | info | W2-40 | Named in W2-40's KPIs (EXP-002 and harness limits). |
 | W2-I002 | Path-map capability values for this repository are the implementer's | info | backlog | Observation; recorded, nothing to build in Wave 2. |
 | W2-I003 | fixtures/** is the only product namespace | info | backlog | Observation; recorded, nothing to build in Wave 2. |

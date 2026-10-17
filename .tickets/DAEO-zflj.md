@@ -22,6 +22,7 @@ allowed_paths:
 - template/governance/kernel/templates/decision-record.md
 - src/gov/check/schema.py
 - tests/unit/check/test_schema*
+- tests/unit/check/test_check.py
 kpis:
   success:
   - 'The kernel schemas define these types [AR-1, AR-3, W2-M316, W2-M317, AR-9]: a decision entry: one register entry, with id, status, owner, date and its own span; an audit report in DEC-441''s form;
@@ -36,6 +37,8 @@ sources:
 - DEC-441
 - CAP-44.h
 - DEC-730
+- DEC-741
+- DEC-746
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-02/
@@ -85,3 +88,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-02), as approved (DEC-729). The list row
   - A type with no schema file is reported unmeasured, not green [W2-M260, W2-L177].
   - The `wbs_id` grammar accepts an id with one lower-case letter suffix (`W2-15a`) and still refuses any other form (`W2-15`, `W2-15ab`, `W2-15A`, `W2-1`) [DEC-730]. The grammar's one definition is `template/governance/kernel/schemas/common.schema.json`.
 - **KPIs, failure:** an audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still `SCHEMA_INVALID_TYPE`.
+- **The adoption verdict (DEC-741, I (ii), 2026-10-17):** the three CAP-44.h values, and a list of named conditions, each with its source item and its state (met, not met, accepted by an owner entry). W2-02 closes on its own; W2-52's stage records are read as conditions later.
+- **DEC-746 (delegated, 2026-10-17):** `tests/unit/check/test_check.py` is in the paths for `test_schema_clean_record` only (P-A). W1-26's one assertion is revised by an independent test designer, stricter (P-B). KPI line 4's refused list is read as `W2-15ab`, `W2-15A`, `W2-1`: `W2-15` is accepted (P-1, for the owner to confirm). The verdict's conditions are typed per DEC-741 I (ii) (P-2). P-3 to P-5 as the lead recommended.
