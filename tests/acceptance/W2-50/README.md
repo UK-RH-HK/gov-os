@@ -4,10 +4,12 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**154 cases in 6 files** (67 test functions with their parameters): the first 139 cases in 5 files, written before
-the change proposal (red run on `w2/W2-50` at `689bd17e` plus that suite: **48 failed, 91 passed**), and 15 cases in
-`test_w2_50_owner_answers.py` for the owner's answers to it (DEC-743; see the section below). Red run of the whole
-suite on `w2/W2-50` at `a5ef3c69` plus the new file: **55 failed, 99 passed**, about 1.5 to 5 minutes.
+**208 cases in 7 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
+answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
+file: **55 failed, 99 passed**), and 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
+added after implementation, from the review (DEC-136)** (red run of the whole suite at `d0c6be04` plus that file:
+**34 failed, 174 passed**, about 1.5 minutes; see the section below).
 
 ## Run
 
@@ -137,6 +139,58 @@ two `rmdir` controls, the two followed links, the two refusals of answer 4 and t
   empty folder) stays unjudged, as today, though the failure line refuses "another ticket's folder". And
   `rmdir -p ~/gov-os-runs/W2-90/sub` removes the root too when it is otherwise empty. Neither is a spelling of the
   root, so neither is tested; the owner's scope is kept. Both are W2-09's to judge with the guard's Bash forms.
+
+## The review's findings: tests added after implementation, from the review (DEC-136)
+
+The review of the implemented ticket found three behaviours the suite missed. The lead passed them on as described
+behaviour; they are tested in `review` = `test_w2_50_review_findings.py`, through the guard's hook and `gov launch`
+with the stand-in CLI, as the rest of the suite. No existing test file, support module or conftest was changed; the
+new file builds what it needs from the support module's public pieces. One sandbox form is new: `_InsideTheOwnFolder`,
+the suite's `Sandbox` with the fixture project at `~/gov-os-runs/W2-90/clone` of the temporary HOME (the same folders,
+only the project's location differs). Tickets are written as the suite writes them, `external-ref: <name>` with the
+value as written (no quoting), the form the review's examples have.
+
+| Behaviour | New cases | Red reason today | Green today, and why |
+|---|---|---|---|
+| **1. A project inside the session's own folder keeps every in-project rule** (Write, Edit and a judged Bash redirect, with the guard's reason) | `review::test_a_project_inside_the_own_folder_keeps_its_refusals` × 8 places × 2 locations: an acceptance test by the engineer, and by the orchestrator; `.gov-runtime/freeze`; `.gov-runtime/findings.jsonl`; `.tickets/DAEO-zz90.md`; `.claude/settings.json`; the guard hook; `docs/notes.md` (outside `src/app/**`) | `inside-the-own-folder`: "Write on …/gov-os-runs/W2-90/clone/<place> by <role> on DAEO-zz90 … was not refused: decision=allow": the own-folder allowance covers the whole clone | the 8 `a-worktree` cases: the control that each rule holds in another project (reason "Write to '…' denied for role '…'") |
+| 1 — what the rules allow stays allowed there | `review::test_a_project_inside_the_own_folder_keeps_what_its_rules_allow` × 3 × 2: `src/app/main.py`, `.gov-runtime/scratch/notes.md`, an acceptance test by the test designer | none | all 6: the controls of the refusals; they must stay green |
+| 1 — the own folder outside such a project gives that session nothing (DEC-108's counterpart) | `review::test_the_own_folder_outside_a_project_inside_it_gives_that_session_nothing` (a file beside the clone, a file in a sibling clone, `mkdir -p` of a sibling) | "Write on …/gov-os-runs/W2-90/notes.txt (beside the project …) was not refused: decision=allow" | — |
+| 1 — `gov launch` there puts no entry holding the project's root in the write list; the temp folder stays | `review::test_a_launch_in_a_project_inside_the_own_folder_does_not_add_the_project` | "the sandbox of a session in the project …/W2-90/clone may write the project itself through ['//…/gov-os-runs/W2-90']" | — |
+| **2. Only a plain folder name names a folder**: the guard refuses a write in the folder a name that is not plain would give (Write, Edit, Bash redirect, `mkdir -p`), and for a glob name in a folder the glob matches | `review::test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder` × 11: `*`, `**`, `W2-9?`, `W2-[9]3`, `W2'90`, `W2 90`, `W2-90#a`, `~W2-90`, `-W2-90`, `.hidden`, `..` | "Write on …/gov-os-runs/<name>/notes.txt by the engineer on DAEO-zz80 (external-ref '<name>') was not refused: decision=allow" (10 names) | `dot-dot`: `~/gov-os-runs/..` is HOME, which the guard refuses already; it stays as the guard on the change |
+| 2 — control: a plain name with `.` and `_` names its folder | `review::test_a_plain_folder_name_with_dot_and_underscore_names_the_folder` (`W2-90_b.1`, the same ticket form) | none | passes today; shows the refusals above are the name's, not the ticket form's |
+| 2 — the launcher neither makes the folder nor adds an entry at, under or above the root, and the write list holds no pattern; the temp folder stays | `review::test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain` × 7: `*`, `**`, `W2-[9]3`, `W2'90`, `W2 90`, `-W2-90`, `..` | "the sandbox of a session on DAEO-zz80 (external-ref '*') may write at or under the root through ['//…/gov-os-runs/*']" (likewise `/**`, `/W2-[9]3`, …; 6 names) | `dot-dot`: the launcher adds nothing for it today; it stays as the guard on the change |
+| 2 — control: the launcher adds exactly the folder of a plain name and makes it | `review::test_the_launcher_adds_the_folder_of_a_plain_name_with_dot_and_underscore` | none | passes today |
+| **3. One folder belongs to one ticket**: two tickets with the external-ref `W2-90`; MAIN's session refused there whatever the other's status | `review::test_a_folder_two_tickets_name_is_refused_to_the_session_of_either` × `in_progress`, `open`, `closed` | "Write on …/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, <status>) was not refused: decision=allow" | — |
+| 3 — the other ticket's session gets it neither | `review::test_the_other_ticket_naming_the_folder_gets_it_neither` (DAEO-zz81, `in_progress`) | "… by the engineer on DAEO-zz81 … was not refused: decision=allow" | — |
+| 3 — an external-ref equal to the tk id another ticket's folder is named by: refused to both sessions | `review::test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both` × 2 (DAEO-zz98, which has no external-ref; DAEO-zz82, external-ref `DAEO-zz98`) | "Write on …/gov-os-runs/DAEO-zz98/notes.txt by the engineer on <tk> … was not refused: decision=allow" | — |
+| 3 — control: a ticket whose name no other shares keeps its folder, in the same project | `review::test_a_ticket_whose_name_no_other_shares_keeps_its_folder` (W2-91) | none | passes today |
+| 3 — the launcher neither makes nor adds a shared folder; the temp folder stays | `review::test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name` × 2 (the same external-ref of a closed ticket; an external-ref equal to the tk id) | "the sandbox of a session on DAEO-zz90 may write the shared folder …/gov-os-runs/W2-90 through ['//…/gov-os-runs/W2-90']" (likewise DAEO-zz98) | — |
+| 3 — control: the launcher gives the unshared ticket exactly its folder, made | `review::test_the_launcher_keeps_the_folder_of_a_ticket_whose_name_no_other_shares` (W2-91, beside a shared W2-90) | none | passes today |
+
+**The fixture tickets of this file**, written into the fixture project by the case from the suite's ticket text (an
+engineer ticket on `src/app/**`, no `wbs_id`), with the `external-ref` line added and, where named, the status
+changed, and committed with the rest of the project:
+
+| tk id | external-ref | used by |
+|---|---|---|
+| DAEO-zz80 | the case's name (behaviour 2) | the name cases |
+| DAEO-zz81 | `W2-90` (MAIN's), `in_progress`, `open` or `closed` | behaviour 3, the same external-ref |
+| DAEO-zz82 | `DAEO-zz98` (the tk id NO_W2_ID's folder is named by) | behaviour 3, a name equal to a tk id |
+
+**Red run (whole suite, at `d0c6be04` plus the new file): 34 failed, 174 passed, 0 skipped.** The new file: 34 red,
+20 green (the 8 worktree refusals and the 6 allowances of behaviour 1, the two `..` cases, and the four controls of
+behaviours 2 and 3). Every earlier case still passes (154).
+
+### Discoveries of this round (no test)
+
+- **A quoted `external-ref` is read two ways.** With `external-ref: "W2-90_b.1"` (YAML quotes), measured at
+  `d0c6be04`: the guard allows `~/gov-os-runs/"W2-90_b.1"/…` and refuses `~/gov-os-runs/W2-90_b.1/…`, and the
+  launcher adds and makes `~/gov-os-runs/"W2-90_b.1"`. Both keep the quotes, so the two agree, and under behaviour 2
+  such a name (it holds a quote) gives no folder. A YAML reader would give the plain `W2-90_b.1`. No source says
+  which reading a ticket's front matter has; `tk` writes the value unquoted. Not tested: the cases write values
+  unquoted, as `tk` does.
+- **A name holding `/`** (`external-ref: W2-91/sub`) is refused by the guard and given nothing by the launcher
+  today; behaviour 2 holds it too (a `/` is not allowed in a plain name). Not tested beyond `..`.
 
 ## Readings chosen where a KPI line admits more than one
 
