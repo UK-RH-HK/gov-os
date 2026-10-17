@@ -104,7 +104,7 @@ Three tracks.
 | W2-16 | A | Immutable, hash-pinned releases (CAP-43.b lite) | implementation | engineer | FULL | W2-49 | 150 | CAP-43.b (lite, DEC-722) |
 | W2-17 | A | `gov update` | implementation | engineer | FULL | W2-16 | 260 | CAP-45.a, AR-10 |
 | W2-18 | A | Pinned install: a product repository runs a fixed release, never the development copy | implementation | engineer | STANDARD | W2-16 | 140 | CAP-43, W2-H032, W2-H021 |
-| W2-19 | A | Language-agnostic test commands | implementation | engineer | FULL | W2-07 | 300 | AR-10, DEC-534, DEC-567 |
+| W2-19 | A | Language-agnostic test commands | implementation | engineer | FULL | W2-07, W2-53 (DEC-757) | 300 | AR-10, DEC-534, DEC-567 |
 | W2-20 | A | Machine-wide resource gate | implementation | engineer | STANDARD | — | 120 | W2-M244, W2-M188 |
 | W2-21 | A | Stable launch: `gov launch lead`, the ticket-lead role, launch records | implementation | engineer | FULL | W2-20 | 220 | AR-10, DEC-715, DEC-434, W2-H001, W2-H046 |
 | W2-22 | A | `gov doctor` green | implementation | engineer | STANDARD | W2-09 | 120 | F-M2 |
@@ -116,7 +116,7 @@ Three tracks.
 | W2-50 | A | The durable scratch root: `~/gov-os-runs/<own ticket>/` in the guard and the launcher's sandbox (CIT-P) | implementation | engineer | FULL | W2-01 | 120 | DEC-728, W2-M355 |
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
 | W2-52 | A | The lite A7 and A10 stage records (DEC-741) | implementation | engineer | FULL | W2-01, W2-49 | 100 | CAP-44.f (lite) |
-| W2-53 | A | The probe gate measures every later merge against git's own merge of its parents (DEC-750, DEC-754) | implementation | engineer | FULL | W2-01 | 40 | DEC-750 item 2 |
+| W2-53 | A | The probe gate measures every later merge against git's own merge of its parents; owner-accepted known reds, integration-side ticket edits, a load-sensitive quarantine (DEC-750, DEC-754, DEC-757) | implementation | engineer | FULL | W2-01 | 160 | DEC-750 item 2, DEC-757 |
 | W2-26 | B | EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg) | research | research | STANDARD | the owner's copy (DEC-723); a `/tmp` clone until W2-50 (DEC-728) | 60 | EXP-003 (EXAMIN), W2-I041 |
 | W2-27 | B | EXAMIN adoption on a copy | integration | orchestrator | FULL | the DEC-727 subset, W2-26, W2-49, W2-50, W2-19 (DEC-736), W2-52 (DEC-741) | 0 | Track B |
 | W2-28 | B | Independent verdict on the copy | audit | independent-auditor | FULL | W2-27 | 0 | Track B |
@@ -566,18 +566,25 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The adoption verdict (W2-02's type) reads both records as named conditions.
 - **KPIs, failure:** a lite gate that fails writes a failing record, and the verdict cannot be ADOPTED_HEALTHY; a missing record is a named failure, never healthy.
 
-#### W2-53 The probe gate measures every later merge against git's own merge of its parents (FULL, engineer; DEC-750, DEC-754)
+#### W2-53 The probe gate measures every later merge against git's own merge of its parents (FULL, engineer; DEC-750, DEC-754, DEC-757)
 - **Why:** split from W2-01 after its fourth and last probe (DEC-750 item 2). A later merge holding the probed commit, bringing another ticket's branch made before the merge-back and naming that ticket's `Task:`, can delete or revert a probed file or remove an acceptance test, and `gov close` passes; a reopened ticket whose first round was merged back before its final probe cannot close.
-- **Starts** right after W2-01 closes (the same paths), test designer first. W2-07, W2-41 and W2-48 share `src/gov/close/` and run after it.
+- **Starts** right after W2-01 closes (the same paths), alone, ahead of every held ticket (DEC-757), test designer first. W2-07, W2-41 and W2-48 share `src/gov/close/` and run after it.
 - **Allowed paths:** `src/gov/close/**`, `tests/unit/close/**`.
 - **KPIs, success:**
   - After a FULL ticket's probed commit, every later merge that holds it refuses, naming the merge, whatever task it names (or none), when a probed path (the ticket's allowed paths, its acceptance folder, its ticket file) at the merge is not what git's own merge of its parents gives, a removal or a return to a version from before the ticket included; on the integration branch, inward on the ticket's branch, and for an octopus merge [DEC-750, DEC-754].
   - A later merge that takes another ticket's whole version of a probed file is measured the same way, against git's own merge of its parents (P-5 (c)) [DEC-754].
   - A reopened FULL ticket whose earlier round was merged back before its final probe closes when the probed code at the closed head is the final probed code [DEC-754].
   - A merge whose probed paths are what git's own merge of its parents gives, and another ticket's merge holding the probed commit on neither side, pass as before; W2-01's acceptance cases stay green [W2-H047, W2-M202].
+  - **The accepted-red ratchet (DEC-757 item 2.1).** A red whose exact test id the path map's `accepted_reds` lists, with an ACCEPTED owner decision naming it, a reason and the ticket that fixes it, does not refuse the close; the close names it with its decision and fixing ticket. An entry counts only when the commit that added it carries `Role: owner`. Its core is one function W2-19 reuses for declared test commands (DEC-736) [DEC-757].
+  - **Integration-side ticket edits (DEC-757 item 2.2).** A change to the ticket's file after its probed commit, made by a commit carrying `Role: orchestrator` or `Role: owner`, naming the ticket in `Task:` and changing only that file, is not a change to the probed code [DEC-757].
+  - **The load-sensitive quarantine (DEC-757 item 2.3).** A test the path map's `load_sensitive` lists that fails in the close is re-run alone, in its own process, inside the same close; it counts as passed only if that re-run passes, and the close reports it by name with both results [DEC-757, DEC-372].
+  - W2-53 closes through `gov close` with its own merged mechanism, its only reds the listed ones [DEC-757].
 - **KPIs, failure:**
   - An acceptance test added on the ticket's branch before the probe and removed or changed by a later merge refuses the close.
   - A merge whose own merge git cannot compute, or cannot read, is judged against the probed code and never passes by default.
+  - A red not on `accepted_reds` refuses the close. A listed red that passes refuses the close, naming the entry to remove. An entry added by a commit without `Role: owner`, or whose decision is not an ACCEPTED owner entry naming that test id, is refused, naming the entry; the list never grows without an owner decision [DEC-757].
+  - A ticket-file change on the ticket's own side after the probe, or an integration-side commit that changes more than the ticket's file, still refuses [DEC-757].
+  - A load-sensitive test that fails its isolated re-run refuses; a test not on `load_sensitive` is never re-run; no re-run is silent [DEC-757].
 
 #### W2-24 Track A gate run (FULL, orchestrator)
 - **Allowed paths:** `docs/plan/wave-2/track-a-gate/**` (evidence); fixture clones under `~/gov-os-runs/W2-24/`.
