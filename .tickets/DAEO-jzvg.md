@@ -1,7 +1,7 @@
 ---
 id: DAEO-jzvg
 status: open
-deps: [DAEO-g0ip, DAEO-r9ss]
+deps: [DAEO-g0ip, DAEO-r9ss, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 - DAEO-r9ss
+- DAEO-7rr2
 allowed_paths:
 - src/gov/close/**
 - src/gov/config/**
@@ -42,6 +43,7 @@ sources:
 - DEC-083
 - DEC-727
 - DEC-736
+- DEC-757
 est_loc: 300
 acceptance_tests:
   path: tests/acceptance/W2-19/
@@ -85,3 +87,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-19), as approved (DEC-729). The list row
   - A declared suite whose environment is missing is declared "needs environment" and is reported UNMEASURED by name, never as passed [DEC-736, W2-H026].
 - **KPIs, failure:** an undeclared language in a project with no test command is a named refusal, not a silent pytest run.
 - **On EXAMIN's path (DEC-736, correcting DEC-735 item 2):** `gov close` runs its regression only over `tests/`, and EXAMIN's suites are in `product/tests` and `governance/scripts/tests`. W2-27's close with EXAMIN's own test command therefore needs this ticket's declared test commands. The estimate is 300 lines with the ratchet baseline (DEC-736).
+- **DEC-757 (owner, 2026-10-17):** depends on W2-53, whose accepted-red ratchet core this ticket reuses for declared test commands and EXAMIN (DEC-736).
