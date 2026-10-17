@@ -31,7 +31,7 @@ kpis:
   failure:
   - 'A commit after the base without Task:, Role: or Implements: still refuses.'
   - A merge that adds its own change outside the merged side still refuses.
-  - A hand-resolved merge that changes probed code still refuses the probe gate.
+  - 'A hand-resolved merge that changes probed code still refuses the probe gate, for the cases its acceptance suite holds: a hand-resolved inward merge; a merge-back that changes, drops or replaces probed code, whatever task it names; and a later merge holding the probed commit that rewrites or removes probed code present in both parents. A later merge measured against git''s own merge of its parents is W2-53''s (DEC-754).'
   - An accepted-history entry without an ACCEPTED owner decision is refused.
 profile: FULL
 sources:
@@ -39,6 +39,8 @@ sources:
 - DEC-436
 - DEC-738
 - DEC-739
+- DEC-750
+- DEC-754
 est_loc: 180
 acceptance_tests:
   path: tests/acceptance/W2-01/
@@ -79,6 +81,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-01), as approved (DEC-729). The list row
 - **KPIs, failure:**
   - A commit after the base without `Task:`, `Role:` or `Implements:` still refuses.
   - A merge that adds its own change outside the merged side still refuses.
-  - A hand-resolved merge that changes probed code still refuses the probe gate.
+  - A hand-resolved merge that changes probed code still refuses the probe gate, for the cases its acceptance suite holds: a hand-resolved inward merge; a merge-back that changes, drops or replaces probed code, whatever task it names; and a later merge holding the probed commit that rewrites or removes probed code present in both parents. A later merge measured against git's own merge of its parents is W2-53's (DEC-754).
   - An accepted-history entry without an ACCEPTED owner decision is refused.
 - **Round 3 (DEC-739, 2026-10-17):** the owner allows one review round beyond DEC-413 and no fourth: a merge-back that names no task, or another ticket's task, and drops or replaces probed code refuses, naming the merge. Row W2-M263 left this ticket for W2-07 (DEC-738 item 4).
+- **Split (DEC-750 item 2, DEC-754, 2026-10-17):** the fourth and last probe (`PR-DAEO-g0ip-round-4.md`, probed `09a01912`) failed on a later merge that removes or reverts probed code through a parent made before the ticket (findings 1 to 3, P-5). That case moves to W2-53 (DAEO-7rr2); the failure line above is narrowed to the cases held, and all 88 acceptance cases stay. A judgement-only re-probe of the final head against this card precedes the close.
