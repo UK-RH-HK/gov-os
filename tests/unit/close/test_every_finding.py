@@ -72,11 +72,12 @@ def test_a_test_run_with_findings_is_a_finding_of_the_tickets_work(tmp_path):
             _check_tests(tmp_path, tmp_path / "tests", 60, tmp_path / "ignored")
     assert (raised.value.code, raised.value.findings) == ("CHECK_FAILED", ["FAILED test_a"])
     assert ran.call_args.kwargs == {"ignore": tmp_path / "ignored", "none_collected_ok": True, "stated": None,
-                                    "workers": "auto"}
+                                    "workers": "auto", "told": None}
     stated = []
     with patch.object(command, "_run_tests", return_value=([], dict(COUNTS))) as ran:
         assert _check_tests(tmp_path, tmp_path / "tests", 60, stated=stated, workers=2) == COUNTS
-    assert ran.call_args.kwargs == {"ignore": None, "none_collected_ok": False, "stated": stated, "workers": 2}
+    assert ran.call_args.kwargs == {"ignore": None, "none_collected_ok": False, "stated": stated, "workers": 2,
+                                    "told": None}
 
 
 def test_without_acceptance_tests_no_run_is_made_and_it_is_said_as_not_measured(tmp_path):

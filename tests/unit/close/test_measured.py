@@ -400,13 +400,20 @@ def test_a_commit_without_a_task_inside_the_tickets_paths_after_the_probed_commi
     assert "stale" in said and rewrite[:12] in said and "src/a.py" in said
 
 
-def test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit(repo):
+def test_a_merge_of_the_ticket_is_measured_against_gits_own_merge_of_its_parents(repo):
+    """DEC-754 P-5 (c): the ticket's merge that is git's own merge of its parents passes; one that changes a
+    probed path beyond it refuses, naming the merge and the path."""
     _probe(repo, _work(repo))
     repo.git("checkout", "-q", "-b", "side")
     repo.commit("another ticket's work on the side", "Task: T-0002", "Role: engineer", files={"src/side.py": "s\n"})
     repo.git("checkout", "-q", "main")
     repo.git("merge", "-q", "--no-ff", "--no-gpg-sign", "-m", "merge\n\n" + "\n".join(TRAILERS) + "\n", "side")
-    merge = repo.git("rev-parse", "HEAD").strip()
+    _gate(repo)
+    repo.git("checkout", "-q", "side")
+    repo.commit("more on the side", "Task: T-0002", "Role: engineer", files={"docs/side.md": "d\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+    merge = repo.commit("merge again", *TRAILERS, files={"src/side.py": "changed in the merge\n"})
     said = _refused(repo)
     assert merge[:12] in said and "src/side.py" in said
 
