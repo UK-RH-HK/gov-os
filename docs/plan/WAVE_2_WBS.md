@@ -499,7 +499,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:** each planted change in an input class makes every dependent test run; a change outside every key reuses. A cache that cannot be read means everything runs, never "passed".
 
 #### W2-49 Contract v4.2, lite (STANDARD, product-spec; DEC-722)
-- **Allowed paths:** `docs/contract/contract.yaml`, `docs/contract/CONTRACT_v4.md` (the v4.2 text), `docs/changes/W2-49-CIT-P.md`, `docs/changes/W2-49-CIT-E.md`, `docs/contract/capabilities/**` (DEC-741 K: the version line in every record, and the records of the split and moved items, from the approved `contract.yaml`).
+- **Allowed paths:** `docs/contract/contract.yaml`, `docs/contract/CONTRACT_v4.md` (the v4.2 text), `docs/changes/W2-49-CIT-P.md`, `docs/changes/W2-49-CIT-E.md`, `docs/contract/capabilities/**` (DEC-741 K, confirmed by DEC-745: the version line in every record, and the eight records of the split and moved items rewritten from the approved `contract.yaml` in a commit of their own), `docs/contract/SOURCE_MAP.csv` (the eight rows of the CIT-P's §8 only, aligned with v4.2; DEC-745).
 - **Route:** CIT-P, independent review, the owner's approval, versioned promotion (CAP-33). **Approved (DEC-741, `0faa0664`), with answers A to J.** The plan validator lines close with W2-51 (DEC-744).
 - **KPIs, success:**
   - The CIT-P names each change, its source (DEC-722) and its impact (W2-02, W2-16, W2-18, W2-27 to W2-30, exit criteria 6 and 7):
