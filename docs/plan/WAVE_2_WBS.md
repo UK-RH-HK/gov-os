@@ -116,6 +116,7 @@ Three tracks.
 | W2-50 | A | The durable scratch root: `~/gov-os-runs/<own ticket>/` in the guard and the launcher's sandbox (CIT-P) | implementation | engineer | FULL | W2-01 | 120 | DEC-728, W2-M355 |
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
 | W2-52 | A | The lite A7 and A10 stage records (DEC-741) | implementation | engineer | FULL | W2-01, W2-49 | 100 | CAP-44.f (lite) |
+| W2-53 | A | The probe gate measures every later merge against git's own merge of its parents (DEC-750, DEC-754) | implementation | engineer | FULL | W2-01 | 40 | DEC-750 item 2 |
 | W2-26 | B | EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg) | research | research | STANDARD | the owner's copy (DEC-723); a `/tmp` clone until W2-50 (DEC-728) | 60 | EXP-003 (EXAMIN), W2-I041 |
 | W2-27 | B | EXAMIN adoption on a copy | integration | orchestrator | FULL | the DEC-727 subset, W2-26, W2-49, W2-50, W2-19 (DEC-736), W2-52 (DEC-741) | 0 | Track B |
 | W2-28 | B | Independent verdict on the copy | audit | independent-auditor | FULL | W2-27 | 0 | Track B |
@@ -205,7 +206,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:**
   - A commit after the base without `Task:`, `Role:` or `Implements:` still refuses.
   - A merge that adds its own change outside the merged side still refuses.
-  - A hand-resolved merge that changes probed code still refuses the probe gate.
+  - A hand-resolved merge that changes probed code still refuses the probe gate, for the cases its acceptance suite holds: a hand-resolved inward merge; a merge-back that changes, drops or replaces probed code, whatever task it names; and a later merge holding the probed commit that rewrites or removes probed code present in both parents. A later merge measured against git's own merge of its parents is W2-53's (DEC-754).
   - An accepted-history entry without an ACCEPTED owner decision is refused.
 
 #### W2-02 Record types: decision entry, audit report, adoption verdict, close record (STANDARD, product-spec)
@@ -565,6 +566,19 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The adoption verdict (W2-02's type) reads both records as named conditions.
 - **KPIs, failure:** a lite gate that fails writes a failing record, and the verdict cannot be ADOPTED_HEALTHY; a missing record is a named failure, never healthy.
 
+#### W2-53 The probe gate measures every later merge against git's own merge of its parents (FULL, engineer; DEC-750, DEC-754)
+- **Why:** split from W2-01 after its fourth and last probe (DEC-750 item 2). A later merge holding the probed commit, bringing another ticket's branch made before the merge-back and naming that ticket's `Task:`, can delete or revert a probed file or remove an acceptance test, and `gov close` passes; a reopened ticket whose first round was merged back before its final probe cannot close.
+- **Starts** right after W2-01 closes (the same paths), test designer first. W2-07, W2-41 and W2-48 share `src/gov/close/` and run after it.
+- **Allowed paths:** `src/gov/close/**`, `tests/unit/close/**`.
+- **KPIs, success:**
+  - After a FULL ticket's probed commit, every later merge that holds it refuses, naming the merge, whatever task it names (or none), when a probed path (the ticket's allowed paths, its acceptance folder, its ticket file) at the merge is not what git's own merge of its parents gives, a removal or a return to a version from before the ticket included; on the integration branch, inward on the ticket's branch, and for an octopus merge [DEC-750, DEC-754].
+  - A later merge that takes another ticket's whole version of a probed file is measured the same way, against git's own merge of its parents (P-5 (c)) [DEC-754].
+  - A reopened FULL ticket whose earlier round was merged back before its final probe closes when the probed code at the closed head is the final probed code [DEC-754].
+  - A merge whose probed paths are what git's own merge of its parents gives, and another ticket's merge holding the probed commit on neither side, pass as before; W2-01's acceptance cases stay green [W2-H047, W2-M202].
+- **KPIs, failure:**
+  - An acceptance test added on the ticket's branch before the probe and removed or changed by a later merge refuses the close.
+  - A merge whose own merge git cannot compute, or cannot read, is judged against the probed code and never passes by default.
+
 #### W2-24 Track A gate run (FULL, orchestrator)
 - **Allowed paths:** `docs/plan/wave-2/track-a-gate/**` (evidence); fixture clones under `~/gov-os-runs/W2-24/`.
 - **KPIs:**
@@ -776,7 +790,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 | Layer | Track A | Track B | Track C |
 |---|---|---|---|
 | 1 | **W2-01** (alone among code tickets) | W2-26 (read-only; closes after W2-07) | |
-| 2 | **W2-02**, W2-05, W2-09, W2-20, W2-48, W2-49, W2-50, W2-51 | | |
+| 2 | **W2-02**, W2-05, W2-09, W2-20, W2-48, W2-49, W2-50, W2-51, W2-53 | | |
 | 3 | **W2-03**, W2-06, W2-07, W2-10, W2-16, W2-21, W2-22, W2-52 | | |
 | 4 | **W2-13**, W2-04, W2-18, W2-08, W2-12, W2-11, W2-17, W2-19 | | W2-31, W2-33, W2-34, W2-37, W2-40, W2-42, W2-44 |
 | 5 | **W2-15a**, W2-23, W2-14 | | W2-35, W2-36, W2-39, W2-41, W2-43, W2-45 |
@@ -792,7 +806,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 - W2-09 then closes at ≈ day 7, W2-10 at ≈ day 10, W2-21 at ≈ day 8 and W2-06 at ≈ day 8.
 - All of these are ahead of their users: W2-14 and W2-15a at ≈ day 10, W2-27 at ≈ day 11. None becomes critical.
 
-**Shared paths added later.** W2-52 shares `src/gov/adopt/` with W2-23, so W2-23 runs after W2-52 (DEC-741). W2-49 closes after W2-51, whose validator its KPI uses (DEC-744).
+**Shared paths added later.** W2-52 shares `src/gov/adopt/` with W2-23, so W2-23 runs after W2-52 (DEC-741). W2-49 closes after W2-51, whose validator its KPI uses (DEC-744). W2-53 shares `src/gov/close/` with W2-07, W2-41 and W2-48, which run after it (DEC-754).
 
 **Critical path** (by working days, from est. LOC and profile; owner waits not included): W2-01 → W2-02 → W2-03 → **W2-13 → W2-15a → W2-32 → W2-15b** → W2-29 → W2-30 → W2-46 → W2-47, ≈ 20.5 working days.
 

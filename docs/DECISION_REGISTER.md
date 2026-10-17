@@ -8126,3 +8126,159 @@ The owner committed DEC-736 to DEC-744 as `cf4ce2b8` (`Role: owner`) and pushed 
 | 0.230 | 2026-10-17 | Owner: DEC-745 (EXAMIN's governance suite unknown to the owner, sorted by W2-27's diagnosis hour; `SOURCE_MAP.csv`'s eight rows in W2-49's paths, aligned with v4.2; K confirmed: the eight records of the split and moved items rewritten from the approved `contract.yaml`, in their own commit). Delegated: DEC-746 (W2-02's packages: one builder test in its paths; W1-26's one assertion revised, stricter; DEC-730's `W2-15` read as a slip, for the owner; the verdict's conditions typed per DEC-741 I (ii); P-3 to P-5 as recommended), DEC-747 (W2-20's packages: `src/gov/check/commands.py` in its paths for the one recorded command; "at most 8" counts the new session's weight; DEC-742's load value stands), DEC-748 (W2-49's apply round: condition (3)'s wording and condition (2)'s wave kept as built), DEC-749 (W2-02's shape check measures arrays, objects and one conditional, for the verdict's conditions; fail closed otherwise). Next free id: DEC-750. |
 
 ---
+
+## 231. The owner's answers of 2026-10-17 on W2-01's fourth round, the early starts, the capability records and DEC-730's reading (register v0.231, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+The owner committed DEC-745 to DEC-749 as `25e0f675` (`Role: owner`). W2-01's third and last probe (`docs/probes/DAEO-g0ip/PR-DAEO-g0ip-round-3.md`, probed `4437d617`, record `993a3f7e`) failed:
+- **F1 (fail-open, loses work).** A second merge-back that names another ticket's task and drops probed code still closes.
+- **F2 (fails closed, breaks exit criterion 1).** Any later merge whose first parent lacks the probed commit is taken as the merge-back, so later FULL closes are refused wrongly.
+
+Under DEC-739 there was no fourth round without the owner, so the orchestrator put P-W2-15 to the owner, with P-W2-16 and DEC-746 item 3's reading.
+
+### DEC-750 — W2-01 gets a fourth and last round, then closes or splits; early starts resume; P-W2-16 approved; DEC-730's "W2-15" was a slip
+- **Status:** ACCEPTED (owner, 2026-10-17; committed by the owner with `Role: owner`, in the next batch) · **Under:** DEC-413, DEC-739, DEC-737, DEC-721, DEC-741, DEC-745, DEC-748, DEC-730, DEC-746 · **Basis:** P-W2-15, P-W2-16 and DEC-746 item 3, in the orchestrator's report of 2026-10-17.
+- **Decision:**
+  1. **P-W2-15 (a): one more bounded round for W2-01, and it is the last.** About 3 to 4 hours, in this order:
+     - a test design batch with the behaviour;
+     - a fresh engineer;
+     - the full verification;
+     - a fourth probe, recorded as `docs/probes/DAEO-g0ip/PR-DAEO-g0ip-round-4.md`.
+
+     The behaviour the round builds:
+     - **The merge-back is the merge after the probed commit whose first parent lacks it and whose other parent holds it.**
+     - **Every later merge that holds the probed commit and changes probed code refuses, whatever task it names.**
+     - A merge that holds the probed commit on neither side is judged as before.
+  2. **If the fourth probe passes, W2-01 closes.** If it does not, **there is no fifth round: W2-01 is split.**
+     - The part that passes closes cleanly now.
+     - The remaining merge-back case becomes a new FULL ticket, **W2-53**, test designer first, placed early in the layers.
+  3. **Until W2-53 closes (or W2-01 closes whole), the orchestrator's merge procedure avoids the dangerous shape.** This binds every merge into `w2/integrate` and every merge of `w2/integrate` into a ticket branch:
+     - every merge carries a `Task:` trailer;
+     - no merge is ever made with `-s ours`;
+     - no conflict is ever resolved by dropping the ticket's side.
+
+     The rule is stated in the orchestrator's checkpoint and in every lead brief.
+  4. **The early starts resume now, at the moderate pace: at most 3 beside W2-01**, so that the machine is not idle while the fourth round runs. DEC-737's other rules stand: the held tickets stay held until W2-01 closes, and closes go one at a time.
+  5. **P-W2-16: yes.** In W2-49's resume round, the stale derived record `docs/contract/capabilities/CAP-45.a.md` is regenerated from the approved Contract v4.2, and the capability records' `status:` line is set to the Contract's ACCEPTED.
+  6. **DEC-730's "W2-15" in item 2's refused list is confirmed as a slip,** as DEC-746 item 3 reads it. The grammar accepts `W2-15` and `W2-15a`, and refuses `W2-15ab`, `W2-15A` and `W2-1`.
+- **Applied by the orchestrator:**
+  - W2-01's run 4 (a resume lead) starts at once, from a brief that carries this entry.
+  - Item 3's rule is in the orchestrator's checkpoint, in the early-start brief template and in every lead brief from now on.
+  - **Item 4 found no eligible ticket under DEC-737 as written.** Every unstarted ticket is one of these:
+    - W2-05 overlaps W2-01's paths.
+    - W2-09 shares `src/gov/guard/decide.py` with W2-50, which is in flight.
+    - W2-48 waits for W2-01 entirely (DEC-737 item 4).
+    - Every other ticket depends on a ticket that is held, not closed.
+
+    The orchestrator puts the way to use the slots to the owner as P-W2-17, and starts nothing outside DEC-737 until the owner answers.
+- Next free id: DEC-751.
+
+### DEC-751 — W2-50's last review: the two fail-open findings are repaired, stricter; the probe after the repair goes to the owner (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6, DEC-220, DEC-416 and DEC-537's stricter-only rule, 2026-10-17; listed in the digest; the owner overturns any part in the next batch) · **Under:** DEC-728, DEC-743, DEC-413, DEC-737 · **Basis:** W2-50's lead (run 2, head `21ac28b7`) returned PACKAGES. The CIT-P was committed with DEC-743's answers (`a5ef3c69`), then implementation, CIT-E and one fix round (`86aa805c`, `0bbada97`). W2-50 208 passed; `tests/unit` 2126 passed, 1 skipped; every other suite green but W1-42's two named reds. The second and last review (probed `f9277098`) failed on two fail-open findings:
+  - **P-A.** An own folder is named only by the ticket's name, which is unique per repository, not per home. So a second Gov OS project on the same home with a ticket of the same name can write to, and `rm -rf`, this repository's ticket folder, and its launch adds that folder to its sandbox.
+  - **P-B.** A clone inside an own folder passes its own secrets check with a linked store inside the clone: the walk prunes by realpath under the root.
+- **Decision:**
+  1. **P-A (a), stricter only.** The launcher writes a marker in the own folder naming this repository's git common directory. The guard and the launcher refuse a folder whose marker is missing or names another repository. This is about 40 to 60 lines in `runs.py` and `launcher.py`, within DEC-728.
+  2. **P-B (a), stricter only.** The secrets walk follows links whose target stays inside the repository being scanned, even under the root. This is about 5 to 10 lines in `src/gov/secrets/__init__.py`, within DEC-743 item 3's link rule; W1-15's B4 stays green.
+  3. Both are fixes after the last review that DEC-413 allows (fail-open holes, losses of work): a test design batch first, given each finding as described behaviour (DEC-136); the lead checks red; then a fresh engineer, who updates the CIT-E in the same round; then the full verification.
+  4. **Fail probe records stay uncommitted drafts** in the lead's scratch until the owner rules on P-W2-18. A committed fail record is read by the probe gate as it stands in this worktree.
+  5. **W-1 (a).** The live `local_only` cases of W1-46 and W1-50, which start real sessions with the real home, would now create the real `~/gov-os-runs`. They stay deselected in every run until W2-21; a list row is triaged to W2-21.
+  6. **W-2 (b).** The launcher starting a session silently with no own folder (CIT-E difference 7) gets a warning line in W2-21; a list row.
+  7. **Finding 3** (a FIFO in `.tickets/` hangs `gov launch`; fails closed; low) is a residual row at W2-50's close.
+- **Put to the owner, not decided here (P-W2-18):** after the repair, the probe gate still needs a passing probe of the final code. DEC-413's last review is used. The options are:
+  - (a) one more review, of the repair only, whose pass record is committed, with the fail records kept in the CIT-E as history;
+  - (b) both findings accepted as residuals, with a pass record written on the owner's ruling;
+  - (c) re-baseline the gate.
+- **Next:** W2-50's run 3 (a resume lead) takes its slot now. It runs items 1 to 3, then holds before any probe, for P-W2-18.
+- Next free id: DEC-752.
+
+### DEC-752 — Stacked early starts for W2-03 and W2-16; W2-50's repair gets one more independent review
+- **Status:** ACCEPTED (owner, 2026-10-17; committed by the owner with `Role: owner`, in the next batch) · **Under:** DEC-737, DEC-750, DEC-751, DEC-728, DEC-413, DEC-498 · **Basis:** P-W2-17 and P-W2-18, in the orchestrator's reports of 2026-10-17. No unstarted ticket was eligible under DEC-737 as written (DEC-750, "Applied").
+- **Decision:**
+  1. **P-W2-17 (a): stacked early starts.**
+     - **W2-03** (DAEO-ym8a) starts on W2-02's held branch.
+     - **W2-16** (DAEO-49o5) starts on W2-49's held branch.
+
+     Each is cut from `w2/integrate` with its base ticket's held branch merged in, under DEC-750 item 3's merge rule. Each runs its full loop and holds, as under DEC-737.
+     - **If a base ticket changes in its own close** (a repair round, or its merge of `w2/integrate`), the stacked ticket merges that change in and re-verifies before its own merge.
+     - **A stacked ticket merges only after its base has closed.**
+  2. **P-W2-18 (a): one more independent review of W2-50's repair.** W2-50 loosens the guard (DEC-728), so its repair gets the extra look beyond DEC-413.
+     - The review covers the DEC-751 repair: the own folder's marker and the secrets walk's links. A fresh reviewer probes the final code.
+     - Only that review's pass record is committed under `docs/probes/DAEO-kl5e/`. The two fail records go into the CIT-E as history.
+     - A fail-open or lost-work finding of this review comes back as a package with no new round. Every other finding is a residual.
+- **Applied by the orchestrator:**
+  - W2-03 and W2-16 are claimed, one commit each. Their worktrees are cut from `w2/integrate`, and the base branch is merged in with a merge commit carrying the stacked ticket's `Task:`. Their leads then start.
+  - W2-50's run 4 (the review) follows its run 3, which is now running the repair.
+- Next free id: DEC-753.
+
+### DEC-753 — W2-16's new `gov release` command is recorded after W2-20 closes (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6, DEC-220 and DEC-747 item 1, 2026-10-17; listed in the digest; the owner overturns it in the next batch) · **Under:** DEC-747, DEC-235, DEC-752 · **Basis:** W2-16 adds a `gov` command (`gov release`). A new command is recorded in two lists: W1-07's tests' list and `RECORDED_GOV_COMMANDS` in `src/gov/check/commands.py` (DEC-747). W2-20, held but not closed, holds that file in its paths and changed both lists. Two tickets in flight never share a path (DEC-235).
+- **Decision:**
+  1. `src/gov/check/commands.py` joins W2-16's `allowed_paths`, for the one line that records `release`.
+  2. **That line and W1-07's list entry are made in W2-16's resume round, after W2-20 has closed,** so the two tickets never write the file at the same time. The list entry is made by a fresh test designer with a `Rewrite-Reason:`.
+  3. Until then, the W1-07 and W1-26 cases that find `release` unrecorded are named reds in W2-16's hold verification, with this entry as their reason. Nothing else is excused.
+- Next free id: DEC-754.
+
+### DEC-754 — W2-01 is split as DEC-750 item 2 orders; W2-53 takes the later-merge case; a judgement-only re-probe precedes W2-01's close (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6, DEC-220 and DEC-416, applying DEC-750 item 2, 2026-10-17; listed in the digest; the owner overturns any part in the next batch) · **Under:** DEC-750, DEC-739, DEC-413, DEC-498, DEC-733, DEC-737 · **Basis:** W2-01's lead (run 4, 135 min) returned PACKAGES.
+  - The round went green: tests `40dbe546` (7 cases), fix `b283af77` (+14 −4 in `src/gov/close/command.py`), probed head `09a01912`. W2-01 88 passed; W1-30 512 passed; every other suite green but W1-42's two named reds; `tests/unit` 2126 passed, 1 skipped.
+  - The fourth and last probe (`docs/probes/DAEO-g0ip/PR-DAEO-g0ip-round-4.md`, `e5d1c528`) failed:
+    - **Finding 1 (fail-open, loses work).** A later merge that holds the probed commit, brings another ticket's branch made before the merge-back and names that ticket's `Task:` can delete a probed file, or set it back to its text from before the ticket, and `gov close` passes. Seen on `main`, in KPI 4's layout, as an octopus merge and inward.
+    - **Finding 2.** The same kind of merge can remove an acceptance test added on the branch before the probe.
+    - **Finding 3 (fails closed).** A reopened ticket whose first round was merged back before its final probe cannot close.
+    - **P-5.** A later merge that takes another ticket's whole version of a probed file still closes.
+  - Round 3's F1 and F2 are fixed and sound, and no commit needs a revert: the finding-1 layout also passed at `4437d617`. The lead returned the split package DEC-750 item 2 asks for, recommended at medium confidence; the reviewer recommends P-5 (c) at medium-high.
+- **Decision (DEC-750 item 2 applied):**
+  1. **The part that passes stays in W2-01 and closes.**
+     - Every KPI line, list row and acceptance case stays (all 88 green at `b283af77`).
+     - The failure line "a hand-resolved merge that changes probed code still refuses the probe gate" is narrowed to the cases the suite holds: a hand-resolved inward merge; a merge-back that changes, drops or replaces probed code, whatever task it names; and a later merge holding the probed commit that rewrites or removes probed code present in both parents. The ticket and the WBS card say so.
+  2. **W2-53 (DAEO-7rr2), FULL, engineer, test designer first, layer 2 right after W2-01** (the same paths: `src/gov/close/**`, `tests/unit/close/**`; est. 40). It takes:
+     - findings 1 to 3;
+     - P-5, settled as **(c)**: every later merge holding the probed commit is measured against git's own merge of its parents, on the probed paths (the ticket's allowed paths, its acceptance folder, its ticket file), whatever task it names; a merge git cannot compute is judged against the probed code and never passes by default.
+
+     W2-07, W2-41 and W2-48 share `src/gov/close/` and now depend on W2-53. W2-24 and W2-46 list it.
+  3. **The clean close.** A fresh, read-only reviewer re-probes W2-01's final head (`e5d1c528`, a descendant of the round-4 probed commit) against the narrowed card. It makes **a judgement only: no code and no test changes**, so it is not a fifth round.
+     - If it passes, its record is committed under `docs/probes/DAEO-g0ip/` (DEC-733). The orchestrator then merges W2-01 into `w2/integrate` and runs `gov close`.
+     - If it finds a fail-open or lost-work case that the narrowed card still holds, it comes back to the owner as a package, with no new round. The alternative named by the lead is a close with the ticket tool by owner decision, as for W1-42.
+  4. **DEC-750 item 3's merge rule is extended, stricter only, until W2-53 closes.** No merge removes or reverts a file that git's own merge of its parents keeps. The orchestrator's merges are plain `git merge` with no hand edits; a conflict is resolved only by keeping both sides' intent, or returned as a package.
+- **Next:** W2-01's run 5 (a judgement-only re-probe) takes its slot now. W2-53 starts when W2-01 has closed.
+- Next free id: DEC-755.
+
+### DEC-755 — W2-03's packages of run 1, decided by the orchestrator (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6, DEC-220, DEC-416 and DEC-537's stricter-only rule, 2026-10-17; listed in the digest; the owner overturns any part in the next batch) · **Under:** DEC-729, DEC-752, DEC-491, DEC-746 · **Basis:** W2-03's lead (run 1, head `fe0c1d58`, stacked on W2-02) returned PACKAGES.
+  - W2-03 39 passed; W2-02 53 passed.
+  - The real register loads as 745 decision records with 745 distinct hashes.
+  - `tests/unit`: 9 failed (P-W203-1), 2116 passed. W1-26: 2 failed (P-1, P-2). Every other suite green but W1-42's named reds and the latency cases.
+  - Each part below is P2 or P3, reversible, agrees with the lead's recommendation at medium confidence or higher, and touches neither the Charter, the master rules, the Contract's scope, the guard, containment nor the held-out path.
+- **Decision:**
+  1. **P-1 (a), stricter only.** A fresh independent test designer adds `- **Status:** ACCEPTED` under the fixture heading of W1-26's `test_a_heading_after_a_closed_fence_records_its_id`, with a `Rewrite-Reason:` naming W2-03's KPI line 3 and W2-L221. The case keeps its purpose; a heading with no status line is no record.
+  2. **P-2 (a), stricter only.** The same designer turns W1-26's `test_a_decision_file_records_its_id[no-type-id-in-grammar]` into a case where that form is flagged, not counted, with a `Rewrite-Reason:` naming W2-M267 and W2-M145.
+  3. **P-W203-1 (a).** `tests/unit/check/test_citations.py` joins W2-03's `allowed_paths`, for its fixtures only. A fresh engineer adds a status line under each of the nine fixture headings; no expectation changes.
+  4. **P-3 (a), as built.** There is no folder rule for decision files, since no source declares the folders. The folder part of W2-M145 becomes a Wave 2 list row.
+  5. **P-4 (a), as built.** A register entry is held to the `decision_id` grammar and a canonical status; its type stays `decision`, and owner and date are not required. Aligning `register-entry.schema.json`'s constant type and its required owner and date is a list row for product-spec.
+  6. The lead's residuals become rows at W2-03's close:
+     - a span ends at any heading, so text under a `####` inside an entry is in no span (0 of 745 today);
+     - file records carry no `content_hash`;
+     - W2-M039's 289 dangling references;
+     - W2-M055 in `src/gov/tasks/queue.py`;
+     - `citations.py`'s copy of the `state_class` list;
+     - `gov close`'s owner-entry lookup with its own heading rule (it fails closed);
+     - acceptance suites colliding on `conftest` in one pytest process.
+- **Next:** the orchestrator merges `w2/integrate` into W2-03's branch, which brings the widened paths and W2-01's merged change. W2-03's run 2 (a resume lead) then applies items 1 to 3, re-verifies and holds (DEC-737, DEC-752).
+- Next free id: DEC-756.
+
+### DEC-756 — W2-50's repair: two stricter consequences confirmed; the extra review runs (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6, DEC-220 and DEC-537's stricter-only rule, 2026-10-17; listed in the digest; the owner overturns any part in the next batch) · **Under:** DEC-728, DEC-743, DEC-751, DEC-752 · **Basis:** W2-50's lead (run 3, head `6d5ad6d0`) returned PACKAGES: the DEC-751 repair made and verified.
+  - Tests `e58081be` (25 cases; the setup of 80 earlier cases now makes the folder through a launch, no expectation changed); repair `df5f1e50`; CIT-E `8a3c27e9`.
+  - W2-50 233 passed; `tests/unit` 2130 passed, 1 skipped; every other suite green but W1-42's named reds and W1-02's latency case under load (7 passed alone).
+  - The marker is `<own>/.gov-os-repository`, holding the real path of the repository's git common directory. The launcher makes and marks a folder only when nothing exists at its path. The guard gives the folder only when it is a real folder whose marker matches exactly, and refuses writes to the marker.
+- **Decision:**
+  1. **CIT-E difference 14 is confirmed, stricter only.** A session writes in its own folder only after a launch of its ticket has made it; the guard no longer opens a folder at the session's first write (R2's guard half of DEC-743 item 1 falls away). Folders made before this change have no marker and no longer open; none exist.
+  2. **CIT-E difference 15 is confirmed,** with a list row for W2-21: the sandbox denies writes to the marker too (`denyWrite`). Today the guard alone protects it; a Bash form the guard does not judge could only close the session's own folder, never open another repository's.
+  3. **P-W2-18 is already answered (DEC-752 item 2).** W2-50's run 4 is that one extra independent review. Before the review, an engineer adds the two failed reviews to the CIT-E as history, so that nothing but the review's own record is committed after the probed head. Only a pass record is committed under `docs/probes/DAEO-kl5e/`. A fail-open or lost-work finding comes back as a package, with no new round.
+- Next free id: DEC-757.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.231 | 2026-10-17 | Owner: DEC-750 (P-W2-15 (a): W2-01's fourth and last round, then it closes or splits into a passing part and W2-53, a FULL ticket; until then no merge without `Task:`, with `-s ours` or dropping the ticket's side of a conflict; early starts resume, at most 3 beside W2-01; P-W2-16 approved for W2-49's resume round; DEC-730's `W2-15` confirmed as a slip). Delegated: DEC-751 (W2-50's last review: the own folder marked with its repository and the secrets walk following links inside the scanned repository, both stricter; fail records kept as drafts; the probe after the repair put to the owner as P-W2-18). Owner: DEC-752 (P-W2-17 (a): stacked early starts for W2-03 on W2-02 and W2-16 on W2-49, re-verifying on any base change and merging only after the base closes; P-W2-18 (a): one more independent review of W2-50's repair). Delegated: DEC-753 (`src/gov/check/commands.py` in W2-16's paths, its `release` line and W1-07's entry made after W2-20 closes), DEC-754 (W2-01 split per DEC-750 item 2: its failure line narrowed to the cases held; W2-53, FULL, takes the later merge measured against git's own merge of its parents, P-5 (c); a judgement-only re-probe before W2-01's close; the merge rule extended, stricter), DEC-755 (W2-03's packages: two W1-26 fixtures revised, stricter; `tests/unit/check/test_citations.py` in its paths for nine fixtures; no folder rule; register entries held to the id grammar and a canonical status), DEC-756 (W2-50's repair: the own folder opens only after a launch made it; the marker's sandbox protection a W2-21 row; the extra review runs). Next free id: DEC-757. |
+
+---
