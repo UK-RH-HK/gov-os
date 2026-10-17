@@ -1,9 +1,9 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "adoption-verdict",
-  "description": "Frontmatter of an adoption verdict: the shared frontmatter and one of the three verdicts of CAP-44.h, brought into Wave 2 lite by Contract v4.2 (DEC-722). The conditions behind the verdict are the lite list Contract v4.2 states (W2-49, not yet written), so `conditions` is optional and its content is not constrained here.",
+  "description": "Frontmatter of an adoption verdict: the shared frontmatter, one of the three verdicts of CAP-44.h, brought into Wave 2 lite by Contract v4.2 (DEC-722), and the required list of named conditions behind it (DEC-741 I (ii)). Each condition has its name, its source item and its state, one of `met`, `not met` and `accepted`; an `accepted` condition names the owner entry that accepts it (DEC-741 answer F). The schema states the shape only: whether the verdict agrees with its conditions is asked elsewhere, not here.",
   "allOf": [{ "$ref": "common.schema.json#/$defs/frontmatter" }],
-  "required": ["verdict"],
+  "required": ["verdict", "conditions"],
   "properties": {
     "id": { "$ref": "common.schema.json#/$defs/record_id" },
     "type": { "const": "adoption-verdict" },
@@ -12,7 +12,28 @@
       "enum": ["ADOPTED_HEALTHY", "ADOPTED_WITH_ACCEPTED_EXCEPTIONS", "NOT_ADOPTED_HEALTHY"]
     },
     "conditions": {
-      "description": "The conditions behind the verdict, in the lite form Contract v4.2 states (DEC-722); open until W2-49 states them."
+      "description": "The named conditions behind the verdict, in the lite form Contract v4.2 states (DEC-741 I (ii)).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/condition" }
+    }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1 },
+    "condition": {
+      "description": "One condition: its name, the item of the Contract or the register it comes from, and its state. An `accepted` condition names the owner entry, a decision id, that accepts it (DEC-741 answer F).",
+      "type": "object",
+      "required": ["name", "source", "state"],
+      "properties": {
+        "name": { "$ref": "#/$defs/text" },
+        "source": { "$ref": "#/$defs/text" },
+        "state": {
+          "description": "Whether the condition holds: met, not met, or accepted by an owner entry.",
+          "enum": ["met", "not met", "accepted"]
+        },
+        "owner_entry": { "$ref": "common.schema.json#/$defs/decision_id" }
+      },
+      "if": { "properties": { "state": { "const": "accepted" } } },
+      "then": { "required": ["owner_entry"] }
     }
   }
 }

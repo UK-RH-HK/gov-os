@@ -46,8 +46,12 @@ STANDALONE_TYPES = ("probe", "audit-report", "adoption-verdict")
 # is an audit report.
 AUDIT_REPORT_DIR, AUDIT_REPORT_TYPE = "docs/audit", "audit-report"
 
-_JSON_TYPES = {"string": str, "boolean": bool}
+_JSON_TYPES = {"string": str, "boolean": bool, "array": list, "object": dict}
 _SHAPE_KEYWORDS = {"description", "const", "enum", "type", "minLength", "pattern"}
+# What a list or a map adds, and no more (DEC-741 I (ii), the verdict's named conditions): a list's items; a map's
+# properties, the keys it requires, and one conditional, an `if` that tests constants and the `then` it brings.
+_NESTED_KEYWORDS = {"array": {"items"}, "object": {"properties", "required", "if", "then"}}
+_UNMEASURABLE = "has a shape the check cannot measure"
 
 
 def _frontmatter(text: str) -> dict | None:
@@ -93,30 +97,73 @@ def _validate(front: dict, schema: dict, common: dict | None, rel: str) -> list[
 
 def _resolve(spec: dict, schema: dict, common: dict | None) -> dict | None:
     """The shape a property names: itself, or the definition its ``$ref`` points to here or in the common file."""
+    if not isinstance(spec, dict):
+        return None
     ref = spec.get("$ref")
     if ref is None:
         return spec
-    source, _, name = ref.partition("#/$defs/")
+    source, _, name = str(ref).partition("#/$defs/")
     owner = schema if not source else common if source == "common.schema.json" else None
     target = (owner or {}).get("$defs", {}).get(name)
     return target if isinstance(target, dict) else None
 
 
-def _shape_fault(value, shape: dict | None) -> str | None:
-    """Why ``value`` does not have ``shape``, or None. A shape this check cannot read is a fault, never a pass."""
-    if shape is None or set(shape) - _SHAPE_KEYWORDS or shape.get("type", "string") not in _JSON_TYPES:
-        return "has a shape the check cannot measure"
+def _tested_constants(test) -> dict | None:
+    """``{key: constant}`` an ``if`` tests, or None when the ``if`` is not a test of constants on properties."""
+    tests = test.get("properties") if isinstance(test, dict) and set(test) == {"properties"} else None
+    if not isinstance(tests, dict) or not tests \
+            or any(not isinstance(each, dict) or set(each) != {"const"} for each in tests.values()):
+        return None
+    return {key: each["const"] for key, each in tests.items()}
+
+
+def _shape_fault(value, shape: dict | None, schema: dict, common: dict | None, where: str) -> tuple | None:
+    """Where and why ``value`` does not have ``shape``, or None; ``where`` is the place, as ``conditions[1].state``.
+    A shape this check cannot read is a fault, never a pass, at every depth."""
+    kind = shape.get("type", "string") if isinstance(shape, dict) else None
+    if not isinstance(kind, str) or kind not in _JSON_TYPES \
+            or set(shape) - _SHAPE_KEYWORDS - _NESTED_KEYWORDS.get(kind, set()):
+        return where, _UNMEASURABLE
+    required, properties = shape.get("required", []), shape.get("properties", {})
+    if not isinstance(required, list) or not all(isinstance(key, str) for key in required) \
+            or not isinstance(properties, dict):
+        return where, _UNMEASURABLE
+    # the one conditional: an `if` that tests constants on properties, and its `then`; any other is unread
+    if ("if" in shape or "then" in shape) \
+            and (_tested_constants(shape.get("if")) is None or not isinstance(shape.get("then"), dict)):
+        return where, _UNMEASURABLE
     if "const" in shape and value != shape["const"]:
-        return f"is not {shape['const']!r}"
+        return where, f"is not {shape['const']!r}"
     if "enum" in shape and not any(value == word and type(value) is type(word) for word in shape["enum"]):
-        return f"is not one of {shape['enum']}"
+        return where, f"is not one of {shape['enum']}"
     if "type" in shape and not isinstance(value, _JSON_TYPES[shape["type"]]):
-        return f"is not a {shape['type']}"
+        return where, f"is not a {shape['type']}"
     if isinstance(value, str):
         if len(value) < shape.get("minLength", 0):
-            return "is empty"
+            return where, "is empty"
         if "pattern" in shape and not re.search(shape["pattern"], value):
-            return f"does not match {shape['pattern']}"
+            return where, f"does not match {shape['pattern']}"
+    if kind == "array" and "items" in shape:
+        items = _resolve(shape["items"], schema, common)
+        if items is None:
+            return where, _UNMEASURABLE
+        for index, item in enumerate(value):
+            fault = _shape_fault(item, items, schema, common, f"{where}[{index}]")
+            if fault:
+                return fault
+    if kind == "object":
+        for key in required:
+            if key not in value:
+                return where, f"has no '{key}'"
+        for key, spec in properties.items():
+            fault = _shape_fault(value[key], _resolve(spec, schema, common), schema, common, f"{where}.{key}") \
+                if key in value else None
+            if fault:
+                return fault
+        # as JSON Schema reads it, the `if` holds when each key it tests is absent or has its constant
+        tests = _tested_constants(shape.get("if")) or {}
+        if tests and all(key not in value or value[key] == const for key, const in tests.items()):
+            return _shape_fault(value, {"type": "object", **shape["then"]}, schema, common, where)
     return None
 
 
@@ -125,10 +172,13 @@ def _validate_shapes(front: dict, schema: dict, common: dict | None, rel: str) -
     for field, spec in schema.get("properties", {}).items():
         if field not in front:
             continue
-        fault = _shape_fault(front[field], _resolve(spec, schema, common))
+        fault = _shape_fault(front[field], _resolve(spec, schema, common), schema, common, field)
         if fault:
+            # a fault inside a list or a map is the top-level field's, and its message says where inside it
+            where, why = fault
+            place = "" if where == field else f": {where}"
             findings.append({"code": "SCHEMA_INVALID_FIELD", "path": rel, "field": field,
-                             "message": f"{rel}: field '{field}' {fault}"})
+                             "message": f"{rel}: field '{field}'{place} {why}"})
     return findings
 
 

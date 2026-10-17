@@ -62,7 +62,7 @@ def test_a_shared_type_with_its_schema_absent_is_unmeasured_once(tmp_path):
 
 def test_the_adoption_verdict_owes_the_shared_frontmatter(tmp_path):
     _write(_project(tmp_path), "docs/adoption/AV-0001.md", "id: AV-0001\ntype: adoption-verdict\n"
-           "verdict: ADOPTED_HEALTHY\n")
+           "verdict: ADOPTED_HEALTHY\nconditions:\n- {name: gov doctor is green, source: CAP-44.h, state: met}\n")
     assert sorted(f["field"] for f in check(tmp_path)) == ["state_class", "status"]
 
 
