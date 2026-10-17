@@ -1,6 +1,6 @@
 ---
 id: DAEO-ym8a
-status: open
+status: in_progress
 deps: [DAEO-g0ip, DAEO-zflj]
 links: []
 created: 2026-10-16T16:35:10Z
@@ -36,6 +36,7 @@ kpis:
 profile: STANDARD
 sources:
 - DEC-729
+- DEC-752
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-03/
@@ -65,3 +66,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-03), as approved (DEC-729). The list row
   - A register heading alone, or any Markdown file with a decision id in its frontmatter, is not a decision record [W2-L221, W2-M267, W2-M145].
   - Decision status and id comparisons follow the schema's grammar, case included [W2-M106, W2-L069].
 - **KPIs, failure:** an edited entry changes only its own hash; a duplicate DEC id is refused with both locations.
+- **DEC-752 (owner, 2026-10-17):** a stacked early start on W2-02's held branch; it merges W2-02's later changes in and re-verifies, and merges only after W2-02 has closed.
