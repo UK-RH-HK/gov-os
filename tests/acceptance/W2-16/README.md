@@ -3,7 +3,9 @@
 Ticket `DAEO-49o5`, profile FULL. Written by an Independent Test Designer before implementation (MR-3), from the
 ticket's KPI lines, Contract v4.2 (CAP-43, CAP-43.a to CAP-43.d, CAP-02, CAP-02.a, CAP-02.c), the list rows
 W2-H029, W2-L002, W2-L014, W2-L227, W2-M174, W2-M175 with their origin lines, and DEC-722, DEC-023, DEC-027,
-DEC-488, DEC-493, DEC-499, DEC-542, DEC-194, DEC-244, DEC-654, DEC-221, DEC-752, DEC-753. 75 cases in three files.
+DEC-488, DEC-493, DEC-499, DEC-542, DEC-194, DEC-244, DEC-654, DEC-221, DEC-752, DEC-753. 75 cases in three files;
+10 more in a fourth, added after implementation from the first review of W2-16 (DEC-136; see "Cases added after the
+first review" below).
 
 Run from this worktree:
 
@@ -178,12 +180,33 @@ works where `gov` is an isolated tool and no `python3` imports it) and names no 
 manifest wrong" changes one file's hash inside the manifest and restates the manifest's own hash to match, so
 only the file hash is wrong.
 
+### Cases added after the first review — `test_w2_16_immutability.py`
+
+Written by a fresh Independent Test Designer after the implementation (commit `58869611`), from the KPI lines and
+the review's findings passed as described behaviour (DEC-136), without reading the implementation. Each refusal
+is the suite's: non-zero exit, no traceback, the whole snapshot (files, refs, HEAD, index) unchanged. The positive
+controls are the suite's own: the `releases` fixture shows the same stand-in, without the case's change, releases
+the same version. Red as seen on `58869611`'s checkpoint `38c8f1bb`.
+
+| Case | KPI line | Source | Holds | Red (seen) |
+|---|---|---|---|---|
+| `test_the_same_version_from_an_older_integration_commit_is_refused` (2: HEAD detached at the first release's record commit, or at the commit the first release was built from) | success 3 [CAP-43]; success 1 ("a clean `w2/integrate` commit") | first review of W2-16, finding 1 | `w2/integrate` holds release `1.5.0`'s committed record; HEAD is an older commit it contains, whose tree has no record of `1.5.0`: `gov release 1.5.0` refused, nothing written | own: "`gov release 1.5.0` built a release although w2/integrate holds release 1.5.0's record" (exit 0) |
+| `test_the_same_version_after_its_record_was_removed_is_refused` (2: each release) | success 3 [CAP-43] | first review of W2-16, finding 1 | the record removed by `git rm` in a later commit on `w2/integrate`, then a new commit: building that version again refused, nothing written | own: "built a release although release <V>'s record was committed on w2/integrate and removed later" (exit 0) |
+| `test_the_same_version_as_an_existing_owner_tag_is_refused` (2: lightweight, annotated) | success 3 [CAP-43]; success 2 (the owner's tag) | first review of W2-16, finding 1 | the pristine stand-in with `v1.4.0` tagged by the case (unsigned, standing for the owner), no record in the tree, a later commit: `gov release 1.4.0` refused, nothing written | own: "built a release although the tag v1.4.0 already exists, on another commit" (exit 0) |
+| `test_a_version_differing_only_by_build_metadata_from_a_recorded_one_is_refused` (2: each release) | success 3 [CAP-43] | first review of W2-16, finding 4 | `<V>+build.2` beside a recorded `<V>` (equal precedence in semantic versioning), from a later clean commit: refused, nothing written | own: "`gov release 1.4.0+build.2` built a release although release 1.4.0 exists …" (exit 0) |
+| `test_a_release_never_hashes_bytes_the_commit_does_not_hold` (2: `--assume-unchanged`, `--skip-worktree`) | success 1 ("from a clean `w2/integrate` commit"; "every shipped file with its sha256") | first review of W2-16, finding 5 | a tracked template file edited and hidden from `git status`: either refused with nothing written, or the manifest gives that file exactly the sha256 of `git cat-file blob <commit>:template/<path>`, never the edited bytes' | own: exit 0, "the manifest of 1.4.0 gives template/governance/kernel/schemas/ticket.schema.json the hash of bytes the commit … does not hold" |
+
+The earlier case `test_the_same_version_from_another_commit_is_refused_and_its_record_left_as_it_was` is
+unchanged; these cases hold the forms it leaves open (the record not in the checked-out tree, a tag, build
+metadata). Rebuilding the same version from the same commit stays uncovered, as "Not covered here" says: no case
+above builds from the commit an existing release names.
+
 ## Covers and rows
 
 | Id | Cases |
 |---|---|
 | CAP-43.b (lite) | success 1, the failure line |
-| CAP-43 | success 3, success 4 (lock records the release), the failure line |
+| CAP-43 | success 3 (with the four immutability cases added after the first review), success 4 (lock records the release), the failure line |
 | CAP-43.d (ahead of its wave) | CLI version, schema versions, release notes |
 | CAP-02.a | the doctor cases of the failure line, W2-M174 |
 | CAP-02.c (stays W3, DEC-722) | success 2 |
