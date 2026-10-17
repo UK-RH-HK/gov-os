@@ -61,6 +61,36 @@ def test_a_root_that_is_a_link_gives_no_folder(box, tmp_path):
     assert runs.own_folder(str(box[1]), "TST-a001", "engineer") is None
 
 
+@pytest.mark.parametrize("name", ("*", "W2-9?", "W2 90", "-W2-90", ".hidden", "..", "~W2-90", "W2'90"))
+def test_a_name_that_is_not_plain_gives_no_folder(box, name):
+    (box[1] / ".tickets" / "TST-a004.md").write_text(_ticket("TST-a004", ref=name), encoding="utf-8")
+    assert runs.own_folder(str(box[1]), "TST-a004", "engineer") is None
+
+
+def test_a_plain_name_with_dot_and_underscore_gives_its_folder(box):
+    (box[1] / ".tickets" / "TST-a004.md").write_text(_ticket("TST-a004", ref="W2-90_b.1"), encoding="utf-8")
+    assert runs.own_folder(str(box[1]), "TST-a004", "engineer").endswith("/W2-90_b.1")
+
+
+@pytest.mark.parametrize("ref", ("W2-90", "TST-a002"))
+def test_a_name_two_tickets_give_is_no_ones_folder(box, ref):
+    (box[1] / ".tickets" / "TST-a005.md").write_text(_ticket("TST-a005", "closed", ref), encoding="utf-8")
+    shared = "TST-a001" if ref == "W2-90" else "TST-a002"
+    assert runs.own_folder(str(box[1]), shared, "engineer") is None
+    assert runs.own_folder(str(box[1]), "TST-a005", "engineer") is None
+
+
+def test_a_project_in_the_own_folder_gives_no_folder(box):
+    home, project = box
+    clone = home / runs.ROOT_NAME / "W2-90" / "clone"
+    (clone / ".tickets").mkdir(parents=True)
+    (clone / ".tickets" / "TST-a001.md").write_text(_ticket("TST-a001", ref="W2-90"), encoding="utf-8")
+    assert runs.own_folder(str(clone), "TST-a001", "engineer") is None
+    assert _decide(clone, "Write", clone / "src" / "f.py") == "allow"
+    for target in (clone / "docs" / "f.md", clone.parent / "f.txt"):
+        assert _decide(clone, "Write", target) == "deny", target
+
+
 def test_the_guard_opens_the_own_folder_only(box):
     home, project = box
     root = home / runs.ROOT_NAME

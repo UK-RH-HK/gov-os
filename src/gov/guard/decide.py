@@ -184,6 +184,10 @@ def _is_in_scratch(path: str, root: str) -> bool:
     return real == tmp or real.startswith(tmp + "/")
 
 
+def _at_or_under(real: str, rr: str) -> bool:
+    return real == rr or real.startswith(rr + "/")
+
+
 def _path_allowed(path: str, root: str, patterns: list[str], role: str,
                   own: str | None = None) -> bool:
     real = os.path.realpath(path)
@@ -917,7 +921,10 @@ def decide(
 
     pats = _get_allowed_paths(acting_role, ticket_id, project_root,
                               session_role=erole)
-    own = runs.own_folder(project_root, ticket_id, acting_role)
+    # The own folder neither holds the project nor lies in it, so only a target outside the project needs it.
+    rr = os.path.realpath(project_root)
+    own = (runs.own_folder(project_root, ticket_id, acting_role)
+           if any(not _at_or_under(os.path.realpath(t), rr) for t in write_targets) else None)
     for tgt in write_targets:
         if not _path_allowed(tgt, project_root, pats, acting_role, own):
             lbl = "Bash write" if tool_name == "Bash" else tool_name

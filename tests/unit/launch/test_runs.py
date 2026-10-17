@@ -65,6 +65,14 @@ def test_the_own_folder_is_made_and_added_to_the_write_list(started):
     assert os.path.isdir(own)  # the launcher never removes it
 
 
+def test_a_name_two_tickets_give_is_neither_made_nor_added(started, tmp_path):
+    (tmp_path / "project" / ".tickets" / "TST-a002.md").write_text(
+        TICKET.replace("TST-a001", "TST-a002").replace("in_progress", "closed"), encoding="utf-8")
+    allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+    assert len(allow) == 1 and "W2-90" not in allow[0]
+    assert not os.path.lexists(started.root / "W2-90")
+
+
 def test_an_own_folder_that_is_a_link_is_not_opened(started, tmp_path):
     (tmp_path / "elsewhere").mkdir()
     started.root.mkdir()
