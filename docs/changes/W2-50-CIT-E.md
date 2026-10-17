@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738]
+decisions_carried: [DEC-728, DEC-743, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135]
 state_class: EVIDENCE
 ---
 
@@ -30,6 +30,8 @@ R7 scoped to the root, R2's launcher step, §6.1 (i), the own folder open only w
 | `a5ef3c69` | engineer | The approved CIT-P, word for word, with the owner's answers (DEC-738 item 1) |
 | `887c288c` | independent-test-designer | 15 acceptance cases for the owner's answers (`tests/acceptance/W2-50/test_w2_50_owner_answers.py`) and the README's new section; no case of the first suite changed |
 | `91200c82` | engineer | The implementation: the guard, the new module, the launcher, the secrets check, and builder tests |
+| `72263054` | independent-test-designer | 54 acceptance cases for the review's findings (`tests/acceptance/W2-50/test_w2_50_review_findings.py`), tests added after implementation (DEC-136); 34 red at that commit |
+| `86aa805c` | engineer | The repair round (§6): a project inside the own folder, plain folder names, one folder per ticket |
 
 Every commit carries `Task: DAEO-kl5e` and `Implements: DEC-728`. The files changed by `91200c82` are all in the
 ticket's `allowed_paths`, as DEC-743 left them: `src/gov/guard/runs.py` (new), `src/gov/guard/decide.py`,
@@ -64,7 +66,8 @@ alike:
    default deny. Unit case `test_a_root_that_is_a_link_gives_no_folder`.
 2. **A folder name that is not one folder gives no folder:** an empty name, `.`, `..`, or a name holding `/` or a NUL.
    The proposal does not say. Reason: a ticket's `external-ref` is free text; such a name would name the root, a
-   folder above it or a nested folder.
+   folder above it or a nested folder. *Superseded in the repair round (§6, change 2): only a plain folder name gives
+   a folder.*
 3. **The guard's ticket loader also finds a ticket by its `wbs_id`.** So a `GOV_TICKET` that is the W2 id names the
    same ticket, and the same folder, as the `tk` id. This is the guard's behaviour before this change, not new; R3 is
    kept, since the folder still follows the ticket `GOV_TICKET` names.
@@ -241,3 +244,101 @@ The code is within the estimate of 120 LOC (`est_loc`): 100 lines added, 93 net.
 | Difference 7: a launch whose own folder cannot be named or made starts without it, silently | W2-21 (it edits `launcher.py` next), or an owner answer: refuse, announce, or keep |
 | Difference 10: the secrets check run inside a clone under the root scans the clone's own store; no test holds it | The test designer of a later ticket that adopts a clone under the root (W2-14, W2-15a), or W2-06 |
 | W2-06 builds on `secrets-indexing.yaml` unchanged (difference 9) | W2-06; nothing to merge from W2-50 in that file |
+| Difference 13: a ticket file in `.tickets/` that cannot be read closes every own folder of the project | Kept as the guard's default deny; an owner answer if it is found too strict |
+
+## 6. The repair round (after the review)
+
+The review of `91200c82` found three behaviours the suite did not hold. The test designer added them as
+`tests/acceptance/W2-50/test_w2_50_review_findings.py` at `72263054`, tests added after implementation (DEC-136):
+54 cases, 34 red against `91200c82` (the README's section "The review's findings"). The findings the new tests hold:
+
+1. **A project inside the own folder keeps every in-project rule.** A clone at `~/gov-os-runs/W2-90/clone` with
+   its own `.tickets/` is a project like any other: its acceptance tests, its `.gov-runtime/` outside `scratch/`, its
+   `.tickets/`, its `.claude/settings.json`, its guard hook and every path outside the ticket's `allowed_paths` stay
+   refused; the own folder outside such a project gives that session nothing (DEC-108's counterpart), and `gov
+   launch` there adds no entry that holds the project. Before the repair, the own-folder allowance covered the
+   whole clone (16 + 1 + 1 red).
+2. **Only a plain folder name names a folder:** a letter or digit first, then only letters, digits, `.`, `_` and
+   `-`. Before the repair, `*`, `W2-9?`, `W2 90`, `-W2-90`, `.hidden` and the like each gave a folder, and the
+   launcher put a glob entry such as `//…/gov-os-runs/*` in the sandbox's write list (10 + 6 red).
+3. **One folder belongs to one ticket.** A name that two or more tickets of the project give, whatever the other
+   ticket's status, gives no session of either ticket that folder, also when one ticket's `external-ref` equals the
+   `tk` id another ticket's folder is named by (3 + 1 + 2 + 2 red).
+
+### What the repair changed, file by file
+
+- **`src/gov/guard/runs.py`** — `own_folder` gives no folder (`None`) in three more cases, each checked after the
+  existing ones:
+  - the name is not a plain folder name (`PLAIN_NAME`, `[A-Za-z0-9][A-Za-z0-9._-]*`, matched whole). This replaces
+    the earlier test for `""`, `.`, `..`, `/` and NUL, which it covers;
+  - the own folder and the project's real root overlap: the folder is the project's root, holds it or lies in it;
+  - the name is not given by exactly one ticket of the project's `.tickets/` (`_named_once`: each ticket's name is
+    its `external-ref` as written, else its `id`, as for the session's own ticket). A ticket file that cannot be read
+    gives no folder, since it may give the name too.
+  
+  The interface is unchanged: `root()`, `own_folder(project_root, ticket_id, role) -> str | None` and
+  `holds(own, real) -> bool`. The launcher and the secrets check need no change: the launcher makes and adds only
+  what `own_folder` gives, so each finding's launcher half follows from the guard's.
+- **`src/gov/guard/decide.py`** — `own_folder` is now asked only when a write target lies outside the project's real
+  root (new helper `_at_or_under`). This is exact, not a shortcut: an own folder never overlaps the project, so it can
+  never hold a target inside it. It keeps the ticket scan of `_named_once` off the guard's path for every write in
+  the project, for the latency cases of W1-02 and W1-05.
+- **`tests/unit/guard/test_runs.py`**, **`tests/unit/launch/test_runs.py`** — builder tests, regression evidence
+  only: names that are not plain (8) and a plain name with `.` and `_`; a name two tickets give (the same
+  `external-ref`, and an `external-ref` equal to a `tk` id), refused to both; a project in the own folder that keeps
+  its in-project rules and is refused beside itself; the launcher neither making nor adding a shared folder.
+- **Not changed:** `src/gov/launch/launcher.py`, `src/gov/secrets/__init__.py`,
+  `template/governance/kernel/checks/secrets-indexing.yaml`, every acceptance test.
+
+### New differences from the CIT-P
+
+12. **A folder overlaps the project in either direction.** The tests ask that a project inside the own folder gets
+    no folder. The repair also gives none when the own folder would lie inside the project (a HOME inside a
+    repository). Reason: there, too, the own-folder allowance would pass over the in-project rules. It costs nothing
+    on the tested paths.
+13. **An unreadable ticket file closes the folder.** A `.md` file in `.tickets/` that cannot be read (or a folder of
+    that name) gives no own folder to any session of the project, since it cannot be shown not to give the same name.
+    The guard's default deny; no test asks for it (§5).
+
+None of the three findings is in the CIT-P's text; they are the review's readings of R1 ("named by the ticket's W2
+id") and of DEC-108's counterpart, passed on as described behaviour (DEC-136). Each makes the guard stricter: no case
+that refused before the repair is allowed after it.
+
+### Verification of the repair round
+
+At `86aa805c`, each run with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-50/src` (DEC-732), in the foreground:
+
+| Run | Result |
+|---|---|
+| `tests/acceptance/W2-50` | **208 passed** (34 failed, 174 passed at `72263054`) |
+| W1-02 (incl. `test_decision_p95_is_under_100_ms`) | 3653 passed |
+| W1-03 | 363 passed, 1 skipped (the interpreter finds `gov` without `PYTHONPATH`) |
+| W1-04 | 336 passed |
+| W1-05 (incl. `test_a_call_waits_under_100_ms_p95_for_the_hook`) | 99 passed |
+| W1-15 | 124 passed |
+| W1-28 | 151 passed |
+| W1-32 | 81 passed |
+| W1-38 | 201 passed |
+| W1-46, `-m "not local_only"` | 457 passed, 36 deselected |
+| W1-48 | 172 passed |
+| W1-50, `-m "not local_only"` | 683 passed, 2 deselected |
+| Builder tests `tests/unit` | **2126 passed, 1 skipped** |
+
+The `local_only` live-launch cases were not run, as in §3: they would make the real `~/gov-os-runs`, which does not
+exist.
+
+### Size of the repair
+
+`git show --shortstat 86aa805c`: 4 files, 87 insertions, 5 deletions.
+
+| Part | Added | Removed |
+|---|---|---|
+| `src/gov/guard/runs.py` | 41 | 4 |
+| `src/gov/guard/decide.py` | 8 | 1 |
+| **Code** | **49** | **5** |
+| `tests/unit/guard/test_runs.py` | 30 | 0 |
+| `tests/unit/launch/test_runs.py` | 8 | 0 |
+| **Builder tests** | **38** | **0** |
+
+With the first round's 100 code lines, the change's code is 149 lines added and 12 removed, 137 net, above the
+estimate of 120 LOC (`est_loc`) by 17 lines.
