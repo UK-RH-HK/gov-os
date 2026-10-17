@@ -301,16 +301,29 @@ def test_a_commit_of_the_ticket_in_another_acceptance_folder_does_not_refuse(pro
 # Settled: the ticket's own file
 # --------------------------------------------------------------------------
 
-def test_a_commit_of_the_ticket_after_the_probed_one_that_changes_its_ticket_file_refuses(
+def test_a_commit_of_the_tickets_own_side_after_the_probed_one_that_changes_its_ticket_file_refuses(
         project, sandbox, interface):
-    """Settlement 33, the stricter reading (package P-1): the ticket file says what the ticket's paths and its
-    profile are; a commit of the ticket that changes it after the probe refuses, as today."""
+    """Settlement 33, the stricter reading (package P-1), as DEC-757 item 3 leaves it: the ticket file says what
+    the ticket's paths and its profile are; a commit of the ticket's own side (the engineer's, naming the ticket)
+    that changes it after the probe refuses, as today. An orchestrator's or the owner's commit that names the
+    ticket and changes only its ticket file is integration-side and no change to the probed code (DEC-757 item
+    3); W2-53's suite holds that.
+
+    W1-50's judgement has a finding of its own for a worker's commit of a ticket file, so here the probe gate is
+    not the only gate with something to say: the case holds W1-50's one finding, for this commit and this file,
+    and that the probe gate's finding is among the refusal's parts all the same."""
     probed = _probed_work(project)
     text = (project.root / TICKET_FILE).read_text(encoding="utf-8")
-    commit = _orchestrators_commit(project, "a note in the ticket", {TICKET_FILE: text + "\nA note.\n"})
+    project.write(TICKET_FILE, text + "\nA note.\n")
+    commit = project.commit("a note in the ticket", who=support.IMPLEMENTER, trailers=ENGINEER, exact=True)
     _recorded_and_checkpointed(project, probed)
     assert _changed_by(project, commit) == [TICKET_FILE]
-    _of_the_ticket(project, sandbox, probed, commit)
+    assert commit in support.ticket_commits(project.root, TICKET), "the fixture is wrong: the edit names no ticket"
+    assert commit in support.git(project.root, "rev-list", f"{probed}..HEAD").split(), \
+        "the fixture is wrong: the edit does not follow the probed commit"
+    judged = support.judged_by_w1_50(project, sandbox, support.ticket_commits(project.root, TICKET))
+    assert [(entry["commit"], entry["paths"]) for entry in judged] == [(commit, [TICKET_FILE])], \
+        f"the fixture is wrong: W1-50's judgement is not the one finding for the edit: {judged}"
     _refused_for(project, sandbox, interface, commit, TICKET_FILE)
 
 
