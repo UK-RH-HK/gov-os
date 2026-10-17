@@ -23,6 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from gov.config.loader import load_config
+from gov.guard.runs import root as runs_root
 
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
@@ -150,10 +151,21 @@ def stores_with_secrets(root: Path) -> list[str]:
     def refuse(error: OSError) -> None:
         raise error  # a folder that cannot be entered is not a store without a secret
 
-    # Linked folders are followed; a file that cannot be read raises.
-    files = sorted(Path(folder) / name
-                   for folder, _, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True)
-                   for name in names)
+    # DEC-728, DEC-743 3: a link into ~/gov-os-runs is not followed; nothing there is this repository's.
+    # The runtime folder's own files are scanned, also in a clone that lies there.
+    runs, runtime = runs_root(), os.path.realpath(root / RUNTIME_REL)
+
+    def followed(path: str) -> bool:
+        real = os.path.realpath(path)
+        within = lambda top: real == top or real.startswith(top + os.sep)  # noqa: E731
+        return runs is None or within(runtime) or not within(runs)
+
+    # Linked folders elsewhere are followed; a file that cannot be read raises.
+    files = []
+    for folder, folders, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True):
+        folders[:] = [name for name in folders if followed(os.path.join(folder, name))]
+        files += [Path(folder) / name for name in names if followed(os.path.join(folder, name))]
+    files.sort()
     # Every file is read and scanned, several at a time; the first that cannot be decided raises.
     with ThreadPoolExecutor() as pool:
         verdicts = list(pool.map(lambda path: _holds_secret(rules, _store_content(path)), files))

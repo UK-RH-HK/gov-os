@@ -1,0 +1,73 @@
+"""Builder tests for the session's own folder in the launcher (W2-50, DEC-728, DEC-743 R2).
+
+Regression evidence only (DEC-136). No CLI is started: ``subprocess.Popen`` is
+replaced, HOME and the project are temporary; the real ``~/gov-os-runs`` is
+never named.
+"""
+from __future__ import annotations
+
+import json
+import os
+import sys
+from pathlib import Path
+
+import pytest
+
+REPO = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(REPO / "src"))
+
+from gov.guard import runs  # noqa: E402
+from gov.launch import launcher  # noqa: E402
+
+TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: engineer\nallowed_paths:\n- src/**\n---\n"
+
+
+@pytest.fixture
+def started(tmp_path, monkeypatch):
+    """``started()`` launches an engineer on TST-a001 and returns the settings and what the session found."""
+    home, temp, project = tmp_path / "home", tmp_path / "temp", tmp_path / "project"
+    for folder in (home / ".local" / "bin", temp, project / ".tickets"):
+        folder.mkdir(parents=True)
+    (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
+    monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
+    found = {}
+
+    class Session:
+        def __init__(self, argv, cwd, env):
+            found["settings"] = json.loads(argv[argv.index("--settings") + 1])
+            found["root"] = sorted(os.listdir(home / runs.ROOT_NAME)) if (home / runs.ROOT_NAME).is_dir() else None
+
+        def wait(self):
+            return 0
+
+        def poll(self):
+            return 0
+
+    monkeypatch.setattr(launcher.subprocess, "Popen", Session)
+
+    def _started():
+        assert launcher.launch(project, "engineer", "TST-a001", []) == 0
+        return found
+
+    _started.root = home / runs.ROOT_NAME
+    return _started
+
+
+def test_the_own_folder_is_made_and_added_to_the_write_list(started):
+    found = started()
+    own = os.path.join(os.path.realpath(started.root), "W2-90")
+    assert found["root"] == ["W2-90"]
+    assert f"/{own}" in found["settings"]["sandbox"]["filesystem"]["allowWrite"]
+    assert len(found["settings"]["sandbox"]["filesystem"]["allowWrite"]) == 2
+    assert os.path.isdir(own)  # the launcher never removes it
+
+
+def test_an_own_folder_that_is_a_link_is_not_opened(started, tmp_path):
+    (tmp_path / "elsewhere").mkdir()
+    started.root.mkdir()
+    (started.root / "W2-90").symlink_to(tmp_path / "elsewhere", target_is_directory=True)
+    allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+    assert len(allow) == 1 and "W2-90" not in allow[0]

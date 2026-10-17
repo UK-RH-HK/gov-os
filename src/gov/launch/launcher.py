@@ -30,6 +30,7 @@ from gov.cli.errors import GovError
 from gov.guard.decide import ACCEPTANCE, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
+from gov.guard.runs import own_folder
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
@@ -284,6 +285,17 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     faults = sandbox_faults(settings)
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
+    # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
+    # never removed by the launcher; what it holds is left alone, and no other folder is made. A folder that
+    # cannot be named or made, or that is not a folder, is not opened: the session then has none.
+    own = own_folder(str(root), ticket_id, role)
+    try:
+        if own is not None:
+            os.makedirs(own, exist_ok=True)
+    except OSError:
+        own = None
+    if own is not None and (os.path.islink(own) or not os.path.isdir(own)):
+        own = None
     state = {"session": None, "ended": False, "asked": False}
 
     def end(signum=None, frame=None):
@@ -306,7 +318,7 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
         # DEC-159: a temp directory of the session's own, for the CLI and for its sandboxed commands.
         tmpdir = tempfile.mkdtemp(prefix=f"gov-launch-{role}-")
         settings["env"].update({"TMPDIR": tmpdir, "CLAUDE_CODE_TMPDIR": tmpdir})
-        settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}"]}
+        settings["sandbox"]["filesystem"] = {"allowWrite": [f"/{tmpdir}", *([f"/{own}"] if own else [])]}
         env = {**os.environ, **settings["env"]}
         if not state["ended"]:  # a signal that came first: no session is started
             try:

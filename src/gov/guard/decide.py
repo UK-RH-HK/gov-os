@@ -10,6 +10,8 @@ import stat
 import tempfile
 from pathlib import Path
 
+from gov.guard import runs
+
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
     "engineer", "independent-auditor",
@@ -182,7 +184,8 @@ def _is_in_scratch(path: str, root: str) -> bool:
     return real == tmp or real.startswith(tmp + "/")
 
 
-def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
+def _path_allowed(path: str, root: str, patterns: list[str], role: str,
+                  own: str | None = None) -> bool:
     real = os.path.realpath(path)
     if real == "/dev/null":
         return True
@@ -191,6 +194,9 @@ def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
     if role == "independent-test-designer" and not patterns:
         return False
     if _is_in_scratch(real, root):
+        return True
+    # DEC-728, DEC-743: the session's own folder under ~/gov-os-runs.
+    if own is not None and runs.holds(own, real):
         return True
     rr = os.path.realpath(root)
     if not real.startswith(rr + "/") and real != rr:
@@ -487,6 +493,14 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             for a in args:
                 if not a.startswith("-"):
                     _resolve(a)
+            continue
+        if name == "rmdir":
+            # DEC-743 1 (R7): rmdir is judged for ~/gov-os-runs itself only.
+            found: list[str] = []
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a, found)
+            targets.extend(t for t in found if t == runs.root())
             continue
         if name == "link":
             # DEC-334: both names of the hard link are judged.
@@ -903,8 +917,9 @@ def decide(
 
     pats = _get_allowed_paths(acting_role, ticket_id, project_root,
                               session_role=erole)
+    own = runs.own_folder(project_root, ticket_id, acting_role)
     for tgt in write_targets:
-        if not _path_allowed(tgt, project_root, pats, acting_role):
+        if not _path_allowed(tgt, project_root, pats, acting_role, own):
             lbl = "Bash write" if tool_name == "Bash" else tool_name
             return "deny", f"{lbl} to '{tgt}' denied for role '{acting_role}'"
 
