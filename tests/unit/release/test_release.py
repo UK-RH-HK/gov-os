@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import subprocess
 
 import pytest
+import yaml
 
-from gov.release import HASH_NAME, MANIFEST_NAME, RELEASES_REL, ReleaseError, build, verify
+from gov.lock import ANSWERS_REL, LOCK_REL
+from gov.release import HASH_NAME, MANIFEST_NAME, RELEASES_REL, ReleaseError, build, lock_from, verify
 
 
 def _git(repo, *args):
@@ -130,3 +133,101 @@ def test_verify_refuses_a_release_that_does_not_match_its_hashes(tmp_path, how):
     with pytest.raises(ReleaseError, match="added.schema.json" if how == "added" else
                        ("manifest" if how == "manifest hash" else "ticket.schema.json")):
         verify(repo, "1.4.0")
+
+
+def _installed(repo, project, tag):
+    """A project as Copier leaves it before the lock task: the template's files and the answers file."""
+    for path in (repo / "template").rglob("*"):
+        if path.is_file():
+            target = project / path.relative_to(repo / "template")
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(path.read_bytes())
+    (project / ANSWERS_REL).write_text(f"_commit: {tag}\n_template_commit: \"{'a' * 40}\"\n", encoding="utf-8")
+    return project
+
+
+def _released(tmp_path):
+    repo = _repo(tmp_path / "gov-os")
+    build(repo, "1.4.0")
+    _commit(repo, "record")
+    return repo
+
+
+def _plain(repo, folder):
+    """The template source with no release record and no history: copier.yml-less, template/ alone."""
+    for path in (repo / "template").rglob("*"):
+        if path.is_file():
+            target = folder / path.relative_to(repo)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(path.read_bytes())
+    return folder
+
+
+def test_lock_from_a_plain_source_states_no_release(tmp_path):
+    repo = _repo(tmp_path / "gov-os")
+    project = _installed(repo, tmp_path / "product", "v0.1.0")
+    assert lock_from(project, _plain(repo, tmp_path / "plain")) == (project / LOCK_REL, None)
+    assert yaml.safe_load((project / LOCK_REL).read_text(encoding="utf-8"))["release"] is None
+
+
+@pytest.mark.parametrize("source", ("plain folder", "records removed"))
+def test_lock_from_never_rewrites_a_release_lock_without_a_release(tmp_path, source):
+    repo = _released(tmp_path)
+    project = _installed(repo, tmp_path / "product", "v1.4.0")
+    assert lock_from(project, repo)[1] == "1.4.0"
+    before = (project / LOCK_REL).read_bytes()
+    if source == "plain folder":
+        other = _plain(repo, tmp_path / "plain")
+    else:
+        _git(repo, "rm", "-q", "-r", "--", RELEASES_REL)
+        _commit(repo, "removed")
+        other = repo
+    with pytest.raises(ReleaseError, match="records release 1.4.0"):
+        lock_from(project, other)
+    assert (project / LOCK_REL).read_bytes() == before
+
+
+def test_lock_from_a_source_whose_records_were_removed_is_refused(tmp_path):
+    repo = _released(tmp_path)
+    _git(repo, "rm", "-q", "-r", "--", RELEASES_REL)
+    _commit(repo, "removed")
+    project = _installed(repo, tmp_path / "product", "v1.6.0")
+    with pytest.raises(ReleaseError, match="history"):
+        lock_from(project, repo)
+    assert not (project / LOCK_REL).exists()
+
+
+@pytest.mark.parametrize("lock", ("no release key", "not a map"))
+def test_lock_from_refuses_a_lock_it_cannot_tell(tmp_path, lock):
+    repo = _repo(tmp_path / "gov-os")
+    project = _installed(repo, tmp_path / "product", "v0.1.0")
+    (project / LOCK_REL).write_text("template_tag: v0.1.0\n" if lock == "no release key" else "- a list\n",
+                                    encoding="utf-8")
+    with pytest.raises(ReleaseError, match="release"):
+        lock_from(project, _plain(repo, tmp_path / "plain"))
+
+
+@pytest.mark.parametrize("role", ("engineer", "independent-auditor", "ticket-lead", ""))
+@pytest.mark.parametrize("lock", (False, True))
+def test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role, lock):
+    from gov.cli.errors import GovError
+    from gov.release.command import run
+
+    repo = _repo(tmp_path / "gov-os")
+    monkeypatch.setenv("GOV_ROLE", role)
+    args = argparse.Namespace(version=None if lock else "1.4.0", lock_from=str(repo) if lock else None)
+    with pytest.raises(GovError, match="only the orchestrator") as refused:
+        run(repo, args, {})
+    assert refused.value.code == "RELEASE_REFUSED" and not (repo / RELEASES_REL).exists()
+
+
+@pytest.mark.parametrize("role", ("orchestrator", None))
+def test_gov_release_runs_for_the_orchestrator_and_the_owner(tmp_path, monkeypatch, role):
+    from gov.release.command import run
+
+    repo = _repo(tmp_path / "gov-os")
+    if role is None:
+        monkeypatch.delenv("GOV_ROLE", raising=False)
+    else:
+        monkeypatch.setenv("GOV_ROLE", role)
+    assert run(repo, argparse.Namespace(version="1.4.0", lock_from=None), {})["version"] == "1.4.0"

@@ -141,6 +141,23 @@ def test_a_kernel_file_edited_with_its_lock_entry_differs_from_the_release(tmp_p
     assert compare(root).drifted_files == (HOOK,)
 
 
+def test_a_lock_without_a_release_states_release_null_and_matches(tmp_path):
+    root = _project(tmp_path)
+    assert yaml.safe_load((root / LOCK_REL).read_text(encoding="utf-8"))["release"] is None
+    assert compare(root).verdict == "MATCH"
+
+
+@pytest.mark.parametrize("released", (False, True))
+def test_a_lock_that_does_not_state_its_release_is_an_error(tmp_path, released):
+    root = _project(tmp_path)
+    if released:
+        _release(root, {rel: hashlib.sha256((root / rel).read_bytes()).hexdigest()
+                        for rel in (HOOK, f"{KERNEL_REL}/settings.json")})
+    _rewrite(root, lambda lock: lock.pop("release"))
+    answer = compare(root)
+    assert answer.verdict == "ERROR" and "release" in answer.reason
+
+
 @pytest.mark.parametrize("answers", ("empty", "not a map", "folder", "dangling link"))
 def test_no_lock_beside_any_entry_named_as_the_answers_file_is_unlocked(tmp_path, answers):
     path = tmp_path / ANSWERS_REL

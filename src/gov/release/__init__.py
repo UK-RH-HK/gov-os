@@ -248,14 +248,61 @@ def verify(source: Path, version: str) -> tuple[bytes, str]:
     return data, digest
 
 
+def _held(project: Path) -> str | None:
+    """The release the project's lock records, or ``None`` where it has no lock or states ``release: null``.
+    A lock that cannot be read, or that does not state its release (its release entries deleted), refuses: whether
+    it holds a release cannot be told (DEC-761)."""
+    path = project / lock.LOCK_REL
+    if not lock._present(path):
+        return None
+    data = lock._read_map(path)
+    if data is None:
+        raise ReleaseError(f"{lock.LOCK_REL} is not a readable map: whether it records a release cannot be told")
+    if "release" not in data:
+        raise ReleaseError(f"{lock.LOCK_REL} does not state the release it holds (its release entries are gone)")
+    release = data["release"]
+    if release is None:
+        return None
+    version = release.get("version") if isinstance(release, dict) else None
+    return version if isinstance(version, str) else repr(release)
+
+
+def _records_in_history(source: Path) -> str | None:
+    """A release record in the history of the git repository at ``source`` (any ref), or ``None``; ``None`` for a
+    source that is no git repository (it has no history). A history that cannot be read refuses."""
+    if not lock._present(source / ".git"):
+        return None
+    top = Path(_git(source, "rev-parse", "--show-toplevel").strip())
+    if top.resolve() != source.resolve():
+        raise ReleaseError(f"{source} holds .git but is not the top of a git repository: its history cannot be read")
+    history = _git(source, "log", "--all", "--no-renames", "--format=", "--name-only", "-z", "--", RELEASES_REL)
+    for rel in history.replace("\n", "\0").split("\0"):
+        parts = rel.split("/")
+        if len(parts) > 3 and SEMVER.fullmatch(parts[2]):
+            return rel
+    return None
+
+
 def lock_from(project: Path, source: Path) -> tuple[Path, str | None]:
     """The template's Copier task: verify the release the project's answers name in the template ``source``,
     then write the project's lock with it. A source with no release record installs as before (W1-39); one
-    with a record installs release tags only."""
-    answers = lock._read_map(Path(project) / lock.ANSWERS_REL) or {}
+    with a record installs release tags only.
+
+    Refused (DEC-761): a source with no release record where the project's lock records a release (the lock is
+    never rewritten without it), or where the source's history holds release records (they were removed)."""
+    project, source = Path(project), Path(source)
+    held = _held(project)
+    answers = lock._read_map(project / lock.ANSWERS_REL) or {}
     tag = answers.get("_commit")
-    releases = Path(source) / RELEASES_REL
+    releases = source / RELEASES_REL
     if not any(releases.glob(f"*/{MANIFEST_NAME}")):
+        if held is not None:
+            raise ReleaseError(f"{lock.LOCK_REL} records release {held} and {source} holds no release record: "
+                               "a lock that records a release is never rewritten without one")
+        removed = _records_in_history(source)
+        if removed:
+            raise ReleaseError(f"{source} holds no release record but its history does ({removed}): a source whose "
+                               "release records were removed is not installed; install a release tag")
         return lock.write(project), None
     version = tag[1:] if isinstance(tag, str) and tag.startswith("v") else tag
     if not isinstance(version, str) or not SEMVER.fullmatch(version) or not (releases / version).is_dir():

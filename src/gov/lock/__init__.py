@@ -3,7 +3,8 @@
 The lock is one YAML map below a comment header: the template tag and commit, the reference to Copier's
 answers file, the sha256 manifest of every installed file under the shipped paths (``governance/kernel/`` and
 the declared paths outside it, W2-M174), the executable files and the folders there, and, for a project
-installed from a release (W2-16), the release's version, its manifest's sha256 and the manifest itself.
+installed from a release (W2-16), the release's version, its manifest's sha256 and the manifest itself; without a
+release the lock states ``release: null``, and a lock that does not state its release fails (DEC-761).
 ``compare`` is the one comparison of a project with its lock (DEC-488): it never answers MATCH without having
 hashed.
 """
@@ -184,8 +185,11 @@ def compare(root: Path) -> Comparison:
             return Comparison("ERROR", (), f"framework.lock lacks {lock_key} or {ANSWERS_REL} lacks {answers_key}")
         if locked != installed:
             differing.append(lock_key)
+    if "release" not in lock:
+        return Comparison("ERROR", (), "framework.lock does not state the release it holds (a release, or "
+                                       "release: null for none): its release entries may have been deleted")
     released = None
-    if "release" in lock:
+    if lock["release"] is not None:
         released, why = released_files(lock["release"])
         if why:
             return Comparison("ERROR", (), why)
@@ -233,6 +237,7 @@ def write(root: Path, release: tuple[str, bytes] | None = None) -> Path:
     installed_files, installed_folders, unlisted = _shipped(root)
     if unlisted:
         raise LockError(f"cannot list the kernel folders {unlisted}")
+    lock["release"] = None  # stated even without a release: a lock without the key is refused (DEC-761)
     if release is not None:
         version, data = release
         lock["release"] = {"version": version, "manifest_sha256": hashlib.sha256(data).hexdigest(),
