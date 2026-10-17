@@ -173,6 +173,26 @@ def test_ticket_work_after_the_probed_commit_refuses_and_a_path_outside_it_does_
     assert "docs/a-note.md" not in finding.message
 
 
+@pytest.mark.parametrize("strategy", [(), ("-s", "ours")], ids=["the probed code", "the ours strategy"])
+def test_a_plain_merge_back_is_measured_by_the_probed_code(repo, strategy):
+    """DEC-739: the merge-back that brings the probed commit, naming no task, passes with the probed code
+    and is returned; one that drops it refuses, naming it."""
+    repo.commit("start")
+    repo.git("checkout", "-q", "-b", "side")
+    probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
+    repo.git("checkout", "-q", "main")
+    repo.commit("the integration branch goes on", files={"docs/b.md": "b\n"})
+    repo.git("merge", "-q", "--no-ff", "--no-edit", *strategy, "side")
+    back = repo.git("rev-parse", "HEAD").strip()
+    _probe(repo, probed)
+    if not strategy:
+        commits = _ticket_commits(repo.root, TICKET)
+        assert _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
+                            frozenset({TICKET})) == {back}
+    else:
+        assert back[:12] in _refused(repo).message
+
+
 def test_a_probed_commit_that_is_no_commit_or_no_ancestor_refuses(repo):
     work = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
     _probe(repo, "0" * 40)

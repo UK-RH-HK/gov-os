@@ -182,11 +182,12 @@ def run(root: Path, args, config: dict):
         except _Finding as f:
             found.append(f)
 
+    brought = frozenset()  # the merge-backs of exactly the probed code (DEC-739); none where the gate refuses
     if profile == "FULL":
-        gate(_check_probe, root, ticket, commits, others, inside, own, tickets)
+        brought = gate(_check_probe, root, ticket, commits, others, inside, own, tickets) or frozenset()
     gate(_check_trailers, root, commits, ticket, history)
     gate(_check_accepted_history, history["refused"])
-    gate(_check_unmeasured, ticket, others, own, tickets)
+    gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought], own, tickets)
     gate(_check_containment, root, commits)
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
@@ -568,7 +569,9 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
     allowed paths, one of its acceptance tests, or its own file (DEC-581).
 
     Every probe record of the ticket is read (DEC-500): each is asked everything, so one that does not say
-    that the probe of the final code passed refuses whatever another says, and the close needs one."""
+    that the probe of the final code passed refuses whatever another says, and the close needs one.
+
+    Returns the merge-backs that bring exactly the probed code (DEC-739)."""
     from gov.tasks.tickets import frontmatter
 
     def invalid(message: str, **details):
@@ -606,7 +609,7 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
         return bool(mine) and any(other != mine and not _git(root, "merge-base", "--is-ancestor", mine, other,
                                                              ok=(0, 1), code=True) for other in rounds)
 
-    records = 0
+    records, brought = 0, set()
     for path, pf in found:
         if earlier_round(path):
             continue
@@ -659,6 +662,16 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             if REVIEWER_ROLE in c["trailers"].get("Role", []):
                 raise invalid("a commit between the probed commit and HEAD "
                               "carries the reviewer's role", commit=sha[:12])
+            if len(c["parents"]) > 1 and _git(root, "merge-base", "--is-ancestor", probed, c["parents"][0],
+                                              ok=(0, 1), code=True):
+                # DEC-505, DEC-739: the merge-back that brings the probed commit is measured by the probed code,
+                # whatever task it names: unchanged, it is neither stale nor work without a task.
+                dropped = [p for p in _history.differing(root, probed, sha) if own(p)]
+                if dropped:
+                    raise invalid(f"merge-back {sha[:12]} brings the probed commit but not the probed code: "
+                                  f"{', '.join(dropped)} differ from the probed commit", commit=sha[:12])
+                brought.add(sha)
+                continue
             changed = [p for p in c["paths"] if inside(p)] if _names_no_task(c, tickets) else []
             if changed:  # DEC-490: work on the ticket's paths the probe did not see
                 raise invalid(f"commit {sha[:12]} names no task and changes {', '.join(changed)} "
@@ -686,6 +699,7 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
         raise _Finding("PROBE_MISSING",
                        f"FULL-profile ticket {ticket} has no valid probe record",
                        {"ticket": ticket})
+    return frozenset(brought)
 
 
 def _full_id(root: Path, given: str) -> str | None:
