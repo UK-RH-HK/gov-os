@@ -193,6 +193,48 @@ def test_a_plain_merge_back_is_measured_by_the_probed_code(repo, strategy):
         assert back[:12] in _refused(repo).message
 
 
+@pytest.mark.parametrize("change", ["removed", "replaced"])
+def test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses(repo, change):
+    """DEC-750 (2): after the merge-back, a second one naming another task that removes or replaces a probed file
+    (in neither parent's version) refuses, naming it."""
+    repo.commit("start")
+    repo.git("checkout", "-q", "-b", "side")
+    probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-edit", "side")
+    repo.git("checkout", "-q", "side")
+    repo.commit("notes", "Role: orchestrator", files={"docs/n.md": "n\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+    if change == "removed":
+        repo.git("rm", "-q", "src/a.py")
+    later = repo.commit("again", "Task: T-0002", "Role: orchestrator", "Implements: CAP-01",
+                        files={"src/a.py": "other\n"} if change == "replaced" else None)
+    _probe(repo, probed)
+    commits = _ticket_commits(repo.root, TICKET)
+    with pytest.raises(_Finding) as raised:
+        _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
+                     frozenset({TICKET, "T-0002"}))
+    assert later[:12] in raised.value.message and "neither parent" in raised.value.message
+
+
+def test_a_merge_holding_the_probed_commit_on_neither_side_is_not_the_merge_back(repo):
+    """DEC-750 (1, 3): another ticket's merge on the integration branch is not the merge-back."""
+    repo.commit("start")
+    repo.git("checkout", "-q", "-b", "side")
+    probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
+    repo.git("checkout", "-q", "-b", "other", "main")
+    repo.commit("other work", "Task: T-0002", "Role: engineer", "Implements: CAP-01", files={"docs/o.md": "o\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-edit", "other")
+    repo.git("merge", "-q", "--no-ff", "--no-edit", "side")
+    back = repo.git("rev-parse", "HEAD").strip()
+    _probe(repo, probed)
+    commits = _ticket_commits(repo.root, TICKET)
+    assert _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
+                        frozenset({TICKET})) == {back}
+
+
 def test_a_probed_commit_that_is_no_commit_or_no_ancestor_refuses(repo):
     work = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
     _probe(repo, "0" * 40)

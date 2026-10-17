@@ -662,16 +662,26 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
             if REVIEWER_ROLE in c["trailers"].get("Role", []):
                 raise invalid("a commit between the probed commit and HEAD "
                               "carries the reviewer's role", commit=sha[:12])
-            if len(c["parents"]) > 1 and _git(root, "merge-base", "--is-ancestor", probed, c["parents"][0],
-                                              ok=(0, 1), code=True):
-                # DEC-505, DEC-739: the merge-back that brings the probed commit is measured by the probed code,
-                # whatever task it names: unchanged, it is neither stale nor work without a task.
+            holds = [not _git(root, "merge-base", "--is-ancestor", probed, p, ok=(0, 1), code=True)
+                     for p in c["parents"]] if len(c["parents"]) > 1 else []
+            if holds and not holds[0] and any(holds):
+                # DEC-505, DEC-739, DEC-750 (1): the merge-back (its first parent lacks the probed commit, another
+                # holds it) is measured by the probed code, whatever task it names: unchanged, it is neither stale
+                # nor work without a task.
                 dropped = [p for p in _history.differing(root, probed, sha) if own(p)]
                 if dropped:
                     raise invalid(f"merge-back {sha[:12]} brings the probed commit but not the probed code: "
                                   f"{', '.join(dropped)} differ from the probed commit", commit=sha[:12])
                 brought.add(sha)
                 continue
+            if holds and holds[0]:
+                # DEC-750 (2): a later merge holding the probed commit refuses, whatever task it names, where it
+                # changes probed code itself: a probed path at it in no parent's version (P-5 open for the rest).
+                mine = set.intersection(*(set(_history.differing(root, p, sha)) for p in c["parents"]))
+                if any(own(p) for p in mine):
+                    raise invalid(f"merge {sha[:12]} holds the probed commit and changes probed code: "
+                                  f"{', '.join(sorted(p for p in mine if own(p)))} in neither parent's version",
+                                  commit=sha[:12])
             changed = [p for p in c["paths"] if inside(p)] if _names_no_task(c, tickets) else []
             if changed:  # DEC-490: work on the ticket's paths the probe did not see
                 raise invalid(f"commit {sha[:12]} names no task and changes {', '.join(changed)} "
