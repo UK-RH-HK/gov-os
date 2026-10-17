@@ -5,7 +5,8 @@ ticket's KPI lines, Contract v4.2 (CAP-43, CAP-43.a to CAP-43.d, CAP-02, CAP-02.
 W2-H029, W2-L002, W2-L014, W2-L227, W2-M174, W2-M175 with their origin lines, and DEC-722, DEC-023, DEC-027,
 DEC-488, DEC-493, DEC-499, DEC-542, DEC-194, DEC-244, DEC-654, DEC-221, DEC-752, DEC-753. 75 cases in three files;
 10 more in a fourth, added after implementation from the first review of W2-16 (DEC-136; see "Cases added after the
-first review" below).
+first review" below); 29 more in a fifth, the last round ordered by DEC-761 after the second review (see "The last
+round" below). 114 cases in all.
 
 Run from this worktree:
 
@@ -25,6 +26,10 @@ PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/go
   `python3` the task runs (W1-39's arrangement). The W2-M175 case takes `PYTHONPATH` away and puts first on
   `PATH` a `python3` (and `python`) that runs this machine's Python with `-I`, which imports no `gov`.
 - `test_every_gov_the_suite_runs_is_this_worktree_s` checks all three: each imports `gov` from `<SRC>`.
+- **`GOV_ROLE` is unset** in every `gov` and Copier run of the suite (each environment is built from scratch, so
+  the role of the session that runs the tests never reaches them): the caller is the owner in a plain terminal
+  (DEC-365, DEC-761). Only the role cases of the last round set it, per call. Keep it so; the guard
+  `test_the_suite_runs_gov_and_copier_with_gov_role_unset` holds it.
 
 ## What the cases use
 
@@ -201,12 +206,79 @@ unchanged; these cases hold the forms it leaves open (the record not in the chec
 metadata). Rebuilding the same version from the same commit stays uncovered, as "Not covered here" says: no case
 above builds from the commit an existing release names.
 
+### The last round (DEC-761) — `test_w2_16_last_round.py`
+
+Written by a fresh Independent Test Designer after the second review of W2-16 (R2-F1, R2-F2, R2-F3) and the
+owner's DEC-761 (2026-10-17, staged; applied as the brief states it), from the KPI lines and the behaviour passed as
+described behaviour (DEC-136, the lead's reading), without reading the implementation. Red as seen on `ee557d02`.
+A refusal is the suite's: non-zero exit, no traceback, nothing written (the whole snapshot or, for
+`gov release --lock-from`, the project's lock byte for byte). `--lock-from` runs by hand at the project root, as the
+template's Copier task runs it (`gov release --lock-from <source>`).
+
+| Case | KPI line | Source | Holds | Red (seen) |
+|---|---|---|---|---|
+| `test_lock_from_a_source_with_no_release_record_is_refused_where_the_lock_records_a_release` (2: a plain folder of `copier.yml` and `template/`; W1-39's git source tagged `v0.1.0`, no record ever) | success 4; the failure line | second review of W2-16, R2-F1; DEC-761 | a project of release 1.4.0, a kernel file edited (doctor DRIFT first): refused, the lock as it was, doctor still DRIFT naming the file | own: exit 0, `"release": null` — the lock rewritten without a release |
+| `test_lock_from_the_installed_release_s_own_source_never_makes_an_edited_kernel_pass` | success 4; the failure line | R2-F1; DEC-761 | the same with the genuine source (`v1.4.0` checked out): refused with the lock as it was, or, if it writes, doctor still DRIFT naming the file (never MATCH) | **green today** (a guard): the command writes (exit 0) and doctor still reports DRIFT naming the file |
+| `test_a_source_whose_release_records_were_removed_is_refused` (3: `copier copy`, `copier update` from 1.4.0, `gov release --lock-from` by hand) | success 4; the failure line | R2-F3 (b); DEC-761 | the stand-in's `w2/integrate` holds records in its history; a later commit removes `docs/releases/` and edits a kernel file, tagged `v1.6.0` by the case: copy refused (no lock that passes doctor), update refused (the lock still records 1.4.0), `--lock-from` refused (the lock as it was) | own: copy exit 0 and doctor MATCH; update exit 0; `--lock-from` exit 0, `"release": null` |
+| `test_a_lock_whose_release_entries_were_deleted_fails` (2: the release entries alone; with a kernel file and its lock hash edited together) | success 4 ("a project cannot silence the lock comparison"); the failure line | R2-F2 (the first review's F2); DEC-761 | every lock entry whose value is the release version, holds the manifest hash, or is the release manifest (map, text or base64) deleted, found by value, nothing else changed: doctor's lock part fails | own: `{"match": "MATCH", "status": "pass"}`, exit 0 (both) |
+| `test_gov_release_refuses_every_role_but_the_orchestrator_and_the_owner` (16: 2 forms × `engineer`, `independent-auditor`, `independent-test-designer`, `product-spec`, `research`, `ticket-lead`, an unknown name, set and empty) | success 2 ("agents never tag") | DEC-761; DEC-365 (the caller is `GOV_ROLE`) | refused, the role named or "only the orchestrator or the owner", nothing written. Build form: a clean stand-in on `w2/integrate`, `gov release 1.4.0`. `--lock-from` form: a project of 1.4.0 in the state a copy is in when its task runs (lock not yet written), the genuine `v1.4.0` source | own: exit 0 (the release built; the lock written) |
+| `test_gov_release_runs_for_the_orchestrator_and_the_owner` (4: 2 forms × `orchestrator`, unset) | success 2 | DEC-761; DEC-365 | positive controls: the same calls release (a record under `docs/releases/`; a lock recording 1.4.0 and its manifest hash) | **green today** (positive controls) |
+| `test_the_suite_runs_gov_and_copier_with_gov_role_unset` | — | DEC-761 (the lead's note) | guard: no `gov` or Copier environment of the suite carries `GOV_ROLE` | **green today** (a guard) |
+
+**Seen on `ee557d02`:** the whole suite `23 failed, 91 passed` (no skip, no error): the 23 are this file's
+refusal cases, each on its own assertion as the table states; the 85 earlier cases pass; 6 of this file pass (the
+genuine-source guard, the 4 positive controls, the `GOV_ROLE` guard).
+
+**Readings.** "Refuses once the lock records a release" is read as the lead reads it: `--lock-from` never rewrites
+or drops the release the lock records; it writes another release's lock only at an update, where that release
+verifies against its hashes. The positive control of the update is the suite's own
+(`test_a_project_updated_to_a_later_release_records_that_release_in_its_lock`), unchanged. An entry that "records
+the release" is found by value: equal to the version, holding the manifest hash, or the manifest itself; a value
+that only contains the version inside longer text (the template tag `v1.4.0`) is not one, and stays. The
+`--lock-from` role cases run where `--lock-from` must write when allowed (the state of a copy when its task runs:
+every file, the answers file, no lock yet), so the refusal is the role's and nothing else's; that state is what
+Copier hands the task, and the unset and orchestrator controls show it writes there today. A command that sets
+`GOV_ROLE=orchestrator` itself from a session of another role is a known limit (W2-H058's guard side): no case.
+
+**Not covered, by the brief.** Edits beyond the deletion above, which rewrite every record a project holds
+consistently, are the unsigned limit (CAP-02.c, Wave 3): no case.
+
+### Open: a source that never held a record (R2-F3, item C)
+
+DEC-761 says "a version tag from a source with no release records is refused". This round builds the refusal for a
+source **whose history holds release records** (the case above). A source that **never** held one (W1-39's
+template source, `copier.yml` and `template/` alone, tagged `v0.1.0`) still installs as W1-39 holds it: W1-39's
+suite (about 55 cases) and this suite's plain-source cases (W2-M174, W2-L227, W2-H029's and W2-M175's first forms)
+install from such a source, and the owner named none of them for a rewrite. No case here refuses a never-recorded
+source and none of those cases is changed. This part waits for the owner's answer (the lead's package). Item 3 of
+DEC-761 leaves to the owner which commit is tagged (W2-L351, R2-P2): no case depends on it beyond what the suite
+already does (the tag is on the commit that holds the record).
+
+### The two recorded rewrites of earlier tickets' cases (DEC-761, DEC-491)
+
+Each is in the designer's commit with its `Rewrite-Reason:` trailer and states the rewrite and its reason in its
+docstring. Nothing else in W1-39's or W1-32's folders changes.
+
+- **`tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured`.**
+  It deleted both files from a project made by `copier copy` (an installed kernel) and held "unmeasured, exit 0",
+  which W2-H029 (KPI success 4) and `test_deleting_both_the_lock_and_the_answers_file_does_not_silence_the_comparison`
+  make a failure (package P-1 below, option (a)). Rewritten to a project never installed from the template (W1-27's
+  shape: its overlay alone, no installed kernel, no lock, no answers file); both assertions kept
+  (unmeasured and no failure; not a match). Today: it passed after the rewrite (before it, it failed: status `fail`).
+- **`tests/acceptance/W1-32/test_w1_32_command_set.py::test_the_command_set_is_the_twelve_and_the_three_recorded_ones`.**
+  It failed because `gov --help` offers `release`, which the recorded lists do not hold yet (DEC-753: recorded in
+  W1-07's list and `RECORDED_GOV_COMMANDS` only after W2-20 closes; those lists are not touched). Rewritten so that
+  `release`, and only `release`, is excused while the lists lack it, and so it passes unchanged once they record it;
+  any other unrecorded command, a recorded command gone, or the module command offered still fails it. Today: it
+  passed after the rewrite (before it: `gov has commands the command list does not record: ['release']`).
+
 ## Covers and rows
 
 | Id | Cases |
 |---|---|
 | CAP-43.b (lite) | success 1, the failure line |
-| CAP-43 | success 3 (with the four immutability cases added after the first review), success 4 (lock records the release), the failure line |
+| CAP-43 | success 3 (with the four immutability cases added after the first review), success 4 (lock records the release; the last round's `--lock-from`, removed-records and release-entry cases), the failure line |
+| CAP-43.b (lite), success 2 | the last round's role cases (DEC-761: only the orchestrator or the owner releases) |
 | CAP-43.d (ahead of its wave) | CLI version, schema versions, release notes |
 | CAP-02.a | the doctor cases of the failure line, W2-M174 |
 | CAP-02.c (stays W3, DEC-722) | success 2 |
@@ -236,7 +308,8 @@ its own assertion with its preconditions met. No trial file is in the tree.
 
 - **`tests/acceptance/W1-39/test_w1_39_drift.py::test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured`**
   against KPI success 4 (W2-H029, the silencing part): it deletes both files of a project made by `copier copy`
-  and holds "unmeasured", exit 0 — exactly what the KPI says may no longer pass. Package P-1. Not edited.
+  and holds "unmeasured", exit 0 — exactly what the KPI says may no longer pass. Package P-1. Rewritten in the last
+  round (DEC-761; "The two recorded rewrites" above).
 - **DEC-753:** the W1-07 and W1-26 cases that find `release` unrecorded are named reds until the resume round
   records it. Not touched here.
 
