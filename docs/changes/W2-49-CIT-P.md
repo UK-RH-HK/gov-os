@@ -1,8 +1,9 @@
 ---
 id: W2-49-CIT-P
 type: change-impact-proposal
-status: PROPOSED
-pending: the owner's approval (queued package Q-14), after an independent review (CAP-33)
+status: ACCEPTED
+accepted: owner, 2026-10-17 (DEC-741, apply now, with the answers A to K recorded in section 13; staged for the owner's commit, not yet in this worktree's register)
+pending: 'the owner''s commit of DEC-741 with Role: owner (DEC-724), and the owner''s confirmation or overturn of the K (2) reading (W2-49-CIT-E §3.3)'
 date: 2026-10-16
 branch: w2/W2-49
 base: a02e3485
@@ -745,3 +746,28 @@ Also in this round, as the brief asked: §11's order line follows DEC-737 (stage
 C (the ten ADOPTED_HEALTHY conditions), D (CAP-45.a's signed tag), E (DEC-090 and CAP-54.a), F (the rule for each
 verdict, and who accepts an exception), G (which operational checks are lite conditions), H (which ticket builds the
 lite A7 and A10 stage records), I (W2-02's order against W2-49), J (who closes W2-I017, and how).
+
+## 13. The owner's answers (DEC-741)
+
+The owner approved this CIT-P on 2026-10-17 (DEC-741, staged for the owner's commit), apply now, with this CIT-P's
+recommended answer to each question. Sections 1 to 12 are the reviewed text, kept as approved. What was applied, and
+each difference from it, is in `docs/changes/W2-49-CIT-E.md`.
+
+- **A (a1):** the split form; the new ids CAP-43.d, CAP-44.k and CAP-44.l.
+- **B (i):** lite CAP-43.b is the manifest and file hashes only.
+- **C (i):** a named read of Adoption Protocol v3.0 §20 and Distribution Protocol v1.2 §18, with (ii) as fallback.
+- **D (ii):** CAP-45.a's Wave 2 wording.
+- **E (i):** DEC-741 amends DEC-090 in part: A7, A10 and the verdict come into Wave 2, lite; A9, A11 and the rest stay
+  in Wave 3.
+- **F (i):** only the owner accepts an exception, by name, in a `Role: owner` entry; the auditor accepts nothing.
+- **G (i):** the lite healthy conditions add `gov doctor` green, `gov check` with no RED, and a first `gov close` at
+  exit 0.
+- **H (i):** the new ticket that builds the lite A7 and A10 stage records is **W2-52 (DAEO-siiz)**, FULL, engineer,
+  layer 3; it starts after the apply round and closes before W2-27. It is the ticket §2, §5.5, §7 H, §9 and §10 F-1
+  call "a new ticket" or "the ticket of Question H".
+- **I (ii):** W2-02 types the verdict with its three values and a list of named conditions (source item, state: met,
+  not met, accepted by an owner entry), and closes on its own.
+- **J (i):** at W2-30's close the orchestrator records row W2-I017 as carried to Wave 3.
+- **K:** (1) the owner's answer: the version line in all 273 capability records; (2) the orchestrator's reading, staged
+  for the owner to confirm or overturn: the records §8 names as rewritten (CAP-43.b, CAP-44.f, CAP-44.h, the new
+  CAP-43.d, CAP-44.k and CAP-44.l, and the "Covers:" lists of CAP-43 and CAP-44), in a commit of its own.
