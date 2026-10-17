@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import history as _history, state as _state, tool as _tool
+from gov.close import history as _history, ratchet as _ratchet, state as _state, tool as _tool
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -182,7 +182,7 @@ def run(root: Path, args, config: dict):
         except _Finding as f:
             found.append(f)
 
-    brought = frozenset()  # the merge-backs of exactly the probed code (DEC-739); none where the gate refuses
+    brought = frozenset()  # the merges that are git's own merge on the probed paths (DEC-754); none on a refusal
     if profile == "FULL":
         brought = gate(_check_probe, root, ticket, commits, others, inside, own, tickets) or frozenset()
     gate(_check_trailers, root, commits, ticket, history)
@@ -193,9 +193,14 @@ def run(root: Path, args, config: dict):
     # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
     # as serial-only afterwards (DEC-527); ``test_runs`` are the runs as they were made.
     test_runs: list[dict] = []
-    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers)
+    # DEC-757: where the path map has a list of known reds or load-sensitive cases, each run tells each test's
+    # result, and the reds of the runs are judged by the lists, after both runs.
+    told = {"results": {}, "rootdirs": {}, "env": None} \
+        if any(settings.get(key) for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE)) else None
+    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers, told)
     counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs, test_runs,
-                  workers)
+                  workers, told)
+    reds = gate(_check_reds, root, told, timeout) if told is not None else None
     # A commit of the range that names no task and changes a governance file has the checks run too (DEC-490)
     checked = gate(_check_governance_blocks, root,
                    commits + [c for c in others if _names_no_task(c, tickets)])
@@ -223,6 +228,7 @@ def run(root: Path, args, config: dict):
         "commits": _commit_models(commits),
     }
     record.update(checked)
+    record.update(reds or {})
     record[SHARE_KEY] = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
     record["created"] = _now()  # one time of the record, whether or not it is written again with its share
 
@@ -242,7 +248,7 @@ def run(root: Path, args, config: dict):
         _write_count(root, ticket, reset)
 
     return {"ticket": ticket, "close_record": close_record_path,
-            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report}
+            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report, **(reds or {})}
 
 
 def _time_limit(given, settings: dict):
@@ -571,8 +577,9 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
     Every probe record of the ticket is read (DEC-500): each is asked everything, so one that does not say
     that the probe of the final code passed refuses whatever another says, and the close needs one.
 
-    Returns the merge-backs that bring exactly the probed code (DEC-739)."""
-    from gov.tasks.tickets import frontmatter
+    Returns the merges after the probed commit that are git's own merge of their parents on the probed paths
+    (DEC-739, DEC-754): neither stale nor work without a task."""
+    from gov.tasks.tickets import TICKETS_REL, frontmatter
 
     def invalid(message: str, **details):
         return _Finding("PROBE_INVALID", message, {"ticket": ticket, **details}, not_measured=[
@@ -658,51 +665,52 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                           probed_commit=probed)
 
         after = {c["sha"]: c for c in _read_commits(root, f"{probed}..HEAD")}
+        measured = []  # the merges measured against git's own merge of their parents, oldest last
         for sha, c in after.items():
             if REVIEWER_ROLE in c["trailers"].get("Role", []):
                 raise invalid("a commit between the probed commit and HEAD "
                               "carries the reviewer's role", commit=sha[:12])
-            holds = [not _git(root, "merge-base", "--is-ancestor", probed, p, ok=(0, 1), code=True)
-                     for p in c["parents"]] if len(c["parents"]) > 1 else []
-            if holds and not holds[0] and any(holds):
-                # DEC-505, DEC-739, DEC-750 (1): the merge-back (its first parent lacks the probed commit, another
-                # holds it) is measured by the probed code, whatever task it names: unchanged, it is neither stale
-                # nor work without a task.
-                dropped = [p for p in _history.differing(root, probed, sha) if own(p)]
+            holds = any(not _git(root, "merge-base", "--is-ancestor", probed, p, ok=(0, 1), code=True)
+                        for p in c["parents"]) if len(c["parents"]) > 1 else False
+            if holds or (len(c["parents"]) > 1 and ticket in c["trailers"].get("Task", [])):
+                # DEC-750, DEC-754 (P-5 (c)): every merge that holds the probed commit (the merge-back, a later
+                # merge, inward, an octopus), and the ticket's own merge, whatever task it names, is measured on
+                # the probed paths against git's own merge of its parents. Where git cannot compute that merge
+                # (a conflict, an object it cannot read) the measure is the probed code itself: never a pass.
+                expected = _history.own_merge(root, c["parents"])
+                against = "git's own merge of its parents" if expected else \
+                    "the probed code (git cannot compute its own merge of its parents)"
+                dropped = [p for p in _history.differing(root, expected or probed, sha) if own(p)]
                 if dropped:
-                    raise invalid(f"merge-back {sha[:12]} brings the probed commit but not the probed code: "
-                                  f"{', '.join(dropped)} differ from the probed commit", commit=sha[:12])
-                brought.add(sha)
-                continue
-            if holds and holds[0]:
-                # DEC-750 (2): a later merge holding the probed commit refuses, whatever task it names, where it
-                # changes probed code itself: a probed path at it in no parent's version (P-5 open for the rest).
-                mine = set.intersection(*(set(_history.differing(root, p, sha)) for p in c["parents"]))
-                if any(own(p) for p in mine):
-                    raise invalid(f"merge {sha[:12]} holds the probed commit and changes probed code: "
-                                  f"{', '.join(sorted(p for p in mine if own(p)))} in neither parent's version",
+                    raise invalid(f"merge {sha[:12]} {'holds' if holds else 'of the ticket does not hold'} the "
+                                  f"probed commit and its probed paths are not {against}: {', '.join(dropped)}",
                                   commit=sha[:12])
-            changed = [p for p in c["paths"] if inside(p)] if _names_no_task(c, tickets) else []
+                measured.append(sha)
+                continue
+            judged = own if len(c["parents"]) < 2 else inside  # a merge on neither side: as before (DEC-750)
+            changed = [p for p in c["paths"] if judged(p)] if _names_no_task(c, tickets) else []
             if changed:  # DEC-490: work on the ticket's paths the probe did not see
                 raise invalid(f"commit {sha[:12]} names no task and changes {', '.join(changed)} "
                               "after the probed commit: the probe is stale", commit=sha[:12])
+        brought.update(measured)
+        ticket_file = f"{TICKETS_REL}/{ticket}.md"
         for c in commits:
             sha = c["sha"][:12]
             if any(str(reviewer) in value
                    for values in c["trailers"].values() for value in values):
                 raise invalid(f"commit {sha} trailer names the reviewer session",
                               commit=sha)
-            if c["sha"] in after:
-                paths = c["paths"]
-                if len(c["parents"]) > 1:
-                    # DEC-505, W2-H047: at a merge after the probed commit (of it, of the integration branch into
-                    # the ticket's branch, or the merge back) the probed code is what it is at the probed commit,
-                    # whichever parent's version the merge took: the paths judged are those that are not.
-                    paths = _history.differing(root, probed, c["sha"])
-                for p in paths:
-                    if own(p):
-                        raise invalid(f"ticket commit {sha} changes {p} "
-                                      "after the probed commit", commit=sha, path=p)
+            if c["sha"] not in after or len(c["parents"]) > 1:
+                continue  # a merge of the ticket after the probed commit is measured above
+            if c["paths"] == [ticket_file] and c["trailers"].get("Role") in (["orchestrator"], ["owner"]):
+                continue  # DEC-757 item 3: an integration-side edit of the ticket file is not the ticket's change
+            for p in c["paths"]:
+                if own(p):
+                    # R-7: the refusal names the edit and the merge-backs that carry it in
+                    carried = [m[:12] for m in measured if _carries(root, m, after[m]["parents"], c["sha"])]
+                    raise invalid(f"ticket commit {sha} changes {p} after the probed commit"
+                                  + (f", carried in by merge {', '.join(carried)}" if carried else ""),
+                                  commit=sha, path=p)
         records += 1
 
     if not records:
@@ -710,6 +718,12 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
                        f"FULL-profile ticket {ticket} has no valid probe record",
                        {"ticket": ticket})
     return frozenset(brought)
+
+
+def _carries(root: Path, merge: str, parents: list[str], commit: str) -> bool:
+    """Whether ``merge`` brings ``commit`` to its first parent: it holds the commit and its first parent does not."""
+    return bool(_git(root, "merge-base", "--is-ancestor", commit, parents[0], ok=(0, 1), code=True)) and \
+        not _git(root, "merge-base", "--is-ancestor", commit, merge, ok=(0, 1), code=True)
 
 
 def _full_id(root: Path, given: str) -> str | None:
@@ -723,18 +737,19 @@ def _full_id(root: Path, given: str) -> str | None:
 # ---------------------------------------------------------------------------
 
 def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None = None,
-                 stated: list | None = None, workers=AUTO_WORKERS) -> dict:
+                 stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None) -> dict:
     """The counts of a test run without a finding; ``CHECK_FAILED`` with its findings. With ``ignore`` the run
-    is the regression run, which may collect nothing. ``stated`` gets the runs as they were made."""
+    is the regression run, which may collect nothing. ``stated`` gets the runs as they were made, ``told`` each
+    test's result (``_run_tests``)."""
     findings, counts = _run_tests(root, test_path, timeout, ignore=ignore, none_collected_ok=ignore is not None,
-                                  stated=stated, workers=workers)
+                                  stated=stated, workers=workers, told=told)
     if findings:
         raise _Finding("CHECK_FAILED", "tests or checks failed", {"tests_run": counts}, findings)
     return counts
 
 
 def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: list | None = None,
-                      workers=AUTO_WORKERS) -> dict:
+                      workers=AUTO_WORKERS, told: dict | None = None) -> dict:
     """The counts of the ticket's acceptance run. The acceptance tests are part of the ticket's work
     (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492)."""
     folder = root / "tests" / "acceptance" / wbs
@@ -743,7 +758,7 @@ def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: l
                        f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
                        {"ticket": ticket, "wbs": wbs},
                        not_measured=[f"the acceptance run of {ticket}: not measured, it has no acceptance tests"])
-    return _check_tests(root, folder, timeout, stated=stated, workers=workers)
+    return _check_tests(root, folder, timeout, stated=stated, workers=workers, told=told)
 
 
 _HAS_PARALLEL_RUNNER = "import importlib.util, sys; sys.exit(importlib.util.find_spec('xdist') is None)"
@@ -752,7 +767,7 @@ _HAS_PARALLEL_RUNNER = "import importlib.util, sys; sys.exit(importlib.util.find
 def _run_tests(root: Path, test_path: Path, timeout: int,
                ignore: Path | None = None,
                none_collected_ok: bool = False,
-               stated: list | None = None, workers=AUTO_WORKERS) -> tuple[list[str], dict]:
+               stated: list | None = None, workers=AUTO_WORKERS, told: dict | None = None) -> tuple[list[str], dict]:
     """Run pytest on ``test_path`` to its end: its findings and its counts, every case counted once.
 
     The run is parallel (DEC-527): the installed runner's ``-n`` with ``workers``, the project's number or
@@ -765,11 +780,14 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     ``TEST_RUNNER_ABSENT`` when this interpreter has no pytest: nothing ran.
     A list that is no UTF-8 text is ``SERIAL_ONLY_LIST_UNREADABLE``, and a file of the project that would be
     loaded in the place of the plugin is a finding: in both no test is run (DEC-555).
+
+    With ``told`` (a project whose path map has DEC-757's lists) every run tells each test's result into it, and
+    a run whose every red is a test it named leaves them to ``_check_reds``: no finding of its own.
     """
     import importlib.machinery
     import importlib.util
     import os
-    from gov.close.pytest_plugin import gov_close_serial_only as serial_only
+    from gov.close.pytest_plugin import gov_close_results as results, gov_close_serial_only as serial_only
 
     counts = {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}  # a skip is counted, not refused (DEC-500)
     if not test_path.is_dir():
@@ -831,11 +849,30 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
     else:
         declared = []
         runs = [("serial", pytest + whole + options, env, f"the test run of {rel}")]
+    if told is not None:  # DEC-757: every run tells each test's result, under the plugin's name (DEC-555)
+        before = importlib.machinery.PathFinder.find_spec(results.PLUGIN, [str(root), env["PYTHONPATH"]])
+        if before is not None and before.origin:
+            return [f"the test run of {rel}: {os.path.relpath(before.origin, root)} of the project is named like "
+                    f"the plugin of the close ({results.PLUGIN}) and would be loaded in its place: no test was run"
+                    ], counts
+        folder = str(Path(results.__file__).resolve().parent)
+        runs = [(form, cmd + ["-p", results.PLUGIN], {**run_env, results.ROOT_VARIABLE: str(root), "PYTHONPATH":
+                 os.pathsep.join([run_env["PYTHONPATH"], folder])}, what) for form, cmd, run_env, what in runs]
+        told["env"] = runs[0][2]
 
     findings: list[str] = []
     collected = False
     for form, cmd, run_env, what in runs:
-        found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
+        if told is None:
+            found, ran = _one_test_run(root, cmd, run_env, timeout, what, rel)
+        else:
+            found, ran, results_of_run = _told_run(root, cmd, run_env, timeout, what, rel)
+            told["results"].update(results_of_run.get("results", {}))
+            told["rootdirs"].update(dict.fromkeys(results_of_run.get("results", {}), results_of_run.get("rootdir")))
+            reds = [test for test, outcome in results_of_run.get("results", {}).items() if _ratchet.red(outcome)]
+            if found and reds and len(reds) == ran["failed"] + ran["errors"] and \
+                    all(line.startswith(("FAILED", "ERROR")) for line in found):
+                found = []  # each red of the run is a test the plugin named: the path map's lists judge them
         collected = collected or found is not None
         findings += found or []
         counts = {key: counts[key] + ran[key] for key in counts}
@@ -927,6 +964,68 @@ def _one_test_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str
     failures = sorted(line.strip() for line in result.stdout.split("\n")
                       if "FAILED" in line or line.startswith("ERROR "))
     return failures or [f"{what} exited {rc}: {result.stderr.strip()[-200:]}"], ran
+
+
+def _told_run(root: Path, cmd: list[str], env: dict, timeout: int, what: str, rel: str):
+    """``_one_test_run`` with the results plugin's file: its findings, its counts, and what the plugin told
+    (``{}`` where it told nothing: a run cut short, or one that never reached its end)."""
+    import os
+    import tempfile
+    from gov.close.pytest_plugin import gov_close_results as results
+
+    handle, to = tempfile.mkstemp(prefix="gov-close-results-", suffix=".json")
+    os.close(handle)
+    try:
+        found, ran = _one_test_run(root, cmd, {**env, results.TO_VARIABLE: to}, timeout, what, rel)
+        try:
+            told = json.loads(Path(to).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            told = {}
+    finally:
+        Path(to).unlink(missing_ok=True)
+    return found, ran, told if isinstance(told, dict) and isinstance(told.get("results"), dict) else {}
+
+
+def _check_reds(root: Path, told: dict, timeout: int) -> dict:
+    """The reds of the close's runs judged by the path map's lists (DEC-757 items 2 and 4); what the close states
+    of them (``accepted_reds``, ``load_sensitive``), or ``CHECK_FAILED`` with a finding for each.
+
+    A red that a counted ``load_sensitive`` entry names is run again alone, in its own process (R-4); it counts as
+    passed only when that run passes, and each re-run is reported with both results. No other test is run again.
+    The results, so read, then go to the ratchet (``gov.close.ratchet.apply_accepted_reds``)."""
+    results = told["results"]
+    quarantined, found = _ratchet.counted_entries(root, _ratchet.LOAD_SENSITIVE)
+    reruns = []
+    for test, outcome in sorted(results.items()):
+        entry = next((e for e in quarantined if _ratchet.covers(e["test"], test)), None)
+        if entry is None or not _ratchet.red(outcome):
+            continue
+        alone = _alone(root, test, told, timeout)
+        reruns.append({"test": test, "decision": entry["decision"], "in_run": _ratchet.FAILED, "alone": alone})
+        if alone == _ratchet.PASSED:
+            results[test] = _ratchet.PASSED
+        else:
+            found.append({"code": "LOAD_SENSITIVE_FAILED_ALONE", "test": test,
+                          "message": f"the load-sensitive test {test} failed in the run and failed alone too"})
+    verdict = _ratchet.apply_accepted_reds(root, results)
+    found += verdict["findings"]
+    stated = {_ratchet.ACCEPTED_REDS: verdict[_ratchet.ACCEPTED_REDS], _ratchet.LOAD_SENSITIVE: reruns}
+    if found:
+        raise _Finding("CHECK_FAILED", "tests or checks failed", {**stated, "red_findings": found},
+                       [f["message"] for f in found])
+    return stated
+
+
+def _alone(root: Path, test: str, told: dict, timeout: int) -> str:
+    """``passed`` when ``test`` passes run alone: a process of its own whose session holds that one node id, with
+    the run's root folder and environment; ``failed`` otherwise, a run cut at the time limit included."""
+    from gov.close.pytest_plugin import gov_close_results as results
+
+    path, sep, rest = test.partition("::")
+    cmd = [sys.executable, "-m", "pytest", str(root / path) + sep + rest, "--rootdir", told["rootdirs"][test],
+           "-q", "-p", "no:cacheprovider", "--tb=line", "--no-header", "-p", results.PLUGIN]
+    found, _, alone = _told_run(root, cmd, told["env"], timeout, f"the run alone of {test}", path)
+    return _ratchet.PASSED if found == [] and alone.get("results") == {test: _ratchet.PASSED} else _ratchet.FAILED
 
 
 # ---------------------------------------------------------------------------
