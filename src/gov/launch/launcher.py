@@ -30,7 +30,7 @@ from gov.cli.errors import GovError
 from gov.guard.decide import ACCEPTANCE, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
-from gov.guard.runs import own_folder
+from gov.guard import runs
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
 WORKER_ROLES = ("engineer", "independent-test-designer", "independent-auditor", "research", "product-spec")
@@ -286,16 +286,13 @@ def launch(root: Path, role: str, ticket_id: str, cli_args: list[str]) -> int:
     if faults:
         raise _refuse("the built settings are not strict: " + "; ".join(faults))
     # DEC-728, DEC-743 (R2): the session's own folder under ~/gov-os-runs, made before the session starts and
-    # never removed by the launcher; what it holds is left alone, and no other folder is made. A folder that
-    # cannot be named or made, or that is not a folder, is not opened: the session then has none.
-    own = own_folder(str(root), ticket_id, role)
-    try:
-        if own is not None:
-            os.makedirs(own, exist_ok=True)
-    except OSError:
-        own = None
-    if own is not None and (os.path.islink(own) or not os.path.isdir(own)):
-        own = None
+    # never removed by the launcher; what it holds is left alone, and no other folder is made. DEC-751 1: only a
+    # folder made here is marked as this repository's; a folder that is there without this repository's marker,
+    # or that cannot be named, made or marked, is not opened: the session then has none.
+    name = runs.folder(str(root), ticket_id, role)
+    if name is not None and not os.path.lexists(name):
+        runs.make(name, str(root))
+    own = runs.own_folder(str(root), ticket_id, role)
     state = {"session": None, "ended": False, "asked": False}
 
     def end(signum=None, frame=None):

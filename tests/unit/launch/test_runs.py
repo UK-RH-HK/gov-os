@@ -26,7 +26,7 @@ TICKET = "---\nid: TST-a001\nstatus: in_progress\nexternal-ref: W2-90\nrole: eng
 def started(tmp_path, monkeypatch):
     """``started()`` launches an engineer on TST-a001 and returns the settings and what the session found."""
     home, temp, project = tmp_path / "home", tmp_path / "temp", tmp_path / "project"
-    for folder in (home / ".local" / "bin", temp, project / ".tickets"):
+    for folder in (home / ".local" / "bin", temp, project / ".tickets", project / ".git"):
         folder.mkdir(parents=True)
     (home / launcher.CLI_REL).write_text("", encoding="utf-8")
     (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
@@ -63,6 +63,21 @@ def test_the_own_folder_is_made_and_added_to_the_write_list(started):
     assert f"/{own}" in found["settings"]["sandbox"]["filesystem"]["allowWrite"]
     assert len(found["settings"]["sandbox"]["filesystem"]["allowWrite"]) == 2
     assert os.path.isdir(own)  # the launcher never removes it
+    assert os.listdir(own) == [runs.MARKER]
+    allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]  # a later launch keeps the folder
+    assert len(allow) == 2 and allow[1] == f"/{own}"
+    assert os.listdir(own) == [runs.MARKER]
+
+
+@pytest.mark.parametrize("content", ((), ("work.txt",)))
+def test_a_folder_already_there_is_neither_marked_nor_added(started, content):
+    """DEC-751 1: the launcher marks only a folder it has just made."""
+    (started.root / "W2-90").mkdir(parents=True)
+    for name in content:
+        (started.root / "W2-90" / name).write_text("x", encoding="utf-8")
+    allow = started()["settings"]["sandbox"]["filesystem"]["allowWrite"]
+    assert len(allow) == 1 and "W2-90" not in allow[0]
+    assert sorted(os.listdir(started.root / "W2-90")) == list(content)
 
 
 def test_a_name_two_tickets_give_is_neither_made_nor_added(started, tmp_path):

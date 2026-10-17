@@ -152,13 +152,14 @@ def stores_with_secrets(root: Path) -> list[str]:
         raise error  # a folder that cannot be entered is not a store without a secret
 
     # DEC-728, DEC-743 3: a link into ~/gov-os-runs is not followed; nothing there is this repository's.
-    # The runtime folder's own files are scanned, also in a clone that lies there.
-    runs, runtime = runs_root(), os.path.realpath(root / RUNTIME_REL)
+    # The runtime folder's own files are scanned, also in a clone that lies there, and (DEC-751 2) a link
+    # whose target stays inside the project being scanned is followed there too.
+    runs, runtime, project = runs_root(), os.path.realpath(root / RUNTIME_REL), os.path.realpath(root)
 
     def followed(path: str) -> bool:
         real = os.path.realpath(path)
         within = lambda top: real == top or real.startswith(top + os.sep)  # noqa: E731
-        return runs is None or within(runtime) or not within(runs)
+        return runs is None or within(runtime) or within(project) or not within(runs)
 
     # Linked folders elsewhere are followed; a file that cannot be read raises.
     files = []
