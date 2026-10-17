@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135]
+decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752]
 state_class: EVIDENCE
 ---
 
@@ -462,3 +462,44 @@ The `local_only` live-launch cases were not run, as in §3; the real `~/gov-os-r
 The code is 64 lines net, within the brief's estimate of 50 to 70 lines; 83 lines added, above it, about a third of
 them docstrings. With the earlier rounds the change's code is 232 lines added and 31 removed, 201 net, above the
 estimate of 120 LOC (`est_loc`) by 81 lines.
+
+## 8. The two failed reviews (history, DEC-752)
+
+Two independent reviews of this change failed before the repairs of §6 and §7. Each was a fresh read-only reviewer
+(role `independent-auditor`, the reading tools only), commissioned and judged by the orchestrator. Their probe records
+are kept here as history, not under `docs/probes/` (DEC-752 item 2, the owner, 2026-10-17; staged for the owner's
+commit, not yet in this worktree's register).
+
+### Review 1
+
+- **Probed commit:** `b7981b0faf3cad33b596cdd330cd1a339fad5d8c` (implementation `91200c82`, CIT-E `b7981b0f`).
+- **Reviewer session:** `9ffac555-e15e-4654-ba56-e68b45435bb3`.
+- **Judgement:** fail.
+
+| # | Finding (the record's words, summarised) | What was done with it |
+|---|---|---|
+| 1 | A project lying inside the session's own folder lost every in-project rule (acceptance tests, freeze flag, records, `.tickets/`, settings file, guard hook, `allowed_paths`); high, reproduced, fail-open | Repaired: tests `72263054`, repair `86aa805c`, CIT-E `0bbada97` (§6 finding 1) |
+| 2 | Glob characters in `external-ref` put `//…/gov-os-runs/*` or `/**` into the sandbox write list; medium | Repaired in the same commits (§6 finding 2) |
+| 3 | Two tickets naming the same folder shared it; medium-low, can lose work | Repaired in the same commits (§6 finding 3) |
+| 4 | A `ticket-lead` session's subagent of another role type reaches the folder (the guard's acting-role model); low, owner question | Residual: the guard's model of the acting role, as inside the repository; not fail-open under DEC-743 item 7, as the second review was briefed |
+| 5 | The own folder's path can be written as a file; low | Residual: a later launch then started without an own folder (difference 7, to W2-21; DEC-751 W-2 (b) makes the silent start a warning row for W2-21). Since `df5f1e50` a file in the folder's place also gives no folder (§7) |
+| 6 | `rmdir` of the root with an unresolvable argument; low | Residual: difference 5, to W2-09 (§5) |
+| 7 | Bash forms the guard never judged (`find -delete`, `env rm`, `git clean`, `rsync --delete`, `dd of=`, `truncate`, an interpreter's `-c`); pre-existing | Residual, pre-existing: the guard's Bash forms, W2-09 |
+| 8 | Two cases stricter than needed: a link in the own folder resolved through for `rm`; a secrets-check loop on a link to a HOME that holds the project, which fails closed and existed before | Residual, not fail-open |
+
+### Review 2, the second and last under DEC-413
+
+- **Probed commit:** `f9277098f60c747df9c52efb134dd684cd064f0c` (implementation `91200c82`, repair `86aa805c`, CIT-E
+  `0bbada97`, lead checkpoint `f9277098`).
+- **Reviewer session:** `1e0c179d-c135-4a63-a5a3-e65980db433f`.
+- **Judgement:** fail.
+
+| # | Finding (the record's words, summarised) | What was done with it |
+|---|---|---|
+| 1 | Another project's ticket of the same name gets this repository's ticket folder: a second Gov OS project on the same home with an `in_progress` ticket whose `external-ref` names the folder may write in it and remove it, and its launch adds the folder to the sandbox write list; medium-high, reproduced through the guard and `gov launch` | Decided by DEC-751 item 1 (P-A (a)); repaired: tests `e58081be`, repair `df5f1e50`, CIT-E `8a3c27e9` (§7 finding 1, the marker) |
+| 2 | A clone's own secrets check fails open for a linked store inside the clone: with the project under the root, a `.gov-runtime/` link to a folder of the same project holding a secret is not followed (green), while the same layout outside the root goes red; medium, reproduced | Decided by DEC-751 item 2 (P-B (a)); repaired in the same commits (§7 finding 2) |
+| 3 | A FIFO among the ticket files hangs `gov launch` and makes the guard refuse every write outside the project (the temp folder included) until its deadline; low | Residual row (DEC-751 item 5): fails closed, availability only |
+
+Neither fail record is committed: both stay uncommitted drafts by DEC-752 item 2, and a further independent review of
+the repaired change follows this record; its pass record, if it passes, is the only probe record committed under
+`docs/probes/DAEO-kl5e/`.
