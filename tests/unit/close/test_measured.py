@@ -183,10 +183,12 @@ def test_any_other_commit_refuses_nothing():
 
 def test_a_commit_of_the_ticket_without_a_role_refuses_like_one_without_implements():
     whole = {"Task": [TICKET], "Role": ["engineer"], "Implements": ["CAP-01"]}
-    _check_trailers([{"sha": "a" * 40, "trailers": whole}], TICKET)
+    no_history = {"after": None, "accepted": {}}
+    _check_trailers("/p", [{"sha": "a" * 40, "parents": [], "trailers": whole}], TICKET, no_history)
     for key in ("Role", "Implements"):
         with pytest.raises(_Finding) as raised:
-            _check_trailers([{"sha": "a" * 40, "trailers": {k: v for k, v in whole.items() if k != key}}], TICKET)
+            _check_trailers("/p", [{"sha": "a" * 40, "parents": [], "trailers": {k: v for k, v in whole.items() if k != key}}],
+                            TICKET, no_history)
         assert raised.value.code == "TRAILER_MISSING" and f"{key}:" in raised.value.message
         assert "a" * 12 in raised.value.message
 
@@ -290,7 +292,9 @@ def test_every_probe_record_of_the_ticket_is_asked_everything(repo):
     _gate(repo)
     later = repo.commit("more work", *TRAILERS, files={"src/b.py": "b\n"})
     _records(repo, later, **{"PR-2": "pass"})  # the first record is now of an earlier round
-    assert "after the probed commit" in _refused(repo)
+    _gate(repo)  # W2-M209: it neither passes nor refuses; the record of the final code decides
+    _records(repo, later, **{"PR-3": "fail"})  # a failing record of the final code refuses with its judgement
+    assert "judgement" in _refused(repo)
 
 
 def test_a_record_of_another_ticket_or_another_type_in_the_folder_is_none_of_the_tickets(repo):

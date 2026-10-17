@@ -19,6 +19,7 @@ from gov.tasks.tickets import frontmatter
 TICKET = "T-0001"
 COUNTS = {"passed": 1, "failed": 0, "errors": 0}
 WHOLE = {"Task": [TICKET], "Role": ["engineer"], "Implements": ["CAP-01"]}
+NO_HISTORY = {"after": None, "accepted": {}}  # no trailers base, no accepted history
 NO_ACCEPTANCE_RUN = f"the acceptance run of {TICKET}: not measured, it has no acceptance tests"
 
 
@@ -39,7 +40,8 @@ def _tickets(root):
 
 def test_every_trailer_a_commit_lacks_is_a_finding():
     with pytest.raises(_Finding) as raised:
-        _check_trailers([_commit("a", Implements=0), _commit("b"), _commit("c", Role=0, Implements=0)], TICKET)
+        _check_trailers("/p", [_commit("a", Implements=0), _commit("b"), _commit("c", Role=0, Implements=0)], TICKET,
+                        NO_HISTORY)
     assert raised.value.findings == [f"commit {'a' * 12} lacks Implements: trailer",
                                      f"commit {'c' * 12} lacks Implements: trailer",
                                      f"commit {'c' * 12} lacks Role: trailer"]
@@ -48,7 +50,7 @@ def test_every_trailer_a_commit_lacks_is_a_finding():
 
 def test_a_ticket_without_a_commit_says_that_its_containment_was_not_measured():
     with pytest.raises(_Finding) as raised:
-        _check_trailers([], TICKET)
+        _check_trailers("/p", [], TICKET, NO_HISTORY)
     assert raised.value.not_measured == [f"the containment of the commits of {TICKET}: not measured, it has no commit"]
     with patch("gov.guard.containment.judge_commits") as judge:
         _check_containment("/p", [])

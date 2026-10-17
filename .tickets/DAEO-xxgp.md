@@ -1,7 +1,7 @@
 ---
 id: DAEO-xxgp
 status: open
-deps: [DAEO-g0ip]
+deps: [DAEO-g0ip, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -16,6 +16,7 @@ state_class: AUTHORITATIVE
 role: engineer
 depends_on:
 - DAEO-g0ip
+- DAEO-7rr2
 allowed_paths:
 - src/gov/testcache/**
 - src/gov/close/cache*

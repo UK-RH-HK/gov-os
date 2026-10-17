@@ -1,7 +1,7 @@
 ---
 id: DAEO-nn1s
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-swdu, DAEO-b926, DAEO-60rw, DAEO-wbdh, DAEO-0pyc, DAEO-lrre, DAEO-yadm, DAEO-2keg, DAEO-w19l, DAEO-6n5k, DAEO-g23i, DAEO-wudw, DAEO-6ox0, DAEO-s694, DAEO-fau3, DAEO-u5g6, DAEO-zndm, DAEO-neam]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-0mab, DAEO-btt7, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e, DAEO-2ds6, DAEO-h4rh, DAEO-csj8, DAEO-swdu, DAEO-b926, DAEO-60rw, DAEO-wbdh, DAEO-0pyc, DAEO-lrre, DAEO-yadm, DAEO-2keg, DAEO-w19l, DAEO-6n5k, DAEO-g23i, DAEO-wudw, DAEO-6ox0, DAEO-s694, DAEO-fau3, DAEO-u5g6, DAEO-zndm, DAEO-neam, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:12Z
 type: task
@@ -64,6 +64,7 @@ depends_on:
 - DAEO-u5g6
 - DAEO-zndm
 - DAEO-neam
+- DAEO-7rr2
 allowed_paths:
 - docs/plan/wave-2-exit/**
 kpis:
