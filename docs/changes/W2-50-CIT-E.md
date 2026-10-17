@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752]
+decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752, DEC-758]
 state_class: EVIDENCE
 ---
 
@@ -34,6 +34,8 @@ R7 scoped to the root, R2's launcher step, §6.1 (i), the own folder open only w
 | `86aa805c` | engineer | The repair round (§6): a project inside the own folder, plain folder names, one folder per ticket |
 | `e58081be` | independent-test-designer | 25 acceptance cases for the last review's findings (`tests/acceptance/W2-50/test_w2_50_last_review.py`, DEC-751), 15 red; 80 earlier cases made the folder by a launch (DEC-491) |
 | `df5f1e50` | engineer | The repair round after the last review (§7): the own folder's repository marker, links inside the scanned project |
+| `ef7c1835` | independent-test-designer | 72 acceptance cases for the extra review's findings F1 and F2 (`tests/acceptance/W2-50/test_w2_50_extra_review.py`, DEC-758), 38 red |
+| `83b0f2f4` | engineer | The last round (§9): a copy into a folder judged file by file, no own folder for a project under the root |
 
 Every commit carries `Task: DAEO-kl5e` and `Implements: DEC-728`. The files changed by `91200c82` are all in the
 ticket's `allowed_paths`, as DEC-743 left them: `src/gov/guard/runs.py` (new), `src/gov/guard/decide.py`,
@@ -408,8 +410,9 @@ passed. The findings the new tests hold (the README's section "The last review's
     exist yet, or that no launch of this repository made, gives nothing. The orchestrator, which is not launched, can
     write in a ticket's folder only once that ticket has been launched. DEC-751 1; tested.
 15. **The marker is refused to its own session in the guard, not in the sandbox.** The guard refuses Write, Edit and
-    every judged Bash form on the marker; the sandbox's write list still holds the whole folder, so a command whose
-    target the guard cannot see could change it. A session that does so closes or hands over its own folder only,
+    every judged Bash form on the marker (*corrected in §9: until DEC-758 a copy, install or move into the own folder
+    that landed on the marker was not refused, row W2-L349; since the last round it is*); the sandbox's write list
+    still holds the whole folder, so a command whose target the guard cannot see could change it. A session that does so closes or hands over its own folder only,
     never opens another's. No source asks for it; it costs one comparison.
 
 **Difference 10 is closed.** A clone under the root now has its own check over its own store and over links that stay
@@ -503,3 +506,128 @@ commit, not yet in this worktree's register).
 Neither fail record is committed: both stay uncommitted drafts by DEC-752 item 2, and a further independent review of
 the repaired change follows this record; its pass record, if it passes, is the only probe record committed under
 `docs/probes/DAEO-kl5e/`.
+
+## 9. The last round, after the extra review (DEC-758)
+
+An extra independent review of the repaired change found two more behaviours missing. The owner decided them on
+2026-10-17 (DEC-758 item 1; staged for the owner's commit, not yet in this worktree's register) and allowed this
+round as the last. The test designer added them as `tests/acceptance/W2-50/test_w2_50_extra_review.py` at
+`ef7c1835`, tests added after implementation (DEC-136): 72 cases. The suite at `ef7c1835`: 38 failed, 267 passed, every
+failure in the new file (the README's section "The extra review's findings"). The findings the new tests hold:
+
+- **F1. A copy or install into a folder is judged as each file it writes.** `cp X d/`, `cp X d`, `install X d/`,
+  `cp -r s/. d/`, `cp a b d/` and the `-t` / `--target-directory` forms write `d/<name>`, and the call is refused,
+  with the guard's reason, when any such file is refused as a direct write: an entry already at that name that is a
+  symbolic link out of the allowed place, a hard link to a file elsewhere, or a link to a folder outside. Before the
+  repair the guard judged only the folder `d` (11 + 4 red in the own folder). This closes:
+  - **row W2-H056**, the older hole, for every ticket inside the repository: a copy into a folder of the role's paths
+    that lands on a link to the acceptance test (4 red);
+  - **row W2-L349**: a file named like the own folder's marker copied, installed or moved into the own folder (5
+    red), refused as the direct write onto the marker is.
+- **F2. A project whose real root is inside `~/gov-os-runs` gets no own folder.** Its sessions get nothing in any
+  folder under the root outside the project, whatever ticket they name (7 red), and its `gov launch` adds no folder
+  under the root to the sandbox's write list, makes none and writes nothing there (7 red).
+
+A FIFO in the marker's place is row W2-L350, not this round's work.
+
+### What the repair changed, file by file
+
+- **`src/gov/guard/runs.py`** (F2) — `folder(...)`, and so `own_folder(...)`, gives `None` when the project's real
+  root (`os.path.realpath`) is the root or lies under it. The project's path is resolved, so a project reached
+  through a link outside the root is caught too. The interface is unchanged.
+- **`src/gov/launch/launcher.py`** — not changed. The launcher makes and adds only what `runs.folder` and
+  `runs.own_folder` give, so F2's launcher half follows from the module: no folder is made or marked, and the write
+  list holds the temp folder only.
+- **`src/gov/guard/decide.py`** (F1), in the Bash target reading:
+  - `_paths(raw)`: the expansion half of `_resolve` (variables, `~`, globs, `/dev/null`, the working folder), giving
+    the absolute paths as written and not resolved. `_resolve` now calls it; what it gives is unchanged.
+  - `_into(dest, sources, itself=..., merge=...)`: a copy, install or move of the sources into the folder `dest`. When
+    `dest` is a folder that exists (a `-t` folder whether or not it exists), each source gives `<dest>/<name of the
+    source as written>`; a source written `s/.`, `s/..` or `/` gives each entry of `s` in `dest`. A destination whose
+    kind cannot be told (an error other than "not there") and a source that cannot be resolved are refused.
+  - `_land(src, dst)`: judges `dst` by its real path, as a direct write is judged, so a link out, a link to another
+    ticket's folder, the marker and a hard link (R8, in the own folder) are refused as they are for Write. When `src`
+    is a folder and `dst` a folder that exists, each entry of `src` in `dst` is judged too, and so on down.
+  - `_copies(args, operands, dirs)`: for `cp`, `install` and `mv`, each `-t` folder, and the last operand (every
+    operand but the first after an option written after an operand, as before). `-T` / `--no-target-directory`
+    (`merge`): a source folder's entries land in the destination itself.
+  - Every target judged before is still judged: the new targets are added to them, so no call that was refused before
+    is allowed now. `_MOST_LANDED = 10000`: a copy judged as more paths than that is refused.
+- **`tests/unit/guard/test_runs.py`**, **`tests/unit/launch/test_runs.py`** — builder tests, regression evidence
+  only: eight copy forms (`cp X d/`, `cp X d`, `install`, `cp -r s/. d/`, several sources, `mv`, `cp -rT`, `cp -t`)
+  × a link out, a hard link, the marker, each refused, and the same into a clean folder allowed; a folder below a
+  folder already there; the path limit; a project under the root with no folder, keeping its own writes; a launch
+  from a project under the root that makes and adds nothing.
+- **Not changed:** `src/gov/launch/launcher.py`, `src/gov/secrets/__init__.py`,
+  `template/governance/kernel/checks/secrets-indexing.yaml`, every acceptance test.
+
+### The interface as changed
+
+- **A copy, install or move into a folder** is judged as the folder (as before) and as each file it writes in it,
+  `<folder>/<name>`, by that file's real path and under the same link and hard-link rule as a Write on it, and below
+  where a folder of the same name is already there. The refusal is the guard's own: "Bash write to '<path>' denied for
+  role '<role>'", naming the file's resolved path.
+- **A project whose real root lies in `~/gov-os-runs`** has no own folder: in the guard every path under the root
+  outside the project is refused to its sessions; in the launcher nothing is made, marked or added there. Its
+  in-project rules are unchanged.
+
+### New differences from the CIT-P
+
+16. **`mv` into a folder is judged the same way.** DEC-758 names copies and installs; the marker case of the tests
+    moves a file, and a move into a folder writes `<folder>/<name>` as a copy does. Stricter only.
+17. **The walk goes down only where the destination already has a folder.** Files a recursive copy makes inside a
+    folder that is not there yet are judged by that folder's own path, which is judged; nothing below it exists that
+    could lead out. A ticket pattern that holds a folder but not the files in it (`src/app/*`) is therefore judged at
+    the copy's first new level only, as before this round. Reason: the cost of a walk of the whole source; no test
+    asks more.
+18. **Doubt refuses.** A destination whose kind cannot be told, a source that cannot be resolved (an unknown
+    variable, a glob with no match), a `-t` source written as a folder's contents, and a copy of more than 10 000
+    paths are refused. The first three were allowed before when the destination alone was allowed; DEC-758 and the
+    brief ask that doubt refuse.
+19. **`-T` is read wherever a `T` stands in a cluster of short options.** A suffix such as `-S.T` is read as `-T`
+    too; the call is then judged both ways, never fewer.
+
+**Difference 15's text is corrected** (§7): it said every judged Bash form on the marker was refused, which did not
+hold for a copy, install or move into the own folder (W2-L349). It holds as written since this round.
+
+### Verification of the last round
+
+At `83b0f2f4`'s tree, each run with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-50/src` (DEC-732), in the
+foreground, never with `-x`; `gov.__file__` is `/home/usain/gov-os-worktrees/W2-50/src/gov/__init__.py`:
+
+| Run | Result |
+|---|---|
+| `tests/acceptance/W2-50` | **305 passed** (38 failed, 267 passed at `ef7c1835`) |
+| W1-02 (incl. `test_decision_p95_is_under_100_ms`) | 3653 passed |
+| W1-03 | 363 passed, 1 skipped (the interpreter finds `gov` without `PYTHONPATH`) |
+| W1-04 | 336 passed |
+| W1-05 (incl. `test_a_call_waits_under_100_ms_p95_for_the_hook`) | 99 passed |
+| W1-15 | 124 passed |
+| W1-16 | 167 passed |
+| W1-28 | 151 passed |
+| W1-30 | 512 passed |
+| W1-32 | 81 passed |
+| W1-38 | 201 passed |
+| W1-46, `-m "not local_only"` | 457 passed, 36 deselected |
+| W1-48 | 172 passed |
+| W1-50, `-m "not local_only"` | 683 passed, 2 deselected |
+| Builder tests `tests/unit` | **2159 passed, 1 skipped** |
+
+The latency cases passed as part of their suites, with the machine under load from other sessions. The
+`local_only` live-launch cases were not run, as in §3; the real `~/gov-os-runs` still does not exist.
+
+### Size of the last round
+
+`git show --shortstat 83b0f2f4`: 4 files, 211 insertions, 19 deletions.
+
+| Part | Added | Removed |
+|---|---|---|
+| `src/gov/guard/decide.py` | 103 | 18 |
+| `src/gov/guard/runs.py` | 6 | 1 |
+| **Code** | **109** | **19** |
+| `tests/unit/guard/test_runs.py` | 73 | 0 |
+| `tests/unit/launch/test_runs.py` | 29 | 0 |
+| **Builder tests** | **102** | **0** |
+
+The code is 90 lines net, about a third of them docstrings and comments. With the earlier rounds the change's code
+is 341 lines added and 50 removed, 291 net, above the estimate of 120 LOC (`est_loc`) by 171 lines.
