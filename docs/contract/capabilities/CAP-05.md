@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-05: Emergency controls (pause/freeze/cancel/rollback)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can freeze all agent writes with one command and resume them, and roll back by `git revert`.
 - **Acceptance:** After `gov pause`, the next Edit/Write/Bash write by any role is denied by the guard, and `git status --porcelain` is unchanged; `gov pause --off` restores writes.

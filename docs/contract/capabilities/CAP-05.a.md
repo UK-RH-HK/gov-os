@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-05.a: PAUSE and FREEZE_WRITES (gov pause)
 
-A covers item of CAP-05 (Emergency controls (pause/freeze/cancel/rollback)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-05 (Emergency controls (pause/freeze/cancel/rollback)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** PAUSE and FREEZE_WRITES (gov pause)
 - **Wave:** W1

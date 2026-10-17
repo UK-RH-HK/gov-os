@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-48: Framework health SLOs and healthy-repo definition
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can see the Gov OS's health against SLOs.
 - **Acceptance:** `gov health` shows index freshness, test status and governance share as G/Y/R against configured SLOs.

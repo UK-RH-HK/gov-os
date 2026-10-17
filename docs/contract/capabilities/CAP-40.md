@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-40: Execution telemetry and organisational questions
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can see tokens, model, cost and outcome per ticket.
 - **Acceptance:** Each closed ticket has a telemetry record with fresh input/output tokens, cache reads, model, governance tokens and pass/fail.

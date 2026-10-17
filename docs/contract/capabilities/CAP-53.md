@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-53: Proportionality profiles (LITE/STANDARD/FULL)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner gets ceremony in proportion to impact: LITE, STANDARD or FULL.
 - **Acceptance:** An R0 change runs only the LITE checks and an R3 change raises the FULL gate and readiness rows, with the profile computed by `gov impact`.

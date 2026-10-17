@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-16.b: Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → bounded compilation
 
-A covers item of CAP-16 (Multi-batch, multi-hop, paginated retrieval). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-16 (Multi-batch, multi-hop, paginated retrieval). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Parallel facet retrieval → merge/filter → unresolved dependencies → sequential follow-up → bounded compilation
 - **Wave:** W1

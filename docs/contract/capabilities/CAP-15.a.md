@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-15.a: Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate
 
-A covers item of CAP-15 (Context packet compilation). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-15 (Context packet compilation). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Packet: mandatory inputs by id, version and sha256; authority block first; supplementary block separate
 - **Wave:** W1
