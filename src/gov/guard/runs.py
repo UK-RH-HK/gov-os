@@ -125,9 +125,14 @@ def own_folder(project_root: str, ticket_id: str | None, role: str | None) -> st
 def folder(project_root: str, ticket_id: str | None, role: str | None) -> str | None:
     """The path the session's own folder has under the root, or ``None``: an unknown role or ticket, a ticket that
     is not ``in_progress`` (DEC-743 6), a name that is not a plain folder name or that another ticket gives too, a
-    folder that holds the project or lies in it, or a root that is a link."""
+    folder that holds the project or lies in it, a project whose real root lies in the root (DEC-758 1), or a root
+    that is a link."""
     base = root()
     if role not in ROLES or not ticket_id or base is None or os.path.islink(base):
+        return None
+    # DEC-758 1 (F2): a project under the root, however reached, gets no folder there.
+    real = os.path.realpath(project_root)
+    if real == base or real.startswith(base + os.sep):
         return None
     from gov.guard.decide import _load_ticket
     ticket = _load_ticket(project_root, ticket_id)

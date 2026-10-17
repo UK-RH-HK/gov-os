@@ -52,6 +52,9 @@ _PUNCT = frozenset("();<>|&\n")
 _WRITE_CMDS = frozenset({"touch", "rm", "mv", "cp", "mkdir"})
 _ASSIGN_RE = re.compile(r"^[A-Za-z_]\w*=")
 _UNRESOLVABLE = "/<guard-unresolvable>"
+# DEC-758 1: the most paths a copy into a folder is judged as; beyond, the
+# call is not known to be free of what is refused.
+_MOST_LANDED = 10000
 
 
 # -- frontmatter --------------------------------------------------------------
@@ -367,31 +370,111 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     link_dests = 0                # how many of *targets* are their destinations
     hard_sources: list[str] = []  # the files a hard link gives a second name
 
+    def _paths(raw: str) -> list[str] | None:
+        """Expand and glob-expand *raw* into absolute paths, not resolved:
+        ``[]`` for /dev/null, ``None`` when it is unresolvable."""
+        exp = _expand_token(raw)
+        if exp is None or '{' in exp or '}' in exp:
+            return None
+        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
+            return []
+        if not os.path.isabs(exp) and not ecwd_ok:
+            return None
+        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+        if _has_glob(exp):
+            return glob.glob(p) or None
+        return [p]
+
     def _resolve(raw: str, targets: list[str] = targets) -> None:
         """Expand, glob-expand and resolve *raw* into *targets*."""
-        exp = _expand_token(raw)
-        if exp is None:
+        found = _paths(raw)
+        if found is None:
             targets.append(_UNRESOLVABLE)
-            return
-        if '{' in exp or '}' in exp:
-            targets.append(_UNRESOLVABLE)
-            return
-        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
-            return
-        if not os.path.isabs(exp) and not ecwd_ok:
-            targets.append(_UNRESOLVABLE)
-            return
-        if _has_glob(exp):
-            pat = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
-            matches = glob.glob(pat)
-            if not matches:
+        else:
+            targets.extend(os.path.realpath(p) for p in found)
+
+    def _land(src: str, dst: str) -> None:
+        """DEC-758 1: *src* copied to *dst* writes *dst*; when both are
+        folders that exist, each entry of *src* in *dst* too, and so on."""
+        pending = [(src, dst)]
+        while pending:
+            src, dst = pending.pop()
+            real = os.path.realpath(dst)
+            targets.append(real)
+            if len(targets) > _MOST_LANDED:
                 targets.append(_UNRESOLVABLE)
                 return
-            for m in matches:
-                targets.append(os.path.realpath(m))
+            try:
+                if not (os.path.isdir(src)
+                        and stat.S_ISDIR(os.stat(real).st_mode)):
+                    continue
+                names = os.listdir(src)
+            except (FileNotFoundError, NotADirectoryError):
+                continue
+            except OSError:
+                targets.append(_UNRESOLVABLE)
+                return
+            pending.extend((os.path.join(src, n), os.path.join(real, n))
+                           for n in names)
+
+    def _into(dest: str, sources: list[str], *, itself: bool,
+              merge: bool) -> None:
+        """DEC-758 1: a copy, install or move of *sources* into the folder
+        *dest* is judged as each file it writes there, as a direct write
+        would be: ``<dest>/<name of the source>``, and each entry of a
+        source written ``s/.`` (and, when *merge*, of every source).
+
+        *itself*: *dest* is the last operand, judged itself, and a folder
+        only when one is there; otherwise it is a ``-t`` folder.
+        """
+        found = _paths(dest)
+        if found is None:
+            targets.append(_UNRESOLVABLE)
             return
-        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
-        targets.append(os.path.realpath(p))
+        for d in found:
+            real = os.path.realpath(d)
+            if itself:
+                targets.append(real)
+                try:
+                    if not stat.S_ISDIR(os.stat(real).st_mode):
+                        continue
+                except (FileNotFoundError, NotADirectoryError):
+                    continue
+                except OSError:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+            for raw in sources:
+                got = _paths(raw)
+                if got is None:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+                for src in got:
+                    base = os.path.basename(src.rstrip("/"))
+                    contents = base in ("", ".", "..")
+                    if contents and not itself:
+                        targets.append(_UNRESOLVABLE)
+                        continue
+                    if not contents:
+                        _land(src, os.path.join(real, base))
+                    if contents or merge:
+                        _land(src, real)
+
+    def _copies(args: list[str], nf: list[str], dirs: list[str]) -> None:
+        """DEC-758 1: the folders a ``cp``, ``install`` or ``mv`` call writes
+        into, beside the targets judged before: each ``-t`` folder, and each
+        operand that may be the destination."""
+        short = "".join(a for a in args
+                        if a.startswith("-") and not a.startswith("--"))
+        # -T, --no-target-directory: a source folder's entries land in the
+        # destination itself.
+        merge = "T" in short or any(a.startswith("--no-t") for a in args)
+        for d in dirs:
+            _into(d, nf, itself=False, merge=merge)
+        if not dirs and len(nf) >= 2:
+            last = (range(1, len(nf)) if _option_after_operand(args)
+                    else (len(nf) - 1,))
+            for i in last:
+                _into(nf[i], nf[:i] + nf[i + 1:], itself=True, merge=merge)
 
     # Split on non-redirect punctuation into simple commands.
     # A punctuation token containing '>' stays with its command (redirect).
@@ -521,6 +604,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 continue
             for a in parsed[0] + parsed[1]:
                 _resolve(a)
+            _copies(args, *parsed)
             continue
         if name in ("cp", "install"):
             parsed = _cp_operands(args)
@@ -556,6 +640,7 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 # earlier operand, so every operand but the first is judged.
                 for a in (nf[1:] if _option_after_operand(args) else nf[-1:]):
                     _resolve(a)
+            _copies(args, nf, dirs)
             continue
         if name == "ln":
             # DEC-311: the destination of a symbolic or a hard link is a

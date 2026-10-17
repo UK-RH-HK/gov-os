@@ -146,6 +146,79 @@ def test_a_hard_link_in_the_own_folder_is_refused(box, tmp_path):
     assert _decide(box[1], "Bash", f"echo x > {own / 'hard.txt'}") == "deny"
 
 
+@pytest.mark.parametrize("command", ("cp {src}/f.py {d}/", "cp {src}/f.py {d}", "install {src}/f.py {d}/",
+                                     "cp -r {src}/. {d}/", "cp {src}/g.py {src}/f.py {d}/", "mv {src}/f.py {d}/",
+                                     "cp -rT {src} {d}", "cp -t {d} {src}/f.py"))
+@pytest.mark.parametrize("entry", ("link", "hard", "marker"))
+def test_a_copy_into_a_folder_is_judged_as_each_file_it_writes(box, tmp_path, command, entry):
+    """DEC-758 1 (F1): the file a copy writes in the folder, refused as the direct write on it is."""
+    home, project = box
+    own = home / runs.ROOT_NAME / "W2-90"
+    runs.make(str(own), str(project))
+    src, outside = own / "src", tmp_path / "outside.txt"  # in the own folder: mv judges its source too
+    src.mkdir()
+    outside.write_text("x", encoding="utf-8")
+    name = runs.MARKER if entry == "marker" else "f.py"
+    for each in (name, "g.py"):
+        (src / each).write_text("y", encoding="utf-8")
+    command = command.replace("f.py", name)
+    d = own if entry == "marker" else own / "d"
+    d.mkdir(exist_ok=True)
+    if entry == "link":
+        (d / name).symlink_to(outside)
+    elif entry == "hard":
+        os.link(outside, d / name)
+    assert _decide(project, "Write", d / name) == "deny"
+    assert _decide(project, "Bash", command.format(src=src, d=d)) == "deny"
+    clean = own / "clean"
+    clean.mkdir()
+    assert _decide(project, "Bash", command.format(src=src, d=clean)) == "allow"
+
+
+def test_a_copy_into_a_folder_below_a_folder_already_there_is_judged_too(box, tmp_path):
+    home, project = box
+    own = home / runs.ROOT_NAME / "W2-90"
+    runs.make(str(own), str(project))
+    (tmp_path / "s" / "sub").mkdir(parents=True)
+    (tmp_path / "s" / "sub" / "f.py").write_text("y", encoding="utf-8")
+    (tmp_path / "outside.txt").write_text("x", encoding="utf-8")
+    (own / "d" / "s" / "sub").mkdir(parents=True)
+    (own / "d" / "s" / "sub" / "f.py").symlink_to(tmp_path / "outside.txt")
+    assert _decide(project, "Bash", f"cp -r {tmp_path / 's'} {own / 'd'}/") == "deny"
+    assert _decide(project, "Bash", f"cp -r {tmp_path / 's'} {own / 'e'}/") == "allow"
+
+
+def test_a_copy_of_more_entries_than_the_guard_judges_is_refused(box, tmp_path, monkeypatch):
+    from gov.guard import decide as module
+    home, project = box
+    own = home / runs.ROOT_NAME / "W2-90"
+    runs.make(str(own), str(project))
+    (tmp_path / "s").mkdir()
+    for i in range(5):
+        (tmp_path / "s" / f"f{i}.py").write_text("y", encoding="utf-8")
+    (own / "d").mkdir()
+    monkeypatch.setattr(module, "_MOST_LANDED", 3)
+    assert _decide(project, "Bash", f"cp -r {tmp_path / 's'}/. {own / 'd'}/") == "deny"
+
+
+@pytest.mark.parametrize("ticket", ("TST-a001", "TST-a002"))
+def test_a_project_under_the_root_gets_no_folder(box, ticket):
+    """DEC-758 1 (F2): wherever under the root the project lies, it has no own folder there."""
+    home, project = box
+    root = home / runs.ROOT_NAME
+    runs.make(str(root / "W2-90"), str(project))
+    runs.make(str(root / "TST-a002"), str(project))
+    clone = root / "W2-90" / "clone"
+    (clone / ".tickets").mkdir(parents=True)
+    (clone / ".git").mkdir()
+    for tk, ref in (("TST-a001", "W2-90"), ("TST-a002", None)):
+        (clone / ".tickets" / f"{tk}.md").write_text(_ticket(tk, ref=ref), encoding="utf-8")
+    assert runs.folder(str(clone), ticket, "engineer") is None
+    assert _decide(clone, "Write", root / "TST-a002" / "f.txt", ticket=ticket) == "deny"
+    assert _decide(clone, "Write", clone / "src" / "f.py", ticket=ticket) == "allow"
+    assert _decide(project, "Write", root / "TST-a002" / "f.txt", ticket="TST-a002") == "allow"
+
+
 def test_rmdir_is_judged_for_the_root_only(box):
     home, project = box
     root = home / runs.ROOT_NAME

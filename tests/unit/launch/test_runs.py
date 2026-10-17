@@ -88,6 +88,35 @@ def test_a_name_two_tickets_give_is_neither_made_nor_added(started, tmp_path):
     assert not os.path.lexists(started.root / "W2-90")
 
 
+def test_a_project_under_the_root_gets_no_folder_made_or_added(tmp_path, monkeypatch):
+    """DEC-758 1 (F2): a launch from a project in the root makes nothing there and adds only its temp folder."""
+    home, temp = tmp_path / "home", tmp_path / "temp"
+    project = home / runs.ROOT_NAME / "TST-a002" / "clone"
+    for folder in (home / ".local" / "bin", temp, project / ".tickets", project / ".git"):
+        folder.mkdir(parents=True)
+    (home / launcher.CLI_REL).write_text("", encoding="utf-8")
+    (project / ".tickets" / "TST-a001.md").write_text(TICKET, encoding="utf-8")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setattr(launcher.tempfile, "tempdir", str(temp))
+    monkeypatch.setattr(launcher, "_check_repository_settings", lambda *args: None)
+    found = {}
+
+    class Session:
+        def __init__(self, argv, cwd, env):
+            found["allow"] = json.loads(argv[argv.index("--settings") + 1])["sandbox"]["filesystem"]["allowWrite"]
+
+        def wait(self):
+            return 0
+
+        def poll(self):
+            return 0
+
+    monkeypatch.setattr(launcher.subprocess, "Popen", Session)
+    assert launcher.launch(project, "engineer", "TST-a001", []) == 0
+    assert len(found["allow"]) == 1 and runs.ROOT_NAME not in found["allow"][0]
+    assert sorted(os.listdir(home / runs.ROOT_NAME)) == ["TST-a002"]
+
+
 def test_an_own_folder_that_is_a_link_is_not_opened(started, tmp_path):
     (tmp_path / "elsewhere").mkdir()
     started.root.mkdir()
