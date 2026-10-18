@@ -24,6 +24,7 @@ allowed_paths:
 - tests/unit/check/test_schema_audit_report*
 - docs/changes/W2-54-CIT-E.md
 - src/gov/retrieval/semantic.py
+- src/gov/retrieval/ollama.py
 - tests/unit/retrieval/**
 kpis:
   success:
@@ -31,6 +32,8 @@ kpis:
   - "The same text always gets the same query vector, whatever was embedded before it: query vectors are stored, keyed by the model, the model's revision and the exact text, and a stored vector is used whenever its key matches; whether an embedder setting (thread count, seed) also removes the variation is measured first and recorded in the change record [owner, 2026-10-18, P-W2-30 (a)]."
   - "The query-vector cache is the one file a read command writes: a derived file under .gov-runtime/, keyed by model, model revision and a hash of the exact text, written atomically and safely by several sessions at once, bounded in size, and rebuildable from nothing [owner, 2026-10-18, P-W2-32 (a)]."
   - "Where the cache cannot be written (a sandboxed worker, whose .gov-runtime is read-only), the same text still gets the same vector; a test shows it inside a launched, sandboxed worker [owner, 2026-10-18, P-W2-32 (a)]."
+  - "On the shared GPU Ollama, the same text read many times, after different texts and by two sessions at once, gets one vector: query embeddings come from the CPU-only embedder on its own port, the shared runner is never moved to the CPU, and the cache key names the device [owner, 2026-10-19, P-W2-40 (b)]."
+  - "W1-21's hit@5 on the real models, with CPU query vectors against the GPU-built index, is at or above its pass line of 80; the figure is recorded in the change record [owner, 2026-10-19, P-W2-40 (b)]."
   - "W1-46's live cases launch their sessions with no CLAUDE* variable in the environment [owner, 2026-10-18, P-W2-34 (a)]."
   - "The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768]."
   - "`gov check` gives context-reproducibility green on `w2/integrate` [DEC-768]."
