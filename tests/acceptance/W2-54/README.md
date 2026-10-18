@@ -2,8 +2,9 @@
 
 Written before the implementation by the independent test designer (MR-3), from the ticket's KPI lines and its
 sources (DEC-768, DEC-626, DEC-441, DEC-565, CAP-33) and the decisions that apply (DEC-595, DEC-600, DEC-285,
-DEC-628, DEC-221, DEC-462, DEC-136, DEC-491, DEC-732). **50 cases in four files.** No private part of the code to
-be written was read; the cases reach the behaviour through public interfaces only.
+DEC-628, DEC-221, DEC-462, DEC-136, DEC-491, DEC-732). **50 cases in four files** in round 1; round 2 (the
+query vector, below) adds **15 cases in a fifth file**, `test_w2_54_query_vector.py`: **65 cases in five files.**
+No private part of the code to be written was read; the cases reach the behaviour through public interfaces only.
 
 Run (the project's test command, to its end):
 
@@ -158,3 +159,172 @@ has its limit and the run-as-declared case runs the check.
   `supplementary`. If `gov check` stays red here after the fix on such a ticket, that is a new finding.
 - **The stand-in's targeting** (`W254_TARGET`) reads the `ticket` keyword the context passes to the retrieval
   today. If the context stops passing it, the targeted failure case fails (it never passes falsely).
+
+---
+
+# Round 2: the query vector (owner, 2026-10-18, P-W2-30 (a))
+
+The owner widened the ticket for one more round (DEC-773, staged; the ticket cites it as "owner, 2026-10-18,
+P-W2-30 (a)"). Round 1's verification left context-reproducibility red on 14 tickets of this repository, with
+**different items** in the two computations: the embedder gives a text a slightly different vector when a
+different text was embedded just before it. The new KPI line (success 2):
+
+> The same text always gets the same query vector, whatever was embedded before it: query vectors are stored,
+> keyed by the model, the model's revision and the exact text, and a stored vector is used whenever its key
+> matches; whether an embedder setting (thread count, seed) also removes the variation is measured first and
+> recorded in the change record.
+
+Written by a fresh independent test designer before the implementation, from the KPI line, the owner's decision
+as the lead gave it, DEC-768, DEC-374, DEC-379, DEC-381, DEC-342, DEC-322, DEC-221, DEC-462, DEC-136, DEC-491 and
+DEC-732, and W1-19's suite (its interface table and how it stands in for Ollama). The round-1 cases are unchanged;
+no existing case was rewritten. The measurement of an embedder setting is the engineer's, recorded in the change
+record: no case judges it (the KPI line says it is measured, and the stored vectors are used whatever it shows).
+
+## What the cases state, and what they do not
+
+The cases state **what an answer is**: the hits of `gov.retrieval.semantic.search(root, q, refresh=False)`, their
+order and their `distance`; the bundle of `gov.retrieval.retrieve.retrieve(root, q)`; the packet and hash of
+`gov context --json`; the verdict of the context-reproducibility check run as its declaration says. They never
+state where a vector is kept, in what form, when it is written, or under what name; they name no part of the code
+to be written. "Stored" is seen only as its effect: an answer that does not change whatever was asked before it,
+across processes as well as within one.
+
+## The stand-in embedder (`w2_54_support.EmbedderStandIn`)
+
+Built in this suite's support file (no other suite's support is imported), after the manner of W1-19's: a loopback
+HTTP server at `OLLAMA_HOST` that answers `GET /api/version`, `GET /api/tags` (the model list: the pinned model with
+its digest, the model's revision, DEC-374), `POST /api/show`, `GET /api/ps`, `POST /api/embed` and
+`POST /api/embeddings`, with 1024 numbers made of the words of a text. What it adds:
+
+- **The measured variation.** A text embedded right after a *different* text gets
+  `unit(own + 0.35 × previous)`; right after itself (a repeat), or as the very first text, it gets its own vector.
+  This is the real embedder's shape as the owner's finding states it (the first embedding of a text after another
+  text differs from its repeats; repeats are stable). **Its size is exaggerated on purpose**: the measured
+  difference is up to 0.001948 in a component; 0.35 moves a question's nearest hits, so the variation shows in the
+  order of the hits and in a context's items, not only in a distance. The corpus of every fixture is embedded with
+  the variation off, so two projects built alike hold the same vectors.
+- **Targets.** A question can be sent to the words of one file of the corpus (`targets`), matched by the longest
+  key the text sent *ends with*, **character for character**: no case folding, no Unicode normalisation, no
+  stripping. The nearest hit then shows which vector a search used. (Today the facet sends
+  `Instruct: …\nQuery: <the question>` with the question exactly as given; the match by the end of the text needs
+  no knowledge of that prefix.)
+- **Another revision.** `digest` is what its model list reports; `OTHER_DIGEST` is another build of the same model.
+- **Failure.** `mode = "fail"`: every embedding request answers HTTP 500; `mode = "short"`: one vector fewer than
+  asked (none, for one question).
+- Every request is recorded: the texts sent to be embedded, in order, and the model each request names.
+
+**The model part of the key.** No public interface lets a case change the embedding model: the model is the pin of
+ADR-0002 §2, and selecting another is W2-32's (CAP-19, "swap by configuration"). The key's model part is held
+instead by (a) the revision case, since another build of the model under the same name is another key, and (b) that
+case's assertion that every request to be embedded names the pinned model (`qwen3-embedding:0.6b`), so every
+stored vector is one of that model's. When W2-32 makes the model configurable, a case for "another model, another
+vector" belongs to it.
+
+## The fixtures
+
+Temporary git repositories built from scratch (single named files of this worktree only: the path map and
+`template/.gitleaks.toml`), each with its own store, lexical index and vectors, built through the stand-in
+(`gov.retrieval.semantic.refresh`, then `gov.store.load`). The corpus is six notes, each about one subject with words
+no other note holds (bakery, tides, orchard, kiln, forge, apiary). The context fixture adds a charter and three
+tickets whose titles differ (`TK-W254-BAKERY`, `TK-W254-TIDES`, `TK-W254-ORCHARD`), so each ticket's context asks
+the retrieval its own question. (As seen at the stand-in, a context sends the embedder **the first word of the
+ticket's title**: `Sourdough`, `Harbour`, `Pear` here. In a first probe, three tickets whose titles all began with
+"the" sent `the` for every context, so the variation never showed and the check was green. Round 1's fixture gives
+its two tickets one title. No case depends on how the question is made from the ticket; the titles only begin with
+words of their own.) Every process gets the scratch environment of round 1 (empty `HOME`,
+this worktree's `src/` on `PYTHONPATH`, DEC-732), `OLLAMA_HOST` naming the stand-in, and a folder that links the one
+`sqlite_vec` package the Python that runs pytest imports (as W1-19's suite does).
+
+## The new KPI line and its cases
+
+| part of the KPI line | case | red today? | red reason (as seen at `5ac58b7a` plus this suite) |
+|---|---|---|---|
+| **1. one text, one vector, whatever was embedded before** (separate processes) | `test_one_question_asked_again_after_others_gives_the_same_answer_across_processes` | **red** | "answer 2 … differs from the first": kiln at 0.483027488 then 0.483027518, tides at 0.6696 then 0.7911 |
+| 1 (within one process) | `test_one_question_asked_again_after_others_gives_the_same_answer_within_one_process` | **red** | the same figures: answer 2 differs from the first |
+| 1 (the retrieval's public entry) | `test_the_retrieval_s_public_entry_gives_one_bundle_for_one_question_whatever_was_asked_before` | **red** | "one question, two bundles in one store (bundle 3)": the bundle asked in a later process holds the same six items with tides last instead of second |
+| **2. two computations of every ticket's context give one hash** | `test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet` | **red** | "TK-W254-BAKERY: 3 hashes in 3 computations in one store" |
+| 2 (the check, over several tickets) | `test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary` | **red** | the check exits 1: `FAIL: TK-W254-BAKERY: … != …` (and the two other tickets) |
+| **3. a stored vector is never taken for another key**: another revision; the same revision again | `test_a_stored_vector_is_not_used_under_another_revision_and_is_used_again_when_the_revision_matches` | **red** | its last part: with the first digest again the answer is not the first answer (kiln at 0.0561416708 against 0.0561417267, the second hit orchard at 0.885 in place of tides at 0.670); its other parts pass today |
+| 3: a text that differs in any character | `test_a_text_that_differs_in_any_character_gets_its_own_answer[case, spacing, trailing-newline, unicode-normal-form]` | pass | — |
+| **4. the first answer is unchanged** | `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it` | pass | — |
+| **5. nothing is left behind by a failed or partial call** | `test_a_failed_embedding_gives_no_hit_and_leaves_nothing_a_later_search_uses[fail, short]` | pass | — |
+| **6. one project's vectors are never another's** | `test_two_projects_do_not_share_query_vectors` | pass | — |
+| 1 with **the real embedder** | `test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before` | **red** (here) | answer 2 differs from the first: kiln at 0.36549 then 0.36438, orchard at 0.72068 then 0.72273 (the real variation) |
+
+**Count:** 15 cases (11 functions); 7 red today, 8 pass today.
+
+### The cases that pass today, and why they are here
+
+They hold what storing a vector could break; today nothing is stored, so each holds trivially, and each turns red
+under a store that gets the key wrong.
+
+- **Another spelling** (case, two spaces for one, the decomposed Unicode form of `café`, a trailing newline): the
+  embedder sends the question to the kiln and the other spelling to the forge. A key that folds case, collapses
+  spacing, normalises Unicode or strips the text would give the other spelling the kiln.
+- **Another revision**: under the other digest, the answer is the forge's (that build's vector), **or the facet is
+  unavailable with no hit**; never the kiln's. Unavailable is accepted because a mismatched model failing closed is
+  CAP-19's (Wave 2) and no source here decides it; a store keyed without the revision, or with the index's
+  revision instead of the one the model list reports now, gives the kiln. This part passes today; the case is red
+  for its last part.
+- **The first answer**: a question asked for the first time is sent to the embedder once, and answered with the
+  vector it returns (the orchard, which the question's own words do not lead to); two projects built and asked alike
+  give the same first answer, hit for hit and distance for distance.
+- **A failed or partial call** (HTTP 500; one vector fewer than asked): unavailable, no hit, as today; the next
+  search with a healthy embedder **asks the embedder again** and gets its vector. A store that kept anything from
+  the failed call (an empty or partial vector, a marker) would not ask again or would answer from it.
+- **Two projects**: the same model, revision and question, two stores, two embedders that answer differently: each
+  project gets its own embedder's answer; the second project's search changes no file of the first project's
+  runtime folder and writes nothing under `HOME` (a vector kept for every project, under `HOME`, would show there).
+
+## The real embedder
+
+`test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before` **needs the real embedder**
+(an `ollama` executable at `GOV_OLLAMA_BIN`, on `PATH` or at `~/.local/ollama/bin/ollama`, with
+`qwen3-embedding:0.6b` in Ollama's model folder), `sqlite_vec` and `gitleaks`, and **skips with the reason** when
+one is absent; nothing is started or installed to decide it. It runs in this machine's own environment (W1-19's
+`real_env` manner: `GOV_ROLE` and `GOV_TICKET` removed, this worktree's `src/`, the Hugging Face libraries held
+offline), so `gov` reaches this machine's Ollama (and, DEC-261, starts it and leaves it running if it is not). It
+embeds a fixture of six notes and asks the question, three other questions, and the question again, in separate
+processes and in one. **Here it ran and is red**: the real variation reproduced on the first repeat. Every other
+round-2 case runs against the stand-in only; the stand-in cases skip, with the reason, only where `gitleaks` or
+`sqlite_vec` is absent.
+
+## How long the new cases run
+
+`test_w2_54_query_vector.py` alone: **22 to 24 s** (61 s the first time, when the real-embedder case waited for
+Ollama to load the model). The stand-in is deterministic: two runs gave the same figures, hash for hash. Each stand-in case takes 2.5 to 6 s; the real-embedder case 7.7 s with the model
+loaded. The whole suite: about 9 minutes as before, plus about half a minute.
+
+## The tension with W1-19's "a search that may not write" (returned as a package)
+
+W1-19's interface table says a semantic search with `refresh=False` writes nothing (DEC-379: "`refresh=False` never
+writes"; DEC-342; DEC-322: only orchestrator-role sessions write the live store). The retrieval's public entry, and
+so `gov context` and the context check, search with `refresh=False`. The new line says query vectors are stored.
+These cases require the same answer across separate processes, through `refresh=False` searches, in an environment
+with no `GOV_ROLE`: so some search that may not write must leave something a later process reads. **No W1-19 case
+necessarily turns red**: `test_a_search_that_may_not_write_reports_a_missing_index_and_writes_nothing` (W1-19,
+`test_w1_19_unavailable.py`) asks a project with **no** index and requires that no `.gov-runtime/` appear; an
+implementation that stores a query vector only where an index exists keeps it green. But the decided text of
+DEC-379 and W1-19's README line do not hold together with the new line, and in a worker session the vector would be
+written into the live store against DEC-322. The designer's package (P-R2-1) is in the return; this suite does not
+settle it, and no case states where the vector is written.
+
+## Risks (round 2)
+
+- **The "green here" cases mean nothing on a stale store.** `gov check`'s context-reproducibility, and the
+  run-as-declared case, read this worktree's store. Any change to a tracked file after the lead's rebuild (this
+  round's own test files included) makes the lexical and semantic indexes `stale`; both facets are then unavailable,
+  the retrieval returns nothing, every context is the same twice, and the check is green **for that reason**. Seen
+  in this round: with this suite's files in the tree, `retrieve(DAEO-0rfi)` reports both facets `stale` and returns
+  0 items, the run-as-declared case passed in 31 s and `test_gov_check_gives_context_reproducibility_green_here`
+  passed, where round 1's verification saw 14 tickets red on a fresh store. They are only evidence after a full
+  rebuild at the commit under test.
+- **The stand-in's size of variation** is not the real one (0.35 against at most 0.002 a component). The cases do
+  not depend on the size, only on its shape (after another text, not on a repeat); the real-embedder case holds the
+  real size, where Ollama is present.
+- **The revision part needs the revision now**: a store that keys a vector by the revision the index was built with,
+  and not by what the model list reports at the time of the search, fails the revision case. That is the stricter
+  reading of "keyed by … the model's revision": a vector made by one build is never another build's.
+- **"The same answer" is exact**: equal distances as floats. A store that kept a vector at a lower precision than the
+  first answer used would make the first answer and the later ones differ (the first answer is the embedder's
+  vector, KPI part 4); keeping it exactly as the first search used it passes both.

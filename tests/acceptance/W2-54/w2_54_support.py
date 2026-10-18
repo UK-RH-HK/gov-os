@@ -22,12 +22,17 @@ How the tests run (README, "How the suite runs this worktree's code"):
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import os
+import re
 import shutil
+import socket
 import subprocess
 import sys
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 import yaml
@@ -497,3 +502,326 @@ def worktree_env():
     env = dict(os.environ)
     env["PYTHONPATH"] = str(SRC)
     return env
+
+
+# --------------------------------------------------------------------------
+# Round 2: the query vector (owner, 2026-10-18, P-W2-30 (a))
+# --------------------------------------------------------------------------
+#
+# The embedder is reached over HTTP at OLLAMA_HOST (Ollama's /api/tags and /api/embed). The stand-in below answers
+# that interface on a loopback port and behaves as the real embedder was measured to: a text embedded right after a
+# *different* text gets a slightly different vector; a text embedded right after itself gets its own vector again.
+# Everything is observed through the semantic facet's public search, the retrieval's public entry, `gov context`
+# and the context check; nothing names where or how a vector is kept.
+
+SEMANTIC_MODULE = "gov.retrieval.semantic"
+RETRIEVE_MODULE = "gov.retrieval.retrieve"
+EMBED_MODEL = "qwen3-embedding:0.6b"             # the pinned embedder (ADR-0002 §2); no public interface selects another
+EMBED_PIN = "ac6da0dfba84"                       # its pinned revision (DEC-374: the digest Ollama's model list reports)
+DIGEST = EMBED_PIN + hashlib.sha256(b"w2-54 stand-in embedder").hexdigest()[:52]
+OTHER_DIGEST = "5e" + hashlib.sha256(b"w2-54 another build of the embedder").hexdigest()[:62]
+DIMENSIONS = 1024
+DRIFT = 0.35   # how far a text's vector moves toward the text embedded just before it (the stand-in's variation)
+_STOP = {"the", "and", "for", "with", "that", "this", "each", "does", "when", "who", "what", "into", "from",
+         "its", "are", "was", "has", "have", "before", "after", "then", "any", "all", "given", "query",
+         "instruct", "retrieve", "relevant", "passages", "search", "web", "answer", "document"}
+
+
+def word_vector(text):
+    """A unit vector made of the words of ``text``: texts that share words are near each other."""
+    vector = [0.0] * DIMENSIONS
+    for word in re.findall(r"[a-z0-9]+", str(text).lower()):
+        if len(word) < 3 or word in _STOP:
+            continue
+        digest = hashlib.sha256(word.encode()).digest()
+        vector[int.from_bytes(digest[:4], "big") % DIMENSIONS] += 1.0 if digest[4] % 2 else -1.0
+    norm = sum(value * value for value in vector) ** 0.5
+    if norm == 0.0:
+        vector[0], norm = 1.0, 1.0
+    return [value / norm for value in vector]
+
+
+def _unit(vector):
+    norm = sum(value * value for value in vector) ** 0.5 or 1.0
+    return [value / norm for value in vector]
+
+
+class EmbedderStandIn:
+    """A loopback Ollama endpoint whose vectors depend on what was embedded just before (the measured variation).
+
+    - ``digest`` is what its model list (``GET /api/tags``) reports for the pinned model: the model's revision.
+    - ``targets`` maps an exact text to another text whose words make its vector. A text sent to be embedded is
+      matched by the longest key it *ends with*, compared character for character (no case folding, no Unicode
+      normalisation, no stripping), so each spelling of a question can be sent to its own place in the corpus.
+    - ``drift``: a text embedded right after a different text gets ``unit(own + drift * previous)``; right after
+      itself (a repeat), or as the very first text, it gets ``own``. The order is the order of the texts within a
+      request and across requests.
+    - ``mode``: ``healthy``; ``fail`` (every embedding request answers HTTP 500); ``short`` (an embedding request
+      answers with one vector fewer than it was asked for).
+
+    Every request is recorded: ``embedded()`` lists the texts sent to be embedded, in order.
+    """
+
+    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT):
+        self.digest, self.targets, self.drift, self.mode = digest, dict(targets or {}), drift, "healthy"
+        self.requests, self.previous = [], None
+        stand_in = self
+
+        class Handler(BaseHTTPRequestHandler):
+            def answer(self):
+                length = int(self.headers.get("Content-Length") or 0)
+                body = self.rfile.read(length).decode("utf-8") if length else ""
+                try:
+                    asked = json.loads(body) if body else {}
+                except ValueError:
+                    asked = {}
+                status, reply = stand_in.reply(self.command, self.path.split("?")[0].rstrip("/"), asked)
+                payload = json.dumps(reply).encode()
+                self.send_response(status)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+
+            do_GET = do_POST = do_HEAD = do_DELETE = answer
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.server.daemon_threads = True
+        self.host = f"127.0.0.1:{self.server.server_address[1]}"
+        threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True).start()
+        self._lock = threading.Lock()
+
+    def target(self, text):
+        keys = [key for key in self.targets if text.endswith(key)]
+        return self.targets[max(keys, key=len)] if keys else text
+
+    def vector(self, text):
+        own = word_vector(self.target(text))
+        previous, self.previous = self.previous, text
+        if previous is None or previous == text or not self.drift:
+            return own
+        before = word_vector(self.target(previous))
+        return _unit([a + self.drift * b for a, b in zip(own, before)])
+
+    def reply(self, method, route, asked):
+        with self._lock:
+            model = {"name": EMBED_MODEL, "model": EMBED_MODEL, "digest": self.digest, "size": 639150000,
+                     "details": {"family": "qwen3", "parameter_size": "595.78M", "quantization_level": "Q8_0"}}
+            if route in ("/api/embed", "/api/embeddings"):
+                given = asked.get("input", asked.get("prompt", ""))
+                texts = [given] if isinstance(given, str) else [str(text) for text in given]
+                self.requests.append({"route": route, "model": asked.get("model"), "texts": texts,
+                                      "mode": self.mode})
+                if self.mode == "fail":
+                    return 500, {"error": "the W2-54 stand-in embedder fails on purpose"}
+                vectors = [self.vector(text) for text in texts]
+                if self.mode == "short":
+                    vectors = vectors[:-1]
+                if route == "/api/embeddings":
+                    return 200, ({"embedding": vectors[0]} if vectors else {})
+                return 200, {"model": EMBED_MODEL, "embeddings": vectors, "total_duration": 1, "load_duration": 1,
+                             "prompt_eval_count": len(texts)}
+            self.requests.append({"route": route, "method": method})
+            if route == "/api/version":
+                return 200, {"version": "0.35.0"}
+            if route == "/api/tags":
+                return 200, {"models": [model]}
+            if route == "/api/ps":
+                return 200, {"models": []}
+            if route == "/api/show":
+                return 200, {"details": model["details"], "capabilities": ["embedding"],
+                             "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS}}
+            return 404, {}
+
+    def embedded(self):
+        """Every text sent to be embedded, in the order it was sent."""
+        return [text for request in self.requests if "texts" in request for text in request["texts"]]
+
+    def asked_for(self, question):
+        """How many texts sent to be embedded end with ``question`` exactly."""
+        return sum(1 for text in self.embedded() if text.endswith(question))
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+def vector_site(box):
+    """A folder holding one link, to the ``sqlite_vec`` package the Python that runs pytest imports (the scratch HOME
+    has no user site folder to find it in); None when this machine has none."""
+    spec = importlib.util.find_spec("sqlite_vec")
+    if spec is None or not spec.origin:
+        return None
+    origin = Path(spec.origin)
+    source = origin.parent if spec.submodule_search_locations else origin
+    site = box.workdir / "site"
+    site.mkdir(exist_ok=True)
+    link = site / source.name
+    if not link.is_symlink():
+        link.symlink_to(source, target_is_directory=source.is_dir())
+    return site
+
+
+def embed_env(box, endpoint):
+    """The scratch environment with the stand-in embedder at OLLAMA_HOST and ``sqlite_vec`` importable."""
+    site = vector_site(box)
+    return box.env(PYTHONPATH=os.pathsep.join([str(SRC), *([str(site)] if site else [])]),
+                   OLLAMA_HOST=endpoint.host if endpoint else f"127.0.0.1:{_dead_port()}")
+
+
+def _dead_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
+
+# A driver: the calls of one process, through the public functions, each answer printed as JSON.
+_DRIVER = r'''
+import json, sys
+from pathlib import Path
+import gov.retrieval.semantic as semantic
+import gov.retrieval.retrieve as entry
+
+root = Path(sys.argv[1])
+out = []
+for call in json.loads(sys.argv[2]):
+    if call[0] == "refresh":
+        out.append(semantic.refresh(root))
+    elif call[0] == "load":
+        import gov.store
+        gov.store.load(root)
+        out.append(None)
+    elif call[0] == "search":
+        out.append(semantic.search(root, call[1], refresh=False))
+    elif call[0] == "retrieve":
+        out.append(entry.retrieve(root, call[1]))
+print(json.dumps(out))
+'''
+
+
+def drive(box, project, endpoint, *calls):
+    """``calls`` (``("refresh",)``, ``("load",)``, ``("search", question)``, ``("retrieve", question)``) in one
+    new process, in that order; their answers."""
+    return drive_env(box, project, embed_env(box, endpoint), *calls, timeout=CALL_TIMEOUT_S)
+
+
+def ask(box, project, endpoint, question):
+    """The semantic facet's answer to ``question`` (``search(root, question, refresh=False)``) in a new process."""
+    return drive(box, project, endpoint, ("search", question))[0]
+
+
+def hits_of(answer):
+    """An answer as the hits it gives: chunk, path and distance, in order."""
+    return [(hit.get("chunk_id"), hit.get("path"), hit.get("distance")) for hit in answer.get("hits") or []]
+
+
+# The corpus of the query-vector cases: one file per subject, each with words no other file holds, so a vector
+# made of one file's words has that file's chunk nearest.
+SUBJECTS = {
+    "notes/bakery.md": "# Bakery\n\nSourdough loaves proof overnight in the cold room; the baker scores each loaf.\n",
+    "notes/tides.md": "# Tides\n\nThe harbour pilot reads the tide tables at dawn and logs the spring height.\n",
+    "notes/orchard.md": "# Orchard\n\nThe orchard keeper prunes the pear trees in February with bronze shears.\n",
+    "notes/kiln.md": "# Kiln\n\nThe potter fires the glazed bowls in the brick kiln on Thursdays.\n",
+    "notes/forge.md": "# Forge\n\nThe smith quenches the iron horseshoes in the forge trough at noon.\n",
+    "notes/apiary.md": "# Apiary\n\nThe beekeeper smokes the hives and lifts the honey frames in July.\n",
+}
+BAKERY, TIDES, ORCHARD, KILN, FORGE, APIARY = SUBJECTS
+
+
+def semantic_project(box, project, endpoint, files=None):
+    """A temporary project with its record store, its lexical index and its vectors, built through the stand-in
+    ``endpoint``. The corpus is embedded without the variation, so two projects built alike hold the same vectors;
+    the variation is on again for every question asked afterwards."""
+    project = new_repo(project)
+    adopt_embedded(project)
+    for rel, text in (files or SUBJECTS).items():
+        write(project, rel, text)
+    commit_all(project)
+    drift, endpoint.drift = endpoint.drift, 0.0
+    try:
+        report = drive(box, project, endpoint, ("refresh",), ("load",))[0]
+    finally:
+        endpoint.drift = drift
+    assert report.get("available") is True, f"the fixture's vectors were not built: {report}"
+    return project
+
+
+def home_files(box):
+    """Every file under the scratch HOME of the suite's processes."""
+    home = box.workdir / "home"
+    return sorted(path.relative_to(home).as_posix() for path in home.rglob("*") if path.is_file())
+
+
+# Tickets whose questions differ: each ticket's context asks the retrieval its own question.
+QUESTION_TICKETS = {
+    "TK-W254-BAKERY": "Sourdough loaf scoring by the baker",
+    "TK-W254-TIDES": "Harbour tide tables read by the pilot",
+    "TK-W254-ORCHARD": "Pear trees pruned by the keeper",
+}
+QUESTION_CHARTER = "CHARTER-W254-Q"
+
+
+def ticket_files():
+    """The corpus of the query-vector cases with a charter and three tickets, each with its own title."""
+    files = dict(SUBJECTS)
+    files["docs/charter/charter.md"] = record(QUESTION_CHARTER, "charter", "ACTIVE", "The charter of the project.")
+    for ticket_id, title in QUESTION_TICKETS.items():
+        files[f".tickets/{ticket_id}.md"] = ticket(ticket_id, title, [QUESTION_CHARTER])
+    return files
+
+
+# ---- the real embedder (this machine's Ollama), for the one case that uses it
+
+def real_embedder_lacking():
+    """Why this machine cannot run the real-embedder case; empty when it can. Nothing is started to decide it."""
+    lacking = []
+    if shutil.which("gitleaks") is None:
+        lacking.append("gitleaks is not on PATH")
+    if importlib.util.find_spec("sqlite_vec") is None:
+        lacking.append(f"sqlite_vec cannot be imported by {sys.executable}")
+    home = Path.home() / ".local/ollama/bin/ollama"
+    if not (os.environ.get("GOV_OLLAMA_BIN") or shutil.which("ollama") or home.is_file()):
+        lacking.append("no ollama executable (GOV_OLLAMA_BIN, PATH, ~/.local/ollama/bin/ollama)")
+    models = Path(os.environ.get("OLLAMA_MODELS") or Path.home() / ".ollama/models")
+    if not (models / "manifests/registry.ollama.ai/library/qwen3-embedding/0.6b").is_file():
+        lacking.append(f"the model {EMBED_MODEL} is not in Ollama's model folder")
+    return lacking
+
+
+def real_env(box):
+    """This machine's own environment (its Ollama), with this worktree's ``src/``; nothing may be downloaded."""
+    env = {key: value for key, value in os.environ.items() if key not in ("GOV_ROLE", "GOV_TICKET")}
+    env.update({"PYTHONPATH": str(SRC), "PYTHONPYCACHEPREFIX": str(box.workdir / "pycache"),
+                "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "GIT_CONFIG_NOSYSTEM": "1"})
+    return env
+
+
+def drive_env(box, project, env, *calls, timeout=600.0):
+    """As ``drive``, in the environment ``env``."""
+    done = run([sys.executable, "-c", _DRIVER, project, json.dumps(calls)], cwd=box.workdir / "elsewhere",
+               env=env, timeout=timeout)
+    assert done.returncode == 0, f"the public calls failed\n{done.describe()}"
+    return json.loads(done.stdout.strip().splitlines()[-1])
+
+
+def adopt_embedded(project):
+    """The project's path map, as ``adopt`` writes it, with the ``docs`` and ``notes`` namespaces embedded."""
+    document = yaml.safe_load((REPO_ROOT / PATH_MAP_REL).read_text(encoding="utf-8"))
+    keep = {key: document[key] for key in ("state_class", "capabilities", "policies", "systems") if key in document}
+    spaces = {"top": (["*"], "not embedded"), "docs": (["docs/**"], "embedded"), "notes": (["notes/**"], "embedded"),
+              "tickets": ([".tickets/**"], "not embedded")}
+    keep["namespaces"] = {name: {"paths": patterns, "memory_class": "governance", **_NAMESPACE_FIELDS,
+                                 "embedding_policy": policy} for name, (patterns, policy) in spaces.items()}
+    write(project, PATH_MAP_REL, yaml.safe_dump(keep, sort_keys=False))
+    shutil.copy2(REPO_ROOT / GITLEAKS_TEMPLATE_REL, Path(project) / ".gitleaks.toml")
+
+
+def runtime_digest(project):
+    """``relative path -> sha256`` of every file under the project's ``.gov-runtime/``."""
+    base = Path(project) / ".gov-runtime"
+    if not base.is_dir():
+        return {}
+    return {path.relative_to(base).as_posix(): sha256(path) for path in sorted(base.rglob("*")) if path.is_file()}

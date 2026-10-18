@@ -61,6 +61,16 @@ def _fresh_log(request):
     yield
 
 
+@pytest.fixture()
+def embedder():
+    """Round 2: the stand-in embedder, healthy, on its own loopback port (README, "The stand-in embedder")."""
+    stand_in = support.EmbedderStandIn()
+    try:
+        yield stand_in
+    finally:
+        stand_in.close()
+
+
 @pytest.fixture(scope="session")
 def gov_check_here(code_under_test):
     """One ``gov check --json`` in this worktree, against the store the lead built (about six minutes)."""
