@@ -82,11 +82,12 @@ def _checked(root: Path) -> Path:
 def _env(root: Path, tool: str) -> dict:
     """The environment of a start of the binary: the repository's home and the repository's daemon directory.
 
-    Both are set here whatever the caller's environment holds; the rest of that environment is passed on.
+    Both are set here whatever the caller's environment holds; the rest of that environment is passed on, less the
+    inherited ``GIT_*`` variables (``git_env``: the tool starts git in the project, AR-2).
     The tool's loopback UI is turned off in that home first (DEC-362).
     """
     root = _checked(root)
-    env = {**os.environ, "CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
+    env = {**git_env(root),"CBM_CACHE_DIR": str(home(root)), "CBM_RUNTIME_DIR": str(_daemon_dir(root))}
     # A daemon reads the setting of its home when it starts, and an index builds the home anew: set at every start.
     if subprocess.run([TOOL, "config", "set", "ui_enabled", "false"], capture_output=True, text=True,
                       stdin=subprocess.DEVNULL, env=env).returncode != 0:

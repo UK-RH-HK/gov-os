@@ -38,6 +38,9 @@ fetch behind the reader's back.
   by itself, so clearing it changes nothing. The git directory of `root` is asked of git with every `GIT_*`
   variable cleared and the configuration pinned. This happens only when a `GIT_INDEX_FILE` was inherited. With
   no `root`, nothing is kept.
+- `foreign_index(root, *, base=None) -> str | None` answers from the same rule: the inherited `GIT_INDEX_FILE`
+  as given when `git_env(root)` would not keep it, else None. The staged-secrets gate asks it and refuses on such
+  an index, naming it: the index being committed is never replaced by the default one (review F1, row 13).
 
 ## The calls
 
@@ -55,11 +58,11 @@ before this ticket. "Change" says what W2-05 did. A call in a file of another un
 | 6 | `src/gov/check/claims.py` | `_check_taxonomy_change`: `git diff HEAD~1 -- <dims>` | the project root | yes | `env=git_env(root)` |
 | 7 | `src/gov/check/pathmap.py` | `_git_ls_files`: `git ls-files -z` | the project root | yes | `env=git_env(root)` |
 | 8 | `src/gov/check/runner.py` | `_head`: `git rev-parse HEAD` (also `gov ci`'s head) | the project root | yes | `env=git_env(root)` |
-| 9 | `src/gov/check/runner.py` | `_run_command`: `sh -c <declared check>` (each declared check, which starts git itself) | the project root | yes | the check's environment is `git_env(root, base=...)` |
+| 9 | `src/gov/check/runner.py` | `_run_command`: `sh -c <declared check>` (each declared check, which starts git itself) | the project root | yes | the check's environment is `git_env(root)` |
 | 10 | `src/gov/check/runner.py` | `_check_skill_version`: `git diff HEAD~1 --name-only -- <vendor>` | the project root | yes | `env=git_env(root)` |
 | 11 | `src/gov/check/runner.py` | `_check_skill_version`: `git show HEAD~1:<rel>` | the project root | yes | `env=git_env(root)` |
 | 12 | `src/gov/checkpoint/record.py` | `_git`: `git -C <root> <args>` | the project root | yes | `env=git_env(root)` |
-| 13 | `src/gov/ci/command.py` | `_staged_secrets`: `gitleaks git --pre-commit --staged` (gitleaks starts `git diff --staged`), twice | the project root | yes (less `GITLEAKS_CONFIG`) | `git_env(root)`, less `GITLEAKS_CONFIG`: a planted index is cleared, git's own index of the commit is kept |
+| 13 | `src/gov/ci/command.py` | `_staged_secrets`: `gitleaks git --pre-commit --staged` (gitleaks starts `git diff --staged`), twice | the project root | yes (less `GITLEAKS_CONFIG`) | `git_env(root)`, less `GITLEAKS_CONFIG`: git's own index of the commit is kept. An inherited `GIT_INDEX_FILE` that is not git's own (`foreign_index(root)`) is refused, naming it, before gitleaks starts (review F1) |
 | 14 | `src/gov/ci/command.py` | `_git`: `git notes`, `git push` (`gov ci push`, `gov ci record`) | the project root | yes | `env=git_env(root)` |
 | 15 | `src/gov/closure/__init__.py` | `closure`: `git --no-optional-locks status --porcelain` | the project root | yes | `env=git_env(root)` |
 | 16 | `src/gov/codeintel/__init__.py` | `_checked`: `git rev-parse --show-toplevel` | the project root | yes | `env=git_env(root)` |
@@ -89,13 +92,17 @@ before this ticket. "Change" says what W2-05 did. A call in a file of another un
 | 40 | `src/gov/decisions/checker.py` | the `cat-file --batch` process of its batch reader (`__init__`) | the project root | as row 39 | after W2-03 merges |
 | 41 | `src/gov/store/loader.py` | `_git`: `git -C <root> <args>` (the record store) | the project root, or the check's temporary clone | yes | after W2-03 merges. In the retrieval check it is reached through row 28. |
 | 42 | `src/gov/guard/decide.py` | `_mirror_path`: `git -C <root> rev-parse --git-common-dir` (the guard hook's freeze look-up), by name, with no limit of its own (W2-L160) | the project root | yes | after W2-50 merges |
+| 43 | `src/gov/codeintel/__init__.py` | `_env`: `codebase-memory-mcp config set ui_enabled false` (the tool starts git in the project) | the project root | yes | `_env` builds on `git_env(root)` with `CBM_CACHE_DIR` and `CBM_RUNTIME_DIR` (review F2) |
+| 44 | `src/gov/codeintel/__init__.py` | `_tool`: `codebase-memory-mcp cli --quiet --json <tool> <args>` (`index_repository` among them) | the project root | yes | through row 43: `env=_env(root, tool)` |
+| 45 | `src/gov/codeintel/__init__.py` | `_Session.tool`: the `codebase-memory-mcp` server (`Popen`) | the project root | yes | through row 43: `env=_env(root, tool)` |
 
 Files that name git and start none: `src/gov/guard/protected.py` reads `git diff` and `git status` in a Bash
 command it judges, and starts nothing. `src/gov/secrets/__init__.py` (W2-50's) starts `gitleaks stdin`, which
-starts no git. `src/gov/launch/launcher.py` (W2-50's) starts the session, whose hooks are the rows above.
+starts no git. `src/gov/launch/launcher.py` (W2-50's) starts the session, whose hooks are the rows above. `src/gov/doctor/command.py` starts `codebase-memory-mcp`
+only to ask its version and does not build the code index; the code index's starts of the tool are rows 43 to 45.
 
-**Counts:** 42 calls listed. 31 changed by W2-05 (rows 1 to 31; row 37 changes through row 19 with its file
-untouched). 10 marked "after <W2 id> merges": rows 32 to 36 and 38 (W2-53), 39 to 41 (W2-03) and 42 (W2-50).
+**Counts:** 45 calls listed. 34 changed by W2-05 (rows 1 to 31 and 43 to 45; row 37 changes through row 19 with
+its file untouched). 10 marked "after <W2 id> merges": rows 32 to 36 and 38 (W2-53), 39 to 41 (W2-03) and 42 (W2-50).
 
 The test helpers outside `src/` (`tests/**/*support*.py`) build their own environments and are not Gov OS calls.
 The one test run the Gov OS starts is row 36.

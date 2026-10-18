@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from gov.util.gitenv import git_env
+from gov.util.gitenv import foreign_index, git_env
 
 CLEAN = {"PATH": "/usr/bin:/bin", "HOME": "/nonexistent", "LC_ALL": "C", "GIT_CONFIG_NOSYSTEM": "1",
          "GIT_CONFIG_GLOBAL": os.devnull, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.invalid",
@@ -107,6 +107,25 @@ def test_pinned_reads_no_global_or_xdg_configuration(repo, tmp_path):
     assert read(plain, "w2.home") == "yes" and read(plain, "w2.xdg") == "yes"
     pinned = git_env(repo, base=base, pinned=True)
     assert read(pinned, "w2.home") == "" and read(pinned, "w2.xdg") == ""
+
+
+def test_foreign_index_names_an_inherited_index_that_is_not_git_s_own(repo, decoy, tmp_path):
+    for value in (str(decoy / ".git" / "index"), str(tmp_path / "elsewhere" / "commit-index")):
+        assert foreign_index(repo, base={"PATH": "/usr/bin:/bin", "GIT_INDEX_FILE": value}) == value
+    assert foreign_index(tmp_path / "not-a-repo",
+                         base={"PATH": "/usr/bin:/bin", "GIT_INDEX_FILE": str(repo / ".git" / "index")}) is not None
+
+
+def test_foreign_index_is_none_for_git_s_own_index_or_none_inherited(repo, tmp_path):
+    for value in (str(repo / ".git" / "index.lock"), str(repo / ".git" / "next-index-1.lock")):
+        assert foreign_index(repo, base={"PATH": "/usr/bin:/bin", "GIT_INDEX_FILE": value}) is None
+    assert foreign_index(repo, base={"PATH": "/usr/bin:/bin", "GIT_DIR": str(tmp_path)}) is None
+    tree = tmp_path / "wt"
+    _git(repo, "worktree", "add", "-q", str(tree), "-b", "side")
+    own = Path(_git(tree, "rev-parse", "--absolute-git-dir").strip()) / "index.lock"
+    base = {"PATH": "/usr/bin:/bin", "GIT_DIR": str(own.parent), "GIT_INDEX_FILE": str(own)}
+    assert foreign_index(tree, base=base) is None
+    assert foreign_index(repo, base=base) == str(own)
 
 
 def test_the_caller_s_environment_is_not_changed(repo, decoy, monkeypatch):

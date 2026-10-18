@@ -11,7 +11,8 @@ the git directory of ``root``. ``git commit -a`` and ``git commit -- <path>`` gi
 (``index.lock``, ``next-index-*.lock``) and what is to be committed is only there. Any other value is cleared,
 a linked worktree's index under the main tree's ``.git/worktrees/`` among them. A
 ``GIT_DIR`` that names the git directory of ``root`` is the one git finds from ``root`` by itself, so clearing
-it changes nothing.
+it changes nothing. ``foreign_index`` names an inherited ``GIT_INDEX_FILE`` that is not kept, for a caller that
+must refuse rather than act on the default index in its place (the staged-secrets gate).
 
 ``pinned`` also leaves the system and the person's own configuration unread (``~/.gitconfig``, the XDG file):
 for the calls that only read, where a setting there (``trace2.eventTarget``) could write or change an answer.
@@ -51,6 +52,17 @@ def git_env(root: str | Path | None = None, *, pinned: bool = False, base: dict 
     if own is not None:
         env[_OWN] = own
     return env
+
+
+def foreign_index(root: str | Path, *, base: dict | None = None) -> str | None:
+    """The ``GIT_INDEX_FILE`` of ``base`` (default ``os.environ``) as given, when ``git_env(root)`` would not keep it
+    (it is not git's own index of ``root``); None when it is git's own or none is set. A caller that must act on
+    the index being committed refuses on it rather than act on the default index (review F1, DEC-580)."""
+    source = os.environ if base is None else base
+    value = source.get(_OWN)
+    if not value:
+        return None
+    return None if _own_index(root, value, git_env(None, base=source)) is not None else value
 
 
 def _own_index(root: str | Path, value: str | None, cleared: dict) -> str | None:
