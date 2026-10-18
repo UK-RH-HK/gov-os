@@ -1,6 +1,6 @@
 ---
 id: DAEO-0rfi
-status: open
+status: in_progress
 deps: []
 links: []
 created: 2026-10-18T03:12:15Z
