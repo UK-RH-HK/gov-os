@@ -28,6 +28,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from gov.secrets import indexable, path_holds_secret
+from gov.util.gitenv import git_env
 
 TOOL = "codebase-memory-mcp"
 BASE_REL = ".gov-runtime/codeintel"
@@ -69,7 +70,8 @@ def _daemon_dir(root: Path) -> Path:
 def _checked(root: Path) -> Path:
     """``root`` resolved. Raises unless it is the top level of a git repository and its home is under it."""
     root = Path(root).resolve()
-    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"], capture_output=True, text=True,
+                         env=git_env(root))
     if top.returncode != 0 or Path(top.stdout.removesuffix("\n")).resolve() != root:
         raise RuntimeError(f"{root} is not the top level of a git repository: no code index there")
     if home(root).resolve() != root / BASE_REL / "home":  # a link on the way would put the index somewhere else
@@ -181,7 +183,7 @@ def index(root: Path) -> None:
         shutil.rmtree(base)
     _graph.cache_clear()
     listed = subprocess.run(["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard"],
-                            capture_output=True, text=True, check=True).stdout
+                            capture_output=True, text=True, check=True, env=git_env(root)).stdout
     allowed = indexable(root, [rel for rel in listed.split("\0") if rel])
     with ThreadPoolExecutor() as pool:  # the index stores paths: a path that holds a secret stays out (DEC-339)
         named = list(pool.map(lambda rel: path_holds_secret(root, rel), allowed))

@@ -15,6 +15,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from gov.util.gitenv import git_env
+
 CLASS = "read"
 HELP = "health of the installation and the project"
 EXIT_CODES = {3: "one or more health checks failed or reported drift"}
@@ -103,7 +105,7 @@ def _git(root: Path, *args: str) -> str:
     try:
         return subprocess.run(
             ["git", "-C", str(root), *args],
-            capture_output=True, check=True, text=True,
+            capture_output=True, check=True, text=True, env=git_env(root),
         ).stdout
     except (OSError, subprocess.CalledProcessError):
         return ""

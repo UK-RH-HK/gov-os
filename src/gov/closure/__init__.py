@@ -12,6 +12,8 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
+from gov.util.gitenv import git_env
+
 COMPLETE, DEPTH_LIMIT, FACET_UNAVAILABLE, UNRESOLVED = \
     "CLOSURE_COMPLETE", "DEPTH_LIMIT_REACHED", "FACET_UNAVAILABLE", "UNRESOLVED"
 # The stopping reason when unresolved ids are the only gaps: with the owner (DEC-391, DP-5). Only this line names it.
@@ -52,7 +54,7 @@ def closure(root: Path, ids: list[str], depth: int) -> dict:
     finally:
         connection.close()
     status = subprocess.run(["git", "--no-optional-locks", "-C", str(root), "-c", "core.quotePath=false", "status",
-                             "--porcelain"], capture_output=True, text=True, check=True).stdout
+                             "--porcelain"], capture_output=True, text=True, check=True, env=git_env(root)).stdout
     kinds, gaps, code, front, askable = {}, {}, "not_asked", set(ids), set(ids)
     for _ in range(depth + 1):
         named = set()

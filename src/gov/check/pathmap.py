@@ -8,6 +8,8 @@ from pathlib import Path
 
 import yaml
 
+from gov.util.gitenv import git_env
+
 VERSION = "1.0.0"
 
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -17,7 +19,7 @@ def _git_ls_files(root: Path) -> list[str]:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "ls-files", "-z"],
-            capture_output=True, text=True, check=True
+            capture_output=True, text=True, check=True, env=git_env(root)
         )
         return [f for f in result.stdout.split("\0") if f]
     except (subprocess.CalledProcessError, OSError):

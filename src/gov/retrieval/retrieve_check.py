@@ -13,6 +13,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from gov.util.gitenv import git_env
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
@@ -43,6 +45,12 @@ def main():
 
     tiers_map = {"A": "a-dev", "B": "b-dev"}
 
+    # Every git call of the check acts on a temporary clone, never on the repository whose hook runs it
+    # (DEC-710): the GIT_* variables a hook inherits are cleared for the whole process, the store's calls included.
+    clean = git_env(None, pinned=True)
+    os.environ.clear()
+    os.environ.update(clean)
+
     with tempfile.TemporaryDirectory() as tmpdir:
         roots: dict[str, Path] = {}
         for programme, tier_name in tiers_map.items():
@@ -51,13 +59,14 @@ def main():
                 continue
             dest = Path(tmpdir) / tier_name
             result = subprocess.run(["git", "clone", "-q", "--no-hardlinks", str(tier_path), str(dest)],
-                                    capture_output=True)
+                                    capture_output=True, env=git_env(None, pinned=True))
             if result.returncode != 0:
                 continue
             _adopt(dest)
             git_cmd = ["git", "-C", str(dest), "-c", "user.name=check", "-c", "user.email=check@check"]
-            subprocess.run([*git_cmd, "add", "-A"], capture_output=True)
-            subprocess.run([*git_cmd, "commit", "-q", "--allow-empty", "-m", "adopted"], capture_output=True)
+            subprocess.run([*git_cmd, "add", "-A"], capture_output=True, env=git_env(dest, pinned=True))
+            subprocess.run([*git_cmd, "commit", "-q", "--allow-empty", "-m", "adopted"], capture_output=True,
+                           env=git_env(dest, pinned=True))
             try:
                 lexical.refresh(dest)
             except Exception:

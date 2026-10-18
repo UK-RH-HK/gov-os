@@ -23,11 +23,11 @@ record: for one that says "no G3 check declared" those words are its report, and
 from __future__ import annotations
 
 import json
-import os
 import subprocess
 from pathlib import Path
 
 from gov.cli.errors import GovError
+from gov.util.gitenv import git_env
 
 CLASS = "read"
 HELP = "the gates of the lefthook hooks and the CI job: checks by tier, staged secrets, the evidence record"
@@ -98,8 +98,9 @@ def _staged_secrets(root: Path) -> dict:
 
     scan = ["gitleaks", "git", "--pre-commit", "--staged", "--no-banner", "--redact", "--verbose",
             "--log-level", "error", "--exit-code", str(_LEAKS)]
-    # A configuration path in the environment would win over the rules given there.
-    env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
+    # A configuration path in the environment would win over the rules given there. gitleaks reads the index git
+    # gave this commit (``index.lock`` of ``commit -a``), never one an inherited variable names elsewhere.
+    env = {key: value for key, value in git_env(root).items() if key != "GITLEAKS_CONFIG"}
     try:
         alone = _rules(root)[-1]  # the project's rules without `extend`: gitleaks' built-in allowlist is not in it
         for extra, scan_env in ((["--config", CONFIG_REL], env), ([], env | {"GITLEAKS_CONFIG_TOML": alone})):
@@ -115,7 +116,7 @@ def _staged_secrets(root: Path) -> dict:
 
 def _git(root: Path, *args: str) -> str:
     try:
-        done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True)
+        done = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, env=git_env(root))
     except OSError as error:
         raise GovError(NOT_MEASURED, f"git {args[0]} could not run: {error}") from None
     if done.returncode != 0:

@@ -28,6 +28,7 @@ from gov.config.loader import PROJECT_DIR
 from gov.retrieval.chunking import chunk_file
 from gov.secrets import CONFIG_REL, indexable
 from gov.store import STORE_REL
+from gov.util.gitenv import git_env
 
 FACET = "lexical"
 # Carried: porter unicode61, with '_' a token character so a snake_case identifier stays one token.
@@ -57,7 +58,8 @@ _DIGESTED = (
 
 def _git(root: Path, *args: str, stdin: bytes | None = None) -> bytes:
     try:
-        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True).stdout
+        return subprocess.run(["git", "-C", str(root), *args], input=stdin, capture_output=True, check=True,
+                              env=git_env(root)).stdout
     except (OSError, subprocess.CalledProcessError) as exc:
         reason = " ".join(getattr(exc, "stderr", b"").decode("utf-8", "replace").split()) or str(exc)
         raise GovError("INDEX_GIT_FAILED", f"git {args[0]} failed in {root}: {reason}", {"root": str(root)}) from None

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -13,6 +12,7 @@ from pathlib import Path
 import yaml
 
 from gov.cli.checks import CHECKS_DIRS, ENFORCES_FIELD, TIMEOUT_FIELD, load_declarations
+from gov.util.gitenv import git_env
 
 VERSION = "1.0.0"
 
@@ -54,7 +54,7 @@ def _head(root: Path) -> str:
     try:
         result = subprocess.run(
             ["git", "-C", str(root), "rev-parse", "HEAD"],
-            capture_output=True, text=True, check=True,
+            capture_output=True, text=True, check=True, env=git_env(root),
         )
         return result.stdout.strip()
     except (subprocess.CalledProcessError, OSError):
@@ -75,7 +75,7 @@ def _provenance(check_id: str, commit: str, version: str = VERSION) -> dict:
 
 def _run_command(command: str, root: Path, timeout: int = TIMEOUT_S) -> tuple[int | None, str, str]:
     """The exit code, output and error output of ``command``. The exit code is None when it passed ``timeout`` seconds."""
-    env = dict(os.environ)
+    env = git_env(root)  # a declared check starts git in the root: no GIT_* variable of a hook names another repository
     pythonpath = env.get("PYTHONPATH", "")
     src = str(root / "src")
     if src not in pythonpath:
@@ -225,7 +225,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
         try:
             diff_result = subprocess.run(
                 ["git", "-C", str(root), "diff", "HEAD~1", "--name-only", "--", SKILL_DIR],
-                capture_output=True, text=True,
+                capture_output=True, text=True, env=git_env(root),
             )
             if diff_result.returncode == 0 and diff_result.stdout.strip():
                 changed_files = [f for f in diff_result.stdout.strip().split("\n") if f]
@@ -240,7 +240,7 @@ def _check_skill_version(root: Path, commit: str) -> dict:
 
                     old_result = subprocess.run(
                         ["git", "-C", str(root), "show", f"HEAD~1:{rel}"],
-                        capture_output=True, text=True,
+                        capture_output=True, text=True, env=git_env(root),
                     )
                     if old_result.returncode != 0:
                         continue
