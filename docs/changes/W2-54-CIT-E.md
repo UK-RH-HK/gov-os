@@ -82,6 +82,9 @@ ticket's `allowed_paths`. It is returned to the lead as a decision package.
 
 ## 4. Round 2: one query vector per text (owner, 2026-10-18, P-W2-30 (a))
 
+*Round 3 changes parts of this section (the file's name, the key, how the vector is computed and why the stored one
+is used); §5.4 lists each correction. The text below is round 2's, kept as it was.*
+
 The owner widened the ticket for one more round (DEC-773, owner, 2026-10-18, staged for the owner's commit; the
 ticket cites it as "owner, 2026-10-18, P-W2-30 (a)"), adding `src/gov/retrieval/semantic.py` and
 `tests/unit/retrieval/**` to its paths. DEC-768's premise (the two computations differ only in the order of
@@ -206,3 +209,101 @@ the run (the first computation of every ticket's context embedded its question; 
 
 The run takes the time round 1's did (130.07 seconds): a stored vector saves one embedding request and adds one
 model-list request per search. **The declared `timeout-seconds: 600` stays**: it is 4.7 times this run.
+
+## 5. Round 3: the query-vector cache, and a vector that does not depend on it (owner, 2026-10-18, P-W2-32 (a))
+
+The owner allowed one more round: DEC-782 (owner, 2026-10-18, P-W2-32 (a); staged for the owner's commit, cited by
+the ticket as "owner, 2026-10-18, P-W2-32 (a)") amends DEC-379 for one file only: a read command (`gov retrieve`,
+`gov context`) may write the query-vector cache, and nothing else, within five limits. The ticket gains success
+lines 3 and 4 (the cache; the same vector where it cannot be written) and 5 (W1-46's environment, DEC-784, a test
+rewrite, no code here). The change is made under CAP-33 and DEC-768: evidence (round 2's verification, §5.1),
+the owner's approval (DEC-782), tests first (`test_w2_54_query_cache.py` and `test_w2_54_sandboxed_worker.py`, 15
+cases, 12 red at `3bee9a50`, written by an independent test designer before this round's code), one review. No
+hard-block check is skipped, downgraded or excluded (DEC-768 item 4).
+
+### 5.1 The cause
+
+- **Round 2's five reds.** Round 2's code stores a question's vector at query time, so a read writes a file; five W1
+  cases that held "a read writes nothing" turned red (W1-19's
+  `test_the_vectors_are_in_the_shared_store_beside_the_lexical_index`; W1-21's
+  `test_a_retrieval_writes_nothing[a question, a ticket, batches of one]` and `test_the_command_writes_nothing`).
+  DEC-782 decides it: that one derived file may be written, and the W1 cases are rewritten to it (their READMEs'
+  "Rewrite (W2-54, DEC-782, 2026-10-18)" sections).
+- **The determinism finding.** In round 2 the vector a text got still depended on what was embedded before it; the
+  cache only froze the first one. Where the cache cannot be written (a sandboxed worker, whose `.gov-runtime/` is
+  read-only), every read embedded afresh and got whichever vector the request before it produced; a cold, a deleted
+  or a full cache gave another text's drift; and six processes on a cold cache gave answers that depended on their
+  interleaving (the acceptance README's round-3 table, 12 red). DEC-782: the computation itself must be
+  deterministic, and the cache only saves time.
+
+### 5.2 How the vector is the same without the cache
+
+`semantic.query_vector(root, question)` (now public; `search` calls it) sends **one request**,
+`input: [INSTRUCTION, INSTRUCTION + question]`: the bare instruction, then the question with it, and uses **the
+second vector**. Within that request the question always follows the same text, so its vector no longer depends on
+the request that came before it, from this process or another. A computation split over two requests (the text, then
+the text again) could be split by another process's request; one request cannot be split by a client of an embedder
+that serves a request's inputs in order (the stand-in does; the real embedder is measured in §5.5). By §4.2, the real
+embedder's vector for a text after any different instruction-prefixed text is one vector whichever text came before,
+so the question after the bare instruction is expected to get that vector; §5.5 measures it, with a chunk without the
+instruction, other questions and the question itself before the read. The cost: one short extra input per read that
+the cache does not answer.
+
+The cached vector is used whenever its key matches (it saves the request); since it is the vector the computation
+gives, a cold, warm, deleted, full or unwritable cache gives the same bytes. Why not "the text twice, the repeat
+used": the round-2 case `test_a_question_asked_for_the_first_time_gets_the_vector_the_embedder_returns_for_it`
+holds that a question asked for the first time is sent to the embedder once; the bare instruction is not the question.
+
+### 5.3 The five limits as built
+
+| Limit (DEC-782) | As built in `src/gov/retrieval/semantic.py` |
+|---|---|
+| 1. One derived file under `.gov-runtime/`, nothing authoritative | `.gov-runtime/query-vector-cache.db` (`QUERY_VECTORS_REL`), a SQLite file of its own: not `store.db`, not tracked (the runtime folder is ignored by git), read by no check and outside the store digest. Rollback-journal mode, never WAL, so no `-wal` or `-shm` file stays beside it; the journal exists only during a write and is removed at its commit or rollback. Nothing is written when the lexical or semantic index is missing, empty or stale (the search returns before the vector is asked for), as round 2. |
+| 2. Keyed by model, model revision and a hash of the exact text | Table `query_vector (model, revision, text_sha256, embedding)`, the three first the primary key: `MODEL`; the digest Ollama's model list reports at the time of the search (DEC-374, as round 2); the sha256 (hex) of the exact text sent, `INSTRUCTION + question` in UTF-8, with no case folding, no whitespace or Unicode normalisation and no stripping. The text is kept nowhere. Without a digest in the model list there is no key, and nothing is cached. |
+| 3. Atomic, safe with several sessions at once | One `BEGIN IMMEDIATE` transaction per entry, `INSERT OR IGNORE` on the key, a busy timeout of 30 seconds; a read opens the file `mode=ro`. A transaction is all or nothing, so no entry is torn; concurrent writers of one key keep one entry, which is the same bytes either way. The locks are the operating system's advisory locks on the file, released when a process ends: none is left behind. Any SQLite error (a file or folder that cannot be read, written or created, a file that is not a database, a lock held past the timeout) is swallowed: the read uses the vector it computed, and its answer is the same. A failed or partial embedding call caches nothing, as round 2. |
+| 4. Bounded in size | The setting `GOV_QUERY_VECTOR_CACHE_MAX_BYTES` bounds the file in bytes; its default is 67108864 bytes (64 MiB, `CACHE_BOUND`); a value that is not a whole number gives the default. |
+| 5. Rebuildable from nothing | The file is derived: deleting it changes no answer (§5.2); the next reads fill it again. |
+
+**What happens at the bound.** The size is checked inside the write's transaction (`page_count × page_size`, the
+file's size once it commits). A write that would take the file past the bound is undone; it is then tried once more
+in a new transaction that first deletes **the older half of the entries** (by the order they were written), whose
+pages SQLite reuses, so the file does not grow; if the entry still does not fit (a bound smaller than one entry), that
+is undone too and the entry is not kept. So the file never passes the bound, and it never shrinks (no `VACUUM`).
+Reads at the bound are unchanged: an evicted text is computed again, to the same vector. Measured with 1024-number
+vectors: about 4,805 bytes an entry (4,804,608 bytes for 1,000 entries), so the default holds about 13,900
+questions; the context check over 106 tickets asks 67.
+
+**Round 2's file.** `.gov-runtime/query-vectors.db` (round 2's name, which kept each text in clear) is no longer read
+or written. It is derived; where it exists (this worktree's and the main tree's runtime folders, after round 2's
+runs), deleting it changes nothing. This engineer wrote neither runtime folder; the lead deletes it.
+
+**The tests.** `tests/unit/retrieval/test_semantic_query_vector.py` (21 cases, regression evidence only): the request
+and the vector used; one text, one vector after other texts, in seven cache states (cold, warm, deleted, its folder
+unwritable, its file unwritable, no folder, a file that is not a database); a cached vector used without a request;
+the key a hash and no text in the file; the exact text; another revision; a failed embedding; no revision; the bound
+(never passed, the newest entries kept, the older ones evicted and computed again to the same vector); an entry larger
+than the bound; the setting's default; a search without an index writes nothing. Acceptance:
+`test_w2_54_query_cache.py` and `test_w2_54_query_vector.py`, 29 cases: 28 green at `77bf7cc7` (the real-embedder
+case included, §5.5), the 29th the bound's statement in this record.
+
+### 5.4 Corrections to §4
+
+- §4.3 change 5, "keyed by … the exact text sent": the key is now the sha256 of that text, and the text is kept
+  nowhere. "the first write wins and every later search uses it": the vector no longer depends on which write won;
+  every computation gives it (§5.2). "one request, `input: [INSTRUCTION + text]`" (§4.2's protocol, round 2's
+  search): a search now sends `[INSTRUCTION, INSTRUCTION + text]`.
+- §4.3 "Where the vectors are kept": the file is `.gov-runtime/query-vector-cache.db`, the table
+  `query_vector (model, revision, text_sha256, embedding)`, bounded (§5.3). The rest holds.
+- §4.3 "DEC-379 and DEC-322 beside it": settled by DEC-782 (the one file a read writes). DEC-322 holds as written:
+  `store.db` is written by no read.
+- §4.4: measured on round 2's code; this round's measurement is §5.5.
+
+### 5.5 Measurement on the real embedder (run by the lead)
+
+*To be filled in from the lead's run: the measurement script's command and figures, the Ollama version it prints,
+and the context check's seconds, tickets and load after a full rebuild, against the declared `timeout-seconds: 600`.*
+
+(In this engineer's sandbox, the acceptance case `test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before`
+passed at `77bf7cc7`: this machine's Ollama is not reachable from inside the sandbox, so `gov` started an Ollama of
+its own there (DEC-261), with this machine's executable and model folder, and that server ended with the run. It is
+the real model, not the shared server; the lead's measurement is the evidence.)
