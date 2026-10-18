@@ -7,8 +7,12 @@ DEC-381).
   virtual table, so the store stays readable by a connection that has not loaded the extension.
 - The manifest names the embedder and the reranker, each with its revision. The embedder's is the digest Ollama's
   model list reported when the vectors were built (DEC-374). Vectors of another embedder are dropped and built again.
-- ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write (DEC-322). Missing, empty
+- ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write it (DEC-322). Missing, empty
   or stale vectors, an absent ``sqlite_vec`` and an absent Ollama make the facet unavailable; none raises.
+- A question's vector is kept in ``QUERY_VECTORS_REL``, beside the store and never in it, keyed by the model, the
+  revision the model list reports at the time of the search and the exact text, and used whenever its key matches:
+  the embedder gives a text another vector after a different text, so one question would get several answers
+  (DEC-773). The first vector stored under a key is the one every search uses.
 """
 
 from __future__ import annotations
@@ -49,6 +53,10 @@ _NEAREST = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, " 
            "JOIN lexical_chunk c ON c.chunk_id = v.chunk_id ORDER BY distance, c.chunk_id LIMIT ?"
 _TEXT = "SELECT f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id WHERE c.chunk_id = ?"
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
+QUERY_VECTORS_REL = ".gov-runtime/query-vectors.db"  # a file of its own: store.db is not written by a search
+_QUERY_SCHEMA = "CREATE TABLE IF NOT EXISTS query_vector (model TEXT NOT NULL, revision TEXT NOT NULL, " \
+                "text TEXT NOT NULL, embedding BLOB NOT NULL, PRIMARY KEY (model, revision, text))"
+_QUERY_VECTOR = "SELECT embedding FROM query_vector WHERE model = ? AND revision = ? AND text = ?"
 
 
 def _report(reason: str | None, **more) -> dict:
@@ -83,6 +91,39 @@ def _revision() -> str | None:
         if MODEL in (model.get("name"), model.get("model")):
             return model.get("digest") or None
     return None
+
+
+def _stored(path: Path, key: tuple, vector: bytes | None = None) -> bytes | None:
+    """The vector stored under ``key`` at ``path``, after storing ``vector`` there unless one is already; None when
+    none can be read. A write that loses keeps the vector that won; one that fails raises nothing."""
+    try:
+        connection = sqlite3.connect(path, timeout=30.0)
+        try:
+            with connection:
+                if vector is not None:
+                    connection.execute(_QUERY_SCHEMA)
+                    connection.execute("INSERT OR IGNORE INTO query_vector VALUES (?, ?, ?, ?)", (*key, vector))
+                row = connection.execute(_QUERY_VECTOR, key).fetchone()
+        finally:
+            connection.close()
+    except sqlite3.Error:
+        return None
+    return row and row[0]
+
+
+def _query_vector(root: Path, text: str) -> bytes | None:
+    """The vector of ``text``: the one stored under its key, else the embedder's, stored then; None when the
+    embedder gives none (nothing is stored). Without a revision in the model list there is no key: the embedder's
+    vector is used and nothing is stored."""
+    revision, path = _revision(), root / QUERY_VECTORS_REL
+    key = (MODEL, revision, text)
+    stored = _stored(path, key) if revision and path.is_file() else None
+    if stored:
+        return stored
+    vectors = _embed([text])
+    if vectors is None or revision is None:
+        return vectors and vectors[0]
+    return _stored(path, key, vectors[0]) or _stored(path, key) or vectors[0]
 
 
 def _ready(connection: sqlite3.Connection) -> str | None:
@@ -186,8 +227,9 @@ def refresh(root: Path) -> dict:
 def search(root: Path, query: str, refresh: bool = True) -> dict:
     """The ``TOP_K`` chunks nearest to ``query``, nearest first, as the chunk records of the lexical index.
 
-    With ``refresh`` the vectors are brought up to date first. Without, nothing is written, and missing, empty or
-    stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342).
+    With ``refresh`` the vectors are brought up to date first. Without, the store is not written, and missing, empty
+    or stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342). Either way, the
+    question's vector is kept beside the store once the vectors can be answered from (DEC-773).
     """
     root = Path(root)
     reason = (_build(root) if refresh else None) or _status(root)
@@ -196,11 +238,11 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
     connection = _open(root)
     try:
         reason = _ready(connection)
-        vectors = None if reason else _embed([INSTRUCTION + query])
-        if vectors is None:
+        vector = None if reason else _query_vector(root, INSTRUCTION + query)
+        if vector is None:
             return _report(reason or NO_EMBEDDING, hits=[])
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
-        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vectors[0], TOP_K))])
+        return _report(None, hits=[dict(zip(keys, row)) for row in connection.execute(_NEAREST, (vector, TOP_K))])
     finally:
         connection.close()
 
