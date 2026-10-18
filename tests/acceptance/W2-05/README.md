@@ -3,7 +3,9 @@
 **Ticket:** W2-05, "The git environment of every check, hook and helper; the settings re-sort". Profile FULL.
 **Closes:** AR-2. **Sources:** DEC-710 (with DEC-711 and DEC-712).
 **Author:** the independent test designer (MR-3). The tests were written from the ticket's KPI lines and its
-sources before the implementation, and shown red on `c94e1507`.
+sources before the implementation, and shown red on `c94e1507`. The four S3 cases (`test_w2_05_settings.py`)
+were rewritten after the implementation began by a later independent test designer, as the owner re-baselined
+the S3 line (DEC-783, option (b) of P-W2-33). Each rewrite carries a `Rewrite-Reason:` trailer (DEC-491).
 
 ## Running them
 
@@ -12,8 +14,11 @@ PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/go
   python3 -m pytest tests/acceptance/W2-05 -q -p no:cacheprovider -rs
 ```
 
-The suite has 29 cases. The whole run takes about 50 s on this machine. On `c94e1507` it gives 23 failed, 6
-passed and 0 skipped.
+The suite has 29 cases. The whole run takes about 50 s on this machine.
+
+- On `c94e1507`, with the S3 cases as first written, it gave 23 failed, 6 passed and 0 skipped.
+- On `aa676b9f`, with the S3 cases rewritten (DEC-783), it gives 5 failed, 24 passed and 0 skipped (49 s).
+  The 5 red cases are the ones listed under "Red until another ticket merges".
 
 ## How the tests run this worktree's `src/` (DEC-732)
 
@@ -67,10 +72,10 @@ before they were stopped. The suite now bounds this in three ways:
 |---|---|
 | **S1**: every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables; one helper does it; the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160] | `test_w2_05_sweep.py`: all 3 cases (the record, every git-starting file named, the helper). The behaviour half is in `test_w2_05_planted.py`, listed under the covers ids below. |
 | **S2**: a hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (DEC-710) | `test_w2_05_linked_worktree.py`: `test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree]` (success); `[the main tree]` (guard); `test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change` (the refusing side); `test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file` (through lefthook and `gov ci checks G1 G2`) |
-| **S3**: lefthook install and uninstall leave `.claude/settings.json` byte-identical, and adapter-portability stays green | `test_w2_05_settings.py`: `test_install_and_uninstall_leave_the_settings_byte_identical[lefthook.yml]`, `[the template's hooks file]`; `test_install_and_uninstall_from_a_linked_worktree_leave_both_settings_byte_identical`; `test_adapter_portability_stays_green_through_install_and_uninstall` |
+| **S3**, as DEC-783 (b) re-baselined it: `lefthook install` leaves `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green; `uninstall` is an owner act, followed by restoring the committed file (DEC-712) | `test_w2_05_settings.py`: `test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore[lefthook.yml]`, `[the template's hooks file]`; `test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean`; `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore`. What `uninstall` alone does to the file is lefthook's own behaviour and is not asserted. The state after the owner's act is: `lefthook uninstall`, then `git restore -- .claude/settings.json` in each tree whose file changed. |
 | **F1**: a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call | `test_w2_05_planted.py`: `test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy[the check's declared command]`, `[gov ci checks G1]`; `test_a_staged_secret_is_found_under_a_planted_decoy_index[GIT_INDEX_FILE]`, `[GIT_DIR and GIT_INDEX_FILE]`; `test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret[GIT_DIR]`, `[GIT_DIR and GIT_INDEX_FILE]`; `test_read_merge_under_a_planted_git_dir_reads_its_own_repository`; `test_the_containment_check_catches_the_change_whatever_its_environment_holds[a decoy GIT_DIR and GIT_INDEX_FILE]`; and the S2 linked-worktree cases, where git itself plants both variables |
 | Edge: a caller that set `GIT_*` on purpose for its own folder | `test_w2_05_planted.py::test_a_hooked_commit_in_a_linked_worktree_scans_the_index_git_gives_it` with `[git commit -a, a secret in a tracked file]`, `[git commit -- <path>, a secret in that file]` and `[git commit -a, nothing secret]` |
-| Edge: a check in a linked worktree | the S2 cases; `test_install_and_uninstall_from_a_linked_worktree_...`; `test_the_guard_hook_refuses_within_its_own_limit_...` |
+| Edge: a check in a linked worktree | the S2 cases; `test_install_from_a_linked_worktree_...`; `test_the_guard_hook_refuses_within_its_own_limit_...` |
 | Edge: a call in a command, a check and a test helper | command: `gov ci staged-secrets`, `gov ci checks G1`, `gov close`; check: retrieval-regression, containment (W1-03's PostToolUse hook); test helper: the ticket's acceptance test that `gov close` runs (`test_gov_close_runs_...`) |
 
 ## The covers ids and their tests
@@ -88,9 +93,11 @@ Not written:
 - **W2-L109** (findings grouped by cause) and **W2-M231** (the check and the hand-run generator use the same
   root) state no form these tests could hold them to. They are returned to the lead.
 - **W2-M012** is an owner act.
-- **W2-M281** (adapter-portability goes red on a planted drift in the template's hooks source) is package P-4.
+- **W2-M281** (adapter-portability goes red on a planted drift in the template's hooks source) has no case in
+  this suite. DEC-783 accepted reading P-4: the source is `template/.rulesync/hooks.jsonc`. The lead returns
+  the row as a package.
 
-## Each test's expected red reason on `c94e1507`
+## Each test's expected red reason on `c94e1507` (the rewritten S3 cases: what was seen on `aa676b9f`)
 
 | Test | Red now because |
 |---|---|
@@ -101,10 +108,10 @@ Not written:
 | `..._leaves_the_branch_as_the_commit_made_it[the main tree]` | **green** (guard: no `GIT_DIR` is exported in the main tree) |
 | `test_a_refusing_hook_in_a_linked_worktree_...` | the same nested hook run |
 | `test_a_commit_in_a_linked_worktree_through_lefthook_...` | the DEC-710 symptom: the check's foreign commit moved the worktree's HEAD, and the real commit failed with `fatal: cannot lock ref 'HEAD': is at <x> but expected <y>` |
-| `test_install_and_uninstall_leave_the_settings_byte_identical[lefthook.yml]` | `lefthook uninstall` re-sorts `.claude/settings.json` (its keys, alphabetically) |
-| `...[the template's hooks file]` | the same |
-| `test_install_and_uninstall_from_a_linked_worktree_...` | the same, in the worktree |
-| `test_adapter_portability_stays_green_through_install_and_uninstall` | the same, on rulesync's generated settings (`install` alone leaves them identical) |
+| the four S3 cases, as first written (`test_install_and_uninstall_leave_the_settings_byte_identical[...]` ×2, `..._from_a_linked_worktree_...`, `test_adapter_portability_stays_green_through_install_and_uninstall`) | `lefthook uninstall` re-sorted `.claude/settings.json` (its keys, alphabetically). The same happened on rulesync's generated settings. `install` alone left the file identical. These cases were replaced by the rewritten ones below (DEC-783). |
+| `test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore[lefthook.yml]`, `[the template's hooks file]` | not run on `c94e1507` (written later). On `aa676b9f`: **green**. `lefthook` is not part of the code under test and neither hooks file was changed. |
+| `test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean` | the same: **green** on `aa676b9f` |
+| `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore` | the same: **green** on `aa676b9f` |
 | `test_the_retrieval_check_under_a_planted_git_dir_...[the check's declared command]` | the decoy changed: the check committed into it (`COMMIT_EDITMSG`, index, reflogs, objects) |
 | `...[gov ci checks G1]` | the same |
 | `test_a_staged_secret_is_found_under_a_planted_decoy_index[GIT_INDEX_FILE]` | exit 0: `gov ci staged-secrets` scanned the decoy's clean index and missed the staged secret (fail-open) |
@@ -131,6 +138,14 @@ These cases depend on files of other unmerged tickets, which this run does not c
 | `test_w2_05_planted.py::test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment` | **W2-53** merges | `src/gov/close/**` (the close's test run and its git calls) |
 | `test_w2_05_planted.py::test_the_guard_hook_does_not_run_the_git_first_on_path` | **W2-50** merges | `src/gov/guard/decide.py` (the guard's `git rev-parse --git-common-dir`) |
 | `test_w2_05_planted.py::test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs` | **W2-50** merges | `src/gov/guard/decide.py` (the freeze look-up) |
+| `test_w2_05_planted.py::test_the_containment_check_catches_the_change_whatever_its_environment_holds[trace variables]` | **W2-50** merges | `src/gov/guard/decide.py` (its mirror-path git call) |
+| `test_w2_05_planted.py::test_the_containment_check_catches_the_change_whatever_its_environment_holds[a trace setting in the person's git configuration]` | **W2-50** merges | the same |
+
+That makes 4 cases red until W2-50 merges and 1 until W2-53 merges. On `aa676b9f` these are the run's only 5
+red cases. The lead found the two containment parametrizations in the earlier verification. This run agrees with
+that finding from outside: in both cases the only git calls that wrote the planted trace targets were
+`git -C <root> rev-parse --git-common-dir`, twice. The `[trace variables]` case shows it in `GIT_TRACE`, and the
+configuration case in the `trace2.eventTarget` events. The guard-hook case reports the same call as the guard's.
 
 No case depends on the files of W2-54, W2-03, W2-16 or W2-20.
 
@@ -144,10 +159,12 @@ absent, and nothing skips.
 | `git` | every case that uses the box |
 | `lefthook` | the S3 cases; the lefthook case of S2 |
 | `gitleaks` | the staged-secrets cases; the lefthook case of S2 |
-| `rulesync` | `test_adapter_portability_stays_green_through_install_and_uninstall` |
+| `rulesync` | `test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore` |
 | `sqlite_vec` | the retrieval-regression cases (the `tiers` fixture) |
 
-## Readings the tests rest on (returned as packages)
+## Readings the tests rest on
+
+P-1 and P-2 were returned as packages. DEC-783 accepted P-3 and P-4 and answered P-A.
 
 - **P-1: an honoured versus a planted `GIT_INDEX_FILE`.** A `GIT_*` value that names the call's own
   repository's git directory, or a file inside it, is git's own. Examples are `index.lock` for `commit -a`,
@@ -155,12 +172,20 @@ absent, and nothing skips.
   honoured. Any other value is cleared. The F1 cases and `_on_purpose` are written against this reading.
 - **P-2: the freeze look-up's own limit.** The ticket gives no value. The case takes "below the hook's 20 s
   deadline" and asserts an answer within 18 s. The answer is `deny` (DEC-580: the guard answers refuse).
-- **P-3: the template's hooks file.** The ticket's allowed path is `template/lefthook.yml`, but the tree holds
-  `template/lefthook.yml.jinja`. The template case takes `template/lefthook.yml` if it exists, and the `.jinja`
-  file otherwise.
-- **P-4: W2-M281.** "A planted drift in the template hooks source" has two readings: `lefthook.yml.jinja`, or
-  the Claude Code hooks source `template/.rulesync/hooks.jsonc` compared with the kernel's `settings.json`. No
-  case is written for it.
+- **P-3: the template's hooks file. Accepted by the owner (DEC-783).** The ticket's allowed path is
+  `template/lefthook.yml`, but the tree holds `template/lefthook.yml.jinja`. The template's hooks file is
+  `template/lefthook.yml.jinja`, which stays untouched. The template case takes that file.
+- **P-4: W2-M281. Accepted by the owner (DEC-783).** "A planted drift in the template hooks source" is read as
+  the Claude Code hooks source `template/.rulesync/hooks.jsonc`. W2-M281 has no case in this suite. The lead
+  returns it as a package.
+- **P-A: the S3 line as first written. Answered by DEC-783 (b).** lefthook 2.1.15 rewrites a Claude Code
+  settings file on every `uninstall`, whatever the project's files hold. The owner re-baselined the line:
+  - `lefthook install` leaves the file byte-identical to the committed one;
+  - `uninstall` is an owner act, followed by restoring the committed file (DEC-712).
+
+  The S3 cases were rewritten to match. Every install keeps its byte-identical expectation. Each case also
+  asserts that `install` really installed a pre-commit hook, so that an unchanged file cannot come from an
+  install that did nothing.
 
 ## What was measured (git 2.43.0, lefthook 2.1.15, gitleaks 8.30.1)
 
@@ -169,4 +194,5 @@ absent, and nothing skips.
     `.../index`, or `index.lock` for `commit -a`, or `next-index-*.lock` for `commit -- <path>`.
   - In the main tree: `GIT_INDEX_FILE=.git/index` (relative) and no `GIT_DIR`.
 - **lefthook 2.1.15:** `install` leaves a Claude Code settings file byte-identical; `uninstall` re-sorts its
-  keys.
+  keys. Run from a linked worktree, `install` left both trees' files identical, and `uninstall` rewrote only
+  the worktree's file, not the main tree's (measured on 2026-10-18).

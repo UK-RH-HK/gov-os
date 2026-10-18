@@ -1,11 +1,18 @@
-"""KPI success 3: "Lefthook install and uninstall leave .claude/settings.json byte-identical to the committed
-file, and adapter-portability stays green" [AR-2].
+"""KPI success 3, as the owner re-baselined it (DEC-783, option (b) of P-W2-33): "`lefthook install` leaves
+.claude/settings.json byte-identical to the committed file, and adapter-portability stays green; `uninstall` is an
+owner act, followed by restoring the committed file (DEC-712)" [AR-2].
+
+lefthook 2.1.15 rewrites a Claude Code settings file on every ``uninstall`` (its keys re-sorted), whatever the
+project's files hold. What ``uninstall`` alone does to the file is lefthook's own behaviour and is not asserted
+here. The cases assert the state once the owner's act is complete: ``lefthook uninstall``, then the committed file
+restored with ``git restore`` in each tree whose file changed, as DEC-712 records the operator doing it. Every
+``install`` keeps its byte-identical expectation.
 
 Every case runs lefthook in a temporary repository built from scratch, with its working folder there and an
 environment built from nothing (no ``GIT_*`` variable of the caller): lefthook can never act on this
 repository, whose hooks stay uninstalled until W2-08. The hooks file is this repository's own (``lefthook.yml``,
-and the template's hooks file), copied into the temporary repository as one named file; the ticket's change to
-it is what the cases measure.
+and the template's hooks file ``template/lefthook.yml.jinja``, DEC-783), copied into the temporary repository as
+one named file.
 
 The settings file is a stand-in in the shape of a Claude Code settings file with hooks (``stand_in_settings``),
 or, for the adapter-portability half, the one ``rulesync generate`` writes from the kernel template's sources
@@ -20,16 +27,12 @@ import w2_05_support as support
 from w2_05_support import skip_without
 
 SETTINGS = ".claude/settings.json"
+OWNER_ACT = "the owner's act (`lefthook uninstall`, then the committed file restored with `git restore`, DEC-712)"
 
 
 def _hooks_file(which):
-    if which == "project":
-        path = support.LEFTHOOK_YML
-    else:
-        # The ticket's allowed path is ``template/lefthook.yml``; the tree holds ``template/lefthook.yml.jinja``
-        # (package P-3). The case takes the first that exists.
-        plain = support.REPO_ROOT / "template" / "lefthook.yml"
-        path = plain if plain.is_file() else support.TEMPLATE_HOOKS
+    # The template's hooks file is ``template/lefthook.yml.jinja`` (DEC-783, reading P-3 accepted).
+    path = support.LEFTHOOK_YML if which == "project" else support.TEMPLATE_HOOKS
     assert path.is_file(), f"the {which} hooks file is absent ({path.relative_to(support.REPO_ROOT)})"
     return path
 
@@ -46,6 +49,23 @@ def _lefthook(box, where, verb):
     return done
 
 
+def _install(box, where):
+    """``lefthook install`` from ``where``; it must have installed the hooks file's pre-commit hook, so that a
+    settings file left as it was is not the mark of an install that did nothing."""
+    _lefthook(box, where, "install")
+    hook = support.common_dir_of(where) / "hooks" / "pre-commit"
+    assert hook.is_file(), f"`lefthook install` in {where} installed no pre-commit hook ({hook} is absent)"
+
+
+def _owner_uninstall(box, where, trees, committed):
+    """The owner's act: ``lefthook uninstall`` from ``where``, then the committed settings file restored with
+    ``git restore`` in each of ``trees`` whose file changed (DEC-712)."""
+    _lefthook(box, where, "uninstall")
+    for tree in trees:
+        if (tree / SETTINGS).read_bytes() != committed:
+            support.git(tree, "restore", "--", SETTINGS)
+
+
 def _committed(repo):
     return support.git(repo, "show", f"HEAD:{SETTINGS}").encode("utf-8")
 
@@ -53,32 +73,48 @@ def _committed(repo):
 def assert_byte_identical(tree, committed, after):
     now = (tree / SETTINGS).read_bytes()
     assert now == committed, (
-        f"`lefthook {after}` changed {SETTINGS} in {tree.name} (it must stay byte-identical to the committed "
-        f"file):\n" + support.git(tree, "diff", "--", SETTINGS)[:3000])
+        f"{SETTINGS} in {tree.name} is not byte-identical to the committed file after {after}:\n"
+        + support.git(tree, "diff", "--", SETTINGS)[:3000])
+
+
+def assert_no_change(tree, after):
+    status = support.git(tree, "status", "--porcelain", "--untracked-files=all")
+    assert status == "", f"the tree {tree.name} shows a change after {after}:\n{status[:3000]}"
 
 
 @pytest.mark.parametrize("which", ("project", "template"), ids=("lefthook.yml", "the template's hooks file"))
-def test_install_and_uninstall_leave_the_settings_byte_identical(tmp_path, box, which):
+def test_install_leaves_the_settings_byte_identical_before_and_after_the_owner_s_uninstall_and_restore(
+        tmp_path, box, which):
     skip_without("lefthook")
     repo = _repo(tmp_path / "repo", _hooks_file(which))
     committed = _committed(repo)
-    for verb in ("install", "uninstall", "install", "uninstall"):
-        _lefthook(box, repo, verb)
-        assert_byte_identical(repo, committed, verb)
+    _install(box, repo)
+    assert_byte_identical(repo, committed, "`lefthook install`")
+    _install(box, repo)
+    assert_byte_identical(repo, committed, "a second `lefthook install`")
+    _owner_uninstall(box, repo, [repo], committed)
+    assert_byte_identical(repo, committed, OWNER_ACT)
+    assert_no_change(repo, OWNER_ACT)
+    _install(box, repo)
+    assert_byte_identical(repo, committed, f"`lefthook install` after {OWNER_ACT}")
 
 
-def test_install_and_uninstall_from_a_linked_worktree_leave_both_settings_byte_identical(tmp_path, box):
+def test_install_from_a_linked_worktree_leaves_both_settings_byte_identical_and_the_owner_s_act_both_clean(
+        tmp_path, box):
     skip_without("lefthook")
     repo = _repo(tmp_path / "repo", _hooks_file("project"))
     tree = support.add_worktree(repo, tmp_path / "wt")
     committed = _committed(repo)
-    for verb in ("install", "uninstall"):
-        _lefthook(box, tree, verb)
-        assert_byte_identical(tree, committed, verb)
-        assert_byte_identical(repo, committed, verb)
+    _install(box, tree)
+    assert_byte_identical(tree, committed, "`lefthook install` from the linked worktree")
+    assert_byte_identical(repo, committed, "`lefthook install` from the linked worktree")
+    _owner_uninstall(box, tree, [tree, repo], committed)
+    for each in (tree, repo):
+        assert_byte_identical(each, committed, f"{OWNER_ACT}, from the linked worktree")
+        assert_no_change(each, f"{OWNER_ACT}, from the linked worktree")
 
 
-def test_adapter_portability_stays_green_through_install_and_uninstall(tmp_path, box):
+def test_adapter_portability_stays_green_through_install_and_the_owner_s_uninstall_and_restore(tmp_path, box):
     """W1-38's adopted project, generated by the real rulesync and committed, with the project's hooks file."""
     skip_without("lefthook", "rulesync")
     import w1_38_support as w138
@@ -97,9 +133,14 @@ def test_adapter_portability_stays_green_through_install_and_uninstall(tmp_path,
     first = w138.run_portability_check(project)
     assert first.returncode == 0, (f"adapter-portability is not green before lefthook runs; the case needs a green "
                                    f"start:\n{w138.output_of(first)[-3000:]}")
-    for verb in ("install", "uninstall"):
-        _lefthook(box, project, verb)
-        assert_byte_identical(project, committed, verb)
-        checked = w138.run_portability_check(project)
-        assert checked.returncode == 0, (f"adapter-portability went red after `lefthook {verb}`:\n"
-                                         f"{w138.output_of(checked)[-3000:]}")
+    _install(box, project)
+    assert_byte_identical(project, committed, "`lefthook install`")
+    checked = w138.run_portability_check(project)
+    assert checked.returncode == 0, (f"adapter-portability went red after `lefthook install`:\n"
+                                     f"{w138.output_of(checked)[-3000:]}")
+    _owner_uninstall(box, project, [project], committed)
+    assert_byte_identical(project, committed, OWNER_ACT)
+    assert_no_change(project, OWNER_ACT)
+    checked = w138.run_portability_check(project)
+    assert checked.returncode == 0, (f"adapter-portability is red after {OWNER_ACT}:\n"
+                                     f"{w138.output_of(checked)[-3000:]}")
