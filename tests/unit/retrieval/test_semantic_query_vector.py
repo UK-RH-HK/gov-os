@@ -34,10 +34,11 @@ def embedder(tmp_path, monkeypatch):
     """A project with a runtime folder, and an embedder whose vector for a text depends on the text embedded just
     before it, as the real one's does; ``state["revision"]`` is what the model list reports."""
     (tmp_path / ".gov-runtime").mkdir()
-    state = {"revision": DIGEST, "calls": [], "fail": False, "previous": None}
+    state = {"revision": DIGEST, "calls": [], "options": [], "fail": False, "previous": None}
 
-    def embed(texts):
+    def embed(texts, options=None):
         state["calls"].append(texts)
+        state["options"].append(options)
         if state["fail"]:
             return None
         vectors = []
@@ -59,6 +60,40 @@ def test_the_question_is_sent_after_the_bare_instruction_in_one_request_and_that
     root, state = embedder
     assert semantic.query_vector(root, "who fires the bowls") == vector(I + "who fires the bowls", I)
     assert state["calls"] == [[I, I + "who fires the bowls"]]
+    assert state["options"] == [{"num_gpu": 0}]
+
+
+def test_a_question_s_request_asks_for_the_cpu_and_a_chunk_s_request_asks_for_nothing(monkeypatch):
+    """The request bodies: the question's names ``num_gpu: 0`` (on the CPU its vector is one vector, §5.5 of the
+    change record); the index's chunks are embedded with the runner as it is loaded, as before."""
+    bodies = []
+
+    def ask(path, body=None):
+        bodies.append(body)
+        return {"embeddings": [[0.5] * 4 for _ in body["input"]]}
+
+    monkeypatch.setattr(semantic, "_ask", ask)
+    assert semantic._embed(["a chunk"]) == [struct.pack("4f", *[0.5] * 4)]
+    assert semantic._embed([I, I + "q"], semantic.QUERY_OPTIONS) is not None
+    assert bodies == [{"model": semantic.MODEL, "input": ["a chunk"]},
+                      {"model": semantic.MODEL, "input": [I, I + "q"], "options": {"num_gpu": 0}}]
+
+
+def test_a_vector_is_computed_again_to_the_same_bytes_with_the_same_request(embedder):
+    """Without the cache, the vector is the computation's: the same request each time, never one that depends on
+    the cache's state (DEC-782)."""
+    root, state = embedder
+    first = semantic.query_vector(root, "q")
+    cache(root).unlink()
+    (root / ".gov-runtime").chmod(0o555)
+    try:
+        semantic._embed(["something else"])
+        again = semantic.query_vector(root, "q")
+    finally:
+        (root / ".gov-runtime").chmod(0o755)
+    assert again == first and not cache(root).exists()
+    assert state["calls"] == [[I, I + "q"], ["something else"], [I, I + "q"]]
+    assert state["options"] == [{"num_gpu": 0}, None, {"num_gpu": 0}]
 
 
 @pytest.mark.parametrize("cache_state", ["cold", "warm", "deleted", "folder unwritable", "file unwritable",

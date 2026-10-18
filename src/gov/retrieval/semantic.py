@@ -9,9 +9,10 @@ DEC-381).
   model list reported when the vectors were built (DEC-374). Vectors of another embedder are dropped and built again.
 - ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write it (DEC-322). Missing, empty
   or stale vectors, an absent ``sqlite_vec`` and an absent Ollama make the facet unavailable; none raises.
-- The embedder gives a text one vector right after a different text and another on a repeat (DEC-773). So a
-  question is sent in one request after the bare instruction, and the vector it gets there is its vector: a text
-  that always follows the same text gets the same vector, whatever this or another process embedded before.
+- On the GPU the embedder gives a text a vector that depends on the prompt the runner computed just before it, by
+  this or any other client (DEC-773; W2-54's change record §5.5). On the CPU it gives one vector whatever came
+  before, whatever the request's shape and whoever else asks at the same time. So a question is embedded on the CPU
+  (``QUERY_OPTIONS``), in one request after the bare instruction, and the second vector is its vector.
 - That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in
   it, keyed by the model, the revision the model list reports at the time of the search and the sha256 of the exact
   text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. The cache only saves a request: a cache that cannot be
@@ -39,6 +40,7 @@ MODEL = "qwen3-embedding:0.6b"
 EMBEDDED = "embedded"  # the one value of ``embedding_policy`` that embeds (DEC-381)
 # A question is embedded with the model's retrieval instruction; a chunk is embedded without one.
 INSTRUCTION = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
+QUERY_OPTIONS = {"num_gpu": 0}  # a question is embedded with no layer on the GPU: on the CPU its vector is one vector
 EMBED_CHARS = 512  # a chunk is embedded as its first characters, this many, as S0b2's R1 does (DEC-406)
 TOP_K = 30  # the nearest chunks the route returns, as S0b2's R1 takes them (DEC-406)
 BATCH = 32
@@ -84,9 +86,11 @@ def _ask(path: str, body: dict | None = None):
         return None
 
 
-def _embed(texts: list[str]) -> list[bytes] | None:
-    """One float32 BLOB per text; None unless the endpoint returned a vector for each."""
-    vectors = (_ask("/api/embed", {"model": MODEL, "input": texts}) or {}).get("embeddings") or []
+def _embed(texts: list[str], options: dict | None = None) -> list[bytes] | None:
+    """One float32 BLOB per text, embedded with the runner ``options`` if given; None unless the endpoint returned a
+    vector for each."""
+    body = {"model": MODEL, "input": texts, **({"options": options} if options else {})}
+    vectors = (_ask("/api/embed", body) or {}).get("embeddings") or []
     if len(vectors) != len(texts):
         return None
     return [struct.pack(f"{len(vector)}f", *vector) for vector in vectors]
@@ -147,14 +151,15 @@ def _cache(path: Path, key: tuple, vector: bytes) -> None:
 
 def query_vector(root: Path, query: str) -> bytes | None:
     """The vector a search compares with for ``query``: the one cached under its key, else the one the embedder gives
-    the question sent right after the bare instruction, in one request (cached then); None when the embedder gives
-    none (nothing is cached). Without a revision in the model list there is no key and nothing is cached."""
+    the question on the CPU, sent right after the bare instruction in one request (cached then); None when the
+    embedder gives none (nothing is cached). Without a revision in the model list there is no key and nothing is
+    cached."""
     text, revision, path = INSTRUCTION + query, _revision(), Path(root) / QUERY_VECTORS_REL
     key = revision and (MODEL, revision, hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest())
     cached = key and _cached(path, key)
     if cached:
         return cached
-    vectors = _embed([INSTRUCTION, text])
+    vectors = _embed([INSTRUCTION, text], QUERY_OPTIONS)
     if vectors is None:
         return None
     if key:
