@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752, DEC-758, DEC-764, DEC-765]
+decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752, DEC-758, DEC-764, DEC-765, DEC-774, DEC-778]
 state_class: EVIDENCE
 ---
 
@@ -796,3 +796,202 @@ The `local_only` live-launch cases were not run, as in §3; the real `~/gov-os-r
 
 The code is 118 lines net, about a third of them docstrings, comments and the option tables. With the earlier rounds
 the change's code is 511 lines added and 102 removed, 409 net, above the estimate of 120 LOC (`est_loc`) by 289 lines.
+
+## 11. The last round, after the review of §10's round (DEC-774, DEC-778)
+
+The review of §10's round found one more behaviour missing (finding D), and the owner widened the round by one more
+(DEC-778). Both were decided on 2026-10-18 (staged for the owner's commit, not yet in this worktree's register):
+
+- **DEC-774 (finding D).** `cp -b` (`--backup`), `install`, `mv` and `cp --remove-destination` onto a symbolic link
+  replace the link with a new file at the link's own path, while the guard judged the link's target. The guard now
+  refuses as doubt a write that replaces a link rather than following it: the four forms, and any other form of `cp`,
+  `install` or `mv` whose write replaces the link at its own path. Ordinary writes through a link to an allowed
+  target, and every copy, install and move run 6 allows into allowed folders, still pass. This record is corrected by
+  a new section; §10 is not rewritten in place.
+- **DEC-778 (one option reader).** The guard's read rule for the protected pair (the settings file and the held-out
+  file) read `mv` and `cp -l` with the older option reader (a `t` inside an option's value read as `-t`; `--`
+  ignored). It now uses the reader the write rule uses (DEC-765), so the guard reads every copy-like command one way,
+  for writes and for reads. The ticket's `allowed_paths` gained `src/gov/guard/protected.py` and
+  `tests/unit/guard/test_protected*` (`b4172c59`).
+
+The test designer added them as `tests/acceptance/W2-50/test_w2_50_link_replaced.py` at `2956f9e7` (88 cases; 58 red
+at `2d60cdd3`, each "not refused: decision=allow") and `tests/acceptance/W2-50/test_w2_50_one_reader.py` at
+`397a80de` (167 cases), tests added after implementation (DEC-136). The suite at `397a80de`: 104 failed, 509 passed:
+the 58 D cases; 38 second names of the stand-in protected file allowed for the orchestrator; 8 refused for the
+engineer by the write rule instead of as reads (the README's sections "Finding D, a write that replaces a link" and
+"One option reader in the guard's read rule").
+
+### The correction of §10
+
+This section corrects §10; §10 is left as written.
+
+- **What §10 claimed.** That a copy, install or move is judged as "the files it writes" (DEC-765), backups included:
+  "with `-b`, `--backup`, `-S` or `--suffix`, the backup `<file><suffix>` is judged beside each file the call
+  replaces"; that for `cp`, `install` and `mv` "a copy, install or move into a folder is judged as each file it
+  writes, and a form whose landed path the guard does not read is refused"; and, on those grounds, that row
+  **W2-H056** was closed within that scope.
+- **What did not hold at `2d60cdd3`** (the tree §10 describes, with its record), each shown red by
+  `test_w2_50_link_replaced.py` at `2956f9e7`: where the path a call writes was a symbolic link, the guard judged the
+  link's target (by its real path), but these forms write the link's own path:
+  - a backup: `cp -b`, `--backup`, `--backup=simple`, `--backup=numbered`, `-S.t`, `--suffix=.bak`, `-bS .t`,
+    `-b -S .t`, `-b -f`, `-b -t`, `-b -T`, `-b --` rename the link to `<link><suffix>` and make a new file at the link's
+    path; the guard judged the backup as `<target><suffix>` and the write as the target;
+  - `cp --remove-destination` (and `--remove`, `--rem`), and `cp -f` onto a link whose target it cannot open for
+    writing, remove the link and make a file at its path;
+  - every `install` and every `mv` (a rename over the link), and `-T` onto a link to a folder (`mv -T`, `install -T`,
+    `cp -b -T`), which replaces the folder link with a file;
+  - `cp -P`, `-a`, `-R`, `--no-dereference` of a source that is itself a link, which put a new link at the
+    destination link's path;
+  - `mv <link> <elsewhere>`, which takes the link away from its own folder, while the guard judged the link's target.
+
+  So with a link at a protected name (an acceptance test's name, another ticket's folder) pointing to an allowed file,
+  a session could put a file at that protected name (58 red). §10's "judged as each file it writes" and its account
+  of backups did not hold for a destination that is a link.
+- **W2-H056 as §10 scoped it** (a copy into a folder of the role's paths that lands on a link *to* the acceptance
+  test) is not reopened by D: such a link is followed by a plain copy and was judged at its target, the acceptance
+  test, and refused. D is the converse layout (a link *at* a protected name, to an allowed file), which §10's general
+  claim covered and did not hold. Since this round it holds (below).
+- **§10 did not name** that the read rule for the protected pair still read `mv` and `cp -l` with the older option
+  reader in a way that left second names of the protected file unread as reads. §10's "What stays open" said
+  `protected.py` read "the second names of `mv` and `cp -l` with the earlier `_cp_operands`" and gave one example
+  (`mv -- -t f`), and that the reader did not serve the write targets. It did not say that a joined value holding a
+  `t` (`mv -S.t F N`, `cp -lS.t F N`), the separate value `-t` of `-S` or `--suffix`, `-S.t` after both operands or
+  after `-t`'s folder, and a dashed name after `--` (`mv -- F -t`) were allowed for the orchestrator (38 red) and
+  refused for the engineer by the write rule, not as reads (8 red). §10's "the guard reads option values as values"
+  (DEC-765) held for the write rule only.
+
+### What holds after this round
+
+- **Refused as doubt** (DEC-774), with the guard's reason naming `/<guard-unresolvable>`, as `ln -t` and `cp --parents`
+  are: a `cp`, `install` or `mv` whose landed path is a symbolic link, when the write replaces the link rather than
+  following it. The landed path is each path the call writes, as §9 and §10 read them: the destination given as the
+  last operand, and each `<folder>/<name>` in a `-t` folder or a destination folder, and below where a folder copy
+  meets a folder already there. A write replaces the link:
+  - for **every `install` and every `mv`**, whatever the options (`install -m 644`, `-b`, `-t`, `-T`, `-D`; `mv -f`,
+    `-b`, `-T`, `-t`, `--`);
+  - for **`cp` with a backup or a replacing option**: `-b`, `--backup` in every spelling and value, `-S` / `--suffix`,
+    `--remove-destination` and its abbreviations, and **`-f` / `--force`**. `cp -f` replaces a link whose target it
+    cannot open for writing (it removes the link and makes a file); whether the target opens is not known ahead, so
+    the form may replace and is refused, onto a writable target and onto a dangling link too;
+  - for **`cp` that copies a link as a link** (`-P`, `-d`, `--no-dereference`, `-a`, `-r`, `-R`, `--recursive`), when
+    the source written there is itself a link;
+  - onto a **link to a folder** given as the last operand, only with `-T` / `--no-target-directory` and one of the
+    above (`mv -T`, `install -T`, `cp -b -T`); without `-T` the tools write into the folder it points to.
+
+  A source that cannot be resolved, given with a destination that is a link to a file or to nothing, is refused too
+  (not tested). Held by the 60 D cases of
+  `link::test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read` (each refusal names the doubt
+  target an `ln -t` refusal names, or, at a protected name, the link or its folder) and the builder test
+  `test_a_write_that_replaces_a_link_is_refused_as_doubt` (20 refused forms, among them `cp -rb <tree> <folder>/`
+  landing on a link two levels down).
+- **A link moved away** (`mv <link> <elsewhere>`, `mv -t <folder> <link>`) is judged, beside the link's target as
+  before, as a write to the folder that holds the link (its real path): the move takes that folder's entry away. So
+  a move of a link out of a protected folder is refused naming that folder, and a link moved between allowed folders
+  is allowed. Held by the 4 "link moved away" D cases, `link::test_a_link_moved_between_allowed_folders_is_allowed`
+  (2), and the builder cases `mv <acceptance link> <folder>/`, `mv -t <folder> <acceptance link>` (refused naming the
+  acceptance folder) and `mv <allowed link> <folder>/` (allowed).
+- **Still allowed:** a plain `cp` (no backup, no `-f`, no `--remove-destination`) through a link to an allowed,
+  writable file, also when the link sits at a protected name, and `cp -t` the same way
+  (`link::test_a_plain_copy_through_a_link_to_an_allowed_file_is_allowed`, 6); `cp`, `cp -b`, `install`,
+  `install -m 644` and `mv` into a link to an allowed folder, or through one at a middle level
+  (`link::test_a_copy_install_or_move_through_a_link_to_an_allowed_folder_is_allowed`, 10); `cp -b`,
+  `cp --remove-destination`, `cp -f`, `install` and `mv -b` onto an ordinary allowed file
+  (`link::test_a_replacing_form_onto_an_ordinary_allowed_file_is_allowed`, 10); `cp -P` of a regular source onto a
+  link, and `cp -r <tree> <folder>/` where the landed path holds a link but no replacing option is given (builder
+  cases). Every copy, install and move into allowed folders that run 6 allows: held by the earlier cases of the suite
+  (the README lists them under "Held already"), all green at this round's tree.
+- **The read rule reads `mv` and `cp -l` as the write rule does** (DEC-778): `_second_names` in
+  `src/gov/guard/protected.py` calls `_copy_args`, the reader of DEC-765 (§10). An option's value is a value (a `t` in
+  `-S.t` is no `-t`, an `l` in `-S.l` no `-l`), nothing after `--` is an option, and `-t` / `--target-directory` and
+  `-l` / `--link` are read from the options as read. The second names are the sources: with a `-t` folder every
+  operand; otherwise every operand but the destination; with an option written after an operand, every operand
+  unless the last word is the last operand (both readings take it as the destination). A `cp` without `-l` gives no
+  second name. **When the options cannot be read** (an option the tool does not know, an ambiguous abbreviation, a
+  value missing), every word of the call is taken as a second name, so a call that names a protected file or its
+  folder anywhere is refused as a read; the write rule refuses such a call as doubt in any case (DEC-764). Held by
+  `reader::test_a_second_name_for_the_protected_file_is_refused_as_a_read_however_the_options_are_written` (79),
+  `reader::test_a_second_name_is_refused_as_a_read_also_for_a_role_that_may_not_write_the_file` (10: the read refusal,
+  not the write rule's), the controls `reader::test_the_same_forms_of_an_unprotected_file_stay_allowed` (60) and
+  `reader::test_a_plain_copy_of_an_unprotected_file_with_such_options_is_not_refused_as_a_read` (16), the premise
+  (2), and the builder tests of `tests/unit/guard/test_protected_one_reader.py` (51, among them `mv --no-such F N`
+  and `cp -q F N` giving every word). `_cp_operands`, the older reader, is removed: nothing else used it.
+
+### What stays open
+
+- **Rows W2-L354** (`ln -f` / `ln -sf` onto the own folder's marker) and **W2-L350** (a FIFO in the marker's place):
+  unchanged, not this round's work.
+- **§10's open points stay as §10 states them:** `POSIXLY_CORRECT` (a dashed word after the first operand is not
+  judged as a source landing in the destination), numbered backups and `SIMPLE_BACKUP_SUFFIX` onto an ordinary file
+  (onto a link every backup form is now refused), other tools that write into a folder, another coreutils version.
+  §10's point on `protected.py` is closed by DEC-778 (above).
+- **Other tools that replace a link rather than follow it, read from the code, not tested:** DEC-774 names `cp`,
+  `install` and `mv`, and the guard reads the link check for those three only. `sed -i` without `--follow-symlinks`
+  (as GNU sed documents it, not tried here) replaces a link with a new file at the link's own path, and the guard
+  judges the link's target (its `sed` branch resolves the path); `rm <link>` removes the link at its own path and is
+  judged at the target. So a link at a protected name, pointing to an allowed file, can still be replaced by `sed -i`
+  or removed by `rm`. Returned to the lead.
+- **Stricter than D, not tested:** `cp --backup=none` / `--backup=off` (which follow the link, the README's
+  discovery) are refused onto a link, since any `-b` / `--backup` counts; `cp -L` or `-H` with `-a` / `-R` of a
+  source that is a link (which dereference it) are refused onto a link, since `-a` / `-R` count whatever follows.
+- The README's discovery that `mv -t <folder>` is judged as the folder itself, unlike `cp -t` and `install -t`, is
+  unchanged: stricter, not this round's work.
+
+### What the repair changed, file by file
+
+- **`src/gov/guard/decide.py`** (DEC-774, DEC-778):
+  - `_CP_REPLACING` (`b`, `S`, `remove-destination`, `f`, `force`) and `_CP_AS_LINK` (`P`, `d`, `no-dereference`,
+    `a`, `archive`, `r`, `R`, `recursive`): the `cp` options, as `_copy_args` reads them, with which a write replaces
+    a link, always or when the source is a link.
+  - In `_extract_bash_write_targets`: `replace_any` (any `install` or `mv`, or `cp` with a replacing option) and
+    `replace_links` (`cp` copying links as links), set for each `cp`, `install` and `mv` before `_copies`, and
+    `_replaces(src)` from them. `_land` adds `/<guard-unresolvable>` when the landed path is a link and `_replaces`
+    holds; `_into`, for the destination as the last operand, adds it when the destination is a link to a file or to
+    nothing (or, with `-T`, any link) and a source replaces it or cannot be resolved.
+  - The `mv` branch: for each source that is a link, the real path of the folder that holds it is a target.
+  - `_cp_operands` removed (34 lines): `protected.py` no longer imports it.
+- **`src/gov/guard/protected.py`** (DEC-778): imports `_copy_args` in place of `_cp_operands`; `_second_names` reads
+  `mv` and `cp` with it, as described above.
+- **`tests/unit/guard/test_runs.py`** — builder test `test_a_write_that_replaces_a_link_is_refused_as_doubt` (32
+  cases: 20 refused, 12 allowed), regression evidence only (temporary HOME).
+- **`tests/unit/guard/test_protected_one_reader.py`** (new) — builder tests of the read rule's reader (51 cases),
+  regression evidence only; the stand-in is a temporary project's own settings file.
+- **Not changed:** `src/gov/guard/runs.py`, `src/gov/launch/launcher.py`, `src/gov/secrets/__init__.py`,
+  `template/governance/kernel/checks/secrets-indexing.yaml`, every acceptance test.
+
+### Verification of this round
+
+At `1c80aa97`'s tree, run by the lead in this worktree with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-50/src`
+(DEC-732); `gov.__file__` is `/home/usain/gov-os-worktrees/W2-50/src/gov/__init__.py`:
+
+| Run | Result |
+|---|---|
+| `tests/acceptance/W2-50` | **613 passed** (104 failed, 509 passed at `397a80de`): 358 before this round, and its 88 + 167 |
+| Builder tests `tests/unit` | **2267 passed, 1 skipped** (2184 at §10's round, and this round's 32 + 51) |
+
+The lead's full verification follows this record (every suite, the rebuild). The engineer who wrote this record ran
+no suite. The real `~/gov-os-runs` still does not exist.
+
+### Commits and size of this round
+
+| Commit | Role | What |
+|---|---|---|
+| `2956f9e7` | independent-test-designer | 88 acceptance cases for D (`test_w2_50_link_replaced.py`) and the README's section; 58 red at `2d60cdd3` |
+| `b4172c59` | orchestrator | The ticket's `allowed_paths` widened for DEC-778 (`src/gov/guard/protected.py`, `tests/unit/guard/test_protected*`) |
+| `397a80de` | independent-test-designer | 167 acceptance cases for DEC-778 (`test_w2_50_one_reader.py`) and the README's section; the suite 104 failed, 509 passed |
+| `1c80aa97` | engineer | The repair: `src/gov/guard/decide.py`, `src/gov/guard/protected.py`, the builder tests |
+| The commit that adds this section | engineer | `docs/changes/W2-50-CIT-E.md` only |
+
+`git show --shortstat 1c80aa97`: 4 files, 170 insertions, 40 deletions.
+
+| Part | Added | Removed |
+|---|---|---|
+| `src/gov/guard/decide.py` | 32 | 34 |
+| `src/gov/guard/protected.py` | 16 | 6 |
+| **Code** | **48** | **40** |
+| `tests/unit/guard/test_runs.py` | 45 | 0 |
+| `tests/unit/guard/test_protected_one_reader.py` (new) | 77 | 0 |
+| **Builder tests** | **122** | **0** |
+
+The code is 8 lines net: the older reader's 34 lines removed, the link check and the shared reader added. With the
+earlier rounds the change's code is 559 lines added and 142 removed, 417 net, above the estimate of 120 LOC
+(`est_loc`) by 297 lines.
