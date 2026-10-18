@@ -178,13 +178,13 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 
 ## 3. The rest of the list, by severity
 
-791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), W2-L343 (DEC-741), W2-M360 and W2-L344 to W2-L348 (DEC-757), W2-H056, W2-L349, W2-L350 and W2-M361 to W2-M363 (DEC-758), W2-H057 (DEC-759), W2-H058 and W2-L351 (DEC-761), W2-M364 and W2-L352 (DEC-762), and W2-M365, W2-M366 and W2-L353 (DEC-763), so 820 are open, 58 of them high, 366 medium and 353 low. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
+791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), W2-L343 (DEC-741), W2-M360 and W2-L344 to W2-L348 (DEC-757), W2-H056, W2-L349, W2-L350 and W2-M361 to W2-M363 (DEC-758), W2-H057 (DEC-759), W2-H058 and W2-L351 (DEC-761), W2-M364 and W2-L352 (DEC-762), and W2-M365, W2-M366 and W2-L353 (DEC-763), W2-L354 (DEC-765), W2-M367 (DEC-768), and W2-H059 and W2-H060 (DEC-772), so 824 are open, 60 of them high, 367 medium and 354 low. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
 
 - **How the list was made:** helpers read every line of `bootstrap.md` and the register, and gave one row per item. The orchestrator added the exit report's residuals and the audit's findings, and merged rows with the same title (2 merged).
 - **What remains to check:** a row is carried as the source recorded it. Rows that name one problem from two places may remain; the source references join them. Before a ticket picks a row up, its state is re-checked against the code at that time, because a later commit may have fixed it unrecorded.
 - **Where to read more:** the full text of each item is at its source line. Item ids are stable once committed; new items take the next free id of their severity.
 
-### 3.1 high (58)
+### 3.1 high (60)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -246,8 +246,10 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-H056 | A copy or install into a folder (`cp X d/`, `cp X d`, `install X d/`, `cp -r s/. d/`) is judged by the folder, so it writes through a symbolic or hard link already in it: an acceptance test, another ticket's file, a local clone's objects | engineer | Every copy or install into a folder is judged as each file it writes, `<folder>/<name>`, under the same link and hard-link rule as a direct write, and refused with the guard's reason. Closed by W2-50. | W2-50 extra review F1, 2026-10-17 (DEC-758) |
 | W2-H057 | Guard-hardening pass (Wave 3): no systematic inventory of the command shapes that write (copy into folders, links, merges, opaque interpreters); Wave 2's reviews found three such holes (MultiEdit, the merge-back, the copy through a link) | engineer | Every command shape that writes is inventoried and judged by the guard, each with a test of its own, before qualification. | Owner, 2026-10-17 (DEC-759) |
 | W2-H058 | Neither the guard nor the CLI enforces an act command's declared write paths: a role denied a direct write to a file can rewrite it through a `gov` command (found with `gov release --lock-from` and `governance/framework.lock`) | engineer | Every act command's writes are judged against the caller's role and allowed paths, by the guard or by the command, and refused with a reason; each act command has a test of it. | W2-16 last review R2-F1, 2026-10-17 (DEC-761) |
+| W2-H059 | Every role check that reads `GOV_ROLE` can be spoofed: a session sets the variable for one command (found with `gov release` from an auditor's session, R3-NAMED) | engineer | A session's identity is bound to its launch, and every role check reads that binding, not a variable the caller sets (W2-44). | W2-16 run-2 review R3-NAMED, 2026-10-18 (DEC-772) |
+| W2-H060 | The guard skips a leading `NAME=value` assignment, and reads an `env` prefix as the command, in front of a `gov` command, so a session runs `GOV_ROLE=orchestrator gov …` or `env -u GOV_ROLE gov …` past a role check (found with `gov release`, R3-NAMED) | engineer | The guard refuses a leading `NAME=value` assignment or an `env` prefix in front of any `gov` command, with a reason (W2-42). | W2-16 run-2 review R3-NAMED, 2026-10-18 (DEC-772) |
 
-### 3.2 medium (366)
+### 3.2 medium (367)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -617,8 +619,9 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M364 | W1-46's 23 live-session cases fail at setup under parallel load (the launched session runs a step without its `cd`, so its probe script is not found) and pass alone (Wave 3; the fix of their `load_sensitive` entries, DEC-762) | independent-test-designer | The cases are robust under load, or run serially; their `load_sensitive` entries leave the list. | W2-03 run 2, 2026-10-17 (DEC-760, DEC-762) |
 | W2-M365 | After the probe, an integration-side edit of the ticket file (DEC-757 item 2.2) can change `profile`, `allowed_paths`, `wbs_id` or `external-ref`, and then unprobed code closes or the acceptance folder moves | engineer | The probe gate reads those fields at the probed commit, or refuses an integration-side edit that changes them (W2-41). | W2-53 review finding 2, 2026-10-17 (DEC-763) |
 | W2-M366 | A ticket-file edit after the probe whose commit names another ticket's task passes the probe gate, for an orchestrator's commit and for an engineer's | engineer | Such an edit refuses, for every role. | W2-53 lead P-3, 2026-10-17 (DEC-763) |
+| W2-M367 | A refused close's envelope does not carry the ratchet's report: the accepted reds it let through and the load-sensitive re-runs are stated only in a passing close's record | engineer | A refused close states the ratchet's report beside its findings, each test by name (W2-41). | W2-53's first close, 2026-10-18 (DEC-768) |
 
-### 3.3 low (353)
+### 3.3 low (354)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -975,6 +978,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L351 | Which commit the owner tags for a release (the commit the manifest names, or the commit holding the release record) is not stated, and `gov release`'s verify does not check the tag against the manifest's `commit` | engineer | The release notes state which commit is tagged, and verify refuses a tag that names another commit. | W2-16 last review R2-P2, 2026-10-17 (DEC-761) |
 | W2-L352 | `tests/unit/close/test_follow_up.py::test_at_the_time_limit_the_processes_a_run_started_are_ended_with_it` fails under parallel load (`-n 8`) and passes alone (Wave 3; the fix of its `load_sensitive` entry, DEC-762) | independent-test-designer | The case is robust under load, or runs serially; its `load_sensitive` entry leaves the list. | W2-53 review, 2026-10-17 (DEC-762) |
 | W2-L353 | W1-50 makes a finding of an owner's commit that names a ticket in `Task:`, even when it changes only that ticket's file from the integration side | engineer | W1-50's ledger states the case; owner commits name `Task: decision-record`. | W2-53 lead P-1, 2026-10-17 (DEC-763) |
+| W2-L354 | `ln -f` and `ln -sf` into the session's own folder under `~/gov-os-runs` replace its marker; the session can only hand over its own folder | engineer | A link whose destination is the own folder's marker is refused, for every form of `ln`. | W2-50 run-5 review finding C, 2026-10-18 (DEC-765) |
 
 ### 3.4 info (41)
 

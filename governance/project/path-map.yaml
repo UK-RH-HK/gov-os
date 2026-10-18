@@ -214,6 +214,11 @@ decision_citations_base: "46ec8da3"
 # The trailers check (DEC-482, DEC-579): the commit after which commits are judged for their trailers
 # (the commit that records DEC-476).
 trailers_base: "1c33dd28"
+# Commits after the base that the trailer gate and the product-traceability check do not judge (DEC-734): each
+# with the owner's ACCEPTED decision that names it.
+accepted_history:
+  - commit: "93bcb247990552c07dfbe9a20c685830b47e46d2"
+    decision: DEC-717
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200

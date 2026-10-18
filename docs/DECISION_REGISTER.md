@@ -8371,3 +8371,87 @@ The owner committed DEC-757 to DEC-760 as `078d9553` (`Role: owner`), with the f
 | 0.233 | 2026-10-17 | Owner: DEC-761 (P-W2-21 (a): W2-16's last round, tests first: `--lock-from` refused once a release is recorded or with no release record, a deleted release block fails, a tag from a source with no records refused, `gov release` only for the orchestrator or the owner in a plain terminal, W1-39 and W1-32 revised as recorded rewrites; one review of that change; W2-H058, W2-L351), DEC-762 (`load_sensitive` shrinks like `accepted_reds`: every entry names its fix, W2-M332 for the p95 cases, W2-M364 for W1-46's; the check built in W2-19; W1-46's 17 parameterised entries named in full; a close unit test that flakes under load joins, W2-L352). Delegated: DEC-763 (W2-53's packages P-A, P-1, P-3 as rows W2-M365, W2-L353, W2-M366; P-4 settled by DEC-762 item 3). Next free id: DEC-764. |
 
 ---
+
+## 234. The owner's answers of 2026-10-18 on W2-50's last review, the ratchet lists' growth and W2-16's case defect (register v0.234, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+The owner committed DEC-761 to DEC-763 as `1330e0e2` (`Role: owner`). W2-50's run 5 (DEC-758's last round, head `8a310cb2`, CP-DAEO-kl5e-0032, probed) returned PACKAGES: the round was green, and its one review failed. Finding A: `cp --parents X -t <folder>` writes `<folder>/<X as written>`, not `<folder>/<name>`, so the copy leaves the folder; the guard allowed it, and the reviewer overwrote an acceptance test and another ticket's file with it in temporary projects. Finding B, older (W1-46): the guard's option parser reads a `t` inside an option's value as `-t` (`cp -S.t`, `cp -bS.t`, `install -S.t`, `install -oroot`, `install -m+t`) and does not honour `--`. Finding C (low): `ln -f` and `ln -sf` into the session's own folder replace its marker.
+
+### DEC-764 — W2-50 one more short round: `cp --parents` refused as doubt (P-W2-24 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-728, DEC-758, DEC-413, DEC-737 · **Basis:** P-W2-24; W2-50's run-5 return (head `8a310cb2`), its review draft `.gov-runtime/scratch/lead/probes/PR-DAEO-kl5e-last-round.md` in W2-50's worktree.
+- **Decision:**
+  1. **One more short round for W2-50, tests first:** the guard refuses `cp --parents` (and every option that makes the landed path other than `<folder>/<name>`) as doubt, the way `ln -t` is refused.
+  2. **The change record is corrected:** W2-50's CIT-E states what holds after this round; its §9 claim that every copy into a folder is judged file by file, and that W2-H056 is closed, is corrected by a new section, not rewritten in place.
+  3. With DEC-765, then **one review of that change only.** A pass record is committed under `docs/probes/DAEO-kl5e/` and W2-50 holds for the close order (it closes after W2-53, DEC-760); a fail comes back to the owner.
+
+### DEC-765 — The guard reads option values as values and honours `--`, in the same round (P-W2-25 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-764, DEC-728 · **Basis:** P-W2-25; finding B of W2-50's run-5 review.
+- **Decision:**
+  1. **Folded into DEC-764's round:** the guard's copy, install and move parser knows the short options that take a value (among them `-S`, `-o`, `-g`, `-m`, `-Z`, joined or separate) and reads their values as values, not as options; it honours `--`, so nothing after it is read as an option and the destination is still judged. `cp -S.t`, `cp -bS.t`, `install -S.t`, `install -oroot`, `install -m+t` onto an acceptance test, and `cp -- -t F`, are judged as the files they write.
+  2. One review covers DEC-764 and this entry together, on that change only.
+  3. **W2-L354 (low):** `ln -f` and `ln -sf` into the session's own folder replace its marker (finding C); this hands over only the session's own folder.
+
+### DEC-766 — The ratchet lists only shrink; an addition comes to the owner as a package first
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-757, DEC-762 · **Basis:** DEC-762 item 4, where the orchestrator folded a new `load_sensitive` entry (the unit test that flakes under load) into a batch as its own proposal, and `load_sensitive` grew from 26 to 27.
+- **Decision:**
+  1. **From `1330e0e2` on, `accepted_reds` and `load_sensitive` only shrink.** An entry leaves when its fix closes, or when its test passes (DEC-757).
+  2. **Any addition comes to the owner as a decision package first,** with its exact test id, the evidence that it is load-sensitive or a known red, and the ticket or row that fixes it. It is never folded into a batch of other answers, and the orchestrator never proposes one inside a decision entry.
+
+### DEC-767 — W2-16's case defect P-R3-2: a one-line test fix in its resume round (delegated)
+- **Status:** ACCEPTED (delegated by the orchestrator under MR-6 and DEC-220, 2026-10-18; listed in the digest; the owner overturns it in the next batch) · **Under:** DEC-761, DEC-491, DEC-737 · **Basis:** W2-16's run-2 return (held at `1908149d`, review pass on `d9035982`, record `6f5c5cf3`): W2-16's suite 113 of 114, the one failure a defect of the case (it copies into a folder it has already filled), not of the code.
+- **Decision:**
+  1. **P-R3-2, option (a):** in W2-16's resume round (after the owner's answers to P-W2-22 and P-W2-23), its test designer corrects that case in one line, as a recorded rewrite with its reason (`Rewrite-Reason:`, DEC-491), keeping its purpose; the lead then has the case's change judged by a reviewer, on that change only, before the hold.
+  2. P2, reversible, the proposer's recommendation and the orchestrator's agree, confidence medium-high; it changes no code, weakens no check, and touches no installs, held-out path, release or main branch.
+- Next free id: DEC-768.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.234 | 2026-10-18 | Owner: DEC-764 (P-W2-24 (a): one more short W2-50 round, tests first: `cp --parents` refused as doubt; the change record corrected), DEC-765 (P-W2-25 (a): the guard reads option values as values and honours `--`, in the same round; one review of that change only; W2-L354), DEC-766 (`accepted_reds` and `load_sensitive` only shrink; an addition comes to the owner as a package first). Delegated: DEC-767 (W2-16's case defect P-R3-2, a one-line recorded rewrite in its resume round). Next free id: DEC-768. |
+
+---
+
+## 235. The owner's answers of 2026-10-18 on W2-53's refused close, the sandbox for leads, and W2-16's deferred and named findings (register v0.235, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit, with v0.234)
+
+W2-53 was merged into `w2/integrate` at `c9537e39` (`Task: DAEO-7rr2`; its tree is git's own merge of its parents). `gov close DAEO-7rr2` refused with exit 3, `CHECK_FAILED` (log `close-DAEO-7rr2.json`): acceptance 57 passed; regression 13,310 passed and 2 failed in parallel (W1-42's two `accepted_reds`, which the ratchet let through), 263 passed serial afterwards. Its findings: three hard-block checks RED, each red before W2-53's merge too and none of them W2-53's work (core-schema, on `docs/audit/wave-1/W1-43-wave-1-exit-audit.md`, which has no `type`; product-traceability-trailers, on W1-42's claim commit `93bcb247`, which has no `Implements:`; context-reproducibility, which ran past its 60-second limit), and a stale checkpoint. Run alone, context-reproducibility takes 122 seconds and fails on 15 tickets: two computations of a ticket's context give its `dropped` list in two orders.
+
+### DEC-768 — The three pre-existing reds are cleared, never weakened; W2-54; then W2-53 is closed again (P-W2-26 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-757, DEC-717, DEC-734, DEC-482, CAP-33 · **Basis:** P-W2-26; W2-53's refused close; the orchestrator's runs of `gov check` at `1330e0e2` (before the merge) and at `c9537e39`, and of the context check alone.
+- **Decision:**
+  1. **The W1-43 audit record (P-W2-28 (a), refined):** W2-54 adds the audit record type to core-schema **exactly as W2-02 defines it on its held branch** (`w2/W2-02` at `2a35fd7b`), so no second or conflicting type is made and W2-02's later merge adds nothing new for that type: the type `audit-report`; its schema `template/governance/kernel/schemas/audit-report.schema.json` byte for byte as W2-02's (required `milestone`, `commit`, `pack_sha256`; `type` optional, `const: audit-report`); a standalone type (no shared frontmatter owed, DEC-441, DEC-565); and a record in `docs/audit/` that states no `type` read as an audit report (DEC-626), in W2-02's words in `src/gov/check/schema.py`. **After W2-54 merges, the W1-43 audit report gets only the frontmatter lines that type requires, body untouched.** Run with W2-02's code on the untouched record, core-schema finds nothing: the record already holds `milestone`, `commit` and `pack_sha256`, and its folder gives its type, so the orchestrator expects no line to be added. The record's sha256 before: `b14e17d6e71b2727c3cea123dec112fdccbeb27afc1f50b67f5e27294ecdac1d`; after: recorded here by the orchestrator's commit once W2-54 has merged (the same hash where no line is owed).
+  2. **W1-42's claim commit is accepted history:** the path map's `accepted_history` holds `{commit: 93bcb247990552c07dfbe9a20c685830b47e46d2, decision: DEC-717}` (DEC-734's form). DEC-717 is the owner's ACCEPTED entry that names `93bcb247` (the claim commit, with no `Implements:` and no `Role:`); the trailer gate and the product-traceability check no longer judge that one commit, and judge every other as before.
+  3. **After the owner's commit of this batch: W2-54, a short fix ticket, alone, tests first, one review** (FULL; its card, staged): the context packet's `dropped` list is sorted stably with a full tie-break, so two computations of a ticket's context give one hash; and the context-reproducibility check is given a declared time limit (`timeout-seconds`, as `retrieval-regression` and `secrets-indexing` declare theirs) that fits its measured run, with the measurement recorded in W2-54's change record. The declaration is a kernel file: this entry approves that one change (CAP-33). Then W2-53 is closed again with `gov close`, after a fresh transition checkpoint.
+  4. **No hard-block check is weakened** to let a close pass (P-W2-26 option (c) refused).
+  5. **W2-M367 (W2-53's residual):** a refused close's envelope does not carry the ratchet's report (the accepted reds it let through and the load-sensitive re-runs); only a passing close's record states them.
+
+### DEC-769 — Leads run sandboxed, in W2-21; the test designer writes only its own acceptance folder (P-W2-27 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-715, DEC-315, DEC-728, DEC-759 · **Basis:** P-W2-27. A launched worker's Bash already runs in the operating-system sandbox, writing only its own worktree and session folder (and its own folder under `~/gov-os-runs` once W2-50 lands), with `tests/acceptance/**`, the tickets, `.claude` and `.gov-runtime` (but its scratch) read-only for every role but the test designer; W1-46's live cases show such writes fail. Leads and the orchestrator run with no sandbox, so for them the guard's reading of shell text is the only layer.
+- **Decision:**
+  1. **Folded into W2-21 (the stable lead launch).** It starts with a feasibility test of one to two hours: can a sandboxed lead start a sandboxed worker on this machine? Its result is recorded and brought to the owner if it fails.
+  2. **Then leads run sandboxed:** the lead's worktree writable; `tests/acceptance/**`, every other worktree and every other ticket's folder read-only.
+  3. **The independent test designer writes only its own ticket's acceptance folder** (`tests/acceptance/<its WBS id>/`), not the whole of `tests/acceptance/`.
+  4. **The orchestrator's own session stays unsandboxed.**
+
+### DEC-770 — Standing policy: a guard text-reading hole only an unsandboxed session can reach becomes a row
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-769, DEC-759, DEC-413
+- **Decision:**
+  1. **Once leads are sandboxed (W2-21 closed),** a hole in the guard's reading of shell text that only an unsandboxed session can reach (the orchestrator's) becomes a list row, not a new round of the ticket that found it.
+  2. **Until W2-21 lands, a hole that leads can reach is still fixed** in the ticket that found it, as now.
+
+### DEC-771 — W2-16's never-recorded sources go to W2-17 and W2-18; W2-18 refuses a lock that shows `release: null` (P-W2-22 (b))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-761, DEC-105, DEC-722 · **Basis:** P-W2-22; W2-16's run-2 return (held at `1908149d`): P-R3-1, a source that has never recorded a release, against W1-39's closed suite; with P-R3-4 (the migration document copied again) and P-R3-5 (a shallow source refused).
+- **Decision:**
+  1. **Deferred:** P-R3-1, P-R3-4 and P-R3-5 are W2-17's (`gov update`) and W2-18's (pinned install), in their own rounds, tests first; W1-39's closed suite is not reopened by W2-16.
+  2. **The condition:** W2-18 refuses to pin a product repository to a lock that shows `release: null`. Until then, R3-F3 (a lock laundered to `release: null`) is a residual of W2-16's close.
+
+### DEC-772 — `gov release` is the owner's alone, from a plain terminal; the guard refuses a prefix in front of any `gov` command (P-W2-23)
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-761, DEC-409, DEC-722 · **Basis:** P-W2-23; W2-16's run-2 review, finding R3-NAMED: from an auditor's session, `GOV_ROLE=orchestrator gov release` and `env -u GOV_ROLE gov release` wrote a release and a lock.
+- **Decision:**
+  1. **`gov release` is owner-only, from a plain terminal,** like `gov approve` and the freeze lift: it refuses with a Claude Code process among its ancestors, with `GOV_ROLE` or `GOV_TICKET` set, or without a terminal, and asks for a typed one-time code. **This replaces DEC-761 item 1's line "`gov release` refuses unless the role is orchestrator, or the owner in a plain terminal".** It is W2-16's next round, and that round does only this (tests first, one review of that change); W2-16's allowed paths do not change.
+  2. **And (b): the guard refuses a leading `NAME=value` assignment or an `env` prefix in front of any `gov` command:** a high row, W2-H060, triaged to W2-42 (the guard-holes ticket), not W2-16's.
+  3. **W2-H059 (high, triaged to W2-44):** every role check that reads `GOV_ROLE` can be spoofed until a session's identity is bound to its launch.
+- Next free id: DEC-773.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.235 | 2026-10-18 | Owner: DEC-768 (P-W2-26 (a): W1-42's claim commit `93bcb247` accepted history under DEC-717; W2-54 sorts the context packet's dropped list stably, gives the context check a declared time limit fitting its measured run, and adds the `audit-report` type exactly as W2-02 defines it (P-W2-28 (a), refined), after which the W1-43 record gets only the lines that type requires, its sha256 before and after recorded; then W2-53 closes again; no hard-block check weakened; W2-M367), DEC-769 (P-W2-27 (a): leads sandboxed in W2-21 after a feasibility test; the test designer writes only its own acceptance folder; the orchestrator unsandboxed), DEC-770 (a guard text-reading hole only an unsandboxed session can reach becomes a row once leads are sandboxed), DEC-771 (P-W2-22 (b): never-recorded sources to W2-17 and W2-18; W2-18 refuses `release: null`), DEC-772 (P-W2-23: `gov release` owner-only from a plain terminal with a one-time code, replacing DEC-761's orchestrator line, W2-16's next round and nothing else; the guard's refusal of a prefix in front of any `gov` command is W2-H060, for W2-42; W2-H059). Next free id: DEC-773. |
+
+---

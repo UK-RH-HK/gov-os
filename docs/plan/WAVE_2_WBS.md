@@ -117,6 +117,7 @@ Three tracks.
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
 | W2-52 | A | The lite A7 and A10 stage records (DEC-741) | implementation | engineer | FULL | W2-01, W2-49 | 100 | CAP-44.f (lite) |
 | W2-53 | A | The probe gate measures every later merge against git's own merge of its parents; owner-accepted known reds, integration-side ticket edits, a load-sensitive quarantine (DEC-750, DEC-754, DEC-757) | implementation | engineer | FULL | W2-01 | 160 | DEC-750 item 2, DEC-757 |
+| W2-54 | A | The context packet's dropped list in a stable order; the context-reproducibility check's declared time limit; the `audit-report` type as W2-02 defines it (DEC-768) | implementation | engineer | FULL | — | 60 | DEC-768 items 1 and 3 |
 | W2-26 | B | EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg) | research | research | STANDARD | the owner's copy (DEC-723); a `/tmp` clone until W2-50 (DEC-728) | 60 | EXP-003 (EXAMIN), W2-I041 |
 | W2-27 | B | EXAMIN adoption on a copy | integration | orchestrator | FULL | the DEC-727 subset, W2-26, W2-49, W2-50, W2-19 (DEC-736), W2-52 (DEC-741) | 0 | Track B |
 | W2-28 | B | Independent verdict on the copy | audit | independent-auditor | FULL | W2-27 | 0 | Track B |
@@ -134,7 +135,7 @@ Three tracks.
 | W2-39 | C | Model and provider switch reconstructs the same inputs | implementation | engineer | STANDARD | W2-04 | 80 | CAP-37.e |
 | W2-40 | C | EXP-002: the untested sandbox cases and the harness's hook limits | research | research | FULL | W2-21 | 60 | CAP-61.f, W2-H052 |
 | W2-41 | C | Close and escalation integrity | implementation | engineer | FULL | W2-19 | 160 | W2-H022 … W2-H025, W2-H033 |
-| W2-42 | C | Guard: missing role, links, late paths, atomic saves | implementation | engineer | FULL | W2-10 | 180 | W2-H006, H007, H009, H010, H011, H013, H031 |
+| W2-42 | C | Guard: missing role, links, late paths, atomic saves | implementation | engineer | FULL | W2-10 | 180 | W2-H006, H007, H009, H010, H011, H013, H031, H060 |
 | W2-43 | C | CI integrity and the secret-rule floor | implementation | engineer | STANDARD | W2-08 | 140 | W2-H002, H008, H014, H027, H028 |
 | W2-44 | C | Trailers bound to the launch identity | implementation | engineer | FULL | W2-21 | 160 | W2-H019 |
 | W2-45 | C | `gov check` runner semantics and scale | implementation | engineer | STANDARD | W2-08 | 160 | W2-H018 |
@@ -397,6 +398,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The vendored skills carry their licence and version in the release [W2-L002, W2-L014].
 - **KPIs, failure:** a release whose files or manifest do not match their hashes is refused by `gov install`, `gov update` and `gov doctor`.
 - **DEC-761 (owner, 2026-10-17; P-W2-21 (a)), one more round after the failed last review, tests first:** `gov release --lock-from` refuses once the lock records a release, and when the source holds no release record; a lock whose release block was deleted fails; a version tag from a source with no records is refused; `gov release` refuses unless the role is orchestrator (or the owner in a plain terminal), so engineers and auditors never cut or rewrite a release; W1-39's no-files case and W1-32's command list are revised as recorded rewrites with their reasons. Then one review of that change only.
+- **DEC-767 (delegated) and DEC-772 (owner, 2026-10-18), W2-16's next round:** the case defect P-R3-2 corrected in one line as a recorded rewrite; **`gov release` is owner-only, from a plain terminal** (refused with a Claude Code ancestor, with `GOV_ROLE` or `GOV_TICKET` set, or without a terminal; a typed one-time code), replacing DEC-761's orchestrator line. The round does only this, tests first, with one review of that change; the allowed paths do not change. The guard's refusal of a `NAME=value` or `env` prefix is W2-42's (W2-H060).
+- **DEC-771 (owner, 2026-10-18):** never-recorded sources (P-R3-1, with P-R3-4 and P-R3-5) are W2-17's and W2-18's, not W2-16's; R3-F3 is a residual of W2-16's close.
 
 #### W2-17 `gov update` (FULL, engineer)
 - **Allowed paths:** `src/gov/update/**` (new), `src/gov/adapters/**` (regeneration only), `tests/unit/update/**`.
@@ -411,6 +414,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:**
   - An update to a release that fails hash verification refuses.
   - An overlay file changed by the update is a failure and triggers the rollback.
+- **DEC-771 (owner, 2026-10-18):** an update from or to a source that has never recorded a release is handled here, tests first, with W2-16's P-R3-4 (the migration document copied again) and P-R3-5 (a shallow source refused).
 
 #### W2-18 Pinned install: a product repository runs a fixed release, never the development copy (STANDARD, engineer)
 - **Allowed paths:** `src/gov/install/**` (new), `src/gov/doctor/install*`, `template/governance/kernel/hooks/**` (the import fallback only), `tests/unit/install/**`.
@@ -421,6 +425,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The kernel hooks import the pinned `gov`, never a product's own package named `gov`. With no `gov` installed, they say so clearly instead of blocking every call [W2-H032, W2-M279, W2-L172, W2-L230, W2-L173, W2-L174].
   - Two repositories on the machine can run two different releases side by side [CAP-43].
 - **KPIs, failure:** a product session that imports this repository's `src/gov` is refused by doctor and reported.
+- **DEC-771 (owner, 2026-10-18):** `gov install` refuses to pin a product repository to a lock that shows `release: null`, and a source that has never recorded a release is handled here, tests first.
 
 #### W2-19 Language-agnostic test commands (FULL, engineer)
 - **Needs first:** a Rust toolchain for the fixture (an install package under DEC-083, queued Q-6); Node 22 is present.
@@ -454,6 +459,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Launched sessions can run `gov check`, `gov rebuild` and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181].
   - The kernel template's settings carry one narrow allow rule, `Bash(gov launch:*)` [DEC-715].
 - **KPIs, failure:** a raw `claude` launch stays unallowed in the template.
+- **DEC-769 (owner, 2026-10-18), leads sandboxed:** first a feasibility test of one to two hours (can a sandboxed lead start a sandboxed worker on this machine?), its result recorded; then leads run in the operating-system sandbox, their worktree writable and `tests/acceptance/**`, every other worktree and every other ticket's folder read-only; the independent test designer writes only `tests/acceptance/<its WBS id>/`. The orchestrator's session stays unsandboxed. DEC-770: once this closes, a guard text-reading hole only an unsandboxed session can reach becomes a row.
 
 #### W2-22 `gov doctor` green (STANDARD, engineer)
 - **Allowed paths:** `src/gov/doctor/**`, `governance/project/tool-registry.yaml`, `tests/unit/doctor/**`.
@@ -587,6 +593,20 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - A red not on `accepted_reds` refuses the close. A listed red that passes refuses the close, naming the entry to remove. An entry added by a commit without `Role: owner`, or whose decision is not an ACCEPTED owner entry naming that test id, is refused, naming the entry; the list never grows without an owner decision [DEC-757].
   - A ticket-file change on the ticket's own side after the probe, or an integration-side commit that changes more than the ticket's file, still refuses [DEC-757].
   - A load-sensitive test that fails its isolated re-run refuses; a test not on `load_sensitive` is never re-run; no re-run is silent [DEC-757].
+
+#### W2-54 The context packet's dropped list in a stable order; the context check's declared time limit; the audit-report type (FULL, engineer; DEC-768)
+- **Why:** W2-53's close refused on context-reproducibility (DEC-768). Run alone, the check takes 122 seconds against the 60 seconds a check without a declared limit gets, and fails on 15 tickets: two computations of a ticket's context give its `dropped` list in two orders, so two hashes. It refused on core-schema too: the W1-43 audit report states no `type` (P-W2-28).
+- **Starts** right after the owner's commit of DEC-768, alone; W2-53 is closed again after it.
+- **Allowed paths:** `src/gov/context/**`, `template/governance/kernel/checks/context-reproducibility.yaml` (the `timeout-seconds` line only), `src/gov/check/schema.py` (the `audit-report` type only), `template/governance/kernel/schemas/audit-report.schema.json` (new), `tests/unit/context/**`, `tests/unit/check/test_schema_audit_report*` (new), `docs/changes/W2-54-CIT-E.md`. The two kernel files are approved by DEC-768 (CAP-33).
+- **KPIs, success:**
+  - Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order retrieval returns tied items in [DEC-768].
+  - The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768].
+  - `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768].
+  - **The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`)** [DEC-768 item 1]: its schema file byte for byte as W2-02's; in `src/gov/check/schema.py`, W2-02's lines for that type (its `SCHEMA_MAP` entry, the type among the standalone types, the audit-report folder `docs/audit` and its reading of a record there that states no `type` as an audit report), nothing of W2-02's other types; so W2-02's later merge adds nothing new for this type. Core-schema is green on `w2/integrate`, with the W1-43 audit report's body untouched.
+- **KPIs, failure:**
+  - A context whose items or hash differ between two computations still fails the check, naming the ticket.
+  - A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4].
+  - A record outside `docs/audit/` that states no `type` still fails core-schema; an audit report that lacks `milestone`, `commit` or `pack_sha256` fails it, naming the field.
 
 #### W2-24 Track A gate run (FULL, orchestrator)
 - **Allowed paths:** `docs/plan/wave-2/track-a-gate/**` (evidence); fixture clones under `~/gov-os-runs/W2-24/`.
@@ -744,6 +764,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - Links are resolved, and a write that reaches the acceptance tests through a link is refused [W2-H013, W2-M031, W2-M067].
   - The guard creates the folder of an allowed file instead of refusing it [W2-M173, W2-L216].
   - A quoted `$NAME` target is judged as the literal the shell writes [W2-M019].
+  - **A leading `NAME=value` assignment or an `env` prefix in front of any `gov` command is refused, with a reason** (`GOV_ROLE=orchestrator gov release`, `env -u GOV_ROLE gov release`) [W2-H060, DEC-772].
 
 #### W2-43 CI integrity and the secret-rule floor (STANDARD, engineer)
 - **Allowed paths:** `src/gov/ci/**`, `src/gov/secrets/**`, `.github/workflows/**`, `template/.github/workflows/**`, `tests/unit/ci/**`, `tests/unit/secrets/**`.
