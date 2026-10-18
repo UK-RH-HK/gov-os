@@ -219,6 +219,61 @@ def test_a_project_under_the_root_gets_no_folder(box, ticket):
     assert _decide(project, "Write", root / "TST-a002" / "f.txt", ticket="TST-a002") == "allow"
 
 
+@pytest.mark.parametrize("command", ("cp --parents {x} {d}/", "cp --parents -t {d} {x}", "cp --path {x} {d}",
+                                     "cp --pa {x} {d}", "cp -r --parents --target-directory={d} {x}",
+                                     "cp --p {x} {d}", "cp --parents=x {x} {d}", "cp -q {x} {d}",
+                                     "install --no-such {x} {d}", "mv {x} {d} -S"))
+def test_a_copy_whose_landed_path_is_not_read_is_refused(box, command):
+    """DEC-764 (A): cp --parents in each spelling, and an option the guard cannot read, refused as doubt."""
+    home, project = box
+    own = home / runs.ROOT_NAME / "W2-90"
+    runs.make(str(own), str(project))
+    (own / "d").mkdir()
+    (own / "x.txt").write_text("x", encoding="utf-8")
+    assert _decide(project, "Bash", command.format(x=own / "x.txt", d=own / "d")) == "deny"
+    assert _decide(project, "Bash", f"cp {own / 'x.txt'} {own / 'd'}/") == "allow"
+
+
+@pytest.mark.parametrize("command, verdict", (
+    ("cp -S.t {s} {acc}", "deny"), ("cp -S -t {s} {acc}", "deny"), ("cp --suffix -t {s} {acc}", "deny"),
+    ("install -oroot {s} {acc}", "deny"), ("install -m+t {s} {acc}", "deny"), ("install -gstaff {s} {acc}", "deny"),
+    ("cp -- -t {acc}", "deny"), ("cp -t {accdir} -- {s}", "deny"), ("cp -Zt {accdir} {s}", "deny"),
+    ("install -m 0644 -o root {s} {dst}", "allow"), ("install --mode 0644 --owner=root {s} {dst}", "allow"),
+    ("cp -S.t {s} {dst}", "allow"), ("cp -- {s} {dst}", "allow"), ("install -m 644 {s} {d}/", "allow")))
+def test_an_option_value_is_a_value_and_nothing_after_double_dash_is_an_option(box, command, verdict):
+    """DEC-765 (B): the destination is judged, never an option's value or a word after --."""
+    home, project = box
+    accdir = project / "tests" / "acceptance" / "W2-90"
+    accdir.mkdir(parents=True)
+    (accdir / "test_a.py").write_text("x", encoding="utf-8")
+    (project / "src" / "d").mkdir(parents=True)
+    for name in ("s.py", "dst.py", "-t"):
+        (project / name if name == "-t" else project / "src" / name).write_text("y", encoding="utf-8")
+    paths = {"s": project / "src" / "s.py", "acc": accdir / "test_a.py", "accdir": accdir,
+             "dst": project / "src" / "dst.py", "d": project / "src" / "d"}
+    assert _decide(project, "Bash", command.format(**paths)) == verdict
+
+
+def test_a_backup_is_judged_beside_the_file_it_replaces(box):
+    """DEC-765: mv -b -T onto the own folder leaves the backup directly in the root, which is refused."""
+    home, project = box
+    own = home / runs.ROOT_NAME / "W2-90"
+    runs.make(str(own), str(project))
+    (project / "src" / "s").mkdir(parents=True)
+    (own / "f.txt").write_text("x", encoding="utf-8")
+    s = project / "src" / "s"
+    assert _decide(project, "Bash", f"mv -T {s} {own}") == "allow"
+    for command in (f"mv -b -T {s} {own}", f"mv --backup=numbered -T {s} {own}", f"mv -S.old -T {s} {own}"):
+        assert _decide(project, "Bash", command) == "deny", command
+    for command in (f"cp -b {s}/../s {own}/f.txt", f"cp -S.bak {project}/src/s {own}/", f"mv -b {s} {own}/"):
+        assert _decide(project, "Bash", command) == "allow", command
+    # A suffix that turns a file of the own folder into the marker's name would replace the marker.
+    head, tail = runs.MARKER[:-1], runs.MARKER[-1]
+    (own / head).write_text("x", encoding="utf-8")
+    assert _decide(project, "Bash", f"cp -S{tail} {own / 'f.txt'} {own / head}") == "deny"
+    assert _decide(project, "Bash", f"cp {own / 'f.txt'} {own / head}") == "allow"
+
+
 def test_rmdir_is_judged_for_the_root_only(box):
     home, project = box
     root = home / runs.ROOT_NAME

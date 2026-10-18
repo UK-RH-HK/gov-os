@@ -343,6 +343,117 @@ def _option_after_operand(args: list[str]) -> bool:
     return False
 
 
+# DEC-765: the options of cp, mv and install as GNU coreutils 9.4 reads them:
+# the short letters that take no value, those that take one (joined to the
+# letter or as the next word), and the long names.  A long name ending in
+# "=" takes a value (after "=" or as the next word), one ending in "?" only
+# after "="; a name after "/" is the key it is read as.
+_COPY_SPEC = {
+    "cp": ("abdfHilLnPprRsTuvxZ", "St",
+           "archive attributes-only backup?/b copy-contents debug dereference "
+           "force interactive link/l no-clobber no-dereference no-preserve= "
+           "no-target-directory/T one-file-system parents path/parents "
+           "preserve? recursive reflink? remove-destination sparse= "
+           "strip-trailing-slashes suffix=/S symbolic-link target-directory=/t "
+           "update? verbose context? help version"),
+    "mv": ("bfinTuvZ", "St",
+           "backup?/b context debug force interactive no-clobber no-copy "
+           "no-target-directory/T strip-trailing-slashes suffix=/S "
+           "target-directory=/t update? verbose help version"),
+    "install": ("bcCdDpsTvZ", "gmoSt",
+                "backup?/b compare context? debug directory/d group= mode= "
+                "no-target-directory/T owner= preserve-context "
+                "preserve-timestamps strip strip-program= suffix=/S "
+                "target-directory=/t verbose help version"),
+}
+
+
+def _long_options(spec: str) -> dict[str, tuple[str, str]]:
+    out = {}
+    for word in spec.split():
+        word, _, key = word.partition("/")
+        name = word.rstrip("=?")
+        out[name] = (key or name, word[len(name):])
+    return out
+
+
+_COPY_LONG = {name: _long_options(spec[2]) for name, spec in _COPY_SPEC.items()}
+
+
+def _copy_args(name: str, args: list[str]) -> tuple[
+        list[str], dict[str, list[str]], list[str] | None] | None:
+    """DEC-765: read the arguments of ``cp``, ``mv`` or ``install`` as the
+    tool does: an option's value is a value, and nothing after ``--`` is an
+    option.
+
+    Returns the operands, the options read (each key with its values) and,
+    when an option is written after an operand, the words after the first
+    operand that may be the destination (with POSIXLY_CORRECT set each word
+    after the first operand is one); ``None`` when an option cannot be read.
+    """
+    flags, valued, _ = _COPY_SPEC[name]
+    longs = _COPY_LONG[name]
+    operands: list[str] = []
+    opts: dict[str, list[str]] = {}
+    after: list[str] = []
+    late = False
+
+    def _operand(w: str) -> None:
+        if operands:
+            after.append(w)
+        operands.append(w)
+
+    def _next() -> str | None:
+        """The next word, as the value of an option."""
+        nonlocal i
+        if i >= len(args):
+            return None
+        i += 1
+        if operands and not args[i - 1].startswith("-"):
+            after.append(args[i - 1])
+        return args[i - 1]
+
+    i = 0
+    while i < len(args):
+        a = args[i]
+        i += 1
+        if a == "--":
+            for w in args[i:]:
+                _operand(w)
+            break
+        if a == "-" or not a.startswith("-"):
+            _operand(a)
+            continue
+        late = late or bool(operands)
+        if a.startswith("--"):
+            opt, eq, val = a[2:].partition("=")
+            found = ({longs[opt]} if opt in longs else
+                     {v for n, v in longs.items() if n.startswith(opt)})
+            if len(found) != 1:
+                return None
+            (key, kind), = found
+            if eq and not kind:
+                return None
+            if kind == "=" and not eq:
+                val = _next()
+                if val is None:
+                    return None
+            opts.setdefault(key, []).append(val)
+            continue
+        for j, c in enumerate(a[1:], 2):
+            if c in flags:
+                opts.setdefault(c, []).append("")
+                continue
+            if c not in valued:
+                return None
+            val = a[j:] or _next()
+            if val is None:
+                return None
+            opts.setdefault(c, []).append(val)
+            break
+    return operands, opts, (after if late else None)
+
+
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     """Return absolute write-target paths, or None when the command is read-only.
 
@@ -459,22 +570,19 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     if contents or merge:
                         _land(src, real)
 
-    def _copies(args: list[str], nf: list[str], dirs: list[str]) -> None:
+    def _copies(nf: list[str], dirs: list[str], dests: list[str],
+                merge: bool) -> None:
         """DEC-758 1: the folders a ``cp``, ``install`` or ``mv`` call writes
         into, beside the targets judged before: each ``-t`` folder, and each
-        operand that may be the destination."""
-        short = "".join(a for a in args
-                        if a.startswith("-") and not a.startswith("--"))
-        # -T, --no-target-directory: a source folder's entries land in the
-        # destination itself.
-        merge = "T" in short or any(a.startswith("--no-t") for a in args)
+        word that may be the destination.  *merge* (-T,
+        --no-target-directory): a source folder's entries land in the
+        destination itself."""
         for d in dirs:
             _into(d, nf, itself=False, merge=merge)
-        if not dirs and len(nf) >= 2:
-            last = (range(1, len(nf)) if _option_after_operand(args)
-                    else (len(nf) - 1,))
-            for i in last:
-                _into(nf[i], nf[:i] + nf[i + 1:], itself=True, merge=merge)
+        if not dirs:
+            for dest in dests:
+                _into(dest, [a for a in nf if a != dest], itself=True,
+                      merge=merge)
 
     # Split on non-redirect punctuation into simple commands.
     # A punctuation token containing '>' stays with its command (redirect).
@@ -595,52 +703,62 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 if not a.startswith("-"):
                     _resolve(a)
             continue
-        if name == "mv":
-            # DEC-334: the target directory is a write target in every
-            # spelling of the option, beside the operands.
-            parsed = _cp_operands(args)
-            if parsed is None:
+        if name in ("cp", "mv", "install"):
+            parsed = _copy_args(name, args)
+            if parsed is None or "parents" in parsed[1]:
+                # DEC-764: an option the guard cannot read, or cp --parents,
+                # which writes <folder>/<source as written>: the landed path
+                # is not known, so the call is refused, as ln -t is.
                 targets.append(_UNRESOLVABLE)
                 continue
-            for a in parsed[0] + parsed[1]:
-                _resolve(a)
-            _copies(args, *parsed)
-            continue
-        if name in ("cp", "install"):
-            parsed = _cp_operands(args)
-            if parsed is None:
-                targets.append(_UNRESOLVABLE)
-                continue
-            nf, dirs = parsed
-            short = "".join(a for a in args
-                            if a.startswith("-") and not a.startswith("--"))
-            if name == "install" and not dirs and (
-                    "d" in short or any(a.startswith("--d") for a in args)):
+            nf, opts, after = parsed
+            dirs = opts.get("t", [])
+            # The destination is the last operand.  With an option after an
+            # operand, every word after the first operand is judged as it
+            # (DEC-765: as the call is read with POSIXLY_CORRECT set).
+            dests = (after if after is not None
+                     else nf[-1:] if len(nf) >= 2 else [])
+            before = len(targets)
+            if name == "mv":
+                # DEC-334: the target directory is a write target in every
+                # spelling of the option, beside the operands.
+                for a in nf + dirs:
+                    _resolve(a)
+            elif name == "install" and not dirs and "d" in opts:
                 # install -d: every operand is a directory it makes.
                 for a in nf:
                     _resolve(a)
                 continue
-            if name == "cp" and (
-                    "l" in short or any(a.startswith("--l") for a in args)):
-                # DEC-334: cp -l makes hard links to its sources.
-                for a in (nf if dirs else nf[:-1]):
-                    _resolve(a, hard_sources)
-            # -t, --target-directory: every operand is a source, and the
-            # copy lands in the directory under the operand's own name.
-            for d in dirs:
-                for a in nf:
-                    base = os.path.basename(a.rstrip("/"))
-                    if base in ("", ".", ".."):
-                        targets.append(_UNRESOLVABLE)
-                    else:
-                        _resolve(os.path.join(d, base) if d else d)
-            if not dirs and len(nf) >= 2:
-                # An option after an operand may take the word after it as
-                # its value (-S bak, -m 644): the destination is then an
-                # earlier operand, so every operand but the first is judged.
-                for a in (nf[1:] if _option_after_operand(args) else nf[-1:]):
-                    _resolve(a)
-            _copies(args, nf, dirs)
+            else:
+                if name == "cp" and "l" in opts:
+                    # DEC-334: cp -l makes hard links to its sources.
+                    for a in (nf if dirs else nf[:-1]):
+                        _resolve(a, hard_sources)
+                # -t, --target-directory: every operand is a source, and the
+                # copy lands in the directory under the operand's own name.
+                for d in dirs:
+                    for a in nf:
+                        base = os.path.basename(a.rstrip("/"))
+                        if base in ("", ".", ".."):
+                            targets.append(_UNRESOLVABLE)
+                        else:
+                            _resolve(os.path.join(d, base) if d else d)
+                if not dirs:
+                    for a in dests:
+                        _resolve(a)
+            merge = "T" in opts
+            _copies(nf, dirs, dests, merge)
+            if "b" in opts or "S" in opts:
+                # DEC-765: a backup lands beside each file the call replaces
+                # (a folder too, for a move with -T), as <file><suffix>; a
+                # suffix that is empty or holds a slash is read as "~".
+                suffix = opts.get("S", ["~"])[-1]
+                if not suffix or "/" in suffix:
+                    suffix = "~"
+                targets.extend(
+                    t + suffix for t in targets[before:]
+                    if t != _UNRESOLVABLE and (
+                        not os.path.isdir(t) or (name == "mv" and merge)))
             continue
         if name == "ln":
             # DEC-311: the destination of a symbolic or a hard link is a
