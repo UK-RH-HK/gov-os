@@ -182,3 +182,27 @@ per new key) though it never writes the store. Read as "never writes the store o
 literally, the new line (DEC-773, "query vectors are stored") and DEC-379 differ, and `semantic.py`'s module text now
 says "never write it [the store]". A sentence in DEC-379 (or DEC-773) naming the query-vector file as the one write a
 `refresh=False` search makes would close the gap.
+
+### 4.4 The context check after the change: green, and the declared limit still fits
+
+On the commit `db9830d7` (change 5 and this record's §4.1 to §4.3), after the full rebuild
+`PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 -m gov.cli.main rebuild --json` (store digest
+`c1a9f0cc637049429d4bfb07d4dfb6c75208fed5bdd6b9d2c0d89e89e36aa8f7`; lexical, semantic and codeintel recreated; the
+lexical index `fresh` and the semantic vectors answerable), with no `query-vectors.db` in the runtime folder before
+the run (the first computation of every ticket's context embedded its question; the second used the stored vector):
+
+    uptime; nproc; /usr/bin/time -v env PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 -m gov.context.context_check; uptime
+
+| Measure | Value |
+|---|---|
+| Wall clock | 128.67 seconds (2:08.67); user 75.70 s, system 19.34 s, 73% of one processor |
+| Tickets measured | 106 (`project_tickets`: 106 held, 0 unheld; 106 files `.tickets/*.md`), each computed twice |
+| Load before (1, 5, 15 minutes) | 26.68, 18.15, 14.94 |
+| Load after | 7.81, 13.85, 13.75 |
+| Processors | 20 |
+| Maximum resident set | 81,324 kB |
+| Exit | 0: `context-reproducibility: green` (14 tickets red at `4f753c72`) |
+| After the run | `query-vectors.db` holds 67 vectors (67 distinct question texts; one model, one revision `ac6da0df…`); the store digest is still `c1a9f0cc…`, and `store.db` was not written (its time is the rebuild's) |
+
+The run takes the time round 1's did (130.07 seconds): a stored vector saves one embedding request and adds one
+model-list request per search. **The declared `timeout-seconds: 600` stays**: it is 4.7 times this run.
