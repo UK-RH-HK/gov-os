@@ -4,7 +4,7 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**446 cases in 11 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**613 cases in 12 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
 file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
@@ -21,8 +21,10 @@ the last round (DEC-136, DEC-764, DEC-765)**, no earlier case rewritten (red run
 that file and this README: **24 failed, 334 passed, 0 skipped**, about 4.5 minutes; see its section), and 88 cases in
 `test_w2_50_link_replaced.py` for the review's finding D, **tests added after implementation, from the review of the
 last round (DEC-136, DEC-774)**, no earlier case rewritten (red run of the whole suite at `2d60cdd3` plus that file
-and this README: **58 failed, 388 passed, 0 skipped**, in five runs of about 10 minutes together; see the last
-section).
+and this README: **58 failed, 388 passed, 0 skipped**, in five runs of about 10 minutes together; see its section),
+and 167 cases in `test_w2_50_one_reader.py` for the owner's widening of the round, **tests added after
+implementation, for the owner's widening of the round (DEC-136, DEC-778)**, no earlier case rewritten (red run of the
+whole suite at `b4172c59` plus that file and this README: see the last section).
 
 ## Run
 
@@ -539,6 +541,116 @@ file: 58 red (the D cases), 30 green (the 2 `mv -t` D cases refused today, 28 co
 - **`mv -t <folder>` is judged as the folder itself** (lexically), unlike `cp -t <folder>` and `install -t <folder>`,
   which are judged as each file they write: `mv -t <acceptance folder> X` is refused today, `cp -b -t <acceptance
   folder> X` is not.
+
+## One option reader in the guard's read rule: tests added after implementation, for the owner's widening of the round (DEC-136, DEC-778)
+
+The guard refuses every role a call that reads the protected pair (the project's settings file and its held-out
+file), and counts as a read a command that gives such a file, or a folder that holds one, a second name: the sources
+of `mv` and of `cp -l` (`--link`) (DEC-548, DEC-553). For that rule the guard read the options of `mv` and `cp -l`
+with an older reader than the one it uses for writes (the one DEC-765 replaced for `cp` and `install`; CIT-E §10,
+"What stays open"). The owner ruled (DEC-778, 2026-10-18; staged for the owner's commit, not yet in this worktree's
+register): **the guard reads every copy-like command one way, for writes and for reads**; `mv` and `cp -l` with
+value-taking options whose value holds a `t` (joined and separate), and with `--` before and after the source and the
+destination, are judged as the reads they are; ordinary `mv` and `cp -l` of unprotected files still pass. Tested in
+`reader` = `test_w2_50_one_reader.py`, through the guard's hook with the call on stdin, as the rest of the suite. `ln`
+(rows W2-L354, W2-L350) and the write rules of `cp`, `install` and `mv` (finding D's cases) are not this round's: no
+case. No earlier test file, support module or conftest was changed.
+
+**The stand-in for the protected file** is the fixture project's own `.claude/settings.json`, which the suite's
+`make_project` writes in the test's temporary project (it registers the copied guard). It is public: the test wrote
+it, in its own temporary tree, and DEC-778 names it as a means. Its folder `.claude/` is "a folder that holds a
+protected file". The held-out file is never named, typed, read or copied, by a case or by the designer (no case takes
+its path from the guard's module either, as W1-02's suite does). The settings file was never moved or linked for
+real: the guard is only asked.
+
+**How the cases are built.** One project for the module (the cases only ask the guard; W1-02's way): the fixture
+project with its settings file, an unprotected `src/app/data.json` and a folder `src/app/cfg/` holding `data.json`,
+and an empty `src/app/d/`. New names lie in the temp folder (`systmp/w2-50-second-name`, `systmp/w2-50-moved`, the
+folder `systmp/w2-50-into/` for `-t`), where every role may write. A new name that starts with a dash (`-t`, `-S.t`,
+written after `--`) is relative, so it lands in the working folder: those calls are asked from the temp folder (the
+hook input's `cwd` and the guard's own), the others from the project; the relative spellings (`.claude/settings.json`,
+`.claude`) from the project.
+
+**What each form does, seen with the tool** (GNU coreutils 9.4, `cp --help`, `mv --help`), run in a temporary folder
+of the designer's own on a stand-in file `D/settings.json` with a known content; a form is a second name when, after
+it ran, that content was reachable at the new name:
+
+- **Value-taking options of `--help`.** `mv`: `-S`/`--suffix=SUFFIX`, `-t`/`--target-directory=DIRECTORY`,
+  `--backup[=CONTROL]`, `--update[=UPDATE]`. `cp` adds `--preserve[=ATTR_LIST]`, `--no-preserve=ATTR_LIST`,
+  `--reflink[=WHEN]`, `--sparse=WHEN`, `--context[=CTX]`. A bracketed value is taken only after `=`
+  (`cp -l --preserve timestamps F N` reads `timestamps` as an operand and fails: no case); the others also as the next
+  word. Values holding a `t` that the tools accept: any suffix (`.t`, `t`, `-t`), `--backup=t` (numbered),
+  `--sparse=auto`/`always`, `--reflink=auto`, `--preserve=timestamps`, `--no-preserve=timestamps`, `--context=t` (no
+  SELinux here, accepted). `--update` accepts only `all`, `none`, `older`: no value holds a `t`, so no case.
+- **Second names (content reachable at the new name; `mv` removes the old name, `cp -l` keeps it):** `mv` and `cp -l`
+  with `-S.t`, `-St`, `-bS.t`, `-bSt`, `-TS.t`, `-S .t`, `-S t`, `-bS .t`, `-S -t`, `--suffix=.t`, `--suffix .t`,
+  `--suffix -t`, `--backup=t`, an option after both operands (`F N -S.t`: the tools take options anywhere), and
+  `-t D -S.t F`, `-S.t -t D F`; `cp -l` also with `-lS.t`, `-lS .t`, `-lS -t`, `-alS.t`, `-lbS.t`, `-lTS.t`,
+  `--link -S.t` and each of the other values above; `--` before the source, between the source and the destination,
+  and after both (`mv -- F N`, `mv F -- N`, `mv F N --`, the same for `cp -l`), `-t D -- F`; a new name that starts
+  with a dash after `--` (`mv -- F -t`, `mv F -- -t`, `mv F -- -S.t`, `mv --backup=t -- F -t`, `mv -T F -- -t`, the
+  same for `cp -l`, with `--sparse=auto` and `--reflink=auto`) makes the file `./-t` (`./-S.t`); `-t D F`, `-lt D F`,
+  `--target-directory=D F`, `--target-directory D F` put it at `D/settings.json`; `-T F N`, `-lT F N` at `N`. The
+  folder as the source: `mv -S.t`, `mv -St`, `mv -S.t --`, `mv -S.t -t`, `mv -S.t -T`, `mv D -- -t`, `cp -rlS.t`,
+  `cp -rlS.t --`, `cp -rl -S.t -t`, `cp -rl D -- -t` each make `<new>/settings.json` reachable.
+- **Not second names, so no case:** `mv -- -t D F` (after `--`, `-t` is a file; the tool fails); `mv -- F N -S.t`
+  (after `--`, `-S.t` is the target folder, which does not exist; the tool fails).
+- **A plain `cp` of an unprotected file** with `-S.t`, `-S -t`, `F N -S.t`, `-t D -S.t`, `--preserve=timestamps`,
+  `--sparse=auto`, `-- F -t` and `-rS.t` of a folder copies it, as the tool's text says.
+
+**Which role, and why.** Found through the hook at `b4172c59` (a fixture in the designer's temporary folder):
+
+- **The orchestrator** on DAEO-zz90 may write the settings file and the temp folder: today `mv -S.t <settings file>
+  <temp>/…` is allowed for it. Its write rules let it write the new name and remove the old one, so a refusal of it is
+  the read rule's alone. Every case of behaviour 1 runs as the orchestrator.
+- **The engineer** on DAEO-zz90 (paths `src/app/**`) is refused the same forms today by its write rules, naming the
+  file: "Bash write to '…/W2-90/.claude/settings.json' denied for role 'engineer'". The read rule is for every role,
+  so ten forms are asked of it too, and its refusal must be the read refusal (not the write rule's).
+- The controls run as both: each role's write rules allow `src/app/**`.
+
+**What "refused as a read" is compared with.** The plain form `mv <settings file> <new name>` is refused today, for
+both roles, with "the call reads the settings file or the held-out file, which is refused to every role (DEC-508,
+DEC-525); …" (`deny`, exit code 0). Each case first asks the guard for that plain form, by the same role from the same
+working folder (a premise: refused, naming one of DEC-508, DEC-525, DEC-548, DEC-553, and no path), then asks that its
+own refusal be a `deny` with exit code 0 whose reason names **the same set of decision ids** as the plain form's (at
+least one of those four) and **neither the file's path nor its folder's** (as given, resolved, or as
+`.claude/settings.json`), as W1-02 asks of the read refusal. A write-rule refusal ("Bash write to '…' denied for
+role …") names no such decision and names the path: it does not pass. The rest of the wording is not prescribed.
+
+| Behaviour | New cases | Red reason today (`b4172c59`) | Green today, and why |
+|---|---|---|---|
+| Premise: the plain second names are refused as reads | `reader::test_the_plain_second_names_are_refused_as_reads` × orchestrator, engineer (`mv F N`, `cp -l F N`, `cp --link F N`, `mv .claude DD`, `cp -rl .claude DD`) | none | pass (2): the premise; it must stay green |
+| **1. A second name for the protected file is refused as a read, however the options are written** (the orchestrator) | `reader::test_a_second_name_for_the_protected_file_is_refused_as_a_read_however_the_options_are_written` × 79, named for the form. `mv` (31): `-S.t`, `-St`, `-bS.t`, `-bSt`, `-TS.t`, `-S .t`, `-bS .t`, `-S -t`, `--suffix=.t`, `--suffix .t`, `--suffix -t`, `--backup=t`, `F N -S.t`, `-S.t .claude/settings.json N` (relative); `-- F N`, `F -- N`, `F N --`, `-S.t -- F N`, `-- F -t`, `F -- -t`, `F -- -S.t`, `--backup=t -- F -t`, `-T F -- -t`; `-t T F`, `-t T -- F`, `-t T -S.t F`, `-S.t -t T F`, `-St -t T F`, `--target-directory=T F`, `--target-directory T F`, `-T F N`. `cp -l` (37): `-lS.t`, `-l -S.t`, `-lbS.t`, `-alS.t`, `-lTS.t`, `--link -S.t`, `-lS .t`, `-l -S -t`, `-lS -t`, `-l --suffix=.t`, `-l --suffix .t`, `-l --suffix -t`, `-l --backup=t`, `-l F N -S.t`, `-lS.t .claude/settings.json N`; `--sparse=auto`, `--sparse always`, `--reflink=auto`, `--preserve=timestamps`, `--no-preserve=timestamps`, `--no-preserve timestamps`, `--context=t`; `-l -- F N`, `-l F -- N`, `-l F N --`, `-l -S.t -- F N`, `-l -- F -t`, `-l F -- -t`, `-l -- F -S.t`, `-l --sparse=auto -- F -t`, `-l --reflink=auto F -- -t`; `-lt T F`, `-l -t T -- F`, `-l -t T -S.t F`, `-lS.t -t T F`, `-l --target-directory=T F`, `-lT F N`. The folder `.claude` as the source (11): `mv -S.t`, `mv -St`, `mv -S.t --`, `mv .claude -- -t`, `mv -S.t -t T`, `mv -S.t -T`, `mv -S.t .claude DD` (relative), `cp -rlS.t`, `cp -rlS.t --`, `cp -rl -S.t -t T`, `cp -rl .claude -- -t` | "Bash `<form>` from the <project or temp> folder by the orchestrator (<case>; a second name for the settings file or its folder) was not refused: decision=allow exit=0" (38): a short cluster with a joined value holding a `t` (`-S.t`, `-St`, `-bS.t`, `-bSt`, `-TS.t`, `-lS.t`, `-lbS.t`, `-alS.t`, `-lTS.t`, `--link -S.t`, `-l -S.t`; the folder's `mv -S.t`, `mv -St`, `cp -rlS.t`; the three relative spellings `mv -S.t .claude/settings.json N`, `cp -lS.t .claude/settings.json N`, `mv -S.t .claude DD`); the separate value `-t` of `-S` or `--suffix` (`mv -S -t`, `mv --suffix -t`, `cp -l -S -t`, `cp -lS -t`, `cp -l --suffix -t`); `-S.t` after both operands (`mv`, `cp -l`); `-S.t` after `-t T` (`mv`, `cp -l`); a new name with a dash after `--` (`mv -- F -t`, `mv F -- -t`, `mv F -- -S.t`, `mv --backup=t -- F -t`, `mv -T F -- -t`, `cp -l -- F -t`, `cp -l F -- -t`, `cp -l -- F -S.t`, `cp -l --sparse=auto -- F -t`, `cp -l --reflink=auto F -- -t`, the folder's `mv .claude -- -t` and `cp -rl .claude -- -t`) | 41 forms refused as reads today: the separate values not starting with `-` (`-S .t`, `-bS .t`, `--suffix .t`, `-lS .t`, `-l --suffix .t`, `--sparse always`, `--no-preserve timestamps`), every value after `=`, `--` with ordinary names before, between and after (and `-S.t --`, the folder's too), every `-t`, `--target-directory` and `-T` form, and `-S.t` before `-t` or `-T` (the folder's too). They must stay refused |
+| 1 — for every role: the engineer's refusal is the read refusal too | `reader::test_a_second_name_is_refused_as_a_read_also_for_a_role_that_may_not_write_the_file` × 10: `mv -S.t`, `mv -S -t`, `mv F N -S.t`, `mv -- F -t`, `cp -lS.t`, `cp -l F -- -t`, the folder's `mv -S.t` and `cp -rlS.t`, `mv -- F N`, `cp -l -t T -- F` | "… by the engineer (…) was refused, but not as a read of the protected file: the reason names none of DEC-508, DEC-525, DEC-548, DEC-553" (8): the write rule's "Bash write to '…/.claude/settings.json' denied for role 'engineer'" | `mv -- F N`, `cp -l -t T -- F` (2): refused as reads today; they must stay so |
+| **2. Controls: the same forms of unprotected files stay allowed** where the role's write rules allow the destination | `reader::test_the_same_forms_of_an_unprotected_file_stay_allowed` × 30 forms × orchestrator, engineer: `mv` `-S.t`, `-St`, `-S -t`, `--suffix -t`, `--backup=t`, `U AN -S.t`, `-- U AN`, `U -- AN`, `U AN --`, `-- U -t` (from `src/app/d/`), `-t AD -S.t U`, `-t AD -- U`, `--target-directory=AD U`, `-T U AN`, `-S.t -T U AN`, the folder `mv -S.t src/app/cfg src/app/moved`; `cp -l` `-lS.t`, `-l -S -t`, `-l U AN -S.t`, `--backup=t`, `--sparse=auto`, `--reflink=auto`, `--preserve=timestamps`, `--no-preserve=timestamps`, `-l -- U AN`, `-l -- U -t` (from `src/app/d/`), `-l -t AD -- U`, `-lt AD U`, `-lT U AN`, the folder `cp -rlS.t src/app/cfg src/app/linked` (`U` = `src/app/data.json`, `AN` = `src/app/d/new.json`, `AD` = `src/app/d`) | none | pass (60): the controls; a fix that refuses every `mv` or `cp -l` with such options turns them red |
+| 2 — a plain `cp` (no `-l`) of an unprotected file with such options is not refused as a read | `reader::test_a_plain_copy_of_an_unprotected_file_with_such_options_is_not_refused_as_a_read` × 8 forms × orchestrator, engineer: `cp -S.t`, `cp -S -t`, `cp U AN -S.t`, `cp -t AD -S.t U`, `cp --preserve=timestamps`, `cp --sparse=auto`, `cp -- U -t` (from `src/app/d/`), `cp -rS.t src/app/cfg src/app/copied` | none | pass (16): a reading that takes a `t` or an `l` in a value as `-l` must not refuse a plain copy |
+| 2 — the plain second names the guard refuses today stay refused | held already, not duplicated: W1-02's `test_w1_02_second_names.py::test_a_second_name_for_a_protected_file_is_refused_as_a_read` (`move-relative`, `move-absolute`, `rename-in-its-folder`, `move-into-a-target-directory`, `linking-copy`, `linking-copy-long-option`, `linking-copy-in-a-cluster-of-options`) and `::test_a_second_name_is_refused_as_a_read_whether_or_not_the_role_may_write_the_file`; `test_w1_02_holding_folders.py::test_a_second_name_for_a_folder_that_holds_a_protected_file_is_refused_as_a_read` and `::test_a_second_name_for_a_holding_folder_is_refused_whether_or_not_the_role_may_write_it` (`mv`, `mv -t`, `cp -rl`, `cp -al`, `cp -r --link`); and this file's premise and its 41 forms refused today | — | — |
+
+**No earlier case conflicts with DEC-778.** No case of this suite gives the settings file a second name (its
+`.claude/settings.json` appears only as a refused Write target, `review::test_a_project_inside_the_own_folder_keeps_its_refusals`).
+Among the earlier tickets' suites, no case gives a protected stand-in a second name with `-S`, `--suffix`, `-b`,
+`--backup` or `--` (a search of `tests/acceptance` for such `mv` and `cp -l` forms on W1-02's `{rel}`/`{abs}` found
+none); W1-02's plain writes that give the file as the *destination* (`mv {scratch}/w1-02-new {rel}`) are not second
+names and stay as they are. No case rewritten.
+
+**Red run (whole suite, at `b4172c59` plus the new file and this README): 104 failed, 509 passed, 0 skipped**, in four
+runs of the same line, each file once, never with `-x`: `reader` and `extra` 46 failed, 193 passed (2.2 min); `round`,
+`last`, `index` and `answers` 99 passed (1.7 min); `code_under_test`, `own`, `ref`, `launch` and `review` 187 passed
+(1.7 min); `link` 58 failed, 30 passed (1.4 min). Every earlier case gives what it gave before: the 58 D cases red,
+the other 388 green. The new file: 46 red (38 forms of behaviour 1, 8 of the engineer's), 121 green (the 2 premises,
+41 forms of behaviour 1 and 2 of the engineer's refused as reads today, 60 controls of unprotected files, 16 plain
+copies).
+
+### Discoveries of this round (no test)
+
+- **A plain `cp` and `install` of the protected file are already refused as reads in every form tried**, whatever the
+  options (`cp -S.t F N`, `cp -- F -t`, `cp F N -S.t`, `cp -S -t F N`, `cp -rS.t .claude DD`, `install -S.t F N`,
+  `install -- F -t`, all refused with the read rule's reason at `b4172c59`). Only `mv` and `cp -l` were misread, as
+  DEC-778 says; no case for `cp` and `install` of the file (DEC-778's text names `mv` and `cp -l`).
+- **Where the misreading lies, as the public result shows it:** a joined value holding a `t` in a cluster, the separate
+  value `-t`, an option written after the operands or after `-t`'s folder, and a dashed name after `--`. An `=` value,
+  a separate value without a leading dash, and an ordinary `--` are read right today.
+- **`--update`** takes a value (`all`, `none`, `older`), none holding a `t`: not tested with one.
 
 ## Readings chosen where a KPI line admits more than one
 
