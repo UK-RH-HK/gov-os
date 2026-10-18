@@ -12,6 +12,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import w2_54_support as support  # noqa: E402
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "local_only: starts a real worker session through gov launch (CLI, bwrap, socat); not for CI")
+
+
 @pytest.fixture(scope="session")
 def code_under_test():
     """Every process the suite starts imports ``gov`` from this worktree's ``src/`` (DEC-732)."""

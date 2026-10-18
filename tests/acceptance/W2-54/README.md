@@ -4,6 +4,8 @@ Written before the implementation by the independent test designer (MR-3), from 
 sources (DEC-768, DEC-626, DEC-441, DEC-565, CAP-33) and the decisions that apply (DEC-595, DEC-600, DEC-285,
 DEC-628, DEC-221, DEC-462, DEC-136, DEC-491, DEC-732). **50 cases in four files** in round 1; round 2 (the
 query vector, below) adds **15 cases in a fifth file**, `test_w2_54_query_vector.py`: **65 cases in five files.**
+Round 3 (the query-vector cache, at the end) adds **15 cases in two files**, `test_w2_54_query_cache.py` and
+`test_w2_54_sandboxed_worker.py`: **80 cases in seven files.**
 No private part of the code to be written was read; the cases reach the behaviour through public interfaces only.
 
 Run (the project's test command, to its end):
@@ -328,3 +330,177 @@ settle it, and no case states where the vector is written.
 - **"The same answer" is exact**: equal distances as floats. A store that kept a vector at a lower precision than the
   first answer used would make the first answer and the later ones differ (the first answer is the embedder's
   vector, KPI part 4); keeping it exactly as the first search used it passes both.
+
+---
+
+# Round 3: the query-vector cache (owner, 2026-10-18, P-W2-32 (a))
+
+The owner allowed one more round after the lead's package PKG-W2-54-2: DEC-782 (P-W2-32 (a)) and DEC-784 (P-W2-34
+(a)), staged, cited by the ticket as "owner, 2026-10-18, P-W2-32 (a)" and "P-W2-34 (a)". Round 2's code stores query
+vectors at query time; its verification left five W1 cases red because a read now writes one file. DEC-782 amends
+DEC-379 for that one file only. The ticket's three new success lines:
+
+> **S3.** The query-vector cache is the one file a read command writes: a derived file under .gov-runtime/, keyed by
+> model, model revision and a hash of the exact text, written atomically and safely by several sessions at once,
+> bounded in size, and rebuildable from nothing.
+>
+> **S4.** Where the cache cannot be written (a sandboxed worker, whose .gov-runtime is read-only), the same text still
+> gets the same vector; a test shows it inside a launched, sandboxed worker.
+>
+> **S5.** W1-46's live cases launch their sessions with no CLAUDE* variable in the environment.
+
+Written by a fresh independent test designer before the implementation, from those lines, DEC-782 and DEC-784 as the
+lead gave them, DEC-768, DEC-773, DEC-374, DEC-379, DEC-381, DEC-342, DEC-322, DEC-317, DEC-221, DEC-462, DEC-136,
+DEC-491 and DEC-732, W1-19's interface table and W1-46's live suite. No earlier W2-54 case was changed (two helpers
+were added to `w2_54_support.py`: a `wait` call for the driver and the round-3 section; and the `local_only` marker
+to `conftest.py`). S5 is W1-46's rewrite (below, "The rewrites"); no W2-54 case states it.
+
+## What the cases state, and what they do not
+
+What a read gives (the semantic search's hits and distances, `gov retrieve --json`'s bundle, `gov context --json`'s
+packet and hash) and what it leaves on disk (the project's file tree before and after). **No case names the cache
+file, its form, its key's form or the code that writes it.** The cache is seen as "the file under `.gov-runtime/` a
+read wrote that is not the store" (the store is `store.db*`, W1-19's "one shared store"). "Deleted" means every file
+under `.gov-runtime/` beside the store removed; "the file read-only" means every such file read-only.
+
+## The bound: where it is stated and how a case sees it (an interface this KPI needs)
+
+"Bounded in size" needs a stated bound and, to run in seconds, a way to lower it. The cases use:
+
+- **The setting `GOV_QUERY_VECTOR_CACHE_MAX_BYTES`**, an environment variable read by the read commands: the bound,
+  in bytes, on the files beside the store under `.gov-runtime/` (the cache, and anything it keeps beside itself).
+  The cases lower it to **262,144 bytes (256 KiB)**.
+- **The default bound** is stated in the change record `docs/changes/W2-54-CIT-E.md`, on a line that names the
+  setting, as a whole number of bytes; the change record also says what happens at the bound (no case judges the
+  prose).
+- **How a case sees it:** the sum of the sizes of the files beside the store, after every process, is at most the
+  bound. 200 distinct texts of at least 4,096 bytes each (1,024 numbers kept exactly) are at least 819,200 bytes,
+  more than three times the lowered bound, so the bound is reached whatever the cache keeps per entry.
+
+What the cache does at the bound (evict, stop writing) is the engineer's to choose and state; the cases require only
+that reads go on succeeding and give the same answers.
+
+## The new KPI lines and their cases
+
+| part | case | red today? | red reason (as seen at `3bee9a50` plus this suite) |
+|---|---|---|---|
+| **S3.1** the one file a read writes; nothing authoritative | `test_w2_54_query_cache.py::test_gov_retrieve_and_gov_context_write_at_most_one_derived_file_under_the_runtime_folder` | pass | — |
+| S3.1 no index, nothing created | `::test_in_a_project_without_an_index_a_read_creates_nothing` | pass | — |
+| **S3.2** keyed by a hash of the text, not the text | `::test_no_file_of_the_project_holds_a_question_in_clear_after_it_was_asked` | **red** | "the question is kept in clear: `['.gov-runtime/query-vectors.db (UTF-8)']`" |
+| S3.2 the exact text, all of it | `::test_two_long_texts_that_differ_only_in_their_last_character_get_their_own_answers` | pass | — |
+| **S3.3** several sessions at once | `::test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_and_lose_no_entry` | **red** | "process 1, 'how does the glazed meet the prunes item0103': one text, two answers": the third hit apiary at 0.95327 in place of tides at 0.95820 (the answer depends on the interleaving) |
+| **S3.4** a stated bound | `::test_the_change_record_states_the_cache_s_bound_and_the_setting_that_lowers_it` | **red** | "docs/changes/W2-54-CIT-E.md does not name the setting GOV_QUERY_VECTOR_CACHE_MAX_BYTES" |
+| S3.4 never past it; reads at it give the same answers | `::test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_same_answers` | **red** | "the cache grew past its bound of 262144 bytes: [258048, 503808] after 100 texts" |
+| **S3.5 / S4** one answer whatever the cache's state: cold, warm, deleted, full, `.gov-runtime/` read-only, the file read-only | `::test_one_text_gets_one_answer_whatever_the_cache_s_state[cold, warm, deleted, full, unwritable-folder, unwritable-file]` | **red** (6) | each "one text, two answers" against the answer the text gets first in a new store (kiln 0.48303, tides 0.66965 second): cold after two other texts gives bakery 0.90656 second; warm, apiary 0.94777 second; deleted, forge 0.95328 second; full ("first asked after 200 other texts"), bakery 0.90656 second; `.gov-runtime/` read-only, tides 0.95328 second; the file read-only, kiln 0.52975 first |
+| S3.5 / S4 for a context: one packet hash | `::test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state` | **red** | "cold, after another ticket: one ticket, two packets: f5beed7f… != a1a24120… (the first in a new store)" |
+| **S4** inside a launched, sandboxed worker | `test_w2_54_sandboxed_worker.py::test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written` (`local_only`) | **red** | "inside the sandbox, one text got two answers": first kiln 0.45228, forge 1.0; again kiln 0.48303, tides 0.79107 |
+
+**Count:** 15 cases (10 functions); 12 red today, 3 pass today.
+
+(The `full` state first asked the question before filling the cache, and passed today: the answer came from the
+cache, which today's code never empties. It now asks the question for the first time when the cache is full; a
+question asked before the cache filled, and perhaps evicted, is the bound case's "first and last ten texts asked
+again".)
+
+### The cases that pass today, and why they are here
+
+Round 2's code already writes one file and keys it by the whole text; these cases hold what the change must keep.
+
+- **One file, nothing authoritative:** two `gov retrieve` and two `gov context` runs leave at most one file changed,
+  always the same, under `.gov-runtime/`, not `store.db*`, not tracked. A fix that added a lock file, a journal left
+  behind, a second cache or a write to the store turns it red.
+- **No index, nothing created:** a project never indexed gets no `.gov-runtime/` from a read (W1-21 holds it for the
+  retrieval; here for `gov context` too). A cache made before the index is checked turns it red.
+- **The long texts:** about 8,000 characters differing only in the last; the stand-in is sent the whole text (seen:
+  7,893 characters for a 7,801-character question). A key cut to the first characters of the text, or a hash of a
+  prefix, gives the second text the first's answer.
+
+### The red reasons, and what each case holds after them
+
+- **Concurrency** is red today only for the variation: run three times with the stand-in's variation off, today's
+  code passed it every time (no error, no lost or torn entry, nothing left beside the store). After the fix it holds
+  the atomic, safe writes: six processes released together (each waits on a file until all have imported the code),
+  then every text asked again sends none to the embedder, and at most one file is beside the store.
+- **The states:** today the first answer a text gets depends on what was embedded just before it, so the cold answer
+  differs from the reference and the warm and deleted answers repeat or recompute that drifted vector; with the
+  cache unwritable each read embeds afresh after another text. No state errors today (exit code 0, no traceback:
+  checked on every read).
+- **The reference** is the answer a text gets as **the first question asked of a new store built alike**, by a fresh
+  stand-in right after it embedded that store's corpus (an ordinary process, the cache writable and cold). In the
+  sandboxed case it is the first text a fresh stand-in sees, inside and outside alike. A deterministic computation
+  gives every state that answer; a computation that depends on the order, or on the cache, does not.
+
+## The sandboxed worker (S4)
+
+`test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written` starts **one
+real worker session through `gov launch`** under its OS sandbox, as W1-46's live cases do: W1-46's fixture project
+(`w1_46_support.make_project`, its held-out stand-in), the engineer role on W1-46's ticket, `--model haiku`,
+`--permission-mode acceptEdits`, `--allowedTools Bash`, `--max-turns 6`, and the environment of DEC-784 (no `CLAUDE*`,
+`GOV_ROLE` or `GOV_TICKET`). The session runs one Bash command, a probe the case wrote into
+`.gov-runtime/scratch/w2-54/`.
+
+**How it reaches an embedder.** Checked first, with one real session: from inside the sandbox **this machine's Ollama
+is not reachable** (`curl http://127.0.0.1:11434/api/version` ends with exit code 7: the sandbox has its own network,
+and the engineer's allowlist is empty). A stand-in **started inside the sandbox** binds a loopback port there and
+answers. So the probe starts round 2's stand-in embedder (from this suite's support file, with its variation) inside
+the sandbox, and every read inside names it at `OLLAMA_HOST`. The probe records the outcome of the curl to this
+machine's Ollama in its result file; the case does not judge it.
+
+**Where the cache cannot be written.** Also checked first: the sandbox makes read-only only the names under the
+launched project's `.gov-runtime/` that a literal deny rule names at launch. The launcher's rules for the rest of
+`.gov-runtime/` have patterns, which the Linux sandbox skips (DEC-311's recorded residual). **A new file under the
+worker's own `.gov-runtime/` is writable from its Bash:** in the probe run, `touch .gov-runtime/w2-54-new-name`
+succeeded and round 2's cache file was made there from inside the sandbox. A project **outside** the launched
+repository is read-only to the worker as a whole (W1-46 success 8; in the probe run a new file there was refused). So
+the worker reads a project with a built index that lies outside its repository: that project's `.gov-runtime/` is the
+read-only one the KPI line names. The case holds that premise: the reader inside tries to make a file there and must
+fail, and the folder's files are unchanged after the session.
+
+**What it asserts.** This worktree's `gov` inside (`gov.__file__`); the stand-in inside was asked the text; every read
+ends with exit code 0 and no traceback, and the semantic facet answers (a read with no semantic answer fails the
+case: it did not reach an embedder); the text, asked again after another text, gets the same hits, order and
+distances, and `gov retrieve` gives the same bundle; and both are the answer an ordinary process outside the sandbox
+gets, with the same reader, the same environment (only `OLLAMA_HOST` and `TMPDIR` differ) and a fresh stand-in, for
+the same project afterwards.
+
+**Cost and needs.** One headless session (the real CLI at `~/.local/bin/claude`, the caller's credentials), one Bash
+call; `bwrap`, `socat`, `gitleaks`, `sqlite_vec`. No network. It fails (it does not skip) when a prerequisite is
+missing, as W1-46's live cases do. Leave it out with `-m "not local_only"`. Its run here: 8 s.
+
+## The real embedder and the real CLI
+
+- **The real embedder** (this machine's Ollama): no round-3 case needs it. Every round-3 case uses the stand-in; the
+  stand-in cases skip, with the reason, only where `gitleaks` or `sqlite_vec` is absent.
+- **The real CLI**: only the sandboxed-worker case (`local_only`, above). The `gov` commands of the other cases are
+  this worktree's `gov`, run as `python3 -c` of its entry (as round 1 and 2), never an installed console script.
+
+## How long the new cases run
+
+The two new files together: **49 s** in the last red run (a 1-minute load of 15 on 20 processors); 92 to 131 s in
+runs at a higher load. The concurrency case takes 8 to 21 s, the bound case 6 to 23 s, the full state about 4.5 s,
+the others 1 to 4.5 s each. `test_w2_54_sandboxed_worker.py`: **8 to 10 s** here (one haiku session; allow up to its
+420 s limit). The whole suite: as before (about 9 minutes, most of it the green-here file) plus about one minute.
+
+## The rewrites (other suites)
+
+- **W1-21** (`test_a_retrieval_writes_nothing[a question, a ticket, batches of one]`,
+  `test_the_command_writes_nothing`) and **W1-19**
+  (`test_the_vectors_are_in_the_shared_store_beside_the_lexical_index`): the expectation "a read writes nothing" /
+  "`.gov-runtime/` holds only `store.db*`" becomes "nothing but one derived file under `.gov-runtime/`, not the
+  store". Each suite's README has a section "Rewrite (W2-54, DEC-782, 2026-10-18)". No pass line or threshold moves.
+- **W1-46**: the live fixture removes every `CLAUDE*` variable, and still `GOV_ROLE` and `GOV_TICKET` (DEC-784).
+
+## Risks (round 3)
+
+- **The worker's own `.gov-runtime/` is not read-only for new names** (above). The KPI line's premise ("a sandboxed
+  worker, whose .gov-runtime is read-only") holds for the names a literal rule covers and for any folder outside the
+  repository, not for a new file in the worker's own `.gov-runtime/`: a worker's read writes the cache there. That
+  is DEC-311's residual, not this ticket's; the sandboxed case does not depend on it.
+- **The bound's setting is an interface this suite names.** If the engineer states the bound another way (a count of
+  entries, a constant), the two bound cases and the `full` states stay red until the setting exists; the README
+  names it so the engineer can provide it, and the lead can change it by a decision.
+- **Concurrency against the stand-in is strict.** The stand-in's "previous text" is shared by every process, so a
+  computation that sends a text in two requests can be split by another process's request. A computation that is
+  deterministic per request (one request whose result does not depend on another's) passes.
+- **Time-dependence:** the concurrency case releases its processes after 1.5 s; on a very slow machine a process may
+  not yet wait at the start line. The case is still valid (fewer processes truly at once), it does not pass falsely.

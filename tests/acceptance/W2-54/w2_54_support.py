@@ -698,6 +698,11 @@ for call in json.loads(sys.argv[2]):
         out.append(semantic.search(root, call[1], refresh=False))
     elif call[0] == "retrieve":
         out.append(entry.retrieve(root, call[1]))
+    elif call[0] == "wait":
+        import time
+        while not Path(call[1]).exists():
+            time.sleep(0.005)
+        out.append(None)
 print(json.dumps(out))
 '''
 
@@ -825,3 +830,145 @@ def runtime_digest(project):
     if not base.is_dir():
         return {}
     return {path.relative_to(base).as_posix(): sha256(path) for path in sorted(base.rglob("*")) if path.is_file()}
+
+
+# --------------------------------------------------------------------------
+# Round 3: the query-vector cache (owner, 2026-10-18, P-W2-32 (a))
+# --------------------------------------------------------------------------
+#
+# What a read leaves on disk is seen as the project's file tree before and after; the store is the files named
+# `store.db*` under `.gov-runtime/` (W1-19's suite: the one shared store). No case names the cache file: it is "the
+# file under .gov-runtime/ a read wrote that is not the store".
+
+RUNTIME_REL = ".gov-runtime"
+STORE_PREFIX = "store.db"
+# The public setting that lowers the cache's bound, in bytes (README, "The bound"): an interface this KPI needs.
+CACHE_BOUND_SETTING = "GOV_QUERY_VECTOR_CACHE_MAX_BYTES"
+LOW_BOUND = 262144             # 256 KiB: what the bound cases lower it to
+VECTOR_BYTES = DIMENSIONS * 4  # the least one vector kept exactly takes (1024 float32 numbers)
+
+
+def project_tree(project):
+    """``relative path -> sha256`` of every file of ``project``, git's own folder left out."""
+    project = Path(project)
+    return {path.relative_to(project).as_posix(): sha256(path) for path in sorted(project.rglob("*"))
+            if path.is_file() and ".git" not in path.relative_to(project).parts}
+
+
+def tree_change(before, after):
+    """The paths added, removed or changed between two ``project_tree`` results."""
+    return sorted(path for path in set(before) | set(after) if before.get(path) != after.get(path))
+
+
+def is_store(rel):
+    """``rel`` (relative to the project) is a file of the shared store."""
+    return rel.startswith(f"{RUNTIME_REL}/") and Path(rel).name.startswith(STORE_PREFIX)
+
+
+def runtime_others(project):
+    """Every file under ``.gov-runtime/`` that is not a file of the store, relative to the project."""
+    base = Path(project) / RUNTIME_REL
+    if not base.is_dir():
+        return []
+    return sorted(path.relative_to(project).as_posix() for path in base.rglob("*")
+                  if path.is_file() and not path.name.startswith(STORE_PREFIX))
+
+
+def others_size(project):
+    """The bytes of every file under ``.gov-runtime/`` that is not a file of the store."""
+    return sum((Path(project) / rel).stat().st_size for rel in runtime_others(project))
+
+
+def delete_cache(project):
+    """Delete every file under ``.gov-runtime/`` that is not a file of the store; what was deleted."""
+    gone = runtime_others(project)
+    for rel in gone:
+        (Path(project) / rel).unlink()
+    return gone
+
+
+def tracked(project):
+    """The files git tracks in ``project``."""
+    return set(git(project, "ls-files", "-z").split("\0")) - {""}
+
+
+def questions(count, start=0):
+    """``count`` distinct questions, each with words of the corpus (so their hits differ) and a number of its own
+    at its end (so no question ends with another)."""
+    words = [word for text in SUBJECTS.values() for word in re.findall(r"[a-z]{4,}", text.lower())
+             if word not in _STOP]
+    return [f"how does the {words[(7 * n) % len(words)]} meet the {words[(11 * n + 3) % len(words)]} "
+            f"item{n:04d}" for n in range(start, start + count)]
+
+
+def drive_run(box, project, env, *calls, timeout=CALL_TIMEOUT_S):
+    """As ``drive_env``, keeping the run: ``(answers, run)``. The answers are None when the process failed."""
+    done = run([sys.executable, "-c", _DRIVER, project, json.dumps(calls)], cwd=box.workdir / "elsewhere",
+               env=env, timeout=timeout)
+    answers = json.loads(done.stdout.strip().splitlines()[-1]) if done.returncode == 0 and done.stdout.strip() \
+        else None
+    return answers, done
+
+
+def clean(done):
+    """Why a read's process was not clean (an exit code other than 0, a traceback); empty when it was."""
+    faults = []
+    if done.returncode != 0:
+        faults.append(f"exit code {done.returncode}")
+    if "Traceback" in done.stderr or "Traceback" in done.stdout:
+        faults.append("a traceback")
+    return faults
+
+
+def at_once(box, project, env, call_lists, timeout=300.0):
+    """One process per list of calls, all released together once every one has imported the code; their runs."""
+    go = box.workdir / "tmp" / f"go-{time.monotonic_ns()}"
+    started = time.monotonic()
+    children = [subprocess.Popen([sys.executable, "-c", _DRIVER, str(project),
+                                  json.dumps([("wait", str(go)), *calls])],
+                                 cwd=str(box.workdir / "elsewhere"), env=env, stdout=subprocess.PIPE,
+                                 stderr=subprocess.PIPE, text=True, stdin=subprocess.DEVNULL)
+                for calls in call_lists]
+    time.sleep(1.5)   # every process imports the code and waits; then all are released at once
+    go.touch()
+    runs = []
+    for child, calls in zip(children, call_lists):
+        try:
+            stdout, stderr = child.communicate(timeout=timeout)
+        except subprocess.TimeoutExpired:
+            for other in children:
+                other.kill()
+            raise AssertionError(f"a concurrent read did not end within {timeout:.0f} s") from None
+        done = subprocess.CompletedProcess(child.args, child.returncode, stdout, stderr)
+        runs.append(Run(["driver", *[call[0] for call in calls]], done, time.monotonic() - started))
+    return runs
+
+
+class ReadOnly:
+    """``with ReadOnly(paths):`` the paths (folders or files) lose every write bit; restored afterwards."""
+
+    def __init__(self, *paths):
+        self.paths = [Path(path) for path in paths]
+        self.modes = {}
+
+    def __enter__(self):
+        for path in self.paths:
+            self.modes[path] = path.stat().st_mode
+            path.chmod(self.modes[path] & ~0o222)
+        return self
+
+    def __exit__(self, *exc):
+        for path, mode in self.modes.items():
+            path.chmod(mode)
+        return False
+
+
+def cannot_create_in(folder):
+    """True when a new file cannot be made in ``folder`` (the premise of an unwritable cache folder)."""
+    probe = Path(folder) / "w2-54-write-probe"
+    try:
+        probe.open("x").close()
+    except OSError:
+        return True
+    probe.unlink()
+    return False
