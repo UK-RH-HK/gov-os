@@ -238,6 +238,14 @@ hard-block check is skipped, downgraded or excluded (DEC-768 item 4).
 
 ### 5.2 How the vector is the same without the cache
 
+*Corrected after the lead's measurement at `b33ef9b3` (§5.5): the request shape below does not make the computation
+deterministic on the real embedder. What holds now: the question's request names `options: {"num_gpu": 0}`
+(`QUERY_OPTIONS`), so the question is embedded on the CPU, where its vector is one vector whatever was embedded before
+it, by this process or another, whatever the request's shape (§5.5.2); the request is still
+`[INSTRUCTION, INSTRUCTION + question]` and the second vector is used. The paragraph that follows is the first change
+of round 3, kept as it was; its premise ("a request's inputs in order", "one vector whichever text came before") is
+refuted by §5.5.1, items 1 to 3.*
+
 `semantic.query_vector(root, question)` (now public; `search` calls it) sends **one request**,
 `input: [INSTRUCTION, INSTRUCTION + question]`: the bare instruction, then the question with it, and uses **the
 second vector**. Within that request the question always follows the same text, so its vector no longer depends on
@@ -298,12 +306,151 @@ case included, §5.5), the 29th the bound's statement in this record.
   `store.db` is written by no read.
 - §4.4: measured on round 2's code; this round's measurement is §5.5.
 
-### 5.5 Measurement on the real embedder (run by the lead)
+### 5.5 Measurement on the real embedder, and round 3's second change
 
-*To be filled in from the lead's run: the measurement script's command and figures, the Ollama version it prints,
-and the context check's seconds, tickets and load after a full rebuild, against the declared `timeout-seconds: 600`.*
+Round 3's first change (§5.2's kept paragraph, `77bf7cc7`, `b33ef9b3`) passed its acceptance tests, but the lead's
+measurement on this machine's shared embedder was red. The owner's limits stand (DEC-782, owner, 2026-10-18,
+P-W2-32 (a)): the computation itself must be deterministic, and the cache only saves time. This second change is made
+under CAP-33 and DEC-768: evidence (§5.5.1, §5.5.2), the owner's approval (DEC-782), the acceptance tests unchanged,
+one review. No hard-block check, test or limit of the cache is weakened (DEC-768 item 4).
 
-(In this engineer's sandbox, the acceptance case `test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before`
-passed at `77bf7cc7`: this machine's Ollama is not reachable from inside the sandbox, so `gov` started an Ollama of
-its own there (DEC-261), with this machine's executable and model folder, and that server ended with the run. It is
-the real model, not the shared server; the lead's measurement is the evidence.)
+(The engineer of the first change ran the acceptance case
+`test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before` in a sandbox and it passed at
+`77bf7cc7`. That Ollama was one `gov` started inside the sandbox (DEC-261), with this machine's executable and model
+folder, not the shared server. §5.5.2 shows why that case passes there whatever the code does.)
+
+#### 5.5.1 The lead's failing measurement at `b33ef9b3` (the shared Ollama, outside the sandbox)
+
+**1. The first change's measurement script** (through `semantic.query_vector`; 6 texts, each read after another
+question, after a chunk without the instruction, after the text alone and after a repeated read; cache cold, written
+and unwritable). Ollama 0.35.0 at 127.0.0.1:11434; `qwen3-embedding:0.6b` digest
+`ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d`; bound 67108864 bytes.
+
+| Text | cold: runs / differed / largest | written | unwritable |
+|---|---|---|---|
+| `context` | 12 / 2 / 0.002887 | 12 / 12 / 0.002887 | 12 / 2 / 0.002887 |
+| `The context packet's dropped list in a s…` | 12 / 2 / 0.003281 | 12 / 0 / 0.000000 | 12 / 3 / 0.003281 |
+| `who reads the harbour tide tables` | 12 / 1 / 0.002833 | 12 / 0 / 0.000000 | 12 / 2 / 0.002833 |
+| `the audit-report type exactly as W2-02 d…` | 12 / 2 / 0.004074 | 12 / 12 / 0.004074 | 12 / 1 / 0.004074 |
+| `how is a query vector cached` | 12 / 2 / 0.002609 | 12 / 0 / 0.000000 | 12 / 2 / 0.002466 |
+| `café au lait` | 12 / 4 / 0.005548 | 12 / 0 / 0.000000 | 12 / 3 / 0.005548 |
+
+All of the read's vectors: 216 runs, 50 differed from the text's first, the largest component difference 0.005548.
+The embedder alone (first after another question against its repeat): 18 runs, 18 differed, the largest 0.004074.
+7.3 seconds; the writable cache held 16384 bytes. With the cache cold or unwritable, one text got several vectors.
+
+**2. The lead's probe of request shapes** (`T` = `how is a query vector cached`; 10 runs each, every second run
+preceded by another question's request of the same shape; "differed" against run 0):
+
+| Shape | Runs | Differed | Largest |
+|---|---|---|---|
+| `[I+t]` (round 2) | 10 | 4 | 0.002466 |
+| `[I, I+t]`, the second (round 3's first change) | 10 | 8 | 0.002466 |
+| `[I+t, I+t]`, the second | 10 | 3 | 0.002466 |
+| `[I+t, I+t, I+t]`, the third | 10 | 2 | 0.002466 |
+| `[t]`, bare | 10 | 4 | 0.001719 |
+| `[X, I+t]`, the second, `X` unrelated | 10 | 1 | 0.002609 |
+
+**3. The lead's probe of what decides the vector** (`[I+T]` alone, right after one request of the text named, three
+rounds; the vector's sha256, first 10 characters):
+
+| Vector | Cases that gave it |
+|---|---|
+| `0ffecdbdfe` | unrelated (shares I) #0, #1, #2 |
+| `4332c41b1b` | shares I + `how is a` #0, #1, #2; shares I + `how is a query vector` #0, #1, #2 |
+| `5a4fc29484` | shares nothing #0, #1, #2 |
+| `d326dafe53` | itself (repeat) #0, #1, #2 |
+
+The lead's reading: the vector is reproducible for a given prefix the text shares with the prompt computed just
+before it, and differs between those cases, as if the embedder reused the computed prefix of the previous prompt; the
+inputs of one request are not served in a guaranteed order (`[X, I+t]` still differed once in 10, with other sessions
+using the shared server at the same time).
+
+**4. The context check at `b33ef9b3`**, after a full rebuild (store digest
+`b0d5f5ba40a60fa4a8ca03261d0cb5eb53a84fefc1300da5922229a2e9b61cd9`), the cache cold: `context-reproducibility: green`,
+exit 0, 151.45 seconds (2:31.45) against the declared `timeout-seconds: 600` (a quarter of it), every ticket of this
+repository, load 36.81 before and 14.84 after, 20 processors. It is green because each context's second computation
+reads the vector its first one cached, not because the computation is deterministic.
+
+#### 5.5.2 What this engineer measured
+
+**Where.** Inside this engineer's sandbox (`gov launch`). The shared server is not reachable there (`curl
+http://127.0.0.1:11434/api/version` exits 7). Each probe started an Ollama through `gov.retrieval.ollama.ensure_available`
+(DEC-261), with this machine's executable (`ollama version is 0.35.0`) and model folder:
+`qwen3-embedding:0.6b`, digest `ac6da0df…`. The sandbox blocks the GPU (`nvidia-smi`: "GPU access blocked by the
+operating system"), so `/api/ps` reports `size 2371270737, size_vram 0`: the whole model on the **CPU**. On the shared
+server `size_vram` equals `size`: the whole model on the GPU (§4.2). There are 20 processors, and the load was 1.7 to
+16 during the probes. The probe scripts were throwaway, in the session's temporary folder; the measurement script for
+the lead is described below.
+
+| Probe | What | Result |
+|---|---|---|
+| 1 | `[I+T]` alone (T as in item 3), first in a fresh runner, then after each of 10 predecessors × 3 rounds: a chunk, `x`, `zebra ` × 200 (none shares a prefix), I + a short and I + a long other question, I + `how is a`, I + `how is a query vector`, I + `how is a query vector stored on disk forever`, the text itself, the bare I | **one vector** in 31 of 31 (`ad0ba0b6bb`) |
+| 2 | 4 texts; for each, 3 processes × 15 reads (each read after a noise request of another kind), while a 4th process sends default-option requests of 3 inputs (chunk, `I + question`, `I + prefix`) without pause; then the shapes `[I+t]`, `[I, I+t]`, `[N, I+t, N']`, `[I+t, I+t]` × 3 each. All of it once with default options and once with `num_gpu: 0` | **one vector per text** in 60 of 60 reads, for each of the 4 texts and under both options; `num_gpu: 0` gives the default's vector here, since the CPU is the only device |
+| 2′ | probe 2 again, the sandbox's daemon started with `OLLAMA_NUM_PARALLEL=4 OLLAMA_FLASH_ATTENTION=1` (gov's `env` argument; the shared server's own settings are not known here) | the same: one vector per text, **the same hashes** as probe 2 |
+| 3 | `num_gpu: 0` with `num_thread` 1, 4, 20 and unset | the same 3 vectors for `context`, T and `café au lait` in every case; each change of options reloads the runner (first request 1.05 to 1.11 s) |
+| 4 | a fresh daemon, short requests in turn: default, default, `num_gpu: 0`, `num_gpu: 0`, default, `num_gpu: 999`, default, `num_gpu: 0` | 1.093 s (the load), 0.020, **1.130 (reload)**, 0.022, **0.022 (no reload)**, 1.135 (reload), 0.020, 1.122 (reload): an explicit option different from the loaded runner's reloads it; a request without options never does, and is served by whichever runner is loaded |
+| 5 | CPU costs | a question `[I, I+t]`: 0.02 to 0.06 s; 96 chunks of 512 characters in batches of 32: 36.63 s (0.38 s a chunk, load 11.2) |
+| 6 | the measurement script for the lead (below), run here | one process: 324 reads (6 texts × 3 cache states × 9 kinds of predecessor × 2), **0 differed**; two processes at once with a third client: 96 reads, **0 differed** from the one-process reference; 70.8 s |
+
+**What decides the vector.** The device does. On the CPU, with the same executable, model and digest as the shared
+server, a text's vector is the same bytes whatever was embedded before it. That holds for a predecessor that shares
+nothing, the instruction, a longer prefix or the whole text, for every request shape, with other processes asking at
+the same time, with 1 or 4 parallel slots, with flash attention, and with any thread count. Across separate daemons
+it is the same hash (`ad0ba0b6bb` for T in probes 1, 2, 2′ and 6). On the GPU (the shared server, §5.5.1) the vector
+depends on the prompt computed just before it. The lead's reading of the mechanism (the runner reuses the computed
+prefix of the previous prompt, and the GPU's arithmetic for the tokens left to compute differs from a computation
+of the whole text) fits both sets of figures: on the CPU a reused prefix changes no number. It is not measured here,
+since no GPU is reachable in this sandbox. **This also means that every embedding run in a sandbox is deterministic
+whatever the code does**: the round-3 sandboxed case and the real-embedder case passing there are no evidence about
+the GPU. The shared server is the evidence, and the lead runs it (below).
+
+**Why no request shape could do it on the GPU.** A computation on the GPU depends on what the slot computed before
+it, and any client's request can come first. A shape that puts a known text first in the same request needs the
+inputs served in order on one slot, and item 2 shows they are not. Repeating the text and using the repeat freezes
+the prefix as the first of the repeats computed it, after whatever came before. No embed option was found that
+turns off the reuse of a computed prefix. Settings that only work at load time (the batch size, the context length)
+would reload the shared runner for every client.
+
+#### 5.5.3 The change
+
+| # | File | Change | Evidence |
+|---|---|---|---|
+| 6 | `src/gov/retrieval/semantic.py` | `QUERY_OPTIONS = {"num_gpu": 0}`. A question's request (`query_vector`) names these options, so the question is embedded with no layer on the GPU. `_embed(texts, options=None)` adds `options` to the body only when given, so the index's chunks are embedded as before, with no options. The request stays `[INSTRUCTION, INSTRUCTION + question]` and uses the second vector. The cache is unchanged: its file, its key (model, revision, sha256 of the exact text), its atomic writes, its bound (`GOV_QUERY_VECTOR_CACHE_MAX_BYTES`, default 67108864 bytes, the older half evicted at the bound), and a cache that cannot be read, written or created is skipped silently. | `tests/unit/retrieval/test_semantic_query_vector.py` (23 cases; 2 new: the request bodies, a question's with `options: {"num_gpu": 0}` and a chunk's with none; and the same request computed again to the same bytes once the cache is deleted and its folder unwritable); acceptance `test_w2_54_query_cache.py` and `test_w2_54_query_vector.py`, 29 of 29 green (in the sandbox) |
+
+**Why the computation is deterministic now.** A question's vector is computed on the CPU, where the vector of a text
+depends on the text alone (§5.5.2). Every cache state therefore gives the same bytes: cold, written, full, deleted and
+unwritable. A cache that answers saves one request and nothing else (DEC-782). **Why `[INSTRUCTION, INSTRUCTION +
+question]` stays:** on the CPU the second vector is the vector of the question alone (the same hash, `ad0ba0b6bb`,
+from `[I+T]` in probe 1 and from `query_vector` in probe 6). The acceptance suite's stand-in embedder models an
+embedder that serves a request's inputs in order and moves a text's vector toward the one before it. Against that
+stand-in this shape is what makes the vector deterministic, and dropping it would turn those cases red. Its cost is
+one short extra input per read the cache does not answer.
+
+**Fit for purpose.** The question's vector is still the model's: the same model and digest, the same instruction, the
+instruction-prefixed question against chunk vectors made without it (DEC-406), as before. Only the device changes.
+The index's vectors are made as before (by whichever runner is loaded). How far a CPU vector lies from a GPU one is
+not measured here: no GPU is reachable. W1-21's hit@5 (pass line 80; 81.67 at `5f038b47`) runs on the real models
+and the lead runs it.
+
+**The cost on the shared server** (probe 4, Ollama 0.35.0). When the model is loaded on the GPU, the first question's
+request reloads it on the CPU (about 1.1 s here). A request without options does not reload, so after that, every
+client's default-option request is served by the CPU runner: other sessions' questions, `gov rebuild`'s chunks and
+the index builds of other worktrees. This lasts until the model is unloaded after its idle keep-alive, or until a
+client asks with explicit options again. In that window a rebuild embeds at the CPU's rate (0.38 s a chunk here, under
+load 11). The lead's script prints where the model sits before and after. This is returned to the lead as a decision
+(PKG-W2-54-R3-1).
+
+**Vectors cached by the first change.** At `b33ef9b3` the cache file `.gov-runtime/query-vector-cache.db` (this
+worktree's, after the lead's runs) holds vectors computed on the GPU, under the same key. Its use is unchanged; it is
+derived (DEC-782 limit 5), and **the lead deletes it before measuring**, so that every vector in it is one this
+change computed.
+
+**Measurement after the change on the shared embedder (run by the lead):** *to be filled in: the command, the Ollama
+version and model placement it prints, the figures (one process, two processes at once), and the context check's
+seconds, tickets and load after a full rebuild with the cache deleted, against the declared `timeout-seconds: 600`.*
+
+The command (the script is given to the lead with this engineer's return; it writes only in a temporary folder of
+its own):
+
+    PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 <the script>/eng4-measure.py
