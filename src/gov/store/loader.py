@@ -12,9 +12,11 @@ commit gives the same store wherever and whenever it is loaded.
   from the successor. A dangling edge is stored like any other.
 - Each entry of the register file that the path map of ``HEAD`` names under ``decision_register`` is a record of
   type ``decision`` (DEC-521, DEC-473, DEC-479): its id is the heading's, its status the word after
-  ``**Status:**`` on its first line that is not blank, its path the register file. Its heading and title are kept
-  in ``register_entries``. A named register that ``HEAD`` does not hold as a file of text refuses the load
-  (DEC-579: one that is not in the commit too).
+  ``**Status:**`` on its first line that is not blank, its path the register file. Its heading, title, span and
+  ``content_hash`` are kept in ``register_entries`` (AR-1): the span is its own text, the hash the sha256 of it.
+  A heading alone, one inside an HTML comment, an id outside the ``decision_id`` grammar, a status word not in
+  capitals and an id under two headings make no record (W2-L221, W2-M145, W2-M106). A named register that
+  ``HEAD`` does not hold as a file of text refuses the load (DEC-579: one that is not in the commit too).
 - ``Task:`` and ``Implements:`` trailers are read from the final trailer block;
   a commit made before 2026-10-03 is read from the whole message (DEC-182).
 """
@@ -39,10 +41,14 @@ PATH_MAP_REL = "governance/project/path-map.yaml"
 REGISTER_KEY = "decision_register"  # DEC-479
 REGISTER_TABLE = "register_entries"
 
-# DEC-473: a level-3 heading at the start of a line, the id, a space, a colon or a dash, and the title
-_ENTRY = re.compile(r"### (DEC-[0-9]+)(?=[ :\-–—])[ \t:\-–—]*([^\s:\-–—].*)")
+# DEC-473 read through the kernel's decision_id grammar (common.schema.json): a level-3 heading at the start of a
+# line, the id of three digits or more, a space, a colon or a dash, and the title
+_ENTRY = re.compile(r"### (DEC-[0-9]{3,})(?=[ :\-–—])[ \t:\-–—]*([^\s:\-–—].*)")
+_NOT_AN_ID = re.compile(r"### ((?i:dec)-[0-9]+)(?=[ :\-–—])")  # the heading's form, with an id outside the grammar
+_HEADING = re.compile(r"#{1,6}(?:\s|$)")
 _FENCE = re.compile(r" {0,3}(`{3,}|~{3,})")
 _STATUS = re.compile(r"\s*(?:[-*+]\s+)?\*\*Status:\*\*\s*([A-Za-z][A-Za-z_-]*)")
+_CANONICAL = re.compile(r"[A-Z][A-Z_-]*")  # a status word in capitals, as the sources write it (W2-M106)
 _SUPERSEDES = re.compile(r"\*\*Supersedes:\*\*([^·]*)")
 _IDS_ALONE = re.compile(r"DEC-[0-9]+(?:(?:\s*,\s*|\s+and\s+)DEC-[0-9]+)*")
 
@@ -54,7 +60,8 @@ _TABLES = {
     "commits": "id TEXT PRIMARY KEY",
     "trailers": "commit_id TEXT, key TEXT, value TEXT, PRIMARY KEY (commit_id, key, value)",
     "commit_paths": "commit_id TEXT, path TEXT, PRIMARY KEY (commit_id, path)",
-    REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL",
+    REGISTER_TABLE: "id TEXT PRIMARY KEY, heading TEXT NOT NULL, title TEXT NOT NULL, span TEXT NOT NULL,"
+                    " content_hash TEXT NOT NULL",
 }
 
 
@@ -116,40 +123,90 @@ def _register(root: Path, tree: dict) -> tuple[str, str] | None:
     return path, text
 
 
+def register_entries(text: str) -> tuple[list[dict], list[str]]:
+    """The live entries of a register's ``text``, and the reason each heading of the entry form is no entry.
+
+    A live entry is a heading of DEC-473's grammar outside fenced code blocks and HTML comments, whose first line
+    that is not blank is a status line with a word in capitals (W2-L221, W2-M145, W2-M106). Its ``span`` is its own
+    text, from its heading to the line before the next heading, without the blank lines that end it; its
+    ``content_hash`` is the sha256 of the span (AR-1). An id under two headings is no entry, named with both lines.
+    The store and the decision-citations check count entries by this one rule.
+    """
+    lines, ends, heads, fence, comment = text.split("\n"), [], [], None, False
+    for number, line in enumerate(lines):
+        mark = _FENCE.match(line)
+        if fence is not None:
+            if mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
+                fence = None  # closed by a fence of the same mark, at least as long, with nothing after it
+        elif comment:
+            comment = "-->" not in line
+            if _HEADING.match(line):
+                ends.append(number)
+        elif mark:
+            fence = mark.group(1)
+        else:
+            if _HEADING.match(line):
+                ends.append(number)
+                heads.append(number)
+            if "<!--" in line:
+                comment = "-->" not in line.rpartition("<!--")[2]
+    ends.append(len(lines))
+    found, refused = {}, []
+    for number in heads:
+        entry = _ENTRY.match(lines[number])
+        if not entry:
+            outside = _NOT_AN_ID.match(lines[number])
+            if outside:
+                refused.append(f"{outside.group(1)} at line {number + 1} is no id of the decision_id grammar "
+                               "((ADR|DEC)-[0-9]{3,}): the heading is no record")
+            continue
+        own = lines[number:next(at for at in ends if at > number)]
+        while not own[-1].strip():
+            own.pop()
+        span = "\n".join(own)
+        found.setdefault(entry.group(1), []).append({
+            "id": entry.group(1), "line": number + 1, "heading": lines[number].rstrip(),
+            "title": entry.group(2).strip(), "first": next((line for line in own[1:] if line.strip()), ""),
+            "span": span, "content_hash": hashlib.sha256(span.encode("utf-8")).hexdigest()})
+    live = []
+    for record_id, entries in found.items():
+        status = _STATUS.match(entries[0]["first"])
+        if len(entries) > 1:
+            *some, last = [str(entry["line"]) for entry in entries]
+            refused.append(f"{record_id} stands under {len(entries)} headings of the register, at lines "
+                           f"{', '.join(some)} and {last}: none of them is a record")
+        elif not status:
+            refused.append(f"{record_id} at line {entries[0]['line']} has no status line (`**Status:**` and a word, "
+                           "first under its heading)")
+        elif not _CANONICAL.fullmatch(status.group(1)):
+            refused.append(f"{record_id} at line {entries[0]['line']}: its status word {status.group(1)!r} is not "
+                           "canonical (a word in capitals, as the sources write it): the entry is no record")
+        else:
+            live.append({**entries[0], "status": status.group(1)})
+    return live, refused
+
+
 def _read_register(path: str, text: str, recorded: dict[str, str]):
     """The decision records, the SUPERSEDES edges, the headings and the entries that are no records of a register.
 
     ``recorded`` is ``id -> path`` of the records of the files: an id a file records is the file's, never two.
     """
-    entries, fence, lines = {}, None, text.split("\n")
-    for number, line in enumerate(lines):
-        mark, entry = _FENCE.match(line), _ENTRY.match(line)
-        if fence is None:
-            if mark:
-                fence = mark.group(1)
-            elif entry:
-                first = next((lines[at] for at in range(number + 1, len(lines)) if lines[at].strip()), "")
-                entries.setdefault(entry.group(1), []).append((line.rstrip(), entry.group(2).strip(), first))
-        elif mark and mark.group(1).startswith(fence) and not line[mark.end():].strip():
-            fence = None  # closed by a fence of the same mark, at least as long, with nothing after it
-    records, edges, headings, invalid = [], set(), [], []
-    for record_id, found in entries.items():
-        (heading, title, first), status = found[0], _STATUS.match(found[0][2])
-        if len(found) > 1:
-            reason = f"{record_id} stands under {len(found)} headings of the register: none of them is a record"
-        elif record_id in recorded:
-            reason = f"{record_id} is recorded by the decision file {recorded[record_id]}: the entry is no record"
-        elif not status:
-            reason = f"{record_id} has no status line (`**Status:**` and a word, first under its heading)"
-        else:
-            records.append((path, record_id, "decision", status.group(1)))
-            headings.append((record_id, heading, title))
-            superseded = _SUPERSEDES.search(first)
-            if superseded and _IDS_ALONE.fullmatch(superseded.group(1).strip()):  # a part of a decision gives none
-                edges.update(("SUPERSEDES", record_id, target)
-                             for target in re.findall(r"DEC-[0-9]+", superseded.group(1)))
+    entries, refused = register_entries(text)
+    records, edges, headings = [], set(), []
+    invalid = [{"path": path, "reason": reason} for reason in refused]
+    for entry in entries:
+        record_id = entry["id"]
+        if record_id in recorded:
+            invalid.append({"path": path, "reason": f"{record_id} is recorded by the decision file "
+                                                    f"{recorded[record_id]} and by the heading at line "
+                                                    f"{entry['line']} of the register: the entry is no record"})
             continue
-        invalid.append({"path": path, "reason": reason})
+        records.append((path, record_id, "decision", entry["status"]))
+        headings.append((record_id, entry["heading"], entry["title"], entry["span"], entry["content_hash"]))
+        superseded = _SUPERSEDES.search(entry["first"])
+        if superseded and _IDS_ALONE.fullmatch(superseded.group(1).strip()):  # a part of a decision gives none
+            edges.update(("SUPERSEDES", record_id, target)
+                         for target in re.findall(r"DEC-[0-9]+", superseded.group(1)))
     return records, edges, headings, invalid
 
 
