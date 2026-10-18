@@ -4,7 +4,7 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**305 cases in 9 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**358 cases in 10 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
 file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
@@ -15,7 +15,10 @@ for the last review's findings, **tests added after implementation, from the las
 changes: **15 failed, 218 passed, 0 skipped**, about 3 minutes; see its section), and 72 cases in
 `test_w2_50_extra_review.py` for the extra review's findings, **tests added after implementation, from the extra
 review (DEC-136, DEC-758)**, no earlier case rewritten (red run of the whole suite at `19a4e9fd` plus that file and
-this README: **38 failed, 267 passed, 0 skipped**, about 5.5 minutes; see the last section).
+this README: **38 failed, 267 passed, 0 skipped**, about 5.5 minutes; see its section), and 53 cases in
+`test_w2_50_short_round.py` for the review of the last round, **tests added after implementation, from the review of
+the last round (DEC-136, DEC-764, DEC-765)**, no earlier case rewritten (red run of the whole suite at `8a310cb2` plus
+that file and this README: **24 failed, 334 passed, 0 skipped**, about 4.5 minutes; see the last section).
 
 ## Run
 
@@ -319,6 +322,99 @@ cases already refused, 4 in-project controls and 1 clone launch.
   day leaves a second entry there fails the marker cases' premise, not their behaviour.
 - **`cp` and `install` forms the brief does not name** (`cp -a`, `cp -R`, `install -t d`, `install -D`) fall under
   the same rule in F1's words ("every copy or install into a folder"), but only the named forms are tested (DEC-221).
+
+## The review of the last round: tests added after implementation, from the review of the last round (DEC-136, DEC-764, DEC-765)
+
+The review of the last round found two behaviours the suite missed. The owner decided them (DEC-764 and DEC-765,
+2026-10-18; staged for the owner's commit, not yet in this worktree's register): **A** (DEC-764), the guard refuses
+`cp --parents`, and every copy, install or move option that makes the landed path other than `<folder>/<name>`, as
+doubt, the way it refuses `ln -t`; **B** (DEC-765), the guard reads option values as values and honours `--`, and
+judges each call as the files it writes. They are tested in `round` = `test_w2_50_short_round.py`, through the guard's
+hook with the call on stdin, as the rest of the suite. `ln -f` onto the marker (row W2-L354) and a FIFO in the
+marker's place (row W2-L350) are other rows: no test. No earlier test file, support module or conftest was changed;
+no earlier ticket's test conflicts (W1-03's `install -m 644 README.md docs/installed.md` and W1-46's options after the
+destination, `install … -m 644`, `cp … --suffix bak`, already read a value as a value).
+
+**How the cases are built.** One fixture, `places`: MAIN's and OTHER's folders made by a launch; the project's
+acceptance test `tests/acceptance/W2-90/test_a.py` ("the acceptance test", in "the acceptance folder"); empty folders
+`~/gov-os-runs/W2-90/d/` and `src/app/d/` that hold no link; the links `~/gov-os-runs/W2-90/lnk` → OTHER's folder and
+`src/app/m/sub` → the acceptance folder, for the middle-level cases; sources of the test's own in `elsewhere/` and
+in `src/app/staging/` (`X`, `F`, and a file named `-t`) and `~/gov-os-runs/W2-90/staging/`, so that a move's source
+lies where the session may write and its removal is not what is refused. A call is asked from a working folder (the
+payload's `cwd` and the guard's own): the project, `elsewhere/`, `elsewhere/cwd/` or `src/app/staging/`, as the
+relative spelling of the case needs. No allowed command is run: the guard is only asked. The engineer on DAEO-zz90
+(paths `src/app/**`) makes every call.
+
+**What each tool writes** was found by running each form in a temporary folder of the designer's own (GNU coreutils
+9.4, `cp --help`, `install --help`, `mv --help`), never in the project or the root:
+
+- `cp --parents <source> <folder>` (and `-t <folder>`, `--target-directory=<folder>`, with `-r` or `-a`) writes
+  `<folder>/<source as written>`: from `a/b/src`, `cp --parents ../src/X d/` wrote `d/../src/X`, outside `d`.
+  `cp` accepts `--parent`, `--paren`, `--par` and `--pa` as `--parents`; `--p` is refused as ambiguous
+  (`--parents`, `--preserve`); `--parents=x` is refused.
+- `-S <suffix>` / `--suffix` makes a backup for `cp`, `install` and `mv` without `-b`: `cp -S.t X f`, `cp -bS.t X f`,
+  `cp -S .t X f`, `cp --suffix=.t X f`, `cp --suffix .t X f`, `install -S.t X f` and `mv -S.t X f` each write `f` and
+  `f.t` (the old `f`); `cp -S -t F f` and `cp --suffix -t F f` write `f` (from `F`) and `f-t`. A suffix holding `/`
+  is not used (`cp -b -S /../evil X f` wrote `f~`).
+- `install -oroot X f`, `install -o root X f`, `install -gstaff X f` write `f` and then fail to change its owner or
+  group (not root here); `install -m+t X f` and `install --mode=+t X f` write `f` with mode `+t`.
+- `cp -- -t f` and `mv -- -t f` write `f` from the file named `-t`; `cp -t d -- X` and `cp -- X d/` write `d/X`;
+  `cp X -- f` writes `f`.
+- `-Z` takes no value for `cp`, `install` and `mv` here (`--help`: "set SELinux security context … to default
+  type"); `cp -Zt d X`, `install -Zt d X` and `mv -Zt d X` each write `d/X`.
+- **`install` and `mv`: no option makes the landed path other than `<folder>/<name>` or the named destination.**
+  `install -D X d/new/f` writes the named destination `d/new/f` (making its folders), `install -D -t d/n X` writes
+  `d/n/X`; `install -d` makes folders only; `--strip-trailing-slashes` (`mv`, `cp`) changes how a source is read, not
+  where it lands; backups land at `<destination><suffix>` (B). So A has no `install` or `mv` case.
+
+**What A's comparison with `ln -t` is.** Today `ln -t <folder> X` is refused with "Bash write to
+'/<guard-unresolvable>' denied for role 'engineer'". Each A case asks the guard for `ln -t <the case's folder>
+<elsewhere>/X` from the same working folder first (a premise: it must be refused), takes the first quoted path of
+that refusal's reason (today `/<guard-unresolvable>`), and asks that the `--parents` call's refusal name the same.
+That is as far as the public result lets the two be compared: the same target named, so the same "cannot read" path,
+not a refusal of the place the copy lands in. The wording around it is not prescribed. If an `ln -t` refusal one day
+names no quoted path, only the refusal itself is asked.
+
+**"With the guard's reason" in B.** The reason must name a file the call writes (as given, normalised or resolved):
+the destination, the backup `<destination><suffix>`, or for a copy into a folder `<folder>/X` or the folder. The
+suite's usual reason words (`role`, `ticket`, `outside`) are not accepted here: every refusal names its role, and a
+refusal for a wrong path must not pass.
+
+| Behaviour | New cases | Red reason today (`8a310cb2`) | Green today, and why |
+|---|---|---|---|
+| **A. `cp --parents` is refused as a form the guard cannot read**, into the own folder and into a folder of the repository the session may write, whatever its source | `round::test_a_copy_with_parents_is_refused_as_a_form_the_guard_cannot_read` × 13. Own folder: `cp --parents ../W2-91/work.txt ~/gov-os-runs/W2-90/` from `elsewhere/cwd` (lands in OTHER's folder, the review's example); `cp --parents lnk/work.txt ~/gov-os-runs/W2-90/` (through the link `W2-90/lnk` at a middle level); harmless sources that land inside `W2-90/d`: `cp --parents X d`, `… X d/`, `… -t d X`, `… --target-directory=d X`, `cp -r --parents s d/`, `cp --parent X d`. Repository: `cp --parents ../../tests/acceptance/W2-90/test_a.py -t <project>/src/app` from the project (lands on the acceptance test; the review's example, its source a file of the test's own in HOME), `cp --parents sub/test_a.py src/app/m/` (through the link `src/app/m/sub`), and harmless: `cp --parents X src/app/d`, `cp -a --parents s src/app/d/`, `cp --par X src/app/d` | "Bash `cp --parents …` from … (<case>; cp --parents writes <folder>/<source as written>) was not refused: decision=allow" (13): the guard judges the folder (and `<folder>/<name>`), which is allowed | — |
+| **B. An option's value is read as a value, and nothing after `--` as an option**: each call judged as the files it writes and refused, naming one of them, when one is refused as a direct write. Premise: the acceptance test named directly (Write, a redirect, a plain `cp`) is refused | `round::test_the_acceptance_test_named_directly_is_refused` | none | passes: the premise; it must stay green |
+| B — the value of `-S` / `--suffix` | `round::test_an_option_value_or_a_double_dash_is_judged_as_the_files_the_call_writes` × `cp -S.t X <acceptance test>`, `cp -bS.t …`, `cp -S .t …`, `cp --suffix=.t …`, `cp --suffix .t …`, `cp -S -t F …`, `cp --suffix -t F …`, `install -S.t …`, `mv -S.t …` (X and F in `src/app/staging/`) | "… was not refused: decision=allow" for `cp -S.t`, `cp -bS.t`, `cp -S -t F`, `cp --suffix -t F`, `install -S.t` (5): the `t` of the value, or the value `-t`, is read as `-t` with `X` (or `F`) as the target folder, so the guard judges `src/app/staging/X/test_a.py`, which is allowed, and the acceptance test is read as a source | `cp -S .t`, `cp --suffix=.t`, `cp --suffix .t`, `mv -S.t` (4): judged and refused naming the acceptance test today; they must stay so |
+| B — the values of `install -o`, `-m`, `-g` (`--mode`) | the same test × `install -oroot X <acceptance test>`, `install -o root …`, `install -m+t …`, `install --mode=+t …`, `install -gstaff …` | `-oroot`, `-m+t` (2): "was not refused: decision=allow" (read as `-t` with `X` as the target folder). `-gstaff` (1): refused, but "the refusal's reason names neither the target nor why …: \"Bash write to '…/W2-90/aff/X' denied …\"" (the rest of `-gstaff` after its `t`, `aff`, read as a `-t` folder) | `-o root`, `--mode=+t` (2): refused naming the acceptance test today |
+| B — `--` | the same test × `cp -- -t <acceptance test>` and `mv -- -t <acceptance test>` from `src/app/staging/` (which holds a file named `-t`), `cp -t <acceptance folder> -- X`, `cp -- X <acceptance folder>/`, `cp X -- <acceptance test>` | `cp -- -t` (1): "was not refused: decision=allow": `-t` after `--` is read as `-t`, with the acceptance test as the target folder and no source, so nothing is judged | `mv -- -t`, `cp -t … -- X`, `cp -- X …/`, `cp X -- …` (4): refused naming the file they write today; they must stay so |
+| B — `-Z` takes no value: `cp -Zt <acceptance folder> X` stays judged and refused (fail-closed control) | the same test × `cp -Zt <acceptance folder> X` | none | passes: refused naming `<acceptance folder>/X` today; a reading of `-Z` as taking a value (`t`) must not let it through |
+| **Controls: a value with no `t`, a `--`, and the B forms, onto an allowed file, are allowed** (`src/app/existing.py`, and `~/gov-os-runs/W2-90/d2/f.txt`) | `round::test_an_option_value_or_a_double_dash_onto_an_allowed_file_is_allowed` × 5 forms × 2 places: `cp -S.bak X f`, `install -m 0644 -o root X f`, `cp -- X f`, and the B forms `cp -S.t X f`, `install -oroot X f` (X in `src/app/staging/`) | `install -m 0644 -o root` (2): "was not allowed: decision=deny … reason=\"Bash write to '…/W2-90/root' denied …\"": the separate value `root` of `-o`, after `-m 0644`, is read as an operand (B; the brief lists it as a control, it is red today) | `cp -S.bak`, `cp --` (4): allowed today. `cp -S.t`, `install -oroot` (4): allowed today only because the misread `-t` folder `src/app/staging/X` lies in the session's paths; after the fix they must be allowed as the files they write |
+| Controls: ordinary forms into an allowed folder holding no link, allowed | `round::test_an_ordinary_copy_or_move_into_an_allowed_folder_is_allowed` × `mv W2-90/staging/X W2-90/d/`, `mv src/app/staging/X src/app/d/`, `cp X src/app/d` (no slash). The other ordinary forms are held already: `extra::test_an_ordinary_copy_into_an_own_folder_folder_is_allowed` (`cp X d/`, `cp X d`, `install X d/`, `cp -r s/. d/`, `cp a b d/`, `cp -r s d/` in the own folder), `extra::test_an_ordinary_copy_into_an_allowed_repository_folder_is_allowed` (`cp X d/`, `install X d/`, `cp -r s/. d/` in `src/app/drop/` and `docs/spec/drop/`), `extra::test_an_ordinary_file_copied_or_moved_into_the_own_folder_is_allowed` (`cp`, `install`, `mv` into the own folder itself) | none | pass (3): the controls; a fix that refuses every copy into a folder, or every move, turns them red |
+| Controls: `cp -t <folder> X` and `install -m 644 X <folder>/` stay judged as before | `round::test_the_t_and_m_forms_stay_judged_as_before` × the 2 forms × `~/gov-os-runs/W2-90/d` (allowed), `src/app/d` (allowed), the acceptance folder (refused, naming it or `<folder>/X`) | none | pass (6): the controls; a fix that reads `-m 644` or `-t` otherwise turns them red |
+
+**Red run (whole suite, at `8a310cb2` plus the new file and this README): 24 failed, 334 passed, 0 skipped**, about 4.5 minutes. Every earlier case still
+passes (305). The new file: 24 red, 29 green. Red: A 13; B 9 (`cp -S.t`, `cp -bS.t`, `cp -S -t F`,
+`cp --suffix -t F`, `install -S.t`, `install -oroot`, `install -m+t`, `install -gstaff`, `cp -- -t`); controls 2
+(`install -m 0644 -o root`, both places). Green: the B premise, 11 B forms refused today with the guard's reason
+(`cp -S .t`, `cp --suffix=.t`, `cp --suffix .t`, `mv -S.t`, `install -o root`, `install --mode=+t`, `mv -- -t`,
+`cp -t … -- X`, `cp -- X …/`, `cp X -- …`, `cp -Zt`), 8 controls onto an allowed file, 3 ordinary forms and 6 `-t`
+and `-m` forms.
+
+### Discoveries of this round (no test)
+
+- **A backup is a second file written.** With `-S` or `--suffix` (and `-b`, `--backup`) `cp`, `install` and `mv`
+  rename the file they replace to `<destination><suffix>` in the same folder. B's refusals accept a reason that names
+  that backup; no case asks that the backup path alone be judged, for an allowed destination that exists and whose
+  backup name is a protected entry of the same folder (for example a suffix that turns a file of the own folder
+  into the marker's name: the rename would replace the marker). No source names it; it is the lead's to raise if
+  wanted (it may be W2-L354's neighbour).
+- **`install -m 0644 -o root X f` is refused today** for `<project>/root`: a separate value after another option's
+  value is read as an operand. The brief lists it as a control; it is red today, and B's "values are values" makes it
+  green.
+- **The misreading also lets some B forms pass for the wrong reason.** `cp -S.t X <allowed file>` and
+  `install -oroot X <allowed file>` are allowed today only because the misread `-t` folder (the source's own path)
+  lies in the session's paths; with a source in `elsewhere/` the same calls are refused today, naming
+  `elsewhere/X/<name>`.
 
 ## Readings chosen where a KPI line admits more than one
 
