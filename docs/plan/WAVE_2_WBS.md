@@ -117,7 +117,7 @@ Three tracks.
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
 | W2-52 | A | The lite A7 and A10 stage records (DEC-741) | implementation | engineer | FULL | W2-01, W2-49 | 100 | CAP-44.f (lite) |
 | W2-53 | A | The probe gate measures every later merge against git's own merge of its parents; owner-accepted known reds, integration-side ticket edits, a load-sensitive quarantine (DEC-750, DEC-754, DEC-757) | implementation | engineer | FULL | W2-01 | 160 | DEC-750 item 2, DEC-757 |
-| W2-54 | A | The context packet's dropped list in a stable order; the context-reproducibility check's declared time limit; the `audit-report` type as W2-02 defines it (DEC-768) | implementation | engineer | FULL | — | 60 | DEC-768 items 1 and 3 |
+| W2-54 | A | The context packet's dropped list in a stable order; the context-reproducibility check's declared time limit; the `audit-report` type as W2-02 defines it (DEC-768) | implementation | engineer | FULL | — | 120 | DEC-768 items 1 and 3, DEC-773 |
 | W2-26 | B | EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg) | research | research | STANDARD | the owner's copy (DEC-723); a `/tmp` clone until W2-50 (DEC-728) | 60 | EXP-003 (EXAMIN), W2-I041 |
 | W2-27 | B | EXAMIN adoption on a copy | integration | orchestrator | FULL | the DEC-727 subset, W2-26, W2-49, W2-50, W2-19 (DEC-736), W2-52 (DEC-741) | 0 | Track B |
 | W2-28 | B | Independent verdict on the copy | audit | independent-auditor | FULL | W2-27 | 0 | Track B |
@@ -245,6 +245,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-05 The git environment of every check, hook and helper; the settings re-sort (FULL, engineer)
 - **Allowed paths:**
   - `src/gov/**/*.py`, limited to calls that start git. The sweep is the ticket's first deliverable and names each file before it is changed.
+  - **DEC-776, DEC-777 (2026-10-18):** an early start. While another ticket is unmerged or unclosed, W2-05 changes no file in that ticket's allowed paths (W2-50, W2-54, W2-53's `src/gov/close/**`, and the held W2-02, W2-03, W2-16, W2-20, W2-49, W2-51). The sweep lists those calls as "after <ticket> merges", and the resume round changes them.
   - `src/gov/util/gitenv.py` (new), `lefthook.yml`, `template/lefthook.yml`, `tests/unit/gitenv/**`, `docs/research/AR-2-git-sweep.md`.
 - **KPIs, success:**
   - Every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables. One helper does it, and the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160].
@@ -534,6 +535,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `src/gov/secrets/__init__.py` (the link rule only: a link from `.gov-runtime/` into `~/gov-os-runs` is not followed; DEC-743 §6.1 (i));
   - `tests/unit/guard/test_runs*`, `tests/unit/launch/test_runs*`;
   - `docs/changes/W2-50-CIT-P.md`, `docs/changes/W2-50-CIT-E.md`.
+- **DEC-774 (owner, 2026-10-18; P-W2-29 (a)):** run 6's review found D: `cp -b`/`--backup`, `install`, `mv` and `cp --remove-destination` onto a link replace the link, while the guard judged its target. A lead can reach it (no sandbox), so one more short round, tests first: the guard refuses as doubt a replacing write onto a link; the change record gains a section correcting §10; one review of that change; the paths do not change.
 - **KPIs, success:**
   - **One durable root.** `~/gov-os-runs/` is the one durable scratch root outside the repository, known to the guard and to the launcher's sandbox [DEC-728, W2-M355].
   - **Its own folder only.** A session of any role writes only under `~/gov-os-runs/<its own ticket>/`. That folder is named by the ticket's W2 id (its `external-ref`, as for worktrees), or by its `tk` id when it has none, and resolved from the session's `GOV_TICKET`.
@@ -597,9 +599,11 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-54 The context packet's dropped list in a stable order; the context check's declared time limit; the audit-report type (FULL, engineer; DEC-768)
 - **Why:** W2-53's close refused on context-reproducibility (DEC-768). Run alone, the check takes 122 seconds against the 60 seconds a check without a declared limit gets, and fails on 15 tickets: two computations of a ticket's context give its `dropped` list in two orders, so two hashes. It refused on core-schema too: the W1-43 audit report states no `type` (P-W2-28).
 - **Starts** right after the owner's commit of DEC-768, alone; W2-53 is closed again after it.
-- **Allowed paths:** `src/gov/context/**`, `template/governance/kernel/checks/context-reproducibility.yaml` (the `timeout-seconds` line only), `src/gov/check/schema.py` (the `audit-report` type only), `template/governance/kernel/schemas/audit-report.schema.json` (new), `tests/unit/context/**`, `tests/unit/check/test_schema_audit_report*` (new), `docs/changes/W2-54-CIT-E.md`. The two kernel files are approved by DEC-768 (CAP-33).
+- **DEC-773 (owner, 2026-10-18; P-W2-30 (a)):** the first round showed that the two computations hold different items, not only two orders: the embedder returns a slightly different vector for a text after a different text. One more round, tests first, one review: the paths gain `src/gov/retrieval/semantic.py` and `tests/unit/retrieval/**`; query vectors are stored, keyed by model, model revision and exact text, so the same text always gets the same query vector; whether an embedder setting (thread count, seed) also removes the variation is measured first and recorded, and the stored vectors are used regardless. W2-15a's baseline is taken with this behaviour.
+- **Allowed paths:** `src/gov/context/**`, `template/governance/kernel/checks/context-reproducibility.yaml` (the `timeout-seconds` line only), `src/gov/check/schema.py` (the `audit-report` type only), `template/governance/kernel/schemas/audit-report.schema.json` (new), `tests/unit/context/**`, `tests/unit/check/test_schema_audit_report*` (new), `docs/changes/W2-54-CIT-E.md`; and, by DEC-773, `src/gov/retrieval/semantic.py` (the query vector) and `tests/unit/retrieval/**`. The two kernel files are approved by DEC-768 (CAP-33).
 - **KPIs, success:**
   - Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order retrieval returns tied items in [DEC-768].
+  - The same text always gets the same query vector, whatever was embedded before it: query vectors are stored, keyed by model, model revision and exact text [DEC-773].
   - The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768].
   - `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768].
   - **The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`)** [DEC-768 item 1]: its schema file byte for byte as W2-02's; in `src/gov/check/schema.py`, W2-02's lines for that type (its `SCHEMA_MAP` entry, the type among the standalone types, the audit-report folder `docs/audit` and its reading of a record there that states no `type` as an audit report), nothing of W2-02's other types; so W2-02's later merge adds nothing new for this type. Core-schema is green on `w2/integrate`, with the W1-43 audit report's body untouched.

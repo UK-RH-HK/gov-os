@@ -8455,3 +8455,62 @@ W2-53 was merged into `w2/integrate` at `c9537e39` (`Task: DAEO-7rr2`; its tree 
 | 0.235 | 2026-10-18 | Owner: DEC-768 (P-W2-26 (a): W1-42's claim commit `93bcb247` accepted history under DEC-717; W2-54 sorts the context packet's dropped list stably, gives the context check a declared time limit fitting its measured run, and adds the `audit-report` type exactly as W2-02 defines it (P-W2-28 (a), refined), after which the W1-43 record gets only the lines that type requires, its sha256 before and after recorded; then W2-53 closes again; no hard-block check weakened; W2-M367), DEC-769 (P-W2-27 (a): leads sandboxed in W2-21 after a feasibility test; the test designer writes only its own acceptance folder; the orchestrator unsandboxed), DEC-770 (a guard text-reading hole only an unsandboxed session can reach becomes a row once leads are sandboxed), DEC-771 (P-W2-22 (b): never-recorded sources to W2-17 and W2-18; W2-18 refuses `release: null`), DEC-772 (P-W2-23: `gov release` owner-only from a plain terminal with a one-time code, replacing DEC-761's orchestrator line, W2-16's next round and nothing else; the guard's refusal of a prefix in front of any `gov` command is W2-H060, for W2-42; W2-H059). Next free id: DEC-773. |
 
 ---
+
+## 236. The owner's answers of 2026-10-18 on W2-54's package, W2-50's finding D, a blocker sweep before W2-53's second close, and early starts (register v0.236, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+W2-54's first round (lead return of 2026-10-18, head `71a3a592`, not reviewed, not merged) met every KPI but one: the `dropped` list is sorted with a full tie-break, the context check declares `timeout-seconds: 600` (measured 130.07 s for 106 tickets, 212 computations, one-minute load 26.97 before and 8.47 after, 20 processors), the `audit-report` type is byte for byte W2-02's, core-schema is green and the W1-43 audit report is untouched. context-reproducibility stays red on 14 tickets: DEC-768's premise (the same items in two orders) does not hold. The two computations hold different items, because the embedder (Ollama, `qwen3-embedding:0.6b`) returns a slightly different vector for a text when a different text was embedded just before it. The orchestrator reproduced it: the first embedding of "context" after another text differed from its repeats by up to 0.001948 in a component; repeats were identical. The fix lies in `src/gov/retrieval/semantic.py`, outside W2-54's paths (PKG-W2-54-1, shown to the owner as P-W2-30).
+
+### DEC-773 — The same text always gets the same query vector: W2-54 widened for one more round (P-W2-30 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-768, DEC-105, DEC-406, CAP-33 · **Basis:** P-W2-30; W2-54's first-round return; the orchestrator's reproduction.
+- **Decision:**
+  1. **W2-54's allowed paths gain `src/gov/retrieval/semantic.py` and `tests/unit/retrieval/**`** for one more round: tests first, then the engineer, the verification and one review. W2-54 has not been reviewed, so the orchestrator makes the edit of its ticket file on `w2/W2-54`, in a commit of its own (DEC-757 item 6 is kept).
+  2. **The behaviour:** the same text always gets the same query vector. Query vectors are stored, keyed by the model, the model's revision and the exact text; a stored vector is used whenever its key matches.
+  3. **Measured first:** whether an embedder setting (thread count, seed) also removes the variation. The measurement is recorded in W2-54's change record; the stored vectors are used regardless.
+  4. **DEC-768's premise is corrected** by this entry: the two computations differed in their items, not only in their order. The stable sort of the `dropped` list stays.
+  5. **W2-15a's baseline is taken with this behaviour.** No retrieval figure has been published yet, so none is disturbed.
+
+### DEC-774 — W2-50's finding D is fixed in W2-50's round: a lead can reach it (P-W2-29 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18, the rule; the orchestrator's reading of reach, the same day; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-764, DEC-765, DEC-770, DEC-413 · **Basis:** P-W2-29; W2-50's run-6 review, finding D.
+- **Finding D, in one line:** `cp -b` (`--backup`), `install`, `mv` and `cp --remove-destination` onto a symbolic link replace the link with a new file at the link's own path, while the guard judges the link's target; so where such a link already sits at a protected name, a session puts a file there.
+- **The owner's rule:** (a), a fix in W2-50's round, if D is reachable by a launched worker or by a lead; a list row under DEC-770, with no new round, if only the orchestrator's unsandboxed session can reach it.
+- **The reach, as the orchestrator reads it:**
+  - A launched worker cannot use D. Its Bash runs in the operating-system sandbox: `tests/acceptance/**` is read-only for every role but the test designer, and another ticket's worktree or folder is outside its write list. Replacing a link writes the folder that holds it, so the system refuses it (W1-46's live cases).
+  - A lead can. Leads run with no sandbox, as the orchestrator does, so the guard's reading is their only layer (DEC-769 changes that in W2-21).
+  - The precondition is a link already at a protected name. No session can create one through the guard, and `tests/acceptance/` holds no tracked link today.
+- **Decision:** **(a). W2-50 gets one more short round:**
+  - the guard refuses as doubt a replacing write onto a link (the four forms above, and any other form whose write replaces the link rather than following it);
+  - tests first;
+  - the change record gains a section correcting §10;
+  - one review of that change only.
+  - W2-50's allowed paths do not change.
+
+### DEC-775 — One blocker sweep before W2-54's round: every red that would refuse W2-53's close, at once
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-768, DEC-757, DEC-536
+- **Decision:**
+  1. Before W2-54's second round starts, the orchestrator makes a scratch merge of `w2/integrate` with W2-54's head in a scratch worktree (never the main tree). There it runs a full rebuild, `gov check` (every hard-block family) and the full regression once.
+  2. It lists every red that would refuse W2-53's close, each with its cause and its owner: the whole list at once, not one blocker per close.
+  3. Whatever lies outside W2-54's round goes to the owner as one package.
+
+### DEC-776 — The machine is kept busy: W2-05 starts now; other early starts that overlap neither W2-50 nor W2-54; at most 3 in flight
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-737, DEC-235
+- **Decision:**
+  1. **W2-05 starts now** as an early start under DEC-737: its full loop, then a hold before the merge.
+  2. **Any other eligible early start** whose paths overlap neither W2-50's nor W2-54's may start too.
+  3. **At most 3 tickets are in flight** (DEC-737), under the resource gate.
+
+### DEC-777 — W2-05's early start leaves every unmerged ticket's files alone (delegated, stricter-only)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-18; listed in the digest; the owner overturns it at will) · **Under:** DEC-776, DEC-235, DEC-737, MR-6 · **Basis:**
+  - W2-05's allowed paths (`src/gov/**/*.py`, limited to calls that start git) overlap every code ticket.
+  - In W2-50's paths, `src/gov/guard/decide.py`, `src/gov/launch/launcher.py` and `src/gov/secrets/__init__.py` start git.
+  - No file in W2-54's paths starts git.
+- **Decision:**
+  1. **While another ticket is unmerged or unclosed, W2-05 changes no file in its allowed paths.** Those tickets are W2-50, W2-54, W2-53 (merged but not closed, `src/gov/close/**`) and the held W2-02, W2-03, W2-16, W2-20, W2-49 and W2-51.
+  2. Its sweep record still lists every git call in those files. It marks each one "after <ticket> merges", and W2-05's resume round changes them after merging `w2/integrate` (DEC-737 item 3).
+  3. **No further early start now:** W2-50, W2-54 and W2-05 fill the 3 slots.
+- Next free id: DEC-778.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.236 | 2026-10-18 | Owner: DEC-773 (P-W2-30 (a): W2-54 widened by `src/gov/retrieval/semantic.py` and `tests/unit/retrieval/**` for one more round; query vectors stored by model, revision and exact text; embedder settings measured first; DEC-768's premise corrected), DEC-774 (P-W2-29 (a): finding D is reachable by a lead, so W2-50 gets one more short round, the replacing write onto a link refused as doubt), DEC-775 (one blocker sweep on a scratch merge before W2-54's round), DEC-776 (W2-05 starts now; at most 3 in flight). Delegated: DEC-777 (W2-05 leaves every unmerged ticket's files alone). Next free id: DEC-778. |
+
+---
