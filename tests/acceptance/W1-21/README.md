@@ -162,3 +162,20 @@ A throwaway `retrieve` kept outside the worktree (removed with the session) met 
 model-free dev-tier cases, and four faults put into it were each caught: no authority filter (11 cases red), the
 budget reported as `SATURATED`, nothing put ahead, and expansion ignoring the budget. The command and check cases
 could not be checked this way: both need a file inside the worktree.
+
+## Rewrite (W2-54, DEC-782, 2026-10-18)
+
+`test_w1_21_closure_and_gaps.py::test_a_retrieval_writes_nothing` ("a question", "a ticket", "batches of one") and
+`test_w1_21_command.py::test_the_command_writes_nothing` are rewritten for DEC-782 (owner, 2026-10-18, P-W2-32 (a)):
+a read command may write the query-vector cache, one derived file under `.gov-runtime/`, and nothing else (DEC-379 is
+amended for that file only). Only the expectation that depended on the old behaviour changes:
+
+- **before:** the project's file tree after a retrieval is the tree before it (the read writes no file);
+- **after:** the tree differs in **at most one file**, added or changed, under `.gov-runtime/` and not a file of the
+  store (`store.db*`); no file is removed (`w1_21_support.beyond_the_query_vector_cache`). With W2-54's round-2 code
+  the one file is `.gov-runtime/query-vectors.db`.
+
+Every other assertion of the four cases (the index built first, the bundle checked by `check_bundle`), the no-index
+cases (no runtime folder is made), and every pass line and threshold of this suite are unchanged. Commit trailer:
+`Rewrite-Reason: DEC-782 (owner, 2026-10-18, P-W2-32 (a)): a read command may write the query-vector cache and nothing
+else`.

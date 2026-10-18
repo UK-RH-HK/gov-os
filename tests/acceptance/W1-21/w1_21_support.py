@@ -555,6 +555,24 @@ def tree(project):
             for path in sorted(project.rglob("*")) if path.is_file() and ".git" not in path.relative_to(project).parts}
 
 
+def beyond_the_query_vector_cache(before, after):
+    """What a read wrote beyond the one query-vector cache file; empty when it wrote nothing else.
+
+    DEC-782 (owner, 2026-10-18, P-W2-32 (a)) amends DEC-379 for one file only: a read command may write the
+    query-vector cache, one derived file under ``.gov-runtime/``, and nothing else. So between ``before`` and
+    ``after`` (two ``tree`` results) at most one path may be added or changed, under ``.gov-runtime/``, never a file
+    of the store (``store.db*``), and no path may be removed.
+    """
+    changed = sorted(path for path in set(before) | set(after) if before.get(path) != after.get(path))
+    faults = [f"{path} removed" for path in changed if path not in after]
+    faults += [f"{path} is outside {RUNTIME_REL}/" for path in changed if not path.startswith(f"{RUNTIME_REL}/")]
+    faults += [f"{path} is a file of the store" for path in changed
+               if path.startswith(f"{RUNTIME_REL}/") and Path(path).name.startswith("store.db")]
+    if len(changed) > 1:
+        faults.append(f"{len(changed)} files written, not at most one: {changed}")
+    return faults
+
+
 # --------------------------------------------------------------------------
 # The fixture project
 # --------------------------------------------------------------------------

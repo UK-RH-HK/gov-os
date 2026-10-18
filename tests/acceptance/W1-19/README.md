@@ -133,7 +133,7 @@ reranker is absent.**
 | Function | Returns |
 |---|---|
 | `gov.retrieval.semantic.refresh(root)` | Brings the lexical index up to date, then embeds the chunks that have no vector. `{"available": bool, "facet": "semantic", "state": str, "reason": str or None, …}`. Unavailable (Ollama absent, no `sqlite_vec`): `available` false, `state` `"FACET_UNAVAILABLE"`, a non-empty `reason`. More keys are allowed. |
-| `gov.retrieval.semantic.search(root, query, refresh=True)` | The same four keys and `"hits": [...]`, nearest first, each chunk once. A hit is the chunk record of W1-17: `{"chunk_id", "path", "start_line", "end_line", "parent_id"}`, more keys allowed. Unavailable carries no hit. With `refresh=False` nothing is written, and a missing or stale index is reported unavailable (DEC-342, DEC-322). |
+| `gov.retrieval.semantic.search(root, query, refresh=True)` | The same four keys and `"hits": [...]`, nearest first, each chunk once. A hit is the chunk record of W1-17: `{"chunk_id", "path", "start_line", "end_line", "parent_id"}`, more keys allowed. Unavailable carries no hit. With `refresh=False` nothing is written but the query-vector cache, one derived file under `.gov-runtime/` (DEC-782, which amends DEC-379 for that file only), and a missing or stale index is reported unavailable (DEC-342, DEC-322). |
 | `gov.retrieval.semantic.manifest(root)` | `None` when there is no index; else `{"embedder": {"model", "revision"}, "reranker": {"model", "revision"}}`. Writes nothing and asks Ollama nothing: the manifest is held in the shared store (DEC-374). The embedder's revision is the digest the endpoint's model list reported when the vectors were built, not a constant (DEC-374); the tests accept the digest or its first twelve or more characters, with `sha256:` allowed in front. |
 | `gov.retrieval.fusion.rrf(routes, k=60)` | `routes` is `route name -> ranked hits`, each hit a map with `chunk_id`. One list, best first: each chunk once, with the fields it came with, `score` (the sum of `1 / (k + rank)` over the routes that returned it, ranks from 1) and `routes` (the names of those routes). Several hits of one route in one chunk count once, at the best rank. |
 | `gov.retrieval.fusion.search(root, query, limit, refresh=True, reranker=None)` | The whole retrieval: both routes, RRF, one rerank. `{"hits": [...], "facets": {"lexical": {…}, "semantic": {…}}, "reranked": bool}`. A hit is a chunk record with `routes`. Each facet entry has `available`, `facet`, `state`, `reason`. A limit cuts after the rerank; `limit=None` returns the whole reranked merged set. The tests always pass `limit` by name. |
@@ -468,3 +468,18 @@ decided (DEC-397). Three things stay with the ticket lead and the engineer:
 - The RRF constant's default: the cases that compare scores pass `k=60`.
 - Spellings of `embedding_policy` that differ from the two known values only by case or spacing, and a path that
   matches two namespaces with different policies.
+
+## Rewrite (W2-54, DEC-782, 2026-10-18)
+
+`test_the_vectors_are_in_the_shared_store_beside_the_lexical_index` is rewritten for DEC-782 (owner, 2026-10-18,
+P-W2-32 (a)): a read command may write the query-vector cache, one derived file under `.gov-runtime/`, and nothing
+else (DEC-379 is amended for that file only). Only the expectation that depended on the old behaviour changes:
+
+- **before:** `.gov-runtime/` holds the store's files only (`store.db*`);
+- **after:** `.gov-runtime/` holds the store's files and **at most one other file** (the cache a search of the
+  session's other cases wrote: `['query-vectors.db', 'store.db']` with W2-54's round-2 code).
+
+The second clone is still given **the store's files only**, so the case still requires the vectors to be in the
+store and nowhere else; every other assertion, and every pass line and threshold of this suite, is unchanged. The
+interface table's line for `search(..., refresh=False)` now says the same. Commit trailer: `Rewrite-Reason: DEC-782
+(owner, 2026-10-18, P-W2-32 (a)): a read command may write the query-vector cache and nothing else`.

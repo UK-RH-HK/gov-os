@@ -132,8 +132,12 @@ def test_a_project_without_any_index_is_answered_without_evidence_and_nothing_is
 @pytest.mark.parametrize("kwargs", [{}, {"ticket": support.TICKET_IN_SCOPE, "radius": support.RADIUS_FULL},
                                     {"batch_size": 1}], ids=["a question", "a ticket", "batches of one"])
 def test_a_retrieval_writes_nothing(api, repo, ollama, kwargs):
-    """A read command writes nowhere (DEC-317): not the index, not the store, not a cache."""
+    """A read command writes nowhere (DEC-317): not the index, not the store, nothing but the query-vector cache.
+
+    Rewritten by DEC-782 (owner, 2026-10-18, P-W2-32 (a)): a read command may write the query-vector cache, one
+    derived file under ``.gov-runtime/``, and nothing else (it was: no file at all)."""
     api.build(repo, ollama.host)
     before = support.tree(repo)
     support.check_bundle(api.retrieve(repo, support.PHRASE, host=ollama.host, **kwargs), root=repo)
-    assert support.tree(repo) == before, "the retrieval wrote or changed a file of the project"
+    assert support.beyond_the_query_vector_cache(before, support.tree(repo)) == [], \
+        "the retrieval wrote or changed a file of the project beyond the query-vector cache"
