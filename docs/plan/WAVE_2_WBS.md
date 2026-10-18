@@ -450,6 +450,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
 
 #### W2-21 Stable launch: `gov launch lead`, the ticket-lead role, launch records (FULL, engineer, with a product-spec worker for the role file)
+- **DEC-779 (owner, 2026-10-18), priority raised:** W2-21 takes the next free slot after W2-50 closes, ahead of any Track C ticket, so that the leads are sandboxed as early as possible. It leaves the held W2-20's `src/gov/launch/gate*` alone until W2-20 merges. Until W2-21 lands, a guard text-parsing hole that only unsandboxed sessions can reach, or that needs a precondition no session can create through the guard, is a row for every guard ticket.
 - **Allowed paths:** `src/gov/launch/**`, `template/governance/kernel/roles/ticket-lead.md` (new), `template/governance/kernel/settings.json` (the one allow rule), `tests/unit/launch/**`.
 - **KPIs, success:**
   - `gov launch lead <ticket>` builds the whole lead invocation (absolute paths, the identity in `--settings`, the model, background mode, the log and PID files) and passes the resource gate [DEC-715, W2-H046].
@@ -487,6 +488,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:** the fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
 
 #### W2-48 Test-result cache at close, keyed on exact input hashes (FULL, engineer; DEC-726)
+- **DEC-780 (owner, 2026-10-18), priority:** after W2-53 closes, W2-48 takes the next free slot after W2-21, since it shortens every later close.
 - **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
 - **KPIs, success:**
   - **The key.** Each test's cache key is a sha256 over all of these:
@@ -534,8 +536,11 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `template/governance/kernel/checks/secrets-indexing.yaml` (the exclusion only);
   - `src/gov/secrets/__init__.py` (the link rule only: a link from `.gov-runtime/` into `~/gov-os-runs` is not followed; DEC-743 §6.1 (i));
   - `tests/unit/guard/test_runs*`, `tests/unit/launch/test_runs*`;
+  - by DEC-778: `src/gov/guard/protected.py` (the option reader for `mv` and `cp -l`), `tests/unit/guard/test_protected*`;
   - `docs/changes/W2-50-CIT-P.md`, `docs/changes/W2-50-CIT-E.md`.
 - **DEC-774 (owner, 2026-10-18; P-W2-29 (a)):** run 6's review found D: `cp -b`/`--backup`, `install`, `mv` and `cp --remove-destination` onto a link replace the link, while the guard judged its target. A lead can reach it (no sandbox), so one more short round, tests first: the guard refuses as doubt a replacing write onto a link; the change record gains a section correcting §10; one review of that change; the paths do not change.
+- **DEC-778 (owner, 2026-10-18; P-I):** folded into run 7, which had not reached its review: `src/gov/guard/protected.py` uses the option reader W2-50 built for `cp` and `install` for `mv` and `cp -l` too, so the guard reads every copy-like command one way, for writes and for reads. The paths gain `src/gov/guard/protected.py` and `tests/unit/guard/test_protected*`; tests first; the round's one review covers it.
+- **DEC-779 (owner, 2026-10-18): run 7 is W2-50's last.** After its review W2-50 closes; any further guard text-parsing finding is a list row unless a launched, sandboxed worker can reach it.
 - **KPIs, success:**
   - **One durable root.** `~/gov-os-runs/` is the one durable scratch root outside the repository, known to the guard and to the launcher's sandbox [DEC-728, W2-M355].
   - **Its own folder only.** A session of any role writes only under `~/gov-os-runs/<its own ticket>/`. That folder is named by the ticket's W2 id (its `external-ref`, as for worktrees), or by its `tk` id when it has none, and resolved from the session's `GOV_TICKET`.
@@ -792,6 +797,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - The decision checker runs within the `gov check` budget on a 200-decision, 20k-commit repository [W2-H018].
   - A check that exits 0 with findings, or with "unmeasured" in its result, is not green [W2-M129, W2-M212].
   - An absent tool of a hard-block check is red, not yellow [W2-M130, W2-M265].
+  - **`openspec-validate` measures something or says it does not apply:** real openspec content that it validates, or an owner decision that declares it not applicable here, stated by the check; never silently yellow [W2-H061, DEC-781].
   - A hard-block key is covered only by a check of hard-block tier [W2-M211, W2-M259].
   - The time limit is stated and tested [W2-M151].
 

@@ -8514,3 +8514,55 @@ W2-54's first round (lead return of 2026-10-18, head `71a3a592`, not reviewed, n
 | 0.236 | 2026-10-18 | Owner: DEC-773 (P-W2-30 (a): W2-54 widened by `src/gov/retrieval/semantic.py` and `tests/unit/retrieval/**` for one more round; query vectors stored by model, revision and exact text; embedder settings measured first; DEC-768's premise corrected), DEC-774 (P-W2-29 (a): finding D is reachable by a lead, so W2-50 gets one more short round, the replacing write onto a link refused as doubt), DEC-775 (one blocker sweep on a scratch merge before W2-54's round), DEC-776 (W2-05 starts now; at most 3 in flight). Delegated: DEC-777 (W2-05 leaves every unmerged ticket's files alone). Next free id: DEC-778. |
 
 ---
+
+## 237. The owner's answer of 2026-10-18 on the guard's second option reader (register v0.237, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+W2-50's run-6 engineer found that `src/gov/guard/protected.py`, outside W2-50's paths, still reads `mv` and `cp -l` with the old option reader. That is the one P-W2-25 (DEC-765) replaced for `cp` and `install`, which read a `t` inside an option's value as `-t` and ignored `--`. That file holds the guard's refusal to read protected material, the held-out material among it. Leads run with no sandbox, so a lead can reach the misreading (DEC-770 item 2). It was shown to the owner as P-I.
+
+### DEC-778 — One option reader for every copy-like command, for writes and for reads (P-I)
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-765, DEC-770, DEC-774, DEC-413 · **Basis:** P-I; W2-50's run-6 return.
+- **Decision:**
+  1. **Fixed in Wave 2, not deferred:** it protects the held-out material against reads by a lead.
+  2. **One option reader:** `src/gov/guard/protected.py` stops using its old option reader for `mv` and `cp -l`. It uses the reader W2-50 built for `cp` and `install`, so the guard reads every copy-like command one way, for writes and for reads.
+  3. **Where:**
+     - **If W2-50's run 7 has not reached its review,** W2-50's allowed paths gain `src/gov/guard/protected.py` and its unit tests, and the change is folded into run 7, tests first.
+     - **Otherwise,** a short ticket W2-55 runs right after W2-50 closes, alone on the guard's files, tests first, then one review.
+- **Applied (orchestrator, 2026-10-18):** run 7 had not reached its review; its test designer was writing finding D's cases. The orchestrator let that test designer finish, stopped the lead before an engineer started, widened W2-50's ticket file on `w2/W2-50` (never on `w2/integrate`, DEC-757 item 6), and restarted the round from there with this change added: tests first, one review of the round's change. No W2-55 is created.
+
+### DEC-779 — W2-50's run 7 is its last; a guard hole that only unsandboxed sessions can reach is a row; W2-21 next
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-770, DEC-769, DEC-774, DEC-778, DEC-413, DEC-235
+- **Decision:**
+  1. **W2-50's run 7 (with DEC-778 folded in) is its last.** After run 7's review, W2-50 closes. Any further guard text-parsing finding becomes a list row, not a new round, unless a launched, sandboxed worker can reach it (a true fail-open through the operating-system sandbox).
+  2. **The same holds for every guard ticket from now on.** A hole is a row, not a round, when:
+     - it needs a precondition no session can create through the guard; or
+     - only unsandboxed sessions (the orchestrator and the leads) can reach it.
+     The structural fix is the lead sandbox in W2-21 (DEC-769). This brings DEC-770 item 1 forward and replaces its item 2 for guard text-parsing holes.
+  3. **W2-21's priority is raised.** It takes the next free slot after W2-50 closes, ahead of any Track C ticket, so that the leads are sandboxed as early as possible.
+     - W2-21's `src/gov/launch/**` covers `src/gov/launch/launcher.py` (W2-50's) and `src/gov/launch/gate*` (the held W2-20's). W2-21 starts once W2-50 has closed.
+     - It leaves W2-20's `gate*` files alone until W2-20 merges (as DEC-777 reads it). Its `tk` dependency on W2-20 is read as "closes after" (DEC-737 item 5).
+- Next free id: DEC-780.
+
+### DEC-780 — Closes run in a quiet window, back-to-back; W2-48 after W2-21 (P-W2-31 (a))
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-760, DEC-762, DEC-766, DEC-768, DEC-779 · **Basis:**
+  - P-W2-31: the blocker sweep (DEC-775) ran W2-53's close on a scratch merge while two leads ran.
+  - W1-46's 23 live-session cases failed under load in the regression. 20 passed in the ratchet's re-run alone. 3 failed alone too: the allowlist cases for `pypi.org`, `files.pythonhosted.org` and `objects.githubusercontent.com`.
+  - The orchestrator re-ran all 17 allowlist cases afterwards on a quieter machine, and all 17 passed. The "alone" re-run was not alone.
+- **Decision:**
+  1. **(a), a quiet window for each close.** No lead starts during a close. A close starts only when the running leads are holding or between their suite runs.
+  2. **Closes are queued and run back-to-back** in one quiet window (overnight where possible), one at a time, each with a fresh checkpoint, so that slots do not idle.
+  3. **Never (c):** the ratchet does not retry a load-sensitive case to let a close through.
+  4. **After W2-53 closes, W2-48 (the test cache) takes the next free slot after W2-21,** since it shortens every later close.
+
+### DEC-781 — openspec-validate never stays silently yellow: row W2-H061
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-775, DEC-768 item 4 · **Basis:** the blocker sweep. `openspec-validate`, a hard-block check (family product traceability), is yellow whatever the environment: "openspec is not on PATH" without node, and "nothing to validate" with it. It never measures anything, and a yellow check does not refuse a close.
+- **Decision:** a hard-block check that never measures anything is a false green. **Row W2-H061 (high, owner; triaged to W2-45, the `gov check` runner)** settles it one of two ways:
+  - this repository gets real openspec content for the check to validate; or
+  - the check is declared not applicable here by an owner decision, and says so.
+  It never stays silently yellow.
+- Next free id: DEC-782.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.237 | 2026-10-18 | Owner: DEC-778 (P-I: `src/gov/guard/protected.py` uses W2-50's option reader for `mv` and `cp -l`; folded into W2-50's run 7, which had not reached its review; W2-50's paths gain `protected.py` and its unit tests), DEC-779 (W2-50's run 7 is its last, then it closes; a guard text-parsing hole that needs a precondition no session can create through the guard, or that only unsandboxed sessions can reach, is a row for every guard ticket; W2-21 takes the next free slot after W2-50 closes, ahead of Track C), DEC-780 (P-W2-31 (a): closes in a quiet window, queued and run back-to-back, each with a fresh checkpoint; never a retry in the ratchet; W2-48 after W2-21), DEC-781 (openspec-validate never stays silently yellow: row W2-H061). Next free id: DEC-782. |
+
+---
