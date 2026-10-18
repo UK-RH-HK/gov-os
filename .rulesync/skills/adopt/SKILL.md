@@ -36,9 +36,15 @@ Every namespace of the target path map states its `embedding_policy`, as one of 
 
 Stage A3 refuses a path map in which a namespace states another value or none, or in which no namespace is `embedded`; it records nothing. Outside adoption an unknown or missing value is read as `not embedded` (DEC-388), and `gov rebuild` and `gov doctor` say "no namespace is embedded" where none is.
 
-## Independent gates (Wave 3)
+## Independent gates (A7 and A10 lite; the rest Wave 3)
 
-The independent gates A7 (independent migration verification), A10 (independent memory verification) and A11 (full audit) are Wave 3, together with CAP-47. The final verdict — `ADOPTED_HEALTHY`, `ADOPTED_WITH_ACCEPTED_EXCEPTIONS` or `NOT_ADOPTED_HEALTHY` — is issued from Wave 3 (DEC-090).
+Contract v4.2 brings A7 and A10 into Wave 2 in a lite form (CAP-44.f, DEC-741). Each is recorded as its own stage: `gov adopt --lite --stage A7` (or `A10`) `--verdict <path>`, run by the session that ran the stages on the committed record of a fresh Independent Auditor session. That record states `stage`, `verdict` (only `pass` passes), an `auditor_session` that ran no stage, and `checked`: each record checked, with its sha256 at HEAD. It is committed with `Role: independent-auditor`. The gate commits its own record under `governance/adoption/`, with its conditions; a gate that fails commits a failing record.
+
+- **A7** — independent migration verification, by a fresh Independent Auditor session: the A6 migration against the A3 path map and the A4 plan reviewed at A5. The gate also checks that each move of the plan stands in the project.
+- **A10** — independent memory verification, by a fresh Independent Auditor session: A8's extraction and retirement, the derived state rebuilt from git (`gov rebuild`, CAP-20), and the canary of each index (CAP-55).
+- **The verdict** reads each gate's record as named conditions (CAP-44.h (4), (6), (9)). A missing A7 or A10 record is that gate's condition `not met`, never healthy. No gate and no auditor accepts a condition; only the owner does, by name.
+
+Wave 3 (CAP-44.k): A7 and A10 by separate verifier roles (CAP-47.a), A10 over the A9 knowledge fabric, A9 itself, A11 (full audit) and the full verdict.
 
 ## Governing sources
 
