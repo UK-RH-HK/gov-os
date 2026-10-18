@@ -9,7 +9,7 @@ proposal: W2-50-CIT-P
 ticket: DAEO-kl5e (W2-50)
 author: engineer (ticket mode, single author)
 decisions_recorded: []
-decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752, DEC-758]
+decisions_carried: [DEC-728, DEC-743, DEC-751, DEC-723, DEC-108, DEC-159, DEC-386, DEC-313, DEC-334, DEC-434, DEC-732, DEC-738, DEC-136, DEC-135, DEC-752, DEC-758, DEC-764, DEC-765]
 state_class: EVIDENCE
 ---
 
@@ -631,3 +631,168 @@ The latency cases passed as part of their suites, with the machine under load fr
 
 The code is 90 lines net, about a third of them docstrings and comments. With the earlier rounds the change's code
 is 341 lines added and 50 removed, 291 net, above the estimate of 120 LOC (`est_loc`) by 171 lines.
+
+## 10. One more short round, after the review of the last round (DEC-764, DEC-765)
+
+The review of the last round found two behaviours missing. The owner decided them on 2026-10-18 (DEC-764 and DEC-765;
+staged for the owner's commit, not yet in this worktree's register): **A** (DEC-764), the guard refuses `cp --parents`,
+and every copy, install or move option that makes the landed path other than `<folder>/<name>`, as doubt, the way it
+refuses `ln -t`; **B** (DEC-765), the guard reads option values as values and honours `--`, and judges each call as the
+files it writes. The test designer added them as `tests/acceptance/W2-50/test_w2_50_short_round.py` at `41aa00c0`,
+tests added after implementation (DEC-136): 53 cases. The suite at `41aa00c0`: 24 failed, 334 passed, every failure in
+the new file: A 13; B 9 (`cp -S.t`, `cp -bS.t`, `cp -S -t F`, `cp --suffix -t F`, `install -S.t`, `install -oroot`,
+`install -m+t`, `install -gstaff`, `cp -- -t`); the control `install -m 0644 -o root X f` 2 (the README's section "The
+review of the last round"). `ln -f` / `ln -sf` onto the own folder's marker (row W2-L354) and a FIFO in the marker's
+place (row W2-L350) are not this round's work.
+
+### The correction of §9
+
+This section corrects §9; §9 is left as written.
+
+- **What §9 claimed.** F1: "a copy, install or move into a folder is judged as the folder (as before) and as each file
+  it writes in it, `<folder>/<name>`", and with it that row **W2-H056** was closed "for every ticket inside the
+  repository".
+- **What did not hold at `8a310cb2`** (the tree §9 describes), each shown red by the new file at `41aa00c0`:
+  - **`cp --parents`** (and `--parent`, `--par`) writes `<folder>/<source as written>`, not `<folder>/<name>`. The
+    guard judged `<folder>/<name>`, so `cp --parents ../../tests/acceptance/W2-90/test_a.py -t <project>/src/app`,
+    which lands on the acceptance test, and `cp --parents sub/test_a.py src/app/m/` through a link at a middle level
+    were allowed, as were the same forms into the own folder that land in another ticket's folder (13 red).
+  - **The option reader** (`_cp_operands`) read any cluster of short options holding a `t` as `-t`, with the rest of
+    the word or the next word as its folder; it read an option's separate value as an operand; and it read nothing
+    after `--` as an operand. So `cp -S.t X <acceptance test>`, `cp -bS.t …`, `cp -S -t F …`, `cp --suffix -t F …`,
+    `install -S.t …`, `install -oroot …`, `install -m+t …` and `cp -- -t <acceptance test>` were allowed,
+    `install -gstaff …` was refused for a wrong path (`…/aff/X`), and `install -m 0644 -o root X f` onto an allowed
+    file was refused for `<project>/root` (11 red).
+  - So W2-H056 was **not** closed at `8a310cb2`: a copy into a folder of the role's paths could still land on the
+    acceptance test.
+- **§9's difference 19** ("`-T` is read wherever a `T` stands in a cluster of short options; a suffix such as `-S.T`
+  is read as `-T` too") no longer holds: since this round a value is a value, so `-S.T` is the suffix `.T` and the
+  call is judged as the one it is. `-T` and `--no-target-directory` are read where the tool reads them.
+- **W2-H056 now.** For `cp`, `install` and `mv`, read as GNU coreutils 9.4 reads them, a copy, install or move into a
+  folder is judged as each file it writes, and a form whose landed path the guard does not read is refused. The
+  grounds: the 13 A cases, the B premise and 20 B cases, and the 19 controls of `test_w2_50_short_round.py`, with F1's cases of
+  `test_w2_50_extra_review.py`, all green at this round's tree. This record reads W2-H056 as closed within that
+  scope; the forms under "What stays open" below are outside it.
+
+### What holds after this round
+
+- **How `cp`, `install` and `mv` are read** (`_copy_args`, DEC-765), as GNU coreutils 9.4 reads them:
+  - the short letters that take no value (`cp` `abdfHilLnPprRsTuvxZ`, `mv` `bfinTuvZ`, `install` `bcCdDpsTvZ`) and those
+    that take one (`-S`, `-t`, and for `install` `-g`, `-m`, `-o`), the value joined to the letter (`-S.t`, `-oroot`,
+    `-m+t`, `-bS.t`) or the next word (`-S -t`, `-o root`); `-Z` takes no value, so `cp -Zt <folder> X` is a copy into
+    `<folder>` and stays judged (held by the fail-closed control);
+  - the long names, and every abbreviation the tool accepts (a unique prefix, or prefixes that name one option, as
+    `--pa` names `--parents` and `--path`); a long name that takes a value takes it after `=` or as the next word
+    (`--suffix .t`, `--mode=+t`), one with an optional value only after `=` (`--backup`, `--preserve`, `--context`
+    for `cp` and `install`);
+  - nothing after `--` is an option (`cp -- -t f` copies the file `-t` onto `f`); a lone `-` is an operand.
+  - The tables were checked against the tools on this machine by a script in my temporary folder (each long name is
+    known to the tool, takes a value exactly when the table says, and every name in `--help` is in the table): **not a
+    committed test**. The acceptance and builder tests hold the forms they name.
+- **What is judged.** As before: the operands of `mv`, each `-t` folder, the destination (the last operand), and each
+  file a copy, install or move writes in a folder (§9). With an option written after an operand every word after
+  the first operand is judged as a possible destination, separate values included (as the earlier reader did, so a
+  call read with `POSIXLY_CORRECT` set is judged no less than before; not tested). `install -d` and `cp -l` are read
+  from the options as read, so a value (`-S.d`, `-S.l`) or `--debug` no longer reads as either (not tested).
+- **Refused as doubt**, with the guard's reason naming `/<guard-unresolvable>`, the target an `ln -t` refusal names
+  (DEC-764): `cp --parents`, whatever its source and whether its folder is given as the last operand, `-t` or
+  `--target-directory`, in the spellings `--parents`, `--parent`, `--par` (A cases), `--pa` and the old alias
+  `--path`, which coreutils 9.4 still accepts (builder tests); the other prefixes (`--pare`, `--paren`) are read
+  the same way, not tested one by one; an option the tool does not know (`cp -q`, `install --no-such`); an ambiguous abbreviation
+  (`--p`); a value given to an option that takes none (`--parents=x`); an option missing its value at the end
+  (`mv X d -S`). Held by the A cases and the builder test
+  `test_a_copy_whose_landed_path_is_not_read_is_refused` (10 forms).
+- **Backups** (DEC-765, "the files it writes"): with `-b`, `--backup`, `-S` or `--suffix`, the backup
+  `<file><suffix>` is judged beside each file the call replaces that is not a folder, and beside the destination
+  folder of `mv -T` (which `mv -b -T` renames); a suffix that is empty or holds a slash is read as `~`, as the tools
+  do. Held by the builder test `test_a_backup_is_judged_beside_the_file_it_replaces`: `mv -b -T <dir> <own folder>`
+  (the backup would land directly in the root) and `cp -S<c> X <own folder>/<marker minus c>` (the backup would
+  replace the marker) are refused; the same calls without a backup, and backups into allowed places, are allowed.
+  The README's discovery that no case asks this is answered by these builder tests, not by an acceptance test.
+- **Allowed as before:** ordinary copies, installs and moves into a folder the session may write; `cp -t` and
+  `install -m 644` into an allowed folder; a value with no `t`, a `--`, and the B forms onto an allowed file (the
+  controls). `install -m 0644 -o root X f` onto an allowed file is allowed now (red before).
+
+### What stays open
+
+- **Rows W2-L354** (`ln -f` / `ln -sf` onto the own folder's marker) and **W2-L350** (a FIFO in the marker's place):
+  not this round's work (DEC-765).
+- **`POSIXLY_CORRECT`.** With it set in the session the tools read every word after the first operand as an operand.
+  Every such word that does not start with `-` is judged as a possible destination (above), but a word that starts
+  with `-` after the first operand (a `-t` there) is not judged as a source landing in that destination
+  (`<folder>/-t`). The landed folder itself is judged. Not tested.
+- **Numbered backups and `SIMPLE_BACKUP_SUFFIX`.** `--backup=numbered` writes `<file>.~N~` and the environment's
+  suffix replaces `~`: the guard judges `<file>~` (or the given suffix) in the same folder instead, so the folder's
+  rules hold but a ticket pattern that admits one name and not the other is not read. Not tested.
+- **`src/gov/guard/protected.py`** (outside this ticket's paths) still reads the second names of `mv` and `cp -l`
+  with the earlier `_cp_operands`, which this round leaves unchanged for it: for `mv -- -t f` it finds no source.
+  That reader serves the settings and held-out rules (DEC-548, DEC-553), not the write targets judged here. Not
+  tested; returned to the lead.
+- **Other tools that write into a folder** (`git clone`, `rsync`, `tar -C`, `unzip -d`) are not read as copies (the
+  README's earlier discovery for `git clone`). Not this round's work.
+- **Another coreutils version** may read options otherwise. An option this table does not know is refused as doubt,
+  so a newer option (9.5's `mv --exchange`) fails closed; a letter that changes from no value to a value would not.
+
+### What the repair changed, file by file
+
+- **`src/gov/guard/decide.py`**:
+  - `_COPY_SPEC` and `_COPY_LONG`: the short letters (with and without a value) and the long names (with what each
+    takes) of `cp`, `mv` and `install`, as coreutils 9.4 reads them.
+  - `_copy_args(name, args)`: the reader. It gives the operands, the options read (each key with its values) and,
+    when an option follows an operand, the words after the first operand; `None` when an option cannot be read.
+  - The `cp` / `install` and `mv` branches of the Bash target reading are one branch on `_copy_args`. `--parents`
+    (key `parents`, for `--path` too) and `None` add `/<guard-unresolvable>`. The rest is as before, read from the
+    options as read; the backups are added after.
+  - `_copies(operands, dirs, dests, merge)`: takes the destinations and `-T` from the branch, which reads them,
+    instead of reading the raw words again.
+  - `_cp_operands` and `_option_after_operand` are unchanged: `protected.py` imports the first, `ln` uses the second.
+- **`tests/unit/guard/test_runs.py`** — builder tests, regression evidence only (temporary HOME): the doubt forms
+  (10); values and `--` (14: refused onto the acceptance test, allowed onto an allowed file); the backups (one case).
+- **Not changed:** `src/gov/guard/runs.py`, `src/gov/launch/launcher.py`, `src/gov/secrets/__init__.py`,
+  `template/governance/kernel/checks/secrets-indexing.yaml`, every acceptance test.
+
+### Verification of this round
+
+At `83756def`'s tree, each run with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-50/src` (DEC-732), never with `-x`;
+`gov.__file__` is `/home/usain/gov-os-worktrees/W2-50/src/gov/__init__.py`. Two suites took longer than one
+foreground call may run (W1-05, whose switch-over case runs other suites for about ten minutes, and W1-30): they were
+run in the background to their end and their logs read; the first W1-05 run was stopped by a time limit before its
+end and was run again whole.
+
+| Run | Result |
+|---|---|
+| `tests/acceptance/W2-50` | **358 passed** (24 failed, 334 passed at `41aa00c0`) |
+| W1-02 (incl. `test_decision_p95_is_under_100_ms`) | 3653 passed |
+| W1-03 | 363 passed, 1 skipped (the interpreter finds `gov` without `PYTHONPATH`) |
+| W1-04 | 336 passed |
+| W1-05 (incl. `test_a_call_waits_under_100_ms_p95_for_the_hook`) | 99 passed |
+| W1-15 | 124 passed |
+| W1-16 | 167 passed |
+| W1-28 | 151 passed |
+| W1-30 | 512 passed |
+| W1-32 | 81 passed |
+| W1-38 | 201 passed |
+| W1-46, `-m "not local_only"` | 457 passed, 36 deselected |
+| W1-47 (it holds `cp`, `mv` and `install` forms) | 983 passed |
+| W1-48 | 172 passed |
+| W1-50, `-m "not local_only"` | 683 passed, 2 deselected |
+| Builder tests `tests/unit` | **2184 passed, 1 skipped** (2159 before, and this round's 25) |
+
+The `local_only` live-launch cases were not run, as in §3; the real `~/gov-os-runs` still does not exist.
+
+### Commits and size of this round
+
+- `83756def` — the repair: `src/gov/guard/decide.py`, `tests/unit/guard/test_runs.py`.
+- The commit that adds this section — `docs/changes/W2-50-CIT-E.md` only.
+
+`git show --shortstat 83756def`: 2 files, 225 insertions, 52 deletions.
+
+| Part | Added | Removed |
+|---|---|---|
+| `src/gov/guard/decide.py` | 170 | 52 |
+| **Code** | **170** | **52** |
+| `tests/unit/guard/test_runs.py` | 55 | 0 |
+| **Builder tests** | **55** | **0** |
+
+The code is 118 lines net, about a third of them docstrings, comments and the option tables. With the earlier rounds
+the change's code is 511 lines added and 102 removed, 409 net, above the estimate of 120 LOC (`est_loc`) by 289 lines.
