@@ -22,6 +22,9 @@ allowed_paths:
 - src/gov/adopt/stages.py
 - template/governance/kernel/skills/adopt/**
 - tests/unit/adopt/test_lite_gates*
+- src/gov/adopt/command.py
+- .rulesync/skills/adopt/SKILL.md
+- template/.rulesync/skills/adopt/SKILL.md
 kpis:
   success:
   - gov adopt runs the lite A7 and A10 gates as Contract v4.2's CAP-44.f (lite) states; each writes a stage record with its evidence, and the adopt skill names both steps [DEC-741, CAP-44.f].
