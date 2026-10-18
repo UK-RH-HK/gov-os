@@ -298,40 +298,6 @@ def _is_punct(tok: str) -> bool:
     return bool(tok) and all(c in _PUNCT for c in tok)
 
 
-def _cp_operands(args: list[str]) -> tuple[list[str], list[str]] | None:
-    """Split the arguments of ``cp``, ``mv`` or ``install`` into operands
-    and target directories.
-
-    The directories are the values of ``-t`` and ``--target-directory``, in
-    their four spellings.  ``None`` when an option cannot be read.
-    """
-    operands: list[str] = []
-    dirs: list[str] = []
-    i = 0
-    while i < len(args):
-        a = args[i]
-        i += 1
-        if a.startswith("--t"):
-            opt, eq, val = a.partition("=")
-            if not "--target-directory".startswith(opt):
-                return None
-        elif a.startswith("-") and not a.startswith("--") and "t" in a:
-            val = a[a.index("t") + 1:]
-            eq = val
-        elif a.startswith("-"):
-            continue
-        else:
-            operands.append(a)
-            continue
-        if not eq:
-            if i >= len(args):
-                return None
-            val = args[i]
-            i += 1
-        dirs.append(val)
-    return operands, dirs
-
-
 def _option_after_operand(args: list[str]) -> bool:
     """True when an option is written after a word that is not one."""
     seen = False
@@ -378,6 +344,13 @@ def _long_options(spec: str) -> dict[str, tuple[str, str]]:
 
 
 _COPY_LONG = {name: _long_options(spec[2]) for name, spec in _COPY_SPEC.items()}
+# DEC-774: the options with which cp replaces a link at the place it writes
+# rather than writing through it (a backup, --remove-destination, and -f,
+# which may), and those with which it copies a source that is a link as a
+# link, so replacing the link it lands on.  install and mv always replace.
+_CP_REPLACING = frozenset({"b", "S", "remove-destination", "f", "force"})
+_CP_AS_LINK = frozenset({"P", "d", "no-dereference", "a", "archive",
+                         "r", "R", "recursive"})
 
 
 def _copy_args(name: str, args: list[str]) -> tuple[
@@ -480,6 +453,12 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     link_sources: list[str] = []  # what the links made by this command name
     link_dests = 0                # how many of *targets* are their destinations
     hard_sources: list[str] = []  # the files a hard link gives a second name
+    replace_any = replace_links = False  # DEC-774: set for each cp, install, mv
+
+    def _replaces(src: str) -> bool:
+        """DEC-774: a write of *src* onto a link replaces the link, rather
+        than writing through it."""
+        return replace_any or (replace_links and os.path.islink(src))
 
     def _paths(raw: str) -> list[str] | None:
         """Expand and glob-expand *raw* into absolute paths, not resolved:
@@ -512,6 +491,10 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             src, dst = pending.pop()
             real = os.path.realpath(dst)
             targets.append(real)
+            if os.path.islink(dst) and _replaces(src):
+                # DEC-774: the link at *dst* is replaced, not followed: a
+                # form the guard does not read.
+                targets.append(_UNRESOLVABLE)
             if len(targets) > _MOST_LANDED:
                 targets.append(_UNRESOLVABLE)
                 return
@@ -546,6 +529,12 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
             real = os.path.realpath(d)
             if itself:
                 targets.append(real)
+                # DEC-774: onto a link to a file or to nothing, or with -T
+                # onto any link, the write replaces the link itself.
+                if (os.path.islink(d) and (merge or not os.path.isdir(real))
+                        and any(got is None or any(map(_replaces, got))
+                                for got in map(_paths, sources))):
+                    targets.append(_UNRESOLVABLE)
                 try:
                     if not stat.S_ISDIR(os.stat(real).st_mode):
                         continue
@@ -724,6 +713,13 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 # spelling of the option, beside the operands.
                 for a in nf + dirs:
                     _resolve(a)
+                # DEC-774: a link moved away is written at its own path, not
+                # its target's; its own path resolves to the target, so the
+                # folder whose entry the move takes away is judged.
+                for a in nf if dirs or after is not None else nf[:-1]:
+                    for p in _paths(a) or []:
+                        if os.path.islink(p):
+                            targets.append(os.path.realpath(os.path.dirname(p)))
             elif name == "install" and not dirs and "d" in opts:
                 # install -d: every operand is a directory it makes.
                 for a in nf:
@@ -747,6 +743,8 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                     for a in dests:
                         _resolve(a)
             merge = "T" in opts
+            replace_any = name != "cp" or not _CP_REPLACING.isdisjoint(opts)
+            replace_links = not _CP_AS_LINK.isdisjoint(opts)
             _copies(nf, dirs, dests, merge)
             if "b" in opts or "S" in opts:
                 # DEC-765: a backup lands beside each file the call replaces

@@ -274,6 +274,51 @@ def test_a_backup_is_judged_beside_the_file_it_replaces(box):
     assert _decide(project, "Bash", f"cp {own / 'f.txt'} {own / head}") == "allow"
 
 
+@pytest.mark.parametrize("command, verdict", (
+    ("cp -b {x} {al}", "deny"), ("cp -S.t {x} {al}", "deny"), ("cp --remove-destination {x} {al}", "deny"),
+    ("cp --rem {x} {pl}", "deny"), ("cp -f {x} {al}", "deny"), ("cp --force {x} {pl}", "deny"),
+    ("cp -f {x} {ax}", "deny"), ("install {x} {pl}", "deny"), ("install -m 644 {x} {al}", "deny"),
+    ("mv {x} {pl}", "deny"), ("mv -T {x} {pd}", "deny"), ("install -T {x} {pd}", "deny"),
+    ("cp -b -t {acc} {sa}/test_link.py", "deny"), ("install -t {links} {sa}/ok_link.py", "deny"),
+    ("cp -P {sl} {pl}", "deny"), ("cp -a {sl} {al}", "deny"), ("cp --no-dereference {sl} {pl}", "deny"),
+    ("cp -rb {tree} {d}/", "deny"), ("mv {al} {d}/", "deny"), ("mv -t {d} {al}", "deny"),
+    ("cp {x} {pl}", "allow"), ("cp {x} {al}", "allow"), ("cp -t {links} {sa}/ok_link.py", "allow"),
+    ("cp -P {x} {pl}", "allow"), ("cp -b {x} {pd}/", "allow"), ("install {x} {pd}/", "allow"),
+    ("mv {x} {pd}/new.py", "allow"), ("cp -r {tree} {d}/", "allow"), ("mv {pl} {d}/", "allow"),
+    ("cp -b {x} {plain}", "allow"), ("install {x} {plain}", "allow"), ("mv -b {x} {plain}", "allow")))
+def test_a_write_that_replaces_a_link_is_refused_as_doubt(box, command, verdict):
+    """DEC-774 (D): a write that replaces a link at its own path, rather than following it, is refused as a
+    form the guard does not read; a write through a link to an allowed place, and onto an ordinary file, is not."""
+    home, project = box
+    app, acc = project / "src" / "app", project / "tests" / "acceptance" / "W2-90"
+    for folder in (app / "links", app / "d", app / "s", app / "tree" / "sub", acc):
+        folder.mkdir(parents=True)
+    allowed = app / "allowed.py"
+    for each in (allowed, app / "plain.py", app / "s" / "X", app / "s" / "test_link.py", app / "s" / "ok_link.py",
+                 app / "tree" / "sub" / "f.py"):
+        each.write_text("y", encoding="utf-8")
+    (acc / "test_link.py").symlink_to(allowed)
+    (acc / "test_dangling.py").symlink_to(app / "missing.py")
+    (app / "links" / "ok_link.py").symlink_to(allowed)
+    (app / "dirlink").symlink_to(app / "d", target_is_directory=True)
+    (app / "s" / "SL").symlink_to(app / "s" / "X")
+    (app / "d" / "tree" / "sub").mkdir(parents=True)
+    (app / "d" / "tree" / "sub" / "f.py").symlink_to(allowed)
+    (app / "e" / "tree" / "sub").mkdir(parents=True)
+    paths = {"x": app / "s" / "X", "sa": app / "s", "sl": app / "s" / "SL", "al": acc / "test_link.py",
+             "ax": acc / "test_dangling.py", "pl": app / "links" / "ok_link.py", "pd": app / "dirlink",
+             "acc": acc, "links": app / "links", "tree": app / "tree", "d": app / "d", "plain": app / "plain.py"}
+    decision, reason = decide("Bash", {"command": command.format(**paths)}, str(project), "engineer", "TST-a001",
+                              cwd=str(project), flag="absent")
+    assert decision == verdict, command
+    # Refused as doubt; a link moved away, for the folder it is taken from.
+    if verdict == "deny":
+        assert "'/<guard-unresolvable>'" in reason or f"'{acc}'" in reason, (command, reason)
+    # Into a folder with no link at the landed path, the same folder copy is allowed.
+    if command == "cp -rb {tree} {d}/":
+        assert _decide(project, "Bash", command.format(**{**paths, "d": app / "e"})) == "allow"
+
+
 def test_rmdir_is_judged_for_the_root_only(box):
     home, project = box
     root = home / runs.ROOT_NAME
