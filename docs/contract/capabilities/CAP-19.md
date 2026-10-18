@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-19: Retrieval component separation and model selection
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can swap an embedding or reranking model through configuration, with a pinned revision and a regression check.
 - **Acceptance:** Changing the embedder pin in configuration triggers a full re-embed, the dev-tier retrieval regression passes, and an unpinned or mismatched model makes retrieval fail closed with a named error.

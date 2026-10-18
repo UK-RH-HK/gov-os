@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-39.b: G6 qualification (synthetic repos, chaos, soak, hidden tests)
 
-A covers item of CAP-39 (Governance health scheduler (G0-G6 tiers)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-39 (Governance health scheduler (G0-G6 tiers)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** G6 qualification (synthetic repos, chaos, soak, hidden tests)
 - **Wave:** W3

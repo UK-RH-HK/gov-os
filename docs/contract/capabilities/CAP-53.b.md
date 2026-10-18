@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-53.b: Profile computed from impact
 
-A covers item of CAP-53 (Proportionality profiles (LITE/STANDARD/FULL)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-53 (Proportionality profiles (LITE/STANDARD/FULL)). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Profile computed from impact
 - **Wave:** W2

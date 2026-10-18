@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-03: Security and sensitivity classification
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can rely on secrets never reaching an index, a packet or an export: a content-based filter runs before every indexer, and harness deny rules cover secret files.
 - **Acceptance:** After indexing a tree with planted secrets (including a token-shaped canary gitleaks defaults miss), no canary string appears in any `.gov-runtime/` store, codebase-memory index, context packet or evidence bundle.

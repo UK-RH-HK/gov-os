@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-52: Model-agnostic adapters (provider, IDE, CLI)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** The owner can use Claude Code or an AGENTS.md-reading harness with the same rules, generated from one source.
 - **Acceptance:** `rulesync generate` produces CLAUDE.md, AGENTS.md and `.claude/`; CI fails when a generated file differs from its source; the Claude Code adapter carries every hook and deny rule.

@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-24.c: Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
 
-A covers item of CAP-24 (Skill lifecycle and versioning). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority (DEC-614).
+A covers item of CAP-24 (Skill lifecycle and versioning). Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority (DEC-614).
 
 - **Item:** Skill changes follow evidence → proposal → independent review → owner approval → versioned promotion
 - **Wave:** W1

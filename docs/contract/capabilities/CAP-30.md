@@ -10,7 +10,7 @@ depends_on:
 
 # CAP-30: Feature readiness contract (26-dimension checklist)
 
-Generated from `docs/contract/contract.yaml` (Contract v4, version 4.1), which is the authority; this record exists so that the id resolves (DEC-614).
+Generated from `docs/contract/contract.yaml` (Contract v4, version 4.2), which is the authority; this record exists so that the id resolves (DEC-614).
 
 - **Outcome:** An agent can see, per feature, which of the 26 readiness rows are open for its profile, and each gap becomes work.
 - **Acceptance:** A specification with a row its profile requires MISSING (for example test data at FULL) keeps its production tickets out of READY, and `gov readiness --generate` creates one linked ticket per required open row with its dependencies.
