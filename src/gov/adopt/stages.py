@@ -15,7 +15,7 @@ from pathlib import Path, PurePosixPath
 
 import yaml
 
-from gov.adopt import project
+from gov.adopt import lite_gates, project
 from gov.adopt.project import FOLDER, MOVING, git, refuse, resolve
 from gov.cli.errors import GovError
 from gov.retrieval.semantic import EMBEDDED
@@ -53,6 +53,8 @@ class Run:
 def run(root: Path, args, config: dict) -> dict:
     project.require_repository(root)
     tracked = project.tree(root)
+    if args.stage in lite_gates.GATES:  # A7 and A10 are in no chain: each reads the records it stands on itself
+        return STAGE[args.stage](Run(root, args, config, args.stage, tracked, {}, {}))
     records, hashes = project.chain(root, tracked, args.stage)
     stage = STAGE[args.stage]
     return stage(Run(root, args, config, args.stage, tracked, records, hashes))
@@ -447,4 +449,5 @@ def a8(run: Run) -> dict:
     return legacy.retire(run)
 
 
-STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A8": a8}
+STAGE = {"A0": a0, "A1": a1, "A2": a2, "A3": a3, "A4": a4, "A5": a5, "A6": a6, "A7": lite_gates.gate, "A8": a8,
+         "A10": lite_gates.gate}
