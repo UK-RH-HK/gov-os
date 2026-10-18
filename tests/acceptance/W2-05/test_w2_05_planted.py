@@ -11,6 +11,11 @@ repository's git directory or a file inside it is git's own (``git commit -a`` g
 ``index.lock`` there); any other is cleared. The cases of ``_on_purpose`` hold that reading from the other
 side: a hooked ``git commit -a`` and ``git commit -- <path>`` still have their secret found.
 
+The staged-secrets gate is held to the stricter behaviour that stands under either answer to P-1 (independent
+review F1, DEC-413 round 1): it never passes on an index other than the one being committed. An inherited
+``GIT_INDEX_FILE`` that is not git's own index of the project (a decoy's, or any file outside the project's git
+directory) is refused, and the refusal names it, whatever that index or the project's own index holds.
+
 The list rows:
 
 - W2-M105, ``gov.guard.containment_merge``: a merge is read with ``GIT_TRACE*`` cleared, and with
@@ -86,8 +91,23 @@ def _scan(box, repo, **plants):
     return box.run(["gov", "ci", "staged-secrets", "--json"], cwd=repo, env=box.env(**plants))
 
 
+def assert_index_refused(done, index, what):
+    """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+    non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+    output = done.stdout + done.stderr
+    assert done.returncode != 0, (
+        f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+        f"must refuse it:\n{support.said(done)}")
+    assert support.names_path(output, index), (
+        f"{what}: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal "
+        f"does not name {index}:\n{support.said(done)}")
+
+
+# Rewritten (independent review F1, DEC-413 round 1; was ``test_a_staged_secret_is_found_under_a_planted_decoy_index``,
+# which expected the staged-secret refusal): the planted index is not git's own index of the project, so the gate
+# refuses it, naming it, instead of scanning another index.
 @pytest.mark.parametrize("plants", ("GIT_INDEX_FILE", "GIT_DIR and GIT_INDEX_FILE"))
-def test_a_staged_secret_is_found_under_a_planted_decoy_index(tmp_path, box, plants):
+def test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index(tmp_path, box, plants):
     skip_without("gitleaks")
     repo = _secrets_repo(tmp_path / "project", secret=True)
     decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=False)
@@ -98,13 +118,27 @@ def test_a_staged_secret_is_found_under_a_planted_decoy_index(tmp_path, box, pla
 
     done = _scan(box, repo, **planted)
 
-    assert done.returncode != 0 and STAGED_SECRET_EXIT in done.stdout + done.stderr, (
-        f"the secret staged in the project was not found under a planted {plants} (it read the decoy's clean "
-        f"index):\n{support.said(done)}")
+    assert_index_refused(done, planted["GIT_INDEX_FILE"], f"a secret staged in the project under a planted {plants}")
     assert_untouched(decoy, f"gov ci staged-secrets under a planted {plants}")
 
 
-@pytest.mark.parametrize("plants", ("GIT_DIR", "GIT_DIR and GIT_INDEX_FILE"))
+# Rewritten (independent review F1, DEC-413 round 1; was ``test_a_clean_index_is_not_refused_for_a_decoy_s_staged_
+# secret[GIT_DIR and GIT_INDEX_FILE]``, which expected a pass): a planted index is refused, never passed.
+def test_a_clean_index_under_a_planted_decoy_index_is_refused_naming_the_index(tmp_path, box):
+    skip_without("gitleaks")
+    repo = _secrets_repo(tmp_path / "project", secret=False)
+    decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=True)
+    decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+    planted = support.planted(decoy_repo)
+
+    done = _scan(box, repo, **planted)
+
+    assert_index_refused(done, planted["GIT_INDEX_FILE"],
+                         "the project's clean index under a planted GIT_DIR and GIT_INDEX_FILE")
+    assert_untouched(decoy, "gov ci staged-secrets under a planted GIT_DIR and GIT_INDEX_FILE")
+
+
+@pytest.mark.parametrize("plants", ("GIT_DIR",))
 def test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret(tmp_path, box, plants):
     skip_without("gitleaks")
     repo = _secrets_repo(tmp_path / "project", secret=False)
@@ -119,6 +153,81 @@ def test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret(tmp_path, box,
     assert done.returncode == 0, (f"the project's clean index was refused under a planted {plants} (it read the "
                                   f"decoy's staged secret):\n{support.said(done)}")
     assert_untouched(decoy, f"gov ci staged-secrets under a planted {plants}")
+
+
+# --------------------------------------------------------------------------
+# an index outside the project's git directory: the commit's index, never git's own (independent review F1)
+# --------------------------------------------------------------------------
+
+_CLEAN, _SECRET = "token = none\n", f"token = {support.SECRET}\n"
+
+_OUTSIDE = {
+    "a secret in that index, the project's index clean": (_SECRET, None),
+    "nothing secret in that index, the project's index clean": ("token = rotated\n", None),
+    "nothing secret in that index, a secret in the project's index": ("token = rotated\n", _SECRET),
+}
+
+
+@pytest.mark.parametrize("case", tuple(_OUTSIDE))
+def test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it(tmp_path, box, case):
+    """A person or a tool commits with ``GIT_INDEX_FILE=<a file outside the git directory>``: that file is the
+    commit's index, and it is not git's own index of the project. The gate may not scan another index in its
+    place: it refuses, naming the index, whatever either index holds."""
+    skip_without("gitleaks")
+    in_that_index, in_the_project = _OUTSIDE[case]
+    repo = support.new_repo(tmp_path / "project", {
+        "README.md": "# A project\n", "config.txt": _CLEAN,
+        ".gitleaks.toml": support.GITLEAKS_RULES.read_text(encoding="utf-8")})
+    index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                    {"config.txt": in_that_index})
+    if in_the_project is not None:
+        support.write(repo, "config.txt", in_the_project)
+        support.git(repo, "add", "config.txt")
+
+    done = _scan(box, repo, GIT_INDEX_FILE=index)
+
+    assert_index_refused(done, index, f"an inherited GIT_INDEX_FILE outside the git directory ({case})")
+
+
+def test_a_hooked_commit_with_its_index_outside_the_git_directory_and_a_secret_there_does_not_land(tmp_path, box):
+    """The project's own ``lefthook.yml`` installed by lefthook in a temporary repository (G1 and G2 each a
+    declared check that passes). A commit made with ``GIT_INDEX_FILE`` naming a file outside the git directory,
+    a secret staged in that index only, does not land: the branch, the indexes and the reflogs stay as they were."""
+    skip_without("lefthook", "gitleaks")
+    assert support.LEFTHOOK_YML.is_file(), "lefthook.yml is absent from the repository root"
+    repo = support.gov_project(tmp_path / "repo", hooks_file=support.LEFTHOOK_YML, retrieval=False)
+    support.declare_check(repo, "w2-05-g1", "graph integrity", "G1", "true")
+    support.git(repo, "add", "-A")
+    support.git(repo, "commit", "-q", "-m", "a G1 check that passes")
+    installed = box.run(["lefthook", "install"], cwd=repo, env=box.env())
+    assert installed.returncode == 0, f"lefthook install refused the project's lefthook.yml:\n{support.said(installed)}"
+    assert (support.common_dir_of(repo) / "hooks" / "pre-commit").is_file(), "lefthook installed no pre-commit hook"
+    support.write(repo, "notes.md", "the first line\na plain change\n")
+    support.git(repo, "add", "notes.md")
+    plain = box.run([support.GIT, "commit", "-q", "-m", "a plain change"], cwd=repo, env=box.env(),
+                    timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+    assert plain.returncode == 0, (f"a plain hooked commit with nothing secret was refused; the case needs hooks "
+                                   f"that let it through:\n{support.said(plain)}")
+    index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                    {"config.txt": _SECRET})
+    before = support.repo_state(repo, [repo])
+    staged = support.staged_in(repo, index)
+
+    done = box.run([support.GIT, "commit", "-q", "-m", "a secret in another index"], cwd=repo,
+                   env=box.env(GIT_INDEX_FILE=index), timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+
+    after = support.repo_state(repo, [repo])
+    landed = after.heads[str(repo)] != before.heads[str(repo)]
+    assert done.returncode != 0 and not landed, (
+        "a commit whose index lies outside the git directory, with a secret staged there, landed: the "
+        f"staged-secrets gate passed on another index\n{support.git(repo, 'log', '-2', '--format=%h %s')}"
+        f"{support.said(done)}")
+    assert after.refs == before.refs, (
+        f"a refused commit moved refs: { {k: v for k, v in after.refs.items() if before.refs.get(k) != v} }")
+    assert after.reflogs == before.reflogs, "a refused commit changed a reflog"
+    assert after.reachable == before.reachable, "a refused commit left new commits reachable"
+    assert after.indexes == before.indexes, "a refused commit changed the project's index"
+    assert support.staged_in(repo, index) == staged, "a refused commit changed the index it was made with"
 
 
 # --------------------------------------------------------------------------

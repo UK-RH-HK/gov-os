@@ -43,6 +43,21 @@ def test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep():
                          f"src/gov that start git: {unnamed}")
 
 
+def test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git():
+    """The code index's tool (``codebase-memory-mcp``, W1-16's README) starts git in the project itself
+    (independent review F2). Every file of the code index's package that names it as a program (a string
+    literal that is exactly its name) has a row of the sweep's tables naming both the tool and that file."""
+    text = _sweep_text()
+    starting = support.files_naming_program(support.CODE_INDEX_TOOL, support.CODE_INDEX_PACKAGE_REL)
+    assert starting, (f"no file of {support.CODE_INDEX_PACKAGE_REL} names {support.CODE_INDEX_TOOL}: the lower "
+                      f"bound is empty, the case is wrong")
+    rows = support.table_rows(text)
+    unlisted = [rel for rel in starting
+                if not any(support.CODE_INDEX_TOOL in row and support.names_file(row, rel) for row in rows)]
+    assert not unlisted, (f"{support.SWEEP_REL} has no row naming {support.CODE_INDEX_TOOL} and the file that "
+                          f"starts it, for: {unlisted}")
+
+
 def test_the_one_helper_is_there_and_the_sweep_names_it(code_under_test):
     done = subprocess.run(
         [sys.executable, "-c", f"import {support.HELPER_MODULE} as m; print(m.__file__)"],

@@ -42,7 +42,7 @@ SRC = REPO_ROOT / "src"
 ACCEPTANCE = HERE.parent
 
 # Earlier suites whose public supports these cases reuse (each imported by name where it is needed).
-for _suite in ("W1-02", "W1-03", "W1-21", "W1-38", "W1-40", "W2-01"):
+for _suite in ("W1-02", "W1-03", "W1-16", "W1-21", "W1-38", "W1-40", "W2-01"):
     _folder = str(ACCEPTANCE / _suite)
     if _folder not in sys.path:
         sys.path.append(_folder)
@@ -69,6 +69,11 @@ WORKTREE_BRANCH = "w2-05/feature"
 USER_NAME, USER_EMAIL = "W2-05 person", "w2-05@example.invalid"
 
 TRACE_VARIABLES = ("GIT_TRACE", "GIT_TRACE2_EVENT", "GIT_TRACE2", "GIT_TRACE_PACKET", "GIT_TRACE_SETUP")
+
+# The code index's external tool, as W1-16's README names it (it starts git in the project itself), and the
+# package of the code index (W1-16's public interface, ``gov.codeintel``).
+CODE_INDEX_TOOL = "codebase-memory-mcp"
+CODE_INDEX_PACKAGE_REL = "src/gov/codeintel"
 
 # A token by the template's gitleaks rules (W1-40's ``PLAIN``, never written whole in this file).
 SECRET = "sk_" + "7Qd2" + "Xk9Lm4Wp8Zr3Tb6V"
@@ -400,6 +405,33 @@ def staged_tree(tree):
     return git(tree, "write-tree").strip()
 
 
+def index_outside_the_git_directory(repo, path, files):
+    """An index file at ``path``, outside the repository's git directory, as a person or a tool that commits
+    with ``GIT_INDEX_FILE=<file>`` makes one: ``HEAD``'s tree, with ``files`` (``rel -> text``) staged in it
+    only. The repository's own index and working tree are not touched."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    env = dict(clean_env(), GIT_INDEX_FILE=str(path))
+    git(repo, "read-tree", "HEAD", env=env)
+    for number, (rel, text) in enumerate(files.items()):
+        content = path.parent / f"content-{number}"
+        content.write_text(text, encoding="utf-8")
+        blob = git(repo, "hash-object", "-w", content).strip()
+        git(repo, "update-index", "--add", "--cacheinfo", f"100644,{blob},{rel}", env=env)
+    return path
+
+
+def staged_in(repo, index):
+    """``git ls-files --stage`` of the index file ``index`` (read with the setup's clean git)."""
+    return git(repo, "ls-files", "--stage", env=dict(clean_env(), GIT_INDEX_FILE=str(index)))
+
+
+def names_path(output, path):
+    """Whether ``output`` names ``path``, as given or resolved."""
+    path = Path(path)
+    return any(form in output for form in {str(path), str(path.resolve())})
+
+
 # --------------------------------------------------------------------------
 # the stand-in dev tier and the retrieval-regression check (W1-21's public support)
 # --------------------------------------------------------------------------
@@ -525,6 +557,46 @@ def written_traces(folder):
 
 
 # --------------------------------------------------------------------------
+# the code index's tool, as a recording stand-in
+# --------------------------------------------------------------------------
+
+def code_index_project(root):
+    """A project ``gov rebuild`` builds a code index for: a full path map (W1-16's public support, one
+    namespace ``**``), the template's gitleaks rules, one source file. Committed on ``main``."""
+    import w1_16_support as w116
+    return new_repo(root, {
+        "README.md": "# A project\n",
+        ".gitignore": ".gov-runtime/\n__pycache__/\n",
+        ".gitleaks.toml": GITLEAKS_RULES.read_text(encoding="utf-8"),
+        w116.PATH_MAP_REL: w116.path_map_text(w116.EVERYTHING),
+        "src/app.py": "def hello():\n    return 1\n\n\ndef caller():\n    return hello()\n",
+    })
+
+
+def recording_stand_in(folder, name, record):
+    """A program ``name`` in ``folder`` that records each start (its arguments, its folder and the environment it
+    was started with) as one JSON file in ``record``, prints nothing and exits 0. ``folder`` goes first on
+    ``PATH``."""
+    folder, record = Path(folder), Path(record)
+    folder.mkdir(parents=True, exist_ok=True)
+    record.mkdir(parents=True, exist_ok=True)
+    program = folder / name
+    program.write_text(
+        f"#!{sys.executable}\n"
+        "import json, os, sys, uuid\n"
+        f"with open(os.path.join({str(record)!r}, uuid.uuid4().hex + '.json'), 'w', encoding='utf-8') as out:\n"
+        "    json.dump({'argv': sys.argv, 'cwd': os.getcwd(), 'env': dict(os.environ)}, out)\n", encoding="utf-8")
+    program.chmod(0o755)
+    return folder
+
+
+def recorded_starts(record):
+    record = Path(record)
+    return [json.loads(path.read_text(encoding="utf-8")) for path in sorted(record.glob("*.json"))] \
+        if record.is_dir() else []
+
+
+# --------------------------------------------------------------------------
 # the sweep record
 # --------------------------------------------------------------------------
 
@@ -541,6 +613,26 @@ def files_that_start_git():
         if _GIT_LITERAL.search(path.read_text(encoding="utf-8", errors="replace")):
             found.append(path.relative_to(REPO_ROOT).as_posix())
     return found
+
+
+def files_naming_program(name, under):
+    """Every file of the source under ``under`` (``src/gov/...``) that names the program ``name``: a string
+    literal that is exactly ``name``. A lower bound of the files that start it, as for git."""
+    literal = re.compile(r"""(?<![\w.\-/])["']""" + re.escape(name) + r"""["']""")
+    found = []
+    for path in sorted((REPO_ROOT / under).rglob("*.py")):
+        if "__pycache__" in path.parts:
+            continue
+        if literal.search(path.read_text(encoding="utf-8", errors="replace")):
+            found.append(path.relative_to(REPO_ROOT).as_posix())
+    return found
+
+
+def table_rows(text):
+    """The body rows of every Markdown table of ``text`` (each as its line), header separators left out."""
+    separator = re.compile(r"\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)*\|?")
+    return [line for line in text.splitlines()
+            if line.strip().startswith("|") and not separator.fullmatch(line.strip())]
 
 
 def names_file(text, rel):
