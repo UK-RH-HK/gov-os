@@ -9,14 +9,18 @@ DEC-381).
   model list reported when the vectors were built (DEC-374). Vectors of another embedder are dropped and built again.
 - ``search(..., refresh=False)`` and ``manifest`` open the store read-only and never write it (DEC-322). Missing, empty
   or stale vectors, an absent ``sqlite_vec`` and an absent Ollama make the facet unavailable; none raises.
-- A question's vector is kept in ``QUERY_VECTORS_REL``, beside the store and never in it, keyed by the model, the
-  revision the model list reports at the time of the search and the exact text, and used whenever its key matches:
-  the embedder gives a text another vector after a different text, so one question would get several answers
-  (DEC-773). The first vector stored under a key is the one every search uses.
+- The embedder gives a text one vector right after a different text and another on a repeat (DEC-773). So a
+  question is sent in one request after the bare instruction, and the vector it gets there is its vector: a text
+  that always follows the same text gets the same vector, whatever this or another process embedded before.
+- That vector is cached in ``QUERY_VECTORS_REL``, the one file a read writes (DEC-782): beside the store and never in
+  it, keyed by the model, the revision the model list reports at the time of the search and the sha256 of the exact
+  text, at most ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` bytes. The cache only saves a request: a cache that cannot be
+  read, written or created is skipped, and deleting it changes no answer.
 """
 
 from __future__ import annotations
 
+import hashlib
 import http.client
 import json
 import os
@@ -53,10 +57,13 @@ _NEAREST = "SELECT c.chunk_id, c.path, c.start_line, c.end_line, c.parent_id, " 
            "JOIN lexical_chunk c ON c.chunk_id = v.chunk_id ORDER BY distance, c.chunk_id LIMIT ?"
 _TEXT = "SELECT f.text FROM lexical_chunk c JOIN lexical_fts f ON f.rowid = c.id WHERE c.chunk_id = ?"
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # the endpoint is local: no proxy
-QUERY_VECTORS_REL = ".gov-runtime/query-vectors.db"  # a file of its own: store.db is not written by a search
+QUERY_VECTORS_REL = ".gov-runtime/query-vector-cache.db"  # a file of its own: store.db is not written by a search
+CACHE_BOUND_SETTING = "GOV_QUERY_VECTOR_CACHE_MAX_BYTES"
+CACHE_BOUND = 64 * 1024 * 1024  # the default bound on the cache file, in bytes
 _QUERY_SCHEMA = "CREATE TABLE IF NOT EXISTS query_vector (model TEXT NOT NULL, revision TEXT NOT NULL, " \
-                "text TEXT NOT NULL, embedding BLOB NOT NULL, PRIMARY KEY (model, revision, text))"
-_QUERY_VECTOR = "SELECT embedding FROM query_vector WHERE model = ? AND revision = ? AND text = ?"
+                "text_sha256 TEXT NOT NULL, embedding BLOB NOT NULL, PRIMARY KEY (model, revision, text_sha256))"
+_QUERY_VECTOR = "SELECT embedding FROM query_vector WHERE model = ? AND revision = ? AND text_sha256 = ?"
+_OLDER_HALF = "DELETE FROM query_vector WHERE rowid <= (SELECT (min(rowid) + max(rowid)) / 2 FROM query_vector)"
 
 
 def _report(reason: str | None, **more) -> dict:
@@ -93,17 +100,20 @@ def _revision() -> str | None:
     return None
 
 
-def _stored(path: Path, key: tuple, vector: bytes | None = None) -> bytes | None:
-    """The vector stored under ``key`` at ``path``, after storing ``vector`` there unless one is already; None when
-    none can be read. A write that loses keeps the vector that won; one that fails raises nothing."""
+def _bound() -> int:
+    """The cache's bound in bytes: ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES``, else ``CACHE_BOUND``."""
     try:
-        connection = sqlite3.connect(path, timeout=30.0)
+        return int(os.environ.get(CACHE_BOUND_SETTING) or CACHE_BOUND)
+    except ValueError:
+        return CACHE_BOUND
+
+
+def _cached(path: Path, key: tuple) -> bytes | None:
+    """The vector cached under ``key`` at ``path``, opened read-only; None when there is none or none can be read."""
+    try:
+        connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True, timeout=30.0)
         try:
-            with connection:
-                if vector is not None:
-                    connection.execute(_QUERY_SCHEMA)
-                    connection.execute("INSERT OR IGNORE INTO query_vector VALUES (?, ?, ?, ?)", (*key, vector))
-                row = connection.execute(_QUERY_VECTOR, key).fetchone()
+            row = connection.execute(_QUERY_VECTOR, key).fetchone()
         finally:
             connection.close()
     except sqlite3.Error:
@@ -111,19 +121,45 @@ def _stored(path: Path, key: tuple, vector: bytes | None = None) -> bytes | None
     return row and row[0]
 
 
-def _query_vector(root: Path, text: str) -> bytes | None:
-    """The vector of ``text``: the one stored under its key, else the embedder's, stored then; None when the
-    embedder gives none (nothing is stored). Without a revision in the model list there is no key: the embedder's
-    vector is used and nothing is stored."""
-    revision, path = _revision(), root / QUERY_VECTORS_REL
-    key = (MODEL, revision, text)
-    stored = _stored(path, key) if revision and path.is_file() else None
-    if stored:
-        return stored
-    vectors = _embed([text])
-    if vectors is None or revision is None:
-        return vectors and vectors[0]
-    return _stored(path, key, vectors[0]) or _stored(path, key) or vectors[0]
+def _cache(path: Path, key: tuple, vector: bytes) -> None:
+    """Cache ``vector`` under ``key`` at ``path`` in one transaction, unless an entry is there already. Past the bound
+    the transaction is undone, and tried once more after the older half of the entries is deleted; an entry that
+    still does not fit is not kept. A cache that cannot be written raises nothing."""
+    try:
+        connection = sqlite3.connect(path, timeout=30.0, isolation_level=None)
+        try:
+            for evict in (False, True):
+                connection.execute("BEGIN IMMEDIATE")
+                connection.execute(_QUERY_SCHEMA)
+                if evict:
+                    connection.execute(_OLDER_HALF)
+                connection.execute("INSERT OR IGNORE INTO query_vector VALUES (?, ?, ?, ?)", (*key, vector))
+                pages = connection.execute("PRAGMA page_count").fetchone()[0]
+                if pages * connection.execute("PRAGMA page_size").fetchone()[0] <= _bound():
+                    connection.execute("COMMIT")
+                    return
+                connection.execute("ROLLBACK")
+        finally:
+            connection.close()
+    except sqlite3.Error:
+        return
+
+
+def query_vector(root: Path, query: str) -> bytes | None:
+    """The vector a search compares with for ``query``: the one cached under its key, else the one the embedder gives
+    the question sent right after the bare instruction, in one request (cached then); None when the embedder gives
+    none (nothing is cached). Without a revision in the model list there is no key and nothing is cached."""
+    text, revision, path = INSTRUCTION + query, _revision(), Path(root) / QUERY_VECTORS_REL
+    key = revision and (MODEL, revision, hashlib.sha256(text.encode("utf-8", "surrogatepass")).hexdigest())
+    cached = key and _cached(path, key)
+    if cached:
+        return cached
+    vectors = _embed([INSTRUCTION, text])
+    if vectors is None:
+        return None
+    if key:
+        _cache(path, key, vectors[1])
+    return vectors[1]
 
 
 def _ready(connection: sqlite3.Connection) -> str | None:
@@ -229,7 +265,7 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
 
     With ``refresh`` the vectors are brought up to date first. Without, the store is not written, and missing, empty
     or stale vectors are reported as ``FACET_UNAVAILABLE`` with the reason and no hit (DEC-342). Either way, the
-    question's vector is kept beside the store once the vectors can be answered from (DEC-773).
+    question's vector is cached beside the store once the vectors can be answered from (DEC-782).
     """
     root = Path(root)
     reason = (_build(root) if refresh else None) or _status(root)
@@ -238,7 +274,7 @@ def search(root: Path, query: str, refresh: bool = True) -> dict:
     connection = _open(root)
     try:
         reason = _ready(connection)
-        vector = None if reason else _query_vector(root, INSTRUCTION + query)
+        vector = None if reason else query_vector(root, query)
         if vector is None:
             return _report(reason or NO_EMBEDDING, hits=[])
         keys = ("chunk_id", "path", "start_line", "end_line", "parent_id", "distance")
