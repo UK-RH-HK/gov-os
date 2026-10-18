@@ -42,10 +42,20 @@ def decoy(tmp_path):
 def test_every_git_variable_is_cleared_and_lazy_fetch_is_off(repo, decoy):
     base = {"PATH": "/usr/bin:/bin", "GIT_DIR": str(decoy / ".git"), "GIT_INDEX_FILE": str(decoy / ".git/index"),
             "GIT_WORK_TREE": str(decoy), "GIT_TRACE": "/tmp/x", "GIT_TRACE2_EVENT": "/tmp/y",
-            "GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "core.pager", "GIT_CONFIG_VALUE_0": "cat", "OTHER": "kept"}
+            "GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "core.pager", "GIT_CONFIG_VALUE_0": "cat",
+            "GIT_CONFIG_GLOBAL": "/tmp/g", "GIT_NAMESPACE": "n", "GIT_ALTERNATE_OBJECT_DIRECTORIES": "/tmp/o",
+            "OTHER": "kept"}
     env = git_env(repo, base=base)
     assert {k for k in env if k.startswith("GIT_")} == {"GIT_NO_LAZY_FETCH"}
     assert env["GIT_NO_LAZY_FETCH"] == "1" and env["OTHER"] == "kept" and env["PATH"] == "/usr/bin:/bin"
+
+
+def test_the_person_s_identity_and_push_transport_are_kept(repo):
+    """A note of ``gov ci push`` needs the identity (W1-40's acceptance tests give it so)."""
+    person = {"GIT_AUTHOR_NAME": "a", "GIT_AUTHOR_EMAIL": "a@x", "GIT_COMMITTER_NAME": "c",
+              "GIT_COMMITTER_EMAIL": "c@x", "GIT_SSH_COMMAND": "ssh -i k", "GIT_TERMINAL_PROMPT": "0"}
+    env = git_env(repo, base=dict(person, PATH="/usr/bin:/bin"))
+    assert {k: env[k] for k in person} == person
 
 
 def test_without_a_root_nothing_is_kept(repo):

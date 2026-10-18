@@ -25,6 +25,11 @@ from pathlib import Path
 
 _PREFIX = "GIT_"
 _OWN = "GIT_INDEX_FILE"
+# The person's own: who commits (a note of ``gov ci push`` needs it) and how a push reaches its remote. None names
+# a repository, a trace, a configuration or a fetch.
+_PERSON = frozenset({
+    "GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_AUTHOR_DATE", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL",
+    "GIT_COMMITTER_DATE", "GIT_SSH", "GIT_SSH_COMMAND", "GIT_SSH_VARIANT", "GIT_ASKPASS", "GIT_TERMINAL_PROMPT"})
 _TIMEOUT_S = 10
 _PINNED = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
 
@@ -32,11 +37,13 @@ _PINNED = {"GIT_CONFIG_NOSYSTEM": "1", "GIT_CONFIG_GLOBAL": os.devnull}
 def git_env(root: str | Path | None = None, *, pinned: bool = False, base: dict | None = None) -> dict[str, str]:
     """The environment for a git call (or a program that starts git) acting on the repository at ``root``.
 
-    ``base`` (default ``os.environ``) without any ``GIT_*`` variable, with ``GIT_NO_LAZY_FETCH=1``; and, with
+    ``base`` (default ``os.environ``) without any ``GIT_*`` variable but the person's identity and push transport
+    (``GIT_AUTHOR_*``, ``GIT_COMMITTER_*``, ``GIT_SSH*``, ``GIT_ASKPASS``, ``GIT_TERMINAL_PROMPT``), with
+    ``GIT_NO_LAZY_FETCH=1``; and, with
     ``pinned``, with the system and global configuration files unread. A ``GIT_INDEX_FILE`` of ``base`` that names
     a file directly in the git directory of ``root`` is kept, as an absolute path. With no ``root`` nothing is kept."""
     source = os.environ if base is None else base
-    env = {key: value for key, value in source.items() if not key.startswith(_PREFIX)}
+    env = {key: value for key, value in source.items() if not key.startswith(_PREFIX) or key in _PERSON}
     env["GIT_NO_LAZY_FETCH"] = "1"
     if pinned:
         env.update(_PINNED)

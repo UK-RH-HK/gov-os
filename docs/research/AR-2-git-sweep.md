@@ -18,6 +18,12 @@ fetch behind the reader's back.
 - It starts from `base` (default `os.environ`) and removes every `GIT_*` variable. This covers the location
   variables (`GIT_DIR`, `GIT_INDEX_FILE`, `GIT_WORK_TREE`, `GIT_COMMON_DIR`, `GIT_OBJECT_DIRECTORY` and the
   others), the trace variables (`GIT_TRACE*`, W2-M105) and the configuration variables (`GIT_CONFIG_*`).
+- It keeps the person's own variables, which name no repository, trace, configuration or fetch:
+  - the identity (`GIT_AUTHOR_NAME`, `_EMAIL`, `_DATE`, `GIT_COMMITTER_NAME`, `_EMAIL`, `_DATE`). Without it,
+    `gov ci push`'s `git notes add` refused with "Author identity unknown" (W1-40's acceptance tests, 11 failed
+    and 21 errors on a first draft that cleared them).
+  - how a push reaches its remote (`GIT_SSH`, `GIT_SSH_COMMAND`, `GIT_SSH_VARIANT`, `GIT_ASKPASS`,
+    `GIT_TERMINAL_PROMPT`).
 - It sets `GIT_NO_LAZY_FETCH=1`: no call fetches a missing object in a partial clone (W2-M105).
 - With `pinned=True` it also sets `GIT_CONFIG_NOSYSTEM=1` and `GIT_CONFIG_GLOBAL=/dev/null`. The system file and
   the person's own configuration (`~/.gitconfig`, `$XDG_CONFIG_HOME/git/config`) are then not read (W2-M113).
