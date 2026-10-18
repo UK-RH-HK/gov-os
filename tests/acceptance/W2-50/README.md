@@ -4,7 +4,7 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**358 cases in 10 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**446 cases in 11 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
 file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
@@ -18,7 +18,11 @@ review (DEC-136, DEC-758)**, no earlier case rewritten (red run of the whole sui
 this README: **38 failed, 267 passed, 0 skipped**, about 5.5 minutes; see its section), and 53 cases in
 `test_w2_50_short_round.py` for the review of the last round, **tests added after implementation, from the review of
 the last round (DEC-136, DEC-764, DEC-765)**, no earlier case rewritten (red run of the whole suite at `8a310cb2` plus
-that file and this README: **24 failed, 334 passed, 0 skipped**, about 4.5 minutes; see the last section).
+that file and this README: **24 failed, 334 passed, 0 skipped**, about 4.5 minutes; see its section), and 88 cases in
+`test_w2_50_link_replaced.py` for the review's finding D, **tests added after implementation, from the review of the
+last round (DEC-136, DEC-774)**, no earlier case rewritten (red run of the whole suite at `2d60cdd3` plus that file
+and this README: **58 failed, 388 passed, 0 skipped**, in five runs of about 10 minutes together; see the last
+section).
 
 ## Run
 
@@ -415,6 +419,126 @@ and `-m` forms.
   `install -oroot X <allowed file>` are allowed today only because the misread `-t` folder (the source's own path)
   lies in the session's paths; with a source in `elsewhere/` the same calls are refused today, naming
   `elsewhere/X/<name>`.
+
+## Finding D, a write that replaces a link: tests added after implementation, from the review of the last round (DEC-136, DEC-774)
+
+The review of the last round found one more behaviour the suite missed: `cp -b` (`--backup`), `install`, `mv` and
+`cp --remove-destination` onto a symbolic link replace the link with a new file at the link's own path, while the
+guard judges the link's target, so a session puts a file at a protected name where such a link sits. The owner decided
+it (DEC-774, 2026-10-18; staged for the owner's commit, not yet in this worktree's register): **the guard refuses as
+doubt a write that replaces a link rather than following it**, for the four forms and any other form of `cp`,
+`install` or `mv` whose write replaces the link at its own path; ordinary writes through a link to an allowed target,
+and every copy, install and move run 6 allows into allowed folders, still pass. Tested in `link` =
+`test_w2_50_link_replaced.py`, through the guard's hook with the call on stdin, as the rest of the suite. `ln -f` /
+`ln -sf` onto the marker (row W2-L354) and a FIFO in the marker's place (row W2-L350) are other rows: no test. No
+earlier test file, support module or conftest was changed.
+
+**How the cases are built.** One fixture, `links`: MAIN's and OTHER's folders made by a launch, and links made by the
+fixture in the test's own temporary tree, never in the repository. At a protected name: in the fixture project's
+acceptance folder `tests/acceptance/W2-90/`, `test_link.py` → `src/app/allowed.py` (allowed, writable),
+`test_ro.py` → `src/app/readonly.py` (allowed, mode 0444) and `test_dangling.py` → `src/app/missing.py` (not there);
+in OTHER's folder, `~/gov-os-runs/W2-91/mylink` → `~/gov-os-runs/W2-90/mine.txt` and `W2-91/dirlink` →
+`W2-90/sub/` (a link to a folder). In an allowed folder, to an allowed place: `src/app/links/ok_link.py` →
+`allowed.py`, `src/app/links/ro_link.py` → `readonly.py`, `src/app/dirlink` → `src/app/d/`,
+`~/gov-os-runs/W2-90/links/ok_link.txt` → `W2-90/mine.txt`, `W2-90/dirlink` → `W2-90/sub/`. The sources are files of
+the test's own in `src/app/staging/` (`X`, a file at each link's name for the `-t` forms, and `SL`, a link to `X`),
+in the session's paths, so a move's source is not what is refused (today `mv <elsewhere>/X <link>` is refused for its
+source). The engineer on DAEO-zz90 (paths `src/app/**`) makes every call; no allowed command is run.
+
+**What each form does to a link**, found by running each in a temporary folder of the designer's own (GNU coreutils
+9.4; `cp --help`, `install --help`, `mv --help`), with a link `dst/X` → `tgt/target`. "Replaces": the link's own path
+then holds a regular file (or a new link), or the link is gone, and the target is unchanged. "Follows": the link
+stays and its target holds the new content.
+
+| Form | onto a link to a file |
+|---|---|
+| `cp X L`, `cp -t D X`, `cp -T`, `-a`, `-p`, `-d`, `-P`, `-R`, `-L`, `-H`, `-x`, `-v`, `-i` (answered y), `--reflink=auto`, `--sparse=always`, `--copy-contents`, `--preserve=all`, `--no-preserve=mode`, `--strip-trailing-slashes`, `--debug`, `--update=all` (each with a regular source) | follows |
+| `cp -f X L`, `cp --force X L`, the target writable | follows |
+| `cp -f X L`, the target without write permission (mode 0444) | **replaces** (it cannot open the target, removes the link, makes a file) |
+| `cp X L`, the target without write permission | fails, nothing changed |
+| `cp X L` and `cp -f X L`, a dangling link | fails, nothing changed ("not writing through dangling symlink") |
+| `cp -b`, `--backup`, `--backup=simple`, `--backup=numbered`, `-S.t`, `--suffix=.bak`, `-bS .t`, `-b -S .t`, `-b -f`, `-b -t D X`, `-b -T`, `-b --` | **replaces** (the link renamed to `L~`, `L.~1~` or `L<suffix>`, a new file at `L`) |
+| `cp --backup=none`, `--backup=off` (also with `-S.t`) | follows |
+| `cp --remove-destination`, `--remove`, `--rem` (alone and with `-t`) | **replaces**; `--r` is refused as ambiguous |
+| `cp -P`, `-d`, `--no-dereference`, `-a`, `-r`, `-R` with a source that is itself a link | **replaces** (a new link at `L`, to the source's target); a plain `cp` of that source follows |
+| `cp -s`, `cp -l` | fail ("cannot create … link"), nothing changed |
+| `cp -u` (target newer), `cp -n`, `--update=none`, `--attributes-only` | nothing written |
+| `install X L`, `-m 644`, `-b`, `-t D X`, `-T`, `-D`, `-C` (also with equal content), `-p`, `-S.t`, a source that is a link | **replaces** |
+| `mv X L`, `-f`, `-b`, `-T`, `-t D X`, `--`, `-S.t`, a source that is a link | **replaces** (a rename over the link) |
+| `mv -n`, `mv -u` (target newer) | nothing written |
+| `mv L <elsewhere>` (the link as the source) | the link is gone from its place (moved, still a link) |
+
+| Form | onto a link to a folder (`T` → `tgt/`) |
+|---|---|
+| `cp X T/`, `cp X T`, `cp -t T X`, `cp -b X T/`, `cp --remove-destination X T`, `install X T/`, `install X T`, `install -m 644 X T/`, `install -t T X`, `mv X T/`, `mv X T`, `mv -b X T`, `mv -t T X`, and through it at a middle level (`T/new`) | follows: writes `tgt/X` |
+| `mv -T X T`, `install -T X T`, `cp -b -T X T` | **replaces** the folder link with a file |
+| `cp -T X T` | fails ("cannot overwrite directory"), nothing changed |
+
+So none of the control forms replaces a link; the forms that replace are exactly the D cases' families. **Other
+options of `--help` that replace rather than write through:** `install` replaces always and `mv` renames always (so
+every option of theirs does); for `cp`, beyond the backup options, `--remove-destination` and `-f`, the options that
+copy a link as a link (`-P`, `-d`, `--no-dereference`, and `-a`, `-r`, `-R`, which imply it) replace the destination
+when the source is itself a link: one case each for `-P`, `-a`, `-R` and `--no-dereference`. `-s` and `-l` fail onto
+an existing destination (and making links is refused already, `ref`'s hard-link cases); no other `cp` option replaces.
+
+**What D's comparison with doubt is.** Today `ln -t <folder> X` is refused with "Bash write to
+'/<guard-unresolvable>' denied for role 'engineer'", and `cp --parents` (A, DEC-764) is refused naming the same
+`/<guard-unresolvable>` (measured at `2d60cdd3` with the guard probed in a temporary fixture). Each D case first asks
+the guard for `ln -t <project>/src/app/d <staging>/X` (an allowed folder, so the refusal is doubt alone; a premise:
+it must be refused) and takes the first quoted path of that refusal's reason. A case **in an allowed place** must be
+refused naming that same path: nothing else there could be refused, so that is the refusal as doubt. A case **at a
+protected name** must be refused naming that path, or the link's own path, or the link's folder (as given or
+normalised): the guard may name the protected place where it also refuses it; the allowed-place cases hold that the
+rule is the form's. If an `ln -t` refusal one day names no quoted path, only the refusal itself is asked. The wording
+around it is not prescribed.
+
+| Behaviour | New cases | Red reason today (`2d60cdd3`) | Green today, and why |
+|---|---|---|---|
+| **D. A write that replaces a link is refused as a form the guard cannot read** | `link::test_a_write_that_replaces_a_link_is_refused_as_a_form_the_guard_cannot_read` × 60, each named `<form>--<place>`. **cp with a backup** (17): `cp -b` onto the acceptance link, OTHER's link and an allowed link; `cp --backup`, `--backup=simple`, `--backup=numbered`; `cp -S.t` (acceptance; own folder's `links/ok_link.txt`); `cp --suffix=.bak`; `cp -bS .t`; `cp -b -S .t`; `cp -b -f`; `cp -b -t <acceptance folder> test_link.py`; `cp -b -t W2-91 mylink` (the review's example); `cp --backup -t src/app/links ok_link.py` (allowed); `cp -b -T`; `cp -b --`. **`--remove-destination`** (6): acceptance, OTHER's, allowed; `--rem`; `--remove-destination -t W2-91 mylink`; `--remove -t <acceptance folder> test_link.py`. **`cp -f`** (7): `-f` and `--force` onto the acceptance link to the read-only file; `-f` onto the allowed link to it; `-f` onto the acceptance link and the allowed link to a writable file, `--force` onto OTHER's (the form may replace); `-f` onto the dangling acceptance link. **install** (9): onto the acceptance link, OTHER's, the allowed link; `-m 644`; `-b`; `-t <acceptance folder>`; `-t W2-91`; `-T`; `-D`. **mv** (9, from `src/app/staging/`): acceptance, OTHER's, allowed; `-f`; `-b`; `-T`; `-t <acceptance folder>`; `-t W2-91`; `--`. **`-T` onto a link to a folder** (4): `mv -T`, `install -T`, `cp -b -T` onto `W2-91/dirlink`; `mv -T` onto `src/app/dirlink`. **A source that is a link** (4): `cp -P` and `cp -R` onto the acceptance link, `cp -a` onto OTHER's, `cp --no-dereference` onto the allowed link. **A link moved away** (4): `mv <acceptance link> W2-90/x`, `mv W2-91/mylink W2-90/x`, `mv W2-91/dirlink W2-90/moved`, `mv -t W2-90/sub <acceptance link>` | "Bash `…` (<case>; it replaces the link … -> …, <place>) was not refused: decision=allow" (58): the guard judges the link's target (an allowed file, the own folder's `mine.txt` or `sub/`), not the link it replaces; for a link moved away it judges the source's target too | `mv-t--acceptance`, `mv-t--other-ticket` (2): refused today naming the `-t` folder ("Bash write to '…/tests/acceptance/W2-90' denied", likewise `…/gov-os-runs/W2-91`): the guard judges the folder of `mv -t` itself. They must stay refused |
+| **Controls: a plain `cp` through a link to an allowed, writable file is allowed** (the tool writes through it) | `link::test_a_plain_copy_through_a_link_to_an_allowed_file_is_allowed` × `cp X src/app/links/ok_link.py`, `cp X W2-90/links/ok_link.txt`, `cp -t src/app/links ok_link.py`, `cp -t W2-90/links ok_link.txt`, and at a protected name `cp X <acceptance link to allowed.py>`, `cp X W2-91/mylink` (to the own folder's `mine.txt`) | none | pass (6): the controls; a fix that refuses every write onto a link turns them red |
+| Controls: a link to a folder as the destination folder, or at a middle level, is followed: allowed | `link::test_a_copy_install_or_move_through_a_link_to_an_allowed_folder_is_allowed` × `cp X src/app/dirlink/`, `cp -b X src/app/dirlink/`, `install X src/app/dirlink/`, `install -m 644 X src/app/dirlink/`, `mv X src/app/dirlink/`, `cp`/`install`/`mv X src/app/dirlink/new.py`, `cp X W2-90/dirlink/`, `mv X W2-90/dirlink/` | none | pass (10): no tool replaced the link in any of these (above) |
+| Controls: the replacing forms onto an ordinary allowed file (not a link) are allowed | `link::test_a_replacing_form_onto_an_ordinary_allowed_file_is_allowed` × `cp -b`, `cp --remove-destination`, `cp -f`, `install`, `mv -b` × `src/app/existing.py`, `W2-90/d2/f.txt` | none | pass (10): a fix that refuses the form whatever the destination turns them red |
+| Controls: a link moved between allowed folders is allowed | `link::test_a_link_moved_between_allowed_folders_is_allowed` × `mv src/app/links/ok_link.py src/app/d/`, `mv W2-90/links/ok_link.txt W2-90/sub/` | none | pass (2) |
+
+**Held already, not duplicated.** The copies, installs and moves run 6 allows into allowed folders:
+`extra::test_an_ordinary_copy_into_an_own_folder_folder_is_allowed` (6 forms),
+`extra::test_an_ordinary_copy_into_an_allowed_repository_folder_is_allowed` (6),
+`extra::test_a_copy_over_an_ordinary_file_of_the_same_name_in_the_own_folder_is_allowed` (2),
+`extra::test_an_ordinary_file_copied_or_moved_into_the_own_folder_is_allowed` (3),
+`round::test_an_ordinary_copy_or_move_into_an_allowed_folder_is_allowed` (3),
+`round::test_the_t_and_m_forms_stay_judged_as_before` (the 4 allowed ones),
+`round::test_an_option_value_or_a_double_dash_onto_an_allowed_file_is_allowed` (10; `cp -S.bak` onto an ordinary
+file among them), `own::test_judged_bash_forms_into_the_own_folder_are_allowed` (8). The refusals that stay:
+`ref`'s symbolic-link, hard-link and move cases, `extra::test_a_copy_into_an_own_folder_folder_that_lands_on_an_entry_leading_out_is_refused`,
+`extra::test_a_folder_copy_onto_a_link_to_a_folder_outside_is_refused`,
+`extra::test_a_copy_into_a_repository_folder_that_lands_on_a_link_to_the_acceptance_test_is_refused`, the marker
+cases, and `round`'s A and B cases.
+
+**No earlier case conflicts with D.** No case of this suite asks that a form which replaces a link be allowed (the
+links of `ref`, `extra` and `round` are asked as refusals or at a middle level; those of `last` and `answers` are the
+secrets check's). Of the earlier tickets' suites that make links and name `cp`, `mv` or `install` (W1-02, W1-03,
+W1-07, W1-19, W1-39, W1-40, W1-46, W1-48, W1-50), none puts a link at the destination of a replacing form and asks
+it allowed. No case rewritten.
+
+**Red run (whole suite, at `2d60cdd3` plus the new file and this README): 58 failed, 388 passed, 0 skipped.** One
+run of the whole folder took longer than one foreground call may run (stopped at ten minutes), so the suite was run
+to its end in five runs of the same line, each file once, never with `-x`: `extra` 72 passed (1.7 min); `round` and
+`last` 78 passed (1.5 min); `code_under_test`, `own`, `ref`, `launch` and `review` 187 passed (2.4 min); `index` and
+`answers` 21 passed (1.6 min); `link` 58 failed, 30 passed (3 min). Every earlier case still passes (358). The new
+file: 58 red (the D cases), 30 green (the 2 `mv -t` D cases refused today, 28 controls).
+
+### Discoveries of this round (no test)
+
+- **`cp -f` onto a dangling link does not replace it** on coreutils 9.4 ("not writing through dangling symlink"),
+  with or without `-f`. The case `cp-f-dangling--acceptance` holds the form (`cp -f` onto a link may replace), not
+  what the tool does there.
+- **`cp --backup=none` / `--backup=off` follow the link** (no backup is made). D's text refuses a form that replaces;
+  whether these two are refused or allowed is not tested either way.
+- **`cp -a`, `-P`, `-R` of a regular source onto a link follow it**; only a source that is itself a link makes them
+  replace. A fix that refuses those options onto any link is stricter than D and is not tested against.
+- **`mv -t <folder>` is judged as the folder itself** (lexically), unlike `cp -t <folder>` and `install -t <folder>`,
+  which are judged as each file they write: `mv -t <acceptance folder> X` is refused today, `cp -b -t <acceptance
+  folder> X` is not.
 
 ## Readings chosen where a KPI line admits more than one
 
