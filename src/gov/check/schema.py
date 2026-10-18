@@ -29,11 +29,18 @@ SCHEMA_MAP = {
     "capability": "capability.schema.json",
     "specification": "specification.schema.json",
     "plan": "plan.schema.json",
+    # an audit report in DEC-441's form
+    "audit-report": "audit-report.schema.json",
 }
 
 # A type whose schema stands alone (DEC-565): the shared frontmatter is not owed by its records, and each
-# field a record states is held to the shape the schema gives.
-STANDALONE_TYPES = ("probe",)
+# field a record states is held to the shape the schema gives. The audit report's form has no shared
+# frontmatter (DEC-441).
+STANDALONE_TYPES = ("probe", "audit-report")
+
+# The audit-report folder (DEC-626, the audit-reproducibility declaration): a record there that states no `type`
+# is an audit report.
+AUDIT_REPORT_DIR, AUDIT_REPORT_TYPE = "docs/audit", "audit-report"
 
 _JSON_TYPES = {"string": str, "boolean": bool}
 _SHAPE_KEYWORDS = {"description", "const", "enum", "type", "minLength", "pattern"}
@@ -137,7 +144,8 @@ def check(root: Path) -> list[dict]:
             front = _frontmatter(text)
             if front is None:
                 continue
-            record_type = front.get("type")
+            in_audit_dir = md_file.is_relative_to(root / AUDIT_REPORT_DIR)
+            record_type = front.get("type", AUDIT_REPORT_TYPE if in_audit_dir else None)
             if not isinstance(record_type, str):
                 findings.append({"code": "SCHEMA_INVALID_TYPE", "path": str(rel),
                                  "message": f"{rel}: 'type' field is missing or not a string"})
