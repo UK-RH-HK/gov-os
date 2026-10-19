@@ -1,0 +1,148 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+........................................................................ [ 10%]
+....................................................................F... [ 13%]
+..........................................................FF............ [ 16%]
+........................................................................ [ 20%]
+.....................................................F.................. [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 43%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 70%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 87%]
+........................................................................ [ 91%]
+......................................s................................. [ 94%]
+........................................................................ [ 97%]
+.............................................                            [100%]
+=================================== FAILURES ===================================
+________ test_a_test_run_with_findings_is_a_finding_of_the_tickets_work ________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-2459/test_a_test_run_with_findings_0')
+
+    def test_a_test_run_with_findings_is_a_finding_of_the_tickets_work(tmp_path):
+        with patch.object(command, "_run_tests", return_value=(["FAILED test_a"], dict(COUNTS))) as ran:
+            with pytest.raises(_Finding) as raised:
+                _check_tests(tmp_path, tmp_path / "tests", 60, tmp_path / "ignored")
+        assert (raised.value.code, raised.value.findings) == ("CHECK_FAILED", ["FAILED test_a"])
+>       assert ran.call_args.kwargs == {"ignore": tmp_path / "ignored", "none_collected_ok": True, "stated": None,
+                                        "workers": "auto"}
+E       AssertionError: assert {'ignore': Po...d': None, ...} == {'ignore': Po...kers': 'auto'}
+E         
+E         Omitting 4 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'told': None}
+E         Use -v to get more diff
+
+tests/unit/close/test_every_finding.py:74: AssertionError
+_ test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses[removed] _
+
+repo = <close.conftest.Repo object at 0x7c18e0d05310>, change = 'removed'
+
+    @pytest.mark.parametrize("change", ["removed", "replaced"])
+    def test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses(repo, change):
+        """DEC-750 (2): after the merge-back, a second one naming another task that removes or replaces a probed file
+        (in neither parent's version) refuses, naming it."""
+        repo.commit("start")
+        repo.git("checkout", "-q", "-b", "side")
+        probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
+        repo.git("checkout", "-q", "main")
+        repo.git("merge", "-q", "--no-ff", "--no-edit", "side")
+        repo.git("checkout", "-q", "side")
+        repo.commit("notes", "Role: orchestrator", files={"docs/n.md": "n\n"})
+        repo.git("checkout", "-q", "main")
+        repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+        if change == "removed":
+            repo.git("rm", "-q", "src/a.py")
+        later = repo.commit("again", "Task: T-0002", "Role: orchestrator", "Implements: CAP-01",
+                            files={"src/a.py": "other\n"} if change == "replaced" else None)
+        _probe(repo, probed)
+        commits = _ticket_commits(repo.root, TICKET)
+        with pytest.raises(_Finding) as raised:
+            _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
+                         frozenset({TICKET, "T-0002"}))
+>       assert later[:12] in raised.value.message and "neither parent" in raised.value.message
+E       assert ('7c28af353c2a' in "merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" and 'neither parent' in "merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py")
+E        +  where "merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" = _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py").message
+E        +    where _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") = <ExceptionInfo _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") tblen=2>.value
+E        +  and   "merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" = _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py").message
+E        +    where _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") = <ExceptionInfo _Finding("merge 7c28af353c2a holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") tblen=2>.value
+
+tests/unit/close/test_gates.py:218: AssertionError
+_ test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses[replaced] _
+
+repo = <close.conftest.Repo object at 0x7c18e0d071a0>, change = 'replaced'
+
+    @pytest.mark.parametrize("change", ["removed", "replaced"])
+    def test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses(repo, change):
+        """DEC-750 (2): after the merge-back, a second one naming another task that removes or replaces a probed file
+        (in neither parent's version) refuses, naming it."""
+        repo.commit("start")
+        repo.git("checkout", "-q", "-b", "side")
+        probed = repo.commit("work", *TRAILERS, files={"src/a.py": "a\n"})
+        repo.git("checkout", "-q", "main")
+        repo.git("merge", "-q", "--no-ff", "--no-edit", "side")
+        repo.git("checkout", "-q", "side")
+        repo.commit("notes", "Role: orchestrator", files={"docs/n.md": "n\n"})
+        repo.git("checkout", "-q", "main")
+        repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+        if change == "removed":
+            repo.git("rm", "-q", "src/a.py")
+        later = repo.commit("again", "Task: T-0002", "Role: orchestrator", "Implements: CAP-01",
+                            files={"src/a.py": "other\n"} if change == "replaced" else None)
+        _probe(repo, probed)
+        commits = _ticket_commits(repo.root, TICKET)
+        with pytest.raises(_Finding) as raised:
+            _check_probe(repo.root, TICKET, commits, _commits_since(repo.root, commits), _inside, _own,
+                         frozenset({TICKET, "T-0002"}))
+>       assert later[:12] in raised.value.message and "neither parent" in raised.value.message
+E       assert ('78493b2cfc3f' in "merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" and 'neither parent' in "merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py")
+E        +  where "merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" = _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py").message
+E        +    where _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") = <ExceptionInfo _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") tblen=2>.value
+E        +  and   "merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py" = _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py").message
+E        +    where _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") = <ExceptionInfo _Finding("merge 78493b2cfc3f holds the probed commit and its probed paths are not git's own merge of its parents: src/a.py") tblen=2>.value
+
+tests/unit/close/test_gates.py:218: AssertionError
+_ test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit _
+
+repo = <close.conftest.Repo object at 0x7c18e0da3b00>
+
+    def test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit(repo):
+        _probe(repo, _work(repo))
+        repo.git("checkout", "-q", "-b", "side")
+        repo.commit("another ticket's work on the side", "Task: T-0002", "Role: engineer", files={"src/side.py": "s\n"})
+        repo.git("checkout", "-q", "main")
+        repo.git("merge", "-q", "--no-ff", "--no-gpg-sign", "-m", "merge\n\n" + "\n".join(TRAILERS) + "\n", "side")
+        merge = repo.git("rev-parse", "HEAD").strip()
+>       said = _refused(repo)
+               ^^^^^^^^^^^^^^
+
+tests/unit/close/test_measured.py:410: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+repo = <close.conftest.Repo object at 0x7c18e0da3b00>
+
+    def _refused(repo):
+>       with pytest.raises(_Finding) as raised:
+E       Failed: DID NOT RAISE <class 'gov.close.command._Finding'>
+
+tests/unit/close/test_measured.py:246: Failed
+=========================== short test summary info ============================
+FAILED tests/unit/close/test_every_finding.py::test_a_test_run_with_findings_is_a_finding_of_the_tickets_work
+FAILED tests/unit/close/test_gates.py::test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses[removed]
+FAILED tests/unit/close/test_gates.py::test_a_later_merge_holding_the_probed_commit_that_changes_probed_code_itself_refuses[replaced]
+FAILED tests/unit/close/test_measured.py::test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit
+4 failed, 2128 passed, 1 skipped in 107.58s (0:01:47)

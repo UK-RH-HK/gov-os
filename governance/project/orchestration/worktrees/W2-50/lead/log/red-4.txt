@@ -1,0 +1,508 @@
+........................................................................ [ 30%]
+..............................................FFFFFFFFFFFF...FFF........ [ 61%]
+........................................................................ [ 92%]
+.................                                                        [100%]
+=================================== FAILURES ===================================
+_ test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made[a-clone-inside-the-first-projects-own-folder] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/pycache'))
+form = 'a-clone-inside-the-first-projects-own-folder'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made(first, sandbox, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        assert ticket.folder == ANOTHER_REPOSITORY[form] and folder.is_dir()
+        assert (other / ".tickets" / f"{ticket.tk}.md").is_file(), f"premise: {other} has no ticket {ticket.tk}"
+>       _writes_refused(box, other, folder, f"by the engineer on {ticket.tk} of another repository {other} ({form})",
+                        ticket.tk)
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:94: in _writes_refused
+    _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/home/gov-os-runs/W2-91/work/README.md...1653/test_another_repositorys_sessi0/w2-50/home/gov-os-runs/W2-90/clone (a-clone-inside-the-first-projects-own-folder)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/home/gov-os-runs/W2-91/work/README.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/home/gov-os-runs/W2-91/work/README.md by the engineer on DAEO-zz91 of another repository /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi0/w2-50/home/gov-os-runs/W2-90/clone (a-clone-inside-the-first-projects-own-folder) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made[a-clone-of-the-first-project-outside-the-root] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/pycache'))
+form = 'a-clone-of-the-first-project-outside-the-root'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made(first, sandbox, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        assert ticket.folder == ANOTHER_REPOSITORY[form] and folder.is_dir()
+        assert (other / ".tickets" / f"{ticket.tk}.md").is_file(), f"premise: {other} has no ticket {ticket.tk}"
+>       _writes_refused(box, other, folder, f"by the engineer on {ticket.tk} of another repository {other} ({form})",
+                        ticket.tk)
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:94: in _writes_refused
+    _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/home/gov-os-runs/W2-90/work/README.md...in/pytest-1653/test_another_repositorys_sessi1/w2-50/home/clones/third (a-clone-of-the-first-project-outside-the-root)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/home/gov-os-runs/W2-90/work/README.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/home/gov-os-runs/W2-90/work/README.md by the engineer on DAEO-zz90 of another repository /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi1/w2-50/home/clones/third (a-clone-of-the-first-project-outside-the-root) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made[a-project-built-apart-outside-the-root] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/pycache'))
+form = 'a-project-built-apart-outside-the-root'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_another_repositorys_session_gets_nothing_in_a_folder_the_first_made(first, sandbox, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        assert ticket.folder == ANOTHER_REPOSITORY[form] and folder.is_dir()
+        assert (other / ".tickets" / f"{ticket.tk}.md").is_file(), f"premise: {other} has no ticket {ticket.tk}"
+>       _writes_refused(box, other, folder, f"by the engineer on {ticket.tk} of another repository {other} ({form})",
+                        ticket.tk)
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:94: in _writes_refused
+    _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/gov-os-runs/W2-91/work/README.md...-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/projects/second (a-project-built-apart-outside-the-root)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/gov-os-runs/W2-91/work/README.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/gov-os-runs/W2-91/work/README.md by the engineer on DAEO-zz91 of another repository /tmp/pytest-of-usain/pytest-1653/test_another_repositorys_sessi2/w2-50/home/projects/second (a-project-built-apart-outside-the-root) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder[a-clone-inside-the-first-projects-own-folder] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/elsewhere/claude-plan.json'))
+form = 'a-clone-inside-the-first-projects-own-folder'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder(first, sandbox, cli, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        before = _state(folder)
+        result = _launched(box, cli, ticket)
+        holding = _entries_at_or_under_the_root(result, box)
+>       assert holding == [], (
+            f"the sandbox of a session on {ticket.tk} in another repository {other} ({form}) may write at or under the "
+            f"root through {holding}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz91 in another repository /tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/gov-os-runs/W2-90/clone (a-clone-inside-the-first-projects-own-folder) may write at or under the root through ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/gov-os-runs/W2-91']: allowWrite is ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/systmp/gov-launch-engineer-dw_uyqjq', '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/gov-os-runs/W2-91']
+E       assert ['//tmp/pytes...s-runs/W2-91'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos0/w2-50/home/gov-os-runs/W2-91'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:249: AssertionError
+_ test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder[a-clone-of-the-first-project-outside-the-root] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/elsewhere/claude-plan.json'))
+form = 'a-clone-of-the-first-project-outside-the-root'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder(first, sandbox, cli, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        before = _state(folder)
+        result = _launched(box, cli, ticket)
+        holding = _entries_at_or_under_the_root(result, box)
+>       assert holding == [], (
+            f"the sandbox of a session on {ticket.tk} in another repository {other} ({form}) may write at or under the "
+            f"root through {holding}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz90 in another repository /tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/clones/third (a-clone-of-the-first-project-outside-the-root) may write at or under the root through ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/gov-os-runs/W2-90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/systmp/gov-launch-engineer-vymjfbux', '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/gov-os-runs/W2-90']
+E       assert ['//tmp/pytes...s-runs/W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos1/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:249: AssertionError
+_ test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder[a-project-built-apart-outside-the-root] _
+
+first = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/elsewhere/claude-plan.json'))
+form = 'a-project-built-apart-outside-the-root'
+
+    @pytest.mark.parametrize("form", sorted(ANOTHER_REPOSITORY))
+    def test_a_launch_in_another_repository_neither_adds_nor_changes_the_folder(first, sandbox, cli, form):
+        box, other, ticket = _another_repository(sandbox, first, form)
+        folder = sandbox.own(ticket)
+        before = _state(folder)
+        result = _launched(box, cli, ticket)
+        holding = _entries_at_or_under_the_root(result, box)
+>       assert holding == [], (
+            f"the sandbox of a session on {ticket.tk} in another repository {other} ({form}) may write at or under the "
+            f"root through {holding}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz91 in another repository /tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/projects/second (a-project-built-apart-outside-the-root) may write at or under the root through ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/gov-os-runs/W2-91']: allowWrite is ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/systmp/gov-launch-engineer-wvk8j6nt', '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/gov-os-runs/W2-91']
+E       assert ['//tmp/pytes...s-runs/W2-91'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1653/test_a_launch_in_another_repos2/w2-50/home/gov-os-runs/W2-91'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:249: AssertionError
+___ test_a_folder_made_by_hand_gives_no_session_anything[before-any-launch] ____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/elsewhere/claude-plan.json'))
+layout = 'before-any-launch'
+
+    @pytest.mark.parametrize("layout", NO_RECORD)
+    def test_a_folder_made_by_hand_gives_no_session_anything(project, sandbox, cli, layout):
+        """A folder under the root that no launch made: the guard refuses MAIN's session there, with its reason."""
+        _no_record_layout(sandbox, cli, layout)
+        _work(sandbox.own(MAIN), "made by hand\n")
+>       _writes_refused(sandbox, project, sandbox.own(MAIN), f"(a folder made by hand, {layout})", MAIN.tk)
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:94: in _writes_refused
+    _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/home/gov-os-runs/W2-90/work/README.md (a folder made by hand, before-any-launch)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/home/gov-os-runs/W2-90/work/README.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv0/w2-50/home/gov-os-runs/W2-90/work/README.md (a folder made by hand, before-any-launch) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_a_folder_made_by_hand_gives_no_session_anything[beside-a-launched-folder] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/elsewhere/claude-plan.json'))
+layout = 'beside-a-launched-folder'
+
+    @pytest.mark.parametrize("layout", NO_RECORD)
+    def test_a_folder_made_by_hand_gives_no_session_anything(project, sandbox, cli, layout):
+        """A folder under the root that no launch made: the guard refuses MAIN's session there, with its reason."""
+        _no_record_layout(sandbox, cli, layout)
+        _work(sandbox.own(MAIN), "made by hand\n")
+>       _writes_refused(sandbox, project, sandbox.own(MAIN), f"(a folder made by hand, {layout})", MAIN.tk)
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:94: in _writes_refused
+    _refused(_ask(box, project, tool_name, target, ticket), f"{tool_name} on {target} {what}", box, target)
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/home/gov-os-runs/W2-90/work/README.md (a folder made by hand, beside-a-launched-folder)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/home/gov-os-runs/W2-90/work/README.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_made_by_hand_giv1/w2-50/home/gov-os-runs/W2-90/work/README.md (a folder made by hand, beside-a-launched-folder) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_a_folder_that_does_not_exist_yet_gives_no_session_anything[before-any-launch] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/elsewhere/claude-plan.json'))
+layout = 'before-any-launch'
+
+    @pytest.mark.parametrize("layout", NO_RECORD)
+    def test_a_folder_that_does_not_exist_yet_gives_no_session_anything(project, sandbox, cli, layout):
+        _no_record_layout(sandbox, cli, layout)
+        own = sandbox.own(MAIN)
+        assert not os.path.lexists(own)
+        what = f"(the own folder does not exist yet, {layout})"
+        for tool_name in ("Write", "Edit"):
+>           _refused(_ask(sandbox, project, tool_name, own / "notes.txt", MAIN.tk), f"{tool_name} on {own} {what}",
+                     sandbox, own / "notes.txt")
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/home/gov-os-runs/W2-90 (the own folder does not exist yet, before-any-launch)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex0/w2-50/home/gov-os-runs/W2-90 (the own folder does not exist yet, before-any-launch) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_a_folder_that_does_not_exist_yet_gives_no_session_anything[beside-a-launched-folder] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/elsewhere/claude-plan.json'))
+layout = 'beside-a-launched-folder'
+
+    @pytest.mark.parametrize("layout", NO_RECORD)
+    def test_a_folder_that_does_not_exist_yet_gives_no_session_anything(project, sandbox, cli, layout):
+        _no_record_layout(sandbox, cli, layout)
+        own = sandbox.own(MAIN)
+        assert not os.path.lexists(own)
+        what = f"(the own folder does not exist yet, {layout})"
+        for tool_name in ("Write", "Edit"):
+>           _refused(_ask(sandbox, project, tool_name, own / "notes.txt", MAIN.tk), f"{tool_name} on {own} {what}",
+                     sandbox, own / "notes.txt")
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_last_review.py:83: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/home/gov-os-runs/W2-90 (the own folder does not exist yet, beside-a-launched-folder)'
+names = ('/tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1653/test_a_folder_that_does_not_ex1/w2-50/home/gov-os-runs/W2-90 (the own folder does not exist yet, beside-a-launched-folder) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:377: AssertionError
+_ test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record[empty] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/elsewhere/claude-plan.json'))
+content = 'empty'
+
+    @pytest.mark.parametrize("content", ("empty", "holding-a-file"))
+    def test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record(project, sandbox, cli, content):
+        """The folder was there before any launch: the launch leaves it as it is and gives the session nothing there."""
+        own = sandbox.own(MAIN)
+        own.mkdir(parents=True)
+        if content == "holding-a-file":
+            _work(own, "there before any launch\n")
+        before = _state(own)
+        result = _launched(sandbox, cli, MAIN)
+        holding = _entries_at_or_under_the_root(result, sandbox)
+>       assert holding == [], (
+            f"the launch added a folder that no launch made ({content}) through {holding}: allowWrite is "
+            f"{result.allow_write()}")
+E       AssertionError: the launch added a folder that no launch made (empty) through ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/home/gov-os-runs/W2-90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/systmp/gov-launch-engineer-auoirboo', '//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/home/gov-os-runs/W2-90']
+E       assert ['//tmp/pytes...s-runs/W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor0/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:298: AssertionError
+_ test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record[holding-a-file] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/elsewhere/claude-plan.json'))
+content = 'holding-a-file'
+
+    @pytest.mark.parametrize("content", ("empty", "holding-a-file"))
+    def test_a_launch_neither_adds_nor_records_a_folder_that_exists_without_a_record(project, sandbox, cli, content):
+        """The folder was there before any launch: the launch leaves it as it is and gives the session nothing there."""
+        own = sandbox.own(MAIN)
+        own.mkdir(parents=True)
+        if content == "holding-a-file":
+            _work(own, "there before any launch\n")
+        before = _state(own)
+        result = _launched(sandbox, cli, MAIN)
+        holding = _entries_at_or_under_the_root(result, sandbox)
+>       assert holding == [], (
+            f"the launch added a folder that no launch made ({content}) through {holding}: allowWrite is "
+            f"{result.allow_write()}")
+E       AssertionError: the launch added a folder that no launch made (holding-a-file) through ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/home/gov-os-runs/W2-90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/systmp/gov-launch-engineer-7b8twprs', '//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/home/gov-os-runs/W2-90']
+E       assert ['//tmp/pytes...s-runs/W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1653/test_a_launch_neither_adds_nor1/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:298: AssertionError
+_ test_a_projects_own_check_follows_a_link_that_stays_inside_the_project[a-clone-under-the-root-a-file-link] _
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll3/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll3/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll3/w2-50/pycache'))
+location = 'a-clone-under-the-root', link = 'a-file-link'
+
+    @needs_gitleaks
+    @pytest.mark.parametrize("link", sorted(INSIDE_LINKS))
+    @pytest.mark.parametrize("location", LOCATIONS)
+    def test_a_projects_own_check_follows_a_link_that_stays_inside_the_project(indexed_project, sandbox, location, link):
+        project = _located(sandbox, indexed_project, location)
+        runtime = _runtime(project)
+        name, target_rel, planted_rel = INSIDE_LINKS[link]
+        target = project / target_rel
+        _plant(target / planted_rel if planted_rel else target)
+        premise = support.run_check(sandbox, project)
+        assert premise.returncode == 0, (
+            f"premise: with no link, the check in {project} is red on a secret outside .gov-runtime/\n{premise.describe()}")
+        (runtime / name).parent.mkdir(parents=True, exist_ok=True)
+        (runtime / name).symlink_to(target, target_is_directory=planted_rel is not None)
+        run = support.run_check(sandbox, project)
+>       assert run.returncode != 0, (
+            f"the check of the project {project} ({location}) did not follow {link} .gov-runtime/{name} -> {target}, a "
+            f"place of the same project that holds a secret: it is green\n{run.describe()}")
+E       AssertionError: the check of the project /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll3/w2-50/home/gov-os-runs/W2-90/clone (a-clone-under-the-root) did not follow a-file-link .gov-runtime/store.txt -> /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll3/w2-50/home/gov-os-runs/W2-90/clone/kept/store.txt, a place of the same project that holds a secret: it is green
+E         gov secrets-indexing
+E         exit code: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('secrets-indexing',), returncode=0, stdout='', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:368: AssertionError
+_ test_a_projects_own_check_follows_a_link_that_stays_inside_the_project[a-clone-under-the-root-a-folder-link-in-scratch] _
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll4/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll4/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll4/w2-50/pycache'))
+location = 'a-clone-under-the-root', link = 'a-folder-link-in-scratch'
+
+    @needs_gitleaks
+    @pytest.mark.parametrize("link", sorted(INSIDE_LINKS))
+    @pytest.mark.parametrize("location", LOCATIONS)
+    def test_a_projects_own_check_follows_a_link_that_stays_inside_the_project(indexed_project, sandbox, location, link):
+        project = _located(sandbox, indexed_project, location)
+        runtime = _runtime(project)
+        name, target_rel, planted_rel = INSIDE_LINKS[link]
+        target = project / target_rel
+        _plant(target / planted_rel if planted_rel else target)
+        premise = support.run_check(sandbox, project)
+        assert premise.returncode == 0, (
+            f"premise: with no link, the check in {project} is red on a secret outside .gov-runtime/\n{premise.describe()}")
+        (runtime / name).parent.mkdir(parents=True, exist_ok=True)
+        (runtime / name).symlink_to(target, target_is_directory=planted_rel is not None)
+        run = support.run_check(sandbox, project)
+>       assert run.returncode != 0, (
+            f"the check of the project {project} ({location}) did not follow {link} .gov-runtime/{name} -> {target}, a "
+            f"place of the same project that holds a secret: it is green\n{run.describe()}")
+E       AssertionError: the check of the project /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll4/w2-50/home/gov-os-runs/W2-90/clone (a-clone-under-the-root) did not follow a-folder-link-in-scratch .gov-runtime/scratch/kept -> /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll4/w2-50/home/gov-os-runs/W2-90/clone/kept-store, a place of the same project that holds a secret: it is green
+E         gov secrets-indexing
+E         exit code: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('secrets-indexing',), returncode=0, stdout='', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:368: AssertionError
+_ test_a_projects_own_check_follows_a_link_that_stays_inside_the_project[a-clone-under-the-root-a-store-folder-link] _
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll5/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll5/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll5/w2-50/pycache'))
+location = 'a-clone-under-the-root', link = 'a-store-folder-link'
+
+    @needs_gitleaks
+    @pytest.mark.parametrize("link", sorted(INSIDE_LINKS))
+    @pytest.mark.parametrize("location", LOCATIONS)
+    def test_a_projects_own_check_follows_a_link_that_stays_inside_the_project(indexed_project, sandbox, location, link):
+        project = _located(sandbox, indexed_project, location)
+        runtime = _runtime(project)
+        name, target_rel, planted_rel = INSIDE_LINKS[link]
+        target = project / target_rel
+        _plant(target / planted_rel if planted_rel else target)
+        premise = support.run_check(sandbox, project)
+        assert premise.returncode == 0, (
+            f"premise: with no link, the check in {project} is red on a secret outside .gov-runtime/\n{premise.describe()}")
+        (runtime / name).parent.mkdir(parents=True, exist_ok=True)
+        (runtime / name).symlink_to(target, target_is_directory=planted_rel is not None)
+        run = support.run_check(sandbox, project)
+>       assert run.returncode != 0, (
+            f"the check of the project {project} ({location}) did not follow {link} .gov-runtime/{name} -> {target}, a "
+            f"place of the same project that holds a secret: it is green\n{run.describe()}")
+E       AssertionError: the check of the project /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll5/w2-50/home/gov-os-runs/W2-90/clone (a-clone-under-the-root) did not follow a-store-folder-link .gov-runtime/packets -> /tmp/pytest-of-usain/pytest-1653/test_a_projects_own_check_foll5/w2-50/home/gov-os-runs/W2-90/clone/shared-store, a place of the same project that holds a secret: it is green
+E         gov secrets-indexing
+E         exit code: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert 0 != 0
+E        +  where 0 = Run(args=('secrets-indexing',), returncode=0, stdout='', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_last_review.py:368: AssertionError
+15 failed, 218 passed in 172.96s (0:02:52)

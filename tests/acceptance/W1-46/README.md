@@ -336,6 +336,13 @@ acceptEdits`, `--model haiku`, `--max-turns 8`, `--allowedTools Bash,Write`). Th
 variable, so the ticket cannot close on skipped tests. A run in which the model does not execute the stated command
 fails with that reason and is repeated; it is not a finding against the launcher.
 
+**The environment a live session is launched with** (rewritten by DEC-784, owner, 2026-10-18, P-W2-34 (a), in
+W2-54): the caller's environment less `GOV_ROLE`, `GOV_TICKET` and **every variable whose name begins `CLAUDE`**
+(`CLAUDECODE`, `CLAUDE_CODE_*` and any other), so a run from inside a Claude session launches its sessions as a run
+from a plain shell does. Before, the fixture removed a fixed list (`CLAUDECODE`, `CLAUDE_CODE_ENTRYPOINT`,
+`CLAUDE_PROJECT_DIR`, `CLAUDE_CODE_SSE_PORT`). Nothing else of the live cases changes. The other launches of this
+suite (`support.run_gov` with `gov_environment`) build their environment from nothing and carry no `CLAUDE*` name.
+
 | Session | Model work | Needs |
 |---|---|---|
 | engineer | one Bash call (a probe script in scratch) and one Write call | `bwrap`, `socat`; no network (the connection must be refused) |

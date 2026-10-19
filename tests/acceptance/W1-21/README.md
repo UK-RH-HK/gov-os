@@ -162,3 +162,43 @@ A throwaway `retrieve` kept outside the worktree (removed with the session) met 
 model-free dev-tier cases, and four faults put into it were each caught: no authority filter (11 cases red), the
 budget reported as `SATURATED`, nothing put ahead, and expansion ignoring the budget. The command and check cases
 could not be checked this way: both need a file inside the worktree.
+
+## Rewrite (W2-54, DEC-782, 2026-10-18)
+
+`test_w1_21_closure_and_gaps.py::test_a_retrieval_writes_nothing` ("a question", "a ticket", "batches of one") and
+`test_w1_21_command.py::test_the_command_writes_nothing` are rewritten for DEC-782 (owner, 2026-10-18, P-W2-32 (a)):
+a read command may write the query-vector cache, one derived file under `.gov-runtime/`, and nothing else (DEC-379 is
+amended for that file only). Only the expectation that depended on the old behaviour changes:
+
+- **before:** the project's file tree after a retrieval is the tree before it (the read writes no file);
+- **after:** the tree differs in **at most one file**, added or changed, under `.gov-runtime/` and not a file of the
+  store (`store.db*`); no file is removed (`w1_21_support.beyond_the_query_vector_cache`). With W2-54's round-2 code
+  the one file is `.gov-runtime/query-vectors.db`.
+
+Every other assertion of the four cases (the index built first, the bundle checked by `check_bundle`), the no-index
+cases (no runtime folder is made), and every pass line and threshold of this suite are unchanged. Commit trailer:
+`Rewrite-Reason: DEC-782 (owner, 2026-10-18, P-W2-32 (a)): a read command may write the query-vector cache and nothing
+else`.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only the fixture changes:
+
+- `Box.scratch_env`: **before**, `OLLAMA_HOST` = the given stand-in or a dead port; **after**, the same, and
+  `GOV_QUERY_OLLAMA_HOST` = **the same** stand-in or the same dead port. One stand-in answers chunks and questions with
+  the same vectors, so every bundle, every stand-in figure (hit@5 73.2 on the stand-in vectors) and every
+  "endpoint dead" case is what it was.
+- `OllamaStandIn`: **before**, no `GET /api/ps` (404); **after**, `/api/ps` lists the model with `size_vram` 0, as
+  the CPU-only embedder must report it.
+- **Not changed:** `real_env`, every real-models case (`needs("ollama", "reranker")`) and its pass line. In
+  particular `test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line` keeps the default addresses.
+  DEC-798 item 3 has the lead re-measure it before merge, on the real models, with CPU query vectors against the
+  GPU-built index (W2-54's README, "Round 4", says how); a figure below 80 is a red for W2-54.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 122 passed
+in eleven files, run file by file; the five real-models and `local_only` cases were left out (they use `real_env`;
+the sandbox reaches no shared Ollama). Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
+query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
+expectation`.

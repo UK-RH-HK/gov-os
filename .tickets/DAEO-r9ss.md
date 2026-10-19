@@ -1,7 +1,7 @@
 ---
 id: DAEO-r9ss
 status: open
-deps: [DAEO-g0ip, DAEO-zflj]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 - DAEO-zflj
+- DAEO-7rr2
 allowed_paths:
 - src/gov/close/**
 - src/gov/telemetry/**

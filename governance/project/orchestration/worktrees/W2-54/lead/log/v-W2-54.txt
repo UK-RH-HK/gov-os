@@ -1,0 +1,65 @@
+.....................................F......F.....                       [100%]
+=================================== FAILURES ===================================
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x74c3c35a3110>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '316f36550d14c4fc638ef3c2a0fa111e4ff7087b', 'inputs_hash': 'ae8d921f8b67f69a'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "FAIL: DAEO-0pyc: 1a9bb451d5d03eee6ba526c193b8bb5038f8d8f4b6308c9787c173e8f6f007d6 != 97706a9b47bb758a0f106f39a6b4c82ba232f2fe6ef89521cb150d99debe7f78\nFAIL: DAEO-1ve2: 747189b2aa491c1891c62337c4ce37162"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:26: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-54/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+        assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+        command = yaml.safe_load(_declared())["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=max(limit, 1) + 30)
+        assert done.seconds < limit, f"the check ran {done.seconds:.0f} s, past its declared limit of {limit} s"
+>       assert done.returncode == 0, f"the check is not green on this repository\n{done.describe()}"
+E       AssertionError: the check is not green on this repository
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (117.3 s)
+E         stdout:
+E         FAIL: DAEO-0pyc: 1a9bb451d5d03eee6ba526c193b8bb5038f8d8f4b6308c9787c173e8f6f007d6 != 97706a9b47bb758a0f106f39a6b4c82ba232f2fe6ef89521cb150d99debe7f78
+E         FAIL: DAEO-1ve2: 747189b2aa491c1891c62337c4ce37162adb1a25c219249aa376f16f8499f9e4 != 8de5a04167db1e993371c19fcfde00636533030e55cdbd8fc3f06fc2d148e29d
+E         FAIL: DAEO-32n6: cb94804f3e038138fca2a9768627edb7a1678e63292916053d1daee91cc94f36 != 295bdf5456b098f370ddcfc0ee9f14a5cc5cb1a5f3a8363dfe8fb2823e3f6ed8
+E         FAIL: DAEO-7nne: eb227fed8c7fa531553f4b7646256d8f23f1e5cb6113a63829ac822ffa90a276 != 9aae54240e96b428af085e015899b5ae2351557a9f4299e1ae4f958c962ee983
+E         FAIL: DAEO-csj8: d1a43ab873aabc6fa12c7a14d7d7080f1db07da1806fe8349f871da106d2fbf3 != 3b70cf487760cd20d01b7be446f0b294b948e85e16e47f6701507a62bc368ec1
+E         FAIL: DAEO-ipqy: f65a5efcc3d196b7fbbb597ad971d9f50bdb440a8fc3908c33a9b0555c96587b != 086b21bace2590f2c6f056ad15defd402d93c2c2ec3820ce24a39419780db2ba
+E         FAIL: DAEO-jip3: 01db1d2dc1ac0fc2fc4ac5edfdceb6cc32b5c4e79fdd07be0113f538f7c4f154 != d8a943d0cd6496e48be768be06d52fc7f09efa1b932f3e7d70c3cd11db80e437
+E         FAIL: DAEO-lrre: 035c07e9341fb45a2c79035b9be5bef42c47288e3e9baa885dd993f4da6bfe60 != b8b2925c5e9155ab856263d2fa7f89907391f9b207af82bcb6888c24d2c01ff9
+E         FAIL: DAEO-nn1s: 1486148fd5062a271db6e4e76ee34959d06e37a76523631a4933a8c83a2b8dd5 != 748809f0fcd04ced18317ac6a32b5f53acda42fae9746c39c009a1951e3e86d5
+E         FAIL: DAEO-o4fg: 2de51c1105513fe555b78f81260fcec2b49a5c23946bd1cba2df21a16582c098 != d992ca706cc7913f6dee6a240db18d32691c5a55777047a80eb298dd4abb9d40
+E         FAIL: DAEO-sdxk: eb245d7914cd06465860666e2dfe3daa25088d19d25ecdb63e2f0b82a51e0a74 != 87328fde4d308fcd83668d8c70bf116c830bb145da3bb21f1fffa78d5a414701
+E         FAIL: DAEO-xnbx: 1b8489e3d57aaff70d3c45ca3571313647068b65460ecc33c3fb5dbaee9b8d23 != 139e1815a18be6a98b663fd7a212cb91581e9157d87dc66ca5a3a9504149167c
+E         FAIL: DAEO-xog0: 910b8a210b6846e953fb5c97968831c4505530cdcf4e8783638a721c67a61f6f != a779015c9ec47faeaf44c884522992f17498c1098cf0efc397026e2e5a3cb117
+E         FAIL: DAEO-zqvn: 424bf9015281e32be493270d3e041fa0326561fd26b5c7d93995b8b0706bc7d7 != 3020789b08abb66d68276129c45f9b2d1ebac773f070b0188a3c8da0762710fc
+E         context-reproducibility: 14 ticket(s) failed, 0 error(s)
+E         
+E         stderr:
+E         
+E         Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]
+E         Loading weights: 100%|██████████| 310/310 [00:00<00:00, 4081.25it/s]
+E         Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x74c3c35a3380>.returncode
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:84: AssertionError
+2 failed, 48 passed in 455.21s (0:07:35)

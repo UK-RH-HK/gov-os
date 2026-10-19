@@ -44,7 +44,7 @@ kpis:
   - 'One LITE ticket goes through the full cycle: test designer, red, implement, green, then gov close at exit 0 with EXAMIN''s own test command.'
   - Its governance share is measured and ≤ 15 %.
   - At the first full gov rebuild after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler, against DEC-078's envelope; a figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735].
-  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones, using the owner's answer on whether its governance suite passes in the owner's environment.
+  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones; the owner does not know whether its governance suite passes on Windows, so the hour finds out (DEC-745).
     Then the reds go into W2-19's ratchet baseline (exact id, owner, cause class, how it shrinks), which the owner accepts [DEC-736].
   - One pinned install package goes to the owner. It holds EXAMIN's 10 product-suite packages from EXAMIN's own lock file, installed into the clone's own virtual environment only. With the owner's approval,
     the product suite is measured before W2-30's verdict. Until then it is "needs environment", reported UNMEASURED by name and never as passed [DEC-736].
@@ -61,6 +61,7 @@ sources:
 - DEC-735
 - DEC-736
 - DEC-741
+- DEC-745
 est_loc: 0
 acceptance_tests:
   judged_by: 'its class (WBS §0 rule 1, W2-07): its named evidence files'
@@ -83,7 +84,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-27), as approved (DEC-729). The list row
   - One LITE ticket goes through the full cycle: test designer, red, implement, green, then `gov close` at exit 0 with EXAMIN's own test command.
   - Its governance share is measured and ≤ 15 %.
   - At the first full `gov rebuild` after adoption, each index's time, peak RSS and node and edge counts on EXAMIN are measured with W2-26's method and RSS sampler (`docs/research/EXP-003/examin/`), against DEC-078's envelope. A figure over the envelope stops the ticket, and W2-45 joins its dependencies [DEC-735].
-  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones, using the owner's answer on whether its governance suite passes in the owner's environment. Then the reds go into W2-19's ratchet baseline (exact id, owner, cause class, how it shrinks), which the owner accepts [DEC-736].
+  - Before any known-red list, a diagnosis hour sorts EXAMIN's red tests into environment reds and real ones; the owner does not know whether its governance suite passes on Windows, so the hour finds out (DEC-745). Then the reds go into W2-19's ratchet baseline (exact id, owner, cause class, how it shrinks), which the owner accepts [DEC-736].
   - One pinned install package goes to the owner. It holds EXAMIN's 10 product-suite packages from EXAMIN's own lock file, installed into the clone's own virtual environment only. With the owner's approval, the product suite is measured before W2-30's verdict. Until then it is "needs environment", reported UNMEASURED by name and never as passed [DEC-736].
   - EXAMIN's governance kit stays in a legacy namespace, and its tests stay in the declared test command. The A5 review maps each of its checks to a Gov OS check family or to "no equivalent". Retirement is the owner's decision later, judged on function, never to clear reds [DEC-736].
   - The path map marks the tool-configuration folders (`.claude/commands/` and the kit's `.claude/` templates) as not records. The files in `spec/5-REPORTS/attempts/` get a mechanical quoting fix of their front matter with no change of content, as an adoption commit. If the store cannot leave paths unread, all 18 files get the fix [DEC-736].

@@ -1,0 +1,29 @@
+.........................F...............                                [100%]
+=================================== FAILURES ===================================
+______ test_the_vectors_are_in_the_shared_store_beside_the_lexical_index _______
+
+api = <w1_19_support.Api object at 0x713f24ecdf70>
+indexed = (PosixPath('/tmp/pytest-of-usain/pytest-3303/w1-19-indexed0/repo'), <w1_19_support.OllamaStandIn object at 0x713f24f6f7d0>, {'available': True, 'facet': 'semantic', 'reason': None, 'state': 'AVAILABLE'})
+base = PosixPath('/tmp/pytest-of-usain/pytest-3303/w1-19-base0/repo')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3303/test_the_vectors_are_in_the_sh0')
+
+    @INDEX
+    def test_the_vectors_are_in_the_shared_store_beside_the_lexical_index(api, indexed, base, tmp_path):
+        root, endpoint, report = indexed
+        # The premise, which this case did not hold before: without it the lexical index alone satisfies what follows.
+        assert report["available"] is True, f"the vectors were not built: {report!r}"
+        files = support.runtime_files(root)
+>       assert "store.db" in files and all(name.startswith("store.db") for name in files), \
+            f"the vectors are not in the one shared store (G-20): .gov-runtime/ holds {files}"
+E       AssertionError: the vectors are not in the one shared store (G-20): .gov-runtime/ holds ['query-vectors.db', 'store.db']
+E       assert ('store.db' in ['query-vectors.db', 'store.db'] and False)
+E        +  where False = all(<generator object test_the_vectors_are_in_the_shared_store_beside_the_lexical_index.<locals>.<genexpr> at 0x713f2455f5e0>)
+
+tests/acceptance/W1-19/test_w1_19_semantic_index.py:75: AssertionError
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+1 failed, 40 passed in 109.56s (0:01:49)

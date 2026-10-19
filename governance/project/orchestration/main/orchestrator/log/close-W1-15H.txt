@@ -1,0 +1,9 @@
+rebuild exit 0
+load before measurement: 24.61 12.73 8.58; processors 20
+241
+2609
+gov.secrets exit 1 in 179.204748201 s; output lines 3
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:59.20
+	Maximum resident set size (kbytes): 2657996
+close exit 3
+13.33 11.07 8.04

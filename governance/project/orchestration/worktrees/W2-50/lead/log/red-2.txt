@@ -1,0 +1,1433 @@
+.FFFFFFFFFFFFFFFFFFFFFFFFFF.FFFFF..................................F.... [ 46%]
+...........................................FFFFFFFFFF..FFF.F.....FFFFF.. [ 93%]
+FFF..F....                                                               [100%]
+=================================== FAILURES ===================================
+__ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-engineer] __
+
+guard = <function guard.<locals>._guard at 0x74eb5c903420>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50/pycache'))
+role = 'engineer', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50/home...ery_role_may_write_a_fi0/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by engineer on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by engineer on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi0/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-independent-test-designer] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c794540>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50/pycache'))
+role = 'independent-test-designer', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50/home...e_a_fi1/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'independent-test-designer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by independent-test-designer on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by independent-test-designer on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi1/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'independent-test-designer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-independent-auditor] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795440>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50/pycache'))
+role = 'independent-auditor', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50/home...y_write_a_fi2/w2-50/home/gov-os-runs/W2-94/notes/existing.txt\' denied for role \'independent-auditor\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50/home/gov-os-runs/W2-94/notes/existing.txt by independent-auditor on DAEO-zz94 (W2-94)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50/home/gov-os-runs/W2-94/notes/existing.txt by independent-auditor on DAEO-zz94 (W2-94) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi2/w2-50/home/gov-os-runs/W2-94/notes/existing.txt' denied for role 'independent-auditor'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-orchestrator] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c794900>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50/pycache'))
+role = 'orchestrator', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50/home...role_may_write_a_fi3/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'orchestrator\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by orchestrator on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by orchestrator on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi3/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'orchestrator'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-product-spec] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c7944a0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50/pycache'))
+role = 'product-spec', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50/home...role_may_write_a_fi4/w2-50/home/gov-os-runs/W2-92/notes/existing.txt\' denied for role \'product-spec\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50/home/gov-os-runs/W2-92/notes/existing.txt by product-spec on DAEO-zz92 (W2-92)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50/home/gov-os-runs/W2-92/notes/existing.txt by product-spec on DAEO-zz92 (W2-92) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi4/w2-50/home/gov-os-runs/W2-92/notes/existing.txt' denied for role 'product-spec'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+__ test_every_role_may_write_a_file_in_its_own_tickets_folder[Write-research] __
+
+guard = <function guard.<locals>._guard at 0x74eb5c7942c0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50/pycache'))
+role = 'research', tool_name = 'Write'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50/home...ery_role_may_write_a_fi5/w2-50/home/gov-os-runs/W2-97/notes/existing.txt\' denied for role \'research\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50/home/gov-os-runs/W2-97/notes/existing.txt by research on DAEO-zz97 (W2-97)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50/home/gov-os-runs/W2-97/notes/existing.txt by research on DAEO-zz97 (W2-97) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi5/w2-50/home/gov-os-runs/W2-97/notes/existing.txt' denied for role 'research'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+__ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-engineer] ___
+
+guard = <function guard.<locals>._guard at 0x74eb5c794860>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50/pycache'))
+role = 'engineer', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50/home/...ery_role_may_write_a_fi6/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by engineer on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by engineer on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi6/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-independent-test-designer] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795620>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50/pycache'))
+role = 'independent-test-designer', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50/home/...e_a_fi7/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'independent-test-designer\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by independent-test-designer on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by independent-test-designer on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi7/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'independent-test-designer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-independent-auditor] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795a80>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50/pycache'))
+role = 'independent-auditor', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50/home/...y_write_a_fi8/w2-50/home/gov-os-runs/W2-94/notes/existing.txt\' denied for role \'independent-auditor\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50/home/gov-os-runs/W2-94/notes/existing.txt by independent-auditor on DAEO-zz94 (W2-94)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50/home/gov-os-runs/W2-94/notes/existing.txt by independent-auditor on DAEO-zz94 (W2-94) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi8/w2-50/home/gov-os-runs/W2-94/notes/existing.txt' denied for role 'independent-auditor'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-orchestrator] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795800>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50/pycache'))
+role = 'orchestrator', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50/home/...role_may_write_a_fi9/w2-50/home/gov-os-runs/W2-90/notes/existing.txt\' denied for role \'orchestrator\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by orchestrator on DAEO-zz90 (W2-90)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50/home/gov-os-runs/W2-90/notes/existing.txt by orchestrator on DAEO-zz90 (W2-90) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi9/w2-50/home/gov-os-runs/W2-90/notes/existing.txt' denied for role 'orchestrator'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-product-spec] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795b20>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50/pycache'))
+role = 'product-spec', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50/home...ole_may_write_a_fi10/w2-50/home/gov-os-runs/W2-92/notes/existing.txt\' denied for role \'product-spec\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50/home/gov-os-runs/W2-92/notes/existing.txt by product-spec on DAEO-zz92 (W2-92)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50/home/gov-os-runs/W2-92/notes/existing.txt by product-spec on DAEO-zz92 (W2-92) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi10/w2-50/home/gov-os-runs/W2-92/notes/existing.txt' denied for role 'product-spec'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+__ test_every_role_may_write_a_file_in_its_own_tickets_folder[Edit-research] ___
+
+guard = <function guard.<locals>._guard at 0x74eb5c795760>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50/pycache'))
+role = 'research', tool_name = 'Edit'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    @pytest.mark.parametrize("tool_name", ("Write", "Edit"))
+    def test_every_role_may_write_a_file_in_its_own_tickets_folder(guard, sandbox, role, tool_name):
+        """"A session of any role": each role, on the ticket its session runs under, with the file tools."""
+        ticket = support.TICKET_OF[role]
+        own = sandbox.own(ticket)
+        target = own / "notes" / "existing.txt"
+        support.write(target, "a\n")
+>       support.assert_allowed(guard(tool_name, target, role, ticket.tk),
+                               f"{tool_name} on {target} by {role} on {ticket.tk} ({ticket.folder})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50/home...ry_role_may_write_a_fi11/w2-50/home/gov-os-runs/W2-97/notes/existing.txt\' denied for role \'research\'"}}', stderr='')
+what = 'Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50/home/gov-os-runs/W2-97/notes/existing.txt by research on DAEO-zz97 (W2-97)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Edit on /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50/home/gov-os-runs/W2-97/notes/existing.txt by research on DAEO-zz97 (W2-97) was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_a_fi11/w2-50/home/gov-os-runs/W2-97/notes/existing.txt' denied for role 'research'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+__ test_every_role_may_write_through_bash_in_its_own_tickets_folder[engineer] __
+
+guard = <function guard.<locals>._guard at 0x74eb5c795080>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50/pycache'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50...23/test_every_role_may_write_thro0/w2-50/home/gov-os-runs/W2-90/bash.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50/home/gov-os-runs/W2-90/bash.txt` by engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50/home/gov-os-runs/W2-90/bash.txt` by engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro0/w2-50/home/gov-os-runs/W2-90/bash.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_through_bash_in_its_own_tickets_folder[independent-test-designer] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c796340>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50/pycache'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50...e_may_write_thro1/w2-50/home/gov-os-runs/W2-90/bash.txt\' denied for role \'independent-test-designer\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50/home/gov-os-runs/W2-90/bash.txt` by independent-test-designer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50/home/gov-os-runs/W2-90/bash.txt` by independent-test-designer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro1/w2-50/home/gov-os-runs/W2-90/bash.txt' denied for role 'independent-test-designer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_through_bash_in_its_own_tickets_folder[independent-auditor] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c794720>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50/pycache'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50...ry_role_may_write_thro2/w2-50/home/gov-os-runs/W2-94/bash.txt\' denied for role \'independent-auditor\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50/home/gov-os-runs/W2-94/bash.txt` by independent-auditor on DAEO-zz94'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50/home/gov-os-runs/W2-94/bash.txt` by independent-auditor on DAEO-zz94 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro2/w2-50/home/gov-os-runs/W2-94/bash.txt' denied for role 'independent-auditor'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_through_bash_in_its_own_tickets_folder[orchestrator] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c795440>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50/pycache'))
+role = 'orchestrator'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50...est_every_role_may_write_thro3/w2-50/home/gov-os-runs/W2-90/bash.txt\' denied for role \'orchestrator\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50/home/gov-os-runs/W2-90/bash.txt` by orchestrator on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50/home/gov-os-runs/W2-90/bash.txt` by orchestrator on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro3/w2-50/home/gov-os-runs/W2-90/bash.txt' denied for role 'orchestrator'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_every_role_may_write_through_bash_in_its_own_tickets_folder[product-spec] _
+
+guard = <function guard.<locals>._guard at 0x74eb5c7953a0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50/pycache'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50...est_every_role_may_write_thro4/w2-50/home/gov-os-runs/W2-92/bash.txt\' denied for role \'product-spec\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50/home/gov-os-runs/W2-92/bash.txt` by product-spec on DAEO-zz92'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50/home/gov-os-runs/W2-92/bash.txt` by product-spec on DAEO-zz92 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro4/w2-50/home/gov-os-runs/W2-92/bash.txt' denied for role 'product-spec'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+__ test_every_role_may_write_through_bash_in_its_own_tickets_folder[research] __
+
+guard = <function guard.<locals>._guard at 0x74eb5c7968e0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50/pycache'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", support.ROLES)
+    def test_every_role_may_write_through_bash_in_its_own_tickets_folder(guard, sandbox, role):
+        ticket = support.TICKET_OF[role]
+        target = sandbox.own(ticket) / "bash.txt"
+        command = f"echo written > {q(target)}"
+>       support.assert_allowed(guard("Bash", command, role, ticket.tk), f"Bash `{command}` by {role} on {ticket.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50...23/test_every_role_may_write_thro5/w2-50/home/gov-os-runs/W2-97/bash.txt\' denied for role \'research\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50/home/gov-os-runs/W2-97/bash.txt` by research on DAEO-zz97'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50/home/gov-os-runs/W2-97/bash.txt` by research on DAEO-zz97 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_every_role_may_write_thro5/w2-50/home/gov-os-runs/W2-97/bash.txt' denied for role 'research'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_______ test_judged_bash_forms_into_the_own_folder_are_allowed[redirect] _______
+
+guard = <function guard.<locals>._guard at 0x74eb5c794180>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50/home/gov-os-worktrees/W2-90')
+form = 'redirect'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50...923/test_judged_bash_forms_into_th0/w2-50/home/gov-os-runs/W2-90/out.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50/home/gov-os-runs/W2-90/out.txt` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written > /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50/home/gov-os-runs/W2-90/out.txt` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th0/w2-50/home/gov-os-runs/W2-90/out.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+________ test_judged_bash_forms_into_the_own_folder_are_allowed[append] ________
+
+guard = <function guard.<locals>._guard at 0x74eb5c794e00>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50/home/gov-os-worktrees/W2-90')
+form = 'append'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50...923/test_judged_bash_forms_into_th1/w2-50/home/gov-os-runs/W2-90/log.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `echo more >> /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50/home/gov-os-runs/W2-90/log.txt` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo more >> /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50/home/gov-os-runs/W2-90/log.txt` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th1/w2-50/home/gov-os-runs/W2-90/log.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_________ test_judged_bash_forms_into_the_own_folder_are_allowed[tee] __________
+
+guard = <function guard.<locals>._guard at 0x74eb5c794f40>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50/home/gov-os-worktrees/W2-90')
+form = 'tee'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50...923/test_judged_bash_forms_into_th2/w2-50/home/gov-os-runs/W2-90/tee.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `echo written | tee /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50/home/gov-os-runs/W2-90/tee.txt` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `echo written | tee /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50/home/gov-os-runs/W2-90/tee.txt` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th2/w2-50/home/gov-os-runs/W2-90/tee.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+________ test_judged_bash_forms_into_the_own_folder_are_allowed[touch] _________
+
+guard = <function guard.<locals>._guard at 0x74eb5c797240>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50/home/gov-os-worktrees/W2-90')
+form = 'touch'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50...test_judged_bash_forms_into_th3/w2-50/home/gov-os-runs/W2-90/touched.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `touch /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50/home/gov-os-runs/W2-90/touched.txt` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `touch /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50/home/gov-os-runs/W2-90/touched.txt` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th3/w2-50/home/gov-os-runs/W2-90/touched.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_______ test_judged_bash_forms_into_the_own_folder_are_allowed[mkdir-p] ________
+
+guard = <function guard.<locals>._guard at 0x74eb5c795a80>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50/home/gov-os-worktrees/W2-90')
+form = 'mkdir-p'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50...t-923/test_judged_bash_forms_into_th4/w2-50/home/gov-os-runs/W2-90/a/b/c\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `mkdir -p /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50/home/gov-os-runs/W2-90/a/b/c` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `mkdir -p /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50/home/gov-os-runs/W2-90/a/b/c` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th4/w2-50/home/gov-os-runs/W2-90/a/b/c' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_______ test_judged_bash_forms_into_the_own_folder_are_allowed[cp-into] ________
+
+guard = <function guard.<locals>._guard at 0x74eb5c796ca0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-worktrees/W2-90')
+form = 'cp-into'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50...923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-runs/W2-90/copy.py\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `cp /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-worktrees/W2-90/src/app/ma...of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-runs/W2-90/copy.py` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `cp /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-worktrees/W2-90/src/app/main.py /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-runs/W2-90/copy.py` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th5/w2-50/home/gov-os-runs/W2-90/copy.py' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+______ test_judged_bash_forms_into_the_own_folder_are_allowed[mv-within] _______
+
+guard = <function guard.<locals>._guard at 0x74eb5c796020>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-worktrees/W2-90')
+form = 'mv-within'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50...3/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/first.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `mv /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/first.txt /tmp/...usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/second.txt` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `mv /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/first.txt /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/second.txt` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th6/w2-50/home/gov-os-runs/W2-90/first.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+______ test_judged_bash_forms_into_the_own_folder_are_allowed[rm-within] _______
+
+guard = <function guard.<locals>._guard at 0x74eb5c7968e0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50/home/gov-os-worktrees/W2-90')
+form = 'rm-within'
+
+    @pytest.mark.parametrize("form", BASH_FORMS)
+    def test_judged_bash_forms_into_the_own_folder_are_allowed(guard, sandbox, project, form):
+        _prepare_own(sandbox)
+        command = _bash_forms(sandbox, project)[form]
+>       support.assert_allowed(guard("Bash", command), f"Bash `{command}` by the engineer on {MAIN.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50...est-923/test_judged_bash_forms_into_th7/w2-50/home/gov-os-runs/W2-90/old\' denied for role \'engineer\'"}}', stderr='')
+what = 'Bash `rm -rf /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50/home/gov-os-runs/W2-90/old` by the engineer on DAEO-zz90'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `rm -rf /tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50/home/gov-os-runs/W2-90/old` by the engineer on DAEO-zz90 was not allowed: decision=deny exit=0 reason="Bash write to '/tmp/pytest-of-usain/pytest-923/test_judged_bash_forms_into_th7/w2-50/home/gov-os-runs/W2-90/old' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+________ test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed _________
+
+guard = <function guard.<locals>._guard at 0x74eb5c796480>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50/pycache'))
+
+    def test_a_write_deep_inside_a_clone_in_the_own_folder_is_allowed(guard, sandbox):
+        own = sandbox.own(MAIN)
+        target = own / "clone" / "src" / "pkg" / "module.py"
+        support.write(target, "VALUE = 1\n")
+        for tool_name in ("Write", "Edit"):
+>           support.assert_allowed(guard(tool_name, target), f"{tool_name} on {target}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50/home..._deep_inside_a_clo0/w2-50/home/gov-os-runs/W2-90/clone/src/pkg/module.py\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50/home/gov-os-runs/W2-90/clone/src/pkg/module.py'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50/home/gov-os-runs/W2-90/clone/src/pkg/module.py was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_write_deep_inside_a_clo0/w2-50/home/gov-os-runs/W2-90/clone/src/pkg/module.py' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+____ test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id _____
+
+guard = <function guard.<locals>._guard at 0x74eb5c7974c0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50/pycache'))
+
+    def test_a_ticket_without_a_w2_id_writes_in_the_folder_named_by_its_tk_id(guard, sandbox):
+        target = sandbox.root / support.NO_W2_ID.tk / "notes.txt"
+>       support.assert_allowed(guard("Write", target, support.ENGINEER, support.NO_W2_ID.tk),
+                               f"Write on {target} by the engineer on {support.NO_W2_ID.tk}, which has no external-ref")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50/home...st_a_ticket_without_a_w2_id_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz98, which has no external-ref'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz98, which has no external-ref was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+________ test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written _________
+
+guard = <function guard.<locals>._guard at 0x74eb5c795b20>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50/pycache'))
+
+    def test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written(guard, sandbox):
+        """``external-ref: W2-99a`` -> ``~/gov-os-runs/W2-99a/`` (as for worktrees, e.g. W2-15a)."""
+        target = sandbox.root / support.SUFFIXED.wbs / "notes.txt"
+>       support.assert_allowed(guard("Write", target, support.ENGINEER, support.SUFFIXED.tk),
+                               f"Write on {target} by the engineer on {support.SUFFIXED.tk} ({support.SUFFIXED.wbs})")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50/home.../test_a_w2_id_with_a_letter_suf0/w2-50/home/gov-os-runs/W2-99a/notes.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50/home/gov-os-runs/W2-99a/notes.txt by the engineer on DAEO-zz99 (W2-99a)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50/home/gov-os-runs/W2-99a/notes.txt by the engineer on DAEO-zz99 (W2-99a) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf0/w2-50/home/gov-os-runs/W2-99a/notes.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_____________ test_the_folder_follows_gov_ticket_not_the_worktree ______________
+
+guard = <function guard.<locals>._guard at 0x74eb5c797060>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50/pycache'))
+
+    def test_the_folder_follows_gov_ticket_not_the_worktree(guard, sandbox):
+        """Resolved from the session's GOV_TICKET: in the W2-90 worktree, a session on W2-91 has W2-91's folder."""
+        target = sandbox.own(support.OTHER) / "notes.txt"
+>       support.assert_allowed(guard("Write", target, support.ENGINEER, support.OTHER.tk),
+                               f"Write on {target} by the engineer on {support.OTHER.tk}")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:123: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50/home...3/test_the_folder_follows_gov_ti0/w2-50/home/gov-os-runs/W2-91/notes.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50/home/gov-os-runs/W2-91/notes.txt by the engineer on DAEO-zz91'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50/home/gov-os-runs/W2-91/notes.txt by the engineer on DAEO-zz91 was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_folder_follows_gov_ti0/w2-50/home/gov-os-runs/W2-91/notes.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+_ test_the_first_write_is_allowed_when_neither_the_root_nor_the_folder_exists __
+
+guard = <function guard.<locals>._guard at 0x74eb5c796f20>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50/pycache'))
+
+    def test_the_first_write_is_allowed_when_neither_the_root_nor_the_folder_exists(guard, sandbox):
+        """"The folder is created on first use": the guard does not ask for the folder to exist first."""
+        assert not sandbox.root.exists(), "the fixture's HOME already holds the root"
+        target = sandbox.own(MAIN) / "first.txt"
+>       support.assert_allowed(guard("Write", target), f"Write on {target}, the first use")
+
+tests/acceptance/W2-50/test_w2_50_guard_own_folder.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50/home...3/test_the_first_write_is_allowe0/w2-50/home/gov-os-runs/W2-90/first.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50/home/gov-os-runs/W2-90/first.txt, the first use'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50/home/gov-os-runs/W2-90/first.txt, the first use was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_first_write_is_allowe0/w2-50/home/gov-os-runs/W2-90/first.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+______________ test_removing_or_moving_the_root_is_refused[rmdir] ______________
+
+guard = <function guard.<locals>._guard at 0x74eb5c8160c0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_removing_or_moving_the_ro5/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_removing_or_moving_the_ro5/w2-50/pycache'))
+name = 'rmdir'
+
+    @pytest.mark.parametrize("name", sorted(ROOT_REMOVALS))
+    def test_removing_or_moving_the_root_is_refused(guard, sandbox, name):
+        _populate(sandbox)
+        command = ROOT_REMOVALS[name].format(root=q(sandbox.root), elsewhere=q(sandbox.elsewhere))
+>       _refused(guard("Bash", command), f"Bash `{command}`", sandbox, sandbox.root)
+
+tests/acceptance/W2-50/test_w2_50_guard_refusals.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_guard_refusals.py:43: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_removing_or_moving_the_ro5/w2-50/home/gov-os-runs`'
+names = ('/tmp/pytest-of-usain/pytest-923/test_removing_or_moving_the_ro5/w2-50/home/gov-os-runs', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_removing_or_moving_the_ro5/w2-50/home/gov-os-runs` was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_________ test_the_sandbox_may_write_the_sessions_own_folder[engineer] _________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/elsewhere/claude-plan.json'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_may_write_the_sessions_own_folder(project, sandbox, cli, role):
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = sandbox.own(ticket)
+        entries = _real_entries(result, sandbox)
+>       assert any(support.covers(real, own / "clone" / "file.txt") for _, real in entries), (
+            f"the sandbox of a {role} session on {ticket.tk} may not write its own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a engineer session on DAEO-zz90 may not write its own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/home/gov-os-runs/W2-90: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the0/w2-50/systmp/gov-launch-engineer-8rhnycx1']
+E       assert False
+E        +  where False = any(<generator object test_the_sandbox_may_write_the_sessions_own_folder.<locals>.<genexpr> at 0x74eb5c860040>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:56: AssertionError
+_ test_the_sandbox_may_write_the_sessions_own_folder[independent-test-designer] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/elsewhere/claude-plan.json'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_may_write_the_sessions_own_folder(project, sandbox, cli, role):
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = sandbox.own(ticket)
+        entries = _real_entries(result, sandbox)
+>       assert any(support.covers(real, own / "clone" / "file.txt") for _, real in entries), (
+            f"the sandbox of a {role} session on {ticket.tk} may not write its own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a independent-test-designer session on DAEO-zz90 may not write its own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/home/gov-os-runs/W2-90: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the1/w2-50/systmp/gov-launch-independent-test-designer-rtrf5y8k']
+E       assert False
+E        +  where False = any(<generator object test_the_sandbox_may_write_the_sessions_own_folder.<locals>.<genexpr> at 0x74eb5c860130>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:56: AssertionError
+___ test_the_sandbox_may_write_the_sessions_own_folder[independent-auditor] ____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/elsewhere/claude-plan.json'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_may_write_the_sessions_own_folder(project, sandbox, cli, role):
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = sandbox.own(ticket)
+        entries = _real_entries(result, sandbox)
+>       assert any(support.covers(real, own / "clone" / "file.txt") for _, real in entries), (
+            f"the sandbox of a {role} session on {ticket.tk} may not write its own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a independent-auditor session on DAEO-zz94 may not write its own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/home/gov-os-runs/W2-94: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the2/w2-50/systmp/gov-launch-independent-auditor-zpl_q87t']
+E       assert False
+E        +  where False = any(<generator object test_the_sandbox_may_write_the_sessions_own_folder.<locals>.<genexpr> at 0x74eb5c8635b0>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:56: AssertionError
+_______ test_the_sandbox_may_write_the_sessions_own_folder[product-spec] _______
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/elsewhere/claude-plan.json'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_may_write_the_sessions_own_folder(project, sandbox, cli, role):
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = sandbox.own(ticket)
+        entries = _real_entries(result, sandbox)
+>       assert any(support.covers(real, own / "clone" / "file.txt") for _, real in entries), (
+            f"the sandbox of a {role} session on {ticket.tk} may not write its own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a product-spec session on DAEO-zz92 may not write its own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/home/gov-os-runs/W2-92: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the3/w2-50/systmp/gov-launch-product-spec-za66rc5x']
+E       assert False
+E        +  where False = any(<generator object test_the_sandbox_may_write_the_sessions_own_folder.<locals>.<genexpr> at 0x74eb5c8636a0>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:56: AssertionError
+_________ test_the_sandbox_may_write_the_sessions_own_folder[research] _________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/elsewhere/claude-plan.json'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_may_write_the_sessions_own_folder(project, sandbox, cli, role):
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = sandbox.own(ticket)
+        entries = _real_entries(result, sandbox)
+>       assert any(support.covers(real, own / "clone" / "file.txt") for _, real in entries), (
+            f"the sandbox of a {role} session on {ticket.tk} may not write its own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a research session on DAEO-zz97 may not write its own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/home/gov-os-runs/W2-97: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_may_write_the4/w2-50/systmp/gov-launch-research-l_ds60we']
+E       assert False
+E        +  where False = any(<generator object test_the_sandbox_may_write_the_sessions_own_folder.<locals>.<genexpr> at 0x74eb5c863c40>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:56: AssertionError
+____ test_the_sandbox_adds_exactly_the_own_folder_under_the_root[engineer] _____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/elsewhere/claude-plan.json'))
+role = 'engineer'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_adds_exactly_the_own_folder_under_the_root(project, sandbox, cli, role):
+        """Exactly that folder: one entry under the root, the own folder itself; never the root, never a wider one."""
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = os.path.realpath(sandbox.own(ticket))
+        root = os.path.realpath(sandbox.root)
+        entries = _real_entries(result, sandbox)
+        wide = [entry for entry, real in entries if support.covers(real, root)]
+        assert wide == [], f"the sandbox may write the root itself or a folder above it: {wide}"
+        under = [real for _, real in entries if real is not None and real.startswith(root + "/")]
+>       assert under == [own], (
+            f"the sandbox's entries under the root are {under}, not exactly the own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox's entries under the root are [], not exactly the own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/home/gov-os-runs/W2-90: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/systmp/gov-launch-engineer-cjg9_ije']
+E       assert [] == ['/tmp/pytest...s-runs/W2-90']
+E         
+E         Right contains one more item: '/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_0/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:72: AssertionError
+_ test_the_sandbox_adds_exactly_the_own_folder_under_the_root[independent-test-designer] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/elsewhere/claude-plan.json'))
+role = 'independent-test-designer'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_adds_exactly_the_own_folder_under_the_root(project, sandbox, cli, role):
+        """Exactly that folder: one entry under the root, the own folder itself; never the root, never a wider one."""
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = os.path.realpath(sandbox.own(ticket))
+        root = os.path.realpath(sandbox.root)
+        entries = _real_entries(result, sandbox)
+        wide = [entry for entry, real in entries if support.covers(real, root)]
+        assert wide == [], f"the sandbox may write the root itself or a folder above it: {wide}"
+        under = [real for _, real in entries if real is not None and real.startswith(root + "/")]
+>       assert under == [own], (
+            f"the sandbox's entries under the root are {under}, not exactly the own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox's entries under the root are [], not exactly the own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/home/gov-os-runs/W2-90: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/systmp/gov-launch-independent-test-designer-clwd8svy']
+E       assert [] == ['/tmp/pytest...s-runs/W2-90']
+E         
+E         Right contains one more item: '/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_1/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:72: AssertionError
+_ test_the_sandbox_adds_exactly_the_own_folder_under_the_root[independent-auditor] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/elsewhere/claude-plan.json'))
+role = 'independent-auditor'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_adds_exactly_the_own_folder_under_the_root(project, sandbox, cli, role):
+        """Exactly that folder: one entry under the root, the own folder itself; never the root, never a wider one."""
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = os.path.realpath(sandbox.own(ticket))
+        root = os.path.realpath(sandbox.root)
+        entries = _real_entries(result, sandbox)
+        wide = [entry for entry, real in entries if support.covers(real, root)]
+        assert wide == [], f"the sandbox may write the root itself or a folder above it: {wide}"
+        under = [real for _, real in entries if real is not None and real.startswith(root + "/")]
+>       assert under == [own], (
+            f"the sandbox's entries under the root are {under}, not exactly the own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox's entries under the root are [], not exactly the own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/home/gov-os-runs/W2-94: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/systmp/gov-launch-independent-auditor-i_1zquar']
+E       assert [] == ['/tmp/pytest...s-runs/W2-94']
+E         
+E         Right contains one more item: '/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_2/w2-50/home/gov-os-runs/W2-94'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:72: AssertionError
+__ test_the_sandbox_adds_exactly_the_own_folder_under_the_root[product-spec] ___
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/elsewhere/claude-plan.json'))
+role = 'product-spec'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_adds_exactly_the_own_folder_under_the_root(project, sandbox, cli, role):
+        """Exactly that folder: one entry under the root, the own folder itself; never the root, never a wider one."""
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = os.path.realpath(sandbox.own(ticket))
+        root = os.path.realpath(sandbox.root)
+        entries = _real_entries(result, sandbox)
+        wide = [entry for entry, real in entries if support.covers(real, root)]
+        assert wide == [], f"the sandbox may write the root itself or a folder above it: {wide}"
+        under = [real for _, real in entries if real is not None and real.startswith(root + "/")]
+>       assert under == [own], (
+            f"the sandbox's entries under the root are {under}, not exactly the own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox's entries under the root are [], not exactly the own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/home/gov-os-runs/W2-92: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/systmp/gov-launch-product-spec-c8nxtsv3']
+E       assert [] == ['/tmp/pytest...s-runs/W2-92']
+E         
+E         Right contains one more item: '/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_3/w2-50/home/gov-os-runs/W2-92'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:72: AssertionError
+____ test_the_sandbox_adds_exactly_the_own_folder_under_the_root[research] _____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/elsewhere/claude-plan.json'))
+role = 'research'
+
+    @pytest.mark.parametrize("role", support.LAUNCHED_ROLES)
+    def test_the_sandbox_adds_exactly_the_own_folder_under_the_root(project, sandbox, cli, role):
+        """Exactly that folder: one entry under the root, the own folder itself; never the root, never a wider one."""
+        ticket = support.TICKET_OF[role]
+        result = _launched(sandbox, cli, role, ticket)
+        own = os.path.realpath(sandbox.own(ticket))
+        root = os.path.realpath(sandbox.root)
+        entries = _real_entries(result, sandbox)
+        wide = [entry for entry, real in entries if support.covers(real, root)]
+        assert wide == [], f"the sandbox may write the root itself or a folder above it: {wide}"
+        under = [real for _, real in entries if real is not None and real.startswith(root + "/")]
+>       assert under == [own], (
+            f"the sandbox's entries under the root are {under}, not exactly the own folder {own}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox's entries under the root are [], not exactly the own folder /tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/home/gov-os-runs/W2-97: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/systmp/gov-launch-research-22_06qj1']
+E       assert [] == ['/tmp/pytest...s-runs/W2-97']
+E         
+E         Right contains one more item: '/tmp/pytest-of-usain/pytest-923/test_the_sandbox_adds_exactly_4/w2-50/home/gov-os-runs/W2-97'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:72: AssertionError
+_______ test_a_ticket_without_a_w2_id_gets_the_folder_named_by_its_tk_id _______
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/elsewhere/claude-plan.json'))
+
+    def test_a_ticket_without_a_w2_id_gets_the_folder_named_by_its_tk_id(project, sandbox, cli):
+        result = _launched(sandbox, cli, support.ENGINEER, support.NO_W2_ID)
+        own = sandbox.root / support.NO_W2_ID.tk
+>       assert any(support.covers(real, own / "f.txt") for _, real in _real_entries(result, sandbox)), (
+            f"the sandbox of a session on {support.NO_W2_ID.tk} (no external-ref) may not write {own}: "
+            f"{result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz98 (no external-ref) may not write /tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/home/gov-os-runs/DAEO-zz98: ['//tmp/pytest-of-usain/pytest-923/test_a_ticket_without_a_w2_id_1/w2-50/systmp/gov-launch-engineer-8qihbqht']
+E       assert False
+E        +  where False = any(<generator object test_a_ticket_without_a_w2_id_gets_the_folder_named_by_its_tk_id.<locals>.<genexpr> at 0x74eb5c861b70>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:105: AssertionError
+________ test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written _________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/elsewhere/claude-plan.json'))
+
+    def test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written(project, sandbox, cli):
+        result = _launched(sandbox, cli, support.ENGINEER, support.SUFFIXED)
+        own = sandbox.root / support.SUFFIXED.wbs
+>       assert any(support.covers(real, own / "f.txt") for _, real in _real_entries(result, sandbox)), (
+            f"the sandbox of a session on {support.SUFFIXED.tk} may not write {own}: {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz99 may not write /tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/home/gov-os-runs/W2-99a: ['//tmp/pytest-of-usain/pytest-923/test_a_w2_id_with_a_letter_suf1/w2-50/systmp/gov-launch-engineer-fgpoq9wz']
+E       assert False
+E        +  where False = any(<generator object test_a_w2_id_with_a_letter_suffix_names_the_folder_as_written.<locals>.<genexpr> at 0x74eb5c860130>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:113: AssertionError
+______________ test_the_own_folder_exists_when_the_session_starts ______________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50/elsewhere/claude-plan.json'))
+
+    def test_the_own_folder_exists_when_the_session_starts(project, sandbox, cli):
+        """First use: neither the root nor the folder exists before the launch; the session finds its folder made."""
+        assert not sandbox.root.exists(), "the fixture's HOME already holds the root"
+        support.set_plan(cli, check=(sandbox.own(MAIN), sandbox.own(OTHER)))
+        session = _launched(sandbox, cli, support.ENGINEER, MAIN).session()
+>       assert session["seen"][str(sandbox.own(MAIN))] is True, (
+            f"the session started without its own folder {sandbox.own(MAIN)}: the sandbox cannot bind a folder that "
+            "does not exist, so the first use would fail")
+E       AssertionError: the session started without its own folder /tmp/pytest-of-usain/pytest-923/test_the_own_folder_exists_whe0/w2-50/home/gov-os-runs/W2-90: the sandbox cannot bind a folder that does not exist, so the first use would fail
+E       assert False is True
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:126: AssertionError
+_ test_a_clone_made_in_the_own_folder_survives_the_sessions_end_and_the_next_session_finds_it _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/elsewhere/claude-plan.json'))
+
+    def test_a_clone_made_in_the_own_folder_survives_the_sessions_end_and_the_next_session_finds_it(project, sandbox,
+                                                                                                 cli):
+        source, head = _source_repository(sandbox)
+        clone = sandbox.own(MAIN) / "clone"
+        support.set_plan(cli, clone=((source, clone),),
+                         files={sandbox.own(MAIN) / "results.txt": "kept\n"})
+        first = _launched(sandbox, cli, support.ENGINEER, MAIN)
+        # The stand-in is not sandboxed: a real session could make the clone only if its sandbox may write there.
+>       assert any(support.covers(real, clone / ".git" / "HEAD") for _, real in _real_entries(first, sandbox)), (
+            f"a sandboxed session could not make the clone {clone}: allowWrite is {first.allow_write()}")
+E       AssertionError: a sandboxed session could not make the clone /tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/home/gov-os-runs/W2-90/clone: allowWrite is ['//tmp/pytest-of-usain/pytest-923/test_a_clone_made_in_the_own_f0/w2-50/systmp/gov-launch-engineer-6ggpplhm']
+E       assert False
+E        +  where False = any(<generator object test_a_clone_made_in_the_own_folder_survives_the_sessions_end_and_the_next_session_finds_it.<locals>.<genexpr> at 0x74eb5c7a8220>)
+
+tests/acceptance/W2-50/test_w2_50_launcher.py:165: AssertionError
+_ test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder[a-folder-link] _
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t0/w2-50/pycache'))
+link = 'a-folder-link'
+
+    @needs_gitleaks
+    @pytest.mark.parametrize("link", ("a-folder-link", "a-file-link"))
+    def test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder(indexed_project, sandbox, link):
+        """A link from ``.gov-runtime/scratch/`` into the own folder: the check never scans ``~/gov-os-runs``."""
+        clone = _plant_runs_clone(sandbox)
+        scratch = indexed_project / ".gov-runtime" / "scratch"
+        scratch.mkdir(parents=True, exist_ok=True)
+        if link == "a-folder-link":
+            (scratch / "runs").symlink_to(sandbox.own(MAIN), target_is_directory=True)
+        else:
+            (scratch / "store-link.txt").symlink_to(clone / ".gov-runtime" / "store.txt")
+        run = support.run_check(sandbox, indexed_project)
+>       assert run.returncode == 0, (
+            f"the repository's check scanned ~/gov-os-runs through {link} in .gov-runtime/scratch/\n{run.describe()}")
+E       AssertionError: the repository's check scanned ~/gov-os-runs through a-folder-link in .gov-runtime/scratch/
+E         gov secrets-indexing
+E         exit code: 1
+E         stdout:
+E         secret found in derived store: .gov-runtime/scratch/runs/clone/.gov-runtime/store.txt
+E         secret found in derived store: .gov-runtime/scratch/runs/clone/docs/config.md
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('secrets-indexing',), returncode=1, stdout='secret found in derived store: .gov-runtime/scratch/runs/clone/.gov-runtime/store.txt\nsecret found in derived store: .gov-runtime/scratch/runs/clone/docs/config.md\n', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_never_indexed.py:158: AssertionError
+_ test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder[a-file-link] _
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t1/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t1/w2-50/pycache'))
+link = 'a-file-link'
+
+    @needs_gitleaks
+    @pytest.mark.parametrize("link", ("a-folder-link", "a-file-link"))
+    def test_the_check_does_not_scan_the_root_through_a_link_in_the_runtime_folder(indexed_project, sandbox, link):
+        """A link from ``.gov-runtime/scratch/`` into the own folder: the check never scans ``~/gov-os-runs``."""
+        clone = _plant_runs_clone(sandbox)
+        scratch = indexed_project / ".gov-runtime" / "scratch"
+        scratch.mkdir(parents=True, exist_ok=True)
+        if link == "a-folder-link":
+            (scratch / "runs").symlink_to(sandbox.own(MAIN), target_is_directory=True)
+        else:
+            (scratch / "store-link.txt").symlink_to(clone / ".gov-runtime" / "store.txt")
+        run = support.run_check(sandbox, indexed_project)
+>       assert run.returncode == 0, (
+            f"the repository's check scanned ~/gov-os-runs through {link} in .gov-runtime/scratch/\n{run.describe()}")
+E       AssertionError: the repository's check scanned ~/gov-os-runs through a-file-link in .gov-runtime/scratch/
+E         gov secrets-indexing
+E         exit code: 1
+E         stdout:
+E         secret found in derived store: .gov-runtime/scratch/store-link.txt
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('secrets-indexing',), returncode=1, stdout='secret found in derived store: .gov-runtime/scratch/store-link.txt\n', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_never_indexed.py:158: AssertionError
+___________ test_rmdir_of_the_root_is_refused_in_each_spelling[dot] ____________
+
+guard = <function guard.<locals>._guard at 0x74eb5c7c36a0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu0/w2-50/pycache'))
+spelling = 'dot'
+
+    @pytest.mark.parametrize("spelling", sorted(ROOT_RMDIRS))
+    def test_rmdir_of_the_root_is_refused_in_each_spelling(guard, sandbox, spelling):
+        """DEC-743 1: ``rmdir`` is judged for ``~/gov-os-runs`` itself, however the root is spelled."""
+        _populate(sandbox)
+        command = ROOT_RMDIRS[spelling].format(root=q(sandbox.root))
+>       _refused(guard("Bash", command), f"Bash `{command}`", sandbox, sandbox.root)
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:49: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu0/w2-50/home/gov-os-runs/.`'
+names = ('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu0/w2-50/home/gov-os-runs', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu0/w2-50/home/gov-os-runs/.` was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+__ test_rmdir_of_the_root_is_refused_in_each_spelling[through-the-own-folder] __
+
+guard = <function guard.<locals>._guard at 0x74eb5c7c28e0>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu1/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu1/w2-50/pycache'))
+spelling = 'through-the-own-folder'
+
+    @pytest.mark.parametrize("spelling", sorted(ROOT_RMDIRS))
+    def test_rmdir_of_the_root_is_refused_in_each_spelling(guard, sandbox, spelling):
+        """DEC-743 1: ``rmdir`` is judged for ``~/gov-os-runs`` itself, however the root is spelled."""
+        _populate(sandbox)
+        command = ROOT_RMDIRS[spelling].format(root=q(sandbox.root))
+>       _refused(guard("Bash", command), f"Bash `{command}`", sandbox, sandbox.root)
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:49: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu1/w2-50/home/gov-os-runs/W2-90/..`'
+names = ('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu1/w2-50/home/gov-os-runs', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu1/w2-50/home/gov-os-runs/W2-90/..` was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+______ test_rmdir_of_the_root_is_refused_in_each_spelling[trailing-slash] ______
+
+guard = <function guard.<locals>._guard at 0x74eb5c7c2c00>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu2/w2-50/pycache'))
+spelling = 'trailing-slash'
+
+    @pytest.mark.parametrize("spelling", sorted(ROOT_RMDIRS))
+    def test_rmdir_of_the_root_is_refused_in_each_spelling(guard, sandbox, spelling):
+        """DEC-743 1: ``rmdir`` is judged for ``~/gov-os-runs`` itself, however the root is spelled."""
+        _populate(sandbox)
+        command = ROOT_RMDIRS[spelling].format(root=q(sandbox.root))
+>       _refused(guard("Bash", command), f"Bash `{command}`", sandbox, sandbox.root)
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:49: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu2/w2-50/home/gov-os-runs/`'
+names = ('/tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu2/w2-50/home/gov-os-runs', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Bash `rmdir /tmp/pytest-of-usain/pytest-923/test_rmdir_of_the_root_is_refu2/w2-50/home/gov-os-runs/` was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+__ test_the_first_launch_makes_the_root_with_the_own_folder_and_nothing_else ___
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50/elsewhere/claude-plan.json'))
+
+    def test_the_first_launch_makes_the_root_with_the_own_folder_and_nothing_else(project, sandbox, cli):
+        """Neither the root nor any folder exists: the session finds the root holding its own folder only."""
+        assert not sandbox.root.exists(), "the fixture's HOME already holds the root"
+        support.set_plan(cli, listing=(sandbox.root,))
+        session = _launched(sandbox, cli, ENGINEER, MAIN).session()
+>       assert session["listed"][str(sandbox.root)] == [MAIN.folder], (
+            f"when the session started, the root {sandbox.root} held {session['listed'][str(sandbox.root)]}, "
+            f"not exactly the own folder [{MAIN.folder!r}] (None: the launcher made no root)")
+E       AssertionError: when the session started, the root /tmp/pytest-of-usain/pytest-923/test_the_first_launch_makes_th0/w2-50/home/gov-os-runs held None, not exactly the own folder ['W2-90'] (None: the launcher made no root)
+E       assert None == ['W2-90']
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:128: AssertionError
+_ test_a_launch_into_an_existing_root_makes_only_the_own_folder_and_leaves_the_rest_alone _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_launch_into_an_existing0/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_launch_into_an_existing0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_launch_into_an_existing0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_launch_into_an_existing0/w2-50/home/.local/bin/claude'), lo...'), plan=PosixPath('/tmp/pytest-of-usain/pytest-923/test_a_launch_into_an_existing0/w2-50/elsewhere/claude-plan.json'))
+
+    def test_a_launch_into_an_existing_root_makes_only_the_own_folder_and_leaves_the_rest_alone(project, sandbox, cli):
+        """The root exists with other folders but not the own one: the launch adds the own folder and touches nothing else."""
+        support.write(sandbox.own(OTHER) / "clone" / "README.md", "W2-91's clone\n")
+        support.write(sandbox.root / "W2-77" / "notes.txt", "a folder of no ticket\n")
+        before = support.snapshot(sandbox.root)
+        support.set_plan(cli, listing=(sandbox.root,))
+        session = _launched(sandbox, cli, ENGINEER, MAIN).session()
+        expected = sorted(["W2-77", MAIN.folder, OTHER.folder])
+>       assert session["listed"][str(sandbox.root)] == expected, (
+            f"when the session started, the root held {session['listed'][str(sandbox.root)]}, not {expected}")
+E       AssertionError: when the session started, the root held ['W2-77', 'W2-91'], not ['W2-77', 'W2-90', 'W2-91']
+E       assert ['W2-77', 'W2-91'] == ['W2-77', 'W2-90', 'W2-91']
+E         
+E         At index 1 diff: 'W2-91' != 'W2-90'
+E         Right contains one more item: 'W2-91'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:143: AssertionError
+___ test_the_check_does_not_scan_the_root_through_a_link_to_the_root_itself ____
+
+indexed_project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t2/w2-50/home/gov-os-worktrees/W2-90')
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t2/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_check_does_not_scan_t2/w2-50/pycache'))
+
+    @needs_gitleaks
+    def test_the_check_does_not_scan_the_root_through_a_link_to_the_root_itself(indexed_project, sandbox):
+        """A folder link from ``.gov-runtime/scratch/`` to ``~/gov-os-runs`` itself, not to a folder under it."""
+        _plant_secret(sandbox.own(MAIN) / "clone")
+        (_scratch(indexed_project) / "runs-root").symlink_to(sandbox.root, target_is_directory=True)
+        run = support.run_check(sandbox, indexed_project)
+>       assert run.returncode == 0, (
+            f"the repository's check scanned ~/gov-os-runs through a link to the root itself\n{run.describe()}")
+E       AssertionError: the repository's check scanned ~/gov-os-runs through a link to the root itself
+E         gov secrets-indexing
+E         exit code: 1
+E         stdout:
+E         secret found in derived store: .gov-runtime/scratch/runs-root/W2-90/clone/.gov-runtime/store.txt
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = Run(args=('secrets-indexing',), returncode=1, stdout='secret found in derived store: .gov-runtime/scratch/runs-root/W2-90/clone/.gov-runtime/store.txt\n', stderr='').returncode
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:181: AssertionError
+______________ test_the_same_ticket_in_progress_opens_its_folder _______________
+
+guard = <function guard.<locals>._guard at 0x74eb5c61e480>
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50'), home=PosixPath('/tmp/.../w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/pycache'))
+project = PosixPath('/tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/home/gov-os-worktrees/W2-90')
+
+    def test_the_same_ticket_in_progress_opens_its_folder(guard, sandbox, project):
+        """The control of the two refusals below: the ticket written the same way, ``in_progress``, opens its folder."""
+        _add_ticket(project, STATUS_TICKET, "in_progress")
+        target = sandbox.own(STATUS_TICKET) / "notes.txt"
+        support.write(target, "a\n")
+        for tool_name in ("Write", "Edit"):
+>           support.assert_allowed(guard(tool_name, target, ENGINEER, STATUS_TICKET.tk),
+                                   f"{tool_name} on {target} by the engineer on {STATUS_TICKET.tk} (in_progress)")
+
+tests/acceptance/W2-50/test_w2_50_owner_answers.py:235: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/home...3/test_the_same_ticket_in_progre0/w2-50/home/gov-os-runs/W2-95/notes.txt\' denied for role \'engineer\'"}}', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/home/gov-os-runs/W2-95/notes.txt by the engineer on DAEO-zz95 (in_progress)'
+
+    def assert_allowed(result, what):
+>       assert result.decision == "allow", f"{what} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/home/gov-os-runs/W2-95/notes.txt by the engineer on DAEO-zz95 (in_progress) was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-923/test_the_same_ticket_in_progre0/w2-50/home/gov-os-runs/W2-95/notes.txt' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:362: AssertionError
+55 failed, 99 passed in 111.62s (0:01:51)

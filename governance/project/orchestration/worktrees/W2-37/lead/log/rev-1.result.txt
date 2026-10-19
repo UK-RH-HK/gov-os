@@ -1,0 +1,112 @@
+task: Probe the W2-37 / DAEO-6n5k head (`gov impact`) for behaviour the acceptance tests miss, writing nothing.
+status: DONE. The probes without a code graph are finished; the code-graph probes are blocked by the known limit P-W2-38 and listed under unresolved.
+work_completed: Ran the sandbox check and the identity checks. Read the ticket, the impact code, the closure API and the acceptance support module. Ran the acceptance and unit suites. Ran 5 probe scripts against throwaway fixture repos in `$TMPDIR` (built with `git init`; store loaded with `gov.store.load`, no `gov rebuild`). They covered: uncommitted record edits, switching to an older branch after the store was loaded, nine CIT-E comparison cases, the `--out` file's content and target, record-id clashes, 14 question forms, 6 store faults, a read-only snapshot, and impact against `gov closure` at equal depth.
+files_changed: none
+evidence: Step 0 result: (a) FAILED as required: `OSError: [Errno 30] Read-only file system: '/home/usain/gov-os-worktrees/.sandbox-trial-DAEO-6n5k'`, and no file exists there. (b) WORKED: `git hash-object -w` printed `1ae28402a109c3397a44b19239a00adfa9472eb0` (rc 0) and `git update-index --refresh` returned rc 0. Identity: `printenv` gave `independent-auditor`, `DAEO-6n5k`; top level `/home/usain/gov-os-worktrees/W2-37`; branch `w2/W2-37`; HEAD `6b5640b0b0662a4d81ff0415f454acd9731db7a0`. Code under test (DEC-732): `PYTHONPATH=/home/usain/gov-os-worktrees/W2-37/src python3 -c "import gov; print(gov.__file__)"` printed `/home/usain/gov-os-worktrees/W2-37/src/gov/__init__.py`. `git status --short` at start and at end was the same, sandbox placeholders only: `?? .bash_profile .bashrc .gitconfig .gitmodules .idea .mcp.json .profile .ripgreprc .vscode .zprofile .zshrc docs/source`. Commits and trailers: bb630e54 `Role: independent-test-designer` touches only `tests/acceptance/W2-37/*`. cfface91 `Role: orchestrator` touches only `docs/checkpoints/DAEO-6n5k/CP-DAEO-6n5k-0002.md`. 2234049f `Role: engineer` touches only `src/gov/impact/{__init__,command,readings}.py` and `tests/unit/impact/*`. 6b5640b0 `Role: orchestrator` touches only `CP-DAEO-6n5k-0004.md`. `git diff bb630e54 HEAD -- tests/acceptance` is empty, and `git diff 4d79565e HEAD -- src/gov/closure` is empty.
+tests: `pytest tests/acceptance/W2-37 tests/unit/impact` gave 79 passed, 3 failed, 12 errors. The 3 failures are the expected ones: `test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement` (P-2), and `test_the_skill_runs_gov_impact_for_the_question[template]` and `[claude-copy]` (P-1). All 12 errors are `gov.codeintel.index` failing with `OSError: [Errno 30] Read-only file system: '/tmp/gov-cbm-1000/226783cb032aaa51'` (P-W2-38). They cover 7 cases in code_graph, 3 in deletable, 1 in incomplete (stale code graph) and 1 in question (symbol).
+discoveries: Five findings, F1 to F5, in the payload below. Two are fail-open findings an honest agent hits in ordinary work: F1 (the record graph reports `ok` when it does not match the working tree) and F2 (the CIT-E check reports a match when the CIT-E differs).
+risks: F1 can make the whole report read `complete: true` once a current code graph exists. That is likely but not reproduced, because no code index could be built here. The radius feeds the profile (W2-38), so a wrong radius would also give a wrong profile.
+lessons: The store is loaded from `HEAD` only, and "stale" in impact means only "HEAD is not among the loaded commits". `gov closure` already reports `uncommitted` files for this reason; `gov impact` does not. Fixture helpers in `tests/acceptance/W2-37/w2_37_support.py` (`build_fixture`, `load_store`, `snapshot`) work well for probes in `$TMPDIR` without `gov rebuild`.
+proposed_decisions: none (findings go to the test designer via the lead, MR-4)
+unresolved: These code-graph probes could not run. Each fails on `gov.codeintel.index` with `OSError: [Errno 30] Read-only file system: '/tmp/gov-cbm-1000/df32fdb8d07b3d5b'` (from `_daemon_dir`, `place.mkdir`). (1) F1 taken to `complete: true`: an uncommitted ticket that implements DEC-001, then the index built, then `gov impact DEC-001`. (2) Symbol name clash: `deletable` checks the dead-code set by bare name, so a change to a live symbol that shares its name with a dead one may read deletable, giving R0 (depth 1) and a lower profile. This is from reading the code only, not reproduced. (3) An error from `codeintel.callers`/`callees` during the walk: is it a refusal or a traceback? (4) A code file whose mtime is preserved (a copy that keeps the date) while the index is checked for staleness. The lead can resume this session outside the sandbox to run them.
+recommended_next_action: Pass F1 and F2 to the test designer as new acceptance cases for a repair round, F3 to F5 as rows, and resume this session outside the sandbox for the 4 code-graph probes.
+
+**Head probed:** `6b5640b0b0662a4d81ff0415f454acd9731db7a0`
+**Session id:** `606bdff7-6e36-41ce-a19e-9dd9357e8407` (read from the scratchpad path)
+**Judgement: fail.** F1 and F2 are both `Ordinary work: yes` and `Consequence: fails open`.
+
+### F1 — MAJOR — The record graph reads `ok` when it does not match the working tree (makes a gate fail open)
+
+**Case (a), uncommitted edits.** I loaded the store at HEAD, then without committing:
+- added a ticket `PROJ-new1` that implements DEC-001;
+- removed DEC-002's `depends_on: DEC-001`.
+
+`gov impact DEC-001` then reported:
+- `graphs.record: "ok"`;
+- PROJ-new1 neither listed nor a gap;
+- DEC-002 still listed;
+- no word about uncommitted files.
+
+`gov closure` on the same repo does report `uncommitted: ['.tickets/PROJ-new1.md', 'docs/adr/DEC-002.md']`.
+
+**Case (b), branch switch.** I loaded the store on a branch where PROJ-ab01 had been replaced by PROJ-br01, then switched the temporary repo to an older branch that has PROJ-ab01. Impact reported:
+- `graphs.record: "ok"`;
+- PROJ-br01 listed, although that file is not in the tree;
+- PROJ-ab01 dropped, although it is in the tree and implements DEC-001.
+
+The cause: "current" only checks that HEAD is among the loaded commits, so an older commit passes. `gov status` uses the same rule.
+
+In both runs `complete` was `false`, but only because no code index existed. The code index is copied from the working tree, so one built after these edits would read `ok`, and the report would then read complete. That last step is unreproduced.
+
+**What should happen:** an uncommitted change under a record path, or a store loaded from a commit other than HEAD, should give a record graph that is not `ok` (stale) and `complete: false`. At least, the uncommitted files should be listed, as `gov closure` does.
+
+- Ordinary work: yes, because changing a decision and asking its impact before committing is the KPI-1 flow itself, and switching branches after a load is routine.
+- Consequence: fails open
+
+### F2 — MAJOR — A CIT-E with an extra item, written as a single value or a map, is reported as matching (fails open)
+
+The proposal had `code: []`. The CIT-E had `code: w37_orphan`, a single value instead of a list. `--compare` gave `matches: true, differences: []`.
+
+The same happens with a map, `decisions: {DEC-099: done}`: `matches: true`. Any kind whose value is neither a list nor empty is silently dropped from the comparison.
+
+When the proposal has items in that kind, the single-value form shows up instead as a false "only in proposal" difference.
+
+**What should happen:** a kind that is not a list should be refused as malformed, or reported as a difference, never ignored.
+
+- Ordinary work: yes, because writing one item as `key: value` instead of `key: [value]` is a common YAML slip.
+- Consequence: fails open
+
+### F3 — MAJOR — The CIT-P written by `--out` drops the report's incompleteness
+
+`gov impact DEC-001 --out docs/citp/CITP-x1.md` with no code index:
+- The printed result had `complete: false`, `graphs.code: "missing: …"`, and the gap `w37_apply: CODE_GRAPH_MISSING`.
+- The file it wrote has only `change`, `radius: R3`, `depth: 8` and `affected` with `code: []`.
+- The file has no `complete`, no `graphs` and no `gaps`.
+
+So the saved CIT-P reads as a full assessment with nothing affected in code. Later `--compare` runs check CIT-Es against these lists.
+
+**What should happen:** the file should carry the graph states, the gaps and `complete`, or `--out` should refuse while the report is incomplete. The README requires only `change`, `radius`, `depth` and `affected`, so no test catches this.
+
+- Ordinary work: yes, because any project without a current code index that uses `--out` hits it.
+- Consequence: other. The live report is honest; the persisted record misleads its readers (the owner's approval, the later CIT-E check), but nothing is lost and no gate opens at the time of writing. If the lead reads it as fail-open, it joins F1/F2 in the round.
+
+### F4 — MINOR — The `--out` file name becomes the record id with no clash check
+
+`gov impact SPEC-300 --out docs/impact/SPEC-300.md` wrote a CIT-P whose id is `SPEC-300`, the same id as the closed specification it assesses. After a commit and a store load:
+- the store reported `invalid: []`;
+- it kept the specification and silently left the CIT-P out;
+- a `--compare` naming that CIT-P would be refused as "a specification, not a change-impact-proposal".
+
+The same happened with `--out docs/citp/DEC-002.md` (id DEC-002).
+
+**What should happen:** refuse a file name whose stem is an existing record id, or use the generated `CITP-…` id.
+
+- Ordinary work: yes, because naming the impact file after the thing changed is natural.
+- Consequence: other. The CIT-P silently never becomes a record; this fails closed.
+
+### F5 — MINOR — `gov impact` is declared "read" but `--out` writes anywhere, unseen by the guard (role scope)
+
+`--out` wrote, in turn:
+- a file outside the repo through `../escape.md`;
+- a file inside `.git/` (`.git/CITP-g.md`);
+- a file through a dangling link, at that link's target.
+
+The command declares `CLASS = "read"`, which by the CLI convention means "writes nowhere", so it cannot declare `ACT_PATHS`. The guard's Bash parser does not see the `--out` target, so an engineer can write a CIT-P outside their allowed paths. It never overwrites an existing file. The guard polices no `gov` command's writes (act commands included), so this predates the ticket.
+
+- Ordinary work: no for the link, the `..` path and `.git/` (deliberate constructions); yes for a plain out-of-scope path.
+- Consequence: other. A new file is added; no loss, no overwrite. This is a Wave 3 hardening row.
+
+### Probed and found sound
+
+- **Read-only:** a run without `--out`, including a closed-specification run, left every file outside `.git` (store included), HEAD, refs, stash, status and `.git/index` unchanged. `--out` added only its one file and refused an existing target.
+- **Refusals stay refusals:**
+  - no store gives `IMPACT_RECORD_GRAPH_MISSING`;
+  - a zero-byte, truncated or garbage store, or one without the edges table, gives `IMPACT_RECORD_GRAPH_UNREADABLE`;
+  - an empty change gives `IMPACT_NO_CHANGE`; a blank one gives `MALFORMED`;
+  - an unknown id names the unreadable code graph;
+  - a CIT-E whose `affected` is a list (not a map) is refused;
+  - `--compare` together with a change or `--out` is refused.
+- **Questions:** the exact form, `what is`, upper case and backticks run the assessment of exactly the id asked. Two ids, "changing X", "Whats", "What will be", curly double quotes and a trailing period are refused, never answered wrongly. Unquoted words are refused, naming them as unknown.
+- **CIT-E comparison:** ids differing only in case, a misnamed kind, a missing item, an extra item in list form and an item without an id are all reported as differences.
+- **Same sets as closure:** the record ids in impact's affected list plus its gaps equal `gov closure`'s set at the same depth for DEC-001 (depth 8), DEC-003 (depth 3, 60 links) and DEC-070 (a register entry, depth 1).
+- **Scope:** all commits are within their allowed paths with the right `Role:` trailers; no `src/gov/closure` change; the acceptance tests are unchanged since the test designer's commit.

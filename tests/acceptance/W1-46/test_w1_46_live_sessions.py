@@ -64,8 +64,16 @@ FOLDER = support.EXPERIMENT_REL
 SCRATCH = ".gov-runtime/scratch/w1-46"
 SESSION_TIMEOUT_S = 420.0
 MARK = "w1-46-probe"
-NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET", "CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_PROJECT_DIR",
-                 "CLAUDE_CODE_SSE_PORT")
+# Rewritten by DEC-784 (owner, 2026-10-18, P-W2-34 (a)): the sessions launch with no CLAUDE* variable in the
+# environment (CLAUDECODE, CLAUDE_CODE_* and every other name beginning CLAUDE), not only a fixed list of them.
+NOT_INHERITED = ("GOV_ROLE", "GOV_TICKET")
+NOT_INHERITED_PREFIX = "CLAUDE"
+
+
+def inherited(environ):
+    """The caller's environment less ``GOV_ROLE``, ``GOV_TICKET`` and every name beginning ``CLAUDE`` (DEC-784)."""
+    return {key: value for key, value in environ.items()
+            if key not in NOT_INHERITED and not key.startswith(NOT_INHERITED_PREFIX)}
 
 
 @dataclass(frozen=True)
@@ -112,7 +120,7 @@ def _start(launcher, tmp, role, prompt, probe_rel, probe, results_rel, prepare=N
                   .replace("@RESULTS@", results_rel))
     before = {rel: (project / rel).read_text(encoding="utf-8")
               for rel in ("README.md", "experiments/spikes/exp-900/data.txt", *watch)}
-    env = {key: value for key, value in os.environ.items() if key not in NOT_INHERITED}
+    env = inherited(os.environ)
     env.update({"PYTHONPATH": str(project / "src"), "PYTHONPYCACHEPREFIX": str(sandbox.pycache)})
     run = support.run_gov(project, sandbox, "launch", role, support.TICKET_OF[role], "--",
                           "-p", prompt.replace("@OUTSIDE@", str(outside)).replace("@ROOT@", str(project)),

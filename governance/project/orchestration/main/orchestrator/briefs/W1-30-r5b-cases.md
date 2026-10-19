@@ -1,0 +1,12 @@
+You are the independent test designer for ticket `DAEO-2lwj` (`W1-30`, `gov close`), in the worktree `/home/usain/gov-os-worktrees/W1-30` on branch `w1/W1-30`, continuing your round 5 (commit `f07051bf`). Same limits as before: you write only under `tests/acceptance/W1-30/`, no source code, nothing under `~/gov-os-workbench/`, `qualification-oracle/`, never the project's held-out file or the live settings file; never copy or clone this tree; never run `gov close` or `gov rebuild` against this worktree itself; leave `docs/checkpoints/`.
+
+Four of your packages are decided: read DEC-470 in the main tree's register (`/home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md`, the last section; this branch does not hold it yet), and DEC-460 just above it.
+
+Write the cases DEC-470 calls for:
+1. **No record store:** the close is refused with the context's reason, no close record, the ticket open, the refusal counted. Say whether the suite's projects must then be given a store by their fixtures, and do it where needed.
+2. **A missing source:** rewrite the older receipt case that expected a close record for a missing source to the refusal (your package 5).
+3. **The probe gate's exit code:** every probe refusal ends with exit code 3; tighten the older case that accepted two codes.
+4. **Session models:** the close record lists, for each of the ticket's commits, its role and the model named in its `Co-Authored-By` line exactly as read; a commit without such a line is listed with "not measured"; no commit is left out. Cases: commits of two roles with two different model lines; one commit without the line.
+5. Your packages 7 and 8: tighten `test_close_fails_when_ticket_tool_absent` so that no ticket tool is reachable at all (as your new repair-ticket cases do); remove the unused fixture that copies the working tree.
+
+The question "which red checks refuse a close" is still with the owner: no case for it. Run `env -u PYTHONPATH python3 -m pytest tests/acceptance/W1-30 -q -p no:cacheprovider -rs` to its end. Commit once with the message `W1-30 cases round 5b: no store, missing source, probe exit code, models of the commits (DEC-470)` and the trailers `Task: DAEO-2lwj`, `Role: independent-test-designer`, `Implements: CAP-13.a`, `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Return: the commit id, the new and changed cases with their red reasons, the counts.

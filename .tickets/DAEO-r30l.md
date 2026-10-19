@@ -18,6 +18,7 @@ depends_on:
 - DAEO-g0ip
 allowed_paths:
 - src/gov/resources/**
+- src/gov/check/commands.py
 - src/gov/launch/gate*
 - tests/unit/resources/**
 kpis:
@@ -31,6 +32,7 @@ profile: STANDARD
 sources:
 - DEC-729
 - DEC-742
+- DEC-747
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-20/
@@ -55,3 +57,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-20), as approved (DEC-729). The list row
   - The gate opens or shuts with a named reason.
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
 - **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
+- **DEC-747 (delegated, 2026-10-17):** `src/gov/check/commands.py` is in the paths for the one line that records `resources` (P-A). "At most 8 sessions" holds after the start: the start check adds the new session's weight (P-B). DEC-742's load value stands (P-C).

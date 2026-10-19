@@ -1,0 +1,735 @@
+/home/usain/gov-os-worktrees/W2-54/src/gov/__init__.py
+F.FFFFFFF.....FFFFFFF..FFFF......F....F.F.FFF.....                       [100%]
+=================================== FAILURES ===================================
+________________ test_the_schema_file_is_w2_02_s_byte_for_byte _________________
+
+    def test_the_schema_file_is_w2_02_s_byte_for_byte():
+        """*Red.* ``template/governance/kernel/schemas/audit-report.schema.json`` is byte for byte
+        ``git show 2a35fd7b:template/governance/kernel/schemas/audit-report.schema.json``."""
+        path = S.REPO_ROOT / S.AUDIT_SCHEMA_REL
+>       assert path.is_file(), f"there is no {S.AUDIT_SCHEMA_REL}"
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-54/template/governance/kernel/schemas/audit-report.schema.json').is_file
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:36: AssertionError
+_ test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[docs/audit/report.md] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_in_the_audit_fol0')
+rel = 'docs/audit/report.md'
+
+    @pytest.mark.parametrize("rel", REPORT_IN_FOLDER)
+    def test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report(box, tmp_path, rel):
+        """*Red.* A record under ``docs/audit/`` (at any depth) that states no ``type`` and holds ``milestone``,
+        ``commit`` and ``pack_sha256`` is an audit report (DEC-626): core-schema finds nothing and is green.
+        Today: ``SCHEMA_INVALID_TYPE``."""
+>       project = S.schema_project(tmp_path / "p", {rel: S.audit_record()})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_in_the_audit_fol0/p')
+files = {'docs/audit/report.md': '---\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef01234567\npack_sha256: ...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[docs/audit/wave-9/wave-9-exit-audit.md] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_in_the_audit_fol1')
+rel = 'docs/audit/wave-9/wave-9-exit-audit.md'
+
+    @pytest.mark.parametrize("rel", REPORT_IN_FOLDER)
+    def test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report(box, tmp_path, rel):
+        """*Red.* A record under ``docs/audit/`` (at any depth) that states no ``type`` and holds ``milestone``,
+        ``commit`` and ``pack_sha256`` is an audit report (DEC-626): core-schema finds nothing and is green.
+        Today: ``SCHEMA_INVALID_TYPE``."""
+>       project = S.schema_project(tmp_path / "p", {rel: S.audit_record()})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:53: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_in_the_audit_fol1/p')
+files = {'docs/audit/wave-9/wave-9-exit-audit.md': '---\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef01234...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_a_record_of_type_audit_report_owes_no_shared_frontmatter[docs/reports/report.md] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_of_type_audit_re0')
+rel = 'docs/reports/report.md'
+
+    @pytest.mark.parametrize("rel", ("docs/reports/report.md", "docs/audit/stated.md"))
+    def test_a_record_of_type_audit_report_owes_no_shared_frontmatter(box, tmp_path, rel):
+        """*Red.* A record that states ``type: audit-report`` and holds the three fields, with no ``id``, ``status``
+        or ``state_class``, is green wherever it is: the type stands alone (DEC-441, DEC-565). Today:
+        ``SCHEMA_UNKNOWN_TYPE`` and missing shared fields."""
+        text = S.frontmatter({"type": "audit-report", **S.audit_front()}, S.AUDIT_BODY)
+>       project = S.schema_project(tmp_path / "p", {rel: text})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_of_type_audit_re0/p')
+files = {'docs/reports/report.md': '---\ntype: audit-report\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef0...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_a_record_of_type_audit_report_owes_no_shared_frontmatter[docs/audit/stated.md] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_of_type_audit_re1')
+rel = 'docs/audit/stated.md'
+
+    @pytest.mark.parametrize("rel", ("docs/reports/report.md", "docs/audit/stated.md"))
+    def test_a_record_of_type_audit_report_owes_no_shared_frontmatter(box, tmp_path, rel):
+        """*Red.* A record that states ``type: audit-report`` and holds the three fields, with no ``id``, ``status``
+        or ``state_class``, is green wherever it is: the type stands alone (DEC-441, DEC-565). Today:
+        ``SCHEMA_UNKNOWN_TYPE`` and missing shared fields."""
+        text = S.frontmatter({"type": "audit-report", **S.audit_front()}, S.AUDIT_BODY)
+>       project = S.schema_project(tmp_path / "p", {rel: text})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_a_record_of_type_audit_re1/p')
+files = {'docs/audit/stated.md': '---\ntype: audit-report\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef012...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[commit-not-a-commit] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_0')
+field = 'commit', value = 'not-a-commit'
+
+    @pytest.mark.parametrize("field, value", (("commit", "not-a-commit"), ("milestone", ""), ("pack_sha256", "")))
+    def test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes(box, tmp_path, field, value):
+        """*Red.* The schema's shapes hold: a ``commit`` that is no commit id, an empty ``milestone`` or an empty
+        ``pack_sha256`` is ``SCHEMA_INVALID_FIELD`` naming the field."""
+        rel = "docs/audit/report.md"
+>       project = S.schema_project(tmp_path / "p", {rel: S.audit_record(**{field: value})})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_0/p')
+files = {'docs/audit/report.md': '---\nmilestone: wave-9-exit\ncommit: not-a-commit\npack_sha256: 2355ce5f42d2a8d087535fa0dd3b...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+__ test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[milestone-] ___
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_1')
+field = 'milestone', value = ''
+
+    @pytest.mark.parametrize("field, value", (("commit", "not-a-commit"), ("milestone", ""), ("pack_sha256", "")))
+    def test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes(box, tmp_path, field, value):
+        """*Red.* The schema's shapes hold: a ``commit`` that is no commit id, an empty ``milestone`` or an empty
+        ``pack_sha256`` is ``SCHEMA_INVALID_FIELD`` naming the field."""
+        rel = "docs/audit/report.md"
+>       project = S.schema_project(tmp_path / "p", {rel: S.audit_record(**{field: value})})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_1/p')
+files = {'docs/audit/report.md': "---\nmilestone: ''\ncommit: 0123456789abcdef0123456789abcdef01234567\npack_sha256: 2355ce5f4...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n"}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[pack_sha256-] __
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_2')
+field = 'pack_sha256', value = ''
+
+    @pytest.mark.parametrize("field, value", (("commit", "not-a-commit"), ("milestone", ""), ("pack_sha256", "")))
+    def test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes(box, tmp_path, field, value):
+        """*Red.* The schema's shapes hold: a ``commit`` that is no commit id, an empty ``milestone`` or an empty
+        ``pack_sha256`` is ``SCHEMA_INVALID_FIELD`` naming the field."""
+        rel = "docs/audit/report.md"
+>       project = S.schema_project(tmp_path / "p", {rel: S.audit_record(**{field: value})})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_s_fields_2/p')
+files = {'docs/audit/report.md': "---\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef01234567\npack_sha256: ''\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n"}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-milestone] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a0')
+missing = 'milestone', placement = 'folder'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a0/p')
+files = {'docs/audit/wave-9/report.md': '---\ncommit: 0123456789abcdef0123456789abcdef01234567\npack_sha256: 2355ce5f42d2a8d08...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-commit] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a1')
+missing = 'commit', placement = 'folder'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a1/p')
+files = {'docs/audit/wave-9/report.md': '---\nmilestone: wave-9-exit\npack_sha256: 2355ce5f42d2a8d087535fa0dd3bbcc012a0ec43ec0d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[folder-pack_sha256] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a2')
+missing = 'pack_sha256', placement = 'folder'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a2/p')
+files = {'docs/audit/wave-9/report.md': '---\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef01234567\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-milestone] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a3')
+missing = 'milestone', placement = 'stated'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a3/p')
+files = {'docs/reports/report.md': '---\ntype: audit-report\ncommit: 0123456789abcdef0123456789abcdef01234567\npack_sha256: 23...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-commit] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a4')
+missing = 'commit', placement = 'stated'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a4/p')
+files = {'docs/reports/report.md': '---\ntype: audit-report\nmilestone: wave-9-exit\npack_sha256: 2355ce5f42d2a8d087535fa0dd3b...d08f1f712b6dde8e48c23\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+_ test_an_audit_report_lacking_a_required_field_fails_naming_it[stated-pack_sha256] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a5')
+missing = 'pack_sha256', placement = 'stated'
+
+    @pytest.mark.parametrize("missing", S.AUDIT_FIELDS)
+    @pytest.mark.parametrize("placement", ("folder", "stated"))
+    def test_an_audit_report_lacking_a_required_field_fails_naming_it(box, tmp_path, missing, placement):
+        """*Red.* Failure line 3, second half. An audit report, read from its folder (no ``type``) or stating
+        ``type: audit-report``, that lacks ``missing`` is ``SCHEMA_MISSING_FIELD`` naming that field, and only
+        that field. Today: ``SCHEMA_INVALID_TYPE`` or ``SCHEMA_UNKNOWN_TYPE``, naming no field."""
+        if placement == "folder":
+            rel, front = "docs/audit/wave-9/report.md", S.audit_front(**{missing: None})
+        else:
+            rel, front = "docs/reports/report.md", {"type": "audit-report", **S.audit_front(**{missing: None})}
+>       project = S.schema_project(tmp_path / "p", {rel: S.frontmatter(front, S.AUDIT_BODY)})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-3032/test_an_audit_report_lacking_a5/p')
+files = {'docs/reports/report.md': '---\ntype: audit-report\nmilestone: wave-9-exit\ncommit: 0123456789abcdef0123456789abcdef01234567\n---\n\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP-01 | OK | README.md |\n'}
+require_audit = True
+
+    def schema_project(project, files, require_audit=True):
+        """A temporary project with this worktree's common and audit-report schema files and ``files``. A case
+        about another type runs without the audit-report file when this worktree has none (``require_audit``)."""
+        project = new_repo(project)
+        destination = Path(project) / SCHEMAS_REL
+        destination.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(REPO_ROOT / COMMON_SCHEMA_REL, destination / "common.schema.json")
+        audit = REPO_ROOT / AUDIT_SCHEMA_REL
+>       assert audit.is_file() or not require_audit, f"there is no {AUDIT_SCHEMA_REL} in this worktree"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: there is no template/governance/kernel/schemas/audit-report.schema.json in this worktree
+
+tests/acceptance/W2-54/w2_54_support.py:438: AssertionError
+______ test_core_schema_is_green_on_this_repository_with_w1_43_untouched _______
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-54/src/gov/__init__.py'
+
+    def test_core_schema_is_green_on_this_repository_with_w1_43_untouched(code_under_test):
+        """*Red.* Core-schema, run as declared in this worktree, finds nothing; the W1-43 report's sha256 is
+        ``b14e17d6...cdac1d`` before and after the run. Today: ``SCHEMA_INVALID_TYPE`` on the W1-43 report."""
+        assert S.sha256(S.REPO_ROOT / S.W1_43_REL) == S.W1_43_SHA256, "the W1-43 audit report is changed"
+        declaration = (S.REPO_ROOT / S.CHECKS_REL / "core-schema.yaml").read_text(encoding="utf-8")
+        command = yaml.safe_load(declaration)["command"]
+        done = S.run(["sh", "-c", command], cwd=S.REPO_ROOT, env=S.worktree_env(), timeout=S.CALL_TIMEOUT_S)
+>       assert done.returncode == 0, f"core-schema is not green on this repository\n{done.describe()}"
+E       AssertionError: core-schema is not green on this repository
+E         sh -c python3 -m gov.check.schema
+E         exit code: 1 (0.4 s)
+E         stdout:
+E         [
+E           {
+E             "code": "SCHEMA_INVALID_TYPE",
+E             "path": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md",
+E             "message": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md: 'type' field is missing or not a string"
+E           }
+E         ]
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x73ff559f0f20>.returncode
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:146: AssertionError
+_ test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[reverse] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+indexed = PosixPath('/tmp/pytest-of-usain/pytest-3032/w2-54-box0/indexed')
+order = 'reverse'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+        expected = S.packet(box, indexed, S.TK_BIG, "identity")
+        other = S.packet(box, indexed, S.TK_BIG, order)
+        last = box.calls()[-1]
+        assert last["out"] != last["in"] and sorted(last["out"]) == sorted(last["in"]), \
+            f"the stand-in did not return the same items in another order: {last}"
+>       assert other[S.K_DROPPED] == expected[S.K_DROPPED], (
+            f"the dropped list follows the order the retrieval returned (order {order!r}):\n"
+            f"retrieval's own order: {[entry.get('id') for entry in expected[S.K_DROPPED]]}\n"
+            f"{order}: {[entry.get('id') for entry in other[S.K_DROPPED]]}")
+E       AssertionError: the dropped list follows the order the retrieval returned (order 'reverse'):
+E         retrieval's own order: ['TK-W254-BIG', 'TK-W254-BIG', 'TK-W254-SMALL', 'TK-W254-SMALL', 'a01cc53f882e5e70cafd24db', 'ADR-W254-A', 'ADR-W254-A', 'ADR-W254-B', 'ADR-W254-B', 'ADR-W254-C', 'ADR-W254-C', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-E', 'ADR-W254-E', 'ADR-W254-F', 'ADR-W254-F', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT']
+E         reverse: ['ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-F', 'ADR-W254-F', 'ADR-W254-E', 'ADR-W254-E', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-C', 'ADR-W254-C', 'ADR-W254-B', 'ADR-W254-B', 'ADR-W254-A', 'ADR-W254-A', 'a01cc53f882e5e70cafd24db', 'TK-W254-SMALL', 'TK-W254-SMALL', 'TK-W254-BIG', 'TK-W254-BIG']
+E       assert [{'id': 'ADR-...ceeded'}, ...] == [{'id': 'TK-W...ceeded'}, ...]
+E         
+E         At index 0 diff: {'id': 'ADR-W254-SPLIT', 'reason': 'budget exceeded'} != {'id': 'TK-W254-BIG', 'reason': 'budget exceeded'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:61: AssertionError
+_ test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[rotate] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+indexed = PosixPath('/tmp/pytest-of-usain/pytest-3032/w2-54-box0/indexed')
+order = 'rotate'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+        expected = S.packet(box, indexed, S.TK_BIG, "identity")
+        other = S.packet(box, indexed, S.TK_BIG, order)
+        last = box.calls()[-1]
+        assert last["out"] != last["in"] and sorted(last["out"]) == sorted(last["in"]), \
+            f"the stand-in did not return the same items in another order: {last}"
+>       assert other[S.K_DROPPED] == expected[S.K_DROPPED], (
+            f"the dropped list follows the order the retrieval returned (order {order!r}):\n"
+            f"retrieval's own order: {[entry.get('id') for entry in expected[S.K_DROPPED]]}\n"
+            f"{order}: {[entry.get('id') for entry in other[S.K_DROPPED]]}")
+E       AssertionError: the dropped list follows the order the retrieval returned (order 'rotate'):
+E         retrieval's own order: ['TK-W254-BIG', 'TK-W254-BIG', 'TK-W254-SMALL', 'TK-W254-SMALL', 'a01cc53f882e5e70cafd24db', 'ADR-W254-A', 'ADR-W254-A', 'ADR-W254-B', 'ADR-W254-B', 'ADR-W254-C', 'ADR-W254-C', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-E', 'ADR-W254-E', 'ADR-W254-F', 'ADR-W254-F', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT']
+E         rotate: ['TK-W254-BIG', 'TK-W254-SMALL', 'TK-W254-SMALL', 'a01cc53f882e5e70cafd24db', 'ADR-W254-A', 'ADR-W254-A', 'ADR-W254-B', 'ADR-W254-B', 'ADR-W254-C', 'ADR-W254-C', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-E', 'ADR-W254-E', 'ADR-W254-F', 'ADR-W254-F', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'TK-W254-BIG']
+E       assert [{'id': 'TK-W...ceeded'}, ...] == [{'id': 'TK-W...ceeded'}, ...]
+E         
+E         At index 1 diff: {'id': 'TK-W254-SMALL', 'reason': 'budget exceeded'} != {'id': 'TK-W254-BIG', 'reason': 'budget exceeded'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:61: AssertionError
+_ test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash[shuffle] _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+indexed = PosixPath('/tmp/pytest-of-usain/pytest-3032/w2-54-box0/indexed')
+order = 'shuffle'
+
+    @pytest.mark.parametrize("order", ORDERS)
+    def test_every_order_of_the_retrieval_s_items_gives_the_same_packet_and_hash(box, indexed, order):
+        """*Red.* The ticket's mandatory input is past the default ceiling, so every supplementary item is dropped.
+        The retrieval returning the same items in another order (``order``) gives the same packet, ``dropped``
+        included, and the same hash."""
+        expected = S.packet(box, indexed, S.TK_BIG, "identity")
+        other = S.packet(box, indexed, S.TK_BIG, order)
+        last = box.calls()[-1]
+        assert last["out"] != last["in"] and sorted(last["out"]) == sorted(last["in"]), \
+            f"the stand-in did not return the same items in another order: {last}"
+>       assert other[S.K_DROPPED] == expected[S.K_DROPPED], (
+            f"the dropped list follows the order the retrieval returned (order {order!r}):\n"
+            f"retrieval's own order: {[entry.get('id') for entry in expected[S.K_DROPPED]]}\n"
+            f"{order}: {[entry.get('id') for entry in other[S.K_DROPPED]]}")
+E       AssertionError: the dropped list follows the order the retrieval returned (order 'shuffle'):
+E         retrieval's own order: ['TK-W254-BIG', 'TK-W254-BIG', 'TK-W254-SMALL', 'TK-W254-SMALL', 'a01cc53f882e5e70cafd24db', 'ADR-W254-A', 'ADR-W254-A', 'ADR-W254-B', 'ADR-W254-B', 'ADR-W254-C', 'ADR-W254-C', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-E', 'ADR-W254-E', 'ADR-W254-F', 'ADR-W254-F', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT', 'ADR-W254-SPLIT']
+E         shuffle: ['ADR-W254-SPLIT', 'ADR-W254-B', 'TK-W254-SMALL', 'ADR-W254-C', 'TK-W254-BIG', 'TK-W254-BIG', 'ADR-W254-F', 'ADR-W254-D', 'ADR-W254-D', 'ADR-W254-A', 'ADR-W254-E', 'TK-W254-SMALL', 'ADR-W254-A', 'ADR-W254-B', 'ADR-W254-SPLIT', 'ADR-W254-F', 'ADR-W254-C', 'ADR-W254-SPLIT', 'ADR-W254-E', 'a01cc53f882e5e70cafd24db']
+E       assert [{'id': 'ADR-...ceeded'}, ...] == [{'id': 'TK-W...ceeded'}, ...]
+E         
+E         At index 0 diff: {'id': 'ADR-W254-SPLIT', 'reason': 'budget exceeded'} != {'id': 'TK-W254-BIG', 'reason': 'budget exceeded'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:61: AssertionError
+_ test_a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order _
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+indexed = PosixPath('/tmp/pytest-of-usain/pytest-3032/w2-54-box0/indexed')
+
+    def test_a_budget_below_the_mandatory_inputs_gives_the_same_packet_under_any_order(box, indexed):
+        """*Red.* ``gov context --budget``: with a ceiling below the mandatory inputs alone, every supplementary
+        item is dropped, and the reversed order of the retrieval's items gives the same packet and hash."""
+        alone = S.packet(box, indexed, S.TK_SMALL, "empty")
+        budget = max(1, int(alone["tokens"]) // 2)
+        expected = S.packet(box, indexed, S.TK_SMALL, "identity", "--budget", str(budget))
+        assert expected[S.K_SUPPLEMENTARY] == [] and expected[S.K_DROPPED], \
+            f"with a budget of {budget} the fixture should drop every supplementary item: {S.canonical(expected)[:800]}"
+        reversed_ = S.packet(box, indexed, S.TK_SMALL, "reverse", "--budget", str(budget))
+>       assert reversed_[S.K_DROPPED] == expected[S.K_DROPPED], \
+            "under --budget the dropped list follows the order the retrieval returned"
+E       AssertionError: under --budget the dropped list follows the order the retrieval returned
+E       assert [{'id': 'ADR-...ceeded'}, ...] == [{'id': 'TK-W...ceeded'}, ...]
+E         
+E         At index 0 diff: {'id': 'ADR-W254-SPLIT', 'reason': 'budget exceeded'} != {'id': 'TK-W254-SMALL', 'reason': 'budget exceeded'}
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:78: AssertionError
+_________ test_the_check_is_green_when_two_computations_see_two_orders _________
+
+box = <w2_54_support.Box object at 0x73ff557b54f0>
+big_only = PosixPath('/tmp/pytest-of-usain/pytest-3032/w2-54-box0/big-only')
+
+    def test_the_check_is_green_when_two_computations_see_two_orders(box, big_only):
+        """*Red.* The context-reproducibility check, run as its declaration says, computes the ticket's context
+        twice; the retrieval returns its items in one order the first time and reversed the second. One packet, one
+        hash: the check is green. Today it prints ``FAIL: TK-W254-BIG: <hash> != <hash>`` and exits 1."""
+        done = S.context_check(box, big_only, "alternate")
+        calls = [call for call in box.calls() if call["ticket"] in (S.TK_BIG, None)]
+        assert len({S.canonical(call["out"]) for call in calls}) >= 2, \
+            f"the check's computations did not see two orders of the retrieval's items: {calls}"
+>       assert done.returncode == 0, f"two orders of the same items fail the check\n{done.describe()}"
+E       AssertionError: two orders of the same items fail the check
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (0.1 s)
+E         stdout:
+E         FAIL: TK-W254-BIG: 30d2cf383f989d02b3048e16093bef8ad9dcade79c5492a5136eca5ce6f0fe80 != 34ec711b483e4eccba49904e5661c2c6dd57485406f00c3e643b7a4eb733e195
+E         context-reproducibility: 1 ticket(s) failed, 0 error(s)
+E         
+E         stderr:
+E         
+E       assert 1 == 0
+E        +  where 1 = <w2_54_support.Run object at 0x73ff559f3710>.returncode
+
+tests/acceptance/W2-54/test_w2_54_dropped_order.py:136: AssertionError
+_________________ test_gov_check_gives_core_schema_green_here __________________
+
+gov_check_here = (<w2_54_support.Run object at 0x73ff5576a300>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '93ace3dc9a592a354dffa90146df8a825a8cbd87', 'inputs_hash': '20049c0a2cd37fc8'}, ...}, ...})
+
+    def test_gov_check_gives_core_schema_green_here(gov_check_here):
+        """*Red.* Core-schema, in ``gov check --json`` on this repository, is GREEN."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CORE_SCHEMA_ID)
+        assert entry is not None, f"gov check lists no {S.CORE_SCHEMA_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CORE_SCHEMA_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: core-schema is RED here: [{"code": "SCHEMA_INVALID_TYPE", "message": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md: 'type' field is missing or not a string", "path": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:36: AssertionError
+____________ test_only_the_timeout_line_is_added_to_the_declaration ____________
+
+    def test_only_the_timeout_line_is_added_to_the_declaration():
+        """*Red.* Against the declaration before this ticket (``b644d28a``), exactly one line is added, a
+        ``timeout-seconds: <whole number>`` line, and no line is changed or removed."""
+        before = S.show(S.BASE_COMMIT, S.CONTEXT_DECLARATION_REL).decode("utf-8").splitlines()
+        after = _declared().splitlines()
+        added = list(after)
+        for line in before:
+            assert line in added, f"the line {line!r} of the declaration is changed or removed"
+            added.remove(line)
+        assert [line for line in after if line not in added] == before, "the declaration's lines are reordered"
+>       assert len(added) == 1 and re.fullmatch(r"timeout-seconds: [1-9][0-9]*", added[0]), \
+            f"the declaration should add one `timeout-seconds: <seconds>` line and nothing else; it adds {added}"
+E       AssertionError: the declaration should add one `timeout-seconds: <seconds>` line and nothing else; it adds []
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:36: AssertionError
+__________ test_the_declared_limit_is_above_the_runner_s_and_bounded ___________
+
+    def test_the_declared_limit_is_above_the_runner_s_and_bounded():
+        """*Red.* The declaration states a positive whole number of seconds (DEC-600), above the runner's 60
+        (DEC-595: the measured run at ``c9537e39`` was 122 s) and at most 600 s, so that a hang is still caught
+        (README, "The bound on the time limit")."""
+        limit = S.limit_of(_declared())
+>       assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}: the check gets the " \
+                                  f"runner's {S.RUNNER_DEFAULT_S} seconds"
+E       AssertionError: template/governance/kernel/checks/context-reproducibility.yaml states no timeout-seconds: the check gets the runner's 60 seconds
+E       assert None is not None
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:55: AssertionError
+_________ test_the_change_record_states_the_limit_and_its_measurement __________
+
+    def test_the_change_record_states_the_limit_and_its_measurement():
+        """*Red.* ``docs/changes/W2-54-CIT-E.md`` records the change and the measurement: the declared limit, the
+        run's seconds, the tickets measured and the machine's load."""
+        path = S.REPO_ROOT / S.CHANGE_RECORD_REL
+>       assert path.is_file(), f"there is no change record {S.CHANGE_RECORD_REL}"
+E       AssertionError: there is no change record docs/changes/W2-54-CIT-E.md
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-54/docs/changes/W2-54-CIT-E.md').is_file
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:65: AssertionError
+_ test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit _
+
+code_under_test = '/home/usain/gov-os-worktrees/W2-54/src/gov/__init__.py'
+
+    def test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit(code_under_test):
+        """*Red.* Needs this worktree's store (about three minutes). The check's command, by ``sh -c`` in this
+        worktree, ends with exit 0 within the declared limit. Today no limit is declared (and the run, 164 s at a
+        load of 15 to 29 on 20 processors, fails on 13 tickets)."""
+        limit = S.limit_of(_declared())
+>       assert limit is not None, f"{S.CONTEXT_DECLARATION_REL} states no {S.TIMEOUT_FIELD}"
+E       AssertionError: template/governance/kernel/checks/context-reproducibility.yaml states no timeout-seconds
+E       assert None is not None
+
+tests/acceptance/W2-54/test_w2_54_time_limit.py:80: AssertionError
+25 failed, 25 passed in 330.30s (0:05:30)
