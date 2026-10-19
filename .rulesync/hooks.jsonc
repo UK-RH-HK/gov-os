@@ -4,7 +4,7 @@
     "preToolUse": [
       {
         "type": "command",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 2; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py\"",
         "timeout": 60
       }
     ],
@@ -12,7 +12,7 @@
       {
         "type": "command",
         "matcher": "Bash",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 2; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
         "timeout": 60
       }
     ],
@@ -20,14 +20,14 @@
       {
         "type": "command",
         "matcher": "Bash",
-        "command": "PYTHONPATH=\"$CLAUDE_PROJECT_DIR/src\" python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 2; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 2; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py\"",
         "timeout": 60
       }
     ],
     "preCompact": [
       {
         "type": "command",
-        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py\"",
         "timeout": 60
       }
     ],
@@ -35,21 +35,21 @@
       {
         "type": "command",
         "matcher": "compact|clear|resume",
-        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py\"",
         "timeout": 60
       }
     ],
     "stop": [
       {
         "type": "command",
-        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py\"",
         "timeout": 60
       }
     ],
     "subagentStop": [
       {
         "type": "command",
-        "command": "python3 \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py\"",
+        "command": "g=\"$HOME/.local/bin/gov\"; [ -f \"$g\" ] || g=\"$(command -v gov)\" || { echo \"gov hook: no pinned gov at $HOME/.local/bin/gov or on PATH\" >&2; exit 1; }; read -r p < \"$g\"; p=\"${p#'#!'}\"; [ -x \"$p\" ] || { echo \"gov hook: $g names no interpreter that runs: $p\" >&2; exit 1; }; exec \"$p\" \"$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py\"",
         "timeout": 60
       }
     ]
