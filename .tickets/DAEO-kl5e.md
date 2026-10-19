@@ -26,6 +26,7 @@ allowed_paths:
 - tests/unit/launch/test_runs*
 - src/gov/guard/protected.py
 - tests/unit/guard/test_protected*
+- tests/unit/secrets/**
 - docs/changes/W2-50-CIT-P.md
 - docs/changes/W2-50-CIT-E.md
 kpis:
@@ -37,6 +38,9 @@ kpis:
   - Survival. A clone made there survives the session's end and a restart.
   - 'Never indexed. Nothing under ~/gov-os-runs is indexed by this repository''s stores, and this repository''s secrets-indexing check never scans it: A product clone that is adopted there has its own store,
     inside the clone; that store is the clone''s, not this repository''s; A planted secret in a clone there reaches no index of this repository.'
+  - 'The secrets scan finishes. This repository''s secrets-indexing scan finishes on stores of today''s size (a 250 MB store.db, a 210 MB code graph): its time limit grows with the content''s size, or a large
+    store is scanned in bounded chunks each within the limit, and its pool is bounded so that large files are not starved [DEC-853].'
+  - 'A clean scan reused by its hash. A store whose hash has not changed since its last clean scan is not scanned again; its clean result is reused, keyed on the store''s hash [DEC-853].'
   failure:
   - 'Each refused, with the guard''s reason: another ticket''s folder under ~/gov-os-runs'
   - 'Each refused, with the guard''s reason: the root itself (a file directly in it, or removing it)'
@@ -44,6 +48,8 @@ kpis:
   - 'Each refused, with the guard''s reason: a session with no ticket'
   - 'Each refused, with the guard''s reason: any path outside the repository other than the temp folder and the session''s own folder.'
   - 'Each refused, with the guard''s reason: ~/gov-os-workbench and ~/gov-os-worktrees (other than the session''s own worktree) stay refused as before.'
+  - 'The secrets scan stays whole and closed: every file is still scanned with every rule set; a scan that cannot finish still fails closed; a store changed by one byte is scanned again in full; a finding
+    is never reused [DEC-853].'
 profile: FULL
 sources:
 - DEC-728
@@ -52,6 +58,7 @@ sources:
 - CAP-33
 - DEC-738
 - DEC-743
+- DEC-853
 est_loc: 120
 acceptance_tests:
   path: tests/acceptance/W2-50/
@@ -99,3 +106,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-50), as approved (DEC-729). The list row
   - `~/gov-os-workbench` and `~/gov-os-worktrees` (other than the session's own worktree) stay refused as before.
 - **CIT-P approved (DEC-743, 2026-10-17)** within DEC-728: R1 to R8 as written (R7 scoped to the root only), §6.1 (i), the own folder open only while the ticket is `in_progress`, `ticket-lead` not among "any role". The engineer commits the CIT-P word for word before any code, and the CIT-E after (DEC-738 item 1). A session writes only under its own ticket's folder; nothing there is indexed or scanned; the workbench and other worktrees stay refused.
 - **Widened for run 7 (owner, 2026-10-18, P-I):** `src/gov/guard/protected.py` uses the option reader this ticket built for `cp` and `install` for `mv` and `cp -l` too, so the guard reads every copy-like command one way, for writes and for reads; the paths gain `src/gov/guard/protected.py` and `tests/unit/guard/test_protected*`.
+- **Widened for run 8 (owner, 2026-10-19, DEC-853, P-W2-49 (a)):** the secrets scan's time limit and pool are fixed in this resume, in `src/gov/secrets/__init__.py` (the scan only, keeping this ticket's link rule in `stores_with_secrets`): the time limit grows with the content's size (or a large store is scanned in bounded chunks, each within the limit), and the pool is bounded so that large files are not starved. A store whose hash has not changed since its last clean scan is not re-scanned; its clean result is reused, keyed on the store's hash. Every file is still scanned with every rule set; a scan that cannot finish still fails closed; a changed store is always scanned in full; a finding is never reused. The paths gain `tests/unit/secrets/**`.
