@@ -4,7 +4,9 @@ Written by the independent test designer (MR-3, DEC-069) from the KPI lines of t
 in `docs/plan/WAVE_2_WBS.md` §2, the list row W2-M355, and DEC-728, DEC-723, DEC-159, DEC-160, DEC-161, DEC-221 and
 DEC-732. Profile FULL. Written before the implementation; no earlier ticket's test was revised.
 
-**613 cases in 12 files**: the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
+**636 cases in 13 files** (613 in 12 files before the owner's DEC-853, and 23 cases in
+`test_w2_50_secrets_scan_scale.py` for it, **tests added for the owner's DEC-853, before its implementation**; see the
+section of that name): the first 139 cases in 5 files, written before the change proposal (red run on `w2/W2-50`
 at `689bd17e` plus that suite: **48 failed, 91 passed**), 15 cases in `test_w2_50_owner_answers.py` for the owner's
 answers to it (DEC-743; see the section below), written before the implementation (red run at `a5ef3c69` plus that
 file: **55 failed, 99 passed**), 54 cases in `test_w2_50_review_findings.py` for the review's findings, **tests
@@ -35,7 +37,10 @@ PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/go
 
 Standard library, `pytest` and PyYAML. No network, nothing installed, no real `claude` session. `git` is needed;
 `gitleaks` on `PATH` is needed by the six cases of `test_w2_50_never_indexed.py` (they skip without it; the red
-run used gitleaks 8.30.1 at `~/.local/bin`).
+run used gitleaks 8.30.1 at `~/.local/bin`). The 23 cases of `test_w2_50_secrets_scan_scale.py` skip without
+gitleaks too; its three large cases each write a 160 MiB store in their temporary folder and take about 65 s each
+before DEC-853's implementation and about 85 to 175 s each after it, so a run of that file alone takes about 5 to 10
+minutes (run its large cases, `-k large`, in a command of their own where a command is limited to 10 minutes).
 
 ## How the suite is built
 
@@ -651,6 +656,146 @@ copies).
   value `-t`, an option written after the operands or after `-t`'s folder, and a dashed name after `--`. An `=` value,
   a separate value without a leading dash, and an ordinary `--` are read right today.
 - **`--update`** takes a value (`all`, `none`, `older`), none holding a `t`: not tested with one.
+
+## Tests added for the owner's DEC-853, before its implementation
+
+DEC-853 (owner, 2026-10-19, P-W2-49 (a)) adds to this ticket: the secrets-indexing check finishes on stores of today's
+size, and a store unchanged since its last clean scan is not scanned again. 23 cases in
+`test_w2_50_secrets_scan_scale.py`, with their helpers in `w2_50_scan_support.py`; written from the three KPI lines
+marked [DEC-853] in `.tickets/DAEO-kl5e.md`, DEC-853, P-W2-49, DEC-347 and the check's declaration, without reading
+this ticket's implementation (the existing scan was read as it stands on `w2/integrate` only). No earlier file of
+this suite was changed but this README.
+
+**Working figures** (given to the engineer in the same words): a store must be decided whenever gitleaks reads its
+input at **1 MB/s or faster**; a reused clean result is labelled in the check's output (standard output or standard
+error of `python3 -m gov.secrets`) by **a line that names the store's project-relative path and the SHA-256 hex
+digest of the store file's bytes** it was keyed on; a store that is scanned carries no such line.
+
+### The interface and the stand-in
+
+Every case runs the check's declared `command` by `sh -c` in a temporary project's root (built from scratch as the
+suite builds it, with the kernel's `template/.gitleaks.toml`, which extends gitleaks' defaults with rules of its own:
+two rule sets), with `HOME`, `TMPDIR` and `XDG_CACHE_HOME` in the test's own folder. One case runs `gov check --json`
+instead, with the check's declaration copied into the project, for the runner's own limit.
+
+What gitleaks is given is seen through **a stand-in named `gitleaks`, first on `PATH`**. It hands every decision to
+the real gitleaks (the one `PATH` finds without it, 8.30.1 at `~/.local/bin`) and logs, in the test's `elsewhere/`
+folder, per gitleaks run: the input's size, which of the test's own marker words it saw, its exit code and time, and
+which rule set it ran with (a 16-digit hash of the configuration gitleaks reads: `GITLEAKS_CONFIG_TOML`, else
+`--config` or `GITLEAKS_CONFIG`). It never logs content. It is a public means: it sees only what any gitleaks on
+`PATH` sees, its command line, environment and standard input, as `gitleaks stdin --help` describes them (for
+`gitleaks dir`/`detect` it reads the named files instead). It can also:
+
+- **read its input more slowly**, at a stated rate, while the real gitleaks reads the same bytes at the same time (so
+  a run lasts about the larger of the two); sleeping only ever makes a run longer, so "today's fixed 60 s is too short"
+  is deterministic however loaded the machine is;
+- **fail on an input that holds a given marker word**: never finish, kill itself by a signal, or exit with a code
+  gitleaks does not give (2, or the next not in {0, 1, the `--exit-code` asked}).
+
+Every run first writes `.gov-runtime/scratch/fresh.txt` with a word of that run only: a file that must be scanned,
+whose word in the log shows the stand-in was the gitleaks the check ran, and whose rule sets are the run's rule sets.
+"**Scanned in full**" means every marker word of the store (at its start, middle and end) was seen under every rule
+set of the run. A red scan may stop at its first finding (today's does), so the red cases ask only that the store
+was given to gitleaks again ("a fresh scan").
+
+### Why a stand-in for the large store, and the figures measured
+
+Real gitleaks on a store large enough to pass today's 60 s even under load would need well over 1 GB on this machine
+(it read 29 MB/s under a load of 27), and whether it fails today would depend on the load. The stand-in at
+**2 MB/s, twice the working figure,** over a **160 MiB (167,772,160-byte)** plain store gives one gitleaks run of
+**83.9 s**: past today's 60 s by 24 s whatever the load, and half of what the working figure allows (167.8 s at
+1 MB/s), so a fix that meets the figure has a margin of two. The small files of the large cases are read at the same
+rate. Measured on 2026-10-19 (20 processors, loads 11 to 61):
+
+| What | Measured |
+|---|---|
+| Writing the 160 MiB store | 0.2 s |
+| Real gitleaks, one pass over it with the kernel's rules, alone | 5.7 s (29.2 MB/s), load 27 |
+| The stand-in at 2 MB/s, one pass over it | 84.0 s, load 33 |
+| Today's check on a project holding it, stand-in at 2 MB/s | red after 61.6 s, 62.8 s, 63.2 s: `subprocess.TimeoutExpired` after 60 seconds |
+| Today's `gov check --json`, the same store and 300 small files | exit 3 after 104 s; secrets-indexing RED, `CHECK_FAILED` |
+| The large cases against a reference scan (below) | 169.7 s (clean, two rule sets one after the other), 84.5 s (canary), 171.2 s (`gov check`) |
+
+Memory: each large case holds at most a few copies of the 160 MiB store at once (the scan, the stand-in streams in
+256 KiB pieces); disk: 160 MiB in the test's temporary folder, removed with it.
+
+### KPI lines, tests and red reasons
+
+Red run on `w2/W2-50` at `c2b094da` plus this file: **15 failed, 8 passed, 0 skipped** (the 20 small cases in 194 s,
+the 3 large ones in about 4 minutes). Then `test_w2_50_never_indexed.py` and `test_w2_50_code_under_test.py`: **7
+passed**, as before.
+
+**Success, "The secrets scan finishes … on stores of today's size … its pool is bounded so that large files are not
+starved [DEC-853]":**
+
+| Test | Red today because |
+|---|---|
+| `test_a_large_clean_store_is_decided_green` (160 MiB clean, stand-in at 2 MB/s: green, and scanned in full) | the check is red after about 62 s: `TimeoutExpired`, 60 s |
+| `test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it` (the canary stands across the store's middle byte, where a split into halves or powers of two falls; a gitleaks run over it must finish and report it) | red by the time limit, naming no store |
+| `test_a_large_store_among_many_small_files_is_decided_by_gov_check` (the large store and 300 small stores, all read at 2 MB/s: the pool full; `gov check --json` reports secrets-indexing GREEN within the declared limit) | `gov check` reports it RED (`CHECK_FAILED`, the time limit) |
+
+**Success, "A clean scan reused by its hash … its clean result is reused, keyed on the store's hash [DEC-853]":**
+
+| Test | Red today because |
+|---|---|
+| `test_an_unchanged_store_is_not_scanned_again_and_its_reuse_is_labelled` (a SQLite store and a plain one: runs 2 and 3 green, neither store given to gitleaks, each labelled with its path and digest; the fresh file not labelled) | run 2 has no reuse line (today every run scans every store) |
+
+**Failure, "The secrets scan stays whole and closed: every file is still scanned with every rule set; a scan that
+cannot finish still fails closed; a store changed by one byte is scanned again in full; a finding is never reused
+[DEC-853]":** the cases whose subject is that a reuse ends first show the reuse (run 1 a full scan, run 2 reused and
+labelled), so they are red today at run 2 and test the ending after the fix.
+
+| Test | Red today because, or why it passes today |
+|---|---|
+| `test_a_store_changed_by_one_byte_is_scanned_again_in_full[first-byte, middle-byte, last-byte]` (size and modification time kept: green, scanned in full, labelled with neither digest) | run 2 has no reuse line |
+| `test_a_one_byte_change_that_makes_a_secret_appear_is_found[default-rule-canary-in-a-sqlite-store, own-rule-value-in-a-plain-store]` (the second is a value only the scan with the project's rules alone finds, DEC-347: so every rule set ran) | run 2 has no reuse line |
+| `test_a_clean_store_that_gains_a_canary_is_red_on_the_next_run` | run 2 has no reuse line |
+| `test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count[a-rule-that-finds-a-value-in-the-store, a-rule-that-finds-nothing-there]` (the store unchanged; a rule added: red, or green and scanned in full; never labelled) | run 2 has no reuse line |
+| `test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean[garbage, truncated, digest-flipped]` (the record is found only by its effect: the files in the project or under HOME that runs 1 and 2 made or changed, other than the store and the fresh file; damaged; then the check is red, or green with the store scanned in full and not labelled. It skips, saying why, if the reuse works but no such file exists, or no file holds the store's digest for `digest-flipped`) | run 2 has no reuse line |
+| `test_a_store_with_a_canary_is_red_from_a_fresh_scan_on_every_run` (three runs: red naming it, given to gitleaks each time, never labelled) | passes today: today's scan never reuses anything |
+| `test_each_store_is_scanned_with_both_rule_sets` (two rule sets; every store's words under each) | passes today: today's scan runs both on every file |
+| `test_a_store_whose_only_secret_the_projects_own_rules_find_is_red` (two runs) | passes today (DEC-347) |
+| `test_a_scan_that_cannot_finish_fails_closed_and_records_nothing[hang, signal, exit-code]` (a clean store changed by one byte; gitleaks fails on it: red within the declared limit, not labelled; the next run, gitleaks back, green with the store scanned in full) | passes today: today's scan raises on each and records nothing |
+
+**Controls (true today and after):** `test_control_a_small_clean_project_is_green` and
+`test_control_a_small_store_with_a_canary_is_red_naming_it_never_the_secret` (real gitleaks alone, no stand-in); every
+red case also asserts the check's output never holds the secret's value.
+
+### The tests can go green: a reference scan outside the tree
+
+To show the 23 cases ask nothing impossible, they were run against a throwaway reference scan kept only in this
+session's scratchpad (never in the tree, never committed): the base scan of `w2/integrate` with a limit of 60 s plus
+1 s a MB, eight workers taking the largest files first, and a record of clean results keyed on the store's path, the
+SHA-256 of its bytes and a hash of the rule sets. **23 passed** (the three large cases in 169.7 s, 84.5 s and 171.2 s).
+Two wrong variants of it are caught by the cases meant for them: with the rules left out of the key, the two
+`rules_makes_no_earlier_clean_result_count` cases fail; with reuse keyed on size and modification time instead of the
+hash, the five one-byte cases fail.
+
+### Readings chosen (the lead's to confirm)
+
+- **D1 — "scanned in full".** Every marker word of the store at its start, middle and end seen under every rule set
+  the run used (the rule sets the fresh file was scanned with), not a count of gitleaks runs: a fix may split a store
+  into chunks or run rule sets side by side.
+- **D2 — a red scan may stop at its first finding.** The red cases ask for a fresh scan (the store given to gitleaks
+  in that run), not every rule set over all of it: today's scan stops at the first rule set that finds.
+- **D3 — "within a bounded time"** for a scan that cannot finish is the check's declared `timeout-seconds` (900), the
+  limit `gov check` holds it to.
+- **D4 — the record of clean results** is looked for in the project and under `HOME` (both temporary). A fix that
+  keeps it elsewhere makes the three damage cases skip with a stated reason, never pass silently.
+- **D5 — the reuse label.** A line naming the path and a digest; "no such line" is checked for the store's current
+  digest and, after a change, its earlier one. The label's other words are not prescribed.
+- **D6 — gitleaks is the one `PATH` finds.** If a fix ran gitleaks by an absolute path, every case that uses the stand-in
+  fails on the fresh-file control, saying so, rather than passing.
+
+### Discoveries of this round (no test)
+
+- **`gov check --json` with a hard-block check RED** exits 3, and its JSON envelope does not hold the check results at
+  `result.checks`, where the green envelope holds them (the case's first form read that key and found nothing); the
+  case looks for the `checks` list anywhere in the envelope.
+- **`gov check` passes the caller's `PYTHONPATH` to the declared command**: the reference scan above was reached
+  through it.
+- **`gov retrieve` gave nothing** for the three questions asked (`FACET_UNAVAILABLE`, both facets stale); the sources
+  were read by name instead.
 
 ## Readings chosen where a KPI line admits more than one
 
