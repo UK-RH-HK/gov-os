@@ -14,10 +14,12 @@
   close's quiet window, one writer per worktree, ceiling 10; fewer until W2-48. Countdown: number in flight + why.
 - **W2-58 first in K3 (DEC-849).** Until it lands: take a refusal, never another form, search named folders (not
   the repo root, `governance/project/`, `.claude/`); count refusals for the digest (today: 3, incl. 2 DEC-409).
-- **Questions (DEC-850):** all-blocking -> six-part package as my message, saved in `governance/project/
-  orchestration/packages/<id>.md`, END THE TURN with "QUESTION FOR THE OWNER: <id> - choose (a), (b), (c) or
-  Discuss first; my recommendation is (x)" then OWNER_ACTION. NEVER the AskUserQuestion box. Part-blocking ->
-  report + digest, six parts. Leads/workers never ask the owner.
+- **Notify the owner (DEC-855, replaces DEC-850's question line):** anything needing the owner (a decision gating
+  ANY ticket, COMMIT-NEEDED, an owner act, LAUNCH_BLOCKED/ESCALATION/AUTH_REQUIRED): (a) six-part package in my
+  message + `governance/project/orchestration/packages/<id>.md`; (b) start everything not depending on it; (c) LAST
+  ACTION: `~/.local/bin/owner-ping "<P1|P2|COMMIT|ACT> <id> | gates <tickets|nothing> | <what I need>"` (a
+  permission request: the only route that reaches the phone). Gates nothing -> daily digest. No secret, key,
+  held-out path or file content in a ping. Never the AskUserQuestion box. Only I ping; leads/workers never.
 - **W2-48 (DEC-852):** subprocess code seen or such tests re-run; serves leads' runs; from its merge a NIGHTLY full
   uncached regression in a quiet window, result in the digest; fail-there-but-cached-pass = P1.
 - **Effort (DEC-839):** Opus 5.5; `--effort high`; max auditors/FULL probes/owner packages; xhigh FULL test designer.
@@ -27,20 +29,24 @@
   `-- <paths>` with `Task: DAEO-sdxk`, `Role: orchestrator`; a session summary in `.../orchestration/sessions/`.
 - **Policy 2 (DEC-820):** reads open except secrets, held-out contents, the counterpart's work, a hidden eval half.
 
-### Where things stand
-- **Staged batch (owner commits, `Role: owner`):** register §248 DEC-831..852 (v0.248, next DEC-853) + Changed-by
-  notes; plan ACCEPTED; prompt v3; `LEAD-w2-common.md`; `AUDITOR-common.md`; W2-48 card + `.tickets/DAEO-xxgp.md`.
-  A staged batch blocks `git merge`; DEC-788: committed before any close. Working memory: `a5798521`.
+### Where things stand (23:05 BST)
+- **Owner committed DEC-831..852 (`a5789de1`).** Answers since: P-W2-49 (a) + hash reuse (DEC-853); P-W2-48 (a)
+  (DEC-854); NOTIFY-TEST (b) -> owner-ping (DEC-855). **STAGED for the owner:** register §249 (v0.249, next
+  DEC-856), prompt v3.1, `LEAD-w2-common.md` (DEC-855; wait for load < 20 before heavy runs), `AUDITOR-common.md`,
+  WBS (W2-50 DEC-853 lines, W2-59 card). A staged batch blocks `git merge`: COMMIT before W2-62 merges.
+- **Leads:** W2-62 running (since 22:29); W2-59 (`DAEO-kh9l`, worktree from `c5100159`) launches when load < 20;
+  W2-50 resume run 8 (secrets fix + merge-back + probe) launches 10 min after W2-59, load < 20.
+- **P1 P-W2-50 (open):** the orchestration record is indexed (5,686 of 7,606 files; 38 % of chunks; 67 % of the
+  code graph's nodes) and gitleaks-scanned each rebuild; rec (a) path-map namespace edit by the owner (I can't read
+  the path map). Rebuild 1,258 s = lexical 396 + semantic ~55 + code graph ~808.
+- **Ping test 1** (22:49:48) ran with no visible permission request: this session predates the ask rule.
 - **Pin proven:** gov -> `~/.local/share/gov-os/pin-fecb870c/bin/gov`; no system `gov`; window 1M. Rebuild 21 min
   (Wave 1: 2.5-3.5). `gov check` (12.6 min): 21 GREEN; YELLOW openspec-validate (not on PATH), core-decision-
   citations (warning); **RED secrets-indexing**: declared checks still run the tree's `src` (W2-59's gap), and
   gitleaks times out (60 s per file, ~24 in parallel) on `store.db` 250 MB and `code.db` 210 MB. Deterministic ->
   **every `gov close` would be refused.**
-- **P1 P-W2-49 (part-blocking: all closes):** fix the scan's time limit/concurrency. W2-50's branch rewrites the same
-  function. Options in the report; W2-50's resume waits for the answer. Never attempt a close known to fail.
-- **P2 P-W2-48:** W2-59 overlaps W2-05's unmerged lines (`check/runner.py` `_run_command` env, `retrieve_check.py`).
-  Rec (a) start now beside W2-05. W2-59 waits.
-- **Notify:** test 1 (the box) did NOT reach the phone. Test 2 (end of turn, NOTIFY-TEST) open.
+- Closes wait for W2-50's merge (the secrets fix). Never attempt a close known to fail. The re-pin after W2-59 must
+  be at a commit holding W2-50's fix (DEC-853 item 4).
 - **Close lock:** before a close, create `.gov-runtime/scratch/orchestrator/CLOSE-RUNNING`; leads hold; remove after.
 - **Usage 22:1x:** session 1 %, week 17 % (resets Oct 25 09:00). Sampler running -> `log/lead-usage.jsonl`.
 
@@ -50,10 +56,9 @@
    given to it: SessionStart context arrives whole up to ~10,000 chars; at 12,000+ Claude Code saves it to a file
    and shows a preview only (measured 22:4x with random tokens). 1 lead in flight: fewer until W2-48, and the
    other candidates wait on P-W2-48 / P-W2-49 / the batch commit.
-2. On the owner's commit + P-W2-49's answer: the secrets fix; then W2-53's close (rebuild immediately before, once),
-   W2-54's close; W2-50's resume -> W2-58. On P-W2-48: W2-59.
+2. W2-50 merges -> W2-53's close (rebuild immediately before, once) -> W2-54's close -> W2-58 starts.
 3. Before each ticket starts: its WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-63; rows W2-H063,
-   W2-M386, W2-L362; package P-W2-50.
+   W2-M386, W2-L362 (proposed in P-W2-50); package P-W2-51.
 
 ### State (git is the truth)
 - Countdown: 1/55 closed (W2-01 by `tk close`). Merged not closed: W2-53, W2-54. Idle: W2-05. Held: W2-02 `2a35fd7b`,
