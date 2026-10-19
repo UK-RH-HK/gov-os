@@ -27,14 +27,19 @@
 - **Effort (DEC-839):** Opus 5.5; `--effort high`; max auditors/FULL probes/owner packages; xhigh FULL designers.
 - **Also:** CAP-10 both figures (85 floor, 99 % target; DEC-833); recalibrate after K2 (DEC-834); the owner's daily
   backup push (DEC-848); every standing rule to register/prompt/RESUME/lead brief/cards (DEC-851).
+- **I commit the owner's decision records (DEC-861):** as soon as written, with the files they govern, trailers
+  `Task: decision-record`, `Role: orchestrator`, `Decided-by: owner (chat, <date>)`; never `Role: owner`; never push
+  (the owner's push = acceptance); nothing left staged. Digest lists every record since the owner's last push (DEC,
+  one line, sha). Exception until P-W2-51: ratchet entries and escalation lifts need an owner commit (ping ACT).
 - **Policy 1 (DEC-819):** `python3 governance/project/orchestration/sync_context.py`, gitleaks on staged, commit
   `-- <paths>`, `Task: DAEO-sdxk`, `Role: orchestrator`. **Policy 2 (DEC-820):** reads open but four.
 
 ### Where things stand
-- **Owner committed DEC-856..858 (`ccf28d5c`)** with the path-map edit (the raw orchestration record out of
-  governance memory). **STAGED:** register §251 DEC-859..860 (v0.251, next DEC-861); prompt v3.2;
-  `LEAD-w2-common.md`; `AUDITOR-common.md`; WBS (W2-37, W2-04, W2-15b lines; new W2-61 card); ticket files
-  `DAEO-u4oz` (W2-04), `DAEO-swdu` (W2-15b). W2-37's ticket file: its lead at resume (reviewed ticket).
+- **Owner committed DEC-859..860 (`f0680605`, pushed).** DEC-861 (I commit decision records) is DRAFTED,
+  UNSTAGED, in the register §252 (v0.252, next DEC-862), prompt v3.3, `LEAD-w2-common.md`: it waits on **P1
+  P-W2-51** (two close checks read only `Role: owner`: ratchet `close/ratchet.py:104-111`, escalation lift
+  `close/state.py:172-200`; DEC-360's checker dormant). Rec (a): those two kinds stay owner commits; (b) via W2-12.
+  W2-37's ticket file: its lead at resume (reviewed ticket).
 - **Leads (00:14):** W2-62 verifying (engineer `7d8e49d8`); W2-59 engineer running (tests `922dd542`); W2-50 run 8
   engineer running (merge-back `e61b67f5`, ticket `c2b094da`, tests `878467c9`). None has `ccf28d5c`.
 - **Merge `w2/integrate` into a lead's branch only at its return** (a commit under a running lead trips its stop
