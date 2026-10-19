@@ -1,2 +1,59 @@
 ................................................F....................... [ 76%]
-...F.............
+...F..................                                                   [100%]
+=================================== FAILURES ===================================
+_ test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut _
+
+run = Hooks(precompact_commands={'manual': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"', '..._lar0/sandbox/systmp'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4211/test_a_resume_here_section_lar0/sandbox/bin')))
+project = PosixPath('/tmp/pytest-of-usain/pytest-4211/test_a_resume_here_section_lar0/repo')
+
+    def test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut(run, project):
+        """Failure 2, "within the hook's size cap": the paths and the instruction stay.
+    
+        Rewritten for W2-62 (DEC-837 item 1, W2-M372): the section is never cut and never said to be truncated; the
+        injection gives its line range for the session to read (was: the head kept and the word `truncated`)."""
+        head = support.resume_section("ZQ")
+        body = head + "".join(f"- note {n:04d}: an invented line that fills the section\n" for n in range(500))
+        assert len(body) > 2 * support.SIZE_CAP_CHARS
+        support.write_checkpoint(project, ORCH, support.checkpoint_text(body, after=LATER))
+        result = run.sessionstart(project, "compact")
+        assert result.returncode == 0, result.describe()
+        support.assert_within_cap(result)
+        support.assert_reads_both_now(result.injection, support.PROMPT_REL, ORCH)
+>       assert re.search(r"\blines \d+-\d+\b", result.injection), "the injection gives no line range of the section"
+E       AssertionError: the injection gives no line range of the section
+E       assert None
+E        +  where None = <function search at 0x7e6c77b3e3e0>('\\blines \\d+-\\d+\\b', 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 26837 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]')
+E        +    where <function search at 0x7e6c77b3e3e0> = re.search
+E        +    and   'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 26837 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]' = HookRun(command='python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"', returncode=0, stdout...37 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]"}}', stderr='').injection
+
+tests/acceptance/W1-49/test_w1_49_sessionstart.py:93: AssertionError
+______ test_a_section_over_the_cap_with_the_warning_stays_inside_the_cap _______
+
+run = Hooks(precompact_commands={'manual': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"', '...p_wi0/sandbox/systmp'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4211/test_a_section_over_the_cap_wi0/sandbox/bin')))
+project = PosixPath('/tmp/pytest-of-usain/pytest-4211/test_a_section_over_the_cap_wi0/repo')
+
+    def test_a_section_over_the_cap_with_the_warning_stays_inside_the_cap(run, project):
+        """Failure 3: the warning and both paths are kept.
+    
+        Rewritten for W2-62 (DEC-837 item 1, W2-M372): the section is named by its line range, never cut and never said
+        to be truncated (was: cut from its end, the head kept, and the word `truncated`)."""
+        head = support.resume_section("ZQ")
+        body = head + "".join(f"- note {n:04d}: an invented line that fills the section\n" for n in range(500))
+        text = support.checkpoint_text(body, after=LATER)
+        path = support.write_checkpoint(project, ORCH, text, age_s=support.STALE_AGE_S)
+        support.assert_not_blocked(run.precompact(project, "auto"), "the compaction")
+        support.read_block(path, text)
+        after = run.sessionstart(project, "compact")
+        assert after.returncode == 0, after.describe()
+        support.assert_within_cap(after)
+        support.assert_warns_older(after.injection, ORCH)
+        support.assert_reads_both_now(after.injection, support.PROMPT_REL, ORCH)
+>       assert re.search(r"\blines \d+-\d+\b", after.injection), "the injection gives no line range of the section"
+E       AssertionError: the injection gives no line range of the section
+E       assert None
+E        +  where None = <function search at 0x7e6c77b3e3e0>('\\blines \\d+-\\d+\\b', 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 26837 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]')
+E        +    where <function search at 0x7e6c77b3e3e0> = re.search
+E        +    and   'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 26837 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]' = HookRun(command='python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"', returncode=0, stdout...37 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]"}}', stderr='').injection
+
+tests/acceptance/W1-49/test_w1_49_sessionstart.py:450: AssertionError
+2 failed, 92 passed, 11 deselected in 6.84s
