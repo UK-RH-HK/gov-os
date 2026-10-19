@@ -4,7 +4,6 @@ Regression evidence only (DEC-136); the acceptance tests prove it from an instal
 """
 from __future__ import annotations
 
-import os
 import shlex
 import sys
 from pathlib import Path
@@ -37,6 +36,7 @@ def test_the_check_gets_no_pythonpath_naming_the_project(tmp_path, monkeypatch):
 def test_a_gov_package_at_the_project_s_root_is_not_imported(tmp_path, monkeypatch):
     (tmp_path / "gov").mkdir()
     (tmp_path / "gov" / "__init__.py").write_text("", encoding="utf-8")
-    monkeypatch.setenv("PYTHONPATH", os.pathsep.join([str(Path(gov.__file__).parents[1])]))
+    package = Path(gov.__file__).resolve()
+    monkeypatch.setenv("PYTHONPATH", str(package.parents[1]))
     code, out, _ = runner._run_command('python3 -c "import gov; print(gov.__file__)"', tmp_path)
-    assert code == 0 and out.strip() == gov.__file__
+    assert code == 0 and Path(out.strip()).resolve() == package
