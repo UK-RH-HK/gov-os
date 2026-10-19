@@ -356,3 +356,21 @@ never-indexed case each ask a closure no other case asks, or have an environment
 **Not run by the designer** (the daemon cannot start in its session): the ten `local_only` cases. Run there:
 collection (51 cases, the same node ids), `py_compile`, the 41 cases that need no code tool (41 passed), and
 `support.calls` with two calls of the wrapper that run no tool.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): `gov` has a second embedding address, the CPU-only embedder's,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"), whose default is a port of this
+machine. The two no-model cases now point that address at the same recording listener as `OLLAMA_HOST`, so "neither
+is used" still covers every embedding address `gov` has:
+
+- `test_w1_20_facets_and_no_model.py::test_a_closure_starts_no_ollama_and_asks_no_model` and
+  `test_w1_20_code.py::test_a_closure_over_code_starts_no_ollama_and_asks_no_model`: **before**, `OLLAMA_HOST` =
+  the listener; **after**, `OLLAMA_HOST` and `GOV_QUERY_OLLAMA_HOST` = the listener. The assertions (no connection
+  to the listener, the stub `ollama` never run) are unchanged.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 42 passed and
+9 errors, as before: the 9 are `test_w1_20_code.py` cases whose fixture builds the code index, and in that sandbox
+`gov.codeintel` cannot create `/tmp/gov-cbm-1000/…` (read-only file system). The code case above is one of them; the
+lead runs it. Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from
+the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no expectation`.
