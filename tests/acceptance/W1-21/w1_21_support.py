@@ -251,6 +251,8 @@ class Api:
             "PYTHONPATH": os.pathsep.join([str(SRC), *([str(self.site)] if self.site else [])]),
             "PYTHONPYCACHEPREFIX": str(self.workdir / "pycache"),
             "OLLAMA_HOST": ollama_host or self.dead_host,
+            # W2-54, DEC-798: the CPU-only embedder's address; the same stand-in (or the same dead port).
+            "GOV_QUERY_OLLAMA_HOST": ollama_host or self.dead_host,
             "HF_HUB_OFFLINE": "1",
             "TRANSFORMERS_OFFLINE": "1",
             **extra,
@@ -803,6 +805,9 @@ class OllamaStandIn:
                     reply = {"version": "0.35.0"}
                 elif route == "/api/tags":
                     reply = {"models": [model]}
+                elif route == "/api/ps":
+                    # W2-54, DEC-798: as the CPU-only embedder must, the model loaded wholly on the CPU.
+                    reply = {"models": [{**model, "size": 639150000, "size_vram": 0}]}
                 elif route == "/api/embed":
                     given = asked.get("input", "")
                     texts = [given] if isinstance(given, str) else list(given)

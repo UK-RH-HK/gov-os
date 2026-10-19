@@ -483,3 +483,22 @@ The second clone is still given **the store's files only**, so the case still re
 store and nowhere else; every other assertion, and every pass line and threshold of this suite, is unchanged. The
 interface table's line for `search(..., refresh=False)` now says the same. Commit trailer: `Rewrite-Reason: DEC-782
 (owner, 2026-10-18, P-W2-32 (a)): a read command may write the query-vector cache and nothing else`.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only the fixture changes:
+
+- `Api.scratch_env`: **before**, `OLLAMA_HOST` = the given stand-in or a dead port; **after**, the same, and
+  `GOV_QUERY_OLLAMA_HOST` = **the same** stand-in or the same dead port. One stand-in answers chunks and questions with
+  the same vectors, so every ranking, every recorded request (`embedded_text()`) and every "Ollama absent" case is
+  what it was.
+- `OllamaStandIn`'s `GET /api/ps`: **before**, `{"models": []}`; **after**, the model listed with `size_vram` 0, as
+  the CPU-only embedder must report it (W2-54 uses a vector only from an embedder that reports the model on the CPU).
+- `real_env` (the real-models cases) is unchanged: they use the default addresses.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change: 35 passed
+without `test_w1_19_real_models.py` (as before; that file needs the real models and was not run). Commit trailer:
+`Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)): query embeddings come from the CPU-only embedder on its own
+port; the fixtures point it at a stand-in and change no expectation`.

@@ -2291,3 +2291,18 @@ W1-26's policy cases: 11 passed.
 
 Estimate: 220 LOC. Second-start implementation: 732 LOC. Tests cover the full scope of
 A1–A8 and B1–B7; no shrinkage applied.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only one fixture changes:
+
+- `test_w1_30_r11_rebuild_mode.py`, fixture `rebuild_without_embeddings`: **before**, `OLLAMA_HOST` = a dead loopback
+  port (Ollama absent); **after**, `OLLAMA_HOST` and `GOV_QUERY_OLLAMA_HOST` = that dead port, so Ollama is absent at
+  both addresses. The assertions (the rebuild succeeds; the stand-in program is never started) are unchanged.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change:
+`test_w1_30_r11_rebuild_mode.py` 2 passed. Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
+query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
+expectation`.

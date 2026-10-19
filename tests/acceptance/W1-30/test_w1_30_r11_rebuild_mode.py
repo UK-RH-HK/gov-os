@@ -49,7 +49,9 @@ def rebuild_without_embeddings(project, sandbox, interface, tmp_path):
     program.parent.mkdir()
     program.write_text(f"#!/bin/sh\necho started >> '{program.parent / 'started'}'\n", encoding="utf-8")
     program.chmod(0o755)
-    env = {**support.sandbox_env(sandbox), "OLLAMA_HOST": dead, "GOV_OLLAMA_BIN": str(program)}
+    # W2-54, DEC-798: the CPU-only embedder's address is dead too.
+    env = {**support.sandbox_env(sandbox), "OLLAMA_HOST": dead, "GOV_QUERY_OLLAMA_HOST": dead,
+           "GOV_OLLAMA_BIN": str(program)}
 
     def rebuild():
         run = project.gov(sandbox, "rebuild", MODE, "--json", env=env)
