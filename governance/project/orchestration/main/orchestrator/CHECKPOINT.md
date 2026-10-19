@@ -1,59 +1,75 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-19 ~19:30 — Wave 2 PAUSED; handover to a fresh session; DEC-792 layout)
+## RESUME HERE (2026-10-19 ~23:00 — Wave 2 RESUMED by keystones; plan ACCEPTED with DEC-831..DEC-852 STAGED)
 
-### WAVE 2 IS PAUSED until the owner approves the revised plan (DEC-829 item 6)
-- Start no ticket, lead, worker; run no close; merge nothing. **Run no `gov` command until the owner says the
-  handover is complete** (owner, 19:20: they are installing the pin and changing user-level settings).
-- **Handover sequence (owner, 2026-10-19 ~19:20):**
-  1. Commit the batch: **DONE** `b8571d9d` (DEC-813..DEC-830, `Role: owner`; register v0.247; next free DEC-831).
-  2. Install the bootstrap pin (DEC-822 step 1): `.gov-runtime/scratch/orchestrator/pin/PIN-COMMANDS.sh` (wheel of
-     `fecb870c`, sha256 `385fd5f0…f7bd`, venv `~/.local/share/gov-os/pin-fecb870c`, then `pin_registry.py`, then the
-     owner commits `governance/project/tool-registry.yaml` with `Implements: DEC-822`). At 19:30 NOT yet done
-     (`~/.local/bin/gov` was still the editable install's script).
-  3. The owner changes user-level settings (lens F: compaction window, subagent model, agent teams). Never read
-     `~/.claude/`; ask the owner what changed if it matters.
-  4. This session closes; a fresh one starts here.
-- **First thing in the fresh session (read-only, no `gov`):** `git log --oneline -5` (expect `b8571d9d`, my
-  working-memory commit, and the owner's DEC-822 registry commit); `readlink -f ~/.local/bin/gov` (expect
-  `…/pin-fecb870c/bin/gov`); `python3 -c 'import gov'` (expect ModuleNotFoundError); `git status --short`. Report
-  what holds. If the pin is absent, say so: installing it is the owner's act, never mine. The pin does NOT yet cover
-  the declared checks or the hook lines (they import the tree's `src`): that is W2-59, keystone 1.
-- **The revised plan awaits the owner:** `docs/plan/WAVE_2_REVISED_PLAN.md` (PROPOSED; committed with my working
-  memory; reported 19:15). 12 decisions in its §11: (1) approve the plan; (2) Contract re-baseline, 9 items to Wave 3,
-  via W2-49 (rec (a) now); (3) CAP-10 keep 85; (4) withdraw DEC-062 and DEC-140; (5) lens F Table 3 + prompt v3,
-  subagents on the parent's model, agent teams off, DEC-460's cause corrected; (6) defer the 8 Charter roles;
-  (7) W2-59 scope; (8) W2-48's behaviour KPI + testmon/coverage package; (9) `docs/imported/` out of the schema
-  check; (10) path map `experiments/**` + `evaluation_sets`; (11) owner acts (pin, held-out index check, lefthook
-  measure, S0b2 leftovers); (12) cap 3 -> 4 after keystone 2.
-- **After the owner's answers (in order):**
-  1. The owner records them (DEC-831 onward, owner commit). I draft the entries only if asked.
-  2. The plan's changes land before any ticket starts (DEC-825 item 7): WBS + LIST (moves to Wave 3 with reasons,
-     the new cards W2-59/60/61, the widenings, row W2-M385 = doctor canary path / `gov --version` / gov-by-wheel),
-     `tk` files for W2-55..W2-61, W2-27's ticket file, W2-19 cut; prompt v3 (owner edit: `--effort`, compaction
-     via `--settings` env, A5 checkpoints at milestones, resume only via `gov launch --resume`); path-map edits
-     (owner). Next free: ticket W2-62, rows W2-H063 / W2-M386 / W2-L362 (W2-M385 proposed in the plan).
-  3. On the owner's word, resume by keystones (plan §3, §4): K1 W2-59 (lead) then the owner re-pins at its merge;
-     K2 the close queue in DEC-806 order, each once, quiet window, rebuild immediately before: **W2-53 first**
-     (P-W2-47 is settled by DEC-823 (a): the W1-30 r13 case is in `load_sensitive`, `b8571d9d`), W2-54, W2-02
-     (resume), W2-03, W2-20, W2-51 (resume), W2-49, W2-16, W2-50 (resume), W2-05 (resume), W2-52 (resume), W2-37
-     (resume), W2-26 (re-scope to `experiments/EXP-003/**`, after W2-07); with W2-57, W2-48, W2-07. Cap 3 (DEC-776)
-     unless the owner raises it.
-- **ASSESSMENT, done:** `docs/assessment/2026-10/` A-G + SYNTHESIS, committed `b8571d9d`; total $193.03 (F $12.15,
-  G $26.82). Stats: `assessment_stats.py`.
+### Where things stand
+- **Owner batch STAGED, not committed:** DEC-831..DEC-852 (register §248, v0.248, next free DEC-853; "Changed by"
+  notes on DEC-062/140/460/726/737/776/786/792/828/829/830) + the plan ACCEPTED (`docs/plan/WAVE_2_REVISED_PLAN.md`)
+  + prompt v3 + `LEAD-w2-common.md` + `AUDITOR-common.md` + W2-48's card (WBS) and ticket file `DAEO-xxgp`
+  (DEC-843, DEC-852). The owner commits it (`Role: owner`). **A staged batch blocks `git merge`, and DEC-788 needs
+  it committed before any close.**
+- **NOTIFY-TEST open:** my turn ended with "QUESTION FOR THE OWNER: NOTIFY-TEST - did this reach your phone? (a) yes
+  (b) no" (DEC-850's test). If (b), the owner adds a Notification hook.
+- **The close lock (LEAD-w2-common, DEC-847/780):** before each close I create
+  `.gov-runtime/scratch/orchestrator/CLOSE-RUNNING`; leads start no worker or suite batch while it exists; I remove
+  it when the close ends.
+- **The pin is proven** (session of 2026-10-19 evening): `~/.local/bin/gov` -> `~/.local/share/gov-os/pin-fecb870c/
+  bin/gov`; system `python3 -c 'import gov'` -> ModuleNotFoundError; window "1m tokens (default for this model)".
+  Full rebuild under the pin: exit 0, 21 min (Wave 1: 2.5-3.5 min; lexical 396 s; load ~32 from parallel gitleaks).
+  `gov check` under the pin: see `log/pin-check-2026-10-19.json`.
+- **Package P-W2-48 (P2, part-blocking, in the report):** W2-59 overlaps W2-05's unmerged `_run_command` env lines
+  (`check/runner.py`, `retrieval/retrieve_check.py`). Rec (a): start W2-59 now on w2/integrate; W2-05's resume
+  absorbs the overlap. Until answered, W2-59 waits; everything else goes on.
+- **Notification test 1 (owner, 22:2x):** the AskUserQuestion box did NOT reach the owner's phone (answer "No").
+  Hence DEC-850 item 1: never the box; end the turn with the QUESTION FOR THE OWNER line.
+- **Next, in order:** owner commits the batch -> W2-53 close (quiet window, rebuild immediately before, once) ->
+  W2-54 close. Leads now: W2-62 (resume in full, new, no overlap) and W2-50 (resume probe; frees W2-58). W2-58
+  starts when W2-50 merges or stacked on it after its probe passes. Then the plan's WBS/LIST/tk edits ticket by
+  ticket before each starts (DEC-825 item 7). Next free: ticket W2-63, rows W2-H063 / W2-M386 / W2-L362.
+- **Usage (owner's subscription):** `claude -p "/usage"` at 22:1x: session 1 %, week 17 % (resets Oct 25 09:00).
+- **Lead usage sampler running:** `tools/lead_usage.py log/lead-usage.jsonl 30`; summary with `--summary`.
+
+### Standing owner rules of 2026-10-19 (short form; full text in the register and prompt v3, DEC-851)
+- **Window (DEC-838):** every session on its model's full window (1M, Opus 5.5). Never set a compaction threshold;
+  never ask a session to stop or compact early. Usage is the limit: digest reports daily/weekly use (`/usage`).
+- **Checkpoint at every handover (DEC-837):** a worker's return, a merge, a package, a compaction. RESUME HERE holds
+  the full session state (happening / decided / next / where); repository knowledge comes from retrieval and packets.
+  DEC-792's 8,000-char limit is lifted once W2-62 lands (the hook then loads RESUME HERE in full).
+- **Memory used (DEC-836):** every lead/worker brief tells its agent to use `gov retrieve`; from W2-04's merge I
+  build every brief with `gov context` (until then, record each brief built without one); usage counted.
+- **Parallelism (DEC-847):** no fixed cap. Start leads as eligible tickets (deps closed or DEC-786-stackable), the
+  MEASURED gate (DEC-798's figures until measured: load1 < 20, MemAvailable >= 6710886 kB), the owner's usage
+  limits, never during a close's quiet window, one writer per worktree, ceiling 10. Fewer until W2-48 lands. Every
+  countdown: number in flight and why.
+- **W2-58 first in keystone 3 (DEC-849).** Until it lands: take a read refusal, never another form, search named
+  folders (never from the repo root, `governance/project/` or `.claude/`); count refusals in the digest (today: 1).
+- **Questions (DEC-850):** all-blocking -> six-part package (DEC-818) as my message + saved under
+  `governance/project/orchestration/packages/<id>.md`; END THE TURN with it, last lines: "QUESTION FOR THE OWNER:
+  <id> - choose (a), (b), (c) or Discuss first; my recommendation is (x)" then OWNER_ACTION. NEVER the
+  AskUserQuestion box (it does not notify the phone). Background work keeps going. Part-blocking -> report +
+  digest, six parts, no question line. Leads/workers never ask the owner; leads return packages saying all/part.
+- **W2-48 (DEC-852):** cache sees subprocess code or re-runs process-starting tests; serves leads' runs (same rules,
+  `--no-cache`); from its merge, a NIGHTLY full uncached regression on w2/integrate's head in a quiet window, result
+  in the next digest; a test failing there but passed via cache = P1 package. W2-24/W2-46 full runs stay.
+- **Rules about rules (DEC-851):** each standing rule goes to the register, prompt v3, RESUME HERE, LEAD-w2-common,
+  and JUDGEMENT/AUDITOR-common where it applies; each report names the places.
+- **Backups (DEC-848):** agents never push; the owner's own backup push of w2/integrate continues, at least daily.
+- **Effort per launch (DEC-839):** Opus 5.5 everywhere; `--effort high` (max: auditors, FULL probes, owner
+  packages; xhigh trial: FULL test designers); subagents on the parent's model; agent teams off.
+- **CAP-10 (DEC-833):** report both figures: hit@5 vs the floor 85, and complete stacked evidence vs the target 99 %.
+- **Estimates (DEC-834):** recalibrate all after keystone 2 from measured ticket and close times.
 - **POLICY 1 (DEC-819):** all context in git; at every checkpoint `python3 governance/project/orchestration/
-  sync_context.py`, gitleaks on the staged set, commit with `Task: DAEO-sdxk`, `Role: orchestrator`; a session
-  summary under `governance/project/orchestration/sessions/` at each session end. Never secrets, held-out material,
-  stores, models, binaries.
+  sync_context.py`, gitleaks on the staged set, commit with `Task: DAEO-sdxk`, `Role: orchestrator`, `-- <paths>`;
+  a session summary under `governance/project/orchestration/sessions/` at each session end.
 - **POLICY 2 (DEC-820, ADR-0001):** reads open; refused only (a) secrets, (b) held-out contents (names ok),
   (c) the counterpart's work on the same ticket, (d) the hidden half of an evaluation set. Writes: own ticket paths
-  only. The guard still enforces DEC-508/525/557 until W2-58: never route round it.
+  only.
 
 ### State (git is the truth; re-derive from git + `.tickets/` if this block is older)
-- **Branch** `w2/integrate` at `b8571d9d` (owner batch DEC-813..830) + my working-memory commit. Before: `fecb870c`
-  versioned brief text; W2-54 merged `6f7d4f9e`; W2-53 merged `c9537e39`.
-- **Countdown:** 1/55 closed (W2-01). Merged not closed: W2-53, W2-54. Running 0. Idle 1 (W2-05). Held 10. Not
-  started 41. (With the plan approved: 53 W2 tickets + W2-00.)
+- **Branch** `w2/integrate` at `70aea435` (owner's DEC-822 pin registry commit) + my working-memory commits of
+  2026-10-19 evening. Before: `6a5d6b34` (handover), `b8571d9d` (owner batch DEC-813..830).
+- **Countdown:** 1/55 closed (W2-01, by `tk close`). Merged not closed: W2-53, W2-54. Running 0. Idle 1 (W2-05).
+  Held 10. Close success rate: 0 of 3 `gov close` runs clean (all W2-53). Wave 2 = 55 tickets + W2-00 (DEC-831).
 - **W2-53's last re-close** (12:01, `log/close-DAEO-7rr2-3.json`) REFUSED on the W1-30 r13 case only; repair ticket
   DAEO-c6ir in `log/repair-tickets/`. Its next re-close is legitimate now (the load_sensitive change), once only.
 
@@ -65,7 +81,9 @@
   (on W2-49): merge, DEC-814 regenerate, rebuild, all suites, probe. W2-54 `226ec458`: merged, close after W2-53.
 
 ### Open owner items
-- **The revised plan's 12 decisions** (above). **The bootstrap pin** (step 2, the owner's act).
+- **COMMIT:** the staged batch DEC-831..DEC-852 (above). **P2 P-W2-48** (W2-59 vs W2-05; rec (a)), saved at
+  `governance/project/orchestration/packages/P-W2-48.md`. **NOTIFY-TEST** (a)/(b). DEC-822 step 2 (the hook lines)
+  rides in W2-59. The path-map lines of DEC-845 (I give them when W2-58/W2-26 need them).
 
 ### Decision packages (DEC-818)
 Every P1 package is self-contained: (1) context in plain words with history and links; (2) what happened, with
