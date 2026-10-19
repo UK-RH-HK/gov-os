@@ -32,6 +32,7 @@ block" is measured against.
 from __future__ import annotations
 
 import os
+import re
 
 import pytest
 
@@ -76,8 +77,11 @@ def test_a_long_checkpoint_does_not_push_the_section_out_of_the_cap(run, project
     assert support.TRUNCATED not in result.injection.lower(), "a section that fits the cap is reported as cut"
 
 
-def test_a_resume_here_section_larger_than_the_cap_is_cut_and_said_so(run, project):
-    """Failure 2, "within the hook's size cap": the head is kept, the cut is named, the paths and the instruction stay."""
+def test_a_resume_here_section_larger_than_the_cap_is_named_by_its_lines_not_cut(run, project):
+    """Failure 2, "within the hook's size cap": the paths and the instruction stay.
+
+    Rewritten for W2-62 (DEC-837 item 1, W2-M372): the section is never cut and never said to be truncated; the
+    injection gives its line range for the session to read (was: the head kept and the word `truncated`)."""
     head = support.resume_section("ZQ")
     body = head + "".join(f"- note {n:04d}: an invented line that fills the section\n" for n in range(500))
     assert len(body) > 2 * support.SIZE_CAP_CHARS
@@ -86,9 +90,9 @@ def test_a_resume_here_section_larger_than_the_cap_is_cut_and_said_so(run, proje
     assert result.returncode == 0, result.describe()
     support.assert_within_cap(result)
     support.assert_reads_both_now(result.injection, support.PROMPT_REL, ORCH)
-    _assert_whole_section(result.injection, head)
-    assert support.TRUNCATED in result.injection.lower(), (
-        f"the section was cut to fit the cap and the injection does not say `{support.TRUNCATED}`"
+    assert re.search(r"\blines \d+-\d+\b", result.injection), "the injection gives no line range of the section"
+    assert support.TRUNCATED not in result.injection.lower(), (
+        f"the section is larger than the cap and the injection says `{support.TRUNCATED}` (W2-M372)"
     )
 
 
@@ -428,7 +432,10 @@ def test_the_markers_quoted_inside_the_section_do_not_cut_it(run, project):
 
 
 def test_a_section_over_the_cap_with_the_warning_stays_inside_the_cap(run, project):
-    """Failure 3: the warning and both paths are kept, the section is cut from its end and said so."""
+    """Failure 3: the warning and both paths are kept.
+
+    Rewritten for W2-62 (DEC-837 item 1, W2-M372): the section is named by its line range, never cut and never said
+    to be truncated (was: cut from its end, the head kept, and the word `truncated`)."""
     head = support.resume_section("ZQ")
     body = head + "".join(f"- note {n:04d}: an invented line that fills the section\n" for n in range(500))
     text = support.checkpoint_text(body, after=LATER)
@@ -440,8 +447,8 @@ def test_a_section_over_the_cap_with_the_warning_stays_inside_the_cap(run, proje
     support.assert_within_cap(after)
     support.assert_warns_older(after.injection, ORCH)
     support.assert_reads_both_now(after.injection, support.PROMPT_REL, ORCH)
-    _assert_whole_section(after.injection, head)
-    assert support.TRUNCATED in after.injection.lower(), "the section was cut to fit the cap and the injection does not say so"
+    assert re.search(r"\blines \d+-\d+\b", after.injection), "the injection gives no line range of the section"
+    assert support.TRUNCATED not in after.injection.lower(), "the section is larger than the cap and the injection says so"
 
 
 # --------------------------------------------------------------------------
