@@ -536,12 +536,41 @@ question in this sandbox, under load), and 0.02 to 0.06 s a question after that 
   reads; W1-21's real-models figure; the context check and `gov check` after a full rebuild; the CPU embedder's memory
   beside the shared runner's.
 
-Measurement after the change on the shared GPU (run by the lead): *to be filled in: the command, the placement it
-prints for the shared runner (`size_vram` against `size`) and the CPU embedder (its port, `size_vram`), the figures
-(one process, two processes at once), the `shared_gpu` cases, and the context check's seconds, tickets and load after
-a full rebuild with the cache deleted, against the declared `timeout-seconds: 600`.*
+Measurement after the change on the shared GPU (run by the lead, at `a4801649`):
 
-W1-21's hit@5 with CPU query vectors (run by the lead): *to be filled in.*
+- Command: `env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3
+  .gov-runtime/scratch/lead/eng5-measure.py` (the script as returned, sha256
+  `b0956ec7a1c63e97464035d8a508b45f94da1b29abeca442387c143e3e337e2c`), exit 0, 152.0 s.
+- Shared: Ollama 0.35.0 at 127.0.0.1:11434, `qwen3-embedding:0.6b` digest
+  `ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d`. The shared runner before:
+  `size 2370652077 size_vram 2370652077` (wholly on the GPU); after: the same.
+- CPU embedder: at 127.0.0.1:11435 (port 11435), started by the run (1.92 s), the same digest; first question request
+  5.74 s (the CPU model load); after it `size 2371270737 size_vram 0`. Its runner process's resident memory: 1194116 KiB
+  (about 1.14 GiB) beside the shared runner; Ollama reports its model size as 2.21 GiB.
+- One process: 360 reads (6 texts × cold, written, unwritable × 10 kinds of predecessor × 2), **0 differed**, largest
+  component difference 0.000000.
+- Two processes at once with a third client: 96 reads, **0 differed** from the one-process reference.
+- `VERDICT: GREEN (differed 0 + 0; shared on the GPU before True, after True)`.
+- The `shared_gpu` cases: `env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST "PATH=…"
+  PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 -m pytest tests/acceptance/W2-54/test_w2_54_shared_gpu.py
+  -m shared_gpu -s -q -p no:cacheprovider -rs`: **2 passed in 35.07 s**; it printed "the CPU embedder serves at
+  127.0.0.1:11435 (port 11435); its qwen3-embedding:0.6b size 2371270737 bytes (2.21 GiB), size_vram 0; the shared
+  runner at 127.0.0.1:11434: size 2370652077, size_vram 2370652077". The shared runner's placement before, between
+  and after the two runs: `size_vram` = `size` each time.
+- The context check after a full rebuild (`gov rebuild --json`, 234 s, store digest
+  `1835b802253557321b65135df8812f23c1bb397563cfd94b0b255eaaecc93f4f`), the cache cold for the device key (round 3's
+  table, never served, dropped at the first write; 67 entries written by the run): `python3 -m gov.context.context_check`
+  → `context-reproducibility: green`, exit 0, **142.41 s** (2:22.41) against the declared `timeout-seconds: 600`, every
+  ticket of this repository (106 ticket files under `.tickets/`), load average 31.94 before and 10.68 after, 20
+  processors.
+- Before this change, the lead's red check at `cd363a8e` ran round 2's real-embedder case with round 3's `num_gpu: 0`
+  code against the shared server, which left the shared runner on the CPU (`size_vram 0`), kept there by other
+  sessions' requests without options; the lead moved it back with one embed request naming `num_gpu: 999` (reloaded on
+  the GPU, `size_vram` = `size`), the cost DEC-798 removes.
+
+W1-21's hit@5 with CPU query vectors (run by the lead, at `a4801649`, on the real models, the index built by the shared runner on the GPU, the questions embedded by the CPU-only embedder at `127.0.0.1:11435`): **81.67** (pass line 80), `1 passed in 60.33s`; per class decisions 83.3, failed-approaches 100.0, tests 80.0, stale-evidence 66.7, current-vs-superseded 100.0, deletable 40.0, callers-impact 100.0, where-defined 83.3, why 80.0, history 83.3. Command: `env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST "PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH" PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 -m pytest "tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line" -q -p no:cacheprovider -rs`.
+
+Round 3's figure with GPU query vectors was the same, 81.67.
 
 The script's command (the script is given to the lead with this engineer's return; it writes only in a temporary
 folder of its own and never reads or deletes the worktree's cache file):
