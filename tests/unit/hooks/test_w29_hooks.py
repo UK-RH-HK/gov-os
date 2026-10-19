@@ -27,6 +27,7 @@ import sessionstart  # noqa: E402
 
 ORCH = ".gov-runtime/scratch/orchestrator/CHECKPOINT.md"
 WRITTEN = "# C\n\n## RESUME HERE\n\n- SECRET-71\n"
+PROMPT = "governance/project/prompts/w9-orchestrator.md"  # W2-62: the prompt the roster names
 
 TWELVE_FIELDS = (
     "task", "status", "work_completed", "files_changed",
@@ -221,6 +222,9 @@ def _make_project(tmp_path):
     )
     cp_dir = tmp_path / "docs" / "checkpoints" / "TEST-abcd"
     cp_dir.mkdir(parents=True)
+    roster = tmp_path / "governance" / "project" / "roster.yaml"
+    roster.parent.mkdir(parents=True)
+    roster.write_text(f"roles:\n  orchestrator:\n    prompt: {PROMPT}\n")
     _init_git(tmp_path)
     return tmp_path
 
@@ -289,7 +293,7 @@ class TestSessionStartCombined:
         assert run.returncode == 0
         data = json.loads(run.stdout)
         ctx = data["hookSpecificOutput"]["additionalContext"]
-        assert sessionstart.PROMPT_REL in ctx
+        assert PROMPT in ctx
 
     def test_non_orchestrator_no_prompt_path(self, tmp_path):
         project = _make_project(tmp_path)
@@ -299,7 +303,7 @@ class TestSessionStartCombined:
         if run.stdout.strip():
             data = json.loads(run.stdout)
             ctx = data.get("hookSpecificOutput", {}).get("additionalContext", "")
-            assert sessionstart.PROMPT_REL not in ctx
+            assert PROMPT not in ctx
 
     def test_checkpoint_resume_brief_on_compact(self, tmp_path):
         project = _make_project(tmp_path)
@@ -329,13 +333,13 @@ class TestSessionStartCombined:
         if run.stdout.strip():
             data = json.loads(run.stdout)
             ctx = data.get("hookSpecificOutput", {}).get("additionalContext", "")
-            assert sessionstart.PROMPT_REL not in ctx
+            assert PROMPT not in ctx
 
     def test_cut_order_preserves_critical(self, tmp_path):
         project = _make_project(tmp_path)
         ckpt = project / ORCH
         ckpt.parent.mkdir(parents=True)
-        large_section = "x" * 9500
+        large_section = "x" * 9800  # W2-62: too long to fit whole with the instruction
         ckpt.write_text(f"# C\n\n## RESUME HERE\n\n{large_section}\n")
         stamp = time.time() - 60
         os.utime(ckpt, (stamp, stamp))
@@ -345,7 +349,10 @@ class TestSessionStartCombined:
         data = json.loads(run.stdout)
         ctx = data["hookSpecificOutput"]["additionalContext"]
         assert len(ctx) <= sessionstart.CAP_CHARS
-        assert sessionstart.PROMPT_REL in ctx
+        assert PROMPT in ctx
+        # W2-62: never a cut; the section is named by its lines and size instead
+        assert "lines 3-5, 9,816 characters" in ctx
+        assert "x" * 100 not in ctx and "truncated" not in ctx
 
     def test_within_cap(self, tmp_path):
         project = _make_project(tmp_path)

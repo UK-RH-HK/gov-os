@@ -4,23 +4,27 @@ SessionStart hook (W1-49 resume injection + W1-29 context packet, CAP-37).
 
 Combined injection, within the 10,000-character cap:
 
-Critical parts (W1-49, orchestrator only, last to be cut):
-  - instruction to read the prompt and checkpoint
+Critical parts (W1-49, W2-62, orchestrator only, never cut):
+  - instruction to read the prompt the roster names and the checkpoint
   - staleness warning (DEC-264)
-  - RESUME HERE section
+  - instruction to read the RESUME HERE section in full: the
+    checkpoint's path, the section's line range and its size
+  - the whole RESUME HERE section, only when it fits within the cap
+    with the rest; a section is never cut (DEC-837)
 
-Optional parts (W1-29, all roles, first to be cut):
+Optional parts (W1-29, all roles, the ones trimmed):
   - gov context --brief output
   - tk ready output
   - checkpoint resume brief (on compact/clear/resume)
 
 When the combined injection exceeds the cap, the optional parts are
-trimmed first; the instruction and the staleness warning are the last
-things cut (reviewer finding 3).
+trimmed (reviewer finding 3).
 
 Acts for all roles when GOV_TICKET is set (W1-29 context injection).
-The W1-49 orchestrator injection (prompt path, RESUME HERE, staleness
+The orchestrator injection (prompt path, RESUME HERE, staleness
 warning) acts only when GOV_ROLE is exactly "orchestrator" (DEC-259).
+The prompt is the one governance/project/roster.yaml names under
+roles: orchestrator: prompt:; with none, no prompt is named (W2-M373).
 
 Always exits 0.
 """
@@ -36,30 +40,47 @@ import sys
 import time
 from pathlib import Path
 
-PROMPT_REL = "governance/project/prompts/w1-orchestrator.md"
-CAP_CHARS = 10_000
-SECTION_MAX_CHARS = 9_000
+ROSTER_REL = "governance/project/roster.yaml"
+CAP_CHARS = 10_000  # Claude Code moves a longer additionalContext to a file (W2-62 CIT-P)
 
 
-def resume_section(text: str) -> str:
-    """The heading that begins with RESUME HERE and everything up to
-    the next heading of the same or a higher level. A line inside a
-    fenced code block (three backticks) is not a heading."""
-    kept: list[str] = []
-    level = 0
+def resume_lines(text: str) -> tuple[int, int, str]:
+    """(first, last, section): the heading that begins with RESUME HERE
+    and everything up to the next heading of the same or a higher
+    level, trailing empty lines excluded; first and last are 1-based
+    line numbers of text. A line inside a fenced code block (three
+    backticks) is not a heading. (0, 0, "") when there is none."""
+    lines = text.split("\n")
+    first = last = level = 0
     fenced = False
-    for line in text.splitlines():
+    for number, line in enumerate(lines, 1):
         if line.startswith("```"):
             fenced = not fenced
         heading = None if fenced else re.match(r"(#{1,6})\s+(.*)", line)
         if level:
             if heading and len(heading.group(1)) <= level:
                 break
-            kept.append(line)
         elif heading and heading.group(2).startswith("RESUME HERE"):
-            level = len(heading.group(1))
-            kept.append(line)
-    return "\n".join(kept).strip()
+            level, first = len(heading.group(1)), number
+        if level and line.strip():
+            last = number
+    return first, last, "\n".join(lines[first - 1:last]) if first else ""
+
+
+def resume_section(text: str) -> str:
+    return resume_lines(text)[2]
+
+
+def roster_prompt(project_root: str) -> str:
+    """The orchestrator's prompt the project's roster names
+    (roles: orchestrator: prompt:), or "" when it names none."""
+    try:
+        import yaml
+        with open(os.path.join(project_root, ROSTER_REL), encoding="utf-8") as f:
+            prompt = yaml.safe_load(f)["roles"]["orchestrator"]["prompt"]
+    except Exception:
+        return ""
+    return prompt.strip() if isinstance(prompt, str) else ""
 
 
 def _add_src(project_root: str) -> None:
@@ -74,7 +95,7 @@ def main() -> None:
         data = json.loads(sys.stdin.read())
     except Exception:
         data = {}
-    source = data.get("source", "")
+    source = data.get("source", "") if isinstance(data, dict) else ""
 
     project_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
     role = os.environ.get("GOV_ROLE", "")
@@ -86,18 +107,20 @@ def main() -> None:
 
         rel = checkpoint_rel(project_root)
         path = os.path.join(project_root, rel)
+        prompt = roster_prompt(project_root)
         if "/lead/" in rel:
             lead_ticket = ticket or "this worktree's ticket (GOV_TICKET is not set)"
+            appendix = f"appendix A5 of {prompt} and " if prompt else ""
             critical_parts.append(
-                f"You are the ticket lead for {lead_ticket}; read appendix A5 of "
-                f"{PROMPT_REL} and your checkpoint {rel} now.")
+                f"You are the ticket lead for {lead_ticket}; read {appendix}your checkpoint {rel} now.")
         else:
-            critical_parts.append(f"Read now, before anything else: {PROMPT_REL} and {rel}.")
+            critical_parts.append(f"Read now, before anything else: {f'{prompt} and ' if prompt else ''}{rel}.")
+        first = last = 0
         section, older = "", False
         try:
             with open(path, "rb") as f:
                 written, block = split(f.read())
-            section = resume_section(written.decode("utf-8", errors="replace"))
+            first, last, section = resume_lines(written.decode("utf-8", errors="replace"))
             stamp = re.search(rb"^generated: (\S+)", block, re.M)
             older = bool(stamp) and os.path.getmtime(path) < calendar.timegm(
                 time.strptime(stamp.group(1).decode(), STAMP))
@@ -108,11 +131,17 @@ def main() -> None:
                 f"CHECKPOINT OLDER THAN STATE BLOCK: the written part of {rel} is older than the generated "
                 "state block at the end of that file. Re-derive state from git and the tickets before acting.")
         if section:
-            critical_parts.append(f"The RESUME HERE section of {rel}:\n\n{section[:SECTION_MAX_CHARS]}")
-            if len(section) > SECTION_MAX_CHARS:
+            critical_parts.append(
+                f"Read the RESUME HERE section of {rel} in full before anything else: "
+                f"lines {first}-{last}, {len(section):,} characters.")
+            whole = f"The whole RESUME HERE section of {rel} (lines {first}-{last}):\n\n{section}"
+            if len("\n\n".join(critical_parts + [whole])) <= CAP_CHARS:
+                critical_parts.append(whole)
+            else:
                 critical_parts.append(
-                    f"[truncated: the first {SECTION_MAX_CHARS} of {len(section)} characters of the "
-                    f"section are shown; the rest is in {rel}]")
+                    f"The section is longer than this injection can carry whole ({CAP_CHARS:,} characters), so "
+                    f"none of it is shown here: read lines {first}-{last} of {rel} now, every line, in as many "
+                    "reads as it takes.")
         else:
             critical_parts.append(f"{rel} is missing, can't be read or has no RESUME HERE section.")
 
