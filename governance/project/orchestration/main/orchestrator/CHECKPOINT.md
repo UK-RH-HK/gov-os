@@ -1,115 +1,75 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-19 ~23:00 — Wave 2 RESUMED by keystones; plan ACCEPTED with DEC-831..DEC-852 STAGED)
+## RESUME HERE (2026-10-19 ~22:30 BST — Wave 2 RESUMED by keystones; DEC-831..DEC-852 STAGED for the owner)
+
+### Standing owner rules of 2026-10-19 (short; full text: register §248, prompt v3; DEC-851)
+- **Window (DEC-838):** full model window (1M); never set a compaction threshold; never ask a session to stop or
+  compact early. Usage is the limit: digest gives daily/weekly allowance used (`~/.local/bin/claude -p "/usage"`).
+- **Checkpoint at every handover (DEC-837):** worker return, merge, package, compaction. RESUME HERE = full session
+  state (happening/decided/next/where); repo knowledge from retrieval. Keep it < 8,000 chars until W2-62 lands.
+- **Memory used (DEC-836):** every lead/worker brief says use `gov retrieve`; from W2-04's merge every brief is built
+  with `gov context` (until then record each one built without); count usage for the digest and K4's exit.
+- **Parallelism (DEC-847):** no fixed cap; eligible tickets (deps closed / DEC-786 stack), the MEASURED gate
+  (`tools/lead_usage.py`; until measured load1 < 20, MemAvailable >= 6710886 kB), the owner's usage, never in a
+  close's quiet window, one writer per worktree, ceiling 10; fewer until W2-48. Countdown: number in flight + why.
+- **W2-58 first in K3 (DEC-849).** Until it lands: take a refusal, never another form, search named folders (not
+  the repo root, `governance/project/`, `.claude/`); count refusals for the digest (today: 3, incl. 2 DEC-409).
+- **Questions (DEC-850):** all-blocking -> six-part package as my message, saved in `governance/project/
+  orchestration/packages/<id>.md`, END THE TURN with "QUESTION FOR THE OWNER: <id> - choose (a), (b), (c) or
+  Discuss first; my recommendation is (x)" then OWNER_ACTION. NEVER the AskUserQuestion box. Part-blocking ->
+  report + digest, six parts. Leads/workers never ask the owner.
+- **W2-48 (DEC-852):** subprocess code seen or such tests re-run; serves leads' runs; from its merge a NIGHTLY full
+  uncached regression in a quiet window, result in the digest; fail-there-but-cached-pass = P1.
+- **Effort (DEC-839):** Opus 5.5; `--effort high`; max auditors/FULL probes/owner packages; xhigh FULL test designer.
+- **Also:** CAP-10 both figures (85 floor, 99 % target; DEC-833); recalibrate estimates after K2 (DEC-834);
+  agents never push, the owner's daily backup push continues (DEC-848); rules about rules (DEC-851).
+- **Policy 1 (DEC-819):** `python3 governance/project/orchestration/sync_context.py`, gitleaks on staged, commit
+  `-- <paths>` with `Task: DAEO-sdxk`, `Role: orchestrator`; a session summary in `.../orchestration/sessions/`.
+- **Policy 2 (DEC-820):** reads open except secrets, held-out contents, the counterpart's work, a hidden eval half.
 
 ### Where things stand
-- **Owner batch STAGED, not committed:** DEC-831..DEC-852 (register §248, v0.248, next free DEC-853; "Changed by"
-  notes on DEC-062/140/460/726/737/776/786/792/828/829/830) + the plan ACCEPTED (`docs/plan/WAVE_2_REVISED_PLAN.md`)
-  + prompt v3 + `LEAD-w2-common.md` + `AUDITOR-common.md` + W2-48's card (WBS) and ticket file `DAEO-xxgp`
-  (DEC-843, DEC-852). The owner commits it (`Role: owner`). **A staged batch blocks `git merge`, and DEC-788 needs
-  it committed before any close.**
-- **NOTIFY-TEST open:** my turn ended with "QUESTION FOR THE OWNER: NOTIFY-TEST - did this reach your phone? (a) yes
-  (b) no" (DEC-850's test). If (b), the owner adds a Notification hook.
-- **The close lock (LEAD-w2-common, DEC-847/780):** before each close I create
-  `.gov-runtime/scratch/orchestrator/CLOSE-RUNNING`; leads start no worker or suite batch while it exists; I remove
-  it when the close ends.
-- **The pin is proven** (session of 2026-10-19 evening): `~/.local/bin/gov` -> `~/.local/share/gov-os/pin-fecb870c/
-  bin/gov`; system `python3 -c 'import gov'` -> ModuleNotFoundError; window "1m tokens (default for this model)".
-  Full rebuild under the pin: exit 0, 21 min (Wave 1: 2.5-3.5 min; lexical 396 s; load ~32 from parallel gitleaks).
-  `gov check` under the pin: see `log/pin-check-2026-10-19.json`.
-- **Package P-W2-48 (P2, part-blocking, in the report):** W2-59 overlaps W2-05's unmerged `_run_command` env lines
-  (`check/runner.py`, `retrieval/retrieve_check.py`). Rec (a): start W2-59 now on w2/integrate; W2-05's resume
-  absorbs the overlap. Until answered, W2-59 waits; everything else goes on.
-- **Notification test 1 (owner, 22:2x):** the AskUserQuestion box did NOT reach the owner's phone (answer "No").
-  Hence DEC-850 item 1: never the box; end the turn with the QUESTION FOR THE OWNER line.
-- **Next, in order:** owner commits the batch -> W2-53 close (quiet window, rebuild immediately before, once) ->
-  W2-54 close. Leads now: W2-62 (resume in full, new, no overlap) and W2-50 (resume probe; frees W2-58). W2-58
-  starts when W2-50 merges or stacked on it after its probe passes. Then the plan's WBS/LIST/tk edits ticket by
-  ticket before each starts (DEC-825 item 7). Next free: ticket W2-63, rows W2-H063 / W2-M386 / W2-L362.
-- **Usage (owner's subscription):** `claude -p "/usage"` at 22:1x: session 1 %, week 17 % (resets Oct 25 09:00).
-- **Lead usage sampler running:** `tools/lead_usage.py log/lead-usage.jsonl 30`; summary with `--summary`.
+- **Staged batch (owner commits, `Role: owner`):** register §248 DEC-831..852 (v0.248, next DEC-853) + Changed-by
+  notes; plan ACCEPTED; prompt v3; `LEAD-w2-common.md`; `AUDITOR-common.md`; W2-48 card + `.tickets/DAEO-xxgp.md`.
+  A staged batch blocks `git merge`; DEC-788: committed before any close. Working memory: `a5798521`.
+- **Pin proven:** gov -> `~/.local/share/gov-os/pin-fecb870c/bin/gov`; no system `gov`; window 1M. Rebuild 21 min
+  (Wave 1: 2.5-3.5). `gov check` (12.6 min): 21 GREEN; YELLOW openspec-validate (not on PATH), core-decision-
+  citations (warning); **RED secrets-indexing**: declared checks still run the tree's `src` (W2-59's gap), and
+  gitleaks times out (60 s per file, ~24 in parallel) on `store.db` 250 MB and `code.db` 210 MB. Deterministic ->
+  **every `gov close` would be refused.**
+- **P1 P-W2-49 (part-blocking: all closes):** fix the scan's time limit/concurrency. W2-50's branch rewrites the same
+  function. Options in the report; W2-50's resume waits for the answer. Never attempt a close known to fail.
+- **P2 P-W2-48:** W2-59 overlaps W2-05's unmerged lines (`check/runner.py` `_run_command` env, `retrieve_check.py`).
+  Rec (a) start now beside W2-05. W2-59 waits.
+- **Notify:** test 1 (the box) did NOT reach the phone. Test 2 (end of turn, NOTIFY-TEST) open.
+- **Close lock:** before a close, create `.gov-runtime/scratch/orchestrator/CLOSE-RUNNING`; leads hold; remove after.
+- **Usage 22:1x:** session 1 %, week 17 % (resets Oct 25 09:00). Sampler running -> `log/lead-usage.jsonl`.
 
-### Standing owner rules of 2026-10-19 (short form; full text in the register and prompt v3, DEC-851)
-- **Window (DEC-838):** every session on its model's full window (1M, Opus 5.5). Never set a compaction threshold;
-  never ask a session to stop or compact early. Usage is the limit: digest reports daily/weekly use (`/usage`).
-- **Checkpoint at every handover (DEC-837):** a worker's return, a merge, a package, a compaction. RESUME HERE holds
-  the full session state (happening / decided / next / where); repository knowledge comes from retrieval and packets.
-  DEC-792's 8,000-char limit is lifted once W2-62 lands (the hook then loads RESUME HERE in full).
-- **Memory used (DEC-836):** every lead/worker brief tells its agent to use `gov retrieve`; from W2-04's merge I
-  build every brief with `gov context` (until then, record each brief built without one); usage counted.
-- **Parallelism (DEC-847):** no fixed cap. Start leads as eligible tickets (deps closed or DEC-786-stackable), the
-  MEASURED gate (DEC-798's figures until measured: load1 < 20, MemAvailable >= 6710886 kB), the owner's usage
-  limits, never during a close's quiet window, one writer per worktree, ceiling 10. Fewer until W2-48 lands. Every
-  countdown: number in flight and why.
-- **W2-58 first in keystone 3 (DEC-849).** Until it lands: take a read refusal, never another form, search named
-  folders (never from the repo root, `governance/project/` or `.claude/`); count refusals in the digest (today: 1).
-- **Questions (DEC-850):** all-blocking -> six-part package (DEC-818) as my message + saved under
-  `governance/project/orchestration/packages/<id>.md`; END THE TURN with it, last lines: "QUESTION FOR THE OWNER:
-  <id> - choose (a), (b), (c) or Discuss first; my recommendation is (x)" then OWNER_ACTION. NEVER the
-  AskUserQuestion box (it does not notify the phone). Background work keeps going. Part-blocking -> report +
-  digest, six parts, no question line. Leads/workers never ask the owner; leads return packages saying all/part.
-- **W2-48 (DEC-852):** cache sees subprocess code or re-runs process-starting tests; serves leads' runs (same rules,
-  `--no-cache`); from its merge, a NIGHTLY full uncached regression on w2/integrate's head in a quiet window, result
-  in the next digest; a test failing there but passed via cache = P1 package. W2-24/W2-46 full runs stay.
-- **Rules about rules (DEC-851):** each standing rule goes to the register, prompt v3, RESUME HERE, LEAD-w2-common,
-  and JUDGEMENT/AUDITOR-common where it applies; each report names the places.
-- **Backups (DEC-848):** agents never push; the owner's own backup push of w2/integrate continues, at least daily.
-- **Effort per launch (DEC-839):** Opus 5.5 everywhere; `--effort high` (max: auditors, FULL probes, owner
-  packages; xhigh trial: FULL test designers); subagents on the parent's model; agent teams off.
-- **CAP-10 (DEC-833):** report both figures: hit@5 vs the floor 85, and complete stacked evidence vs the target 99 %.
-- **Estimates (DEC-834):** recalibrate all after keystone 2 from measured ticket and close times.
-- **POLICY 1 (DEC-819):** all context in git; at every checkpoint `python3 governance/project/orchestration/
-  sync_context.py`, gitleaks on the staged set, commit with `Task: DAEO-sdxk`, `Role: orchestrator`, `-- <paths>`;
-  a session summary under `governance/project/orchestration/sessions/` at each session end.
-- **POLICY 2 (DEC-820, ADR-0001):** reads open; refused only (a) secrets, (b) held-out contents (names ok),
-  (c) the counterpart's work on the same ticket, (d) the hidden half of an evaluation set. Writes: own ticket paths
-  only.
+### Next
+1. **W2-62 lead IN FLIGHT** since 22:29 (PID 3744202; worktree `~/gov-os-worktrees/W2-62` from `162f17ea`; brief
+   `briefs/W2-62-A5-run1.md` built by `tools/build_lead_brief.py`; log `log/W2-62-A5-run1.json`). Hook-size facts
+   given to it: SessionStart context arrives whole up to ~10,000 chars; at 12,000+ Claude Code saves it to a file
+   and shows a preview only (measured 22:4x with random tokens). 1 lead in flight: fewer until W2-48, and the
+   other candidates wait on P-W2-48 / P-W2-49 / the batch commit.
+2. On the owner's commit + P-W2-49's answer: the secrets fix; then W2-53's close (rebuild immediately before, once),
+   W2-54's close; W2-50's resume -> W2-58. On P-W2-48: W2-59.
+3. Before each ticket starts: its WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-63; rows W2-H063,
+   W2-M386, W2-L362; package P-W2-50.
 
-### State (git is the truth; re-derive from git + `.tickets/` if this block is older)
-- **Branch** `w2/integrate` at `70aea435` (owner's DEC-822 pin registry commit) + my working-memory commits of
-  2026-10-19 evening. Before: `6a5d6b34` (handover), `b8571d9d` (owner batch DEC-813..830).
-- **Countdown:** 1/55 closed (W2-01, by `tk close`). Merged not closed: W2-53, W2-54. Running 0. Idle 1 (W2-05).
-  Held 10. Close success rate: 0 of 3 `gov close` runs clean (all W2-53). Wave 2 = 55 tickets + W2-00 (DEC-831).
-- **W2-53's last re-close** (12:01, `log/close-DAEO-7rr2-3.json`) REFUSED on the W1-30 r13 case only; repair ticket
-  DAEO-c6ir in `log/repair-tickets/`. Its next re-close is legitimate now (the load_sensitive change), once only.
+### State (git is the truth)
+- Countdown: 1/55 closed (W2-01 by `tk close`). Merged not closed: W2-53, W2-54. Idle: W2-05. Held: W2-02 `2a35fd7b`,
+  W2-03 `9a3e3456`, W2-16 `1908149d`, W2-20 `1a54976c`, W2-26 `62c4e477`, W2-37 `2ff873b2` (on W2-03), W2-49
+  `19d45246`, W2-50 `0affa162` (resume: merge-back, re-verify, fresh probe under DEC-779/785), W2-51 `c2c80e6c`,
+  W2-52 `a21f06a7` (on W2-49). Close success rate 0 of 3 `gov close` runs (W2-53).
+- W2-53's last re-close (12:01) refused on the W1-30 r13 case only (now in `load_sensitive`); next re-close once.
 
-### Held / idle tickets (heads)
-- W2-02 `2a35fd7b` (resolve standalone-types to its line; fresh probe; + check-jsonschema widening). W2-03
-  `9a3e3456`. W2-16 `1908149d`. W2-20 `1a54976c`. W2-26 `62c4e477`. W2-49 `19d45246`. W2-51 `c2c80e6c`
-  (+ lens A F4). W2-50 `0affa162` (resume probe). W2-05 `f19f156e` (idle; F-A, P-1, W2-M281, DEC-805, lens G R7).
-- W2-37 `2ff873b2` (on W2-03): resume per DEC-812 + DEC-815/816 + `codeintel/**` via `trace_path`. W2-52 `a21f06a7`
-  (on W2-49): merge, DEC-814 regenerate, rebuild, all suites, probe. W2-54 `226ec458`: merged, close after W2-53.
-
-### Open owner items
-- **COMMIT:** the staged batch DEC-831..DEC-852 (above). **P2 P-W2-48** (W2-59 vs W2-05; rec (a)), saved at
-  `governance/project/orchestration/packages/P-W2-48.md`. **NOTIFY-TEST** (a)/(b). DEC-822 step 2 (the hook lines)
-  rides in W2-59. The path-map lines of DEC-845 (I give them when W2-58/W2-26 need them).
-
-### Decision packages (DEC-818)
-Every P1 package is self-contained: (1) context in plain words with history and links; (2) what happened, with
-evidence; (3) why it matters to the Gov OS's purpose; (4) options with consequence, cost, risk and what each changes
-in the Contract, specs, skills or briefs; (5) recommendation and confidence, threat-model class of any finding;
-(6) what it blocks and what waiting costs. P2 items go into one daily digest.
-
-### Judgement rules (w2 prompt §14; DEC-801..803, DEC-807..809)
-- `governance/project/briefs/JUDGEMENT.md`: "Can an honest agent hit this in ordinary work?" "Does it fail open or
-  lose work?" Only yes to both = a round; constructions = Wave 3 rows. Each finding: `Ordinary work: yes|no,
-  because …`, `Consequence: fails open|loses work|other`. `briefs/AUDITOR-common.md` starts W2-25/28/30/47 briefs.
-
-### Standing rules (short; the prompt and the register hold the full text)
-- Every report: countdown first; phone-readable; evidence; last line exactly one
-  `OWNER_ACTION: <P1|P2|COMMIT|COMMIT-NEEDED|none> <ids> - <summary>` naming every open owner item (DEC-787, DEC-788).
-- Lead launch (DEC-715) as in the prompt; gate by hand in the same command: load1 < 20, MemAvailable >= 6710886 kB.
-- Workers: `gov launch` sandboxed unless the suites need the code graph (old form + tripwire), DEC-799.
-- Commits: `--trailer Task/Implements/Role: orchestrator/Co-Authored-By`, `-- <paths>` only; merges `--no-ff`, tree
-  == `git merge-tree --write-tree HEAD^1 HEAD^2`. A staged batch blocks `git merge`.
-- Closes (DEC-780): quiet window; rebuild IMMEDIATELY before (no commit between: STORE_STALE); fresh checkpoint;
-  once only; a refused close's repair ticket -> `log/repair-tickets/`.
-- Guard: no `$VAR` write targets; never type the settings or held-out paths; no glob/list over `governance/project/`.
-- Never: push/tag/rebase/main; amend w2/integrate; `gov approve`; `rebuild --no-embeddings`; tk close a W2 ticket;
-  lefthook install/uninstall; --no-verify; read ~/.claude/, workers' output, held-out/settings files; touch
-  ~/gov-os-workbench or EXAMIN's real repo; edit a reviewed ticket's file on w2/integrate; grow accepted_reds/
-  load_sensitive without the owner; weaken a hard-block check; let the ratchet retry; strip CLAUDE* from my close.
+### Standing rules (short; the prompt holds the full text)
+- Report: countdown first, phone-readable, evidence, last line one `OWNER_ACTION: <P1|P2|COMMIT|COMMIT-NEEDED|none>
+  <ids> - <summary>`. Lead launch per prompt v3 §4, gate in the same command. Workers via `gov launch` (DEC-799).
+- Commits: trailers Task/Implements/Role/Co-Authored-By; `-- <paths>`; merges `--no-ff`, tree == merge-tree.
+- Closes (DEC-780): quiet window; rebuild immediately before; fresh checkpoint; once only; repair -> `log/repair-tickets/`.
+- Never: push/tag/rebase/main; amend; `gov approve`; `rebuild --no-embeddings`; tk close a W2 ticket; hooks;
+  --no-verify; secrets/held-out contents; ~/gov-os-workbench; grow accepted_reds/load_sensitive; weaken a
+  hard-block check; let the ratchet retry.
 
 ## Archive
 The long history moved to `CHECKPOINT-ARCHIVE.md` beside this file (DEC-792, 2026-10-18).
