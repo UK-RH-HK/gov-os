@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.251 (the version table at the end of each section gives the history)
+**Version:** 0.252 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -7700,7 +7700,7 @@ The orchestrator's planning report of 2026-10-16 put five packages (P-W2-1 to P-
   4. **Agents never list, glob or search `~/gov-os-workbench`.** They name a file there explicitly, or ask the owner.
 
 ### DEC-724 — Owner acceptances are owner git facts: `Role: owner`, batched, and a `gov approve` command (P-W2-5 (a), refined)
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-409, DEC-718 (AR-7, F-M6) · **Basis:** F-M6 found register entries set ACCEPTED in commits the orchestrator made, with no git fact of the owner's approval.
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Changed by:** its owner commits replaced by DEC-861: the orchestrator commits the records with `Decided-by: owner`, the owner pushes (2026-10-20) · **Under:** DEC-409, DEC-718 (AR-7, F-M6) · **Basis:** F-M6 found register entries set ACCEPTED in commits the orchestrator made, with no git fact of the owner's approval.
 - **Decision:**
   1. From now on, the owner commits every owner register entry with `Role: owner`. The orchestrator drafts and stages; it never commits an owner entry.
   2. **Owner decisions are staged in batches:** at most one owner commit per session break.
@@ -8642,7 +8642,7 @@ The owner answered P-W2-32, P-W2-33 and P-W2-34, ruled on W2-50's run-7 review, 
 The orchestrator's quality-control check (the owner's item 7 of 2026-10-18) found that no Wave 2 worker is OS-sandboxed, and the owner answered its three packages and set four rules.
 
 ### DEC-788 — Owner batch commits once a day
-- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-724, DEC-787
+- **Status:** ACCEPTED (owner, 2026-10-18; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** the daily owner batch replaced by DEC-861 (2026-10-20) · **Under:** DEC-724, DEC-787
 - **Decision:**
   1. **Owner batch commits happen once a day,** not after every answer. The orchestrator keeps staging and keeps working.
   2. **A commit is needed sooner only:**
@@ -9362,5 +9362,33 @@ The owner committed DEC-856 to DEC-858 (`ccf28d5c`), with the path-map edit, and
 | Version | Date | Change |
 |---|---|---|
 | 0.251 | 2026-10-20 | Owner: DEC-859 (the code graph: the tool's traversal for questions, pages for whole-graph jobs, split by module on large repositories, never a query over the cap; W2-37), DEC-860 (context: retrieval in batches, ranked and stacked, never one giant query or context; W2-04, W2-61, W2-15b). Next free id: DEC-861. |
+
+---
+
+## 252. The owner's standing rule of 2026-10-20 and P-W2-51: the orchestrator commits the records of the owner's decisions; the owner pushes (register v0.252, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule that replaces DEC-724's "the owner commits owner entries" and the owner's earlier patch-file idea. From this section on, the orchestrator commits the records of the owner's decisions itself, signed as below.
+
+### DEC-861 — The orchestrator commits the records of the owner's decisions; the owner's push is the acceptance (standing)
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-724, DEC-788, DEC-851, ADR-0001 · **Basis:** OWNER, 2026-10-20: "Nothing is ever left staged in the main tree, so no merge, close or lead ever waits on me." · **Changes:** DEC-724 (owner entries were committed by the owner with `Role: owner`) and DEC-788 (the daily owner batch).
+- **Decision:**
+  1. **What the orchestrator commits:** the records of the owner's decisions (the register, the plan files, the prompt, the briefs, the path map and the ratchet lists), as soon as they are written. Nothing is left staged in the main tree.
+  2. **How it signs:** never as the owner. Its commits carry `Role: orchestrator`, never `Role: owner`, plus `Task: decision-record` and `Decided-by: owner (chat, <date>)` naming whose decision it records. The owner's own commits keep `Role: owner`.
+  3. **Pushing:** the orchestrator never pushes. The push stays the owner's (through the operator, or a scheduled job of the owner's), and **the owner's push is the owner's acceptance** of what the orchestrator committed.
+  4. **The owner's check:** the daily digest lists every decision recorded since the owner's last push, each with its DEC id, its one-line content and its commit sha.
+  5. **Until W2-12's `gov approve` lands,** the register records the owner's decisions as the orchestrator faithfully transcribes them, and the owner's push is the owner's act. This replaces the owner's earlier patch-file idea.
+  6. **Where `Role: owner` is still read** (the check of item 5 of the owner's rule, 2026-10-20): the close's ratchet (`src/gov/close/ratchet.py:104-111`) and its escalation lift (`src/gov/close/state.py:172-200`) count an owner's entry only from a commit with `Role: owner` alone, and the decisions checker (DEC-360) will when decision files exist. How they should read `Decided-by` was package P-W2-51, answered by DEC-862: those two kinds stay the owner's own `Role: owner` commits until W2-12 lands.
+
+### DEC-862 — P-W2-51 (a) now, (b) later, (c) never: ratchet entries and escalation lifts stay the owner's commits until W2-12 makes the push the acceptance
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-861, DEC-757, DEC-766, DEC-360, DEC-724 · **Basis:** P-W2-51 (`governance/project/orchestration/packages/P-W2-51.md`): the close's ratchet (`src/gov/close/ratchet.py:104-111`) and its escalation lift (`src/gov/close/state.py:172-200`) read the owner's acceptance only from a `Role: owner` commit.
+- **Decision:**
+  1. **(a), now:** the orchestrator commits DEC-861 and every later decision record itself, under DEC-861, **except ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts:** those stay the owner's own `Role: owner` commits. The orchestrator prepares each ready to commit and pings `ACT`; the operator commits it.
+  2. **(b), later, in W2-12** (its card and ticket file carry it as a KPI): the close counts a ratchet entry or an escalation lift from a commit carrying `Task: decision-record` and `Decided-by: owner` only once that commit is in the owner's pushed `origin/w2/integrate`, so that the owner's push becomes the acceptance in git. W2-12's paths gain `src/gov/close/ratchet.py` and `src/gov/close/state.py` (the owner-entry reading only) and their unit tests. Until W2-12 lands, (a) holds.
+  3. **(c), never:** reading `Decided-by` alone fails open.
+- Next free id: DEC-863.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.252 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-861 (the orchestrator commits the records of the owner's decisions, `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, <date>)`; the owner's push is the acceptance; the digest lists every record since the last push; P-W2-51 for the two close checks that read `Role: owner`), DEC-862 (P-W2-51: (a) now, ratchet entries and escalation lifts stay the owner's commits; (b) in W2-12, the push as the acceptance; (c) never). Next free id: DEC-863. |
 
 ---

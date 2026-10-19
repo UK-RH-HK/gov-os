@@ -103,7 +103,7 @@ Three tracks.
 | W2-09 | A | `SubagentHandback` on the guard's list; the list checked against the CLI | implementation | engineer | FULL | — | 90 | AR-4, F-M7 |
 | W2-10 | A | Guardrails explain themselves, refuse once, then record | implementation | engineer | FULL | W2-09 | 160 | AR-5, AR-6, F-M12 |
 | W2-11 | A | Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 | skill | product-spec | STANDARD | W2-10 | 120 | AR-5, AR-6, F-m1 |
-| W2-12 | A | Owner approval facts and `gov approve` | implementation | engineer | FULL | W2-03 | 280 | AR-7, F-M6, DEC-724 |
+| W2-12 | A | Owner approval facts and `gov approve` | implementation | engineer | FULL | W2-03 | 340 | AR-7, F-M6, DEC-724, DEC-862 |
 | **W2-13** | A | RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) | implementation | engineer | FULL | W2-03 | 300 | AR-9 (RETR-X-02), DEC-725 |
 | W2-14 | A | ARGUS's full cycle, a-dev green, the governance share per programme | integration | orchestrator | FULL | W2-04, W2-07, W2-13, W2-50 | 0 | AR-9, F-M1 |
 | **W2-15a** | A | EXP-003, pass 1: the baseline | research | research | FULL | W2-03, W2-04, W2-07, W2-13, W2-50 | 100 | AR-10 (EXP-003) |
@@ -348,7 +348,10 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - A decision set ACTIVE without an owner approval fact turns core-authority red [W2-H049, W2-M227, W2-M257].
   - "The decision checker could not run" is a finding, never green [W2-H037, W2-H048].
   - Body edits that keep an approved decision ACTIVE are flagged [W2-L010]. An author date earlier than the committer date by more than a day is flagged [W2-M107].
+  - **The owner's push as the acceptance in git (DEC-862 (b), owner, 2026-10-20):** the close counts a ratchet entry (`accepted_reds`, `load_sensitive`) or an escalation lift from a commit carrying `Task: decision-record` and `Decided-by: owner` only once that commit is an ancestor of the owner's pushed `origin/w2/integrate`; before the push it counts nothing, and says so by name. Paths gain `src/gov/close/ratchet.py` and `src/gov/close/state.py` (the owner-entry reading only), `tests/unit/close/test_ratchet*` and `tests/unit/close/test_owner_entry*`.
+  - A register entry recorded by the orchestrator under DEC-861 reads as the owner's once its commit is in the pushed ref, and as "recorded, not yet pushed" before [DEC-861, DEC-862].
 - **KPIs, failure:**
+  - A `Decided-by` trailer alone, on a commit not in the owner's pushed ref, never counts as the owner's (DEC-862 (c): never, it fails open).
   - `gov approve` run from an agent's Bash call, piped input included, commits nothing.
   - A `Role: owner` trailer on a commit made inside an agent's call is a containment finding, not an approval.
 
