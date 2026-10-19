@@ -20,6 +20,15 @@
    rulesync source corrected; ADR-0001 accepted; the path map's W1-30 entry; W2-57 widened and W2-58's card; this
    orchestration record; the assessment reports.
 
+5. **Lens G (to about 18:56, $26.82)** copied byte for byte and staged; the batch (5,703 files, gitleaks clean) and the
+   bootstrap pin's operator commands reported (Step 3). The pin's dry run found that the declared checks and the
+   hook lines still import the working tree's `src` (fails open; proposed W2-59).
+6. **The revised plan (Step 4, about 19:15):** `docs/plan/WAVE_2_REVISED_PLAN.md`, PROPOSED: nine keystones, the
+   adoption-ready set, glue over build (lens G), per-role model, effort and compaction per launch (lens F), the moves
+   to Wave 3 with reasons, the eight roles, estimates, and 12 owner decisions. Reported; stopped for review.
+7. **Handover (about 19:20):** the owner committed the batch (`b8571d9d`), and is installing the pin and changing
+   user-level settings before starting a fresh session. RESUME HERE rewritten for it.
+
 ## Lessons
 
 - The guard reads `>=` and `>` inside inline scripts as redirects, and refuses `$VAR` write targets: put scripts in
@@ -29,5 +38,5 @@
 
 ## Next
 
-Step 3: the owner commits the batch and runs the bootstrap pin's operator commands. Step 4: after lens G reports, the
-revised Wave 2 plan by keystones (DEC-829), for the owner's review. Wave 2 stays paused until the owner approves it.
+The fresh session checks the pin and the commits read-only, runs no `gov` command until the owner's word, and waits
+for the owner's 12 decisions on the revised plan. Wave 2 stays paused until the owner approves it (DEC-829 item 6).
