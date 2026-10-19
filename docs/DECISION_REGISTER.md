@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.249 (the version table at the end of each section gives the history)
+**Version:** 0.250 (the version table at the end of each section gives the history)
 **Date:** 2026-10-19
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -8943,7 +8943,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   3. It replaces, for P1 packages, the field list of the w2 prompt §7 ("question, why now, options, …"); the prompt says so (DEC-824).
 
 ### DEC-819 — Policy 1: commit the context (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** Charter v5 §2 (the repository is the authoritative memory), MR-5, DEC-792 · **Basis:** OWNER, 2026-10-19; lens C F-1 and lens E F2 (the working rules and briefs live in git-ignored scratch).
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 4 corrected by DEC-856: `governance/**` was governance memory; the raw record leaves it (2026-10-19) · **Under:** Charter v5 §2 (the repository is the authoritative memory), MR-5, DEC-792 · **Basis:** OWNER, 2026-10-19; lens C F-1 and lens E F2 (the working rules and briefs live in git-ignored scratch).
 - **Decision:**
   1. **Everything that is context goes into git,** so every worktree and session sees the same truth: the orchestrator's working rules, the brief templates and the briefs given, RESUME HERE and its archive, checkpoints, lead records (copied before a worktree is removed), decision packages, plans, reports and session summaries.
   2. **Never committed:** secrets and keys (gitleaks scans before every commit), the held-out material, derived indexes and stores, model files and large binary caches.
@@ -9227,7 +9227,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. DEC-830's "no push" means no pre-push gate yet, not no backups.
 
 ### DEC-849 — W2-58 goes first in keystone 3; until it lands, a read refusal is taken, never routed round, and counted (standing until W2-58 lands)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-820 item 6, DEC-821, DEC-829 item 2 · **Basis:** OWNER, 2026-10-19: until W2-58 lands, the guard still refuses the reads Policy 2 opened (the orchestrator's repository-wide search met one on 2026-10-19), and that slows every agent.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 1 (W2-58's place) by DEC-857: straight after W2-50 merges, ahead of anything else (2026-10-19) · **Under:** DEC-820 item 6, DEC-821, DEC-829 item 2 · **Basis:** OWNER, 2026-10-19: until W2-58 lands, the guard still refuses the reads Policy 2 opened (the orchestrator's repository-wide search met one on 2026-10-19), and that slows every agent.
 - **Decision:**
   1. **W2-58 goes first in keystone 3,** or straight after keystone 1 if its paths allow. (On 2026-10-19 they do not yet: W2-50's unmerged branch changes `src/gov/guard/decide.py`, `src/gov/guard/protected.py` and `src/gov/launch/launcher.py`. W2-58 starts when W2-50 merges, or stacked on W2-50 once W2-50's resume probe has passed, DEC-786.)
   2. **Until W2-58 lands, every session keeps the refusal rule:** it takes the refusal, never looks for another form, and searches named folders instead.
@@ -9286,7 +9286,7 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 - **Decision:** W2-59 starts now on `w2/integrate`, although W2-05's unmerged branch changes two of its files (`src/gov/check/runner.py`'s `_run_command` environment and git calls; `src/gov/retrieval/retrieve_check.py`). W2-59's engineer is told W2-05's changes and keeps its own edit of those lines small and composable; W2-05's resume merges `w2/integrate` first and resolves the conflict keeping both sides (DEC-750, DEC-754). An exception to the prompt's §3 for this pair only.
 
 ### DEC-855 — How the owner is notified: `owner-ping`, a permission request (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 7 corrected by DEC-858: the pings reach the owner (2026-10-19) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
 - **Decision:**
   1. **Whenever anything needs the owner** (any decision that gates any ticket, even if other work continues; any COMMIT-NEEDED; any owner act, such as an install, a pin, a release or a go; any LAUNCH_BLOCKED, ESCALATION or AUTH_REQUIRED), the orchestrator:
      - (a) writes the full six-part package (DEC-818) in its message, and saves it under `governance/project/orchestration/packages/<id>.md`;
@@ -9303,5 +9303,37 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 | Version | Date | Change |
 |---|---|---|
 | 0.249 | 2026-10-19 | Owner: DEC-853 (P-W2-49 (a): the secrets scan's time limit and pool fixed in W2-50's resume; an unchanged store's clean scan reused by its hash, a finding never), DEC-854 (P-W2-48 (a): W2-59 starts now beside W2-05), DEC-855 (the owner is notified by `owner-ping`, a permission request, as the orchestrator's last action; replaces DEC-850 item 1's question line). Next free id: DEC-856. |
+
+---
+
+## 250. The owner's answers of 2026-10-19 on P-W2-50, the pings, and the read restrictions (register v0.250, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+The owner committed DEC-853 to DEC-855 (`7f95e6f5`) and answered P-W2-50 (`governance/project/orchestration/packages/P-W2-50.md`), the ping tests and the question of the read restrictions. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
+
+### DEC-856 — P-W2-50 (a) and (b): the raw orchestration record leaves governance memory; its searchable parts stay
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with the path-map edit, in the next batch; the path-map edit is the owner's, DEC-766) · **Under:** DEC-819, DEC-285, DEC-766, DEC-836 · **Basis:** P-W2-50: the rebuild took 1,258 s (lexical 396 s, semantic about 55 s, code graph about 808 s), most of it the per-file gitleaks gate; the orchestration record was 5,686 of the store's 7,606 files, 38 % of its chunks and 67 % of the code graph's nodes, because `governance/**` is the `project-overlay` namespace, governance memory · **Corrects:** DEC-819 item 4.
+- **Decision:**
+  1. **(a), now:** the raw orchestration record leaves governance memory, so the lexical index, the code graph and the per-file secrets gate no longer read it: `worktrees/**`, `main/checkpoints/**`, `main/orchestrator/log/**`, `briefs/**`, `drafts/**`, `specimen/**`, `pin/**`, `tools/**`, and the scripts, run files, drafts and notes at `main/orchestrator/` (by kind and name). **What agents need to search stays memory:** `packages/**`, `sessions/**`, `main/orchestrator/CHECKPOINT.md` (RESUME HERE), the `PR-*.md` packages, and the record's own `README.md` and `sync_context.py`.
+  2. **The edit,** made by the orchestrator under the owner's authority to read `governance/project/path-map.yaml` with the Read tool for this edit (Policy 2: the path map holds names, not contents): `project-overlay`'s single pattern `governance/**` is replaced by explicit patterns that leave the raw parts out, and a new namespace `orchestration-record` (memory class `product`, as `fixtures/**`: kept out of governance memory; not embedded; export denied) holds them. Every tracked path still matches exactly one namespace: the pinned `gov.check.pathmap` passes (exit 0). A new kind of file in the record that no pattern matches fails that check, and gets its pattern then.
+  3. **Policy 1 is unchanged:** the files stay in git, and gitleaks scans them before every commit (DEC-819 item 6).
+  4. **DEC-819 item 4 is corrected:** `governance/**` was governance memory (`project-overlay`), so the copies were indexed and crowded retrieval; after this edit, only the record's searchable parts are.
+  5. **(b) as well,** as row W2-L362 for W2-06: each file's clean secret verdict is reused by its content hash; a changed file is scanned in full; a finding is never reused.
+  6. **Measured before and after:** the rebuild's time and the code graph's size, reported. Once the lighter rebuild is in, the orchestrator re-measures what one lead's rebuild uses and raises parallelism as far as the gate and the owner's limits allow (DEC-847).
+
+### DEC-857 — The read restrictions come off as fast as possible: W2-58 straight after W2-50 merges, ahead of anything else
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-820, DEC-821, DEC-849 · **Basis:** OWNER, 2026-10-19: the guard's remaining read refusals now block the orchestrator's own work (five refusals on 2026-10-19). · **Changes:** DEC-849 item 1 (W2-58's place).
+- **Decision:**
+  1. **W2-58 starts straight after W2-50 merges, ahead of every other start.**
+  2. **No configuration-only way exists** to narrow today's read refusals to Policy 2's four (the orchestrator's answer, 2026-10-19): the guard protects two files by constants, `governance/project/held-out.yaml` and `.claude/settings.json` (`src/gov/guard/heldout.py:19-21`), and refuses any target that takes either in: the file, any folder above it inside the project, or a glob that matches it (`src/gov/guard/protected.py`). No guard or path-map setting changes this; moving either file would break the guard or Claude Code. W2-58 is the route.
+  3. **W2-58's KPIs therefore name both files:** the held-out list file's names become readable and the held-out material's contents stay refused (DEC-820 (b)); the settings file's reads follow Policy 2 (it holds no secret; a secret anywhere stays refused, (a)); searches from the repository root or `governance/project/` stop being refused for the files' sake.
+
+### DEC-858 — The pings reach the owner; the orchestrator's session cannot see the request
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-855 · **Basis:** OWNER, 2026-10-19: both of the session's pings (the test at 22:49:48 and P-W2-50's) arrived on the owner's phone · **Corrects:** DEC-855 item 7.
+- **Decision:** the orchestrator's session does not see the permission request from its side; the ping works. No fresh session is needed; the orchestrator keeps pinging exactly as DEC-855 says.
+- Next free id: DEC-859.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.250 | 2026-10-19 | Owner: DEC-856 (P-W2-50 (a): the raw orchestration record leaves governance memory by a path-map edit, its searchable parts stay; DEC-819 item 4 corrected; (b) as row W2-L362), DEC-857 (W2-58 straight after W2-50 merges; no configuration-only way to narrow the read refusals), DEC-858 (the pings reach the owner; DEC-855 item 7 corrected). Next free id: DEC-859. |
 
 ---
