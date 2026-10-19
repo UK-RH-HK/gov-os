@@ -29,17 +29,23 @@
   `-- <paths>` with `Task: DAEO-sdxk`, `Role: orchestrator`; a session summary in `.../orchestration/sessions/`.
 - **Policy 2 (DEC-820):** reads open except secrets, held-out contents, the counterpart's work, a hidden eval half.
 
-### Where things stand (23:05 BST)
-- **Owner committed DEC-831..852 (`a5789de1`).** Answers since: P-W2-49 (a) + hash reuse (DEC-853); P-W2-48 (a)
-  (DEC-854); NOTIFY-TEST (b) -> owner-ping (DEC-855). **STAGED for the owner:** register §249 (v0.249, next
-  DEC-856), prompt v3.1, `LEAD-w2-common.md` (DEC-855; wait for load < 20 before heavy runs), `AUDITOR-common.md`,
-  WBS (W2-50 DEC-853 lines, W2-59 card). A staged batch blocks `git merge`: COMMIT before W2-62 merges.
-- **Leads:** W2-62 running (since 22:29); W2-59 (`DAEO-kh9l`, worktree from `c5100159`) launches when load < 20;
-  W2-50 resume run 8 (secrets fix + merge-back + probe) launches 10 min after W2-59, load < 20.
-- **P1 P-W2-50 (open):** the orchestration record is indexed (5,686 of 7,606 files; 38 % of chunks; 67 % of the
-  code graph's nodes) and gitleaks-scanned each rebuild; rec (a) path-map namespace edit by the owner (I can't read
-  the path map). Rebuild 1,258 s = lexical 396 + semantic ~55 + code graph ~808.
-- **Ping test 1** (22:49:48) ran with no visible permission request: this session predates the ask rule.
+### Where things stand (23:15 BST)
+- **Owner committed DEC-853..855 (`7f95e6f5`).** Pings DO reach the phone (DEC-858); my session can't see the request.
+- **STAGED for the owner:** register §250 DEC-856..858 (v0.250, next DEC-859), `path-map.yaml` (P-W2-50 (a):
+  `project-overlay` split into explicit patterns + new `orchestration-record` namespace, memory_class product;
+  pinned `gov.check.pathmap` exit 0), WBS (W2-58 straight after W2-50, DEC-857), LIST (row W2-L362), prompt.
+  A staged batch blocks `git merge`: COMMIT before any merge.
+- **Leads:** W2-62 (td-1 running); W2-59 (since 22:58; its rebuild-1 on the OLD map); W2-50 run 8 waiting/starting.
+- **Rebuild before:** 1,258 s (lexical 396, semantic ~55, code graph ~808); store 7,606 files / 56,999 chunks;
+  code graph ~86k nodes / 182,113 edges. **After (23:10, mean load 32 beside W2-59's rebuild):** 443.7 s (lexical
+  119, semantic ~66, code graph ~258); chunks 35,296 (record 90); code graph 28,923 nodes / 117,939 edges (still
+  > 100k: tests); code.db 82 MB; store.db 241 MB (vectors unchanged). Clean figure: before W2-53's close.
+- Leads' worktrees keep the old map until the owner commits and they merge `w2/integrate`; re-measure a lead's
+  rebuild at the next start after the commit (W2-58), then raise parallelism.
+- **Read restrictions:** no config-only way (constants in `src/gov/guard/heldout.py:19-21`, rule in
+  `protected.py`); W2-58 straight after W2-50 merges, ahead of all (DEC-857). Read refusals today: 5. The owner
+  authorised a Read-tool read of `path-map.yaml` for this edit only (it worked).
+- **After the lighter rebuild:** re-measure one lead's rebuild; raise parallelism (DEC-847).
 - **Pin proven:** gov -> `~/.local/share/gov-os/pin-fecb870c/bin/gov`; no system `gov`; window 1M. Rebuild 21 min
   (Wave 1: 2.5-3.5). `gov check` (12.6 min): 21 GREEN; YELLOW openspec-validate (not on PATH), core-decision-
   citations (warning); **RED secrets-indexing**: declared checks still run the tree's `src` (W2-59's gap), and
