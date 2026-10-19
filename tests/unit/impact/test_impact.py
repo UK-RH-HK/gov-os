@@ -102,6 +102,90 @@ def test_without_a_code_index_the_symbol_is_a_gap(root):
     assert refused.value.code == "IMPACT_CHANGE_UNKNOWN" and "code graph" in refused.value.message
 
 
+def git(root, *args):
+    return subprocess.run(["git", "-C", str(root), "-c", "user.name=unit", "-c", "user.email=unit@example.invalid",
+                           *args], check=True, capture_output=True, text=True).stdout
+
+
+@pytest.mark.parametrize("state", ["record-added", "record-edited", "older-commit"])
+def test_a_record_graph_that_differs_from_the_tree_is_stale(root, state):
+    """The first review's F1: an uncommitted record, an uncommitted edit, a HEAD older than the store's."""
+    if state == "record-added":
+        (root / "DEC-003.md").write_text("---\nid: DEC-003\nstatus: ACTIVE\ntype: decision\n---\n", encoding="utf-8")
+    elif state == "record-edited":
+        (root / "DEC-002.md").write_text("---\nid: DEC-002\nstatus: ACTIVE\ntype: decision\n---\n", encoding="utf-8")
+    else:
+        (root / "DEC-003.md").write_text("---\nid: DEC-003\nstatus: ACTIVE\ntype: decision\n---\n", encoding="utf-8")
+        git(root, "add", "DEC-003.md")
+        git(root, "commit", "-q", "-m", "a later record")
+        store.load(root)
+        git(root, "checkout", "-q", "HEAD~1")
+    found = impact.assess(root, ["DEC-001"], {})
+    assert found["graphs"]["record"].startswith("stale") and found["complete"] is False
+    assert impact.assess(root, ["DEC-050"], {})["change"][0]["deletable"] is False
+
+
+def test_a_markdown_file_without_frontmatter_leaves_the_record_graph_current(root):
+    (root / "NOTES.md").write_text("# notes\n", encoding="utf-8")
+    assert impact.assess(root, ["DEC-001"], {})["graphs"]["record"] == "ok"
+
+
+def test_a_name_with_one_called_definition_is_not_dead(root, monkeypatch):
+    """The first review's F6: two definitions share ``orphan``; one is dead, the other is called."""
+    twice = [{"name": "orphan", "path": "app/flow.py", "label": "Function"},
+             {"name": "orphan", "path": "app/other.py", "label": "Function"}]
+    monkeypatch.setattr(codeintel, "definitions", lambda _root, name: twice if name == "orphan" else [])
+    assert impact.assess(root, ["orphan"], {})["change"][0]["deletable"] is False
+
+
+def test_an_unindexed_file_is_stale_whatever_its_modification_time(root, monkeypatch):
+    """The first review's F8: a file the index would copy now, with a modification time from before the index."""
+    import os
+
+    import gov.secrets
+
+    monkeypatch.setattr(gov.secrets, "indexable", lambda _root, paths: list(paths))
+    monkeypatch.setattr(gov.secrets, "path_holds_secret", lambda _root, rel: False)
+    (root / "app" / "moved.py").write_text("# moved here\n", encoding="utf-8")
+    os.utime(root / "app" / "moved.py", (946684800, 946684800))
+    found = impact.assess(root, ["orphan"], {})
+    assert found["graphs"]["code"].startswith("stale") and "app/moved.py" in found["graphs"]["code"]
+    assert found["complete"] is False
+    monkeypatch.setattr(gov.secrets, "indexable", lambda _root, paths: [])  # a file the filter leaves out
+    assert impact.assess(root, ["orphan"], {})["graphs"]["code"] == "ok"
+
+
+def test_the_written_cit_p_says_what_the_assessment_says_of_completeness(root):
+    """The first review's F3."""
+    import shutil
+
+    import yaml
+
+    shutil.rmtree(codeintel.home(root).parent / "files")
+    found = impact.assess(root, ["DEC-001"], {}, out="CITP-901.md")
+    text = (root / "CITP-901.md").read_text(encoding="utf-8")
+    front = yaml.safe_load(text.split("---\n")[1])
+    assert found["complete"] is False and front["complete"] is False
+    assert front["graphs"] == found["graphs"] and front["gaps"] == found["gaps"] == found["proposal"]["gaps"]
+
+
+@pytest.mark.parametrize("value", ["some_symbol", {"DEC-099": "done"}])
+def test_an_execution_record_whose_kind_is_not_a_list_is_refused(root, value):
+    """The first review's F2."""
+    import yaml
+
+    for rel, front in (("CITP-001.md", {"id": "CITP-001", "type": impact.CITP_TYPE, "affected": {"code": []}}),
+                       ("CITE-001.md", {"id": "CITE-001", "type": impact.CITE_TYPE, "proposal": "CITP-001",
+                                        "affected": {"code": value}})):
+        (root / rel).write_text(f"---\n{yaml.safe_dump({'status': 'ACCEPTED', **front})}---\n", encoding="utf-8")
+    git(root, "add", "CITP-001.md", "CITE-001.md")
+    git(root, "commit", "-q", "-m", "the change's records")
+    store.load(root)
+    with pytest.raises(GovError) as refused:
+        impact.compare(root, "CITE-001.md")
+    assert refused.value.code == "IMPACT_AFFECTED_MALFORMED" and "code" in refused.value.message
+
+
 @pytest.mark.parametrize("asked,ids", [("What's the impact of DEC-001?", ["DEC-001"]),
                                        ("what is the impact of `helper`", ["helper"]),
                                        ("DEC-001", ["DEC-001"])])

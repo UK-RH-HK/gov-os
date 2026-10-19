@@ -17,6 +17,7 @@ import hashlib
 import re
 import sqlite3
 import subprocess
+from collections import Counter
 from pathlib import Path
 
 from gov.cli.errors import GovError
@@ -52,7 +53,8 @@ def _front(text: str) -> dict | None:
 
 
 class _Records:
-    """The record graph of the store, read once; ``state`` is OK only when the store holds ``HEAD``."""
+    """The record graph of the store, read once; ``state`` is OK only when the store was loaded from ``HEAD`` and no
+    record differs from it in the working tree."""
 
     def __init__(self, root: Path):
         from gov import records
@@ -74,8 +76,36 @@ class _Records:
                 self.named_by.setdefault(edge["target"], set()).add(edge["source"])
         self.testers = {edge["source"] for edge in edges if edge["type"] == "TESTS"}
         head = _git(root, "rev-parse", "HEAD").strip()
-        self.state = OK if head and head in stored else \
-            f"stale: HEAD {head[:12] or '(none)'} is not among the store's commits; gov impact never loads it again"
+        dirty = _uncommitted(root, {record["path"] for record in self.by_id.values()})
+        if not head or set(_git(root, "rev-list", "HEAD").split()) != stored:  # the store holds HEAD's history alone
+            self.state = f"stale: the store was not loaded from HEAD {head[:12] or '(none)'}; gov impact never loads " \
+                         "it again"
+        elif dirty:
+            self.state = f"stale: {', '.join(dirty)} differ from HEAD, which the store was loaded from; gov impact " \
+                         "never loads it again"
+        else:
+            self.state = OK
+
+
+def _uncommitted(root: Path, stored: set) -> list[str]:
+    """The paths of the working tree that differ from ``HEAD`` and can change the record graph (DEC-391 DP-7): a
+    stored record's file, a Markdown file with frontmatter, a path map."""
+    changed = _git(root, "diff", "--no-renames", "--name-only", "-z", "HEAD").split("\0") \
+        + _git(root, "ls-files", "-z", "--others", "--exclude-standard").split("\0")
+    found = set()
+    for rel in filter(None, changed):
+        path = root / rel
+        if rel in stored or rel.endswith("path-map.yaml"):
+            found.add(rel)
+        elif rel.endswith(".md") and path.is_file():
+            try:
+                with open(path, "rb") as text:
+                    begins = text.readline().rstrip()
+            except OSError:
+                begins = b"---"  # a file that cannot be read may be a record: never read as none
+            if begins == b"---":
+                found.add(rel)
+    return sorted(found)
 
 
 class _Code:
@@ -84,13 +114,13 @@ class _Code:
     def __init__(self, root: Path):
         from gov import codeintel
 
-        self.root, self.dead, self.paths = root, set(), {}
+        self.root, self.dead, self.paths = root, Counter(), {}
         staged = codeintel.home(root).parent / "files"
         if not staged.is_dir():
             self.state = "missing: no code index was built here; gov impact never builds it"
             return
         try:
-            self.dead = {entry["name"] for entry in codeintel.dead_code(root)}
+            self.dead = Counter(entry["name"] for entry in codeintel.dead_code(root))
         except (RuntimeError, OSError, LookupError, ValueError, TypeError) as error:
             self.state = f"unavailable: the code index cannot be read ({error})"
             return
@@ -112,21 +142,36 @@ class _Code:
 
         return {entry["name"] for entry in codeintel.callers(self.root, name) + codeintel.callees(self.root, name)}
 
+    def is_dead(self, name: str) -> bool:
+        """Dead code only when every definition of the name is (R8): one called definition keeps the name alive."""
+        from gov import codeintel
+
+        return self.dead[name] > 0 and self.dead[name] >= len(codeintel.definitions(self.root, name))
+
 
 def _staleness(root: Path, staged: Path) -> str | None:
-    """Why the code index is not the working tree's: a file it copied changed or went, or a file came after it."""
+    """Why the code index is not the working tree's: a file it copied changed or went, or a file the index would copy
+    now is not in it, whatever its modification time (R4)."""
+    from gov.secrets import indexable, path_holds_secret
+
     listed = [rel for rel in _git(root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").split("\0")
               if rel]
     copies = {path.relative_to(staged).as_posix(): path for path in staged.rglob("*") if path.is_file()}
-    since = min((path.stat().st_mtime for path in copies.values()), default=staged.stat().st_mtime)
-    for rel in sorted(set(listed) | set(copies)):
+    for rel in sorted(copies):
         path = root / rel
-        if rel in copies:
-            changed = not path.is_file() or path.read_bytes() != copies[rel].read_bytes()
-        else:
-            changed = path.is_file() and path.stat().st_mtime > since
-        if changed:
+        if not path.is_file() or path.read_bytes() != copies[rel].read_bytes():
             return f"stale: {rel} changed after the code index was built; gov impact never builds it again"
+    new = sorted(set(listed) - set(copies))
+    if not new:
+        return None
+    try:  # the index's own filter (gov.codeintel.index): what it leaves out is not missing from the index
+        held = [rel for rel in indexable(root, new) if not path_holds_secret(root, rel)]
+    except (RuntimeError, OSError, LookupError, ValueError, TypeError) as error:
+        more = f" and {len(new) - 1} more" if len(new) > 1 else ""
+        return f"stale: whether {new[0]}{more} belong in the code index cannot be decided ({error}); gov impact " \
+               "never builds it again"
+    if held:
+        return f"stale: {held[0]} is not in the code index; gov impact never builds it again"
     return None
 
 
@@ -227,7 +272,7 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
     for item in ids:
         record = graph.by_id.get(item)
         named = bool(graph.named_by.get(item))
-        dead, path = (True, record["path"]) if record else (item in code.dead, (code.defined(item) or [None])[0])
+        dead, path = (True, record["path"]) if record else (code.is_dead(item), (code.defined(item) or [None])[0])
         change.append({"id": item, "graph": RECORD if record else CODE, "path": path,
                        "deletable": readings.deletable(named, dead, current and (record is not None or code.state == OK)),
                        "governance": readings.governance(config.get("path-map.yaml", {}).get("namespaces"), path)})
@@ -243,14 +288,17 @@ def assess(root: Path, values: list[str], config: dict, out: str | None = None) 
     record_id = "CITP-" + hashlib.sha256("\n".join(sorted(ids)).encode("utf-8")).hexdigest()[:8]
     if out is not None and re.fullmatch(r"[A-Z][A-Z0-9]*-[A-Za-z0-9._-]+", Path(out).stem):
         record_id = Path(out).stem
+    graphs = {RECORD: graph.state, CODE: code.state}
+    complete = not gaps and all(state == OK for state in graphs.values())
+    listed_gaps = [{"id": item, "reason": gaps[item]} for item in sorted(gaps)]
+    # The CIT-P says what the assessment says of its completeness (R3, R4): a file never reads as more than it is.
     proposal = {"id": record_id, "type": CITP_TYPE, "status": "PROPOSED", "state_class": "DERIVED",
                 "title": f"The impact of changing {', '.join(ids)}", "change": ids, "radius": f"R{number}",
-                "depth": depth, "affected": {kind: [entry["id"] for entry in affected[kind]] for kind in KINDS}}
-    graphs = {RECORD: graph.state, CODE: code.state}
+                "depth": depth, "affected": {kind: [entry["id"] for entry in affected[kind]] for kind in KINDS},
+                "complete": complete, "graphs": dict(graphs), "gaps": [dict(gap) for gap in listed_gaps]}
     result = {
         "change": change, "radius": f"R{number}", "depth": depth, "depth_source": readings.DEPTH_SOURCE,
-        "affected": affected, "graphs": graphs, "complete": not gaps and all(state == OK for state in graphs.values()),
-        "gaps": [{"id": item, "reason": gaps[item]} for item in sorted(gaps)], "proposal": proposal,
+        "affected": affected, "graphs": graphs, "complete": complete, "gaps": listed_gaps, "proposal": proposal,
         "options": _options(closed, sum(map(len, affected.values()))) if closed else [],
         "findings": [finding for item in closed for finding in _in_place(root, graph.by_id[item])],
     }
@@ -268,17 +316,23 @@ def _write(root: Path, out: str, proposal: dict) -> None:
         raise GovError("IMPACT_OUT_EXISTS", f"{out}: a file is there already; gov impact writes no file over another",
                        {"out": str(out)})
     path.parent.mkdir(parents=True, exist_ok=True)
+    partial = "" if proposal["complete"] else ", from an assessment that is not complete (see `graphs` and `gaps`)"
     path.write_text(f"---\n{yaml.safe_dump(proposal, sort_keys=False, allow_unicode=True)}---\n\n"
                     f"# {proposal['id']}: {proposal['title']}\n\nWritten by `gov impact`: radius {proposal['radius']}, "
-                    f"depth {proposal['depth']}.\n", encoding="utf-8")
+                    f"depth {proposal['depth']}{partial}.\n", encoding="utf-8")
 
 
-def _lists(value) -> dict | None:
-    """``kind -> set of ids`` of an ``affected`` map; None when there is none."""
+def _lists(value, which: str, ids: dict) -> dict | None:
+    """``kind -> set of ids`` of an ``affected`` map; None when there is none. A kind that is not a list is refused
+    (R6): one item or a map in its place is never read as nothing."""
     if not isinstance(value, dict) or not value:
         return None
-    return {str(kind): {str(item.get("id") if isinstance(item, dict) else item) for item in (ids or [])}
-            for kind, ids in value.items() if isinstance(ids, (list, type(None)))}
+    malformed = sorted(str(kind) for kind, listed in value.items() if not isinstance(listed, (list, type(None))))
+    if malformed:
+        raise GovError("IMPACT_AFFECTED_MALFORMED", f"{which}'s `affected` gives {', '.join(malformed)} as no list: "
+                       "the records cannot be compared", {**ids, "kinds": malformed})
+    return {str(kind): {str(item.get("id") if isinstance(item, dict) else item) for item in (listed or [])}
+            for kind, listed in value.items()}
 
 
 def compare(root: Path, rel: str) -> dict:
@@ -303,11 +357,13 @@ def compare(root: Path, rel: str) -> dict:
         what = "no record of the store" if record is None else f"a {record['type']}, no {CITP_TYPE}"
         raise GovError("IMPACT_PROPOSAL_UNKNOWN", f"{execution} names the proposal {named}, which is {what}",
                        {"execution": execution, "proposal": named})
+    named_ids = {"execution": execution, "proposal": named}
     try:
-        proposed = _lists((_front((root / record["path"]).read_text(encoding="utf-8")) or {}).get("affected"))
+        proposed_front = _front((root / record["path"]).read_text(encoding="utf-8")) or {}
     except (OSError, UnicodeDecodeError):
-        proposed = None
-    done = _lists(front.get("affected"))
+        proposed_front = {}
+    proposed = _lists(proposed_front.get("affected"), named, named_ids)
+    done = _lists(front.get("affected"), execution, named_ids)
     for which, lists in ((execution, done), (named, proposed)):
         if lists is None:
             raise GovError("IMPACT_NOTHING_LISTED", f"{which} lists nothing under `affected`: the records cannot be "
