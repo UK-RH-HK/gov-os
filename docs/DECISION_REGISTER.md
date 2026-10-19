@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.248 (the version table at the end of each section gives the history)
+**Version:** 0.249 (the version table at the end of each section gives the history)
 **Date:** 2026-10-19
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9234,7 +9234,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. **The orchestrator counts these refusals** (its own, and those its leads return) in the daily digest.
 
 ### DEC-850 — How questions reach the owner (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19, in two follow-ups; item 1 as the second one restated it; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-818, DEC-787, MR-6 · **Basis:** OWNER, 2026-10-19. The notification test of 2026-10-19: an AskUserQuestion box did not reach the owner's phone (the owner answered "No"); a box pauses the turn mid-way, so the app sends nothing, while a permission request or a finished turn does notify.
+- **Status:** ACCEPTED (owner, 2026-10-19, in two follow-ups; item 1 as the second one restated it; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Changed by:** item 1's end-of-turn question line replaced by DEC-855's `owner-ping` (2026-10-19) · **Under:** DEC-818, DEC-787, MR-6 · **Basis:** OWNER, 2026-10-19. The notification test of 2026-10-19: an AskUserQuestion box did not reach the owner's phone (the owner answered "No"); a box pauses the turn mid-way, so the app sends nothing, while a permission request or a finished turn does notify.
 - **Decision:**
   1. **A question that blocks all further work** (nothing else the orchestrator or any lead can do until the owner answers): the orchestrator writes the full six-part package (DEC-818) as its message, saves the same text under `governance/project/orchestration/packages/<package id>.md`, and **ends its turn with it**, finishing with one line `QUESTION FOR THE OWNER: <package id> - choose (a), (b), (c) or Discuss first; my recommendation is (x)`, then the OWNER_ACTION line. **The AskUserQuestion box is not used.** Background work (leads, workers, runs) keeps going while it waits. If the owner answers "Discuss first", the orchestrator goes on with anything that does not depend on it, and waits for the owner's written answer. If a finished turn does not reach the owner's phone either, a Notification hook is added (the owner's change).
   2. **A question that blocks only part of the work:** no question box. It goes in the report and the daily digest with the same six parts; the orchestrator keeps working on everything it does not block, and uses a question box only once it becomes blocking.
@@ -9266,5 +9266,42 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
 | Version | Date | Change |
 |---|---|---|
 | 0.248 | 2026-10-19 | Owner: DEC-831 (the revised plan approved with the owner's changes; ACCEPTED; Wave 2 resumes by keystones; 55 tickets plus W2-00), DEC-832 (four Charter roles as skill packs in a cut-down W2-33; four to Wave 3), DEC-833 (CAP-10's 85 the floor; 99 % the target W2-61 and W2-15b measure; both figures reported), DEC-834 (estimates recalibrated after keystone 2), DEC-835 (W2-59's scope with the two packaging gaps), DEC-836 (memory used: `gov context` and `gov retrieve` in the briefs, usage measured at keystone 4's exit), DEC-837 (resume in full; W2-62; DEC-792's 8,000-character limit lifted once it lands; a checkpoint at every handover), DEC-838 (every session on its model's full window; no compaction threshold; usage reported against the limits), DEC-839 (Opus 5.5 everywhere, effort per role per launch, subagents on the parent's model, agent teams off, prompt v3), DEC-840 (DEC-460's cause corrected), DEC-841 (the Contract re-baseline (a), nine items, through W2-49's CIT-P), DEC-842 (DEC-062 and DEC-140 withdrawn), DEC-843 (W2-48's key as behaviour; testmon and coverage as one package), DEC-844 (`docs/imported/` out of the schema check), DEC-845 (the path map's `experiments/**` and `evaluation_sets`), DEC-846 (owner acts as exact commands when due), DEC-847 (parallelism: no fixed cap; eligible tickets, the measured gate, the owner's usage limits, never in a quiet window, at most 10; fewer until W2-48), DEC-848 (the owner's daily backup push; DEC-830 item 4 corrected), DEC-849 (W2-58 first in keystone 3; the refusal rule until it lands, counted in the digest), DEC-850 (how questions reach the owner: a blocking question ends the turn with a QUESTION FOR THE OWNER line, never a question box), DEC-851 (every standing owner rule written where sessions read it, ticket cards and files included), DEC-852 (W2-48: subprocesses seen, the leads' runs served, a nightly full uncached run). Next free id: DEC-853. |
+
+---
+
+## 249. The owner's answers of 2026-10-19 on P-W2-48 and P-W2-49, the notification test, and how the owner is notified (register v0.249, prepared by the W2 orchestrator on branch `w2/integrate`, for the owner's next batch commit)
+
+The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two packages of that report, the notification test and the rebuild's cost. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
+
+### DEC-853 — P-W2-49 (a): the secrets scan's time limit and pool are fixed in W2-50's resume; a store unchanged since its last clean scan is not re-scanned
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the change to a hard-block check's mechanics is approved here, CAP-33) · **Under:** DEC-802, DEC-780, CAP-38.b · **Basis:** P-W2-49 (`governance/project/orchestration/packages/P-W2-49.md`): `secrets-indexing` timed out (60 s per gitleaks run, about 24 at a time) on `store.db` (250 MB) and `code.db` (210 MB), so every close would be refused.
+- **Decision:**
+  1. **(a):** the fix rides in W2-50's resume, which already rewrites `stores_with_secrets` in `src/gov/secrets/__init__.py`: the time limit grows with the content's size (or a large store is scanned in bounded chunks, each within the limit), and the pool is bounded so that large files are not starved. Every file is still scanned with every rule set, and a scan that cannot finish still fails closed.
+  2. **Added by the owner:** a store whose hash has not changed since its last clean scan is not re-scanned; the clean result is reused, keyed on the store's hash. A changed store is always scanned in full. **A finding is never reused.**
+  3. W2-50's card and ticket file gain these as KPIs; its lead commits the ticket-file change first, in its worktree, as W2-54 did (a reviewed ticket's file is not edited on `w2/integrate`).
+  4. Until W2-59 lands, the declared checks run the tree's `src`, so the fix reaches the next close when W2-50 merges; after W2-59, it reaches the judge with the owner's re-pin, which must be at a commit that holds both.
+
+### DEC-854 — P-W2-48 (a): W2-59 starts now, beside W2-05
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Under:** DEC-786, DEC-777, DEC-835, the w2 prompt §3 · **Basis:** P-W2-48 (`governance/project/orchestration/packages/P-W2-48.md`).
+- **Decision:** W2-59 starts now on `w2/integrate`, although W2-05's unmerged branch changes two of its files (`src/gov/check/runner.py`'s `_run_command` environment and git calls; `src/gov/retrieval/retrieve_check.py`). W2-59's engineer is told W2-05's changes and keeps its own edit of those lines small and composable; W2-05's resume merges `w2/integrate` first and resolves the conflict keeping both sides (DEC-750, DEC-754). An exception to the prompt's §3 for this pair only.
+
+### DEC-855 — How the owner is notified: `owner-ping`, a permission request (standing)
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-850, DEC-818, DEC-787, DEC-851 · **Basis:** OWNER, 2026-10-19. The notification tests: an AskUserQuestion box did not reach the owner's phone (test 1, "No"); a finished turn did not either (NOTIFY-TEST, (b)); a permission request does (the operator's test, 22:44). `~/.local/bin/owner-ping "<message>"` only appends the date and the message to `~/.config/gov-os-notify/pings.log`; the owner's user-level settings carry an ask rule for it, so running it raises a permission request, which notifies the owner's phone and shows the message · **Replaces:** DEC-850 item 1's end-of-turn `QUESTION FOR THE OWNER` line.
+- **Decision:**
+  1. **Whenever anything needs the owner** (any decision that gates any ticket, even if other work continues; any COMMIT-NEEDED; any owner act, such as an install, a pin, a release or a go; any LAUNCH_BLOCKED, ESCALATION or AUTH_REQUIRED), the orchestrator:
+     - (a) writes the full six-part package (DEC-818) in its message, and saves it under `governance/project/orchestration/packages/<id>.md`;
+     - (b) starts every ticket, resume and run that does not depend on the owner's answer;
+     - (c) then, **as its last action,** runs `owner-ping` with one line: `"<P1|P2|COMMIT|ACT> <id> | gates <tickets, or 'nothing'> | <what you need from me>"`.
+  2. The orchestrator's session pauses on that permission request until the owner taps it; leads and workers keep running. The owner taps "Allow once" (never "Always allow"), then answers in the chat.
+  3. **Items that gate nothing wait for the daily digest.**
+  4. **A ping never holds a secret, a key, a path to the held-out material, or a file's contents.**
+  5. Only the orchestrator pings. Leads and workers never ask or notify the owner (DEC-850 item 3); they return their packages to the orchestrator.
+  6. The AskUserQuestion box stays unused (DEC-850). The OWNER_ACTION line stays at the end of every report (DEC-787).
+  7. The first ping (`ACT TEST | gates nothing | ping check`, 22:49:48) ran without the orchestrator's session showing a permission request: that session started before the ask rule existed. The owner starts a fresh session if the phone showed nothing.
+- Next free id: DEC-856.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.249 | 2026-10-19 | Owner: DEC-853 (P-W2-49 (a): the secrets scan's time limit and pool fixed in W2-50's resume; an unchanged store's clean scan reused by its hash, a finding never), DEC-854 (P-W2-48 (a): W2-59 starts now beside W2-05), DEC-855 (the owner is notified by `owner-ping`, a permission request, as the orchestrator's last action; replaces DEC-850 item 1's question line). Next free id: DEC-856. |
 
 ---

@@ -7,7 +7,7 @@ Every independent-auditor brief the orchestrator writes for W2-25, W2-28, W2-30 
 - You use your model's full window; nobody asks you to stop or compact early. You run at `--effort max`.
 - Use `gov retrieve` for what you need to know, and say in your report which questions it answered.
 - Until W2-58 lands, the guard still refuses some reads Policy 2 opened (searches that start at the repository root, `governance/project/` or `.claude/`): take the refusal, never look for another form, search named folders instead, and count the refusals in your report.
-- You never ask the owner directly and never use a question box: anything that needs the owner goes into your report as a package, in the six parts of DEC-818, saying whether it blocks your audit or only part of it.
+- You never ask or notify the owner directly, never use a question box and never run `owner-ping` (DEC-855): anything that needs the owner goes into your report as a package, in the six parts of DEC-818, saying whether it blocks your audit or only part of it.
 
 ## How you judge (owner, the w2 prompt's section 14)
 
