@@ -9,6 +9,8 @@ DEC-221, DEC-462, DEC-136 and DEC-732. The profile is FULL (DEC-221): every KPI 
 with no combinatorial expansion. Every covers id has at least one test.
 
 **81 cases** (65 test functions) in eleven files, a support module and a conftest. 13 cases are `local_only`.
+With the second batch (the first review's findings, below): **96 cases** (75 test functions) in twelve files,
+20 of them `local_only`.
 
 ## How the suite runs, and the code it runs (DEC-732)
 
@@ -219,6 +221,40 @@ outside the sandbox, P-W2-38).
 | CAP-33.f (Wave 1: the question triggers the assessment) | `test_w2_37_skill_routing.py::test_regression_…` (2, green) |
 | CAP-33.g (Wave 2: the question runs `gov impact`) | `test_w2_37_question.py`; `test_w2_37_skill_routing.py::test_the_skill_runs_gov_impact_for_the_question` (P-1) |
 | DEC-732 | `test_w2_37_code_under_test.py` (green) |
+
+## Second batch: the first review's findings (DEC-136, DEC-413)
+
+A fresh independent test designer added these after the implementation, from the review's findings F1, F2, F3, F6
+and F8, passed on as described behaviours (DEC-136). Every case is in `test_w2_37_review_findings.py`. No earlier
+case was changed. They are built on the suite's fixtures (`project`, `repo`, `indexed_own`, `built`, `tools`) and its
+support module; behaviour 4 builds two temporary repositories of its own. The success half of each behaviour is
+there too (green today), or is an existing case named below.
+
+The red reasons are what this run printed at the commit that added the batch, with `gov impact` built: **9 failed,
+68 passed, 19 errors** over the whole suite. The 81 earlier cases keep the results they had (the three known reds,
+66 passed, 12 `local_only` errors at setup). Of the 15 new cases, 6 fail, 2 pass (success halves) and 7 are
+`local_only`. Here those 7 error at setup with `OSError: [Errno 30] Read-only file system: '/tmp/gov-cbm-<uid>/…'`
+(P-W2-38); the lead runs them outside the sandbox, and the reason expected there is given in the table.
+
+| # | Behaviour | Test (`test_w2_37_review_findings.py`) | `local_only` | Red reason |
+|---|---|---|---|---|
+| 1 | A record graph that does not match the working tree is never reported current (reading R4; `gov closure` names such paths under `uncommitted`, DEC-391 DP-7) | `test_a_record_graph_that_does_not_match_the_tree_is_never_reported_current` (3: a ticket implementing DEC-001 added and not committed; CAP-901's edge removed and not committed; the store loaded on `main`, then the repository switched to the older branch `older`, where the ticket is absent and the edge present). Without the code tool: the record side alone | no | **failed**: "`graphs.record` says 'ok' although that graph was not". The listing is the store's: the new ticket is missing, CAP-901 is still listed, and after the switch `main`'s ticket is listed |
+| | | `test_with_both_graphs_a_record_graph_that_does_not_match_the_tree_is_never_complete` (2: the ticket added and not committed; the branch switch, with the code index built again on `main` first). With a current code graph, `complete` turns on the record graph | yes | expected: `graphs.record` says `ok` and `complete` is true while the listing misses the new ticket (or lists `main`'s) |
+| | Success | `test_a_store_loaded_from_the_tree_as_it_is_reads_the_record_graph_current`: the ticket committed and the store loaded again: `graphs.record` is `ok` and the ticket is listed | no | green |
+| 2 | A CIT-E whose kind is not a list never matches (reading R6) | `test_an_execution_record_whose_kind_is_not_a_list_never_matches` (2: `code: "some_symbol"`; `decisions: {DEC-099: done}`; the proposal's list for that kind empty). A refusal naming the kind, or the item listed as a difference | no | **failed**: "a CIT-E whose `code` is 'some_symbol', not a list, matches" (and the same for the map): `matches: true`, no differences |
+| | Success | `test_an_empty_list_on_both_sides_matches`; and the earlier `test_w2_37_execution.py` cases with lists | no | green |
+| 3 | A CIT-P written from an incomplete assessment never reads as complete (readings R3, R4) | `test_a_cit_p_written_from_an_incomplete_assessment_says_so_or_is_refused`: no code tool, so the result is `complete: false`. The `--out` file carries `complete: false`, the result's `graphs` and the result's gap ids; or the write is refused, naming why (the assessment incomplete, or the code graph), and no file is written | no | **failed**: "the CIT-P written from an incomplete assessment does not say `complete: false`": its frontmatter has the change, radius, depth and lists only |
+| | Success | `test_a_cit_p_written_from_a_complete_assessment_is_written`: both graphs read, the file is written; whatever it says of completeness and of the graphs is the result's | yes | expected green (a guard for the fix: a complete assessment's file is not refused) |
+| 4 | A name two code definitions share is deletable only when every definition of it is (reading R8) | `test_a_name_two_definitions_share_is_not_deletable_when_one_is_called`: `app/alpha.py` and `app/beta.py` each define `w37_shared`; alpha's is called by `w37_caller`, which DEC-201 constrains; beta's by nothing. No `change` entry for `w37_shared` is `deletable`, and its radius is not below the radius of `w37_shared` in the same repository with beta's renamed to `w37_spare` | yes | expected: `w37_shared` reported `deletable: true` with a radius below the renamed repository's (the dead definition is the one judged) |
+| | Success | `test_with_the_dead_definition_renamed_each_name_is_judged_alone`: in the renamed repository `w37_shared` is not deletable and `w37_spare` is | yes | expected green |
+| 5 | A code file the index does not hold makes the code graph not current, whatever its modification time (reading R4) | `test_a_code_file_older_than_the_index_but_not_in_it_is_never_missed` (2: left untracked; committed). After the index was built, `app/moved.py`, calling `w37_apply`, arrives with its own and its folder's modification time from before the index (as `mv`, `cp -p` or an archive leave them). For the change `w37_apply`: the new caller listed, or the code graph not `ok` and `complete: false` | yes | expected: `graphs.code` says `ok` and `complete` is true while `w37_moved` is not listed |
+| | Success | The earlier `test_w2_37_incomplete.py::test_a_stale_code_graph_is_said_and_never_complete` (a caller committed with a fresh modification time) and `test_w2_37_code_graph.py::test_with_both_graphs_read_the_report_says_so` | yes | as before |
+
+The readings behind them are the suite's own. Behaviour 1 is R4 as `test_a_stale_record_store_is_said_and_never_complete`
+reads it, widened to the working tree and to a change of branch: "stale" may be said by the word, or by naming the
+paths that differ. Behaviour 3 takes R3 (the CIT-P is the result's `proposal` and the `--out` file) to mean that
+the file says what the result says about completeness. No new package: each behaviour follows from a source the
+suite already cites.
 
 ## Packages, and the tests that depend on each
 
