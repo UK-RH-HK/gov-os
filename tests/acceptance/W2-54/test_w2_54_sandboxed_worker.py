@@ -10,6 +10,8 @@ probe:
 1. starts the suite's stand-in embedder (round 2's, with its variation: a text after a different text gets another
    vector) on the sandbox's own loopback: this machine's Ollama is not reachable from inside (the sandbox has its own
    network, and the engineer's allowlist is empty), and the probe records that;
+   (round 4, DEC-798: the reads name it both at ``OLLAMA_HOST`` and at the CPU embedder's address, so the
+   question is answered by it, with its variation, as before);
 2. reads a project with a built index that lies **outside** the launched repository, so its ``.gov-runtime/`` is
    read-only to the worker by the sandbox's write fence (the probe records that a new file cannot be made there);
 3. asks one text, a different text, and the first text again, each read in a process of its own, through the
@@ -82,6 +84,7 @@ spec = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 root = spec["root"]
 env = dict(spec["env"])
 env["OLLAMA_HOST"] = spec.get("host") or Path(spec["host_file"]).read_text(encoding="utf-8").strip()
+env[spec["query_setting"]] = env["OLLAMA_HOST"]   # round 4 (DEC-798): the CPU embedder's address, the same stand-in
 env["TMPDIR"] = os.environ.get("TMPDIR") or "/tmp"
 result = {"ollama_host": env["OLLAMA_HOST"], "reads": []}
 probe = Path(root) / ".gov-runtime" / "w2-54-worker-write-probe"
@@ -192,11 +195,13 @@ def test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_c
     L.w47.configure_stand_in(project, L.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
     scratch = project / SCRATCH
     scratch.mkdir(parents=True)
-    env = {key: value for key, value in S.embed_env(box, None).items() if key not in ("OLLAMA_HOST", "TMPDIR")}
+    env = {key: value for key, value in S.embed_env(box, None).items()
+           if key not in ("OLLAMA_HOST", S.QUERY_HOST_SETTING, "TMPDIR")}
     env.pop("PYTHONPYCACHEPREFIX", None)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     common = {"root": str(read_root), "env": env, "python": sys.executable, "driver": str(scratch / "driver.py"),
-              "gov": S._GOV, "texts": [TEXT, OTHER, TEXT], "cwd": str(read_root)}
+              "gov": S._GOV, "texts": [TEXT, OTHER, TEXT], "cwd": str(read_root),
+              "query_setting": S.QUERY_HOST_SETTING}
     (scratch / "driver.py").write_text(S._DRIVER, encoding="utf-8")
     (scratch / "reader.py").write_text(_READER, encoding="utf-8")
     (scratch / "embedder.py").write_text(_EMBEDDER.replace("@SUITE@", repr(str(Path(S.__file__).parent))),

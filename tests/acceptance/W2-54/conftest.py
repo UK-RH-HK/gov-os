@@ -15,6 +15,19 @@ import w2_54_support as support  # noqa: E402
 def pytest_configure(config):
     config.addinivalue_line(
         "markers", "local_only: starts a real worker session through gov launch (CLI, bwrap, socat); not for CI")
+    config.addinivalue_line(
+        "markers", "shared_gpu: needs this machine's shared Ollama with the model on the GPU and the real CPU "
+                   "embedder; run by the lead outside any sandbox, selected with -m shared_gpu (README, Round 4)")
+
+
+def pytest_collection_modifyitems(config, items):
+    """The ``shared_gpu`` cases run only when ``-m`` names them; otherwise they are deselected (and counted so)."""
+    if "shared_gpu" in (config.getoption("markexpr", "") or ""):
+        return
+    dropped = [item for item in items if item.get_closest_marker("shared_gpu")]
+    if dropped:
+        config.hook.pytest_deselected(items=dropped)
+        items[:] = [item for item in items if not item.get_closest_marker("shared_gpu")]
 
 
 @pytest.fixture(scope="session")

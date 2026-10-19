@@ -521,6 +521,13 @@ EMBED_PIN = "ac6da0dfba84"                       # its pinned revision (DEC-374:
 DIGEST = EMBED_PIN + hashlib.sha256(b"w2-54 stand-in embedder").hexdigest()[:52]
 OTHER_DIGEST = "5e" + hashlib.sha256(b"w2-54 another build of the embedder").hexdigest()[:62]
 DIMENSIONS = 1024
+CPU_SIZE = 2371270737            # what /api/ps reports as the loaded model's size (the change record, §5.5.2)
+OTHER_MODEL = "nomic-embed-text:latest"
+# Round 4 (DEC-798): the address of the CPU-only embedder that answers query embeddings (README, "Round 4", "The
+# interfaces this KPI needs"): a setting in OLLAMA_HOST's form, and its default when it is not set.
+QUERY_HOST_SETTING = "GOV_QUERY_OLLAMA_HOST"
+QUERY_HOST_DEFAULT = "127.0.0.1:11435"
+SHARED_HOST_DEFAULT = "127.0.0.1:11434"   # OLLAMA_HOST's default (DEC-260)
 DRIFT = 0.35   # how far a text's vector moves toward the text embedded just before it (the stand-in's variation)
 _STOP = {"the", "and", "for", "with", "that", "this", "each", "does", "when", "who", "what", "into", "from",
          "its", "are", "was", "has", "have", "before", "after", "then", "any", "all", "given", "query",
@@ -558,13 +565,21 @@ class EmbedderStandIn:
       request and across requests.
     - ``mode``: ``healthy``; ``fail`` (every embedding request answers HTTP 500); ``short`` (an embedding request
       answers with one vector fewer than it was asked for).
+    - Round 4 (README, "The stand-ins of round 4"): ``device`` is where the model is loaded by a request that names
+      no option (``cpu``, ``gpu``); a request whose ``options`` name ``num_gpu`` loads it on the CPU (0) or on the
+      device (any other number), and a request without options is served by the runner already loaded, as Ollama
+      does. ``GET /api/ps`` lists the model once it is loaded, with ``size_vram`` 0 on the CPU and equal to ``size``
+      on the GPU. ``ps`` overrides what ``/api/ps`` reports, whatever is loaded: ``gpu``, ``partial`` (half of it
+      in GPU memory), ``nothing``, ``other-model`` (another model, on the CPU). ``bind`` is the address to serve
+      at (a free loopback port when None); ``log`` is a file every request is also appended to, as JSON lines.
 
     Every request is recorded: ``embedded()`` lists the texts sent to be embedded, in order.
     """
 
-    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT):
+    def __init__(self, digest=DIGEST, targets=None, drift=DRIFT, device="cpu", bind=None, size=CPU_SIZE, log=None):
         self.digest, self.targets, self.drift, self.mode = digest, dict(targets or {}), drift, "healthy"
         self.requests, self.previous = [], None
+        self.device, self.size, self.log, self.ps, self.loaded = device, size, log, None, None
         stand_in = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -588,11 +603,40 @@ class EmbedderStandIn:
             def log_message(self, *args):
                 pass
 
-        self.server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        self.server = ThreadingHTTPServer(bind or ("127.0.0.1", 0), Handler)
         self.server.daemon_threads = True
         self.host = f"127.0.0.1:{self.server.server_address[1]}"
         threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True).start()
         self._lock = threading.Lock()
+
+    def _load(self, options):
+        """Where a request with ``options`` is served: the runner it loads, or the one already loaded."""
+        options = options if isinstance(options, dict) else {}
+        if "num_gpu" in options:
+            self.loaded = "cpu" if options["num_gpu"] == 0 or self.device == "cpu" else self.device
+        elif self.loaded is None:
+            self.loaded = self.device
+        return self.loaded
+
+    def ps_models(self):
+        """What ``GET /api/ps`` reports now."""
+        def entry(name, vram):
+            return {"name": name, "model": name, "size": self.size, "digest": self.digest, "size_vram": vram,
+                    "expires_at": "2026-10-19T12:05:00Z", "context_length": 8192,
+                    "details": {"family": "qwen3", "parameter_size": "595.78M", "quantization_level": "Q8_0"}}
+        if self.ps == "nothing":
+            return []
+        if self.ps == "other-model":
+            return [entry(OTHER_MODEL, 0)]
+        where = self.ps or self.loaded
+        if where is None:
+            return []
+        return [entry(EMBED_MODEL, {"cpu": 0, "gpu": self.size, "partial": self.size // 2}[where])]
+
+    def on_gpu(self):
+        """True when ``/api/ps`` reports the pinned model wholly in GPU memory (``size_vram`` equal to ``size``)."""
+        return any(model["name"] == EMBED_MODEL and model["size_vram"] == model["size"] > 0
+                   for model in self.ps_models())
 
     def target(self, text):
         keys = [key for key in self.targets if text.endswith(key)]
@@ -606,6 +650,12 @@ class EmbedderStandIn:
         before = word_vector(self.target(previous))
         return _unit([a + self.drift * b for a, b in zip(own, before)])
 
+    def _record(self, entry):
+        self.requests.append(entry)
+        if self.log:
+            with open(self.log, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps({"kind": "request", "pid": os.getpid(), **entry}) + "\n")
+
     def reply(self, method, route, asked):
         with self._lock:
             model = {"name": EMBED_MODEL, "model": EMBED_MODEL, "digest": self.digest, "size": 639150000,
@@ -613,8 +663,9 @@ class EmbedderStandIn:
             if route in ("/api/embed", "/api/embeddings"):
                 given = asked.get("input", asked.get("prompt", ""))
                 texts = [given] if isinstance(given, str) else [str(text) for text in given]
-                self.requests.append({"route": route, "model": asked.get("model"), "texts": texts,
-                                      "mode": self.mode})
+                served = self._load(asked.get("options"))
+                self._record({"route": route, "model": asked.get("model"), "texts": texts, "mode": self.mode,
+                              "options": asked.get("options"), "served_on": served})
                 if self.mode == "fail":
                     return 500, {"error": "the W2-54 stand-in embedder fails on purpose"}
                 vectors = [self.vector(text) for text in texts]
@@ -624,13 +675,16 @@ class EmbedderStandIn:
                     return 200, ({"embedding": vectors[0]} if vectors else {})
                 return 200, {"model": EMBED_MODEL, "embeddings": vectors, "total_duration": 1, "load_duration": 1,
                              "prompt_eval_count": len(texts)}
-            self.requests.append({"route": route, "method": method})
+            self._record({"route": route, "method": method, "options": asked.get("options")})
             if route == "/api/version":
                 return 200, {"version": "0.35.0"}
             if route == "/api/tags":
                 return 200, {"models": [model]}
             if route == "/api/ps":
-                return 200, {"models": []}
+                return 200, {"models": self.ps_models()}
+            if route == "/api/generate" and asked.get("model") == EMBED_MODEL:
+                self._load(asked.get("options"))
+                return 200, {"model": EMBED_MODEL, "response": "", "done": True}
             if route == "/api/show":
                 return 200, {"details": model["details"], "capabilities": ["embedding"],
                              "model_info": {"general.architecture": "qwen3", "qwen3.embedding_length": DIMENSIONS}}
@@ -643,6 +697,14 @@ class EmbedderStandIn:
     def asked_for(self, question):
         """How many texts sent to be embedded end with ``question`` exactly."""
         return sum(1 for text in self.embedded() if text.endswith(question))
+
+    def embed_requests(self):
+        """Every request to be embedded, in order."""
+        return [request for request in self.requests if "texts" in request]
+
+    def optioned(self):
+        """Every request that named a runner option (a non-empty ``options``)."""
+        return [request for request in self.requests if request.get("options")]
 
     def close(self):
         self.server.shutdown()
@@ -665,11 +727,16 @@ def vector_site(box):
     return site
 
 
-def embed_env(box, endpoint):
-    """The scratch environment with the stand-in embedder at OLLAMA_HOST and ``sqlite_vec`` importable."""
+def embed_env(box, endpoint, cpu=None):
+    """The scratch environment with the stand-in embedder at OLLAMA_HOST and ``sqlite_vec`` importable.
+
+    Round 4 (DEC-798): the CPU embedder's address (``QUERY_HOST_SETTING``) is ``cpu`` (a stand-in or an address)
+    when given, else the same stand-in as OLLAMA_HOST; with no endpoint, both are one dead address."""
     site = vector_site(box)
+    shared = endpoint.host if endpoint else f"127.0.0.1:{_dead_port()}"
+    query = cpu if isinstance(cpu, str) else cpu.host if cpu else shared
     return box.env(PYTHONPATH=os.pathsep.join([str(SRC), *([str(site)] if site else [])]),
-                   OLLAMA_HOST=endpoint.host if endpoint else f"127.0.0.1:{_dead_port()}")
+                   OLLAMA_HOST=shared, **{QUERY_HOST_SETTING: query})
 
 
 def _dead_port():
@@ -696,6 +763,8 @@ for call in json.loads(sys.argv[2]):
         out.append(None)
     elif call[0] == "search":
         out.append(semantic.search(root, call[1], refresh=False))
+    elif call[0] == "search-refresh":
+        out.append(semantic.search(root, call[1], refresh=True))
     elif call[0] == "retrieve":
         out.append(entry.retrieve(root, call[1]))
     elif call[0] == "wait":
@@ -736,10 +805,11 @@ SUBJECTS = {
 BAKERY, TIDES, ORCHARD, KILN, FORGE, APIARY = SUBJECTS
 
 
-def semantic_project(box, project, endpoint, files=None):
+def semantic_project(box, project, endpoint, files=None, cpu=None):
     """A temporary project with its record store, its lexical index and its vectors, built through the stand-in
     ``endpoint``. The corpus is embedded without the variation, so two projects built alike hold the same vectors;
-    the variation is on again for every question asked afterwards."""
+    the variation is on again for every question asked afterwards. ``cpu``: the CPU embedder's address during the
+    build (round 4; ``embed_env``)."""
     project = new_repo(project)
     adopt_embedded(project)
     for rel, text in (files or SUBJECTS).items():
@@ -747,7 +817,8 @@ def semantic_project(box, project, endpoint, files=None):
     commit_all(project)
     drift, endpoint.drift = endpoint.drift, 0.0
     try:
-        report = drive(box, project, endpoint, ("refresh",), ("load",))[0]
+        report = drive_env(box, project, embed_env(box, endpoint, cpu), ("refresh",), ("load",),
+                           timeout=CALL_TIMEOUT_S)[0]
     finally:
         endpoint.drift = drift
     assert report.get("available") is True, f"the fixture's vectors were not built: {report}"
@@ -972,3 +1043,299 @@ def cannot_create_in(folder):
         return True
     probe.unlink()
     return False
+
+
+# --------------------------------------------------------------------------
+# Round 4: the CPU-only embedder on its own port (DEC-798, owner, 2026-10-19, P-W2-40 (b))
+# --------------------------------------------------------------------------
+#
+# Two embedders: the shared one at OLLAMA_HOST (it builds the index) and the CPU-only one at the address the setting
+# QUERY_HOST_SETTING names (it answers query embeddings, and only those). Which one a command asks is seen at the two
+# stand-ins; what the CPU-only one is told when a read starts it is seen in what the stand-in executable records. No
+# case names the code that does it.
+
+def host_of(address):
+    """``host:port`` of an address given in OLLAMA_HOST's forms (``host:port``, ``http://host:port/``)."""
+    text = str(address or "").strip()
+    text = text.split("://", 1)[-1].rstrip("/")
+    return text if ":" in text else f"{text}:11434"
+
+
+def gpu_hidden(env):
+    """True when ``env`` tells an Ollama it starts to use no GPU, the way Ollama documents it: the CUDA devices set
+    to an id that names no device (``CUDA_VISIBLE_DEVICES=-1``), or the CPU library forced (``OLLAMA_LLM_LIBRARY``
+    ``cpu…``). README, "The stand-ins of round 4"."""
+    if str(env.get("OLLAMA_LLM_LIBRARY", "")).lower().startswith("cpu"):
+        return True
+    value = env.get("CUDA_VISIBLE_DEVICES")
+    if value is None or not value.strip():
+        return False
+    items = [item.strip() for item in value.split(",")]
+    return not any(item.isdigit() or item.upper().startswith(("GPU-", "MIG-")) for item in items)
+
+
+def answers(address, path="/api/version", timeout=2.0):
+    """The status and JSON body of ``GET http://<address><path>``, asked by the test with no proxy; None when
+    nothing answers."""
+    import urllib.error
+    import urllib.request
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    try:
+        with opener.open(f"http://{host_of(address)}{path}", timeout=timeout) as reply:
+            body = reply.read()
+            status = reply.status
+    except urllib.error.HTTPError as exc:
+        return exc.code, None
+    except (urllib.error.URLError, OSError, ValueError):
+        return None
+    try:
+        return status, json.loads(body or b"null")
+    except ValueError:
+        return status, None
+
+
+DAEMON_LIFETIME_S = 120     # a started stand-in ends by itself after this long, whatever happens to the test
+DAEMON_START_DELAY_S = 1.0  # how long a started stand-in takes before it listens (so two starts can race)
+
+# The stand-in ``ollama`` executable. It records how it was run (its arguments, its OLLAMA_HOST and every variable
+# that could tell it about the GPU). ``serve`` then waits a moment, as a daemon takes to start, and serves round 2's
+# stand-in embedder at its own OLLAMA_HOST (Ollama's default when unset), with the model on the CPU when its
+# environment hides the GPU and on the GPU otherwise; at an address already held it records that and ends with exit
+# code 1, as Ollama does. It ends by itself after DAEMON_LIFETIME_S, records a SIGTERM or SIGINT before it ends, and
+# writes nothing to its output streams.
+_OLLAMA_EXE = r'''#!@PYTHON@
+import json, os, signal, sys, time
+sys.path.insert(0, @SUITE@)
+LOG = @LOG@
+
+
+def record(entry):
+    with open(LOG, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(entry) + "\n")
+
+
+told = {key: value for key, value in os.environ.items()
+        if key.startswith("OLLAMA_") or key in ("CUDA_VISIBLE_DEVICES", "HIP_VISIBLE_DEVICES",
+                                                 "ROCR_VISIBLE_DEVICES", "GPU_DEVICE_ORDINAL")}
+record({"kind": "exec", "argv": sys.argv[1:], "pid": os.getpid(), "env": told, "path": sys.argv[0]})
+if sys.argv[1:2] != ["serve"]:
+    sys.exit(0)
+import w2_54_support as S
+
+host = S.host_of(os.environ.get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT)
+device = "cpu" if S.gpu_hidden(os.environ) else "gpu"
+time.sleep(S.DAEMON_START_DELAY_S)
+name, _, port = host.rpartition(":")
+try:
+    stand_in = S.EmbedderStandIn(device=device, bind=(name, int(port)), log=LOG)
+except OSError as exc:
+    record({"kind": "bind-failed", "pid": os.getpid(), "host": host, "error": str(exc)})
+    sys.exit(1)
+
+
+def stop(signum, frame):
+    record({"kind": "signal", "pid": os.getpid(), "signal": signum})
+    sys.exit(0)
+
+
+signal.signal(signal.SIGTERM, stop)
+signal.signal(signal.SIGINT, stop)
+record({"kind": "serving", "pid": os.getpid(), "host": host, "device": device})
+end = time.monotonic() + S.DAEMON_LIFETIME_S
+while time.monotonic() < end:
+    time.sleep(0.1)
+'''
+
+EXECUTABLE_PLACES = ("GOV_OLLAMA_BIN", "PATH", "HOME")   # where DEC-260 finds the executable, in its order
+HOME_EXECUTABLE_REL = ".local/ollama/bin/ollama"
+
+
+class Daemons:
+    """One case's stand-in executable and what every run of it recorded; ``close()`` ends every one it started.
+
+    ``env(base, place)`` is ``base`` with the executable at ``place`` (``GOV_OLLAMA_BIN``, ``PATH`` or ``HOME``) or
+    nowhere (None): a HOME of the case's own, and a PATH of folders that hold no ``ollama``."""
+
+    def __init__(self, root):
+        self.root = Path(root)
+        self.home, self.bin, self.out = self.root / "home", self.root / "bin", self.root / "out"
+        for folder in (self.home, self.bin, self.out):
+            folder.mkdir(parents=True, exist_ok=True)
+        self.log = self.root / "daemons.jsonl"
+        self.text = (_OLLAMA_EXE.replace("@PYTHON@", sys.executable).replace("@SUITE@", repr(str(Path(__file__).parent)))
+                     .replace("@LOG@", repr(str(self.log))))
+        self._runs = 0
+
+    def install(self, place):
+        target = {"GOV_OLLAMA_BIN": self.root / "stand-in" / "ollama", "PATH": self.bin / "ollama",
+                  "HOME": self.home / HOME_EXECUTABLE_REL}[place]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(self.text, encoding="utf-8")
+        target.chmod(0o755)
+        return target
+
+    def env(self, base, place=None):
+        env = dict(base)
+        env.pop("GOV_OLLAMA_BIN", None)
+        folders = [str(self.bin)] + [folder for folder in base.get("PATH", "/usr/bin:/bin").split(os.pathsep)
+                                     if folder and not (Path(folder) / "ollama").exists()]
+        env.update({"PATH": os.pathsep.join(folders), "HOME": str(self.home)})
+        if place is not None:
+            path = self.install(place)
+            if place == "GOV_OLLAMA_BIN":
+                env["GOV_OLLAMA_BIN"] = str(path)
+        return env
+
+    def records(self, kind=None):
+        if not self.log.is_file():
+            return []
+        entries = [json.loads(line) for line in self.log.read_text(encoding="utf-8").splitlines() if line.strip()]
+        return [entry for entry in entries if kind is None or entry.get("kind") == kind]
+
+    def serves(self):
+        """Every run of the executable as ``serve``."""
+        return [entry for entry in self.records("exec") if entry["argv"][:1] == ["serve"]]
+
+    def serving(self):
+        """Every started stand-in that took its address."""
+        return self.records("serving")
+
+    def alive(self, pid):
+        try:
+            return b"ollama" in Path(f"/proc/{pid}/cmdline").read_bytes() and \
+                Path(f"/proc/{pid}/stat").read_text().split(")")[-1].split()[0] != "Z"
+        except OSError:
+            return False
+
+    def asked(self, question):
+        """How many texts the started stand-ins were sent to be embedded that end with ``question``."""
+        return sum(1 for entry in self.records("request") for text in entry.get("texts") or []
+                   if text.endswith(question))
+
+    def run(self, argv, *, cwd, env, timeout=CALL_TIMEOUT_S):
+        """``argv`` in a new process whose output streams are files (a daemon it starts may inherit them, and a
+        pipe would stay open after the process ends); its Run."""
+        return self.start(argv, cwd=cwd, env=env)(timeout)
+
+    def start(self, argv, *, cwd, env):
+        """``argv`` started now, its output in files; call the result with a timeout to wait for its Run."""
+        self._runs += 1
+        out, err = self.out / f"run-{self._runs}.out", self.out / f"run-{self._runs}.err"
+        began = time.monotonic()
+        with open(out, "wb") as stdout, open(err, "wb") as stderr:
+            child = subprocess.Popen([str(part) for part in argv], cwd=str(cwd), env=env, stdin=subprocess.DEVNULL,
+                                     stdout=stdout, stderr=stderr)
+
+        def wait(timeout=CALL_TIMEOUT_S):
+            try:
+                child.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                child.kill()
+                child.wait()
+                raise AssertionError(f"{' '.join(map(str, argv[-4:]))} did not end within {timeout:.0f} s") from None
+            done = subprocess.CompletedProcess(argv, child.returncode, out.read_text(encoding="utf-8", errors="replace"),
+                                               err.read_text(encoding="utf-8", errors="replace"))
+            return Run(argv, done, time.monotonic() - began)
+        return wait
+
+    def close(self):
+        for entry in self.records("exec"):
+            if self.alive(entry["pid"]):
+                try:
+                    os.kill(entry["pid"], 9)
+                except (ProcessLookupError, PermissionError):
+                    pass
+
+
+def gov_argv(*args):
+    """The argument list of ``gov <args>`` running this worktree's ``src/`` (as ``gov``)."""
+    return [sys.executable, "-c", _GOV, *[str(arg) for arg in args]]
+
+
+class NotAnEmbedder:
+    """A loopback listener that is not an embedder: every request gets HTTP 404 with a page of text."""
+
+    def __init__(self, port=0):
+        self.requests = []
+        requests = self.requests
+
+        class Handler(BaseHTTPRequestHandler):
+            def answer(self):
+                length = int(self.headers.get("Content-Length") or 0)
+                if length:
+                    self.rfile.read(length)
+                requests.append(f"{self.command} {self.path}")
+                payload = b"<html><body>Not an embedder.</body></html>"
+                self.send_response(404)
+                self.send_header("Content-Type", "text/html")
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                self.wfile.write(payload)
+
+            do_GET = do_POST = do_HEAD = do_DELETE = answer
+
+            def log_message(self, *args):
+                pass
+
+        self.server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+        self.server.daemon_threads = True
+        self.host = f"127.0.0.1:{self.server.server_address[1]}"
+        threading.Thread(target=self.server.serve_forever, kwargs={"poll_interval": 0.05}, daemon=True).start()
+
+    def close(self):
+        self.server.shutdown()
+        self.server.server_close()
+
+
+def facets_of(run):
+    """The ``facets`` of a ``gov retrieve --json`` run that succeeded."""
+    envelope = run.envelope()
+    assert envelope.get("ok") is True and isinstance(envelope.get("result"), dict), run.describe()
+    return envelope["result"].get("facets") or {}
+
+
+def unavailable_with_reason(facet):
+    """Why ``facet`` (a facet entry, or a semantic search's answer) is not "unavailable with a reason, no hit"."""
+    faults = []
+    if facet.get("available") is not False:
+        faults.append(f"available is {facet.get('available')!r}")
+    if not (isinstance(facet.get("reason"), str) and facet["reason"].strip()):
+        faults.append(f"no reason ({facet.get('reason')!r})")
+    if facet.get("hits"):
+        faults.append(f"{len(facet['hits'])} hits")
+    return faults
+
+
+# ---- round 3's cache, as round 3 wrote it (the change record, §5.3; the file of this worktree's runtime folder)
+
+ROUND_3_CACHE_REL = ".gov-runtime/query-vector-cache.db"
+ROUND_3_CACHE_TABLE = ("CREATE TABLE query_vector (model TEXT NOT NULL, revision TEXT NOT NULL, text_sha256 TEXT "
+                       "NOT NULL, embedding BLOB NOT NULL, PRIMARY KEY (model, revision, text_sha256))")
+# What round 3's code sends to be embedded for a question, before the question (seen at the stand-in at 0914d8f8).
+ROUND_3_PREFIX = "Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: "
+
+
+def plant_round_3_entry(project, texts, vector, revision=DIGEST):
+    """Write ``vector`` into the project's cache file under round 3's key (model, revision, sha256 of the exact text
+    sent) for each of ``texts``, in round 3's layout: 1024 float32 numbers, little-endian."""
+    import sqlite3
+    import struct
+    path = Path(project) / ROUND_3_CACHE_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    connection = sqlite3.connect(path)
+    try:
+        if connection.execute("SELECT 1 FROM sqlite_master WHERE name = 'query_vector'").fetchone() is None:
+            connection.execute(ROUND_3_CACHE_TABLE)
+        blob = struct.pack(f"<{len(vector)}f", *vector)
+        for text in dict.fromkeys(texts):
+            connection.execute("INSERT OR REPLACE INTO query_vector VALUES (?, ?, ?, ?)",
+                               (EMBED_MODEL, revision, hashlib.sha256(text.encode("utf-8")).hexdigest(), blob))
+        connection.commit()
+    finally:
+        connection.close()
+    return path
+
+
+def sent_for(stand_ins, question):
+    """Every text the stand-ins were sent to be embedded that ends with ``question`` (the exact text sent for it)."""
+    return [text for stand_in in stand_ins for text in stand_in.embedded() if text.endswith(question)]

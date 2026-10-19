@@ -6,6 +6,8 @@ DEC-628, DEC-221, DEC-462, DEC-136, DEC-491, DEC-732). **50 cases in four files*
 query vector, below) adds **15 cases in a fifth file**, `test_w2_54_query_vector.py`: **65 cases in five files.**
 Round 3 (the query-vector cache, at the end) adds **15 cases in two files**, `test_w2_54_query_cache.py` and
 `test_w2_54_sandboxed_worker.py`: **80 cases in seven files.**
+Round 4 (the CPU-only embedder, at the end) adds **16 cases in two files**, `test_w2_54_cpu_embedder.py` (14, with
+stand-ins) and `test_w2_54_shared_gpu.py` (2, `shared_gpu`, run by the lead): **96 cases in nine files.**
 No private part of the code to be written was read; the cases reach the behaviour through public interfaces only.
 
 Run (the project's test command, to its end):
@@ -504,3 +506,180 @@ the others 1 to 4.5 s each. `test_w2_54_sandboxed_worker.py`: **8 to 10 s** here
   deterministic per request (one request whose result does not depend on another's) passes.
 - **Time-dependence:** the concurrency case releases its processes after 1.5 s; on a very slow machine a process may
   not yet wait at the start line. The case is still valid (fewer processes truly at once), it does not pass falsely.
+
+# Round 4: the CPU-only embedder (owner, 2026-10-19, P-W2-40 (b))
+
+The lead's measurement after round 3 (change record §5.5) was red: on the shared GPU runner a text's vector depends on
+the prompt computed just before it, and round 3's `num_gpu: 0` on a request to the shared runner reloads that runner
+on the CPU for every user of the machine. The owner decided DEC-798 (P-W2-40 (b), 2026-10-19; not yet in the
+register): (1) a CPU-only embedder that `gov` starts on its own port answers query embeddings, and only those; the
+shared GPU runner keeps building the index; no request to the shared runner names `num_gpu: 0`; (2) the cache's key
+names the device, so a GPU-computed vector (as `b33ef9b3` cached) is never served; (3) W1-21's hit@5 is re-measured
+before merge on the real models with CPU query vectors against the GPU-built index, in the lead's session, and a
+figure below 80 is a red for this ticket; (4) the resource gate counts the CPU embedder's 2.4 GB (nothing to test);
+(5) DEC-261 is amended: `gov` starts two daemons on demand and stops neither. DEC-797 (delegated): the setting
+`GOV_QUERY_VECTOR_CACHE_MAX_BYTES` (default 64 MiB) is the cache bound's public interface. The ticket's two new lines:
+
+> **Success 5.** On the shared GPU Ollama, the same text read many times, after different texts and by two sessions at
+> once, gets one vector: query embeddings come from the CPU-only embedder on its own port, the shared runner is never
+> moved to the CPU, and the cache key names the device.
+>
+> **Success 6.** W1-21's hit@5 on the real models, with CPU query vectors against the GPU-built index, is at or above
+> its pass line of 80; the figure is recorded in the change record.
+
+Written by a fresh independent test designer before the implementation, from those lines, DEC-798 and DEC-797 as the
+lead gave them, DEC-260, DEC-261, DEC-782, DEC-374, DEC-414, DEC-732, W1-19's interface for an unavailable facet and
+the change record's §5 (the measurements). No private part of the code was read.
+
+## The interfaces this KPI needs
+
+The cases name these; none exists yet, and the lead can change any of them by a decision:
+
+- **The setting `GOV_QUERY_OLLAMA_HOST`**: the CPU embedder's address, in `OLLAMA_HOST`'s form (`host:port`, with or
+  without `http://`). **Its default `127.0.0.1:11435`** (the shared runner's default port plus one), which the
+  `shared_gpu` cases use with the setting unset. `OLLAMA_HOST` stays the shared runner's address.
+- **The start (DEC-260, DEC-261 as DEC-798 amends it):** where nothing answers at that address, a read starts the
+  executable found as DEC-260 finds it (`GOV_OLLAMA_BIN`, then `PATH`, then `~/.local/ollama/bin/ollama`) as
+  `ollama serve`, with **`OLLAMA_HOST` set to the CPU address** in its environment, and **told to use no GPU**: in its
+  environment `CUDA_VISIBLE_DEVICES` names no device (`-1`, Ollama's documented way; any non-empty value none of whose
+  comma-separated items is a device number or a `GPU-…`/`MIG-…` id), or `OLLAMA_LLM_LIBRARY` begins with `cpu`. An
+  empty or absent `CUDA_VISIBLE_DEVICES` does not count. It is never
+  stopped (no SIGTERM or SIGINT reaches it; it is alive after the read ends).
+- **"The CPU embedder computed it":** the embedder at the CPU address reports, at `GET /api/ps`, the pinned model with
+  `size_vram` 0 (and `size` above 0). The case reads it the way Ollama reports it; how `gov` asks is not judged.
+- **An unavailable facet** is W1-19's: `available` false, `state` `FACET_UNAVAILABLE`, a non-empty `reason`, no hits;
+  in `gov retrieve --json`, `result.facets.semantic.{available, reason}`.
+
+## The stand-ins of round 4 (`w2_54_support.py`)
+
+- **`EmbedderStandIn`** (round 2's, with its variation: on its "GPU" a text's vector drifts with the text before it)
+  now has a device. `device="gpu"` stands for the shared runner, `device="cpu"` for the CPU embedder. It models the
+  runner as §5.5.2 measured it: a request without `options` is served by the runner already loaded, and a request
+  with `num_gpu` 0 reloads it on the CPU. `/api/ps` reports the model once loaded, with `size_vram` equal to `size`
+  (gpu), half of it (partial) or 0 (cpu). Before anything is loaded it reports nothing, as Ollama does. A case can
+  make it report the GPU, half, nothing or only another model. It records each request's route, texts and `options`.
+  **Its variation is kept whatever the device.** The stand-in does not model the CPU's determinism, so the
+  determinism cases of rounds 2 and 3 still hold the code to a computation that does not depend on the text sent
+  before.
+- **The stand-in `ollama` executable** (`Daemons`): a script put where DEC-260 looks. Run as `serve`, it records its
+  argv, its pid and its environment (`OLLAMA_*`, `CUDA_*`, `HIP_*`, `ROCR_*`, `GPU_DEVICE_ORDINAL`), waits a second,
+  and then serves `EmbedderStandIn` at its `OLLAMA_HOST`. That embedder runs on the CPU when the GPU was hidden, and
+  otherwise reports the model on the GPU. A second start at the same address fails to bind and exits 1, as Ollama
+  does. A stop signal is recorded. Each case kills what it started when it ends.
+- **`NotAnEmbedder`**: a listener that answers HTTP 404 with an HTML page to every request.
+- **`plant_round_3_entry`**: writes the question's vector into `.gov-runtime/query-vector-cache.db` in round 3's
+  layout, as seen read-only in this worktree's store: the table `query_vector(model, revision, text_sha256,
+  embedding)`, the key being the model, the full digest and the sha256 of the exact text sent, and the vector 1,024
+  float32 numbers. The vector is the shared runner's (the forge's), keyed by both the text round 3 sent
+  (`Instruct: … Query: ` plus the question) and the text sent today.
+
+## The fixture change (rounds 2 and 3, and the sandboxed worker)
+
+Because round 4's code reads the question's vector from `GOV_QUERY_OLLAMA_HOST`, the earlier cases set it too:
+`embed_env(box, endpoint, cpu=None)` sets `OLLAMA_HOST` to `endpoint` (or a dead port) and `GOV_QUERY_OLLAMA_HOST` to
+`cpu`, **or, when no `cpu` is given, the same as `OLLAMA_HOST`**. `semantic_project` passes `cpu` through. The
+sandboxed reader sets `GOV_QUERY_OLLAMA_HOST` to the `OLLAMA_HOST` it gives (the stand-in inside the sandbox).
+`/api/ps` of the stand-in now reports the loaded model, where it was `[]`. **So rounds 2 and 3 run against one
+stand-in at both addresses, which keeps its variation:** each case's expectation, reference and red reason is
+unchanged. This is the fixture change the commit's `Rewrite-Reason` names.
+
+The stand-in of rounds 2 and 3 has the default device, `cpu`. Once a request has loaded the model, its `/api/ps`
+reports the model with `size_vram` 0, so round 4's rule (a vector is used only from an embedder that reports the
+model on the CPU) lets those cases be answered, as before. Before the first request it reports nothing (as Ollama
+does), so the code has to look at `/api/ps` after it has asked for the vector, not before.
+
+## The KPI parts and their cases
+
+All in `test_w2_54_cpu_embedder.py` but the last two rows. Red reasons as seen at `0914d8f8` plus this suite:
+
+| part | case | red reason |
+|---|---|---|
+| **1** questions to the CPU embedder, and only those; no option to the shared runner | `test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner` | "`gov retrieve … who fires the glazed bowls` sent the shared runner texts to embed: [`…Query: `, `…Query: who fires the glazed bowls`]" |
+| **1** chunks to the shared runner only (build, `gov rebuild`, a search with `refresh=True`) | `test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one` | "the search sent its question to the shared runner" (the build and rebuild parts pass) |
+| **2** the device: GPU, half, nothing, another model → no vector, unavailable with a reason, nothing cached, no fallback; then on the CPU → the CPU vector | `test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu, partial, nothing, other-model]` (4) | each "the CPU address reports 'gpu' (…), yet the search answered (available is True …); nearest forge.md 0.0561" |
+| **3** the key names the device: round 3's entry is never served; one answer after it | `test_a_vector_cached_under_round_3_s_key_is_never_served` | "the read served the vector cached by the shared runner under round 3's key (nearest forge.md 0.0), not the CPU embedder's (the kiln)", which also shows the planted layout is round 3's |
+| **4** started on demand at its address, no GPU, `serve`, never stopped; found as DEC-260 finds it | `test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN, PATH, HOME]` (3) | "the read started no Ollama executable" |
+| **4** two sessions at once: one embedder serving, both answered | `test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer` | the same |
+| **4** the address held by a non-embedder: no other port, no fallback, exit 0, unavailable with a reason, the other routes answer | `test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback` | "the semantic facet is not unavailable with a reason (available is True, no reason (None))" |
+| **4** no executable: the same | `test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers` | the same |
+| **5** on the shared GPU: one answer cold, warm, unwritable, after other texts, two processes; the shared runner on the GPU before and after | `test_w2_54_shared_gpu.py::test_shared_gpu_one_text_gets_one_answer_after_other_texts_at_once_and_whatever_the_cache_s_state` | run by the lead (not run here) |
+| **5** the shared runner holds the model on the GPU, the CPU embedder with `size_vram` 0; one revision; prints the port and the size | `test_w2_54_shared_gpu.py::test_shared_gpu_the_shared_runner_keeps_the_model_on_the_gpu_and_the_cpu_embedder_holds_it_on_the_cpu` | run by the lead (not run here) |
+| **6** the change record states the figure | `test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80` | "docs/changes/W2-54-CIT-E.md has no line naming W1-21, hit@5 and CPU query vectors" |
+
+**Count:** 16 new cases (11 functions). The 14 stand-in cases are all red here. The 2 `shared_gpu` cases are not
+run here.
+
+**Success 6, the figure:** the case looks for a line of the change record that names `W1-21`, `hit@5`, `CPU` and
+"query vector", and does not name round 3's `5f038b47`. That line must hold a figure written with its decimals (as
+W1-21 prints it, `81.67`) between 80 and 100. The decimals keep "the pass line of 80" from counting as the figure. The
+figure itself is W1-21's own case, unchanged: neither its case, its pass line nor its real-models environment
+(`real_env`) was touched.
+
+### What passes today, and why it is here
+
+- In the rebuild case, the build, `gov rebuild` and the refresh already send every chunk to the shared runner and
+  none elsewhere (today there is no other address). A change that embedded chunks at the CPU address would turn
+  those parts red. Only the search's question is red today.
+- Rounds 1 to 3 pass with the fixture change, as before it: 75 passed, with the four green-here cases and the
+  `local_only` case left out (80 − 5).
+
+## The cases on the shared GPU, and W1-21's case: how the lead runs them
+
+Outside any sandbox, in the lead's session, on this machine: the shared Ollama at `127.0.0.1:11434` with
+`qwen3-embedding:0.6b`, the real `ollama` where DEC-260 looks, `gitleaks` and `sqlite_vec`. **Neither address set:**
+
+    env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST \
+      PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src \
+      python3 -m pytest tests/acceptance/W2-54/test_w2_54_shared_gpu.py -m shared_gpu -s -q -p no:cacheprovider -rs
+
+- `-m shared_gpu` selects them; without it `conftest.py` deselects them (counted as deselected), so a sandboxed or CI
+  run leaves them out. Selected, **they fail and do not skip** when a prerequisite is missing or the shared server does
+  not hold the model wholly on the GPU (`size_vram` equal to `size`).
+- `-s` shows the line the second case prints: the CPU embedder's address and port, its `size` (in bytes and GiB) and
+  `size_vram`, and the shared runner's.
+- The first read starts the CPU embedder at `127.0.0.1:11435` (if the engineer kept that default) and leaves it
+  running (DEC-261 as amended). The lead decides whether to stop it afterwards.
+
+W1-21's hit@5 with CPU query vectors (DEC-798 item 3), the same environment, with the dev tiers (`GOV_DEV_TIERS`, or
+the default folder):
+
+    env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST \
+      PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src \
+      python3 -m pytest "tests/acceptance/W1-21/test_w1_21_dev_tier.py::test_the_dev_query_set_meets_the_hit_at_5_pass_line" \
+      -q -p no:cacheprovider -rs
+
+The index is built through the shared runner on the GPU, and the questions are embedded by the CPU embedder (both
+default addresses). The terminal summary prints `mean hit@5 of gov.retrieval.retrieve: NN.NN (pass line 80 …)`. That
+figure goes into the change record on a line naming W1-21's hit@5 and CPU query vectors, which the success-6 case
+then reads. A figure below 80 is a red for this ticket (DEC-798 item 3), not a rewrite.
+
+## The real CLI, and what could not run here
+
+- The sandboxed-worker case (`local_only`, round 3) could not reach `api.anthropic.com` from this designer's sandbox
+  ("Couldn't connect through your proxy"). Its fixture change (above) is **unverified here**; the lead runs it.
+- In this sandbox, an Ollama started by a real-models case tries `ollama.com:443` (denied). It is harmless, and is
+  why the real-models cases here are the lead's.
+
+## How long the new cases run
+
+`test_w2_54_cpu_embedder.py`: **about 23 s** (14 cases; each start case waits about 1 s for the stand-in executable
+to listen). The rest of W2-54 without the green-here file: 138 s. The `shared_gpu` file: not run here; expect a few
+minutes (an index of six notes, about thirty reads, the first of which may load the model on the CPU).
+
+## Risks (round 4)
+
+- **The default port and the no-GPU rule are this suite's choice** (above). If the engineer starts the CPU embedder
+  another way, for example with `OLLAMA_NUM_GPU` or a Vulkan or ROCm variable, the start cases stay red until the
+  lead decides.
+- **When `/api/ps` is read.** A fresh embedder (the stand-in, and Ollama) lists nothing until a request has loaded the
+  model, and the device case `nothing` holds that a listing of nothing gives no vector. Code that reads `/api/ps`
+  before its first embedding request, and refuses on an empty list, never answers a first question; the stand-in
+  cases then show it as "facet unavailable". The KPI's words ("the embedder that computed it reports …") read as
+  after the computation, and this suite holds that reading.
+- **One file under `.gov-runtime/`** (W1-19's and W1-21's DEC-782 rewrites): if round 4 keeps round 3's cache file
+  and adds a new one beside it, those suites see two files and turn red. The cache with the device in its key has
+  to stay one file (or replace the old one).
+- **W1-27's other files** name no endpoint and so use the default addresses on the machine they run on. Today they
+  do the same with `OLLAMA_HOST`.
+- The success-6 case reads a figure with decimals. A whole-number figure (for example exactly `85`) is not read; the
+  change record then writes `85.00`.
