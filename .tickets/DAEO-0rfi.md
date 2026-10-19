@@ -26,6 +26,7 @@ allowed_paths:
 - src/gov/retrieval/semantic.py
 - src/gov/retrieval/ollama.py
 - tests/unit/retrieval/**
+- tests/unit/semantic/test_semantic.py
 kpis:
   success:
   - "Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order retrieval returns tied items in [DEC-768]."
