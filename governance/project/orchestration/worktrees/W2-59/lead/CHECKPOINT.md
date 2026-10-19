@@ -14,9 +14,17 @@
   nothing; lead recommends (b) a row), P-W2-59-2 (installed wheel's commit; lead recommends (a) now, (c) W2-18).
 - Red check by lead: 39 failed, 5 passed, reasons match README (log/red-1.txt). Tree stayed clean.
 - gov checkpoint CP-DAEO-kh9l-0002 committed as 78e10a3c.
-- Now: engineer 1 launched (briefs/eng-1.md, log/eng-1.json, exit log/eng-1.exit), tripwire-before-2.json taken.
-- Next: tripwire compare 2, twelve fields, trailers; then rebuild + verification.
-- Loop count: implementer iteration 1 running.
+- Engineer 1 returned DONE (session 5b7defda-73f6-4543-a7a2-b374758dcce5, 21 min, sandboxed, check passed):
+  commits 771e9a0c (code + builder tests), e120479c (CIT-P), fd675ec4 (builder test fix); trailers Task, Role:
+  engineer, Implements: DEC-822, DEC-835, Co-Authored-By. Its run: W2-59 44/44, W1-38 201/201, unit 2194 passed 1 skipped.
+  Twelve fields present. Tripwire 2: here head only; main tree head moved + 3 unstaged files (orchestrator); W2-50 own.
+  gov retrieve: asked 1 question, index stale in its session (my checkpoint commit after rebuild 1).
+  Lead check: hooks/guard/checkpoint/context identical fecb870c..HEAD; every hook program loads under the pin.
+  Residual to return: hook programs come from the tree while their package comes from the pin (skew blocks calls
+  until a re-pin; fails closed); not in the CIT-P.
+- Now: verification. Rebuild 2 running (log/rebuild-2.*). Then import check, suites by batch with
+  run_suites.sh (log/suites/<batch>/), unit tests, gov check --json.
+- Loop count: implementer iteration 1 done.
 - Decided by the lead (design facts given to workers): a wheel is built out of the tree with DIST_EXTRA_CONFIG
   pointing to a cfg whose [build] build_base and [egg_info] egg_base are in a temp folder (checked in scratchpad:
   nothing lands in the source tree).
