@@ -454,3 +454,99 @@ The command (the script is given to the lead with this engineer's return; it wri
 its own):
 
     PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 <the script>/eng4-measure.py
+
+### 5.6 Round 4: the CPU-only query embedder on its own port (owner, 2026-10-19, P-W2-40 (b))
+
+The lead's measurement after §5.5.3 was red on the shared server, and its package (PKG-W2-54-3) went to the owner.
+The owner allowed one more round: DEC-798 (owner, 2026-10-19, P-W2-40 (b); staged, not yet in the register, cited by
+the ticket as "owner, 2026-10-19, P-W2-40 (b)") and DEC-797 (delegated). The ticket gains success lines 5 and 6 and
+the path `src/gov/retrieval/ollama.py` (the CPU-only embedder only). The change is made under CAP-33 and DEC-768:
+evidence (§5.5.1, §5.5.2), the owner's approval (DEC-798), tests first (`test_w2_54_cpu_embedder.py`, 14 cases with
+stand-ins, and `test_w2_54_shared_gpu.py`, 2 cases on the shared GPU, written by an independent test designer before
+this round's code, `986353cc`, `cd363a8e`), one review. No hard-block check is skipped, downgraded or excluded
+(DEC-768 item 4), and no limit of DEC-782 is loosened.
+
+#### 5.6.1 The cause
+
+- **The device decides the vector** (§5.5.1, §5.5.2). On the shared runner, whose model sits wholly on the GPU, a
+  text's vector depends on the prompt that runner computed just before it, for any client, and no request shape
+  removes it. On the CPU, with the same executable, model and digest, a text's vector is the same bytes whatever came
+  before it, whatever the request's shape and whoever else asks at the same time.
+- **Why §5.5.3's change no longer holds.** `num_gpu: 0` on a question's request to the shared runner gets the CPU's
+  vector, but it moves that runner to the CPU for every client (§5.5.2, probe 4): an explicit option reloads the
+  runner, and a request without options is served by whichever runner is loaded. Other sessions' questions,
+  `gov rebuild`'s chunks and other worktrees' index builds would then run at the CPU's rate until the model is
+  unloaded. **§5.5.3's change 6 (`QUERY_OPTIONS = {"num_gpu": 0}`) is replaced by this round's change**; §5.5 is kept as
+  it was, as the record of that round.
+
+#### 5.6.2 The owner's choice (DEC-798, owner, 2026-10-19, P-W2-40 (b))
+
+1. A CPU-only embedder that `gov` starts on its own port answers query embeddings, and only those. The shared GPU
+   runner keeps building the index. No request to the shared runner names `num_gpu: 0`.
+2. The query-vector cache's key names the device that computed the vector, so a GPU-computed vector (such as those
+   `b33ef9b3` cached in this worktree's `.gov-runtime/query-vector-cache.db`) is never served.
+3. W1-21's hit@5 is measured again before this ticket merges, by the lead, on the real models, with the CPU query
+   vectors against the GPU-built index. A figure below the pass line of 80 is a red for this ticket, not a rewrite.
+4. The resource gate counts the CPU embedder's 2.4 GB as standing memory (the orchestrator's; nothing built here).
+5. DEC-261 is amended: `gov` starts two daemons on demand and stops neither, the shared one and the CPU-only one on
+   its own port.
+
+DEC-797 (delegated): `GOV_QUERY_VECTOR_CACHE_MAX_BYTES` (default 67108864 bytes, 64 MiB) stays the public interface of
+the cache's bound, as built in §5.3. DEC-782's limits stand as §5.3 states them, with the key now naming the device.
+
+#### 5.6.3 The change
+
+| # | File | Change | Evidence |
+|---|---|---|---|
+| 7 | `src/gov/retrieval/ollama.py` | The CPU-only embedder's address and start, nothing else: `query_host()` is the setting `GOV_QUERY_OLLAMA_HOST` (`QUERY_HOST_SETTING`, in `OLLAMA_HOST`'s form), else `127.0.0.1:11435` (`QUERY_DEFAULT_HOST`, the shared runner's default port plus one). `ensure_query_available()` is `ensure_available()` given the caller's environment with `OLLAMA_HOST` set to that address and `CUDA_VISIBLE_DEVICES=-1` (`NO_GPU`, an id that names no device: Ollama's documented way to use no GPU). So the executable is found as DEC-260 finds it (`GOV_OLLAMA_BIN`, `PATH`, `~/.local/ollama/bin/ollama`), started as `ollama serve` in its own session and never stopped (DEC-261 as amended). Two reads that find nothing there at once both start one; the second cannot take the address and ends, and both wait for the first to answer. `ensure_available()` and the shared runner's start are unchanged. | `tests/unit/retrieval/test_semantic_cpu_embedder.py` (the address and its default; the start's environment) |
+| 8 | `src/gov/retrieval/semantic.py` | **The question.** `query_vector(root, question)` returns the vector and, when there is none, why. It asks the CPU embedder alone (`_ask`, `_embed` and `_revision` take a host; without one they ask the shared runner at `OLLAMA_HOST`, as before): its model list for the revision, then one request `[INSTRUCTION, INSTRUCTION + question]` (the second vector, as §5.5.3), **with no options**. **After** that request it reads the CPU embedder's `GET /api/ps` (`_on_cpu`): the vector is used only when the pinned model is listed with `size_vram` 0 and `size` above 0. Anything else (the model in GPU memory, partly there, not listed, only another model listed, no listing) gives no vector, the reason `NOT_ON_CPU`, nothing cached, and no request elsewhere. `search` (with or without `refresh`) makes the CPU embedder answer (`_ready(connection, ollama.ensure_query_available)`, starting it if needed) and no longer the shared runner. When the CPU embedder cannot be reached, its facet is unavailable with Ollama's warning as the reason, and the other routes answer. **The chunks.** `_build` (the semantic refresh, `gov rebuild`, a search with `refresh=True`) makes the shared runner answer as before and sends it every chunk, with no options. `QUERY_OPTIONS` is removed, and no request names `num_gpu` or any other option. **The cache.** The same file, `.gov-runtime/query-vector-cache.db`, now the table `device_query_vector (model, revision, device, text_sha256, embedding)`, the four first the primary key: `MODEL`, the digest the CPU embedder's model list reports at the time of the search, `DEVICE` (`cpu`, the only device a vector is used from) and the sha256 of the exact text sent. Round 3's table `query_vector`, keyed without the device, is never read; the first write drops it inside its own transaction, so the file stays one file and its pages are reused under the bound. Writes, bound, eviction and a cache that cannot be read or written are as §5.3 states. | `tests/unit/retrieval/test_semantic_query_vector.py` (23 cases: the question sent to the CPU embedder's address, no option in any request body, a chunk to the shared runner, the key with its device); `tests/unit/retrieval/test_semantic_cpu_embedder.py` (13 cases: the device listing read after the computation, each listing that is not wholly on the CPU refused, round 3's entries never served and dropped at the next write, a search makes the CPU embedder answer and not the shared runner); acceptance `test_w2_54_cpu_embedder.py` (§5.6.4) |
+
+**Corrections.** §5.3 limit 2 ("Table `query_vector (model, revision, text_sha256, embedding)`") now reads
+`device_query_vector`, keyed by model, revision, device and the sha256 of the exact text; the revision is the one the
+CPU embedder's model list reports (both daemons read one model folder, so it is the shared runner's digest as well).
+§5.5.3's "the cache is unchanged: … its key (model, revision, sha256 of the exact text)" and "the lead deletes it
+before measuring" no longer apply: a vector cached by `b33ef9b3` or by §5.5.3's code is never served.
+
+**Why the computation is deterministic now, and the shared runner untouched.** A question's vector is computed by a
+daemon that has no GPU, and is used only once that daemon reports the model wholly on the CPU after computing it, so
+every vector used is the CPU's vector of the text alone (§5.5.2). A cached vector was so checked when it was computed,
+and its key says so. The shared runner is asked for chunks only, with no options, so its runner is never reloaded and
+stays where it is loaded. The cost: the CPU embedder's memory while the model is loaded (about 2.4 GB, DEC-798 item 4;
+Ollama unloads it after its idle keep-alive), its first load (about 1.8 s to start the daemon and 4.8 s for the first
+question in this sandbox, under load), and 0.02 to 0.06 s a question after that (§5.5.2, probe 5).
+
+#### 5.6.4 What was run here, and what the sandbox cannot measure
+
+- **The acceptance cases with stand-ins** (`test_w2_54_cpu_embedder.py`, 14): 6 pass; 7 fail on two clauses of the
+  cases that the code cannot meet without breaking another line, returned to the lead as packages (PKG-W2-54-4-1: the
+  lexical route is an exact-phrase search and no note holds the cases' question, so "the lexical route gives
+  evidence" cannot hold when the semantic facet is unavailable; PKG-W2-54-4-2: the first case's steps 5 and 6 repeat
+  steps 1 and 2, whose vectors the cache then serves with no request, as KPI success 2 and round 3's cases require);
+  the 14th is the figure the lead writes below. In a throwaway copy with only those two clauses varied, outside the
+  tree, 13 of the 14 passed.
+- **The measurement script for the lead, run once in this sandbox** against two daemons `gov` started there (the
+  shared one through `ensure_available`, the CPU one through `ensure_query_available`): 360 reads in one process and
+  96 in two processes at once with a third client, **0 differed**; the CPU embedder reported
+  `size 2371270737, size_vram 0` and its vectors were used; `how is a query vector cached` gave `ad0ba0b6bb`, the
+  CPU hash of §5.5.2. Its verdict there is RED for the reason it should be: the sandbox has no GPU, so the shared runner
+  was on the CPU too. **None of it says anything about the shared GPU** (§5.5.2).
+- **Not measurable in this sandbox:** the shared server (not reachable here); whether `CUDA_VISIBLE_DEVICES=-1` keeps
+  a real GPU from the CPU embedder on this machine (the sandbox hides the GPU, so any daemon here is on the CPU; the
+  check after the computation refuses a vector from GPU memory either way); the shared runner's placement after many
+  reads; W1-21's real-models figure; the context check and `gov check` after a full rebuild; the CPU embedder's memory
+  beside the shared runner's.
+
+Measurement after the change on the shared GPU (run by the lead): *to be filled in: the command, the placement it
+prints for the shared runner (`size_vram` against `size`) and the CPU embedder (its port, `size_vram`), the figures
+(one process, two processes at once), the `shared_gpu` cases, and the context check's seconds, tickets and load after
+a full rebuild with the cache deleted, against the declared `timeout-seconds: 600`.*
+
+W1-21's hit@5 with CPU query vectors (run by the lead): *to be filled in.*
+
+The script's command (the script is given to the lead with this engineer's return; it writes only in a temporary
+folder of its own and never reads or deletes the worktree's cache file):
+
+    env -u OLLAMA_HOST -u GOV_QUERY_OLLAMA_HOST PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src \
+      python3 <the script>/eng5-measure.py
+
+DEC-768, DEC-798 and CAP-33 govern this round; DEC-261 is read as DEC-798 amends it.
