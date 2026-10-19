@@ -1,0 +1,24 @@
+b33ef9b3 W2-54 (DAEO-0rfi): change record round 3: the query-vector cache within DEC-782's limits, determinism without it
+ollama 0.35.0 at 127.0.0.1:11434; qwen3-embedding:0.6b digest ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d
+bound 67108864 bytes; cache .gov-runtime/query-vector-cache.db
+cold       'context'                                    runs  12  differed   2  largest 0.002887
+written    'context'                                    runs  12  differed  12  largest 0.002887
+unwritable 'context'                                    runs  12  differed   2  largest 0.002887
+cold       "The context packet's dropped list in a s"   runs  12  differed   2  largest 0.003281
+written    "The context packet's dropped list in a s"   runs  12  differed   0  largest 0.000000
+unwritable "The context packet's dropped list in a s"   runs  12  differed   3  largest 0.003281
+cold       'who reads the harbour tide tables'          runs  12  differed   1  largest 0.002833
+written    'who reads the harbour tide tables'          runs  12  differed   0  largest 0.000000
+unwritable 'who reads the harbour tide tables'          runs  12  differed   2  largest 0.002833
+cold       'the audit-report type exactly as W2-02 d'   runs  12  differed   2  largest 0.004074
+written    'the audit-report type exactly as W2-02 d'   runs  12  differed  12  largest 0.004074
+unwritable 'the audit-report type exactly as W2-02 d'   runs  12  differed   1  largest 0.004074
+cold       'how is a query vector cached'               runs  12  differed   2  largest 0.002609
+written    'how is a query vector cached'               runs  12  differed   0  largest 0.000000
+unwritable 'how is a query vector cached'               runs  12  differed   2  largest 0.002466
+cold       'café au lait'                               runs  12  differed   4  largest 0.005548
+written    'café au lait'                               runs  12  differed   0  largest 0.000000
+unwritable 'café au lait'                               runs  12  differed   3  largest 0.005548
+ALL the read's vector: runs 216  differed from the text's first 50  largest component difference 0.005548
+RAW the embedder alone, first after another question vs repeat: runs 18  differed 18  largest 0.004074
+seconds 7.3; the writable cache holds 16384 bytes

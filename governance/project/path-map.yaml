@@ -346,3 +346,7 @@ load_sensitive:
     decision: DEC-762
     reason: "fails once under parallel load (-n 8) and passes alone (W2-53's review, 2026-10-17)"
     fixed_by: W2-L352
+  - test: "tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project"
+    decision: DEC-823
+    reason: "fails once in the full regression at load about 25 and passes alone, 3 of 3 in 17.8 s with a 2 s reaping margin (W2-53's re-close, 2026-10-19 12:01)"
+    fixed_by: W2-M384

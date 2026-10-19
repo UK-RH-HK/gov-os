@@ -1,0 +1,24 @@
+**Resume note (second start of the W1-26 follow-up; read it before the rest, and where it differs from the rest, it holds).** Keep `.gov-runtime/scratch/lead/CHECKPOINT.md` current. The first start returned PACKAGES at `af22cfd3` (designer `22f07ace`, 21 cases; engineer `af22cfd3`, `src/gov/check/skill_validator.py`, 159 lines). Nothing of it is redone. Both parts below are built test first (DEC-136): a fresh launched designer (cases red; you check red to the end of the suite), then a fresh launched engineer.
+
+## Part 1: the package is decided — DEC-441 (in `docs/DECISION_REGISTER.md` on `w1/integrate`, commit `f1576a54`; merge `w1/integrate` first, in one committing command with the trailers, it touches only the register)
+
+An audit report is a Markdown file with YAML frontmatter holding `milestone`, `commit` (the audited commit) and `pack_sha256`, and a body holding one table whose header is `item`, `class`, `evidence`. Each row: one contract item or decision, exactly one of the six classes of DEC-070, and its evidence as paths relative to the repository root, separated by commas; a row of class `OK` cites at least one path, a row of another class may cite none, written as `-`. The validator is green only when the commit resolves in the repository, the table has at least one row, every row is well-formed, and every cited path exists **at the cited commit** (not merely in the working tree). Build it as a second module beside the first, callable the same way with report files or folders as arguments. Unmeasured, never green: no argument, a folder with no report, an unreadable file, and a run outside a git repository.
+
+## Part 2: the skill validator ends green where it must not. The main orchestrator read `skill_validator.py`; the first start's own finding plus five more
+
+1. **The command line the first start gave to W1-35 does not work.** `python3 -m gov.check.skill_validator template/governance/kernel/skills/` finds nothing: a folder is searched one level deep, and the skills live at `skills/(name)/SKILL.md`. A folder argument is searched at every depth for files named `SKILL.md`. A case runs the validator on a skills folder holding several skill folders, and one on the same with one of them broken.
+2. **In a folder, a Markdown file with no or broken frontmatter is skipped, not reported.** With point 1 the rule is: every `SKILL.md` under the folder is validated, and one without valid frontmatter is a finding. A folder holding skill folders of which one has no `SKILL.md` at all: the designer settles from CAP-24 and W1-08's layout whether that is a finding, or returns it as a package.
+3. **A command reference with anything after the command's name is not seen.** The pattern matches only a code span holding exactly `gov` and one word. `gov retreive --json`, `gov chek --list`, a reference inside a longer code span or a code block, pass unseen. Every `gov (word)` in a code span or a code block is checked, whatever follows the word. What prose outside code counts is the designer's question (the first start's design answered it: say what it answered and keep it if it holds).
+4. **A description, name or version that is not text** (a number, a list, a mapping, an empty string) is a finding; none skips a rule (this is the first start's own finding, widened).
+5. **The token count is the one `gov context` uses** (`src/gov/context/`, W1-24), imported, not a second copy of the arithmetic; if that function cannot be imported from `src/gov/check/` without a cycle, say so and keep one named constant in one place.
+6. **A file that cannot be read or decoded** is "unmeasured" by name with the file named, not a traceback. And one bad argument among good ones never yields green: a case with a valid folder plus a missing path.
+
+## Then
+
+- Verify: the W1-26 suite, W1-07, W1-24, `tests/unit` to their ends; `gov check --json` in this worktree still reports as before (this round registers no check).
+- Run the skill validator yourself against W1-35's and W1-36's eight skill files read from their branches (`git show w1/W1-35:(path)` into your scratch folder, laid out as `skills/(name)/SKILL.md`; never check out or merge those branches) and give the output per file. A finding there is information for those tickets, not something this round fixes.
+- Give in your return the literal command lines for the three declarations: `skill-regression-a` (W1-35: `template/governance/kernel/skills/{discovery,planning,test-design,change}`), `skill-regression-b1` (W1-36: its four skill folders) and `audit-reproducibility` (W1-36: where the reports of a project live is W1-36's to say; give the form with a placeholder for the folder, and say what the check reports for a project that has no audit report yet: unmeasured, never green).
+- No reviewer. Before returning, read both modules once more for the one question: can either end green on a file that breaks a rule it is given, or when it validated nothing?
+
+---
+

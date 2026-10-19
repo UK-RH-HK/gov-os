@@ -1,0 +1,29 @@
+== a: exit 0, wall 10.9 s
+hook.log: ['started']
+ran.txt exists: True
+version: 2.1.288
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "6b52440a-457d-4ece-a117-68092dc113ba", "uuid": "9add3c58-9baa-4dbf-af33-e79462c7395e"}
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 129, "estimated_tokens_delta": 79, "session_id": "6b52440a-457d-4ece-a117-68092dc113ba", "uuid": "a19afdbb-a5fc-4ccb-952a-55d13e98e4f7"}
+TOOL_RESULT is_error=False (Bash completed with no output)
+RESULT File created successfully at `/tmp/gov-hook-timeout-exp/a/ran.txt`.
+== b: exit 0, wall 15.6 s
+hook.log: ['started']
+ran.txt exists: True
+version: 2.1.288
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "c27c8c35-7660-4847-80a9-e09218cbc78e", "uuid": "23c11d01-9d83-486b-91b8-73125e55b545"}
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 146, "estimated_tokens_delta": 96, "session_id": "c27c8c35-7660-4847-80a9-e09218cbc78e", "uuid": "04ebf48a-13af-4e92-8768-95f38d77a851"}
+TOOL_RESULT is_error=False (Bash completed with no output)
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "c27c8c35-7660-4847-80a9-e09218cbc78e", "uuid": "8540068c-9fa9-49e0-b077-1da7e18f5ad5"}
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 133, "estimated_tokens_delta": 83, "session_id": "c27c8c35-7660-4847-80a9-e09218cbc78e", "uuid": "57149231-1baf-4109-8f33-f6e48522a51f"}
+RESULT Created `/tmp/gov-hook-timeout-exp/b/ran.txt` successfully.
+== c: exit 0, wall 5.7 s
+hook.log: ['started']
+ran.txt exists: False
+version: 2.1.288
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "13c708c3-a2de-4ea7-94e5-d39f20f3a237", "uuid": "61a80bea-25bc-4adf-bab9-610f1cf26d73"}
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 144, "estimated_tokens_delta": 94, "session_id": "13c708c3-a2de-4ea7-94e5-d39f20f3a237", "uuid": "0c7df07a-441b-4c1d-ba0e-ff91f82611a5"}
+TOOL_RESULT is_error=True PreToolUse:Bash hook error: [echo started >> /tmp/gov-hook-timeout-exp/c/hook.log; echo 'refused by the experiment hook' >&2; exit 2]: refused by the experiment hook
+
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 50, "estimated_tokens_delta": 50, "session_id": "13c708c3-a2de-4ea7-94e5-d39f20f3a237", "uuid": "ef553c28-937f-4774-bbcc-b2b78112ee02"}
+SYSTEM {"type": "system", "subtype": "thinking_tokens", "estimated_tokens": 159, "estimated_tokens_delta": 109, "session_id": "13c708c3-a2de-4ea7-94e5-d39f20f3a237", "uuid": "a88c6bb7-0f10-4a27-9f64-e1b123c800db"}
+RESULT The command was refused by an experiment hook configured in the environment.
