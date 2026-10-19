@@ -32,14 +32,22 @@ STAND_IN = pytest.mark.skipif(bool(LACKING), reason="; ".join(LACKING) or "none"
 
 QUESTION = "who fires the glazed bowls"
 OTHER = "who reads the harbour tide tables"
+# Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): a phrase the kiln note holds, for
+# the reads that expect lexical evidence once the semantic facet is unavailable. QUESTION ends with it, so a text sent
+# for either ends with PHRASE (``S.sent_for(..., PHRASE)`` sees both).
+PHRASE = "fires the glazed bowls"
+# Rewrite-Reason: DEC-811, PKG-W2-54-4-2 (a): steps 5 and 6 of the first case ask texts no earlier step asked; the
+# step-5 text is aimed at the kiln (CPU) and the forge (shared runner), as QUESTION is.
+AGAIN_KILN = "where are the glazed bowls fired"
+AGAIN_OTHER = "who lifts the honey frames"
 CHUNK_PHRASES = {rel: text.split("\n\n", 1)[1].split(";")[0].split(" in ")[0].strip() for rel, text in S.SUBJECTS.items()}
 
 
 @pytest.fixture()
 def shared():
-    """The shared runner: round 2's stand-in at OLLAMA_HOST, its model on the GPU; it sends the question to the
+    """The shared runner: round 2's stand-in at OLLAMA_HOST, its model on the GPU; it sends the questions to the
     forge, so an answer from it shows."""
-    stand_in = S.EmbedderStandIn(device="gpu", targets={QUESTION: S.SUBJECTS[S.FORGE]})
+    stand_in = S.EmbedderStandIn(device="gpu", targets=dict.fromkeys((QUESTION, PHRASE, AGAIN_KILN), S.SUBJECTS[S.FORGE]))
     try:
         yield stand_in
     finally:
@@ -48,9 +56,9 @@ def shared():
 
 @pytest.fixture()
 def cpu():
-    """The CPU embedder: round 2's stand-in at the CPU embedder's address, its model on the CPU; it sends the question
+    """The CPU embedder: round 2's stand-in at the CPU embedder's address, its model on the CPU; it sends the questions
     to the kiln."""
-    stand_in = S.EmbedderStandIn(device="cpu", targets={QUESTION: S.SUBJECTS[S.KILN]})
+    stand_in = S.EmbedderStandIn(device="cpu", targets=dict.fromkeys((QUESTION, PHRASE, AGAIN_KILN), S.SUBJECTS[S.KILN]))
     try:
         yield stand_in
     finally:
@@ -92,7 +100,11 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
     ``gov context``, a semantic search and a retrieval through the public entry each send the CPU embedder at least
     one text to embed (the question) and send the shared runner none; the search's answer is the CPU embedder's
     vector (the kiln, where the shared runner's would be the forge). No request to the shared runner names a runner
-    option, and its model stays on the GPU. Today every question goes to OLLAMA_HOST, with ``num_gpu: 0``."""
+    option, and its model stays on the GPU. Today every question goes to OLLAMA_HOST, with ``num_gpu: 0``.
+
+    Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-2 (a): the search and the retrieval
+    (steps 5 and 6) ask texts no earlier step asked (they asked QUESTION and OTHER again, whose vectors the cache
+    rightly serves with no request), so each step has a text the CPU embedder has not embedded yet."""
     project = S.semantic_project(box, tmp_path / "p", shared, S.ticket_files(), cpu=cpu)
     assert shared.embed_requests() and not cpu.embedded(), \
         f"the premise: the index was built through the shared runner only (CPU embedder sent {cpu.embedded()[:2]})"
@@ -101,7 +113,7 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
              ("gov", "retrieve", "--json", "--root", project, OTHER),
              ("gov", "context", "--json", "--root", project, "TK-W254-TIDES"),
              ("gov", "context", "--json", "--root", project, "TK-W254-BAKERY"),
-             ("search", QUESTION), ("retrieve", OTHER)]
+             ("search", AGAIN_KILN), ("retrieve", AGAIN_OTHER)]
     answer = None
     for step in steps:
         to_shared, to_cpu = len(shared.embed_requests()), len(cpu.embed_requests())
@@ -116,7 +128,8 @@ def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_sh
         sent = [text[-60:] for request in shared.embed_requests()[to_shared:] for text in request["texts"]]
         assert not sent, f"`{what}` sent the shared runner texts to embed: {sent}"
         assert len(cpu.embed_requests()) > to_cpu, f"`{what}` sent the CPU embedder nothing to embed"
-    assert cpu.asked_for(QUESTION) >= 1 and cpu.asked_for(OTHER) >= 1, "the questions never reached the CPU embedder"
+    assert all(cpu.asked_for(text) >= 1 for text in (QUESTION, OTHER, AGAIN_KILN, AGAIN_OTHER)), \
+        "the questions never reached the CPU embedder"
     assert answer.get("available") is True and _nearest(answer) == [S.KILN], (
         f"the search's answer is not the CPU embedder's vector (the kiln): {S.hits_of(answer)[:2]}")
     assert not _chunks_in(cpu.embedded()), f"the CPU embedder was sent chunks: {_chunks_in(cpu.embedded())}"
@@ -169,7 +182,12 @@ def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cp
     code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
     cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
     embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
-    Today the question is answered by the shared runner at OLLAMA_HOST."""
+    Today the question is answered by the shared runner at OLLAMA_HOST.
+
+    Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): ``gov retrieve`` asks PHRASE, a
+    phrase the kiln note holds, where it asked QUESTION, which no note holds as a phrase (so the lexical route had no
+    evidence to give whatever the semantic facet did); the no-fallback check looks for PHRASE, which every text sent
+    for either read ends with. The lexical route and every other assertion are unchanged."""
     project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
     env = S.embed_env(box, shared, cpu)
     warm, done = S.drive_run(box, project, env, ("search", OTHER))
@@ -181,7 +199,7 @@ def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cp
     faults = S.unavailable_with_reason(answers[0])
     assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
                         f"nearest {S.hits_of(answers[0])[:2]}")
-    run = S.gov(box, "retrieve", "--json", "--root", project, QUESTION, env=env)
+    run = S.gov(box, "retrieve", "--json", "--root", project, PHRASE, env=env)
     assert not S.clean(run), f"gov retrieve was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
     facets = S.facets_of(run)
     assert not S.unavailable_with_reason(facets.get("semantic") or {}), \
@@ -189,8 +207,8 @@ def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cp
     assert (facets.get("lexical") or {}).get("available") is True and run.envelope()["result"].get("evidence"), \
         f"the lexical route did not answer: {facets.get('lexical')}"
     assert len(cpu.requests) > contacted, "the premise: the reads never asked the embedder at the CPU address"
-    assert not S.sent_for([shared], QUESTION), \
-        f"the question was sent to the shared runner instead: {S.sent_for([shared], QUESTION)}"
+    assert not S.sent_for([shared], PHRASE), \
+        f"the question was sent to the shared runner instead: {S.sent_for([shared], PHRASE)}"
     after = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
     assert after == beside, f"a read that got no CPU vector changed the files beside the store: {S.tree_change(beside, after)}"
     cpu.ps, sent = None, cpu.asked_for(QUESTION)
@@ -327,7 +345,10 @@ def test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_ans
 
 
 def _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, address):
-    run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+    # Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), PKG-W2-54-4-1 (a): ``gov retrieve`` asks PHRASE,
+    # a phrase the kiln note holds, where it asked QUESTION, which no note holds as a phrase; the no-fallback check
+    # looks for PHRASE, which the texts sent for both reads end with. Every other assertion is unchanged.
+    run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, PHRASE), cwd=box.workdir / "elsewhere",
                       env=env)
     assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
     facets = S.facets_of(run)
@@ -338,9 +359,9 @@ def _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, addr
     answers, done = S.drive_run(box, project, env, ("search", QUESTION), timeout=S.CALL_TIMEOUT_S)
     assert not S.clean(done) and not S.unavailable_with_reason(answers[0]), \
         f"the semantic search is not unavailable with a reason: {answers and answers[0]}\n{done.describe()}"
-    assert not S.sent_for([shared], QUESTION), \
-        f"the question was sent to the shared runner instead: {S.sent_for([shared], QUESTION)}"
-    elsewhere = [entry for entry in daemons.serves()
+    assert not S.sent_for([shared], PHRASE), \
+        f"the question was sent to the shared runner instead: {S.sent_for([shared], PHRASE)}"
+    elsewhere =[entry for entry in daemons.serves()
                  if S.host_of(entry["env"].get("OLLAMA_HOST") or S.SHARED_HOST_DEFAULT) != S.host_of(address)]
     assert not elsewhere, f"an embedder was started at another address: {elsewhere}"
 
@@ -378,11 +399,27 @@ def test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is
 
 # ---- 6. W1-21's hit@5 with CPU query vectors, recorded in the change record ----------------------------------------
 
+FIGURE = r"(?<![\w.])(\d{2,3}\.\d+)(?![\w.])"
+
+
+def _headline(line):
+    """The figure ``line`` states as W1-21's hit@5 (the overall mean): the first figure written with decimals after
+    ``hit@5``, before any per-class list (``per class``, ``per-class``); None when there is none."""
+    before_classes = re.split(r"per[- ]class", line, maxsplit=1, flags=re.I)[0]
+    figures = re.findall(FIGURE, before_classes.split("hit@5", 1)[-1]) if "hit@5" in before_classes else []
+    return float(figures[0]) if figures else None
+
+
 def test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80():
     """*Red.* The change record has a line that names W1-21, ``hit@5`` and CPU query vectors and states the measured
     figure (a mean, written with its decimals, for example ``81.67``) at or above the pass line of 80 (DEC-414); a line
     naming round 3's GPU measurement (``5f038b47``) does not count. The figure itself is W1-21's own case, run by the
-    lead (README, "Round 4"). Today no such line exists."""
+    lead (README, "Round 4"). Today no such line exists.
+
+    Rewrite-Reason: DEC-811 (orchestrator, delegated, 2026-10-19), ride-along (DEC-802): the figure read is W1-21's
+    headline hit@5, the first figure with decimals after ``hit@5`` and before any per-class list, on every such line,
+    where any figure from 80 to 100 on the line counted before (so a per-class figure such as
+    ``failed-approaches 100.0`` met it with a headline below 80). The pass line stays 80."""
     path = S.REPO_ROOT / S.CHANGE_RECORD_REL
     assert path.is_file(), f"there is no {S.CHANGE_RECORD_REL}"
     lines = [line for line in path.read_text(encoding="utf-8").splitlines()
@@ -390,6 +427,9 @@ def test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_
              and "5f038b47" not in line]
     assert lines, (f"{S.CHANGE_RECORD_REL} has no line naming W1-21, hit@5 and CPU query vectors (the figure of "
                    "KPI success 6)")
-    figures = [float(number) for line in lines for number in re.findall(r"(?<![\w.])(\d{2,3}\.\d+)(?![\w.])", line)]
-    assert any(80.0 <= figure <= 100.0 for figure in figures), \
-        f"no line naming W1-21's hit@5 with CPU query vectors states a figure at or above 80: {lines}"
+    headlines = {line: _headline(line) for line in lines}
+    stated = [figure for figure in headlines.values() if figure is not None]
+    assert stated, (f"no line naming W1-21's hit@5 with CPU query vectors states its headline figure (with decimals, "
+                    f"after hit@5 and before any per-class list): {lines}")
+    assert all(80.0 <= figure <= 100.0 for figure in stated), \
+        f"W1-21's headline hit@5 with CPU query vectors is not at or above 80: {headlines}"

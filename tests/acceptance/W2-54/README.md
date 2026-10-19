@@ -683,3 +683,32 @@ minutes (an index of six notes, about thirty reads, the first of which may load 
   do the same with `OLLAMA_HOST`.
 - The success-6 case reads a figure with decimals. A whole-number figure (for example exactly `85`) is not read; the
   change record then writes `85.00`.
+
+## Round 4c: three cases rewritten (DEC-811, orchestrator, delegated, 2026-10-19)
+
+At `fd66ed9c` the lead's run had 7 of these cases red for reasons in the cases, not the code (change record §5.6.4).
+DEC-811 decides the rewrites; each carries `Rewrite-Reason: DEC-811 …` in the file. No pass line, threshold or
+expectation is lowered, and the lexical route is not changed.
+
+- **PKG-W2-54-4-1 (a)**, `test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[4]`
+  and the helper of `test_an_address_held_by_something_that_is_not_an_embedder_…` and
+  `test_with_no_executable_and_nothing_at_the_cpu_address_…`. **Before:** `gov retrieve` asked `who fires the glazed
+  bowls`, which no fixture note holds as a phrase, so the lexical route (an exact-phrase search) gave no evidence
+  whatever the semantic facet did. **After:** it asks `fires the glazed bowls` (`PHRASE`), which the kiln note holds.
+  The no-fallback check now looks for `PHRASE`; the question (`QUESTION`) ends with it, so every text sent for either
+  read (the semantic search still asks `QUESTION`) is caught. Every other assertion stands: the semantic facet
+  unavailable with a reason, exit code 0, no traceback, nothing cached, the lexical route available with evidence.
+- **PKG-W2-54-4-2 (a)**, `test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner`.
+  **Before:** steps 5 and 6 asked `QUESTION` and `OTHER` again, whose vectors steps 1 and 2 had cached, so the CPU
+  embedder was rightly asked nothing (KPI success 2). **After:** step 5 searches `where are the glazed bowls fired`
+  (`AGAIN_KILN`; both stand-ins target it as `QUESTION`: the kiln on the CPU embedder, the forge on the shared runner),
+  step 6 retrieves `who lifts the honey frames` (`AGAIN_OTHER`). Each step still sends the CPU embedder at least one
+  text and the shared runner none; the search's answer is still the kiln; every one of the four texts must have
+  reached the CPU embedder.
+- **Ride-along (DEC-802)**, `test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80`.
+  **Before:** any figure with decimals from 80 to 100 on the line counted, so a per-class figure (the line also lists
+  `failed-approaches 100.0`) met it with a headline below 80. **After:** the case reads W1-21's headline hit@5, the
+  first figure with decimals after `hit@5` and before any per-class list (`per class`, `per-class`), on every line
+  that qualifies, and requires each at or above 80 (the pass line stays 80). Shown once with a throwaway outside the
+  tree: the record's line with its headline set to `78.33` fails the case (the old reading passed it on
+  `failed-approaches 100.0`); with `81.67`, as recorded, it passes.
