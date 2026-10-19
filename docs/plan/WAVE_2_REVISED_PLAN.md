@@ -1,15 +1,43 @@
 ---
 id: WAVE-2-REVISED-PLAN
 type: plan
-status: PROPOSED
+status: ACCEPTED
 state_class: NARRATIVE
 depends_on: [CHARTER-v5, CONTRACT-v4, WAVE-2-WBS, WAVE-2-LIST, WAVE-2-TRIAGE]
-decisions: [DEC-064, DEC-083, DEC-105, DEC-715, DEC-722, DEC-725, DEC-726, DEC-727, DEC-736, DEC-776, DEC-780, DEC-801, DEC-802, DEC-803, DEC-806, DEC-818, DEC-819, DEC-820, DEC-821, DEC-822, DEC-823, DEC-824, DEC-825, DEC-826, DEC-827, DEC-828, DEC-829, DEC-830]
+decisions: [DEC-064, DEC-083, DEC-105, DEC-715, DEC-722, DEC-725, DEC-726, DEC-727, DEC-736, DEC-776, DEC-780, DEC-801, DEC-802, DEC-803, DEC-806, DEC-818, DEC-819, DEC-820, DEC-821, DEC-822, DEC-823, DEC-824, DEC-825, DEC-826, DEC-827, DEC-828, DEC-829, DEC-830, DEC-831, DEC-832, DEC-833, DEC-834, DEC-835, DEC-836, DEC-837, DEC-838, DEC-839, DEC-840, DEC-841, DEC-842, DEC-843, DEC-844, DEC-845, DEC-846, DEC-847, DEC-848, DEC-849, DEC-850, DEC-851, DEC-852]
 ---
 
-# Wave 2, revised plan by keystones (proposed)
+# Wave 2, revised plan by keystones
 
-**Status: PROPOSED, for the owner's review (DEC-829).** Wave 2 stays paused until the owner approves this plan. Once it is approved, the WBS, the ticket files and the list change to match. Each change lands before its ticket starts or resumes (DEC-825 item 7). Until then `docs/plan/WAVE_2_WBS.md` stays the plan in force.
+**Status: ACCEPTED by the owner, 2026-10-19 (DEC-831), with the owner's changes DEC-832 to DEC-852.** Wave 2 resumes by the keystones. The WBS, the ticket files and the list change to match, each change before its ticket starts or resumes (DEC-825 item 7). Until the WBS is brought in line ticket by ticket, this plan holds where the two differ.
+
+## 0. The owner's decisions on this plan (2026-10-19)
+
+The text below carries these answers; where an older sentence survives, this section holds.
+
+| §11 item | Decision | Entry |
+|---|---|---|
+| 1 | Approved, with the changes below | DEC-831 |
+| 1a, 6 | Backend, database and data, integration and API, and security become **skill packs** the engineer loads at launch (through W2-60), in a **cut-down W2-33** (about 1.5 days of product-spec work, no new machinery; CIT-P). Architecture, frontend, DevOps and SRE, and performance go to Wave 3 | DEC-832 |
+| 1b, 3 | CAP-10's **85 stays the floor**; the owner's **99 % is the target** W2-61 and W2-15b measure: the stacked context holds all the evidence each question needs, across batches. Both figures reported | DEC-833 |
+| 1c | **Every estimate recalibrated after keystone 2,** from measured ticket and close times | DEC-834 |
+| 1d, 7 | W2-59 approved; it also ships `retrieve_baseline.yaml` and fixes **every module that finds the repository from its install path** | DEC-835 |
+| 1e | **Memory used, not just built:** keystone 4's exit needs every brief built with `gov context`, every lead and worker brief telling its agent to use `gov retrieve`, and the usage measured | DEC-836 |
+| 1f | **Resume in full, in keystone 3:** new ticket **W2-62** (split out of W2-10); the session-start hook loads RESUME HERE in full; DEC-792's 8,000-character limit lifted once it does; a checkpoint at every handover | DEC-837 |
+| 5 (windows) | **Every session on its model's full window** (1M for Opus 5.5); no compaction threshold in any launch; usage, not money, is the limit. Replaces §6's 300k and 500k | DEC-838 |
+| 5 (the rest) | Opus 5.5 for every role; effort per role per launch; subagents on the parent's model; agent teams off; prompt v3 | DEC-839, DEC-840 |
+| 2 | The Contract re-baseline, (a) now, through W2-49's CIT-P | DEC-841 |
+| 4 | DEC-062 and DEC-140 withdrawn | DEC-842 |
+| 8 | W2-48 approved, testmon and coverage one package; **plus three conditions:** subprocesses seen, the leads' runs served, a nightly full uncached run | DEC-843, DEC-852 |
+| 9 | `docs/imported/` out of the schema check | DEC-844 |
+| 10 | The path map's `experiments/**` and `evaluation_sets` | DEC-845 |
+| 11 | The owner's acts as exact commands, when due | DEC-846 |
+| 12 | **No fixed cap:** as many leads as eligible tickets, the measured resource gate and the owner's usage limits allow, never in a close's quiet window, at most 10; fewer until W2-48 lands | DEC-847 |
+| — | The owner's daily backup push continues | DEC-848 |
+| — | **W2-58 first in keystone 3,** or straight after keystone 1 if its paths allow | DEC-849 |
+| — | How questions reach the owner; every standing rule written where sessions read it | DEC-850, DEC-851 |
+
+**What this changes in the count:** W2-33 stays (cut down) and W2-62 is new, so Wave 2 holds **55 tickets plus W2-00**. Eight tickets move to Wave 3 (W2-31, W2-34, W2-35, W2-36, W2-38, W2-39, W2-41, W2-44) with W2-19's Rust and TypeScript half; the nine Contract items still move (CAP-22.b and CAP-22.c are W2-33's carded scope, which goes to Wave 3).
 
 **Written by:** the Wave 2 orchestrator (W2-00, DAEO-sdxk), 2026-10-19, at `fecb870c` plus the staged batch DEC-813 to DEC-830.
 
@@ -119,7 +147,7 @@ CAP-44.g, CAP-47.a and CAP-48.b need no new work. CAP-44.h's lite verdict covers
 |---|---|---|---|
 | 1 | The pinned judge | The owner's pin (ready); **W2-59** (new) | the pin: day 0; W2-59 and the re-pin: day 2 to 4 |
 | 2 | The close queue moving, and the test cache | the queued closes (DEC-806); W2-57, W2-48, W2-07; resumes of W2-02, W2-05, W2-37, W2-50, W2-51, W2-52 | day 4 to 7 |
-| 3 | Agents know what to do | the batch (done at the commit); **W2-58**, **W2-60** (new), W2-11, W2-09 | day 5 to 8 |
+| 3 | Agents know what to do | the batch (done at the commit); **W2-58 first** (DEC-849), **W2-62** (new, DEC-837), **W2-60** (new), W2-11, W2-09; then the cut-down W2-33 (DEC-832) | day 5 to 8 |
 | 4 | Memory | W2-02, W2-03, W2-55; W2-05, then W2-06; W2-04; W2-10; W2-13, W2-37, W2-15a; **W2-61** (new); then W2-32 | W2-15a's baseline: day 12 to 18; W2-32: day 20 to 26 |
 | 5 | The decision pipeline | W2-55 (its check), W2-49, W2-12 | day 7 to 12 |
 | 6 | The sandbox and write lists per role; leads sandboxed | W2-20, W2-56, W2-21, W2-42, W2-40 | day 10 to 15 |
@@ -149,8 +177,9 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 - **W2-59, new (STANDARD, engineer; CAP-33: a judge change, through CIT-P):**
   - The runner runs the kernel's declared checks with the pinned interpreter and package. Only the code under test comes from the tree (DEC-822 item 3).
   - The hook lines call the pin's environment. This is DEC-822 step 2, after the independent test designer has checked W1-38's hook-source tests.
-  - The canary template is found from the project root, not from `__file__` (`retrieval/canary.py:10`).
-  - `retrieve_baseline.yaml` is shipped as package data.
+  - The canary template is found from the project root, not from `__file__` (`retrieval/canary.py:10`). **DEC-835: every module that finds the repository from its own install path does the same** (today also `retrieval/retrieve_check.py:16`), proven from an installed wheel.
+  - `retrieve_baseline.yaml` is shipped as package data (DEC-835).
+  - **Overlap (2026-10-19):** W2-05's unmerged branch changes `_run_command`'s environment lines in `check/runner.py` and the git calls in `retrieval/retrieve_check.py`, which W2-59 also changes. The order is package P-W2-48.
   - `gov --version` names the version and the commit.
   - Paths: `src/gov/check/runner.py`, `src/gov/retrieval/canary.py`, `src/gov/cli/main.py` (the version), `pyproject.toml` (package data), the hook command lines (owner-approved), `tests/unit/check/**`, `tests/unit/cli/**`, `docs/changes/W2-59-CIT-P.md`.
   - Admission: exit criterion 1 ("a clean `gov close` by the pinned release in force").
@@ -177,10 +206,10 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
   - `.testmondata` written only by main-tree closes;
   - `--testmon-noselect` for W2-24's and W2-46's full runs.
 
-  Needs an owner decision: DEC-726 item 1's "keyed on exact input hashes", and the card's key KPI, restated as behaviour. That is: each planted change re-runs every dependent test; a change outside every input reuses; every reuse is recorded; a failed result is never reused.
+  Decided (DEC-843): the key KPI restated as behaviour. Each planted change re-runs every dependent test; a change outside every input reuses; every reuse is recorded; a failed result is never reused. **DEC-852 adds three conditions:** (1) the cache sees code run in a subprocess (subprocess coverage, configured and tested) or always re-runs a test that starts a process, proven by a change reached only through a subprocess; (2) the same cache serves the leads' suite runs in their worktrees, with the same rules and `--no-cache`; (3) from W2-48's merge, a nightly full uncached regression on `w2/integrate`'s head in a quiet window, reported in the next digest; a test that fails there but passed through the cache is a P1 package.
 - **W2-07 (STANDARD):** close by ticket class, so that research, integration, audit and coordination tickets close properly. It also adds pass or fail and the repair count to the per-run record (section 2).
 - **The countdown reports the close success rate** (DEC-823 item 5).
-- **Owner decision (optional):** raise the in-flight cap from 3 to 4 (DEC-776) once W2-48 and W2-20 have landed, under the resource gate. Section 9 shows what it saves.
+- **Parallelism (DEC-847, replacing the cap):** no fixed number. As many leads as eligible tickets, the measured resource gate and the owner's usage limits allow, never during a close's quiet window, at most 10; fewer until W2-48 lands, then as many as the gate and the limits allow.
 
 ### 4.3 Keystone 3: agents know what to do (DEC-819, DEC-820, DEC-821, DEC-824, DEC-826)
 
@@ -190,15 +219,16 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
   - the working rules in git;
   - `CLAUDE.md` corrected;
   - ADR-0001 accepted.
-- **W2-58 (STANDARD; DEC-821):** Policy 2 in the guard and the launcher.
+- **W2-58 (STANDARD; DEC-821), first in this keystone (DEC-849):** Policy 2 in the guard and the launcher. Its paths overlap W2-50's unmerged files (`guard/decide.py`, `guard/protected.py`, `launch/launcher.py`), so it starts when W2-50 merges, or stacked on W2-50 once W2-50's resume probe has passed (DEC-786). Until it lands, a read refusal is taken, never routed round, and counted in the digest.
   - Widened: `gov.secrets.indexable` leaves out held-out and export-denied paths. This is the code half of the synthesis §6 row 7. The check half is the owner's now: each held-out path is looked up in both indexes.
   - Widened: the path map gains the `evaluation_sets` block (section 4.4).
 - **W2-60, new (STANDARD, engineer), the role at launch (DEC-826 Q1, Q5; lens F R1, R6; lens E F2, F13):**
   - `gov launch` starts a worker as its role: the role file's text and its skills, with their hash and version in the launch record;
   - a cleaned environment: no connectors, no user-level agents or skills, no model-side memory;
-  - the role's default model, effort and compaction threshold, applied through `--settings` env, which beats the user-level variable (lens F P4);
+  - the role's default model and effort, applied on the launch line; **no compaction threshold is set, and the model's full window is recorded** (DEC-838);
   - the subagent model set to the parent's;
-  - a launch record holding all of these;
+  - the engineer's skill packs (DEC-832), once W2-33 has written them;
+  - a launch record holding all of these, and a per-session record with **tokens, turns and any rate-limit event** (DEC-838);
   - a refusal of a model that is not the role's;
   - research first: whether a `paths:`-scoped `.claude/rules/` file loads in a headless worker (lens G Q4).
 
@@ -208,6 +238,12 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
   - one versioned source per skill (DEC-825 item 6);
   - the generated skill list trimmed (lens G R10): no OpenSpec skills or commands in this repository's sessions, and no Superpowers unless a role file names it.
 - **W2-09 (FULL; CIT-P):** `SubagentHandback` on the guard's list. It is needed by W2-10 and W2-22, and the guard refused 58 correct calls.
+- **W2-62, new (STANDARD, engineer; a kernel hook change through CIT-P; DEC-837):** resume in full, split out of W2-10 so that it lands first.
+  - The session-start hook injects the RESUME HERE section in full, never a cut of its first 9,000 characters (row W2-M372), and names the prompt in force (row W2-M373).
+  - The checkpoint skill states the resume rule: the full session state (what is happening, what was decided, what is next, where things are); repository knowledge from retrieval and the context packets.
+  - Once it lands, DEC-792's 8,000-character limit is lifted.
+  - Paths: `template/governance/kernel/hooks/sessionstart.py`, `template/governance/kernel/skills/checkpoint/**` (the resume rule only), `tests/unit/hooks/**`, `docs/changes/W2-62-CIT-P.md`. No dependency; no overlap with a ticket in flight.
+- **The cut-down W2-33 (STANDARD, product-spec; kernel skills through CIT-P; DEC-832):** four skill packs (backend, database and data, integration and API, security), loaded by the engineer at launch through W2-60. After W2-60 and W2-11.
 - **Until W2-60 lands,** the prompt's launch forms carry the values by hand (prompt v3, section 6).
 
 ### 4.4 Keystone 4: memory, in the owner's order (DEC-828)
@@ -220,17 +256,18 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 | 4 | Resume keeps the next step; checkpoints per session | W2-10 | Automatic checkpoints in one subfolder per session (DEC-826 Q3) with the session id; after a compaction the session's own role and task are injected (lens F R5); W2-M372, W2-M373. Paths gain `src/gov/checkpoint/**` (the series only; W2-42 keeps the atomic saves) | §6 row 5: the copy |
 | 5 | Combined retrieval | W2-13, W2-37 (resume), W2-15a; then W2-32 | W2-13: FTS5's `bm25()` with column weights and `ORDER BY rank`, plus a trigram table for exact identifiers (lens G R8). W2-37: `src/gov/codeintel/**` added; `trace_path`, `search_graph` and per-kind `query_graph`, never SKIP-paging; the tool's error passed through (lens G R1); "callers of `rrf` and `indexable`" answered (§6 row 8). W2-15a: the deterministic semantic route (the CPU embedder) and the reranker measured against no reranker; **the reranker is kept only if it helps**, otherwise retired with its venv and model (lens G Q5) | §6 row 8: the copy; W2-32 and W2-15b: the real repository |
 | 6 | The standing 20-question measure | **W2-61**, new | See below | Each release; §6 row 9 on the copy |
+| 7 | **Memory used, not just built (DEC-836)** | the orchestrator and every brief | Every brief built with `gov context` (from W2-04's merge); every lead and worker brief tells its agent to use `gov retrieve`; usage measured: how many briefs and worker tasks used them | Keystone 4's exit |
 
 **W2-61, new (STANDARD, written by an independent auditor session; the script by an engineer):**
 - **Lens B's 20 questions and their gold answers become the visible development half,** because they are already readable: `docs/assessment/2026-10/B-memory-retrieval.md` §2, in this batch.
 - **A hidden measurement half** of 20 more questions is written by a session independent of the retrieval tickets. It is stored where W2-58's `evaluation_sets` block refuses it to the measured roles.
-- **A measurement script** reports the governing source in the first five and in the bundle, and repeatability on an unchanged index and after a rebuild. It prints scores, never the hidden answers.
+- **A measurement script** reports the governing source in the first five and in the bundle, and repeatability on an unchanged index and after a rebuild. It prints scores, never the hidden answers. **It reports both figures (DEC-833):** hit@5 against CAP-10's floor of 85, and the share of questions whose stacked context holds all their needed evidence, across batches, against the owner's target of 99 %.
 - **The same split for EXAMIN's set** (DEC-828 item 3), written before W2-27.
 - **EXP-003's gold answers** (W2-15a, W2-15b) are split the same way.
 - Admission: exit criterion 4, and CAP-10.
 
 **CAP-10's line,** decided before W2-15a measures (DEC-828 item 4):
-- **Recommendation: keep 85**, and do not re-baseline to 80.
+- **Decided (DEC-833): keep 85** as the Contract's floor, and do not re-baseline to 80; the owner's 99 % is the target W2-61 and W2-15b measure.
 - W1-21's and W2-54's tests that use 80 are corrected to 85 by W2-32's test designer.
 - A figure short of 85 after W2-15b is a named residual for the owner (DEC-725's finish line), not a new round.
 - Confidence: medium. Lowering the line before measuring goes against the owner's principle.
@@ -360,19 +397,19 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 
 ## 6. Model, effort and compaction, per role and per launch (lens F; DEC-826 Q6)
 
-**Proposal:** lens F's Table 3, for the owner's decision. Every value is set on the launch line, from role defaults kept in the repository.
+**Decided (DEC-838, DEC-839):** lens F's Table 3 for model, effort and subagents, set on every launch line. **No compaction threshold:** every session uses its model's full window (1M for Opus 5.5), and none is asked to stop or compact early; lens F's 300k and 500k values are replaced. Usage, not money, is the limit: the daily digest reports the daily and weekly allowance used.
 
-| Role | Model | Effort | Compaction threshold (per launch, `--settings` env) | Subagent model |
+| Role | Model | Effort | Window | Subagent model |
 |---|---|---|---|---|
-| Orchestrator (the owner's session) | `claude-opus-5-5` | high; max when it drafts an owner package | 300k | the parent's |
-| Ticket lead | `claude-opus-5-5` | high | 300k, with a checkpoint at each milestone in place of A5's 300k rule | the parent's |
-| Test designer | `claude-opus-5-5` | high; xhigh for FULL tickets, as a measured trial | 300k | — |
-| Engineer | `claude-opus-5-5` | high | 300k | — |
-| Reviewer and probe | `claude-opus-5-5` | high; max for FULL probes, as a trial | 300k | — |
-| Independent auditor | `claude-opus-5-5` | max | 500k, as a measured trial | the parent's |
-| Synthesiser | `claude-opus-5-5` | max | 500k, as a trial | — |
-| Research | `claude-opus-5-5` | high | 300k | — |
-| Product-spec | `claude-opus-5-5`; a lower tier only as a CAP-35 trial | high | 300k | — |
+| Orchestrator (the owner's session) | `claude-opus-5-5` | high; max when it drafts an owner package | the model's full window | the parent's |
+| Ticket lead | `claude-opus-5-5` | high | the model's full window; a checkpoint at every handover | the parent's |
+| Test designer | `claude-opus-5-5` | high; xhigh for FULL tickets, as a measured trial | the model's full window | — |
+| Engineer | `claude-opus-5-5` | high | the model's full window | — |
+| Reviewer and probe | `claude-opus-5-5` | high; max for FULL probes | the model's full window | — |
+| Independent auditor | `claude-opus-5-5` | max | the model's full window | the parent's |
+| Synthesiser | `claude-opus-5-5` | max | the model's full window | — |
+| Research | `claude-opus-5-5` | high | the model's full window | — |
+| Product-spec | `claude-opus-5-5`; a lower tier only as a CAP-35 trial | high | the model's full window | — |
 | Live harness tests (W1-49, W1-46) | Haiku 4.5 where the case only checks that a hook fired; `claude-opus-5-5` at low effort for the recall case (lens F R10) | low | the test's own | — |
 
 **Why per launch** (lens F §2.3):
@@ -380,10 +417,11 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 - 75 Wave 1 main sessions ran unpinned on Opus 4.6, with a 200k window, costing $508.97 (lens F F9).
 
 **Until W2-60 and W2-21 land (prompt v3, an owner edit with this plan):**
-- the lead and worker forms carry `--effort high` and `--settings '{"env":{…,"CLAUDE_CODE_AUTO_COMPACT_WINDOW":"300000","CLAUDE_CODE_SUBAGENT_MODEL":"claude-opus-5-5"}}'`;
-- auditor forms carry `--effort max` and 500k;
-- A5's "if you pass about 300k tokens" becomes "write CHECKPOINT.md at each milestone (a worker's return, a merge, a package)", and `LEAD_CHECKPOINT` is dropped (lens F R4);
+- the lead and worker forms carry `--effort` per the table, and the forms that take `--settings` add `"CLAUDE_CODE_SUBAGENT_MODEL":"claude-opus-5-5"`; none sets `CLAUDE_CODE_AUTO_COMPACT_WINDOW` (DEC-838);
+- A5's "if you pass about 300k tokens" becomes "write CHECKPOINT.md at every handover (a worker's return, a merge, a package, a compaction)", and `LEAD_CHECKPOINT` is dropped (lens F R4, DEC-837, DEC-838);
 - the resume rule of section 4.6 is added.
+
+(The CLI note above, P2 to P4, no longer bites: the user-level `CLAUDE_CODE_AUTO_COMPACT_WINDOW` was removed on 2026-10-19, and `claude -p "/autocompact"` then reported "1m tokens (default for this model)".)
 
 **Owner questions from lens F:**
 - **R7:** is there a reason to keep `CLAUDE_CODE_SUBAGENT_MODEL=claude-opus-4-6`? Recommendation: no; use the parent's model.
@@ -415,7 +453,7 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 | Ticket | Closes (Contract) | Rows | Reason |
 |---|---|---|---|
 | W2-31 Budget gates | CAP-04.a, CAP-04.d | 0 | Not used by the pilot. Lens F's per-run record (W2-60) gives the cost data that budget gates will need |
-| W2-33 Wave 2 roles and typed handoff records | CAP-22.b, CAP-22.c | 6 | The pilot needs no new role (section 10). The twelve-field return stays (AR-6, W2-10 and W2-11) |
+| W2-33's carded scope (Wave 2 roles and typed handoff records) | CAP-22.b, CAP-22.c | 6 | The pilot needs no new role (section 10). The twelve-field return stays (AR-6, W2-10 and W2-11). **W2-33 itself stays in Wave 2, cut down to four skill packs (DEC-832)** |
 | W2-34 `gov readiness --generate` | CAP-30.c | 25 | Not used by the pilot |
 | W2-35 The UX readiness row | CAP-30.g | 1 | Not used by the pilot; it needs W2-33 and W2-34 |
 | W2-36 `gov discover` | CAP-32.d | 1 | Not used by the pilot |
@@ -435,6 +473,8 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
     - (c) defer the decision to W2-46, where the gap would show as a failed exit criterion.
 
 ## 9. Estimates
+
+**Recalibrated after keystone 2 (DEC-834),** from measured ticket and close times; the old and new figures will be shown side by side. The cap columns below predate DEC-847, which sets no fixed cap.
 
 **How they are made:**
 - Each ticket takes about 1 day, plus 1 day per 150 estimated lines, plus half a day for FULL (WBS §4). A resume takes about 1 day.
@@ -491,7 +531,8 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 | Performance | No |
 
 - **What the pilot needs:** the six roles and the ticket lead cover CAP-44.h's lite conditions, and one governed ticket closed with EXAMIN's own test command.
-- **Recommendation:** none stays in Wave 2. Defer all eight to Wave 3 by a recorded decision (DEC-105, defer), naming backend, database and data, integration and API, and security as EXAMIN's first.
+- **Decided (DEC-832):** backend, database and data, integration and API, and security become skill packs the engineer loads at launch, in a cut-down W2-33; the other four go to Wave 3 by that decision.
+- **The orchestrator's recommendation was:** none stays in Wave 2. Defer all eight to Wave 3 by a recorded decision (DEC-105, defer), naming backend, database and data, integration and API, and security as EXAMIN's first.
 - **Confidence:** medium.
 - **The alternative,** if the owner wants governed product work on EXAMIN in Wave 2: keep those four as role files only, in a cut-down W2-33. That is about 1.5 days of product-spec work, with no new machinery.
 
@@ -499,7 +540,7 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
 - UPIM and ASMO are tied to W2-19's Rust and TypeScript half and to Release 1, in Wave 3.
 - Wave 3 is sized, and Release 1 given a range, at Track A's verdict.
 
-## 11. Decisions for the owner, with this plan
+## 11. Decisions for the owner, with this plan (answered 2026-10-19: see section 0)
 
 | # | Decision | Recommendation | Confidence |
 |---|---|---|---|

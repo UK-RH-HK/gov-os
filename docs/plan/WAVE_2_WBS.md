@@ -504,28 +504,23 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - A move to a target that no namespace holds is refused before it runs [W2-M216].
 - **KPIs, failure:** the fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
 
-#### W2-48 Test-result cache at close, keyed on exact input hashes (FULL, engineer; DEC-726)
-- **DEC-780 (owner, 2026-10-18), priority:** after W2-53 closes, W2-48 takes the next free slot after W2-21, since it shortens every later close.
-- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
+#### W2-48 Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (FULL, engineer; DEC-726, DEC-843, DEC-852)
+- **Priority (DEC-823 item 4, the accepted plan's keystone 2):** it starts as soon as the queue moves (W2-53's close), no longer behind W2-21, since it shortens every later close.
+- **Restated by the owner, 2026-10-19 (DEC-843, DEC-852):** the key KPI as behaviour; glued to pytest-testmon and coverage; three conditions added (subprocesses, the leads' runs, a nightly full run). The ticket file `DAEO-xxgp` carries the same lines.
+- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
 - **KPIs, success:**
-  - **The key.** Each test's cache key is a sha256 over all of these:
-    - its test file;
-    - the source it imports, followed transitively inside the repository;
-    - the fixtures, `conftest.py` chain and data files it reads;
-    - the configuration (`pyproject.toml`, pytest settings, the path map's test keys);
-    - the interpreter version and the dependency lock;
-    - the test command and its options.
-  - A test whose key matches a recorded pass is **reused, not skipped.** It is labelled "reused" in the close record, with the key and the run it came from [W2-H044, W2-M153].
-  - A test whose inputs cannot all be hashed (a dynamic import, a read outside the declared inputs, a network or clock dependency it declares) is never reused: it runs.
+  - **Reuse by behaviour (DEC-843).** Each planted change in an input class re-runs every test that depends on it: an imported module, a fixture or `conftest.py`, a configuration file, a data file the test reads, the interpreter or the dependency lock, the test command and its options. A change outside every input reuses.
+  - A reused test is **reused, not skipped.** It is labelled "reused" in the close record (and in a lead's run record), with the run it came from [W2-H044, W2-M153].
+  - **Subprocesses (DEC-852 item 1).** The code a test runs in a separate process (`python3 -m gov …`) is seen by the cache, through subprocess coverage configured and tested; otherwise any test that starts a process is always re-run. A test whose code changed never gets a reused result, proven by a test with a change reached only through a subprocess.
+  - A test whose inputs cannot all be seen (a dynamic import, a read outside the declared inputs, a network or clock dependency it declares) is never reused: it runs.
   - A failed or errored result is never reused.
-  - Cache entries are written only by `gov close` in the main tree, from a clean tree at a recorded commit. An entry from a worker session or a dirty tree is ignored.
-  - `gov close --no-cache` runs everything. W2-24 and W2-46 run the full, uncached regression and say so in their records.
+  - **Where entries come from.** `gov close` writes the shared entries, in the main tree, from a clean tree at a recorded commit. An entry from a dirty tree is ignored.
+  - **The leads' runs (DEC-852 item 2).** A lead's suite runs in its worktree use the same cache with the same rules (exact inputs, failures never reused, `--no-cache` available): they reuse the close's entries, and any entry a lead's run keeps stays in that worktree and is never read by a close.
+  - `gov close --no-cache` runs everything. W2-24 and W2-46 run the full, uncached regression (testmon's noselect) and say so in their records.
+  - **The nightly full run (DEC-852 item 3).** One command runs the full uncached regression on `w2/integrate`'s head and writes a record naming every test that fails there but whose latest result through the cache was a pass or a reuse. (The orchestrator runs it every night in a quiet window from W2-48's merge; such a test is a P1 package about the cache.)
   - For a declared non-pytest command (W2-19), reuse happens only on its declared input globs; without them, everything runs.
-  - **The choice.** `docs/research/W2-48-cache-choice.md` compares pytest-testmon with a small built-in cache:
-    - correctness on a planted change set: a change to an imported module, a fixture, a configuration file, a data file, and a file outside every key;
-    - the time saved on this repository's suite.
-    Any install comes as a package under DEC-083 (queued Q-13).
-- **KPIs, failure:** each planted change in an input class makes every dependent test run; a change outside every key reuses. A cache that cannot be read means everything runs, never "passed".
+  - **The glue (DEC-843).** pytest-testmon and coverage, one DEC-083 install package (Q-13) raised when the ticket starts; `--testmon-env` set to a hash of the declared data globs and the test command. `docs/research/W2-48-cache-choice.md` records the planted change set's results and the time saved on this repository's suite.
+- **KPIs, failure:** each planted change in an input class makes every dependent test run, a change reached only through a subprocess included; a change outside every input reuses. A cache that cannot be read means everything runs, never "passed". A failed result is never reused, in a close or in a lead's run.
 
 #### W2-49 Contract v4.2, lite (STANDARD, product-spec; DEC-722)
 - **Allowed paths:** `docs/contract/contract.yaml`, `docs/contract/CONTRACT_v4.md` (the v4.2 text), `docs/changes/W2-49-CIT-P.md`, `docs/changes/W2-49-CIT-E.md`, `docs/contract/capabilities/**` (DEC-741 K, confirmed by DEC-745: the version line in every record, and the eight records of the split and moved items rewritten from the approved `contract.yaml` in a commit of their own), `docs/contract/SOURCE_MAP.csv` (the eight rows of the CIT-P's §8 only, aligned with v4.2; DEC-745).
@@ -883,6 +878,19 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - The listing and search refusals over `governance/` and `.claude/` (DEC-508) are gone; the held-out material's file names are readable and its contents refused; secrets stay refused [DEC-820 (a), (b)].
   - Reviewers and auditors read everything, tests and code alike [DEC-820].
 - **KPIs, failure:** each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error still fails closed.
+
+#### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
+- **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
+- **Starts** at once: no dependency, and no ticket in flight shares its paths.
+- **Allowed paths:** `template/governance/kernel/hooks/sessionstart.py`, `template/governance/kernel/skills/checkpoint/**` (the resume rule only), `tests/unit/hooks/**`, `docs/changes/W2-62-CIT-P.md`.
+- **KPIs, success:**
+  - The whole RESUME HERE section reaches the resumed session, however long: never a cut of its first 9,000 characters, and no "[truncated]" line in its place [W2-M372, DEC-837 item 1].
+  - **Research first,** recorded in the CIT-P: whether Claude Code 2.1.292 caps or moves a SessionStart hook's `additionalContext` above a size, measured in a headless session. If it does, the hook delivers the section by a route that arrives whole, and a live resumed session shows the whole section read.
+  - The overall cap never cuts the RESUME HERE section or the instruction to read it; the optional parts are the ones trimmed.
+  - The hook names the prompt of the wave in progress, read from the project's configuration, not a constant; with no such setting it names none rather than a wrong one [W2-M373].
+  - The checkpoint skill states the resume rule: the full session state, repository knowledge from retrieval and the context packets, a checkpoint at every handover [DEC-837 items 2 and 3].
+- **KPIs, failure:** a section of 50,000 characters arrives with no character lost; a checkpoint without the section still says so; unreadable input still exits 0; a role other than orchestrator gets no RESUME HERE injection.
+- **Once it lands,** DEC-792's 8,000-character limit is lifted.
 
 #### W2-46 Wave 2 exit run (FULL, orchestrator)
 - **Allowed paths:** `docs/plan/wave-2-exit/**`.

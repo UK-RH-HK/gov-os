@@ -2,6 +2,13 @@
 
 Every independent-auditor brief the orchestrator writes for W2-25, W2-28, W2-30 and W2-47 starts from this file: the sections below go into it unchanged, before the audit's own task.
 
+## Standing rules for your session (owner, DEC-836, DEC-838, DEC-849, DEC-850)
+
+- You use your model's full window; nobody asks you to stop or compact early. You run at `--effort max`.
+- Use `gov retrieve` for what you need to know, and say in your report which questions it answered.
+- Until W2-58 lands, the guard still refuses some reads Policy 2 opened (searches that start at the repository root, `governance/project/` or `.claude/`): take the refusal, never look for another form, search named folders instead, and count the refusals in your report.
+- You never ask the owner directly and never use a question box: anything that needs the owner goes into your report as a package, in the six parts of DEC-818, saying whether it blocks your audit or only part of it.
+
 ## How you judge (owner, the w2 prompt's section 14)
 
 - **The threat model is ADR-0001's** (`docs/adr/ADR-0001-threat-model.md`): the Gov OS guards against honest agent mistakes, plausible accidents and drift in ordinary work, not against a deliberate adversary with the owner's privileges. Machinery against an adversary the design cannot stop produces endless review loops.
