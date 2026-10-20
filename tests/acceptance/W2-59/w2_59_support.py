@@ -409,13 +409,104 @@ def hook_project(base: Path, markers: Path, *, with_src: bool) -> Path:
     return make_repository(base, files, copies)
 
 
-def run_hook_line(command: str, event: str, project: Path, box: Box, *, path: str | None = None) -> Run:
-    """One hook command line, run through ``sh -c`` as the harness runs it, in the project's root, with
-    ``CLAUDE_PROJECT_DIR`` set, an engineer's role and a ticket."""
+def session_env(project: Path, box: Box, *, path: str | None = None, inherited: dict | None = None) -> dict:
+    """The environment a hook line runs with: the session's own (Claude Code runs a hook's line with it), here a
+    temporary home, the case's ``PATH``, ``CLAUDE_PROJECT_DIR``, an engineer's role and a ticket, plus what the
+    session inherited from its launch (``inherited``, for example a worker's ``PYTHONPATH``)."""
     env = base_env(box.home, path or f"{box.local_bin}:{box.decoy_bin}:{SYSTEM_PATH}")
     env.update({"CLAUDE_PROJECT_DIR": str(project), "GOV_ROLE": "engineer", "GOV_TICKET": TICKET})
-    return run(["sh", "-c", command], cwd=project, env=env, stdin=json.dumps(hook_input(event, project)),
-               timeout=120)
+    env.update(inherited or {})
+    return env
+
+
+def run_hook_line(command: str, event: str, project: Path, box: Box, *, path: str | None = None,
+                  inherited: dict | None = None, payload: dict | None = None) -> Run:
+    """One hook command line, run through ``sh -c`` as the harness runs it, in the project's root, with
+    ``CLAUDE_PROJECT_DIR`` set, an engineer's role and a ticket. ``payload`` replaces the event's standard input
+    (``hook_input``); ``inherited`` is added to the session's environment (``session_env``)."""
+    env = session_env(project, box, path=path, inherited=inherited)
+    stdin = payload if payload is not None else hook_input(event, project)
+    return run(["sh", "-c", command], cwd=project, env=env, stdin=json.dumps(stdin), timeout=120)
+
+
+# What a launched worker's session carries (``gov launch`` passes its own environment on to the session, and the
+# committed launch form sets ``PYTHONPATH=<worktree>/src`` on that command; DEC-732, DEC-822 item 3): the import
+# path names a folder that holds a ``gov`` package of the code under test. The decoy package below stands for an
+# edit of that code: its guard allows every call; importing it leaves ``tree-gov-<pid>``; a ``sitecustomize``
+# beside it leaves ``tree-site-<pid>`` whenever an interpreter starts with the folder on its import path.
+def worker_import_path_files(markers: Path, prefix: str = "src/") -> dict:
+    return {
+        f"{prefix}sitecustomize.py": (
+            "import os\n"
+            f"open(os.path.join({str(markers)!r}, 'tree-site-%d' % os.getpid()), 'w').close()\n"),
+        f"{prefix}gov/__init__.py": (
+            "import os\n"
+            f"with open(os.path.join({str(markers)!r}, 'tree-gov-%d' % os.getpid()), 'w') as f:\n"
+            "    f.write(__file__)\n"),
+        f"{prefix}gov/guard/__init__.py": "",
+        f"{prefix}gov/guard/decide.py": (
+            "FREEZE_FLAG = '.gov-runtime/freeze'\n\n\n"
+            "def freeze_state(project_root):\n    return 'none'\n\n\n"
+            "def decide(**kwargs):\n    return 'allow', 'W259: the guard as edited in the tree allows everything'\n"),
+        f"{prefix}gov/guard/install.py": (
+            "def has_sudo(command):\n    return False\n\n\n"
+            "def has_install(command):\n    return False\n\n\n"
+            "def acting_role(role, subagent_type):\n    return role\n\n\n"
+            "def install_in_experiment_folder(*args, **kwargs):\n    return False\n"),
+        f"{prefix}gov/guard/containment.py": (
+            "def take_snapshot(*args, **kwargs):\n    return None\n\n\n"
+            "def clear_actor_snapshots(*args, **kwargs):\n    return None\n\n\n"
+            "def mark_concurrent_write(*args, **kwargs):\n    return None\n"),
+    }
+
+
+def worker_project(base: Path, markers: Path, *, src_in_project: bool) -> tuple:
+    """A project holding the kernel's hook programs, and the folder a worker's inherited ``PYTHONPATH`` names:
+    the project's own ``src`` (as in a ticket worktree) or, for the two programs that add the project's ``src`` to
+    their own import path themselves (row W2-M389), a folder outside the project, so that only the line decides
+    whether the inherited path reaches the program. Returns ``(project, the inherited folder)``."""
+    base = Path(base)
+    copies = {f"{HOOKS_REL}/{path.name}": path for path in sorted((WORKTREE / HOOKS_REL).glob("*.py"))}
+    files = {"README.md": "w259 worker project\n"}
+    if src_in_project:
+        files.update(worker_import_path_files(markers))
+        project = make_repository(base / "project", files, copies)
+        return project, project / "src"
+    project = make_repository(base / "project", files, copies)
+    elsewhere = base / "inherited"
+    for rel, text in worker_import_path_files(markers).items():
+        path = elsewhere / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+    return project, elsewhere / "src"
+
+
+def install_rollback(box: Box) -> Path:
+    """The owner's documented rollback in the case's home (DEC-605, ``pip install --user -e``): a ``gov`` script at
+    ``<HOME>/.local/bin/gov`` whose first line names the system interpreter, and this worktree's package found
+    through the user site folder, whose path file leaves ``rollback-python-<pid>`` when that interpreter starts.
+    The same form as ``test_the_line_follows_the_owner_s_rollback_to_an_editable_install``."""
+    rollback = box.local_bin / "gov"
+    rollback.write_text(f"#!{REAL_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
+                        encoding="utf-8")
+    rollback.chmod(0o755)
+    env = base_env(box.home, SYSTEM_PATH)
+    site = subprocess.run([REAL_PYTHON, "-c", "import site; print(site.getusersitepackages())"],
+                          env=env, capture_output=True, text=True, check=True).stdout.strip()
+    assert site.startswith(str(box.home) + os.sep), f"the user site folder {site} is not under the case's home"
+    os.makedirs(site, exist_ok=True)
+    with open(os.path.join(site, "w259_rollback.pth"), "w", encoding="utf-8") as pth:
+        pth.write(f"{SRC}\n")
+        pth.write(f"import os; open(os.path.join({str(box.markers)!r}, 'rollback-python-%d' % os.getpid()), "
+                  f"'w').close()\n")
+    return rollback
+
+
+def refused_write(project: Path) -> dict:
+    """A PreToolUse input the pin's guard refuses: an engineer's Write outside the ticket's paths."""
+    return {"session_id": "w259-session", "transcript_path": str(project / "transcript.jsonl"), "cwd": str(project),
+            "hook_event_name": "PreToolUse", "tool_name": "Write", "tool_use_id": "toolu_w259_0002",
+            "tool_input": {"file_path": str(project / "outside-the-ticket" / "w259.txt"), "content": "w259\n"}}
 
 
 def denies(done: Run) -> bool:

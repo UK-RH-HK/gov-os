@@ -1,7 +1,9 @@
 # W2-59 acceptance tests: the pinned judge, the hook lines and the packaging gaps
 
 Ticket: `DAEO-kh9l` (W2-59) · Profile: STANDARD (DEC-221) · Sources: DEC-822 (items 1 to 3, step 2), DEC-835,
-DEC-831, DEC-732, DEC-579 · Author: independent test designer (MR-3), written before the implementation, run 1.
+DEC-831, DEC-732, DEC-579 · Author: independent test designer (MR-3), written before the implementation, run 1;
+run 2 (a fresh test designer, after the implementation, from the CIT-P review's finding as a described behaviour,
+DEC-136): the hook lines in a launched worker's environment, section "Run 2" below.
 
 Run:
 
@@ -10,6 +12,10 @@ Run:
 **44 cases in 5 files. Red run on the base (`c5100159`, before any implementation): 39 failed, 5 passed,
 0 skipped, about 7 seconds** (one wheel build per session). The five green cases are named below with the reason.
 Four cases are `local_only` (they need this machine's `gitleaks` binary; skipped without it).
+
+**Run 2 adds 11 cases in a sixth file, `test_w2_59_hook_lines_worker_env.py`: 55 cases in 6 files. Red run at
+`9b9faac3` (the implementation in place): 9 failed, 46 passed, 0 skipped, about 10 seconds;** the 44 earlier cases
+all pass, and the two green new cases are named with the reason.
 
 ## How the cases run this worktree's code (DEC-732)
 
@@ -29,7 +35,9 @@ editable install.
   path map, the gitleaks configurations). No folder of the repository is copied.
 - **`gov --version` from this worktree's code** (KPI 5): `python3 -m gov.cli.main --version` with
   `PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src` set in that one subprocess.
-- Every other subprocess runs with `PYTHONPATH` removed, `HOME` temporary and a `PATH` the case writes.
+- Every other subprocess runs with `PYTHONPATH` removed, `HOME` temporary and a `PATH` the case writes. Run 2's
+  cases then add, on purpose, a worker's `PYTHONPATH` naming a decoy folder of the case (never this worktree's
+  `src`): the session's inherited variable under test.
 
 The `gov.__file__` line, as run for this suite:
 
@@ -103,6 +111,94 @@ Choices, stated:
   interpreter and package for all seven lines, no decoy marker, and exit 2 without a pin for the three guard lines
   (the rollback case was not simulated; the form reads the rollback script's own `#!` line):
   `g=$(command -v gov) || { echo ... >&2; exit 2; }; p=$(sed -n "1s/^#!//p" "$g"); [ -x "$p" ] || { ...; exit 2; }; exec "$p" "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/<program>"`.
+
+### Run 2: the hook lines in a launched worker's environment (`test_w2_59_hook_lines_worker_env.py`, 11 cases)
+
+KPI success 2, "The hook command lines call the pin's environment [DEC-822 step 2]", read with DEC-822 item 3 ("the
+per-command `PYTHONPATH` chooses only the code under test, not the judge"). The behaviour, from the CIT-P review
+(DEC-136): **a hook line runs the pin's governance package whatever import path the session's environment names.**
+
+Why a worker's session carries `PYTHONPATH`: the committed launch form (`governance/project/briefs/LEAD-w2-common.md`)
+sets `PYTHONPATH=<worktree>/src` on the `gov launch` command, and the launcher starts the session with
+`{**os.environ, **settings["env"]}` (`src/gov/launch/launcher.py:319`). Claude Code runs a hook's line with the
+session's environment. This designer's own session shows it: `printenv PYTHONPATH` gives
+`/home/usain/gov-os-worktrees/W2-59/src`.
+
+How the cases run: as the run-1 hook-line cases (`sh -c`, `CLAUDE_PROJECT_DIR` a temporary project holding the
+kernel's six hook programs, `HOME` a temporary folder holding the link `.local/bin/gov` to the stand-in pin built
+from this worktree, that folder first on `PATH`, a decoy `python3` next, an engineer's role and a ticket), with the
+worker's `PYTHONPATH` added to that environment (`w2_59_support.session_env`, `inherited=`). The folder it names
+(`worker_import_path_files`) holds a `gov` package standing for an edit of the code under test: **its guard allows
+every call**, importing it leaves `tree-gov-<pid>`, and a `sitecustomize.py` beside it leaves `tree-site-<pid>`
+whenever an interpreter starts with the folder on its import path. The refused call is an engineer's `Write` to
+`<project>/outside-the-ticket/w259.txt` (`refused_write`); the pin's guard denies it ("Write to ... denied for role
+'engineer'", seen by a scratch probe of this worktree's guard).
+
+| Case | Behaviour item | Red reason seen at `9b9faac3` |
+|---|---|---|
+| `test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]` | 1 | **fail-open:** the line imported the project's `src/gov` and its edited guard decided; the refused write was let through (exit 0, nothing on standard output) |
+| `...[preToolUse[0]-no-pythonpath]` | 1, the control | **green**: without the inherited variable the pin's guard decides and denies, as KPI 2's run-1 cases already require |
+| `test_with_a_worker_s_pythonpath_and_no_pin_the_guard_line_still_blocks[preToolUse[0]]` | 1, never fail open | **green**: with no `gov` to be found the line blocks before it starts any interpreter, so the inherited path is never read; kept as the guard against a fix that falls back |
+| `test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_editable_install[preToolUse[0]]` | 1, the rollback | the line imported the inherited path's `gov`, not the rollback's (DEC-605) package |
+| `test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[0]]`, `[postToolUseFailure[0]]`, `[stop[0]]` | 2 | the program imported the inherited path's `gov` (here the project's `src`), not the pin's |
+| `...[preCompact[0]]`, `[sessionStart[0]]` | 2 | the program imported the inherited path's `gov` (here a folder outside the project, see below) |
+| `...[subagentStop[0]]` | 2 | the pin's interpreter started with the inherited folder on its import path (its `sitecustomize` ran) |
+| `test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]` | 3 | the project's `gov` decided the call (the same cause as the first row); with the simulated fix below the whole case, its second half included, passes |
+
+Choices, stated:
+- **Which install's code ran** is shown by markers, as in run 1: `pin-gov-` (the pin's installed package imported),
+  `pin-python-` (the pin's interpreter started), `tree-gov-` and `tree-site-` (the inherited path's package, or the
+  folder on the import path at all). subagentStop's program imports no governance package, so its case reads the
+  import path itself.
+- **preCompact and sessionStart** add the project's own `src` to their import path when that folder exists (row
+  W2-M389, deferred to W2-10; run 1's package P-W2-59-1). Measured in a project with `src/`, the program would
+  import the tree whatever the line does. So their case measures only what the line controls: the project has no
+  `src/`, and the worker's `PYTHONPATH` names a folder outside the project holding the same decoy package. Left to
+  W2-M389: that these two programs, in a ticket worktree (which has `src/`), import the code under test even when
+  the line runs the pin's interpreter without the inherited path.
+- **The rollback with a worker's `PYTHONPATH`.** DEC-605's editable install finds its package through the user site
+  folder. A line that drops the inherited path by isolating the interpreter (`python -I`, or `-s`) also drops the
+  user site folder, and with it the rollback's package; this case and run 1's rollback case then fail. The form of
+  the fix is the engineer's; the case requires only the behaviour.
+- **Item 3, the variable stays the code under test's.** A line cannot change the session's environment for later
+  commands; what it, or a fix in the guard, could do wrongly is refuse a command that sets `PYTHONPATH` itself. The
+  case requires the pin's guard to let DEC-732's form through (`PYTHONPATH=<src> python3 -c 'import gov; ...'`)
+  and that command, run with the session's environment, to import the tree's package. **Not tested, package
+  P-W2-59-5:** `PYTHONPATH=<src> gov <command>` with the bare pin.
+- **Proportion (DEC-221):** one case per line, plus the control without the variable, the no-pin case and the
+  rollback case for the guard line (the one line that can fail open), and one case for item 3.
+
+A scratch simulation (not committed; a pytest plugin pointing `HOOK_SOURCE_REL` at a generated source, run over this
+file and `test_w2_59_hook_lines.py`, 36 cases) with run 1's simulated form and four interpreter calls:
+`exec "$p" ...` gave the same 9 reds as the head; `exec env -u PYTHONPATH "$p" ...` and `exec "$p" -E ...` gave
+36 passed; `exec "$p" -I ...` gave 34 passed, 2 failed (both rollback cases). (`-E` also ignores every other
+`PYTHON*` variable of the session; `env -u PYTHONPATH` drops only this one.)
+
+The `gov.__file__` line, as run for run 2:
+
+    $ PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src python3 -c "import gov; print(gov.__file__)"
+    /home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py
+
+### Run 2: earlier tests checked against a line that ignores an inherited import path
+
+- **`tests/acceptance/W2-59/` (run 1):** none turns red for a line that drops the inherited `PYTHONPATH` with
+  `env -u PYTHONPATH` or `-E` (simulated: all 25 run-1 hook-line cases pass). A line that uses `-I` or `-s` turns
+  `test_the_line_follows_the_owner_s_rollback_to_an_editable_install[preToolUse[0]]` red (the rollback's package is
+  found through the user site folder). That case is right and needs no revision: the fix must keep the user site
+  folder. The regular expression of `test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path`
+  does not match `env -u PYTHONPATH`.
+- **`tests/acceptance/W1-38/`:** none turns red, and none needs a revision. As run 1 found, its cases read the
+  template's source, the kernel template's settings, or settings generated from the template in a temporary project,
+  never this repository's `.rulesync/hooks.jsonc` (the one mention in `test_w1_38_rulesync.py` is a generated
+  project's). If the template's lines later take the same form, run 1's list applies, and a `-I` or `-s` form would
+  also break its live cases, whose stand-in session finds `gov` through a path file in the user site folder
+  (`w1_38_hooks_support.make_session_sandbox`).
+- **`tests/acceptance/W1-05/`:** none turns red, and none needs a revision. Its live cases run the lines of the
+  generated `.claude/settings.json` (which the owner regenerates, DEC-835 item 3) in an environment built from
+  scratch with no `PYTHONPATH` (`w1_05_support.command_environment`), so dropping an inherited one changes nothing
+  there. A `-E` form also ignores the `PYTHONDONTWRITEBYTECODE=1` that environment sets; the programs run as scripts
+  and no W1-05 case fails on an extra untracked file (`bash_call` asserts only that the changed paths are listed).
+  This is a reading: W1-05 was not run against a regenerated settings file.
 
 ### KPI success 3 and its failure line: the repository from the project root (`test_w2_59_project_root.py`, 5 cases)
 
@@ -207,6 +303,35 @@ form re-baselined first. Not this ticket.
   wheels built from an export, so the owner's pin commands must stay as they are. (c) defer to W2-18 (the release
   and its hash-locked install), which owns how a release is built.
 - Recommendation: (a) now and (c) for the release, confidence medium. Blocks nothing in this suite.
+
+**P-W2-59-5 (run 2). Does a bare `gov` with a per-command `PYTHONPATH` run the pin or the tree?** (The number is
+this README's; the lead numbers its packages.)
+- Context: behaviour item 3 ("a test run or a `gov` command that sets `PYTHONPATH` itself still runs the tree's
+  code", DEC-732) against DEC-822 item 3 ("chooses only the code under test, not the judge") and the common lead
+  brief ("a bare `gov` is the pinned judge").
+- What happened: for `PYTHONPATH=<worktree>/src gov <command>` the two readings differ. DEC-732 item 1 says every
+  `gov` command used for verification runs the worktree's `src/` with the variable set per command; the pin's own
+  script is pip's (`#!<venv>/bin/python`, no `-E`), so today the variable makes the pin's `gov` run the tree's
+  code. The brief's verification forms avoid the question (`python3 -m gov.cli.main ...`).
+- Options: (a) a command that sets the variable itself is a run of the code under test, whatever its program name;
+  only the judge's own entry points (the hook lines, the runner's checks) never take it from the environment; cost
+  none (as built). (b) the pin's `gov` always runs its own package (its script ignores the variable); verification
+  uses `python3 -m gov.cli.main` only; cost small (the wheel's entry-point script, W2-18's release build).
+  (c) defer to W2-18.
+- Recommendation: (a), recorded in DEC-732's words, confidence medium. Not tested here; blocks nothing in this suite.
+
+**P-W2-59-6 (run 2). The launch form puts `PYTHONPATH` into every worker session's environment.**
+- Context: DEC-732 item 3: "It is set per command, not in a session's environment, so the guard's own hooks keep
+  running the code the session started under."
+- What happened: the committed launch form sets `PYTHONPATH=<worktree>/src` on the `gov launch` command, and the
+  launcher passes its whole environment on to the session (`src/gov/launch/launcher.py:319`). Every launched
+  worker therefore runs with the variable in its session environment (this designer's session included), and the
+  hook lines inherit it. Run 2's cases close it at the line; the launch remains a second way in for any other
+  program that is the judge.
+- Options: (a) the launcher drops `PYTHONPATH` from the session's environment (DEC-826 Q5's cleaned environment,
+  W2-56), and DEC-732's per-command form stays as it is; cost small; outside this ticket's paths. (b) the line's fix
+  alone; cost none. (c) both.
+- Recommendation: (c): the line's fix here (this suite requires it) and a row for W2-56, confidence medium.
 
 ## Notes for the engineer and the auditor
 
