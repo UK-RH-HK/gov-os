@@ -153,7 +153,9 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
         with open(path, encoding="utf-8") as f:
             text = f.read()
         head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
-        ticket = load_yaml_unique(head) if head is not None else None
+        import yaml  # the C parser when there is one: the guard runs on every call
+        ticket = (yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
+                  if head is not None else None)
     except Exception:
         ticket = None
     wbs = ticket.get("wbs_id") if isinstance(ticket, dict) else ""
