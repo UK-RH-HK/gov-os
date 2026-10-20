@@ -93,9 +93,10 @@ TK_SAVING_STAND_IN = (                     # batch 4: the session saves its chec
 )
 FAILING_STAND_IN ="#!/bin/sh\necho \"$(basename \"$0\"): stand-in failure\" >&2\nexit 1\n"
 
-WINDOW_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"
-WINDOW_TOKENS = 300_000
-WINDOW_TOLERANCE = 30_000                  # "about 300k": 270,000 to 330,000
+WINDOW_KEY = "CLAUDE_CODE_AUTO_COMPACT_WINDOW"   # DEC-838: no launch and no settings file sets it
+WINDOW_REPORT = "auto-compact window for"  # how `/autocompact` begins its answer (case of letters ignored)
+WINDOW_DEFAULT_FORMS = ("default for this model", ": auto")   # the model's own window, in the two forms seen
+WINDOW_ORIGIN = "(from "                   # how the answer names a setting a window was taken from
 
 HOOK_TIMEOUT_S = 30.0
 HOUR_S = 3600.0
