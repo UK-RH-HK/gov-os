@@ -1,155 +1,44 @@
-FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                                        [100%]
+.F.....FF...............FFFFFFFFF                                        [100%]
 =================================== FAILURES ===================================
-_ test_a_collection_over_the_suite_sees_the_same_tests_with_the_cache_in_place _
-tests/acceptance/W2-48/test_w2_48_collection.py:13: in test_a_collection_over_the_suite_sees_the_same_tests_with_the_cache_in_place
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_collection_over_the_sui0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "3ad57115dd8841f9ac18fd820337be1c", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
 _ test_a_declared_command_runs_again_only_when_a_file_of_its_input_globs_changes _
-tests/acceptance/W2-48/test_w2_48_declared_command.py:62: in test_a_declared_command_runs_again_only_when_a_file_of_its_input_globs_changes
-    first = _run(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_declared_command.py:43: in _run
-    run = support.run_cache(tree.root, told, sandbox, support.COMMAND, *args, "--", sys.executable,
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_declared_command_runs_a0/tree) python3 -m gov.testcache command --json --input data/** --input tools/check_values.py -- /usr/bin/python3 tools/check_values.py
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "command", "result": {"test_cache": {"run": "435ab9c0f428436789bee123c8595518", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-___________ test_a_declared_command_without_input_globs_always_runs ____________
-tests/acceptance/W2-48/test_w2_48_declared_command.py:86: in test_a_declared_command_without_input_globs_always_runs
-    first = _run(tree, told, sandbox, globs=())
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_declared_command.py:43: in _run
-    run = support.run_cache(tree.root, told, sandbox, support.COMMAND, *args, "--", sys.executable,
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_declared_command_withou0/tree) python3 -m gov.testcache command --json -- /usr/bin/python3 tools/check_values.py
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "command", "result": {"test_cache": {"run": "d34b3b8dd6d746b3aaf068dd02f29523", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-________________ test_a_failed_declared_command_is_never_reused ________________
-tests/acceptance/W2-48/test_w2_48_declared_command.py:98: in test_a_failed_declared_command_is_never_reused
-    first = _run(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_declared_command.py:43: in _run
-    run = support.run_cache(tree.root, told, sandbox, support.COMMAND, *args, "--", sys.executable,
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_failed_declared_command0/tree) python3 -m gov.testcache command --json --input data/** --input tools/check_values.py -- /usr/bin/python3 tools/check_values.py
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "command", "result": {"test_cache": {"run": "cb53f9c40426496b8948c5591cf96cd2", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_failed_test_runs_again_with_nothing_changed_and_is_never_shown_reused_or_passed _
-tests/acceptance/W2-48/test_w2_48_failures.py:42: in test_a_failed_test_runs_again_with_nothing_changed_and_is_never_shown_reused_or_passed
-    first, second = _twice(tree, told, sandbox)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_failures.py:32: in _twice
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_failed_test_runs_again_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "159b6e019e924767937e964886a8784c", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-____ test_a_test_that_errored_in_a_fixture_runs_again_with_nothing_changed _____
-tests/acceptance/W2-48/test_w2_48_failures.py:55: in test_a_test_that_errored_in_a_fixture_runs_again_with_nothing_changed
-    first, second = _twice(tree, told, sandbox)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_failures.py:32: in _twice
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_errored_in_a_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "4d4684f55dcb4fd58756616d02673bfc", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_file_that_failed_to_collect_is_collected_again_and_reported_as_an_error _
-tests/acceptance/W2-48/test_w2_48_failures.py:68: in test_a_file_that_failed_to_collect_is_collected_again_and_reported_as_an_error
-    first, second = _twice(tree, told, sandbox)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_failures.py:32: in _twice
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_file_that_failed_to_col0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "cef842ae80314940819b586c81e75494", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
+tests/acceptance/W2-48/test_w2_48_declared_command.py:78: in test_a_declared_command_runs_again_only_when_a_file_of_its_input_globs_changes
+    assert _ran(inside) and _entry(inside).get("result") == support.PASSED, (
+E   AssertionError: data/values.txt, inside the declared globs ['data/**', 'tools/check_values.py'], changed: the command runs again, labelled with its own result
+E     (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_declared_command_runs_a0/tree) python3 -m gov.testcache command --json --input data/** --input tools/check_values.py -- /usr/bin/python3 tools/check_values.py
+E     exit code: 3
+E     record (without tests): {"run": "20261020T152713Z-dbdd41c7", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "inputs": ["data/**", "tools/check_values.py"], "notes": [], "exit_code": 1, "output": ""}
+E       /usr/bin/python3 tools/check_values.py: record 'failed'; ran 0 time(s) in this run
+E       command:check_values: record None; ran 1 time(s) in this run
+E     stdout (end):
+E     {"ok": false, "command": "command", "result": {}, "session": "", "error": {"code": "TESTS_FAILED", "message": "1 test(s) failed or errored: /usr/bin/python3 tools/check_values.py", "details": {"test_cache": {"run": "20261020T152713Z-dbdd41c7", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "inputs": ["data/**", "tools/check_values.py"], "notes": [], "exit_code": 1, "output": "", "tests": [{"id": "/usr/bin/python3 tools/check_values.py", "result": "failed"}]}}}}
+E     
+E     stderr (end):
+E     
+E   assert (True and 'failed' == 'passed'
+E    +  where True = _ran(Cached(what='(in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_declared_command_runs_a...ts': [{'id': '/usr/bin/python3 tools/check_values.py', 'result': 'failed'}]}, ran=Counter({'command:check_values': 1})))
+E     
+E     - passed
+E     + failed)
 _ test_the_record_names_its_engine_pytest_testmon_and_coverage_with_their_versions _
-tests/acceptance/W2-48/test_w2_48_glue_and_research.py:34: in test_the_record_names_its_engine_pytest_testmon_and_coverage_with_their_versions
-    run = support.lead_run(tree.root, told, sandbox)
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_the_record_names_its_engi0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "7672d88d44434aaeaff926286ca6e12f", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
+tests/acceptance/W2-48/test_w2_48_glue_and_research.py:38: in test_the_record_names_its_engine_pytest_testmon_and_coverage_with_their_versions
+    assert isinstance(engine, str) and all(name in engine for name in expected), (
+E   AssertionError: `test_cache.engine` must name the glue with the installed versions, ['pytest-testmon 2.2.0', 'coverage 7.16.2'] (DEC-843: the cache is glued to pytest-testmon and coverage); found ['pytest-testmon 2.2.0', 'coverage 7.16.2']
+E     (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_record_names_its_engi0/tree) python3 -m gov.testcache run --json tests
+E     exit code: 0
+E     record (without tests): {"run": "20261020T152725Z-4455a983", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_record_names_its_engi0/tree/.gov-runtime/testcache/local", "from": null, "commit": "bfb97d6ceac192ca4f32285cd36a7ff23bdf1fe1", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.95, "exit_code": 0}
+E       tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E       tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E       tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E       tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E       tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E       tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     stdout (end):
+E     {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152725Z-4455a983", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_record_names_its_engi0/tree/.gov-runtime/testcache/local", "from": null, "commit": "bfb97d6ceac192ca4f32285cd36a7ff23bdf1fe1", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 253)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.95, "exit_code": 0}}, "session": ""}
+E     
+E     stderr (end):
+E     
+E   assert (False)
+E    +  where False = isinstance(['pytest-testmon 2.2.0', 'coverage 7.16.2'], str)
 __ test_the_research_record_records_the_planted_change_set_and_the_time_saved __
 tests/acceptance/W2-48/test_w2_48_glue_and_research.py:45: in test_the_research_record_records_the_planted_change_set_and_the_time_saved
     assert path.is_file(), (f"{support.RESEARCH_REL} does not exist: it records the planted change set's results and "
@@ -157,472 +46,192 @@ E   AssertionError: docs/research/W2-48-cache-choice.md does not exist: it recor
 E   assert False
 E    +  where False = is_file()
 E    +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-48/docs/research/W2-48-cache-choice.md').is_file
-_ test_a_run_with_nothing_changed_reuses_every_test_labelled_reused_with_the_run_it_came_from _
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:46: in test_a_run_with_nothing_changed_reuses_every_test_labelled_reused_with_the_run_it_came_from
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_run_with_nothing_change0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "de64c4d20db0409a8021fd283bb76b61", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-________ test_a_reused_run_lists_every_test_of_the_suite_never_silently ________
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:63: in test_a_reused_run_lists_every_test_of_the_suite_never_silently
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_reused_run_lists_every_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "f7ab26e8bec84456bdcf0d1a00c588c1", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_change_to_an_imported_module_reruns_the_tests_that_import_it_and_reuses_the_rest _
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:80: in test_a_change_to_an_imported_module_reruns_the_tests_that_import_it_and_reuses_the_rest
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_to_an_imported_m0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "d3ccdc604a3748c8aafc09bad40ca138", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_change_to_a_fixture_in_a_conftest_reruns_the_tests_that_use_it_and_reuses_the_rest _
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:91: in test_a_change_to_a_fixture_in_a_conftest_reruns_the_tests_that_use_it_and_reuses_the_rest
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_to_a_fixture_in_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "f8bfee796aa7401e97d15bbe5dbd4b36", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-________ test_a_change_to_pytests_configuration_file_reruns_every_test _________
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:103: in test_a_change_to_pytests_configuration_file_reruns_every_test
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_to_pytests_confi0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "61cdc958e54b4fd99158653d00ce0bae", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_____ test_a_change_to_a_declared_data_file_reruns_the_tests_that_read_it ______
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:113: in test_a_change_to_a_declared_data_file_reruns_the_tests_that_read_it
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_to_a_declared_da0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "1fae9656a9bb44e48ff80b6375999dc0", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-____________ test_a_change_to_the_dependency_lock_reruns_every_test ____________
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:123: in test_a_change_to_the_dependency_lock_reruns_every_test
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_to_the_dependenc0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "4bd5ee543b6b49d2804380fcc53efd8a", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-__________________ test_another_interpreter_reruns_every_test __________________
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:135: in test_another_interpreter_reruns_every_test
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_another_interpreter_rerun0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "be8ff2ec121448bfa2e0994c0e3b9e5d", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_changed_test_command_or_option_does_not_reuse_results_of_another_command[an-added-k] _
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:152: in test_a_changed_test_command_or_option_does_not_reuse_results_of_another_command
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_changed_test_command_or0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "7589af126d354fa1becb2fd0d1e6ea34", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_changed_test_command_or_option_does_not_reuse_results_of_another_command[another-option] _
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:152: in test_a_changed_test_command_or_option_does_not_reuse_results_of_another_command
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_changed_test_command_or1/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "8609ce8abb1e4d4b9db9c900d73381f1", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_____________ test_a_change_outside_every_input_reuses_every_test ______________
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:161: in test_a_change_outside_every_input_reuses_every_test
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_planted_changes.py:34: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_outside_every_in0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "2736556e7c7540fb86216cf3a7cea4e4", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_change_reached_only_through_a_subprocess_reruns_the_test_that_starts_it _
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:33: in test_a_change_reached_only_through_a_subprocess_reruns_the_test_that_starts_it
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:26: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_reached_only_thr0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "dc791450b72440fb8efec4fca3301878", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_failing_change_reached_only_through_a_subprocess_is_a_failure_never_a_reused_pass _
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:45: in test_a_failing_change_reached_only_through_a_subprocess_is_a_failure_never_a_reused_pass
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:26: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_failing_change_reached_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "7e68e2497295439598661089763aeb0e", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_subprocess_coverage_lets_an_unchanged_test_that_starts_a_process_be_reused _
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:61: in test_subprocess_coverage_lets_an_unchanged_test_that_starts_a_process_be_reused
-    first = _filled(tree, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:26: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_subprocess_coverage_lets_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "9546d02841494257aaca262e21dcb90f", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
-_ test_a_change_reached_through_a_process_with_a_fresh_environment_reruns_the_test_that_starts_it _
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:72: in test_a_change_reached_through_a_process_with_a_fresh_environment_reruns_the_test_that_starts_it
-    _filled(tree, told, sandbox)
-tests/acceptance/W2-48/test_w2_48_subprocesses.py:26: in _filled
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_change_reached_through_0/tree) python3 -m gov.testcache run --json tests
-E   exit code: 0
-E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "350de4b0c67e40c3be79f161f91cef20", "tests": {}}}, "session": ""}
-E   
-E   stderr (end):
 _ test_the_full_uncached_run_runs_every_test_says_so_and_feeds_the_next_cached_run _
-tests/acceptance/W2-48/test_w2_48_uncached_runs.py:18: in test_the_full_uncached_run_runs_every_test_says_so_and_feeds_the_next_cached_run
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_the_full_uncached_run_run0/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_uncached_runs.py:25: in test_the_full_uncached_run_runs_every_test_says_so_and_feeds_the_next_cached_run
+    support.assert_cache(uncached, support.CACHE_OFF, f"the run was made with {support.NO_CACHE}, and its record "
+tests/acceptance/W2-48/w2_48_support.py:514: in assert_cache
+    assert isinstance(reason, str) and reason.strip(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: `test_cache.reason` does not say in words why the cache was off
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_full_uncached_run_run0/tree) python3 -m gov.testcache run --json --no-cache tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152834Z-60867190", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "off", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_full_uncached_run_run0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_full_uncached_run_run0/tree/.gov-runtime/testcache/local", "commit": "dfb0a1fa613096fecb4b138a560fc0c7f6d1d862", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.58, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E     tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "91e15cbaa1764bc890db268e9daebadf", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152834Z-60867190", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "off", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_full_uncached_run_run0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_the_full_uncached_run_run0/tree/.gov-runtime/testcache/local", "commit": "dfb0a1fa613096fecb4b138a560fc0c7f6d1d862", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 885)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.58, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so[corrupt] _
-tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:20: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_cache_that_cannot_be_re0/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:28: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
+    support.assert_cache(run, support.CACHE_UNREADABLE, f"the entries are {form}, and the run says so")
+tests/acceptance/W2-48/w2_48_support.py:514: in assert_cache
+    assert isinstance(reason, str) and reason.strip(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: `test_cache.reason` does not say in words why the cache was unreadable
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re0/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152840Z-017c224b", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re0/tree/.gov-runtime/testcache/local cannot be read: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 25: invalid start byte", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re0/tree/.gov-runtime/testcache/local", "from": null, "commit": "f436e21295847b6fd0e67e1101b74f574c287f65", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.62, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E     tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "ad5f53567eb1440295a239a3613864e6", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152840Z-017c224b", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re0/tree/.gov-runtime/testcache/local cannot be read: UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 25: invalid start byte", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re0/tree/.gov-runtime/testcache/local", "from": null, "commit": "f436e21295847b6fd0e67e1101b74f574c287f65", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 935)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.62, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so[truncated] _
-tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:20: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_cache_that_cannot_be_re1/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:28: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
+    support.assert_cache(run, support.CACHE_UNREADABLE, f"the entries are {form}, and the run says so")
+tests/acceptance/W2-48/w2_48_support.py:514: in assert_cache
+    assert isinstance(reason, str) and reason.strip(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: `test_cache.reason` does not say in words why the cache was unreadable
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re1/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152843Z-a066b1b7", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re1/tree/.gov-runtime/testcache/local cannot be read: JSONDecodeError: Unterminated string starting at: line 1 column 840 (char 839)", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re1/tree/.gov-runtime/testcache/local", "from": null, "commit": "15dc73c9a971878388d5c5867904f3e8491599d1", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.7, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E     tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "c5c6a3ce007b4c7488a6f5ba20686b6d", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152843Z-a066b1b7", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re1/tree/.gov-runtime/testcache/local cannot be read: JSONDecodeError: Unterminated string starting at: line 1 column 840 (char 839)", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re1/tree/.gov-runtime/testcache/local", "from": null, "commit": "15dc73c9a971878388d5c5867904f3e8491599d1", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 971)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.7, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so[wrong-version] _
-tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:20: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_cache_that_cannot_be_re2/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:28: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
+    support.assert_cache(run, support.CACHE_UNREADABLE, f"the entries are {form}, and the run says so")
+tests/acceptance/W2-48/w2_48_support.py:514: in assert_cache
+    assert isinstance(reason, str) and reason.strip(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: `test_cache.reason` does not say in words why the cache was unreadable
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re2/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152846Z-77756a48", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re2/tree/.gov-runtime/testcache/local/entries.json is of format '987654', not 1", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re2/tree/.gov-runtime/testcache/local", "from": null, "commit": "bcd4d8f238f843836c7aac61cf2f009d85b41f20", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.65, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E     tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "c7d28d1d7a474b2e884a307dd2cb8dfc", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152846Z-77756a48", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re2/tree/.gov-runtime/testcache/local/entries.json is of format '987654', not 1", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re2/tree/.gov-runtime/testcache/local", "from": null, "commit": "bcd4d8f238f843836c7aac61cf2f009d85b41f20", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1007)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.65, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so[not-readable] _
-tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:20: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_cache_that_cannot_be_re3/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unreadable_cache.py:28: in test_a_cache_that_cannot_be_read_makes_every_test_run_and_the_run_says_so
+    support.assert_cache(run, support.CACHE_UNREADABLE, f"the entries are {form}, and the run says so")
+tests/acceptance/W2-48/w2_48_support.py:514: in assert_cache
+    assert isinstance(reason, str) and reason.strip(), (
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: `test_cache.reason` does not say in words why the cache was unreadable
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152849Z-d43b472d", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local cannot be read: PermissionError: [Errno 13] Permission denied: '/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local/entries.json'", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local", "from": null, "commit": "3a522dcce8595c93127c08e443b29877582a82bf", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.54, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E     tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "ee8eff23838b417bb0549b5125839a7e", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152849Z-d43b472d", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "unreadable", "unreadable": "the store /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local cannot be read: PermissionError: [Errno 13] Permission denied: '/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local/entries.json'", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_cache_that_cannot_be_re3/tree/.gov-runtime/testcache/local", "from": null, "commit": "3a522dcce8595c93127c08e443b29877582a82bf", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1043)"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0, "reused": 0}, "seconds": 0.54, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused[dynamic-import] _
-tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:43: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_declares_an_u0/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:47: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
+    support.assert_ran(second, [UNSEEN_ID], f"test_unseen declares @pytest.mark.{support.MARKER}({kind!r}): its "
+tests/acceptance/W2-48/w2_48_support.py:474: in assert_ran
+    assert not problems, (
+           ^^^^^^^^^^^^
+E   AssertionError: expected to run: test_unseen declares @pytest.mark.unseen_inputs('dynamic-import'): its inputs cannot all be seen, so it is never reused, also when nothing changed. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E     tests/test_unseen.py::test_unseen did not run in this run (the record says 'reused')
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u0/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152902Z-9c01c1fa", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u0/tree/.gov-runtime/testcache/local", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 1.24, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
+E     tests/test_data.py::test_data: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     tests/test_unseen.py::test_unseen: record 'reused' from {'run': '20261020T152850Z-931f23aa', 'commit': '0ac1c699f82e8751195efbbe58edc8f582c90fb0'}; ran 0 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "81089f05fc124bbfb239fc84d240299c", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152902Z-9c01c1fa", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u0/tree/.gov-runtime/testcache/local", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1079)"}, {"id": "tests/test_unseen.py::test_unseen", "result": "reused", "from": {"run": "20261020T152850Z-931f23aa", "commit": "0ac1c699f82e8751195efbbe58edc8f582c90fb0"}}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 1.24, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused[outside-read] _
-tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:43: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_declares_an_u1/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:47: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
+    support.assert_ran(second, [UNSEEN_ID], f"test_unseen declares @pytest.mark.{support.MARKER}({kind!r}): its "
+tests/acceptance/W2-48/w2_48_support.py:474: in assert_ran
+    assert not problems, (
+           ^^^^^^^^^^^^
+E   AssertionError: expected to run: test_unseen declares @pytest.mark.unseen_inputs('outside-read'): its inputs cannot all be seen, so it is never reused, also when nothing changed. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E     tests/test_unseen.py::test_unseen did not run in this run (the record says 'reused')
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u1/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152908Z-102ee66c", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u1/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u1/tree/.gov-runtime/testcache/local", "commit": "e436549356efe06537127c40ed64b9b9be6b2062", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.42, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
+E     tests/test_data.py::test_data: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     tests/test_unseen.py::test_unseen: record 'reused' from {'run': '20261020T152904Z-7dda85ad', 'commit': 'e436549356efe06537127c40ed64b9b9be6b2062'}; ran 0 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "cd5bb315bbee4fb6a6923c47d949ccd6", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152908Z-102ee66c", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u1/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u1/tree/.gov-runtime/testcache/local", "commit": "e436549356efe06537127c40ed64b9b9be6b2062", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1114)"}, {"id": "tests/test_unseen.py::test_unseen", "result": "reused", "from": {"run": "20261020T152904Z-7dda85ad", "commit": "e436549356efe06537127c40ed64b9b9be6b2062"}}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.42, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused[network] _
-tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:43: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_declares_an_u2/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:47: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
+    support.assert_ran(second, [UNSEEN_ID], f"test_unseen declares @pytest.mark.{support.MARKER}({kind!r}): its "
+tests/acceptance/W2-48/w2_48_support.py:474: in assert_ran
+    assert not problems, (
+           ^^^^^^^^^^^^
+E   AssertionError: expected to run: test_unseen declares @pytest.mark.unseen_inputs('network'): its inputs cannot all be seen, so it is never reused, also when nothing changed. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E     tests/test_unseen.py::test_unseen did not run in this run (the record says 'reused')
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u2/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152910Z-5bfa788d", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u2/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u2/tree/.gov-runtime/testcache/local", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.43, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
+E     tests/test_data.py::test_data: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     tests/test_unseen.py::test_unseen: record 'reused' from {'run': '20261020T152908Z-cda7e9fa', 'commit': '6de1d3011ee2cbeafc1901bfff4c7337826573bf'}; ran 0 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "19c50b5f44f141aabf2c4028eb36c542", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152910Z-5bfa788d", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u2/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u2/tree/.gov-runtime/testcache/local", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1149)"}, {"id": "tests/test_unseen.py::test_unseen", "result": "reused", "from": {"run": "20261020T152908Z-cda7e9fa", "commit": "6de1d3011ee2cbeafc1901bfff4c7337826573bf"}}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.43, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
 _ test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused[clock] _
-tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:43: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
-    first = support.lead_run(tree.root, told, sandbox)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:448: in lead_run
-    return run_cache(root, told, sandbox, RUN, *(args or ("tests",)), python=python)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-tests/acceptance/W2-48/w2_48_support.py:433: in run_cache
-    check_record(record, what, done.stdout, done.stderr, done.returncode)
-tests/acceptance/W2-48/w2_48_support.py:374: in check_record
-    assert isinstance(tests, list) and all(isinstance(e, dict) and isinstance(e.get("id"), str)
-E   AssertionError: `test_cache.tests` is not a list of {id, result} objects with result one of ['passed', 'failed', 'error', 'skipped', 'reused']
-E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_declares_an_u3/tree) python3 -m gov.testcache run --json tests
+tests/acceptance/W2-48/test_w2_48_unseen_inputs.py:47: in test_a_test_that_declares_an_unseen_input_runs_every_time_and_is_never_reused
+    support.assert_ran(second, [UNSEEN_ID], f"test_unseen declares @pytest.mark.{support.MARKER}({kind!r}): its "
+tests/acceptance/W2-48/w2_48_support.py:474: in assert_ran
+    assert not problems, (
+           ^^^^^^^^^^^^
+E   AssertionError: expected to run: test_unseen declares @pytest.mark.unseen_inputs('clock'): its inputs cannot all be seen, so it is never reused, also when nothing changed. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E     tests/test_unseen.py::test_unseen did not run in this run (the record says 'reused')
+E   (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u3/tree) python3 -m gov.testcache run --json tests
 E   exit code: 0
+E   record (without tests): {"run": "20261020T152913Z-a45dc752", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u3/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u3/tree/.gov-runtime/testcache/local", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.47, "exit_code": 0}
+E     tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
+E     tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
+E     tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
+E     tests/test_data.py::test_data: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
+E     tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     tests/test_unseen.py::test_unseen: record 'reused' from {'run': '20261020T152911Z-b912fe6c', 'commit': 'fe9ba2adc70eef4f751e48d7290dca108fac3e53'}; ran 0 time(s) in this run
 E   stdout (end):
-E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "590eb1005eba4521a236f833b0a01445", "tests": {}}}, "session": ""}
+E   {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T152913Z-a45dc752", "engine": ["pytest-testmon 2.2.0", "coverage 7.16.2"], "cache": "used", "scope": "local", "store": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u3/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-5/test_a_test_that_declares_an_u3/tree/.gov-runtime/testcache/local", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53", "clean": true, "wrote_entries": true, "keys": ["80ed26b38b944fa7740f39e435d91019"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 1184)"}, {"id": "tests/test_unseen.py::test_unseen", "result": "reused", "from": {"run": "20261020T152911Z-b912fe6c", "commit": "fe9ba2adc70eef4f751e48d7290dca108fac3e53"}}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 6}, "seconds": 0.47, "exit_code": 0}}, "session": ""}
 E   
 E   stderr (end):
-33 failed, 13 deselected in 4.87s
+12 failed, 21 passed, 13 deselected in 113.87s (0:01:53)
