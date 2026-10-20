@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.260 (the version table at the end of each section gives the history)
+**Version:** 0.261 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -8981,7 +8981,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   6. **Until W2-58 lands** (DEC-821), the guard still refuses some reads this policy opens (DEC-508, DEC-525, DEC-557). A session meeting such a refusal takes it as a refusal: it never looks for another spelling, and records it. (c) and (d) are kept by the briefs until W2-58 enforces them. The briefs and the prompt change now (DEC-824): A1 and A2 state (c), and A2 no longer lets the engineer read the acceptance tests.
 
 ### DEC-821 — W2-58: the guard and launcher changes for Policy 2 (keystone 3), approved here
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the guard and launcher change is approved here, CAP-33) · **Under:** DEC-820, DEC-829, DEC-779, CAP-33 · **Basis:** OWNER, 2026-10-19: "Bring the guard and launcher changes this needs … as a short ticket in keystone 3, as a change I approve here."
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the guard and launcher change is approved here, CAP-33) · **Under:** DEC-820, DEC-829, DEC-779, CAP-33 · **Basis:** OWNER, 2026-10-19: "Bring the guard and launcher changes this needs … as a short ticket in keystone 3, as a change I approve here." · **Changed by:** items 1 and 2's sandbox clause ("and by the launcher's sandbox profile" for (c) and (d)) superseded by DEC-873: the guard enforces (c) and (d), the launcher adds no OS-level Read rule for them, the held-out rules (b) stay (2026-10-20)
 - **Decision:** a new ticket, W2-58, STANDARD, card in WBS §2:
   1. **Read denials per role and per ticket for Policy 2 (c):** a session of role `engineer` on ticket T is refused reads of T's acceptance-test folder (`tests/acceptance/<T's W2 id>/**`), while it may still run them through pytest and see their results; a session of role `independent-test-designer` on T is refused reads of the files T's branch changes against its base, other than its own tests. Both by the guard (tool reads and the read side of Bash) and by the launcher's sandbox profile.
   2. **The evaluation-set split for Policy 2 (d):** an evaluation set is declared in the path map with a visible part and a hidden part; a session measured by the set is refused reads of the hidden part; the measurement runs from a script the measured session cannot read the answers through.
@@ -9532,5 +9532,23 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.260 | 2026-10-20 | Delegated: DEC-872 (W2-02 resumes now with its original scope, the close-record type on every close's path; the plan's widening of W2-02 moves to W2-64). Next free id: DEC-873. |
+
+---
+
+## 261. The owner's answer of 2026-10-20 on P-W2-58-1: Policy 2's (c) and (d) by the guard, not by an OS-level Read rule (register v0.261, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-873 — P-W2-58-1 (a): DEC-821's sandbox clause for (c) and (d) re-baselined; the guard enforces them; the held-out rules stay in the sandbox
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-105 (re-baseline), DEC-820, DEC-821, DEC-801, ADR-0001, DEC-857, DEC-866 · **Basis:** P-W2-58-1 (`governance/project/orchestration/packages/P-W2-58-1.md`, W2-58 run 1): Claude Code 2.1.292 turns every Read deny rule that matches existing files into an OS-level read denial for the session's own commands; under each form tried (`<folder>/**`, `<file>*`, `W2-5[8]/**`) the engineer's pytest collected nothing, the test designer could not import the code it tests, and `git status` showed the test files as deleted (a `commit -a` would lose them) · **Changes:** DEC-821 items 1 and 2 (their sandbox clause).
+- **Decision:**
+  1. **The guard enforces Policy 2's (c) and (d)** on every tool and Bash route an honest agent takes.
+  2. **The launcher adds no OS-level Read rule for (c) or (d),** because running a test means reading it. **The held-out material's rules (b) stay in the sandbox as well;** a launch under a malformed `evaluation_sets` block is still refused.
+  3. **A program run deliberately to evade the guard** (an opaque interpreter that opens a refused file) **is a Wave 3 hardening row** (DEC-801, ADR-0001): row W2-L374, with an OS-level layer for (c) and (d) that keeps a channel to run the tests.
+  4. DEC-821's changed words are marked on its status line, and the sweep (DEC-866) finds them in W2-58's card and ticket file (KPI 1, now restated; a new KPI states item 2) and in W2-58's own unmerged launcher change and its launcher tests, which W2-58's last iteration removes and rewrites. Nothing on `w2/integrate` enforces them: today's base has no sandbox layer for (c) or (d).
+  5. W2-58 finishes now, ahead of everything else (DEC-857): its last engineer iteration, the test batch for its launcher cases, its full verification, its review and its merge.
+- Next free id: DEC-874.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.261 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-873 (P-W2-58-1 (a): Policy 2's (c) and (d) by the guard, no OS-level Read rule for them, the held-out rules stay; DEC-821's sandbox clause re-baselined; row W2-L374). Next free id: DEC-874. |
 
 ---
