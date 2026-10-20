@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.265 (the version table at the end of each section gives the history)
+**Version:** 0.266 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9621,3 +9621,21 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.265 | 2026-10-20 | Delegated: DEC-877 (W2-59: the merge-back remade under DEC-412; P-W2-59-6 (a) as built; P-W2-59-7 a row for W2-56; F3, F4, F5, F7 and td-2's discoveries as rows). Next free id: DEC-878. |
+
+## 266. The owner's rule of 2026-10-20 on the countdown's first line (register v0.266, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-878 — Every countdown starts with one progress line: the tickets by state out of the total, and the keystones done, in progress and ahead
+- **Status:** ACCEPTED (owner, standing, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-787, DEC-823, DEC-847, DEC-851, DEC-861 · **Adds to:** the countdown rule (prompt §8, §13, §15; WBS §6); nothing is superseded.
+- **Decision:** from now on, each countdown starts with one progress line, in this order:
+  1. **Tickets:** closed / merged, not closed / built and held / in flight / not started, out of the total.
+  2. **Keystones:** done / in progress / ahead, out of nine.
+- **How the orchestrator counts (so that every session counts alike):**
+  - **The total** is Wave 2's tickets: every card in the WBS, and every ticket the accepted plan names, less those it moved to Wave 3 (plan §8: W2-31, W2-34, W2-35, W2-36, W2-38, W2-39, W2-41, W2-44). W2-00, the coordination ticket, closes last and is counted apart. On 2026-10-20 the total is 57.
+  - **Each ticket is in one state only,** the first that applies: closed (by a clean `gov close`, or by the owner's decision); in flight (a lead or worker runs for it now, including a merged ticket's correction run); merged, not closed; built and held (it has a worktree with work and waits on a dependency, a close or an answer); not started.
+  - **A keystone is done** when every ticket it lists is closed and its owner acts are made, **in progress** when at least one of its tickets has started, and **ahead** when none has.
+- **Where it went (DEC-851):** this register; the prompt (§8, §13 and §15, v3.6); RESUME HERE; the WBS §6 rule. It does not reach the leads' or auditors' briefs (they write no countdown), nor any ticket card.
+- Next free id: DEC-879.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.266 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-878 (each countdown starts with one progress line: tickets closed / merged, not closed / built and held / in flight / not started out of the total; keystones done / in progress / ahead; how each is counted). Next free id: DEC-879. |

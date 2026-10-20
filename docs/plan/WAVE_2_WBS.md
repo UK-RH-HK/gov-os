@@ -1069,7 +1069,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
   6. the owner's exit decision;
   7. W2-00's close.
   Nothing else starts once W2-46 has started.
-- **Every report starts with a countdown:** the steps left to the end of Wave 2, with a time estimate for each.
+- **Every report starts with a countdown:** the steps left to the end of Wave 2, with a time estimate for each. Its first line is one progress line (DEC-878): tickets closed / merged, not closed / built and held / in flight / not started, out of the total; keystones done / in progress / ahead, out of nine.
 
 ## 7. Owner decisions
 
