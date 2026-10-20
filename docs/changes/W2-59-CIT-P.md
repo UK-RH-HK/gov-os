@@ -4,7 +4,7 @@ type: change-impact-proposal
 status: PROPOSED
 date: 2026-10-20
 branch: w2/W2-59
-base: w2/integrate @ 74d22909 (merged by 3eadca4c; the change started at c5100159)
+base: w2/integrate @ 74d22909 (merged by e48a601d; the change started at c5100159)
 author: engineer (W2-59, DAEO-kh9l, run 1; brought up to date in run 2)
 scope_approved: owner, 2026-10-19 (DEC-835)
 decisions_carried: [DEC-822, DEC-835, DEC-864, DEC-853, DEC-854, DEC-831, DEC-732, DEC-579, DEC-135, DEC-750, DEC-754, CAP-33]
@@ -20,12 +20,12 @@ approved its scope in DEC-835; this record states what changed, what stays, the 
 the rollback.
 
 The change started on `w2/integrate` at `c5100159`; the line numbers and code cited "at `c5100159`" below are from
-there. The branch now also holds `w2/integrate` at `74d22909`, by the merge `3eadca4c` (git's own merge of its two
-parents, no conflict; its record corrected in `6d4925ab`, DEC-750). That merge brought W2-62's session-start hook
+there. The branch now also holds `w2/integrate` at `74d22909`, by the merge `e48a601d` (git's own merge of its two
+parents, no conflict; its record corrected in `70cfbcf9`, DEC-750). That merge brought W2-62's session-start hook
 change (merged `6e4b2750`) and W2-50's secrets-scan fix (merged `98effadc`, DEC-853); it touched none of this
 change's files.
 
-The merge `3eadca4c` carries no `Task:` trailer (its subject names `DAEO-kl9l` by a typing error; `6d4925ab` records
+The merge `3eadca4c` carries no `Task:` trailer (its subject names `DAEO-kl9l` by a typing error; `70cfbcf9` records
 this, unamended). Once it is in `w2/integrate`, `gov close`'s gate for work without a task reads its paths as nobody's
 work. That gate, `_check_unmeasured` in `src/gov/close/command.py`, takes the commits of the closing ticket's range
 (`<its first commit>..HEAD`, its own left out); for each commit whose `Task:` trailers name none of the project's
@@ -35,6 +35,12 @@ tests, a path inside its allowed paths, its own ticket file) refuse the close wi
 FULL-profile ticket's probe gate leaves out the merges after its probed commit that are git's own merge on the
 probed paths (DEC-754); a STANDARD or LITE close leaves out none. So another ticket whose work is among those paths
 and whose range holds `3eadca4c` is refused. This is package P-W2-59-5, open with the orchestrator (§7).
+
+The branch was then remade under DEC-412 and DEC-877 (P-W2-59-5 (a)). `3eadca4c` is no longer on it: the same merge
+of `74d22909` is now `e48a601d`, which carries `Task:`, `Role:` and `Implements:` (git's own merge, the same tree).
+The later commits were re-applied unchanged, so the paragraph above describes the old merge only. The gate's reading
+of an untrailered merge is row W2-M394. Run 3 merged `w2/integrate` at `97fc656a` by `3dbd766d`, with its trailers
+(DEC-750).
 
 ## 1. The evidence
 
@@ -150,7 +156,7 @@ records its commit is row W2-L371, for W2-16 and W2-18 (DEC-864 item 3; §7, P2)
   code that variable names, because the pin's console script starts its interpreter without `-E` and the
   interpreter follows the variable. Seen in this run's own session (launched with
   `PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src`): a bare `gov --version` printed
-  `gov 0.1.0 (commit 6e95cd41…)`, the tree's code naming the tree's `HEAD`; with that variable removed from its
+  `gov 0.1.0 (commit 6e0bf627…)`, the tree's code naming the tree's `HEAD`; with that variable removed from its
   environment, the same `gov` is the pin built from `fecb870c`, which has no `--version` and answers with a usage
   error. The hook lines no longer do this (§3.2). Two questions stay open, both the orchestrator's to decide, not
   this change's:
@@ -163,7 +169,7 @@ records its commit is row W2-L371, for W2-16 and W2-18 (DEC-864 item 3; §7, P2)
   (`XDG_*`), working folder and verdict rules are unchanged.
 - `template/governance/kernel/hooks/precompact.py` and `sessionstart.py` still put the project's `src` on their own
   import path when that folder exists (`sessionstart.py`'s `_add_src`, still there after W2-62's change came in by
-  the merge `3eadca4c`). That is outside this ticket's paths: it is row W2-M389, for W2-10 (DEC-864 item 2).
+  the merge `e48a601d`). That is outside this ticket's paths: it is row W2-M389, for W2-10 (DEC-864 item 2).
 - The generated settings file is not touched (§7).
 
 ## 5. The pin ladder's consequence
@@ -181,7 +187,7 @@ The judge is now the pin, so what the pin does not hold does not judge:
 
 W2-05's unmerged branch (`w2/W2-05` at `f19f156e`) changes the same two files. `git merge-tree` of this branch
 with it gives two small conflicts, each resolved by keeping both sides (DEC-750, DEC-754). Re-checked in run 2 at
-`fc8f8494`, after the merge `3eadca4c` (`git merge-tree --write-tree --name-only HEAD w2/W2-05`, read-only):
+`164d4c64`, after the merge `e48a601d` (`git merge-tree --write-tree --name-only HEAD w2/W2-05`, read-only):
 `w2/W2-05` is still at `f19f156e`, and the conflicts are the same two, in the same lines:
 
 | File | This change | W2-05 | Resolution |
@@ -196,7 +202,7 @@ W2-05's block that clears the environment at the start of `main` does not confli
 
 | # | Act | When |
 |---|---|---|
-| A1 | Re-run the pin commands at the merge commit of this ticket into `w2/integrate`, which must also hold W2-50's secrets fix (DEC-835 item 4, DEC-853 item 4). That fix is on `w2/integrate` (`98effadc`) and on this branch (`3eadca4c`), so this ticket's merge commit holds both | First, after the merge |
+| A1 | Re-run the pin commands at the merge commit of this ticket into `w2/integrate`, which must also hold W2-50's secrets fix (DEC-835 item 4, DEC-853 item 4). That fix is on `w2/integrate` (`98effadc`) and on this branch (`e48a601d`), so this ticket's merge commit holds both | First, after the merge |
 | A2 | Regenerate the settings file from `.rulesync/hooks.jsonc` (the generated files are the owner's). Until then the live hooks keep the old lines, and the adapter-portability check is RED with one finding, `GENERATED_DIFFERS` (DEC-835 item 3). The ticket lead's `gov check` of run 2 shows exactly that: `adapter-portability` RED with one finding, `GENERATED_DIFFERS` on the generated settings file (the lead's record) | After A1 |
 
 The order is corrected from run 1's record, which had the regeneration first: re-pinning first means the live hook
@@ -223,7 +229,7 @@ Three earlier acceptance cases assumed what DEC-822 item 3 and DEC-835 remove (P
   `::test_semantic_canary_hits_after_reindex` used a fixture project with no canary declarations and expected the
   canaries to be found from the install path; the canary runner now reads the project's own (§3.3).
 
-A fresh independent test designer in this ticket's resume revised their setup only, in commit `45c6bfae`
+A fresh independent test designer in this ticket's resume revised their setup only, in commit `912ddc63`
 (`Role: independent-test-designer`, `Rewrite-Reason: DEC-822 item 3, DEC-835 (DEC-864)`; six files under
 `tests/acceptance/W1-22/` and `tests/acceptance/W1-26/`): W1-26's raising checker is planted in the judge's own
 code, and W1-22's fixture carries the kernel's canary declarations, as an adopted project does through the copier
@@ -264,7 +270,7 @@ the new hook lines without an edit.
 
 ## 11. Verification
 
-Run 1's figures, before the merge `3eadca4c` and the revision of §8:
+Run 1's figures, before the merge `e48a601d` and the revision of §8:
 
 - W2-59's acceptance tests (`tests/acceptance/W2-59`): 44 passed, from a stand-in pin built from this branch.
 - W1-38's acceptance tests (the hook-source tests): 201 passed.
@@ -277,7 +283,7 @@ Run 2's verification, after the merge and the revision, is the ticket lead's and
 Run 2's engineer, after the change of §3.2 (`-E` on each line), every run with
 `PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src` (`gov.__file__` = `/home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py`):
 
-- W2-59's acceptance tests (`tests/acceptance/W2-59`, revised in `6e95cd41`): 55 passed (the nine cases of a
-  worker's inherited `PYTHONPATH`, red at `6e95cd41` by the lead's record, now pass).
+- W2-59's acceptance tests (`tests/acceptance/W2-59`, revised in `6e0bf627`): 55 passed (the nine cases of a
+  worker's inherited `PYTHONPATH`, red at `6e0bf627` by the lead's record, now pass).
 - W1-38's acceptance tests (the hook-source tests): 201 passed.
 - Builder tests: the three files above and `tests/unit/validate/test_canary.py`: 16 passed.
