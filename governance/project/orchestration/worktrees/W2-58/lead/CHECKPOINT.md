@@ -28,3 +28,13 @@
   - The sandbox side of (c)/(d): Read deny rules binding the file tools but not the OS sandbox's reads.
   - `gov.secrets.indexable` widening (revised plan) not in the ticket: residual.
 - Guard read refusals met by the lead so far: 0.
+
+## Run 2 (resume after P-W2-58-1; DEC-873 decided (a))
+
+- Start: head 58f0d809, tree clean, identity orchestrator/DAEO-5j8b.
+- Step 1 merge done: eb0f1454 (`--no-ff`, parents 58f0d809 + 0cbe240a; trailers Task: DAEO-5j8b, Implements: DEC-821, Role: orchestrator, Co-Authored-By). One conflict, governance/project/path-map.yaml, resolved keeping both (integrate's two DEC-871 load_sensitive entries, then the evaluation_sets block). Checked: the incoming W1-49 and W2-62 acceptance files, the ticket file and the register equal w2/integrate's; ticket src/tests untouched.
+  - Lesson: a first `git merge --no-commit` had its incoming acceptance-test files restored from HEAD by containment (orchestrator may not write tests/acceptance in the working tree). Aborted (`git merge --abort`, nothing lost) and redid merge+resolve+commit in one Bash command; containment then judged the merge commit's own change (path map only) and passed.
+  - Containment flagged, left in place, two incoming `Role: owner; Task: decision-record` commits (a7992a1e, 8dfd54e9: register, path map) as "a Role: owner commit made during an agent's call" — the orchestrator's earlier records; report as discovery.
+- TD-5 (briefs/td-2.md, log/td-5.json, session 3bfbec7f, launched with this worktree's launcher): STOPPED_SANDBOX at step 0 (b): `git update-index --refresh` exit 1, 14 changed files denied by the session's own `<path>*` read denials (P-W2-58-1 reproduced: cannot import gov.launch.launcher; phantom ` M`). Check (a) passed. Tripwire 8: no change. Twelve fields present. Proposed P-W2-58-2 (relaunch without (c)/(d) Read rules).
+- Lead reading (not a new decision; DEC-873 item 2 + DEC-822): relaunch through the pinned release's `gov launch` (bare `/home/usain/.local/bin/gov`, pin fecb870c, `env -u PYTHONPATH`): its launcher has the held-out Read rules and no (c)/(d) rules; differs from integrate's only by W2-50's ~/gov-os-runs folder. The session's guard hook runs this worktree's src (`.claude/settings.json`: PYTHONPATH=$CLAUDE_PROJECT_DIR/src), so (c)/(d) stay enforced by the guard. Same for the engineer until its fix lands.
+- NEXT: TD-6 (briefs/td-2b.md, log/td-6.json, tripwire-before-9), pinned gov launch, effort high.

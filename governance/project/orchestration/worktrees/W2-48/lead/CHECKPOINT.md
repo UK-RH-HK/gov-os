@@ -14,3 +14,7 @@
 - Merge 9657051f (w2/integrate 872874e6 in, DEC-750 form). W2-53 now closed. integrate head f5738e5a (DAEO-0rfi checkpoint): merge again before verification.
 - Containment flagged 8dfd54e9 (owner Role: owner commit, DEC-871) brought in by my merge: not ours.
 - Next: eng-1 launched (briefs/eng-1.md, log/eng-1.json, tripwire-before-2.json).
+
+- eng-1 DONE (session 71bddafd-ad32-4511-bab8-f543100b177d, sandboxed, high): commits 1df8233b, 635b690f (trailers ok). 32/46 pass; 12 held by P-4; 1 by P-A (timed figure); 1 P-C test defect (confirmed by lead: planted "ok\nok again" makes the fixture tool exit 1). unit 2387p/1s; W2-01 88p; W2-53 57p; W1-07 223p; W1-32 81p; collection ok. 1680 LOC added. Tripwire 2: W2-48 head only here; other trees changed by their own leads / W2-53 close.
+- Merge f233b944 (integrate 0cbe240a), clean.
+- Now: rebuild-1 (log/rebuild-1.*), then gov check, W2-48 suite, unit, timed uncached+cached runs (store in .gov-runtime/scratch/lead/testcache-store).
