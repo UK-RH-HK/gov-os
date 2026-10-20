@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.252 (the version table at the end of each section gives the history)
+**Version:** 0.253 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9390,5 +9390,21 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.252 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-861 (the orchestrator commits the records of the owner's decisions, `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, <date>)`; the owner's push is the acceptance; the digest lists every record since the last push; P-W2-51 for the two close checks that read `Role: owner`), DEC-862 (P-W2-51: (a) now, ratchet entries and escalation lifts stay the owner's commits; (b) in W2-12, the push as the acceptance; (c) never). Next free id: DEC-863. |
+
+---
+
+## 253. A delegated decision of 2026-10-20 on W2-62's integration (register v0.253, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-863 — W2-62's two integration packages, both (a): the checkpoint skill's copies brought to the template, and the roster names the prompt in force (P-W2-62-1, P-W2-62-2; delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, DEC-837, DEC-616 (the precedent `a8cf8867`), DEC-754 (integration-side edits) · **Basis:** W2-62's lead returned PACKAGES (run 1, `log/W2-62-A5-run1.json`) with its work green and its review passed: the checkpoint skill's template was changed (DEC-837 item 2) while its copies `.rulesync/skills/checkpoint/SKILL.md`, `template/.rulesync/skills/checkpoint/SKILL.md` and the generated `.claude/skills/checkpoint/SKILL.md` lie outside the ticket's paths, so W1-38 (36 reds), W1-30 (2) and `gov check`'s adapter portability went red; and the hook reads the prompt in force from `governance/project/roster.yaml`, which has no such key. P2, reversible, the lead's recommendation and the orchestrator's agree, confidence high; nothing in the Charter, the master rules, the Contract or the guard changes.
+- **Decision:**
+  1. **P-W2-62-2 (a):** after W2-62's merge (`6e4b2750`), the orchestrator copies the template skill byte for byte into both rulesync sources and regenerates the Claude copy with `rulesync generate --targets claudecode --features skills` (a dry run first showed that it writes only `.claude/skills/checkpoint/SKILL.md`; `--check` then passed). A file mode rulesync changed on `.claude/skills/systematic-debugging/find-polluter.sh` was restored, not committed.
+  2. **P-W2-62-1 (a):** `governance/project/roster.yaml` gains `roles.orchestrator.prompt: governance/project/prompts/w2-orchestrator.md`; the hook now names it (checked by running the hook once).
+  3. **The lesson goes to W2-11's card** (a skill edit lists its rulesync and generated copies in the ticket's paths) as row W2-L363.
+- Next free id: DEC-864.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.253 | 2026-10-20 | Delegated: DEC-863 (W2-62's integration: the checkpoint skill's copies brought to the template and regenerated; the roster names the prompt in force; row W2-L363). Next free id: DEC-864. |
 
 ---
