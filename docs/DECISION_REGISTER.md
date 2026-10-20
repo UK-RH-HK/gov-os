@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.259 (the version table at the end of each section gives the history)
+**Version:** 0.260 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9516,5 +9516,21 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.259 | 2026-10-20 | Owner: DEC-871 (P-W2-55 (a): three close-queue checkpoint commits accepted history; W1-38's two rulesync-probe cases load-sensitive until W2-57). Next free id: DEC-872. |
+
+---
+
+## 260. A delegated decision of 2026-10-20 after W2-53's close (register v0.260, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-872 — W2-02 resumes now with its original scope, since every close needs its close-record type; the plan's widening of W2-02 becomes W2-64 (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, DEC-831 (the plan's widening of W2-02), DEC-844, DEC-847, DEC-868, DEC-869 · **Basis:** W2-53 closed through `gov close` at 15:53 (exit 0; `a1565e56`), the first clean close of Wave 2. Its record `docs/close/DAEO-7rr2/CL-DAEO-7rr2.md` has `type: close`, which `core-schema` (hard-block) does not know on `w2/integrate` ("unknown record type 'close'"); W2-02's branch defines it (`template/governance/kernel/schemas/close.schema.json`). W2-54's close stopped at the pre-close gate (`gov check` exit 3) for that reason. P2, reversible, nothing in the Charter, the master rules, the Contract or the guard changes.
+- **Decision:**
+  1. **W2-02 resumes now** (run 4) with its original scope: the merge-back (the `STANDALONE_TYPES` line resolved to W2-02's), the close type checked against the real close record, a full re-verification with `core-schema` GREEN, and a fresh probe. Every close after W2-53 waits for its merge.
+  2. **The plan's widening of W2-02** (the full validator through check-jsonschema, lens G's planted ticket as a case; DEC-844's `docs/imported/` out of the schema check) **moves to a new ticket, W2-64**, on the same paths after W2-02 merges, so that the close queue does not wait a further day for it.
+  3. W2-48 keeps its slot ahead (DEC-869); W2-02 takes a further one, as a lead on the close path (DEC-847: four leads in flight).
+- Next free id: DEC-873.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.260 | 2026-10-20 | Delegated: DEC-872 (W2-02 resumes now with its original scope, the close-record type on every close's path; the plan's widening of W2-02 moves to W2-64). Next free id: DEC-873. |
 
 ---

@@ -928,6 +928,15 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - The same split for EXAMIN's set (DEC-828 item 3), written before W2-27; EXP-003's gold answers (W2-15a, W2-15b) split the same way.
 - **KPIs, failure:** a measured role cannot read the hidden half by any route an honest agent takes; the script never prints a hidden answer; a figure is never reported without the other.
 
+#### W2-64 W2-02's widening: the record validator through check-jsonschema; `docs/imported/` out of the schema check (STANDARD, engineer; DEC-831, DEC-844, DEC-872; keystone 4, order 1)
+- **Why:** the accepted plan widened W2-02 (§5 and §4.4 order 1; lens G R2 (a), F2: the 169-line subset validator passes what the schemas refuse, which fails open). DEC-872 moved the widening out of W2-02's resume, so that W2-02's close-record type reaches every close sooner. Ticket file at its start.
+- **Starts** after W2-02 merges (it holds the same paths: `template/governance/kernel/schemas/**`, `src/gov/check/schema.py`, `tests/unit/check/test_schema*`).
+- **KPIs, success:**
+  - `core-schema` validates every record against its schema through check-jsonschema (pinned in the tool registry), not a subset; lens G's planted ticket (a field the schema refuses that the subset passed) is refused [lens G R2 (a), F2].
+  - `docs/imported/` is left out of the schema check, as history (DEC-844), and the check says so by name.
+  - Every record on `w2/integrate` today, the close records of `docs/close/` included, still validates.
+- **KPIs, failure:** a record that its schema refuses fails `core-schema`, naming the record and the rule; check-jsonschema missing or failing to run is RED, never green.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
