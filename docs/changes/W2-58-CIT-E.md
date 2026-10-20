@@ -82,7 +82,13 @@ Every run in this worktree with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-58/s
 | `W1-05` | `d545c34b` | 98 passed, 1 failed (the switch-over record runs W1-02 with `-x` and meets §5 item 1) |
 | `W1-50` | `d545c34b` | 683 passed, 2 failed (`freeze_launcher`, `freeze_live_pause`: live sessions, `api.anthropic.com` denied) |
 | `W2-50` (by file) | `05401735`, `d545c34b` | all files green: 1, 72, 32, 82, 25, 18, 88, 6, 167, 15, 54, 23, 53 passed |
-| `tests/unit/guard`, `tests/unit/launch` | final | 979, 138 passed |
+| `tests/unit/guard`, `tests/unit/launch` | `d545c34b` | 979, 138 passed |
+| `tests/acceptance/W2-58` | `af5d1a25` (DEC-873) | 571 passed, 2 failed, 3 errors: all five in `test_w2_58_launched_sessions.py`, live sessions, `api.anthropic.com` refused by the engineer's sandbox (§5 item 3) |
+| `tests/unit/launch`, `tests/unit/guard` | `af5d1a25` | 1116 passed |
+| `W1-46` | `af5d1a25` | 457 passed, 36 errors (`test_w1_46_live_sessions.py`: live sessions, network refused, as at `31ed6074`) |
+| `W1-32` | `af5d1a25` | 81 passed |
+| `W2-50` (by file) | `af5d1a25` | 636 passed, all files green |
+| `gov.check.pathmap`, `gov.check.schema` | `af5d1a25` | pathmap green; schema one finding, `SCHEMA_UNKNOWN_TYPE` in `docs/close/DAEO-7rr2/CL-DAEO-7rr2.md` (W2-53's close record, on `w2/integrate`, check code unchanged by this ticket) |
 
 `python3 -m gov.guard.hooks` loaded after every guard edit.
 
