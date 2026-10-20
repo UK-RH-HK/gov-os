@@ -359,8 +359,17 @@ def test_the_daily_shell_forms_stay_allowed(world, form, who):
                                   "no-path-and-a-glob-a-source-folder",
                                   "no-path-a-type-filter-and-a-glob-by-an-extension-at-any-depth"))
 def test_the_daily_search_tool_forms_stay_allowed_for_every_role(world, form, who):
+    """Rewritten by W2-58 for the engineer (DEC-821 item 1, brief item 3, TD-5): from the root, a glob by an extension
+    (``*.py``, ``**/*.py``) takes in its own ticket's existing acceptance test (``tests/acceptance/W1-90/``): refused
+    for (c), with a reason. A source folder keeps it out: allowed. Every other role: allowed, as before."""
     result = rnd.ask_form(world, DAILY_TOOL[form], ROOT, who)
-    protected.assert_allowed(result, f"a search tool call with {form} by '{who}'")
+    what = f"a search tool call with {form} by '{who}'"
+    if who == folders.NOT_A_WRITER and form in ("the-root-as-path-and-a-glob-by-an-extension",
+                                                "no-path-a-type-filter-and-a-glob-by-an-extension-at-any-depth"):
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+        assert protected.reason_of(result).strip(), f"{what} was refused without a reason"
+        return
+    protected.assert_allowed(result, what)
 
 
 def _neutral_starts(world):
