@@ -1,11 +1,7 @@
-# W2-54 (DAEO-0rfi) lead checkpoint — run 5 (DEC-874): correction after the merge
+# W2-54 (DAEO-0rfi) lead checkpoint — run 5 (DEC-874): DONE, ready for the merge
 
-- Run 4c merged into `w2/integrate` (`6f7d4f9e`). Run 5 started at `226ec458`.
-- Step 1 done: `de42a87d` merge of `w2/integrate` (`a2e7b691`) --no-ff, Task/Implements DEC-773/Role orchestrator.
-- Step 2: test designer td6 (brief `briefs/td6.md`, gov launch sandboxed, --effort high) revises the three acceptance cases (judge W2-54's own non-merge `Task: DAEO-0rfi` commits via git, on HEAD and on `4ce16df2`). Tripwire 11.
-- td6 returned DONE-with-packages (14884e7b-5fd9-499f-9cc9-acf07e39ece4), commit `49f1f81e`; tripwire 11: own head+W2-54 acceptance folder; other trees W2-58, W2-59 changed by their own leads. Reds: core-schema-green-here (W2-53 close record, known until W2-02) and time-limit-here (store predates merge).
-- Next: step 3 engineer eng8 for `tests/unit/check/test_schema_audit_report.py::test_the_other_types_of_w2_02_stay_unknown`; step 4 verify (rebuild, suites, unit, gov check, collect-only); step 5 FULL probe rv2 (--effort max); step 6 DONE.
-- Loop count: 0.
-- eng8 DONE (cf375c20-03b8-446b-8581-07b1bb46be39), commit `40909d21`; tripwire 12: own head only; W2-59 changed by its lead.
-- Verification run_v6.sh running (logs v6-*). rebuild13 exit 0 (489 s). gov check exit 3: RED core-schema (W2-53 close record, known), RED secrets-indexing (codeintel code.db; NOT W2-54: none of its 40 own commits' added lines nor the merge's 212 code files trip the rules; first full scan since W2-50's merge); YELLOW core-decision-citations, openspec-validate; context-reproducibility GREEN.
-- Next after v6: fill probe brief rv2 placeholders, gov checkpoint commit, launch rv2 (--effort max).
+- Branch `w2/W2-54`, head `49f749f0` (probe record), probed head `ed2037fd` (CP-DAEO-0rfi-0034). Clean but for sandbox placeholders.
+- Run 5 commits: `de42a87d` merge of `w2/integrate` (`a2e7b691`), --no-ff (orchestrator); `49f1f81e` test designer td6 (14884e7b-5fd9-499f-9cc9-acf07e39ece4, sandboxed, Rewrite-Reason DEC-874); `40909d21` engineer eng8 (cf375c20-03b8-446b-8581-07b1bb46be39, sandboxed, Rewrite-Reason DEC-874); `0ccafe25` CP-0031 (orchestrator); `92ba6f02` test designer td7 (4aff6f98-dca6-4884-826d-ab2b54a8788a, sandboxed, Rewrite-Reason DEC-874; second batch after rv2's F1); `ed2037fd` CP-0034 (orchestrator); `49f749f0` probe record `docs/probes/DAEO-0rfi/PR-DAEO-0rfi-run5.md` (orchestrator).
+- Reviews: rv2 0f50d90c-c613-4241-8e21-a5c7f594e5bb (pass, F1 taken into td7; draft probes/rv2-draft-0ccafe25.md); rv3 4a232e30-2b53-42df-b683-5b231525a33f (second and last, pass, rows R1-R5).
+- Verification: rebuild13 exit 0 (489 s); gov check exit 3: RED core-schema (W2-53 close record, known until W2-02), RED secrets-indexing (code.db raw bytes, not W2-54), YELLOW core-decision-citations, openspec-validate. All acceptance suites green but W1-42's 2 accepted reds; W1-25/W1-46 load/fixture errors pass alone. W2-54 at 92ba6f02: 95 passed, 2 known core-schema reds. 4 DEC-874 cases 25 passed on HEAD and 4ce16df2. tests/unit 2375 passed, 1 skipped. Collection 14697/14699, no error.
+- Next: the orchestrator merges W2-54; W2-02 re-merges w2/integrate (DEC-874 item 3).

@@ -1,0 +1,207 @@
+...............................................F.F.FF....                [100%]
+=================================== FAILURES ===================================
+_ test_a_reopened_ticket_whose_first_round_was_merged_back_is_judged_by_the_final_probed_code[brings the final probed code] _
+
+final = 'brings the final probed code'
+project = <w2_01_support.Project object at 0x75355a8568d0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_a_reopened_ticket...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_a_reopened_ticket_whose_f0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("final", FINAL_MERGE_BACKS)
+    def test_a_reopened_ticket_whose_first_round_was_merged_back_is_judged_by_the_final_probed_code(
+            final, project, sandbox, interface):
+        support.create_ticket(project, TICKET, WBS, profile="FULL")
+        project.checkout(BRANCH, create=True)
+        first = support.engineer_commit(project, TICKET, {FEATURE: ROUND_ONE})
+        support.probe_recorded(project, TICKET, first, name=f"PR-{TICKET}-round-1")
+        project.checkout("main")
+        first_back = project.merge(BRANCH, MERGE_TRAILERS, message="merge the ticket's branch, round one")
+    
+        project.checkout(BRANCH)
+        probed = support.engineer_commit(project, TICKET, {FEATURE: ROUND_TWO}, message="round two")
+        project.checkout("main")
+        edit = {FEATURE: ROUND_ONE} if final == FINAL_MERGE_BACKS[1] else None
+        final_back = project.merge(BRANCH, MERGE_TRAILERS, edit=edit, message="merge the ticket's branch, round two")
+        support.probe_recorded(project, TICKET, probed)
+        support.checkpointed(project, TICKET)
+        assert support.holds(project, first, first_back) and not support.holds(project, probed, first_back), \
+            "the fixture is wrong: round one's merge-back does not hold round one's probe alone"
+        assert support.holds(project, first, probed), "the fixture is wrong: round two does not follow round one"
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        if final == FINAL_MERGE_BACKS[0]:
+            assert support.content_at(project, "HEAD", FEATURE) == support.content_at(project, probed, FEATURE), \
+                "the fixture is wrong: the closed head does not hold the final probed code"
+            assert not support.probe_statements(run.envelope().get("error") or {}), \
+                f"the probe gate refuses the reopened ticket: round one's merge-back {first_back[:12]} is judged " \
+                f"against the final probed commit {probed[:12]}\n{run.describe()}"
+>           support.closed(run, interface)
+
+tests/acceptance/W2-53/test_w2_53_reopened.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-ropn', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-r186"}}}\n', stderr='', seconds=2.748001207015477)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-ropn --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.25, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.68, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T204229Z-e3208657", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_a_reopened_ticket_whose_f0/project/.gov-runtime/testcache/shared", "from": null, "commit": "f305b22abc8f3995a56341234a0d34881dd8acf2", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-ropn/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-r186"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_an_orchestrators_integration_side_edit_of_the_ticket_file_on_the_branch_closes _
+
+project = <w2_01_support.Project object at 0x75355a8557f0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_orchestrators_...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_orchestrators_integrat0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_an_orchestrators_integration_side_edit_of_the_ticket_file_on_the_branch_closes(project, sandbox, interface):
+        probed = _probed(project)
+        edit = _edit(project, support.trailers_of(TICKET, role="orchestrator"), support.ORCHESTRATOR)
+        _merged_back_and_recorded(project, probed)
+        assert _changed_by(project, edit) == [TICKET_FILE], "the fixture is wrong: the edit changes more"
+        assert not support.base.judged_by_w1_50(project, sandbox, [edit]), \
+            "the fixture is wrong: W1-50's judgement has a finding for the edit"
+    
+>       _closes(project, sandbox, interface, edit)
+
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:69: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-tkfl', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-5giu"}}}\n', stderr='', seconds=8.168009529006667)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-tkfl --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 3.12, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 2.24, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T204236Z-2cb914b4", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_orchestrators_integrat0/project/.gov-runtime/testcache/shared", "from": null, "commit": "c0fac6e3fa17506f9fc2ebaa505008c64b2403a2", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-tkfl/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-5giu"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_an_integration_side_edit_made_on_main_and_carried_in_by_the_merges_closes[merged back only] _
+
+layout = 'merged back only'
+project = <w2_01_support.Project object at 0x75355a8d7a40>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_si...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_side_edit_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("layout", LAYOUTS)
+    def test_an_integration_side_edit_made_on_main_and_carried_in_by_the_merges_closes(layout, project, sandbox,
+                                                                                      interface):
+        """The orchestrator's edit lies on ``main``: the merge-back (and, before it, the inward merge) carry it in."""
+        probed = _probed(project)
+        project.checkout("main")
+        edit = _edit(project, support.trailers_of(TICKET, role="orchestrator"), support.ORCHESTRATOR)
+        if layout == LAYOUTS[1]:
+            project.checkout(BRANCH)
+            inward = project.merge("main", MERGE_TRAILERS, message="merge the integration branch into the branch")
+            assert support.content_at(project, inward, TICKET_FILE) == support.content_at(project, edit, TICKET_FILE)
+        _merged_back_and_recorded(project, probed)
+        assert support.content_at(project, "HEAD", TICKET_FILE) == support.content_at(project, edit, TICKET_FILE), \
+            "the fixture is wrong: the closed head does not hold the edit"
+    
+>       _closes(project, sandbox, interface, edit)
+
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:69: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-tkfl', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-yxwt"}}}\n', stderr='', seconds=3.4914799840189517)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-tkfl --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.4, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.67, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T204256Z-f944142c", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_side_edit_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "4605af20445220f0f23ece52d7e7ba34caa57962", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-tkfl/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-yxwt"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_an_integration_side_edit_made_on_main_and_carried_in_by_the_merges_closes[merged in, then back] _
+
+layout = 'merged in, then back'
+project = <w2_01_support.Project object at 0x75355a8d74a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_si...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_side_edit_1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("layout", LAYOUTS)
+    def test_an_integration_side_edit_made_on_main_and_carried_in_by_the_merges_closes(layout, project, sandbox,
+                                                                                      interface):
+        """The orchestrator's edit lies on ``main``: the merge-back (and, before it, the inward merge) carry it in."""
+        probed = _probed(project)
+        project.checkout("main")
+        edit = _edit(project, support.trailers_of(TICKET, role="orchestrator"), support.ORCHESTRATOR)
+        if layout == LAYOUTS[1]:
+            project.checkout(BRANCH)
+            inward = project.merge("main", MERGE_TRAILERS, message="merge the integration branch into the branch")
+            assert support.content_at(project, inward, TICKET_FILE) == support.content_at(project, edit, TICKET_FILE)
+        _merged_back_and_recorded(project, probed)
+        assert support.content_at(project, "HEAD", TICKET_FILE) == support.content_at(project, edit, TICKET_FILE), \
+            "the fixture is wrong: the closed head does not hold the edit"
+    
+>       _closes(project, sandbox, interface, edit)
+
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-53/test_w2_53_ticket_file_edits.py:69: in _closes
+    support.closed(run, interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-tkfl', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-pjva"}}}\n', stderr='', seconds=4.648677691002376)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-tkfl --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.61, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.71, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T204300Z-365174b9", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-46/test_an_integration_side_edit_1/project/.gov-runtime/testcache/shared", "from": null, "commit": "d59930a3fbf90f4c05ecf57f3a84e6d903dfde90", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-tkfl/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-pjva"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+4 failed, 53 passed in 221.62s (0:03:41)

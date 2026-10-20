@@ -1,0 +1,30 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0
+rootdir: /home/usain/gov-os-worktrees/W2-54
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.13.0, xdist-3.8.0, testmon-2.2.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 4 items
+
+tests/acceptance/W2-54/test_w2_54_green_here.py ..F.                     [100%]
+
+=================================== FAILURES ===================================
+_________________ test_gov_check_gives_core_schema_green_here __________________
+
+gov_check_here = (<w2_54_support.Run object at 0x70fa755a91c0>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '40909d21b805ce527402fabf1129573fcbc55164', 'inputs_hash': '7df43044211c1edd'}, ...}, ...})
+
+    def test_gov_check_gives_core_schema_green_here(gov_check_here):
+        """*Red.* Core-schema, in ``gov check --json`` on this repository, is GREEN."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CORE_SCHEMA_ID)
+        assert entry is not None, f"gov check lists no {S.CORE_SCHEMA_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CORE_SCHEMA_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: core-schema is RED here: [{"code": "SCHEMA_UNKNOWN_TYPE", "message": "docs/close/DAEO-7rr2/CL-DAEO-7rr2.md: unknown record type 'close'", "path": "docs/close/DAEO-7rr2/CL-DAEO-7rr2.md", "type": "close"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:36: AssertionError
+=================== 1 failed, 3 passed in 379.05s (0:06:19) ====================

@@ -38,7 +38,7 @@
 - **Closed by gov close:** W2-53 (15:53, outputs `a1565e56`). Close success 1 of 8 runs.
 - **Merged, not closed:** W2-54, W2-62, W2-63, W2-50. core-schema RED on W2-53's close record until W2-02 merges
   (DEC-872). context-reproducibility RED only while the store lacks DEC-873 (next rebuild).
-- **In flight (4):** W2-58 run 2 (DEC-873, `log/W2-58-A5-run2.json`); W2-48 run 2 (DEC-876,
+- **In flight (4: W2-58, W2-48, W2-59, W2-02):** W2-58 run 2 (DEC-873, `log/W2-58-A5-run2.json`); W2-48 run 2 (DEC-876,
   `log/W2-48-A5-run2.json`); W2-54 run 5 (DEC-874: fix the 4 cases contradicting W2-02's types;
   `log/W2-54-A5-run5.json`); W2-59 run 3 (DEC-877, 20:40, `log/W2-59-A5-run3.json`; last run: merge-back with
   trailers, CIT-P ids, verify, 2nd/last CIT-P review).
@@ -46,6 +46,14 @@
   merge `e48a601d` trailered. Old kept as `w2/W2-59-old`: delete after run 3 verifies. After W2-59 merges the
   owner re-pins at the merge commit, then regenerates settings from `.rulesync/hooks.jsonc` (ping ACT then).
 - **W2-02 waiting:** after W2-54 run 5 merges, W2-02 run 5 (re-merge, re-verify, probe, merge).
+- **W2-54 run 5 DONE (last review passed), MERGED `6855cdf3` (21:1x).** W2-02 run 5 launched behind the load gate
+  (`briefs/W2-02-A5-run5.md`, `log/W2-02-A5-run5.json`). Rows W2-M395/396, W2-L382..385 added.
+- **secrets-indexing false positive (row W2-M395):** the check scans SQLite raw bytes as one text; in W2-54's store
+  a record's `properties` length byte + row id 27437's two bytes + `codeFunction…` spell a gov-token-lower match
+  (located by `scratchpad/exact_hit.py`, no content printed). Row ids change per rebuild: any rebuild may turn it
+  RED by chance. Main store clean today (0 hits). If the queue's rebuild hits it, gate (b) stops the queue (not a
+  refusal): bring a P1 package (options: W2-45's per-value scan now as a small ticket; or an owner call), never
+  rebuild-until-green.
 - **`.git/config.lock`** zero-byte read-only placeholder (16:06, likely a sandboxed worker): recheck, leave alone.
 
 ### Next
@@ -56,7 +64,7 @@
    sync, remove worktree + branch. Refused -> ping P1 (new or seen cause).
 3. Later: W2-64 (W2-02's widening); re-measure a lead rebuild, raise parallelism; daily digest (records since last
    push, usage, refusal counts, memory-use counts).
-4. Before each start: WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-65; rows W2-H063, W2-M395, W2-L382.
+4. Before each start: WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-65; rows W2-H063, W2-M397, W2-L386.
    Briefs: `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Standing rules (short; the prompt holds the full text)

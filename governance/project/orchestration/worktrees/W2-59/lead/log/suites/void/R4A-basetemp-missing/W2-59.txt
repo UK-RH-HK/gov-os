@@ -1,0 +1,1381 @@
+..EE........EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE                  [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_the_installed_check_does_not_fail_for_want_of_its_baseline _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_installed_check_does_not_fail_for_want_of_its_baseline>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_installed_check_reads_its_thresholds_from_the_installed_package _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_installed_check_reads_its_thresholds_from_the_installed_package>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUseFailure[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUseFailure[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[preCompact[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[preCompact[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[sessionStart[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[sessionStart[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[stop[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[stop[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_starts_its_program_with_the_pin_s_interpreter[subagentStop[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_starts_its_program_with_the_pin_s_interpreter[subagentStop[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUseFailure[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUseFailure[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preCompact[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preCompact[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[sessionStart[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[sessionStart[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[stop[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[stop[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_without_a_pin_the_pretooluse_line_blocks_the_call[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_without_a_pin_the_pretooluse_line_blocks_the_call[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUseFailure[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUseFailure[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_line_follows_the_owner_s_rollback_to_an_editable_install[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_line_follows_the_owner_s_rollback_to_an_editable_install[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-no-pythonpath]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_and_no_pin_the_guard_line_still_blocks[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_and_no_pin_the_guard_line_still_blocks[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_editable_install[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_editable_install[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUseFailure[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUseFailure[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[preCompact[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[preCompact[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[sessionStart[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[sessionStart[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[stop[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[stop[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[subagentStop[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[subagentStop[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_no_declared_check_imports_the_project_s_own_gov_package _
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-5bp99qt0'), wheel=PosixPath('/tmp/w259-pin-5bp99qt0/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-5bp99qt0/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-5bp99qt0/pin-markers'))
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8...e=<pluggy._tracing.TagTracerSub object at 0x76623e492f30>, _basetemp=None, _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def judged(stand_in, tmp_path_factory):
+        """The judge's answer in the decoy project and in the control project, each run once for the module."""
+        answers = {}
+        for name, with_tree in (("decoy", True), ("control", False)):
+>           base = tmp_path_factory.mktemp(f"judge-{name}")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:153: in getbasetemp
+    basetemp.mkdir(mode=0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_check_edited_in_the_tree_does_not_change_the_pinned_judge_s_verdict _
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-5bp99qt0'), wheel=PosixPath('/tmp/w259-pin-5bp99qt0/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-5bp99qt0/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-5bp99qt0/pin-markers'))
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8...e=<pluggy._tracing.TagTracerSub object at 0x76623e492f30>, _basetemp=None, _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def judged(stand_in, tmp_path_factory):
+        """The judge's answer in the decoy project and in the control project, each run once for the module."""
+        answers = {}
+        for name, with_tree in (("decoy", True), ("control", False)):
+>           base = tmp_path_factory.mktemp(f"judge-{name}")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:153: in getbasetemp
+    basetemp.mkdir(mode=0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_declared_python3_command_does_not_run_the_python3_first_on_path _
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-5bp99qt0'), wheel=PosixPath('/tmp/w259-pin-5bp99qt0/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-5bp99qt0/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-5bp99qt0/pin-markers'))
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8...e=<pluggy._tracing.TagTracerSub object at 0x76623e492f30>, _basetemp=None, _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def judged(stand_in, tmp_path_factory):
+        """The judge's answer in the decoy project and in the control project, each run once for the module."""
+        answers = {}
+        for name, with_tree in (("decoy", True), ("control", False)):
+>           base = tmp_path_factory.mktemp(f"judge-{name}")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:153: in getbasetemp
+    basetemp.mkdir(mode=0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_declared_gov_command_does_not_run_the_gov_first_on_path _
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-5bp99qt0'), wheel=PosixPath('/tmp/w259-pin-5bp99qt0/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-5bp99qt0/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-5bp99qt0/pin-markers'))
+tmp_path_factory = TempPathFactory(_given_basetemp=PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8...e=<pluggy._tracing.TagTracerSub object at 0x76623e492f30>, _basetemp=None, _retention_count=3, _retention_policy='all')
+
+    @pytest.fixture(scope="module")
+    def judged(stand_in, tmp_path_factory):
+        """The judge's answer in the decoy project and in the control project, each run once for the module."""
+        answers = {}
+        for name, with_tree in (("decoy", True), ("control", False)):
+>           base = tmp_path_factory.mktemp(f"judge-{name}")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:131: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:112: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+../../.local/lib/python3.12/site-packages/_pytest/tmpdir.py:153: in getbasetemp
+    basetemp.mkdir(mode=0o700)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[installed] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[installed]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[template] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[template]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_a_gov_package_at_the_project_s_root_is_not_imported_by_the_checks _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_a_gov_package_at_the_project_s_root_is_not_imported_by_the_checks>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_doctor_reads_the_canary_declarations_of_the_project_under_check[installed] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_doctor_reads_the_canary_declarations_of_the_project_under_check[installed]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_doctor_reads_the_canary_declarations_of_the_project_under_check[template] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_doctor_reads_the_canary_declarations_of_the_project_under_check[template]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_doctor_does_not_fall_back_to_the_install_path_when_the_project_declares_no_canary _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_doctor_does_not_fall_back_to_the_install_path_when_the_project_declares_no_canary>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[adopted] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[adopted]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[this-repository] _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[this-repository]>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_from_this_worktree_s_code_outside_any_project_it_names_the_version_and_head _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_from_this_worktree_s_code_outside_any_project_it_names_the_version_and_head>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_inside_another_git_repository_it_names_the_code_s_commit_not_that_repository_s _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_inside_another_git_repository_it_names_the_code_s_commit_not_that_repository_s>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+_ ERROR at setup of test_the_installed_pin_names_its_version_and_never_a_wrong_commit _
+
+fixturedef = <FixtureDef argname='tmp_path' scope='function' baseid=''>
+request = <SubRequest 'tmp_path' for <Function test_the_installed_pin_names_its_version_and_never_a_wrong_commit>>
+
+    @pytest.hookimpl(wrapper=True)
+    def pytest_fixture_setup(fixturedef: FixtureDef, request) -> object | None:
+        asyncio_mode = _get_asyncio_mode(request.config)
+        if not _is_asyncio_fixture_function(fixturedef.func):
+            if asyncio_mode == Mode.STRICT:
+                # Ignore async fixtures without explicit asyncio mark in strict mode
+                # This applies to pytest_trio fixtures, for example
+>               return (yield)
+                        ^^^^^
+
+../../.local/lib/python3.12/site-packages/pytest_asyncio/plugin.py:728: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = PosixPath('/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59')
+mode = 448, parents = False, exist_ok = False
+
+    def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+        """
+        Create a new directory at this given path.
+        """
+        try:
+>           os.mkdir(self, mode)
+E           FileNotFoundError: [Errno 2] No such file or directory: '/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5dfefd84-53c4-4217-85c8-20c830f827ec/scratchpad/bt/R4A-W2-59'
+
+/usr/lib/python3.12/pathlib.py:1313: FileNotFoundError
+10 passed, 45 errors in 6.34s

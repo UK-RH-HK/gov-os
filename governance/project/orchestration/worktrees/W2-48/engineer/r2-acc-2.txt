@@ -1,0 +1,49 @@
+....F........                                                            [100%]
+=================================== FAILURES ===================================
+_ test_a_run_outside_a_close_in_a_dirty_main_tree_writes_no_shared_entry_and_a_close_never_reads_it _
+
+project = <w2_01_support.Project object at 0x78617a49c590>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-10/test_a_run_outside_a_c...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-10/test_a_run_outside_a_close_in_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-10/test_a_run_outside_a_close_in_0/told')
+
+    def test_a_run_outside_a_close_in_a_dirty_main_tree_writes_no_shared_entry_and_a_close_never_reads_it(
+            project, sandbox, interface, told):
+        support.w253.create_ticket_named(project, TICKET_A, WBS_A, ["src/pkg/**"], TEST_A)
+        project.write("src/pkg/alpha.py", support.ALPHA_CHANGED)   # an uncommitted change: the main tree is dirty
+        shared_before = support.files_of(project.root / support.SHARED_REL)
+    
+        plain = support.lead_run(project.root, told, sandbox)
+        shared_after = support.files_of(project.root / support.SHARED_REL)
+        support.w201.engineer_commit(project, TICKET_A, {"src/pkg/alpha.py": support.ALPHA_CHANGED})
+        support.w201.checkpointed(project, TICKET_A)
+>       first = support.closed(project, sandbox, interface, told, TICKET_A)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/w2_48_support.py:788: in closed
+    w201.closed(run, interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-aaaa', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-dep4"}}}\n', stderr='', seconds=1.940587897959631)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-aaaa --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["ERROR gw1 - Different tests were collected between gw0 and gw1. The differenc..."], "tests_run": {"passed": 0, "failed": 0, "errors": 1, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.73, "passed": 0, "failed": 0, "errors": 1, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.73, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T200951Z-2046f81e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-10/test_a_run_outside_a_close_in_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "517f4cc93f5fc927b863c8eb5e5ca1d12e95ca1a", "clean": true, "wrote_entries": true, "keys": ["2bb0bfa2ec968bc62a9a48c5b78ae988"], "tests": [{"id": "gw1", "result": "error"}, {"id": "tests/unit/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/unit/test_beta.py::test_beta", "result": "passed"}], "counts": {"passed": 2, "failed": 0, "error": 1, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-dep4"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+1 failed, 12 passed in 67.49s (0:01:07)
