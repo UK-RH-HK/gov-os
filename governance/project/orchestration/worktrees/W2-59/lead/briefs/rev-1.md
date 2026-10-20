@@ -1,6 +1,6 @@
 # Brief: reviewer — W2-59 (DAEO-kh9l), the CIT-P's independent review (CAP-33), read-only
 
-You are a fresh reviewer. Ticket `DAEO-kh9l` (`W2-59`, "The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps"), profile STANDARD, is implemented in the worktree `/home/usain/gov-os-worktrees/W2-59` on branch `w2/W2-59`, at the head `<HEAD>`, and its acceptance tests pass. It is a judge change, so it needs one independent review of its change-impact proposal, `docs/changes/W2-59-CIT-P.md`, and of the final code, before the owner approves it (CAP-33). You probe that head for behaviour the tests miss. **You write nothing.** You wrote none of this code (DEC-137).
+You are a fresh reviewer. Ticket `DAEO-kh9l` (`W2-59`, "The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps"), profile STANDARD, is implemented in the worktree `/home/usain/gov-os-worktrees/W2-59` on branch `w2/W2-59`, at the head `9b9faac3ee45ba9160a110025d6a79cd305501e9`, and its acceptance tests pass. It is a judge change, so it needs one independent review of its change-impact proposal, `docs/changes/W2-59-CIT-P.md`, and of the final code, before the owner approves it (CAP-33). You probe that head for behaviour the tests miss. **You write nothing.** You wrote none of this code (DEC-137).
 
 Probe the final code for behaviour the tests miss: cases that could lose work, let a role write outside its scope, change acceptance tests, or make the guard fail open. Write nothing except the probe record the lead names. Return each finding as a described behaviour, with its severity.
 - Judge against ADR-0001's threat model (section 14): honest agent mistakes and plausible accidents in ordinary work, not deliberate adversaries. Ask of every finding, word for word: "Can an honest agent hit this in ordinary work?" and "Does it fail open or lose work?"
@@ -35,7 +35,7 @@ From brief A3 (reviewer), word for word:
 (b) `echo sandbox-trial | git hash-object -w --stdin` and `git update-index --refresh` must WORK.
 If (a) wrote the file or (b) failed, stop there and return, saying which.
 
-Then run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-kh9l`), `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-59` and `w2/W2-59`) and `git rev-parse HEAD` (expect `<HEAD>`). If anything differs, stop and say so.
+Then run `printenv GOV_ROLE GOV_TICKET` (expect `independent-auditor` and `DAEO-kh9l`), `git rev-parse --show-toplevel --abbrev-ref HEAD` (expect `/home/usain/gov-os-worktrees/W2-59` and `w2/W2-59`) and `git rev-parse HEAD` (expect `9b9faac3ee45ba9160a110025d6a79cd305501e9`). If anything differs, stop and say so.
 
 ## Standing rules (read first)
 

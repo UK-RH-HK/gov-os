@@ -1,1 +1,2 @@
-context-reproducibility: green
+ERROR: DAEO-5j8b: mandatory input 'DEC-873' not found in the store
+context-reproducibility: 0 ticket(s) failed, 1 error(s)

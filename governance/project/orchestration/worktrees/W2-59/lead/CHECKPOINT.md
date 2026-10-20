@@ -50,7 +50,15 @@
   another pytest; re-run alone with own --basetemp). R2E green (W1-30..W1-40).
 - R2F was stopped before it started (a close's quiet window began 12:12; script fixed to check both gates together);
   restarted, waiting. R2D/R2E's last suites ran into that window (runs already going).
-- After R2F: unit tests; W1-05 + W1-02 p95 alone; W1-25 alone; gov check again; then gov checkpoint, reviewer.
+- R2F: W1-41 242, W1-42 2 failed (accepted reds), W1-44 5, W1-45 105, W1-46 493, W1-47 983, W1-48 172,
+  W1-49 2 failed (retired-window tests; fixed on w2/integrate by W2-63), W1-50 685.
+- Unit 2377 passed 1 skipped. Alone: W1-05 switch-over 1 passed; W1-02 p95 5 passed; W1-25 52 passed (own basetemp);
+  W1-05 live-hook p95 4 failed 5 passed at load 16 (load-sensitive; second lone try at low load queued, run_after2.sh).
+- check-3 stopped by the 2 h background limit; check-4 (16:56-17:04, load 6.5): 19/23 GREEN, secrets-indexing GREEN;
+  RED adapter-portability, context-reproducibility (DEC-636, fixed upstream); YELLOW decision-citations, openspec.
+- Lead refusals run 2: 2 (a here-document; a $L write target), both redone in permitted forms. Read refusals 0.
+- Next: gov checkpoint + commit (the head to probe), then reviewer rev-1 (independent-auditor, effort max).
+- (old plan) After R2F: unit tests; W1-05 + W1-02 p95 alone; W1-25 alone; gov check again; then gov checkpoint, reviewer.
 
 ## Now: rebuild-3 then suites (batches A..E via run_suites.sh), unit, gov check. Code head cface154.
 

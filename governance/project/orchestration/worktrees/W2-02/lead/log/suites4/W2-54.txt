@@ -1,0 +1,81 @@
+.F.......FF............................................................. [ 76%]
+......................                                                   [100%]
+=================================== FAILURES ===================================
+___________ test_no_schema_file_of_w2_02_s_other_types_comes_with_it ___________
+
+    def test_no_schema_file_of_w2_02_s_other_types_comes_with_it():
+        """Nothing of W2-02's other types: no ``close`` or ``adoption-verdict`` schema file. Passes today."""
+        for folder in (S.SCHEMAS_REL, "governance/kernel/schemas"):
+            for name in S.W2_02_OTHER_SCHEMAS:
+>               assert not (S.REPO_ROOT / folder / name).exists(), f"{folder}/{name} is added"
+E               AssertionError: template/governance/kernel/schemas/close.schema.json is added
+E               assert not True
+E                +  where True = exists()
+E                +    where exists = ((PosixPath('/home/usain/gov-os-worktrees/W2-02') / 'template/governance/kernel/schemas') / 'close.schema.json').exists
+E                +      where PosixPath('/home/usain/gov-os-worktrees/W2-02') = S.REPO_ROOT
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:45: AssertionError
+________ test_w2_02_s_other_types_are_judged_as_an_unknown_type[close] _________
+
+box = <w2_54_support.Box object at 0x74b348020ec0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4715/test_w2_02_s_other_types_are_j0')
+kind = 'close'
+
+    @pytest.mark.parametrize("kind", ("close", "adoption-verdict"))
+    def test_w2_02_s_other_types_are_judged_as_an_unknown_type(box, tmp_path, kind):
+        """A record of type ``close`` or ``adoption-verdict`` gets the findings a record of a type core-schema
+        does not know gets today, no more and no fewer. Passes today."""
+        front = {"id": "REC-W254-1", "verdict": "accepted", "ticket": "DAEO-0000"}
+        files = {"docs/records/known.md": S.frontmatter({**front, "type": kind}),
+                 "docs/records/unknown.md": S.frontmatter({**front, "type": "w254-no-such-type"})}
+        project = S.schema_project(tmp_path / "p", files, require_audit=False)
+        done, findings = S.core_schema(box, project)
+    
+        def shape(rel, name):
+            return sorted((finding.get("code"), finding.get("field"), finding.get("type") == name,
+                           finding.get("message", "").replace(rel, "<path>").replace(name, "<type>"))
+                          for finding in S.of_path(findings, rel))
+    
+>       assert shape("docs/records/known.md", kind) == shape("docs/records/unknown.md", "w254-no-such-type"), \
+            f"a {kind} record is not judged as an unknown type:\n{findings}"
+E       AssertionError: a close record is not judged as an unknown type:
+E         [{'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/known.md', 'field': 'status', 'message': "docs/records/known.md: missing required field 'status'"}, {'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/known.md', 'field': 'state_class', 'message': "docs/records/known.md: missing required field 'state_class'"}, {'code': 'SCHEMA_UNREADABLE', 'path': 'docs/records/known.md', 'type': 'close', 'message': 'docs/records/known.md: unmeasured, the schema close.schema.json cannot be read'}, {'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/unknown.md', 'field': 'status', 'message': "docs/records/unknown.md: missing required field 'status'"}, {'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/unknown.md', 'field': 'state_class', 'message': "docs/records/unknown.md: missing required field 'state_class'"}, {'code': 'SCHEMA_UNKNOWN_TYPE', 'path': 'docs/records/unknown.md', 'type': 'w254-no-such-type', 'message': "docs/records/unknown.md: unknown record type 'w254-no-such-type'"}]
+E       assert [('SCHEMA_MIS...not be read')] == [('SCHEMA_MIS...pe '<type>'")]
+E         
+E         At index 2 diff: ('SCHEMA_UNREADABLE', None, True, '<path>: unmeasured, the schema <type>.schema.json cannot be read') != ('SCHEMA_UNKNOWN_TYPE', None, True, "<path>: unknown record type '<type>'")
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:98: AssertionError
+___ test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict] ___
+
+box = <w2_54_support.Box object at 0x74b348020ec0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4715/test_w2_02_s_other_types_are_j1')
+kind = 'adoption-verdict'
+
+    @pytest.mark.parametrize("kind", ("close", "adoption-verdict"))
+    def test_w2_02_s_other_types_are_judged_as_an_unknown_type(box, tmp_path, kind):
+        """A record of type ``close`` or ``adoption-verdict`` gets the findings a record of a type core-schema
+        does not know gets today, no more and no fewer. Passes today."""
+        front = {"id": "REC-W254-1", "verdict": "accepted", "ticket": "DAEO-0000"}
+        files = {"docs/records/known.md": S.frontmatter({**front, "type": kind}),
+                 "docs/records/unknown.md": S.frontmatter({**front, "type": "w254-no-such-type"})}
+        project = S.schema_project(tmp_path / "p", files, require_audit=False)
+        done, findings = S.core_schema(box, project)
+    
+        def shape(rel, name):
+            return sorted((finding.get("code"), finding.get("field"), finding.get("type") == name,
+                           finding.get("message", "").replace(rel, "<path>").replace(name, "<type>"))
+                          for finding in S.of_path(findings, rel))
+    
+>       assert shape("docs/records/known.md", kind) == shape("docs/records/unknown.md", "w254-no-such-type"), \
+            f"a {kind} record is not judged as an unknown type:\n{findings}"
+E       AssertionError: a adoption-verdict record is not judged as an unknown type:
+E         [{'code': 'SCHEMA_UNREADABLE', 'path': 'docs/records/known.md', 'type': 'adoption-verdict', 'message': 'docs/records/known.md: unmeasured, the schema adoption-verdict.schema.json cannot be read'}, {'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/unknown.md', 'field': 'status', 'message': "docs/records/unknown.md: missing required field 'status'"}, {'code': 'SCHEMA_MISSING_FIELD', 'path': 'docs/records/unknown.md', 'field': 'state_class', 'message': "docs/records/unknown.md: missing required field 'state_class'"}, {'code': 'SCHEMA_UNKNOWN_TYPE', 'path': 'docs/records/unknown.md', 'type': 'w254-no-such-type', 'message': "docs/records/unknown.md: unknown record type 'w254-no-such-type'"}]
+E       assert [('SCHEMA_UNR...not be read')] == [('SCHEMA_MIS...pe '<type>'")]
+E         
+E         At index 0 diff: ('SCHEMA_UNREADABLE', None, True, '<path>: unmeasured, the schema <type>.schema.json cannot be read') != ('SCHEMA_MISSING_FIELD', 'state_class', False, "<path>: missing required field 'state_class'")
+E         Right contains 2 more items, first extra item: ('SCHEMA_MISSING_FIELD', 'status', False, "<path>: missing required field 'status'")
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py:98: AssertionError
+3 failed, 91 passed, 2 deselected in 905.64s (0:15:05)
