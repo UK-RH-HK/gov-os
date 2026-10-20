@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-20 20:40 BST — Wave 2 by keystones; 4 leads in flight; next free DEC-878)
+## RESUME HERE (2026-10-20 20:40 BST — Wave 2 by keystones; 4 leads in flight; next free DEC-879)
 
 ### Standing owner rules (short; full text: register §248-§265, prompt v3.5; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -34,7 +34,7 @@
 ### Where things stand (20:40)
 - **Owner pushed through `8dfd54e9`.** Records since: DEC-872 `4b6e5766`; DEC-873 `19357fcb`,`6e125150`; DEC-874
   `5f346750`; DEC-875 `8542a970`,`e6976ef3`; DEC-876 `65039414`; registry (testmon, coverage, DEC-843) `b0756906`;
-  DEC-877 `97fc656a` (delegated).
+  DEC-877 `97fc656a` (delegated); DEC-878 (the progress line, owner) below.
 - **Closed by gov close:** W2-53 (15:53, outputs `a1565e56`). Close success 1 of 8 runs.
 - **Merged, not closed:** W2-54, W2-62, W2-63, W2-50. core-schema RED on W2-53's close record until W2-02 merges
   (DEC-872). context-reproducibility RED only while the store lacks DEC-873 (next rebuild).
@@ -60,7 +60,9 @@
    Briefs: `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Standing rules (short; the prompt holds the full text)
-- Report: countdown first, phone-readable, evidence, last line `OWNER_ACTION: <P1|P2|COMMIT|COMMIT-NEEDED|none>
+- Report: countdown first, its first line the progress line (DEC-878: tickets closed / merged-not-closed / built
+  and held / in flight / not started of 57, W2-00 apart, each in its first state, in flight before merged;
+  keystones done / in progress / ahead of 9), phone-readable, evidence, last line `OWNER_ACTION: <P1|P2|COMMIT|COMMIT-NEEDED|none>
   <ids> - <summary>`. Lead launch per prompt §4, gate in the same command, Bash background, timeout 7200000.
 - Commits: trailers Task/Implements/Role/Co-Authored-By; `-- <paths>`; merges `--no-ff`, tree == merge-tree.
 - Closes (DEC-780): quiet window; rebuild immediately before; fresh checkpoint; once only.

@@ -1,0 +1,727 @@
+/home/usain/gov-os-worktrees/W2-48/src/gov/__init__.py
+FFFFFFF........FFFFFF.........................F...F...                   [100%]
+=================================== FAILURES ===================================
+_ test_a_close_labels_each_unchanged_test_reused_in_its_close_record_with_the_run_and_commit_it_came_from _
+
+project = <w2_01_support.Project object at 0x7614a54c87d0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_labels_each_uncha0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_labels_each_uncha0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_labels_each_uncha0/told')
+
+    def test_a_close_labels_each_unchanged_test_reused_in_its_close_record_with_the_run_and_commit_it_came_from(
+            project, sandbox, interface, told):
+>       first, measured = _first_close(project, sandbox, interface, told)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:58: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_close.py:41: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 2.41, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.67, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_gov_close_no_cache_runs_every_test_and_its_close_record_says_it_was_uncached _
+
+project = <w2_01_support.Project object at 0x7614a56610d0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_gov_close_no_cache_runs_e0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_gov_close_no_cache_runs_e0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_gov_close_no_cache_runs_e0/told')
+
+    def test_gov_close_no_cache_runs_every_test_and_its_close_record_says_it_was_uncached(
+            project, sandbox, interface, told):
+>       _first_close(project, sandbox, interface, told)
+
+tests/acceptance/W2-48/test_w2_48_close.py:82: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_close.py:41: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.17, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.53, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_a_close_whose_shared_entries_cannot_be_read_runs_every_test_and_says_so _
+
+project = <w2_01_support.Project object at 0x7614a56618e0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_whose_shared_entr0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_whose_shared_entr0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_close_whose_shared_entr0/told')
+
+    def test_a_close_whose_shared_entries_cannot_be_read_runs_every_test_and_says_so(project, sandbox, interface, told):
+>       _first_close(project, sandbox, interface, told)
+
+tests/acceptance/W2-48/test_w2_48_close.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_close.py:41: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 2.33, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.1, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+___ test_a_test_that_failed_in_a_refused_close_runs_again_in_the_next_close ____
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_failed_in_a_r0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_failed_in_a_r0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_failed_in_a_r0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_failed_in_a_r0/told')
+
+    def test_a_test_that_failed_in_a_refused_close_runs_again_in_the_next_close(tmp_path, sandbox, interface, told):
+        project = support.governed_project(tmp_path / "flaky-project", told,
+                                           extra={"tests/unit/test_flaky.py": _flaky(told)})
+        support.ticket_ready(project, TICKET_A, WBS_A, TEST_A, {"src/example/feature.py": "# ticket A\n"},
+                             ["src/example/**"])
+    
+>       run, refused = support.close(project, sandbox, told, TICKET_A)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or...ted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "fp-1isz"}}}\n'
+stderr = '', returncode = 3
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 3
+E       stdout (end):
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/unit/test_flaky.py::test_flaky - AssertionError: a planted failu..."], "tests_run": {"passed": 2, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 3.55, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.41, "passed": 2, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "fp-1isz"}}}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_a_run_outside_a_close_in_a_dirty_main_tree_writes_no_shared_entry_and_a_close_never_reads_it _
+
+project = <w2_01_support.Project object at 0x7614a550b2c0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_run_outside_a_close_in_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_run_outside_a_close_in_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_run_outside_a_close_in_0/told')
+
+    def test_a_run_outside_a_close_in_a_dirty_main_tree_writes_no_shared_entry_and_a_close_never_reads_it(
+            project, sandbox, interface, told):
+        support.w253.create_ticket_named(project, TICKET_A, WBS_A, ["src/pkg/**"], TEST_A)
+        project.write("src/pkg/alpha.py", support.ALPHA_CHANGED)   # an uncommitted change: the main tree is dirty
+        shared_before = support.files_of(project.root / support.SHARED_REL)
+    
+        plain = support.lead_run(project.root, told, sandbox)
+        shared_after = support.files_of(project.root / support.SHARED_REL)
+        support.w201.engineer_commit(project, TICKET_A, {"src/pkg/alpha.py": support.ALPHA_CHANGED})
+        support.w201.checkpointed(project, TICKET_A)
+>       first = support.closed(project, sandbox, interface, told, TICKET_A)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:164: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.96, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.59, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_entries_of_a_close_whose_tree_holds_an_untracked_input_are_ignored_by_the_next_close _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_entries_of_a_close_whose_0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_entries_of_a_close_whose_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_entries_of_a_close_whose_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_entries_of_a_close_whose_0/told')
+
+    def test_entries_of_a_close_whose_tree_holds_an_untracked_input_are_ignored_by_the_next_close(
+            tmp_path, sandbox, interface, told):
+        extra = {
+            ".gitignore": support.GITIGNORE + "src/pkg/local_*.py\n",
+            "tests/unit/test_local.py": ("from pkg import local_settings\n\n\n"
+                                         "def test_local():\n    assert local_settings.LEVEL == 1\n"),
+        }
+        project = support.governed_project(tmp_path / "untracked-project", told, extra=extra)
+        project.write("src/pkg/local_settings.py", "LEVEL = 1\n")   # an input git ignores: in no commit
+        assert "local_settings" not in support.tree_status(project.root), "the fixture is wrong: the file is not ignored"
+        local_id = "tests/unit/test_local.py::test_local"
+    
+>       first, _ = _first_close(project, sandbox, interface, told)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_close.py:41: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.23, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.53, "passed": 3, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_the_cache_holds_in_the_closes_parallel_run_and_its_serial_only_run_afterwards _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_cache_holds_in_the_cl0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_cache_holds_in_the_cl0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_cache_holds_in_the_cl0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_cache_holds_in_the_cl0/told')
+
+    def test_the_cache_holds_in_the_closes_parallel_run_and_its_serial_only_run_afterwards(
+            tmp_path, sandbox, interface, told):
+        serial_a, serial_b = "tests/unit/test_serial_a.py::test_serial_a", "tests/unit/test_serial_b.py::test_serial_b"
+        extra = {
+            "tests/unit/test_serial_a.py": "from pkg import alpha\n\n\ndef test_serial_a():\n    assert alpha.value() == 1\n",
+            "tests/unit/test_serial_b.py": "from pkg import beta\n\n\ndef test_serial_b():\n    assert beta.value() == 2\n",
+            "tests/acceptance/serial-only.txt": ("tests/unit/test_serial_a.py  # latency: a stand-in\n"
+                                                 "tests/unit/test_serial_b.py  # latency: a stand-in\n"),
+        }
+        project = support.governed_project(tmp_path / "serial-project", told, extra=extra)
+    
+>       first, measured = _first_close(project, sandbox, interface, told)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:217: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_close.py:41: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 3.07, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.84, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "serial-afterwards", "seconds": 0.63, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "cases": ["tests/unit/test_serial_a.py", "tests/unit/test_serial_b.py"]}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+__ test_the_research_record_records_the_planted_change_set_and_the_time_saved __
+
+    def test_the_research_record_records_the_planted_change_set_and_the_time_saved():
+        path = support.REPO_ROOT / support.RESEARCH_REL
+        assert path.is_file(), (f"{support.RESEARCH_REL} does not exist: it records the planted change set's results and "
+                                "the time saved on this repository's suite (KPI 11)")
+        text = path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+    
+        missing = [tool for tool in ("pytest-testmon", "coverage") if tool not in text]
+        assert not missing, f"{support.RESEARCH_REL} does not name the glue it records: {missing}"
+        unrecorded = [name for name, words in CLASSES.items()
+                      if not any(RESULT_WORDS.search(line) and any(word in line.lower() for word in words)
+                                 for line in lines)]
+        assert not unrecorded, (
+            f"{support.RESEARCH_REL} does not record the result of each class of the planted change set: for each, a line "
+            f"names the class and its result (ran, re-ran, reused): missing {unrecorded}")
+        saved = [line for line in lines if "saved" in line.lower() and DURATION.search(line)]
+>       assert saved, (f"{support.RESEARCH_REL} does not state the time saved on this repository's suite: a line with "
+                       "\"saved\" and a duration (seconds, minutes or hours)")
+E       AssertionError: docs/research/W2-48-cache-choice.md does not state the time saved on this repository's suite: a line with "saved" and a duration (seconds, minutes or hours)
+E       assert []
+
+tests/acceptance/W2-48/test_w2_48_glue_and_research.py:59: AssertionError
+_ test_a_leads_run_reuses_the_closes_entries_reruns_what_its_change_touches_and_keeps_its_own_in_its_worktree _
+
+project = <w2_01_support.Project object at 0x7614a55087a0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_leads_run_reuses_the_cl0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_leads_run_reuses_the_cl0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_leads_run_reuses_the_cl0/told')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_leads_run_reuses_the_cl0')
+
+    def test_a_leads_run_reuses_the_closes_entries_reruns_what_its_change_touches_and_keeps_its_own_in_its_worktree(
+            project, sandbox, interface, told, tmp_path):
+>       first, measured = _first_close(project, sandbox, interface, told)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:30: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 3.31, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 1.77, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_a_later_close_in_the_main_tree_never_reads_the_entries_a_leads_run_kept _
+
+project = <w2_01_support.Project object at 0x7614a55083b0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_later_close_in_the_main0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_later_close_in_the_main0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_later_close_in_the_main0/told')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_later_close_in_the_main0')
+
+    def test_a_later_close_in_the_main_tree_never_reads_the_entries_a_leads_run_kept(
+            project, sandbox, interface, told, tmp_path):
+>       first, _ = _first_close(project, sandbox, interface, told)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:30: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.62, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.57, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_no_cache_on_a_leads_run_runs_every_test_whatever_the_shared_entries_hold _
+
+project = <w2_01_support.Project object at 0x7614a56622d0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_no_cache_on_a_leads_run_r0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_no_cache_on_a_leads_run_r0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_no_cache_on_a_leads_run_r0/told')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_no_cache_on_a_leads_run_r0')
+
+    def test_no_cache_on_a_leads_run_runs_every_test_whatever_the_shared_entries_hold(
+            project, sandbox, interface, told, tmp_path):
+>       _first_close(project, sandbox, interface, told)
+
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_leads_runs.py:30: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.29, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.6, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_the_nightly_names_each_test_that_fails_there_whose_cached_result_was_a_pass_and_no_other _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_nightly_names_each_te0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_nightly_names_each_te0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_nightly_names_each_te0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_the_nightly_names_each_te0/told')
+
+    def test_the_nightly_names_each_test_that_fails_there_whose_cached_result_was_a_pass_and_no_other(
+            tmp_path, sandbox, interface, told):
+        outside = tmp_path / "outside-input.txt"
+        outside.write_text("good\n", encoding="utf-8")
+        project = support.governed_project(tmp_path / "project", told, extra={
+            "tests/unit/test_outside.py": _outside_test(outside),
+            "tests/unit/test_known_red.py": "def test_known_red():\n    assert False, 'a known red the owner accepted'\n",
+        })
+        project.record_decision(DECISION, support.w253.OWNER_ACCEPTED, support.w253.owner_text_naming(KNOWN_RED_ID))
+        support.w253.add_entries(project, support.w253.ACCEPTED_REDS,
+                                 [support.w253.red_entry(KNOWN_RED_ID, DECISION, fixed_by="W9-fix")])
+>       first = _first_close(project, sandbox, interface, told)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_nightly.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_nightly.py:39: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa... "a known red the owner accepted", "fixed_by": "W9-fix", "result": "failed"}], "load_sensitive": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.29, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.72, "passed": 3, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": [], "accepted_reds": [{"test": "tests/unit/test_known_red.py::test_known_red", "decision": "DEC-948", "reason": "a known red the owner accepted", "fixed_by": "W9-fix", "result": "failed"}], "load_sensitive": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+__________ test_a_clean_night_runs_every_test_uncached_and_names_none __________
+
+project = <w2_01_support.Project object at 0x7614a558b530>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_clean_night_runs_every_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_clean_night_runs_every_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_clean_night_runs_every_0/told')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_clean_night_runs_every_0')
+
+    def test_a_clean_night_runs_every_test_uncached_and_names_none(project, sandbox, interface, told, tmp_path):
+>       _first_close(project, sandbox, interface, told)
+
+tests/acceptance/W2-48/test_w2_48_nightly.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_nightly.py:39: in _first_close
+    first = support.closed(project, sandbox, interface, told, TICKET_A)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:787: in closed
+    run, cached = close(project, sandbox, told, ticket, *args)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-48/w2_48_support.py:772: in close
+    check_record(record, what, run.stdout, run.stderr, run.returncode)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+record = None, what = 'gov close PROJ-aaaa --json '
+stdout = '{"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa...estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}\n'
+stderr = '', returncode = 0
+
+    def check_record(record, what, stdout, stderr, returncode):
+        """The shape every record has (README, "The record"): a run id and one object per test."""
+        said = f"{what}\nexit code: {returncode}\nstdout (end):\n{stdout[-2500:]}\nstderr (end):\n{stderr[-2500:]}"
+>       assert isinstance(record, dict), (
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+            f"{what.split(' --json')[0]}: no `{RECORD_KEY}` object in the answer: the record of a run (of gov close too) "
+            f"is `result.{RECORD_KEY}` (exit 0) or `error.details.{RECORD_KEY}` (exit 3, a refusal) of the API-0002 "
+            f"envelope under --json\n{said}")
+E       AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E       gov close PROJ-aaaa --json 
+E       exit code: 0
+E       stdout (end):
+E       {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.2, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.57, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:368: AssertionError
+_ test_a_child_started_with_its_own_environment_is_measured_so_an_unchanged_test_that_starts_it_is_reused _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0')
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/sandbox/elsewhere'))
+
+    def test_a_child_started_with_its_own_environment_is_measured_so_an_unchanged_test_that_starts_it_is_reused(
+            tmp_path, told, sandbox):
+        tree = _own_env_tree(tmp_path, told)
+        first = _filled(tree, told, sandbox, OWN_ID)
+    
+        second = support.lead_run(tree.root, told, sandbox)
+    
+>       support.assert_reused(second, [OWN_ID], (
+            f"nothing changed, and {RUN} measures the code of a Python child that test_own_env starts with an "
+            "environment it builds from scratch (python3 -m pkg.own_main, which imports pkg.own_lib; none of the test "
+            "process's variables reach it): DEC-876 condition 1 has the cache pass the child what its measurement "
+            "needs, so such a test is no longer always run"), from_run=first.record["run"])
+
+tests/acceptance/W2-48/test_w2_48_widenings.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree) python3 -m gov.testcache run -...de': 0}, ran=Counter({'tests/test_own_env.py::test_own_env': 1, 'tests/test_subprocess.py::test_subprocess_fresh': 1}))
+ids = ['tests/test_own_env.py::test_own_env']
+why = 'nothing changed, and `python3 -m gov.testcache run` measures the code of a Python child that test_own_env starts with...): DEC-876 condition 1 has the cache pass the child what its measurement needs, so such a test is no longer always run'
+from_run = '20261020T194153Z-d5179eac', from_commit = None
+
+    def assert_reused(run, ids, why, from_run=None, from_commit=None):
+        """Each of ``ids`` did not run, and is labelled ``reused`` with ``from: {run, commit}`` (the given ones)."""
+        problems = []
+        for test_id in ids:
+            entry = run.labels.get(test_id) or {}
+            source = entry.get("from") if isinstance(entry.get("from"), dict) else {}
+            if run.ran.get(test_id):
+                problems.append(f"{test_id} ran again (the record says {entry.get('result')!r})")
+            elif entry.get("result") != REUSED:
+                problems.append(f"{test_id} is labelled {entry.get('result')!r}, not `reused`")
+            elif from_run is not None and source.get("run") != from_run:
+                problems.append(f"{test_id} is reused from run {source.get('run')!r}, not from {from_run!r}, the run "
+                                "that last ran it")
+            elif from_commit is not None and source.get("commit") != from_commit:
+                problems.append(f"{test_id} is reused with commit {source.get('commit')!r}, not {from_commit!r}, the "
+                                "commit of the run it came from")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to be reused: {why}. A test none of whose inputs changed is not run again; the record labels "
+            f"it `reused` with `from: {{run, commit}}`, the run that last ran it and that run's commit "
+            f"(`{RECORD_KEY}.tests[]`):\n  " + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to be reused: nothing changed, and `python3 -m gov.testcache run` measures the code of a Python child that test_own_env starts with an environment it builds from scratch (python3 -m pkg.own_main, which imports pkg.own_lib; none of the test process's variables reach it): DEC-876 condition 1 has the cache pass the child what its measurement needs, so such a test is no longer always run. A test none of whose inputs changed is not run again; the record labels it `reused` with `from: {run, commit}`, the run that last ran it and that run's commit (`test_cache.tests[]`):
+E         tests/test_own_env.py::test_own_env ran again (the record says 'passed')
+E       (in /tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T194158Z-a1d8bb81", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree/.gov-runtime/testcache/local", "from": "/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree/.gov-runtime/testcache/local", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0", "clean": true, "wrote_entries": true, "keys": ["3f8d65aa96074aa15b2eeb18521016a3"], "counts": {"passed": 2, "failed": 0, "error": 0, "skipped": 0, "reused": 5}, "seconds": 1.33, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T194153Z-d5179eac', 'commit': '07048c2db3acc4a4dd638b33f351af1642b687e0'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T194153Z-d5179eac', 'commit': '07048c2db3acc4a4dd638b33f351af1642b687e0'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T194153Z-d5179eac', 'commit': '07048c2db3acc4a4dd638b33f351af1642b687e0'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T194153Z-d5179eac', 'commit': '07048c2db3acc4a4dd638b33f351af1642b687e0'}; ran 0 time(s) in this run
+E         tests/test_own_env.py::test_own_env: record 'passed'; ran 1 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T194153Z-d5179eac', 'commit': '07048c2db3acc4a4dd638b33f351af1642b687e0'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T194158Z-a1d8bb81", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree/.gov-runtime/testcache/local", "from": "/tmp/pytest-of-usain/pytest-4983/test_a_child_started_with_its_0/tree/.gov-runtime/testcache/local", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0", "clean": true, "wrote_entries": true, "keys": ["3f8d65aa96074aa15b2eeb18521016a3"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T194153Z-d5179eac", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T194153Z-d5179eac", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T194153Z-d5179eac", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T194153Z-d5179eac", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0"}}, {"id": "tests/test_own_env.py::test_own_env", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 3163507)"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T194153Z-d5179eac", "commit": "07048c2db3acc4a4dd638b33f351af1642b687e0"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 3163511)"}], "counts": {"passed": 2, "failed": 0, "error": 0, "skipped": 0, "reused": 5}, "seconds": 1.33, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:508: AssertionError
+__ test_a_test_that_runs_git_is_reused_when_the_same_git_is_on_the_runs_path ___
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0')
+told = PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/sandbox/elsewhere'))
+
+    def test_a_test_that_runs_git_is_reused_when_the_same_git_is_on_the_runs_path(tmp_path, told, sandbox):
+        tree = _git_tree(tmp_path, told)
+        first = _filled(tree, told, sandbox, GIT_ID)
+    
+        second = support.lead_run(tree.root, told, sandbox)
+    
+>       support.assert_reused(second, [GIT_ID], (
+            f"nothing changed and the same git is on the PATH {RUN} is given: test_git runs git (a known program, "
+            f"{list(support.KNOWN_PROGRAMS)}), which DEC-876 condition 1 has the cache key by its version "
+            "(`git --version`), so the test is no longer always run"), from_run=first.record["run"])
+
+tests/acceptance/W2-48/test_w2_48_widenings.py:198: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree) python3 -m gov.testcache run -...'exit_code': 0}, ran=Counter({'tests/test_git.py::test_git': 1, 'tests/test_subprocess.py::test_subprocess_fresh': 1}))
+ids = ['tests/test_git.py::test_git']
+why = "nothing changed and the same git is on the PATH `python3 -m gov.testcache run` is given: test_git runs git (a known p...']), which DEC-876 condition 1 has the cache key by its version (`git --version`), so the test is no longer always run"
+from_run = '20261020T194222Z-ac05c429', from_commit = None
+
+    def assert_reused(run, ids, why, from_run=None, from_commit=None):
+        """Each of ``ids`` did not run, and is labelled ``reused`` with ``from: {run, commit}`` (the given ones)."""
+        problems = []
+        for test_id in ids:
+            entry = run.labels.get(test_id) or {}
+            source = entry.get("from") if isinstance(entry.get("from"), dict) else {}
+            if run.ran.get(test_id):
+                problems.append(f"{test_id} ran again (the record says {entry.get('result')!r})")
+            elif entry.get("result") != REUSED:
+                problems.append(f"{test_id} is labelled {entry.get('result')!r}, not `reused`")
+            elif from_run is not None and source.get("run") != from_run:
+                problems.append(f"{test_id} is reused from run {source.get('run')!r}, not from {from_run!r}, the run "
+                                "that last ran it")
+            elif from_commit is not None and source.get("commit") != from_commit:
+                problems.append(f"{test_id} is reused with commit {source.get('commit')!r}, not {from_commit!r}, the "
+                                "commit of the run it came from")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to be reused: {why}. A test none of whose inputs changed is not run again; the record labels "
+            f"it `reused` with `from: {{run, commit}}`, the run that last ran it and that run's commit "
+            f"(`{RECORD_KEY}.tests[]`):\n  " + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to be reused: nothing changed and the same git is on the PATH `python3 -m gov.testcache run` is given: test_git runs git (a known program, ['git']), which DEC-876 condition 1 has the cache key by its version (`git --version`), so the test is no longer always run. A test none of whose inputs changed is not run again; the record labels it `reused` with `from: {run, commit}`, the run that last ran it and that run's commit (`test_cache.tests[]`):
+E         tests/test_git.py::test_git ran again (the record says 'passed')
+E       (in /tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T194227Z-b662148e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree/.gov-runtime/testcache/local", "from": "/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree/.gov-runtime/testcache/local", "commit": "b06815b10f525569416e29ece70b3ca37f918c04", "clean": true, "wrote_entries": true, "keys": ["3f8d65aa96074aa15b2eeb18521016a3"], "counts": {"passed": 2, "failed": 0, "error": 0, "skipped": 0, "reused": 5}, "seconds": 1.65, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T194222Z-ac05c429', 'commit': 'b06815b10f525569416e29ece70b3ca37f918c04'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T194222Z-ac05c429', 'commit': 'b06815b10f525569416e29ece70b3ca37f918c04'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T194222Z-ac05c429', 'commit': 'b06815b10f525569416e29ece70b3ca37f918c04'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T194222Z-ac05c429', 'commit': 'b06815b10f525569416e29ece70b3ca37f918c04'}; ran 0 time(s) in this run
+E         tests/test_git.py::test_git: record 'passed'; ran 1 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T194222Z-ac05c429', 'commit': 'b06815b10f525569416e29ece70b3ca37f918c04'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T194227Z-b662148e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree/.gov-runtime/testcache/local", "from": "/tmp/pytest-of-usain/pytest-4983/test_a_test_that_runs_git_is_r0/tree/.gov-runtime/testcache/local", "commit": "b06815b10f525569416e29ece70b3ca37f918c04", "clean": true, "wrote_entries": true, "keys": ["3f8d65aa96074aa15b2eeb18521016a3"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T194222Z-ac05c429", "commit": "b06815b10f525569416e29ece70b3ca37f918c04"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T194222Z-ac05c429", "commit": "b06815b10f525569416e29ece70b3ca37f918c04"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T194222Z-ac05c429", "commit": "b06815b10f525569416e29ece70b3ca37f918c04"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T194222Z-ac05c429", "commit": "b06815b10f525569416e29ece70b3ca37f918c04"}}, {"id": "tests/test_git.py::test_git", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 3173010)"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T194222Z-ac05c429", "commit": "b06815b10f525569416e29ece70b3ca37f918c04"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed", "always_runs": "it started a process the cache did not measure (pid 3173014)"}], "counts": {"passed": 2, "failed": 0, "error": 0, "skipped": 0, "reused": 5}, "seconds": 1.65, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:508: AssertionError
+15 failed, 39 passed in 249.73s (0:04:09)
