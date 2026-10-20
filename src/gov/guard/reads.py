@@ -16,7 +16,6 @@ files, the ticket file and the path map.  No message carries a path.
 from __future__ import annotations
 
 import fnmatch
-import glob
 import os
 import re
 import subprocess
@@ -387,16 +386,29 @@ class _Judge:
 
     def glob_word(self, word: str, cwd: str, secrets: bool = True) -> str:
         """A word the shell expands: refused when its folder is in a part,
-        or a name it expands to is protected."""
+        when it matches a part's file, or, with its wildcards in its last
+        name alone, when a name of that one folder it matches is a secret.
+        Nothing else is listed: the answer comes in bounded time."""
         segs = word.split("/")
         n = next(i for i, p in enumerate(segs) if _has_glob(p))
-        lead = "/".join(segs[:n]) or ("/" if word.startswith("/") else "")
-        why = self.at(lead, cwd, False) if lead else ""
-        for k, hit in enumerate(glob.iglob(os.path.join(cwd, word))):
-            if why or k > _MOST_FILES:
-                return why or LONG_REFUSAL
-            why = self.at(hit, cwd, secrets)
-        return why
+        lead = "/".join(segs[:n]) or ("/" if word.startswith("/") else ".")
+        why = self.at(lead, cwd, False)
+        start = (self.spellings(lead, cwd) or [None])[-1]
+        rx = _Glob("/".join(segs[n:]))
+        for part in ([] if why else self.parts):
+            if any(rx.match(f[len(start.rstrip("/")) + 1:]) for f in part.below(start)):
+                return part.reason
+        if why or not secrets or n != len(segs) - 1 or not start:
+            return why
+        try:
+            names = os.listdir(start)
+        except OSError:
+            return ""
+        if len(names) > _MOST_FILES:
+            return LONG_REFUSAL
+        return next((SECRET_REFUSAL for name in names if (
+            not name.startswith(".") or segs[-1].startswith("."))
+            and rx.match(name) and self.secret(os.path.join(start, name))), "")
 
     def word(self, word: str, cwd: str, secrets: bool = True) -> str:
         """A word of a command: itself, each word its braces make, and the

@@ -303,9 +303,9 @@ def _copies(target: str | None) -> list[tuple[str, str]]:
 
 def _second_names(name: str, args: list[str]) -> list[str]:
     """The words of a command whose files and folders get a second name
-    (DEC-548, DEC-553): the
-    sources of a move, of a link and of a linking copy, and the files of an
-    in-place edit that leaves a backup."""
+    (DEC-548, DEC-553): the sources of a move, of a link and of a linking
+    copy (``cp -l``, ``cp -s``), and the files of an in-place edit that
+    leaves a backup."""
     if name in ("ln", "link"):
         plain = [a for a in args if not a.startswith("-")]
         return plain[:-1] or plain
@@ -325,7 +325,8 @@ def _second_names(name: str, args: list[str]) -> list[str]:
         if parsed is None:
             return args
         operands, opts, after = parsed
-        if name == "cp" and "l" not in opts:
+        # A linking copy, hard or symbolic (-l, -s); a plain copy is a read.
+        if name == "cp" and {"l", "s", "symbolic-link"}.isdisjoint(opts):
             return []
         if "t" in opts or (after is not None and args[-1:] != operands[-1:]):
             return operands
