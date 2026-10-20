@@ -12,6 +12,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import w2_58_support as support  # noqa: E402
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "local_only: starts a real worker session through gov launch on this machine (CLI, bwrap, socat, "
+                   "the network); not for CI")
+
+
 @pytest.fixture()
 def sandbox(tmp_path):
     """HOME, TMPDIR and an unrelated folder, disjoint siblings in this test's own folder."""

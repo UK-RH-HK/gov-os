@@ -14,10 +14,13 @@ refused, the tests (its own) and the ticket file (the specification) are not.
 In a repository with no ``w2/integrate`` there is no base, and nothing is
 refused under this item.
 
-By its sandbox: the ``--settings`` of ``gov launch independent-test-designer <T>``
-deny the Read tool the changed files (other than tests and tickets), without
-binding the sandbox's reads of commands (see ``test_w2_58_engineer.py``), so its
-pytest can import the code it tests.
+The launcher (DEC-873 item 2): the ``--settings`` of ``gov launch
+independent-test-designer <T>`` hold no ``Read`` deny rule and no sandbox read
+denial that covers a file T's branch changes: the CLI turns every Read deny rule
+that matches existing files into a read denial of the session's own commands,
+whatever its form (P-W2-58-1), and the test designer could not import the code
+it tests. The guard alone refuses (c); the held-out material keeps its Read
+rules (b).
 """
 
 from __future__ import annotations
@@ -145,17 +148,25 @@ def test_another_role_on_t_reads_the_changed_files(branch_world):
 
 
 # --------------------------------------------------------------------------
-# By its sandbox
+# The launcher's --settings (DEC-873 item 2)
 # --------------------------------------------------------------------------
 
-def test_the_launch_denies_the_read_tool_the_changed_files_without_binding_the_sandbox(sandbox, cli):
+def test_the_launch_adds_no_read_denial_for_the_changed_files_and_keeps_the_held_out_rules(sandbox, cli):
+    """Rewritten by DEC-873 (was ``test_the_launch_denies_the_read_tool_the_changed_files_without_binding_the_sandbox``,
+    which asked for a wildcard Read rule over the changed files on the belief that the Linux sandbox skips it).
+
+    No Read deny rule and no sandbox read denial covers a file T's branch
+    changes, nor its own tests, its ticket or unchanged code; the held-out
+    material is still covered.
+    """
     project = s.make_project(sandbox, base=True)
     settings = s.launch(sandbox, cli, TD, s.T).settings()
-    faults = s.read_tool_denial_faults(settings, project, sandbox.home, s.CHANGED)
-    assert not faults, f"the launched test designer's settings: {faults}; Read rules: {s.read_deny_specs(settings)}"
-    for rel in (OWN_TEST, TICKET_FILE, "src/other/main.py"):
-        covering = s.covering_read_rules(settings, project, sandbox.home, project / rel)
-        assert not covering, f"a Read deny rule of the launched test designer covers {rel}: {covering}"
+    faults = s.read_denial_faults(settings, project, sandbox.home, (*s.CHANGED, OWN_TEST, TICKET_FILE,
+                                                                    "src/other/main.py"))
+    assert not faults, (f"the launched test designer's settings deny reads of the code it tests (DEC-873 item 2): "
+                        f"{faults}")
+    lost = s.held_out_faults(settings, sandbox, project)
+    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_with_no_base_denies_the_read_tool_no_code(sandbox, cli):

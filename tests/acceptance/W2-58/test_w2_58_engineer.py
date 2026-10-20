@@ -1,8 +1,9 @@
 """W2-58, item 3 -- (c) for the engineer: T's acceptance tests are refused to it, and it can still run them.
 
-KPI success 1: "A session of role engineer on ticket T is refused reads of
-tests/acceptance/<T's W2 id>/** by the guard (tool reads and the read side of
-Bash) and by its sandbox, and can still run those tests with pytest and see
+KPI success 1 (restated by DEC-873): "A session of role engineer on ticket T is
+refused reads of tests/acceptance/<T's W2 id>/** by the guard, on every tool
+read and the read side of every Bash route an honest agent takes (no OS-level
+Read rule for it, DEC-873), and can still run those tests with pytest and see
 their names, results and failure messages [DEC-820 (c)]".
 KPI failure: "(c) still refuses, by every read route an honest agent takes in
 ordinary work (DEC-801)".
@@ -10,15 +11,15 @@ ordinary work (DEC-801)".
 T is ``DAEO-zz58`` (``wbs_id: W2-95``); its acceptance folder is
 ``tests/acceptance/W2-95/``. Another ticket's folder (``W2-96``) stays readable.
 
-**By its sandbox:** the ``--settings`` value ``gov launch engineer <T>`` hands
-the CLI denies the Read tool the files of T's acceptance folder, and does so
-without binding the operating-system sandbox's reads of the session's commands.
-On Linux the CLI applies a deny rule written as a literal path to the sandbox of
-every command and skips a rule with a wildcard (the launcher's own module
-description records this for its Edit rules), so the folder's Read rules are
-wildcard rules only, and no literal Read rule, nor a ``sandbox.filesystem.denyRead``
-entry, names the folder, a file in it or a folder above it. That way pytest in
-the sandbox still reads the tests. The held-out paths keep their Read rules.
+**The launcher (DEC-873 item 2):** the ``--settings`` value ``gov launch
+engineer <T>`` hands the CLI holds no ``Read`` deny rule and no sandbox read
+denial that covers a file of T's acceptance folder. The CLI turns every Read
+deny rule that matches existing files into a read denial of the session's own
+commands, whatever its form (``<folder>/**``, ``<file>*``, ``W2-5[8]/**``,
+measured in P-W2-58-1): a wildcard does not keep the sandbox out, so pytest would
+collect nothing. The guard alone refuses (c). The held-out material keeps its
+Read rules (b). What a launched session does with this is in
+``test_w2_58_launched_sessions.py``.
 """
 
 from __future__ import annotations
@@ -141,7 +142,7 @@ def test_the_pytest_run_shows_names_results_and_failure_messages(branch_world):
 
 
 # --------------------------------------------------------------------------
-# By its sandbox: the launcher's --settings
+# The launcher's --settings (DEC-873 item 2)
 # --------------------------------------------------------------------------
 
 def _launch_settings(sandbox, cli, role, ticket):
@@ -149,11 +150,22 @@ def _launch_settings(sandbox, cli, role, ticket):
     return result.settings()
 
 
-def test_the_launch_denies_the_read_tool_ts_tests_without_binding_the_sandbox(sandbox, cli):
+def test_the_launch_adds_no_read_denial_for_ts_tests_and_keeps_the_held_out_rules(sandbox, cli):
+    """Rewritten by DEC-873 (was ``test_the_launch_denies_the_read_tool_ts_tests_without_binding_the_sandbox``,
+    which asked for a wildcard Read rule over T's tests on the belief that the Linux sandbox skips it).
+
+    No Read deny rule and no sandbox read denial covers a file of T's acceptance
+    folder: the CLI would turn it into a read denial of the session's commands,
+    and the engineer's pytest would collect nothing (P-W2-58-1). The held-out
+    material is still covered.
+    """
     project = s.make_project(sandbox, base=True)
     settings = _launch_settings(sandbox, cli, s.ENGINEER, s.T)
-    faults = s.read_tool_denial_faults(settings, project, sandbox.home, (TEST_FILE, f"{ACC}/README.md"))
-    assert not faults, f"the launched engineer's settings: {faults}; Read rules: {s.read_deny_specs(settings)}"
+    faults = s.read_denial_faults(settings, project, sandbox.home, (TEST_FILE, f"{ACC}/README.md"))
+    assert not faults, (f"the launched engineer's settings deny reads of its own acceptance tests (DEC-873 item 2): "
+                        f"{faults}")
+    lost = s.held_out_faults(settings, sandbox, project)
+    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_leaves_other_files_to_the_read_tool_and_keeps_the_held_out_rules(sandbox, cli):

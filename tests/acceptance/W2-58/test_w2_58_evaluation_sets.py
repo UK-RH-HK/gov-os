@@ -121,17 +121,31 @@ def test_the_scorer_reads_the_hidden_part_and_prints_only_a_score(eval_world):
 
 
 # --------------------------------------------------------------------------
-# By its sandbox
+# The launcher's --settings (DEC-873 item 2)
 # --------------------------------------------------------------------------
 
-def test_the_launch_of_a_measured_session_denies_the_read_tool_the_hidden_part(sandbox, cli):
-    project = s.make_eval_project(sandbox)
-    settings = s.launch(sandbox, cli, s.ENGINEER, s.MEASURED).settings()
-    faults = s.read_tool_denial_faults(settings, project, sandbox.home, HIDDEN)
-    assert not faults, f"the launched measured session's settings: {faults}; Read rules: {s.read_deny_specs(settings)}"
-    for rel in (VISIBLE_FILE, BESIDE, s.SCORER_REL):
-        covering = s.covering_read_rules(settings, project, sandbox.home, project / rel)
-        assert not covering, f"a Read deny rule of the measured session covers {rel}: {covering}"
+@pytest.mark.parametrize("session", sorted(MEASURED_SESSIONS))
+def test_the_launch_of_a_measured_session_adds_no_read_denial_for_the_set_and_keeps_the_held_out_rules(
+        sandbox, cli, session):
+    """Rewritten by DEC-873 (was ``test_the_launch_of_a_measured_session_denies_the_read_tool_the_hidden_part``,
+    which asked for a wildcard Read rule over the hidden part on the belief that the Linux sandbox skips it).
+
+    No Read deny rule and no sandbox read denial covers the hidden part, the
+    visible part, the file beside it or the scorer: the CLI would turn a Read rule
+    into a read denial of the session's commands, and the measurement could not
+    run (P-W2-58-1). The guard alone refuses (d). The held-out material is still
+    covered. Measured by ticket (an engineer) and, added, by role (research).
+    """
+    files = {s.ALLOWLIST_TEMPLATE_REL: s.ALLOWLIST_TEMPLATE.read_text(encoding="utf-8")}
+    project = s.make_project(sandbox, base=True, extra={**s.EVAL_FILES, **files,
+                                                        s.PATH_MAP_REL: s.path_map_text(s.evaluation_block())})
+    role, ticket = MEASURED_SESSIONS[session]
+    settings = s.launch(sandbox, cli, role, ticket).settings()
+    faults = s.read_denial_faults(settings, project, sandbox.home, (*HIDDEN, VISIBLE_FILE, BESIDE, s.SCORER_REL))
+    assert not faults, (f"the launched measured session's settings ({session}) deny reads of the evaluation set "
+                        f"(DEC-873 item 2): {faults}")
+    lost = s.held_out_faults(settings, sandbox, project)
+    assert not lost, f"the held-out material lost its Read deny rule for {lost}: {s.read_deny_specs(settings)}"
 
 
 def test_the_launch_of_an_unmeasured_session_leaves_the_hidden_part_to_the_read_tool(sandbox, cli):

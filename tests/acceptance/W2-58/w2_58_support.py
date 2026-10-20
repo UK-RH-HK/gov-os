@@ -59,6 +59,9 @@ SCHEMAS = REPO_ROOT / "template/governance/kernel/schemas"
 PATH_MAP_SCHEMA = SCHEMAS / "path-map.schema.json"
 REPO_PATH_MAP = REPO_ROOT / "governance/project/path-map.yaml"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
+# One named file a research launch reads (copied into a fixture project that launches a research session).
+ALLOWLIST_TEMPLATE_REL = "template/governance/kernel/launch/research-allowlist.yaml"
+ALLOWLIST_TEMPLATE = REPO_ROOT / ALLOWLIST_TEMPLATE_REL
 
 SETTINGS_REL = ".claude/settings.json"
 HELD_OUT_LIST_REL = "governance/project/held-out.yaml"     # its names are readable (DEC-820 (b))
@@ -672,9 +675,6 @@ def launch(sandbox, cli, role, ticket):
 # The Read rules of a --settings value, read as the CLI reads them
 # --------------------------------------------------------------------------
 
-WILDCARDS = "*?["
-
-
 def read_deny_specs(settings):
     """The specifiers of the ``permissions.deny`` rules of the Read tool."""
     rules = (settings.get("permissions") or {}).get("deny") or []
@@ -740,67 +740,85 @@ def rule_covers(spec, path, project, home):
     return any(pattern.fullmatch(candidate) for candidate in candidates)
 
 
-def is_literal(spec):
-    return not any(c in spec for c in WILDCARDS)
-
-
-def literal_binds(spec, path, project, home):
-    """Whether a literal Read deny rule binds the sandbox's reads of ``path``: it names the path or a folder above it,
-    or a path inside it (a folder rule)."""
-    target = os.path.normpath(absolute_pattern(spec, str(project), str(home)).rstrip("/"))
-    path = os.path.normpath(str(path))
-    return path == target or path.startswith(target + "/") or target.startswith(path + "/")
-
-
-def sandbox_deny_read(settings):
-    block = ((settings.get("sandbox") or {}).get("filesystem") or {})
-    entries = block.get("denyRead") or []
-    return [str(e) for e in entries] if isinstance(entries, list) else [str(entries)]
-
-
-def sandbox_entries_binding(settings, path, project, home):
-    """The ``sandbox.filesystem.denyRead`` entries that keep the sandbox's commands from reading ``path``."""
-    found = []
-    for entry in sandbox_deny_read(settings):
-        text = entry
-        if text.startswith("~/"):
-            text = f"{home}/{text[2:]}"
-        elif text.startswith("//"):
-            text = text[1:]
-        elif not text.startswith("/"):
-            text = f"{project}/{text}"
-        target = os.path.normpath(text.split("*")[0].rstrip("/") or "/")
-        p = os.path.normpath(str(path))
-        if p == target or p.startswith(target.rstrip("/") + "/"):
-            found.append(entry)
-    return found
-
-
 def covering_read_rules(settings, project, home, path):
     return [spec for spec in read_deny_specs(settings) if rule_covers(spec, path, project, home)]
 
 
-def read_tool_denial_faults(settings, project, home, rels):
-    """Why the settings do not deny the Read tool each of ``rels`` without binding the sandbox's reads; empty if they do.
+def _strings(entries):
+    if isinstance(entries, list):
+        return [str(e) for e in entries]
+    return [str(entries)] if entries else []
 
-    Each file must be covered by a Read deny rule; no literal Read rule may name
-    the file, a folder above it or a path inside it (on Linux the CLI applies a
-    literal rule to the sandbox of every command and skips a wildcard rule); no
-    ``sandbox.filesystem.denyRead`` entry may hold it.
+
+def sandbox_read_denials(settings):
+    """The read denials of the settings' sandbox block.
+
+    Every list under ``sandbox.filesystem`` that denies reads: ``denyRead``, or a
+    ``read`` block's ``denyOnly`` / ``deny``, the name the CLI's own runtime
+    configuration of the commands' sandbox uses (``filesystem.read.denyOnly``).
+    """
+    block = (settings.get("sandbox") or {}).get("filesystem") or {}
+    found = []
+    if not isinstance(block, dict):
+        return found
+    for key, value in block.items():
+        if "read" not in str(key).lower():
+            continue
+        if isinstance(value, dict):
+            for inner, entries in value.items():
+                if "deny" in str(inner).lower():
+                    found += _strings(entries)
+        elif "deny" in str(key).lower():
+            found += _strings(value)
+    return found
+
+
+def _sandbox_entry_covers(entry, path, project, home):
+    """A sandbox entry covers ``path`` if it does read as a rule specifier or as an absolute path (``/abs``)."""
+    if rule_covers(entry, path, project, home):
+        return True
+    return entry.startswith("/") and not entry.startswith("//") and rule_covers("/" + entry, path, project, home)
+
+
+def read_denials_covering(settings, project, home, path):
+    """Every OS-level or file-tool read denial of the settings that covers ``path``: its ``Read`` deny rules (which
+    the CLI also turns into read denials of the session's own commands, P-W2-58-1) and its sandbox read denials."""
+    found = [f"Read({spec})" for spec in covering_read_rules(settings, project, home, path)]
+    found += [f"sandbox read denial {entry}" for entry in sandbox_read_denials(settings)
+              if _sandbox_entry_covers(entry, path, project, home)]
+    return found
+
+
+def read_denial_faults(settings, project, home, rels):
+    """DEC-873 item 2: the read denials of the settings that cover any of ``rels``; empty when none does.
+
+    The launcher adds no OS-level Read rule for (c) or (d), because running a
+    test means reading it: the CLI turns every ``Read`` deny rule that matches
+    existing files into a read denial of the session's own commands, whatever its
+    form (``<folder>/**``, ``<file>*``, ``W2-5[8]/**``; P-W2-58-1), so no ``Read``
+    deny rule and no sandbox read denial may cover these files. The guard alone
+    refuses them.
     """
     faults = []
-    specs = read_deny_specs(settings)
     for rel in rels:
-        path = Path(project) / rel
-        if not covering_read_rules(settings, project, home, path):
-            faults.append(f"no Read deny rule covers {rel}")
-        literal = [spec for spec in specs if is_literal(spec) and literal_binds(spec, path, project, home)]
-        if literal:
-            faults.append(f"literal Read rules bind the sandbox's reads of {rel}: {literal}")
-        entries = sandbox_entries_binding(settings, path, project, home)
-        if entries:
-            faults.append(f"sandbox.filesystem.denyRead entries bind the sandbox's reads of {rel}: {entries}")
+        covering = read_denials_covering(settings, project, home, Path(project) / rel)
+        if covering:
+            faults.append(f"{rel} is covered by {covering}")
     return faults
+
+
+HELD_OUT_SAMPLES = ("answers.md", "cases/test_hidden.py")
+
+
+def held_out_faults(settings, sandbox, project):
+    """DEC-873 item 2: the held-out material's ``Read`` rules (b) stay; the files of the stand-in material it misses."""
+    specs = read_deny_specs(settings)
+    return [str(sandbox.held_out / rel) for rel in HELD_OUT_SAMPLES
+            if not any(rule_covers(spec, sandbox.held_out / rel, project, sandbox.home) for spec in specs)]
+
+
+def tracked_files(project):
+    return [rel for rel in git(project, "ls-files", "-z").split("\0") if rel]
 
 
 # --------------------------------------------------------------------------
