@@ -3,3 +3,4 @@ unit rc=0 :: 2377 passed, 1 skipped in 138.69s (0:02:18)
 w1-05-p95 start 2026-10-20T20:18:20+01:00 load 2.49
 w1-05-p95 rc=0 :: 9 passed in 23.68s
 check-5 start 2026-10-20T20:18:44+01:00 load 2.29
+check-5 rc=3 end 2026-10-20T20:25:15+01:00

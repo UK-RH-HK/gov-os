@@ -30,3 +30,10 @@
 - Packages returned: P-W2-48-4 (widen paths by src/gov/close/command.py; blocks 12 cases), P-W2-48-5 (near-zero saving on this repository as built), P-W2-48-6 (= P-C, declared-command fixture defect), P-1..P-3 confirmations, P-B test_inputs.
 - Resume must: read the answers; if P-C, a fresh test designer revises that one case (Rewrite-Reason); a fresh engineer with the failing output only (wiring, cache-only false reds, pytest output for leads, GOV_TESTCACHE_HOME not inherited by tests, research figure); merge integrate; rebuild; full verification + timed pair; FULL review (max).
 - Left behind: /tmp/gov-testcache-{05t8_upy,fpsxsi6u,qtd2k3iv,rphh0v_7} (my probes) and .gov-runtime/scratch/lead/testcache-store (27M SQLite) and testcache-probe: rm needed approval. DO NOT copy the stores into the repository.
+
+## RUN 2 (resume after DEC-875, DEC-876)
+- Identity ok; head was 17ddaf09, status clean.
+- Merge 81f16a0b: w2/integrate (a90b2709; message says 65039414, integrate moved one W2-00 record commit during the merge) into w2/W2-48, DEC-750 form, trailers Task/Role/Implements in message. Brings DEC-874..876, test_inputs (fixtures/**, template/**, schemas/**), command.py in paths.
+- td-2 launched (briefs/td-2.md, log/td-2.json, tripwire-before-3.json): P-W2-48-6 revision (Rewrite-Reason DEC-875) + DEC-876 cond. 1 proving cases (own-env child; git version) (Rewrite-Reason DEC-876).
+- Plan: red check -> eng-2 (wiring, widenings, cache-only reds, lead-run failure output, GOV_TESTCACHE_HOME not inherited, simplify) -> verify (rebuild, all suites, unit, gov check, collection) -> timed pair (lead measures: uncached --no-cache; fill; engineer resumed plants a typical change uncommitted; cached run; engineer reverts + writes figures, commits) -> FULL review max -> probe record.
+- Loop count: held by lead (run 2 iteration 1 starts at eng-2).
