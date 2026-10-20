@@ -1070,13 +1070,25 @@ def decide(
                                    cwd or project_root, held_out):
         return "deny", "the call names a held-out path"
 
-    # DEC-508, DEC-525: no call reads the settings file or the held-out
-    # file, whatever the tool and the role.
+    # DEC-548, DEC-553, DEC-562: no call gives the settings file or the
+    # held-out file a second name, nor holds more than the guard reads in
+    # bounded time; reads of the two files are open (DEC-821 item 3).
     from gov.guard.protected import read_refusal
     refusal = read_refusal(tool_name, tool_input, project_root,
                            cwd or project_root)
     if refusal:
         return "deny", refusal
+
+    # DEC-820, DEC-821: reads are open but for secrets (a), the
+    # counterpart's work on the ticket (c) and the hidden part of an
+    # evaluation set that measures the session (d).
+    if tool_name in READ_TOOLS or tool_name == "Bash":
+        from gov.guard.reads import policy_refusal
+        refusal = policy_refusal(tool_name, tool_input, project_root,
+                                 cwd or project_root, erole or None, ticket_id,
+                                 subagent_type)
+        if refusal:
+            return "deny", refusal
 
     if tool_name in READ_TOOLS or tool_name in LISTED_TOOLS:
         return "allow", ""

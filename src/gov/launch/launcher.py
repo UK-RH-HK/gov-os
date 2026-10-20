@@ -2,7 +2,8 @@
 
 Starts the CLI at ``~/.local/bin/claude`` (DEC-205) in the repository root with
 one ``--settings`` value built here: the strict sandbox block, the role's network
-profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, ``GOV_ROLE``,
+profile and ``Edit`` deny rules, the held-out ``Read`` deny rules, the ``Read`` deny
+rules of the session's protected parts (DEC-820 (c), (d)), ``GOV_ROLE``,
 ``GOV_TICKET`` and a per-session temp directory, removed when the session ends
 (DEC-386), also when the launcher is interrupted or sent SIGTERM or SIGHUP
 (DEC-392). Nothing fails open: whatever cannot be read or is not of the stated
@@ -30,6 +31,7 @@ from gov.cli.errors import GovError
 from gov.guard.decide import ACCEPTANCE, _load_ticket
 from gov.guard.heldout import HeldOutError, load_held_out, load_yaml_unique
 from gov.guard.install import experiment_folder
+from gov.guard.reads import PolicyError, read_denials
 from gov.guard import runs
 
 # DEC-386: product-spec is launched as the other workers are, with no host in its allowlist.
@@ -145,6 +147,12 @@ def build_settings(root: Path, role: str, ticket_id: str) -> dict:
         deny += [f"Read(/{path}/**)" for path in load_held_out(str(root))]  # a missing file: no rule (DEC-242)
     except HeldOutError as error:
         raise _refuse(f"{error} (DEC-218)") from None
+    # DEC-820 (c), (d): the session's protected parts, each rule with a wildcard, so that it binds the file tools
+    # and not the commands' sandbox, which skips a pattern on Linux: the session's pytest still reads them.
+    try:
+        deny += read_denials(root, role, ticket_id)
+    except PolicyError as error:
+        raise _refuse(f"{error} (DEC-820)") from None
     return {
         "env": {"GOV_ROLE": role, "GOV_TICKET": ticket_id},
         "permissions": {"deny": deny},

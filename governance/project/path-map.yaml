@@ -406,3 +406,13 @@ load_sensitive:
     decision: DEC-823
     reason: "fails once in the full regression at load about 25 and passes alone, 3 of 3 in 17.8 s with a 2 s reaping margin (W2-53's re-close, 2026-10-19 12:01)"
     fixed_by: W2-M384
+# The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
+# in `tickets`) is refused reads of the hidden part by the guard and by its sandbox, and reads the visible part.
+# memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under
+# fixtures/, a product-memory namespace the indexer never reads. W2-61 narrows `measures` to tickets.
+evaluation_sets:
+  memory-retrieval:
+    visible: ["docs/assessment/2026-10/B-memory-retrieval.md"]
+    hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
+    measures:
+      roles: [engineer, research]
