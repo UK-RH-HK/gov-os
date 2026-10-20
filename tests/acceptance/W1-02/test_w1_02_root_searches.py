@@ -1,4 +1,14 @@
-"""W1-02 — a search from the project root that gives no path or glob is refused, for every role (DEC-557, P-23).
+"""W1-02 — a search from the project root that gives no path or glob: refused before W2-58, allowed under Policy 2.
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): DEC-557's
+refusal existed for the two protected files' sake; Policy 2 (DEC-820) narrows it
+away, so every case below that held such a search as refused now holds it as
+allowed. One exception, for (c) and not for the files: an engineer's search
+from the root takes in its own ticket's acceptance folder
+(``tests/acceptance/W1-90/``), so it stays refused (W2-58 KPI success 1).
+The cases of what stays allowed are unchanged.
+
+Before Policy 2 (DEC-557, P-23):
 
 DEC-557: "A search from the project root that gives no path or glob is refused
 by the guard, for every role."
@@ -80,10 +90,10 @@ ROOT_TOOL = {
 
 
 @pytest.mark.parametrize("form", sorted(ROOT_TOOL))
-def test_a_search_tool_call_from_the_root_with_no_path_or_glob_is_refused(world, form):
-    """Point 1, the search tool: nothing keeps either file out of such a search."""
+def test_a_search_tool_call_from_the_root_with_no_path_or_glob_is_allowed_under_policy_2(world, form):
+    """Point 1, the search tool: no longer refused for the protected files' sake (DEC-821 item 3)."""
     result = rnd.ask_form(world, ROOT_TOOL[form], ROOT)
-    rnd.assert_refused_by_the_rule(result, f"a search tool call from the root with {form}")
+    protected.assert_allowed(result, f"a search tool call from the root with {form}")
 
 
 # --------------------------------------------------------------------------
@@ -139,10 +149,10 @@ ROOT_SHELL = {
 
 
 @pytest.mark.parametrize("form", sorted(ROOT_SHELL))
-def test_a_shell_search_from_the_root_with_no_path_is_refused(world, form):
+def test_a_shell_search_from_the_root_with_no_path_is_allowed_under_policy_2(world, form):
     """Point 1, the shell: a recursive search, a ``find`` or a recursive listing whose start is the root."""
     result = rnd.ask_form(world, ROOT_SHELL[form], ROOT)
-    rnd.assert_refused_by_the_rule(result, f"the shell search '{form}' from the root")
+    protected.assert_allowed(result, f"the shell search '{form}' from the root")
 
 
 # A wildcard word from the root takes in the folders that hold the held-out file: the search goes down into them.
@@ -153,14 +163,14 @@ WILDCARD_WORD = {
 
 
 @pytest.mark.parametrize("form", sorted(WILDCARD_WORD))
-def test_a_recursive_search_over_a_wildcard_word_from_the_root_is_refused(world, form):
+def test_a_recursive_search_over_a_wildcard_word_from_the_root_is_allowed_under_policy_2(world, form):
     """Point 1: the wildcard takes in a folder that holds a protected file, and the search is recursive.
 
     Allowed before the change: the guard matches a wildcard word against the two
     files' own paths, and a single star stops at the first folder.
     """
     result = rnd.ask_form(world, WILDCARD_WORD[form], ROOT)
-    rnd.assert_refused_by_the_rule(result, f"the shell search '{form}' from the root")
+    protected.assert_allowed(result, f"the shell search '{form}' from the root")
 
 
 # --------------------------------------------------------------------------
@@ -188,10 +198,10 @@ P_FORMS = {
 
 @pytest.mark.parametrize("site", SITES)
 @pytest.mark.parametrize("form", sorted(P_FORMS))
-def test_a_search_from_a_copy_s_folder_with_no_path_or_glob_is_refused(world, form, site):
+def test_a_search_from_a_copy_s_folder_with_no_path_or_glob_is_allowed_under_policy_2(world, form, site):
     """Point 1 from ``<P>``: a sibling checkout, a folder below the root that is not the root, the stand-in home."""
     result = rnd.ask_form(world, P_FORMS[form], site)
-    rnd.assert_refused_by_the_rule(result, f"{form} from the site '{site}'")
+    protected.assert_allowed(result, f"{form} from the site '{site}'")
 
 
 # The home folder as a shell spells it: ``~`` and ``$HOME`` are the stand-in home of the hook's environment.
@@ -205,10 +215,10 @@ HOME_SHELL = {
 
 
 @pytest.mark.parametrize("form", sorted(HOME_SHELL))
-def test_a_search_from_the_home_folder_as_a_shell_spells_it_is_refused(world, form):
-    """Point 1 on the user-level settings file: the home folder is its ``<P>``."""
+def test_a_search_from_the_home_folder_as_a_shell_spells_it_is_allowed_under_policy_2(world, form):
+    """Point 1 on the user-level settings file: the home folder is its ``<P>``; Policy 2 opens the search."""
     result = folders.ask_bash(world, HOME_SHELL[form], WIDEST)
-    rnd.assert_refused_by_the_rule(result, f"{form} (the stand-in home)")
+    protected.assert_allowed(result, f"{form} (the stand-in home)")
 
 
 # --------------------------------------------------------------------------
@@ -228,10 +238,19 @@ BY_ROLE = [(start, who, _ROLE_FORM_NAMES[(row + column) % len(_ROLE_FORM_NAMES)]
 
 
 @pytest.mark.parametrize("start,who,form", BY_ROLE, ids=[f"{start}-{who}-{form}" for start, who, form in BY_ROLE])
-def test_a_search_with_no_path_or_glob_is_refused_for_every_role(world, start, who, form):
-    """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above)."""
+def test_a_search_with_no_path_or_glob_is_allowed_for_every_role_but_the_engineer_s_from_the_root(world, start, who,
+                                                                                                  form):
+    """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above).
+
+    Allowed under Policy 2, but the engineer's from the root: the root holds its ticket's acceptance folder
+    (``tests/acceptance/W1-90/``), so (c) refuses that search (W2-58 KPI success 1), whatever its reason says.
+    """
     result = rnd.ask_form(world, ROLE_FORMS[form], start, who)
-    rnd.assert_refused_by_the_rule(result, f"{form} from '{start}' by '{who}'")
+    what = f"{form} from '{start}' by '{who}'"
+    if who == folders.NOT_A_WRITER and start == ROOT:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        protected.assert_allowed(result, what)
 
 
 @pytest.mark.parametrize("form", ("the-root-as-an-absolute-path", "a-type-filter-only-and-no-path"))
@@ -245,15 +264,13 @@ SAID = [(ROOT, name) for name in rnd.FILES] + rnd.COPIES
 
 
 @pytest.mark.parametrize("start,name", SAID, ids=[f"{start}-{name}" for start, name in SAID])
-def test_the_refusal_of_a_search_names_the_rule_and_no_path(world, start, name):
-    """A refusal names the rule and the decision: not the file, not its folder, not the start, no value of the file.
-
-    The shell form carries the start in the command, so a refusal that echoes the command fails.
-    """
+def test_the_search_is_allowed_and_the_hook_says_nothing_of_the_file(world, start, name):
+    """Before Policy 2 a refusal named the rule and no path; now the search is allowed (by the orchestrator), and the
+    hook's output carries nothing of the file, its folder or the start."""
     form = "grep-r-absolute"
     result = rnd.ask_form(world, P_FORMS[form], start)
     what = f"{form} from '{start}'"
-    rnd.assert_refused_by_the_rule(result, what)
+    protected.assert_allowed(result, what)
     rnd.assert_says_nothing(result, world, start, name, what)
 
 

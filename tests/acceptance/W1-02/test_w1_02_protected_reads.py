@@ -1,6 +1,14 @@
-"""W1-02 — the guard refuses every agent read of the settings file and of the held-out file.
+"""W1-02 — reads of the settings file and of the held-out file: refused before W2-58, allowed under Policy 2.
 
-Owner's order (DEC-508, DEC-525): "the guard refuses any agent tool call that
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): Policy 2
+(DEC-820) opens every read but four (secrets, the held-out material's
+contents, the counterpart's work on a ticket, an evaluation set's hidden part).
+The held-out list file holds names, not contents, and the settings file holds
+no secret, so every case below that held a read of either file as refused now
+holds it as allowed, by the same actor, in the same form. The write rules are
+not touched here (the write cases live in their own files and stand).
+
+Owner's order before Policy 2 (DEC-508, DEC-525): "the guard refuses any agent tool call that
 reads ``.claude/settings.json`` or the project's held-out file ..., for every
 role, the orchestrator included", and "the guard refuses any agent tool call
 whose expanded file targets (globs included, DEC-108) include the project's
@@ -25,7 +33,6 @@ A refusal names the rule and the decision, and nothing of the file
 from __future__ import annotations
 
 import os
-import re
 
 import pytest
 
@@ -130,27 +137,28 @@ CORE = ("Read-absolute", "Grep-over-the-folder-with-a-glob", "Bash-cat-relative"
 
 
 # --------------------------------------------------------------------------
-# Refused: every form, by the role with the widest scope
+# Allowed under Policy 2: every form, by the role with the widest scope
+# (rewritten by W2-58: DEC-821 item 3, DEC-857 item 3; before, each was refused)
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(FORMS))
-def test_a_read_of_a_protected_file_is_refused(guarded, form, name):
-    """Line 1: each tool, the glob and folder forms, relative and absolute spellings, a link, a copy."""
+def test_a_read_of_a_protected_file_is_allowed_under_policy_2(guarded, form, name):
+    """Each tool, the glob and folder forms, relative and absolute spellings, a link, a copy: read as any file is."""
     tool_name, tool_input = FORMS[form](guarded, name)
     result = protected.ask(guarded, tool_name, tool_input, WIDEST)
-    protected.assert_refused_by_rule(result, f"{form} ({tool_name}) on the stand-in {name} by the {WIDEST}")
+    protected.assert_allowed(result, f"{form} ({tool_name}) on the stand-in {name} by the {WIDEST}")
 
 
 @pytest.mark.parametrize("form", sorted(SETTINGS_FORMS))
-def test_a_command_that_prints_the_settings_file_is_refused(guarded, form):
-    """Line 1, and the incident behind DEC-525. Only ``git diff --stat`` and ``git status`` name the file freely."""
+def test_a_command_that_prints_the_settings_file_is_allowed_under_policy_2(guarded, form):
+    """The incident behind DEC-525 is no longer refused: the settings file's reads follow Policy 2 (DEC-857 item 3)."""
     tool_name, tool_input = SETTINGS_FORMS[form](guarded, "settings-file")
     result = protected.ask(guarded, tool_name, tool_input, WIDEST)
-    protected.assert_refused_by_rule(result, f"{form} on the stand-in settings file by the {WIDEST}")
+    protected.assert_allowed(result, f"{form} on the stand-in settings file by the {WIDEST}")
 
 
-def test_the_search_behind_dec_508_is_refused(guarded):
+def test_the_search_behind_dec_508_is_allowed_under_policy_2(guarded):
     """The incident behind DEC-508: a test designer's search with a glob over the folder that holds the file."""
     name = "held-out-file"
     for tool_name, tool_input in (
@@ -158,52 +166,48 @@ def test_the_search_behind_dec_508_is_refused(guarded):
         ("Grep", {"pattern": "path", "path": guarded.folder_rel(name), "glob": f"*{_ext(guarded, name)}"}),
     ):
         result = protected.ask(guarded, tool_name, tool_input, "test-designer")
-        protected.assert_refused_by_rule(result, f"{tool_name} with a glob over the held-out file's folder")
+        protected.assert_allowed(result, f"{tool_name} with a glob over the held-out file's folder")
 
 
 # --------------------------------------------------------------------------
-# Refused: for every role
+# Allowed under Policy 2: for every role
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("who", sorted(protected.ACTORS))
 @pytest.mark.parametrize("form", CORE)
-def test_a_read_of_a_protected_file_is_refused_for_every_role(guarded, form, who, name):
-    """Line 1: every role, no role, an unknown role, a role subagent, a subagent that is not a role."""
+def test_a_read_of_a_protected_file_is_allowed_for_every_role(guarded, form, who, name):
+    """Every role, no role, an unknown role, a role subagent, a subagent that is not a role: each reads an ordinary
+    file in these forms today, and reads these two files the same way under Policy 2."""
     tool_name, tool_input = FORMS[form](guarded, name)
     result = protected.ask(guarded, tool_name, tool_input, who)
-    protected.assert_refused_by_rule(result, f"{form} ({tool_name}) on the stand-in {name} by {who}")
+    protected.assert_allowed(result, f"{form} ({tool_name}) on the stand-in {name} by {who}")
 
 
-def test_a_read_of_a_protected_file_is_refused_while_frozen(hook, tmp_path):
-    """The freeze stops writes and leaves reading open (KPI success 3); these two files stay closed."""
+def test_a_read_of_a_protected_file_is_allowed_while_frozen(hook, tmp_path):
+    """The freeze stops writes and leaves reading open (KPI success 3); under Policy 2 these two files are read too."""
     guarded = protected.make_guarded(tmp_path)
     support.set_freeze(guarded.project)
     for name in FILES:
         result = protected.ask(guarded, "Read", {"file_path": str(guarded.path(name))}, "engineer")
-        protected.assert_refused_by_rule(result, f"Read on the stand-in {name} by the engineer while frozen")
+        protected.assert_allowed(result, f"Read on the stand-in {name} by the engineer while frozen")
 
 
 # --------------------------------------------------------------------------
-# Line 5: what a refusal says
+# Line 5: before Policy 2, what a refusal said; now the call is allowed and the hook says nothing of the file
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", CORE + ("Bash-copy-with-the-file-as-source",))
-def test_a_refusal_names_the_decision_and_nothing_of_the_file(guarded, form, name):
-    """Line 5: the rule and DEC-508 or DEC-525; no content, no deny value, not the held-out file's path."""
+def test_an_allowed_read_carries_nothing_of_the_file_in_the_hook_s_output(guarded, form, name):
+    """The call is allowed; what the hook itself prints carries no content, no deny value, no held-out path."""
     tool_name, tool_input = FORMS[form](guarded, name)
     result = protected.ask(guarded, tool_name, tool_input, WIDEST)
-    protected.assert_refused_by_rule(result, f"{form} on the stand-in {name}")
-    reason = protected.reason_of(result)
-    assert re.search(r"\bDEC-(508|525)\b", reason), (
-        f"the refusal of {form} on the stand-in {name} names neither DEC-508 nor DEC-525"
-    )
-    assert re.sub(r"\bDEC-\d+\b", "", reason).strip(" .:;()[]"), "the refusal names a decision and no rule"
+    protected.assert_allowed(result, f"{form} on the stand-in {name}")
     said = protected.output_of(result)
     shown = [index for index, secret in enumerate(guarded.secrets(name)) if secret in said]
-    # The values are not put in the message: a failure must not print what a refusal must not print.
+    # The values are not put in the message: a failure must not print what the hook must not print.
     assert not shown, (
-        f"the refusal of {form} on the stand-in {name} carries {len(shown)} value(s) it must not "
+        f"the hook's output for {form} on the stand-in {name} carries {len(shown)} value(s) it must not "
         f"(positions {shown} of Guarded.secrets): the file's content, a deny value, or the held-out file's path"
     )

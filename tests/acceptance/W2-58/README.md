@@ -79,6 +79,15 @@ repository's path map have no `evaluation_sets` block.
   a folder above it or a path inside it, or when a `sandbox.filesystem.denyRead` entry holds the file. Rules are read
   as the CLI reads them: `//abs`, `~/home`, `/` or `./` from the project.
 
+## Earlier cases rewritten (DEC-821 item 3, DEC-857 item 3)
+
+In `tests/acceptance/W1-02/`: every refusal case of `test_w1_02_protected_reads.py` (6 functions, 190 cases) and the
+refusal cases of `test_w1_02_root_searches.py` (7 functions, 122 cases), each now held as allowed for the same actor
+in the same form; the engineer's search from the root stays refused, now for (c). Before the implementation they
+are red (today's guard refuses them); the unchanged cases of both files stay green. The full list, with the 920 W1-02
+cases in 83 functions not rewritten (package P-W2-58-TD-1) and W2-50's 91 second-name cases, is in
+[`EARLIER_CASES.md`](EARLIER_CASES.md).
+
 ## How the tests exercise this worktree's code
 
 Run from this worktree with `PYTHONPATH` set per command:
