@@ -1,4 +1,13 @@
-"""W1-02 — a shell search whose name filter names or matches a protected file is refused (DEC-562, probe finding 1).
+"""W1-02 — a shell search whose name filter names or matches a protected file: refused before W2-58, now allowed.
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): Policy 2
+(DEC-820) opens reads and searches of both files and of their copies, so every
+case below that held such a search as refused now holds it as allowed, by the
+same actor. One cell is left to (c): the engineer's search from the root with a
+name filter (whether the filter keeps its acceptance folder out is not stated);
+it is asked only not to be refused as a read of the two files.
+
+Before Policy 2 (DEC-562, probe finding 1):
 
 DEC-562: "A search in the shell from the project root, or from a copy's folder,
 whose name filter names either file's name or matches it (``--include``, the
@@ -88,11 +97,11 @@ SPELLINGS = {
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("filter_", sorted(FILTERS))
 @pytest.mark.parametrize("spelling", sorted(SPELLINGS))
-def test_a_shell_search_from_the_root_whose_name_filter_takes_a_protected_file_in_is_refused(world, spelling,
+def test_a_shell_search_from_the_root_whose_name_filter_takes_a_protected_file_in_is_allowed_under_policy_2(world, spelling,
                                                                                             filter_, name):
     """Point 2: each spelling of the filter, each filter, each file; the session stands in the root."""
     result = rnd.ask_form(world, SPELLINGS[spelling], ROOT, f=FILTERS[filter_](name))
-    rnd.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"{spelling} from the root with a filter for the stand-in {name} ({filter_})")
 
 
@@ -102,7 +111,7 @@ def test_a_shell_search_from_the_root_whose_name_filter_takes_a_protected_file_i
 def test_a_case_insensitive_filter_in_another_case_takes_the_file_in(world, spelling, name):
     """Point 2: the case-insensitive twin matches the file's name whatever the case of the filter."""
     result = rnd.ask_form(world, SPELLINGS[spelling], ROOT, f=_base(name).upper())
-    rnd.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"{spelling} from the root with the name of the stand-in {name} in capitals")
 
 
@@ -116,10 +125,10 @@ ROOT_PATHS = {
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(ROOT_PATHS))
-def test_the_root_as_the_search_s_path_in_another_spelling_is_refused(world, form, name):
+def test_the_root_as_the_search_s_path_in_another_spelling_is_allowed_under_policy_2(world, form, name):
     """Point 2: "no path, or the root as the path": absolute, after a change of folder, relative."""
     result = rnd.ask_form(world, ROOT_PATHS[form], ROOT, f=_base(name))
-    rnd.assert_refused_by_the_rule(result, f"{form} with the name of the stand-in {name}")
+    protected.assert_allowed(result, f"{form} with the name of the stand-in {name}")
 
 
 SEVERAL = {
@@ -134,7 +143,7 @@ SEVERAL = {
 @pytest.mark.parametrize("form", sorted(SEVERAL))
 def test_with_several_filters_one_that_matches_is_enough(world, form, name):
     result = rnd.ask_form(world, SEVERAL[form], ROOT, f=_base(name))
-    rnd.assert_refused_by_the_rule(result, f"{form} from the root, for the stand-in {name}")
+    protected.assert_allowed(result, f"{form} from the root, for the stand-in {name}")
 
 
 # --------------------------------------------------------------------------
@@ -152,11 +161,11 @@ P_FORMS = {
 @pytest.mark.parametrize("site,name", rnd.COPIES, ids=rnd.COPY_IDS)
 @pytest.mark.parametrize("filter_", ("its-own-name", "its-extension"))
 @pytest.mark.parametrize("form", sorted(P_FORMS))
-def test_a_shell_search_from_a_copy_s_folder_whose_name_filter_takes_the_copy_in_is_refused(world, form, filter_,
+def test_a_shell_search_from_a_copy_s_folder_whose_name_filter_takes_the_copy_in_is_allowed_under_policy_2(world, form, filter_,
                                                                                            site, name):
     """Point 2 from ``<P>``: a sibling checkout, a folder below the root that is not the root, the stand-in home."""
     result = rnd.ask_form(world, P_FORMS[form], site, f=FILTERS[filter_](name))
-    rnd.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"{form} from the site '{site}' with a filter for the copy of the stand-in {name} ({filter_})")
 
 
@@ -169,11 +178,11 @@ HOME_SHELL = {
 
 @pytest.mark.parametrize("filter_", ("its-own-name", "its-extension"))
 @pytest.mark.parametrize("form", sorted(HOME_SHELL))
-def test_a_name_filter_for_the_user_level_settings_file_from_the_home_folder_is_refused(world, form, filter_):
+def test_a_name_filter_for_the_user_level_settings_file_from_the_home_folder_is_allowed_under_policy_2(world, form, filter_):
     """``~``, ``$HOME`` and a bare ``cd`` name the stand-in home of the hook's environment."""
     command = HOME_SHELL[form].format(f=FILTERS[filter_](rnd.SETTINGS))
     result = folders.ask_bash(world, command, WIDEST)
-    rnd.assert_refused_by_the_rule(result, f"{form} with a filter for the settings file ({filter_})")
+    protected.assert_allowed(result, f"{form} with a filter for the settings file ({filter_})")
 
 
 # --------------------------------------------------------------------------
@@ -190,9 +199,9 @@ EXCLUDING = {
 
 @pytest.mark.parametrize("start", (ROOT, "sibling"))
 @pytest.mark.parametrize("form", sorted(EXCLUDING))
-def test_a_search_whose_only_filter_excludes_is_refused_as_a_search_with_no_filter(world, form, start):
+def test_a_search_whose_only_filter_excludes_is_allowed_as_a_search_with_no_filter_is(world, form, start):
     result = rnd.ask_form(world, EXCLUDING[form], start)
-    rnd.assert_refused_by_the_rule(result, f"{form} from '{start}'")
+    protected.assert_allowed(result, f"{form} from '{start}'")
 
 
 # --------------------------------------------------------------------------
@@ -208,25 +217,35 @@ BY_ROLE = [(start, who, _ROLE_SPELLINGS[(row + column) % len(_ROLE_SPELLINGS)],
 
 @pytest.mark.parametrize("start,who,spelling,name", BY_ROLE,
                          ids=[f"{start}-{who}-{spelling}-{name}" for start, who, spelling, name in BY_ROLE])
-def test_a_name_filter_that_takes_a_protected_file_in_is_refused_for_every_role(world, start, who, spelling, name):
-    """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above)."""
+def test_a_name_filter_that_takes_a_protected_file_in_is_decided_by_policy_2_for_every_role(world, start, who,
+                                                                                           spelling, name):
+    """"For every role": an engineer, the test designer and a session with no role (the orchestrator is above).
+
+    Allowed under Policy 2. The engineer's search from the root lies above its ticket's acceptance folder
+    (``tests/acceptance/W1-90/``); whether a name filter for the settings file or the held-out list keeps that folder
+    out is not stated by any source, so that one cell asks only that the call is not refused as a read of the two
+    files (DEC-821 item 1, item 3).
+    """
     result = rnd.ask_form(world, SPELLINGS[spelling], start, who, f=_base(name))
-    rnd.assert_refused_by_the_rule(result, f"{spelling} from '{start}' by '{who}', for the stand-in {name}")
+    what = f"{spelling} from '{start}' by '{who}', for the stand-in {name}"
+    if who == folders.NOT_A_WRITER and start == ROOT:
+        assert result.decision in ("allow", "deny") and result.returncode == 0, f"{what}: {result.describe()}"
+        assert not rnd.RULE_RE.search(protected.reason_of(result)), f"{what} was refused as a read of the two files"
+    else:
+        protected.assert_allowed(result, what)
 
 
 SAID = [(ROOT, name) for name in FILES] + [("sibling", name) for name in FILES] + [("home", rnd.SETTINGS)]
 
 
 @pytest.mark.parametrize("start,name", SAID, ids=[f"{start}-{name}" for start, name in SAID])
-def test_the_refusal_of_a_name_filter_names_the_rule_and_neither_the_file_nor_the_start(world, start, name):
-    """A refusal names the rule and the decision: no path, not the start, no value of the file.
-
-    The command carries the start and, as its filter, the file's own name: a refusal that echoes the command fails.
-    """
+def test_a_name_filter_search_is_allowed_and_the_hook_says_nothing_of_the_file_or_the_start(world, start, name):
+    """Before Policy 2 a refusal named the rule and no path; now the search is allowed, and the hook's output carries
+    no path, not the start, no value of the file, not the command."""
     form = "grep-include-absolute"
     result = rnd.ask_form(world, P_FORMS[form], start, f=_base(name))
     what = f"{form} from '{start}' with the name of the stand-in {name}"
-    rnd.assert_refused_by_the_rule(result, what)
+    protected.assert_allowed(result, what)
     rnd.assert_says_nothing(result, world, start, name, what, more=(f"--include='{_base(name)}'",))
 
 
