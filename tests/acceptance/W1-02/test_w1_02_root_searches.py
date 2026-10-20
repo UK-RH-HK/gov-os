@@ -336,9 +336,17 @@ DAILY_SHELL = {
 @pytest.mark.parametrize("who", (WIDEST,) + rnd.OTHER_ROLES)
 @pytest.mark.parametrize("form", sorted(DAILY_SHELL))
 def test_the_daily_shell_forms_stay_allowed(world, form, who):
-    """A search of a source folder, a named file, a listing of the root without recursion: as today, for every role."""
+    """A search of a source folder, a named file, a listing of the root without recursion: as today, for every role.
+
+    Rewritten by W2-58 for one cell (DEC-821 item 1): ``grep -rn VALUE src tests`` by the engineer searches ``tests/``,
+    which holds its ticket's acceptance folder (``tests/acceptance/W1-90/``): refused for (c).
+    """
     result = rnd.ask_form(world, DAILY_SHELL[form], ROOT, who)
-    protected.assert_allowed(result, f"the shell form '{form}' by '{who}'")
+    what = f"the shell form '{form}' by '{who}'"
+    if form == "grep-rn-over-two-source-folders" and who == folders.NOT_A_WRITER:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        protected.assert_allowed(result, what)
 
 
 @pytest.mark.parametrize("who", rnd.OTHER_ROLES)
