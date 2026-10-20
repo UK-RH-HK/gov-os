@@ -1,4 +1,11 @@
-"""W1-02 — a glob made of wildcards alone from a copy's folder is refused as from the session's root (DEC-553, DP-6).
+"""W1-02 — a glob made of wildcards alone from a copy's folder: refused before W2-58, allowed under Policy 2.
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3; the lead's
+reading of P-W2-58-TD-2 (ii): copies of the two files elsewhere and the
+user-level settings file are open to reads): every case below that held such a
+glob as refused now holds it as allowed, by the same actor. Before Policy 2:
+
+(DEC-553, DP-6) a glob made of wildcards alone from a copy's folder was refused as from the session's root.
 
 DEC-553: "A glob made of wildcards alone from the folder a copy lies under is
 refused as the same glob from the session's own root is: the two no longer
@@ -103,59 +110,59 @@ def _ask(world, start, form, pattern, who=WIDEST):
 
 @pytest.mark.parametrize("site", SITES)
 @pytest.mark.parametrize("form", sorted(FORMS))
-def test_a_glob_over_everything_from_a_copy_s_folder_is_refused(world, form, site):
+def test_a_glob_over_everything_from_a_copy_s_folder_is_allowed_under_policy_2(world, form, site):
     """DP-6: the pattern over everything, in each tool form, from each ``<P>``; relative and absolute starts."""
     result = _ask(world, world.site(site).root, form, EVERYTHING)
-    folders.assert_refused_by_the_rule(result, f"{form} with a glob over everything from the site '{site}'")
+    protected.assert_allowed(result, f"{form} with a glob over everything from the site '{site}'")
 
 
 @pytest.mark.parametrize("site,name", COPIES, ids=COPY_IDS)
 @pytest.mark.parametrize("form", CORE)
-def test_a_glob_over_every_file_at_the_copy_s_depth_is_refused(world, form, site, name):
+def test_a_glob_over_every_file_at_the_copy_s_depth_is_allowed_under_policy_2(world, form, site, name):
     """DP-6: one star per level down to where the copy lies: it names no file and takes the copy in."""
     result = _ask(world, world.site(site).root, form, folders.depth_glob(name))
-    folders.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"{form} with one star per level of the stand-in {name} from the site '{site}'")
 
 
 @pytest.mark.parametrize("pattern", OTHER_EVERYTHING, ids=("two-stars", "a-star-then-two-stars"))
 @pytest.mark.parametrize("form", ("Glob-with-an-absolute-path", "Grep-with-an-absolute-path", "cat-absolute"))
-def test_the_other_globs_over_everything_are_refused(world, form, pattern):
+def test_the_other_globs_over_everything_are_allowed_under_policy_2(world, form, pattern):
     """DP-6: the other spellings of "everything" the root refuses, from a sibling checkout."""
     result = _ask(world, world.site("sibling").root, form, pattern)
-    folders.assert_refused_by_the_rule(result, f"{form} with another glob over everything from another checkout")
+    protected.assert_allowed(result, f"{form} with another glob over everything from another checkout")
 
 
 @pytest.mark.parametrize("site", SITES)
 @pytest.mark.parametrize("form", GREP_FORMS)
-def test_a_search_whose_glob_is_a_single_star_is_refused(world, form, site):
+def test_a_search_whose_glob_is_a_single_star_is_allowed_under_policy_2(world, form, site):
     """DP-6: in the search tool a glob with no slash is a name at any depth; the root refuses a single star."""
     result = _ask(world, world.site(site).root, form, "*")
-    folders.assert_refused_by_the_rule(result, f"{form} with a single star as its glob from the site '{site}'")
+    protected.assert_allowed(result, f"{form} with a single star as its glob from the site '{site}'")
 
 
 @pytest.mark.parametrize("site,name", COPIES, ids=COPY_IDS)
-def test_a_search_whose_glob_starts_with_a_slash_is_refused(world, site, name):
+def test_a_search_whose_glob_starts_with_a_slash_is_allowed_under_policy_2(world, site, name):
     """DP-6: a glob with a slash in front is read from the search's folder; one star per level of the copy."""
     result = _ask(world, world.site(site).root, "Grep-with-an-absolute-path", "/" + folders.depth_glob(name))
-    folders.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"Grep with a slash and one star per level of the stand-in {name} from the site '{site}'")
 
 
 @pytest.mark.parametrize("site", SITES)
-def test_a_search_over_everything_with_a_slash_in_front_is_still_refused(world, site):
-    """Refused from ``<P>`` before DEC-553 already (green today), and held."""
+def test_a_search_over_everything_with_a_slash_in_front_is_allowed_under_policy_2(world, site):
+    """Refused from ``<P>`` before DEC-553 already; under Policy 2 a search over a copy's folder is open."""
     result = _ask(world, world.site(site).root, "Grep-with-an-absolute-path", "/" + EVERYTHING)
-    folders.assert_refused_by_the_rule(result, f"Grep with a slash and a glob over everything from the site '{site}'")
+    protected.assert_allowed(result, f"Grep with a slash and a glob over everything from the site '{site}'")
 
 
 @pytest.mark.parametrize("pattern", ("everything", "depth"))
 @pytest.mark.parametrize("form", sorted(HOME_FORMS))
-def test_a_wildcard_only_glob_from_the_home_folder_as_a_shell_spells_it_is_refused(world, form, pattern):
+def test_a_wildcard_only_glob_from_the_home_folder_as_a_shell_spells_it_is_allowed_under_policy_2(world, form, pattern):
     """DP-6 on the user-level settings file: ``~``, ``$HOME`` and a bare ``cd`` name the stand-in home."""
     glob = EVERYTHING if pattern == "everything" else folders.depth_glob(SETTINGS)
     result = folders.ask_bash(world, HOME_FORMS[form].format(pat=glob), WIDEST)
-    folders.assert_refused_by_the_rule(result, f"{form} with a wildcard-only glob ({pattern}) from the stand-in home")
+    protected.assert_allowed(result, f"{form} with a wildcard-only glob ({pattern}) from the stand-in home")
 
 
 # --------------------------------------------------------------------------
@@ -169,22 +176,20 @@ BY_ROLE = [(site, who, ("Glob-with-an-absolute-path", "cat-absolute")[(row + col
 
 
 @pytest.mark.parametrize("site,who,form", BY_ROLE, ids=[f"{site}-{who}-{form}" for site, who, form in BY_ROLE])
-def test_a_wildcard_only_glob_from_a_copy_s_folder_is_refused_for_every_role(world, site, who, form):
+def test_a_wildcard_only_glob_from_a_copy_s_folder_is_allowed_for_every_role(world, site, who, form):
     """DP-6: "for every role": an engineer, a session with no role, the test designer (the orchestrator is above)."""
     result = _ask(world, world.site(site).root, form, EVERYTHING, who)
-    folders.assert_refused_by_the_rule(result, f"{form} with a glob over everything from the site '{site}' by '{who}'")
+    protected.assert_allowed(result, f"{form} with a glob over everything from the site '{site}' by '{who}'")
 
 
 @pytest.mark.parametrize("site,name", COPIES, ids=COPY_IDS)
-def test_the_refusal_of_a_wildcard_only_glob_names_neither_the_copy_nor_its_folder(world, site, name):
-    """A refusal names the rule and the decision: not the copy, not its folder, not ``<P>``, no value of the file.
-
-    The shell form carries ``<P>`` in the command, so a refusal that echoes the command fails.
-    """
+def test_a_wildcard_only_glob_is_allowed_and_the_hook_says_nothing_of_the_copy_or_its_folder(world, site, name):
+    """Before Policy 2 a refusal named the rule and no path; now the call is allowed, and the hook's output carries
+    nothing of the copy, its folder, ``<P>`` or the file."""
     form = "cat-absolute"
     result = _ask(world, world.site(site).root, form, folders.depth_glob(name))
     what = f"{form} with one star per level of the stand-in {name} from the site '{site}'"
-    folders.assert_refused_by_the_rule(result, what)
+    protected.assert_allowed(result, what)
     folders.assert_says_nothing(result, world, site, name, what)
 
 
