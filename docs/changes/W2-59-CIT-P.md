@@ -279,4 +279,5 @@ Run 2's engineer, after the change of §3.2 (`-E` on each line), every run with
 
 - W2-59's acceptance tests (`tests/acceptance/W2-59`, revised in `6e95cd41`): 55 passed (the nine cases of a
   worker's inherited `PYTHONPATH`, red at `6e95cd41` by the lead's record, now pass).
+- W1-38's acceptance tests (the hook-source tests): 201 passed.
 - Builder tests: the three files above and `tests/unit/validate/test_canary.py`: 16 passed.
