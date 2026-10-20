@@ -143,7 +143,7 @@ def test_the_settings_deny_the_read_tool_the_session_s_protected_parts(tmp_path,
                                    "    measures: {roles: [engineer]}\n")
     deny = launcher.build_settings(root, "engineer", "DAEO-t95")["permissions"]["deny"]
     reads = [rule for rule in deny if rule.startswith("Read(")]
-    assert reads == [f"Read(/{root}/tests/acceptance/W2-95/**)", f"Read(/{root}/eval/hidden/**)"]
+    assert reads == [f"Read(/{root}/tests/acceptance/W2-9[5]/**)", f"Read(/{root}/eval/hidde[n]/**)"]
     assert launcher.build_settings(root, "independent-auditor", "DAEO-t95")["permissions"]["deny"] == [
         rule for rule in launcher._tree_rules(root, "independent-auditor")]
 

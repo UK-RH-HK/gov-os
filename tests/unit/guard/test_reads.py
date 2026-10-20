@@ -8,6 +8,7 @@ ticket's WBS id is a stand-in, W2-95.
 
 from __future__ import annotations
 
+import fnmatch
 import os
 import subprocess
 import sys
@@ -237,12 +238,27 @@ def test_a_set_s_shape_is_checked(entry, fault):
 
 def test_the_sandbox_rules_hold_a_wildcard_and_cover_the_parts(project):
     root = os.path.realpath(project)
-    assert read_denials(project, "engineer", TICKET) == [f"Read(/{root}/tests/acceptance/W2-95/**)"]
-    assert read_denials(project, "independent-test-designer", TICKET) == [
-        f"Read(/{root}/src/app/added.py*)", f"Read(/{root}/src/app/main.py*)"]
-    assert read_denials(project, "research", TICKET) == [
-        f"Read(/{root}/eval/hidden/**)", f"Read(/{root}/eval/answers-*.yaml)"]
-    assert read_denials(project, "independent-auditor", TICKET) == []
+    rules = {role: read_denials(project, role, TICKET) for role in (
+        "engineer", "independent-test-designer", "research", "independent-auditor")}
+    assert rules == {
+        "engineer": [f"Read(/{root}/tests/acceptance/W2-9[5]/**)"],
+        "independent-test-designer": [f"Read(/{root}/src/app/added.py*)", f"Read(/{root}/src/app/main.py*)"],
+        "research": [f"Read(/{root}/eval/hidde[n]/**)", f"Read(/{root}/eval/answers-*.yaml)"],
+        "independent-auditor": []}
+    # A wildcard inside a name, not a trailing /** alone, which the CLI
+    # applies to the commands' sandbox as the folder; each rule covers its files.
+    covered = {"engineer": ["tests/acceptance/W2-95/test_feature.py"],
+               "independent-test-designer": ["src/app/main.py", "src/app/added.py"],
+               "research": ["eval/hidden/a.yaml", "eval/answers-x.yaml"]}
+    for role, rels in covered.items():
+        for rule in rules[role]:
+            body = rule[len("Read(/"):-1]
+            assert any(c in body.removesuffix("/**") for c in "*?["), rule
+        for rel in rels:
+            assert any(fnmatch.fnmatch(f"{root}/{rel}", rule[len("Read(/"):-1])
+                       for rule in rules[role]), rel
+    assert not fnmatch.fnmatch(f"{root}/tests/acceptance/W2-96/test_other.py",
+                               rules["engineer"][0][len("Read(/"):-1])
 
 
 def test_the_rules_answer_within_the_bound(project):
