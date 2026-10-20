@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.264 (the version table at the end of each section gives the history)
+**Version:** 0.265 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9605,3 +9605,19 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | 0.264 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-876 (P-W2-48-5 (b) with (c): fail safe, each widening proven, `test_inputs` declared, the nightly backstop, a measured target of 60 to 70 % reuse and a close under about 15 minutes, a fallback package if short, simplify not add). Next free id: DEC-877. |
 
 ---
+
+## 265. A delegated decision of 2026-10-20 on W2-59's run 2 (register v0.265, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-877 — W2-59: the untrailered merge-back remade under DEC-412; a bare `gov` with `PYTHONPATH` set is a run of the code under test; the launcher's `PYTHONPATH` a row for W2-56 (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** DEC-412, DEC-750, DEC-732, DEC-822, DEC-801, DEC-864 · **Basis:** W2-59's lead returned PACKAGES (run 2, `log/W2-59-A5-run2.json`; the packages in its worktree's `.gov-runtime/scratch/lead/packages-run2.md`): the review's F1 is fixed and verified (`e791465b`); the merge-back `3eadca4c` carries no `Task:` or `Role:` (DEC-750), so once W2-59 lands every later close whose range holds it would refuse as work without a task.
+- **Decision:**
+  1. **P-W2-59-5 (a): the ticket branch is remade before its merge, under DEC-412** ("rewriting an unpushed ticket branch is allowed"; `w2/W2-59` has no remote head). The lead labelled the package P1 for its consequence on the wave's closes; option (a) needs no new rule, since DEC-412 already allows it, and it changes no judge. The orchestrator keeps the old branch as `w2/W2-59-old`, recreates `w2/W2-59` from `c76cddf5`, merges `74d22909` again with `Task: DAEO-kh9l`, `Role: orchestrator` and `Implements: DEC-750` (git's own merge; its tree must equal `6b2943c8`), and re-applies `6d4925ab` to `3d6a27f8` unchanged. The new head's tree must equal the old head's; then the old branch is deleted. The CIT-P's §1, which names `3eadca4c` and `6d4925ab`, is brought up to date in W2-59's run 3, before its second and last review.
+  2. **P-W2-59-5 (b) becomes a row** (W2-M394): the close's work-without-a-task gate reads a merge that is git's own merge of its parents as the trailer gate does (DEC-436's form), so a forgotten trailer on a routine merge-back fails neither gate falsely. Wave 3.
+  3. **P-W2-59-6 (a), as built:** a command that sets `PYTHONPATH` itself is a run of the code under test (DEC-732); only the judge's own entry points (the hook lines, the runner's checks) ignore it. The CIT-P's §4 states it. The close runs in the main tree without the variable.
+  4. **P-W2-59-7 (a): a row for W2-56** (W2-M393): the launcher drops `PYTHONPATH` from a launched session's environment, or states that it passes it on, as DEC-732 says the variable is set per command, never in a session's environment.
+  5. **The review's F3, F4, F5 and F7 become rows for the Wave 3 hardening pass** (W2-L375 to W2-L378; ordinary work: no, DEC-801), **and td-2's three discoveries become rows** (W2-L379 to W2-L381: W1-26's three cases that pass whether or not their plant runs, W1-22's stale `_TEMPLATE` text, W1-22's lexical canary that hits its own declarations).
+- Next free id: DEC-878.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.265 | 2026-10-20 | Delegated: DEC-877 (W2-59: the merge-back remade under DEC-412; P-W2-59-6 (a) as built; P-W2-59-7 a row for W2-56; F3, F4, F5, F7 and td-2's discoveries as rows). Next free id: DEC-878. |
