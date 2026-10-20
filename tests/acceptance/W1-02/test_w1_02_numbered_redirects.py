@@ -1,4 +1,12 @@
-"""W1-02 — a root search with a numbered redirect is refused like the same search without it (DEC-570).
+"""W1-02 — a root search with a numbered redirect is judged like the same search without it (DEC-570).
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): the
+redirect's number is still no path, and the search is still judged as the same
+search without it; under Policy 2 (DEC-820) that search (from the root, from a
+copy's folder, in a folder that holds a protected file, with a name filter for
+either file) is allowed. For every role, the engineer's content search from the
+root stays refused, now for (c) (DEC-821 item 1). The lists below that say
+"refused" were refused before W2-58.
 
 DEC-570: "A root search with a numbered redirect (``2>/dev/null``, ``2>&1``,
 ``1>file``) is refused like the same search without it: the number of a redirect
@@ -46,6 +54,17 @@ def world(hook, tmp_path_factory):
     return fix.make_world(tmp_path_factory.mktemp("numbered-redirects"))
 
 
+def assert_policy_2(result, command, who, start, what):
+    """W2-58 (DEC-821 item 3, DEC-857 item 3): allowed; but an engineer's content search from the root takes in its
+    ticket's acceptance folder (``tests/acceptance/W1-90/``) and is refused for (c) (DEC-821 item 1). A listing
+    from above (``ls``, ``find``, the other program's ``--files``) is not aimed inside that folder: allowed."""
+    listing = any(f" {word} " in f" {command} " for word in ("ls", "find", "--files"))
+    if who == fix.folders.NOT_A_WRITER and start == ROOT and not listing:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        fix.assert_allowed(result, what)
+
+
 # What follows the search: label -> the text after it.
 REDIRECTS = {
     "its-error-output-to-the-null-device": " 2>/dev/null",
@@ -63,11 +82,11 @@ SEARCHES = dict(fix.NO_PATH, **fix.LISTS_FILES)
 
 @pytest.mark.parametrize("redirect", sorted(REDIRECTS))
 @pytest.mark.parametrize("search", sorted(SEARCHES))
-def test_a_search_with_no_path_and_a_numbered_redirect_is_refused_at_the_root(world, search, redirect):
-    """Point 1: the number of a redirect is no path. Red before the change: allowed."""
+def test_a_search_with_no_path_and_a_numbered_redirect_is_allowed_at_the_root_under_policy_2(world, search, redirect):
+    """Point 1: the number of a redirect is no path; the search of the root is open under Policy 2."""
     command = SEARCHES[search] + REDIRECTS[redirect]
     result = fix.ask_command(world, command)
-    fix.assert_refused_command(result, world, command, ROOT, f"{search} with {redirect}, at the root")
+    fix.assert_allowed(result, f"{search} with {redirect}, at the root")
 
 
 # A name filter that takes a file in, in both programs' spellings, with a numbered redirect behind the search.
@@ -83,13 +102,12 @@ WITH_A_FILTER = [(form, name, _FILTER_NAMES[(row + column) % 2])
 
 
 @pytest.mark.parametrize("form,name,filter_", WITH_A_FILTER, ids=fix.ids(WITH_A_FILTER))
-def test_a_search_whose_name_filter_takes_a_protected_file_in_is_refused_with_a_numbered_redirect_too(
+def test_a_search_whose_name_filter_takes_a_protected_file_in_is_allowed_with_a_numbered_redirect_too(
         world, form, name, filter_):
-    """Point 1 on the fifth batch's name filters: the redirect's number is not the search's path."""
+    """Point 1 on the fifth batch's name filters: under Policy 2 a search for either file's name is open."""
     wanted = fix.FILTERS[filter_](name)
     result = fix.ask_command(world, FILTERED[form], f=wanted)
-    fix.assert_refused_command(result, world, FILTERED[form], ROOT,
-                               f"{form} with a filter for the stand-in {name} ({filter_}), at the root", f=wanted)
+    fix.assert_allowed(result, f"{form} with a filter for the stand-in {name} ({filter_}), at the root")
 
 
 AT_A_COPY = {
@@ -107,12 +125,11 @@ COPY_CASES = [(_COPY_FORMS[(2 * row + step) % len(_COPY_FORMS)], site)
 
 
 @pytest.mark.parametrize("form,site", COPY_CASES, ids=fix.ids(COPY_CASES))
-def test_a_search_with_a_numbered_redirect_is_refused_from_a_copy_s_folder(world, form, site):
-    """Point 1 from ``<P>``: a sibling checkout, a folder below the root, the stand-in home."""
+def test_a_search_with_a_numbered_redirect_is_allowed_from_a_copy_s_folder(world, form, site):
+    """Point 1 from ``<P>``: a sibling checkout, a folder below the root, the stand-in home; open under Policy 2."""
     wanted = fix.FILTERS["its-extension"](fix.SETTINGS)
     result = fix.ask_command(world, AT_A_COPY[form], site, f=wanted)
-    fix.assert_refused_command(result, world, AT_A_COPY[form], site,
-                               f"{form}, in a session that stands in the site '{site}'", f=wanted)
+    fix.assert_allowed(result, f"{form}, in a session that stands in the site '{site}'")
 
 
 # A numbered input redirect that closes the standard input, or feeds another descriptor: nothing feeds the search.
@@ -126,9 +143,10 @@ UNFED_AT = [(form, start) for form in sorted(UNFED) for start in (ROOT, "sibling
 @pytest.mark.parametrize("form,start", UNFED_AT, ids=fix.ids(UNFED_AT))
 def test_a_numbered_input_redirect_that_does_not_feed_the_search_program_leaves_it_a_search_of_the_folder(
         world, form, start):
-    """Point 1: the program reads its standard input only when something feeds it; here nothing does."""
+    """Point 1: the program reads its standard input only when something feeds it; here nothing does, so it is a
+    search of the folder, which Policy 2 opens (by the orchestrator, from the root or a sibling checkout)."""
     result = fix.ask_command(world, UNFED[form], start)
-    fix.assert_refused_command(result, world, UNFED[form], start, f"the other program with {form}, from '{start}'")
+    fix.assert_allowed(result, f"the other program with {form}, from '{start}'")
 
 
 IN_A_HOLDING_FOLDER = {
@@ -140,10 +158,10 @@ IN_A_HOLDING_FOLDER = {
 
 @pytest.mark.parametrize("start", sorted(fix.HOLDING))
 @pytest.mark.parametrize("form", sorted(IN_A_HOLDING_FOLDER))
-def test_a_search_with_a_numbered_redirect_is_refused_in_a_folder_that_holds_a_protected_file(world, form, start):
-    """The rule from before the round refuses the search with no path there; the redirect gets it through today."""
+def test_a_search_with_a_numbered_redirect_is_allowed_in_a_folder_that_holds_a_protected_file(world, form, start):
+    """Before Policy 2 the search with no path was refused there; now the folder is read as any folder."""
     result = fix.ask_command(world, IN_A_HOLDING_FOLDER[form], start)
-    fix.assert_refused_command(result, world, IN_A_HOLDING_FOLDER[form], start, f"{form}, in {start}")
+    fix.assert_allowed(result, f"{form}, in {start}")
 
 
 # For the other roles: forms that write no file (a write is another rule's for a role that may not write).
@@ -157,10 +175,10 @@ BY_ROLE = [(who, form, start) for (who, form), start in zip(fix.share(FOR_ROLES)
 
 
 @pytest.mark.parametrize("who,form,start", BY_ROLE, ids=fix.ids(BY_ROLE))
-def test_a_search_with_a_numbered_redirect_is_refused_for_every_role(world, who, form, start):
+def test_a_search_with_a_numbered_redirect_is_decided_by_policy_2_for_every_role(world, who, form, start):
     """An engineer, the test designer and a session with no role (the orchestrator asks every form above)."""
     result = fix.ask_command(world, FOR_ROLES[form], start, who)
-    fix.assert_refused_command(result, world, FOR_ROLES[form], start, f"{form} from '{start}' by '{who}'")
+    assert_policy_2(result, FOR_ROLES[form], who, start, f"{form} from '{start}' by '{who}'")
 
 
 # --------------------------------------------------------------------------
@@ -201,10 +219,10 @@ WITH_THE_ROOT = {
 
 
 @pytest.mark.parametrize("form", sorted(WITH_THE_ROOT))
-def test_a_search_of_the_root_by_its_path_with_a_numbered_redirect_stays_refused(world, form):
-    """As today (green before and after): the root is the search's path, whatever follows."""
+def test_a_search_of_the_root_by_its_path_with_a_numbered_redirect_is_allowed_under_policy_2(world, form):
+    """Refused before W2-58 (the root as the search's path); a search of the root is open under Policy 2."""
     result = fix.ask_command(world, WITH_THE_ROOT[form])
-    fix.assert_refused_command(result, world, WITH_THE_ROOT[form], ROOT, f"{form}, at the root")
+    fix.assert_allowed(result, f"{form}, at the root")
 
 
 # --------------------------------------------------------------------------
