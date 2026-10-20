@@ -452,8 +452,12 @@ def test_a_second_name_for_a_file_is_refused(project, rel):
         f"cp --link {rel} docs/linked", f"cp -al {rel} docs/linked",
         f"sed -i.bak s/a/b/ {rel}", f"sed -i .bak s/a/b/ {rel}",
         f"sed --in-place=.bak s/a/b/ {rel}", f"echo $(mv {rel} docs/moved)",
-        # W2-58: behind a prefix command, as the command it is.
+        # W2-58: behind a prefix command, as the command it is; a symbolic
+        # linking copy; an interpreter's in-place edit, which the allow-list
+        # does not read as a write.
         f"timeout 5 mv {rel} docs/moved", f"env X=1 ln -s {project / rel} docs/second",
+        f"cp -s {project / rel} docs/linked", f"cp --symbolic-link {project / rel} docs/l",
+        f"perl -pi.bak -e s/a/b/ {rel}", f"perl -pi -e s/a/b/ {rel}", f"ruby -i -pe 1 {rel}",
     ):
         assert read_refusal("Bash", {"command": command}, str(project),
                             str(project)) == SECOND_NAME_REFUSAL, command

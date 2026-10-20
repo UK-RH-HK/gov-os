@@ -315,6 +315,13 @@ def _second_names(name: str, args: list[str]) -> list[str]:
                      or (a == "-i" and b.startswith("."))
                      for a, b in zip(args, args[1:] + [""]))
         return args if backup else []
+    if name in ("perl", "ruby"):
+        # W2-58: an interpreter's in-place edit (-i, -pi.bak), with or without
+        # a backup: the allow-list does not read it as a write, so it stays
+        # refused for the two files as it was before their reads opened.
+        edits = any(a.startswith("-") and not a.startswith("--") and "i" in a[1:]
+                    for a in args)
+        return args if edits else []
     if name in ("mv", "cp"):
         # DEC-778: read as the write rule reads it (DEC-765): an option's
         # value is a value, and nothing after "--" is an option.  A call

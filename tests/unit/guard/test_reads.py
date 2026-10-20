@@ -123,6 +123,12 @@ CASES = [
     ("engineer", *_bash("rg --files"), ""),
     ("engineer", "Glob", {"pattern": "**/*.py"}, ""),
     ("engineer", *_bash("grep -rn z . 2>&1 | head"), TESTS_REFUSAL),
+    # an rg fed by a pipe or an input redirect searches what feeds it
+    ("engineer", *_bash("git log --oneline | rg -g '!*.md' z 2>/dev/null"), ""),
+    ("engineer", *_bash("rg z < docs/q.md"), ""),
+    ("engineer", *_bash("ls | rg z ."), TESTS_REFUSAL),
+    ("engineer", *_bash("ls | rg z &"), TESTS_REFUSAL),
+    ("engineer", *_bash("ls | grep -r z"), TESTS_REFUSAL),
     ("engineer", *_bash("git show HEAD:src/app/main.py 2>&1"), ""),
     ("engineer", *_bash("git grep -n z"), TESTS_REFUSAL),
     ("engineer", *_bash("git grep -n z -- src"), ""),

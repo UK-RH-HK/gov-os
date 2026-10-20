@@ -22,7 +22,7 @@ import subprocess
 
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _has_glob, _is_punct,
-                              _load_ticket)
+                              _load_ticket, _parse_frontmatter)
 from gov.guard.heldout import _words, load_yaml_unique
 from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _MOST_RESOLVED,
                                  _PATTERN_OPTIONS, _PIECE_RE, _RG_VALUED, _Glob,
@@ -154,13 +154,21 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
     try:
         with open(path, encoding="utf-8") as f:
             text = f.read()
-        head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
+    except (OSError, UnicodeDecodeError):
+        raise PolicyError("the session's ticket file cannot be read for its WBS id") from None
+    head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
+    try:
         import yaml  # the C parser when there is one: the guard runs on every call
         ticket = (yaml.load(head, Loader=getattr(yaml, "CSafeLoader", yaml.SafeLoader))
                   if head is not None else None)
     except Exception:
         ticket = None
-    wbs = ticket.get("wbs_id") if isinstance(ticket, dict) else ""
+    if isinstance(ticket, dict):
+        wbs = ticket.get("wbs_id")
+    else:
+        # Not YAML: the line reader the write rules use (a fixture's
+        # allowed_paths may start with a *); without a WBS id there, refused.
+        wbs = (_parse_frontmatter(text) or {}).get("wbs_id") or ""
     if wbs is not None and not (isinstance(wbs, str) and _WBS_RE.fullmatch(wbs)):
         raise PolicyError("the session's ticket file cannot be read for its WBS id")
     return wbs  # None: a ticket with no WBS id names no acceptance folder
@@ -495,6 +503,10 @@ class _Judge:
         ecwd: str | None = cwd
         cur: list[str] = []
         skip = False
+        # DEC-557: an rg fed by a pipe or an input redirect searches what
+        # feeds it; in a line with a background job nothing is taken as fed.
+        jobs = any(_is_punct(t) and t.strip("\n;()") == "&" for t in tokens)
+        fed = False
         for i, tok in enumerate(tokens + [";"]):
             if skip:
                 skip = False
@@ -511,14 +523,17 @@ class _Judge:
                     why = self.word(tokens[i + 1], ecwd or self.root)
                     if why:
                         return why
+                    fed = fed or (tok == "<" and not jobs)
                 continue
-            why, ecwd = self.simple(cur, ecwd)
+            why, ecwd = self.simple(cur, ecwd, fed)
             if why:
                 return why
             cur = []
+            fed = tok in ("|", "|&") and not jobs
         return ""
 
-    def simple(self, words: list[str], ecwd: str | None) -> tuple[str, str | None]:
+    def simple(self, words: list[str], ecwd: str | None,
+               fed: bool = False) -> tuple[str, str | None]:
         while words and _ASSIGN_RE.match(words[0]):
             words = words[1:]
         words = _behind(words)
@@ -540,7 +555,7 @@ class _Judge:
             return "", ecwd
         if name == "git":
             return self.git(args, cwd), ecwd
-        return self.reads(name, args, cwd), ecwd
+        return self.reads(name, args, cwd, fed), ecwd
 
     def listed(self, text: str, cwd: str, names: list[str] | None = None,
                fold: bool = False) -> str:
@@ -553,10 +568,14 @@ class _Judge:
                          fnmatch.fnmatchcase(cased(os.path.basename(f)), cased(n))
                          for n in names))), "")
 
-    def reads(self, name: str, args: list[str], cwd: str) -> str:
+    def reads(self, name: str, args: list[str], cwd: str, fed: bool = False) -> str:
         name = "grep" if name in ("egrep", "fgrep") else name
         named = not _FIND_NAMED.isdisjoint(args)
         search = _shell_search(name, list(args), named)
+        if name == "rg" and fed and "--files" not in args:
+            operands, options = _options(list(args), _RG_VALUED)
+            if len(operands) <= _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
+                search = None  # it names no path: it searches what feeds it
         # A listing shows names (ls, find with no action that opens a file,
         # rg --files): from a folder above it takes no part in.
         opens = name == "find" and not _FIND_OPENS.isdisjoint(args)
