@@ -275,6 +275,12 @@ trailers_base: "1c33dd28"
 accepted_history:
   - commit: "93bcb247990552c07dfbe9a20c685830b47e46d2"
     decision: DEC-717
+  - commit: "e7bf7a3e895eb42a779dbdb5eed99ad94ab1b2cf"
+    decision: DEC-871
+  - commit: "851b6230603f9e63f60f45c92465c641b33b857f"
+    decision: DEC-871
+  - commit: "7bacecd21045f56eb1d3b3da9afd9a9ccd1d5197"
+    decision: DEC-871
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
@@ -406,3 +412,11 @@ load_sensitive:
     decision: DEC-823
     reason: "fails once in the full regression at load about 25 and passes alone, 3 of 3 in 17.8 s with a 2 s reaping margin (W2-53's re-close, 2026-10-19 12:01)"
     fixed_by: W2-M384
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project"
+    decision: DEC-871
+    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
+    fixed_by: W2-57
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSettingsHandEdit::test_key_added_by_hand_is_found_and_named[top-level-env]"
+    decision: DEC-871
+    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
+    fixed_by: W2-57
