@@ -54,8 +54,20 @@ namespaces:
     embedding_policy: embedded
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
+  # DEC-856 (P-W2-50 (a)): the overlay is governance memory, except the raw orchestration record below. The
+  # record's searchable parts (packages, session summaries, RESUME HERE, the PR packages) stay here.
   project-overlay:
-    paths: ["governance/**"]
+    paths:
+      - "governance/*"
+      - "governance/adoption/**"
+      - "governance/project/*"
+      - "governance/project/briefs/**"
+      - "governance/project/prompts/**"
+      - "governance/project/orchestration/*"
+      - "governance/project/orchestration/packages/**"
+      - "governance/project/orchestration/sessions/**"
+      - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
+      - "governance/project/orchestration/main/orchestrator/PR-*.md"
     memory_class: governance
     sensitivity: restricted
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
@@ -64,6 +76,50 @@ namespaces:
     embedding_policy: not embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
+  # DEC-856 (P-W2-50 (a)): the raw orchestration record (Policy 1, DEC-819): run logs, briefs given, checkpoint
+  # series, drafts and scripts, copied from scratch. Committed and scanned by gitleaks at commit; kept out of
+  # governance memory, so no index, code graph or per-file secret gate reads it (as fixtures/**).
+  orchestration-record:
+    paths:
+      - "governance/project/orchestration/worktrees/**"
+      - "governance/project/orchestration/main/checkpoints/**"
+      - "governance/project/orchestration/main/orchestrator/log/**"
+      - "governance/project/orchestration/main/orchestrator/briefs/**"
+      - "governance/project/orchestration/main/orchestrator/drafts/**"
+      - "governance/project/orchestration/main/orchestrator/specimen/**"
+      - "governance/project/orchestration/main/orchestrator/pin/**"
+      - "governance/project/orchestration/main/orchestrator/tools/**"
+      - "governance/project/orchestration/main/orchestrator/*.py"
+      - "governance/project/orchestration/main/orchestrator/*.sh"
+      - "governance/project/orchestration/main/orchestrator/*.txt"
+      - "governance/project/orchestration/main/orchestrator/*.yaml"
+      - "governance/project/orchestration/main/orchestrator/*.json"
+      - "governance/project/orchestration/main/orchestrator/*.jsonl"
+      - "governance/project/orchestration/main/orchestrator/dec-*.md"
+      - "governance/project/orchestration/main/orchestrator/register-*.md"
+      - "governance/project/orchestration/main/orchestrator/residuals-*.md"
+      - "governance/project/orchestration/main/orchestrator/bootstrap-*.md"
+      - "governance/project/orchestration/main/orchestrator/closenote-*.md"
+      - "governance/project/orchestration/main/orchestrator/close-*.md"
+      - "governance/project/orchestration/main/orchestrator/resume-*.md"
+      - "governance/project/orchestration/main/orchestrator/verdict-*.md"
+      - "governance/project/orchestration/main/orchestrator/share-*.md"
+      - "governance/project/orchestration/main/orchestrator/policy-*.md"
+      - "governance/project/orchestration/main/orchestrator/p39-*.md"
+      - "governance/project/orchestration/main/orchestrator/adoption-*.md"
+      - "governance/project/orchestration/main/orchestrator/ADOPTION-*.md"
+      - "governance/project/orchestration/main/orchestrator/W2-*.md"
+      - "governance/project/orchestration/main/orchestrator/EXIT-*.md"
+      - "governance/project/orchestration/main/orchestrator/COMPLIANCE*.md"
+      - "governance/project/orchestration/main/orchestrator/CHECKPOINT-*.md"
+    memory_class: product
+    sensitivity: restricted
+    permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
+    retention: kept in git history
+    export_policy: denied
+    embedding_policy: not embedded
+    provenance: copied from the orchestrator's and the leads' scratch by governance/project/orchestration/sync_context.py (DEC-819); scanned by gitleaks before every commit
+    deletion_rebuild: a copy; the live files stay in scratch; restored from git only
   kernel-template:
     paths: ["template/**"]
     memory_class: governance

@@ -20,7 +20,7 @@ import os
 import re
 import shlex
 
-from gov.guard.decide import (LONG_REFUSAL, MOST_READ, _ASSIGN_RE, _cp_operands,
+from gov.guard.decide import (LONG_REFUSAL, MOST_READ, _ASSIGN_RE, _copy_args,
                               _expand_token, _extract_bash_write_targets,
                               _has_glob, _is_punct)
 from gov.guard.heldout import CONFIG_REL, SETTINGS_REL, _words
@@ -354,11 +354,21 @@ def _second_names(name: str, args: list[str]) -> list[str]:
                      or (a == "-i" and b.startswith("."))
                      for a, b in zip(args, args[1:] + [""]))
         return args if backup else []
-    short = "".join(a for a in args if a.startswith("-") and not a.startswith("--"))
-    if name == "mv" or (name == "cp" and (
-            "l" in short or any(a.startswith("--l") for a in args))):
-        operands, dirs = _cp_operands(args) or ([], [])
-        return operands if dirs else operands[:-1]
+    if name in ("mv", "cp"):
+        # DEC-778: read as the write rule reads it (DEC-765): an option's
+        # value is a value, and nothing after "--" is an option.  A call
+        # whose options cannot be read gives every word; with an option
+        # after an operand, every operand but a last word that both
+        # readings take as the destination.
+        parsed = _copy_args(name, args)
+        if parsed is None:
+            return args
+        operands, opts, after = parsed
+        if name == "cp" and "l" not in opts:
+            return []
+        if "t" in opts or (after is not None and args[-1:] != operands[-1:]):
+            return operands
+        return operands[:-1]
     return []
 
 
