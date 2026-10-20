@@ -1,7 +1,11 @@
-# W2-54 (DAEO-0rfi) lead checkpoint — run 4c (DEC-811): DONE, ready for the merge
+# W2-54 (DAEO-0rfi) lead checkpoint — run 5 (DEC-874): correction after the merge
 
-- Branch `w2/W2-54`, head `226ec458` (probe record), probed head `7661402c` (CP-DAEO-0rfi-0026). Clean but for sandbox placeholders.
-- Run 4c commits: `4662871a` ticket file (orchestrator); `75049714` test designer td5 (b5b64d32-228c-48a1-a1ae-6232e2f6c6ab, sandboxed); `a0cb797e` engineer eng7 (ae3c6158-158f-4a03-ada6-cb623d7dea9f, sandboxed); `7661402c` CP-0026 (orchestrator); `226ec458` probe record (orchestrator).
-- Reviewer rv1: 71980794-2a49-4944-90b7-9cb37e5067a5 (independent-auditor, gov launch sandboxed), verdict pass, 6 findings all "Ordinary work: no" → Wave 3 rows. Tripwire 10: no change anywhere.
-- Verification at `a0cb797e`: rebuild11/12 exit 0; gov check exit 0 (context-reproducibility, core-schema GREEN; YELLOW core-decision-citations, openspec-validate); W2-54 94 passed + shared_gpu 2 passed; all suites green but W1-42's 2 accepted reds; W1-19 warm p95 and W1-46 live fixture red under load, pass alone (1; 36); W1-30 512, W1-41 242; tests/unit 2183 passed, 1 skipped. W1-21 hit@5 81.67. Shared runner size_vram = size throughout.
-- Next: the orchestrator merges; W2-53's second close.
+- Run 4c merged into `w2/integrate` (`6f7d4f9e`). Run 5 started at `226ec458`.
+- Step 1 done: `de42a87d` merge of `w2/integrate` (`a2e7b691`) --no-ff, Task/Implements DEC-773/Role orchestrator.
+- Step 2: test designer td6 (brief `briefs/td6.md`, gov launch sandboxed, --effort high) revises the three acceptance cases (judge W2-54's own non-merge `Task: DAEO-0rfi` commits via git, on HEAD and on `4ce16df2`). Tripwire 11.
+- td6 returned DONE-with-packages (14884e7b-5fd9-499f-9cc9-acf07e39ece4), commit `49f1f81e`; tripwire 11: own head+W2-54 acceptance folder; other trees W2-58, W2-59 changed by their own leads. Reds: core-schema-green-here (W2-53 close record, known until W2-02) and time-limit-here (store predates merge).
+- Next: step 3 engineer eng8 for `tests/unit/check/test_schema_audit_report.py::test_the_other_types_of_w2_02_stay_unknown`; step 4 verify (rebuild, suites, unit, gov check, collect-only); step 5 FULL probe rv2 (--effort max); step 6 DONE.
+- Loop count: 0.
+- eng8 DONE (cf375c20-03b8-446b-8581-07b1bb46be39), commit `40909d21`; tripwire 12: own head only; W2-59 changed by its lead.
+- Verification run_v6.sh running (logs v6-*). rebuild13 exit 0 (489 s). gov check exit 3: RED core-schema (W2-53 close record, known), RED secrets-indexing (codeintel code.db; NOT W2-54: none of its 40 own commits' added lines nor the merge's 212 code files trip the rules; first full scan since W2-50's merge); YELLOW core-decision-citations, openspec-validate; context-reproducibility GREEN.
+- Next after v6: fill probe brief rv2 placeholders, gov checkpoint commit, launch rv2 (--effort max).

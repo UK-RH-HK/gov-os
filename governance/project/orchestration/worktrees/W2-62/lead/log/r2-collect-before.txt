@@ -1,0 +1,8 @@
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   ModuleNotFoundError: No module named 'secrets.test_token_rule'; 'secrets' is not a package
+=========================== short test summary info ============================
+ERROR tests/unit/secrets/test_scan_scale.py
+ERROR tests/unit/secrets/test_secrets.py
+ERROR tests/unit/secrets/test_token_rule.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 3 errors during collection !!!!!!!!!!!!!!!!!!!!
+14659/14661 tests collected (2 deselected), 3 errors in 5.99s

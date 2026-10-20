@@ -32,7 +32,6 @@ kpis:
 profile: LITE
 sources:
 - DEC-838
-- DEC-636
 - DEC-665
 - DEC-865
 est_loc: 40

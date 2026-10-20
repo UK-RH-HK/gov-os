@@ -1,0 +1,119 @@
+FFFFFFF.F......FFFFFF.........................                           [100%]
+=================================== FAILURES ===================================
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.1, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.48, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.07, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.48, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.06, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.48, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 3
+    stdout (end):
+    {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/unit/test_flaky.py::test_flaky - AssertionError: a planted failu..."], "tests_run": {"passed": 2, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.02, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.5, "passed": 2, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "repair_ticket": "fp-6of2"}}}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.5, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.47, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.08, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.5, "passed": 3, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.02, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.48, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "serial-afterwards", "seconds": 0.22, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "cases": ["tests/unit/test_serial_a.py", "tests/unit/test_serial_b.py"]}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: data/values.txt, inside the declared globs ['data/**', 'tools/check_values.py'], changed: the command runs again, labelled with its own result
+      (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-96/test_a_declared_command_runs_a0/tree) python3 -m gov.testcache command --json --input data/** --input tools/check_values.py -- /usr/bin/python3 tools/check_values.py
+      exit code: 3
+      record (without tests): {"run": "20261020T161556Z-7fac72b4", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "inputs": ["data/**", "tools/check_values.py"], "commit": "428246cba809d6b72b2b335e0fb96cf1f8c67a75", "exit_code": 1, "output": ""}
+        /usr/bin/python3 tools/check_values.py: record 'failed'; ran 0 time(s) in this run
+        command:check_values: record None; ran 1 time(s) in this run
+      stdout (end):
+      {"ok": false, "command": "command", "result": {}, "session": "", "error": {"code": "TESTS_FAILED", "message": "1 test(s) failed or errored: /usr/bin/python3 tools/check_values.py", "details": {"test_cache": {"run": "20261020T161556Z-7fac72b4", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "inputs": ["data/**", "tools/check_values.py"], "commit": "428246cba809d6b72b2b335e0fb96cf1f8c67a75", "exit_code": 1, "output": "", "tests": [{"id": "/usr/bin/python3 tools/check_values.py", "result": "failed"}]}}}}
+      
+      stderr (end):
+      
+    assert (True and 'failed' == 'passed'
+     +  where True = _ran(Cached(what='(in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-96/test_a_declared_command_runs_...ts': [{'id': '/usr/bin/python3 tools/check_values.py', 'result': 'failed'}]}, ran=Counter({'command:check_values': 1})))
+      
+      - passed
+      + failed)
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/test_w2_48_declared_command.py:78: AssertionError: data/values.txt, inside the declared globs ['data/**', 'tools/check_values.py'], changed: the command runs again, labelled with its own result
+E   AssertionError: docs/research/W2-48-cache-choice.md does not state the time saved on this repository's suite: a line with "saved" and a duration (seconds, minutes or hours)
+    assert []
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/test_w2_48_glue_and_research.py:59: AssertionError: docs/research/W2-48-cache-choice.md does not state the time saved on this repository's suite: a line with "saved" and a duration (seconds, minutes or hours)
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.05, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.47, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.09, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.54, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.1, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.51, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.05, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.5, "passed": 3, "failed": 1, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": [], "accepted_reds": [{"test": "tests/unit/test_known_red.py::test_known_red", "decision": "DEC-948", "reason": "a known red the owner accepted", "fixed_by": "W9-fix", "result": "failed"}], "load_sensitive": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+E   AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+    gov close PROJ-aaaa --json 
+    exit code: 0
+    stdout (end):
+    {"ok": true, "command": "close", "result": {"ticket": "PROJ-aaaa", "close_record": "docs/close/PROJ-aaaa/CL-PROJ-aaaa.md", "checkpoint": "docs/checkpoints/PROJ-aaaa/CP-PROJ-aaaa-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.09, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.5, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+    
+    stderr (end):
+/home/usain/gov-os-worktrees/W2-48/tests/acceptance/W2-48/w2_48_support.py:367: AssertionError: gov close PROJ-aaaa: no `test_cache` object in the answer: the record of a run (of gov close too) is `result.test_cache` (exit 0) or `error.details.test_cache` (exit 3, a refusal) of the API-0002 envelope under --json
+14 failed, 32 passed in 87.29s (0:01:27)
