@@ -25,8 +25,9 @@ from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _has_glob, _is_punct,
                               _load_ticket)
 from gov.guard.heldout import _words, load_yaml_unique
-from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _PATTERN_OPTIONS,
-                                 _PIECE_RE, _RG_VALUED, _Glob, _behind, _braces,
+from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _MOST_RESOLVED,
+                                 _PATTERN_OPTIONS, _PIECE_RE, _RG_VALUED, _Glob,
+                                 _behind, _braces,
                                  _options, _shell_search, _spans, _uncommented)
 
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -37,6 +38,8 @@ _OWN = (ACCEPTANCE + "/", ".tickets/")
 # The most files of a protected part, and the most a glob word expands to,
 # that the rule reads: beyond, no answer comes in bounded time (DEC-562).
 _MOST_FILES = 10000
+# The deepest folder a glob with ``**`` is matched against, below the path itself.
+_MOST_DEPTH = 64
 _GIT_TIMEOUT_S = 5
 _WBS_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _GIT_QUIET = frozenset({"--stat", "--name-only", "--name-status", "--shortstat",
@@ -65,6 +68,10 @@ class PolicyError(Exception):
     (fail closed).  The text is fixed: it carries nothing of a file."""
 
 
+class _Long(Exception):
+    """The call holds more paths than the rule resolves (DEC-562, DEC-570)."""
+
+
 # -- the parts -----------------------------------------------------------------
 
 class _Part:
@@ -75,8 +82,19 @@ class _Part:
     def __init__(self, root: str, globs: list[str], reason: str,
                  files: list[str] | None = None, base: str | None = None):
         self.root, self.globs, self.reason, self.base = root, globs, reason, base
-        self.rx = [_Glob(g) for g in globs] + [
-            _Glob(g[:-3]) for g in globs if g.endswith("/**")]
+        # A literal path, or a literal folder and ``/**``, is matched by its
+        # words; another glob against the path and its folders, each of the
+        # glob's depth when it has one (no ``**``, no braces).
+        self.lead: list[str] = []
+        self.rx: list[tuple[_Glob, int | None]] = []
+        for g in globs:
+            head = g[:-3] if g.endswith("/**") else g
+            if not any(_has_glob(p) for p in head.split("/")):
+                self.lead.append(head.rstrip("/"))
+                continue
+            for one in ([g, head] if head != g else [g]):
+                free = "**" in one or "{" in one
+                self.rx.append((_Glob(one), None if free else one.count("/") + 1))
         self._files = files
 
     def rel(self, path: str) -> str | None:
@@ -86,9 +104,15 @@ class _Part:
         rel = self.rel(path)
         if not rel:
             return False
+        if any(rel == p or rel.startswith(p + "/") for p in self.lead):
+            return True
         parts = rel.split("/")
-        return any(rx.match("/".join(parts[:k])) for k in range(1, len(parts) + 1)
-                   for rx in self.rx)
+        for rx, depth in self.rx:
+            depths = ([depth] if depth else
+                      [*range(1, min(len(parts), _MOST_DEPTH) + 1), len(parts)])
+            if any(k <= len(parts) and rx.match("/".join(parts[:k])) for k in depths):
+                return True
+        return False
 
     @property
     def files(self) -> list[str]:
@@ -133,10 +157,10 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
         ticket = load_yaml_unique(head) if head is not None else None
     except Exception:
         ticket = None
-    wbs = ticket.get("wbs_id") if isinstance(ticket, dict) else None
-    if not isinstance(wbs, str) or not _WBS_RE.fullmatch(wbs):
+    wbs = ticket.get("wbs_id") if isinstance(ticket, dict) else ""
+    if wbs is not None and not (isinstance(wbs, str) and _WBS_RE.fullmatch(wbs)):
         raise PolicyError("the session's ticket file cannot be read for its WBS id")
-    return wbs
+    return wbs  # None: a ticket with no WBS id names no acceptance folder
 
 
 def _git(root: str, *args: str) -> subprocess.CompletedProcess:
@@ -300,6 +324,8 @@ class _Judge:
         home = os.path.expanduser("~")
         self.ssh = os.path.realpath(os.path.join(home, ".ssh"))
         self.key = os.path.realpath(os.path.join(home, ".claude", ".credentials.json"))
+        self.spent = 0  # the folders of the paths resolved so far (DEC-570)
+        self.seen: dict[tuple[str, str], list[str]] = {}
 
     def secret(self, path: str) -> bool:
         name = os.path.basename(path)
@@ -311,11 +337,20 @@ class _Judge:
                 or path == self.key)
 
     def spellings(self, text: str, cwd: str) -> list[str]:
-        try:
-            plain = os.path.abspath(os.path.join(cwd, text))
-            return list(dict.fromkeys((plain, os.path.realpath(plain))))
-        except (OSError, ValueError):
-            return []
+        """A path as written and resolved, once for each path of a call; a
+        call whose paths hold more folders than the rule resolves is more
+        than it reads (DEC-570)."""
+        key = (text, cwd)
+        if key not in self.seen:
+            self.spent += text.count("/") + cwd.count("/") + 1
+            if self.spent > _MOST_RESOLVED:
+                raise _Long
+            try:
+                plain = os.path.abspath(os.path.join(cwd, text))
+                self.seen[key] = list(dict.fromkeys((plain, os.path.realpath(plain))))
+            except (OSError, ValueError):
+                self.seen[key] = []
+        return self.seen[key]
 
     def at(self, text: str, cwd: str, secrets: bool = True) -> str:
         """Why a path at or in a protected thing is refused, or ``""``."""
@@ -387,6 +422,12 @@ class _Judge:
     # -- the tools ---------------------------------------------------------
 
     def tool(self, tool_name: str, tool_input: dict, cwd: str) -> str:
+        try:
+            return self._tool(tool_name, tool_input, cwd)
+        except _Long:
+            return LONG_REFUSAL
+
+    def _tool(self, tool_name: str, tool_input: dict, cwd: str) -> str:
         def text(key: str) -> str:
             value = tool_input.get(key)
             return value if isinstance(value, str) else ""
