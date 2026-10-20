@@ -44,3 +44,8 @@
 - Lines now (wc): __init__ 497, __main__ 81, commands 168, child/sitecustomize 136 (new), plugin 329, close/cache 57, command.py +~20; unit tests 135; research 177; total 1580 (was 1680). diff 5532405a..edff047b: 624+/710-.
 - Lead refusal 1: guard refused a Bash call with a heredoc append ("command cannot be read ... lift form of gov pause", DEC-409); redone with Edit.
 - Next: rebuild-2, gov check, verification batches (all acceptance suites plain, unit, collection), then timed pair.
+- rebuild-2 OK 22:53-23:0x (log/rebuild-2.*). gov.__file__ -> /home/usain/gov-os-worktrees/W2-48/src/gov/__init__.py. gov check running in bg (log/check-2.*; >550 s).
+- Verification streams A-E (verify2.sh, log/verify2/<batch>.codes) started 23:09 on head edff047b. W2-48: 53p/1f (research time-saved only).
+- LEAD PROBES (scratchpad probe1.sh, probe2.sh): FOUR FAIL-OPENS of DEC-876 cond. 1 confirmed: (1) a measured child's read of an undeclared project file not seen (test reused after notes.md changed); (2) git run on the project's own repo keyed only by version (reused after a new commit); (3) a .py file read as text (reused after an unexecuted change); (4) a folder listing (reused after a file added). Ordinary work yes (repo suite: ~64 files list folders, 7 run git on REPO/ROOT, 3 read .py as text); fails open.
+- td-3 launched (briefs/td-3.md, log/td-3.json, tripwire-before-5.json) with the four as described behaviours. Then eng-3 (fresh, failing output + these + any verification reds + research record), then re-verify, timed pair, review.
+- Loop count: held by lead.

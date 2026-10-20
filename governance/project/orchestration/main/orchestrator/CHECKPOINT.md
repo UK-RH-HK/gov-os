@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-20 20:40 BST — Wave 2 by keystones; 4 leads in flight; next free DEC-879)
+## RESUME HERE (2026-10-20 20:40 BST — Wave 2 by keystones; 4 leads in flight; next free DEC-880)
 
 ### Standing owner rules (short; full text: register §248-§265, prompt v3.5; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -38,7 +38,7 @@
 - **Closed by gov close:** W2-53 (15:53, outputs `a1565e56`). Close success 1 of 8 runs.
 - **Merged, not closed:** W2-54, W2-62, W2-63, W2-50. core-schema RED on W2-53's close record until W2-02 merges
   (DEC-872). context-reproducibility RED only while the store lacks DEC-873 (next rebuild).
-- **In flight (4: W2-58, W2-48, W2-59, W2-02):** W2-58 run 2 (DEC-873, `log/W2-58-A5-run2.json`); W2-48 run 2 (DEC-876,
+- **In flight (3: W2-58, W2-48, W2-02):** W2-58 run 2 (DEC-873, `log/W2-58-A5-run2.json`); W2-48 run 2 (DEC-876,
   `log/W2-48-A5-run2.json`); W2-54 run 5 (DEC-874: fix the 4 cases contradicting W2-02's types;
   `log/W2-54-A5-run5.json`); W2-59 run 3 (DEC-877, 20:40, `log/W2-59-A5-run3.json`; last run: merge-back with
   trailers, CIT-P ids, verify, 2nd/last CIT-P review).
@@ -46,6 +46,11 @@
   merge `e48a601d` trailered. Old kept as `w2/W2-59-old`: delete after run 3 verifies. After W2-59 merges the
   owner re-pins at the merge commit, then regenerates settings from `.rulesync/hooks.jsonc` (ping ACT then).
 - **W2-02 waiting:** after W2-54 run 5 merges, W2-02 run 5 (re-merge, re-verify, probe, merge).
+- **W2-59 run 3 DONE (23:3x): head `1cad6aa0`, last review PASS at `fef0fcd5`. HELD, NOT MERGED (DEC-879):** merge it
+  after the queued closes (W2-02, W2-54, W2-62, W2-63, W2-50), so the owner's single re-pin at its merge commit
+  holds every check fix; then ping ACT (re-pin, regenerate settings). If the queue stalls: merge after W2-02's merge.
+  `w2/W2-59-old` deleted. P-W2-59-8 (P1, guard program that can't run lets calls through; rec (b) W2-65 LITE before
+  the regeneration) in packages/, to the owner in the report + digest (gates nothing; no ping per the owner).
 - **W2-54 run 5 DONE (last review passed), MERGED `6855cdf3` (21:1x).** W2-02 run 5 launched behind the load gate
   (`briefs/W2-02-A5-run5.md`, `log/W2-02-A5-run5.json`). Rows W2-M395/396, W2-L382..385 added.
 - **secrets-indexing false positive (row W2-M395):** the check scans SQLite raw bytes as one text; in W2-54's store
@@ -64,7 +69,7 @@
    sync, remove worktree + branch. Refused -> ping P1 (new or seen cause).
 3. Later: W2-64 (W2-02's widening); re-measure a lead rebuild, raise parallelism; daily digest (records since last
    push, usage, refusal counts, memory-use counts).
-4. Before each start: WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-65; rows W2-H063, W2-M397, W2-L386.
+4. Before each start: WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-65; rows W2-H063, W2-M398, W2-L390.
    Briefs: `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Standing rules (short; the prompt holds the full text)

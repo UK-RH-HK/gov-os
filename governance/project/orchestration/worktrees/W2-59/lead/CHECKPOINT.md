@@ -1,35 +1,43 @@
-# W2-59 (DAEO-kh9l) lead checkpoint — run 3 (2026-10-20), the ticket's last run (WBS §6)
+# W2-59 (DAEO-kh9l) lead checkpoint — end of run 3 (2026-10-20, about 23:55), the ticket's last run (WBS §6)
 
 ## State
-- Run 3 started at d3e594bf (the remade branch, DEC-877; old branch kept as w2/W2-59-old: never touch).
-- Step 1 DONE: merge of w2/integrate 97fc656a = 3dbd766d (Task: DAEO-kh9l, Implements: DEC-750, Role: orchestrator,
-  Co-Authored-By); tree d26c7e76 = git merge-tree --write-tree HEAD^1 HEAD^2. No conflict.
-  Containment hook flagged two Role: owner commits brought in by the merge (a7992a1e, 8dfd54e9): on w2/integrate, not ours.
-- Step 2 DONE: eng-4 (engineer, sandboxed, session 6777ce4f-51d3-4437-8669-ca80330b7ce5, effort high) commit
-  a3aefd89 (Task DAEO-kh9l, Role engineer, Implements DEC-877, CAP-33): 13 id swaps + one paragraph. Tripwire: head only.
-  Twelve fields OK. Refusals 0. gov retrieve: told, not used (brief named every file). It proposed P-W2-59-8 (CIT-P §4
-  and §7 still say P-W2-59-5/-6/-7 open though DEC-877 decided them): NOT a round (brief: nothing else changes) -> residual.
-- fb008e91: checkpoint CP-0016 commit (orchestrator). Code/doc head a3aefd89.
-- Step 3 DONE on fb008e91 (green but for known reds; no engineer round): rebuild-5 exit 0, wall 445 s (load 10.5 at start). gov.__file__ = worktree src.
-  check-6: RED adapter-portability (GENERATED_DIFFERS, owner act), RED core-schema (W2-53 close record, known);
-  YELLOW core-decision-citations (historical), openspec-validate (not on PATH); rest GREEN (context-repro GREEN now).
-  collect-3: 14751/14753 collected (2 deselected), no collection error.
-  First R4A/R4B attempt void (my basetemp parent missing; set aside in log/suites/void/); script fixed (mkdir -p).
-  R4A, R4B re-running (lane 1: R4A then R4C then R4E; lane 2: R4B then R4D then R4F, same lists as run 2's R3x).
-  Suites (55, each own process, log/suites/R4A..R4F): all green except W2-54 x2 (core-schema RED on W2-53's close
-  record, known), W1-42 x2 (accepted reds), W1-19 x1 warm p95 (load_sensitive; alone 1 passed at load 1.9, lone-3.txt).
-  W1-05 99 passed (no p95 red this time). Unit (unit-4): 2377 passed, 1 skipped.
-  check-6: 23 checks, 19 GREEN; core-decision-citations 160 findings (159 + e48a601d citing DEC-877, recorded later).
-- Step 4 NEXT: final gov checkpoint commit = the head rev-2 probes; then rev-2 (sandboxed, effort max). Brief written: briefs/rev-2.md (@@HEAD@@ placeholder -> the final checkpoint commit's id before launch).
-- (was step 2:) the CIT-P's commit ids. `gov launch product-spec DAEO-kh9l` would be refused by the launcher
-  (checked via _check_ticket without launching: "ticket 'DAEO-kh9l' is a ticket of another role ('engineer'), not of
-  'product-spec'"; OWN_TICKET_ROLES, DP-8). So a fresh ENGINEER (eng-4, the ticket's role, as in runs 1-2) does it.
-- Then: step 3 full verification (rebuild with wall time, every suite own process, unit, collect-only, gov check);
-  step 4 rev-2 (independent-auditor, effort max, A3 + JUDGEMENT.md); step 5 return.
-- Loop count (never disclose): 2 implementer iterations before run 3, converged.
+- Status returned: DONE. Branch w2/W2-59, head 1cad6aa0 (the probe record), probed head fef0fcd5.
+- Nothing may be committed after fef0fcd5 except the probe record (DEC-413): done. No further round (WBS §6).
+- No worker running, no run running. Loop count (never disclose): converged; no implementer iteration in run 3
+  (2 before run 3).
+- Old branch w2/W2-59-old untouched (the orchestrator deletes it). The remake checked: same head tree 08b3e60b;
+  e48a601d = git's own merge 6b2943c8 with trailers; rev-2 matched all ten re-applied commits by patch-id.
+- The launcher refuses product-spec on this ticket (role engineer; _check_ticket checked without a launch), so the
+  CIT-P's ids went to an engineer (eng-4), as runs 1-2.
 
-## Id map (old -> new, DEC-877)
-3eadca4c->e48a601d, 6d4925ab->70cfbcf9, 45c6bfae->912ddc63, fc8f8494->164d4c64, cface154->06250aee,
-9b9faac3->03727f84, 6e95cd41->6e0bf627, e791465b->92f91614, 3c2d88b5->0c630012, aa83876d->61d0a4a2, 3d6a27f8->d3e594bf.
+## Run 3 commits (oldest first)
+- 3dbd766d merge of w2/integrate 97fc656a (orchestrator; Task DAEO-kh9l, Implements DEC-750, Role orchestrator;
+  tree d26c7e76 = merge-tree of its parents). Containment flagged the Role: owner commits a7992a1e, 8dfd54e9 it
+  brought in (owner decisions DEC-870, DEC-871 on w2/integrate).
+- a3aefd89 the CIT-P's ids after the remake + one paragraph (engineer eng-4, sandboxed, session 6777ce4f-...;
+  Implements DEC-877, CAP-33)
+- fb008e91 checkpoint CP-0016 (orchestrator)
+- fef0fcd5 checkpoint CP-0017 (orchestrator) = the head rev-2 probed
+- 1cad6aa0 probe record docs/probes/DAEO-kh9l/PR-DAEO-kh9l.md (orchestrator; judgement pass)
 
-## Refusals met (DEC-849): lead 0 so far.
+## Verification (on fb008e91; fef0fcd5 adds only a checkpoint record)
+- rebuild-5: exit 0, wall 445 s. gov.__file__ = /home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py.
+- 55 suites, own processes (log/suites/R4A..R4F; a first void attempt in log/suites/void/, my missing basetemp
+  parent): green except W2-54 x2 (core-schema, W2-53's close record), W1-42 x2 (accepted reds), W1-19 x1 warm p95
+  (load_sensitive; alone: 1 passed at load 1.9, lone-3.txt). Unit: 2377 passed, 1 skipped.
+- collect-3: 14751/14753 tests collected (2 deselected), no collection error.
+- check-6: 23 checks; RED adapter-portability (GENERATED_DIFFERS), core-schema (W2-53 close record); YELLOW
+  core-decision-citations (160), openspec-validate; 19 GREEN.
+
+## Review rev-2 (independent-auditor, effort max, sandboxed, session 91d56ad8-529b-4734-bb3d-4f44514872bf): PASS
+- R2-F1 (PYTHONUSERBASE under -E), R2-F3 (gov --version without git): ordinary work no -> Wave 3 rows.
+- R2-F2 (CIT-P stale text; §1 "record corrected in 70cfbcf9" made untrue by the lead's id map): yes/other -> residual.
+- R2-D1 (a guard program in the tree that cannot run exits 1, call allowed): yes/fails open, PREDATES the change ->
+  package P-W2-59-8 (blocks nothing of W2-59).
+- Tripwire: nothing changed in this worktree; other trees changed by their own leads (main, W2-02, W2-48, W2-54).
+
+## Refusals met (DEC-849): lead 0; eng-4 0; rev-2 1 read refusal (+2 guard refusals of unresolvable write targets).
+
+## What a resume must do
+Nothing in this worktree. The orchestrator merges w2/W2-59 (head 1cad6aa0) into w2/integrate; owner acts in order:
+re-pin at the merge commit, then regenerate the settings from .rulesync/hooks.jsonc. Decide P-W2-59-8.
