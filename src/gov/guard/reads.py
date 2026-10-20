@@ -314,36 +314,6 @@ def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
     return out
 
 
-def read_denials(root, role: str, ticket_id: str) -> list[str]:
-    """The sandbox's ``Read`` deny rules for the session's protected parts.
-    Each holds a wildcard inside a name: the CLI binds the file tools with
-    it and, on Linux, skips it for the commands' sandbox, so pytest still
-    reads them.  A trailing ``/**`` alone is no such wildcard: the CLI
-    applies ``<folder>/**`` to the sandbox as the folder (seen in W2-58's own
-    launched session), so the folder's last letter is written as a class,
-    ``W2-5[8]/**``, which matches that folder alone."""
-    def unbound(path: str) -> str:
-        head = path.rstrip("/")
-        return f"{head[:-1]}[{head[-1]}]" if head[-1:].isalnum() else f"{head}*"
-
-    check_sets(str(root))
-    rules: list[str] = []
-    base = os.path.realpath(str(root))
-    for part in parts(str(root), role, ticket_id):
-        for g in part.globs:
-            head = g[:-3] if g.endswith("/**") else g
-            if any(_has_glob(p) for p in head.split("/")):
-                forms = [g]  # a wildcard in a name already
-            elif g.endswith("/**") or part.reason == TESTS_REFUSAL:
-                forms = [f"{unbound(head)}/**"]
-            elif part.base:
-                forms = [f"{g}*"]  # a changed file
-            else:
-                forms = [f"{g}*", f"{unbound(g)}/**"]  # a file or a folder
-            rules += [f"Read(/{base}/{form})" for form in forms]
-    return rules
-
-
 # -- the judge -----------------------------------------------------------------
 
 class _Judge:

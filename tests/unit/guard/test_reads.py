@@ -8,8 +8,6 @@ ticket's WBS id is a stand-in, W2-95.
 
 from __future__ import annotations
 
-import fnmatch
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -21,7 +19,7 @@ sys.path.insert(0, str(REPO / "src"))
 from gov.guard.decide import LONG_REFUSAL, decide  # noqa: E402
 from gov.guard.reads import (CHANGED_REFUSAL, HIDDEN_REFUSAL, SECRET_REFUSAL,  # noqa: E402
                              TESTS_REFUSAL, PolicyError, check_sets, policy_refusal,
-                             read_denials, set_fault)
+                             set_fault)
 
 TICKET = "DAEO-t95"
 SETS = ("evaluation_sets:\n  m:\n    visible: [docs/q.md]\n"
@@ -234,31 +232,6 @@ def test_no_w2_integrate_refuses_the_test_designer_nothing(project):
 ])
 def test_a_set_s_shape_is_checked(entry, fault):
     assert bool(set_fault(entry)) == fault
-
-
-def test_the_sandbox_rules_hold_a_wildcard_and_cover_the_parts(project):
-    root = os.path.realpath(project)
-    rules = {role: read_denials(project, role, TICKET) for role in (
-        "engineer", "independent-test-designer", "research", "independent-auditor")}
-    assert rules == {
-        "engineer": [f"Read(/{root}/tests/acceptance/W2-9[5]/**)"],
-        "independent-test-designer": [f"Read(/{root}/src/app/added.py*)", f"Read(/{root}/src/app/main.py*)"],
-        "research": [f"Read(/{root}/eval/hidde[n]/**)", f"Read(/{root}/eval/answers-*.yaml)"],
-        "independent-auditor": []}
-    # A wildcard inside a name, not a trailing /** alone, which the CLI
-    # applies to the commands' sandbox as the folder; each rule covers its files.
-    covered = {"engineer": ["tests/acceptance/W2-95/test_feature.py"],
-               "independent-test-designer": ["src/app/main.py", "src/app/added.py"],
-               "research": ["eval/hidden/a.yaml", "eval/answers-x.yaml"]}
-    for role, rels in covered.items():
-        for rule in rules[role]:
-            body = rule[len("Read(/"):-1]
-            assert any(c in body.removesuffix("/**") for c in "*?["), rule
-        for rel in rels:
-            assert any(fnmatch.fnmatch(f"{root}/{rel}", rule[len("Read(/"):-1])
-                       for rule in rules[role]), rel
-    assert not fnmatch.fnmatch(f"{root}/tests/acceptance/W2-96/test_other.py",
-                               rules["engineer"][0][len("Read(/"):-1])
 
 
 def test_the_rules_answer_within_the_bound(project):

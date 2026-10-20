@@ -17,6 +17,7 @@ REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 
 from gov.cli.errors import GovError  # noqa: E402
+from gov.guard import heldout  # noqa: E402
 from gov.launch import launcher  # noqa: E402
 
 STRICT = {"enabled": True, "failIfUnavailable": True, "allowUnsandboxedCommands": False,
@@ -136,16 +137,19 @@ def _read_project(root: Path, sets: str) -> Path:
     return root
 
 
-def test_the_settings_deny_the_read_tool_the_session_s_protected_parts(tmp_path, monkeypatch):
-    """W2-58, DEC-820 (c), (d): each rule holds a wildcard, which the sandbox of the commands skips on Linux."""
+def test_the_settings_carry_the_held_out_read_rules_and_none_for_the_protected_parts(tmp_path, monkeypatch):
+    """W2-58, DEC-873: the guard refuses (c) and (d); a Read rule would deny the session's pytest the files too."""
     monkeypatch.setattr(launcher, "_runtime_rules", lambda root: [])
     root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    hidden: [eval/hidden/**]\n"
                                    "    measures: {roles: [engineer]}\n")
-    deny = launcher.build_settings(root, "engineer", "DAEO-t95")["permissions"]["deny"]
-    reads = [rule for rule in deny if rule.startswith("Read(")]
-    assert reads == [f"Read(/{root}/tests/acceptance/W2-9[5]/**)", f"Read(/{root}/eval/hidde[n]/**)"]
-    assert launcher.build_settings(root, "independent-auditor", "DAEO-t95")["permissions"]["deny"] == [
-        rule for rule in launcher._tree_rules(root, "independent-auditor")]
+    (root / "eval/hidden").mkdir(parents=True)
+    (root / "eval/hidden/a.yaml").write_text("x\n", encoding="utf-8")
+    (root / heldout.CONFIG_REL).write_text(f"{heldout.CONFIG_KEY}:\n  - /held/out\n", encoding="utf-8")
+    for role in ("engineer", "independent-test-designer", "independent-auditor", "product-spec"):
+        settings = launcher.build_settings(root, role, "DAEO-t95")
+        reads = [rule for rule in settings["permissions"]["deny"] if rule.startswith("Read(")]
+        assert reads == ["Read(//held/out/**)"], role
+        assert "filesystem" not in settings["sandbox"], role
 
 
 def test_a_malformed_evaluation_set_refuses_the_launch(tmp_path):
