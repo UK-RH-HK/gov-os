@@ -25,6 +25,17 @@ parents, no conflict; its record corrected in `6d4925ab`, DEC-750). That merge b
 change (merged `6e4b2750`) and W2-50's secrets-scan fix (merged `98effadc`, DEC-853); it touched none of this
 change's files.
 
+The merge `3eadca4c` carries no `Task:` trailer (its subject names `DAEO-kl9l` by a typing error; `6d4925ab` records
+this, unamended). Once it is in `w2/integrate`, `gov close`'s gate for work without a task reads its paths as nobody's
+work. That gate, `_check_unmeasured` in `src/gov/close/command.py`, takes the commits of the closing ticket's range
+(`<its first commit>..HEAD`, its own left out); for each commit whose `Task:` trailers name none of the project's
+tickets, the paths it changes (for a merge, what it brings to its first parent: 543 paths for `3eadca4c`, among them
+other tickets' ticket files, checkpoints and probe records) that are the closing ticket's work (its acceptance
+tests, a path inside its allowed paths, its own ticket file) refuse the close with `WORK_WITHOUT_TASK`. Only a
+FULL-profile ticket's probe gate leaves out the merges after its probed commit that are git's own merge on the
+probed paths (DEC-754); a STANDARD or LITE close leaves out none. So another ticket whose work is among those paths
+and whose range holds `3eadca4c` is refused. This is package P-W2-59-5, open with the orchestrator (§7).
+
 ## 1. The evidence
 
 | # | Finding | Source |
@@ -74,7 +85,7 @@ hooks/<name>.py`) stays, so `gov launch` still finds the guard by the text `hook
 
     g="$HOME/.local/bin/gov"; [ -f "$g" ] || g="$(command -v gov)" || { echo "…no pinned gov…" >&2; exit 2; };
     read -r p < "$g"; p="${p#'#!'}"; [ -x "$p" ] || { echo "…names no interpreter that runs…" >&2; exit 2; };
-    exec "$p" "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"
+    exec "$p" -E "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"
 
 - **No versioned path.** The line names the owner's stable link `~/.local/bin/gov` (→ `<pin env>/bin/gov`), else
   the `gov` on `PATH`. The interpreter is the first line of that console script, which pip writes as
@@ -83,6 +94,19 @@ hooks/<name>.py`) stays, so `gov launch` still finds the guard by the text `hook
   `gov` script: its first line names that install's interpreter, and the line starts that one.
 - **The project's `src` is not put on the import path** by the line: the program imports the pin's installed
   package.
+- **An import path the session inherited is not used either (run 2).** Every worker session started by the
+  committed launch form (`PYTHONPATH=<worktree>/src python3 -m gov.cli.main launch …`, `governance/project/briefs/
+  LEAD-w2-common.md`) carries `PYTHONPATH=<worktree>/src`, because the launcher passes its own environment on
+  (`src/gov/launch/launcher.py`, `env = {**os.environ, **settings["env"]}`), and Claude Code runs the hook lines with
+  the session's environment. The pin's interpreter honoured that variable, so in a worker session the program
+  imported the tree's `gov`: an edited guard in the tree decided the worker's calls. DEC-822 item 3 has the
+  per-command `PYTHONPATH` choose only the code under test, never the judge, so each line now starts its program as
+  `"$p" -E …`: the interpreter ignores every `PYTHON*` variable of the environment (`PYTHONPATH`, `PYTHONHOME`,
+  `PYTHONUSERBASE` among them), so no folder the session names is put on the import path and no `sitecustomize`
+  there runs. The interpreter's own `site` still runs, so an editable install, which finds its package through its
+  own `site-packages` entry, still works after the owner's rollback. Seen in this run's own session, which carries
+  `PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src`: the pin's interpreter imported
+  `…/W2-59/src/gov/__init__.py`; with `-E`, `…/pin-fecb870c/lib/python3.12/site-packages/gov/__init__.py`.
 - **Never fail open.** If neither the link nor `PATH` gives a `gov`, or its first line names nothing that runs, the
   line prints why on standard error and ends: with **exit 2** for `preToolUse` (Claude Code blocks the call) and
   for `postToolUse` and `postToolUseFailure` (the message reaches the session; it does not end silently), and with
@@ -121,7 +145,20 @@ records its commit is row W2-L371, for W2-16 and W2-18 (DEC-864 item 3; §7, P2)
 
 - **DEC-822 item 3:** DEC-732's per-command `PYTHONPATH=<worktree>/src` stays. It now chooses only the code under
   test: a judge started that way is the tree's code by intent, and its checks inherit that `PYTHONPATH` with it. A
-  bare `gov` is the pinned judge.
+  bare `gov` is the pinned judge only where the environment carries no `PYTHONPATH`.
+- **DEC-822 item 3 in a worker session.** A bare `gov` in a session whose environment carries `PYTHONPATH` runs the
+  code that variable names, because the pin's console script starts its interpreter without `-E` and the
+  interpreter follows the variable. Seen in this run's own session (launched with
+  `PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src`): a bare `gov --version` printed
+  `gov 0.1.0 (commit 6e95cd41…)`, the tree's code naming the tree's `HEAD`; with that variable removed from its
+  environment, the same `gov` is the pin built from `fecb870c`, which has no `--version` and answers with a usage
+  error. The hook lines no longer do this (§3.2). Two questions stay open, both the orchestrator's to decide, not
+  this change's:
+  - **P-W2-59-6:** whether a bare `gov` with a per-command `PYTHONPATH` (or one inherited) should run the pin or
+    the tree.
+  - **P-W2-59-7:** the launcher carries `PYTHONPATH` into every session it starts (`src/gov/launch/launcher.py`
+    passes its own environment on, and the committed launch form sets it). The launcher is outside this ticket's
+    paths: a row for the launcher's ticket.
 - The declarations, their format and their commands are unchanged; the runner's time limits, environment
   (`XDG_*`), working folder and verdict rules are unchanged.
 - `template/governance/kernel/hooks/precompact.py` and `sessionstart.py` still put the project's `src` on their own
@@ -160,7 +197,7 @@ W2-05's block that clears the environment at the start of `main` does not confli
 | # | Act | When |
 |---|---|---|
 | A1 | Re-run the pin commands at the merge commit of this ticket into `w2/integrate`, which must also hold W2-50's secrets fix (DEC-835 item 4, DEC-853 item 4). That fix is on `w2/integrate` (`98effadc`) and on this branch (`3eadca4c`), so this ticket's merge commit holds both | First, after the merge |
-| A2 | Regenerate the settings file from `.rulesync/hooks.jsonc` (the generated files are the owner's). Until then the live hooks keep the old lines, and the adapter-portability check is RED with one finding, `GENERATED_DIFFERS` (DEC-835 item 3) | After A1 |
+| A2 | Regenerate the settings file from `.rulesync/hooks.jsonc` (the generated files are the owner's). Until then the live hooks keep the old lines, and the adapter-portability check is RED with one finding, `GENERATED_DIFFERS` (DEC-835 item 3). The ticket lead's `gov check` of run 2 shows exactly that: `adapter-portability` RED with one finding, `GENERATED_DIFFERS` on the generated settings file (the lead's record) | After A1 |
 
 The order is corrected from run 1's record, which had the regeneration first: re-pinning first means the live hook
 programs (read from the tree) and the pin's package they import match from the first regenerated session.
@@ -171,6 +208,9 @@ programs (read from the tree) and the pin's package they import match from the f
 | P2 | Whether `gov --version` should know its commit from an installed wheel (a build that records it) | P-W2-59-2 (a) now, (c) later: stays as built; row W2-L371, for W2-16 and W2-18 (DEC-864 item 3) |
 | R1 | The residual: the hook programs are still read from the tree while the package they import comes from the pin, so a ticket that changes a hook program and that package together would block every tool call until a re-pin | Row W2-M390, for W2-18 (DEC-864 item 4) |
 | R2 | A file under `.gov-runtime/` that vanishes during the secrets scan fails `secrets-indexing` with `FileNotFoundError` (seen in run 1) | Row W2-M388, for W2-45 (DEC-864 item 4) |
+| P-W2-59-5 | The merge `3eadca4c` has no `Task:` trailer; once in `w2/integrate`, `_check_unmeasured` reads the paths it brings as work without a task and refuses the close of another ticket whose work is among them (§1) | Open, with the orchestrator |
+| P-W2-59-6 | Whether a bare `gov` with a per-command or inherited `PYTHONPATH` runs the pin or the tree (§4) | Open, with the orchestrator |
+| P-W2-59-7 | The launcher carries `PYTHONPATH` into every session (§4); outside this ticket's paths | Open, with the orchestrator: a row for the launcher's ticket |
 
 ## 8. The earlier tests revised (DEC-864 item 1)
 
@@ -200,11 +240,25 @@ canaries hit after a reindex. No KPI of W1-22 or W1-26 changed and no expectatio
 | `-P` takes the script's own folder off the import path of a declared `python3 <script>.py` | Such a script could not import its siblings | Every declaration today is `python3 -m …` or `gov …` |
 | The merge with W2-05 | Two conflicts | §6 gives the resolution |
 | The hook programs come from the tree, their package from the pin (§7, R1) | A ticket that changes both blocks every tool call until a re-pin | Row W2-M390 (W2-18): a hook program and its package move together on the pin ladder, or the program says what to re-pin |
+| An import path the session inherited (every launched worker carries `PYTHONPATH=<worktree>/src`, §3.2) | Before run 2 the pin's interpreter followed it: the tree's `gov` decided the worker's calls, an edited guard failing open | Each line starts `"$p" -E …`: no `PYTHONPATH` (nor `PYTHONHOME`, `PYTHONUSERBASE`) of the session is used; W2-59's acceptance tests check it for all seven lines and for the rollback |
+| `-E` drops every `PYTHON*` variable, not only `PYTHONPATH` | A setting the owner put in the environment (`PYTHONUTF8`, `PYTHONIOENCODING`, a user install under a non-default `PYTHONUSERBASE`) does not reach the hook program | None is used by the hook programs or the pin; an editable install in a venv or the default user site is still found |
+
+Residuals the independent review named, proposed as rows for the Wave 3 hardening pass (one line each):
+
+| Residual | Proposed |
+|---|---|
+| The `preToolUse` line checks only that the named interpreter is an executable file, not that it is a Python that runs the program | Row for the Wave 3 hardening pass |
+| `gov --version` from a source tree follows a `GIT_DIR` set by hand | Row for the Wave 3 hardening pass |
+| Only a declared command whose first word is exactly `python3` or `gov` is rewritten to the judge's interpreter (§3.1) | Row for the Wave 3 hardening pass |
+| A project that holds both kernel layouts with different canary declarations uses the template's silently (§3.3) | Row for the Wave 3 hardening pass |
 
 ## 10. Rollback
 
-Revert this ticket's merge commit. The hook lines return to `PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 …`, the
-runner to the tree's `src`, and the owner regenerates the settings file again. The pin itself is not touched by this
+Revert this ticket's merge commit. The hook lines return exactly to their form at `c5100159`: three lines
+(`preToolUse`, `postToolUse`, `postToolUseFailure`) were `PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 …` and four
+(`preCompact`, `sessionStart`, `stop`, `subagentStop`) a bare `python3 …`, each the first `python3` on `PATH`, with
+no check of their own that it runs. The runner returns to the tree's `src`, and the owner regenerates the
+settings file again. The pin itself is not touched by this
 change; the owner's pin rollback (the link `~/.local/bin/gov` back to an editable install's `gov`) is followed by
 the new hook lines without an edit.
 
@@ -219,3 +273,10 @@ Run 1's figures, before the merge `3eadca4c` and the revision of §8:
   and passing.
 
 Run 2's verification, after the merge and the revision, is the ticket lead's and is recorded in the lead's return.
+
+Run 2's engineer, after the change of §3.2 (`-E` on each line), every run with
+`PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src` (`gov.__file__` = `/home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py`):
+
+- W2-59's acceptance tests (`tests/acceptance/W2-59`, revised in `6e95cd41`): 55 passed (the nine cases of a
+  worker's inherited `PYTHONPATH`, red at `6e95cd41` by the lead's record, now pass).
+- Builder tests: the three files above and `tests/unit/validate/test_canary.py`: 16 passed.
