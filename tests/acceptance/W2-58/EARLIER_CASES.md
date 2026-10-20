@@ -126,6 +126,38 @@ The "Not yet done" items above are now done:
 Still unchanged, as before: `test_w1_02_second_names.py::test_an_interpreter_in_place_with_no_backup_is_decided_as_today`
 (2), which asks a refusal and no wording.
 
+## Fourth round, after the implementation (`b9e03048`..`3fac19e8`): 32 test errors the lead found (DEC-491)
+
+On the final code, the lead's run showed 32 of these rewritten W1-02 cases failing on test errors:
+
+- **29 cases asked a refusal's wording of an allowed call** (`assert_says_nothing_of_the_file` demands a non-empty
+  reason). Each now asks that the call is allowed and checks only the hook's output: no path, no folder, no value of
+  the files (and, where the case had it, not the start or the command). Commit `08109fa6`, `Rewrite-Reason: the case
+  asserted a refusal's wording on a call Policy 2 allows (DEC-821 item 3)`. The cases:
+  - `test_w1_02_copies.py::test_the_hook_s_answer_for_a_copy_names_neither_the_copy_nor_its_folder` [Read-absolute-*] (3);
+    the "move" cells keep the refusal's checks
+  - `test_w1_02_name_filters.py::test_a_name_filter_search_is_allowed_and_the_hook_says_nothing_of_the_file_or_the_start` (5)
+  - `test_w1_02_root_searches.py::test_the_search_is_allowed_and_the_hook_says_nothing_of_the_file` (7)
+  - `test_w1_02_search_on_a_pipe.py::test_a_search_on_a_pipe_with_a_path_is_allowed_and_the_hook_says_nothing_of_the_files` (1)
+    and `::test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_is_allowed_under_policy_2` (8)
+  - `test_w1_02_wildcard_globs.py::test_a_wildcard_only_glob_is_allowed_and_the_hook_says_nothing_of_the_copy_or_its_folder` (5)
+- **3 cases held an engineer's search from the root allowed although its glob takes in its own existing acceptance
+  test** (`*.py`, `**/*.py` match `tests/acceptance/W1-90/test_fixture.py`). Each is now refused for the engineer, with
+  a reason, and stays allowed for the other roles. Commit `484283f4`, `Rewrite-Reason: an engineer's search that takes
+  in its own existing acceptance folder is refused (DEC-821 item 1, brief item 3, TD-5)`. The cases:
+  - `test_w1_02_root_searches.py::test_the_daily_search_tool_forms_stay_allowed_for_every_role`
+    [the-root-as-path-and-a-glob-by-an-extension-engineer-who-may-not-write-the-file,
+    no-path-a-type-filter-and-a-glob-by-an-extension-at-any-depth-engineer-who-may-not-write-the-file]
+  - `test_w1_02_protected_reads_open.py::test_a_read_a_search_or_a_listing_that_takes_neither_file_in_stays_allowed`
+    [Grep-from-the-root-with-a-glob-that-cannot-match-engineer]
+
+**Not run by this designer on the final code.** The session's own sandbox, as launched for W2-58's test designer,
+denies the reads of the branch's changed files (`src/gov/guard/decide.py*`, `reads.py*`, `protected.py*`,
+`src/gov/launch/launcher.py*` and the others appear as placeholder devices). So `import gov.guard.decide` fails
+(`ModuleNotFoundError`) and no W1-02 file can be collected. The six changed files compile; their runs are the lead's to
+make. `tests/acceptance/W1-05/test_w1_05_switch_over_record.py` gave 1 failed, 1 passed for the same cause: its W1-02
+child run stops on that import error.
+
 ## Not rewritten in the first round: package P-W2-58-TD-1 (920 cases in 83 functions; all but the "not yet done" items above are now handled)
 
 Listed with the number of cases that hit the rule. Many need a reading of Policy 2 that no source states (see the
