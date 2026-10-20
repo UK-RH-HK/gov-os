@@ -655,6 +655,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768].
   - `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768].
   - **The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`)** [DEC-768 item 1]: its schema file byte for byte as W2-02's; in `src/gov/check/schema.py`, W2-02's lines for that type (its `SCHEMA_MAP` entry, the type among the standalone types, the audit-report folder `docs/audit` and its reading of a record there that states no `type` as an audit report), nothing of W2-02's other types; so W2-02's later merge adds nothing new for this type. Core-schema is green on `w2/integrate`, with the W1-43 audit report's body untouched.
+  - **DEC-874 (delegated, 2026-10-20):** "nothing of W2-02's other types" is about W2-54's own change, not the tree: its four cases (three acceptance, one unit) assert that W2-54's own commits bring in no schema file or type of W2-02's beyond `audit-report`, which holds before and after W2-02's merge. Corrected in W2-54's resume (run 5), each with `Rewrite-Reason: DEC-874`.
 - **KPIs, failure:**
   - A context whose items or hash differ between two computations still fails the check, naming the ticket.
   - A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4].

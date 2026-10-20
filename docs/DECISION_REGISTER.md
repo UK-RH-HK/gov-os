@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.261 (the version table at the end of each section gives the history)
+**Version:** 0.262 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9550,5 +9550,21 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.261 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-873 (P-W2-58-1 (a): Policy 2's (c) and (d) by the guard, no OS-level Read rule for them, the held-out rules stay; DEC-821's sandbox clause re-baselined; row W2-L374). Next free id: DEC-874. |
+
+---
+
+## 262. A delegated decision of 2026-10-20 on W2-02's resume (register v0.262, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-874 — P-W2-02-R4 (b): W2-54's own resume corrects its four "W2-02's other types stay unknown" cases; then W2-02 re-merges (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-768 item 1, DEC-746 (the precedent), DEC-872, DEC-866 · **Basis:** W2-02 run 4 (`log/W2-02-A5-run4.json`, PACKAGES, P-W2-02-R4): after its merge-back (`666f56d1`), `core-schema` is GREEN on the real close record, but three W2-54 acceptance cases (`test_w2_54_audit_report.py::test_no_schema_file_of_w2_02_s_other_types_comes_with_it`, `::test_w2_02_s_other_types_are_judged_as_an_unknown_type[close]`, `[adoption-verdict]`) and one W2-54 unit test (`tests/unit/check/test_schema_audit_report.py::test_the_other_types_of_w2_02_stay_unknown`) assert that W2-02's other types do not exist in the tree, so they are red on any tree that holds W2-02's merge, and neither W2-02 nor W2-54 can close. P2, reversible; the lead's recommendation (b) and the orchestrator's agree (confidence medium); nothing in the Charter, the master rules, the Contract or the guard changes.
+- **Decision:**
+  1. **W2-54's KPI S4 is unchanged in meaning** ("the `audit-report` type exactly as W2-02 defines it … nothing of W2-02's other types", DEC-768 item 1): it is about W2-54's own change, not about the tree. Its four cases are corrected to that meaning: W2-54's own commits bring in no schema file and no type of W2-02's beyond `audit-report`, which holds before and after W2-02 merges.
+  2. **(b): in W2-54's own resume** (run 5): its independent test designer revises the three acceptance cases, and its engineer the unit test (in W2-54's paths), each with `Rewrite-Reason: DEC-874`; then its full verification and a fresh FULL probe; then its merge.
+  3. **Then W2-02 re-merges `w2/integrate`,** re-verifies and takes its fresh probe (its run 5), and merges; then the close queue: W2-02, W2-54 and the merged tickets after them.
+- Next free id: DEC-875.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.262 | 2026-10-20 | Delegated: DEC-874 (P-W2-02-R4 (b): W2-54's own resume corrects its four "W2-02's other types stay unknown" cases to its own change; then W2-02 re-merges and probes). Next free id: DEC-875. |
 
 ---
