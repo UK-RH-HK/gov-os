@@ -41,6 +41,8 @@ _MOST_FILES = 10000
 _MOST_DEPTH = 64
 _GIT_TIMEOUT_S = 5
 _WBS_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+# The actions of find that open the files it finds.
+_FIND_OPENS = frozenset({"-exec", "-execdir", "-ok", "-okdir"})
 _GIT_QUIET = frozenset({"--stat", "--name-only", "--name-status", "--shortstat",
                         "--numstat"})
 _GIT_GREP_VALUED = frozenset("-e -f -A -B -C -m --max-depth --threads --context "
@@ -461,8 +463,9 @@ class _Judge:
             why = self.at(base, cwd, False) or (
                 self.glob_lead(pattern, start) if _has_glob(pattern)
                 else self.at(pattern, start, False))
-            if why:
-                return why
+            if why or "**" in pattern:
+                return why  # with **, a listing from above, which shows names
+            # Without **, the pattern names the files it lists: aimed at them.
             for part in self.parts:
                 for f in part.below(start):
                     rel = f[len(start.rstrip("/")) + 1:]
@@ -497,7 +500,10 @@ class _Judge:
                 skip = False
                 continue
             if not _is_punct(tok):
-                cur.append(tok)
+                # The number of a redirect (2>&1, 0<x) is no word (DEC-570).
+                if not (tok.isdigit() and tokens[i + 1:i + 2]
+                        and _is_punct(tokens[i + 1]) and tokens[i + 1][0] in "<>"):
+                    cur.append(tok)
                 continue
             if ("<" in tok or ">" in tok) and i + 1 < len(tokens):
                 skip = True
@@ -536,14 +542,30 @@ class _Judge:
             return self.git(args, cwd), ecwd
         return self.reads(name, args, cwd), ecwd
 
+    def listed(self, text: str, cwd: str, names: list[str] | None = None,
+               fold: bool = False) -> str:
+        """Why a listing of the folder *text* shows a part's file by name: one
+        that lies in it, matched by one of *names* when there are any."""
+        real = (self.spellings(text, cwd) or [None])[-1]
+        cased = (lambda s: s.lower()) if fold else (lambda s: s)
+        return next((p.reason for p in self.parts for f in p.files
+                     if os.path.dirname(f) == real and (names is None or any(
+                         fnmatch.fnmatchcase(cased(os.path.basename(f)), cased(n))
+                         for n in names))), "")
+
     def reads(self, name: str, args: list[str], cwd: str) -> str:
         name = "grep" if name in ("egrep", "fgrep") else name
         named = not _FIND_NAMED.isdisjoint(args)
         search = _shell_search(name, list(args), named)
+        # A listing shows names (ls, find with no action that opens a file,
+        # rg --files): from a folder above it takes no part in.
+        opens = name == "find" and not _FIND_OPENS.isdisjoint(args)
+        listing = name == "ls" or (name == "find" and not opens) or (
+            name == "rg" and "--files" in args)
         for path in (search[0] if search else ()):
             exp = _expand_token(path) or path
-            why = self.at(exp, cwd) or self.above(exp, cwd, search[1] + search[2],
-                                                  fold=bool(search[2]))
+            why = self.at(exp, cwd) or (not listing and self.above(
+                exp, cwd, search[1] + search[2], fold=bool(search[2])))
             if why:
                 return why
         if name == "find" and named:
@@ -551,20 +573,17 @@ class _Judge:
                                              if a.startswith("-") or a in "!("),
                                             len(args))]] or ["."]
             names = [v for o, v in zip(args, args[1:]) if o in ("-name", "-iname")]
-            exact = not (_FIND_NAMED - {"-name", "-iname"}).intersection(args)
+            names = names if not (_FIND_NAMED - {"-name", "-iname"}).intersection(args) else None
             for s in starts:
-                why = self.above(_expand_token(s) or s, cwd,
-                                 names=names if exact else None,
-                                 fold="-iname" in args)
+                s = _expand_token(s) or s
+                why = (self.above(s, cwd, names=names, fold="-iname" in args) if opens
+                       else self.listed(s, cwd, names, "-iname" in args))
                 if why:
                     return why
         if name == "ls":  # a listing shows the names of the files in a folder
             for t in [a for a in args if not a.startswith("-")] or ["."]:
                 t = _expand_token(t) or t
-                real = (self.spellings(t, cwd) or [None])[-1]
-                why = self.at(t, cwd, False) or next(
-                    (p.reason for p in self.parts
-                     if any(os.path.dirname(f) == real for f in p.files)), "")
+                why = self.at(t, cwd, False) or self.listed(t, cwd)
                 if why:
                     return why
         if name in ("cp", "mv"):
