@@ -94,6 +94,12 @@ read rule's wording no longer asked. The engineer's content search from the root
 item 1). The bounded-time cases are kept. The table, the cases kept and the three items left for the resume are in
 `EARLIER_CASES.md`, "Second round".
 
+Third round (TD-4 (b), TD-5): the 20 within-the-bound cases became "allowed within the bound". The subagent case is
+allowed when its ticket's tests do not exist, and a twin is refused when they do. W2-50's 91 second-name cases keep
+their verdict, without the read rule's wording. A sweep found 5 earlier "allowed" cases that (c) turns red (W1-02 ×4,
+W1-50 ×1), each rewritten to refused (DEC-821 item 1) and named in `EARLIER_CASES.md`, "Third round". This suite's own
+cases agree with TD-2, TD-4 and TD-5, so none was changed.
+
 ## How the tests exercise this worktree's code
 
 Run from this worktree with `PYTHONPATH` set per command:

@@ -78,6 +78,54 @@ Whether `perl -pi` by the orchestrator, who may write the settings file, stays r
   no path".
 - The earlier "allowed" cases that (c) turns red (below): not yet rewritten.
 
+## Third round, under the lead's answers to TD-4 (b) and TD-5 (2026-10-20)
+
+The "Not yet done" items above are now done:
+
+- **TD-4 (b), within the bound:** `test_w1_02_bounded_time.py::test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_decided_within_the_bound`
+  (12, was `…_is_refused_within_the_bound`) and `test_w1_02_fix_round_time.py`'s
+  `test_a_new_form_at_the_length_bound_that_searches_the_root_is_decided_within_the_bound` (4) and
+  `test_a_new_form_at_the_length_bound_that_reads_a_protected_file_is_decided_within_the_bound` (4): allowed within
+  the bound, the hook's output carrying nothing of the files. Every case whose input lies beyond the bound is unchanged
+  (refused by the bound). Run on the base: 12 failed, 47 passed; 8 failed, 37 passed. Reason: DEC-821 item 3, DEC-857
+  item 3.
+- **TD-2 (iv) and TD-5, the subagent:** `test_w1_02_root_searches.py::test_a_search_tool_call_from_the_root_by_a_role_subagent_is_allowed_when_its_tests_do_not_exist`
+  (2, was `…_is_refused_for_a_role_subagent_too`): W1-02's fixture holds no `tests/acceptance/W1-91/`, so the
+  engineer subagent's search from the root is allowed. Added beside it,
+  `…_is_refused_when_its_tests_exist` (2, its own world with that folder): refused for (c) (DEC-821 item 1). File run:
+  124 failed, 112 passed.
+- **W2-50's second names:** `tests/acceptance/W2-50/test_w2_50_one_reader.py`: every verdict kept (refused); the premise
+  `_plain` and `assert_refused_as_a_read` now ask a rule's refusal whose message names no path or folder of the file and
+  carries nothing of it (its hook command), in place of the read rule's decisions. 91 cases; file run: 167 passed.
+- **The sweep, "allowed" cases that (c) turns red** (an engineer's read of, or content search over, its own ticket's
+  *existing* acceptance folder), rewritten to refused with `Rewrite-Reason: DEC-821 item 1`:
+  - `tests/acceptance/W1-02/test_w1_02_bash_writes.py::test_engineer_bash_read_is_let_through[cat-acceptance-test]`
+  - `tests/acceptance/W1-02/test_w1_02_root_searches.py::test_the_daily_shell_forms_stay_allowed[grep-rn-over-two-source-folders-engineer-who-may-not-write-the-file]`
+  - `tests/acceptance/W1-02/test_w1_02_name_filters.py::test_a_search_from_the_root_with_a_source_filter_stays_allowed_for_every_role[grep-include-quoted-with-a-dot-engineer-who-may-not-write-the-file]`
+    and `[rg-short-option-with-the-filter-as-the-next-word-engineer-who-may-not-write-the-file]` (a `*.py` filter from
+    the root takes in `tests/acceptance/W1-90/test_fixture.py`)
+  - `tests/acceptance/W1-50/test_w1_50_freeze_lift_guard_rule.py::test_the_rule_leaves_ordinary_work_alone[rg-for-the-phrase]`
+    (`rg -n 'gov pause --off' docs tests`)
+
+  How found: each suite was run on the base's guard with a pytest plugin that inspects every guard call and flags one
+  the guard allowed for an engineer actor (role or subagent type) whose ticket's acceptance folder exists, when the
+  call reads a path in it, aims a Grep, Glob or listing in it, or runs a content search from above. Each flag was read
+  by hand. Swept: W1-02 (all), W1-03 (all), W1-05 (`test_w1_05_live_hooks.py`, `test_w1_05_role_subagents.py`; the
+  switch-over record drives no guard), W1-38 (all), W1-47 (all but `test_w1_47_uv_installs.py`, installs), W1-50 (the
+  eight files that drive the guard) and W2-50 (all but the two secrets-scan files). Flags read and left as they are:
+  searches of `src/`, of a named file, `git show HEAD:docs/notes.md`, and search programs fed by a pipe (none takes in
+  the folder). Run of the four changed files: W1-02 bash_writes 1 failed, 49 passed; root_searches 125 failed,
+  111 passed; name_filters 170 failed, 74 passed; W1-50 freeze_lift_guard_rule 1 failed, 76 passed: each new red is
+  one of the five.
+- **W2-58's own cases against TD-2, TD-4, TD-5:** no disagreement found, so no correction commit. Every W2-58 refusal
+  of a search from above concerns a protected part that exists in its fixture (T's tests, T's changed files, the hidden
+  files). Every aimed refusal is aimed at an existing path, or at a path refused whether or not it exists. No W2-58
+  case asserts a second name allowed (its `cp` cases are plain copies of a secret, of held-out material or of T's
+  tests, refused for (a), (b), (c)). No W2-58 case concerns the bound.
+
+Still unchanged, as before: `test_w1_02_second_names.py::test_an_interpreter_in_place_with_no_backup_is_decided_as_today`
+(2), which asks a refusal and no wording.
+
 ## Not rewritten in the first round: package P-W2-58-TD-1 (920 cases in 83 functions; all but the "not yet done" items above are now handled)
 
 Listed with the number of cases that hit the rule. Many need a reading of Policy 2 that no source states (see the
