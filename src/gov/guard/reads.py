@@ -18,11 +18,12 @@ from __future__ import annotations
 import fnmatch
 import os
 import re
+import shlex
 import subprocess
 
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
-                              _copy_args, _expand_token, _has_glob, _is_punct,
-                              _load_ticket, _parse_frontmatter)
+                              _copy_args, _expand_token, _extract_bash_write_targets,
+                              _has_glob, _is_punct, _load_ticket, _parse_frontmatter)
 from gov.guard.heldout import _words, load_yaml_unique
 from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _MOST_RESOLVED,
                                  _PATTERN_OPTIONS, _PIECE_RE, _RG_VALUED, _Glob,
@@ -167,8 +168,11 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
         wbs = ticket.get("wbs_id")
     else:
         # Not YAML: the line reader the write rules use (a fixture's
-        # allowed_paths may start with a *); without a WBS id there, refused.
-        wbs = (_parse_frontmatter(text) or {}).get("wbs_id") or ""
+        # allowed_paths may start with a *).  No front matter at all, refused.
+        loose = _parse_frontmatter(text)
+        if loose is None:
+            raise PolicyError("the session's ticket file cannot be read for its WBS id")
+        wbs = loose.get("wbs_id") or None
     if wbs is not None and not (isinstance(wbs, str) and _WBS_RE.fullmatch(wbs)):
         raise PolicyError("the session's ticket file cannot be read for its WBS id")
     return wbs  # None: a ticket with no WBS id names no acceptance folder
@@ -297,7 +301,7 @@ def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
     if role in ("engineer", "independent-test-designer"):
         wbs = _ticket_wbs(root, ticket_id)
         if role == "engineer" and wbs:
-            out.append(_Part(root, [f"{ACCEPTANCE}/{wbs}"], TESTS_REFUSAL))
+            out.append(_Part(root, [f"{ACCEPTANCE}/{wbs}/**"], TESTS_REFUSAL))
         changed = _changed(root) if role == "independent-test-designer" else None
         if changed:
             base, names = changed
@@ -619,12 +623,24 @@ class _Judge:
                 why = self.at(t, cwd, False) or self.listed(t, cwd)
                 if why:
                     return why
+        # A write target of its own command is the allow-list's (as the read
+        # rule of the two files left it): it judges it and names it.
+        written = set(_extract_bash_write_targets(
+            " ".join(shlex.quote(w) for w in [name, *args]), cwd) or ())
+
+        def theirs(word: str) -> bool:
+            """A write target, or the folder one lands in (cp -t <folder>)."""
+            exp = _expand_token(word) or word
+            return bool(written) and not _has_glob(exp) and any(
+                t == s or t.startswith(s.rstrip("/") + "/")
+                for s in self.spellings(exp, cwd) for t in written)
+
         if name in ("cp", "mv"):
             parsed = _copy_args(name, list(args))
             sources = (args if parsed is None else parsed[0] if "t" in parsed[1]
                        else parsed[0][:-1])
             for s in sources:
-                why = self.above(_expand_token(s) or s, cwd)
+                why = "" if theirs(s) else self.above(_expand_token(s) or s, cwd)
                 if why:
                     return why
         skip = None
@@ -636,6 +652,8 @@ class _Judge:
         for w in args:
             if w is skip:
                 skip = None
+                continue
+            if theirs(w):
                 continue
             why = self.word(w, cwd)
             if why:

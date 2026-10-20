@@ -274,5 +274,11 @@ def test_the_decision_refuses_through_the_read_rules_and_leaves_writes_to_the_al
     assert decide("Edit", {"file_path": str(project / "src/app/main.py"), "old_string": "c",
                            "new_string": "d"}, str(project), "engineer", TICKET,
                   cwd=str(project), flag="absent") == ("allow", "")
+    # A write into the acceptance folder is the allow-list's, which names the target.
+    for command in ("cp -t tests/acceptance/W2-95 src/app/main.py",
+                    "mv src/app/main.py tests/acceptance/W2-95/x.py"):
+        decision, reason = decide("Bash", {"command": command}, str(project), "engineer", TICKET,
+                                  cwd=str(project), flag="absent")
+        assert decision == "deny" and "tests/acceptance/W2-95" in reason, command
     for reason in (SECRET_REFUSAL, TESTS_REFUSAL, CHANGED_REFUSAL, HIDDEN_REFUSAL):
         assert "DEC-820" in reason and "W2-95" not in reason and ".py" not in reason
