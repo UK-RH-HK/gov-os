@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.262 (the version table at the end of each section gives the history)
+**Version:** 0.263 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9566,5 +9566,24 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.262 | 2026-10-20 | Delegated: DEC-874 (P-W2-02-R4 (b): W2-54's own resume corrects its four "W2-02's other types stay unknown" cases to its own change; then W2-02 re-merges and probes). Next free id: DEC-875. |
+
+---
+
+## 263. A delegated decision of 2026-10-20 on W2-48's run 1 (register v0.263, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-875 — W2-48: the close's wiring in its paths, the fixture defect revised, its test designer's choices confirmed; the saving's trade-off goes to the owner (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-726, DEC-843, DEC-852, DEC-869 · **Basis:** W2-48's lead returned PACKAGES (run 1, `log/W2-48-A5-run1.json`): 32 of 46 acceptance cases pass; 12 wait on the close's wiring, one on a fixture defect, one on the time-saved figure. Each item below is P2 or P3, reversible, the lead's recommendation and the orchestrator's agree (confidence high or medium-high), and nothing in the Charter, the master rules, the Contract or the guard changes.
+- **Decision:**
+  1. **P-W2-48-4 (a):** W2-48's paths gain `src/gov/close/command.py`, for the `--no-cache` option and the call into the cache only (about 15 lines; the KPIs already require both; no ticket in flight touches the file).
+  2. **P-W2-48-6 (a):** a fresh test designer revises the planted change of `test_a_declared_command_runs_again_only_when_a_file_of_its_input_globs_changes` (it writes content its own fixture tool fails, while the test expects `passed`), with `Rewrite-Reason: DEC-875`.
+  3. **P-1, P-2, P-3 confirmed as the test designer wrote them:** module commands, not a new `gov` command; the interpreter change planted as a venv of the same Python version; subprocess coverage as the mechanism, always-run as the fallback.
+  4. **P-A:** the lead measures the time saved in its next round, on the final code on a quiet machine, and the research record carries it.
+  5. **P-W2-48-5 and P-B go to the owner** (`governance/project/orchestration/packages/P-W2-48-5.md`): how far the cache may measure children, and whether this repository declares `test_inputs`, trade fail-open risk against the hour each close costs.
+  6. The resume (run 2) waits for the owner's answer, so that one engineer round carries everything (DEC-802): the wiring, the cache-only reds (W1-07's copied-repository setup race; latency cases slowed by coverage), the lead's run showing its failure output, `GOV_TESTCACHE_HOME` not inherited by the tests' own processes, and the owner's choice.
+- Next free id: DEC-876.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.263 | 2026-10-20 | Delegated: DEC-875 (W2-48: `src/gov/close/command.py` in its paths; the fixture defect revised; P-1 to P-3 confirmed; P-W2-48-5 and P-B to the owner). Next free id: DEC-876. |
 
 ---
