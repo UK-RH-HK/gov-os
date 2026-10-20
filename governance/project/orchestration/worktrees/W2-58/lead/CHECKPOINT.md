@@ -8,7 +8,13 @@
 - Red check done (lead): gov.__file__ = /home/usain/gov-os-worktrees/W2-58/src/gov/__init__.py; W2-58 341 failed / 222 passed, reasons match README (log/red-W2-58.txt).
 - TD resume 1 (log/td-2.json): 12 commits 82729e9e..ea270615, W1-02 rewrites; PACKAGES TD-4, TD-5. TD resume 2 (log/td-3c.json; td-3 and td-3b were gate refusals, load >= 20, nothing launched): commits 6ecab4ea, 4c188d5d, bfc290f3, 151ae7ec, 266d4dfd; DONE. All trailers checked. Lead readings TD-4 (b), TD-5 (by existence for searches from above) in briefs/td-1-resume-2.md.
 - Tripwires 2 and 3: this worktree only test paths (W1-02, W1-50, W2-50, W2-58) plus an empty CLI folder tests/acceptance/.claude/.cc-writes (10:57, untracked, left in place). Other trees: other leads' and the orchestrator's own work (main head 67245c6b->16d30765->e7bf7a3e; W2-59, W2-62, W2-63 heads).
-- Next: full rebuild (store for workers' retrieval + wall time, DEC-856), then engineer from scratchpad eng-1.md copied to briefs/eng-1.md (tripwire-before-4).
+- Lead commit c772c86c (checkpoint record CP-DAEO-5j8b-0004, trailers Task/Implements: DEC-821/Role: orchestrator).
+- Rebuild 1 (store for retrieval): exit 0, wall 920 s, at c772c86c (log/rebuild-1.json).
+- Engineer 1: session 6940b69f-d870-4fca-ab0a-abb6fe205c8c, sandboxed, effort high; first run killed at the 2 h background limit (it waited ~30 min for a close window inside the limit); resumed (briefs/eng-1-resume-1.md, log/eng-2.json); returned PACKAGES (2 test packages). Commits b9e03048..3fac19e8 (16), all trailers checked (Task, Role: engineer, Implements: DEC-821). Files all within allowed paths; path map: evaluation_sets block appended only. Sandbox check passed. Tripwires 4, 5: this worktree only its own paths; other trees: orchestrator's own (main head, W2-48 worktree appeared).
+- Engineer discovery: Read deny rule `<folder>/**` binds the OS sandbox as the folder (it hid the tests from pytest); fixed with `W2-5[8]/**` (31ed6074). The held-out rule has the same form, so held-out folders are denied to commands too (intended for (b)).
+- Lead verification so far: W2-58 on 3fac19e8: 563 passed (log/v1-W2-58.txt). W1-02 disputed files: 32 failures confirmed as test errors (29: refusal-wording helper on allowed calls, w1_02_copies_support.py:255; 3: engineer root search with *.py glob while its acceptance folder exists).
+- Loop: implementer iteration 1 done; test fix batch (TD resume 3, briefs/td-1-resume-3.md, log/td-4.json, tripwire-before-6) running.
+- Next: after TD, full verification: rebuild, gov.__file__, every acceptance suite in its own process, tests/unit, gov check; then a live probe of the engineer's sandbox (pytest reads the tests), then the reviewer (A3, effort max).
 - Interpretations taken (to report in the return):
   - The engineer writes only the `evaluation_sets` block of the path map (ticket allowed_paths, DEC-864 item 5); the ratchet lists stay untouched (DEC-757).
   - DEC-162/DEC-215 (any call naming a held-out path) stay; the latest KPI (DEC-857 item 3) opens the held-out *list file*.
@@ -17,4 +23,3 @@
   - The sandbox side of (c)/(d): Read deny rules binding the file tools but not the OS sandbox's reads.
   - `gov.secrets.indexable` widening (revised plan) not in the ticket: residual.
 - Guard read refusals met by the lead so far: 0.
-- Loop count: 0 implementer iterations.

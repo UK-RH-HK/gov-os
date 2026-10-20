@@ -1,1 +1,3 @@
 unit start 2026-10-20T16:04:10+01:00 load 2.69
+unit rc=0 :: 2377 passed, 1 skipped in 140.38s (0:02:20)
+w1-05-switch-over start 2026-10-20T16:06:46+01:00 load 5.31

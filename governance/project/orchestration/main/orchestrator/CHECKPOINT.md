@@ -62,7 +62,11 @@
   first lead rebuild under the new map: measure it from its return / `log/lead-usage.jsonl`.
 - **W2-63 DONE, MERGED `50c08ae3`** (W1-49 105/105 on DEC-838). DEC-865/866 committed `74d22909`; sweep applied
   `f4d81448`, report `governance/project/orchestration/packages/SWEEP-2026-10-20.md`: nothing else refuses W2-53.
-- **W2-53 close 4 REFUSED** (08:38-09:54; repair DAEO-8em0 in `log/repair-tickets/`): my W2-63 source (superseded
+- **W2-53 CLOSED by gov close, exit 0, 2026-10-20 15:53** (first clean close of Wave 2; outputs `a1565e56`; worktree
+  and branch removed). Its record's `type: close` turns core-schema RED until **W2-02 run 4 (STARTED 16:1x)** merges
+  its close type (DEC-872); W2-54's queue stopped at gate (b) for that, not refused. Next: W2-02 merges -> queue
+  W2-54, W2-62, W2-63, W2-50; W2-48 (started 13:55, stacked) merges after W2-53 (now closed). W2-64 = W2-02's widening.
+- (history) **W2-53 close 4 REFUSED** (08:38-09:54; repair DAEO-8em0 in `log/repair-tickets/`): my W2-63 source (superseded
   DEC-636), my W2-11 paths (MR-3), the `tests/unit/secrets` vs stdlib `secrets` clash (W2-62's live test), stale
   ticket checkpoint. DEC-867 fixed the first two (`b9a14f7c`, `16d30765`); **W2-62 run 2 RUNNING** removes the
   trigger (row W2-L373 renames the folder in W2-43). Then: `bash tools/close_queue.sh DAEO-7rr2 DAEO-0rfi` (gate
