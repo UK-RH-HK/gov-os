@@ -7,8 +7,8 @@ L=/home/usain/gov-os-worktrees/W2-59/.gov-runtime/scratch/lead/log/suites
 batch="$1"; shift
 mkdir -p "$L/$batch"
 cd "$W" || exit 99
-until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING ]; do sleep 60; done
-until awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
+# Both gates at once: no close in its quiet window AND the 1-minute load below 20 (DEC-780, DEC-847).
+until [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING ] && awk '{exit !($1 < 20)}' /proc/loadavg; do sleep 60; done
 date -Is > "$L/$batch/start.txt"
 worst=0
 for s in "$@"; do

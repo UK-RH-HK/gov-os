@@ -28,7 +28,6 @@ from __future__ import annotations
 
 import json
 import os
-import secrets
 import subprocess
 from pathlib import Path
 
@@ -79,7 +78,7 @@ def test_a_resumed_session_quotes_the_last_line_of_a_50000_character_section(tmp
     env["PATH"] = sandbox.path
 
     started = _call(project, env, settings, START_PROMPT, "--tools", "")
-    token = f"W262-{secrets.token_hex(8)}"
+    token = f"W262-{os.urandom(8).hex()}"
     section = support.section_text(50_000, token)
     decoy = "\n## History\n\n- HISTORY-MARKER the last line of the file is not the section's: W262-decoy\n"
     cp = support.checkpoint(section, after=decoy)

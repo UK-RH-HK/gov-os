@@ -1,43 +1,65 @@
-# W2-59 (DAEO-kh9l) lead checkpoint
+# W2-59 (DAEO-kh9l) lead checkpoint — run 2 (2026-10-20)
 
-- Run 1. Base c5100159 on w2/W2-59, clean at start; identity orchestrator/DAEO-kh9l checked.
-- State: step 1 (tests first). Rebuild 1 ended 23:38, exit 0 (store recreated; gov retrieve answers).
-  Tripwire snapshot 1 taken (tripwire-before-1.json). Test designer launched (gov launch, sandboxed, effort high,
-  brief briefs/td-1.md, log log/td-1.json, exit log/td-1.exit, start time in log/td-1.start once the load gate
-  opened).
-- Test designer returned (session 97399552-8432-4fb3-8ca9-2e633b0faa0f, 23 min): twelve fields present; commit
-  922dd542 (trailers Task, Role: independent-test-designer, Implements: DEC-822, DEC-835, Co-Authored-By). 44 cases.
-  Tripwire 1: here only head + tests/acceptance/W2-59 (allowed); main tree head moved and staged files gone (owner
-  batch commit); W2-50 changed (its own lead). Sandboxed: yes; sandbox check passed. Used gov retrieve: yes (2 questions).
-  W1-38 check: no W1-38 test turns red; none needs revision.
-  Packages from it: P-W2-59-1 (precompact.py and sessionstart.py insert the project's src; outside paths; blocks
-  nothing; lead recommends (b) a row), P-W2-59-2 (installed wheel's commit; lead recommends (a) now, (c) W2-18).
-- Red check by lead: 39 failed, 5 passed, reasons match README (log/red-1.txt). Tree stayed clean.
-- gov checkpoint CP-DAEO-kh9l-0002 committed as 78e10a3c.
-- Engineer 1 returned DONE (session 5b7defda-73f6-4543-a7a2-b374758dcce5, 21 min, sandboxed, check passed):
-  commits 771e9a0c (code + builder tests), e120479c (CIT-P), fd675ec4 (builder test fix); trailers Task, Role:
-  engineer, Implements: DEC-822, DEC-835, Co-Authored-By. Its run: W2-59 44/44, W1-38 201/201, unit 2194 passed 1 skipped.
-  Twelve fields present. Tripwire 2: here head only; main tree head moved + 3 unstaged files (orchestrator); W2-50 own.
-  gov retrieve: asked 1 question, index stale in its session (my checkpoint commit after rebuild 1).
-  Lead check: hooks/guard/checkpoint/context identical fecb870c..HEAD; every hook program loads under the pin.
-  Residual to return: hook programs come from the tree while their package comes from the pin (skew blocks calls
-  until a re-pin; fails closed); not in the CIT-P.
-- Verification: rebuild 2 exit 0 (00:38 to ~00:58). gov.__file__ -> /home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py.
-  gov --version: "gov 0.1.0 (commit fd675ec4...)". gov check --json (log/check-1.json): 12/17 GREEN; RED:
-  adapter-portability (GENERATED_DIFFERS .claude/settings.json: this ticket, owner regenerates), context-reproducibility
-  (DEC-854 not in this branch's register; w2/integrate 295a7542 now holds DEC-853..855), secrets-indexing (known;
-  this branch's scan alone rc=0 in 622 s; the pin's own scan crashed on a guard snapshot deleted mid-scan: discovery);
-  YELLOW: core-decision-citations (DEC-854, DEC-837 unrecorded), openspec-validate (openspec not on PATH).
-- Suites (run_suites.sh, log/suites/<batch>/summary.txt): batch A running. W1-26 has 1 red CAUSED BY THIS TICKET:
-  test_planted_authority_defect_decision_checker_exception_not_swallowed plants a broken checker in the project's
-  src/gov and expects the judge to import it; KPI 1 removes that. Package P-W2-59-4 (revise that W1-26 case; a
-  test-designer batch; owner decides). Blocks green, the review and DONE; code unaffected.
-- Loop count: implementer iteration 1 done.
-- Decided by the lead (design facts given to workers): a wheel is built out of the tree with DIST_EXTRA_CONFIG
-  pointing to a cfg whose [build] build_base and [egg_info] egg_base are in a temp folder (checked in scratchpad:
-  nothing lands in the source tree).
-- Register lacks DEC-853, DEC-854, DEC-855 (staged); the brief's text holds.
-- WBS section 2 in this worktree has no W2-59 card; the card's text is in docs/plan/WAVE_2_REVISED_PLAN.md 4.1.
-- Refusals met: 1 write refusal (lead, a Bash write target with a shell variable, retried with literal paths);
-  read refusals: 0.
-- Loop count: 0 implementer iterations.
+## State
+- Run 2, the resume after run 1's PACKAGES. DEC-864 decided: P-W2-59-4 (a) (test designer revises three earlier
+  cases with `Rewrite-Reason: DEC-822 item 3, DEC-835 (DEC-864)`); P-W2-59-1 (b) row W2-M389; P-W2-59-2 (a) + (c)
+  row W2-L371; residuals W2-M390 (hook programs read from the tree), W2-M388 (secrets scan vanishing file).
+- Step 1 done: merge of w2/integrate 74d22909 into w2/W2-59 = 3eadca4c (--no-ff; tree 6b2943c8 == git merge-tree
+  --write-tree; no conflict). LEAD ERROR: the merge commit's message lacks DEC-750's `Task: DAEO-kh9l` and
+  `Role: orchestrator` trailers and its subject names "DAEO-kl9l" (typing error). Not amended (no amend/reset);
+  recorded in the next checkpoint commit's body. Report in the return.
+- Containment flagged on the merge: the owner's Role: owner commits 7f95e6f5, ccf28d5c, f0680605 brought in from
+  w2/integrate (the owner's own commits; nobody in this ticket made them).
+- Loop count: 1 implementer iteration (run 1). Never disclose.
+- No worker running. No run running.
+
+## Step 2 done: test designer td-2 (gov launch, sandboxed, effort high), session f679f793-c840-4279-9a33-58e512f19d23
+- Commit 45c6bfae (Task, Role: independent-test-designer, Implements DEC-864/822/835, Rewrite-Reason, Co-Authored-By).
+  Twelve fields present. Sandbox check passed. Tripwire 3: this tree only head + W1-22, W1-26 folders (allowed);
+  main tree head 74d22909 -> 67245c6b + W1-49 folder (orchestrator); W2-58 worktree untracked tests + placeholders (its own worker).
+- W1-26 412 passed 1 skipped; W1-22 25 passed (its runs, sandboxed). Read refusals 0. gov retrieve: told yes, used yes (1, FACET_UNAVAILABLE stale index).
+- Discoveries to carry as rows: W1-26 test_w1_26_dec436 readiness cases (inert project plants, always-true), the invented_cmd
+  case always-true; W1-22 lexical canary hits its own declaration files in the adopted layout; W1-22 README line 103 and
+  tests/unit/validate/test_canary.py still name a module-level _TEMPLATE.
+
+## Next
+2. (done) Test designer batch (gov launch, sandboxed, effort high): W1-26 planted checker, W1-22 two canary cases.
+3. Full rebuild (time it), every suite, unit, gov check.
+4. CIT-P review (independent-auditor, effort max, A3 + JUDGEMENT.md); probe record only on pass.
+5. Return DONE, owner acts: re-pin at the merge commit, then regenerate settings from .rulesync/hooks.jsonc.
+
+## Extra step (lead's call): engineer eng-2 (gov launch, sandboxed, effort high), session 60f94512-08b4-4f38-b076-d119f53a949e
+- CIT-P brought up to date (base after merge, DEC-864 packages as rows, owner acts re-pin then regenerate, new §8 on the
+  three revised cases). Commit cface154 (Task, Role: engineer, Implements DEC-864/835/CAP-33, Co-Authored-By).
+  Twelve fields present; sandbox check passed; tripwire 4: this tree head only (others: main tree head 16d30765,
+  W2-58 own worker W1-02 edits, W2-62 head 6d7cc0d1). Read refusals 0; 1 write refusal ($S target), redone literal.
+  gov retrieve: told yes, used yes (1, FACET_UNAVAILABLE stale).
+- A rebuild started earlier was stopped while still waiting on load (never ran). Close quiet window waited 08:27-09:55.
+- w2/integrate moved to 67245c6b (W2-63 merged, W1-49 window tests); not merged here (brief: one merge).
+
+## Verification run 2 so far (code head cface154)
+- rebuild-3: exit 0, wall 568 s (start 10:10:46, load 2.19 at start). gov.__file__ in this worktree (log/import-check-2.txt).
+- gov check (check-2, 10:24-10:32): 18/23 GREEN. RED adapter-portability (GENERATED_DIFFERS, owner act), RED
+  context-reproducibility (DAEO-pl6k cites superseded DEC-636; fixed on w2/integrate by b9a14f7c, DEC-867), RED
+  secrets-indexing (traceback while suites ran; alone rc=0 in 146 s: secrets-2.exit; likely W2-M388); YELLOW
+  core-decision-citations (159 historical), openspec-validate (not on PATH). Re-run gov check at the end, quiet.
+- R2A green: W2-59 44, W1-22 25, W1-26 412+1s, W1-38 201, W2-62 58, W2-50 636, W2-53 57.
+- R2B: W2-54 2 failed (the same DAEO-pl6k/DEC-636 red), W2-01 88, W1-01 49+28s, W1-02 3653, W1-03 364, W1-04 336,
+  W1-05 1 failed (switch-over runs W1-02's load-sensitive p95: 165 ms; re-run alone).
+- R2C green (W1-06..W1-17). R2D green except W1-25 1 setup error (pytest basetemp pytest-4549 rotated away by
+  another pytest; re-run alone with own --basetemp). R2E green (W1-30..W1-40).
+- R2F was stopped before it started (a close's quiet window began 12:12; script fixed to check both gates together);
+  restarted, waiting. R2D/R2E's last suites ran into that window (runs already going).
+- R2F: W1-41 242, W1-42 2 failed (accepted reds), W1-44 5, W1-45 105, W1-46 493, W1-47 983, W1-48 172,
+  W1-49 2 failed (retired-window tests; fixed on w2/integrate by W2-63), W1-50 685.
+- Unit 2377 passed 1 skipped. Alone: W1-05 switch-over 1 passed; W1-02 p95 5 passed; W1-25 52 passed (own basetemp);
+  W1-05 live-hook p95 4 failed 5 passed at load 16 (load-sensitive; second lone try at low load queued, run_after2.sh).
+- check-3 stopped by the 2 h background limit; check-4 (16:56-17:04, load 6.5): 19/23 GREEN, secrets-indexing GREEN;
+  RED adapter-portability, context-reproducibility (DEC-636, fixed upstream); YELLOW decision-citations, openspec.
+- Lead refusals run 2: 2 (a here-document; a $L write target), both redone in permitted forms. Read refusals 0.
+- Next: gov checkpoint + commit (the head to probe), then reviewer rev-1 (independent-auditor, effort max).
+- (old plan) After R2F: unit tests; W1-05 + W1-02 p95 alone; W1-25 alone; gov check again; then gov checkpoint, reviewer.
+
+## Now: rebuild-3 then suites (batches A..E via run_suites.sh), unit, gov check. Code head cface154.
+
+## Refusals so far in run 2: lead 1 (a here-document append to CHECKPOINT.md refused, DEC-409; redone with Edit). Read refusals 0.
