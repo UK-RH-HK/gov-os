@@ -25,7 +25,7 @@ for item in "$@"; do
   gov checkpoint --ticket "$ticket" --role orchestrator --trigger ticket-transition \
     --next "gov close $ticket (pre-close gate passed)" --json > "$LOG/checkpoint-$ticket.json" 2>&1 || stop "gov checkpoint failed"
   git add docs/checkpoints/ && git commit -q -m "$ticket: checkpoint before its close (DEC-868)" \
-    --trailer "Task: $ticket" --trailer "Role: orchestrator" \
+    --trailer "Task: $ticket" --trailer "Implements: DEC-868" --trailer "Role: orchestrator" \
     --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -- docs/checkpoints/ \
     > "$LOG/checkpoint-commit-$ticket.txt" 2>&1 || stop "the checkpoint could not be committed"
   date '+%F %T rebuild before '"$ticket" >> "$LOG/queue.txt"
@@ -40,6 +40,14 @@ for item in "$@"; do
   date '+%F %T collect ok: '"$(tail -1 "$LOG/collect-$ticket.txt")" >> "$LOG/queue.txt"
   # (b) gov check after the rebuild, no commit in between.
   gov check --json > "$LOG/check-$ticket.json" 2> "$LOG/check-$ticket.err" || stop "gov check is not green (exit $?)"
+  # (e) every commit of the ticket (Task: <id>) carries Implements: (the close's trailer gate, TRAILER_MISSING),
+  # unless the path map's accepted_history names it.
+  missing=""
+  for c in $(git log --format=%H --grep="^Task: $ticket\$" HEAD); do
+    git log -1 --format='%(trailers:key=Implements,valueonly)' "$c" | grep -q . || \
+      grep -q "${c:0:12}" governance/project/path-map.yaml || missing="$missing ${c:0:12}"
+  done
+  [ -z "$missing" ] || stop "commits of $ticket without Implements: and not accepted history:$missing"
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
   dirty=$(git status --porcelain | head -5 | tr '\n' ' ')
   [ -z "$dirty" ] || stop "the working tree is not clean: $dirty"

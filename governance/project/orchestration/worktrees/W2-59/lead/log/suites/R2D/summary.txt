@@ -1,2 +1,10 @@
 W1-18 rc=0 secs=10 :: 15 passed in 8.57s
 W1-19 rc=0 secs=106 :: 41 passed in 94.29s (0:01:34)
+W1-20 rc=0 secs=136 :: 51 passed in 121.67s (0:02:01)
+W1-21 rc=0 secs=221 :: 127 passed in 198.83s (0:03:18)
+W1-23 rc=0 secs=0 :: 10 passed in 0.43s
+W1-24 rc=0 secs=16 :: 70 passed in 15.44s
+W1-25 rc=1 secs=54 :: 51 passed, 1 error in 46.58s
+W1-27 rc=0 secs=543 :: 133 passed in 489.19s (0:08:09)
+W1-28 rc=0 secs=55 :: 151 passed in 48.34s
+W1-29 rc=0 secs=8 :: 45 passed in 2.36s

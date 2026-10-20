@@ -37,6 +37,21 @@
 - A rebuild started earlier was stopped while still waiting on load (never ran). Close quiet window waited 08:27-09:55.
 - w2/integrate moved to 67245c6b (W2-63 merged, W1-49 window tests); not merged here (brief: one merge).
 
+## Verification run 2 so far (code head cface154)
+- rebuild-3: exit 0, wall 568 s (start 10:10:46, load 2.19 at start). gov.__file__ in this worktree (log/import-check-2.txt).
+- gov check (check-2, 10:24-10:32): 18/23 GREEN. RED adapter-portability (GENERATED_DIFFERS, owner act), RED
+  context-reproducibility (DAEO-pl6k cites superseded DEC-636; fixed on w2/integrate by b9a14f7c, DEC-867), RED
+  secrets-indexing (traceback while suites ran; alone rc=0 in 146 s: secrets-2.exit; likely W2-M388); YELLOW
+  core-decision-citations (159 historical), openspec-validate (not on PATH). Re-run gov check at the end, quiet.
+- R2A green: W2-59 44, W1-22 25, W1-26 412+1s, W1-38 201, W2-62 58, W2-50 636, W2-53 57.
+- R2B: W2-54 2 failed (the same DAEO-pl6k/DEC-636 red), W2-01 88, W1-01 49+28s, W1-02 3653, W1-03 364, W1-04 336,
+  W1-05 1 failed (switch-over runs W1-02's load-sensitive p95: 165 ms; re-run alone).
+- R2C green (W1-06..W1-17). R2D green except W1-25 1 setup error (pytest basetemp pytest-4549 rotated away by
+  another pytest; re-run alone with own --basetemp). R2E green (W1-30..W1-40).
+- R2F was stopped before it started (a close's quiet window began 12:12; script fixed to check both gates together);
+  restarted, waiting. R2D/R2E's last suites ran into that window (runs already going).
+- After R2F: unit tests; W1-05 + W1-02 p95 alone; W1-25 alone; gov check again; then gov checkpoint, reviewer.
+
 ## Now: rebuild-3 then suites (batches A..E via run_suites.sh), unit, gov check. Code head cface154.
 
 ## Refusals so far in run 2: lead 1 (a here-document append to CHECKPOINT.md refused, DEC-409; redone with Edit). Read refusals 0.
