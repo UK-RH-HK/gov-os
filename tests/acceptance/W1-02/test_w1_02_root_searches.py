@@ -253,11 +253,34 @@ def test_a_search_with_no_path_or_glob_is_allowed_for_every_role_but_the_enginee
         protected.assert_allowed(result, what)
 
 
+SUBAGENT = "engineer-subagent-of-the-orchestrator"
+SUBAGENT_ACCEPTANCE_REL = "tests/acceptance/W1-91"   # the acceptance folder of the session's ticket (wbs_id W1-91)
+
+
 @pytest.mark.parametrize("form", ("the-root-as-an-absolute-path", "a-type-filter-only-and-no-path"))
-def test_a_search_tool_call_from_the_root_is_refused_for_a_role_subagent_too(world, form):
-    """An engineer subagent of the orchestrator: the rule holds for every actor of a session."""
-    result = rnd.ask_form(world, ROOT_TOOL[form], ROOT, "engineer-subagent-of-the-orchestrator")
-    rnd.assert_refused_by_the_rule(result, f"a search tool call from the root with {form} by an engineer subagent")
+def test_a_search_tool_call_from_the_root_by_a_role_subagent_is_allowed_when_its_tests_do_not_exist(world, form):
+    """Rewritten by W2-58 (DEC-821 item 3, DEC-857 item 3; the lead's readings of P-W2-58-TD-2 (iv) and TD-5).
+
+    An engineer subagent of the orchestrator acts as an engineer on the session's ticket (``W1-91``). This fixture
+    holds no ``tests/acceptance/W1-91/``: a search from a folder above takes in a protected part only when it exists,
+    so (c) refuses nothing here, and the protected files no longer refuse the search: allowed.
+    """
+    assert not (world.project / SUBAGENT_ACCEPTANCE_REL).exists(), "premise: the ticket's acceptance folder is absent"
+    result = rnd.ask_form(world, ROOT_TOOL[form], ROOT, SUBAGENT)
+    protected.assert_allowed(result, f"a search tool call from the root with {form} by an engineer subagent")
+
+
+@pytest.mark.parametrize("form", ("the-root-as-an-absolute-path", "a-type-filter-only-and-no-path"))
+def test_a_search_tool_call_from_the_root_by_a_role_subagent_is_refused_when_its_tests_exist(tmp_path, hook, form):
+    """The same, with the ticket's acceptance folder present: the search takes in the subagent's own ticket's tests
+    and is refused for (c) (DEC-821 item 1; TD-2 (iv), TD-5). Its own world: the module's has no such folder."""
+    own = rnd.make_world(tmp_path / "subagent-with-tests")
+    tests = own.project / SUBAGENT_ACCEPTANCE_REL
+    tests.mkdir(parents=True)
+    (tests / "test_fixture.py").write_text("VALUE = 1\n", encoding="utf-8")
+    result = rnd.ask_form(own, ROOT_TOOL[form], ROOT, SUBAGENT)
+    what = f"a search tool call from the root with {form} by an engineer subagent whose ticket's tests exist"
+    assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
 
 
 SAID = [(ROOT, name) for name in rnd.FILES] + rnd.COPIES
