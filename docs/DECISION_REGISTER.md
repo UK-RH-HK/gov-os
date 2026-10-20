@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.253 (the version table at the end of each section gives the history)
+**Version:** 0.254 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9406,5 +9406,23 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.253 | 2026-10-20 | Delegated: DEC-863 (W2-62's integration: the checkpoint skill's copies brought to the template and regenerated; the roster names the prompt in force; row W2-L363). Next free id: DEC-864. |
+
+---
+
+## 254. A delegated decision of 2026-10-20 on W2-59's and W2-50's returns, and W2-58's start (register v0.254, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-864 — W2-59's packages; the rows of W2-59 and W2-50; W2-58's paths narrowed at its start (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-822 item 3, DEC-835, DEC-801, DEC-802, DEC-854, DEC-857 · **Basis:** W2-59's lead returned PACKAGES (run 1, `log/W2-59-A5-run1.json`); W2-50's lead returned DONE (run 8, `log/W2-50-A5-run8.json`; merged `98effadc`). Each item: P2 or P3, reversible, the lead's recommendation and the orchestrator's agree, confidence medium or higher, nothing in the Charter, the master rules or the Contract changes, and the guard is not weakened.
+- **Decision:**
+  1. **P-W2-59-4 (a):** three earlier cases assume what DEC-822 item 3 and DEC-835 remove: `tests/acceptance/W1-26/test_w1_26_planted_defects.py::test_planted_authority_defect_decision_checker_exception_not_swallowed` (it plants a raising decision checker in the judged project's `src/gov/` and expects the judge to import it), and W1-22's `TestCanaryRunner::test_lexical_canary_hits_after_reindex` and `::test_semantic_canary_hits_after_reindex` (a fixture project with no canary declarations, expected to find them from the install path). The behaviours they guard stay (an exception in the decision checker is never swallowed; canaries hit after a reindex); only their setup follows the owner's decisions. A fresh independent test designer in W2-59's resume revises the three with `Rewrite-Reason: DEC-822 item 3, DEC-835`: W1-26's raising checker is planted in the judge's own code; W1-22's fixture carries the kernel's canary declarations, as an adopted project does through the copier template (DEC-579). No KPI of W1-22 or W1-26 changes.
+  2. **P-W2-59-1 (b):** row W2-M389 for W2-10 (the hook programs put the tree's `src` on their import path; they fail soft).
+  3. **P-W2-59-2 (a) now, (c) later:** `gov --version` stays as built; row W2-L371 for W2-16 and W2-18 (an installed wheel records its commit).
+  4. **The rows of W2-50's run 8 and W2-59's run 1:** W2-M386 to W2-M388 (the secrets check: its process group on timeout, the first-scan margin, a vanishing file; for W2-45), W2-M390 (hook programs and their package move together on the pin ladder; W2-18), W2-L364 to W2-L368 (F1 to F5, Wave 3 hardening, ordinary work: no), W2-L369 (W2-54's test leaves `~/gov-os-runs/W1-90/`), W2-L370 (W2-50's CIT-E gains DEC-853's section at its close).
+  5. **W2-58's paths are narrowed at its start** to the three files that hold the read rules (`protected.py`, `heldout.py`, `decide.py`), a new `reads.py` if needed, and the card's other paths. `src/gov/guard/containment.py` is out: W2-05's unmerged branch changes it, so DEC-854's exception is not widened. A need there comes back as a package.
+- Next free id: DEC-865.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.254 | 2026-10-20 | Delegated: DEC-864 (W2-59: P-W2-59-4 (a), the three earlier cases revised in its resume; P-W2-59-1 (b); P-W2-59-2 (a) and (c); the rows of W2-50 and W2-59; W2-58's paths narrowed). Next free id: DEC-865. |
 
 ---
