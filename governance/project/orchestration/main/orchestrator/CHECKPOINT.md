@@ -66,13 +66,7 @@
   and branch removed). Its record's `type: close` turns core-schema RED until **W2-02 run 4 (STARTED 16:1x)** merges
   its close type (DEC-872); W2-54's queue stopped at gate (b) for that, not refused. Next: W2-02 merges -> queue
   W2-54, W2-62, W2-63, W2-50; W2-48 (started 13:55, stacked) merges after W2-53 (now closed). W2-64 = W2-02's widening.
-- (history) **W2-53 close 4 REFUSED** (08:38-09:54; repair DAEO-8em0 in `log/repair-tickets/`): my W2-63 source (superseded
-  DEC-636), my W2-11 paths (MR-3), the `tests/unit/secrets` vs stdlib `secrets` clash (W2-62's live test), stale
-  ticket checkpoint. DEC-867 fixed the first two (`b9a14f7c`, `16d30765`); **W2-62 run 2 RUNNING** removes the
-  trigger (row W2-L373 renames the folder in W2-43). Then: `bash tools/close_queue.sh DAEO-7rr2 DAEO-0rfi` (gate
-  of DEC-868 built in). Then W2-48 starts at once (DEC-869): bring its install package (pytest-testmon 2.2.0,
-  coverage 7.16.2, `/usr/bin/python3 -m pip install --user --break-system-packages …`) as ACT, ping.
-- Close success rate: 0 of 4 `gov close` runs.
+- Close success rate: 1 of 8 `gov close` runs (W2-53: 7 runs, the last clean; W2-54: 1, TREE_NOT_COMMITTED; gate stops are not runs).
 - **W2-59's merge-back `3eadca4c` has no Task:/Role: trailers** (W2-63's lead saw it): DEC-750; raise at its return.
 - After a lead rebuild is measured: raise parallelism (DEC-847); next starts: W2-63 (if P-W2-52 (a)), W2-57, W2-48.
 - **Merge `w2/integrate` into a lead's branch only at its return** (a commit under a running lead trips its stop
