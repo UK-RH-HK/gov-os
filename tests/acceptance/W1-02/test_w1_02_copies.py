@@ -1,4 +1,15 @@
-"""W1-02 — the rule covers the same two files outside the session's own project (DEC-548, DP-4).
+"""W1-02 — the same two files outside the session's own project (DEC-548, DP-4), under Policy 2.
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3), by the
+lead's readings of P-W2-58-TD-2: (ii) copies of the two files below the root,
+in another checkout or worktree, anywhere else, and the user-level settings
+file are open to reads (DEC-820 item 1), so every read case below is now held
+as allowed; (i) a second name (a move, a hard or symbolic link, a linking copy,
+an in-place edit with a backup) stays refused, now on the write side (DEC-548,
+DEC-553, DEC-778, DEC-821 item 4), and only its refusal and a message that
+carries no path and nothing of the file are asked. A plain copy is a read.
+
+Before Policy 2:
 
 DEC-548: "The rule covers the same two files outside the session's own
 project: any target whose path ends in either file's project-relative path, in
@@ -112,34 +123,43 @@ def _ask(world, site, name, form, who=WIDEST):
     return batch.ask(world, tool_name, tool_input, who, cwd)
 
 
+def assert_refused_as_a_second_name(result, world, site, name, what):
+    """W2-58 (the lead's reading of P-W2-58-TD-2 (i); DEC-548, DEC-553, DEC-778, DEC-821 item 4): a second name stays
+    refused, now on the write side (a writable alias of a file the role may not write). Only that it is refused by a
+    rule's decision and that the message carries no path and nothing of the file is asked; the wording is not."""
+    assert result.decision == "deny" and result.returncode == 0, (
+        f"{what} was not refused by a rule: decision={result.decision} exit={result.returncode}")
+    batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+
+
 # --------------------------------------------------------------------------
 # Another checkout, a folder that is no repository, a worktree
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(READS))
-def test_a_read_of_a_copy_in_another_checkout_is_refused(world, form, name):
-    """DP-4: every form the rule refuses for the session's own file, on the copy in a sibling checkout."""
+def test_a_read_of_a_copy_in_another_checkout_is_allowed_under_policy_2(world, form, name):
+    """DP-4 before Policy 2; now (DEC-820 item 1, the lead's reading of P-W2-58-TD-2 (ii)) a copy is read as any file."""
     result = _ask(world, "sibling", name, READS[form])
-    batch.assert_refused_by_the_rule(result, f"{form} on the copy of the stand-in {name} in another checkout")
+    protected.assert_allowed(result, f"{form} on the copy of the stand-in {name} in another checkout")
 
 
-def test_a_search_for_the_file_s_name_from_a_folder_between_is_refused(world):
-    """As for the session's own file: a search from a folder of ``<P>`` above the copy, with the file's bare name."""
+def test_a_search_for_the_file_s_name_from_a_folder_between_is_allowed_under_policy_2(world):
+    """A search from a folder of ``<P>`` above the copy, with the file's bare name: open under Policy 2."""
     tool_input = {"pattern": ".", "path": batch.fill(world, "sibling", HELD, "{top}"),
                   "glob": batch.fill(world, "sibling", HELD, "{base}")}
     result = batch.ask(world, "Grep", tool_input, WIDEST)
-    batch.assert_refused_by_the_rule(result, "Grep for the bare name from a folder between another checkout's root "
-                                             "and the copy of the stand-in held-out file")
+    protected.assert_allowed(result, "Grep for the bare name from a folder between another checkout's root "
+                                     "and the copy of the stand-in held-out file")
 
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("site", ("plain", "worktree"))
 @pytest.mark.parametrize("form", CORE)
-def test_a_read_of_a_copy_anywhere_else_or_in_a_worktree_is_refused(world, form, site, name):
-    """DP-4: "in another checkout or worktree or anywhere else": a folder that is no repository, and a git worktree."""
+def test_a_read_of_a_copy_anywhere_else_or_in_a_worktree_is_allowed_under_policy_2(world, form, site, name):
+    """A folder that is no repository, and a git worktree: open under Policy 2 (TD-2 (ii))."""
     result = _ask(world, site, name, READS[form])
-    batch.assert_refused_by_the_rule(result, f"{form} on the copy of the stand-in {name} at the site '{site}'")
+    protected.assert_allowed(result, f"{form} on the copy of the stand-in {name} at the site '{site}'")
 
 
 # --------------------------------------------------------------------------
@@ -148,10 +168,10 @@ def test_a_read_of_a_copy_anywhere_else_or_in_a_worktree_is_refused(world, form,
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(NESTED))
-def test_a_read_of_a_copy_below_the_project_s_root_is_refused(world, form, name):
-    """DP-4: "any target whose path ends in either file's project-relative path": a folder of the project as ``<P>``."""
+def test_a_read_of_a_copy_below_the_project_s_root_is_allowed_under_policy_2(world, form, name):
+    """A copy in a folder of the project (``<P>``): read as any file under Policy 2 (TD-2 (ii))."""
     result = _ask(world, "nested", name, NESTED[form])
-    batch.assert_refused_by_the_rule(result, f"{form} on the copy of the stand-in {name} below the project's root")
+    protected.assert_allowed(result, f"{form} on the copy of the stand-in {name} below the project's root")
 
 
 # --------------------------------------------------------------------------
@@ -159,10 +179,10 @@ def test_a_read_of_a_copy_below_the_project_s_root_is_refused(world, form, name)
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("form", sorted(HOME))
-def test_a_read_of_the_user_level_settings_file_is_refused(world, form):
-    """DP-4: "and the user-level settings file of the harness": the settings file below the hook's ``HOME``."""
+def test_a_read_of_the_user_level_settings_file_is_allowed_under_policy_2(world, form):
+    """DEC-820 replaces the briefs' "nobody reads anything under ``~/.claude/``" (TD-2 (ii))."""
     result = _ask(world, "home", SETTINGS, HOME[form])
-    batch.assert_refused_by_the_rule(result, f"{form} on the stand-in user-level settings file")
+    protected.assert_allowed(result, f"{form} on the stand-in user-level settings file")
 
 
 # --------------------------------------------------------------------------
@@ -170,47 +190,50 @@ def test_a_read_of_the_user_level_settings_file_is_refused(world, form):
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("who", sorted(protected.ACTORS))
-def test_a_read_of_a_copy_is_refused_for_every_role(world, who):
-    """The rule is for every role (DEC-508): the eleven actors of the revision, the two files in turn."""
+def test_a_read_of_a_copy_is_allowed_for_every_role(world, who):
+    """The eleven actors of the revision, the two files in turn: each reads the copy (it is not in its ticket's tests)."""
     name = FILES[sorted(protected.ACTORS).index(who) % len(FILES)]
     result = _ask(world, "sibling", name, READS["Read-absolute"], who)
-    batch.assert_refused_by_the_rule(result, f"Read of the copy of the stand-in {name} in another checkout by '{who}'")
+    protected.assert_allowed(result, f"Read of the copy of the stand-in {name} in another checkout by '{who}'")
 
 
 @pytest.mark.parametrize("who", ("engineer-who-may-write-the-file", "engineer-who-may-not-write-the-file", "no-role"))
-def test_a_read_of_the_user_level_settings_file_is_refused_for_every_role(world, who):
+def test_a_read_of_the_user_level_settings_file_is_allowed_for_every_role(world, who):
     result = _ask(world, "home", SETTINGS, HOME["cat-with-a-tilde"], who)
-    batch.assert_refused_by_the_rule(result, f"`cat` with a tilde on the stand-in user-level settings file by '{who}'")
+    protected.assert_allowed(result, f"`cat` with a tilde on the stand-in user-level settings file by '{who}'")
 
 
 # --------------------------------------------------------------------------
-# A second name for a copy
+# A second name for a copy: stays refused (TD-2 (i)), the reason's wording no longer asked
 # --------------------------------------------------------------------------
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(SECOND_NAMES))
-def test_a_second_name_for_a_copy_in_another_checkout_is_refused_as_a_read(world, form, name):
-    """DP-3 on DP-4's files. Today the allow-list denies four of these as writes outside the project: not the rule."""
+def test_a_second_name_for_a_copy_in_another_checkout_is_refused(world, form, name):
+    """DP-3 on DP-4's files: refused, whichever rule refuses it (before W2-58, as a read)."""
     result = _ask(world, "sibling", name, ("Bash", SECOND_NAMES[form], None))
-    batch.assert_refused_by_the_rule(result, f"{form} of the copy of the stand-in {name} in another checkout")
+    assert_refused_as_a_second_name(result, world, "sibling", name,
+                                    f"{form} of the copy of the stand-in {name} in another checkout")
 
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", ("move", "hard-link"))
-def test_a_second_name_for_a_copy_below_the_project_s_root_is_refused_as_a_read(world, form, name):
+def test_a_second_name_for_a_copy_below_the_project_s_root_is_refused(world, form, name):
     result = _ask(world, "nested", name, ("Bash", SECOND_NAMES[form], None))
-    batch.assert_refused_by_the_rule(result, f"{form} of the copy of the stand-in {name} below the project's root")
+    assert_refused_as_a_second_name(result, world, "nested", name,
+                                    f"{form} of the copy of the stand-in {name} below the project's root")
 
 
 @pytest.mark.parametrize("command", ("mv ~/{rel} {scratch}/w1-02-moved", "ln -s $HOME/{rel} {scratch}/w1-02-second-name"),
                          ids=("move-with-a-tilde", "symbolic-link-with-the-home-variable"))
-def test_a_second_name_for_the_user_level_settings_file_is_refused_as_a_read(world, command):
+def test_a_second_name_for_the_user_level_settings_file_is_refused(world, command):
     result = _ask(world, "home", SETTINGS, ("Bash", command, None))
-    batch.assert_refused_by_the_rule(result, "a second name for the stand-in user-level settings file")
+    assert_refused_as_a_second_name(result, world, "home", SETTINGS,
+                                    "a second name for the stand-in user-level settings file")
 
 
 # --------------------------------------------------------------------------
-# What the refusal says
+# What the hook says: a read allowed, a second name refused; neither names the copy
 # --------------------------------------------------------------------------
 
 REFUSED_COPIES = [("sibling", name) for name in FILES] + [("home", SETTINGS)]
@@ -218,10 +241,14 @@ REFUSED_COPIES = [("sibling", name) for name in FILES] + [("home", SETTINGS)]
 
 @pytest.mark.parametrize("site,name", REFUSED_COPIES, ids=[f"{site}-{name}" for site, name in REFUSED_COPIES])
 @pytest.mark.parametrize("form", ("Read-absolute", "move"))
-def test_the_refusal_for_a_copy_names_neither_the_copy_nor_its_folder(world, form, site, name):
-    """A refusal names the rule and the decision: not the copy's path, not its folder, not ``<P>``, no value of it."""
+def test_the_hook_s_answer_for_a_copy_names_neither_the_copy_nor_its_folder(world, form, site, name):
+    """Under Policy 2 a read of the copy is allowed and a move stays refused (TD-2 (i), (ii)); neither answer carries
+    the copy's path, its folder, ``<P>`` or a value of it."""
     asked = READS[form] if form in READS else ("Bash", SECOND_NAMES[form], None)
     result = _ask(world, site, name, asked)
     what = f"{form} on the copy of the stand-in {name} at the site '{site}'"
-    batch.assert_refused_by_the_rule(result, what)
-    batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+    if form in READS:
+        protected.assert_allowed(result, what)
+        batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+    else:
+        assert_refused_as_a_second_name(result, world, site, name, what)
