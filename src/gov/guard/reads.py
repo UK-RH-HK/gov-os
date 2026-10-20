@@ -628,9 +628,17 @@ class _Judge:
         written = set(_extract_bash_write_targets(
             " ".join(shlex.quote(w) for w in [name, *args]), cwd) or ())
 
+        # The destination of a copy, a move or an install (its -t value, or
+        # its last operand), also where it replaces a link (DEC-774).
+        parsed = _copy_args(name, list(args)) if name in ("cp", "mv", "install") else None
+        dests = set(parsed[1].get("t", []) or parsed[0][-1:] if parsed and (
+            "t" in parsed[1] or len(parsed[0]) > 1) else [])
+
         def theirs(word: str) -> bool:
             """A write target, or the folder one lands in (cp -t <folder>)."""
             exp = _expand_token(word) or word
+            if word in dests:
+                return True
             return bool(written) and not _has_glob(exp) and any(
                 t == s or t.startswith(s.rstrip("/") + "/")
                 for s in self.spellings(exp, cwd) for t in written)
