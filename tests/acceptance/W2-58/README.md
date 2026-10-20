@@ -151,6 +151,35 @@ The twins in settings of the three live conditions: "pytest collects" ↔ the en
 import succeeds" ↔ the test designer's rewritten launcher case; "no phantom deletion" ↔
 `test_the_launch_denies_no_tracked_file_of_the_project_by_a_read_rule`.
 
+## Review cases (fifth round, after the implementation; DEC-136)
+
+An independent review found five behaviours the suite missed (KPI failure: "each of (a) to (d) still refuses, by
+every read route an honest agent takes in ordinary work (DEC-801); no write rule widens"; DEC-873 item 1). They are
+in `test_w2_58_review.py`, written by a fresh test designer without reading the implementation (only the guard's
+answers and `gov launch`'s hand-off to the stand-in CLI). No existing case changed. The test count goes from 576 to
+754 (178 added: 117 red, 61 green).
+
+A **protected part** is (c)'s acceptance folder for an engineer on T, (c)'s changed files for a test designer on T,
+and (d)'s hidden part for a session an evaluation set measures.
+
+| Behaviour | Tests | Red today because |
+|---|---|---|
+| 1. File names given at run time: a read or search whose file names come from another command's output (a pipe into `xargs`, `$(...)`, backticks, a `while read` loop over a listing) is judged as a search from the folder the listing starts at | Refused: `::test_the_engineer_is_refused_file_names_given_at_run_time_that_take_in_ts_tests` (7 forms: `git ls-files \| xargs grep`, `find . -name '*.py' \| xargs grep`, `grep … $(git ls-files '*.py')`, `cat $(find tests -name …)`, both with backticks, `find . -print \| while read f; do grep -H … "$f"; done`); `::test_the_test_designer_is_refused_file_names_given_at_run_time_that_take_in_the_changed_files` (7: the same from `.`, `git ls-files src \| xargs cat`, `cat $(find src -name main.py)` and backticks); `::test_a_measured_session_is_refused_file_names_given_at_run_time_that_take_in_the_hidden_part` (6 forms over `eval` or `.` × by role, by ticket). Allowed: `::test_the_engineer_s_narrowed_run_time_listings_and_test_runs_stay_allowed` (6 forms narrowed to `src`, and `python3 -m pytest tests/acceptance/W2-95/ -q … \| tail` ×2); `::test_the_test_designer_s_narrowed_run_time_listings_stay_allowed` (5, narrowed to `src/other` or `docs`); `::test_a_measured_session_s_run_time_listings_of_the_visible_part_stay_allowed` (4 × 2); `::test_a_session_with_no_protected_part_runs_the_same_forms` (the engineer's 7 refused forms × the ticket lead on T, the auditor on T, product-spec, an engineer whose ticket W2-93 has no acceptance folder) | The guard allows each refused form (`decision=allow`): it does not take the names a listing gives at run time as a search from the listing's start. The allowed cases pass. |
+| 2. A subagent's reads: at least what its session's role is refused on the session's ticket, and what its own type is refused | Refused: `::test_a_subagent_of_an_engineer_session_is_refused_ts_tests` (subagent `independent-auditor`, `orchestrator`, `research`, `product-spec`, `independent-test-designer` × Read, `cat` of T's test); `::test_a_subagent_of_a_test_designer_session_is_refused_the_changed_files` (subagent `engineer`, `independent-auditor` × Read of `src/app/main.py`); `::test_an_engineer_subagent_of_the_ticket_lead_is_refused_ts_tests`. Allowed: `::test_an_untyped_or_explore_subagent_of_the_ticket_lead_reads_ts_tests` (`general-purpose`, `Explore`) | The guard judges a subagent's read by its type alone: a typed subagent of an engineer or test-designer session reads what its session is refused. The engineer-subagent and untyped cases pass. |
+| 3. A ticket named by its WBS id | At the guard (`GOV_TICKET=W2-95`, `W2-93`): `::test_an_engineer_whose_ticket_is_given_by_its_wbs_id_is_refused_ts_tests` (Read, `cat`, Grep); `::test_a_session_measured_by_a_ticket_given_by_its_wbs_id_is_refused_the_hidden_part` (Read, `cat`); allowed: `::test_an_engineer_given_by_wbs_id_reads_its_code_and_another_ticket_s_engineer_reads_ts_tests`. Through `gov launch <role> <wbs_id>` with a stand-in CLI that also records the `GOV_*` environment: `::test_gov_launch_accepts_a_ticket_named_by_its_wbs_id_and_its_session_is_refused_ts_tests`, `::test_gov_launch_by_wbs_id_of_a_measured_ticket_hands_on_a_ticket_the_guard_measures` (the launch starts one session and hands on `GOV_TICKET=<wbs_id>`; the guard is then asked with it) | `gov launch engineer W2-95` already starts and hands on `GOV_TICKET=W2-95`, but the guard does not resolve a WBS id to its ticket: it allows the engineer T's tests and the measured session the hidden part. |
+| 4. Secrets by the repository's credential names: `*.env` at any depth, any file under a `.secrets` folder at any depth | `::test_a_credential_file_is_refused` (`deepseek.env`, `services/api/provider.env`, `.secrets/token.txt`, `ops/deploy/.secrets/api.json` × Read, `cat`, `cp` × engineer, auditor); `::test_every_role_is_refused_each_credential_file_by_the_read_tool` (6 roles); allowed: `::test_the_neighbours_of_credential_files_are_readable` (`docs/provider.env.md`, `docs/secrets/README.md`). A search from above is not asserted (the owner's) | The guard's name rule covers `.env` and `.env.<anything>`, not a name ending in `.env`, and no `.secrets` folder: every such read is allowed. The neighbours pass. |
+| 5. No write rule widens: writes naming the held-out list or `.claude/settings.json` stay refused to the engineer, the test designer and research | `::test_a_write_to_the_held_out_list_or_the_settings_file_stays_refused` (`dd of=`, `truncate -s 0`, `sort -o`, `rsync`, `patch`, `git checkout --`, `git restore` × 2 files × 3 roles); allowed: `::test_reading_the_held_out_list_or_the_settings_file_stays_allowed` (Read, `cat`) | Each write is allowed. On the base (`git show w2/integrate:src/gov/guard/protected.py`, `_command_reads`) a word of a Bash command that took in either file was a read refused to every role unless it was a write target of its own command, which the allow-list then refused for these roles: opening the reads let through every write the write extractor does not know. The reads pass. |
+
+Readings the review cases take:
+
+- "**Untyped**" is a subagent whose `agent_type` is `general-purpose` (the type the harness sends for an Agent call
+  that names none). A call with `agent_id` and no `agent_type` is not asserted.
+- The run-time forms of item 1 are asserted at the guard only (the guard is asked; nothing runs). An engineer
+  session's `git ls-files | xargs grep` also takes in the fixture's stand-in secrets: it is allowed to the sessions
+  with no protected part, because a search from above a secret is not refused for its sake (DEC-820 (a)).
+- Item 3's launch reads `GOV_TICKET` from the settings' `env` block when it is there, else from the process
+  environment the stand-in CLI records (W1-46's rule, DEC-183).
+
 ### The live cases
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
