@@ -16,6 +16,7 @@ Without the real session and the CLI: add `-m "not local_only"`.
 | 3 | After it, on the owner's decisions DEC-263 and DEC-264 | 15 rewritten and 2 removed (reason "owner decision, DEC-264"), 30 added (reason "owner decision"): 93 |
 | 4 | After it, from a review's findings (DEC-136): the written part is never lost | 12 added in `test_w1_49_written_part.py`: 105. No existing test was changed. |
 | 5 | After it, 2026-10-13, on the owner's decision DEC-665 (the pass of DEC-669, inside the W1-38 round) | 2 rewritten in `test_w1_49_threshold.py` (reason: the window is set in the owner's user-level settings since the apply block of 2026-10-11, DEC-636, DEC-665), none added, none removed: 105. |
+| 6 | 2026-10-19, by W2-62's test designer, on the owner's decision DEC-837 (rows W2-M372, W2-M373) | The fixture project gets a roster naming its stand-in prompt (`w1_49_support.py`: the hook now names the prompt the roster names); 2 rewritten in `test_w1_49_sessionstart.py` (a section over the cap is named by its line range, never cut, never "truncated"); none added, none removed: 105. The rows "The cap" and "SessionStart in the main tree" of section 1 are superseded on these points; see `tests/acceptance/W2-62/README.md`. |
 
 Batch 3 by name is in section 2.1, batch 4 in section 2.2, batch 5 in section 2.4.
 
