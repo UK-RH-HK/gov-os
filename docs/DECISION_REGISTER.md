@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.255 (the version table at the end of each section gives the history)
+**Version:** 0.256 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9450,5 +9450,23 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.255 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-865 (P-W2-52 (a): W2-63 revises W1-49's two window tests to DEC-838; DEC-863 and DEC-864 accepted; DEC-636 superseded), DEC-866 (supersession propagates: the old entry marked at once, a sweep by id and value, each item updated or kept with a reason, W2-55's check; DEC-208, DEC-237, DEC-248, DEC-451, DEC-636 and DEC-665 marked). Next free id: DEC-867. |
+
+---
+
+## 256. A delegated decision of 2026-10-20 on W2-53's refused re-close (register v0.256, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-867 — W2-53's fourth close refused for four causes, three of them the orchestrator's own records: each repaired, then one re-close (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-780, DEC-866, DEC-511 · **Basis:** `gov close DAEO-7rr2` at 08:38 to 09:54 (`log/close-queue-2026-10-20/close-DAEO-7rr2.json`, repair ticket DAEO-8em0 in `log/repair-tickets/`): 14,565 passed, 4 failed (W1-42's two accepted reds, W2-54's two), 5 errors; 20 findings. Each cause is P2 or P3, reversible, and changes nothing in the Charter, the master rules, the Contract or the guard.
+- **Decision:**
+  1. **`context-reproducibility` RED, and W2-54's two "green here" and "time limit" cases with it:** W2-63's ticket named DEC-636 as a mandatory source, and DEC-636 was marked SUPERSEDED (DEC-865), which `gov context` rightly refuses. W2-63's `sources` drop DEC-636 (DEC-838 and DEC-665 stay). The check is green again (run alone, 2026-10-20).
+  2. **`core-mutation` RED (`IMPLEMENTER_COVERS_ACCEPTANCE`):** the sweep's edit put W1-35's test files into W2-11's `allowed_paths`, and W2-11's role is product-spec (MR-3). They leave the paths; its test designer revises them because its KPI names them (brief A1). The check is green again.
+  3. **Five errors (`tests/unit/secrets/*` ImportError; W1-07's and W1-25's declaration cases):** `tests/unit/secrets/` is a package named `secrets` and shadows the standard library's `secrets` once W2-62's new live case (`tests/acceptance/W2-62/test_w2_62_live_resume.py:31, 82`, `secrets.token_hex`) has imported it in the same worker ("'secrets' is not a package"; reproduced by collection order). **W2-62 run 2:** a fresh independent test designer makes that case draw its token without the `secrets` module (`os.urandom(8).hex()`), `Rewrite-Reason: DEC-867`, no other change; the lead verifies W2-62 and `tests/unit` collected together. **Row W2-L373 for W2-43** (which holds `tests/unit/secrets/**`): rename the folder so that no test package shadows a standard-library module.
+  4. **`CHECKPOINT_STALE`:** DEC-780's "a fresh checkpoint first" means the ticket's own `gov checkpoint --ticket <id>` record, not only the orchestrator's; the close queue now writes one immediately before each rebuild.
+  5. **The re-close:** after W2-62's run 2 merges, one rebuild and W2-53's close once, in a quiet window, then W2-54's. The causes differ from W2-53's earlier refusals (DEC-823's W1-30 r13), so this is not the same reason twice.
+- Next free id: DEC-868.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.256 | 2026-10-20 | Delegated: DEC-867 (W2-53's fourth refused close: W2-63's sources, W2-11's paths, the `secrets` name collision through W2-62 run 2 and row W2-L373, a fresh ticket checkpoint before each close). Next free id: DEC-868. |
 
 ---
