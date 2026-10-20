@@ -1,0 +1,224 @@
+EEEEEEE.FEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE....EEE [ 88%]
+EEEEE..FF                                                                [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_a_decision_change_lists_the_symbol_it_names_from_the_code_graph _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+____ ERROR at setup of test_the_record_side_is_listed_beside_the_code_side _____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_the_callers_and_callees_of_the_named_symbol_are_listed_within_the_depth _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_with_both_graphs_read_the_report_says_so ________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_symbol_change_reaches_the_records_that_name_its_callers _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_____________ ERROR at setup of test_a_mention_in_prose_is_no_link _____________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+____ ERROR at setup of test_every_item_is_traced_to_the_graph_it_came_from _____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_unknown_id_is_refused_not_answered_with_an_empty_impact _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_known_id_beside_an_unknown_one_is_refused_and_the_unknown_one_named _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_________ ERROR at setup of test_a_malformed_change_is_refused[empty] __________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_________ ERROR at setup of test_a_malformed_change_is_refused[blank] __________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_________ ERROR at setup of test_a_malformed_change_is_refused[no-id] __________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+______________ ERROR at setup of test_no_change_at_all_is_refused ______________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______________ ERROR at setup of test_gov_impact_writes_nothing _______________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+______ ERROR at setup of test_out_writes_the_named_file_and_nothing_else _______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_nothing_links_is_deletable_and_affects_nothing _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_____ ERROR at setup of test_a_decision_others_depend_on_is_not_deletable ______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_the_radius_of_a_deletable_change_is_below_that_of_a_wide_one _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_symbol_nothing_calls_and_no_record_names_is_deletable _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_symbol_nothing_calls_but_a_record_names_is_not_deletable _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+___________ ERROR at setup of test_a_called_symbol_is_not_deletable ____________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_execution_record_that_agrees_with_its_proposal_is_reported_as_matching _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+________ ERROR at setup of test_the_order_of_the_lists_does_not_matter _________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_item_proposed_and_not_done_is_a_listed_difference __
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_item_done_and_not_proposed_is_a_listed_difference __
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+______________ ERROR at setup of test_every_difference_is_listed _______________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_execution_record_that_lists_nothing_never_matches __
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_execution_record_without_its_proposal_is_refused[no-proposal-key] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_execution_record_without_its_proposal_is_refused[unknown-proposal] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_execution_record_without_its_proposal_is_refused[proposal-is-no-cit-p] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+____ ERROR at setup of test_a_record_that_is_no_execution_record_is_refused ____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_________ ERROR at setup of test_a_missing_execution_record_is_refused _________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______________ ERROR at setup of test_comparing_writes_nothing ________________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_the_proposal_gov_impact_writes_is_what_the_execution_record_is_checked_against _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+___ ERROR at setup of test_without_a_record_store_the_report_is_not_complete ___
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+__________ ERROR at setup of test_an_unreadable_record_store_is_said ___________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+____ ERROR at setup of test_a_stale_record_store_is_said_and_never_complete ____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_unreadable_code_graph_is_said_and_the_record_side_still_given _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+___________ ERROR at setup of test_a_code_graph_never_built_is_said ____________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_____ ERROR at setup of test_a_stale_code_graph_is_said_and_never_complete _____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_change_lists_each_linked_record_once_under_its_kind_from_the_record_graph[SPEC-001-specifications] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_change_lists_each_linked_record_once_under_its_kind_from_the_record_graph[CAP-901-specifications] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_change_lists_each_linked_record_once_under_its_kind_from_the_record_graph[DEC-002-decisions] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_change_lists_each_linked_record_once_under_its_kind_from_the_record_graph[PROJ-ab01-tickets] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_change_lists_each_linked_record_once_under_its_kind_from_the_record_graph[TR-0001-tests] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_the_change_is_named_as_the_stated_change ________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_decision_that_is_an_entry_of_the_register_is_a_stated_change _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_nothing_the_graphs_do_not_link_is_listed ________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_________________ ERROR at setup of test_no_list_is_cut_short __________________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_two_changes_together_list_what_each_lists _______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+__ ERROR at setup of test_the_radius_gives_the_depth_gov_closure_gives_for_it __
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_the_list_holds_every_record_gov_closure_reaches_at_that_depth _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_item_beyond_the_depth_is_a_gap_and_the_report_is_not_complete _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+______ ERROR at setup of test_the_assessment_is_a_change_impact_proposal _______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_the_same_change_gives_the_same_assessment _______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_out_writes_the_proposal_as_a_cit_p_record _______
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_plain_language_question_gives_the_assessment_of_the_id_it_names[whats] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_plain_language_question_gives_the_assessment_of_the_id_it_names[what-is-lower-case] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_plain_language_question_gives_the_assessment_of_the_id_it_names[typographic-apostrophe] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_question_about_an_unknown_id_is_refused_and_names_it _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_question_that_names_no_change_is_refused[no-subject] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_question_that_names_no_change_is_refused[not-about-a-change] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_______ ERROR at setup of test_a_plain_language_question_about_a_symbol ________
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_governance_paths_are_the_path_maps_not_fixed_prefixes[policy-is-governance] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_governance_paths_are_the_path_maps_not_fixed_prefixes[notes-are-governance] _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_a_change_to_a_closed_specification_gives_the_three_costed_options _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_unedited_closed_specification_is_not_flagged_as_edited_in_place _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_edit_in_place_of_a_closed_specification_in_the_working_tree_is_flagged _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_an_edit_in_place_of_a_closed_specification_in_a_commit_is_flagged _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+____ ERROR at setup of test_an_edit_of_an_open_specification_is_not_flagged ____
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+_ ERROR at setup of test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement _
+gov impact is not built: `gov --help` lists no `impact` command, and `gov impact --help` exits 2: gov: error: argument <command>: invalid choice: 'impact' (choose from 'status', 'check', 'readiness', 'doctor', 'rebuild', 'context', 'closure', 'retrieve', 'checkpoint', 'close', 'adopt', 'pause', 'c
+=================================== FAILURES ===================================
+_______________________ test_gov_lists_an_impact_command _______________________
+
+box = Box(base=PosixPath('/tmp/pytest-of-usain/pytest-3744/w2-37-box0'), home=PosixPath('/tmp/pytest-of-usain/pytest-3744/w2...pytest-of-usain/pytest-3744/w2-37-box0/elsewhere'), bare=PosixPath('/tmp/pytest-of-usain/pytest-3744/w2-37-box0/bare'))
+
+    def test_gov_lists_an_impact_command(box):
+        """``gov --help`` lists ``impact``, and ``gov impact --help`` names the options the README states."""
+        listing = support.gov(box, "--help")
+>       assert re.search(r"^\s+impact\s", listing.stdout, re.MULTILINE), \
+            f"`gov --help` lists no `impact` command\n{listing.describe()}"
+E       AssertionError: `gov --help` lists no `impact` command
+E         gov --help
+E         exit code: 0
+E         stdout:
+E         usage: gov [-h] <command> ...
+E         
+E         Governance OS command line.
+E         
+E         positional arguments:
+E           <command>
+E             status    tickets, gates, readiness, share, pause state
+E             check     list the declared checks (--list); running them is not built yet
+E             readiness
+E                       readiness of a ticket or a gate
+E             doctor    health of the installation and the project
+E             rebuild   rebuild derived state
+E             context   the context for a ticket (--dry-run)
+E             closure   the lineage of a feature and its missing links
+E             retrieve  retrieve records
+E             checkpoint
+E                       write a checkpoint
+E             close     close a ticket
+E             adopt     adopt a project
+E             pause     pause or resume governed work
+E             ci        the gates of the lefthook hooks and the CI job: checks by tier,
+E                       staged secrets, the evidence record
+E             launch    start a sandboxed worker session
+E             telemetry
+E                       measure a ticket's governance share (DEC-086); only reads
+E         
+E         options:
+E           -h, --help  show this help message and exit
+E         
+E         stderr:
+E         
+E       assert None
+E        +  where None = <function search at 0x78368b53e480>('^\\s+impact\\s', "usage: gov [-h] <command> ...\n\nGovernance OS command line.\n\npositional arguments:\n  <command>\n    status    tic...measure a ticket's governance share (DEC-086); only reads\n\noptions:\n  -h, --help  show this help message and exit\n", re.MULTILINE)
+E        +    where <function search at 0x78368b53e480> = re.search
+E        +    and   "usage: gov [-h] <command> ...\n\nGovernance OS command line.\n\npositional arguments:\n  <command>\n    status    tic...measure a ticket's governance share (DEC-086); only reads\n\noptions:\n  -h, --help  show this help message and exit\n" = Run(argv=('--help',), returncode=0, stdout="usage: gov [-h] <command> ...\n\nGovernance OS command line.\n\npositional...cket's governance share (DEC-086); only reads\n\noptions:\n  -h, --help  show this help message and exit\n", stderr='').stdout
+E        +    and   re.MULTILINE = re.MULTILINE
+
+tests/acceptance/W2-37/test_w2_37_command.py:20: AssertionError
+__________ test_the_skill_runs_gov_impact_for_the_question[template] ___________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+_________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+3 failed, 7 passed, 71 errors in 1.53s

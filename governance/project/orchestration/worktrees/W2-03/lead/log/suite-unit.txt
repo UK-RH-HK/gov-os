@@ -1,0 +1,189 @@
+........................................................................ [  3%]
+........................................................................ [  6%]
+.................................FFFFFF............FF.............F..... [ 10%]
+........................................................................ [ 13%]
+........................................................................ [ 16%]
+........................................................................ [ 20%]
+........................................................................ [ 23%]
+........................................................................ [ 27%]
+........................................................................ [ 30%]
+........................................................................ [ 33%]
+........................................................................ [ 37%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 47%]
+........................................................................ [ 50%]
+........................................................................ [ 54%]
+........................................................................ [ 57%]
+........................................................................ [ 60%]
+........................................................................ [ 64%]
+........................................................................ [ 67%]
+........................................................................ [ 71%]
+........................................................................ [ 74%]
+........................................................................ [ 77%]
+........................................................................ [ 81%]
+........................................................................ [ 84%]
+........................................................................ [ 88%]
+........................................................................ [ 91%]
+............................s........................................... [ 94%]
+........................................................................ [ 98%]
+......................................                                   [100%]
+=================================== FAILURES ===================================
+_________ test_an_entry_heading_records_its_id[### DEC-101 The title] __________
+
+line = '### DEC-101 The title'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+_________ test_an_entry_heading_records_its_id[### DEC-101: The title] _________
+
+line = '### DEC-101: The title'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+______ test_an_entry_heading_records_its_id[### DEC-101 \u2014 The title] ______
+
+line = '### DEC-101 — The title'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+________ test_an_entry_heading_records_its_id[### DEC-101 - The title] _________
+
+line = '### DEC-101 - The title'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+_________ test_an_entry_heading_records_its_id[### DEC-101-The title] __________
+
+line = '### DEC-101-The title'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+_____ test_an_entry_heading_records_its_id[### DEC-101 \u2014 The title\r] _____
+
+line = '### DEC-101 — The title\r'
+
+    @pytest.mark.parametrize("line", [
+        "### DEC-101 The title", "### DEC-101: The title", "### DEC-101 — The title", "### DEC-101 - The title",
+        "### DEC-101-The title", "### DEC-101 — The title\r",
+    ])
+    def test_an_entry_heading_records_its_id(line):
+>       assert citations._entries(f"# Decisions\n\n{line}\n- body\n".encode("utf-8")) == {"DEC-101"}
+E       AssertionError: assert set() == {'DEC-101'}
+E         
+E         Extra items in the right set:
+E         'DEC-101'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:67: AssertionError
+____________________ test_a_longer_id_is_recorded_as_itself ____________________
+
+    def test_a_longer_id_is_recorded_as_itself():
+>       assert citations._entries(b"### DEC-1010 - Another\n") == {"DEC-1010"}
+E       AssertionError: assert set() == {'DEC-1010'}
+E         
+E         Extra items in the right set:
+E         'DEC-1010'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:80: AssertionError
+_ test_a_heading_in_a_fence_does_not_count_and_the_fence_ends_where_it_is_closed _
+
+    def test_a_heading_in_a_fence_does_not_count_and_the_fence_ends_where_it_is_closed():
+        text = ("```\n### DEC-101 - In a fence\n```\n### DEC-102 - After it\n"
+                "~~~~ text\n### DEC-103 - In a fence\n```\n~~~\n### DEC-104 - Still in it\n~~~~\n### DEC-105 - After\n"
+                "```\n### DEC-106 - In a fence that is never closed\n")
+>       assert citations._entries(text.encode("utf-8")) == {"DEC-102", "DEC-105"}
+E       AssertionError: assert set() == {'DEC-102', 'DEC-105'}
+E         
+E         Extra items in the right set:
+E         'DEC-102'
+E         'DEC-105'
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:87: AssertionError
+_________ test_the_register_is_read_from_the_tree_of_the_citing_commit _________
+
+project = <check.test_citations.Project object at 0x7ea9b1250710>
+
+    def test_the_register_is_read_from_the_tree_of_the_citing_commit(project):
+        project.configure(decision_register=REGISTER)
+        project.write(REGISTER, "### DEC-101 - First\n")
+        early = project.commit("Work (DEC-101, DEC-102)")
+        project.write(REGISTER, "### DEC-102 - Second\n")
+        late = project.commit("Work (DEC-101, DEC-102)")
+>       assert project.flagged() == sorted([("DECISION_UNRECORDED", early, "DEC-102"),
+                                            ("DECISION_UNRECORDED", late, "DEC-101")])
+E       AssertionError: assert [('DECISION_U...', 'DEC-102')] == [('DECISION_U...', 'DEC-101')]
+E         
+E         At index 0 diff: ('DECISION_UNRECORDED', '553a25dc39b5e1310adf4b9cecb76e7b0b72db4d', 'DEC-101') != ('DECISION_UNRECORDED', '553a25dc39b5e1310adf4b9cecb76e7b0b72db4d', 'DEC-102')
+E         Left contains 2 more items, first extra item: ('DECISION_UNRECORDED', 'cf507d4a74d37b5bc6e987ae3a763e8874a81b7a', 'DEC-101')
+E         Use -v to get more diff
+
+tests/unit/check/test_citations.py:136: AssertionError
+=========================== short test summary info ============================
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101 The title]
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101: The title]
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101 \u2014 The title]
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101 - The title]
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101-The title]
+FAILED tests/unit/check/test_citations.py::test_an_entry_heading_records_its_id[### DEC-101 \u2014 The title\r]
+FAILED tests/unit/check/test_citations.py::test_a_longer_id_is_recorded_as_itself
+FAILED tests/unit/check/test_citations.py::test_a_heading_in_a_fence_does_not_count_and_the_fence_ends_where_it_is_closed
+FAILED tests/unit/check/test_citations.py::test_the_register_is_read_from_the_tree_of_the_citing_commit
+9 failed, 2116 passed, 1 skipped in 368.86s (0:06:08)

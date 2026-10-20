@@ -1,0 +1,2 @@
+
+**The adoption verdict moved (DEC-626).** The auditor committed it at `docs/audit/wave-1/adoption-path-map-verdict.md` (`b87ac775`), where the orchestrator's brief had put it; the audit-report check reads that folder as exit-audit reports and went red on it. The orchestrator moved it, byte for byte, to `docs/adoption/adoption-path-map-verdict.md`. Its sha256 is the one the A5 record holds (`verdict_sha256`); the A5 record names the old path, which holds at `b87ac775` to `c7cf6999`.

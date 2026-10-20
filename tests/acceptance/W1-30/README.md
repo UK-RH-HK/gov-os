@@ -1853,7 +1853,7 @@ today: the refusal itself when its code is `PROBE_INVALID`, else the one entry o
 | 3. its acceptance tests refuse | `test_a_commit_of_the_ticket_after_the_probed_one_in_its_acceptance_tests_refuses` (2: a case added, a case changed) | the test designer's commit in `tests/acceptance/<wbs>/`: the probe gate's finding names the commit and the path | red, both: the ticket closes. The stricter half of the rule |
 | 4. one inside and one outside | `test_a_commit_that_changes_one_file_inside_and_one_outside_refuses_for_the_inside_file` | one commit changes the notes and the source: refused, the finding names the source file and does not name the notes | red: refused today, but the finding names `docs/residuals.md`, the first path of the commit outside `tests/` and `docs/probes/` |
 | 5. under `tests/`, neither inside nor the ticket's folder | `test_a_commit_of_the_ticket_in_another_acceptance_folder_does_not_refuse` | the test designer's commit, with this ticket's trailers, adds a case to another work package's acceptance folder: the ticket closes | green (as today). Package P-2 below |
-| settlement 33 | `test_a_commit_of_the_ticket_after_the_probed_one_that_changes_its_ticket_file_refuses` | the orchestrator's commit of the ticket changes `.tickets/<ticket>.md`: refused, commit and path named | green (as today). Package P-1 below |
+| settlement 33 | `test_a_commit_of_the_tickets_own_side_after_the_probed_one_that_changes_its_ticket_file_refuses` (until DEC-757: `test_a_commit_of_the_ticket_after_the_probed_one_that_changes_its_ticket_file_refuses`) | the engineer's commit of the ticket changes `.tickets/<ticket>.md` alone: refused, commit and path named. W1-50's judgement has its own finding for that commit; the probe gate's is among the parts. Until DEC-757 item 3 the commit was the orchestrator's | green (as today). Package P-1 below, settled by DEC-757 item 3 for the integration side |
 | settlement 34 | `test_a_merge_after_the_probed_commit_that_brings_only_files_outside_the_tickets_work_does_not_refuse` | a merge commit of the ticket that is not the merge of the probed commit and brings the notes alone: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
 | settlement 34 | `test_the_merge_of_the_probed_commit_with_a_file_outside_the_tickets_work_added_in_it_does_not_refuse` | DEC-505's merge, with the notes written into the merge itself: closes | red: `PROBE_INVALID` for `docs/residuals.md` |
 
@@ -1914,6 +1914,19 @@ profile are. Held: a commit of the ticket after the probed one that changes it r
 today. The merge of the probed commit brings the ticket file as the probed commit has it and is
 not touched by this. Package P-1.
 
+*Under DEC-757 item 3 (owner, 2026-10-17).* "A ticket-file edit made from the integration side is
+not the ticket's own change: a commit carrying `Role: orchestrator` or `Role: owner`, naming the
+ticket in `Task:` and changing only its ticket file. A change on the ticket's own side after the
+probe still refuses." This settles package P-1 for the integration side: such a commit is no
+change to the probed code and does not refuse; W2-53's suite holds it
+(`tests/acceptance/W2-53/`, form R-7). Settlement 33 now holds the ticket's own side only: every
+other commit that changes the ticket file after the probed one, such as a worker's commit that
+names the ticket, refuses. The case is renamed
+`test_a_commit_of_the_tickets_own_side_after_the_probed_one_that_changes_its_ticket_file_refuses`
+and its commit is the engineer's (`Rewrite-Reason:` naming DEC-757). W1-50's judgement has a
+finding of its own for a worker's commit of a ticket file, so this case holds that one finding
+and reads the probe gate's among the refusal's parts.
+
 **34. A merge commit of the ticket after the probed one** is judged by what it changes itself,
 with the rule's paths. One that is not the merge of the probed commit: by every path it brings
 to its first parent (so one that brings the notes alone does not refuse, one that brings a
@@ -1949,6 +1962,9 @@ P-3.
 - *Reversibility.* Full: one case.
 - *Cost.* (a) none. (b) one case rewritten. (c) a comparison of two keys, two cases.
 - *Recommendation.* (a). *Confidence.* Medium.
+- *Settled* by DEC-757 item 3 (owner, 2026-10-17) for the integration side: a commit with
+  `Role: orchestrator` or `Role: owner`, naming the ticket in `Task:` and changing only the ticket
+  file, does not refuse. On the ticket's own side (a) stands. See settlement 33.
 
 **P-2: a test outside the ticket's acceptance folder (rule 5).**
 - *Question.* Which gate answers for a commit that names this ticket and, after the probe,
@@ -2262,7 +2278,7 @@ W1-26's policy cases: 11 passed.
 30. **An owner's decision as a register entry** (round 13, DEC-483): one heading of DEC-473's form in the register named by `decision_register`, a status line whose first word is `ACCEPTED`, brought into the register by a commit that carries `Role: owner` alone, absent from the register of the commit at which the escalation began, not used before. Full table in round 13, piece 6
 31. **The base commit of the trailers check** (round 13, DEC-482; proposed): the optional top-level key `trailers_base` of the path map; a base that is no commit the checked commit descends from is the finding `TRAILERS_BASE_UNKNOWN`; a base with no commit after it gives the unmeasured answer; a closed ticket no commit names stays `NO_COMMITS`. Full text in round 13, piece 7
 32. **The skills of an installed kernel in the close record** (round 13): `governance/kernel/skills/` and `governance/kernel/vendor/` are listed as the template layout is; a project with both layouts lists both, one entry for a skill both hold with one version, an entry for each version where they differ
-33. **The ticket's own file after the probed commit** (round 14, DEC-581; the stricter reading, package P-1): a commit of the ticket that changes `.tickets/<ticket>.md` after the probed one refuses, as before
+33. **The ticket's own file after the probed commit** (round 14, DEC-581; the stricter reading, package P-1; under DEC-757 item 3): a commit of the ticket's own side that changes `.tickets/<ticket>.md` after the probed one refuses, as before. A commit with `Role: orchestrator` or `Role: owner`, naming the ticket in `Task:` and changing only that file, is integration-side and does not refuse (DEC-757 item 3, which settles P-1 for that side; W2-53's suite holds it)
 34. **A merge commit of the ticket after the probed one** (round 14, DEC-581): judged by what it changes itself, with the rule's paths; settlement 24's second condition reads with those paths. Full text in round 14
 35. **Whose commits the probe gate judges** (round 14, DEC-581): the ticket's own, and those that name no task (DEC-490); a commit that names another ticket is not judged (package P-3)
 
@@ -2275,3 +2291,18 @@ W1-26's policy cases: 11 passed.
 
 Estimate: 220 LOC. Second-start implementation: 732 LOC. Tests cover the full scope of
 A1–A8 and B1–B7; no shrinkage applied.
+
+## Fixture (W2-54, DEC-798, 2026-10-19)
+
+DEC-798 (owner, 2026-10-19, P-W2-40 (b)): a question's vector comes from a CPU-only embedder on its own address,
+`GOV_QUERY_OLLAMA_HOST` (an interface W2-54's KPI needs; README of W2-54, "Round 4"); the shared runner at
+`OLLAMA_HOST` keeps building the index. Only one fixture changes:
+
+- `test_w1_30_r11_rebuild_mode.py`, fixture `rebuild_without_embeddings`: **before**, `OLLAMA_HOST` = a dead loopback
+  port (Ollama absent); **after**, `OLLAMA_HOST` and `GOV_QUERY_OLLAMA_HOST` = that dead port, so Ollama is absent at
+  both addresses. The assertions (the rebuild succeeds; the stand-in program is never started) are unchanged.
+
+No expectation, assertion, pass line or threshold changes. In the designer's sandbox, after the change:
+`test_w1_30_r11_rebuild_mode.py` 2 passed. Commit trailer: `Rewrite-Reason: DEC-798 (owner, 2026-10-19, P-W2-40 (b)):
+query embeddings come from the CPU-only embedder on its own port; the fixtures point it at a stand-in and change no
+expectation`.

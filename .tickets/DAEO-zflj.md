@@ -39,6 +39,7 @@ sources:
 - DEC-730
 - DEC-741
 - DEC-746
+- DEC-749
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-02/
@@ -90,3 +91,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-02), as approved (DEC-729). The list row
 - **KPIs, failure:** an audit report missing its milestone or pack hash is invalid [W2-M138]; a record with an unknown type is still `SCHEMA_INVALID_TYPE`.
 - **The adoption verdict (DEC-741, I (ii), 2026-10-17):** the three CAP-44.h values, and a list of named conditions, each with its source item and its state (met, not met, accepted by an owner entry). W2-02 closes on its own; W2-52's stage records are read as conditions later.
 - **DEC-746 (delegated, 2026-10-17):** `tests/unit/check/test_check.py` is in the paths for `test_schema_clean_record` only (P-A). W1-26's one assertion is revised by an independent test designer, stricter (P-B). KPI line 4's refused list is read as `W2-15ab`, `W2-15A`, `W2-1`: `W2-15` is accepted (P-1, for the owner to confirm). The verdict's conditions are typed per DEC-741 I (ii) (P-2). P-3 to P-5 as the lead recommended.
+- **DEC-749 (delegated, 2026-10-17):** core-schema's shape check in `src/gov/check/schema.py` measures `array` with `items`, `object` with `properties` and `required`, and one `if`/`then` on a `const`, so that the verdict's required list of conditions can be measured; every other keyword stays a fault. Estimate about 250.

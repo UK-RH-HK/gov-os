@@ -1,0 +1,23 @@
+........................................................F............... [ 43%]
+........................................................................ [ 86%]
+......................                                                   [100%]
+=================================== FAILURES ===================================
+________________ test_this_repository_is_not_indexed_by_the_run ________________
+
+two = (<w1_16_support.Repo object at 0x750d94527dd0>, <w1_16_support.Repo object at 0x750d94445610>, {'default-home': {'_con...78, 1790801784200428528)}, 'this-repository': {'findings.jsonl', 'last_head.json', 'records.jsonl', 'snapshots/.seq'}})
+
+    @pytest.mark.local_only
+    def test_this_repository_is_not_indexed_by_the_run(two):
+        """DEC-322: the tests build their indexes in temporary repositories; this repository's stores are not theirs."""
+        before = two[2]
+        runtime = support.REPO_ROOT / support.RUNTIME_REL
+        now = {rel for rel in support.listing(runtime) if not rel.startswith("scratch/")} if runtime.is_dir() else set()
+        changed = sorted(now ^ before["this-repository"])
+>       assert not changed, f"files appeared or went under {runtime}: {changed}"
+E       AssertionError: files appeared or went under /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime: ['snapshots/toolu_01MkPzJmpFms2AbM8EeLTCA1.json']
+E       assert not ['snapshots/toolu_01MkPzJmpFms2AbM8EeLTCA1.json']
+
+tests/acceptance/W1-16/test_w1_16_home.py:164: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-16/test_w1_16_home.py::test_this_repository_is_not_indexed_by_the_run
+1 failed, 165 passed in 694.19s (0:11:34)

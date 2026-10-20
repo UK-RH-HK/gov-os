@@ -1,0 +1,71 @@
+== W1-30
+        blocker.write_text("I am a file, not a directory", encoding="utf-8")
+        project.commit("block close record directory", who=support.ORCHESTRATOR)
+        run = support.run_close(project, sandbox, TICKET)
+        front = support.read_ticket_frontmatter(project.root, TICKET)
+>       assert front.get("status") != "closed", \
+            "the ticket must stay open when the close record cannot be written"
+E       AssertionError: the ticket must stay open when the close record cannot be written
+E       assert 'closed' != 'closed'
+E        +  where 'closed' = <built-in method get of dict object at 0x76d5f562bb40>('status')
+E        +    where <built-in method get of dict object at 0x76d5f562bb40> = {'acceptance_tests': {'author': 'independent-test-designer; written before implementation', 'path': 'tests/acceptance/W1-test/'}, 'allowed_paths': ['src/example/**'], 'assignee': 'engineer', 'class': 'implementation', ...}.get
+
+tests/acceptance/W1-30/test_w1_30_close.py:657: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-30/test_w1_30_close.py::test_close_record_unwritable_ticket_stays_open
+1 failed, 146 passed in 223.66s (0:03:43)
+== W1-07
+E           gov close --json
+E           exit code: 2
+E           stdout:
+E           
+E           stderr:
+E           usage: gov close [-h] [--json] [--root <path>] [--session <id>]
+E                            [--role <role>] [--disposition DISPOSITION]
+E                            [--owner-decision OWNER_DECISION] [--timeout TIMEOUT]
+E                            ticket
+E           gov close: error: the following arguments are required: ticket
+
+tests/acceptance/W1-07/w1_07_support.py:393: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_envelope.py::test_a_governance_error_has_exit_code_1_and_its_code_in_the_json
+1 failed, 217 passed in 158.78s (0:02:38)
+== W1-11
+........................................................................ [ 50%]
+......................................................................   [100%]
+142 passed in 16.88s
+== W1-25
+....................................................                     [100%]
+52 passed in 31.46s
+== W1-26
+...........................................s............................ [ 33%]
+........................................................................ [ 67%]
+.....................................................................    [100%]
+212 passed, 1 skipped in 170.56s (0:02:50)
+== W1-50
+........................................................................ [ 75%]
+........................................................................ [ 86%]
+........................................................................ [ 97%]
+..................                                                       [100%]
+=============================== warnings summary ===============================
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+  /home/usain/gov-os-worktrees/W1-30/tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+  /home/usain/gov-os-worktrees/W1-30/tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+666 passed, 2 warnings in 261.04s (0:04:21)
+== W1-28
+........................................................................ [ 48%]
+........................................................................ [ 96%]
+.....                                                                    [100%]
+149 passed in 44.33s
+== unit
+........................................................................ [ 82%]
+........................................................................ [ 89%]
+........................................................................ [ 96%]
+........................................                                 [100%]
+1048 passed in 41.27s

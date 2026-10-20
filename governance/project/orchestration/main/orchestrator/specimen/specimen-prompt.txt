@@ -1,0 +1,3 @@
+Run exactly this one Bash command, once, and then answer with the single word done:
+
+PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 -m gov.cli.main doctor --help

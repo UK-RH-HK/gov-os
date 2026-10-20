@@ -1,7 +1,7 @@
 ---
 name: checkpoint
 description: Method for writing, watching and resuming from structured checkpoints with gov checkpoint
-version: "1.0.0"
+version: "1.1.0"
 ---
 
 # Checkpoint / Resume
@@ -36,6 +36,14 @@ A fresh checkpoint exits 0; a stale one exits 3 with the reasons. The watchdog o
 ## Resuming from a checkpoint
 
 `gov checkpoint --resume --ticket <id>` prints the brief a session needs to resume: the ticket, its inputs with hashes, the next action and the checkpoint path. A fresh agent on a fresh clone resumes the ticket at the recorded next step from the checkpoint alone (CAP-20, CAP-37).
+
+## The resume rule
+
+The orchestrator's checkpoint opens with a RESUME HERE section. RESUME HERE holds the full session state: what is happening, what was decided, what is next and where things are. It sets no size limit of its own; DEC-792's 8,000-character limit is lifted (DEC-837). Knowledge of the repository comes from retrieval (`gov retrieve`) and the context packets (`gov context`), not from the resume (DEC-837).
+
+A checkpoint is written at every handover: a worker's return, a merge, a package and a compaction (DEC-837).
+
+The session-start hook delivers the RESUME HERE section in full: it names the checkpoint's path, the section's exact line range and its size, and tells the session to read those lines in full before anything else; when the section fits within the hook's 10,000-character bound with the rest, the whole section is injected as well. The section is never cut (DEC-837).
 
 ## Governing sources
 

@@ -1,0 +1,20 @@
+# W2-58 (DAEO-5j8b) lead checkpoint
+
+- Run 1. Branch w2/W2-58, base 9afe3d00.
+- Commits: b4fae70b (TD: W2-58 tests, 563 cases, 341 red / 222 green), 1a5d5bc5 (TD: 312 W1-02 cases rewritten, EARLIER_CASES.md). Both trailers checked: Task, Role: independent-test-designer, Implements: DEC-821, Co-Authored-By (+ Rewrite-Reason on 1a5d5bc5).
+- Test designer 1: session 3b480023-1364-4fff-a9cf-e30faf16781d, sandboxed (gov launch), effort high, 61 min, 120 turns. Sandbox check passed. Twelve fields: present. Returned PACKAGES (TD-1 rewrite surface 920 + 91 cases; TD-2 readings; TD-3). 1 guard read refusal (DEC-849, a gov retrieve query naming the two files); gov retrieve: STORE_MISSING (no store in this worktree).
+- Tripwire 1: this worktree: head, W1-02, W2-58 changed (allowed). Other trees (not this worker; sandboxed): main tree head 74d22909->67245c6b and acceptance W1-49; W2-59 head c76cddf5->fc8f8494, acceptance W1-22, W1-26, W1-49, W2-50, W2-62; W2-63 head f8a0954f->ad38ed68, acceptance W1-49, its status lines (W1-49 edits, sandbox placeholders) gone.
+- Lead readings given to TD (briefs/td-1-resume-1.md): second names stay refused (write alias, DEC-821 item 4); copies and ~/.claude/settings.json open; bounded-time refusals stay; subagent = acting role on the session ticket; NUL stays; TD-3 (a).
+- Red check done (lead): gov.__file__ = /home/usain/gov-os-worktrees/W2-58/src/gov/__init__.py; W2-58 341 failed / 222 passed, reasons match README (log/red-W2-58.txt).
+- TD resume 1 (log/td-2.json): 12 commits 82729e9e..ea270615, W1-02 rewrites; PACKAGES TD-4, TD-5. TD resume 2 (log/td-3c.json; td-3 and td-3b were gate refusals, load >= 20, nothing launched): commits 6ecab4ea, 4c188d5d, bfc290f3, 151ae7ec, 266d4dfd; DONE. All trailers checked. Lead readings TD-4 (b), TD-5 (by existence for searches from above) in briefs/td-1-resume-2.md.
+- Tripwires 2 and 3: this worktree only test paths (W1-02, W1-50, W2-50, W2-58) plus an empty CLI folder tests/acceptance/.claude/.cc-writes (10:57, untracked, left in place). Other trees: other leads' and the orchestrator's own work (main head 67245c6b->16d30765->e7bf7a3e; W2-59, W2-62, W2-63 heads).
+- Next: full rebuild (store for workers' retrieval + wall time, DEC-856), then engineer from scratchpad eng-1.md copied to briefs/eng-1.md (tripwire-before-4).
+- Interpretations taken (to report in the return):
+  - The engineer writes only the `evaluation_sets` block of the path map (ticket allowed_paths, DEC-864 item 5); the ratchet lists stay untouched (DEC-757).
+  - DEC-162/DEC-215 (any call naming a held-out path) stay; the latest KPI (DEC-857 item 3) opens the held-out *list file*.
+  - Secrets (a) by name: `.env`/`.env.*`, `*.pem`, `*.key`, `config/secrets*`, `~/.ssh/**` (+ `~/.claude/.credentials.json`); searches from above not refused for a secret's sake — residual.
+  - Test designer's base: merge base with `w2/integrate`; no such branch -> no (c) refusal; git failure where it exists -> refuse.
+  - The sandbox side of (c)/(d): Read deny rules binding the file tools but not the OS sandbox's reads.
+  - `gov.secrets.indexable` widening (revised plan) not in the ticket: residual.
+- Guard read refusals met by the lead so far: 0.
+- Loop count: 0 implementer iterations.

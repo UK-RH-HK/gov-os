@@ -1,0 +1,13 @@
+PASS YAML parses — 3 files + 107 frontmatters
+PASS 62 capabilities, CAP-01..CAP-62
+PASS every capability has outcome/acceptance/wave/provider/sources/disposition
+PASS waves valid
+PASS DEC-080 W1 set
+PASS LITE states lite form; DROP states non-goal + DEC
+PASS MR-1..MR-6 clauses with acceptance
+PASS scenario ids exist in COVERAGE_MATRIX — []
+Traceback (most recent call last):
+  File "/home/usain/gov-os-worktrees/W2-02/docs/plan/tools/validate_s1.py", line 67, in <module>
+    tk = {v['wbs_id']: (p, v) for p, v in fms.items() if '/.tickets/' in p}
+          ~^^^^^^^^^^
+KeyError: 'wbs_id'

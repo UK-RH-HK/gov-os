@@ -1,0 +1,37 @@
+......................................F................................  [100%]
+=================================== FAILURES ===================================
+______ test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured ______
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-2363/test_a_project_with_neither_lo0/product')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-2363/test_a_project_with_neither_lo0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-2363/test_a_project_with_neither_lo0/sandbox/elsewhere'))
+
+    def test_a_project_with_neither_lock_nor_answers_file_stays_unmeasured(project, sandbox):
+        """Neither file: a project never installed from the template. The lock part is unmeasured and no failure.
+    
+        DEC-499: as W1-27's cases hold, and as this repository is before its adoption. Not a match either: nothing
+        was hashed (DEC-488). That an installed project can delete both files is a residual of DEC-499 (the lock is
+        not signed before Wave 3).
+        """
+        _delete_the_lock(project)
+        (project / support.ANSWERS_REL).unlink()
+        result = support.doctor(project, sandbox)
+        support.assert_not_a_match(result, f"the project holds neither {support.LOCK_REL} nor {support.ANSWERS_REL}")
+>       assert result.section.get("status") == "unmeasured" and not result.reports_drift, (
+            f"the lock part of gov doctor is not 'unmeasured' in a project with neither {support.LOCK_REL} nor "
+            f"{support.ANSWERS_REL} (DEC-499)\n{result.describe()}")
+E       AssertionError: the lock part of gov doctor is not 'unmeasured' in a project with neither governance/framework.lock nor .copier-answers.yml (DEC-499)
+E         framework-lock section: {"match": "UNLOCKED", "reason": "framework.lock and .copier-answers.yml are missing, and governance/kernel/ is installed: install it with `copier copy` (its task writes framework.lock); nothing of the kernel was compared", "status": "fail"}
+E         gov doctor --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "doctor", "result": {}, "session": "", "error": {"code": "DOCTOR_UNHEALTHY", "message": "one or more health checks failed or reported drift: framework_lock (framework.lock and .copier-answers.yml are missing, and governance/kernel/ is installed: install it with `copier copy` (its task writes framework.lock); nothing of the kernel was compared)", "details": {"healthy": false, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "pass", "config_present": true, "binary_installed": true}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"], "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}}}, "framework_lock": {"status": "fail", "match": "UNLOCKED", "reason": "framework.lock and .copier-answers.yml are missing, and governance/kernel/ is installed: install it with `copier copy` (its task writes framework.lock); nothing of the kernel was compared"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL", "systems_identified": 0, "systems_total": 1}}}}
+E         
+E         stderr:
+E         
+E       assert ('fail' == 'unmeasured'
+E         
+E         - unmeasured
+E         + fail)
+
+tests/acceptance/W1-39/test_w1_39_drift.py:285: AssertionError
+1 failed, 70 passed in 165.06s (0:02:45)

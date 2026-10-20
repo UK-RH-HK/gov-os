@@ -1,7 +1,7 @@
 ---
 id: DAEO-r9ss
 status: open
-deps: [DAEO-g0ip, DAEO-zflj]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -17,6 +17,7 @@ role: engineer
 depends_on:
 - DAEO-g0ip
 - DAEO-zflj
+- DAEO-7rr2
 allowed_paths:
 - src/gov/close/**
 - src/gov/telemetry/**
@@ -30,12 +31,16 @@ kpis:
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - 'The pre-close gate, inside gov close (DEC-868): before its regression, the close collects every suite it will run, in one process, as it runs them (pytest --collect-only), runs gov check with no
+    commit since the rebuild, and checks that the ticket''s checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt'
   failure:
   - A research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+  - A tree with a collection error (an import or name clash), a RED gov check or a stale checkpoint is refused by the gate within minutes, not after the regression [DEC-868].
 profile: STANDARD
 sources:
 - DEC-729
 - DEC-738
+- DEC-868
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -90,5 +95,6 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list row
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - **The pre-close gate, inside `gov close` (DEC-868, owner, 2026-10-20):** before its regression, the close collects every suite it will run, in one process, as it runs them (`pytest --collect-only`), runs `gov check` with no commit since the rebuild, and checks that the ticket's checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. Failure: a tree with a collection error (an import or name clash, as `tests/unit/secrets` shadowing the standard library), a RED `gov check` or a stale checkpoint is refused within minutes, not after the regression.
 - **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
 - **Row W2-M263 (DEC-738 item 4, 2026-10-17):** re-triaged from W2-01. RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.

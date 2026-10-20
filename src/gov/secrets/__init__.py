@@ -9,25 +9,41 @@ path allowlist never applies (DEC-290) and no report is written. The file's othe
 allowlists and its disabled rules are left out of the scan (DEC-298), and a second scan with
 the file's rules alone keeps the allowlist of gitleaks' defaults from sheltering them
 (DEC-347). Whatever cannot be decided raises or is left out; nothing is let through undecided.
+
+Each gitleaks run may take a minute plus a second a megabyte, so a store is decided whenever gitleaks
+reads at 1 MB/s or faster (DEC-853). A store whose bytes were scanned clean before, by the same rule sets
+and the same gitleaks, is not scanned again: the check's record of clean results says so, and the reuse
+is labelled on standard error with the store's path and digest. A finding is never recorded.
 """
 
 from __future__ import annotations
 
+import contextlib
+import hashlib
 import json
 import os
 import re
+import shutil
 import sqlite3
 import subprocess
+import sys
+import tempfile
+import threading
 import tomllib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from gov.config.loader import load_config
+from gov.guard.runs import root as runs_root
 
 CONFIG_REL = ".gitleaks.toml"
 RUNTIME_REL = ".gov-runtime"
+RECORD_REL = f"{RUNTIME_REL}/secrets-clean.json"  # the clean results, by digest (DEC-853)
 GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
+_FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
+_LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
+_FORM = 1  # the form of the record and of what a scan reads; another form is never trusted
 
 __all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
 
@@ -67,17 +83,20 @@ def _rules(root: Path) -> tuple[str, ...]:
 
 def _holds_secret(rules: tuple[str, ...], content: bytes) -> bool:
     """Whether gitleaks finds a secret in ``content`` by any of ``rules``. Raises when gitleaks cannot run or does not decide."""
+    # The leading newline keeps gitleaks from skipping content it would take for a binary file.
+    parts = [b"\n", content]
     if b"\0" in content:  # UTF-16 text: the same content without its zero bytes is scanned too
-        content += b"\n" + content.replace(b"\0", b"")
+        parts += [b"\n", content.replace(b"\0", b"")]
+    data = b"".join(parts)  # one copy, read by every scan
     # The rules go by the environment, so no file of them is written; a configuration path there would win over them.
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
     for each in rules:  # clean only when every scan ran and found nothing
-        # The leading newline keeps gitleaks from skipping content it would take for a binary file.
         done = subprocess.run(
             ["gitleaks", "stdin", "--no-banner", "--redact",
              "--ignore-gitleaks-allow", "--gitleaks-ignore-path", "/dev/null", "--log-level", "error",
              "--exit-code", str(_LEAKS)],
-            input=b"\n" + content, capture_output=True, timeout=_TIMEOUT_S, env=env | {"GITLEAKS_CONFIG_TOML": each})
+            input=data, capture_output=True, timeout=_TIMEOUT_S + len(data) / _FLOOR,
+            env=env | {"GITLEAKS_CONFIG_TOML": each})
         if done.returncode not in (0, _LEAKS):
             raise RuntimeError(f"gitleaks could not scan with {CONFIG_REL} (exit code {done.returncode})")
         if done.returncode == _LEAKS:
@@ -125,9 +144,10 @@ def path_holds_secret(root: Path, path: str) -> bool:
     return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])))
 
 
-def _store_content(path: Path) -> bytes:
-    """What a derived store holds: the bytes of the file and, for a SQLite file, its rows as text too."""
-    content = path.read_bytes()  # deleted rows and the text of views are in the bytes
+def _store_content(path: Path, content: bytes | None = None) -> bytes:
+    """What a derived store holds: the bytes of the file (``content``, read if not given) and, for a SQLite file, its rows as text too."""
+    if content is None:
+        content = path.read_bytes()  # deleted rows and the text of views are in the bytes
     if not content.startswith(b"SQLite format 3\0"):
         return content
     connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
@@ -140,6 +160,64 @@ def _store_content(path: Path) -> bytes:
         connection.close()
 
 
+def _scanner(rules: tuple[str, ...]) -> str | None:
+    """What decides a scan besides the content: the rule sets, the gitleaks ``PATH`` finds, and the scan's form.
+
+    None when no gitleaks is found; the scan then raises, and nothing is reused or recorded.
+    """
+    found = shutil.which("gitleaks")
+    if found is None:
+        return None
+    with open(found, "rb") as handle:
+        binary = hashlib.file_digest(handle, "sha256").hexdigest()
+    return hashlib.sha256(json.dumps([_FORM, list(rules), binary]).encode()).hexdigest()
+
+
+def _check(body: dict) -> str:
+    """The digest a record carries of its own body: a record damaged in any way no longer matches it."""
+    return hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
+
+
+def _trusted(root: Path, scanner: str | None) -> set[str]:
+    """The digests of the bytes the record holds as clean for ``scanner``.
+
+    Empty when the record is missing, unreadable, damaged, of another form or of another scanner: then every store is scanned.
+    """
+    if scanner is None:
+        return set()
+    try:
+        record = json.loads((root / RECORD_REL).read_text(encoding="utf-8"))
+        body = {key: record[key] for key in ("form", "scanner", "clean")}
+        if (set(record) != {*body, "check"} or record["check"] != _check(body) or body["form"] != _FORM
+                or body["scanner"] != scanner or not isinstance(body["clean"], list)
+                or not all(isinstance(each, str) and re.fullmatch("[0-9a-f]{64}", each) for each in body["clean"])):
+            return set()
+    except (OSError, ValueError, KeyError, TypeError):
+        return set()
+    return set(body["clean"])
+
+
+def _record(root: Path, scanner: str, clean: set[str]) -> None:
+    """Replaces the record in one step, so an interrupted run leaves the old record or the new one, never part of one.
+
+    A record that cannot be written is left out: the next run scans in full.
+    """
+    body = {"form": _FORM, "scanner": scanner, "clean": sorted(clean)}
+    path = root / RECORD_REL
+    temporary = None
+    try:
+        handle, temporary = tempfile.mkstemp(dir=path.parent, prefix=".secrets-clean.", suffix=".part")
+        with os.fdopen(handle, "w", encoding="utf-8") as stream:
+            stream.write(json.dumps(body | {"check": _check(body)}))
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, path)
+    except OSError:
+        if temporary is not None:
+            with contextlib.suppress(OSError):
+                os.unlink(temporary)
+
+
 def stores_with_secrets(root: Path) -> list[str]:
     """Every file under ``.gov-runtime/`` whose content holds a secret, as project-relative paths (DEC-290)."""
     root = Path(root)
@@ -150,11 +228,47 @@ def stores_with_secrets(root: Path) -> list[str]:
     def refuse(error: OSError) -> None:
         raise error  # a folder that cannot be entered is not a store without a secret
 
-    # Linked folders are followed; a file that cannot be read raises.
-    files = sorted(Path(folder) / name
-                   for folder, _, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True)
-                   for name in names)
-    # Every file is read and scanned, several at a time; the first that cannot be decided raises.
-    with ThreadPoolExecutor() as pool:
-        verdicts = list(pool.map(lambda path: _holds_secret(rules, _store_content(path)), files))
-    return [path.relative_to(root).as_posix() for path, verdict in zip(files, verdicts) if verdict]
+    # DEC-728, DEC-743 3: a link into ~/gov-os-runs is not followed; nothing there is this repository's.
+    # The runtime folder's own files are scanned, also in a clone that lies there, and (DEC-751 2) a link
+    # whose target stays inside the project being scanned is followed there too.
+    runs, runtime, project = runs_root(), os.path.realpath(root / RUNTIME_REL), os.path.realpath(root)
+
+    def followed(path: str) -> bool:
+        real = os.path.realpath(path)
+        within = lambda top: real == top or real.startswith(top + os.sep)  # noqa: E731
+        return runs is None or within(runtime) or within(project) or not within(runs)
+
+    # Linked folders elsewhere are followed; a file that cannot be read raises.
+    files = []
+    for folder, folders, names in os.walk(root / RUNTIME_REL, onerror=refuse, followlinks=True):
+        folders[:] = [name for name in folders if followed(os.path.join(folder, name))]
+        files += [Path(folder) / name for name in names if followed(os.path.join(folder, name))]
+    files.sort()
+    # DEC-853: a store's bytes once scanned clean by the same scanner are not scanned again.
+    scanner = _scanner(rules)
+    trusted, clean, reused = _trusted(root, scanner), set(), {}
+    large = threading.BoundedSemaphore(2)
+
+    def judge(path: Path) -> bool:
+        with large if path.stat().st_size >= _LARGE else contextlib.nullcontext():
+            content = path.read_bytes()
+            digest = hashlib.sha256(content).hexdigest()
+            if digest in trusted:
+                reused[path] = digest
+            elif _holds_secret(rules, _store_content(path, content)):
+                return True  # a finding is never recorded
+            clean.add(digest)
+            return False
+
+    # Every file is read and judged, the largest first, as many at a time as there are processors, so a large
+    # store is neither started last nor slowed by more runs than the machine runs at once. The first file that
+    # cannot be decided raises, and then nothing is recorded.
+    by_size = sorted(files, key=lambda path: -path.stat().st_size)
+    with ThreadPoolExecutor(max_workers=os.cpu_count() or 1) as pool:
+        verdicts = dict(zip(by_size, pool.map(judge, by_size)))
+    for path, digest in sorted(reused.items()):  # the label names the store and the digest, never content
+        print(f"secrets-indexing: clean result reused, not scanned again: {path.relative_to(root).as_posix()} "
+              f"sha256 {digest}", file=sys.stderr)
+    if scanner is not None:
+        _record(root, scanner, clean)
+    return [path.relative_to(root).as_posix() for path in files if verdicts[path]]

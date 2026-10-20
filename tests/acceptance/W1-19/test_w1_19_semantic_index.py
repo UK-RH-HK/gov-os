@@ -71,9 +71,14 @@ def test_the_vectors_are_in_the_shared_store_beside_the_lexical_index(api, index
     root, endpoint, report = indexed
     # The premise, which this case did not hold before: without it the lexical index alone satisfies what follows.
     assert report["available"] is True, f"the vectors were not built: {report!r}"
-    files = support.runtime_files(root)
-    assert "store.db" in files and all(name.startswith("store.db") for name in files), \
-        f"the vectors are not in the one shared store (G-20): .gov-runtime/ holds {files}"
+    # Rewritten by DEC-782 (owner, 2026-10-18, P-W2-32 (a)): beside the store, .gov-runtime/ may hold the one
+    # query-vector cache file a read command writes (the searches of this session's other cases); it was: the store's
+    # files only. The clone below is still given the store's files only, so the vectors must be in the store.
+    held = support.runtime_files(root)
+    files = [name for name in held if name.startswith("store.db")]
+    beside = [name for name in held if not name.startswith("store.db")]
+    assert "store.db" in files and len(beside) <= 1, \
+        f"the vectors are not in the one shared store (G-20): .gov-runtime/ holds {held}"
     env = api.scratch_env(ollama_host=endpoint.host)
     assert api.call(support.LEXICAL, "freshness", ROOT(root), env=env)["status"] == "fresh", \
         "building the vectors left the lexical index of the same store missing or stale"

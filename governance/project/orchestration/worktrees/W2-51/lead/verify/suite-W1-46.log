@@ -1,0 +1,262 @@
+........................................................................ [ 14%]
+........................................................................ [ 29%]
+.....................................EEEEEEEEEEEEEEEEEEEEEEE............ [ 43%]
+........................................................................ [ 58%]
+........................................................................ [ 73%]
+........................................................................ [ 87%]
+.............................................................            [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_a_research_install_outside_the_repository_fails_at_the_write_fence _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+__ ERROR at setup of test_a_research_bash_write_to_a_sibling_directory_fails ___
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[api.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[raw.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[objects.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[codeload.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[pypi.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[files.pythonhosted.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[registry.npmjs.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[huggingface.co] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[export.arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.python.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.rs] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[developer.mozilla.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.readthedocs.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_ ERROR at setup of test_the_research_allowlist_refuses_a_domain_that_is_not_on_it _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+_____ ERROR at setup of test_each_session_uses_a_temp_directory_of_its_own _____
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-1248/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully — created venv and installed the wheel package.
+
+Step 2 failed — `bash experiments/spikes/exp-901/probe.sh` returned exit code 127 (file not found). The probe.sh script does not exist at that path. As instructed, I have not retried or worked around this failure.
+
+stderr:
+
+470 passed, 23 errors in 204.64s (0:03:24)

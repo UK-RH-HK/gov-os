@@ -1,7 +1,7 @@
 ---
 id: DAEO-0mab
 status: open
-deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e]
+deps: [DAEO-g0ip, DAEO-zflj, DAEO-ym8a, DAEO-u4oz, DAEO-0z8c, DAEO-kia7, DAEO-r9ss, DAEO-7r5e, DAEO-a3m2, DAEO-cuao, DAEO-k7hz, DAEO-j8gn, DAEO-zqvn, DAEO-7y6v, DAEO-rd0g, DAEO-49o5, DAEO-sdhj, DAEO-057v, DAEO-jzvg, DAEO-r30l, DAEO-1ahb, DAEO-xm6l, DAEO-kmcr, DAEO-xxgp, DAEO-ha8z, DAEO-kl5e, DAEO-7rr2]
 links: []
 created: 2026-10-16T16:35:11Z
 type: task
@@ -41,6 +41,7 @@ depends_on:
 - DAEO-xxgp
 - DAEO-ha8z
 - DAEO-kl5e
+- DAEO-7rr2
 allowed_paths:
 - docs/plan/wave-2/track-a-gate/**
 kpis:

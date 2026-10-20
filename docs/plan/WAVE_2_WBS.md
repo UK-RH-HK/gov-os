@@ -21,7 +21,7 @@ decisions: [DEC-078, DEC-083, DEC-086, DEC-096, DEC-104, DEC-105, DEC-136, DEC-1
 - **DEC-725:** W2-13 becomes a ranked lexical route (BM25, SQLite FTS5). EXP-003 is split into W2-15a (baseline) and W2-15b (final), with bounded improvements in W2-32 between them.
 - **DEC-726:** test-result caching at close is its own ticket, W2-48, in layer 2.
 - **DEC-727:** EXAMIN adoption on the copy (W2-27) depends only on the safety-critical subset. The real repository (W2-29) stays gated by W2-25 and W2-15b.
-- **DEC-723:** agents never write, list, glob or search `~/gov-os-workbench`.
+- **DEC-723:** agents never write in `~/gov-os-workbench`. (Its listing refusal was replaced by DEC-820: reads there are open except the held-out material's contents; DEC-866.)
 - **Proposed:** a coordination ticket, W2-00, for the main session's identity (P-W2-6).
 
 **Changes in revision 3 (the owner's approval).**
@@ -45,7 +45,7 @@ Wave 1's rules carry over unchanged unless this section says otherwise: the READ
 New or changed for Wave 2:
 
 1. **Every Wave 2 ticket in this repository closes through a clean `gov close`:** exit 0, no `--disposition`, no exception, with its close record kept (the F-M3 proof; AR-8). A `tk close` is never used, unless the owner orders it by decision; that close is then a named failure of exit criterion 1.
-   - **W2-01 goes first, alone (DEC-721).** It fixes the close path (trailers base, merge form, accepted history, the probe gate after a merge-back). It is itself closed with `gov close` once merged, because `gov` runs from this repository's `src/` (an editable install).
+   - **W2-01 goes first, alone (DEC-721).** It fixes the close path (trailers base, merge form, accepted history, the probe gate after a merge-back). It is itself closed with `gov close` once merged, because `gov` ran from this repository's `src/` (an editable install, DEC-605; since DEC-822 the pinned release judges, and `PYTHONPATH` chooses only the code under test).
    - The one exception to "alone" is W2-26. It is read-only on the owner's copy, writes only its own evidence and a throwaway clone under `/tmp` (rule 8), and closes after W2-07.
    - **W2-07 lands before the first close of a ticket that has no acceptance tests of its own** (research, integration, audit and coordination tickets), so that `gov close` can judge a ticket by its class (W2-H045).
    - A refused close is repaired in a new round, never worked round. Two refusals for the same reason go to the owner as a package.
@@ -56,10 +56,10 @@ New or changed for Wave 2:
    - Every brief lists the twelve return fields by name: task, status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action.
    - The brief requires them first, as labelled lines, with any machine-readable payload after them.
    - It tells the helper to stop, and say so, after two identical refusals.
-6. **Launches.** Until W2-21 closes, leads start in the owner's launch form (DEC-715); a blocked launch is a `LAUNCH_BLOCKED` stop to the owner. After W2-21, `gov launch lead <ticket>` and `gov launch <role> <ticket>` are the only ways in.
+6. **Launches.** **DEC-789 (owner, 2026-10-18): the next worker any lead starts is a trial through `gov launch <role> <ticket>`, sandboxed; if it starts, does its job and is refused a write outside its worktree, every new worker starts through `gov launch` and this rule is amended by DEC-789; if it fails, the failure goes to the owner as a package.** **DEC-799 (owner, 2026-10-19), from the trial: every worker whose suites do not need the code graph, test designers included, starts through `gov launch`, sandboxed; only a worker whose suites need it starts in the old launch form, with the tripwire (DEC-789 item 1); each lead's return names which workers ran sandboxed. W2-56 makes `gov launch` usable for every worker.** Until W2-21 closes, leads start in the owner's launch form (DEC-715); a blocked launch is a `LAUNCH_BLOCKED` stop to the owner. After W2-21, `gov launch lead <ticket>` and `gov launch <role> <ticket>` are the only ways in.
 7. **Product repositories.** No product repository is written in Wave 2 except as DEC-727 allows: a throwaway clone of EXAMIN may be adopted (W2-27) once the safety-critical subset has closed. The real repository waits for W2-25, W2-15b and the owner's go. A product repository runs a fixed, pinned, hash-verified Gov OS release (W2-16, W2-18), never this repository's editable development copy.
 8. **The workbench (DEC-723).**
-   - Agents never write in `~/gov-os-workbench`, and never list, glob or search it. They name a file there explicitly, or ask the owner.
+   - Agents never write in `~/gov-os-workbench`. Reads there are open except the held-out material's contents (DEC-820, replacing DEC-723's listing refusal; DEC-866).
    - The owner makes the EXAMIN copy at `~/gov-os-workbench/examin/` in a plain terminal and gives its exact path.
    - Work that writes (indexing, test runs, adoption on a copy, dev-tier clones) runs on a clone the agent makes under `~/gov-os-runs/<W2 id>/`, from an exact path. Acceptance tests keep reading the dev tiers through `GOV_DEV_TIERS` by name and cloning into a temporary folder.
    - **The durable scratch root (DEC-728).** Until W2-50 closes, neither the guard nor the launcher's sandbox lets a session write in `~/gov-os-runs`. Every ticket that clones there therefore depends on W2-50.
@@ -68,13 +68,19 @@ New or changed for Wave 2:
    - Until W2-20 closes, the orchestrator reads the gate by hand before each start: `free -g` shows at least 4 GiB available, the 1-minute load is below `nproc`, and heavy tickets count double. It counts every Gov OS session on the machine, not only its own.
    - After W2-20, `gov launch` refuses when the gate is shut.
 10. **List rows.** A list row's state is re-checked against the code when its ticket picks it up (DEC-718). A row a ticket closes is marked closed in `docs/plan/WAVE_2_LIST.md` with its commit.
-11. **Owner decisions (DEC-724).**
-    - The orchestrator drafts and stages owner register entries; the owner commits them with `Role: owner`.
-    - Owner decisions are staged in batches, with at most one owner commit per session break.
-    - Once W2-12 lands, the owner commits them with `gov approve` in a plain terminal.
+11. **Owner decisions (DEC-724, changed by DEC-861 and DEC-862).**
+    - The orchestrator records the owner's decisions and commits them itself, as soon as they are written, with `Role: orchestrator`, `Task: decision-record` and `Decided-by: owner (chat, <date>)`; nothing stays staged. The owner's push is the acceptance.
+    - Until W2-12 lands, ratchet entries (`accepted_reds`, `load_sensitive`) and escalation lifts stay the owner's own `Role: owner` commits (DEC-862 (a)).
+    - Once W2-12 lands, the owner approves with `gov approve` in a plain terminal, and the close counts a decision-record commit once it is in the owner's pushed ref (DEC-862 (b)).
     - Delegated decisions are the orchestrator's, with `Role: orchestrator`.
 12. **The coordination ticket W2-00 (DEC-729)** carries the main session's own records (section 2, W2-00).
 13. **The finish line (§6) applies from day one,** EXP-003's two passes included (DEC-725).
+14. **Stacked starts (DEC-786).** A ticket may start stacked on a held, verified base when its paths overlap no unmerged ticket's paths, parallelism allows one more lead (DEC-847, which replaced DEC-786's "at most 3"), and it merges every change to its base and re-verifies before its own merge, which comes only after its base has closed.
+15. **Reports (DEC-787).** Every orchestrator report ends with exactly one line, `OWNER_ACTION: <P1|P2|COMMIT|none> <ids> - <one-line summary>`, naming every open owner item.
+16. **Owner commits (DEC-788, changed by DEC-861).** There is no owner batch any more: the orchestrator commits the records of the owner's decisions as they are written (rule 11). The owner commits only a ratchet entry or an escalation lift (DEC-862 (a)), prepared by the orchestrator and asked for with an `ACT` ping (DEC-855); the report's final line then names it.
+17. **Workers (DEC-789, DEC-793).** After each worker exits, its lead confirms that the main tree, every other worktree and every acceptance folder are unchanged (`git status` and a hash of `tests/acceptance/`), and reports it. Until W2-33 lands, the lead checks every worker's return for the twelve fields and sends a non-compliant return back with the missing fields named. Until every worker starts through `gov launch`, a guard hole a worker can reach through a script is fixed, not rowed (DEC-779 as DEC-789 reads it), when an honest agent reaches it in ordinary work (DEC-801).
+18. **Reviews (DEC-801, DEC-802, DEC-803, DEC-824).** Every reviewer, probe and auditor brief carries the one canonical judgement text, `governance/project/briefs/JUDGEMENT.md` (the w2 prompt's §14), word for word. In short: reviewers and probes judge against ADR-0001's threat model, honest agent mistakes and plausible accidents in ordinary work, not deliberate adversaries; a finding that needs a deliberate construction is a row for the Wave 3 hardening pass, never a new round. Every finding is judged by two questions, word for word: "Can an honest agent hit this in ordinary work?" and "Does it fail open or lose work?" Every finding in a probe or audit record carries two lines, `Ordinary work: yes|no, because …` and `Consequence: fails open|loses work|other`; a finding marked "no" is a row automatically, never a round (DEC-808). A package that proposes a round states its findings' classification on one line before the recommendation (DEC-809). A ticket that will resume anyway takes its accepted fixes in that resume, never in a separate round. A risk that exists only when a feature is switched on is an entry criterion of the ticket that switches it on.
+19. **Closes first (DEC-806).** W2-54, then W2-53's re-close, then the held tickets in the quiet-window order; no new ticket starts while a close waits on a quiet window it would disturb.
 
 ## 1. Tickets
 
@@ -97,25 +103,31 @@ Three tracks.
 | W2-09 | A | `SubagentHandback` on the guard's list; the list checked against the CLI | implementation | engineer | FULL | — | 90 | AR-4, F-M7 |
 | W2-10 | A | Guardrails explain themselves, refuse once, then record | implementation | engineer | FULL | W2-09 | 160 | AR-5, AR-6, F-M12 |
 | W2-11 | A | Briefs and the orchestration skill: twelve fields, payload after, two-refusal stop, DEC-430 | skill | product-spec | STANDARD | W2-10 | 120 | AR-5, AR-6, F-m1 |
-| W2-12 | A | Owner approval facts and `gov approve` | implementation | engineer | FULL | W2-03 | 280 | AR-7, F-M6, DEC-724 |
+| W2-12 | A | Owner approval facts and `gov approve` | implementation | engineer | FULL | W2-03 | 340 | AR-7, F-M6, DEC-724, DEC-862 |
 | **W2-13** | A | RETR-X-02 and a ranked lexical route (BM25, SQLite FTS5) | implementation | engineer | FULL | W2-03 | 300 | AR-9 (RETR-X-02), DEC-725 |
 | W2-14 | A | ARGUS's full cycle, a-dev green, the governance share per programme | integration | orchestrator | FULL | W2-04, W2-07, W2-13, W2-50 | 0 | AR-9, F-M1 |
 | **W2-15a** | A | EXP-003, pass 1: the baseline | research | research | FULL | W2-03, W2-04, W2-07, W2-13, W2-50 | 100 | AR-10 (EXP-003) |
 | W2-16 | A | Immutable, hash-pinned releases (CAP-43.b lite) | implementation | engineer | FULL | W2-49 | 150 | CAP-43.b (lite, DEC-722) |
 | W2-17 | A | `gov update` | implementation | engineer | FULL | W2-16 | 260 | CAP-45.a, AR-10 |
 | W2-18 | A | Pinned install: a product repository runs a fixed release, never the development copy | implementation | engineer | STANDARD | W2-16 | 140 | CAP-43, W2-H032, W2-H021 |
-| W2-19 | A | Language-agnostic test commands | implementation | engineer | FULL | W2-07 | 300 | AR-10, DEC-534, DEC-567 |
+| W2-19 | A | Language-agnostic test commands | implementation | engineer | FULL | W2-07, W2-53 (DEC-757) | 300 | AR-10, DEC-534, DEC-567 |
 | W2-20 | A | Machine-wide resource gate | implementation | engineer | STANDARD | — | 120 | W2-M244, W2-M188 |
 | W2-21 | A | Stable launch: `gov launch lead`, the ticket-lead role, launch records | implementation | engineer | FULL | W2-20 | 220 | AR-10, DEC-715, DEC-434, W2-H001, W2-H046 |
 | W2-22 | A | `gov doctor` green | implementation | engineer | STANDARD | W2-09 | 120 | F-M2 |
 | W2-23 | A | Adoption safety on a real repository | implementation | engineer | FULL | W2-18 | 220 | W2-H036, W2-H035, W2-H050 |
 | W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |
 | W2-25 | A | Track A independent audit | audit | independent-auditor | FULL | W2-24 | 0 | AR block verdict |
-| W2-48 | A | Test-result cache at close, keyed on exact input hashes | implementation | engineer | FULL | W2-01 | 220 | W2-H044, W2-M153, DEC-726 |
+| W2-48 | A | Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (DEC-843, DEC-852) | implementation | engineer | FULL | W2-01 | 220 | W2-H044, W2-M153, DEC-726 |
 | W2-49 | A | Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P) | specification | product-spec | STANDARD | W2-51 (closes after it, DEC-744) | 0 | DEC-722 |
 | W2-50 | A | The durable scratch root: `~/gov-os-runs/<own ticket>/` in the guard and the launcher's sandbox (CIT-P) | implementation | engineer | FULL | W2-01 | 120 | DEC-728, W2-M355 |
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
 | W2-52 | A | The lite A7 and A10 stage records (DEC-741) | implementation | engineer | FULL | W2-01, W2-49 | 100 | CAP-44.f (lite) |
+| W2-53 | A | The probe gate measures every later merge against git's own merge of its parents; owner-accepted known reds, integration-side ticket edits, a load-sensitive quarantine (DEC-750, DEC-754, DEC-757) | implementation | engineer | FULL | W2-01 | 160 | DEC-750 item 2, DEC-757 |
+| W2-54 | A | The context packet's dropped list in a stable order; the context-reproducibility check's declared time limit; the `audit-report` type as W2-02 defines it (DEC-768) | implementation | engineer | FULL | — | 120 | DEC-768 items 1 and 3, DEC-773 |
+| W2-55 | C | Decisions tagged by domain, status and scope; superseded and done entries left out of what agents see (DEC-791) | implementation | engineer | STANDARD | W2-03 | 150 | DEC-791 (i) |
+| W2-56 | A | `gov launch` usable for every worker: the code-graph folder in the session's own temporary folder, the sandbox's write list limited to the ticket's paths, no placeholder in a commit (DEC-799) | implementation | engineer | FULL | W2-50, W2-05 (closes after them) | 120 | DEC-789, DEC-799 |
+| W2-57 | A | Load out of the close: W1-46's live cases and W1-30's time-limit case hold under load; the close reads the gate or isolates its timing-sensitive cases (DEC-813, DEC-823) | implementation | independent-test-designer, then engineer | FULL | the closes now queued; closes before W2-24 | 120 | DEC-813, DEC-823, W2-M364, W2-M384 |
+| W2-58 | A | Policy 2 in the guard and the launcher: reads open, refused only secrets, held-out contents, the counterpart's work on the ticket, an evaluation set's hidden half (DEC-820, DEC-821; keystone 3) | implementation | engineer | STANDARD | keystone 3 of the revised plan (DEC-829) | 150 | DEC-820, DEC-821 |
 | W2-26 | B | EXAMIN profile on the owner's copy (EXP-003's EXAMIN leg) | research | research | STANDARD | the owner's copy (DEC-723); a `/tmp` clone until W2-50 (DEC-728) | 60 | EXP-003 (EXAMIN), W2-I041 |
 | W2-27 | B | EXAMIN adoption on a copy | integration | orchestrator | FULL | the DEC-727 subset, W2-26, W2-49, W2-50, W2-19 (DEC-736), W2-52 (DEC-741) | 0 | Track B |
 | W2-28 | B | Independent verdict on the copy | audit | independent-auditor | FULL | W2-27 | 0 | Track B |
@@ -133,7 +145,7 @@ Three tracks.
 | W2-39 | C | Model and provider switch reconstructs the same inputs | implementation | engineer | STANDARD | W2-04 | 80 | CAP-37.e |
 | W2-40 | C | EXP-002: the untested sandbox cases and the harness's hook limits | research | research | FULL | W2-21 | 60 | CAP-61.f, W2-H052 |
 | W2-41 | C | Close and escalation integrity | implementation | engineer | FULL | W2-19 | 160 | W2-H022 … W2-H025, W2-H033 |
-| W2-42 | C | Guard: missing role, links, late paths, atomic saves | implementation | engineer | FULL | W2-10 | 180 | W2-H006, H007, H009, H010, H011, H013, H031 |
+| W2-42 | C | Guard: missing role, links, late paths, atomic saves | implementation | engineer | FULL | W2-10 | 180 | W2-H006, H007, H009, H010, H011, H013, H031, H060 |
 | W2-43 | C | CI integrity and the secret-rule floor | implementation | engineer | STANDARD | W2-08 | 140 | W2-H002, H008, H014, H027, H028 |
 | W2-44 | C | Trailers bound to the launch identity | implementation | engineer | FULL | W2-21 | 160 | W2-H019 |
 | W2-45 | C | `gov check` runner semantics and scale | implementation | engineer | STANDARD | W2-08 | 160 | W2-H018 |
@@ -205,7 +217,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:**
   - A commit after the base without `Task:`, `Role:` or `Implements:` still refuses.
   - A merge that adds its own change outside the merged side still refuses.
-  - A hand-resolved merge that changes probed code still refuses the probe gate.
+  - A hand-resolved merge that changes probed code still refuses the probe gate, for the cases its acceptance suite holds: a hand-resolved inward merge; a merge-back that changes, drops or replaces probed code, whatever task it names; and a later merge holding the probed commit that rewrites or removes probed code present in both parents. A later merge measured against git's own merge of its parents is W2-53's (DEC-754).
   - An accepted-history entry without an ACCEPTED owner decision is refused.
 
 #### W2-02 Record types: decision entry, audit report, adoption verdict, close record (STANDARD, product-spec)
@@ -238,16 +250,20 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Two builds of one ticket's context, on stores rebuilt from one commit, give the same packet hash with or without a live semantic index. Ties in the supplementary block are ordered deterministically [AR-9, W2-M294, W2-M239, W2-M330].
   - An unreadable mandatory record blocks the context or is marked not read; it is never shown as read with an empty hash [W2-H034, W2-M215].
   - The supplementary query is built from the ticket's KPIs and title, not the first long word [W2-M126].
+- **DEC-860 (owner, 2026-10-20; standing):** never one giant query and never one giant context. Within the packet's ceiling, the supplementary evidence comes from retrieval in batches, ranked and stacked in order of relevance; the packet names what it left for a further batch.
 - **KPIs, failure:** DAEO-03pw's context (814,821 tokens at the audit) refuses or fits; a RETIRED or REJECTED record does not satisfy a mandatory source.
 
 #### W2-05 The git environment of every check, hook and helper; the settings re-sort (FULL, engineer)
 - **Allowed paths:**
   - `src/gov/**/*.py`, limited to calls that start git. The sweep is the ticket's first deliverable and names each file before it is changed.
+  - **DEC-776, DEC-777 (2026-10-18):** an early start. While another ticket is unmerged or unclosed, W2-05 changes no file in that ticket's allowed paths (W2-50, W2-54, W2-53's `src/gov/close/**`, and the held W2-02, W2-03, W2-16, W2-20, W2-49, W2-51). The sweep lists those calls as "after <ticket> merges", and the resume round changes them.
   - `src/gov/util/gitenv.py` (new), `lefthook.yml`, `template/lefthook.yml`, `tests/unit/gitenv/**`, `docs/research/AR-2-git-sweep.md`.
+  - **DEC-783 (2026-10-18), P-W2-33 (b):** the settings re-sort is re-baselined (the KPI below); the test designer rewrites its 4 cases. The freeze lookup's own time limit is 15 seconds, in `src/gov/guard/decide.py`, set in the resume round after W2-50 merges. `template/lefthook.yml.jinja` stays untouched; W2-M281 is read as `template/.rulesync/hooks.jsonc`.
+  - **DEC-804, DEC-805 (owner, 2026-10-19):** no third round now. The resume after W2-50 and W2-53 merge also takes, tests first: F-A (a declared check gets no inherited `GIT_INDEX_FILE`) and P-1 (an inherited index honoured only for git calls in the project root); F-B and D-1 are Wave 3 rows W2-M375 and W2-M376 (DEC-807); W2-M281 as hook events and matchers with paths normalised, and `template/.rulesync/hooks.jsonc` gains the template's missing `sessionStart` matcher (that line only), so adapter-portability lands green. The resume's fresh probe reviews them.
 - **KPIs, success:**
   - Every check, test helper and command that runs git in another folder clears the inherited `GIT_*` variables. One helper does it, and the sweep record lists every call [AR-2, W2-M105, W2-M113, W2-M161, W2-L160].
   - A hooked commit in a linked worktree leaves its branch, index and reflog as the commit made them (the DEC-710 case) [AR-2].
-  - `lefthook install` and `uninstall` leave `.claude/settings.json` byte-identical to the committed file, and adapter-portability stays green [AR-2].
+  - `lefthook install` leaves `.claude/settings.json` byte-identical to the committed file; `uninstall` is an owner act, followed by restoring the committed file (DEC-712); adapter-portability stays green [AR-2, DEC-783].
 - **KPIs, failure:** a planted `GIT_DIR` or `GIT_INDEX_FILE` in a hook's environment reaches no child git call.
 
 #### W2-06 Fast pre-commit tier and commit-time re-index (FULL, engineer)
@@ -263,6 +279,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-07 `gov close` by ticket class; complete, tracked repair tickets; a share for every close (STANDARD, engineer)
 - **Allowed paths:** `src/gov/close/**` (except `src/gov/close/cache*`, W2-48's), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
 - **KPIs, success:**
+  - The probe gate accepts a failed probe record whose every finding is named, with its row, in an ACCEPTED owner decision that names the record and its probed commit; any finding not so named still refuses [W2-M371, DEC-790].
   - `gov close` judges a ticket by its class [W2-H045]:
     - an implementation ticket on its acceptance tests;
     - a specification ticket on its closed readiness record and its acceptance tests;
@@ -273,10 +290,12 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - **The pre-close gate, inside `gov close` (DEC-868, owner, 2026-10-20):** before its regression, the close collects every suite it will run, in one process, as it runs them (`pytest --collect-only`), runs `gov check` with no commit since the rebuild, and checks that the ticket's checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. Failure: a tree with a collection error (an import or name clash, as `tests/unit/secrets` shadowing the standard library), a RED `gov check` or a stale checkpoint is refused within minutes, not after the regression.
 - **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
 
 #### W2-08 Hooks back on (STANDARD, orchestrator, with the independent test designer)
 - **Allowed paths:** `docs/plan/wave-2/hooks-back-on/**` (evidence), `tests/acceptance/W1-40/**` (test designer only).
+- **Entry criteria (DEC-803, DEC-804, DEC-807):** W2-05's F-A (a project's own check running git during a hooked commit acts on the project's index) is fixed and tested on `w2/integrate`; the hooks do not return before.
 - **Steps and KPIs:**
   - The independent test designer restates `test_no_lefthook_hook_is_installed_in_this_repository` so that installed hooks are the expected state. This is a rewrite after implementation, with its reason [F-M4, MR-3, DEC-136].
   - The owner reinstalls the hooks (an owner act). The orchestrator asks; the operator restores `.claude/settings.json` only if W2-05 did not fix the re-sort [AR-3, W2-M013].
@@ -308,13 +327,21 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-11 Briefs and the orchestration skill (STANDARD, product-spec)
 - **Allowed paths:** `template/governance/kernel/templates/brief-*.md`, `template/governance/kernel/skills/orchestration/**`, `template/governance/kernel/skills/audit/**`, `.claude/skills/orchestration/**` and `.claude/skills/audit/**` (generated, through the adapter), `docs/changes/W2-11-CIT-P.md`.
 - **Route:** a kernel skill change: CIT-P, independent review, owner approval (CAP-33).
+- **DEC-808 (owner, 2026-10-19):** the paths gain `template/governance/kernel/schemas/probe.schema.json` and `template/governance/kernel/schemas/audit-report.schema.json` (the two finding fields only, required for records written after the change; earlier records stay valid).
 - **KPIs, success:**
+  - **The threat model in the kernel (DEC-808, W2-M377):** every finding in a probe record and an audit report carries `ordinary_work` (yes or no, with its reason) and `consequence` (fails open, loses work or other); the reviewer brief template and the audit skill ask the two questions word for word ("Can an honest agent hit this in ordinary work?", "Does it fail open or lose work?") and say that a finding marked "no" is a row, never a round.
+  - **The standing decisions distilled (DEC-791 (ii)):** the orchestration skill and the brief templates state DEC-715 and DEC-731, DEC-719, DEC-732, DEC-733, DEC-847 (which replaced DEC-737's and DEC-786's caps), DEC-750 and DEC-754, DEC-757 item 6, DEC-766, DEC-768 item 4, DEC-779, DEC-780 and DEC-787, each with its source; entries scoped to this repository go to the project prompt, not the kernel skill.
   - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
-  - They also carry the workbench rule (DEC-723) and the owner-approval rule (DEC-724).
+  - They also carry Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
   - The audit brief states DEC-430 [F-m1, W2-L268].
   - The launcher command is stated as a command, not a code span [W2-L257].
   - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].
-- **KPIs, failure:** the skill validator refuses a brief without the twelve-field rule.
+- **DEC-866 (owner, 2026-10-20), the sweep's findings for this ticket** (`governance/project/orchestration/packages/SWEEP-2026-10-20.md`):
+  - The brief templates (`brief-lead.md`, `brief-engineer.md`, `brief-test-designer.md`, `brief-product-spec.md`, `brief-reviewer.md`), the orchestration skill and its three copies (`template/.rulesync/skills/`, `.rulesync/skills/`, `.claude/skills/`) and the orchestrator role file and its copies no longer teach a superseded rule: no `LEAD_CHECKPOINT` and no "at about <context limit> tokens" (DEC-838; a checkpoint at every handover, DEC-837); no listing or search refusal over the governance folder or `.claude/`, and the held-out list's names readable (DEC-820, replacing DEC-508, DEC-525, DEC-557 and DEC-162's "names a held-out path"); no fixed ceiling of tickets in flight (DEC-847); the owner's decisions recorded by the orchestrator's decision-record commits (DEC-861). DEC-460's citation for naming the model stays (its pin of main sessions stands).
+  - Its independent test designer revises the W1-35 cases that require those sentences (`test_the_brief_carries_the_standing_sentences_word_for_word`, `test_every_clause_of_the_row_is_stated[temp hygiene and protected files]`, `[parallel tickets]`), each with `Rewrite-Reason: <the new decision>`; no other expectation changes.
+  - The paths gain `template/governance/kernel/roles/orchestrator.md` and its copies (`.rulesync/subagents/`, `template/.rulesync/subagents/`, `.claude/agents/`: those lines only) and the skill copies under `.rulesync/skills/` and `template/.rulesync/skills/` (W2-L363). The W1-35 cases are not in `allowed_paths` (an implementer's paths never cover acceptance tests, MR-3, `core-mutation`): its test designer revises them because the KPI names them (brief A1, DEC-867).
+  - If W2-58 has merged first, the listing-refusal sentences are already wrong in practice; if not, they stay until W2-58 merges, and W2-11 merges after it.
+- **KPIs, failure:** the skill validator refuses a brief without the twelve-field rule; a template, skill or role file that still teaches `LEAD_CHECKPOINT`, a listing refusal or a fixed ceiling fails a test.
 
 #### W2-12 Owner approval facts and `gov approve` (FULL, engineer)
 - **Allowed paths:** `src/gov/decisions/**`, `src/gov/approve/**` (new), `src/gov/check/authority.py`, `template/governance/kernel/checks/core-authority.yaml`, `tests/unit/decisions/**`, `tests/unit/approve/**`, `tests/unit/check/test_authority*`.
@@ -323,11 +350,14 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
     - It is run by the owner in a plain terminal. It shows the staged register entries (ids and titles), asks for a typed one-time code, and commits exactly those entries, with the files staged beside them, with `Role: owner`.
     - It refuses, with a named reason and nothing committed, when it is run with a Claude Code ancestor process, with a launched session's identity (`GOV_ROLE` or `GOV_TICKET` set), or without an interactive terminal. This is the freeze lift's test (DEC-409).
     - It refuses when nothing is staged, or when a staged entry is not an owner entry.
-  - A register entry reads as the owner's only when the commit that sets it ACCEPTED carries `Role: owner` and was made by `gov approve`, or by the owner's own commit before W2-12 (or, once the owner chooses signatures, has a valid owner signature). Otherwise core-authority names it "transcribed" [AR-7, F-M6, W2-M258, W2-M108].
+  - A register entry reads as the owner's only when the commit that sets it ACCEPTED carries `Role: owner` and was made by `gov approve`, or by the owner's own commit before W2-12, or (DEC-861, DEC-862 (b)) by the orchestrator's decision-record commit with `Decided-by: owner` once it is in the owner's pushed ref (or, once the owner chooses signatures, has a valid owner signature). Otherwise core-authority names it "transcribed" [AR-7, F-M6, W2-M258, W2-M108].
   - A decision set ACTIVE without an owner approval fact turns core-authority red [W2-H049, W2-M227, W2-M257].
   - "The decision checker could not run" is a finding, never green [W2-H037, W2-H048].
   - Body edits that keep an approved decision ACTIVE are flagged [W2-L010]. An author date earlier than the committer date by more than a day is flagged [W2-M107].
+  - **The owner's push as the acceptance in git (DEC-862 (b), owner, 2026-10-20):** the close counts a ratchet entry (`accepted_reds`, `load_sensitive`) or an escalation lift from a commit carrying `Task: decision-record` and `Decided-by: owner` only once that commit is an ancestor of the owner's pushed `origin/w2/integrate`; before the push it counts nothing, and says so by name. Paths gain `src/gov/close/ratchet.py` and `src/gov/close/state.py` (the owner-entry reading only), `tests/unit/close/test_ratchet*` and `tests/unit/close/test_owner_entry*`.
+  - A register entry recorded by the orchestrator under DEC-861 reads as the owner's once its commit is in the pushed ref, and as "recorded, not yet pushed" before [DEC-861, DEC-862].
 - **KPIs, failure:**
+  - A `Decided-by` trailer alone, on a commit not in the owner's pushed ref, never counts as the owner's (DEC-862 (c): never, it fails open).
   - `gov approve` run from an agent's Bash call, piped input included, commits nothing.
   - A `Role: owner` trailer on a commit made inside an agent's call is a containment finding, not an approval.
 
@@ -377,6 +407,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - **The stacking test**, final: complete and no duplicates, or each gap named [AR-10].
   - **The scale probe:** EXAMIN's clone and `~/workspace` against DEC-078's envelope (≈ 80k nodes, 270k edges, ≈ 2.2 GB peak RSS), including the brute-force vector scan and the graph cache [W2-M351, W2-L317, W2-L320, W2-M089].
   - CAP-10's hit@5 against 85, per class beside the single-class figure, for the owner's CAP-10 package (Q-10) [W2-M017, F-m2].
+  - **Batched, ranked, stacked retrieval (DEC-860):** a question whose evidence exceeds one batch is answered in batches, ranked and stacked within the agent's budget, never by one giant query or context. The measure is the share of questions whose stacked context holds all their needed evidence, in order of relevance, across batches, against the owner's target of 99 %.
+  - **Both figures in every report (DEC-833):** hit@5 against CAP-10's floor of 85, and the complete-stacked-evidence share against 99 %.
 - **Under the finish line (DEC-725):** one run plus its probe; what is short of 99 % becomes a named residual with its cause, and goes to the owner.
 - **Gates:** W2-29 (DEC-727).
 
@@ -395,6 +427,9 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `framework.lock` records the release version and manifest hash, at copy as well as at update. A missing lock fails, and a project cannot silence the lock comparison [W2-L227, W2-H029 (the silencing part), W2-M174, W2-M175].
   - The vendored skills carry their licence and version in the release [W2-L002, W2-L014].
 - **KPIs, failure:** a release whose files or manifest do not match their hashes is refused by `gov install`, `gov update` and `gov doctor`.
+- **DEC-761 (owner, 2026-10-17; P-W2-21 (a)), one more round after the failed last review, tests first:** `gov release --lock-from` refuses once the lock records a release, and when the source holds no release record; a lock whose release block was deleted fails; a version tag from a source with no records is refused; `gov release` refuses unless the role is orchestrator (or the owner in a plain terminal), so engineers and auditors never cut or rewrite a release; W1-39's no-files case and W1-32's command list are revised as recorded rewrites with their reasons. Then one review of that change only.
+- **DEC-767 (delegated) and DEC-772 (owner, 2026-10-18), W2-16's next round:** the case defect P-R3-2 corrected in one line as a recorded rewrite; **`gov release` is owner-only, from a plain terminal** (refused with a Claude Code ancestor, with `GOV_ROLE` or `GOV_TICKET` set, or without a terminal; a typed one-time code), replacing DEC-761's orchestrator line. The round does only this, tests first, with one review of that change; the allowed paths do not change. The guard's refusal of a `NAME=value` or `env` prefix is W2-42's (W2-H060).
+- **DEC-771 (owner, 2026-10-18):** never-recorded sources (P-R3-1, with P-R3-4 and P-R3-5) are W2-17's and W2-18's, not W2-16's; R3-F3 is a residual of W2-16's close.
 
 #### W2-17 `gov update` (FULL, engineer)
 - **Allowed paths:** `src/gov/update/**` (new), `src/gov/adapters/**` (regeneration only), `tests/unit/update/**`.
@@ -409,6 +444,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:**
   - An update to a release that fails hash verification refuses.
   - An overlay file changed by the update is a failure and triggers the rollback.
+- **DEC-771 (owner, 2026-10-18):** an update from or to a source that has never recorded a release is handled here, tests first, with W2-16's P-R3-4 (the migration document copied again) and P-R3-5 (a shallow source refused).
 
 #### W2-18 Pinned install: a product repository runs a fixed release, never the development copy (STANDARD, engineer)
 - **Allowed paths:** `src/gov/install/**` (new), `src/gov/doctor/install*`, `template/governance/kernel/hooks/**` (the import fallback only), `tests/unit/install/**`.
@@ -419,6 +455,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The kernel hooks import the pinned `gov`, never a product's own package named `gov`. With no `gov` installed, they say so clearly instead of blocking every call [W2-H032, W2-M279, W2-L172, W2-L230, W2-L173, W2-L174].
   - Two repositories on the machine can run two different releases side by side [CAP-43].
 - **KPIs, failure:** a product session that imports this repository's `src/gov` is refused by doctor and reported.
+- **DEC-771 (owner, 2026-10-18):** `gov install` refuses to pin a product repository to a lock that shows `release: null`, and a source that has never recorded a release is handled here, tests first.
 
 #### W2-19 Language-agnostic test commands (FULL, engineer)
 - **Needs first:** a Rust toolchain for the fixture (an install package under DEC-083, queued Q-6); Node 22 is present.
@@ -430,6 +467,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Tests run in a clean checkout of the commit, so ignored and compiled files neither dirty the tree nor reach the run [W2-M253, W2-M159, W2-M160].
 - **KPIs, failure:** an undeclared language in a project with no test command is a named refusal, not a silent pytest run.
 - **On EXAMIN's path (DEC-736):** `gov close` runs its regression only over `tests/`, and EXAMIN's suites are elsewhere, so W2-27 needs the declared test commands. It also builds the ratchet baseline of known reds (estimate 300).
+- **The ratchet's shrink rule for `load_sensitive` (DEC-762):** the ratchet core W2-53 built reads each `load_sensitive` entry's `fixed_by` (a ticket or a Wave 3 row) and refuses an entry without one; the close of the ticket an entry names refuses while that entry is still listed.
 
 #### W2-20 Machine-wide resource gate (STANDARD, engineer)
 - **The values (DEC-742):** at least 4 GiB available, 1-minute load below `nproc`, heavy sessions counting double, at most 8 Gov OS sessions on the machine; taken as configuration, in one place.
@@ -441,6 +479,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
 
 #### W2-21 Stable launch: `gov launch lead`, the ticket-lead role, launch records (FULL, engineer, with a product-spec worker for the role file)
+- **DEC-779 (owner, 2026-10-18), priority raised:** W2-21 takes the next free slot after W2-50 closes, ahead of any Track C ticket, so that the leads are sandboxed as early as possible. It leaves the held W2-20's `src/gov/launch/gate*` alone until W2-20 merges. Until W2-21 lands, a guard text-parsing hole that only unsandboxed sessions can reach, or that needs a precondition no session can create through the guard, is a row for every guard ticket.
 - **Allowed paths:** `src/gov/launch/**`, `template/governance/kernel/roles/ticket-lead.md` (new), `template/governance/kernel/settings.json` (the one allow rule), `tests/unit/launch/**`.
 - **KPIs, success:**
   - `gov launch lead <ticket>` builds the whole lead invocation (absolute paths, the identity in `--settings`, the model, background mode, the log and PID files) and passes the resource gate [DEC-715, W2-H046].
@@ -451,6 +490,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Launched sessions can run `gov check`, `gov rebuild` and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181].
   - The kernel template's settings carry one narrow allow rule, `Bash(gov launch:*)` [DEC-715].
 - **KPIs, failure:** a raw `claude` launch stays unallowed in the template.
+- **DEC-769 (owner, 2026-10-18), leads sandboxed:** first a feasibility test of one to two hours (can a sandboxed lead start a sandboxed worker on this machine?), its result recorded; then leads run in the operating-system sandbox, their worktree writable and `tests/acceptance/**`, every other worktree and every other ticket's folder read-only; the independent test designer writes only `tests/acceptance/<its WBS id>/`. The orchestrator's session stays unsandboxed. DEC-770: once this closes, a guard text-reading hole only an unsandboxed session can reach becomes a row.
 
 #### W2-22 `gov doctor` green (STANDARD, engineer)
 - **Allowed paths:** `src/gov/doctor/**`, `governance/project/tool-registry.yaml`, `tests/unit/doctor/**`.
@@ -476,30 +516,26 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - A move to a target that no namespace holds is refused before it runs [W2-M216].
 - **KPIs, failure:** the fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
 
-#### W2-48 Test-result cache at close, keyed on exact input hashes (FULL, engineer; DEC-726)
-- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
+#### W2-48 Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (FULL, engineer; DEC-726, DEC-843, DEC-852)
+- **Priority (DEC-869, owner, 2026-10-20; replacing DEC-823 item 4's place):** it takes the very next free slot after W2-53's close, ahead of every other keystone-2 ticket, the held closes' resumes included: until it lands, every close costs over an hour. Its three conditions stay (DEC-852).
+- **Restated by the owner, 2026-10-19 (DEC-843, DEC-852):** the key KPI as behaviour; glued to pytest-testmon and coverage; three conditions added (subprocesses, the leads' runs, a nightly full run). The ticket file `DAEO-xxgp` carries the same lines.
+- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
 - **KPIs, success:**
-  - **The key.** Each test's cache key is a sha256 over all of these:
-    - its test file;
-    - the source it imports, followed transitively inside the repository;
-    - the fixtures, `conftest.py` chain and data files it reads;
-    - the configuration (`pyproject.toml`, pytest settings, the path map's test keys);
-    - the interpreter version and the dependency lock;
-    - the test command and its options.
-  - A test whose key matches a recorded pass is **reused, not skipped.** It is labelled "reused" in the close record, with the key and the run it came from [W2-H044, W2-M153].
-  - A test whose inputs cannot all be hashed (a dynamic import, a read outside the declared inputs, a network or clock dependency it declares) is never reused: it runs.
+  - **Reuse by behaviour (DEC-843).** Each planted change in an input class re-runs every test that depends on it: an imported module, a fixture or `conftest.py`, a configuration file, a data file the test reads, the interpreter or the dependency lock, the test command and its options. A change outside every input reuses.
+  - A reused test is **reused, not skipped.** It is labelled "reused" in the close record (and in a lead's run record), with the run it came from [W2-H044, W2-M153].
+  - **Subprocesses (DEC-852 item 1).** The code a test runs in a separate process (`python3 -m gov …`) is seen by the cache, through subprocess coverage configured and tested; otherwise any test that starts a process is always re-run. A test whose code changed never gets a reused result, proven by a test with a change reached only through a subprocess.
+  - A test whose inputs cannot all be seen (a dynamic import, a read outside the declared inputs, a network or clock dependency it declares) is never reused: it runs.
   - A failed or errored result is never reused.
-  - Cache entries are written only by `gov close` in the main tree, from a clean tree at a recorded commit. An entry from a worker session or a dirty tree is ignored.
-  - `gov close --no-cache` runs everything. W2-24 and W2-46 run the full, uncached regression and say so in their records.
+  - **Where entries come from.** `gov close` writes the shared entries, in the main tree, from a clean tree at a recorded commit. An entry from a dirty tree is ignored.
+  - **The leads' runs (DEC-852 item 2).** A lead's suite runs in its worktree use the same cache with the same rules (exact inputs, failures never reused, `--no-cache` available): they reuse the close's entries, and any entry a lead's run keeps stays in that worktree and is never read by a close.
+  - `gov close --no-cache` runs everything. W2-24 and W2-46 run the full, uncached regression (testmon's noselect) and say so in their records.
+  - **The nightly full run (DEC-852 item 3).** One command runs the full uncached regression on `w2/integrate`'s head and writes a record naming every test that fails there but whose latest result through the cache was a pass or a reuse. (The orchestrator runs it every night in a quiet window from W2-48's merge; such a test is a P1 package about the cache.)
   - For a declared non-pytest command (W2-19), reuse happens only on its declared input globs; without them, everything runs.
-  - **The choice.** `docs/research/W2-48-cache-choice.md` compares pytest-testmon with a small built-in cache:
-    - correctness on a planted change set: a change to an imported module, a fixture, a configuration file, a data file, and a file outside every key;
-    - the time saved on this repository's suite.
-    Any install comes as a package under DEC-083 (queued Q-13).
-- **KPIs, failure:** each planted change in an input class makes every dependent test run; a change outside every key reuses. A cache that cannot be read means everything runs, never "passed".
+  - **The glue (DEC-843).** pytest-testmon and coverage, one DEC-083 install package (Q-13) raised when the ticket starts; `--testmon-env` set to a hash of the declared data globs and the test command. `docs/research/W2-48-cache-choice.md` records the planted change set's results and the time saved on this repository's suite.
+- **KPIs, failure:** each planted change in an input class makes every dependent test run, a change reached only through a subprocess included; a change outside every input reuses. A cache that cannot be read means everything runs, never "passed". A failed result is never reused, in a close or in a lead's run.
 
 #### W2-49 Contract v4.2, lite (STANDARD, product-spec; DEC-722)
-- **Allowed paths:** `docs/contract/contract.yaml`, `docs/contract/CONTRACT_v4.md` (the v4.2 text), `docs/changes/W2-49-CIT-P.md`, `docs/changes/W2-49-CIT-E.md`, `docs/contract/capabilities/**` (DEC-741 K: the version line in every record, and the records of the split and moved items, from the approved `contract.yaml`).
+- **Allowed paths:** `docs/contract/contract.yaml`, `docs/contract/CONTRACT_v4.md` (the v4.2 text), `docs/changes/W2-49-CIT-P.md`, `docs/changes/W2-49-CIT-E.md`, `docs/contract/capabilities/**` (DEC-741 K, confirmed by DEC-745: the version line in every record, and the eight records of the split and moved items rewritten from the approved `contract.yaml` in a commit of their own), `docs/contract/SOURCE_MAP.csv` (the eight rows of the CIT-P's §8 only, aligned with v4.2; DEC-745).
 - **Route:** CIT-P, independent review, the owner's approval, versioned promotion (CAP-33). **Approved (DEC-741, `0faa0664`), with answers A to J.** The plan validator lines close with W2-51 (DEC-744).
 - **KPIs, success:**
   - The CIT-P names each change, its source (DEC-722) and its impact (W2-02, W2-16, W2-18, W2-27 to W2-30, exit criteria 6 and 7):
@@ -524,7 +560,14 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `template/governance/kernel/checks/secrets-indexing.yaml` (the exclusion only);
   - `src/gov/secrets/__init__.py` (the link rule only: a link from `.gov-runtime/` into `~/gov-os-runs` is not followed; DEC-743 §6.1 (i));
   - `tests/unit/guard/test_runs*`, `tests/unit/launch/test_runs*`;
+  - by DEC-778: `src/gov/guard/protected.py` (the option reader for `mv` and `cp -l`), `tests/unit/guard/test_protected*`;
   - `docs/changes/W2-50-CIT-P.md`, `docs/changes/W2-50-CIT-E.md`.
+- **DEC-774 (owner, 2026-10-18; P-W2-29 (a)):** run 6's review found D: `cp -b`/`--backup`, `install`, `mv` and `cp --remove-destination` onto a link replace the link, while the guard judged its target. A lead can reach it (no sandbox), so one more short round, tests first: the guard refuses as doubt a replacing write onto a link; the change record gains a section correcting §10; one review of that change; the paths do not change.
+- **DEC-778 (owner, 2026-10-18; P-I):** folded into run 7, which had not reached its review: `src/gov/guard/protected.py` uses the option reader W2-50 built for `cp` and `install` for `mv` and `cp -l` too, so the guard reads every copy-like command one way, for writes and for reads. The paths gain `src/gov/guard/protected.py` and `tests/unit/guard/test_protected*`; tests first; the round's one review covers it.
+- **DEC-779 (owner, 2026-10-18): run 7 is W2-50's last.** After its review W2-50 closes; any further guard text-parsing finding is a list row unless a launched, sandboxed worker can reach it.
+- **DEC-785 (owner, 2026-10-18):** run 7's review failed; its findings are rows W2-H062 (high), W2-M368 and W2-M369, and its probe record is committed as it is (judgement: fail). Whether the probe gate then lets W2-50 close goes to the owner before its close.
+- **DEC-790 (owner, 2026-10-18; P-W2-35 (a)):** the resume's fresh probe judges under DEC-779 and DEC-785: a finding already accepted as a row does not fail it. Its passing record makes run 7's failed record an earlier round (W2-M209), so the probe gate passes.
+- **DEC-801 (owner, 2026-10-19):** the resume's probe also judges against ADR-0001's threat model; W2-H062, W2-M368 and W2-M369 are Wave 3 rows.
 - **KPIs, success:**
   - **One durable root.** `~/gov-os-runs/` is the one durable scratch root outside the repository, known to the guard and to the launcher's sandbox [DEC-728, W2-M355].
   - **Its own folder only.** A session of any role writes only under `~/gov-os-runs/<its own ticket>/`. That folder is named by the ticket's W2 id (its `external-ref`, as for worktrees), or by its `tk` id when it has none, and resolved from the session's `GOV_TICKET`.
@@ -542,6 +585,10 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - a session with no ticket;
   - any path outside the repository other than the temp folder and the session's own folder.
   - `~/gov-os-workbench` and `~/gov-os-worktrees` (other than the session's own worktree) stay refused as before.
+- **Widened by the owner, 2026-10-19 (DEC-853, P-W2-49 (a)): the secrets scan at today's sizes, in this ticket's resume** (`src/gov/secrets/__init__.py`, the scan only; its tests):
+  - the `secrets-indexing` scan finishes on stores of today's size (`store.db` about 250 MB, `code.db` about 210 MB): the time limit grows with the content's size, or a large store is scanned in bounded chunks each within the limit, and the pool is bounded so that large files are not starved;
+  - a store whose hash has not changed since its last clean scan is not re-scanned: the clean result is reused, keyed on the store's hash; a changed store is always scanned in full; **a finding is never reused**;
+  - failure: every file is still scanned with every rule set; a scan that cannot finish still fails closed; a store changed by one byte is scanned again in full.
 
 #### W2-51 The Wave 2 plan validator (STANDARD, engineer; DEC-744)
 - **Why:** `docs/plan/tools/validate_s1.py` is Wave 1's. It fails on Wave 2's tree, and by default it reads `~/gov-os-workbench` and `docs/source/`. Exit criterion 7 and W2-49's KPI need a validator that reads Wave 2. `validate_s1.py` stays as Wave 1's record, unchanged.
@@ -558,16 +605,66 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-52 The lite A7 and A10 stage records (FULL, engineer; DEC-741)
 - **Why:** Contract v4.2 (DEC-741, H (i)) brings the A7 and A10 gates of CAP-44.f into Wave 2, lite, but no ticket built their stage records. Exit criterion 7 needs each lite item delivered by a closed ticket and cited by an acceptance test.
 - **Starts** after W2-49's apply round; **closes** before W2-27 starts. It shares `src/gov/adopt/` with W2-23, which runs after it.
+- **DEC-786 (owner, 2026-10-18): starts now, stacked on the held W2-49.** It merges every change to W2-49's branch and re-verifies before its own merge, and merges only after W2-49 has closed.
 - **Allowed paths:** `src/gov/adopt/lite_gates.py` (new), `src/gov/adopt/stages.py` (the A7 and A10 entries only), `template/governance/kernel/skills/adopt/**` (the A7 and A10 steps only), `tests/unit/adopt/test_lite_gates*`. The engineer writes the skill's steps too (DEC-738 item 1).
+- **DEC-800 (owner, 2026-10-19; P-W2-39 (a)):** the paths gain `src/gov/adopt/command.py` (the `STAGES` entries `"A7"` and `"A10"` and the docstring's stage list beside them, only) and `.rulesync/skills/adopt/SKILL.md` and `template/.rulesync/skills/adopt/SKILL.md` (byte copies of the template's adopt skill). `stages.py`'s import line used only by the A7 and A10 routing counts as one of its A7 and A10 entries.
+- **DEC-810 (delegated, 2026-10-19):** so does the two-line A7/A10 branch in `stages.py`'s `run()`.
+- **DEC-814 (owner, 2026-10-19; P-W2-43 (b)):** the paths gain `.claude/skills/adopt/SKILL.md` (rulesync's output only), regenerated in the resume before its fresh probe.
 - **KPIs, success:**
   - `gov adopt` runs the lite A7 and A10 gates as Contract v4.2's CAP-44.f (lite) states; each writes a stage record with its evidence, and the adopt skill names both steps.
   - Each lite gate checks what v4.2 says it checks, and its record names what stays for Wave 3.
   - The adoption verdict (W2-02's type) reads both records as named conditions.
 - **KPIs, failure:** a lite gate that fails writes a failing record, and the verdict cannot be ADOPTED_HEALTHY; a missing record is a named failure, never healthy.
 
+#### W2-53 The probe gate measures every later merge against git's own merge of its parents (FULL, engineer; DEC-750, DEC-754, DEC-757)
+- **Why:** split from W2-01 after its fourth and last probe (DEC-750 item 2). A later merge holding the probed commit, bringing another ticket's branch made before the merge-back and naming that ticket's `Task:`, can delete or revert a probed file or remove an acceptance test, and `gov close` passes; a reopened ticket whose first round was merged back before its final probe cannot close.
+- **Starts** right after W2-01 closes (the same paths), alone, ahead of every held ticket (DEC-757), test designer first. W2-07, W2-41 and W2-48 share `src/gov/close/` and run after it.
+- **Allowed paths:** `src/gov/close/**`, `tests/unit/close/**`.
+- **KPIs, success:**
+  - After a FULL ticket's probed commit, every later merge that holds it refuses, naming the merge, whatever task it names (or none), when a probed path (the ticket's allowed paths, its acceptance folder, its ticket file) at the merge is not what git's own merge of its parents gives, a removal or a return to a version from before the ticket included; on the integration branch, inward on the ticket's branch, and for an octopus merge [DEC-750, DEC-754].
+  - A later merge that takes another ticket's whole version of a probed file is measured the same way, against git's own merge of its parents (P-5 (c)) [DEC-754].
+  - A reopened FULL ticket whose earlier round was merged back before its final probe closes when the probed code at the closed head is the final probed code [DEC-754].
+  - A merge whose probed paths are what git's own merge of its parents gives, and another ticket's merge holding the probed commit on neither side, pass as before; W2-01's acceptance cases stay green [W2-H047, W2-M202].
+  - **The accepted-red ratchet (DEC-757 item 2.1).** A red whose exact test id the path map's `accepted_reds` lists, with an ACCEPTED owner decision naming it, a reason and the ticket that fixes it, does not refuse the close; the close names it with its decision and fixing ticket. An entry counts only when the commit that added it carries `Role: owner`. Its core is one function W2-19 reuses for declared test commands (DEC-736) [DEC-757].
+  - **Integration-side ticket edits (DEC-757 item 2.2).** A change to the ticket's file after its probed commit, made by a commit carrying `Role: orchestrator` or `Role: owner`, naming the ticket in `Task:` and changing only that file, is not a change to the probed code [DEC-757].
+  - **The load-sensitive quarantine (DEC-757 item 2.3).** A test the path map's `load_sensitive` lists that fails in the close is re-run alone, in its own process, inside the same close; it counts as passed only if that re-run passes, and the close reports it by name with both results [DEC-757, DEC-372].
+  - W2-53 closes through `gov close` with its own merged mechanism, its only reds the listed ones [DEC-757].
+- **KPIs, failure:**
+  - An acceptance test added on the ticket's branch before the probe and removed or changed by a later merge refuses the close.
+  - A merge whose own merge git cannot compute, or cannot read, is judged against the probed code and never passes by default.
+  - A red not on `accepted_reds` refuses the close. A listed red that passes refuses the close, naming the entry to remove. An entry added by a commit without `Role: owner`, or whose decision is not an ACCEPTED owner entry naming that test id, is refused, naming the entry; the list never grows without an owner decision [DEC-757].
+  - A ticket-file change on the ticket's own side after the probe, or an integration-side commit that changes more than the ticket's file, still refuses [DEC-757].
+  - A load-sensitive test that fails its isolated re-run refuses; a test not on `load_sensitive` is never re-run; no re-run is silent [DEC-757].
+
+#### W2-54 The context packet's dropped list in a stable order; the context check's declared time limit; the audit-report type (FULL, engineer; DEC-768)
+- **Why:** W2-53's close refused on context-reproducibility (DEC-768). Run alone, the check takes 122 seconds against the 60 seconds a check without a declared limit gets, and fails on 15 tickets: two computations of a ticket's context give its `dropped` list in two orders, so two hashes. It refused on core-schema too: the W1-43 audit report states no `type` (P-W2-28).
+- **Starts** right after the owner's commit of DEC-768, alone; W2-53 is closed again after it.
+- **DEC-773 (owner, 2026-10-18; P-W2-30 (a)):** the first round showed that the two computations hold different items, not only two orders: the embedder returns a slightly different vector for a text after a different text. One more round, tests first, one review: the paths gain `src/gov/retrieval/semantic.py` and `tests/unit/retrieval/**`; query vectors are stored, keyed by model, model revision and exact text, so the same text always gets the same query vector; whether an embedder setting (thread count, seed) also removes the variation is measured first and recorded, and the stored vectors are used regardless. W2-15a's baseline is taken with this behaviour.
+- **DEC-798 (owner, 2026-10-19; P-W2-40 (b)):** run 3b found the shared GPU Ollama's vector depends on the prompt computed before it. One more round: a CPU-only embedder that `gov` starts on its own port answers query embeddings only, and the shared GPU runner keeps building the index (no request to it names `num_gpu: 0`); the cache key names the device; the paths gain `src/gov/retrieval/ollama.py` (the CPU-only embedder only); DEC-261 is amended. W1-21's hit@5 is re-measured before the merge, and a figure below its pass line of 80 is a red for this ticket, not a rewrite.
+- **DEC-782, DEC-784 (owner, 2026-10-18; P-W2-32 (a), P-W2-34 (a)):** one more round, tests first, one review. A read command may write the query-vector cache, and only that file, under the limits of the KPIs below (DEC-379 amended for it). The W1-19 and W1-21 cases that depended on the old, varying vectors are rewritten with a `Rewrite-Reason:` and their figures before and after; no pass line is lowered. W1-46's fixture removes every CLAUDE* variable before it launches a session, in this round's test-design batch.
+- **DEC-811 (delegated, 2026-10-19):** the paths gain `tests/unit/semantic/test_semantic.py` (the stub's fixture only); the query embedder's interface is `GOV_QUERY_OLLAMA_HOST`, default `127.0.0.1:11435`.
+- **Allowed paths:** `src/gov/context/**`, `template/governance/kernel/checks/context-reproducibility.yaml` (the `timeout-seconds` line only), `src/gov/check/schema.py` (the `audit-report` type only), `template/governance/kernel/schemas/audit-report.schema.json` (new), `tests/unit/context/**`, `tests/unit/check/test_schema_audit_report*` (new), `docs/changes/W2-54-CIT-E.md`; and, by DEC-773, `src/gov/retrieval/semantic.py` (the query vector) and `tests/unit/retrieval/**`. The two kernel files are approved by DEC-768 (CAP-33).
+- **KPIs, success:**
+  - Two computations of any ticket's context in one store give one hash: the `dropped` list is sorted stably with a full tie-break, whatever order retrieval returns tied items in [DEC-768].
+  - The same text always gets the same query vector, whatever was embedded before it: query vectors are stored, keyed by model, model revision and exact text [DEC-773].
+  - The query-vector cache is the one file a read command writes: a derived file under `.gov-runtime/`, keyed by model, model revision and a hash of the exact text, written atomically and safely by several sessions at once, bounded in size, and rebuildable from nothing [DEC-782].
+  - Where the cache cannot be written (a sandboxed worker, whose `.gov-runtime` is read-only), the same text still gets the same vector; a test shows it inside a launched, sandboxed worker [DEC-782].
+  - On the shared GPU Ollama, the same text read many times, after different texts and by two sessions at once, gets one vector: query embeddings come from the CPU-only embedder on its own port, the shared runner is never moved to the CPU, and the cache key names the device [DEC-798].
+  - W1-21's hit@5 on the real models, with CPU query vectors against the GPU-built index, is at or above its pass line of 80; the figure is recorded in the change record [DEC-798]. (Kept with its reason, DEC-866: DEC-833 item 1 has W2-32's test designer raise W1-21's and W2-54's line to 85; until then 80 stands.)
+  - W1-46's live cases launch their sessions with no CLAUDE* variable in the environment [DEC-784].
+  - The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768].
+  - `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768].
+  - **The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`)** [DEC-768 item 1]: its schema file byte for byte as W2-02's; in `src/gov/check/schema.py`, W2-02's lines for that type (its `SCHEMA_MAP` entry, the type among the standalone types, the audit-report folder `docs/audit` and its reading of a record there that states no `type` as an audit report), nothing of W2-02's other types; so W2-02's later merge adds nothing new for this type. Core-schema is green on `w2/integrate`, with the W1-43 audit report's body untouched.
+- **KPIs, failure:**
+  - A context whose items or hash differ between two computations still fails the check, naming the ticket.
+  - A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4].
+  - A record outside `docs/audit/` that states no `type` still fails core-schema; an audit report that lacks `milestone`, `commit` or `pack_sha256` fails it, naming the field.
+
 #### W2-24 Track A gate run (FULL, orchestrator)
+- **DEC-813 (owner, 2026-10-19):** does not start before W2-57 (W1-46 robust under load) has closed.
 - **Allowed paths:** `docs/plan/wave-2/track-a-gate/**` (evidence); fixture clones under `~/gov-os-runs/W2-24/`.
 - **KPIs:**
+  - **The quality-control check of 2026-10-18 is repeated, sections (a) to (f), with evidence (counts, paths, commits)** [DEC-794]. Sections (a) (workers sandboxed through `gov launch`) and (d) (`gov retrieve` correct and deterministic on this repository) gate W2-27.
   - From a fresh orchestrator session in accept-edits mode, one lead starts with `gov launch lead`, with no classifier denial and no permission given by hand; the launch is recorded [AR-10, DEC-716].
   - A release is cut and hash-verified, then installed pinned into a fresh copy of a non-Python dev fixture (the W2-19 TypeScript fixture) [AR-10, CAP-43.b lite]:
     - the fixture is adopted (A0 to A6, A8);
@@ -602,6 +699,8 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 #### W2-27 EXAMIN adoption on a copy (FULL, orchestrator)
 - **Depends on (DEC-727):** W2-01, W2-03, W2-04, W2-05, W2-06, W2-08, W2-09, W2-10, W2-16, W2-18, W2-20, W2-21 and W2-23; W2-26; W2-49 (the lite gates); W2-50 (the clone's folder, DEC-728); W2-19 (DEC-736); W2-52 (the lite A7 and A10 stage records, DEC-741); and W2-45 if the index measures say so (DEC-735). W2-07 lands before it by rule 1.
+- **DEC-794 (owner, 2026-10-18):** W2-27 does not start unless W2-24's repeat of the quality-control check gives sections (a) and (d) green: workers sandboxed through `gov launch`, and `gov retrieve` returning correct, deterministic results on this repository.
+- **DEC-799 (owner, 2026-10-19):** and W2-56 has closed.
 - **Allowed paths:** `docs/plan/wave-2/examin-copy/**` (evidence); the clone at `~/gov-os-runs/W2-27/examin/` only.
 - **KPIs:**
   - The pinned, hash-verified release is installed (W2-16, W2-18).
@@ -643,6 +742,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - chunking: span size, overlap and parent expansion, with a re-embed;
   - the hit@5 85 row on the dev queryset [W2-M341].
   Each gets one round plus its probe; its effect is measured by W2-15b. What remains is a named residual.
+- **DEC-833 item 1 and DEC-866 (the sweep of 2026-10-20):** its independent test designer raises every pass line of 80 to CAP-10's 85, with `Rewrite-Reason: DEC-833`: W1-19's `HIT_AT_5_PASS_LINE` (`tests/acceptance/W1-19/w1_19_support.py:92`) and its test, W1-21's (`w1_21_support.py:100` and its dev-tier and family-check cases), W2-54's change-record case (`test_w2_54_cpu_embedder.py:413, 434`); and the engineer the retrieval check's own baseline (`src/gov/retrieval/retrieve_baseline.yaml:4`, `retrieve_check.py:41`). Until then the 80 lines stand, with this reason.
 - **Failure:** an improvement that lowers any baseline figure of W2-15a beyond its noise band is reverted.
 
 #### W2-33 Wave 2 roles and typed handoff records (STANDARD, product-spec)
@@ -673,11 +773,20 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 #### W2-37 `gov impact` (FULL, engineer)
 - **Allowed paths:** `src/gov/impact/**` (new), `src/gov/closure/**` (read API only), `tests/unit/impact/**`.
+- **DEC-812 (delegated, 2026-10-19):** the paths gain `src/gov/check/commands.py` (the line recording `impact` only) and, for its test designer, W1-07's command lists and W1-32's command-set assertion (`impact` only). The resume after W2-03 closes fixes the second review's A and B (no third round now, DEC-802) with C, E and F4 riding along; its fresh probe reviews them.
+- **DEC-816 (owner, 2026-10-19; P-W2-44 (a); CAP-33):** the paths gain the impact-assessment section of `template/governance/kernel/skills/change/SKILL.md` and of its copies `template/.rulesync/skills/change/SKILL.md`, `.rulesync/skills/change/SKILL.md` and `.claude/skills/change/SKILL.md` (rulesync's output), routing the question to `gov impact`, in the resume.
+- **DEC-815 (owner, 2026-10-19; P-W2-45 (a)):** the depths of R0/R1, R2 and R3 are 1, 3 and 8 hops; `depth_source` names DEC-815 (`readings.py`), set in the resume.
 - **KPIs:**
   - A decision change raises a CIT-P that lists the affected specifications, decisions, tickets, tests and code from both graphs, with a radius [CAP-33.b, W2-M285].
   - After apply or archive, the CIT-E record matches the proposal or lists the differences [W2-L319].
   - "What's the impact of X?" in plain language runs `gov impact` [CAP-33.g, DEC-167].
   - It also takes the S0b2 glue G-16 (id mapping) and G-24 (deletable-class join).
+- **DEC-859 (owner, 2026-10-20; standing), in the resume:** the paths gain `src/gov/codeintel/**` (the accepted plan's widening, §4.4).
+  - Agents' questions use the code-graph tool's own traversal (`trace_path`, `search_graph`, `query_graph`), with small, targeted answers; the wrapper never loads the whole graph to answer a question; the tool's error is passed through.
+  - Whole-graph jobs (a full impact map, an audit of every dependency) read the graph in pages, never one query over the tool's row cap.
+  - On large repositories, a job may be split by module or folder, and its parts queried in parallel.
+  - **KPIs:** no query ever exceeds the cap, tested on this repository (28,923 nodes and 117,939 edges on 2026-10-19, after DEC-856) and on a large synthetic repository well over the cap; the callers of `rrf` and `indexable` are answered on this repository.
+  - The lead commits these lines to the ticket file first, in its worktree.
 
 #### W2-38 Profile from impact; impact-selected tests at close (FULL, engineer)
 - **Allowed paths:** `src/gov/impact/profile*`, `src/gov/close/select*`, `tests/unit/impact/**`, `tests/unit/close/test_select*`.
@@ -721,6 +830,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - Links are resolved, and a write that reaches the acceptance tests through a link is refused [W2-H013, W2-M031, W2-M067].
   - The guard creates the folder of an allowed file instead of refusing it [W2-M173, W2-L216].
   - A quoted `$NAME` target is judged as the literal the shell writes [W2-M019].
+  - **A leading `NAME=value` assignment or an `env` prefix in front of any `gov` command is refused, with a reason** (`GOV_ROLE=orchestrator gov release`, `env -u GOV_ROLE gov release`) [W2-H060, DEC-772].
 
 #### W2-43 CI integrity and the secret-rule floor (STANDARD, engineer)
 - **Allowed paths:** `src/gov/ci/**`, `src/gov/secrets/**`, `.github/workflows/**`, `template/.github/workflows/**`, `tests/unit/ci/**`, `tests/unit/secrets/**`.
@@ -744,8 +854,92 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - The decision checker runs within the `gov check` budget on a 200-decision, 20k-commit repository [W2-H018].
   - A check that exits 0 with findings, or with "unmeasured" in its result, is not green [W2-M129, W2-M212].
   - An absent tool of a hard-block check is red, not yellow [W2-M130, W2-M265].
+  - **`openspec-validate` measures something or says it does not apply:** real openspec content that it validates, or an owner decision that declares it not applicable here, stated by the check; never silently yellow [W2-H061, DEC-781].
   - A hard-block key is covered only by a check of hard-block tier [W2-M211, W2-M259].
   - The time limit is stated and tested [W2-M151].
+
+#### W2-55 Decisions tagged by domain, status and scope (STANDARD, engineer; DEC-791)
+- **Why:** the register is about 244,000 tokens (783 entries). Superseded and amended entries are not marked as such, and nothing says which decisions are kernel-wide; agents see all of it (the quality-control check, 2026-10-18).
+- **Starts** after W2-03 closes (it owns `src/gov/decisions/**` and `src/gov/records/**`). It shares `src/gov/context/**` with W2-04 and `src/gov/retrieve/**` with W2-13: it runs after them, or stacked under DEC-786.
+- **Allowed paths:** `src/gov/decisions/**`, `src/gov/context/**` (the decisions filter only), `src/gov/retrieve/**` (the decisions filter only), `template/governance/kernel/schemas/decision*`, `tests/unit/decisions/**`, `docs/research/W2-55-backfill.md` (the proposed backfill).
+- **KPIs, success:**
+  - Every register entry has a domain from the closed list (guard, close, retrieval, context, adopt, launch, checks, plan, roles, records, release), a status that names what superseded or amended it, and a scope (this repository, or kernel-wide) [DEC-791 (i)].
+  - `gov context` and `gov retrieve` leave out superseded and done entries, and say how many they left out [DEC-791 (i)].
+  - The backfill is a proposal: every entry's proposed tags with the reason for each, and a sample drawn for the owner's review; nothing is applied before the owner accepts it [DEC-791 (i)].
+- **DEC-866 (owner, 2026-10-20; standing): supersession propagates.** A check fails when anything (a test, code, a skill, a brief, a ticket's KPI, the prompt, the path map) still enforces a superseded or changed decision without a recorded reason: each superseded entry's status line names the entry that replaced it, and every place that cites or enforces the old one is either updated to the new decision or listed with its reason in the register. The sweep of 2026-10-20 (`governance/project/orchestration/packages/SWEEP-2026-10-20.md`) is its first fixture: W1-49's two window cases and W2-59's three earlier cases are what it must find.
+- **KPIs, failure:** an entry with no domain, status or scope fails the decisions validator, naming it; a superseded entry that still reaches an agent's context fails a test; a test or check that enforces a superseded decision with no recorded reason fails the new check, naming both decisions and the place.
+
+#### W2-56 `gov launch` usable for every worker (FULL, engineer; DEC-799)
+- **Why:** the `gov launch` trial (DEC-789): the sandbox refuses writes outside the worktree and lets git commit, but a worker cannot run a suite that builds the code graph, because `/tmp/gov-cbm-<uid>` is read-only inside the sandbox (`DAEMON_BASE`, `src/gov/codeintel/__init__.py:35`). A worker's script can write anywhere in its worktree, the launcher's `.gov-runtime/` deny rules are patterns that the Linux sandbox skips, and placeholder files (`.bashrc`, `.gitconfig`, `.mcp.json` and others) appear in a worktree while a sandboxed worker runs.
+- **Starts** with high priority: the first free slot after W2-50 and W2-05 close (both change files it needs), ahead of Track C. It shares `src/gov/launch/launcher.py` with W2-21: W2-56 runs first, and W2-21 after it or stacked on it (DEC-786). **Closes** before W2-27 starts (DEC-799).
+- **Allowed paths:** `src/gov/codeintel/__init__.py` (the daemon's folder only), `src/gov/launch/**` (the sandbox settings the launcher writes), `tests/unit/launch/**`, `tests/unit/codeintel/**` (the daemon's folder only), `docs/changes/W2-56-CIT-E.md`. A file outside them that the placeholder KPI needs is a package.
+- **KPIs, success:**
+  - Inside a launched, sandboxed worker, a suite that builds the code graph runs: the code graph's folder is under the session's own temporary folder, and outside a sandbox it stays where it is [DEC-799].
+  - The sandbox's write list is the ticket's allowed paths plus git's folders: a worker's script writing a file outside them, `.gov-runtime/` outside the session's scratch included, is refused by the operating system [DEC-799, DEC-789].
+  - No placeholder file that the sandbox makes can reach a commit [DEC-799].
+- **KPIs, failure:** a write outside the list from a script still fails; `/tmp/gov-cbm-<uid>` is never on the write list (DEC-799 item 2); a launch whose sandbox cannot be built still refuses to start.
+
+#### W2-57 Load out of the close: W1-46's live cases and W1-30's time-limit case hold under load (FULL, independent-test-designer then engineer; DEC-813, DEC-823, W2-M364, W2-M384)
+- **Why:** W1-46's 23 live-session cases fail at setup under the full regression's parallel load (a launched session runs a step without its `cd`, so its probe script is not found) and pass alone; their 23 `load_sensitive` entries hide that. W1-46 proves the launcher and the sandbox, so it must be solid before EXAMIN (DEC-813). W1-30's r13 time-limit case failed once in W2-53's re-close at load about 25 and passes alone (DEC-823): either its timing is load-sensitive, or the close leaves a process alive under load. A single timing case must not hold the close queue again (DEC-823 (b)).
+- **Starts** in the first free slot after the closes now queued (DEC-806, as the revised plan orders them); **closes** before W2-24 starts. Tests first: the independent test designer on the fixtures and the close's behaviour under load; then a fresh engineer on `gov close`; then a reviewer. The close change is judged by the pinned close (DEC-822).
+- **Allowed paths:** `tests/acceptance/W1-46/**` and `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py` (the test designer: the fixtures and READMEs; no expectation lowered, every change with a `Rewrite-Reason:`); `tests/acceptance/W2-57/**` (the test designer); `src/gov/close/**` (the engineer: the close's own resource gate, or its isolated suite for the timing-sensitive cases, only), `tests/unit/close/**`, `docs/changes/W2-57-CIT-E.md`.
+- **KPIs, success:**
+  - W1-46's 36 live cases pass inside the full regression run under its usual parallel load, three runs in a row, each with the load recorded [DEC-813, W2-M364].
+  - Each launched session runs its steps from its own working folder, so its probe script is found whatever runs beside it [W2-M364].
+  - W2-M384's cause is settled and recorded: the case's timing made robust, or the close's ending of a timed-out run's processes fixed under load; the case passes inside three full regressions under load [DEC-823, W2-M384].
+  - The close takes load out of its own run: it reads the resource gate before its regression and waits or refuses with a named reason when the gate is shut, or it runs the cases named timing-sensitive as their own isolated suite, still a real check that fails the close when they fail [DEC-823 (b)].
+  - Then the orchestrator commits the removal of W1-46's 23 entries and W1-30's entry from `load_sensitive` (DEC-861: a removal only shrinks the list; an addition would stay the owner's commit, DEC-862) [DEC-766, DEC-813, DEC-823].
+- **KPIs, failure:** a case that still errors or fails under load keeps its entry and fails the ticket; no case is skipped, serialised by marker alone, or weakened to pass; a timing-sensitive case that fails in its isolated suite still fails the close.
+
+#### W2-58 Policy 2 in the guard and the launcher: reads open, four refusals (STANDARD, engineer; DEC-820, DEC-821; keystone 3)
+- **Why:** the owner's Policy 2 (DEC-820) opens reads to everything but four things, and needs two refusals the guard does not make yet: the counterpart's work on the same ticket (c), and the hidden half of an evaluation set (d). The listing refusals of DEC-508 go. The change is approved by the owner in DEC-821 (CAP-33).
+- **Starts straight after W2-50 merges, ahead of every other start (DEC-857, owner, 2026-10-19):** the read refusals block the orchestrator's own work. Before the workers keystone 4 starts.
+- **Widened (DEC-857 item 3):** the two files the guard protects by constant (`src/gov/guard/heldout.py:19-21`: the held-out list file and the settings file) are what today's refusals turn on; the KPIs below name both: the held-out list file's names readable and the held-out material's contents refused; the settings file's reads under Policy 2; searches from the repository root or `governance/project/` no longer refused for the files' sake. It shares `src/gov/guard/**` and `src/gov/launch/**` with W2-56 and W2-21: it runs before them, or stacked under DEC-786, as the plan orders.
+- **Allowed paths (narrowed at its start, DEC-864: the read rules live in three files, and W2-05's unmerged branch changes `containment.py`):** `src/gov/guard/protected.py`, `src/gov/guard/heldout.py`, `src/gov/guard/decide.py` (the read rules only), `src/gov/guard/reads.py` (new, if needed), `src/gov/launch/**` (the sandbox's read denials only), `governance/project/path-map.yaml` (an `evaluation_sets` block only, reviewed by the orchestrator, DEC-861), `template/governance/kernel/schemas/path-map.schema.json` (the same block), `tests/unit/guard/**`, `tests/unit/launch/**`, `docs/changes/W2-58-CIT-E.md`.
+- **KPIs, success:**
+  - A session of role `engineer` on ticket T is refused reads of `tests/acceptance/<T's W2 id>/**` by the guard (tool reads and the read side of Bash) and by its sandbox, and can still run those tests with pytest and see their names, results and failure messages [DEC-820 (c)].
+  - A session of role `independent-test-designer` on T is refused reads of the files T's branch changes against its base, other than its own tests, and reads the base's version of existing code [DEC-820 (c), DEC-826 Q2].
+  - An evaluation set declared in the path map with a visible and a hidden part: a session measured by it is refused reads of the hidden part, and the measurement script scores it without showing the answers [DEC-820 (d)].
+  - The listing and search refusals over `governance/` and `.claude/` (DEC-508) are gone; the held-out material's file names are readable and its contents refused; secrets stay refused [DEC-820 (a), (b)].
+  - Reviewers and auditors read everything, tests and code alike [DEC-820].
+- **KPIs, failure:** each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error still fails closed.
+
+#### W2-59 The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps (STANDARD, engineer; CIT-P; DEC-822, DEC-835, DEC-854; keystone 1)
+- **Why:** the bootstrap pin's dry run and its `gov check` of 2026-10-19: `src/gov/check/runner.py`'s `_run_command` runs each declared check as `python3 -m gov.check.*` with the working tree's `src` first on `PYTHONPATH`, and the hook lines do the same, so a ticket that edits the checks changes the checks that judge it (ordinary work: yes; fails open). The pin's `secrets-indexing` ran from `/home/usain/Dynamic-Agentic-Engineering-OS/src/gov/…`.
+- **Starts** now (DEC-854), beside W2-05, whose unmerged branch changes `_run_command`'s environment (`env = git_env(root)`) and the git calls in `runner.py` and `retrieve_check.py`: the engineer keeps its edit of those lines small and composable; W2-05's resume takes the conflict.
+- **Allowed paths:** `src/gov/check/runner.py`, `src/gov/retrieval/canary.py`, `src/gov/retrieval/retrieve_check.py`, `src/gov/cli/main.py` (the version only), `pyproject.toml` (package data only), `.rulesync/hooks.jsonc` (the hook command lines' interpreter only; owner-approved, DEC-822 step 2; the generated settings file is regenerated by the owner), `tests/unit/check/**`, `tests/unit/cli/**`, `tests/unit/retrieval/**` (the canary and baseline cases only), `docs/changes/W2-59-CIT-P.md`.
+- **KPIs, success:**
+  - The runner runs every declared check with the pinned interpreter and package; only the code under test comes from the tree (DEC-822 item 3).
+  - The hook command lines call the pin's environment (DEC-822 step 2), after the independent test designer has checked W1-38's hook-source tests against the change.
+  - Every module that finds the repository from its own install path finds it from the project root instead (today `src/gov/retrieval/canary.py:10` and `src/gov/retrieval/retrieve_check.py:16`), proven from an installed wheel (DEC-835).
+  - `retrieve_baseline.yaml` is shipped as package data, proven from an installed wheel (DEC-835).
+  - `gov --version` names the version and the commit.
+- **KPIs, failure:** a check edited in the tree does not change the verdict of the pinned judge; a wheel without the data file fails the build or its test; a module that still reads the repository from its install path fails a test.
+- **After it merges,** the owner re-pins at its merge commit, which must also hold W2-50's secrets fix (DEC-853 item 4).
+
+#### W2-61 The standing 20-question measure, split under Policy 2 (d) (STANDARD; the questions by an independent auditor session, the script by an engineer; DEC-828, DEC-833, DEC-860; keystone 4)
+- **Why:** the accepted plan's §4.4, order 6 (DEC-828 item 4): lens B's 20 questions become the standing measure at each release and on EXAMIN's copy. Ticket file at its start (DEC-825 item 7).
+- **KPIs, success:**
+  - Lens B's 20 questions and their gold answers (`docs/assessment/2026-10/B-memory-retrieval.md` §2) are the visible development half.
+  - A hidden measurement half of 20 more questions is written by a session independent of the retrieval tickets, stored where W2-58's `evaluation_sets` block refuses it to the measured roles (DEC-820 (d)).
+  - A measurement script reports the governing source in the first five and in the bundle, and repeatability on an unchanged index and after a rebuild; it prints scores, never the hidden answers.
+  - **Both figures (DEC-833):** hit@5 against CAP-10's floor of 85, and the share of questions whose stacked context holds all their needed evidence, across batches, against the owner's target of 99 %.
+  - **Stacked, never giant (DEC-860):** each question is answered by retrieval in batches, ranked and stacked within the budget, never one giant query or context; the script measures the stacked answer.
+  - The same split for EXAMIN's set (DEC-828 item 3), written before W2-27; EXP-003's gold answers (W2-15a, W2-15b) split the same way.
+- **KPIs, failure:** a measured role cannot read the hidden half by any route an honest agent takes; the script never prints a hidden answer; a figure is never reported without the other.
+
+#### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
+- **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
+- **Starts** at once: no dependency, and no ticket in flight shares its paths.
+- **Allowed paths:** `template/governance/kernel/hooks/sessionstart.py`, `template/governance/kernel/skills/checkpoint/**` (the resume rule only), `tests/unit/hooks/**`, `docs/changes/W2-62-CIT-P.md`.
+- **KPIs, success:**
+  - The whole RESUME HERE section reaches the resumed session, however long: never a cut of its first 9,000 characters, and no "[truncated]" line in its place [W2-M372, DEC-837 item 1].
+  - **Research first,** recorded in the CIT-P: whether Claude Code 2.1.292 caps or moves a SessionStart hook's `additionalContext` above a size, measured in a headless session. If it does, the hook delivers the section by a route that arrives whole, and a live resumed session shows the whole section read.
+  - The overall cap never cuts the RESUME HERE section or the instruction to read it; the optional parts are the ones trimmed.
+  - The hook names the prompt of the wave in progress, read from the project's configuration, not a constant; with no such setting it names none rather than a wrong one [W2-M373].
+  - The checkpoint skill states the resume rule: the full session state, repository knowledge from retrieval and the context packets, a checkpoint at every handover [DEC-837 items 2 and 3].
+- **KPIs, failure:** a section of 50,000 characters arrives with no character lost; a checkpoint without the section still says so; unreadable input still exits 0; a role other than orchestrator gets no RESUME HERE injection.
+- **Once it lands,** DEC-792's 8,000-character limit is lifted.
 
 #### W2-46 Wave 2 exit run (FULL, orchestrator)
 - **Allowed paths:** `docs/plan/wave-2-exit/**`.
@@ -776,7 +970,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 | Layer | Track A | Track B | Track C |
 |---|---|---|---|
 | 1 | **W2-01** (alone among code tickets) | W2-26 (read-only; closes after W2-07) | |
-| 2 | **W2-02**, W2-05, W2-09, W2-20, W2-48, W2-49, W2-50, W2-51 | | |
+| 2 | **W2-02**, W2-05, W2-09, W2-20, W2-48, W2-49, W2-50, W2-51, W2-53 | | |
 | 3 | **W2-03**, W2-06, W2-07, W2-10, W2-16, W2-21, W2-22, W2-52 | | |
 | 4 | **W2-13**, W2-04, W2-18, W2-08, W2-12, W2-11, W2-17, W2-19 | | W2-31, W2-33, W2-34, W2-37, W2-40, W2-42, W2-44 |
 | 5 | **W2-15a**, W2-23, W2-14 | | W2-35, W2-36, W2-39, W2-41, W2-43, W2-45 |
@@ -792,7 +986,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 - W2-09 then closes at ≈ day 7, W2-10 at ≈ day 10, W2-21 at ≈ day 8 and W2-06 at ≈ day 8.
 - All of these are ahead of their users: W2-14 and W2-15a at ≈ day 10, W2-27 at ≈ day 11. None becomes critical.
 
-**Shared paths added later.** W2-52 shares `src/gov/adopt/` with W2-23, so W2-23 runs after W2-52 (DEC-741). W2-49 closes after W2-51, whose validator its KPI uses (DEC-744).
+**Shared paths added later.** W2-52 shares `src/gov/adopt/` with W2-23, so W2-23 runs after W2-52 (DEC-741). W2-49 closes after W2-51, whose validator its KPI uses (DEC-744). W2-53 shares `src/gov/close/` with W2-07, W2-41 and W2-48, which run after it (DEC-754).
 
 **Critical path** (by working days, from est. LOC and profile; owner waits not included): W2-01 → W2-02 → W2-03 → **W2-13 → W2-15a → W2-32 → W2-15b** → W2-29 → W2-30 → W2-46 → W2-47, ≈ 20.5 working days.
 
@@ -841,7 +1035,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
    - CAP-10's figures for the owner (F-m2).
 5. **The adoption-readiness block passes:** AR-1 to AR-10, shown in order (W2-24) and audited (W2-25).
 6. **EXAMIN is adopted with a healthy verdict.** ADOPTED_HEALTHY comes from a fresh independent auditor on the real repository (W2-30), after the copy's verdict (W2-28), against Contract v4.2's lite CAP-44.h. **EXAMIN runs a pinned, hash-verified Gov OS release** (DEC-722).
-7. **The Contract's 17 Wave 2 items, and Contract v4.2's lite items** (CAP-44.h with A7 and A10, CAP-43.b), are each delivered by a closed ticket and cited by an acceptance test. The plan validator checks this both ways.
+7. **The Contract's Wave 2 items after the re-baseline (DEC-841: eight, CAP-17.b, CAP-45.a, CAP-10.b, CAP-19.a, CAP-19.c, CAP-33.b, CAP-33.g and CAP-61.f; the other nine moved to Wave 3 through W2-49's CIT-P), and Contract v4.2's lite items** (CAP-44.h with A7 and A10, CAP-43.b), are each delivered by a closed ticket and cited by an acceptance test. The plan validator checks this both ways.
 8. **Governance share ≤ 15 %** on each programme's run (ORION, ARGUS and the EXAMIN pilot), measured as in DEC-086.
 9. **The full, uncached regression and the dev-tier regression are green,** and a mid-programme specification change on a-dev propagates through CIT-P → CIT-E with the correct impact set.
 10. **Every one of the 791 rows** is closed, carried to Wave 3 or the backlog with its reason, or named as an exception the owner accepts (`docs/plan/WAVE_2_TRIAGE.md` kept current).

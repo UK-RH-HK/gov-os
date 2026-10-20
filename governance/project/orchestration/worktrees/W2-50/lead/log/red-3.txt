@@ -1,0 +1,1164 @@
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+..................FFFFFFFF......FFFFFFFFFFFF..FFFFFF..FFFFFF.FF.         [100%]
+=================================== FAILURES ===================================
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-a-path-outside-the-tickets-paths] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50'), home=Po...e')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'a-path-outside-the-tickets-paths'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone/docs/not...paths, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone/docs/notes.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone/docs/notes.md by engineer on DAEO-zz90 (a-path-outside-the-tickets-paths, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_8/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-a-runtime-record] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50'), home=Po...e')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'a-runtime-record'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone/.gov-run...ecord, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone/.gov-runtime/findings.jsonl', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone/.gov-runtime/findings.jsonl by engineer on DAEO-zz90 (a-runtime-record, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_9/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-a-ticket-file] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'a-ticket-file'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone/.ticket...file, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone/.tickets/DAEO-zz90.md', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone/.tickets/DAEO-zz90.md by engineer on DAEO-zz90 (a-ticket-file, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_10/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-an-acceptance-test-by-the-engineer] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'an-acceptance-test-by-the-engineer'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone/tests/a...neer, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone/tests/acceptance/W2-90/test_new.py', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone/tests/acceptance/W2-90/test_new.py by engineer on DAEO-zz90 (an-acceptance-test-by-the-engineer, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_11/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-an-acceptance-test-by-the-orchestrator] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'an-acceptance-test-by-the-orchestrator'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone/tests/a...ator, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone/tests/acceptance/W2-90/test_new.py', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone/tests/acceptance/W2-90/test_new.py by orchestrator on DAEO-zz90 (an-acceptance-test-by-the-orchestrator, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_12/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-the-freeze-flag] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'the-freeze-flag'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone/.gov-ru...flag, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone/.gov-runtime/freeze', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone/.gov-runtime/freeze by engineer on DAEO-zz90 (the-freeze-flag, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_13/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-the-guard-hook] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'the-guard-hook'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone/governa...hook, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone/governance/kernel/hooks/pretooluse.py', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone/governance/kernel/hooks/pretooluse.py by engineer on DAEO-zz90 (the-guard-hook, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_14/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_project_inside_the_own_folder_keeps_its_refusals[inside-the-own-folder-the-settings-file] _
+
+located = (_InsideTheOwnFolder(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50'), home=P...')), PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone'))
+place = 'the-settings-file'
+
+    @pytest.mark.parametrize("place", sorted(IN_PROJECT_REFUSALS))
+    def test_a_project_inside_the_own_folder_keeps_its_refusals(located, place):
+        """Each refusal the project's rules make in a worktree, made the same way when the project is a clone in the own folder."""
+        box, project = located
+        role, rel, word = IN_PROJECT_REFUSALS[place]
+>       _all_refused(box, project, project / rel, f"by {role} on {MAIN.tk} ({place}, project at {project})", role,
+                     MAIN.tk, word)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone/.claude...file, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone/.claude/settings.json', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone/.claude/settings.json by engineer on DAEO-zz90 (the-settings-file, project at /tmp/pytest-of-usain/pytest-1490/test_a_project_inside_the_own_15/w2-50/home/gov-os-runs/W2-90/clone) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+__ test_the_own_folder_outside_a_project_inside_it_gives_that_session_nothing __
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/pycache'))
+
+    def test_the_own_folder_outside_a_project_inside_it_gives_that_session_nothing(sandbox):
+        """DEC-108's counterpart: a project in the own folder does not get the own folder's allowance outside itself."""
+        box = _inside_the_own_folder(sandbox)
+        project = support.make_project(box)
+        own = box.own(MAIN)
+        support.write(own / "notes.txt", "beside the clone\n")
+        for target in (own / "notes.txt", own / "another-clone" / "README.md"):
+>           _all_refused(box, project, target, f"(beside the project {project}, in the own folder)")
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:201: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/home/gov-os-runs/W2-90/notes.txt (bes...tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/home/gov-os-runs/W2-90/clone, in the own folder)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/home/gov-os-runs/W2-90/notes.txt (beside the project /tmp/pytest-of-usain/pytest-1490/test_the_own_folder_outside_a_0/w2-50/home/gov-os-runs/W2-90/clone, in the own folder) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+__ test_a_launch_in_a_project_inside_the_own_folder_does_not_add_the_project ___
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/elsewhere/claude-plan.json'))
+
+    def test_a_launch_in_a_project_inside_the_own_folder_does_not_add_the_project(sandbox, cli):
+        """``gov launch`` there: no entry of the sandbox write list holds the project's root; the temp folder stays."""
+        box = _inside_the_own_folder(sandbox)
+        project = support.make_project(box)
+        result = _launched(box, cli, ENGINEER, MAIN)
+        holding = [entry for entry, real in _real_entries(result, box) if support.covers(real, project)]
+>       assert holding == [], (
+            f"the sandbox of a session in the project {project} may write the project itself through {holding}: "
+            f"allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session in the project /tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/home/gov-os-runs/W2-90/clone may write the project itself through ['//tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/home/gov-os-runs/W2-90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/systmp/gov-launch-engineer-lmpqzclm', '//tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/home/gov-os-runs/W2-90']
+E       assert ['//tmp/pytes...s-runs/W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_a_launch_in_a_project_ins0/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:212: AssertionError
+__ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-bracket] __
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai0/w2-50/pycache'))
+case = 'a-bracket'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai0/w2-50/home/gov-os-runs/W2-[9]3/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-[9]3', a-bracket)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai0/w2-50/home/gov-os-runs/W2-[9]3/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai0/w2-50/home/gov-os-runs/W2-[9]3/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-[9]3', a-bracket) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-double-star] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai1/w2-50/pycache'))
+case = 'a-double-star'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai1/w2-50/home/gov-os-runs/**/notes.txt by the engineer on DAEO-zz80 (external-ref '**', a-double-star)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai1/w2-50/home/gov-os-runs/**/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai1/w2-50/home/gov-os-runs/**/notes.txt by the engineer on DAEO-zz80 (external-ref '**', a-double-star) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-hash] ____
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai2/w2-50/pycache'))
+case = 'a-hash'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai2/w2-50/home/gov-os-runs/W2-90#a/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-90#a', a-hash)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai2/w2-50/home/gov-os-runs/W2-90#a/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai2/w2-50/home/gov-os-runs/W2-90#a/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-90#a', a-hash) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-leading-dash] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai3/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai3/w2-50/pycache'))
+case = 'a-leading-dash'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai3/w2-50/home/gov-os-runs/-W2-90/notes.txt by the engineer on DAEO-zz80 (external-ref '-W2-90', a-leading-dash)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai3/w2-50/home/gov-os-runs/-W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai3/w2-50/home/gov-os-runs/-W2-90/notes.txt by the engineer on DAEO-zz80 (external-ref '-W2-90', a-leading-dash) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-leading-dot] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai4/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai4/w2-50/pycache'))
+case = 'a-leading-dot'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai4/w2-50/home/gov-os-runs/.hidden/notes.txt by the engineer on DAEO-zz80 (external-ref '.hidden', a-leading-dot)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai4/w2-50/home/gov-os-runs/.hidden/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai4/w2-50/home/gov-os-runs/.hidden/notes.txt by the engineer on DAEO-zz80 (external-ref '.hidden', a-leading-dot) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-question-mark] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai5/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai5/w2-50/pycache'))
+case = 'a-question-mark'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai5/w2-50/home/gov-os-runs/W2-9?/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-9?', a-question-mark)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai5/w2-50/home/gov-os-runs/W2-9?/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai5/w2-50/home/gov-os-runs/W2-9?/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2-9?', a-question-mark) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-quote] ___
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai6/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai6/w2-50/pycache'))
+case = 'a-quote'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai6/w2-50/home/gov-os-runs/W2\'90/notes.txt by the engineer on DAEO-zz80 (external-ref "W2\'90", a-quote)'
+names = ("/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai6/w2-50/home/gov-os-runs/W2'90/notes.txt", 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai6/w2-50/home/gov-os-runs/W2'90/notes.txt by the engineer on DAEO-zz80 (external-ref "W2'90", a-quote) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-space] ___
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai7/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai7/w2-50/pycache'))
+case = 'a-space'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai7/w2-50/home/gov-os-runs/W2 90/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2 90', a-space)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai7/w2-50/home/gov-os-runs/W2 90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai7/w2-50/home/gov-os-runs/W2 90/notes.txt by the engineer on DAEO-zz80 (external-ref 'W2 90', a-space) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-star] ____
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai8/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai8/w2-50/pycache'))
+case = 'a-star'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai8/w2-50/home/gov-os-runs/*/notes.txt by the engineer on DAEO-zz80 (external-ref '*', a-star)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai8/w2-50/home/gov-os-runs/*/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai8/w2-50/home/gov-os-runs/*/notes.txt by the engineer on DAEO-zz80 (external-ref '*', a-star) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder[a-tilde] ___
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai9/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai9/w2-50/pycache'))
+case = 'a-tilde'
+
+    @pytest.mark.parametrize("case", sorted(NOT_PLAIN))
+    def test_a_name_that_is_not_a_plain_folder_name_gives_no_own_folder(sandbox, case):
+        """The guard refuses a write in the folder such a name would give, and in any folder a glob of it would match."""
+        name, matched = NOT_PLAIN[case]
+        project = _named_project(sandbox, name)
+        what = f"by the engineer on {NAMED.tk} (external-ref {name!r}, {case})"
+>       _folder_refused(sandbox, project, sandbox.root / name, what, NAMED.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai9/w2-50/home/gov-os-runs/~W2-90/notes.txt by the engineer on DAEO-zz80 (external-ref '~W2-90', a-tilde)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai9/w2-50/home/gov-os-runs/~W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_name_that_is_not_a_plai9/w2-50/home/gov-os-runs/~W2-90/notes.txt by the engineer on DAEO-zz80 (external-ref '~W2-90', a-tilde) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-star] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/elsewhere/claude-plan.json'))
+case = 'a-star'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref '*') may write at or under the root through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/home/gov-os-runs/*']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/systmp/gov-launch-engineer-tfi2977f', '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/home/gov-os-runs/*']
+E       assert ['//tmp/pytes...ov-os-runs/*'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make0/w2-50/home/gov-os-runs/*'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-double-star] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/elsewhere/claude-plan.json'))
+case = 'a-double-star'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref '**') may write at or under the root through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/home/gov-os-runs/**']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/systmp/gov-launch-engineer-a7w547te', '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/home/gov-os-runs/**']
+E       assert ['//tmp/pytes...v-os-runs/**'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make1/w2-50/home/gov-os-runs/**'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-bracket] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/elsewhere/claude-plan.json'))
+case = 'a-bracket'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref 'W2-[9]3') may write at or under the root through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/home/gov-os-runs/W2-[9]3']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/systmp/gov-launch-engineer-wf_drp3s', '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/home/gov-os-runs/W2-[9]3']
+E       assert ['//tmp/pytes...runs/W2-[9]3'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make2/w2-50/home/gov-os-runs/W2-[9]3'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-quote] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/elsewhere/claude-plan.json'))
+case = 'a-quote'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref "W2'90") may write at or under the root through ["//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/home/gov-os-runs/W2'90"]: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/systmp/gov-launch-engineer-6f88nese', "//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/home/gov-os-runs/W2'90"]
+E       assert ["//tmp/pytes...s-runs/W2'90"] == []
+E         
+E         Left contains one more item: "//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make3/w2-50/home/gov-os-runs/W2'90"
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-space] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/elsewhere/claude-plan.json'))
+case = 'a-space'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref 'W2 90') may write at or under the root through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/home/gov-os-runs/W2 90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/systmp/gov-launch-engineer-hn9i53lp', '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/home/gov-os-runs/W2 90']
+E       assert ['//tmp/pytes...s-runs/W2 90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make4/w2-50/home/gov-os-runs/W2 90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain[a-leading-dash] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/elsewhere/claude-plan.json'))
+case = 'a-leading-dash'
+
+    @pytest.mark.parametrize("case", LAUNCHED_NOT_PLAIN)
+    def test_the_launcher_neither_makes_nor_adds_a_folder_for_a_name_that_is_not_plain(sandbox, cli, case):
+        """No entry at, under or above the root, no pattern in the write list, no folder made; the temp folder stays."""
+        name, _ = NOT_PLAIN[case]
+        _named_project(sandbox, name)
+        result = _launched(sandbox, cli, ENGINEER, NAMED.tk)
+        under = _entries_at_or_under_the_root(result, sandbox)
+>       assert under == [], (
+            f"the sandbox of a session on {NAMED.tk} (external-ref {name!r}) may write at or under the root through "
+            f"{under}: allowWrite is {result.allow_write()}")
+E       AssertionError: the sandbox of a session on DAEO-zz80 (external-ref '-W2-90') may write at or under the root through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/home/gov-os-runs/-W2-90']: allowWrite is ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/systmp/gov-launch-engineer-c8qb3i67', '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/home/gov-os-runs/-W2-90']
+E       assert ['//tmp/pytes...-runs/-W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make5/w2-50/home/gov-os-runs/-W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:274: AssertionError
+_ test_a_folder_two_tickets_name_is_refused_to_the_session_of_either[in_progress] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name0/w2-50/pycache'))
+status = 'in_progress'
+
+    @pytest.mark.parametrize("status", ("in_progress", "open", "closed"))
+    def test_a_folder_two_tickets_name_is_refused_to_the_session_of_either(sandbox, status):
+        """Two tickets with the external-ref W2-90: MAIN's session may not write there, whatever SHARER's status."""
+        project = _sharing_project(sandbox, status)
+>       _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {MAIN.tk} ({SHARER.tk} names it too, "
+                        f"{status})", MAIN.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name0/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, in_progress)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name0/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name0/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, in_progress) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___ test_a_folder_two_tickets_name_is_refused_to_the_session_of_either[open] ___
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name1/w2-50/pycache'))
+status = 'open'
+
+    @pytest.mark.parametrize("status", ("in_progress", "open", "closed"))
+    def test_a_folder_two_tickets_name_is_refused_to_the_session_of_either(sandbox, status):
+        """Two tickets with the external-ref W2-90: MAIN's session may not write there, whatever SHARER's status."""
+        project = _sharing_project(sandbox, status)
+>       _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {MAIN.tk} ({SHARER.tk} names it too, "
+                        f"{status})", MAIN.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name1/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, open)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name1/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name1/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, open) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+__ test_a_folder_two_tickets_name_is_refused_to_the_session_of_either[closed] __
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name2/w2-50/pycache'))
+status = 'closed'
+
+    @pytest.mark.parametrize("status", ("in_progress", "open", "closed"))
+    def test_a_folder_two_tickets_name_is_refused_to_the_session_of_either(sandbox, status):
+        """Two tickets with the external-ref W2-90: MAIN's session may not write there, whatever SHARER's status."""
+        project = _sharing_project(sandbox, status)
+>       _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {MAIN.tk} ({SHARER.tk} names it too, "
+                        f"{status})", MAIN.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:319: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = 'Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name2/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, closed)'
+names = ('/tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name2/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_a_folder_two_tickets_name2/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz90 (DAEO-zz81 names it too, closed) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+___________ test_the_other_ticket_naming_the_folder_gets_it_neither ____________
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_other_ticket_naming_t0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_other_ticket_naming_t0/w2-50/pycache'))
+
+    def test_the_other_ticket_naming_the_folder_gets_it_neither(sandbox):
+        project = _sharing_project(sandbox)
+>       _folder_refused(sandbox, project, sandbox.own(MAIN), f"by the engineer on {SHARER.tk} (external-ref "
+                        f"{MAIN.folder}, as {MAIN.tk}'s)", SHARER.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:325: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_the_other_ticket_naming_t0/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz81 (external-ref W2-90, as DAEO-zz90's)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_the_other_ticket_naming_t0/w2-50/home/gov-os-runs/W2-90/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_the_other_ticket_naming_t0/w2-50/home/gov-os-runs/W2-90/notes.txt by the engineer on DAEO-zz81 (external-ref W2-90, as DAEO-zz90's) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both[the-ticket-named-by-its-tk-id] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_0/w2-50/pycache'))
+ticket = Ticket(tk='DAEO-zz98', role='engineer', wbs=None, allowed=('src/app/**',))
+
+    @pytest.mark.parametrize("ticket", (NO_W2_ID, CROSS), ids=("the-ticket-named-by-its-tk-id", "the-ticket-whose-ref-is-it"))
+    def test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both(sandbox, ticket):
+        """CROSS's external-ref is DAEO-zz98, the name of NO_W2_ID's folder (it has no external-ref): neither gets it."""
+        project = _crossing_project(sandbox)
+>       _folder_refused(sandbox, project, sandbox.root / NO_W2_ID.tk, f"by the engineer on {ticket.tk} "
+                        f"({CROSS.tk}'s external-ref is {NO_W2_ID.tk})", ticket.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz98 (DAEO-zz82's external-ref is DAEO-zz98)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_0/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz98 (DAEO-zz82's external-ref is DAEO-zz98) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both[the-ticket-whose-ref-is-it] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_1/w2-50/pycache'))
+ticket = Ticket(tk='DAEO-zz82', role='engineer', wbs=None, allowed=('src/app/**',))
+
+    @pytest.mark.parametrize("ticket", (NO_W2_ID, CROSS), ids=("the-ticket-named-by-its-tk-id", "the-ticket-whose-ref-is-it"))
+    def test_an_external_ref_equal_to_another_tickets_tk_id_folder_is_refused_to_both(sandbox, ticket):
+        """CROSS's external-ref is DAEO-zz98, the name of NO_W2_ID's folder (it has no external-ref): neither gets it."""
+        project = _crossing_project(sandbox)
+>       _folder_refused(sandbox, project, sandbox.root / NO_W2_ID.tk, f"by the engineer on {ticket.tk} "
+                        f"({CROSS.tk}'s external-ref is {NO_W2_ID.tk})", ticket.tk)
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_review_findings.py:79: in _folder_refused
+    _all_refused(box, project, folder / "notes.txt", what, ENGINEER, ticket)
+tests/acceptance/W2-50/test_w2_50_review_findings.py:64: in _all_refused
+    _refused(_ask(box, project, tool_name, target, role, ticket), f"{tool_name} on {target} {what}", box, target,
+tests/acceptance/W2-50/test_w2_50_review_findings.py:54: in _refused
+    support.assert_refused(result, what, *names)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+what = "Write on /tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_1/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz82 (DAEO-zz82's external-ref is DAEO-zz98)"
+names = ('/tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_1/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt', 'gov-os-runs', 'gov-os-workbench', 'gov-os-worktrees', 'outside', 'role', ...)
+
+    def assert_refused(result, what, *names):
+        """Refused, with a reason: the refusal's text is not empty and names the target or why.
+    
+        ``names`` are strings of which the reason must hold one: the path as given,
+        a form of it, or a word that says why. The guard's own wording is not
+        prescribed.
+        """
+>       assert result.decision == "deny", f"{what} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Write on /tmp/pytest-of-usain/pytest-1490/test_an_external_ref_equal_to_1/w2-50/home/gov-os-runs/DAEO-zz98/notes.txt by the engineer on DAEO-zz82 (DAEO-zz82's external-ref is DAEO-zz98) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-50/w2_50_support.py:372: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name[an-external-ref-equal-to-the-tk-id] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/elsewhere/claude-plan.json'))
+case = 'an-external-ref-equal-to-the-tk-id'
+
+    @pytest.mark.parametrize("case", sorted(SHARED_LAUNCHES))
+    def test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name(sandbox, cli, case):
+        ticket, folder = SHARED_LAUNCHES[case]
+        if ticket is MAIN:
+            _sharing_project(sandbox, "closed")
+        else:
+            _crossing_project(sandbox)
+        result = _launched(sandbox, cli, ENGINEER, ticket)
+        holding = [entry for entry, real in _real_entries(result, sandbox)
+                   if support.covers(real, sandbox.root / folder / "f.txt")]
+>       assert holding == [], (
+            f"the sandbox of a session on {ticket.tk} may write the shared folder {sandbox.root / folder} through "
+            f"{holding} ({case})")
+E       AssertionError: the sandbox of a session on DAEO-zz98 may write the shared folder /tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/home/gov-os-runs/DAEO-zz98 through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/home/gov-os-runs/DAEO-zz98'] (an-external-ref-equal-to-the-tk-id)
+E       assert ['//tmp/pytes...ns/DAEO-zz98'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make7/w2-50/home/gov-os-runs/DAEO-zz98'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:360: AssertionError
+_ test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name[the-same-external-ref-of-a-closed-ticket] _
+
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/pycache'))
+cli = Cli(path=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/home/.local/bin/claude'), l...), plan=PosixPath('/tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/elsewhere/claude-plan.json'))
+case = 'the-same-external-ref-of-a-closed-ticket'
+
+    @pytest.mark.parametrize("case", sorted(SHARED_LAUNCHES))
+    def test_the_launcher_neither_makes_nor_adds_a_folder_two_tickets_name(sandbox, cli, case):
+        ticket, folder = SHARED_LAUNCHES[case]
+        if ticket is MAIN:
+            _sharing_project(sandbox, "closed")
+        else:
+            _crossing_project(sandbox)
+        result = _launched(sandbox, cli, ENGINEER, ticket)
+        holding = [entry for entry, real in _real_entries(result, sandbox)
+                   if support.covers(real, sandbox.root / folder / "f.txt")]
+>       assert holding == [], (
+            f"the sandbox of a session on {ticket.tk} may write the shared folder {sandbox.root / folder} through "
+            f"{holding} ({case})")
+E       AssertionError: the sandbox of a session on DAEO-zz90 may write the shared folder /tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/home/gov-os-runs/W2-90 through ['//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/home/gov-os-runs/W2-90'] (the-same-external-ref-of-a-closed-ticket)
+E       assert ['//tmp/pytes...s-runs/W2-90'] == []
+E         
+E         Left contains one more item: '//tmp/pytest-of-usain/pytest-1490/test_the_launcher_neither_make8/w2-50/home/gov-os-runs/W2-90'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_review_findings.py:360: AssertionError
+34 failed, 174 passed in 88.20s (0:01:28)

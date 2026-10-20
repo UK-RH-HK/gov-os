@@ -1,0 +1,97 @@
+.................FF......                                                [100%]
+=================================== FAILURES ===================================
+__ test_DEC_747_at_most_8_holds_after_the_start[7, a heavy start is refused] ___
+
+machine = <w2_20_support.Machine object at 0x7d90565c3110>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a1/this-repo')
+weighted = 7, start = 'heavy'
+
+    @pytest.mark.parametrize("weighted, start", [(7, "light"), (7, "heavy"), (8, "light")],
+                             ids=["7, a light start opens", "7, a heavy start is refused",
+                                  "8, the reading shuts and a light start is refused"])
+    def test_DEC_747_at_most_8_holds_after_the_start(machine, repo, weighted, start):
+        """DEC-747 (delegated, staged), a reading of DEC-742: the start check opens on sessions only when the live
+        weighted count plus the new session's weight (1 light, 2 heavy) is at most the maximum; the reading shows the
+        gate shut on sessions once the count is at the maximum. DEC-742's default maximum, 8; the other conditions hold.
+        """
+        assert not machine.config_file.exists()
+        for n in range(3):
+            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bh{n}", heavy=True)
+        for n in range(weighted - 6):
+            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bl{n}")
+    
+        reading = machine.read(repo)
+        assert reading.get("weighted_sessions") == weighted, f"three heavy and {weighted - 6} light sessions: {reading}"
+        assert reading["thresholds"]["max_weighted_sessions"] == 8, reading
+        reasons = support.reasons_by_condition(reading)
+        if weighted < 8:
+            assert support.gate_of(reading)["open"] is True and reasons == {}, f"{weighted} of 8 must read open: {reading}"
+        else:
+            assert support.gate_of(reading)["open"] is False, f"8 of 8 leaves no room and must read shut: {reading}"
+            assert set(reasons) == {"sessions"}, reasons
+            assert (reasons["sessions"]["reading"], reasons["sessions"]["threshold"]) == (8, 8), reasons["sessions"]
+    
+        heavy = start == "heavy"
+        after = weighted + (2 if heavy else 1)
+        code, envelope, out, err = machine.check(repo, heavy=heavy)
+        if after <= 8:
+            opened = support.reading_of(code, envelope, out, err)
+            gate = support.gate_of(opened)
+            assert gate["open"] is True and gate["reasons"] == [], f"{weighted} + 1 = {after} must open: {opened}"
+        else:
+>           refused = support.refusal_of(code, envelope, out, err)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-20/test_w2_20_gate.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 1
+envelope = {'command': 'resources', 'error': {'code': 'RESOURCE_REGISTER_INVALID', 'details': {}, 'message': '--ticket, --session-role and --heavy go with --register'}, 'ok': False, 'result': {}, ...}
+out = '{"ok": false, "command": "resources", "result": {}, "session": "", "error": {"code": "RESOURCE_REGISTER_INVALID", "message": "--ticket, --session-role and --heavy go with --register", "details": {}}}\n'
+err = ''
+
+    def refusal_of(code, envelope, out, err) -> dict:
+        """The reading a refused start check carries: ``ok: false``, error ``RESOURCE_GATE_SHUT``, reading in details."""
+        assert envelope is not None, f"gov resources --check printed no JSON envelope (exit {code})\nstdout: {out}\nstderr: {err}"
+        assert code not in (0, 2), f"a start check with the gate shut ended with exit {code}, not a refusal\n{envelope}"
+        assert envelope.get("ok") is False, f"a refused start check has ok: {envelope.get('ok')}\n{envelope}"
+        error = envelope.get("error")
+>       assert isinstance(error, dict) and error.get("code") == GATE_SHUT_ERROR, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the refusal is not the named error {GATE_SHUT_ERROR}: {error}")
+E       AssertionError: the refusal is not the named error RESOURCE_GATE_SHUT: {'code': 'RESOURCE_REGISTER_INVALID', 'message': '--ticket, --session-role and --heavy go with --register', 'details': {}}
+
+tests/acceptance/W2-20/w2_20_support.py:231: AssertionError
+_ test_DEC_747_at_most_8_holds_after_the_start[8, the reading shuts and a light start is refused] _
+
+machine = <w2_20_support.Machine object at 0x7d90565739b0>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo')
+weighted = 8, start = 'light'
+
+    @pytest.mark.parametrize("weighted, start", [(7, "light"), (7, "heavy"), (8, "light")],
+                             ids=["7, a light start opens", "7, a heavy start is refused",
+                                  "8, the reading shuts and a light start is refused"])
+    def test_DEC_747_at_most_8_holds_after_the_start(machine, repo, weighted, start):
+        """DEC-747 (delegated, staged), a reading of DEC-742: the start check opens on sessions only when the live
+        weighted count plus the new session's weight (1 light, 2 heavy) is at most the maximum; the reading shows the
+        gate shut on sessions once the count is at the maximum. DEC-742's default maximum, 8; the other conditions hold.
+        """
+        assert not machine.config_file.exists()
+        for n in range(3):
+            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bh{n}", heavy=True)
+        for n in range(weighted - 6):
+            machine.register(repo, machine.live_process().pid, ticket=f"DAEO-bl{n}")
+    
+        reading = machine.read(repo)
+        assert reading.get("weighted_sessions") == weighted, f"three heavy and {weighted - 6} light sessions: {reading}"
+        assert reading["thresholds"]["max_weighted_sessions"] == 8, reading
+        reasons = support.reasons_by_condition(reading)
+        if weighted < 8:
+            assert support.gate_of(reading)["open"] is True and reasons == {}, f"{weighted} of 8 must read open: {reading}"
+        else:
+>           assert support.gate_of(reading)["open"] is False, f"8 of 8 leaves no room and must read shut: {reading}"
+E           AssertionError: 8 of 8 leaves no room and must read shut: {'registry': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/home/.gov-os/machine', 'available_memory_bytes': 68719476736, 'load_1m': 0.1, 'nproc': 4, 'sessions': [{'pid': 236724, 'repository': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo', 'ticket': 'DAEO-bh0', 'role': 'engineer', 'heavy': True}, {'pid': 236748, 'repository': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo', 'ticket': 'DAEO-bh1', 'role': 'engineer', 'heavy': True}, {'pid': 236750, 'repository': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo', 'ticket': 'DAEO-bh2', 'role': 'engineer', 'heavy': True}, {'pid': 236752, 'repository': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo', 'ticket': 'DAEO-bl0', 'role': 'engineer', 'heavy': False}, {'pid': 236754, 'repository': '/tmp/pytest-of-usain/pytest-1233/test_DEC_747_at_most_8_holds_a2/this-repo', 'ticket': 'DAEO-bl1', 'role': 'engineer', 'heavy': False}], 'weighted_sessions': 8, 'cleared': [], 'thresholds': {'min_available_memory_bytes': 4294967296, 'max_load_1m': 4, 'max_weighted_sessions': 8}, 'heavy_weight': 2, 'gate': {'open': True, 'reasons': []}}
+E           assert True is False
+
+tests/acceptance/W2-20/test_w2_20_gate.py:179: AssertionError
+2 failed, 23 passed in 5.09s

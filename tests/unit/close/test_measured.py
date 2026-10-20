@@ -183,10 +183,12 @@ def test_any_other_commit_refuses_nothing():
 
 def test_a_commit_of_the_ticket_without_a_role_refuses_like_one_without_implements():
     whole = {"Task": [TICKET], "Role": ["engineer"], "Implements": ["CAP-01"]}
-    _check_trailers([{"sha": "a" * 40, "trailers": whole}], TICKET)
+    no_history = {"after": None, "accepted": {}}
+    _check_trailers("/p", [{"sha": "a" * 40, "parents": [], "trailers": whole}], TICKET, no_history)
     for key in ("Role", "Implements"):
         with pytest.raises(_Finding) as raised:
-            _check_trailers([{"sha": "a" * 40, "trailers": {k: v for k, v in whole.items() if k != key}}], TICKET)
+            _check_trailers("/p", [{"sha": "a" * 40, "parents": [], "trailers": {k: v for k, v in whole.items() if k != key}}],
+                            TICKET, no_history)
         assert raised.value.code == "TRAILER_MISSING" and f"{key}:" in raised.value.message
         assert "a" * 12 in raised.value.message
 
@@ -290,7 +292,9 @@ def test_every_probe_record_of_the_ticket_is_asked_everything(repo):
     _gate(repo)
     later = repo.commit("more work", *TRAILERS, files={"src/b.py": "b\n"})
     _records(repo, later, **{"PR-2": "pass"})  # the first record is now of an earlier round
-    assert "after the probed commit" in _refused(repo)
+    _gate(repo)  # W2-M209: it neither passes nor refuses; the record of the final code decides
+    _records(repo, later, **{"PR-3": "fail"})  # a failing record of the final code refuses with its judgement
+    assert "judgement" in _refused(repo)
 
 
 def test_a_record_of_another_ticket_or_another_type_in_the_folder_is_none_of_the_tickets(repo):
@@ -396,13 +400,20 @@ def test_a_commit_without_a_task_inside_the_tickets_paths_after_the_probed_commi
     assert "stale" in said and rewrite[:12] in said and "src/a.py" in said
 
 
-def test_a_merge_of_the_ticket_is_judged_with_the_paths_it_brings_after_the_probed_commit(repo):
+def test_a_merge_of_the_ticket_is_measured_against_gits_own_merge_of_its_parents(repo):
+    """DEC-754 P-5 (c): the ticket's merge that is git's own merge of its parents passes; one that changes a
+    probed path beyond it refuses, naming the merge and the path."""
     _probe(repo, _work(repo))
     repo.git("checkout", "-q", "-b", "side")
     repo.commit("another ticket's work on the side", "Task: T-0002", "Role: engineer", files={"src/side.py": "s\n"})
     repo.git("checkout", "-q", "main")
     repo.git("merge", "-q", "--no-ff", "--no-gpg-sign", "-m", "merge\n\n" + "\n".join(TRAILERS) + "\n", "side")
-    merge = repo.git("rev-parse", "HEAD").strip()
+    _gate(repo)
+    repo.git("checkout", "-q", "side")
+    repo.commit("more on the side", "Task: T-0002", "Role: engineer", files={"docs/side.md": "d\n"})
+    repo.git("checkout", "-q", "main")
+    repo.git("merge", "-q", "--no-ff", "--no-commit", "side")
+    merge = repo.commit("merge again", *TRAILERS, files={"src/side.py": "changed in the merge\n"})
     said = _refused(repo)
     assert merge[:12] in said and "src/side.py" in said
 

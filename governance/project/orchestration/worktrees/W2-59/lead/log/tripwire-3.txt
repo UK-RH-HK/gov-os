@@ -1,0 +1,171 @@
+{
+ "changes": [
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "head",
+   "before": "74d2290987a7",
+   "after": "67245c6be45b"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M .tickets/DAEO-j8gn.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M .tickets/DAEO-k7hz.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M docs/plan/WAVE_2_WBS.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "status line gone",
+   "line": " M governance/project/prompts/w2-orchestrator.md"
+  },
+  {
+   "tree": "/home/usain/Dynamic-Agentic-Engineering-OS",
+   "change": "acceptance folder",
+   "folder": "W1-49"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .bash_profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .bashrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .gitconfig"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .gitmodules"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .idea"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .mcp.json"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .profile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .ripgreprc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .vscode"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .zprofile"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? .zshrc"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? docs/source"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/README.md"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/conftest.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_auditor.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_code_under_test.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_engineer.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_evaluation_sets.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_fails_closed.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_reads_open.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_still_refused.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/test_w2_58_test_designer.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "status line added",
+   "line": "?? tests/acceptance/W2-58/w2_58_support.py"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-58",
+   "change": "acceptance folder",
+   "folder": "W2-58"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-59",
+   "change": "head",
+   "before": "6d4925abc7ba",
+   "after": "45c6bfae18dd"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-59",
+   "change": "acceptance folder",
+   "folder": "W1-22"
+  },
+  {
+   "tree": "/home/usain/gov-os-worktrees/W2-59",
+   "change": "acceptance folder",
+   "folder": "W1-26"
+  }
+ ]
+}

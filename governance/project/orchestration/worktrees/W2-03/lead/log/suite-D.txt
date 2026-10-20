@@ -1,0 +1,171 @@
+........................................................................ [  5%]
+........................................................................ [ 10%]
+........................................................................ [ 15%]
+...........................................F............................ [ 21%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 36%]
+........................................................................ [ 42%]
+........................................................................ [ 47%]
+..................s.................................................F... [ 52%]
+.................................F...................................... [ 58%]
+........................................................................ [ 63%]
+........................................................................ [ 68%]
+........................................................................ [ 73%]
+........................................................................ [ 79%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 94%]
+.....................................................................    [100%]
+=================================== FAILURES ===================================
+____________ test_a_warm_query_answers_within_half_a_second_at_p95 _____________
+
+measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...4099620804, 0.27852347200678196, 0.3156771799986018, 0.4289165260124719, 0.32696672101155855, 0.329812280004262, ...]}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 0.717 s over 52 queries (limit 0.5 s; the three slowest: [0.717, 1.383, 3.758])
+E       assert 0.716930438997224 <= 0.5
+E        +  where 0.716930438997224 = <function p95 at 0x7a9990fc13a0>([0.33815102399967145, 0.24106377900170628, 0.22014843299984932, 0.21665702099562623, 0.21503657900029793, 0.2720914770034142, ...])
+E        +    where <function p95 at 0x7a9990fc13a0> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:181: AssertionError
+__________ test_a_decision_file_records_its_id[no-type-id-in-grammar] __________
+
+declaration = {'command': 'python3 -m gov.check.citations', 'family': 'authority/role limits', 'id': 'core-decision-citations', 'severity': 'warning', ...}
+history = <test_w1_26_decision_citations.History object at 0x7a999056d2e0>
+form = 'no-type-id-in-grammar'
+
+    @pytest.mark.parametrize("form", ["typed-in-docs-adr", "typed-in-another-folder", "no-type-id-in-grammar"])
+    def test_a_decision_file_records_its_id(declaration, history, form):
+        """A decision file is a Markdown file whose frontmatter has ``type: decision`` or an ``id`` in the
+        ``decision_id`` grammar, in any folder."""
+        if form == "typed-in-docs-adr":
+            history.record("DEC-101")
+        elif form == "typed-in-another-folder":
+            history.record("DEC-101", folder="decisions/2026")
+        else:
+            history.write("decisions/DEC-101.md",
+                          "---\nid: DEC-101\nstatus: ACTIVE\ntitle: A legacy decision\n---\n\n# DEC-101\n\nBody.\n")
+        history.commit("Record a decision", who=OWNER)
+        history.commit("Change the parser (DEC-101)")
+        witness = history.commit(f"Another change ({WITNESS})")
+>       assert_flagged(run_declared(declaration, history.root), [(witness, WITNESS)])
+
+tests/acceptance/W1-26/test_w1_26_decision_citations.py:391: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = <test_w1_26_decision_citations.Answer object at 0x7a99903618e0>
+expected = [('011fc20874efdb2d7012434afb6355530fe488dc', 'DEC-900')]
+
+    def assert_flagged(answer, expected):
+        expected = sorted(expected, key=repr)
+>       assert answer.flagged == expected, (
+            f"the {CODE} findings are not the expected ones\n"
+            f"expected (commit, decision): {expected}\n"
+            f"found:                       {answer.flagged}\n{answer.describe()}")
+E       AssertionError: the DECISION_UNRECORDED findings are not the expected ones
+E         expected (commit, decision): [('011fc20874efdb2d7012434afb6355530fe488dc', 'DEC-900')]
+E         found:                       [('011fc20874efdb2d7012434afb6355530fe488dc', 'DEC-900'), ('eb22b4681f4ad7ea3315ad498cb8f5a043b42f1b', 'DEC-101')]
+E         exit 1
+E         stdout: {
+E           "findings": [
+E             {
+E               "code": "DECISION_UNRECORDED",
+E               "commit": "011fc20874efdb2d7012434afb6355530fe488dc",
+E               "decision": "DEC-900",
+E               "message": "commit 011fc20874ef cites DEC-900, which its tree does not record"
+E             },
+E             {
+E               "code": "DECISION_UNRECORDED",
+E               "commit": "eb22b4681f4ad7ea3315ad498cb8f5a043b42f1b",
+E               "decision": "DEC-101",
+E               "message": "commit eb22b4681f4a cites DEC-101, which its tree does not record"
+E             }
+E           ]
+E         }
+E         
+E         stderr: 
+E       assert [('011fc20874...', 'DEC-101')] == [('011fc20874...', 'DEC-900')]
+E         
+E         Left contains one more item: ('eb22b4681f4ad7ea3315ad498cb8f5a043b42f1b', 'DEC-101')
+E         Use -v to get more diff
+
+tests/acceptance/W1-26/test_w1_26_decision_citations.py:215: AssertionError
+______________ test_a_heading_after_a_closed_fence_records_its_id ______________
+
+declaration = {'command': 'python3 -m gov.check.citations', 'family': 'authority/role limits', 'id': 'core-decision-citations', 'severity': 'warning', ...}
+history = <test_w1_26_decision_citations.History object at 0x7a99903326c0>
+
+    def test_a_heading_after_a_closed_fence_records_its_id(declaration, history):
+        """The fence ends where it is closed: a heading after it is an entry again."""
+        text = register(CONTROL_HEADING) + (
+            "\nHow an entry is written:\n\n```\n### DEC-nnn — The title\n```\n\n"
+            f"### {SUBJECT} — The parser changes\n- **Decision:** A fixture.\n")
+>       judged_with(declaration, history, text, [WITNESS])
+
+tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py:229: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py:137: in judged_with
+    assert_flagged(run_declared(declaration, history.root), [(commit, an_id) for an_id in flagged_ids])
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = <test_w1_26_decision_citations.Answer object at 0x7a999056d970>
+expected = [('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-900')]
+
+    def assert_flagged(answer, expected):
+        expected = sorted(expected, key=repr)
+>       assert answer.flagged == expected, (
+            f"the {CODE} findings are not the expected ones\n"
+            f"expected (commit, decision): {expected}\n"
+            f"found:                       {answer.flagged}\n{answer.describe()}")
+E       AssertionError: the DECISION_UNRECORDED findings are not the expected ones
+E         expected (commit, decision): [('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-900')]
+E         found:                       [('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-101'), ('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-900')]
+E         exit 1
+E         stdout: {
+E           "findings": [
+E             {
+E               "code": "DECISION_UNRECORDED",
+E               "commit": "359da8d173936027bc36c2a6e1d8e18a5253d882",
+E               "decision": "DEC-101",
+E               "message": "commit 359da8d17393 cites DEC-101, which its tree does not record"
+E             },
+E             {
+E               "code": "DECISION_UNRECORDED",
+E               "commit": "359da8d173936027bc36c2a6e1d8e18a5253d882",
+E               "decision": "DEC-900",
+E               "message": "commit 359da8d17393 cites DEC-900, which its tree does not record"
+E             }
+E           ]
+E         }
+E         
+E         stderr: 
+E       assert [('359da8d173...', 'DEC-900')] == [('359da8d173...', 'DEC-900')]
+E         
+E         At index 0 diff: ('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-101') != ('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-900')
+E         Left contains one more item: ('359da8d173936027bc36c2a6e1d8e18a5253d882', 'DEC-900')
+E         Use -v to get more diff
+
+tests/acceptance/W1-26/test_w1_26_decision_citations.py:215: AssertionError
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95
+FAILED tests/acceptance/W1-26/test_w1_26_decision_citations.py::test_a_decision_file_records_its_id[no-type-id-in-grammar]
+FAILED tests/acceptance/W1-26/test_w1_26_decision_register_and_base.py::test_a_heading_after_a_closed_fence_records_its_id
+3 failed, 1361 passed, 1 skipped in 3060.48s (0:51:00)

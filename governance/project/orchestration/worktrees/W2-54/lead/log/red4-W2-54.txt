@@ -1,0 +1,533 @@
+.....................FFFFFFFFFFFFFF..................................... [ 76%]
+......................                                                   [100%]
+=================================== FAILURES ===================================
+_ test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdcba990>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fdcb9370>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_every_read_sends_its_ques0')
+
+    @STAND_IN
+    def test_every_read_sends_its_question_to_the_cpu_embedder_and_nothing_to_the_shared_runner(
+            box, shared, cpu, tmp_path):
+        """*Red.* With the shared runner at OLLAMA_HOST and the CPU embedder at its address: two ``gov retrieve``, two
+        ``gov context``, a semantic search and a retrieval through the public entry each send the CPU embedder at least
+        one text to embed (the question) and send the shared runner none; the search's answer is the CPU embedder's
+        vector (the kiln, where the shared runner's would be the forge). No request to the shared runner names a runner
+        option, and its model stays on the GPU. Today every question goes to OLLAMA_HOST, with ``num_gpu: 0``."""
+        project = S.semantic_project(box, tmp_path / "p", shared, S.ticket_files(), cpu=cpu)
+        assert shared.embed_requests() and not cpu.embedded(), \
+            f"the premise: the index was built through the shared runner only (CPU embedder sent {cpu.embedded()[:2]})"
+        env = S.embed_env(box, shared, cpu)
+        steps = [("gov", "retrieve", "--json", "--root", project, QUESTION),
+                 ("gov", "retrieve", "--json", "--root", project, OTHER),
+                 ("gov", "context", "--json", "--root", project, "TK-W254-TIDES"),
+                 ("gov", "context", "--json", "--root", project, "TK-W254-BAKERY"),
+                 ("search", QUESTION), ("retrieve", OTHER)]
+        answer = None
+        for step in steps:
+            to_shared, to_cpu = len(shared.embed_requests()), len(cpu.embed_requests())
+            if step[0] == "gov":
+                done = S.gov(box, *step[1:], env=env)
+                assert not S.clean(done) and done.envelope().get("ok") is True, done.describe()
+            else:
+                answers, done = S.drive_run(box, project, env, step)
+                assert not S.clean(done), done.describe()
+                answer = answers[0] if step[0] == "search" else answer
+            what = " ".join(str(part) for part in step if part != project)
+            sent = [text[-60:] for request in shared.embed_requests()[to_shared:] for text in request["texts"]]
+>           assert not sent, f"`{what}` sent the shared runner texts to embed: {sent}"
+E           AssertionError: `gov retrieve --json --root who fires the glazed bowls` sent the shared runner texts to embed: ['ry, retrieve relevant passages that answer the query\nQuery: ', 'ages that answer the query\nQuery: who fires the glazed bowls']
+E           assert not ['ry, retrieve relevant passages that answer the query\nQuery: ', 'ages that answer the query\nQuery: who fires the glazed bowls']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:117: AssertionError
+_ test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0e9f0>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0e240>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_a_rebuild_and_a_search_th0')
+
+    @STAND_IN
+    def test_a_rebuild_and_a_search_that_builds_vectors_send_every_chunk_to_the_shared_runner_and_none_to_the_cpu_one(
+            box, shared, cpu, tmp_path):
+        """*Red.* The index of a project is built (the semantic refresh), then a new file is committed and ``gov rebuild``
+        runs, then another file and a search that builds missing vectors (``refresh=True``): every chunk goes to the shared
+        runner, none to the CPU embedder; the search's question goes to the CPU embedder and not to the shared runner. No
+        request to the shared runner names a runner option, and its model stays on the GPU. The build and the rebuild pass
+        today; the search sends its question to OLLAMA_HOST with ``num_gpu: 0``."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        assert _chunks_in(shared.embedded()) == sorted(S.SUBJECTS), \
+            f"the build did not send every chunk to the shared runner: {_chunks_in(shared.embedded())}"
+        env = S.embed_env(box, shared, cpu)
+        cooper, weaver = "The cooper hoops the oak barrels", "The weaver threads the linen warp"
+        S.write(project, "notes/cooper.md", f"# Cooper\n\n{cooper} by the river.\n")
+        S.commit_all(project, "the cooper")
+        done = S.gov(box, "rebuild", "--json", "--root", project, env=env, timeout=300)
+        assert done.returncode == 0 and done.envelope().get("ok") is True, done.describe()
+        assert done.envelope()["result"]["stores"]["semantic"]["status"] == "recreated", done.describe()
+        assert any(cooper in text for text in shared.embedded()), "gov rebuild did not send the new chunk to the shared runner"
+        S.write(project, "notes/weaver.md", f"# Weaver\n\n{weaver} at the loom.\n")
+        S.commit_all(project, "the weaver")
+        asked = len(shared.embedded())
+        answers, done = S.drive_run(box, project, env, ("search-refresh", QUESTION))
+        assert not S.clean(done) and answers[0].get("available") is True, done.describe()
+        assert any(weaver in text for text in shared.embedded()[asked:]), \
+            "the search that builds missing vectors did not send the new chunk to the shared runner"
+        to_cpu = [text for text in cpu.embedded() if cooper in text or weaver in text or _chunks_in([text])]
+        assert not to_cpu, f"chunks were sent to the CPU embedder: {[text[:50] for text in to_cpu]}"
+>       assert not S.sent_for([shared], QUESTION), \
+            f"the search sent its question to the shared runner: {S.sent_for([shared], QUESTION)}"
+E       AssertionError: the search sent its question to the shared runner: ['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: who fires the glazed bowls']
+E       assert not ['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: who fires the glazed bowls']
+E        +  where ['Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery: who fires the glazed bowls'] = <function sent_for at 0x78f9fdc79e40>([<w2_54_support.EmbedderStandIn object at 0x78f9fdb0e9f0>], 'who fires the glazed bowls')
+E        +    where <function sent_for at 0x78f9fdc79e40> = S.sent_for
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:154: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[gpu] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0edb0>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0ea80>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_embedder_at_the_cpu_ad0')
+reported = 'gpu'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'gpu', yet the search answered (available is True, no reason (None), 6 hits); nearest [('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:182: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[partial] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0e2a0>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0f9e0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_embedder_at_the_cpu_ad1')
+reported = 'partial'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'partial', yet the search answered (available is True, no reason (None), 6 hits); nearest [('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:182: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[nothing] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0f350>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0e660>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_embedder_at_the_cpu_ad2')
+reported = 'nothing'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'nothing', yet the search answered (available is True, no reason (None), 6 hits); nearest [('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:182: AssertionError
+_ test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector[other-model] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fdb0de50>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fd976990>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_embedder_at_the_cpu_ad3')
+reported = 'other-model'
+
+    @STAND_IN
+    @pytest.mark.parametrize("reported", ("gpu", "partial", "nothing", "other-model"))
+    def test_an_embedder_at_the_cpu_address_that_does_not_report_the_model_on_the_cpu_gives_no_query_vector(
+            box, shared, cpu, tmp_path, reported):
+        """*Red.* The embedder at the CPU address reports, at ``/api/ps``, the model in GPU memory (``gpu``), half of it
+        there (``partial``), nothing (``nothing``), or only another model on the CPU (``other-model``). A new question then
+        gets no query vector: the semantic search is unavailable with a reason and no hit, ``gov retrieve`` ends with exit
+        code 0 and no traceback, its semantic facet is unavailable with a reason and the lexical route answers; nothing is
+        cached (no file beside the store changes); the question is never sent to the shared runner instead. Once the
+        embedder reports the model on the CPU, the question is embedded there and answered with its vector (the kiln).
+        Today the question is answered by the shared runner at OLLAMA_HOST."""
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        env = S.embed_env(box, shared, cpu)
+        warm, done = S.drive_run(box, project, env, ("search", OTHER))
+        assert not S.clean(done), done.describe()
+        beside = {rel: S.sha256(project / rel) for rel in S.runtime_others(project)}
+        cpu.ps, contacted = reported, len(cpu.requests)
+        answers, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+        faults = S.unavailable_with_reason(answers[0])
+>       assert not faults, (f"the CPU address reports {reported!r}, yet the search answered ({', '.join(faults)}); "
+                            f"nearest {S.hits_of(answers[0])[:2]}")
+E       AssertionError: the CPU address reports 'other-model', yet the search answered (available is True, no reason (None), 6 hits); nearest [('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.056141726672649384), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E       assert not ['available is True', 'no reason (None)', '6 hits']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:182: AssertionError
+___________ test_a_vector_cached_under_round_3_s_key_is_never_served ___________
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd9abb60>
+cpu = <w2_54_support.EmbedderStandIn object at 0x78f9fd9a8a40>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_a_vector_cached_under_rou0')
+
+    @STAND_IN
+    def test_a_vector_cached_under_round_3_s_key_is_never_served(box, shared, cpu, tmp_path):
+        """*Red.* The project's cache file holds the question's vector as round 3 wrote it: computed by the shared runner
+        (the forge's), under round 3's key (model, revision, sha256 of the exact text sent; both the text round 3 sent and
+        the text sent now), in round 3's layout. The read asks the CPU embedder and answers with its vector, the kiln:
+        the answer a new store built alike gives, hit for hit and distance for distance; asked again after another text,
+        the same. The shared runner is asked nothing. Today round 3's entry is served (the forge)."""
+        twin_shared = S.EmbedderStandIn(device="gpu", targets={QUESTION: S.SUBJECTS[S.FORGE]})
+        twin_cpu = S.EmbedderStandIn(device="cpu", targets={QUESTION: S.SUBJECTS[S.KILN]})
+        try:
+            twin = S.semantic_project(box, tmp_path / "twin", twin_shared, cpu=twin_cpu)
+            answers, done = S.drive_run(box, twin, S.embed_env(box, twin_shared, twin_cpu), ("search", QUESTION))
+            assert not S.clean(done), done.describe()
+            reference, sent = answers[0], S.sent_for([twin_shared, twin_cpu], QUESTION)
+        finally:
+            twin_shared.close()
+            twin_cpu.close()
+        assert sent, "the premise: the question was never sent to be embedded"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=cpu)
+        planted = S.plant_round_3_entry(project, [S.ROUND_3_PREFIX + QUESTION, *sent], S.word_vector(S.SUBJECTS[S.FORGE]))
+        assert S.runtime_others(project) == [planted.relative_to(project).as_posix()], S.runtime_others(project)
+        env = S.embed_env(box, shared, cpu)
+        first, done = S.drive_run(box, project, env, ("search", QUESTION))
+        assert not S.clean(done), f"the read was not clean ({', '.join(S.clean(done))})\n{done.describe()}"
+>       assert first[0].get("available") is True and _nearest(first[0]) == [S.KILN], (
+            f"the read served the vector cached by the shared runner under round 3's key (nearest "
+            f"{S.hits_of(first[0])[:2]}), not the CPU embedder's (the kiln)")
+E       AssertionError: the read served the vector cached by the shared runner under round 3's key (nearest [('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]), not the CPU embedder's (the kiln)
+E       assert (True is True and ['notes/forge.md'] == ['notes/kiln.md']
+E        +  where True = <built-in method get of dict object at 0x78f9fc047480>('available')
+E        +    where <built-in method get of dict object at 0x78f9fc047480> = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '1e2346adb24a8d09634c6aa0', 'distance': 0.0, 'end_line'...9f', 'distance': 1.100000023841858, 'end_line': 3, 'parent_id': '9d20a78a35abbd674b9f34bc', ...}], 'reason': None, ...}.get
+E         
+E         At index 0 diff: 'notes/forge.md' != 'notes/kiln.md'
+E         Use -v to get more diff)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:231: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[GOV_OLLAMA_BIN] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd975c10>
+daemons = <w2_54_support.Daemons object at 0x78f9fd977620>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_a_read_starts_the_cpu_emb0')
+place = 'GOV_OLLAMA_BIN'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x78f9fd977620>
+address = '127.0.0.1:49019'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+>       assert serves, "the read started no Ollama executable"
+E       AssertionError: the read started no Ollama executable
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:252: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[PATH] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd9a93a0>
+daemons = <w2_54_support.Daemons object at 0x78f9fd9a9220>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_a_read_starts_the_cpu_emb1')
+place = 'PATH'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x78f9fd9a9220>
+address = '127.0.0.1:43701'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+>       assert serves, "the read started no Ollama executable"
+E       AssertionError: the read started no Ollama executable
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:252: AssertionError
+_ test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it[HOME] _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd975b20>
+daemons = <w2_54_support.Daemons object at 0x78f9fd976090>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_a_read_starts_the_cpu_emb2')
+place = 'HOME'
+
+    @STAND_IN
+    @pytest.mark.parametrize("place", S.EXECUTABLE_PLACES)
+    def test_a_read_starts_the_cpu_embedder_at_its_address_with_no_gpu_and_never_stops_it(
+            box, shared, daemons, tmp_path, place):
+        """*Red.* Nothing answers at the CPU embedder's address; the stand-in ``ollama`` is where DEC-260 looks
+        (``place``: ``GOV_OLLAMA_BIN``, ``PATH``, ``~/.local/ollama/bin/ollama``). ``gov retrieve`` starts it as ``serve``,
+        told to serve at that address (its OLLAMA_HOST) and to use no GPU, asks it the question and gets the semantic
+        answer, with exit code 0; the shared runner is asked nothing. After the read the started embedder still serves and
+        was sent no stop; a second read uses it and starts nothing. Today no read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), place)
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        semantic = S.facets_of(run).get("semantic") or {}
+        assert semantic.get("available") is True, \
+            f"the read did not get its semantic answer: {semantic}; the executable's runs: {daemons.records('exec')}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x78f9fd976090>
+address = '127.0.0.1:34339'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+>       assert serves, "the read started no Ollama executable"
+E       AssertionError: the read started no Ollama executable
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:252: AssertionError
+_ test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd9ab080>
+daemons = <w2_54_support.Daemons object at 0x78f9fd9aa120>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_two_reads_at_once_leave_o0')
+
+    @STAND_IN
+    def test_two_reads_at_once_leave_one_cpu_embedder_serving_and_both_get_their_answer(
+            box, shared, daemons, tmp_path):
+        """*Red.* Two ``gov retrieve`` started together, nothing at the CPU embedder's address, the stand-in executable
+        at ``GOV_OLLAMA_BIN`` (it takes a second to listen, so both reads find nothing): both end with exit code 0 and
+        their semantic answer; every start was told that address and no GPU; afterwards one embedder serves there, and
+        nothing stopped it. Today neither read starts anything at that address."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), "GOV_OLLAMA_BIN")
+        waits = [daemons.start(S.gov_argv("retrieve", "--json", "--root", project, text), cwd=box.workdir / "elsewhere",
+                               env=env) for text in (QUESTION, OTHER)]
+        runs = [wait(S.CALL_TIMEOUT_S) for wait in waits]
+        for text, run in zip((QUESTION, OTHER), runs):
+            assert not S.clean(run), f"the read of {text!r} was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+            assert (S.facets_of(run).get("semantic") or {}).get("available") is True, \
+                f"the read of {text!r} did not get its semantic answer: {S.facets_of(run)}; runs {daemons.records()}"
+>       _started_alone_at(daemons, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+daemons = <w2_54_support.Daemons object at 0x78f9fd9aa120>
+address = '127.0.0.1:44681'
+
+    def _started_alone_at(daemons, address):
+        """The runs of ``serve``: each told to serve at ``address`` and to use no GPU."""
+        serves = daemons.serves()
+>       assert serves, "the read started no Ollama executable"
+E       AssertionError: the read started no Ollama executable
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:252: AssertionError
+_ test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd977320>
+daemons = <w2_54_support.Daemons object at 0x78f9fd974620>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_address_held_by_someth0')
+
+    @STAND_IN
+    def test_an_address_held_by_something_that_is_not_an_embedder_gives_no_semantic_answer_and_no_fallback(
+            box, shared, daemons, tmp_path):
+        """*Red.* The CPU embedder's address is held by a listener that does not answer as Ollama (HTTP 404 to every
+        request); the stand-in executable is at ``GOV_OLLAMA_BIN``. ``gov retrieve`` ends with exit code 0 and no
+        traceback; its semantic facet is unavailable with a reason, its lexical route answers; the semantic search is
+        unavailable with a reason; the question is not sent to the shared runner, and no embedder is started at another
+        address. Today the shared runner answers the question."""
+        listener = S.NotAnEmbedder()
+        try:
+            project = S.semantic_project(box, tmp_path / "p", shared, cpu=listener.host)
+            env = daemons.env(S.embed_env(box, shared, listener.host), "GOV_OLLAMA_BIN")
+>           _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, listener.host)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:360: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd977320>
+daemons = <w2_54_support.Daemons object at 0x78f9fd974620>
+project = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_an_address_held_by_someth0/p')
+env = {'GIT_CONFIG_NOSYSTEM': '1', 'GOV_OLLAMA_BIN': '/tmp/pytest-of-usain/pytest-3866/test_an_address_held_by_someth0/daemons/stand-in/ollama', 'GOV_QUERY_OLLAMA_HOST': '127.0.0.1:39409', 'HF_HUB_OFFLINE': '1', ...}
+address = '127.0.0.1:39409'
+
+    def _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, address):
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        facets = S.facets_of(run)
+        faults = S.unavailable_with_reason(facets.get("semantic") or {})
+>       assert not faults, f"the semantic facet is not unavailable with a reason ({', '.join(faults)}): {facets}"
+E       AssertionError: the semantic facet is not unavailable with a reason (available is True, no reason (None)): {'lexical': {'available': True, 'reason': None}, 'semantic': {'available': True, 'reason': None}}
+E       assert not ['available is True', 'no reason (None)']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:335: AssertionError
+_ test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers _
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd9aa480>
+daemons = <w2_54_support.Daemons object at 0x78f9fd9abd40>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_with_no_executable_and_no0')
+
+    @STAND_IN
+    def test_with_no_executable_and_nothing_at_the_cpu_address_the_semantic_facet_is_unavailable_and_the_rest_answers(
+            box, shared, daemons, tmp_path):
+        """*Red.* Nothing answers at the CPU embedder's address and no ``ollama`` is where DEC-260 looks (no
+        ``GOV_OLLAMA_BIN``, none on PATH, none under HOME): as with a listener that is not an embedder, exit code 0, no
+        traceback, the semantic facet unavailable with a reason, the other routes answering, no fallback to the shared
+        runner. Today the shared runner answers the question."""
+        address = f"127.0.0.1:{S._dead_port()}"
+        project = S.semantic_project(box, tmp_path / "p", shared, cpu=address)
+        env = daemons.env(S.embed_env(box, shared, address), None)
+>       _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, address)
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:375: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_54_support.Box object at 0x78f9fdab8560>
+shared = <w2_54_support.EmbedderStandIn object at 0x78f9fd9aa480>
+daemons = <w2_54_support.Daemons object at 0x78f9fd9abd40>
+project = PosixPath('/tmp/pytest-of-usain/pytest-3866/test_with_no_executable_and_no0/p')
+env = {'GIT_CONFIG_NOSYSTEM': '1', 'GOV_QUERY_OLLAMA_HOST': '127.0.0.1:45527', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3866/test_with_no_executable_and_no0/daemons/home', ...}
+address = '127.0.0.1:45527'
+
+    def _no_semantic_answer_and_no_fallback(box, shared, daemons, project, env, address):
+        run = daemons.run(S.gov_argv("retrieve", "--json", "--root", project, QUESTION), cwd=box.workdir / "elsewhere",
+                          env=env)
+        assert not S.clean(run), f"the read was not clean ({', '.join(S.clean(run))})\n{run.describe()}"
+        facets = S.facets_of(run)
+        faults = S.unavailable_with_reason(facets.get("semantic") or {})
+>       assert not faults, f"the semantic facet is not unavailable with a reason ({', '.join(faults)}): {facets}"
+E       AssertionError: the semantic facet is not unavailable with a reason (available is True, no reason (None)): {'lexical': {'available': True, 'reason': None}, 'semantic': {'available': True, 'reason': None}}
+E       assert not ['available is True', 'no reason (None)']
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:335: AssertionError
+_ test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80 _
+
+    def test_the_change_record_states_w1_21_s_hit_at_5_with_cpu_query_vectors_at_or_above_80():
+        """*Red.* The change record has a line that names W1-21, ``hit@5`` and CPU query vectors and states the measured
+        figure (a mean, written with its decimals, for example ``81.67``) at or above the pass line of 80 (DEC-414); a line
+        naming round 3's GPU measurement (``5f038b47``) does not count. The figure itself is W1-21's own case, run by the
+        lead (README, "Round 4"). Today no such line exists."""
+        path = S.REPO_ROOT / S.CHANGE_RECORD_REL
+        assert path.is_file(), f"there is no {S.CHANGE_RECORD_REL}"
+        lines = [line for line in path.read_text(encoding="utf-8").splitlines()
+                 if "W1-21" in line and "hit@5" in line and "CPU" in line and re.search(r"query[- ]vector", line, re.I)
+                 and "5f038b47" not in line]
+>       assert lines, (f"{S.CHANGE_RECORD_REL} has no line naming W1-21, hit@5 and CPU query vectors (the figure of "
+                       "KPI success 6)")
+E       AssertionError: docs/changes/W2-54-CIT-E.md has no line naming W1-21, hit@5 and CPU query vectors (the figure of KPI success 6)
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_cpu_embedder.py:391: AssertionError
+14 failed, 80 passed, 2 deselected in 1059.04s (0:17:39)

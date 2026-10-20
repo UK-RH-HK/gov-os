@@ -1,0 +1,282 @@
+/home/usain/gov-os-worktrees/W2-54/src/gov/__init__.py
+....................................FFFFF....F....F..........            [100%]
+=================================== FAILURES ===================================
+_ test_one_question_asked_again_after_others_gives_the_same_answer_across_processes _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d94397530>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_one_question_asked_again_0')
+
+    @STAND_IN
+    def test_one_question_asked_again_after_others_gives_the_same_answer_across_processes(box, embedder, tmp_path):
+        """*Red.* Each search in a process of its own: the question, then other questions, then the question again,
+        and again right after itself. The same hits, in the same order, at the same distances, every time."""
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        answers = [S.ask(box, project, embedder, QUESTION)]
+        for other in OTHERS:
+            S.ask(box, project, embedder, other)
+            answers.append(S.ask(box, project, embedder, QUESTION))
+        answers.append(S.ask(box, project, embedder, QUESTION))
+        assert embedder.asked_for(OTHERS[0]) >= 1, "the premise: the other questions were sent to the embedder"
+>       _answers_agree(answers, QUESTION)
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answers = [{'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.483027487993...5e7865195f64625', 'distance': 1.0, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}]
+question = 'who fires the glazed bowls'
+
+    def _answers_agree(answers, question):
+        first = S.hits_of(answers[0])
+        assert answers[0].get("available") is True and first, f"the first answer to {question!r} has no hit: {answers[0]}"
+        for number, answer in enumerate(answers[1:], start=2):
+            assert answer.get("available") is True, f"answer {number} to {question!r} is unavailable: {answer}"
+>           assert S.hits_of(answer) == first, (
+                f"one question, two answers in one store: answer {number} to {question!r} differs from the first\n"
+                f"first: {first[:4]}\nthen:  {S.hits_of(answer)[:4]}")
+E           AssertionError: one question, two answers in one store: answer 2 to 'who fires the glazed bowls' differs from the first
+E             first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E             then:  [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274), ('e63e003365e7865195f64625', 'notes/tides.md', 0.7910680770874023), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E           assert [('6ed39f6f20...ary.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E             
+E             At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036)
+E             Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:41: AssertionError
+_ test_one_question_asked_again_after_others_gives_the_same_answer_within_one_process _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d9414e960>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_one_question_asked_again_1')
+
+    @STAND_IN
+    def test_one_question_asked_again_after_others_gives_the_same_answer_within_one_process(box, embedder, tmp_path):
+        """*Red.* The same, every search in one process."""
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        calls = [("search", QUESTION)]
+        for other in OTHERS:
+            calls += [("search", other), ("search", QUESTION)]
+        answers = S.drive(box, project, embedder, *calls)
+>       _answers_agree(answers[0::2], QUESTION)
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answers = [{'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.483027487993...5e7865195f64625', 'distance': 1.0, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}]
+question = 'who fires the glazed bowls'
+
+    def _answers_agree(answers, question):
+        first = S.hits_of(answers[0])
+        assert answers[0].get("available") is True and first, f"the first answer to {question!r} has no hit: {answers[0]}"
+        for number, answer in enumerate(answers[1:], start=2):
+            assert answer.get("available") is True, f"answer {number} to {question!r} is unavailable: {answer}"
+>           assert S.hits_of(answer) == first, (
+                f"one question, two answers in one store: answer {number} to {question!r} differs from the first\n"
+                f"first: {first[:4]}\nthen:  {S.hits_of(answer)[:4]}")
+E           AssertionError: one question, two answers in one store: answer 2 to 'who fires the glazed bowls' differs from the first
+E             first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E             then:  [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274), ('e63e003365e7865195f64625', 'notes/tides.md', 0.7910680770874023), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E           assert [('6ed39f6f20...ary.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E             
+E             At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036)
+E             Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:41: AssertionError
+_ test_the_retrieval_s_public_entry_gives_one_bundle_for_one_question_whatever_was_asked_before _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d9414e1b0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_the_retrieval_s_public_en0')
+
+    @STAND_IN
+    def test_the_retrieval_s_public_entry_gives_one_bundle_for_one_question_whatever_was_asked_before(
+            box, embedder, tmp_path):
+        """*Red.* ``gov.retrieval.retrieve.retrieve``: one question, another between, the same question again (in one
+        process and in another): the same bundle, the same evidence in the same order."""
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        within = S.drive(box, project, embedder, ("retrieve", QUESTION), ("retrieve", OTHERS[0]), ("retrieve", QUESTION))
+        S.drive(box, project, embedder, ("retrieve", OTHERS[1]))
+        later = S.drive(box, project, embedder, ("retrieve", QUESTION))[0]
+        bundles = [within[0], within[2], later]
+        evidence = [[(item.get("chunk_id"), item.get("path")) for item in bundle.get("evidence") or []]
+                    for bundle in bundles]
+        assert evidence[0], f"the premise: the retrieval returned no evidence: {S.canonical(within[0])[:800]}"
+        assert bundles[0]["facets"].get("semantic", {}).get("available") is True, \
+            f"the premise: the semantic route did not answer: {bundles[0]['facets']}"
+        for number, items in enumerate(evidence[1:], start=2):
+>           assert items == evidence[0], (f"one question, two bundles in one store (bundle {number}):\n"
+                                          f"first: {evidence[0]}\nthen:  {items}")
+E           AssertionError: one question, two bundles in one store (bundle 3):
+E             first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md'), ('e63e003365e7865195f64625', 'notes/tides.md'), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md'), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md'), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md'), ('95e651f38c14608c2fcf9d39', 'notes/apiary.md')]
+E             then:  [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md'), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md'), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md'), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md'), ('95e651f38c14608c2fcf9d39', 'notes/apiary.md'), ('e63e003365e7865195f64625', 'notes/tides.md')]
+E           assert [('6ed39f6f20...es/tides.md')] == [('6ed39f6f20...s/apiary.md')]
+E             
+E             At index 1 diff: ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md') != ('e63e003365e7865195f64625', 'notes/tides.md')
+E             Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:89: AssertionError
+_ test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet __
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d9414e930>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_gov_context_twice_for_eac0')
+
+    @STAND_IN
+    def test_gov_context_twice_for_each_ticket_with_others_between_gives_one_packet(box, embedder, tmp_path):
+        """*Red.* Three tickets, each asking the retrieval its own question. ``gov context --json`` for each, then for
+        each again after the others, then in the opposite order: one packet and one hash per ticket."""
+        project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
+        tickets = list(S.QUESTION_TICKETS)
+        packets = collections.defaultdict(list)
+        for ticket_id in tickets + tickets + tickets[::-1]:
+            done = S.gov(box, "context", "--json", "--root", project, ticket_id, env=S.embed_env(box, embedder))
+            assert done.returncode == 0, done.describe()
+            packets[ticket_id].append(done.envelope()["result"])
+        assert len(embedder.embedded()) > 0, "the premise: no context asked the embedder anything"
+        for ticket_id, computed in packets.items():
+            assert computed[0][S.K_SUPPLEMENTARY], f"the premise: {ticket_id}'s context holds no retrieval item"
+            hashes = [packet[S.K_HASH] for packet in computed]
+>           assert len(set(hashes)) == 1, (
+                f"{ticket_id}: {len(set(hashes))} hashes in {len(hashes)} computations in one store: {hashes}\n"
+                f"supplementary ids: {[[item.get('id') for item in p[S.K_SUPPLEMENTARY]] for p in computed]}")
+E           AssertionError: TK-W254-BAKERY: 3 hashes in 3 computations in one store: ['67184e6d908b871e49c93cd92561459cf99eb55f3fd1b8f0c2d99ccd39c9e64c', '5bd7fbeb91c776ffbee22210c6e5c627ba2887d62975f66ca7b96706f6fc994c', '45cef3b82cb7aa9da946d4adba6af4c46149ad05c1e5cbc58663b90a027abdb5']
+E             supplementary ids: [['TK-W254-BAKERY', 'TK-W254-BAKERY', '862c3c36c5c13134e1bb4885', 'e63e003365e7865195f64625', '1e2346adb24a8d09634c6aa0', '6ed39f6f20a6645c722a8a9f', '7e60fe9e8921c9ac62d2d213', '95e651f38c14608c2fcf9d39', 'CHARTER-W254-Q', 'CHARTER-W254-Q'], ['TK-W254-BAKERY', '862c3c36c5c13134e1bb4885', 'TK-W254-BAKERY', '7e60fe9e8921c9ac62d2d213', '1e2346adb24a8d09634c6aa0', '6ed39f6f20a6645c722a8a9f', '95e651f38c14608c2fcf9d39', 'CHARTER-W254-Q', 'e63e003365e7865195f64625', 'CHARTER-W254-Q'], ['TK-W254-BAKERY', '862c3c36c5c13134e1bb4885', 'TK-W254-BAKERY', 'e63e003365e7865195f64625', '1e2346adb24a8d09634c6aa0', '6ed39f6f20a6645c722a8a9f', '7e60fe9e8921c9ac62d2d213', '95e651f38c14608c2fcf9d39', 'CHARTER-W254-Q', 'CHARTER-W254-Q']]
+E           assert 3 == 1
+E            +  where 3 = len({'45cef3b82cb7aa9da946d4adba6af4c46149ad05c1e5cbc58663b90a027abdb5', '5bd7fbeb91c776ffbee22210c6e5c627ba2887d62975f66ca7b96706f6fc994c', '67184e6d908b871e49c93cd92561459cf99eb55f3fd1b8f0c2d99ccd39c9e64c'})
+E            +    where {'45cef3b82cb7aa9da946d4adba6af4c46149ad05c1e5cbc58663b90a027abdb5', '5bd7fbeb91c776ffbee22210c6e5c627ba2887d62975f66ca7b96706f6fc994c', '67184e6d908b871e49c93cd92561459cf99eb55f3fd1b8f0c2d99ccd39c9e64c'} = set(['67184e6d908b871e49c93cd92561459cf99eb55f3fd1b8f0c2d99ccd39c9e64c', '5bd7fbeb91c776ffbee22210c6e5c627ba2887d62975f66ca7b96706f6fc994c', '45cef3b82cb7aa9da946d4adba6af4c46149ad05c1e5cbc58663b90a027abdb5'])
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:112: AssertionError
+_ test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d9416e840>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_the_context_check_is_gree0')
+
+    @STAND_IN
+    def test_the_context_check_is_green_over_several_tickets_with_an_embedder_whose_vectors_vary(
+            box, embedder, tmp_path):
+        """*Red.* The context-reproducibility check, run as its declaration says, over a project with three tickets,
+        the stand-in behind every context: green. Today it prints ``FAIL: <ticket>: <hash> != <hash>``."""
+        project = S.semantic_project(box, tmp_path / "p", embedder, S.ticket_files())
+        before = len(embedder.embedded())
+        done = S.run(["sh", "-c", S.yaml.safe_load(
+            (S.REPO_ROOT / S.CONTEXT_DECLARATION_REL).read_text(encoding="utf-8"))["command"]],
+            cwd=project, env=S.embed_env(box, embedder), timeout=S.CHECK_TIMEOUT_S)
+        assert len(embedder.embedded()) > before, "the premise: the check's contexts never reached the embedder"
+>       assert done.returncode == 0 and "FAIL" not in done.stdout, \
+            f"two computations of a ticket's context in one store give two hashes\n{done.describe()}"
+E       AssertionError: two computations of a ticket's context in one store give two hashes
+E         sh -c python3 -m gov.context.context_check
+E         exit code: 1 (0.2 s)
+E         stdout:
+E         FAIL: TK-W254-BAKERY: 67184e6d908b871e49c93cd92561459cf99eb55f3fd1b8f0c2d99ccd39c9e64c != c4009e7db3fe79a96c635e2355e485f4058a1271f72b7d4f51aab85f77b152f1
+E         FAIL: TK-W254-ORCHARD: 674a85164ba0a88dddb69fdd147ee848edd1a24f8401ecf5be4e9cbc680c3169 != dc931b7c183c4bf9a042e1d022869d36549a984e34152d5f13b724069af95dc3
+E         FAIL: TK-W254-TIDES: 7ff355fa5850bb728bc87288dca1940d84d2933f6965a8e494cf43f44189f33b != a1a241201feaf408af7b871861c25f4be4bd0080e52c87f725ad281a6730daa4
+E         context-reproducibility: 3 ticket(s) failed, 0 error(s)
+E         
+E         stderr:
+E         
+E       assert (1 == 0)
+E        +  where 1 = <w2_54_support.Run object at 0x774d94200b60>.returncode
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:129: AssertionError
+_ test_a_stored_vector_is_not_used_under_another_revision_and_is_used_again_when_the_revision_matches _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+embedder = <w2_54_support.EmbedderStandIn object at 0x774d943ce7b0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_a_stored_vector_is_not_us0')
+
+    @STAND_IN
+    def test_a_stored_vector_is_not_used_under_another_revision_and_is_used_again_when_the_revision_matches(
+            box, embedder, tmp_path):
+        """*Red.* The model list reports one digest (the model's revision): the question goes to the kiln. Then it
+        reports another digest, and that build of the model sends the question to the forge: the answer is the forge's,
+        or the facet is unavailable with no hit, never the kiln's. Then the first digest again: the first answer, hit
+        for hit and distance for distance, whatever was embedded meanwhile. Every request to be embedded names the
+        pinned model (the key's model part; no public interface selects another model). Today the last answer differs
+        from the first."""
+        embedder.targets = {QUESTION: S.SUBJECTS[S.KILN]}
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        first = S.ask(box, project, embedder, QUESTION)
+        assert [hit[1] for hit in S.hits_of(first)][:1] == [S.KILN], f"the premise: {S.hits_of(first)[:3]}"
+        rebuilt = S.EmbedderStandIn(digest=S.OTHER_DIGEST, targets={QUESTION: S.SUBJECTS[S.FORGE]})
+        try:
+            S.ask(box, project, rebuilt, OTHERS[0])
+            other = S.ask(box, project, rebuilt, QUESTION)
+            models = {request.get("model") for request in rebuilt.requests if "texts" in request}
+        finally:
+            rebuilt.close()
+        if other.get("available"):
+            assert [hit[1] for hit in S.hits_of(other)][:1] == [S.FORGE], (
+                f"under another revision of the model the question got the vector stored under the first: "
+                f"{S.hits_of(other)[:2]}")
+        else:
+            assert other.get("hits") == [], f"an unavailable facet gave hits: {other}"
+        S.ask(box, project, embedder, OTHERS[1])
+        back = S.ask(box, project, embedder, QUESTION)
+        models |= {request.get("model") for request in embedder.requests if "texts" in request}
+        assert models == {S.EMBED_MODEL}, f"vectors were asked of another model than the pinned one: {models}"
+>       assert S.hits_of(back) == S.hits_of(first), (
+            "with the first revision again, the question did not get the vector stored under it\n"
+            f"first: {S.hits_of(first)[:3]}\nback:  {S.hits_of(back)[:3]}")
+E       AssertionError: with the first revision again, the question did not get the vector stored under it
+E         first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.056141726672649384), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E         back:  [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.05614167079329491), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.8849867582321167), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 1.0)]
+E       assert [('6ed39f6f20...858623504639)] == [('6ed39f6f20...858623504639)]
+E         
+E         At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.05614167079329491) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.056141726672649384)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:195: AssertionError
+_ test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before _
+
+box = <w2_54_support.Box object at 0x774d94132e70>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3253/test_with_the_real_embedder_on0')
+
+    @pytest.mark.skipif(bool(S.real_embedder_lacking()), reason="; ".join(S.real_embedder_lacking()) or "none")
+    def test_with_the_real_embedder_one_question_gives_one_answer_whatever_was_asked_before(box, tmp_path):
+        """*Red* where the variation reproduces. **Needs the real embedder** (``ollama`` with ``qwen3-embedding:0.6b``),
+        ``sqlite_vec`` and ``gitleaks``; skips with the reason otherwise. In this machine's own environment: the
+        question, other questions, the question again, in separate processes and in one: one answer."""
+        env = S.real_env(box)
+        project = S.new_repo(tmp_path / "real")
+        S.adopt_embedded(project)
+        for rel, text in S.SUBJECTS.items():
+            S.write(project, rel, text)
+        S.commit_all(project)
+        report = S.drive_env(box, project, env, ("refresh",), ("load",))[0]
+        assert report.get("available") is True, f"the vectors were not built with the real embedder: {report}"
+        answers = [S.drive_env(box, project, env, ("search", QUESTION))[0]]
+        for other in OTHERS:
+            S.drive_env(box, project, env, ("search", other))
+            answers.append(S.drive_env(box, project, env, ("search", QUESTION))[0])
+        calls = [("search", QUESTION)]
+        for other in reversed(OTHERS):
+            calls += [("search", other), ("search", QUESTION)]
+        answers += S.drive_env(box, project, env, *calls)[0::2]
+>       _answers_agree(answers, QUESTION)
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:298: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answers = [{'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.365485727787...istance': 0.8181752562522888, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}, ...]
+question = 'who fires the glazed bowls'
+
+    def _answers_agree(answers, question):
+        first = S.hits_of(answers[0])
+        assert answers[0].get("available") is True and first, f"the first answer to {question!r} has no hit: {answers[0]}"
+        for number, answer in enumerate(answers[1:], start=2):
+            assert answer.get("available") is True, f"answer {number} to {question!r} is unavailable: {answer}"
+>           assert S.hits_of(answer) == first, (
+                f"one question, two answers in one store: answer {number} to {question!r} differs from the first\n"
+                f"first: {first[:4]}\nthen:  {S.hits_of(answer)[:4]}")
+E           AssertionError: one question, two answers in one store: answer 2 to 'who fires the glazed bowls' differs from the first
+E             first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.3654857277870178), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.5830747485160828), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.6209769248962402), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.7206838726997375)]
+E             then:  [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.3643771708011627), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.5830842852592468), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.6205989718437195), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.7227341532707214)]
+E           assert [('6ed39f6f20...089525222778)] == [('6ed39f6f20...934515953064)]
+E             
+E             At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.3643771708011627) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.3654857277870178)
+E             Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_vector.py:41: AssertionError
+7 failed, 54 passed in 62.26s (0:01:02)
