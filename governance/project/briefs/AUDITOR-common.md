@@ -9,6 +9,8 @@ Every independent-auditor brief the orchestrator writes for W2-25, W2-28, W2-30 
 - Until W2-58 lands, the guard still refuses some reads Policy 2 opened (searches that start at the repository root, `governance/project/` or `.claude/`): take the refusal, never look for another form, search named folders instead, and count the refusals in your report.
 - You never ask or notify the owner directly, never use a question box and never run `owner-ping` (DEC-855): anything that needs the owner goes into your report as a package, in the six parts of DEC-818, saying whether it blocks your audit or only part of it.
 
+- An entry whose status line says `SUPERSEDED by DEC-n`, or whose "Changed by" note covers a part, is not in force for that part; judge against the newer entry. Anything you find still enforcing a superseded decision without a recorded reason is a finding, naming both decisions and the place (DEC-866).
+
 ## How you judge (owner, the w2 prompt's section 14)
 
 - **The threat model is ADR-0001's** (`docs/adr/ADR-0001-threat-model.md`): the Gov OS guards against honest agent mistakes, plausible accidents and drift in ordinary work, not against a deliberate adversary with the owner's privileges. Machinery against an adversary the design cannot stop produces endless review loops.
