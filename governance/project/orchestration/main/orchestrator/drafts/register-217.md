@@ -1,0 +1,15 @@
+
+## 217. Owner answer of 2026-10-16: one stable launch command for leads and workers (register v0.217, appended by the W1 orchestrator on branch `w1/integrate`)
+
+### DEC-715 — One stable launch command for leads as well as workers, on the Wave 2 list, ranked high
+- **Status:** ACCEPTED (owner, 2026-10-16) · **Under:** DEC-183, DEC-205, DEC-206, DEC-460 · **Basis:** after the WSL restart of 2026-10-15 the orchestrator wrote the brief for W1-42 run 8c (verify, checkpoint, return) and started its lead by hand. Its first two launches had the form `cd ~/gov-os-worktrees/W1-42 && GOV_ROLE=… GOV_TICKET=… /home/usain/.local/bin/claude …`, which matched neither of the owner's allow rules (`Bash(cd /home/usain/gov-os-worktrees/:*)`, `Bash(~/.local/bin/claude:*)`); a first one also used a shell variable in a write target, which the guard refuses. Claude Code's auto-mode classifier denied them ("Create Unsafe Agents"). The owner gave the form the rules allow: `cd /home/usain/gov-os-worktrees/<W1 id> && ~/.local/bin/claude -p --model claude-opus-5-5 … --settings '{"env":{"GOV_ROLE":"…","GOV_TICKET":"…"}}' < <brief> > <log> 2>&1 &`. The classifier denied that form too, in the same words (LAUNCH_BLOCKED); the owner starts run 8c through the operator. Each fresh session writes the launch by hand, so each one can drift from it.
+- **Decision:** on the Wave 2 list, ranked high, beside starting leads through the launcher: **one stable launch command for leads as well as workers**, for example `gov launch lead <ticket>`.
+  - The command builds the whole `claude` invocation itself (absolute paths, the identity in `--settings`, the model, background mode, the log file and the PID file), so no session writes that command by hand and no fresh session can drift from it.
+  - The kernel template's settings carry one narrow allow rule for it, `Bash(gov launch:*)`, which replaces the broad rule for any `claude` command, so every adopted project can start leads and workers under Auto mode without a permission given by hand.
+  - It is tested like any command: it refuses an unknown ticket or role, records the model and the PID, and behaves the same from any session.
+  - Raw `claude` launches stay unallowed by design; the stable command is the only way in.
+- **Until then (Wave 1):** the lead launch form is the owner's above: an absolute `cd` path, `~/.local/bin/claude` first, the identity in `--settings` only, no environment prefix. When it is blocked, the orchestrator stops with LAUNCH_BLOCKED and the exact denial, and the owner starts the lead through the operator; nobody looks for another way round the classifier.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.217 | 2026-10-16 | Owner: DEC-715 (one stable launch command for leads and workers, `gov launch lead <ticket>` for example, with a narrow `Bash(gov launch:*)` allow rule in the kernel template; on the Wave 2 list, ranked high; until then the owner's lead launch form, and LAUNCH_BLOCKED goes to the operator). Next free id: DEC-716. |

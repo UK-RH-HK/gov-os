@@ -1,0 +1,45 @@
+...........................................s............................ [ 17%]
+........................................................................ [ 34%]
+.........................................F.............................. [ 52%]
+........................................................................ [ 69%]
+........................................................................ [ 87%]
+.....................................................                    [100%]
+=================================== FAILURES ===================================
+_____________ test_a_project_with_neither_layout_answers_as_today ______________
+
+scratch = <function scratch.<locals>._scratch at 0x7c6eb0dc9120>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-742/test_a_project_with_neither_la0/sandbox/home'), tmpdir=PosixPa...ox/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-742/test_a_project_with_neither_la0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_project_with_neither_layout_answers_as_today(scratch, sandbox, interface):
+        project = scratch("neither")
+        project.write(PROBE_REL, probes.record_text(probes.probe()))
+        assert project.listed(sandbox, interface) == [], "a project without a kernel lists declared checks"
+        envelope, result, run = project.checked(sandbox, interface)
+        assert envelope["ok"] is True and run.returncode == support.EXIT_OK, \
+            f"gov check does not pass in a project without a kernel\n{run.describe()}"
+        assert [each.get("id") for each in support.checks_of(result)] == list(BUILT_IN), \
+            f"a project without a kernel runs other checks than the three without a declaration\n{run.describe()}"
+        families = support.families_of(result)
+        assert sorted(families) == sorted(support.FAMILIES), f"not the 17 families\n{run.describe()}"
+        counts = {name: family.get("check_count") for name, family in families.items()}
+        expected = dict.fromkeys(support.FAMILIES, 0) | {"skill regression": 1, "product traceability": 2}
+        assert counts == expected, f"the families' check counts are not today's: {counts}"
+        unregistered = {name for name, family in families.items()
+                        if (family.get("status"), family.get("reason")) == (support.YELLOW, "no registered check")}
+        assert unregistered == {name for name, count in expected.items() if count == 0}, \
+            f"the families without a check are not each yellow with that reason\n{run.describe()}"
+        # the schema check, as it is declared: the shared fields are held, a type's own schema cannot be
+        found = probes.run_schema_check(project.root)
+>       assert [(each.get("code"), each.get("path")) for each in found] == [("SCHEMA_UNREADABLE", PROBE_REL)], \
+            f"the schema check in a project without a kernel does not answer as today: {found}"
+E       AssertionError: the schema check in a project without a kernel does not answer as today: [{'code': 'SCHEMA_UNREADABLE', 'path': 'docs/probes/PROJ-full/PR-PROJ-full.md', 'type': 'probe', 'message': 'docs/probes/PROJ-full/PR-PROJ-full.md: unmeasured, the schema probe.schema.json cannot be read'}, {'code': 'SCHEMA_UNREADABLE', 'path': 'docs/records/PROJ-0001.md', 'type': 'task', 'message': 'docs/records/PROJ-0001.md: unmeasured, the schema ticket.schema.json cannot be read'}]
+E       assert [('SCHEMA_UNR...ROJ-0001.md')] == [('SCHEMA_UNR...ROJ-full.md')]
+E         
+E         Left contains one more item: ('SCHEMA_UNREADABLE', 'docs/records/PROJ-0001.md')
+E         Use -v to get more diff
+
+tests/acceptance/W1-26/test_w1_26_installed_kernel.py:339: AssertionError
+=========================== short test summary info ============================
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+1 failed, 411 passed, 1 skipped in 535.88s (0:08:55)

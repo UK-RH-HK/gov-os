@@ -1,0 +1,680 @@
+..........................................F.FFFFFFFFFF...............F.. [ 90%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+___ test_no_file_of_the_project_holds_a_question_in_clear_after_it_was_asked ___
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d954eb260>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_no_file_of_the_project_ho0')
+
+    @STAND_IN
+    def test_no_file_of_the_project_holds_a_question_in_clear_after_it_was_asked(box, embedder, tmp_path):
+        """*Red.* A question with a word no file holds, asked through ``gov retrieve`` and through the semantic search:
+        afterwards no file of the project (the store, the cache, anything) holds that word, in UTF-8 or UTF-16. The key
+        is a hash of the text, not the text. Today the cache holds the question in clear."""
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        question = f"who fires the glazed bowls for {DISTINCT}"
+        env = S.embed_env(box, embedder)
+        done = S.gov(box, "retrieve", "--json", "--root", project, question, env=env)
+        assert not S.clean(done), done.describe()
+        _ask(box, project, env, question, "the search")
+        assert embedder.asked_for(question) >= 1, "the premise: the question was never sent to the embedder"
+        assert S.runtime_others(project), "the premise: the reads left no cache to look in"
+        forms = {"UTF-8": DISTINCT.encode("utf-8"), "UTF-16-LE": DISTINCT.encode("utf-16-le"),
+                 "UTF-16-BE": DISTINCT.encode("utf-16-be")}
+        holding = sorted(f"{rel} ({name})" for rel in S.project_tree(project)
+                         for name, form in forms.items() if form in (project / rel).read_bytes())
+>       assert not holding, f"the question is kept in clear: {holding}"
+E       AssertionError: the question is kept in clear: ['.gov-runtime/query-vectors.db (UTF-8)']
+E       assert not ['.gov-runtime/query-vectors.db (UTF-8)']
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:132: AssertionError
+_ test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_and_lose_no_entry _
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d956dcb90>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_several_processes_reading0')
+
+    @STAND_IN
+    def test_several_processes_reading_at_once_on_a_cold_cache_get_the_one_answer_and_lose_no_entry(
+            box, embedder, tmp_path):
+        """*Red.* Six processes on one project with a cold cache, released together, each asking 16 shared questions
+        (each in its own order) and 4 of its own: 40 distinct texts. None errors; every answer is the one the text gets
+        as the first text in a new store; afterwards, asking every text again in one process gives the same answers and
+        sends **none** of them to the embedder (no entry was lost or torn); and ``.gov-runtime/`` holds the store and at
+        most one other file (no lock or temporary file left behind). Today the answers depend on the interleaving."""
+        shared = S.questions(SHARED)
+        own = [S.questions(OWN, start=100 + OWN * n) for n in range(PROCESSES)]
+        texts = shared + [text for group in own for text in group]
+        fresh = S.EmbedderStandIn()
+        try:
+            twin = S.semantic_project(box, tmp_path / "reference", fresh)
+            references = {text: _ask(box, twin, S.embed_env(box, fresh), text, "the reference") for text in texts}
+        finally:
+            fresh.close()
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        lists = []
+        for n in range(PROCESSES):
+            mine = shared + own[n]
+            random.Random(54 + n).shuffle(mine)
+            lists.append([("search", text) for text in mine])
+        runs = S.at_once(box, project, env, lists)
+        for number, (done, calls) in enumerate(zip(runs, lists), start=1):
+            assert not S.clean(done), f"concurrent process {number} was not clean ({', '.join(S.clean(done))})\n" \
+                                      f"{done.describe()}"
+            answers = S.json.loads(done.stdout.strip().splitlines()[-1])[1:]
+            for (_, text), answer in zip(calls, answers):
+>               _same(answer, references[text], f"process {number}, {text!r}")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:193: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.8805837035179...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '7e60fe9e8921c9ac62d2d213', 'distance': 0.8462904095649...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = "process 1, 'how does the glazed meet the prunes item0103'"
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: process 1, 'how does the glazed meet the prunes item0103': one text, two answers
+E         first in a new store: [('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.8462904095649719), ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.8805837035179138), ('e63e003365e7865195f64625', 'notes/tides.md', 0.9582043290138245)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.8805837035179138), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.8861410617828369), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.9582043290138245)]
+E       assert [('6ed39f6f20...ary.md', 1.0)] == [('7e60fe9e89...ary.md', 1.0)]
+E         
+E         At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.8805837035179138) != ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.8462904095649719)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+_ test_the_change_record_states_the_cache_s_bound_and_the_setting_that_lowers_it _
+
+    def test_the_change_record_states_the_cache_s_bound_and_the_setting_that_lowers_it():
+        """*Red.* The change record names the setting ``GOV_QUERY_VECTOR_CACHE_MAX_BYTES`` and, on that line, the
+        default bound as a whole number of bytes (README, "The bound"). Today it names neither."""
+        path = S.REPO_ROOT / S.CHANGE_RECORD_REL
+        assert path.is_file(), f"there is no {S.CHANGE_RECORD_REL}"
+        lines = [line for line in path.read_text(encoding="utf-8").splitlines() if S.CACHE_BOUND_SETTING in line]
+>       assert lines, f"{S.CHANGE_RECORD_REL} does not name the setting {S.CACHE_BOUND_SETTING}"
+E       AssertionError: docs/changes/W2-54-CIT-E.md does not name the setting GOV_QUERY_VECTOR_CACHE_MAX_BYTES
+E       assert []
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:214: AssertionError
+_ test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_same_answers _
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d95336180>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_the_cache_never_grows_pas0')
+
+    @STAND_IN
+    def test_the_cache_never_grows_past_its_bound_and_reads_at_the_bound_give_the_same_answers(box, embedder, tmp_path):
+        """*Red.* The bound lowered to 256 KiB by its setting; 200 distinct texts asked in four processes of 50 (at
+        least 819,200 bytes of vectors, so the bound is reached). After every process the files beside the store hold
+        at most 256 KiB; every read ends cleanly with an answer; and the first and last ten texts, asked again at the
+        bound, get the answers they got in a new store without a bound. Today the setting changes nothing: the cache
+        grows past the bound."""
+        assert BOUNDED * S.VECTOR_BYTES > 3 * S.LOW_BOUND
+        texts = S.questions(BOUNDED, start=1000)
+        fresh = S.EmbedderStandIn()
+        try:
+            twin = S.semantic_project(box, tmp_path / "reference", fresh)
+            answers, done = S.drive_run(box, twin, S.embed_env(box, fresh), *[("search", text) for text in texts])
+            assert not S.clean(done), done.describe()
+            references = dict(zip(texts, answers))
+        finally:
+            fresh.close()
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = {**S.embed_env(box, embedder), S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+        sizes = []
+        for start in range(0, BOUNDED, 50):
+            answers, done = S.drive_run(box, project, env, *[("search", text) for text in texts[start:start + 50]])
+            assert not S.clean(done), f"a read at the bound was not clean\n{done.describe()}"
+            for answer in answers:
+                _available(answer, "a read at the bound")
+            sizes.append(S.others_size(project))
+>           assert sizes[-1] <= S.LOW_BOUND, (f"the cache grew past its bound of {S.LOW_BOUND} bytes: "
+                                              f"{sizes} after {start + 50} texts ({S.runtime_others(project)})")
+E           AssertionError: the cache grew past its bound of 262144 bytes: [258048, 503808] after 100 texts (['.gov-runtime/query-vectors.db'])
+E           assert 503808 <= 262144
+E            +  where 262144 = S.LOW_BOUND
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:250: AssertionError
+________ test_one_text_gets_one_answer_whatever_the_cache_s_state[cold] ________
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d95337020>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_0')
+state = 'cold'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+>           _same(ask(QUESTION), reference, "cold, after two other texts")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:283: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...65e7865195f64625', 'distance': 1.0, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = 'cold, after two other texts'
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: cold, after two other texts: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.9065628051757812), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E       assert [('6ed39f6f20...des.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 1 diff: ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.9065628051757812) != ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+________ test_one_text_gets_one_answer_whatever_the_cache_s_state[warm] ________
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d942bb3b0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_1')
+state = 'warm'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+            _same(ask(QUESTION), reference, "cold, after two other texts")
+        elif state == "warm":
+            ask(next(others))
+            first = ask(QUESTION)
+            ask(next(others))
+>           _same(first, reference, "the first read, after another text")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:288: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...c5c13134e1bb4885', 'distance': 1.0, 'end_line': 3, 'parent_id': 'e52e258edc775aa9ff80596d', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = 'the first read, after another text'
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: the first read, after another text: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('95e651f38c14608c2fcf9d39', 'notes/apiary.md', 0.9477670192718506), ('e63e003365e7865195f64625', 'notes/tides.md', 0.9532814025878906)]
+E       assert [('6ed39f6f20...ery.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 1 diff: ('95e651f38c14608c2fcf9d39', 'notes/apiary.md', 0.9477670192718506) != ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+______ test_one_text_gets_one_answer_whatever_the_cache_s_state[deleted] _______
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d942bb0e0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_2')
+state = 'deleted'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+            _same(ask(QUESTION), reference, "cold, after two other texts")
+        elif state == "warm":
+            ask(next(others))
+            first = ask(QUESTION)
+            ask(next(others))
+            _same(first, reference, "the first read, after another text")
+            _same(ask(QUESTION), reference, "warm, after another text")
+        elif state == "deleted":
+            ask(QUESTION), ask(next(others))
+            assert S.delete_cache(project), "the premise: the reads left no cache to delete"
+            ask(next(others))
+>           _same(ask(QUESTION), reference, "the cache deleted, after another text")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:294: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = 'the cache deleted, after another text'
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: the cache deleted, after another text: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.9532814025878906), ('e63e003365e7865195f64625', 'notes/tides.md', 0.9532814025878906)]
+E       assert [('6ed39f6f20...ary.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 1 diff: ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.9532814025878906) != ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+________ test_one_text_gets_one_answer_whatever_the_cache_s_state[full] ________
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d95334aa0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_3')
+state = 'full'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+            _same(ask(QUESTION), reference, "cold, after two other texts")
+        elif state == "warm":
+            ask(next(others))
+            first = ask(QUESTION)
+            ask(next(others))
+            _same(first, reference, "the first read, after another text")
+            _same(ask(QUESTION), reference, "warm, after another text")
+        elif state == "deleted":
+            ask(QUESTION), ask(next(others))
+            assert S.delete_cache(project), "the premise: the reads left no cache to delete"
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache deleted, after another text")
+        elif state == "full":
+            env = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+            answers, done = S.drive_run(box, project, env, *[("search", text) for text in S.questions(BOUNDED, start=3000)])
+            assert not S.clean(done), done.describe()
+            ask(next(others))
+>           _same(ask(QUESTION), reference, "the cache full, first asked after 200 other texts")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:300: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...65e7865195f64625', 'distance': 1.0, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = 'the cache full, first asked after 200 other texts'
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: the cache full, first asked after 200 other texts: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.9065628051757812), ('95e651f38c14608c2fcf9d39', 'notes/apiary.md', 0.9477670192718506)]
+E       assert [('6ed39f6f20...des.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 1 diff: ('862c3c36c5c13134e1bb4885', 'notes/bakery.md', 0.9065628051757812) != ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+_ test_one_text_gets_one_answer_whatever_the_cache_s_state[unwritable-folder] __
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d953caa80>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_4')
+state = 'unwritable-folder'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+            _same(ask(QUESTION), reference, "cold, after two other texts")
+        elif state == "warm":
+            ask(next(others))
+            first = ask(QUESTION)
+            ask(next(others))
+            _same(first, reference, "the first read, after another text")
+            _same(ask(QUESTION), reference, "warm, after another text")
+        elif state == "deleted":
+            ask(QUESTION), ask(next(others))
+            assert S.delete_cache(project), "the premise: the reads left no cache to delete"
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache deleted, after another text")
+        elif state == "full":
+            env = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+            answers, done = S.drive_run(box, project, env, *[("search", text) for text in S.questions(BOUNDED, start=3000)])
+            assert not S.clean(done), done.describe()
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache full, first asked after 200 other texts")
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache full, asked again after another text")
+        elif state == "unwritable-folder":
+            assert S.os.geteuid() != 0, "the premise: running as root, no folder is read-only"
+            with S.ReadOnly(runtime):
+                assert S.cannot_create_in(runtime), "the premise: .gov-runtime/ still takes a new file"
+                ask(next(others)), ask(next(others))
+>               _same(ask(QUESTION), reference, ".gov-runtime/ read-only, after two other texts")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = '.gov-runtime/ read-only, after two other texts'
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: .gov-runtime/ read-only, after two other texts: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.9532814025878906), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.9554555416107178)]
+E       assert [('6ed39f6f20...ary.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 1 diff: ('e63e003365e7865195f64625', 'notes/tides.md', 0.9532814025878906) != ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+__ test_one_text_gets_one_answer_whatever_the_cache_s_state[unwritable-file] ___
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d942b7140>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_text_gets_one_answer_5')
+state = 'unwritable-file'
+
+    @STAND_IN
+    @pytest.mark.parametrize("state", STATES)
+    def test_one_text_gets_one_answer_whatever_the_cache_s_state(box, embedder, tmp_path, state):
+        """*Red.* The question's answer, each read in a process of its own after other texts, with the cache ``cold``
+        (never asked), ``warm`` (asked before), ``deleted`` (every file beside the store removed after it was asked),
+        ``full`` (the bound lowered and 200 other texts asked first: the question first asked at the bound; a question
+        asked before the cache filled is the bound case's), ``unwritable-folder`` (``.gov-runtime/`` read-only,
+        no cache file) or ``unwritable-file`` (the cache's files read-only): the answer the question gets as the first
+        text in a new store, hit for hit and distance for distance. An unwritable cache gives no error and no traceback.
+        Today the answer depends on what was embedded before the question was first asked."""
+        reference = _first_answer(box, tmp_path, QUESTION)
+        project = S.semantic_project(box, tmp_path / "p", embedder)
+        env = S.embed_env(box, embedder)
+        others = iter(S.questions(8, start=500 + 10 * STATES.index(state)))
+        ask = lambda text, what=state: _ask(box, project, env, text, what)   # noqa: E731
+        runtime = project / S.RUNTIME_REL
+        if state == "cold":
+            ask(next(others)), ask(next(others))
+            _same(ask(QUESTION), reference, "cold, after two other texts")
+        elif state == "warm":
+            ask(next(others))
+            first = ask(QUESTION)
+            ask(next(others))
+            _same(first, reference, "the first read, after another text")
+            _same(ask(QUESTION), reference, "warm, after another text")
+        elif state == "deleted":
+            ask(QUESTION), ask(next(others))
+            assert S.delete_cache(project), "the premise: the reads left no cache to delete"
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache deleted, after another text")
+        elif state == "full":
+            env = {**env, S.CACHE_BOUND_SETTING: str(S.LOW_BOUND)}
+            answers, done = S.drive_run(box, project, env, *[("search", text) for text in S.questions(BOUNDED, start=3000)])
+            assert not S.clean(done), done.describe()
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache full, first asked after 200 other texts")
+            ask(next(others))
+            _same(ask(QUESTION), reference, "the cache full, asked again after another text")
+        elif state == "unwritable-folder":
+            assert S.os.geteuid() != 0, "the premise: running as root, no folder is read-only"
+            with S.ReadOnly(runtime):
+                assert S.cannot_create_in(runtime), "the premise: .gov-runtime/ still takes a new file"
+                ask(next(others)), ask(next(others))
+                _same(ask(QUESTION), reference, ".gov-runtime/ read-only, after two other texts")
+                ask(next(others))
+                _same(ask(QUESTION), reference, ".gov-runtime/ read-only, asked again after another text")
+            assert not S.runtime_others(project), f"a file was made in a read-only folder: {S.runtime_others(project)}"
+        elif state == "unwritable-file":
+            ask(next(others))
+            files = S.runtime_others(project)
+            assert files, "the premise: the read left no cache file to make read-only"
+            with S.ReadOnly(*[project / rel for rel in files]):
+                ask(next(others))
+>               _same(ask(QUESTION), reference, "the cache's files read-only, after another text")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:318: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+answer = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.5297460556030...65e7865195f64625', 'distance': 1.0, 'end_line': 3, 'parent_id': '4e4748b1a43f5d167016ae40', ...}], 'reason': None, ...}
+reference = {'available': True, 'facet': 'semantic', 'hits': [{'chunk_id': '6ed39f6f20a6645c722a8a9f', 'distance': 0.4830274879932...8c14608c2fcf9d39', 'distance': 1.0, 'end_line': 3, 'parent_id': '06700ecaf2b2592b785d46b7', ...}], 'reason': None, ...}
+what = "the cache's files read-only, after another text"
+
+    def _same(answer, reference, what):
+        _available(answer, what)
+>       assert S.hits_of(answer) == S.hits_of(reference), (
+            f"{what}: one text, two answers\nfirst in a new store: {S.hits_of(reference)[:3]}\n"
+            f"here:                 {S.hits_of(answer)[:3]}")
+E       AssertionError: the cache's files read-only, after another text: one text, two answers
+E         first in a new store: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036), ('e63e003365e7865195f64625', 'notes/tides.md', 0.669649600982666), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E         here:                 [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.5297460556030273), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 0.9532814025878906), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 0.9554555416107178)]
+E       assert [('6ed39f6f20...des.md', 1.0)] == [('6ed39f6f20...ary.md', 1.0)]
+E         
+E         At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.5297460556030273) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302748799324036)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:40: AssertionError
+_______ test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state ________
+
+box = <w2_54_support.Box object at 0x794d95653890>
+embedder = <w2_54_support.EmbedderStandIn object at 0x794d942e6f00>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_one_ticket_gets_one_packe0')
+
+    @STAND_IN
+    def test_one_ticket_gets_one_packet_hash_whatever_the_cache_s_state(box, embedder, tmp_path):
+        """*Red.* ``gov context --json`` for one ticket, in a process of its own, after other tickets' contexts and
+        other questions: cold, warm, the cache deleted, ``.gov-runtime/`` read-only, the cache's files read-only, and the
+        cache full (bound lowered, 200 other texts): one packet and one hash, the one the ticket gets as the first
+        context in a new store built alike. Every run ends with exit code 0 and no traceback. Today the hash depends on
+        what was embedded before the ticket's question was first asked."""
+        files = S.ticket_files()
+        fresh = S.EmbedderStandIn()
+        try:
+            twin = S.semantic_project(box, tmp_path / "reference", fresh, files)
+            reference = S.gov(box, "context", "--json", "--root", twin, TICKET, env=S.embed_env(box, fresh))
+            assert not S.clean(reference), reference.describe()
+            reference = reference.envelope()["result"]
+        finally:
+            fresh.close()
+        assert reference[S.K_SUPPLEMENTARY], "the premise: the ticket's context holds no retrieval item"
+        project = S.semantic_project(box, tmp_path / "p", embedder, files)
+        env = S.embed_env(box, embedder)
+        runtime = project / S.RUNTIME_REL
+    
+        def context(what, ticket=TICKET, env=env):
+            done = S.gov(box, "context", "--json", "--root", project, ticket, env=env)
+            assert not S.clean(done) and done.envelope().get("ok") is True, f"{what}\n{done.describe()}"
+            return done.envelope()["result"]
+    
+        def same(what, **kwargs):
+            packet = context(what, **kwargs)
+            assert packet[S.K_HASH] == reference[S.K_HASH] and S.canonical(packet) == S.canonical(reference), (
+                f"{what}: one ticket, two packets: {packet[S.K_HASH]} != {reference[S.K_HASH]} (the first in a new store)"
+                f"\nsupplementary ids: {[item.get('id') for item in packet[S.K_SUPPLEMENTARY]]} / "
+                f"{[item.get('id') for item in reference[S.K_SUPPLEMENTARY]]}")
+    
+        context("another ticket first", ticket="TK-W254-BAKERY")
+>       same("cold, after another ticket")
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+what = 'cold, after another ticket', kwargs = {}
+packet = {'authority': [{'authority': 'charter', 'constraint': '8f7943abbe8ecb3931db05ce2b8d54505444e15375b3191c1de853c0170d1bf...t': 6000, 'used': 296}, 'dropped': [], 'hash': 'f5beed7fcb2651d7ec0ca0f2c049813671e923d8e89924d9f7f364f50f528161', ...}
+@py_assert1 = ["'f5beed7fcb26...364f50f528161' == 'a1a241201fea...d281a6730daa4'\n~\n~- a1a241201feaf408af7b871861c25f4be4bd0080e52c87f725ad281a6730daa4\n~+ f5beed7fcb2651d7ec0ca0f2c049813671e923d8e89924d9f7f364f50f528161"]
+@py_assert2 = 'f5beed7fcb2651d7ec0ca0f2c049813671e923d8e89924d9f7f364f50f528161'
+@py_assert5 = 'a1a241201feaf408af7b871861c25f4be4bd0080e52c87f725ad281a6730daa4'
+@py_assert4 = False, @py_assert0 = False
+
+    def same(what, **kwargs):
+        packet = context(what, **kwargs)
+>       assert packet[S.K_HASH] == reference[S.K_HASH] and S.canonical(packet) == S.canonical(reference), (
+            f"{what}: one ticket, two packets: {packet[S.K_HASH]} != {reference[S.K_HASH]} (the first in a new store)"
+            f"\nsupplementary ids: {[item.get('id') for item in packet[S.K_SUPPLEMENTARY]]} / "
+            f"{[item.get('id') for item in reference[S.K_SUPPLEMENTARY]]}")
+E       AssertionError: cold, after another ticket: one ticket, two packets: f5beed7fcb2651d7ec0ca0f2c049813671e923d8e89924d9f7f364f50f528161 != a1a241201feaf408af7b871861c25f4be4bd0080e52c87f725ad281a6730daa4 (the first in a new store)
+E         supplementary ids: ['TK-W254-TIDES', 'TK-W254-TIDES', 'e63e003365e7865195f64625', '862c3c36c5c13134e1bb4885', '1e2346adb24a8d09634c6aa0', '6ed39f6f20a6645c722a8a9f', '7e60fe9e8921c9ac62d2d213', '95e651f38c14608c2fcf9d39', 'CHARTER-W254-Q', 'CHARTER-W254-Q'] / ['TK-W254-TIDES', 'TK-W254-TIDES', 'e63e003365e7865195f64625', '1e2346adb24a8d09634c6aa0', '6ed39f6f20a6645c722a8a9f', '7e60fe9e8921c9ac62d2d213', '862c3c36c5c13134e1bb4885', '95e651f38c14608c2fcf9d39', 'CHARTER-W254-Q', 'CHARTER-W254-Q']
+E       assert ('f5beed7fcb26...364f50f528161' == 'a1a241201fea...d281a6730daa4'
+E         
+E         - a1a241201feaf408af7b871861c25f4be4bd0080e52c87f725ad281a6730daa4
+E         + f5beed7fcb2651d7ec0ca0f2c049813671e923d8e89924d9f7f364f50f528161)
+
+tests/acceptance/W2-54/test_w2_54_query_cache.py:351: AssertionError
+_ test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written _
+
+box = <w2_54_support.Box object at 0x794d95653890>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3593/test_inside_a_launched_sandbox0')
+
+    def test_inside_a_launched_sandboxed_worker_one_text_gets_one_answer_where_the_cache_cannot_be_written(
+            box, tmp_path):
+        """*Red.* Inside a worker started by ``gov launch`` under its OS sandbox, reading a project whose
+        ``.gov-runtime/`` it cannot write: one text, a different text, the first text again. The two answers to the
+        first text are one answer (hits, order, distances; the same bundle from ``gov retrieve``), and the answer an
+        ordinary process outside the sandbox gets for it. Today the second answer differs (the variation of the
+        embedder, and no cache to fall back on)."""
+        _prerequisites()
+        # The project the worker reads: a built index, outside the launched repository (read-only to the worker).
+        builder = S.EmbedderStandIn()
+        try:
+            read_root = S.semantic_project(box, tmp_path / "read", builder)
+        finally:
+            builder.close()
+        runtime_before = S.runtime_digest(read_root)
+        # The launched project: W1-46's fixture project, with W1-46's held-out stand-in.
+        project = L.make_project(tmp_path / "repo")
+        sandbox = L.cli_support.make_sandbox(tmp_path / "sandbox")
+        L.w47.configure_stand_in(project, L.w47.make_stand_in(sandbox.elsewhere / "held-out-stand-in"))
+        scratch = project / SCRATCH
+        scratch.mkdir(parents=True)
+        env = {key: value for key, value in S.embed_env(box, None).items() if key not in ("OLLAMA_HOST", "TMPDIR")}
+        env.pop("PYTHONPYCACHEPREFIX", None)
+        env["PYTHONDONTWRITEBYTECODE"] = "1"
+        common = {"root": str(read_root), "env": env, "python": sys.executable, "driver": str(scratch / "driver.py"),
+                  "gov": S._GOV, "texts": [TEXT, OTHER, TEXT], "cwd": str(read_root)}
+        (scratch / "driver.py").write_text(S._DRIVER, encoding="utf-8")
+        (scratch / "reader.py").write_text(_READER, encoding="utf-8")
+        (scratch / "embedder.py").write_text(_EMBEDDER.replace("@SUITE@", repr(str(Path(S.__file__).parent))),
+                                             encoding="utf-8")
+        (scratch / "inside.json").write_text(json.dumps({**common, "host_file": str(scratch / "host"),
+                                                         "out": str(scratch / "inside-result.json")}), encoding="utf-8")
+        (scratch / "probe.sh").write_text(_PROBE, encoding="utf-8")
+    
+        run = L.run_gov(project, sandbox, "launch", L.ENGINEER, L.TICKET_OF[L.ENGINEER], "--", "-p", PROMPT,
+                        "--permission-mode", "acceptEdits", "--model", "haiku", "--max-turns", "6",
+                        "--allowedTools", "Bash", env=_launch_environment(project, sandbox), timeout=SESSION_TIMEOUT_S)
+        results_path = scratch / "results.txt"
+        if not results_path.is_file() or "end=1" not in results_path.read_text(encoding="utf-8"):
+            pytest.fail(f"the launched worker did not run the probe to its end (no complete {SCRATCH}/results.txt)\n"
+                        f"{run.describe()[-1500:]}", pytrace=False)
+        marks = dict(line.split("=", 1) for line in results_path.read_text(encoding="utf-8").splitlines() if "=" in line)
+        logs = "\n".join(f"{name}: {(scratch / name).read_text(encoding='utf-8')[-800:]}"
+                         for name in ("embedder.log", "reader.log") if (scratch / name).is_file())
+        assert (scratch / "inside-result.json").is_file(), f"the reader left no result inside the sandbox: {marks}\n{logs}"
+        inside = json.loads((scratch / "inside-result.json").read_text(encoding="utf-8"))
+    
+        # The premises: this worktree's code; the cache could not be written; the embedder reached is the one inside.
+        assert inside["gov_file"] == str(S.SRC / "gov" / "__init__.py"), f"inside, gov came from {inside['gov_file']!r}"
+        assert inside["runtime_new_file"] != "made", \
+            "the premise: the worker could make a file in the read project's .gov-runtime/ (it is not read-only)"
+        assert S.runtime_digest(read_root) == runtime_before, "the worker changed the read project's .gov-runtime/"
+        embedded = json.loads((scratch / "embedded.json").read_text(encoding="utf-8")) \
+            if (scratch / "embedded.json").is_file() else []
+        assert any(text.endswith(TEXT) for text in embedded), \
+            f"the stand-in inside the sandbox was never asked the text: {embedded[:4]}\n{marks}\n{logs}"
+        reads = _reads(inside, "inside the sandbox")
+        (_, first, first_bundle), _, (_, again, again_bundle) = reads
+    
+        # Outside the sandbox: an ordinary process, the same project and environment, a fresh stand-in.
+        outside_embedder = S.EmbedderStandIn()
+        try:
+            (tmp_path / "outside.json").write_text(json.dumps({**common, "host": outside_embedder.host,
+                                                               "texts": [TEXT], "out": str(tmp_path / "outside.out")}),
+                                                   encoding="utf-8")
+            done = S.run([sys.executable, scratch / "reader.py", tmp_path / "outside.json"], cwd=box.workdir / "elsewhere",
+                         env=S.embed_env(box, outside_embedder), timeout=S.CALL_TIMEOUT_S)
+        finally:
+            outside_embedder.close()
+        assert done.returncode == 0, done.describe()
+        outside = json.loads((tmp_path / "outside.out").read_text(encoding="utf-8"))
+        (_, reference, reference_bundle), = _reads(outside, "outside the sandbox")
+    
+>       assert S.hits_of(again) == S.hits_of(first), (
+            "inside the sandbox, one text got two answers (asked again after another text, no cache to write)\n"
+            f"first: {S.hits_of(first)[:3]}\nagain: {S.hits_of(again)[:3]}")
+E       AssertionError: inside the sandbox, one text got two answers (asked again after another text, no cache to write)
+E         first: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.45227745175361633), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0), ('7e60fe9e8921c9ac62d2d213', 'notes/orchard.md', 1.0)]
+E         again: [('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274), ('e63e003365e7865195f64625', 'notes/tides.md', 0.7910680770874023), ('1e2346adb24a8d09634c6aa0', 'notes/forge.md', 1.0)]
+E       assert [('6ed39f6f20...ary.md', 1.0)] == [('6ed39f6f20...des.md', 1.0)]
+E         
+E         At index 0 diff: ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.48302751779556274) != ('6ed39f6f20a6645c722a8a9f', 'notes/kiln.md', 0.45227745175361633)
+E         Use -v to get more diff
+
+tests/acceptance/W2-54/test_w2_54_sandboxed_worker.py:247: AssertionError
+12 failed, 68 passed in 856.42s (0:14:16)

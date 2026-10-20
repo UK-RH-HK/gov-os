@@ -1,0 +1,9 @@
+07:02:35
+ 07:02:35 up 2 days, 23:24,  0 user,  load average: 1.04, 3.09, 5.71
+shared 11434:
+{"models":[]}
+cpu 11435:
+{"models":[]}
+1331 MiB, 16303 MiB
+ 422673 24644  2-22:42:20 /home/usain/.local/ollama/bin/ollama serve
+1798039 33260    03:04:43 /home/usain/.local/ollama/bin/ollama serve

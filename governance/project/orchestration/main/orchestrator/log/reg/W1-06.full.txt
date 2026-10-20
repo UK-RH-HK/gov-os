@@ -1,0 +1,37 @@
+..............................................F......................... [ 75%]
+........................                                                 [100%]
+=================================== FAILURES ===================================
+___ test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool ____
+
+registry = {'tools': [{'approved_by': 'DEC-074', 'date': '2026-09-30', 'install': "bash -c '. ~/.nvm/nvm.sh && nvm install 22.23....proved_by': 'DEC-074', 'date': '2026-09-30', 'install': 'uv tool install copier==9.18.2', 'name': 'copier', ...}, ...]}
+decisions = {'DEC-001': Decision(id='DEC-001', title='Assemble first; Rust kernel becomes the later replacement', status='PROPOSED...is a health finding (Gate U), not a silent cost.\n- **Measurement:** telemetry (DEC-026) tagged by task ID.\n\n'), ...}
+
+    def test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool(registry, decisions):
+        """Every entry but the ten stack pins: the cited decision's own text holds the entry's name.
+    
+        This covers gitleaks, PyYAML, ccusage, Superpowers and anything else the
+        registry records (bubblewrap and socat cite DEC-141 when they are recorded).
+        """
+        checked, wrong = 0, []
+        for entry in support.entries(registry):
+            name = support.norm_name(entry.get("name", ""))
+            if name in STACK_NAMES:
+                continue
+            checked += 1
+            decision = decisions.get(support.approved_by(entry))
+            if decision is None:
+                wrong.append(f"{name}: {support.approved_by(entry)!r} is not in the register")
+            elif not support.names_tool(support.own_text(decision), name):
+                wrong.append(f"{name}: {decision.id} ({decision.title!r}) does not name it")
+        assert checked, f"{support.REGISTRY_REL} records no tool outside the ten stack pins"
+>       assert wrong == [], f"entries of {support.REGISTRY_REL} approved by a decision that does not name the tool: {wrong}"
+E       AssertionError: entries of governance/project/tool-registry.yaml approved by a decision that does not name the tool: ["qwen3-reranker: DEC-397 ('W1-19 installs: approved (DEC-083)') does not name it"]
+E       assert ['qwen3-reran... not name it'] == []
+E         
+E         Left contains one more item: "qwen3-reranker: DEC-397 ('W1-19 installs: approved (DEC-083)') does not name it"
+E         Use -v to get more diff
+
+tests/acceptance/W1-06/test_w1_06_install_approvals.py:176: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-06/test_w1_06_install_approvals.py::test_every_entry_outside_the_stack_cites_a_decision_that_names_the_tool
+1 failed, 95 passed in 0.68s

@@ -1,0 +1,25 @@
+families with no registered check: adapter/model portability
+  adapter/model portability: YELLOW (no registered check)
+  audit reproducibility: YELLOW (not applicable until the first audit)
+  authority/role limits: GREEN
+  change: RED
+  checkpoint: YELLOW
+  command-contract consistency: YELLOW
+  concurrency/claims: GREEN
+  context reproducibility: RED
+  fresh-agent reconstruction: RED
+  graph integrity: RED
+  human_gate: RED
+  index freshness: RED
+  memory: YELLOW
+  mutation scope: GREEN
+  path-map compliance: GREEN
+  product traceability: YELLOW
+  recovery/rebuild: RED
+  retrieval regression: RED
+  schema/invariants: RED
+  secrets indexing: RED
+  security: RED
+  skill regression: GREEN
+  test: RED
+  tool: RED

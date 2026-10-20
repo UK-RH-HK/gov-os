@@ -1,0 +1,18 @@
+**Resume note (this is a short closing round; read it before the rest, and where it differs from the rest, it holds).** You are on branch `w1/W1-22`, head `f6d88832`, tree clean. Done, do not repeat: the design (`59dab60c`, 21 cases), the engineer (`7fbfae18`), the first review's five fail-open cases and their fix (`1496a446`, `f6d88832`), the second review (no fail-open found by it). **Both review rounds are spent (DEC-413): no reviewer starts.** The earlier lead's packages DP-1 to DP-4 are accepted by the main orchestrator as the design encodes them (to be recorded in the register); a lead decides no package, so return any new one.
+
+The main orchestrator read the return and holds three things back from the merge:
+
+1. **An index whose canary declaration is empty reports `AVAILABLE`** (the second review's R1). Nothing was tested and the answer is green: that is the fail-open shape of this ticket ("a canary miss sets `FACET_UNAVAILABLE`"; a canary that tests nothing must not read as a pass), so it is fixed without a further review. With it, since they are the same lines: a declaration whose `canaries` is null or whose entry has no `query` gives `FACET_UNAVAILABLE` for that index and names the reason, instead of an exception.
+2. **"Each index has canaries" (success line 2, CAP-17.c): the runner knows `lexical` and `semantic` only.** The test designer reads CAP-17.c and CAP-55.a in the Contract, DEC-036, DEC-037 and DEC-080, and what indexes exist in the tree (the lexical index, the semantic index, the code index behind W1-16's wrapper, and the closure, which is computed and has no index), and either adds the cases for an index that the sources include and the suite leaves out, or returns a package that says which indexes "each index" means and why the others are out. It also says, in the README, who calls the canaries "after reindex and in doctor": `gov doctor` is W1-27, which depends on this ticket; if a source requires the reindex itself (W1-17's or W1-19's code, outside this ticket's paths) to call them now, that is a package naming the file.
+3. **The README says unit tests cover malformed declarations; none exist for the canary runner.** The designer corrects the README to what is true after this round; the engineer adds the builder tests it names.
+
+**Also:** the engineer's two commits carry `Task:` and `Implements:` and no `Role:` trailer. Every worker brief in this round says, in its own line: commit with `git commit --trailer "Task: DAEO-8nue" --trailer "Role: <its role>"` (and `--trailer "Implements: <ids>"` for the engineer), and you check `git log -1 --format=%B` after each worker before going on; a commit without its role is redone by that worker (`git commit --amend` with the trailers, before anything else is committed on top).
+
+## What you do, in order
+
+1. `git merge w1/integrate` (it has moved: W1-44 merged, decisions recorded). Before it, compare the two `git diff --name-only <merge base> … -- tests/acceptance .tickets` lists; none should be on both sides (this ticket changed no shared test file); if one is, the alignment way of the brief below.
+2. **Test designer** (`gov launch independent-test-designer DAEO-8nue`, fresh, a short batch): points 1 to 3. Red checked by you.
+3. **Engineer** (`gov launch engineer DAEO-8nue`, fresh): the fix and the builder tests.
+4. **Verify** every suite to its end (no `-x`), each with its own count, `tests/unit` and the validator.
+5. **Return** DONE or PACKAGES: this round's commits, each suite's count, what was decided about "each index", and the whole ticket's residual list as it now stands (the earlier R3 to R5 with what this round changed).
+

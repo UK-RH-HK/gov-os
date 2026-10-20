@@ -1,0 +1,22 @@
+hooks: 
+appended 3220 chars to /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md
+validator: RESULT: ALL PASS
+rebuild v0219 exit 0
+commit 1 exit 0
+28c1388e Decision register v0.219: DEC-717 (owner: W1-42 closed with the ticket tool, its 22 findings named for the exit auditor, the W1-43 audit in place of the missing probe, w1/W1-42 kept for DEC-711)
+Note added to DAEO-gjjf
+note exit 0
+Updated DAEO-gjjf -> closed
+tk close exit 0
+M  .tickets/DAEO-gjjf.md
+rebuild W1-42-tkclose exit 0
+commit 2 exit 0
+c215459d W1-42 closed with the ticket tool by the owner's decision (DEC-717; gov close refused on the two named red cases, history findings, no probe and a stale checkpoint; regression green but for the named cases)
+appended 2355 chars to /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/bootstrap.md
+rebuild W1-42-bootstrap exit 0
+commit 3 exit 0
+60ea6924 Bootstrap: DAEO-gjjf (W1-42) closed with the ticket tool, for the exit auditor (DEC-717)
+c215459d W1-42 closed with the ticket tool by the owner's decision (DEC-717; gov close refused on the two named red cases, history findings, no probe and a stale checkpoint; regression green but for the named cases)
+28c1388e Decision register v0.219: DEC-717 (owner: W1-42 closed with the ticket tool, its 22 findings named for the exit auditor, the W1-43 audit in place of the missing probe, w1/W1-42 kept for DEC-711)
+ca426ca9 W1-42: the worktree list after the worktree's removal, and the exit report's lines after the merge (no run 8c, the lead's scratch folder; DEC-713, DEC-715, DEC-716)
+status: closed

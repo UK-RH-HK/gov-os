@@ -1,0 +1,10 @@
+
+## Run 2: your packages are decided; resume from your checkpoint
+
+You are a fresh lead resuming run 1 (`.gov-runtime/scratch/lead/CHECKPOINT.md` in this worktree; branch head `9bb97942` plus a merge of `w1/integrate` that brings the register). Read DEC-489 in `docs/DECISION_REGISTER.md` (the last section): it decides P-A, P-1, P-2, P-3, P-5, P-B and P-C.
+
+- **P-A:** the engineer writes `template/lefthook.yml.jinja` and the workflow's template with its own tools, then produces `lefthook.yml` and the file under `.github/workflows/` from them by a Bash command (a copy where they are the same text; a rendering by a short `python3 -c` where GitHub's expressions are escaped in the template). The Write and Edit tools are not used on the two root files. If the command is refused too, do not route around it: return the engineer's exact content and the refusal's text.
+- **P-1, P-2, P-3, P-5, P-B, P-C:** as DEC-489 says. A test designer first brings the cases to it where they differ (a mistyped or undeclared tier beside a declared one refuses; a project with no G3 check: the push goes through and the record says "no G3 check declared", never a pass; the note, its ref, what it holds; CI fails on no record and on a record for another commit), and adds the case for your own finding about a tier that is passed over.
+- **P-4 (tools on the hosted runner) is with the owner.** Build everything that does not depend on it. In the workflow, the steps that would install a tool are not written yet: leave one named place for them and one for W1-38's adapter comparison, and a case may hold only that the job fails, not passes, where a tool it needs is absent. Return what remains open as one package, with the gitleaks and rulesync registry entries (version, source, checksum) you did not read last time.
+- From now your own merge commits carry `Implements:` too (use the ticket's capability id), besides `Task:` and `Role: orchestrator`: `gov close` refuses a ticket with a commit that lacks it.
+- Then the loop as before: verify every suite, read the diff for places that end green without having run, return DONE or PACKAGES.

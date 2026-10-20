@@ -1,0 +1,1262 @@
+F.FFFFFFFF...F.F.FFFFFFFFFFFF                                            [100%]
+=================================== FAILURES ===================================
+_ test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it[a linked worktree] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_hooked_commit_that_runs0')
+box = <w2_05_support.Box object at 0x794ce7222c00>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-3161/test_a_hooked_commit_that_runs0/dev/tiers', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3161/test_a_hooked_commit_that_runs0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+linked = True
+
+    @pytest.mark.parametrize("linked", (True, False), ids=("a linked worktree", "the main tree"))
+    def test_a_hooked_commit_that_runs_the_retrieval_check_leaves_the_branch_as_the_commit_made_it(
+            tmp_path, box, retrieval_env, linked):
+        main, tree, trees = _setup(tmp_path, linked)
+        support.plain_hook(main, box.marks, support.retrieval_check_command())
+        before = support.repo_state(main, trees)
+        staged = _stage_a_change(tree)
+    
+        done = _commit(box, tree, retrieval_env)
+    
+        code, output = support.hook_result(box.marks)
+        assert code is not None, f"the pre-commit hook did not run:\n{support.said(done)}"
+>       assert_not_nested(box)
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_05_support.Box object at 0x794ce7222c00>
+
+    def assert_not_nested(box):
+        nested = support.nested_runs(box.marks)
+>       assert not nested, (
+            f"the check's own git calls reached this repository and ran its pre-commit hook again, {len(nested)} "
+            f"time(s) (the GIT_* variables the hook inherited reached a child git call): {nested[:3]}")
+E       AssertionError: the check's own git calls reached this repository and ran its pre-commit hook again, 1 time(s) (the GIT_* variables the hook inherited reached a child git call): ['nested in /tmp/pytest-of-usain/pytest-3161/test_a_hooked_commit_that_runs0/box/tmp/tmppb9e93qn/a-dev']
+E       assert not ['nested in /tmp/pytest-of-usain/pytest-3161/test_a_hooked_commit_that_runs0/box/tmp/tmppb9e93qn/a-dev']
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:51: AssertionError
+_ test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_refusing_hook_in_a_link0')
+box = <w2_05_support.Box object at 0x794ce706a7b0>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-3161/test_a_refusing_hook_in_a_link0/dev/tiers', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3161/test_a_refusing_hook_in_a_link0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+
+    def test_a_refusing_hook_in_a_linked_worktree_leaves_the_branch_the_reflog_and_the_staged_change(
+            tmp_path, box, retrieval_env):
+        main, tree, trees = _setup(tmp_path)
+        support.plain_hook(main, box.marks, support.retrieval_check_command(), refuse=True)
+        before = support.repo_state(main, trees)
+        _stage_a_change(tree)
+        staged_index = support.git(tree, "ls-files", "--stage")
+    
+        done = _commit(box, tree, retrieval_env)
+    
+        code, output = support.hook_result(box.marks)
+        assert code is not None, f"the pre-commit hook did not run:\n{support.said(done)}"
+>       assert_not_nested(box)
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+box = <w2_05_support.Box object at 0x794ce706a7b0>
+
+    def assert_not_nested(box):
+        nested = support.nested_runs(box.marks)
+>       assert not nested, (
+            f"the check's own git calls reached this repository and ran its pre-commit hook again, {len(nested)} "
+            f"time(s) (the GIT_* variables the hook inherited reached a child git call): {nested[:3]}")
+E       AssertionError: the check's own git calls reached this repository and ran its pre-commit hook again, 1 time(s) (the GIT_* variables the hook inherited reached a child git call): ['nested in /tmp/pytest-of-usain/pytest-3161/test_a_refusing_hook_in_a_link0/box/tmp/tmp7iew_ebd/a-dev']
+E       assert not ['nested in /tmp/pytest-of-usain/pytest-3161/test_a_refusing_hook_in_a_link0/box/tmp/tmp7iew_ebd/a-dev']
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:51: AssertionError
+_ test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0')
+box = <w2_05_support.Box object at 0x794ce70160f0>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/dev/tiers', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+
+    def test_a_commit_in_a_linked_worktree_through_lefthook_and_the_project_hooks_file(tmp_path, box, retrieval_env):
+        """The project's own ``lefthook.yml`` (pre-commit: ``gov ci checks G1 G2`` and ``gov ci staged-secrets``),
+        installed in a temporary repository whose G1 check is the retrieval-regression declaration."""
+        skip_without("lefthook", "gitleaks")
+        assert support.LEFTHOOK_YML.is_file(), "lefthook.yml is absent from the repository root"
+        main, tree, trees = _setup(tmp_path, hooks_file=support.LEFTHOOK_YML)
+        installed = box.run(["lefthook", "install"], cwd=main, env=box.env())
+        assert installed.returncode == 0, f"lefthook install refused the project's lefthook.yml:\n{support.said(installed)}"
+        assert (support.common_dir_of(main) / "hooks" / "pre-commit").is_file(), "lefthook installed no pre-commit hook"
+        before = support.repo_state(main, trees)
+        staged = _stage_a_change(tree)
+    
+        done = _commit(box, tree, retrieval_env)
+    
+>       assert_as_the_commit_made_them(main, tree, trees, before, staged, done)
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+main = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/repo')
+tree = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/wt')
+trees = [PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/repo'), PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/wt')]
+before = RepoState(refs={'refs/heads/main': '0670fc008698a17d1d602d2c4af15940205310d2', 'refs/heads/w2-05/feature': '0670fc0086...2', '/tmp/pytest-of-usain/pytest-3161/test_a_commit_in_a_linked_work0/wt': '0670fc008698a17d1d602d2c4af15940205310d2'})
+staged = 'ccc6127bb36d75347172657d9fb666155160ed8f'
+done = CompletedProcess(args=['/usr/bin/git', 'commit', '-q', '-m', 'the hooked change'], returncode=128, stdout='', stderr='... ref \'HEAD\': is at 0ff14f4ec8f8ea9fa7ecc28715dacdb21882d3cd but expected 0670fc008698a17d1d602d2c4af15940205310d2\n')
+
+    def assert_as_the_commit_made_them(main, tree, trees, before, staged, done):
+        """Every half of KPI success 2 for a commit that went through."""
+        what = f"a hooked commit in {'a linked worktree' if tree != main else 'the main tree'}"
+        after = support.repo_state(main, trees)
+        branch = _branch_of(tree)
+        old, new = before.heads[str(tree)], after.heads[str(tree)]
+>       assert done.returncode == 0, f"{what} was refused:\n{support.said(done)}"
+E       AssertionError: a hooked commit in a linked worktree was refused:
+E         exit 128
+E         --- stdout
+E         
+E         --- stderr
+E         [38;2;56;56;56m╭──────────────────────────────────────────╮[m
+E         [38;2;56;56;56m│[m 🥊 lefthook  v2.1.15   hook:  [1mpre-commit[m [38;2;56;56;56m│[m
+E         [38;2;56;56;56m╰──────────────────────────────────────────╯[m
+E         ┃  checks ❯ 
+E         {
+E           "tiers": [
+E             "G1",
+E             "G2"
+E           ],
+E           "checks": {
+E             "retrieval-regression": "GREEN",
+E             "w2-05-g2": "GREEN"
+E           }
+E         }
+E         
+E         ┃  staged-secrets ❯ 
+E         {
+E           "scans": 2,
+E           "secrets": 0
+E         }
+E         
+E         [38;2;56;56;56m  ────────────────────────────────────[m
+E         summary: (done in 3.22 seconds)
+E         ✔️ checks (2.58 seconds)
+E         ✔️ staged-secrets (0.64 seconds)
+E         fatal: cannot lock ref 'HEAD': is at 0ff14f4ec8f8ea9fa7ecc28715dacdb21882d3cd but expected 0670fc008698a17d1d602d2c4af15940205310d2
+E         
+E       assert 128 == 0
+E        +  where 128 = CompletedProcess(args=['/usr/bin/git', 'commit', '-q', '-m', 'the hooked change'], returncode=128, stdout='', stderr='... ref \'HEAD\': is at 0ff14f4ec8f8ea9fa7ecc28715dacdb21882d3cd but expected 0670fc008698a17d1d602d2c4af15940205310d2\n').returncode
+
+tests/acceptance/W2-05/test_w2_05_linked_worktree.py:66: AssertionError
+_ test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy[the check's declared command] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under0')
+box = <w2_05_support.Box object at 0x794ce7068620>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under0/dev/tiers', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under0/box/home', 'LC_ALL': 'C.UTF-8', ...}
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+how = "the check's declared command"
+
+    @pytest.mark.parametrize("how", ("the check's declared command", "gov ci checks G1"))
+    def test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy(tmp_path, box, retrieval_env,
+                                                                                        decoy, how):
+        project = support.gov_project(tmp_path / "project")
+        env = dict(retrieval_env, **support.planted(decoy[0]))
+        command = support.retrieval_check_command() if how.startswith("the check") else "gov ci checks G1"
+    
+        done = box.run(["sh", "-c", command], cwd=project, env=env)
+    
+>       assert_untouched(decoy, f"`{command}` under a planted GIT_DIR")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+what = '`python3 -m gov.retrieval.retrieve_check` under a planted GIT_DIR'
+
+    def assert_untouched(decoy, what):
+        repo, before = decoy
+        after = support.folder_fingerprint(repo)
+        changed = sorted(rel for rel in set(before) | set(after) if before.get(rel) != after.get(rel))
+>       assert not changed, (f"{what}: the planted GIT_DIR / GIT_INDEX_FILE reached a child git call; the decoy "
+                             f"repository changed: {changed[:12]}\n" + support.git(repo, "log", "--all", "--oneline",
+                                                                               "-5"))
+E       AssertionError: `python3 -m gov.retrieval.retrieve_check` under a planted GIT_DIR: the planted GIT_DIR / GIT_INDEX_FILE reached a child git call; the decoy repository changed: ['.git/COMMIT_EDITMSG', '.git/index', '.git/logs/HEAD', '.git/logs/refs/heads/main', '.git/objects/02/462c9e41fafa1060a5a6e57f660345432b1e75', '.git/objects/03/8d9ec52d2345466da4aae66db6307d0172eba1', '.git/objects/04/ac36d7b6a81c1c436369628315ce224ef08125', '.git/objects/09/883f441d0606a9faeb1d66267c7e1baa1f8ad7', '.git/objects/0e/99e8a61718d49fdb2f9b437bb4ad90b5463460', '.git/objects/14/aa00cdd7c2a3d857a2126a22eb91cd2ef024ce', '.git/objects/17/4920b7b45cdced9ccd82d51dd5008dea20c263', '.git/objects/18/a600d2cd960be475ddcd06968c5538c757947e']
+E         7a0bf98 decoy commit
+E         4d0c139 adopted
+E         
+E       assert not ['.git/COMMIT_EDITMSG', '.git/index', '.git/logs/HEAD', '.git/logs/refs/heads/main', '.git/objects/02/462c9e41fafa1060a5a6e57f660345432b1e75', '.git/objects/03/8d9ec52d2345466da4aae66db6307d0172eba1', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:48: AssertionError
+_ test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy[gov ci checks G1] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under1')
+box = <w2_05_support.Box object at 0x794ce7016c90>
+retrieval_env = {'GOV_DEV_TIERS': '/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under1/dev/tiers', 'HF_HUB_OFFLINE': '1', 'HOME': '/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under1/box/home', 'LC_ALL': 'C.UTF-8', ...}
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under1/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+how = 'gov ci checks G1'
+
+    @pytest.mark.parametrize("how", ("the check's declared command", "gov ci checks G1"))
+    def test_the_retrieval_check_under_a_planted_git_dir_measures_and_leaves_the_decoy(tmp_path, box, retrieval_env,
+                                                                                        decoy, how):
+        project = support.gov_project(tmp_path / "project")
+        env = dict(retrieval_env, **support.planted(decoy[0]))
+        command = support.retrieval_check_command() if how.startswith("the check") else "gov ci checks G1"
+    
+        done = box.run(["sh", "-c", command], cwd=project, env=env)
+    
+>       assert_untouched(decoy, f"`{command}` under a planted GIT_DIR")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_retrieval_check_under1/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+what = '`gov ci checks G1` under a planted GIT_DIR'
+
+    def assert_untouched(decoy, what):
+        repo, before = decoy
+        after = support.folder_fingerprint(repo)
+        changed = sorted(rel for rel in set(before) | set(after) if before.get(rel) != after.get(rel))
+>       assert not changed, (f"{what}: the planted GIT_DIR / GIT_INDEX_FILE reached a child git call; the decoy "
+                             f"repository changed: {changed[:12]}\n" + support.git(repo, "log", "--all", "--oneline",
+                                                                               "-5"))
+E       AssertionError: `gov ci checks G1` under a planted GIT_DIR: the planted GIT_DIR / GIT_INDEX_FILE reached a child git call; the decoy repository changed: ['.git/COMMIT_EDITMSG', '.git/index', '.git/logs/HEAD', '.git/logs/refs/heads/main', '.git/objects/02/462c9e41fafa1060a5a6e57f660345432b1e75', '.git/objects/03/8d9ec52d2345466da4aae66db6307d0172eba1', '.git/objects/04/ac36d7b6a81c1c436369628315ce224ef08125', '.git/objects/09/883f441d0606a9faeb1d66267c7e1baa1f8ad7', '.git/objects/0e/99e8a61718d49fdb2f9b437bb4ad90b5463460', '.git/objects/14/aa00cdd7c2a3d857a2126a22eb91cd2ef024ce', '.git/objects/17/4920b7b45cdced9ccd82d51dd5008dea20c263', '.git/objects/18/a600d2cd960be475ddcd06968c5538c757947e']
+E         ed9e400 decoy commit
+E         5463b60 adopted
+E         
+E       assert not ['.git/COMMIT_EDITMSG', '.git/index', '.git/logs/HEAD', '.git/logs/refs/heads/main', '.git/objects/02/462c9e41fafa1060a5a6e57f660345432b1e75', '.git/objects/03/8d9ec52d2345466da4aae66db6307d0172eba1', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:48: AssertionError
+__ test_a_staged_secret_is_found_under_a_planted_decoy_index[GIT_INDEX_FILE] ___
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_staged_secret_is_found_0')
+box = <w2_05_support.Box object at 0x794ce7069d90>, plants = 'GIT_INDEX_FILE'
+
+    @pytest.mark.parametrize("plants", ("GIT_INDEX_FILE", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_staged_secret_is_found_under_a_planted_decoy_index(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=True)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=False)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_INDEX_FILE":
+            planted.pop("GIT_DIR")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert done.returncode != 0 and STAGED_SECRET_EXIT in done.stdout + done.stderr, (
+            f"the secret staged in the project was not found under a planted {plants} (it read the decoy's clean "
+            f"index):\n{support.said(done)}")
+E       AssertionError: the secret staged in the project was not found under a planted GIT_INDEX_FILE (it read the decoy's clean index):
+E         exit 0
+E         --- stdout
+E         {"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}
+E         
+E         --- stderr
+E         [90m3:13PM[0m [31mERR[0m [1m[git] fatal: unable to read fa59b68adb437b55f19e98ebddc6c4c145cefdcb[0m
+E         [90m3:13PM[0m [31mERR[0m [36merror=[0m[31m[1m"stderr is not empty"[0m[0m
+E         [90m3:13PM[0m [31mERR[0m [1m[git] fatal: unable to read fa59b68adb437b55f19e98ebddc6c4c145cefdcb[0m
+E         [90m3:13PM[0m [31mERR[0m [36merror=[0m[31m[1m"stderr is not empty"[0m[0m
+E         
+E       assert (0 != 0)
+E        +  where 0 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "...m\n\x1b[90m3:13PM\x1b[0m \x1b[31mERR\x1b[0m \x1b[36merror=\x1b[0m\x1b[31m\x1b[1m"stderr is not empty"\x1b[0m\x1b[0m\n').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:101: AssertionError
+_ test_a_staged_secret_is_found_under_a_planted_decoy_index[GIT_DIR and GIT_INDEX_FILE] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_staged_secret_is_found_1')
+box = <w2_05_support.Box object at 0x794ce7069700>
+plants = 'GIT_DIR and GIT_INDEX_FILE'
+
+    @pytest.mark.parametrize("plants", ("GIT_INDEX_FILE", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_staged_secret_is_found_under_a_planted_decoy_index(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=True)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=False)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_INDEX_FILE":
+            planted.pop("GIT_DIR")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert done.returncode != 0 and STAGED_SECRET_EXIT in done.stdout + done.stderr, (
+            f"the secret staged in the project was not found under a planted {plants} (it read the decoy's clean "
+            f"index):\n{support.said(done)}")
+E       AssertionError: the secret staged in the project was not found under a planted GIT_DIR and GIT_INDEX_FILE (it read the decoy's clean index):
+E         exit 0
+E         --- stdout
+E         {"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}
+E         
+E         --- stderr
+E         
+E       assert (0 != 0)
+E        +  where 0 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:101: AssertionError
+____ test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret[GIT_DIR] ____
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_clean_index_is_not_refu0')
+box = <w2_05_support.Box object at 0x794ce7014e30>, plants = 'GIT_DIR'
+
+    @pytest.mark.parametrize("plants", ("GIT_DIR", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=False)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=True)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_DIR":
+            planted.pop("GIT_INDEX_FILE")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert done.returncode == 0, (f"the project's clean index was refused under a planted {plants} (it read the "
+                                      f"decoy's staged secret):\n{support.said(done)}")
+E       AssertionError: the project's clean index was refused under a planted GIT_DIR (it read the decoy's staged secret):
+E         exit 3
+E         --- stdout
+E         Finding:     token = [1;3;mREDACTED[0m
+E         Secret:      [1;3;mREDACTED[0m
+E         RuleID:      gov-token-digit
+E         Entropy:     4.436605
+E         File:        config.txt
+E         Line:        1
+E         Fingerprint: config.txt:gov-token-digit:1
+E         
+E         {"ok": false, "command": "ci", "result": {}, "session": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}
+E         
+E         --- stderr
+E         
+E       assert 3 == 0
+E        +  where 3 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=3, stdout='Finding:     token = \x1b[1;3;m...rror": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:119: AssertionError
+_ test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret[GIT_DIR and GIT_INDEX_FILE] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_a_clean_index_is_not_refu1')
+box = <w2_05_support.Box object at 0x794ce7014b00>
+plants = 'GIT_DIR and GIT_INDEX_FILE'
+
+    @pytest.mark.parametrize("plants", ("GIT_DIR", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_clean_index_is_not_refused_for_a_decoy_s_staged_secret(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=False)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=True)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_DIR":
+            planted.pop("GIT_INDEX_FILE")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert done.returncode == 0, (f"the project's clean index was refused under a planted {plants} (it read the "
+                                      f"decoy's staged secret):\n{support.said(done)}")
+E       AssertionError: the project's clean index was refused under a planted GIT_DIR and GIT_INDEX_FILE (it read the decoy's staged secret):
+E         exit 3
+E         --- stdout
+E         Finding:     token = [1;3;mREDACTED[0m
+E         Secret:      [1;3;mREDACTED[0m
+E         RuleID:      gov-token-digit
+E         Entropy:     4.436605
+E         File:        config.txt
+E         Line:        1
+E         Fingerprint: config.txt:gov-token-digit:1
+E         
+E         {"ok": false, "command": "ci", "result": {}, "session": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}
+E         
+E         --- stderr
+E         
+E       assert 3 == 0
+E        +  where 3 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=3, stdout='Finding:     token = \x1b[1;3;m...rror": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:119: AssertionError
+________ test_read_merge_under_planted_trace_variables_writes_no_trace _________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_read_merge_under_planted_0')
+box = <w2_05_support.Box object at 0x794ce71ecd40>
+
+    def test_read_merge_under_planted_trace_variables_writes_no_trace(tmp_path, box):
+        repo, merge = _merge_repo(tmp_path / "repo")
+        plain = _read_merge(box, repo, merge)
+        assert "raised" not in plain, f"read_merge could not read a plain merge; the case needs one: {plain}"
+        traces = tmp_path / "traces"
+    
+        reading = _read_merge(box, repo, merge, **support.trace_plants(traces))
+    
+>       assert_no_trace(traces, "read_merge under planted GIT_TRACE variables (W2-M105)")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_read_merge_under_planted_0/traces')
+what = 'read_merge under planted GIT_TRACE variables (W2-M105)'
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: read_merge under planted GIT_TRACE variables (W2-M105): a child git call wrote the planted trace target(s) ['git_trace', 'git_trace2', 'git_trace2_event', 'git_trace_setup']
+E       assert not ['git_trace', 'git_trace2', 'git_trace2_event', 'git_trace_setup']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:55: AssertionError
+______________ test_read_merge_in_a_partial_clone_fetches_nothing ______________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_read_merge_in_a_partial_c0')
+box = <w2_05_support.Box object at 0x794ce71ed9a0>
+
+    def test_read_merge_in_a_partial_clone_fetches_nothing(tmp_path, box):
+        """A clone made with ``--filter=tree:0`` lacks the trees of the merge; its ``origin`` serves them through a
+        marking ``upload-pack``. With ``GIT_NO_LAZY_FETCH`` set by the code, nothing is fetched and the read fails
+        (it cannot know the merge's files); without it git fetches the trees behind the reader's back."""
+        no_fetch = dict(support.clean_env(), GIT_NO_LAZY_FETCH="1")
+        repo, merge = _merge_repo(tmp_path / "repo")
+        server = tmp_path / "server.git"
+        support.git(tmp_path, "clone", "-q", "--bare", repo, server, env=no_fetch)
+        support.git(server, "config", "uploadpack.allowFilter", "true", env=no_fetch)
+        support.git(server, "config", "uploadpack.allowAnySHA1InWant", "true", env=no_fetch)
+        clone = tmp_path / "clone"
+        support.git(tmp_path, "clone", "-q", "--no-checkout", "--filter=tree:0", f"file://{server}", clone, env=no_fetch)
+        mark = tmp_path / "fetch-mark"
+        upload = tmp_path / "upload-pack"
+        upload.write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec git-upload-pack \"$@\"\n")
+        upload.chmod(0o755)
+        support.git(clone, "config", "remote.origin.uploadpack", upload, env=no_fetch)
+        missing = support.git(clone, "rev-list", "--objects", "--missing=print", merge, env=no_fetch)
+        assert any(line.startswith("?") for line in missing.splitlines()), "the partial clone lacks nothing; the case is wrong"
+    
+        reading = _read_merge(box, clone, merge)
+    
+        fetched = mark.read_text().splitlines() if mark.is_file() else []
+>       assert not fetched, (f"read_merge fetched {len(fetched)} time(s) from origin in a partial clone "
+                             f"(GIT_NO_LAZY_FETCH was not set, W2-M105); it answered {reading}")
+E       AssertionError: read_merge fetched 4 time(s) from origin in a partial clone (GIT_NO_LAZY_FETCH was not set, W2-M105); it answered {'own': ['d.txt'], 'brought': ['b.txt', 'c.txt']}
+E       assert not ['/tmp/pytest-of-usain/pytest-3161/test_read_merge_in_a_partial_c0/server.git', '/tmp/pytest-of-usain/pytest-3161/test..._read_merge_in_a_partial_c0/server.git', '/tmp/pytest-of-usain/pytest-3161/test_read_merge_in_a_partial_c0/server.git']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:249: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[trace variables] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat1')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat1/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = 'trace variables'
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat1/traces')
+what = 'the containment check with trace variables'
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with trace variables: a child git call wrote the planted trace target(s) ['git_trace', 'git_trace2', 'git_trace2_event', 'git_trace_setup']
+E       assert not ['git_trace', 'git_trace2', 'git_trace2_event', 'git_trace_setup']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:55: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[a trace setting in the person's git configuration] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat2')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat2/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = "a trace setting in the person's git configuration"
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_containment_check_cat2/traces')
+what = "the containment check with a trace setting in the person's git configuration"
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with a trace setting in the person's git configuration: a child git call wrote the planted trace target(s) ['user-config-trace2']
+E       assert not ['user-config-trace2']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:55: AssertionError
+_ test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_gov_close_runs_its_subpro0')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3161/test_gov_close_runs_its_subpro0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment(tmp_path, decoy):
+        """Red until W2-53 merges (``src/gov/close/**``)."""
+        import w2_01_support as w201
+        base = w201.base
+        ticket, wbs = "PROJ-genv", "W1-genv"
+        record = tmp_path / "seen-by-the-test.json"
+        traces = tmp_path / "traces"
+        project = w201.Project(tmp_path / "project")
+        w201.create_ticket(project, ticket, wbs)
+        project.write(f"tests/acceptance/{wbs}/test_records_its_environment.py", _ENV_TEST.format(record=str(record)))
+        project.commit("acceptance tests: the environment", who=w201.TEST_DESIGNER,
+                       trailers=w201.trailers_of(ticket, role="independent-test-designer"), exact=True)
+        w201.engineer_commit(project, ticket, {"src/example/feature.py": "# feature\n"})
+        w201.checkpointed(project, ticket)
+        sandbox = w201.cli_support.make_sandbox(tmp_path / "sandbox")
+        interface = w201.cli_support.load_interface(w201.REPO_ROOT)
+        plants = dict(support.planted(decoy[0]), **support.trace_plants(traces))
+        traces.mkdir(exist_ok=True)
+        gitconfig = Path(sandbox.home) / ".gitconfig"
+        gitconfig.write_text((gitconfig.read_text() if gitconfig.is_file() else "")
+                             + f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+        env = dict(base.sandbox_env(sandbox), **plants)
+    
+        run = base.run_close(project, sandbox, ticket, env=env)
+    
+        assert record.is_file(), f"gov close did not run the ticket's acceptance test:\n{run.describe()}"
+        reached = sorted(set(json.loads(record.read_text())) & set(plants))
+>       assert not reached, f"the planted {reached} reached the test run of gov close (W2-M161):\n{run.describe()}"
+E       AssertionError: the planted ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', 'GIT_TRACE_SETUP'] reached the test run of gov close (W2-M161):
+E         gov close PROJ-genv --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "close", "result": {"ticket": "PROJ-genv", "close_record": "docs/close/PROJ-genv/CL-PROJ-genv.md", "checkpoint": "docs/checkpoints/PROJ-genv/CP-PROJ-genv-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.84, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.4, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:333: AssertionError
+____________ test_the_guard_hook_does_not_run_the_git_first_on_path ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_guard_hook_does_not_r0')
+
+    def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
+        """Red until W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tool_input = w102.edit_tool_input("Write", project / "src/gov/guard/decide.py")
+        plain = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID)
+        assert plain.decision == "allow", f"the guard did not allow an in-scope write; the case needs it: {plain.describe()}"
+        fake = tmp_path / "fake-bin"
+        fake.mkdir()
+        mark = tmp_path / "fake-git-ran"
+        (fake / "git").write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec {support.GIT} \"$@\"\n")
+        (fake / "git").chmod(0o755)
+    
+        result = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID,
+                               extra_env={"PATH": f"{fake}:{os.environ.get('PATH', support.SYSTEM_PATH)}"})
+    
+        ran = mark.read_text().splitlines() if mark.is_file() else []
+>       assert not ran, f"the guard hook ran the git first on PATH, not git by absolute path (W2-L160): {ran[:3]}"
+E       AssertionError: the guard hook ran the git first on PATH, not git by absolute path (W2-L160): ['-C /tmp/pytest-of-usain/pytest-3161/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+E       assert not ['-C /tmp/pytest-of-usain/pytest-3161/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:365: AssertionError
+_ test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_guard_hook_refuses_wi0')
+fifo_cleanup = [PosixPath('/tmp/pytest-of-usain/pytest-3161/test_the_guard_hook_refuses_wi0/project/.git/worktrees/wt/HEAD')]
+
+    def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
+        """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
+        look-up must give up within its own limit and refuse (DEC-580), before the hook's 20 s deadline. Red until
+        W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tree = tmp_path / "wt"
+        w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
+        head = support.git_dir_of(tree) / "HEAD"
+        head.unlink()
+        os.mkfifo(head)
+        fifo_cleanup.append(head)
+    
+        result = w102.run_hook(tree, "Write", w102.edit_tool_input("Write", tree / "src/gov/guard/decide.py"), sandbox,
+                               role=w102.ENGINEER, ticket=w102.TICKET_ID)
+    
+>       assert result.decision != "timeout", (
+            f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
+            f"look-up waited (W2-L160: the look-up has no limit of its own): {result.describe()}")
+E       AssertionError: the guard hook did not answer within the hook's 20 s deadline while its freeze look-up waited (W2-L160: the look-up has no limit of its own): decision=timeout exit=None stdout='' stderr=''
+E       assert 'timeout' != 'timeout'
+E        +  where 'timeout' = HookResult(decision='timeout', returncode=None, stdout='', stderr='', seconds=20.01764667700627).decision
+
+tests/acceptance/W2-05/test_w2_05_planted.py:384: AssertionError
+__ test_install_and_uninstall_leave_the_settings_byte_identical[lefthook.yml] __
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_lea0')
+box = <w2_05_support.Box object at 0x794ce5f5bb00>, which = 'project'
+
+    @pytest.mark.parametrize("which", ("project", "template"), ids=("lefthook.yml", "the template's hooks file"))
+    def test_install_and_uninstall_leave_the_settings_byte_identical(tmp_path, box, which):
+        skip_without("lefthook")
+        repo = _repo(tmp_path / "repo", _hooks_file(which))
+        committed = _committed(repo)
+        for verb in ("install", "uninstall", "install", "uninstall"):
+            _lefthook(box, repo, verb)
+>           assert_byte_identical(repo, committed, verb)
+
+tests/acceptance/W2-05/test_w2_05_settings.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tree = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_lea0/repo')
+committed = b'{\n  "permissions": {\n    "deny": [\n      "Read(./secrets/**)",\n      "Edit(./.gov-runtime/**)",\n      "Bash(git...        }\n        ]\n      }\n    ]\n  },\n  "env": {\n    "GOV_GUARD": "on",\n    "DISABLE_TELEMETRY": "1"\n  }\n}\n'
+after = 'uninstall'
+
+    def assert_byte_identical(tree, committed, after):
+        now = (tree / SETTINGS).read_bytes()
+>       assert now == committed, (
+            f"`lefthook {after}` changed {SETTINGS} in {tree.name} (it must stay byte-identical to the committed "
+            f"file):\n" + support.git(tree, "diff", "--", SETTINGS)[:3000])
+E       AssertionError: `lefthook uninstall` changed .claude/settings.json in repo (it must stay byte-identical to the committed file):
+E         diff --git a/.claude/settings.json b/.claude/settings.json
+E         index d3ecf03..9161200 100644
+E         --- a/.claude/settings.json
+E         +++ b/.claude/settings.json
+E         @@ -1,69 +1,63 @@
+E          {
+E         -  "permissions": {
+E         -    "deny": [
+E         -      "Read(./secrets/**)",
+E         -      "Edit(./.gov-runtime/**)",
+E         -      "Bash(git push --force:*)"
+E         -    ],
+E         -    "allow": [
+E         -      "Bash(gov status:*)"
+E         -    ]
+E         +  "env": {
+E         +    "DISABLE_TELEMETRY": "1",
+E         +    "GOV_GUARD": "on"
+E            },
+E            "hooks": {
+E         -    "SessionStart": [
+E         +    "PostToolUse": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PreToolUse": [
+E         +    "PostToolUseFailure": [
+E                {
+E         -        "matcher": "*",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PostToolUse": [
+E         +    "PreCompact": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "PostToolUseFailure": [
+E         +    "PreToolUse": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "*"
+E                }
+E              ],
+E         -    "PreCompact": [
+E         +    "SessionStart": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E         @@ -72,9 +66,9 @@
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E                      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/govern
+E       assert b'{\n  "env":...  ]\n  }\n}\n' == b'{\n  "permi..."1"\n  }\n}\n'
+E         
+E         At index 5 diff: b'e' != b'p'
+E         Use -v to get more diff
+
+tests/acceptance/W2-05/test_w2_05_settings.py:55: AssertionError
+_ test_install_and_uninstall_leave_the_settings_byte_identical[the template's hooks file] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_lea1')
+box = <w2_05_support.Box object at 0x794ce70674d0>, which = 'template'
+
+    @pytest.mark.parametrize("which", ("project", "template"), ids=("lefthook.yml", "the template's hooks file"))
+    def test_install_and_uninstall_leave_the_settings_byte_identical(tmp_path, box, which):
+        skip_without("lefthook")
+        repo = _repo(tmp_path / "repo", _hooks_file(which))
+        committed = _committed(repo)
+        for verb in ("install", "uninstall", "install", "uninstall"):
+            _lefthook(box, repo, verb)
+>           assert_byte_identical(repo, committed, verb)
+
+tests/acceptance/W2-05/test_w2_05_settings.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tree = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_lea1/repo')
+committed = b'{\n  "permissions": {\n    "deny": [\n      "Read(./secrets/**)",\n      "Edit(./.gov-runtime/**)",\n      "Bash(git...        }\n        ]\n      }\n    ]\n  },\n  "env": {\n    "GOV_GUARD": "on",\n    "DISABLE_TELEMETRY": "1"\n  }\n}\n'
+after = 'uninstall'
+
+    def assert_byte_identical(tree, committed, after):
+        now = (tree / SETTINGS).read_bytes()
+>       assert now == committed, (
+            f"`lefthook {after}` changed {SETTINGS} in {tree.name} (it must stay byte-identical to the committed "
+            f"file):\n" + support.git(tree, "diff", "--", SETTINGS)[:3000])
+E       AssertionError: `lefthook uninstall` changed .claude/settings.json in repo (it must stay byte-identical to the committed file):
+E         diff --git a/.claude/settings.json b/.claude/settings.json
+E         index d3ecf03..9161200 100644
+E         --- a/.claude/settings.json
+E         +++ b/.claude/settings.json
+E         @@ -1,69 +1,63 @@
+E          {
+E         -  "permissions": {
+E         -    "deny": [
+E         -      "Read(./secrets/**)",
+E         -      "Edit(./.gov-runtime/**)",
+E         -      "Bash(git push --force:*)"
+E         -    ],
+E         -    "allow": [
+E         -      "Bash(gov status:*)"
+E         -    ]
+E         +  "env": {
+E         +    "DISABLE_TELEMETRY": "1",
+E         +    "GOV_GUARD": "on"
+E            },
+E            "hooks": {
+E         -    "SessionStart": [
+E         +    "PostToolUse": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PreToolUse": [
+E         +    "PostToolUseFailure": [
+E                {
+E         -        "matcher": "*",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PostToolUse": [
+E         +    "PreCompact": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "PostToolUseFailure": [
+E         +    "PreToolUse": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "*"
+E                }
+E              ],
+E         -    "PreCompact": [
+E         +    "SessionStart": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E         @@ -72,9 +66,9 @@
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E                      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/govern
+E       assert b'{\n  "env":...  ]\n  }\n}\n' == b'{\n  "permi..."1"\n  }\n}\n'
+E         
+E         At index 5 diff: b'e' != b'p'
+E         Use -v to get more diff
+
+tests/acceptance/W2-05/test_w2_05_settings.py:55: AssertionError
+_ test_install_and_uninstall_from_a_linked_worktree_leave_both_settings_byte_identical _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_fro0')
+box = <w2_05_support.Box object at 0x794ce7066090>
+
+    def test_install_and_uninstall_from_a_linked_worktree_leave_both_settings_byte_identical(tmp_path, box):
+        skip_without("lefthook")
+        repo = _repo(tmp_path / "repo", _hooks_file("project"))
+        tree = support.add_worktree(repo, tmp_path / "wt")
+        committed = _committed(repo)
+        for verb in ("install", "uninstall"):
+            _lefthook(box, tree, verb)
+>           assert_byte_identical(tree, committed, verb)
+
+tests/acceptance/W2-05/test_w2_05_settings.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tree = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_install_and_uninstall_fro0/wt')
+committed = b'{\n  "permissions": {\n    "deny": [\n      "Read(./secrets/**)",\n      "Edit(./.gov-runtime/**)",\n      "Bash(git...        }\n        ]\n      }\n    ]\n  },\n  "env": {\n    "GOV_GUARD": "on",\n    "DISABLE_TELEMETRY": "1"\n  }\n}\n'
+after = 'uninstall'
+
+    def assert_byte_identical(tree, committed, after):
+        now = (tree / SETTINGS).read_bytes()
+>       assert now == committed, (
+            f"`lefthook {after}` changed {SETTINGS} in {tree.name} (it must stay byte-identical to the committed "
+            f"file):\n" + support.git(tree, "diff", "--", SETTINGS)[:3000])
+E       AssertionError: `lefthook uninstall` changed .claude/settings.json in wt (it must stay byte-identical to the committed file):
+E         diff --git a/.claude/settings.json b/.claude/settings.json
+E         index d3ecf03..9161200 100644
+E         --- a/.claude/settings.json
+E         +++ b/.claude/settings.json
+E         @@ -1,69 +1,63 @@
+E          {
+E         -  "permissions": {
+E         -    "deny": [
+E         -      "Read(./secrets/**)",
+E         -      "Edit(./.gov-runtime/**)",
+E         -      "Bash(git push --force:*)"
+E         -    ],
+E         -    "allow": [
+E         -      "Bash(gov status:*)"
+E         -    ]
+E         +  "env": {
+E         +    "DISABLE_TELEMETRY": "1",
+E         +    "GOV_GUARD": "on"
+E            },
+E            "hooks": {
+E         -    "SessionStart": [
+E         +    "PostToolUse": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PreToolUse": [
+E         +    "PostToolUseFailure": [
+E                {
+E         -        "matcher": "*",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PostToolUse": [
+E         +    "PreCompact": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "PostToolUseFailure": [
+E         +    "PreToolUse": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/posttooluse.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/pretooluse.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "*"
+E                }
+E              ],
+E         -    "PreCompact": [
+E         +    "SessionStart": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/precompact.py",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/governance/kernel/hooks/sessionstart.py",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E         @@ -72,9 +66,9 @@
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E                      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/govern
+E       assert b'{\n  "env":...  ]\n  }\n}\n' == b'{\n  "permi..."1"\n  }\n}\n'
+E         
+E         At index 5 diff: b'e' != b'p'
+E         Use -v to get more diff
+
+tests/acceptance/W2-05/test_w2_05_settings.py:55: AssertionError
+______ test_adapter_portability_stays_green_through_install_and_uninstall ______
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_adapter_portability_stays0')
+box = <w2_05_support.Box object at 0x794ce71ed700>
+
+    def test_adapter_portability_stays_green_through_install_and_uninstall(tmp_path, box):
+        """W1-38's adopted project, generated by the real rulesync and committed, with the project's hooks file."""
+        skip_without("lefthook", "rulesync")
+        import w1_38_support as w138
+        if w138.rulesync_version() is None:
+            pytest.skip(f"rulesync is not installed at {w138.RULESYNC_BIN}")
+        project = tmp_path / "project"
+        project.mkdir()
+        w138.init_git(project)
+        w138.build_project_from_template(project)
+        generated = w138.run_rulesync_generate(project)
+        assert generated.returncode == 0, f"rulesync generate failed: {generated.stderr}"
+        support.write(project, "lefthook.yml", _hooks_file("project").read_text(encoding="utf-8"))
+        w138.commit_all(project, "generated, with the hooks file")
+        assert (project / SETTINGS).is_file(), f"rulesync generate wrote no {SETTINGS}; the case needs one"
+        committed = _committed(project)
+        first = w138.run_portability_check(project)
+        assert first.returncode == 0, (f"adapter-portability is not green before lefthook runs; the case needs a green "
+                                       f"start:\n{w138.output_of(first)[-3000:]}")
+        for verb in ("install", "uninstall"):
+            _lefthook(box, project, verb)
+>           assert_byte_identical(project, committed, verb)
+
+tests/acceptance/W2-05/test_w2_05_settings.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+tree = PosixPath('/tmp/pytest-of-usain/pytest-3161/test_adapter_portability_stays0/project')
+committed = b'{\n  "$schema": "https://json.schemastore.org/claude-code-settings.json",\n  "hooks": {\n    "PreToolUse": [\n      ... "Bash(npm install*)",\n      "Bash(pip install*)",\n      "Bash(sudo *)",\n      "Edit(.tickets/**)"\n    ]\n  }\n}\n'
+after = 'uninstall'
+
+    def assert_byte_identical(tree, committed, after):
+        now = (tree / SETTINGS).read_bytes()
+>       assert now == committed, (
+            f"`lefthook {after}` changed {SETTINGS} in {tree.name} (it must stay byte-identical to the committed "
+            f"file):\n" + support.git(tree, "diff", "--", SETTINGS)[:3000])
+E       AssertionError: `lefthook uninstall` changed .claude/settings.json in project (it must stay byte-identical to the committed file):
+E         diff --git a/.claude/settings.json b/.claude/settings.json
+E         index f85022c..06d215a 100644
+E         --- a/.claude/settings.json
+E         +++ b/.claude/settings.json
+E         @@ -1,70 +1,70 @@
+E          {
+E            "$schema": "https://json.schemastore.org/claude-code-settings.json",
+E            "hooks": {
+E         -    "PreToolUse": [
+E         +    "PostToolUse": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\"",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PostToolUse": [
+E         +    "PostToolUseFailure": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E                      "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+E         -            "timeout": 60
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E         -        ]
+E         +        ],
+E         +        "matcher": "Bash"
+E                }
+E              ],
+E         -    "PostToolUseFailure": [
+E         +    "PreCompact": [
+E                {
+E         -        "matcher": "Bash",
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/posttooluse.py\"",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py\"",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "SessionStart": [
+E         +    "PreToolUse": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/sessionstart.py\"",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/pretooluse.py\"",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "Stop": [
+E         +    "SessionStart": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py\"",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/sessionstart.py\"",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E              ],
+E         -    "PreCompact": [
+E         +    "Stop": [
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         -            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/precompact.py\"",
+E         -            "timeout": 60
+E         +            "command": "python3 \"$CLAUDE_PROJECT_DIR/governance/kernel/hooks/stop.py\"",
+E         +            "timeout": 60,
+E         +            "type": "command"
+E                    }
+E                  ]
+E                }
+E         @@ -73,9 +73,9 @@
+E                {
+E                  "hooks": [
+E                    {
+E         -            "type": "command",
+E         
+E       assert b'{\n  "$sche...  ]\n  }\n}\n' == b'{\n  "$sche...  ]\n  }\n}\n'
+E         
+E         At index 92 diff: b'o' != b'r'
+E         Use -v to get more diff
+
+tests/acceptance/W2-05/test_w2_05_settings.py:55: AssertionError
+_______________ test_the_sweep_record_lists_the_calls_in_a_table _______________
+
+    def test_the_sweep_record_lists_the_calls_in_a_table():
+>       text = _sweep_text()
+               ^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _sweep_text():
+>       assert SWEEP.is_file(), f"the sweep record {support.SWEEP_REL} is absent (AR-2: the sweep is kept as a record)"
+E       AssertionError: the sweep record docs/research/AR-2-git-sweep.md is absent (AR-2: the sweep is kept as a record)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-05/docs/research/AR-2-git-sweep.md').is_file
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:24: AssertionError
+_____ test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep ______
+
+    def test_every_file_of_the_source_that_starts_git_is_named_in_the_sweep():
+>       text = _sweep_text()
+               ^^^^^^^^^^^^^
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:38: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _sweep_text():
+>       assert SWEEP.is_file(), f"the sweep record {support.SWEEP_REL} is absent (AR-2: the sweep is kept as a record)"
+E       AssertionError: the sweep record docs/research/AR-2-git-sweep.md is absent (AR-2: the sweep is kept as a record)
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/home/usain/gov-os-worktrees/W2-05/docs/research/AR-2-git-sweep.md').is_file
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:24: AssertionError
+_____________ test_the_one_helper_is_there_and_the_sweep_names_it ______________
+
+code_under_test = PosixPath('/home/usain/gov-os-worktrees/W2-05/src')
+
+    def test_the_one_helper_is_there_and_the_sweep_names_it(code_under_test):
+        done = subprocess.run(
+            [sys.executable, "-c", f"import {support.HELPER_MODULE} as m; print(m.__file__)"],
+            capture_output=True, text=True, env={"PATH": support.SYSTEM_PATH, "PYTHONPATH": str(code_under_test),
+                                                 "PYTHONDONTWRITEBYTECODE": "1"},
+            cwd=str(support.REPO_ROOT.parent), timeout=60)
+>       assert done.returncode == 0, (f"{support.HELPER_MODULE} cannot be imported from this worktree's src "
+                                      f"(one helper clears the GIT_* variables, AR-2):\n{support.said(done)}")
+E       AssertionError: gov.util.gitenv cannot be imported from this worktree's src (one helper clears the GIT_* variables, AR-2):
+E         exit 1
+E         --- stdout
+E         
+E         --- stderr
+E         Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'gov.util'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '-c', 'import gov.util.gitenv as m; print(m.__file__)'], returncode=1, stdo...(most recent call last):\n  File "<string>", line 1, in <module>\nModuleNotFoundError: No module named \'gov.util\'\n').returncode
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:52: AssertionError
+23 failed, 6 passed in 46.12s

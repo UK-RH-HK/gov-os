@@ -1,0 +1,4 @@
+44f5bded Checkpoint: the W1-31 round before its one further close (DEC-672)
+rebuild exit 0
+close DAEO-3ef2 exit 4
+stopping after the first close (exit 4); the second is not run here

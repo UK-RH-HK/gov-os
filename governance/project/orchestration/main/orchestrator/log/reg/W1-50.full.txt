@@ -1,0 +1,899 @@
+F.FFF..F.F.FF.FFFFFFFFFFF.........FFF.FF.FF                              [100%]
+=================================== FAILURES ===================================
+_ test_commits_inside_the_paths_of_their_own_trailers_are_silent[a-test-designer-commit-then-an-engineer-commit] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_0/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce2c11c0>
+case = 'a-test-designer-commit-then-an-engineer-commit'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_commits_inside_the_paths_of_their_own_trailers_are_silent(project, sandbox, call, case):
+        """The caller is the orchestrator, which may not write ``tests/acceptance/**`` itself (DEC-156)."""
+        command = INSIDE[case]
+        if callable(command):
+            command = command(project, sandbox)
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance...it -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_commits_inside_the_paths_of_their_own_trailers_are_silent[fast-forward-to-a-ticket-branch] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_2/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_2/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce2c34c0>
+case = 'fast-forward-to-a-ticket-branch'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_commits_inside_the_paths_of_their_own_trailers_are_silent(project, sandbox, call, case):
+        """The caller is the orchestrator, which may not write ``tests/acceptance/**`` itself (DEC-156)."""
+        command = INSIDE[case]
+        if callable(command):
+            command = command(project, sandbox)
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = '`git merge -q --ff-only w1/W1-90` in a call of the orchestrator on DAEO-zz90'
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --ff-only w1/W1-90` in a call of the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_commits_inside_the_paths_of_their_own_trailers_are_silent[one-test-designer-commit] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_3/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_3/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce2c3920>
+case = 'one-test-designer-commit'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_commits_inside_the_paths_of_their_own_trailers_are_silent(project, sandbox, call, case):
+        """The caller is the orchestrator, which may not write ``tests/acceptance/**`` itself (DEC-156)."""
+        command = INSIDE[case]
+        if callable(command):
+            command = command(project, sandbox)
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance...1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_commits_inside_the_paths_of_their_own_trailers_are_silent[three-commits-of-two-roles] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_4/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_4/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_commits_inside_the_paths_4/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce2c3ec0>
+case = 'three-commits-of-two-roles'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_commits_inside_the_paths_of_their_own_trailers_are_silent(project, sandbox, call, case):
+        """The caller is the orchestrator, which may not write ``tests/acceptance/**`` itself (DEC-156)."""
+        command = INSIDE[case]
+        if callable(command):
+            command = command(project, sandbox)
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:62: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_f....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance...3' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer' && mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_fixture.py && git add -- tests/acceptance/W1-90/test_fixture.py && git commit -q -m 'commit 3' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_fixture.py, tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[engineer-commit-of-an-acceptance-test-test-designer] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_commit_outside_the_path2/project')
+call = <function call.<locals>._call at 0x7a26ce2c3c40>
+case = 'engineer-commit-of-an-acceptance-test', caller = 'test-designer'
+
+    @pytest.mark.parametrize("caller", sorted(CALLERS), ids=sorted(CALLERS))
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is(project, call, case,
+                                                                                             caller):
+        trailers, path = OUTSIDE[case]
+        role, ticket = CALLERS[caller]
+        command = support.commit(path, trailers)
+        result, left = call(project, command, role, ticket)
+        what = f"a commit of {path} with trailers {trailers}, in a call with GOV_ROLE={role!r} on {ticket}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.03118127900233958, project=Posix..._a_commit_outside_the_path2/sandbox/elsewhere/calls/call-0008.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "a commit of tests/acceptance/W1-90/test_fixture.py with trailers ('engineer', 'DAEO-zz90'), in a call with GOV_ROLE='independent-test-designer' on DAEO-zz90"
+names = ('tests/acceptance/W1-90/test_fixture.py',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a commit of tests/acceptance/W1-90/test_fixture.py with trailers ('engineer', 'DAEO-zz90'), in a call with GOV_ROLE='independent-test-designer' on DAEO-zz90: nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+_ test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[engineer-commit-outside-its-ticket-paths-orchestrator] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_commit_outside_the_path4/project')
+call = <function call.<locals>._call at 0x7a26ce354400>
+case = 'engineer-commit-outside-its-ticket-paths', caller = 'orchestrator'
+
+    @pytest.mark.parametrize("caller", sorted(CALLERS), ids=sorted(CALLERS))
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is(project, call, case,
+                                                                                             caller):
+        trailers, path = OUTSIDE[case]
+        role, ticket = CALLERS[caller]
+        command = support.commit(path, trailers)
+        result, left = call(project, command, role, ticket)
+        what = f"a commit of {path} with trailers {trailers}, in a call with GOV_ROLE={role!r} on {ticket}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.030104171004495583, project=Posi..._a_commit_outside_the_path4/sandbox/elsewhere/calls/call-0010.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "a commit of README.md with trailers ('engineer', 'DAEO-zz90'), in a call with GOV_ROLE='orchestrator' on DAEO-zz90"
+names = ('README.md',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a commit of README.md with trailers ('engineer', 'DAEO-zz90'), in a call with GOV_ROLE='orchestrator' on DAEO-zz90: nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+_ test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[test-designer-commit-of-a-source-file-engineer] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_commit_outside_the_path6/project')
+call = <function call.<locals>._call at 0x7a26ce354b80>
+case = 'test-designer-commit-of-a-source-file', caller = 'engineer'
+
+    @pytest.mark.parametrize("caller", sorted(CALLERS), ids=sorted(CALLERS))
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is(project, call, case,
+                                                                                             caller):
+        trailers, path = OUTSIDE[case]
+        role, ticket = CALLERS[caller]
+        command = support.commit(path, trailers)
+        result, left = call(project, command, role, ticket)
+        what = f"a commit of {path} with trailers {trailers}, in a call with GOV_ROLE={role!r} on {ticket}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.03192639400367625, project=Posix..._a_commit_outside_the_path6/sandbox/elsewhere/calls/call-0012.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "a commit of src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90'), in a call with GOV_ROLE='engineer' on DAEO-zz90"
+names = ('src/gov/guard/decide.py',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a commit of src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90'), in a call with GOV_ROLE='engineer' on DAEO-zz90: nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+_ test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[test-designer-commit-of-a-source-file-orchestrator] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_commit_outside_the_path7/project')
+call = <function call.<locals>._call at 0x7a26ce3551c0>
+case = 'test-designer-commit-of-a-source-file', caller = 'orchestrator'
+
+    @pytest.mark.parametrize("caller", sorted(CALLERS), ids=sorted(CALLERS))
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is(project, call, case,
+                                                                                             caller):
+        trailers, path = OUTSIDE[case]
+        role, ticket = CALLERS[caller]
+        command = support.commit(path, trailers)
+        result, left = call(project, command, role, ticket)
+        what = f"a commit of {path} with trailers {trailers}, in a call with GOV_ROLE={role!r} on {ticket}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:94: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.030483790003927425, project=Posi..._a_commit_outside_the_path7/sandbox/elsewhere/calls/call-0013.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "a commit of src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90'), in a call with GOV_ROLE='orchestrator' on DAEO-zz90"
+names = ('src/gov/guard/decide.py',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: a commit of src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90'), in a call with GOV_ROLE='orchestrator' on DAEO-zz90: nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+____ test_each_commit_is_judged_by_its_own_trailers_not_the_move_as_a_whole ____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_each_commit_is_judged_by_0/project')
+call = <function call.<locals>._call at 0x7a26ce356b60>
+
+    def test_each_commit_is_judged_by_its_own_trailers_not_the_move_as_a_whole(project, call):
+        """Four commits of two roles. Every path is in one role's scope; two commits hold the other role's path."""
+        command = support.commits(
+            (support.SOURCE, AS_DESIGNER),            # outside the test designer's paths
+            (support.NEW_TEST, AS_ENGINEER),          # outside the engineer's paths
+            (support.SECOND_NEW_TEST, AS_DESIGNER),   # inside
+            (support.SECOND_SOURCE, AS_ENGINEER),     # inside
+        )
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_caught(result, support.SOURCE, support.NEW_TEST, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:108: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commi...it -q -m 'commit 4' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90"
+names = ('src/gov/guard/decide.py', 'tests/acceptance/W1-90/test_new.py')
+name = 'src/gov/guard/decide.py'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer' && mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_second.py && git add -- tests/acceptance/W1-90/test_second.py && git commit -q -m 'commit 3' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p . && echo changed >> pyproject.toml && git add -- pyproject.toml && git commit -q -m 'commit 4' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90: the report to the agent does not name 'src/gov/guard/decide.py': 'Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py, tests/acceptance/W1-90/test_second.py.'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_one_commit_outside_its_paths_among_commits_inside_theirs_is_the_only_finding _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_one_commit_outside_its_pa0/project')
+call = <function call.<locals>._call at 0x7a26ce3560c0>
+
+    def test_one_commit_outside_its_paths_among_commits_inside_theirs_is_the_only_finding(project, call):
+        command = support.commits(
+            (support.NEW_TEST, AS_DESIGNER), (support.SOURCE, AS_ENGINEER), (support.README, AS_ENGINEER))
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+>       check_support.assert_caught(result, support.README, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance...it -q -m 'commit 3' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90"
+names = ('README.md',), name = 'README.md'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer' && mkdir -p . && echo changed >> README.md && git add -- README.md && git commit -q -m 'commit 3' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the orchestrator on DAEO-zz90: the report to the agent does not name 'README.md': 'Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py.'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_a_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_commit_outside_its_path0/project')
+call = <function call.<locals>._call at 0x7a26ce355620>
+
+    def test_a_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it(project, call):
+        """ "Commit by commit": the two revisions of ``HEAD`` hold the same files, and one commit still left its paths."""
+        command = (
+            support.commit(support.README, AS_ENGINEER, subject="outside")
+            + f" && git checkout -q HEAD~1 -- {support.README}"
+            + " && git commit -q -m undo --trailer 'Task: " + TICKET + "' --trailer 'Role: engineer'"
+        )
+        result, left = call(project, command, ENGINEER, TICKET)
+        what = f"`{command}` in a call of the engineer on {TICKET}"
+        assert check_support.git(project, "diff", "--name-only", "HEAD~2", "HEAD") == "", (
+            "the fixture is wrong: the two commits together change a file"
+        )
+>       check_support.assert_caught(result, support.README, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_forward_moves.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.030698671005666256, project=Posi..._a_commit_outside_its_path0/sandbox/elsewhere/calls/call-0017.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "`mkdir -p . && echo changed >> README.md && git add -- README.md && git commit -q -m outside --trailer 'Task: DAEO-zz...& git commit -q -m undo --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the engineer on DAEO-zz90"
+names = ('README.md',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `mkdir -p . && echo changed >> README.md && git add -- README.md && git commit -q -m outside --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer' && git checkout -q HEAD~1 -- README.md && git commit -q -m undo --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'` in a call of the engineer on DAEO-zz90: nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+_ test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[diverged-branches] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c0/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce3553a0>
+case = 'diverged-branches'
+
+    @pytest.mark.parametrize("case", sorted(PASSING_MERGES), ids=sorted(PASSING_MERGES))
+    def test_an_integration_merge_of_commits_inside_their_own_paths_is_silent(project, sandbox, call, case):
+        """No finding for the commits, and none for the merge commit itself."""
+        main_moves_on, merge_trailers, ticket = PASSING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, main_moves_on=main_moves_on)
+        command = support.merge(trailers=merge_trailers)
+        result, left = call(project, command, ORCHESTRATOR, ticket)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        assert check_support.read(project, support.NEW_TEST), f"the merge did not bring in {support.NEW_TEST}"
+        what = f"`{command}` by the orchestrator on {ticket}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: HEAD moved (not a forward move, flagged)."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[merge-commit-without-trailers] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c1/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c1/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce354b80>
+case = 'merge-commit-without-trailers'
+
+    @pytest.mark.parametrize("case", sorted(PASSING_MERGES), ids=sorted(PASSING_MERGES))
+    def test_an_integration_merge_of_commits_inside_their_own_paths_is_silent(project, sandbox, call, case):
+        """No finding for the commits, and none for the merge commit itself."""
+        main_moves_on, merge_trailers, ticket = PASSING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, main_moves_on=main_moves_on)
+        command = support.merge(trailers=merge_trailers)
+        result, left = call(project, command, ORCHESTRATOR, ticket)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        assert check_support.read(project, support.NEW_TEST), f"the merge did not bring in {support.NEW_TEST}"
+        what = f"`{command}` by the orchestrator on {ticket}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90'` by the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90'` by the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: HEAD moved (not a forward move, flagged)."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[no-ff-merge-of-a-branch-that-is-ahead] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c2/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c2/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce3568e0>
+case = 'no-ff-merge-of-a-branch-that-is-ahead'
+
+    @pytest.mark.parametrize("case", sorted(PASSING_MERGES), ids=sorted(PASSING_MERGES))
+    def test_an_integration_merge_of_commits_inside_their_own_paths_is_silent(project, sandbox, call, case):
+        """No finding for the commits, and none for the merge commit itself."""
+        main_moves_on, merge_trailers, ticket = PASSING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, main_moves_on=main_moves_on)
+        command = support.merge(trailers=merge_trailers)
+        result, left = call(project, command, ORCHESTRATOR, ticket)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        assert check_support.read(project, support.NEW_TEST), f"the merge did not bring in {support.NEW_TEST}"
+        what = f"`{command}` by the orchestrator on {ticket}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: HEAD moved (not a forward move, flagged)."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[orchestrator-on-another-ticket] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c3/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_an_integration_merge_of_c3/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce357380>
+case = 'orchestrator-on-another-ticket'
+
+    @pytest.mark.parametrize("case", sorted(PASSING_MERGES), ids=sorted(PASSING_MERGES))
+    def test_an_integration_merge_of_commits_inside_their_own_paths_is_silent(project, sandbox, call, case):
+        """No finding for the commits, and none for the merge commit itself."""
+        main_moves_on, merge_trailers, ticket = PASSING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, main_moves_on=main_moves_on)
+        command = support.merge(trailers=merge_trailers)
+        result, left = call(project, command, ORCHESTRATOR, ticket)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        assert check_support.read(project, support.NEW_TEST), f"the merge did not bring in {support.NEW_TEST}"
+        what = f"`{command}` by the orchestrator on {ticket}"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:57: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz91"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz91: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: HEAD moved (not a forward move, flagged)."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[commit-without-trailers-of-an-acceptance-test] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com0/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce356fc0>
+case = 'commit-without-trailers-of-an-acceptance-test'
+
+    @pytest.mark.parametrize("case", sorted(FAILING_MERGES), ids=sorted(FAILING_MERGES))
+    def test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged(project, sandbox, call, case):
+        """The finding names the path of that commit. It is flagged and never reverted (DEC-129)."""
+        trailers, path = FAILING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, (path, trailers))
+        command = support.merge()
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        what = f"`{command}` by the orchestrator on {TICKET}, bringing a commit of {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer...tor'` by the orchestrator on DAEO-zz90, bringing a commit of tests/acceptance/W1-90/test_fixture.py with trailers None"
+names = ('tests/acceptance/W1-90/test_fixture.py',)
+name = 'tests/acceptance/W1-90/test_fixture.py'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of tests/acceptance/W1-90/test_fixture.py with trailers None: the report to the agent does not name 'tests/acceptance/W1-90/test_fixture.py': 'Containment: HEAD moved (not a forward move, flagged).'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[engineer-commit-of-an-acceptance-test] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com1/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com1/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce354d60>
+case = 'engineer-commit-of-an-acceptance-test'
+
+    @pytest.mark.parametrize("case", sorted(FAILING_MERGES), ids=sorted(FAILING_MERGES))
+    def test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged(project, sandbox, call, case):
+        """The finding names the path of that commit. It is flagged and never reverted (DEC-129)."""
+        trailers, path = FAILING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, (path, trailers))
+        command = support.merge()
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        what = f"`{command}` by the orchestrator on {TICKET}, bringing a commit of {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer...ator on DAEO-zz90, bringing a commit of tests/acceptance/W1-90/test_fixture.py with trailers ('engineer', 'DAEO-zz90')"
+names = ('tests/acceptance/W1-90/test_fixture.py',)
+name = 'tests/acceptance/W1-90/test_fixture.py'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of tests/acceptance/W1-90/test_fixture.py with trailers ('engineer', 'DAEO-zz90'): the report to the agent does not name 'tests/acceptance/W1-90/test_fixture.py': 'Containment: HEAD moved (not a forward move, flagged).'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[engineer-commit-outside-its-ticket-paths] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com2/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com2/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce3560c0>
+case = 'engineer-commit-outside-its-ticket-paths'
+
+    @pytest.mark.parametrize("case", sorted(FAILING_MERGES), ids=sorted(FAILING_MERGES))
+    def test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged(project, sandbox, call, case):
+        """The finding names the path of that commit. It is flagged and never reverted (DEC-129)."""
+        trailers, path = FAILING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, (path, trailers))
+        command = support.merge()
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        what = f"`{command}` by the orchestrator on {TICKET}, bringing a commit of {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer...rchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of README.md with trailers ('engineer', 'DAEO-zz90')"
+names = ('README.md',), name = 'README.md'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of README.md with trailers ('engineer', 'DAEO-zz90'): the report to the agent does not name 'README.md': 'Containment: HEAD moved (not a forward move, flagged).'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[test-designer-commit-of-a-source-file] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com3/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merge_that_brings_a_com3/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce357ec0>
+case = 'test-designer-commit-of-a-source-file'
+
+    @pytest.mark.parametrize("case", sorted(FAILING_MERGES), ids=sorted(FAILING_MERGES))
+    def test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged(project, sandbox, call, case):
+        """The finding names the path of that commit. It is flagged and never reverted (DEC-129)."""
+        trailers, path = FAILING_MERGES[case]
+        support.ticket_branch(project, sandbox, *GOOD_COMMITS, (path, trailers))
+        command = support.merge()
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        what = f"`{command}` by the orchestrator on {TICKET}, bringing a commit of {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_integration_merge.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer...rchestrator on DAEO-zz90, bringing a commit of pyproject.toml with trailers ('independent-test-designer', 'DAEO-zz90')"
+names = ('pyproject.toml',), name = 'pyproject.toml'
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+        assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+        for name in names:
+>           assert name in result.report, (
+                   ^^^^^^^^^^^^^^^^^^^^^
+                f"{what}: the report to the agent does not name {name!r}: {result.report[:600]!r}"
+            )
+E           AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of pyproject.toml with trailers ('independent-test-designer', 'DAEO-zz90'): the report to the agent does not name 'pyproject.toml': 'Containment: HEAD moved (not a forward move, flagged).'
+
+tests/acceptance/W1-03/w1_03_support.py:785: AssertionError
+_ test_in_one_move_only_the_commit_without_trailers_is_judged_against_the_caller _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_in_one_move_only_the_comm0/project')
+call = <function call.<locals>._call at 0x7a26ce368540>
+
+    def test_in_one_move_only_the_commit_without_trailers_is_judged_against_the_caller(project, call):
+        """Two commits of acceptance tests in a call of the orchestrator; one carries the test designer's trailers."""
+        command = support.commits((support.ACCEPTANCE_FILE, NO_TRAILERS), (support.NEW_TEST, AS_DESIGNER))
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        what = f"`{command}` in a call of the orchestrator on {TICKET}"
+        check_support.assert_caught(result, support.ACCEPTANCE_FILE, what=what, action=check_support.FLAGGED)
+>       check_support.assert_not_recorded(result, support.NEW_TEST, what=what)
+
+tests/acceptance/W1-50/test_w1_50_no_trailers.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_f....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "`mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_fixture.py && git add -- tests/accept...2' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90"
+paths = ('tests/acceptance/W1-90/test_new.py',)
+finding = {'action': 'flagged', 'agent_type': '', 'command': 'bash /tmp/pytest-of-usain/pytest-160/test_in_one_move_only_the_com...re/calls/call-0035.sh', 'paths': ['tests/acceptance/W1-90/test_fixture.py', 'tests/acceptance/W1-90/test_new.py'], ...}
+
+    def assert_not_recorded(result, *paths, what):
+        """No finding added by this call answers for any of ``paths``."""
+        for finding in new_findings(result, what):
+            for path in paths:
+>               assert not any(_related(e, path) for e in finding_paths(result, finding)), (
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                    f"{what}: a finding names {path!r}, which this call did not change out of scope: "
+                    f"{finding['paths']}"
+                )
+E               AssertionError: `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_fixture.py && git add -- tests/acceptance/W1-90/test_fixture.py && git commit -q -m 'commit 1' && mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'` in a call of the orchestrator on DAEO-zz90: a finding names 'tests/acceptance/W1-90/test_new.py', which this call did not change out of scope: ['tests/acceptance/W1-90/test_fixture.py', 'tests/acceptance/W1-90/test_new.py']
+
+tests/acceptance/W1-03/w1_03_support.py:814: AssertionError
+__ test_a_merged_commit_without_trailers_inside_the_caller_s_paths_is_silent ___
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merged_commit_without_t0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merged_commit_without_t0/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_merged_commit_without_t0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x7a26ce368e00>
+
+    def test_a_merged_commit_without_trailers_inside_the_caller_s_paths_is_silent(project, sandbox, call):
+        """The orchestrator may write README.md itself (DEC-156), so the commit it merges passes."""
+        support.ticket_branch(project, sandbox, (support.NEW_TEST, AS_DESIGNER), (support.README, NO_TRAILERS))
+        command = support.merge()
+        result, left = call(project, command, ORCHESTRATOR, TICKET)
+        assert support.is_merge(project), f"the fixture command `{command}` made no merge commit"
+        what = f"`{command}` by the orchestrator on {TICKET}, bringing a commit of README.md without trailers"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_no_trailers.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: HEAD moved (not a forward move, flagged).', returncode=0, stdout='{"...on":"flagged","reason":"HEAD moved (not a forward move on the same branch)"}',), session_id='w1-03-acceptance-session')
+what = "`git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of README.md without trailers"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: `git merge -q --no-ff --no-commit w1/W1-90 && git commit -q -m 'Merge w1/W1-90' --trailer 'Task: DAEO-zz90' --trailer 'Role: orchestrator'` by the orchestrator on DAEO-zz90, bringing a commit of README.md without trailers: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: HEAD moved (not a forward move, flagged)."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+________ test_a_test_designer_s_commit_during_the_lead_s_call_is_silent ________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_test_designer_s_commit_0/project')
+call = <function call.<locals>._call at 0x7a26ce356ca0>
+during_a_call = <function during_a_call.<locals>._during at 0x7a26ce357e20>
+
+    def test_a_test_designer_s_commit_during_the_lead_s_call_is_silent(project, call, during_a_call):
+        """The worker is a session of its own: its call has both hooks, and its own check is silent as well."""
+        command = support.commits((support.NEW_TEST, AS_DESIGNER), (support.ACCEPTANCE_FILE, AS_DESIGNER))
+        own = {}
+    
+        def worker():
+            own["result"], _ = call(project, command, DESIGNER, TICKET, session_id=WORKER_SESSION)
+    
+        result, left = during_a_call(project, ORCHESTRATOR, TICKET, worker)
+        check_support.assert_silent(own["result"], f"the test designer's own call `{command}`")
+        what = f"the lead's call, during which the test designer ran `{command}`"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_worker_commit.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_f....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "the lead's call, during which the test designer ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/accepta...est_fixture.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'`"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the lead's call, during which the test designer ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_fixture.py && git add -- tests/acceptance/W1-90/test_fixture.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'`: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_fixture.py, tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call[test-designer-commit] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_1/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_1/sandbox/elsewhere'))
+during_a_call = <function during_a_call.<locals>._during at 0x7a26ce36a020>
+case = 'test-designer-commit'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call(project, sandbox, during_a_call,
+                                                                                  case):
+        """Only the lead's call sees the commit here: no hook runs around the worker's command."""
+        command = support.commits(*INSIDE[case])
+        result, left = during_a_call(project, ORCHESTRATOR, TICKET, lambda: support.run(project, sandbox, command))
+        what = f"the lead's call, during which a worker ran `{command}`"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_worker_commit.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "the lead's call, during which a worker ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90...90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'`"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the lead's call, during which a worker ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer'`: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call[test-designer-commit-then-engineer-commit] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_2/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_inside_2/sandbox/elsewhere'))
+during_a_call = <function during_a_call.<locals>._during at 0x7a26ce369800>
+case = 'test-designer-commit-then-engineer-commit'
+
+    @pytest.mark.parametrize("case", sorted(INSIDE), ids=sorted(INSIDE))
+    def test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call(project, sandbox, during_a_call,
+                                                                                  case):
+        """Only the lead's call sees the commit here: no hook runs around the worker's command."""
+        command = support.commits(*INSIDE[case])
+        result, left = during_a_call(project, ORCHESTRATOR, TICKET, lambda: support.run(project, sandbox, command))
+        what = f"the lead's call, during which a worker ran `{command}`"
+>       check_support.assert_silent(result, what)
+
+tests/acceptance/W1-50/test_w1_50_worker_commit.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='report', report='Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_n....py"],"action":"flagged","reason":"committed path(s) outside allowed paths"}',), session_id='w1-03-acceptance-session')
+what = "the lead's call, during which a worker ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90... add -- src/gov/guard/decide.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'`"
+
+    def assert_silent(result, what):
+        """The check found nothing: exit code 0, no text for the agent, no finding."""
+>       assert result.outcome == "silent", f"{what}: the check did not stay silent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the lead's call, during which a worker ran `mkdir -p tests/acceptance/W1-90 && echo changed >> tests/acceptance/W1-90/test_new.py && git add -- tests/acceptance/W1-90/test_new.py && git commit -q -m 'commit 1' --trailer 'Task: DAEO-zz90' --trailer 'Role: independent-test-designer' && mkdir -p src/gov/guard && echo changed >> src/gov/guard/decide.py && git add -- src/gov/guard/decide.py && git commit -q -m 'commit 2' --trailer 'Task: DAEO-zz90' --trailer 'Role: engineer'`: the check did not stay silent: outcome=report exit=0 stdout='{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": "Containment: Committed paths outside allowed paths: tests/acceptance/W1-90/test_new.py."}}' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:828: AssertionError
+_ test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call[engineer-commit-outside-its-ticket-paths] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside1/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside1/sandbox/elsewhere'))
+during_a_call = <function during_a_call.<locals>._during at 0x7a26ce36aca0>
+case = 'engineer-commit-outside-its-ticket-paths'
+
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call(project, sandbox, during_a_call,
+                                                                                    case):
+        """The lead may write the source file and README.md itself; the commit is judged by the worker's trailers."""
+        trailers, path = OUTSIDE[case]
+        command = support.commit(path, trailers)
+        result, left = during_a_call(project, ORCHESTRATOR, TICKET, lambda: support.run(project, sandbox, command))
+        what = f"the lead's call, during which a worker committed {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_worker_commit.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.030942201003199443, project=Posi..._a_worker_s_commit_outside1/sandbox/elsewhere/calls/call-0043.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "the lead's call, during which a worker committed README.md with trailers ('engineer', 'DAEO-zz90')"
+names = ('README.md',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the lead's call, during which a worker committed README.md with trailers ('engineer', 'DAEO-zz90'): nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+_ test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call[test-designer-commit-of-a-source-file] _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside2/sandbox/home'), pycache=PosixP...box/systmp'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-160/test_a_worker_s_commit_outside2/sandbox/elsewhere'))
+during_a_call = <function during_a_call.<locals>._during at 0x7a26ce3696c0>
+case = 'test-designer-commit-of-a-source-file'
+
+    @pytest.mark.parametrize("case", sorted(OUTSIDE), ids=sorted(OUTSIDE))
+    def test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call(project, sandbox, during_a_call,
+                                                                                    case):
+        """The lead may write the source file and README.md itself; the commit is judged by the worker's trailers."""
+        trailers, path = OUTSIDE[case]
+        command = support.commit(path, trailers)
+        result, left = during_a_call(project, ORCHESTRATOR, TICKET, lambda: support.run(project, sandbox, command))
+        what = f"the lead's call, during which a worker committed {path} with trailers {trailers}"
+>       check_support.assert_caught(result, path, what=what, action=check_support.FLAGGED)
+
+tests/acceptance/W1-50/test_w1_50_worker_commit.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-03/w1_03_support.py:822: in assert_caught
+    assert_reported(result, *names, what=what)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = HookResult(outcome='silent', report='', returncode=0, stdout='', stderr='', seconds=0.03108332000556402, project=Posix..._a_worker_s_commit_outside2/sandbox/elsewhere/calls/call-0044.sh', new_lines=(), session_id='w1-03-acceptance-session')
+what = "the lead's call, during which a worker committed src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90')"
+names = ('src/gov/guard/decide.py',)
+
+    def assert_reported(result, *names, what):
+        """The check told the agent, and the report names every one of ``names``."""
+>       assert result.outcome == "report", f"{what}: nothing was reported to the agent: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: the lead's call, during which a worker committed src/gov/guard/decide.py with trailers ('independent-test-designer', 'DAEO-zz90'): nothing was reported to the agent: outcome=silent exit=0 stdout='' stderr=''
+
+tests/acceptance/W1-03/w1_03_support.py:783: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_commits_inside_the_paths_of_their_own_trailers_are_silent[a-test-designer-commit-then-an-engineer-commit]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_commits_inside_the_paths_of_their_own_trailers_are_silent[fast-forward-to-a-ticket-branch]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_commits_inside_the_paths_of_their_own_trailers_are_silent[one-test-designer-commit]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_commits_inside_the_paths_of_their_own_trailers_are_silent[three-commits-of-two-roles]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[engineer-commit-of-an-acceptance-test-test-designer]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[engineer-commit-outside-its-ticket-paths-orchestrator]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[test-designer-commit-of-a-source-file-engineer]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_a_commit_outside_the_paths_of_its_own_trailers_is_flagged_whoever_the_caller_is[test-designer-commit-of-a-source-file-orchestrator]
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_each_commit_is_judged_by_its_own_trailers_not_the_move_as_a_whole
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_one_commit_outside_its_paths_among_commits_inside_theirs_is_the_only_finding
+FAILED tests/acceptance/W1-50/test_w1_50_forward_moves.py::test_a_commit_outside_its_paths_is_flagged_although_a_later_commit_undoes_it
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[diverged-branches]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[merge-commit-without-trailers]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[no-ff-merge-of-a-branch-that-is-ahead]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_an_integration_merge_of_commits_inside_their_own_paths_is_silent[orchestrator-on-another-ticket]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[commit-without-trailers-of-an-acceptance-test]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[engineer-commit-of-an-acceptance-test]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[engineer-commit-outside-its-ticket-paths]
+FAILED tests/acceptance/W1-50/test_w1_50_integration_merge.py::test_a_merge_that_brings_a_commit_outside_its_own_paths_is_flagged[test-designer-commit-of-a-source-file]
+FAILED tests/acceptance/W1-50/test_w1_50_no_trailers.py::test_in_one_move_only_the_commit_without_trailers_is_judged_against_the_caller
+FAILED tests/acceptance/W1-50/test_w1_50_no_trailers.py::test_a_merged_commit_without_trailers_inside_the_caller_s_paths_is_silent
+FAILED tests/acceptance/W1-50/test_w1_50_worker_commit.py::test_a_test_designer_s_commit_during_the_lead_s_call_is_silent
+FAILED tests/acceptance/W1-50/test_w1_50_worker_commit.py::test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call[test-designer-commit]
+FAILED tests/acceptance/W1-50/test_w1_50_worker_commit.py::test_a_worker_s_commit_inside_its_own_paths_is_silent_in_the_waiting_call[test-designer-commit-then-engineer-commit]
+FAILED tests/acceptance/W1-50/test_w1_50_worker_commit.py::test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call[engineer-commit-outside-its-ticket-paths]
+FAILED tests/acceptance/W1-50/test_w1_50_worker_commit.py::test_a_worker_s_commit_outside_its_own_paths_is_flagged_in_the_waiting_call[test-designer-commit-of-a-source-file]
+26 failed, 17 passed in 10.85s

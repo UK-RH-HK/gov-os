@@ -1,0 +1,44 @@
+........................................................................ [ 75%]
+...................F..FF                                                 [100%]
+=================================== FAILURES ===================================
+___ test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement ___
+
+asked = <function asked.<locals>.get at 0x71f81cf4b380>
+
+    def test_the_depth_of_a_radius_comes_from_an_owner_decision_or_a_measurement(asked):
+        found = asked(support.CHANGED)
+        source = found.get("depth_source")
+        assert isinstance(source, str) and source.strip(), f"the result does not say where its depth comes from: {source!r}"
+        if support.DECISION_ID.match(source):
+>           assert source not in PLACEHOLDERS, f"the depth comes from {source}, whose numbers are placeholders"
+E           AssertionError: the depth comes from DEC-035, whose numbers are placeholders
+E           assert 'DEC-035' not in ('DEC-035', 'DEC-391')
+
+tests/acceptance/W2-37/test_w2_37_rows.py:124: AssertionError
+__________ test_the_skill_runs_gov_impact_for_the_question[template] ___________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/template/governance/kernel/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+_________ test_the_skill_runs_gov_impact_for_the_question[claude-copy] _________
+
+path = PosixPath('/home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md')
+
+    @pytest.mark.parametrize("path", COPIES, ids=["template", "claude-copy"])
+    def test_the_skill_runs_gov_impact_for_the_question(path):
+        """CAP-33.g: from Wave 2 the question runs ``gov impact``."""
+        text = section(path)
+>       assert "gov impact" in text, f"{path}: the impact-assessment section does not run `gov impact`"
+E       AssertionError: /home/usain/gov-os-worktrees/W2-37/.claude/skills/change/SKILL.md: the impact-assessment section does not run `gov impact`
+E       assert 'gov impact' in '\nPer DEC-167 (CAP-33.f), a question of the form "what is the impact of X?" triggers the impact assessment. In Wave 1...cations, decisions, tickets, tests and code (DEC-167).\n3. Present the impact summary to the requester (CAP-33.f).\n\n'
+
+tests/acceptance/W2-37/test_w2_37_skill_routing.py:46: AssertionError
+3 failed, 93 passed in 562.68s (0:09:22)

@@ -1,0 +1,39 @@
+W1-01: 46 passed, 28 skipped in 3.76s
+W1-06: 96 passed in 0.74s
+W1-05: 1 failed, 98 passed in 99.76s (0:01:39)
+W1-07: 221 passed in 152.20s (0:02:32)
+W1-04: 336 passed in 174.26s (0:02:54)
+W1-02: 529 passed in 163.25s (0:02:43)
+W1-08: 209 passed in 76.99s (0:01:16)
+W1-09: 77 passed in 33.51s
+W1-10: 76 passed in 6.86s
+W1-11: 142 passed in 21.64s
+W1-03: 364 passed in 124.49s (0:02:04)
+W1-12: 21 passed in 5.76s
+W1-13: 110 passed in 40.05s
+W1-14: 63 passed in 34.89s
+W1-47: 970 passed in 255.00s (0:04:15)
+W1-15: 92 passed in 82.34s (0:01:22)
+W1-16: 166 passed in 803.48s (0:13:23)
+W1-17: 65 passed in 68.16s (0:01:08)
+W1-18: 15 passed in 8.57s
+W1-19: 41 passed in 89.21s (0:01:29)
+W1-20: 51 passed in 261.42s (0:04:21)
+W1-21: 126 passed in 202.25s (0:03:22)
+W1-22: 25 passed in 7.41s
+W1-23: 10 passed in 0.48s
+W1-24: 54 passed in 7.68s
+W1-25: 52 passed in 26.55s
+W1-26: 119 passed, 1 skipped in 162.62s (0:02:42)
+W1-28: 149 passed in 49.17s
+W1-33: 113 passed in 2.78s
+W1-34: 8 passed in 0.02s
+W1-37: 4 passed in 0.02s
+W1-44: 5 passed in 1.25s
+W1-45: 105 passed in 20.79s
+W1-46: 493 passed in 120.52s (0:02:00)
+W1-48: 172 passed in 0.45s
+W1-49: 105 passed in 25.44s
+W1-50: 594 passed, 2 warnings in 182.41s (0:03:02)
+unit: 930 passed in 36.24s
+RESULT: ALL PASS

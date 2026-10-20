@@ -1,0 +1,8 @@
+appended 3259 chars to /home/usain/Dynamic-Agentic-Engineering-OS/docs/DECISION_REGISTER.md
+appended 700 chars to /home/usain/Dynamic-Agentic-Engineering-OS/governance/project/bootstrap.md
+validator: RESULT: ALL PASS
+M  docs/DECISION_REGISTER.md
+M  governance/project/bootstrap.md
+rebuild exit 0
+commit exit 0
+cb1b3d6c Decision register v0.218: DEC-716 (owner: W1-42 merged without a run 8c, its verify covered by the main tree's regression and the missing lead checkpoint named; settings intact after the restart; orchestrator sessions in accept-edits mode to the Wave 2 list, ranked high)

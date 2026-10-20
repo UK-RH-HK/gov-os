@@ -1,0 +1,16 @@
+**Resume note (second start of W1-35; read it before the rest, and where it differs from the rest, it holds).** Keep `.gov-runtime/scratch/lead/CHECKPOINT.md` current.
+
+## The first start's result (`d969bacd`) is accepted except for its check declaration
+
+The four skills and the 98 cases stand and are not redone. `template/governance/kernel/checks/skill-regression-a.yaml` was declared with `command: "true"` because the validator did not exist. A check whose command always succeeds is not merged (DEC-439). The validator now exists on `w1/integrate` (merge `54b8a404`): `python3 -m gov.check.skill_validator (folders or files)`; a folder is searched at every depth for `SKILL.md`; exit 0 only when at least one file was validated and none has a finding; nothing validated is "unmeasured" and exit 1.
+
+In this order:
+
+1. **Merge-back.** Merge `w1/integrate` in one committing command with the trailers `Task: DAEO-0i6h` and `Role: orchestrator` (never `--no-commit`, DEC-436). Before it, the overlap check of the steps below: for a path under `tests/acceptance` or `.tickets` changed on both sides, a launched designer first aligns this branch's file (DEC-412). After it, `git diff --stat w1/integrate HEAD -- tests/acceptance` lists only this ticket's own files and its own lines in shared W1-07 files.
+2. **Test designer** (fresh, launched): cases, red now, that (a) the declaration's command runs the generic validator of W1-26 over exactly this ticket's four skill folders and is nothing that can succeed without it (no `true`, no `||`, no fallback); (b) through `gov check` on a temporary project built from the template: the skill-regression family is green with the four skills as they are, and red when one of the four is broken in each of the validator's rules (frontmatter, version, description size, body size, an unknown `gov` command) and when one of the four folders is missing. The command line W1-26's round gave: `python3 -m gov.check.skill_validator template/governance/kernel/skills/discovery template/governance/kernel/skills/planning template/governance/kernel/skills/test-design template/governance/kernel/skills/change`. **The designer settles one thing from the sources:** the declaration is installed into a project, where the skills do not live under `template/`; the paths in the command are the ones that hold in an installed project (read how W1-26's and W1-25's declarations name project paths and where the installer of W1-04 puts the kernel's skills), and if the same declaration must work both in this repository and in an installed project and cannot, that is a package, early.
+3. **Product-spec worker** (fresh, launched): changes the declaration only, to make the cases pass.
+4. **Verify:** this ticket's suite, `tests/acceptance/W1-26`, `W1-07`, `tests/unit` to their ends; the latency cases of W1-05 and W1-19 alone if they fail beside others (DEC-372: say each occurrence). `gov check --json` in this worktree: give the skill-regression family's entry.
+5. No review round (STANDARD; the first start reviewed itself). Return as the steps below say; repeat the first start's residuals and metrics in full, since the main orchestrator writes the residual section from this return. For W1-42's brief, name again which KPI lines are measured only by text and need a live session.
+
+---
+

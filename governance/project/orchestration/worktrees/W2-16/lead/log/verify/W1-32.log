@@ -1,0 +1,25 @@
+............F........................................................... [ 88%]
+.........                                                                [100%]
+=================================== FAILURES ===================================
+________ test_the_command_set_is_the_twelve_and_the_three_recorded_ones ________
+
+empty_project = <w1_13_support.Project object at 0x70edecb440b0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-2425/test_the_command_set_is_the_tw0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-2425/test_the_command_set_is_the_tw0/sandbox/elsewhere'))
+
+    def test_the_command_set_is_the_twelve_and_the_three_recorded_ones(empty_project, sandbox):
+        """Rewritten (DEC-542) from ``test_this_ticket_adds_no_command``, which pinned the three as found. Every
+        command ``gov`` offers is in the command list, every ``gov`` command of the list is offered, and the
+        recorded module command is not among them."""
+        assert tuple(RECORDED) == ("ci", "launch", "telemetry") and tuple(NO_GOV_COMMAND) == ("lock",)
+        run = support.gov(empty_project, sandbox, "--help")
+        commands = _commands(run)
+        assert set(cli_support.RESERVED_COMMANDS) <= set(commands), f"a Wave 1 operation is gone\n{run.describe()}"
+        gone = sorted(set(RECORDED) - set(commands))
+        assert not gone, f"a recorded command is gone from gov --help: {gone}\n{run.describe()}"
+        extra = sorted(set(commands) - set(cli_support.RESERVED_COMMANDS) - set(RECORDED))
+>       assert not extra, f"gov has commands the command list does not record: {extra}"
+E       AssertionError: gov has commands the command list does not record: ['release']
+E       assert not ['release']
+
+tests/acceptance/W1-32/test_w1_32_command_set.py:64: AssertionError
+1 failed, 80 passed in 58.52s

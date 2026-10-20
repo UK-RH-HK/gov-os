@@ -1,0 +1,16 @@
+You are the ticket lead for ticket `DAEO-topz` (`W1-09`, "Ticket vendoring, claims and READY rule"), profile FULL, working only in the worktree `/home/usain/gov-os-worktrees/W1-09` on branch `w1/W1-09`. You run the ticket loop for this one ticket. Its implementer is an engineer (brief A2). FULL: after green, a reviewer (brief A3).
+
+## State of this ticket
+
+- An earlier lead ran the test design and the vendoring: head `f1f41ae9`, 62 cases (5 green for the vendored script, 57 waiting on `gov.tasks`). Its checkpoint is `.gov-runtime/scratch/lead/CHECKPOINT.md` in this worktree; read it, and the suite's README, which gives the engineer's interface. It returned nine packages.
+- **Seven are decided as the designer and the lead recommended** (DEC-291 to DEC-297 on `w1/integrate`): DP-1 the `gov.tasks` Python interface, no `gov` command; DP-2 the claim convention; DP-3 the acceptance tests folder, for every class; DP-5 `inputs` as record ids; DP-7 `gov.tasks.create` adds `state_class` (the ticket has a new KPI line); DP-8 the doctor check goes to W1-27; DP-9 claims in the main tree only, the claims folder untracked.
+- **Two are with the owner: DP-4** (how the READY rule knows a specification is not closed) **and DP-6** (what an open decision package is, and what ties a ticket to it). The suite encodes option (a) of each. **Build to the suite as written.** The branch is not merged until the owner answers; if an answer differs, a short test round and a small change follow.
+
+## What you do, in order
+
+1. **Take `w1/integrate` into this branch first**: `git merge w1/integrate`, with a message whose last paragraph has `Task: DAEO-topz` and `Role: orchestrator`. Resolve nothing by hand; if it conflicts, abort the merge and return PACKAGES saying so. The containment hook will flag the merge; that is a record, not a defect (DEC-254); mention it in your summary. Then read DEC-291 to DEC-297 and the ticket file.
+2. **Engineer** (brief A2, fresh), for `src/gov/tasks/**` and `tests/unit/tasks/**`, to the suite as it stands. Estimate 100 LOC; proportion rule DEC-135.
+3. **Verify** every suite and the validator. Suites of tickets still in flight elsewhere (W1-46, W1-49, W1-50, W1-25, W1-15) may be red or absent on this branch from their own tickets; W1-50 is red by design (26 failed, 17 passed). Confirm that and report them apart.
+4. **Reviewer** (brief A3): two claims raced from separate processes; a release by a non-holder; a claim on a closed ticket; a ticket id with a path separator or `..`; a claims folder that is a symbolic link or a file; a lock file with odd content (empty, very long, a newline in the holder); a ticket whose `inputs` or `constrains` point at ids that do not exist; a READY rule that fails open when the store or a ticket file cannot be read. A finding that lets two agents hold one claim, or puts a ticket without its acceptance tests folder in the ready queue, is fixed (a test batch first, as described behaviours, then a fresh engineer); the rest are residuals.
+5. Return DONE with the whole ticket's summary, saying plainly that DP-4 and DP-6 are built on option (a) and still with the owner. Learning metrics so far: KPI disputes 9 packages; vendoring 1,510 lines of third-party script, 0 authored.
+

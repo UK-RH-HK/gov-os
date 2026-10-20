@@ -1,0 +1,43 @@
+diff --git a/src/gov/guard/heldout.py b/src/gov/guard/heldout.py
+index 3358a0fa..64eab47a 100644
+--- a/src/gov/guard/heldout.py
++++ b/src/gov/guard/heldout.py
+@@ -14,7 +14,7 @@ import json
+ import os
+ import shlex
+ 
+-from gov.guard.decide import _expand_token
++from gov.guard.decide import MOST_PATH, _expand_token
+ 
+ CONFIG_REL = "governance/project/held-out.yaml"
+ CONFIG_KEY = "held_out_paths"
+@@ -92,13 +92,27 @@ def _words(command: str) -> list[str]:
+         return command.split()
+ 
+ 
+-def _reaches(text: str, cwd: str, bases: list[str], shell: bool) -> bool:
++def _path_limit() -> int:
++    """The system's limit for a path; the guard's own where it reports none."""
++    try:
++        limit = os.pathconf("/", "PC_PATH_MAX")
++    except (AttributeError, OSError, ValueError):
++        return MOST_PATH
++    return limit if limit > 0 else MOST_PATH
++
++
++def _reaches(text: str, cwd: str, bases: list[str], shell: bool,
++             limit: int) -> bool:
+     """True when *text*, read as a path, resolves to a held-out path:
+     relative to *cwd*, through ``..``, ``~`` or a symbolic link, and in a
+-    Bash word through ``$HOME`` (DEC-215)."""
++    Bash word through ``$HOME`` (DEC-215).  A string longer than *limit*
++    both as written and as expanded is no path and is not resolved
++    (DEC-574)."""
+     exp = _expand_token(text) if shell else os.path.expanduser(text)
+     if not exp:
+         return False
++    if len(text) > limit and len(exp) > limit:
++        return False  # longer than a path may be
+     try:
+         real = os.path.realpath(os.path.join(cwd, exp))
+     except (OSError, ValueError):

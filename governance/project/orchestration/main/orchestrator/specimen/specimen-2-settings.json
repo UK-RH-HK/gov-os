@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "SessionStart": [{"hooks": [{"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py SessionStart"}]}],
+    "PreToolUse": [{"matcher": "Bash", "hooks": [{"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py PreToolUse"}]}],
+    "PostToolUse": [{"matcher": "Bash", "hooks": [
+      {"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py PostToolUse"},
+      {"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py PostToolUseFail"}]}],
+    "Stop": [{"hooks": [{"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py Stop"}]}],
+    "SubagentStop": [{"hooks": [{"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py SubagentStop"}]}],
+    "PreCompact": [{"hooks": [{"type": "command", "command": "python3 /tmp/gov-specimen-w1-31b/hooks/hook.py PreCompact"}]}]
+  }
+}

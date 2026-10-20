@@ -1,0 +1,1 @@
+{"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "PROBE_MISSING", "message": "FULL-profile ticket DAEO-2lwj has no probe record", "details": {"findings": ["FULL-profile ticket DAEO-2lwj has no probe record"], "ticket": "DAEO-2lwj", "repair_ticket": "not opened: the ticket tool (tk) is not available at governance/kernel/bin/tk"}}}

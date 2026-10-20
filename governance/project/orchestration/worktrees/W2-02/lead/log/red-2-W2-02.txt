@@ -1,0 +1,551 @@
+...............FFFFFFF........FFFFFFFFFFF............                    [100%]
+=================================== FAILURES ===================================
+__ test_each_of_the_three_verdicts_is_a_well_formed_verdict[ADOPTED_HEALTHY] ___
+
+project = <w2_02_support.Project object at 0x7eae09f7bf50>
+verdict = 'ADOPTED_HEALTHY'
+
+    @pytest.mark.parametrize("verdict", support.VERDICTS)
+    def test_each_of_the_three_verdicts_is_a_well_formed_verdict(project, verdict):
+        """A verdict record with that verdict and a list of named conditions that agrees with it, each with its name,
+        source item and state, an ``accepted`` one with its owner entry (DEC-741 I (ii)): no finding on the file, and
+        the check is green. Rewritten under DEC-741 I (ii): run 1 held only the verdict field, the conditions being open.
+        Red today: the verdict schema types no list of conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_each_of_the_three_verdicts_is_a_well_formed_verdict[ADOPTED_WITH_ACCEPTED_EXCEPTIONS] _
+
+project = <w2_02_support.Project object at 0x7eae09f7b080>
+verdict = 'ADOPTED_WITH_ACCEPTED_EXCEPTIONS'
+
+    @pytest.mark.parametrize("verdict", support.VERDICTS)
+    def test_each_of_the_three_verdicts_is_a_well_formed_verdict(project, verdict):
+        """A verdict record with that verdict and a list of named conditions that agrees with it, each with its name,
+        source item and state, an ``accepted`` one with its owner entry (DEC-741 I (ii)): no finding on the file, and
+        the check is green. Rewritten under DEC-741 I (ii): run 1 held only the verdict field, the conditions being open.
+        Red today: the verdict schema types no list of conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_each_of_the_three_verdicts_is_a_well_formed_verdict[NOT_ADOPTED_HEALTHY] _
+
+project = <w2_02_support.Project object at 0x7eae09f7b8f0>
+verdict = 'NOT_ADOPTED_HEALTHY'
+
+    @pytest.mark.parametrize("verdict", support.VERDICTS)
+    def test_each_of_the_three_verdicts_is_a_well_formed_verdict(project, verdict):
+        """A verdict record with that verdict and a list of named conditions that agrees with it, each with its name,
+        source item and state, an ``accepted`` one with its owner entry (DEC-741 I (ii)): no finding on the file, and
+        the check is green. Rewritten under DEC-741 I (ii): run 1 held only the verdict field, the conditions being open.
+        Red today: the verdict schema types no list of conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:71: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_verdict_record_without_one_of_the_three_verdicts_is_refused[not-one-of-the-three] _
+
+project = <w2_02_support.Project object at 0x7eae09fd0800>, verdict = 'ADOPTED'
+
+    @pytest.mark.parametrize("verdict", ("ADOPTED", "pass", "adopted_healthy", None),
+                             ids=("not-one-of-the-three", "the-A5-word", "lower-case", "missing"))
+    def test_a_verdict_record_without_one_of_the_three_verdicts_is_refused(project, verdict):
+        """A word outside the three, or no verdict at all, in a record whose conditions are well formed: a finding on
+        the file names the verdict field, and the check is not green. Revised under DEC-741 I (ii): the record carries
+        its required conditions, so the verdict is its one defect. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_verdict_record_without_one_of_the_three_verdicts_is_refused[the-A5-word] _
+
+project = <w2_02_support.Project object at 0x7eae09fd2a50>, verdict = 'pass'
+
+    @pytest.mark.parametrize("verdict", ("ADOPTED", "pass", "adopted_healthy", None),
+                             ids=("not-one-of-the-three", "the-A5-word", "lower-case", "missing"))
+    def test_a_verdict_record_without_one_of_the_three_verdicts_is_refused(project, verdict):
+        """A word outside the three, or no verdict at all, in a record whose conditions are well formed: a finding on
+        the file names the verdict field, and the check is not green. Revised under DEC-741 I (ii): the record carries
+        its required conditions, so the verdict is its one defect. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_verdict_record_without_one_of_the_three_verdicts_is_refused[lower-case] _
+
+project = <w2_02_support.Project object at 0x7eae09f7bb30>
+verdict = 'adopted_healthy'
+
+    @pytest.mark.parametrize("verdict", ("ADOPTED", "pass", "adopted_healthy", None),
+                             ids=("not-one-of-the-three", "the-A5-word", "lower-case", "missing"))
+    def test_a_verdict_record_without_one_of_the_three_verdicts_is_refused(project, verdict):
+        """A word outside the three, or no verdict at all, in a record whose conditions are well formed: a finding on
+        the file names the verdict field, and the check is not green. Revised under DEC-741 I (ii): the record carries
+        its required conditions, so the verdict is its one defect. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_verdict_record_without_one_of_the_three_verdicts_is_refused[missing] __
+
+project = <w2_02_support.Project object at 0x7eae09f7bc50>, verdict = None
+
+    @pytest.mark.parametrize("verdict", ("ADOPTED", "pass", "adopted_healthy", None),
+                             ids=("not-one-of-the-three", "the-A5-word", "lower-case", "missing"))
+    def test_a_verdict_record_without_one_of_the_three_verdicts_is_refused(project, verdict):
+        """A word outside the three, or no verdict at all, in a record whose conditions are well formed: a finding on
+        the file names the verdict field, and the check is not green. Revised under DEC-741 I (ii): the record carries
+        its required conditions, so the verdict is its one defect. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+        record_type, field = support.the_verdict_type()
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_record_types.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+__________ test_the_verdict_schema_types_its_list_of_named_conditions __________
+
+    def test_the_verdict_schema_types_its_list_of_named_conditions():
+        """The one adoption-verdict schema has a list property whose items have a state of exactly ``met``,
+        ``not met`` and ``accepted``, a name, a source item and an owner entry with a decision id's grammar, and it
+        requires that list. Red today: ``conditions`` is optional and unconstrained."""
+>       keys = support.the_condition_keys()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+___ test_a_verdict_record_without_its_list_of_conditions_is_refused[missing] ___
+
+project = <w2_02_support.Project object at 0x7eae09fd38c0>
+conditions = Ellipsis
+
+    @pytest.mark.parametrize("conditions", (..., "all met"), ids=("missing", "a-text-not-a-list"))
+    def test_a_verdict_record_without_its_list_of_conditions_is_refused(project, conditions):
+        """No conditions at all, or a text where the list goes. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+>       _refused(project, _the_verdict(), "ADOPTED_HEALTHY", conditions)
+                          ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_verdict_record_without_its_list_of_conditions_is_refused[a-text-not-a-list] _
+
+project = <w2_02_support.Project object at 0x7eae09fd3320>
+conditions = 'all met'
+
+    @pytest.mark.parametrize("conditions", (..., "all met"), ids=("missing", "a-text-not-a-list"))
+    def test_a_verdict_record_without_its_list_of_conditions_is_refused(project, conditions):
+        """No conditions at all, or a text where the list goes. Red today: the verdict schema types no list of
+        conditions (the case fails at finding its keys)."""
+>       _refused(project, _the_verdict(), "ADOPTED_HEALTHY", conditions)
+                          ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:79: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+___ test_a_condition_missing_its_name_source_item_or_state_is_refused[name] ____
+
+project = <w2_02_support.Project object at 0x7eae09fd8a70>, part = 'name'
+
+    @pytest.mark.parametrize("part", ("name", "source", "state"), ids=("name", "source-item", "state"))
+    def test_a_condition_missing_its_name_source_item_or_state_is_refused(project, part):
+        """One ``met`` condition of a not-adopted verdict without that part. Red today: the verdict schema types no
+        list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_condition_missing_its_name_source_item_or_state_is_refused[source-item] _
+
+project = <w2_02_support.Project object at 0x7eae09fd29f0>, part = 'source'
+
+    @pytest.mark.parametrize("part", ("name", "source", "state"), ids=("name", "source-item", "state"))
+    def test_a_condition_missing_its_name_source_item_or_state_is_refused(project, part):
+        """One ``met`` condition of a not-adopted verdict without that part. Red today: the verdict schema types no
+        list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+___ test_a_condition_missing_its_name_source_item_or_state_is_refused[state] ___
+
+project = <w2_02_support.Project object at 0x7eae09fd31a0>, part = 'state'
+
+    @pytest.mark.parametrize("part", ("name", "source", "state"), ids=("name", "source-item", "state"))
+    def test_a_condition_missing_its_name_source_item_or_state_is_refused(project, part):
+        """One ``met`` condition of a not-adopted verdict without that part. Red today: the verdict schema types no
+        list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:90: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused[waived] _
+
+project = <w2_02_support.Project object at 0x7eae09f7bf80>, state = 'waived'
+
+    @pytest.mark.parametrize("state", ("waived", "not_met", "Met"))
+    def test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused(project, state):
+        """A state outside ``met``, ``not met`` and ``accepted``: another word, the words joined by ``_``, another
+        case. Red today: the verdict schema types no list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused[not_met] _
+
+project = <w2_02_support.Project object at 0x7eae09fdad50>, state = 'not_met'
+
+    @pytest.mark.parametrize("state", ("waived", "not_met", "Met"))
+    def test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused(project, state):
+        """A state outside ``met``, ``not met`` and ``accepted``: another word, the words joined by ``_``, another
+        case. Red today: the verdict schema types no list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+__ test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused[Met] __
+
+project = <w2_02_support.Project object at 0x7eae09fda780>, state = 'Met'
+
+    @pytest.mark.parametrize("state", ("waived", "not_met", "Met"))
+    def test_a_condition_whose_state_is_not_one_of_the_three_words_is_refused(project, state):
+        """A state outside ``met``, ``not met`` and ``accepted``: another word, the words joined by ``_``, another
+        case. Red today: the verdict schema types no list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+____ test_an_accepted_condition_without_its_owner_entry_is_refused[missing] ____
+
+project = <w2_02_support.Project object at 0x7eae09fdafc0>, owner_entry = None
+
+    @pytest.mark.parametrize("owner_entry", (None, "the owner said so"), ids=("missing", "not-a-decision-id"))
+    def test_an_accepted_condition_without_its_owner_entry_is_refused(project, owner_entry):
+        """The ``accepted`` condition of a verdict with accepted exceptions, without an owner entry or with one that
+        is no DEC id. Its twin, the same condition with ``DEC-741``, passes. Red today: the verdict schema types no
+        list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+_ test_an_accepted_condition_without_its_owner_entry_is_refused[not-a-decision-id] _
+
+project = <w2_02_support.Project object at 0x7eae0a089880>
+owner_entry = 'the owner said so'
+
+    @pytest.mark.parametrize("owner_entry", (None, "the owner said so"), ids=("missing", "not-a-decision-id"))
+    def test_an_accepted_condition_without_its_owner_entry_is_refused(project, owner_entry):
+        """The ``accepted`` condition of a verdict with accepted exceptions, without an owner entry or with one that
+        is no DEC id. Its twin, the same condition with ``DEC-741``, passes. Red today: the verdict schema types no
+        list of conditions."""
+>       verdict = _the_verdict()
+                  ^^^^^^^^^^^^^^
+
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-02/test_w2_02_verdict_conditions.py:34: in _the_verdict
+    return record_type, field, support.the_condition_keys()
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W2-02/w2_02_support.py:325: in the_condition_keys
+    conditions = _one(sorted(lists), f"list properties whose items have a state of exactly {list(CONDITION_STATES)}",
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+found = []
+what = "list properties whose items have a state of exactly ['met', 'not met', 'accepted']"
+name = 'adoption-verdict.schema.json'
+
+    def _one(found, what, name):
+>       assert len(found) == 1, f"{name}: {len(found)} {what}; one is expected: {sorted(found)}"
+               ^^^^^^^^^^^^^^^
+E       AssertionError: adoption-verdict.schema.json: 0 list properties whose items have a state of exactly ['met', 'not met', 'accepted']; one is expected: []
+
+tests/acceptance/W2-02/w2_02_support.py:301: AssertionError
+18 failed, 35 passed in 5.03s

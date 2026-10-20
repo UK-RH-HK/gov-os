@@ -1,0 +1,26 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_the_nightly_runs_the_head_of_w2_integrate_and_leaves_the_main_tree_as_it_was _
+tests/acceptance/W2-48/test_w2_48_nightly.py:124: in test_the_nightly_runs_the_head_of_w2_integrate_and_leaves_the_main_tree_as_it_was
+    assert night.record.get("ref") == support.DEFAULT_REF and night.record.get("commit") == integrate, (
+E   AssertionError: the nightly, given no --ref, runs w2/integrate's head and its record says so (`ref: w2/integrate`, `commit: cd378c7fb17e2a40654ad5f0bd64ec9c20b4d493`)
+E     (in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-8/test_the_nightly_runs_the_head0/tree) python3 -m gov.testcache nightly --json --record /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-8/test_the_nightly_runs_the_head0/nightly.json
+E     exit code: 0
+E     record (without tests): {"run": "20261020T153255Z-08a4a98e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "off", "reason": "the nightly full run: the whole uncached regression on w2/integrate's head, in a throwaway clone", "branch": "w2/integrate", "commit": "cd378c7fb17e2a40654ad5f0bd64ec9c20b4d493", "seconds": 0.79, "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0}, "latest_from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-8/test_the_nightly_runs_the_head0/tree/.gov-runtime/testcache/shared", "cache_faults": []}
+E       tests/fixtured/test_fixtured.py::test_fixtured: record 'passed'; ran 1 time(s) in this run
+E       tests/test_alpha.py::test_alpha: record 'passed'; ran 1 time(s) in this run
+E       tests/test_beta.py::test_beta: record 'passed'; ran 1 time(s) in this run
+E       tests/test_data.py::test_data: record 'passed'; ran 1 time(s) in this run
+E       tests/test_subprocess.py::test_subprocess: record 'passed'; ran 1 time(s) in this run
+E       tests/test_subprocess.py::test_subprocess_fresh: record 'passed'; ran 1 time(s) in this run
+E     stdout (end):
+E     {"ok": true, "command": "nightly", "result": {"test_cache": {"run": "20261020T153255Z-08a4a98e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "off", "reason": "the nightly full run: the whole uncached regression on w2/integrate's head, in a throwaway clone", "branch": "w2/integrate", "commit": "cd378c7fb17e2a40654ad5f0bd64ec9c20b4d493", "seconds": 0.79, "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "passed"}, {"id": "tests/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/test_data.py::test_data", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "passed"}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "passed"}], "counts": {"passed": 6, "failed": 0, "error": 0, "skipped": 0}, "latest_from": "/tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-8/test_the_nightly_runs_the_head0/tree/.gov-runtime/testcache/shared", "cache_faults": []}}, "session": ""}
+E     
+E     stderr (end):
+E     
+E   assert (None == 'w2/integrate')
+E    +  where None = <built-in method get of dict object at 0x78a02cc71840>('ref')
+E    +    where <built-in method get of dict object at 0x78a02cc71840> = {'branch': 'w2/integrate', 'cache': 'off', 'cache_faults': [], 'commit': 'cd378c7fb17e2a40654ad5f0bd64ec9c20b4d493', ...}.get
+E    +      where {'branch': 'w2/integrate', 'cache': 'off', 'cache_faults': [], 'commit': 'cd378c7fb17e2a40654ad5f0bd64ec9c20b4d493', ...} = Cached(what='(in /tmp/gov-launch-engineer-_wzwfd3u/claude-1000/pytest-of-usain/pytest-8/test_the_nightly_runs_the_head...:test_data': 1, 'tests/test_subprocess.py::test_subprocess': 1, 'tests/test_subprocess.py::test_subprocess_fresh': 1})).record
+E    +  and   'w2/integrate' = support.DEFAULT_REF
+1 failed, 45 deselected in 1.29s

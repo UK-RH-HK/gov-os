@@ -1,0 +1,636 @@
+F......FFF.FFFF.......FFFFF......F.                                      [100%]
+=================================== FAILURES ===================================
+_ test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_code_index_tool_start0')
+box = <w2_05_support.Box object at 0x749e60ae20c0>
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_code_index_tool_start0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_the_code_index_tool_started_by_gov_rebuild_gets_no_inherited_git_variable(tmp_path, box, decoy):
+        project = support.code_index_project(tmp_path / "project")
+        record = tmp_path / "tool-starts"
+        stand_in = support.recording_stand_in(tmp_path / "stand-in", support.CODE_INDEX_TOOL, record)
+        plants = _plants(tmp_path, decoy[0])
+        env = box.env(**plants)
+        env["PATH"] = f"{stand_in}:{env['PATH']}"
+    
+        done = box.run(["gov", "rebuild", "--no-embeddings", "--json"], cwd=project, env=env)
+    
+        starts = support.recorded_starts(record)
+        assert starts, (f"gov rebuild started no {support.CODE_INDEX_TOOL} (the stand-in first on PATH); the case "
+                        f"needs the code index built:\n{support.said(done)}")
+        reached = [(start["argv"][1:], sorted(set(start["env"]) & set(plants)))
+                   for start in starts if set(start["env"]) & set(plants)]
+>       assert not reached, (
+            f"{len(reached)} of the {len(starts)} start(s) of {support.CODE_INDEX_TOOL} by gov rebuild received the "
+            f"caller's GIT_* variables (KPI success 1: a program that starts git in the project): {reached[:4]}")
+E       AssertionError: 2 of the 2 start(s) of codebase-memory-mcp by gov rebuild received the caller's GIT_* variables (KPI success 1: a program that starts git in the project): [(['cli', '--quiet', '--json', 'index_repository', '{"repo_path": "/tmp/pytest-of-usain/pytest-3700/test_the_code_index_tool_start0/project/.gov-runtime/codeintel/files", "name": "code"}'], ['GIT_CONFIG_COUNT', 'GIT_CONFIG_KEY_0', 'GIT_CONFIG_VALUE_0', 'GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2_EVENT']), (['config', 'set', 'ui_enabled', 'false'], ['GIT_CONFIG_COUNT', 'GIT_CONFIG_KEY_0', 'GIT_CONFIG_VALUE_0', 'GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2_EVENT'])]
+E       assert not [(['cli', '--quiet', '--json', 'index_repository', '{"repo_path": "/tmp/pytest-of-usain/pytest-3700/test_the_code_inde...alse'], ['GIT_CONFIG_COUNT', 'GIT_CONFIG_KEY_0', 'GIT_CONFIG_VALUE_0', 'GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', ...])]
+
+tests/acceptance/W2-05/test_w2_05_code_index_tool.py:47: AssertionError
+_ test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index[GIT_INDEX_FILE] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p0')
+box = <w2_05_support.Box object at 0x749e607b8500>, plants = 'GIT_INDEX_FILE'
+
+    @pytest.mark.parametrize("plants", ("GIT_INDEX_FILE", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=True)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=False)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_INDEX_FILE":
+            planted.pop("GIT_DIR")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert_index_refused(done, planted["GIT_INDEX_FILE"], f"a secret staged in the project under a planted {plants}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=3, stdout='Finding:     token = \x1b[1;3;m...rror": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', stderr='')
+index = '/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p0/elsewhere/decoy/.git/index'
+what = 'a secret staged in the project under a planted GIT_INDEX_FILE'
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+        assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+>       assert support.names_path(output, index), (
+            f"{what}: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal "
+            f"does not name {index}:\n{support.said(done)}")
+E       AssertionError: a secret staged in the project under a planted GIT_INDEX_FILE: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal does not name /tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p0/elsewhere/decoy/.git/index:
+E         exit 3
+E         --- stdout
+E         Finding:     token = [1;3;mREDACTED[0m
+E         Secret:      [1;3;mREDACTED[0m
+E         RuleID:      gov-token-digit
+E         Entropy:     4.436605
+E         File:        config.txt
+E         Line:        1
+E         Fingerprint: config.txt:gov-token-digit:1
+E         
+E         {"ok": false, "command": "ci", "result": {}, "session": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}
+E         
+E         --- stderr
+E         
+E       assert False
+E        +  where False = <function names_path at 0x749e60ce18a0>('Finding:     token = \x1b[1;3;mREDACTED\x1b[0m\nSecret:      \x1b[1;3;mREDACTED\x1b[0m\nRuleID:      gov-token-digit\...ion": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', '/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p0/elsewhere/decoy/.git/index')
+E        +    where <function names_path at 0x749e60ce18a0> = support.names_path
+
+tests/acceptance/W2-05/test_w2_05_planted.py:101: AssertionError
+_ test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index[GIT_DIR and GIT_INDEX_FILE] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p1')
+box = <w2_05_support.Box object at 0x749e607b9eb0>
+plants = 'GIT_DIR and GIT_INDEX_FILE'
+
+    @pytest.mark.parametrize("plants", ("GIT_INDEX_FILE", "GIT_DIR and GIT_INDEX_FILE"))
+    def test_a_staged_secret_under_a_planted_decoy_index_is_refused_naming_the_index(tmp_path, box, plants):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=True)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=False)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+        if plants == "GIT_INDEX_FILE":
+            planted.pop("GIT_DIR")
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert_index_refused(done, planted["GIT_INDEX_FILE"], f"a secret staged in the project under a planted {plants}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:121: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=3, stdout='Finding:     token = \x1b[1;3;m...rror": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', stderr='')
+index = '/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p1/elsewhere/decoy/.git/index'
+what = 'a secret staged in the project under a planted GIT_DIR and GIT_INDEX_FILE'
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+        assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+>       assert support.names_path(output, index), (
+            f"{what}: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal "
+            f"does not name {index}:\n{support.said(done)}")
+E       AssertionError: a secret staged in the project under a planted GIT_DIR and GIT_INDEX_FILE: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal does not name /tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p1/elsewhere/decoy/.git/index:
+E         exit 3
+E         --- stdout
+E         Finding:     token = [1;3;mREDACTED[0m
+E         Secret:      [1;3;mREDACTED[0m
+E         RuleID:      gov-token-digit
+E         Entropy:     4.436605
+E         File:        config.txt
+E         Line:        1
+E         Fingerprint: config.txt:gov-token-digit:1
+E         
+E         {"ok": false, "command": "ci", "result": {}, "session": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}
+E         
+E         --- stderr
+E         
+E       assert False
+E        +  where False = <function names_path at 0x749e60ce18a0>('Finding:     token = \x1b[1;3;mREDACTED\x1b[0m\nSecret:      \x1b[1;3;mREDACTED\x1b[0m\nRuleID:      gov-token-digit\...ion": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', '/tmp/pytest-of-usain/pytest-3700/test_a_staged_secret_under_a_p1/elsewhere/decoy/.git/index')
+E        +    where <function names_path at 0x749e60ce18a0> = support.names_path
+
+tests/acceptance/W2-05/test_w2_05_planted.py:101: AssertionError
+__ test_a_clean_index_under_a_planted_decoy_index_is_refused_naming_the_index __
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_a_clean_index_under_a_pla0')
+box = <w2_05_support.Box object at 0x749e60b20a70>
+
+    def test_a_clean_index_under_a_planted_decoy_index_is_refused_naming_the_index(tmp_path, box):
+        skip_without("gitleaks")
+        repo = _secrets_repo(tmp_path / "project", secret=False)
+        decoy_repo = _secrets_repo(tmp_path / "elsewhere" / "decoy", secret=True)
+        decoy = (decoy_repo, support.folder_fingerprint(decoy_repo))
+        planted = support.planted(decoy_repo)
+    
+        done = _scan(box, repo, **planted)
+    
+>       assert_index_refused(done, planted["GIT_INDEX_FILE"],
+                             "the project's clean index under a planted GIT_DIR and GIT_INDEX_FILE")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:136: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='')
+index = '/tmp/pytest-of-usain/pytest-3700/test_a_clean_index_under_a_pla0/elsewhere/decoy/.git/index'
+what = "the project's clean index under a planted GIT_DIR and GIT_INDEX_FILE"
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+>       assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+E       AssertionError: the project's clean index under a planted GIT_DIR and GIT_INDEX_FILE: gov ci staged-secrets passed on an index other than the one being committed (/tmp/pytest-of-usain/pytest-3700/test_a_clean_index_under_a_pla0/elsewhere/decoy/.git/index); it must refuse it:
+E         exit 0
+E         --- stdout
+E         {"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}
+E         
+E         --- stderr
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:98: AssertionError
+_ test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it[a secret in that index, the project's index clean] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an0')
+box = <w2_05_support.Box object at 0x749e60b23800>
+case = "a secret in that index, the project's index clean"
+
+    @pytest.mark.parametrize("case", tuple(_OUTSIDE))
+    def test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it(tmp_path, box, case):
+        """A person or a tool commits with ``GIT_INDEX_FILE=<a file outside the git directory>``: that file is the
+        commit's index, and it is not git's own index of the project. The gate may not scan another index in its
+        place: it refuses, naming the index, whatever either index holds."""
+        skip_without("gitleaks")
+        in_that_index, in_the_project = _OUTSIDE[case]
+        repo = support.new_repo(tmp_path / "project", {
+            "README.md": "# A project\n", "config.txt": _CLEAN,
+            ".gitleaks.toml": support.GITLEAKS_RULES.read_text(encoding="utf-8")})
+        index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                        {"config.txt": in_that_index})
+        if in_the_project is not None:
+            support.write(repo, "config.txt", in_the_project)
+            support.git(repo, "add", "config.txt")
+    
+        done = _scan(box, repo, GIT_INDEX_FILE=index)
+    
+>       assert_index_refused(done, index, f"an inherited GIT_INDEX_FILE outside the git directory ({case})")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='')
+index = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an0/elsewhere/commit-index')
+what = "an inherited GIT_INDEX_FILE outside the git directory (a secret in that index, the project's index clean)"
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+>       assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+E       AssertionError: an inherited GIT_INDEX_FILE outside the git directory (a secret in that index, the project's index clean): gov ci staged-secrets passed on an index other than the one being committed (/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an0/elsewhere/commit-index); it must refuse it:
+E         exit 0
+E         --- stdout
+E         {"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}
+E         
+E         --- stderr
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:98: AssertionError
+_ test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it[nothing secret in that index, the project's index clean] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an1')
+box = <w2_05_support.Box object at 0x749e60a85a00>
+case = "nothing secret in that index, the project's index clean"
+
+    @pytest.mark.parametrize("case", tuple(_OUTSIDE))
+    def test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it(tmp_path, box, case):
+        """A person or a tool commits with ``GIT_INDEX_FILE=<a file outside the git directory>``: that file is the
+        commit's index, and it is not git's own index of the project. The gate may not scan another index in its
+        place: it refuses, naming the index, whatever either index holds."""
+        skip_without("gitleaks")
+        in_that_index, in_the_project = _OUTSIDE[case]
+        repo = support.new_repo(tmp_path / "project", {
+            "README.md": "# A project\n", "config.txt": _CLEAN,
+            ".gitleaks.toml": support.GITLEAKS_RULES.read_text(encoding="utf-8")})
+        index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                        {"config.txt": in_that_index})
+        if in_the_project is not None:
+            support.write(repo, "config.txt", in_the_project)
+            support.git(repo, "add", "config.txt")
+    
+        done = _scan(box, repo, GIT_INDEX_FILE=index)
+    
+>       assert_index_refused(done, index, f"an inherited GIT_INDEX_FILE outside the git directory ({case})")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='')
+index = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an1/elsewhere/commit-index')
+what = "an inherited GIT_INDEX_FILE outside the git directory (nothing secret in that index, the project's index clean)"
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+>       assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+E       AssertionError: an inherited GIT_INDEX_FILE outside the git directory (nothing secret in that index, the project's index clean): gov ci staged-secrets passed on an index other than the one being committed (/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an1/elsewhere/commit-index); it must refuse it:
+E         exit 0
+E         --- stdout
+E         {"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}
+E         
+E         --- stderr
+E         
+E       assert 0 != 0
+E        +  where 0 = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=0, stdout='{"ok": true, "command": "ci", "result": {"scans": 2, "secrets": 0}, "session": ""}\n', stderr='').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:98: AssertionError
+_ test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it[nothing secret in that index, a secret in the project's index] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an2')
+box = <w2_05_support.Box object at 0x749e60a848f0>
+case = "nothing secret in that index, a secret in the project's index"
+
+    @pytest.mark.parametrize("case", tuple(_OUTSIDE))
+    def test_staged_secrets_refuses_an_inherited_index_outside_the_git_directory_naming_it(tmp_path, box, case):
+        """A person or a tool commits with ``GIT_INDEX_FILE=<a file outside the git directory>``: that file is the
+        commit's index, and it is not git's own index of the project. The gate may not scan another index in its
+        place: it refuses, naming the index, whatever either index holds."""
+        skip_without("gitleaks")
+        in_that_index, in_the_project = _OUTSIDE[case]
+        repo = support.new_repo(tmp_path / "project", {
+            "README.md": "# A project\n", "config.txt": _CLEAN,
+            ".gitleaks.toml": support.GITLEAKS_RULES.read_text(encoding="utf-8")})
+        index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                        {"config.txt": in_that_index})
+        if in_the_project is not None:
+            support.write(repo, "config.txt", in_the_project)
+            support.git(repo, "add", "config.txt")
+    
+        done = _scan(box, repo, GIT_INDEX_FILE=index)
+    
+>       assert_index_refused(done, index, f"an inherited GIT_INDEX_FILE outside the git directory ({case})")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+done = CompletedProcess(args=['gov', 'ci', 'staged-secrets', '--json'], returncode=3, stdout='Finding:     token = \x1b[1;3;m...rror": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', stderr='')
+index = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an2/elsewhere/commit-index')
+what = "an inherited GIT_INDEX_FILE outside the git directory (nothing secret in that index, a secret in the project's index)"
+
+    def assert_index_refused(done, index, what):
+        """The staged-secrets gate refused the index it may not take as the commit's (independent review F1): a
+        non-zero exit and a refusal that names that index, whatever either index holds. It never answers pass."""
+        output = done.stdout + done.stderr
+        assert done.returncode != 0, (
+            f"{what}: gov ci staged-secrets passed on an index other than the one being committed ({index}); it "
+            f"must refuse it:\n{support.said(done)}")
+>       assert support.names_path(output, index), (
+            f"{what}: gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal "
+            f"does not name {index}:\n{support.said(done)}")
+E       AssertionError: an inherited GIT_INDEX_FILE outside the git directory (nothing secret in that index, a secret in the project's index): gov ci staged-secrets refused, but not the index it could not take as the commit's: the refusal does not name /tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an2/elsewhere/commit-index:
+E         exit 3
+E         --- stdout
+E         Finding:     token = [1;3;mREDACTED[0m
+E         Secret:      [1;3;mREDACTED[0m
+E         RuleID:      gov-token-digit
+E         Entropy:     4.436605
+E         File:        config.txt
+E         Line:        1
+E         Fingerprint: config.txt:gov-token-digit:1
+E         
+E         {"ok": false, "command": "ci", "result": {}, "session": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}
+E         
+E         --- stderr
+E         
+E       assert False
+E        +  where False = <function names_path at 0x749e60ce18a0>('Finding:     token = \x1b[1;3;mREDACTED\x1b[0m\nSecret:      \x1b[1;3;mREDACTED\x1b[0m\nRuleID:      gov-token-digit\...ion": "", "error": {"code": "SECRET_STAGED", "message": "gitleaks found a secret in what is staged", "details": {}}}\n', PosixPath('/tmp/pytest-of-usain/pytest-3700/test_staged_secrets_refuses_an2/elsewhere/commit-index'))
+E        +    where <function names_path at 0x749e60ce18a0> = support.names_path
+
+tests/acceptance/W2-05/test_w2_05_planted.py:101: AssertionError
+_ test_a_hooked_commit_with_its_index_outside_the_git_directory_and_a_secret_there_does_not_land _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_a_hooked_commit_with_its_0')
+box = <w2_05_support.Box object at 0x749e607b8bf0>
+
+    def test_a_hooked_commit_with_its_index_outside_the_git_directory_and_a_secret_there_does_not_land(tmp_path, box):
+        """The project's own ``lefthook.yml`` installed by lefthook in a temporary repository (G1 and G2 each a
+        declared check that passes). A commit made with ``GIT_INDEX_FILE`` naming a file outside the git directory,
+        a secret staged in that index only, does not land: the branch, the indexes and the reflogs stay as they were."""
+        skip_without("lefthook", "gitleaks")
+        assert support.LEFTHOOK_YML.is_file(), "lefthook.yml is absent from the repository root"
+        repo = support.gov_project(tmp_path / "repo", hooks_file=support.LEFTHOOK_YML, retrieval=False)
+        support.declare_check(repo, "w2-05-g1", "graph integrity", "G1", "true")
+        support.git(repo, "add", "-A")
+        support.git(repo, "commit", "-q", "-m", "a G1 check that passes")
+        installed = box.run(["lefthook", "install"], cwd=repo, env=box.env())
+        assert installed.returncode == 0, f"lefthook install refused the project's lefthook.yml:\n{support.said(installed)}"
+        assert (support.common_dir_of(repo) / "hooks" / "pre-commit").is_file(), "lefthook installed no pre-commit hook"
+        support.write(repo, "notes.md", "the first line\na plain change\n")
+        support.git(repo, "add", "notes.md")
+        plain = box.run([support.GIT, "commit", "-q", "-m", "a plain change"], cwd=repo, env=box.env(),
+                        timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+        assert plain.returncode == 0, (f"a plain hooked commit with nothing secret was refused; the case needs hooks "
+                                       f"that let it through:\n{support.said(plain)}")
+        index = support.index_outside_the_git_directory(repo, tmp_path / "elsewhere" / "commit-index",
+                                                        {"config.txt": _SECRET})
+        before = support.repo_state(repo, [repo])
+        staged = support.staged_in(repo, index)
+    
+        done = box.run([support.GIT, "commit", "-q", "-m", "a secret in another index"], cwd=repo,
+                       env=box.env(GIT_INDEX_FILE=index), timeout=support.HOOKED_COMMIT_TIMEOUT_S)
+    
+        after = support.repo_state(repo, [repo])
+        landed = after.heads[str(repo)] != before.heads[str(repo)]
+>       assert done.returncode != 0 and not landed, (
+            "a commit whose index lies outside the git directory, with a secret staged there, landed: the "
+            f"staged-secrets gate passed on another index\n{support.git(repo, 'log', '-2', '--format=%h %s')}"
+            f"{support.said(done)}")
+E       AssertionError: a commit whose index lies outside the git directory, with a secret staged there, landed: the staged-secrets gate passed on another index
+E         c9ad24f a secret in another index
+E         856a2e5 a plain change
+E         exit 0
+E         --- stdout
+E         
+E         --- stderr
+E         [38;2;56;56;56m╭──────────────────────────────────────────╮[m
+E         [38;2;56;56;56m│[m 🥊 lefthook  v2.1.15   hook:  [1mpre-commit[m [38;2;56;56;56m│[m
+E         [38;2;56;56;56m╰──────────────────────────────────────────╯[m
+E         ┃  checks ❯ 
+E         {
+E           "tiers": [
+E             "G1",
+E             "G2"
+E           ],
+E           "checks": {
+E             "w2-05-g1": "GREEN",
+E             "w2-05-g2": "GREEN"
+E           }
+E         }
+E         
+E         ┃  staged-secrets ❯ 
+E         {
+E           "scans": 2,
+E           "secrets": 0
+E         }
+E         
+E         [38;2;56;56;56m  ────────────────────────────────────[m
+E         summary: (done in 1.17 seconds)
+E         ✔️ checks (0.28 seconds)
+E         ✔️ staged-secrets (0.87 seconds)
+E         
+E       assert (0 != 0)
+E        +  where 0 = CompletedProcess(args=['/usr/bin/git', 'commit', '-q', '-m', 'a secret in another index'], returncode=0, stdout='', st...────────────────\x1b[m\nsummary: (done in 1.17 seconds)\n✔️ checks (0.28 seconds)\n✔️ staged-secrets (0.87 seconds)\n').returncode
+
+tests/acceptance/W2-05/test_w2_05_planted.py:221: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[trace variables] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat1')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat1/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = 'trace variables'
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat1/traces')
+what = 'the containment check with trace variables'
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with trace variables: a child git call wrote the planted trace target(s) ['git_trace', 'git_trace2', 'git_trace2_event']
+E       assert not ['git_trace', 'git_trace2', 'git_trace2_event']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:60: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[a trace setting in the person's git configuration] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat2')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat2/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = "a trace setting in the person's git configuration"
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:393: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_containment_check_cat2/traces')
+what = "the containment check with a trace setting in the person's git configuration"
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with a trace setting in the person's git configuration: a child git call wrote the planted trace target(s) ['user-config-trace2']
+E       assert not ['user-config-trace2']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:60: AssertionError
+_ test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_gov_close_runs_its_subpro0')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3700/test_gov_close_runs_its_subpro0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment(tmp_path, decoy):
+        """Red until W2-53 merges (``src/gov/close/**``)."""
+        import w2_01_support as w201
+        base = w201.base
+        ticket, wbs = "PROJ-genv", "W1-genv"
+        record = tmp_path / "seen-by-the-test.json"
+        traces = tmp_path / "traces"
+        project = w201.Project(tmp_path / "project")
+        w201.create_ticket(project, ticket, wbs)
+        project.write(f"tests/acceptance/{wbs}/test_records_its_environment.py", _ENV_TEST.format(record=str(record)))
+        project.commit("acceptance tests: the environment", who=w201.TEST_DESIGNER,
+                       trailers=w201.trailers_of(ticket, role="independent-test-designer"), exact=True)
+        w201.engineer_commit(project, ticket, {"src/example/feature.py": "# feature\n"})
+        w201.checkpointed(project, ticket)
+        sandbox = w201.cli_support.make_sandbox(tmp_path / "sandbox")
+        interface = w201.cli_support.load_interface(w201.REPO_ROOT)
+        plants = dict(support.planted(decoy[0]), **support.trace_plants(traces))
+        traces.mkdir(exist_ok=True)
+        gitconfig = Path(sandbox.home) / ".gitconfig"
+        gitconfig.write_text((gitconfig.read_text() if gitconfig.is_file() else "")
+                             + f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+        env = dict(base.sandbox_env(sandbox), **plants)
+    
+        run = base.run_close(project, sandbox, ticket, env=env)
+    
+        assert record.is_file(), f"gov close did not run the ticket's acceptance test:\n{run.describe()}"
+        reached = sorted(set(json.loads(record.read_text())) & set(plants))
+>       assert not reached, f"the planted {reached} reached the test run of gov close (W2-M161):\n{run.describe()}"
+E       AssertionError: the planted ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', 'GIT_TRACE_SETUP'] reached the test run of gov close (W2-M161):
+E         gov close PROJ-genv --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "close", "result": {"ticket": "PROJ-genv", "close_record": "docs/close/PROJ-genv/CL-PROJ-genv.md", "checkpoint": "docs/checkpoints/PROJ-genv/CP-PROJ-genv-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.17, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.58, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:442: AssertionError
+____________ test_the_guard_hook_does_not_run_the_git_first_on_path ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_guard_hook_does_not_r0')
+
+    def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
+        """Red until W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tool_input = w102.edit_tool_input("Write", project / "src/gov/guard/decide.py")
+        plain = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID)
+        assert plain.decision == "allow", f"the guard did not allow an in-scope write; the case needs it: {plain.describe()}"
+        fake = tmp_path / "fake-bin"
+        fake.mkdir()
+        mark = tmp_path / "fake-git-ran"
+        (fake / "git").write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec {support.GIT} \"$@\"\n")
+        (fake / "git").chmod(0o755)
+    
+        result = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID,
+                               extra_env={"PATH": f"{fake}:{os.environ.get('PATH', support.SYSTEM_PATH)}"})
+    
+        ran = mark.read_text().splitlines() if mark.is_file() else []
+>       assert not ran, f"the guard hook ran the git first on PATH, not git by absolute path (W2-L160): {ran[:3]}"
+E       AssertionError: the guard hook ran the git first on PATH, not git by absolute path (W2-L160): ['-C /tmp/pytest-of-usain/pytest-3700/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+E       assert not ['-C /tmp/pytest-of-usain/pytest-3700/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:474: AssertionError
+_ test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_guard_hook_refuses_wi0')
+fifo_cleanup = [PosixPath('/tmp/pytest-of-usain/pytest-3700/test_the_guard_hook_refuses_wi0/project/.git/worktrees/wt/HEAD')]
+
+    def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
+        """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
+        look-up must give up within its own limit and refuse (DEC-580), before the hook's 20 s deadline. Red until
+        W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tree = tmp_path / "wt"
+        w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
+        head = support.git_dir_of(tree) / "HEAD"
+        head.unlink()
+        os.mkfifo(head)
+        fifo_cleanup.append(head)
+    
+        result = w102.run_hook(tree, "Write", w102.edit_tool_input("Write", tree / "src/gov/guard/decide.py"), sandbox,
+                               role=w102.ENGINEER, ticket=w102.TICKET_ID)
+    
+>       assert result.decision != "timeout", (
+            f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
+            f"look-up waited (W2-L160: the look-up has no limit of its own): {result.describe()}")
+E       AssertionError: the guard hook did not answer within the hook's 20 s deadline while its freeze look-up waited (W2-L160: the look-up has no limit of its own): decision=timeout exit=None stdout='' stderr=''
+E       assert 'timeout' != 'timeout'
+E        +  where 'timeout' = HookResult(decision='timeout', returncode=None, stdout='', stderr='', seconds=20.021360307990108).decision
+
+tests/acceptance/W2-05/test_w2_05_planted.py:493: AssertionError
+_ test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git _
+
+    def test_the_sweep_lists_the_starts_of_the_code_index_tool_as_calls_that_start_git():
+        """The code index's tool (``codebase-memory-mcp``, W1-16's README) starts git in the project itself
+        (independent review F2). Every file of the code index's package that names it as a program (a string
+        literal that is exactly its name) has a row of the sweep's tables naming both the tool and that file."""
+        text = _sweep_text()
+        starting = support.files_naming_program(support.CODE_INDEX_TOOL, support.CODE_INDEX_PACKAGE_REL)
+        assert starting, (f"no file of {support.CODE_INDEX_PACKAGE_REL} names {support.CODE_INDEX_TOOL}: the lower "
+                          f"bound is empty, the case is wrong")
+        rows = support.table_rows(text)
+        unlisted = [rel for rel in starting
+                    if not any(support.CODE_INDEX_TOOL in row and support.names_file(row, rel) for row in rows)]
+>       assert not unlisted, (f"{support.SWEEP_REL} has no row naming {support.CODE_INDEX_TOOL} and the file that "
+                              f"starts it, for: {unlisted}")
+E       AssertionError: docs/research/AR-2-git-sweep.md has no row naming codebase-memory-mcp and the file that starts it, for: ['src/gov/codeintel/__init__.py']
+E       assert not ['src/gov/codeintel/__init__.py']
+
+tests/acceptance/W2-05/test_w2_05_sweep.py:57: AssertionError
+14 failed, 21 passed in 65.27s (0:01:05)

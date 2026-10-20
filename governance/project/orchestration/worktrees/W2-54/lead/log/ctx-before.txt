@@ -1,0 +1,41 @@
+ 04:28:09 up 1 day, 22:43,  0 user,  load average: 22.54, 18.91, 13.24
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 3099.72it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+FAIL: DAEO-1ve2: 94d7c56ffeec8739ab89c1e9e77026ef14b78019feeb19ecfc5c07e972984a79 != a7783e0c9dfd82bba6bdc85013877b4b53cc119d65d52ab698a8e4132289be5c
+FAIL: DAEO-32n6: 42ce63264f800814914fccd160ec9e9b2d7dbcbdbcdb4236893adc253ca66ce8 != d363cdb24450222a054039597befed58fb1ae40e40f147e1e71b0410b4447d32
+FAIL: DAEO-7nne: ff796f402f34f42d534a9025640fba416b1a091aa94db95bf507abd61b06116f != 1e982dc7f9e3c2949837b7b4b32f4e49b054346113eecd1a1a2b11e8af645783
+FAIL: DAEO-csj8: 00168c37eaf579544703793e7c61106f74698be5c6899de429d74ef0398096dd != c663db4e2ef67c124af0aa37d4f41cfcc607e65c05b9b710e4aef21e64cdb8f5
+FAIL: DAEO-ipqy: ce7f657dcd13b575e6e2bbfde0dfd32c34c27404831efec57d3946e04289b2b3 != c0c87a3fff6a6647597f8926a83815677018f9674c6dd0906b1f3afbe3fa24d5
+FAIL: DAEO-jip3: 8350a0643ea3ce0de6fbc18bbb1aa9ae66ccc50efe7ef9b7a457da7a6dfebdad != a701849db9636ab60449eace28d0cc1f97aca1efefd1a19ec27c61b8aac91acd
+FAIL: DAEO-lrre: d914519706d3b53357b94e19b88ff82c7f16c8af386fd5cdeec9f5f99dd4dcbf != b272b9b8c6bfea55122cc80e9c5c66df0895fd9ceb70de50337df812680db3cb
+FAIL: DAEO-nn1s: b6765f99ccb8809212a062cdf98ef6d423b52e0748d1868c78e3e94700af6504 != 58d94fd04f79a438ddc2843ee9bc688c5147db274328d4012edd440a3f2e67c4
+FAIL: DAEO-o4fg: 107db7abf357f49c732bb351ae5fd9c8cd6b7abba38cc4856a7727497622d5c7 != f2e6ec651e44c8ebc890085750d324552d8da7a0220059d76d9f74be1780df52
+FAIL: DAEO-sdxk: ea655315bbb6d7c7a3c72b650618c2681b4e87853ae666da0899bdb285b1ae46 != a3f519a6e64feef0402e879888ddee9a9c1bf651226d03cecc9436fb568f798d
+FAIL: DAEO-xnbx: c4456818da3a4feb0eaf173a7a7ca75959af88083259b31e5cfc0cc44078d86f != dd765ce5ae090613e6791c2bf36756e1c6c3b471f585ff3b4bc90f6f12402e47
+FAIL: DAEO-xog0: ff765ea1c80dc367ae3c40c0f658f80f49e554641b013040bcb08591a4d0f7af != e91dae40072bfba8c93fb367eadefd2661b205568ba0240d8575c58e133e039c
+FAIL: DAEO-zqvn: 71857663399c333541256e1023ecdb3376b2a7b998126f600f1d91612934d972 != 1d6a372d3168e0186f922719e2d783632bbc808e9741667821339018a69e4cdc
+context-reproducibility: 13 ticket(s) failed, 0 error(s)
+Command exited with non-zero status 1
+	Command being timed: "env PYTHONPATH=/home/usain/gov-os-worktrees/W2-54/src python3 -m gov.context.context_check"
+	User time (seconds): 72.27
+	System time (seconds): 18.78
+	Percent of CPU this job got: 71%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:08.23
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 82672
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 3
+	Minor (reclaiming a frame) page faults: 797434
+	Voluntary context switches: 588340
+	Involuntary context switches: 6801
+	Swaps: 0
+	File system inputs: 3288
+	File system outputs: 1008568
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

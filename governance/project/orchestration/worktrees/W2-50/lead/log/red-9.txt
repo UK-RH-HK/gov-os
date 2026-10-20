@@ -1,0 +1,668 @@
+/home/usain/gov-os-worktrees/W2-50/src/gov/__init__.py
+FFFFFFFFF.F..FF...FFF..                                                  [100%]
+=================================== FAILURES ===================================
+__________________ test_a_large_clean_store_is_decided_green ___________________
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_clean_store_is_de0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_clean_store_is_de0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_clean_store_is_de0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_clean_store_is_de0/w2-50/pycache'))
+
+    def test_a_large_clean_store_is_decided_green(env, sandbox):
+        """160 MiB, read by gitleaks at 2 MB/s (twice the working figure): 84 s a run, past today's fixed 60 s."""
+        project, stand_in = env
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, scan.LARGE_SIZE,
+                        {16: start, scan.LARGE_SIZE // 2 + 4096: middle, scan.LARGE_SIZE - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+>       assert_green(run, f"a clean store of {scan.LARGE_SIZE} bytes read at {scan.SLOW_RATE} bytes a second")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:171: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...h1x1101602'], 'fault': None, 'began': 1792450948.6050663, 'code': 0, 'seconds': 0.19}], fresh='zqxw5853fresh1x1101602')
+what = 'a clean store of 167772160 bytes read at 2000000 bytes a second'
+
+    def assert_green(run, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+>       assert run.returncode == 0, f"{what}: the check is not green\n{run.describe()}"
+E       AssertionError: a clean store of 167772160 bytes read at 2000000 bytes a second: the check is not green
+E         exit code: 1 after 60.5 s; gitleaks runs: 2
+E         stdout:
+E         
+E         stderr:
+E         py", line 401, in __get_result
+E             raise self._exception
+E           File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-50/src/gov/secrets/__init__.py", line 172, in <lambda>
+E             verdicts = list(pool.map(lambda path: _holds_secret(rules, _store_content(path)), files))
+E                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-50/src/gov/secrets/__init__.py", line 77, in _holds_secret
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 60 seconds
+E         
+E       assert 1 == 0
+E        +  where 1 = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...h1x1101602'], 'fault': None, 'began': 1792450948.6050663, 'code': 0, 'seconds': 0.19}], fresh='zqxw5853fresh1x1101602').returncode
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:86: AssertionError
+_____ test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it ______
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_with_a_cana0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_with_a_cana0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_with_a_cana0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_with_a_cana0/w2-50/pycache'))
+
+    def test_a_large_store_with_a_canary_across_its_middle_is_red_naming_it(env, sandbox):
+        """The canary stands across the store's exact middle byte, where a split into halves or powers of two falls."""
+        project, stand_in = env
+        start, middle, end = words(LARGE)
+        across = scan.LARGE_SIZE // 2 - (len(scan.SECRET) + 2) // 2
+        scan.text_store(project / LARGE, scan.LARGE_SIZE,
+                        {16: start, across: scan.SECRET, across + 4096: middle, scan.LARGE_SIZE - 64: end})
+        run = scan.run_scan(sandbox, project, stand_in, markers=words(LARGE), rate=scan.SLOW_RATE)
+>       assert_red_naming(run, LARGE, "a large store with a canary")
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...sh2x1101602'], 'fault': None, 'began': 1792451011.232574, 'code': 0, 'seconds': 0.19}], fresh='zqxw5853fresh2x1101602')
+rel = '.gov-runtime/store-large.bin', what = 'a large store with a canary'
+
+    def assert_red_naming(run, rel, what):
+        assert run.returncode is not None, f"{what}: the check did not finish within its declared limit\n{run.describe()}"
+        assert run.returncode != 0, f"{what}: the check is green\n{run.describe()}"
+>       assert run.lines_naming(rel), f"{what}: the check is red but names no {rel}\n{run.describe()}"
+E       AssertionError: a large store with a canary: the check is red but names no .gov-runtime/store-large.bin
+E         exit code: 1 after 60.5 s; gitleaks runs: 2
+E         stdout:
+E         
+E         stderr:
+E         py", line 401, in __get_result
+E             raise self._exception
+E           File "/usr/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+E             result = self.fn(*self.args, **self.kwargs)
+E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-50/src/gov/secrets/__init__.py", line 172, in <lambda>
+E             verdicts = list(pool.map(lambda path: _holds_secret(rules, _store_content(path)), files))
+E                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-50/src/gov/secrets/__init__.py", line 77, in _holds_secret
+E             done = subprocess.run(
+E                    ^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 550, in run
+E             stdout, stderr = process.communicate(input, timeout=timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+E             stdout, stderr = self._communicate(input, endtime, timeout)
+E                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+E             self._check_timeout(endtime, orig_timeout, stdout, stderr)
+E           File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+E             raise TimeoutExpired(
+E         subprocess.TimeoutExpired: Command '['gitleaks', 'stdin', '--no-banner', '--redact', '--ignore-gitleaks-allow', '--gitleaks-ignore-path', '/dev/null', '--log-level', 'error', '--exit-code', '3']' timed out after 60 seconds
+E         
+E       assert []
+E        +  where [] = lines_naming('.gov-runtime/store-large.bin')
+E        +    where lines_naming = ScanRun(returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "<frozen runpy>", line 198, in _ru...sh2x1101602'], 'fault': None, 'began': 1792451011.232574, 'code': 0, 'seconds': 0.19}], fresh='zqxw5853fresh2x1101602').lines_naming
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:92: AssertionError
+______ test_a_large_store_among_many_small_files_is_decided_by_gov_check _______
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_among_many_0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_among_many_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_among_many_0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_large_store_among_many_0/w2-50/pycache'))
+
+    def test_a_large_store_among_many_small_files_is_decided_by_gov_check(env, sandbox):
+        """The pool full: 300 small stores beside the large one, every gitleaks run at 2 MB/s; run by ``gov check``."""
+        project, stand_in = env
+        start, middle, end = words(LARGE)
+        scan.text_store(project / LARGE, scan.LARGE_SIZE,
+                        {16: start, scan.LARGE_SIZE // 2 + 4096: middle, scan.LARGE_SIZE - 64: end})
+        small = scan.marker("smallfile")
+        block = scan.filler_block(16 * 1024, seed="small").decode()
+        for index in range(300):
+            support.write(project / scan.RUNTIME / "packets" / f"DAEO-{index:04d}" / "packet.md",
+                          f"{block[:8000]}\n{small}\n{block[8000:]}")
+        checks = project / "governance/kernel/checks"
+        checks.mkdir(parents=True, exist_ok=True)
+        (checks / "secrets-indexing.yaml").write_bytes(support.CHECK_DECLARATION.read_bytes())
+        run = scan.run_scan(sandbox, project, stand_in, markers=[*words(LARGE), small], rate=scan.SLOW_RATE,
+                            via_gov_check=True)
+        assert run.returncode is not None, f"gov check did not finish within the check's declared limit\n{run.describe()}"
+        try:
+            envelope = json.loads(run.stdout)
+        except ValueError:
+            raise AssertionError(f"gov check --json gave no JSON\n{run.describe()}") from None
+        status = [entry.get("status") for entry in _check_entries(envelope) if entry.get("id") == "secrets-indexing"]
+>       assert status == ["GREEN"], f"the secrets-indexing check under gov check is {status}, not GREEN\n{run.describe()}"
+E       AssertionError: the secrets-indexing check under gov check is ['RED'], not GREEN
+E         exit code: 3 after 81.5 s; gitleaks runs: 602
+E         stdout:
+E         ibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/home/usain/gov-os-worktrees/W2-50/src/gov/secrets/_"}], "provenance": {"commit": "e0ef3afa86e66319f00feaca659824739f1cf0f3", "check_version": "1.0.0", "inputs_hash": "f323a71fdcf34eda"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "e0ef3afa86e66319f00feaca659824739f1cf0f3", "check_version": "1.0.0", "inputs_hash": "131859ceaeddbb71"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "e0ef3afa86e66319f00feaca659824739f1cf0f3", "check_version": "1.0.0", "inputs_hash": "ce3b4fbd95a75882"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "e0ef3afa86e66319f00feaca659824739f1cf0f3", "check_version": "1.0.0", "inputs_hash": "8a21ec26bdac9d56"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: RED
+E           skill regression: GREEN
+E         
+E       assert ['RED'] == ['GREEN']
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:212: AssertionError
+____ test_an_unchanged_store_is_not_scanned_again_and_its_reuse_is_labelled ____
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_an_unchanged_store_is_not0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_an_unchanged_store_is_not0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_an_unchanged_store_is_not0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_an_unchanged_store_is_not0/w2-50/pycache'))
+
+    def test_an_unchanged_store_is_not_scanned_again_and_its_reuse_is_labelled(env, sandbox):
+        project, stand_in = env
+        db_store(project)
+        plain_store(project, CODE_STORE)
+>       shas = first_runs(sandbox, project, stand_in, [STORE_DB, CODE_STORE])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:225: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8520448110066354, calls=[{'pid': 1134516, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451159.650659, 'code': 0, 'seconds': 0.22}], fresh='zqxw5853fresh5x1101602')
+rel = '.gov-runtime/store.db'
+sha = '6c7c15e243a3d099ec78292df85c922c529c24f3e3cfb0d171c80ba249c182ef'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/store.db's clean result as reused with the SHA-256 of its bytes (6c7c15e243a3d099ec78292df85c922c529c24f3e3cfb0d171c80ba249c182ef)
+E         exit code: 0 after 0.9 s; gitleaks runs: 6
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/store.db', '6c7c15e243a3d099ec78292df85c922c529c24f3e3cfb0d171c80ba249c182ef')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8520448110066354, calls=[{'pid': 1134516, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451159.650659, 'code': 0, 'seconds': 0.22}], fresh='zqxw5853fresh5x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+____ test_a_store_changed_by_one_byte_is_scanned_again_in_full[first-byte] _____
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by0/w2-50/pycache'))
+where = 'first-byte'
+
+    @pytest.mark.parametrize("where", ("first-byte", "middle-byte", "last-byte"))
+    def test_a_store_changed_by_one_byte_is_scanned_again_in_full(env, sandbox, where):
+        """One filler byte changed; the store's size and modification time kept."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+>       old = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8377763929893263, calls=[{'pid': 1134703, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451161.3762426, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh7x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8377763929893263, calls=[{'pid': 1134703, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451161.3762426, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh7x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+____ test_a_store_changed_by_one_byte_is_scanned_again_in_full[middle-byte] ____
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by1/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by1/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by1/w2-50/pycache'))
+where = 'middle-byte'
+
+    @pytest.mark.parametrize("where", ("first-byte", "middle-byte", "last-byte"))
+    def test_a_store_changed_by_one_byte_is_scanned_again_in_full(env, sandbox, where):
+        """One filler byte changed; the store's size and modification time kept."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+>       old = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8413252839818597, calls=[{'pid': 1134882, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451163.1013637, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh9x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8413252839818597, calls=[{'pid': 1134882, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451163.1013637, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh9x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_____ test_a_store_changed_by_one_byte_is_scanned_again_in_full[last-byte] _____
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by2/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by2/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_store_changed_by_one_by2/w2-50/pycache'))
+where = 'last-byte'
+
+    @pytest.mark.parametrize("where", ("first-byte", "middle-byte", "last-byte"))
+    def test_a_store_changed_by_one_byte_is_scanned_again_in_full(env, sandbox, where):
+        """One filler byte changed; the store's size and modification time kept."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+>       old = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:243: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.7752094019670039, calls=[{'pid': 1135034, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451164.775006, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh11x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.7752094019670039, calls=[{'pid': 1135034, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451164.775006, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh11x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_one_byte_change_that_makes_a_secret_appear_is_found[default-rule-canary-in-a-sqlite-store] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma0/w2-50/pycache'))
+kind = 'default-rule-canary-in-a-sqlite-store'
+
+    @pytest.mark.parametrize("kind", ("default-rule-canary-in-a-sqlite-store", "own-rule-value-in-a-plain-store"))
+    def test_a_one_byte_change_that_makes_a_secret_appear_is_found(env, sandbox, kind):
+        """The own-rule value is found only by the scan with the project's rules alone (DEC-347): every rule set ran."""
+        project, stand_in = env
+        if kind.startswith("default"):
+            rel, near, secret = STORE_DB, scan.NEAR_SECRET, scan.SECRET
+            db_store(project, rows=[f"value {near} here"])
+        else:
+            rel, near, secret = CODE_STORE, scan.NEAR_OWN_ONLY, scan.OWN_ONLY
+            plain_store(project, rel, extra={SMALL_STORE // 4: near})
+>       old = first_runs(sandbox, project, stand_in, [rel])[rel]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.7405389999621548, calls=[{'pid': 1135174, 'sub': 'stdin', 'rules...oredbstart'], 'fault': None, 'began': 1792451166.310478, 'code': 0, 'seconds': 0.18}], fresh='zqxw5853fresh13x1101602')
+rel = '.gov-runtime/store.db'
+sha = 'd5bac30fde0a9b9f6e8583ad9f233b7139c922308ec6d9db66f4f9d064dd46e2'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/store.db's clean result as reused with the SHA-256 of its bytes (d5bac30fde0a9b9f6e8583ad9f233b7139c922308ec6d9db66f4f9d064dd46e2)
+E         exit code: 0 after 0.7 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/store.db', 'd5bac30fde0a9b9f6e8583ad9f233b7139c922308ec6d9db66f4f9d064dd46e2')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.7405389999621548, calls=[{'pid': 1135174, 'sub': 'stdin', 'rules...oredbstart'], 'fault': None, 'began': 1792451166.310478, 'code': 0, 'seconds': 0.18}], fresh='zqxw5853fresh13x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_one_byte_change_that_makes_a_secret_appear_is_found[own-rule-value-in-a-plain-store] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma1/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma1/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_one_byte_change_that_ma1/w2-50/pycache'))
+kind = 'own-rule-value-in-a-plain-store'
+
+    @pytest.mark.parametrize("kind", ("default-rule-canary-in-a-sqlite-store", "own-rule-value-in-a-plain-store"))
+    def test_a_one_byte_change_that_makes_a_secret_appear_is_found(env, sandbox, kind):
+        """The own-rule value is found only by the scan with the project's rules alone (DEC-347): every rule set ran."""
+        project, stand_in = env
+        if kind.startswith("default"):
+            rel, near, secret = STORE_DB, scan.NEAR_SECRET, scan.SECRET
+            db_store(project, rows=[f"value {near} here"])
+        else:
+            rel, near, secret = CODE_STORE, scan.NEAR_OWN_ONLY, scan.OWN_ONLY
+            plain_store(project, rel, extra={SMALL_STORE // 4: near})
+>       old = first_runs(sandbox, project, stand_in, [rel])[rel]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:264: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.771707124018576, calls=[{'pid': 1135357, 'sub': 'stdin', 'rules'...detxtstart'], 'fault': None, 'began': 1792451167.8789706, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh15x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = 'a0adac1c866c5cbc449ed8b1eb4ed25b6f55e5d77b107dc1c52018d64c542472'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (a0adac1c866c5cbc449ed8b1eb4ed25b6f55e5d77b107dc1c52018d64c542472)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', 'a0adac1c866c5cbc449ed8b1eb4ed25b6f55e5d77b107dc1c52018d64c542472')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.771707124018576, calls=[{'pid': 1135357, 'sub': 'stdin', 'rules'...detxtstart'], 'fault': None, 'began': 1792451167.8789706, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh15x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+________ test_a_clean_store_that_gains_a_canary_is_red_on_the_next_run _________
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_clean_store_that_gains_0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_clean_store_that_gains_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_clean_store_that_gains_0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_clean_store_that_gains_0/w2-50/pycache'))
+
+    def test_a_clean_store_that_gains_a_canary_is_red_on_the_next_run(env, sandbox):
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+>       old = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:290: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8097718720091507, calls=[{'pid': 1135687, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451171.915743, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh20x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8097718720091507, calls=[{'pid': 1135687, 'sub': 'stdin', 'rules...detxtstart'], 'fault': None, 'began': 1792451171.915743, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh20x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count[a-rule-that-finds-a-value-in-the-store] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_0/w2-50/pycache'))
+added = 'a-rule-that-finds-a-value-in-the-store'
+
+    @pytest.mark.parametrize("added", ("a-rule-that-finds-a-value-in-the-store", "a-rule-that-finds-nothing-there"))
+    def test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count(env, sandbox, added):
+        project, stand_in = env
+        plain_store(project, CODE_STORE, extra={SMALL_STORE // 4: scan.ADDED_VALUE})
+>       sha = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.805508954974357, calls=[{'pid': 1136151, 'sub': 'stdin', 'rules'...etxtstart'], 'fault': None, 'began': 1792451176.1277783, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh25x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.805508954974357, calls=[{'pid': 1136151, 'sub': 'stdin', 'rules'...etxtstart'], 'fault': None, 'began': 1792451176.1277783, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh25x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count[a-rule-that-finds-nothing-there] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_1/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_1/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_change_of_the_projects_1/w2-50/pycache'))
+added = 'a-rule-that-finds-nothing-there'
+
+    @pytest.mark.parametrize("added", ("a-rule-that-finds-a-value-in-the-store", "a-rule-that-finds-nothing-there"))
+    def test_a_change_of_the_projects_rules_makes_no_earlier_clean_result_count(env, sandbox, added):
+        project, stand_in = env
+        plain_store(project, CODE_STORE, extra={SMALL_STORE // 4: scan.ADDED_VALUE})
+>       sha = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:328: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.808085290947929, calls=[{'pid': 1136334, 'sub': 'stdin', 'rules'...detxtstart'], 'fault': None, 'began': 1792451177.7969747, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh27x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339)
+E         exit code: 0 after 0.8 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '6d82c49e1bdf7022e72a8a2811f7d5168a557e3f32fc50246d087a0236070339')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.808085290947929, calls=[{'pid': 1136334, 'sub': 'stdin', 'rules'...detxtstart'], 'fault': None, 'began': 1792451177.7969747, 'code': 0, 'seconds': 0.2}], fresh='zqxw5853fresh27x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean[garbage] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean0/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean0/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean0/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean0/w2-50/pycache'))
+how = 'garbage'
+
+    @pytest.mark.parametrize("how", ("garbage", "truncated", "digest-flipped"))
+    def test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean(env, sandbox, how):
+        """The record, if any, is found only by what a run leaves in the project (or under HOME): the files that a
+        clean run and a reusing run made or changed, other than the stores and the fresh file."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+        leave_out = {str(project / CODE_STORE), str(project / scan.FRESH_REL)}
+        before = _snapshot(sandbox, project, leave_out)
+>       sha = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8604245390160941, calls=[{'pid': 1149593, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451249.32971, 'code': 0, 'seconds': 0.22}], fresh='zqxw5853fresh38x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.9 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8604245390160941, calls=[{'pid': 1149593, 'sub': 'stdin', 'rules...odetxtstart'], 'fault': None, 'began': 1792451249.32971, 'code': 0, 'seconds': 0.22}], fresh='zqxw5853fresh38x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean[truncated] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean1/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean1/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean1/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean1/w2-50/pycache'))
+how = 'truncated'
+
+    @pytest.mark.parametrize("how", ("garbage", "truncated", "digest-flipped"))
+    def test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean(env, sandbox, how):
+        """The record, if any, is found only by what a run leaves in the project (or under HOME): the files that a
+        clean run and a reusing run made or changed, other than the stores and the fresh file."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+        leave_out = {str(project / CODE_STORE), str(project / scan.FRESH_REL)}
+        before = _snapshot(sandbox, project, leave_out)
+>       sha = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8555178950191475, calls=[{'pid': 1150115, 'sub': 'stdin', 'rules...etxtstart'], 'fault': None, 'began': 1792451251.1051576, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh40x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.9 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8555178950191475, calls=[{'pid': 1150115, 'sub': 'stdin', 'rules...etxtstart'], 'fault': None, 'began': 1792451251.1051576, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh40x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+_ test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean[digest-flipped] _
+
+env = (PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean2/w2-50/home/gov-os-worktrees/W2-90'), Stan...xPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean2/w2-50/elsewhere/gitleaks-stand-in/mode.json')))
+sandbox = Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean2/w2-50'), home=PosixPath('/tmp...w2-50/elsewhere'), pycache=PosixPath('/tmp/pytest-of-usain/pytest-4215/test_a_damaged_record_of_clean2/w2-50/pycache'))
+how = 'digest-flipped'
+
+    @pytest.mark.parametrize("how", ("garbage", "truncated", "digest-flipped"))
+    def test_a_damaged_record_of_clean_results_never_makes_a_store_count_as_clean(env, sandbox, how):
+        """The record, if any, is found only by what a run leaves in the project (or under HOME): the files that a
+        clean run and a reusing run made or changed, other than the stores and the fresh file."""
+        project, stand_in = env
+        plain_store(project, CODE_STORE)
+        leave_out = {str(project / CODE_STORE), str(project / scan.FRESH_REL)}
+        before = _snapshot(sandbox, project, leave_out)
+>       sha = first_runs(sandbox, project, stand_in, [CODE_STORE])[CODE_STORE]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:423: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:155: in first_runs
+    assert_reuse_labelled(run2, rel, shas[rel], "run 2, the same store unchanged")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8543855730094947, calls=[{'pid': 1150496, 'sub': 'stdin', 'rules...etxtstart'], 'fault': None, 'began': 1792451252.8653846, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh42x1101602')
+rel = '.gov-runtime/codeintel/home/code.txt'
+sha = '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8'
+what = 'run 2, the same store unchanged'
+
+    def assert_reuse_labelled(run, rel, sha, what):
+>       assert run.reuse_lines(rel, sha), (
+            f"{what}: no line of the check's output labels {rel}'s clean result as reused with the SHA-256 of its "
+            f"bytes ({sha})\n{run.describe()}")
+E       AssertionError: run 2, the same store unchanged: no line of the check's output labels .gov-runtime/codeintel/home/code.txt's clean result as reused with the SHA-256 of its bytes (8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8)
+E         exit code: 0 after 0.9 s; gitleaks runs: 4
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = reuse_lines('.gov-runtime/codeintel/home/code.txt', '8bad539a1495af88473d5a1bcaea2ed92d5fa916fdfa254f881e37521583ada8')
+E        +    where reuse_lines = ScanRun(returncode=0, stdout='', stderr='', seconds=0.8543855730094947, calls=[{'pid': 1150496, 'sub': 'stdin', 'rules...etxtstart'], 'fault': None, 'began': 1792451252.8653846, 'code': 0, 'seconds': 0.21}], fresh='zqxw5853fresh42x1101602').reuse_lines
+
+tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py:122: AssertionError
+15 failed, 8 passed in 297.10s (0:04:57)
