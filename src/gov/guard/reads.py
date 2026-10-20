@@ -18,11 +18,12 @@ from __future__ import annotations
 import fnmatch
 import glob
 import os
+import re
 import subprocess
 
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _has_glob, _is_punct,
-                              _load_ticket, _parse_frontmatter)
+                              _load_ticket)
 from gov.guard.heldout import _words, load_yaml_unique
 from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _PATTERN_OPTIONS,
                                  _PIECE_RE, _RG_VALUED, _Glob, _behind, _braces,
@@ -37,6 +38,7 @@ _OWN = (ACCEPTANCE + "/", ".tickets/")
 # that the rule reads: beyond, no answer comes in bounded time (DEC-562).
 _MOST_FILES = 10000
 _GIT_TIMEOUT_S = 5
+_WBS_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 _GIT_QUIET = frozenset({"--stat", "--name-only", "--name-status", "--shortstat",
                         "--numstat"})
 _GIT_GREP_VALUED = frozenset("-e -f -A -B -C -m --max-depth --threads --context "
@@ -126,11 +128,13 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
         return None
     try:
         with open(path, encoding="utf-8") as f:
-            ticket = _parse_frontmatter(f.read())
-    except (OSError, UnicodeDecodeError, ValueError):
+            text = f.read()
+        head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
+        ticket = load_yaml_unique(head) if head is not None else None
+    except Exception:
         ticket = None
-    wbs = (ticket or {}).get("wbs_id", "").strip("'\" ")
-    if not wbs or "/" in wbs or wbs.startswith("."):
+    wbs = ticket.get("wbs_id") if isinstance(ticket, dict) else None
+    if not isinstance(wbs, str) or not _WBS_RE.fullmatch(wbs):
         raise PolicyError("the session's ticket file cannot be read for its WBS id")
     return wbs
 
