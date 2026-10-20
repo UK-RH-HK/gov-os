@@ -1,0 +1,12 @@
+W1-06 rc=0 secs=1 :: 96 passed in 0.93s
+W1-07 rc=0 secs=435 :: 223 passed in 410.58s (0:06:50)
+W1-08 rc=0 secs=126 :: 235 passed in 117.40s (0:01:57)
+W1-09 rc=0 secs=72 :: 87 passed in 67.18s (0:01:07)
+W1-10 rc=0 secs=32 :: 101 passed in 28.89s
+W1-11 rc=0 secs=75 :: 142 passed in 69.55s (0:01:09)
+W1-12 rc=0 secs=13 :: 21 passed in 13.11s
+W1-13 rc=0 secs=40 :: 110 passed in 37.05s
+W1-14 rc=0 secs=23 :: 63 passed in 20.92s
+W1-15 rc=0 secs=159 :: 124 passed in 148.77s (0:02:28)
+W1-16 rc=0 secs=654 :: 167 passed in 614.83s (0:10:14)
+W1-17 rc=0 secs=112 :: 65 passed in 87.57s (0:01:27)

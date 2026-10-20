@@ -1,0 +1,6 @@
+W2-50 (DAEO-kl5e): merge w2/integrate (W2-53, W2-54, the owner's batches to DEC-855) into the ticket branch
+
+Task: DAEO-kl5e
+Implements: DEC-728
+Role: orchestrator
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>

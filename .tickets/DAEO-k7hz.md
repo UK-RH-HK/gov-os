@@ -24,20 +24,36 @@ allowed_paths:
 - .claude/skills/orchestration/**
 - .claude/skills/audit/**
 - docs/changes/W2-11-CIT-P.md
+- template/governance/kernel/roles/orchestrator.md
+- .rulesync/subagents/orchestrator.md
+- template/.rulesync/subagents/orchestrator.md
+- .claude/agents/orchestrator.md
+- .rulesync/skills/orchestration/**
+- template/.rulesync/skills/orchestration/**
+- .rulesync/skills/audit/**
+- template/.rulesync/skills/audit/**
 kpis:
   success:
   - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
-  - They also carry the workbench rule (DEC-723) and the owner-approval rule (DEC-724).
+  - They also carry Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
   - The audit brief states DEC-430 [F-m1, W2-L268].
   - The launcher command is stated as a command, not a code span [W2-L257].
   - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].
+  - 'Supersession (DEC-866): the brief templates, the orchestration skill and its copies, and the orchestrator role file and its copies no longer teach a superseded rule: no LEAD_CHECKPOINT and no
+    "at about <context limit> tokens" (DEC-838, DEC-837); no listing or search refusal over the governance folder or .claude/, the held-out list''s names readable (DEC-820); no fixed ceiling of
+    tickets in flight (DEC-847); the owner''s decisions recorded by decision-record commits (DEC-861). W1-35''s cases that require the old sentences are revised by the test designer with Rewrite-Reason'
   failure:
   - The skill validator refuses a brief without the twelve-field rule.
+  - A template, skill or role file that still teaches LEAD_CHECKPOINT, a listing refusal or a fixed ceiling fails a test [DEC-866].
 profile: STANDARD
 sources:
 - CAP-33
 - DEC-723
 - DEC-724
+- DEC-820
+- DEC-847
+- DEC-861
+- DEC-866
 - DEC-430
 est_loc: 120
 acceptance_tests:
@@ -67,7 +83,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-11), as approved (DEC-729). The list row
 - **Route:** a kernel skill change: CIT-P, independent review, owner approval (CAP-33).
 - **KPIs, success:**
   - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
-  - They also carry the workbench rule (DEC-723) and the owner-approval rule (DEC-724).
+  - They also carry Policy 2's read rule (DEC-820, which replaced DEC-723's listing refusal and DEC-508) and the decision-record rule (DEC-861, DEC-862, which changed DEC-724's owner commits) [DEC-866].
   - The audit brief states DEC-430 [F-m1, W2-L268].
   - The launcher command is stated as a command, not a code span [W2-L257].
   - The five brief templates carry record frontmatter [W2-L258], and loose citations are fixed [W2-L256].

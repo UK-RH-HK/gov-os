@@ -10,6 +10,8 @@ import stat
 import tempfile
 from pathlib import Path
 
+from gov.guard import runs
+
 KNOWN_ROLES = frozenset({
     "orchestrator", "product-spec", "independent-test-designer",
     "engineer", "independent-auditor",
@@ -50,6 +52,9 @@ _PUNCT = frozenset("();<>|&\n")
 _WRITE_CMDS = frozenset({"touch", "rm", "mv", "cp", "mkdir"})
 _ASSIGN_RE = re.compile(r"^[A-Za-z_]\w*=")
 _UNRESOLVABLE = "/<guard-unresolvable>"
+# DEC-758 1: the most paths a copy into a folder is judged as; beyond, the
+# call is not known to be free of what is refused.
+_MOST_LANDED = 10000
 
 
 # -- frontmatter --------------------------------------------------------------
@@ -182,7 +187,12 @@ def _is_in_scratch(path: str, root: str) -> bool:
     return real == tmp or real.startswith(tmp + "/")
 
 
-def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
+def _at_or_under(real: str, rr: str) -> bool:
+    return real == rr or real.startswith(rr + "/")
+
+
+def _path_allowed(path: str, root: str, patterns: list[str], role: str,
+                  own: str | None = None) -> bool:
     real = os.path.realpath(path)
     if real == "/dev/null":
         return True
@@ -191,6 +201,9 @@ def _path_allowed(path: str, root: str, patterns: list[str], role: str) -> bool:
     if role == "independent-test-designer" and not patterns:
         return False
     if _is_in_scratch(real, root):
+        return True
+    # DEC-728, DEC-743: the session's own folder under ~/gov-os-runs.
+    if own is not None and runs.holds(own, real):
         return True
     rr = os.path.realpath(root)
     if not real.startswith(rr + "/") and real != rr:
@@ -285,40 +298,6 @@ def _is_punct(tok: str) -> bool:
     return bool(tok) and all(c in _PUNCT for c in tok)
 
 
-def _cp_operands(args: list[str]) -> tuple[list[str], list[str]] | None:
-    """Split the arguments of ``cp``, ``mv`` or ``install`` into operands
-    and target directories.
-
-    The directories are the values of ``-t`` and ``--target-directory``, in
-    their four spellings.  ``None`` when an option cannot be read.
-    """
-    operands: list[str] = []
-    dirs: list[str] = []
-    i = 0
-    while i < len(args):
-        a = args[i]
-        i += 1
-        if a.startswith("--t"):
-            opt, eq, val = a.partition("=")
-            if not "--target-directory".startswith(opt):
-                return None
-        elif a.startswith("-") and not a.startswith("--") and "t" in a:
-            val = a[a.index("t") + 1:]
-            eq = val
-        elif a.startswith("-"):
-            continue
-        else:
-            operands.append(a)
-            continue
-        if not eq:
-            if i >= len(args):
-                return None
-            val = args[i]
-            i += 1
-        dirs.append(val)
-    return operands, dirs
-
-
 def _option_after_operand(args: list[str]) -> bool:
     """True when an option is written after a word that is not one."""
     seen = False
@@ -328,6 +307,124 @@ def _option_after_operand(args: list[str]) -> bool:
         elif seen:
             return True
     return False
+
+
+# DEC-765: the options of cp, mv and install as GNU coreutils 9.4 reads them:
+# the short letters that take no value, those that take one (joined to the
+# letter or as the next word), and the long names.  A long name ending in
+# "=" takes a value (after "=" or as the next word), one ending in "?" only
+# after "="; a name after "/" is the key it is read as.
+_COPY_SPEC = {
+    "cp": ("abdfHilLnPprRsTuvxZ", "St",
+           "archive attributes-only backup?/b copy-contents debug dereference "
+           "force interactive link/l no-clobber no-dereference no-preserve= "
+           "no-target-directory/T one-file-system parents path/parents "
+           "preserve? recursive reflink? remove-destination sparse= "
+           "strip-trailing-slashes suffix=/S symbolic-link target-directory=/t "
+           "update? verbose context? help version"),
+    "mv": ("bfinTuvZ", "St",
+           "backup?/b context debug force interactive no-clobber no-copy "
+           "no-target-directory/T strip-trailing-slashes suffix=/S "
+           "target-directory=/t update? verbose help version"),
+    "install": ("bcCdDpsTvZ", "gmoSt",
+                "backup?/b compare context? debug directory/d group= mode= "
+                "no-target-directory/T owner= preserve-context "
+                "preserve-timestamps strip strip-program= suffix=/S "
+                "target-directory=/t verbose help version"),
+}
+
+
+def _long_options(spec: str) -> dict[str, tuple[str, str]]:
+    out = {}
+    for word in spec.split():
+        word, _, key = word.partition("/")
+        name = word.rstrip("=?")
+        out[name] = (key or name, word[len(name):])
+    return out
+
+
+_COPY_LONG = {name: _long_options(spec[2]) for name, spec in _COPY_SPEC.items()}
+# DEC-774: the options with which cp replaces a link at the place it writes
+# rather than writing through it (a backup, --remove-destination, and -f,
+# which may), and those with which it copies a source that is a link as a
+# link, so replacing the link it lands on.  install and mv always replace.
+_CP_REPLACING = frozenset({"b", "S", "remove-destination", "f", "force"})
+_CP_AS_LINK = frozenset({"P", "d", "no-dereference", "a", "archive",
+                         "r", "R", "recursive"})
+
+
+def _copy_args(name: str, args: list[str]) -> tuple[
+        list[str], dict[str, list[str]], list[str] | None] | None:
+    """DEC-765: read the arguments of ``cp``, ``mv`` or ``install`` as the
+    tool does: an option's value is a value, and nothing after ``--`` is an
+    option.
+
+    Returns the operands, the options read (each key with its values) and,
+    when an option is written after an operand, the words after the first
+    operand that may be the destination (with POSIXLY_CORRECT set each word
+    after the first operand is one); ``None`` when an option cannot be read.
+    """
+    flags, valued, _ = _COPY_SPEC[name]
+    longs = _COPY_LONG[name]
+    operands: list[str] = []
+    opts: dict[str, list[str]] = {}
+    after: list[str] = []
+    late = False
+
+    def _operand(w: str) -> None:
+        if operands:
+            after.append(w)
+        operands.append(w)
+
+    def _next() -> str | None:
+        """The next word, as the value of an option."""
+        nonlocal i
+        if i >= len(args):
+            return None
+        i += 1
+        if operands and not args[i - 1].startswith("-"):
+            after.append(args[i - 1])
+        return args[i - 1]
+
+    i = 0
+    while i < len(args):
+        a = args[i]
+        i += 1
+        if a == "--":
+            for w in args[i:]:
+                _operand(w)
+            break
+        if a == "-" or not a.startswith("-"):
+            _operand(a)
+            continue
+        late = late or bool(operands)
+        if a.startswith("--"):
+            opt, eq, val = a[2:].partition("=")
+            found = ({longs[opt]} if opt in longs else
+                     {v for n, v in longs.items() if n.startswith(opt)})
+            if len(found) != 1:
+                return None
+            (key, kind), = found
+            if eq and not kind:
+                return None
+            if kind == "=" and not eq:
+                val = _next()
+                if val is None:
+                    return None
+            opts.setdefault(key, []).append(val)
+            continue
+        for j, c in enumerate(a[1:], 2):
+            if c in flags:
+                opts.setdefault(c, []).append("")
+                continue
+            if c not in valued:
+                return None
+            val = a[j:] or _next()
+            if val is None:
+                return None
+            opts.setdefault(c, []).append(val)
+            break
+    return operands, opts, (after if late else None)
 
 
 def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
@@ -356,32 +453,125 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
     link_sources: list[str] = []  # what the links made by this command name
     link_dests = 0                # how many of *targets* are their destinations
     hard_sources: list[str] = []  # the files a hard link gives a second name
+    replace_any = replace_links = False  # DEC-774: set for each cp, install, mv
+
+    def _replaces(src: str) -> bool:
+        """DEC-774: a write of *src* onto a link replaces the link, rather
+        than writing through it."""
+        return replace_any or (replace_links and os.path.islink(src))
+
+    def _paths(raw: str) -> list[str] | None:
+        """Expand and glob-expand *raw* into absolute paths, not resolved:
+        ``[]`` for /dev/null, ``None`` when it is unresolvable."""
+        exp = _expand_token(raw)
+        if exp is None or '{' in exp or '}' in exp:
+            return None
+        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
+            return []
+        if not os.path.isabs(exp) and not ecwd_ok:
+            return None
+        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
+        if _has_glob(exp):
+            return glob.glob(p) or None
+        return [p]
 
     def _resolve(raw: str, targets: list[str] = targets) -> None:
         """Expand, glob-expand and resolve *raw* into *targets*."""
-        exp = _expand_token(raw)
-        if exp is None:
+        found = _paths(raw)
+        if found is None:
             targets.append(_UNRESOLVABLE)
-            return
-        if '{' in exp or '}' in exp:
-            targets.append(_UNRESOLVABLE)
-            return
-        if os.path.isabs(exp) and os.path.realpath(exp) == "/dev/null":
-            return
-        if not os.path.isabs(exp) and not ecwd_ok:
-            targets.append(_UNRESOLVABLE)
-            return
-        if _has_glob(exp):
-            pat = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
-            matches = glob.glob(pat)
-            if not matches:
+        else:
+            targets.extend(os.path.realpath(p) for p in found)
+
+    def _land(src: str, dst: str) -> None:
+        """DEC-758 1: *src* copied to *dst* writes *dst*; when both are
+        folders that exist, each entry of *src* in *dst* too, and so on."""
+        pending = [(src, dst)]
+        while pending:
+            src, dst = pending.pop()
+            real = os.path.realpath(dst)
+            targets.append(real)
+            if os.path.islink(dst) and _replaces(src):
+                # DEC-774: the link at *dst* is replaced, not followed: a
+                # form the guard does not read.
+                targets.append(_UNRESOLVABLE)
+            if len(targets) > _MOST_LANDED:
                 targets.append(_UNRESOLVABLE)
                 return
-            for m in matches:
-                targets.append(os.path.realpath(m))
+            try:
+                if not (os.path.isdir(src)
+                        and stat.S_ISDIR(os.stat(real).st_mode)):
+                    continue
+                names = os.listdir(src)
+            except (FileNotFoundError, NotADirectoryError):
+                continue
+            except OSError:
+                targets.append(_UNRESOLVABLE)
+                return
+            pending.extend((os.path.join(src, n), os.path.join(real, n))
+                           for n in names)
+
+    def _into(dest: str, sources: list[str], *, itself: bool,
+              merge: bool) -> None:
+        """DEC-758 1: a copy, install or move of *sources* into the folder
+        *dest* is judged as each file it writes there, as a direct write
+        would be: ``<dest>/<name of the source>``, and each entry of a
+        source written ``s/.`` (and, when *merge*, of every source).
+
+        *itself*: *dest* is the last operand, judged itself, and a folder
+        only when one is there; otherwise it is a ``-t`` folder.
+        """
+        found = _paths(dest)
+        if found is None:
+            targets.append(_UNRESOLVABLE)
             return
-        p = exp if os.path.isabs(exp) else os.path.join(ecwd, exp)
-        targets.append(os.path.realpath(p))
+        for d in found:
+            real = os.path.realpath(d)
+            if itself:
+                targets.append(real)
+                # DEC-774: onto a link to a file or to nothing, or with -T
+                # onto any link, the write replaces the link itself.
+                if (os.path.islink(d) and (merge or not os.path.isdir(real))
+                        and any(got is None or any(map(_replaces, got))
+                                for got in map(_paths, sources))):
+                    targets.append(_UNRESOLVABLE)
+                try:
+                    if not stat.S_ISDIR(os.stat(real).st_mode):
+                        continue
+                except (FileNotFoundError, NotADirectoryError):
+                    continue
+                except OSError:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+            for raw in sources:
+                got = _paths(raw)
+                if got is None:
+                    targets.append(_UNRESOLVABLE)
+                    continue
+                for src in got:
+                    base = os.path.basename(src.rstrip("/"))
+                    contents = base in ("", ".", "..")
+                    if contents and not itself:
+                        targets.append(_UNRESOLVABLE)
+                        continue
+                    if not contents:
+                        _land(src, os.path.join(real, base))
+                    if contents or merge:
+                        _land(src, real)
+
+    def _copies(nf: list[str], dirs: list[str], dests: list[str],
+                merge: bool) -> None:
+        """DEC-758 1: the folders a ``cp``, ``install`` or ``mv`` call writes
+        into, beside the targets judged before: each ``-t`` folder, and each
+        word that may be the destination.  *merge* (-T,
+        --no-target-directory): a source folder's entries land in the
+        destination itself."""
+        for d in dirs:
+            _into(d, nf, itself=False, merge=merge)
+        if not dirs:
+            for dest in dests:
+                _into(dest, [a for a in nf if a != dest], itself=True,
+                      merge=merge)
 
     # Split on non-redirect punctuation into simple commands.
     # A punctuation token containing '>' stays with its command (redirect).
@@ -488,56 +678,85 @@ def _extract_bash_write_targets(command: str, cwd: str) -> list[str] | None:
                 if not a.startswith("-"):
                     _resolve(a)
             continue
+        if name == "rmdir":
+            # DEC-743 1 (R7): rmdir is judged for ~/gov-os-runs itself only.
+            found: list[str] = []
+            for a in args:
+                if not a.startswith("-"):
+                    _resolve(a, found)
+            targets.extend(t for t in found if t == runs.root())
+            continue
         if name == "link":
             # DEC-334: both names of the hard link are judged.
             for a in args:
                 if not a.startswith("-"):
                     _resolve(a)
             continue
-        if name == "mv":
-            # DEC-334: the target directory is a write target in every
-            # spelling of the option, beside the operands.
-            parsed = _cp_operands(args)
-            if parsed is None:
+        if name in ("cp", "mv", "install"):
+            parsed = _copy_args(name, args)
+            if parsed is None or "parents" in parsed[1]:
+                # DEC-764: an option the guard cannot read, or cp --parents,
+                # which writes <folder>/<source as written>: the landed path
+                # is not known, so the call is refused, as ln -t is.
                 targets.append(_UNRESOLVABLE)
                 continue
-            for a in parsed[0] + parsed[1]:
-                _resolve(a)
-            continue
-        if name in ("cp", "install"):
-            parsed = _cp_operands(args)
-            if parsed is None:
-                targets.append(_UNRESOLVABLE)
-                continue
-            nf, dirs = parsed
-            short = "".join(a for a in args
-                            if a.startswith("-") and not a.startswith("--"))
-            if name == "install" and not dirs and (
-                    "d" in short or any(a.startswith("--d") for a in args)):
+            nf, opts, after = parsed
+            dirs = opts.get("t", [])
+            # The destination is the last operand.  With an option after an
+            # operand, every word after the first operand is judged as it
+            # (DEC-765: as the call is read with POSIXLY_CORRECT set).
+            dests = (after if after is not None
+                     else nf[-1:] if len(nf) >= 2 else [])
+            before = len(targets)
+            if name == "mv":
+                # DEC-334: the target directory is a write target in every
+                # spelling of the option, beside the operands.
+                for a in nf + dirs:
+                    _resolve(a)
+                # DEC-774: a link moved away is written at its own path, not
+                # its target's; its own path resolves to the target, so the
+                # folder whose entry the move takes away is judged.
+                for a in nf if dirs or after is not None else nf[:-1]:
+                    for p in _paths(a) or []:
+                        if os.path.islink(p):
+                            targets.append(os.path.realpath(os.path.dirname(p)))
+            elif name == "install" and not dirs and "d" in opts:
                 # install -d: every operand is a directory it makes.
                 for a in nf:
                     _resolve(a)
                 continue
-            if name == "cp" and (
-                    "l" in short or any(a.startswith("--l") for a in args)):
-                # DEC-334: cp -l makes hard links to its sources.
-                for a in (nf if dirs else nf[:-1]):
-                    _resolve(a, hard_sources)
-            # -t, --target-directory: every operand is a source, and the
-            # copy lands in the directory under the operand's own name.
-            for d in dirs:
-                for a in nf:
-                    base = os.path.basename(a.rstrip("/"))
-                    if base in ("", ".", ".."):
-                        targets.append(_UNRESOLVABLE)
-                    else:
-                        _resolve(os.path.join(d, base) if d else d)
-            if not dirs and len(nf) >= 2:
-                # An option after an operand may take the word after it as
-                # its value (-S bak, -m 644): the destination is then an
-                # earlier operand, so every operand but the first is judged.
-                for a in (nf[1:] if _option_after_operand(args) else nf[-1:]):
-                    _resolve(a)
+            else:
+                if name == "cp" and "l" in opts:
+                    # DEC-334: cp -l makes hard links to its sources.
+                    for a in (nf if dirs else nf[:-1]):
+                        _resolve(a, hard_sources)
+                # -t, --target-directory: every operand is a source, and the
+                # copy lands in the directory under the operand's own name.
+                for d in dirs:
+                    for a in nf:
+                        base = os.path.basename(a.rstrip("/"))
+                        if base in ("", ".", ".."):
+                            targets.append(_UNRESOLVABLE)
+                        else:
+                            _resolve(os.path.join(d, base) if d else d)
+                if not dirs:
+                    for a in dests:
+                        _resolve(a)
+            merge = "T" in opts
+            replace_any = name != "cp" or not _CP_REPLACING.isdisjoint(opts)
+            replace_links = not _CP_AS_LINK.isdisjoint(opts)
+            _copies(nf, dirs, dests, merge)
+            if "b" in opts or "S" in opts:
+                # DEC-765: a backup lands beside each file the call replaces
+                # (a folder too, for a move with -T), as <file><suffix>; a
+                # suffix that is empty or holds a slash is read as "~".
+                suffix = opts.get("S", ["~"])[-1]
+                if not suffix or "/" in suffix:
+                    suffix = "~"
+                targets.extend(
+                    t + suffix for t in targets[before:]
+                    if t != _UNRESOLVABLE and (
+                        not os.path.isdir(t) or (name == "mv" and merge)))
             continue
         if name == "ln":
             # DEC-311: the destination of a symbolic or a hard link is a
@@ -903,8 +1122,12 @@ def decide(
 
     pats = _get_allowed_paths(acting_role, ticket_id, project_root,
                               session_role=erole)
+    # The own folder neither holds the project nor lies in it, so only a target outside the project needs it.
+    rr = os.path.realpath(project_root)
+    own = (runs.own_folder(project_root, ticket_id, acting_role)
+           if any(not _at_or_under(os.path.realpath(t), rr) for t in write_targets) else None)
     for tgt in write_targets:
-        if not _path_allowed(tgt, project_root, pats, acting_role):
+        if not _path_allowed(tgt, project_root, pats, acting_role, own):
             lbl = "Bash write" if tool_name == "Bash" else tool_name
             return "deny", f"{lbl} to '{tgt}' denied for role '{acting_role}'"
 
