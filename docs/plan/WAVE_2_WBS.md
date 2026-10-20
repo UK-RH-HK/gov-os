@@ -519,7 +519,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 #### W2-48 Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (FULL, engineer; DEC-726, DEC-843, DEC-852)
 - **Priority (DEC-869, owner, 2026-10-20; replacing DEC-823 item 4's place):** it takes the very next free slot after W2-53's close, ahead of every other keystone-2 ticket, the held closes' resumes included: until it lands, every close costs over an hour. Its three conditions stay (DEC-852).
 - **Restated by the owner, 2026-10-19 (DEC-843, DEC-852):** the key KPI as behaviour; glued to pytest-testmon and coverage; three conditions added (subprocesses, the leads' runs, a nightly full run). The ticket file `DAEO-xxgp` carries the same lines.
-- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
+- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `src/gov/close/command.py` (the `--no-cache` option and the call into the cache only; DEC-875), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
 - **KPIs, success:**
   - **Reuse by behaviour (DEC-843).** Each planted change in an input class re-runs every test that depends on it: an imported module, a fixture or `conftest.py`, a configuration file, a data file the test reads, the interpreter or the dependency lock, the test command and its options. A change outside every input reuses.
   - A reused test is **reused, not skipped.** It is labelled "reused" in the close record (and in a lead's run record), with the run it came from [W2-H044, W2-M153].
@@ -655,6 +655,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - The context-reproducibility check declares a time limit that fits its measured run on this repository; the measurement (the run's seconds, the tickets measured, the machine's load) is recorded in the change record [DEC-768].
   - `gov check` gives context-reproducibility green on `w2/integrate` [DEC-768].
   - **The `audit-report` type exactly as W2-02 defines it on `w2/W2-02` (`2a35fd7b`)** [DEC-768 item 1]: its schema file byte for byte as W2-02's; in `src/gov/check/schema.py`, W2-02's lines for that type (its `SCHEMA_MAP` entry, the type among the standalone types, the audit-report folder `docs/audit` and its reading of a record there that states no `type` as an audit report), nothing of W2-02's other types; so W2-02's later merge adds nothing new for this type. Core-schema is green on `w2/integrate`, with the W1-43 audit report's body untouched.
+  - **DEC-874 (delegated, 2026-10-20):** "nothing of W2-02's other types" is about W2-54's own change, not the tree: its four cases (three acceptance, one unit) assert that W2-54's own commits bring in no schema file or type of W2-02's beyond `audit-report`, which holds before and after W2-02's merge. Corrected in W2-54's resume (run 5), each with `Rewrite-Reason: DEC-874`.
 - **KPIs, failure:**
   - A context whose items or hash differ between two computations still fails the check, naming the ticket.
   - A check that runs past its declared limit still fails; no hard-block check is weakened [DEC-768 item 4].
@@ -897,7 +898,8 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 - **Widened (DEC-857 item 3):** the two files the guard protects by constant (`src/gov/guard/heldout.py:19-21`: the held-out list file and the settings file) are what today's refusals turn on; the KPIs below name both: the held-out list file's names readable and the held-out material's contents refused; the settings file's reads under Policy 2; searches from the repository root or `governance/project/` no longer refused for the files' sake. It shares `src/gov/guard/**` and `src/gov/launch/**` with W2-56 and W2-21: it runs before them, or stacked under DEC-786, as the plan orders.
 - **Allowed paths (narrowed at its start, DEC-864: the read rules live in three files, and W2-05's unmerged branch changes `containment.py`):** `src/gov/guard/protected.py`, `src/gov/guard/heldout.py`, `src/gov/guard/decide.py` (the read rules only), `src/gov/guard/reads.py` (new, if needed), `src/gov/launch/**` (the sandbox's read denials only), `governance/project/path-map.yaml` (an `evaluation_sets` block only, reviewed by the orchestrator, DEC-861), `template/governance/kernel/schemas/path-map.schema.json` (the same block), `tests/unit/guard/**`, `tests/unit/launch/**`, `docs/changes/W2-58-CIT-E.md`.
 - **KPIs, success:**
-  - A session of role `engineer` on ticket T is refused reads of `tests/acceptance/<T's W2 id>/**` by the guard (tool reads and the read side of Bash) and by its sandbox, and can still run those tests with pytest and see their names, results and failure messages [DEC-820 (c)].
+  - A session of role `engineer` on ticket T is refused reads of `tests/acceptance/<T's W2 id>/**` by the guard, on every tool read and the read side of every Bash route an honest agent takes (no OS-level Read rule for it, DEC-873), and can still run those tests with pytest and see their names, results and failure messages [DEC-820 (c)].
+  - **DEC-873 (owner, 2026-10-20, P-W2-58-1 (a)):** the launcher adds no OS-level Read deny rule for (c) or (d), because running a test means reading it; the held-out material's Read rules (b) stay in the sandbox; a launch under a malformed `evaluation_sets` block is refused. A program run deliberately to evade the guard is Wave 3 row W2-L374.
   - A session of role `independent-test-designer` on T is refused reads of the files T's branch changes against its base, other than its own tests, and reads the base's version of existing code [DEC-820 (c), DEC-826 Q2].
   - An evaluation set declared in the path map with a visible and a hidden part: a session measured by it is refused reads of the hidden part, and the measurement script scores it without showing the answers [DEC-820 (d)].
   - The listing and search refusals over `governance/` and `.claude/` (DEC-508) are gone; the held-out material's file names are readable and its contents refused; secrets stay refused [DEC-820 (a), (b)].
@@ -927,6 +929,15 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - **Stacked, never giant (DEC-860):** each question is answered by retrieval in batches, ranked and stacked within the budget, never one giant query or context; the script measures the stacked answer.
   - The same split for EXAMIN's set (DEC-828 item 3), written before W2-27; EXP-003's gold answers (W2-15a, W2-15b) split the same way.
 - **KPIs, failure:** a measured role cannot read the hidden half by any route an honest agent takes; the script never prints a hidden answer; a figure is never reported without the other.
+
+#### W2-64 W2-02's widening: the record validator through check-jsonschema; `docs/imported/` out of the schema check (STANDARD, engineer; DEC-831, DEC-844, DEC-872; keystone 4, order 1)
+- **Why:** the accepted plan widened W2-02 (§5 and §4.4 order 1; lens G R2 (a), F2: the 169-line subset validator passes what the schemas refuse, which fails open). DEC-872 moved the widening out of W2-02's resume, so that W2-02's close-record type reaches every close sooner. Ticket file at its start.
+- **Starts** after W2-02 merges (it holds the same paths: `template/governance/kernel/schemas/**`, `src/gov/check/schema.py`, `tests/unit/check/test_schema*`).
+- **KPIs, success:**
+  - `core-schema` validates every record against its schema through check-jsonschema (pinned in the tool registry), not a subset; lens G's planted ticket (a field the schema refuses that the subset passed) is refused [lens G R2 (a), F2].
+  - `docs/imported/` is left out of the schema check, as history (DEC-844), and the check says so by name.
+  - Every record on `w2/integrate` today, the close records of `docs/close/` included, still validates.
+- **KPIs, failure:** a record that its schema refuses fails `core-schema`, naming the record and the rule; check-jsonschema missing or failing to run is RED, never green.
 
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
@@ -1058,7 +1069,7 @@ Wave 2 exits when **all** of these hold. W2-46 runs the checks; W2-47 is the ind
   6. the owner's exit decision;
   7. W2-00's close.
   Nothing else starts once W2-46 has started.
-- **Every report starts with a countdown:** the steps left to the end of Wave 2, with a time estimate for each.
+- **Every report starts with a countdown:** the steps left to the end of Wave 2, with a time estimate for each. Its first line is one progress line (DEC-878): tickets closed / merged, not closed / built and held / in flight / not started, out of the total; keystones done / in progress / ahead, out of nine.
 
 ## 7. Owner decisions
 

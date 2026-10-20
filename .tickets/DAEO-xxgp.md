@@ -20,6 +20,7 @@ depends_on:
 allowed_paths:
 - src/gov/testcache/**
 - src/gov/close/cache*
+- src/gov/close/command.py
 - .coveragerc
 - tests/unit/testcache/**
 - docs/research/W2-48-cache-choice.md
@@ -67,7 +68,7 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-48), as approved (DEC-729), restated by DEC-843 and DEC-852 (owner, 2026-10-19). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
+- **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `src/gov/close/command.py` (the `--no-cache` option and the call into the cache only; DEC-875), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
 - **KPIs, success:**
   - **Reuse by behaviour (DEC-843).** Each planted change in an input class re-runs every test that depends on it: an imported module, a fixture or `conftest.py`, a configuration file, a data file the test reads, the interpreter or the dependency lock, the test command and its options. A change outside every input reuses.
   - A reused test is **reused, not skipped.** It is labelled "reused" in the close record (and in a lead's run record), with the run it came from [W2-H044, W2-M153].

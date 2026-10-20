@@ -281,6 +281,13 @@ accepted_history:
     decision: DEC-871
   - commit: "7bacecd21045f56eb1d3b3da9afd9a9ccd1d5197"
     decision: DEC-871
+# The data files this project's tests read, for the test-result cache (W2-48; DEC-876, P-W2-48-5 (c)): narrow on
+# purpose, fixtures, templates and schemas. The register and the ticket files are left out; a test that reads a
+# non-Python file outside these globs is always run (the cache fails safe).
+test_inputs:
+  - "fixtures/**"
+  - "template/**"
+  - "schemas/**"
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200

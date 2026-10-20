@@ -1,0 +1,49 @@
+........F............................................................... [ 68%]
+...................F.............                                        [100%]
+=================================== FAILURES ===================================
+___ test_the_session_takes_the_auto_compact_window_from_the_settings_env_key ___
+
+live = Live(compact={'is_error': False, 'duration_api_ms': 0, 'num_turns': 0, 'stop_reason': None, 'session_id': 'f550b1a0-c2...ritten part of this checkpoint\n<!-- GENERATED STATE BLOCK END -->\n', head='f8efac3e3d8df312c8051ec88592ee59b9634ef5')
+
+    def test_the_session_takes_the_auto_compact_window_from_the_settings_env_key(live):
+        """Success 3: ``/autocompact`` reports "300k tokens (from CLAUDE_CODE_AUTO_COMPACT_WINDOW)"."""
+>       assert support.WINDOW_KEY in live.window and "300k" in live.window, (
+            f"the session does not report a 300k window from {support.WINDOW_KEY}: {live.window[:300]!r}"
+        )
+E       AssertionError: the session does not report a 300k window from CLAUDE_CODE_AUTO_COMPACT_WINDOW: "Auto-compact window for Haiku 4.5: auto\nAuto-compact summarizes the conversation when context usage approaches this limit. The actual threshold is the minimum of this setting and your model's maximum context window.\nThe auto setting picks a window tuned for your model and is strongly recommended for"
+E       assert ('CLAUDE_CODE_AUTO_COMPACT_WINDOW' in 'Auto-compact window for Haiku 4.5: auto\nAuto-compact summarizes the conversation when context usage approaches this ....\nThe auto setting picks a window tuned for your model and is strongly recommended for the best cost and performance.')
+E        +  where 'CLAUDE_CODE_AUTO_COMPACT_WINDOW' = support.WINDOW_KEY
+E        +  and   'Auto-compact window for Haiku 4.5: auto\nAuto-compact summarizes the conversation when context usage approaches this ....\nThe auto setting picks a window tuned for your model and is strongly recommended for the best cost and performance.' = Live(compact={'is_error': False, 'duration_api_ms': 0, 'num_turns': 0, 'stop_reason': None, 'session_id': 'f550b1a0-c2...ritten part of this checkpoint\n<!-- GENERATED STATE BLOCK END -->\n', head='f8efac3e3d8df312c8051ec88592ee59b9634ef5').window
+
+tests/acceptance/W1-49/test_w1_49_live_session.py:205: AssertionError
+_ test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens _
+
+settings_env = {}
+
+    @pytest.mark.local_only
+    def test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens(settings_env):
+        """Success 3, rewritten after implementation (DEC-665). "About 300k tokens (30 % of the window)" is 270,000 to
+        330,000, as a plain integer: the value a session's commands are given, with no project entry behind it.
+    
+        Before: ``test_the_auto_compact_window_is_about_300k_tokens``.
+        """
+        if os.environ.get(SESSION_MARKER) != "1":
+            pytest.skip(f"not run from a Claude Code session ({SESSION_MARKER} is not 1): the env block of the "
+                        "user-level settings reaches a session's commands only; the window is not measured")
+        assert support.WINDOW_KEY not in settings_env, (
+            f"the env key of {support.SETTINGS_REL} sets {support.WINDOW_KEY}: the session's value is the project's, "
+            "not the user-level one (DEC-636)"
+        )
+        value = os.environ.get(support.WINDOW_KEY)
+>       assert value is not None, (
+            f"this session's commands are given no {support.WINDOW_KEY}: no auto-compact window is set for a session "
+            "on this machine (DEC-636)"
+        )
+E       AssertionError: this session's commands are given no CLAUDE_CODE_AUTO_COMPACT_WINDOW: no auto-compact window is set for a session on this machine (DEC-636)
+E       assert None is not None
+
+tests/acceptance/W1-49/test_w1_49_threshold.py:75: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-49/test_w1_49_live_session.py::test_the_session_takes_the_auto_compact_window_from_the_settings_env_key
+FAILED tests/acceptance/W1-49/test_w1_49_threshold.py::test_a_session_on_this_machine_gets_an_auto_compact_window_of_about_300k_tokens
+2 failed, 103 passed in 36.39s
