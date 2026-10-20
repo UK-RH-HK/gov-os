@@ -1,0 +1,44 @@
+..FF.....................                                                [100%]
+=================================== FAILURES ===================================
+___________ TestCanaryRunner.test_lexical_canary_hits_after_reindex ____________
+
+self = <test_w1_22_canaries.TestCanaryRunner object at 0x7a89ffc85d30>
+canary_api = <w1_22_support.Api object at 0x7a89ffc86420>
+base = PosixPath('/tmp/pytest-of-usain/pytest-4363/w1-22-base0/repo')
+ollama = <w1_22_support.OllamaStandIn object at 0x7a89ffc9b0e0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4363/test_lexical_canary_hits_after0')
+
+    @pytest.mark.needs("gitleaks", "sqlite_vec")
+    def test_lexical_canary_hits_after_reindex(self, canary_api, base, ollama, tmp_path):
+        """After indexing a project with representative content, lexical canaries pass [CAP-17.c]."""
+        root = _indexed(base, canary_api, ollama, tmp_path)
+        result = canary_api.run_canaries(root, env=canary_api.scratch_env(ollama.host))
+        lex = result["lexical"]
+>       assert lex["passed"] is True, f"lexical canaries failed after reindex: {lex}"
+E       AssertionError: lexical canaries failed after reindex: {'passed': False, 'status': 'FACET_UNAVAILABLE', 'misses': [], 'reason': 'unreadable canary declaration'}
+E       assert False is True
+
+tests/acceptance/W1-22/test_w1_22_canaries.py:77: AssertionError
+___________ TestCanaryRunner.test_semantic_canary_hits_after_reindex ___________
+
+self = <test_w1_22_canaries.TestCanaryRunner object at 0x7a89ffc857c0>
+canary_api = <w1_22_support.Api object at 0x7a89ffc86420>
+base = PosixPath('/tmp/pytest-of-usain/pytest-4363/w1-22-base0/repo')
+ollama = <w1_22_support.OllamaStandIn object at 0x7a89ffc9b0e0>
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4363/test_semantic_canary_hits_afte0')
+
+    @pytest.mark.needs("gitleaks", "sqlite_vec")
+    def test_semantic_canary_hits_after_reindex(self, canary_api, base, ollama, tmp_path):
+        """After indexing a project with representative content, semantic canaries pass [CAP-17.c]."""
+        root = _indexed(base, canary_api, ollama, tmp_path)
+        result = canary_api.run_canaries(root, env=canary_api.scratch_env(ollama.host))
+        sem = result["semantic"]
+>       assert sem["passed"] is True, f"semantic canaries failed after reindex: {sem}"
+E       AssertionError: semantic canaries failed after reindex: {'passed': False, 'status': 'FACET_UNAVAILABLE', 'misses': [], 'reason': 'unreadable canary declaration'}
+E       assert False is True
+
+tests/acceptance/W1-22/test_w1_22_canaries.py:85: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-22/test_w1_22_canaries.py::TestCanaryRunner::test_lexical_canary_hits_after_reindex
+FAILED tests/acceptance/W1-22/test_w1_22_canaries.py::TestCanaryRunner::test_semantic_canary_hits_after_reindex
+2 failed, 23 passed in 9.91s

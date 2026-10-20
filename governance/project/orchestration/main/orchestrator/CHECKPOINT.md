@@ -45,7 +45,13 @@
   (`tools/reverify_w2_62.sh` -> `log/reverify-W2-62/`). Close W2-62 later (quiet window; W1-49 reds first).
 - **P1 P-W2-52 (open):** W1-49's two tests require DEC-636's 300k window, retired by DEC-838 -> every close red.
   Rec (a): new LITE ticket W2-63 (test designer revises them, Rewrite-Reason: DEC-838) before W2-53's re-close.
-- **Leads:** W2-59 verifying (rebuild-2); W2-50 run 8 verifying (fix `a403309e`). Neither has `ccf28d5c`.
+- **W2-50 run 8 DONE (probe pass; secrets GREEN; reuse 4.6 s vs 483 s full): MERGED `98effadc`.** Close later.
+- **W2-59 run 1 PACKAGES -> DEC-864 (delegated, `e54accde`):** P-W2-59-4 (a) W1-26 x1 + W1-22 x2 revised in its
+  resume; rows W2-M386..390, W2-L364..371. **W2-59 run 2** launches 08:2x (`briefs/W2-59-A5-run2.md`).
+- **W2-58 run 1 STARTED 08:1x** (`DAEO-5j8b`, worktree from `9afe3d00`, paths narrowed, no `containment.py`);
+  first lead rebuild under the new map: measure it from its return / `log/lead-usage.jsonl`.
+- **Closes wait on P-W2-52** (W1-49's two retired-window tests red everywhere). Queue: W2-53, W2-54, W2-62, W2-50.
+- After a lead rebuild is measured: raise parallelism (DEC-847); next starts: W2-63 (if P-W2-52 (a)), W2-57, W2-48.
 - **Merge `w2/integrate` into a lead's branch only at its return** (a commit under a running lead trips its stop
   rule; under a worker, containment, DEC-254). Then re-measure that lead's rebuild under the new map; then raise
   parallelism.

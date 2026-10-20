@@ -1,6 +1,6 @@
 # Brief: reviewer (FULL, read-only) — DAEO-kl5e (W2-50), the resume's fresh probe: the merge-back and the secrets scan's fix (DEC-853)
 
-You are a fresh reviewer. Ticket DAEO-kl5e (W2-50, "The durable scratch root: ~/gov-os-runs/<own ticket>/ in the guard and the launcher's sandbox (CIT-P)"), profile FULL, is implemented in the worktree `/home/usain/gov-os-worktrees/W2-50` on branch `w2/W2-50`, at the head `{HEAD}` (check it with `git rev-parse HEAD`), and its acceptance tests pass. You probe that head for behaviour the tests miss. You write nothing.
+You are a fresh reviewer. Ticket DAEO-kl5e (W2-50, "The durable scratch root: ~/gov-os-runs/<own ticket>/ in the guard and the launcher's sandbox (CIT-P)"), profile FULL, is implemented in the worktree `/home/usain/gov-os-worktrees/W2-50` on branch `w2/W2-50`, at the head `56240ffb7d02bf5dd0e841da8db10d9a4d177eca` (check it with `git rev-parse HEAD`), and its acceptance tests pass. You probe that head for behaviour the tests miss. You write nothing.
 
 ## Step 0, before any work: the sandbox check
 
@@ -16,7 +16,7 @@ If (a) wrote the file or (b) failed, stop there and return.
 - This resume (run 8) did three things, which are what you probe:
   1. **The merge-back** `e61b67f5`: `w2/integrate` (`7f95e6f5`: W2-53, W2-54, W2-01's probe gate as it stands, and the owner's batches) merged into this branch, parents `0affa162` (the ticket) and `7f95e6f5`. The probe gate (`gov close`'s probe check, `src/gov/close/command.py`, as W2-01 and W2-53 left it) will next judge this ticket's merge into `w2/integrate`.
   2. **The ticket file** `c2b094da` (orchestrator): DEC-853's three KPI lines, `tests/unit/secrets/**` in `allowed_paths`.
-  3. **DEC-853, the secrets scan's fix**: tests `878467c9` (`tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`, `w2_50_scan_support.py`, the README's DEC-853 section); the change `a403309e` (`src/gov/secrets/__init__.py`, builder tests `tests/unit/secrets/test_scan_scale.py`); the lead's checkpoint record at the head.
+  3. **DEC-853, the secrets scan's fix**: tests `878467c9` (`tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`, `w2_50_scan_support.py`, the README's DEC-853 section); the change `a403309e` (`src/gov/secrets/__init__.py`, builder tests `tests/unit/secrets/test_scan_scale.py`); the lead's checkpoint record `56240ffb` (CP-DAEO-kl5e-0049) at the head. Verification at this code: full rebuild ok; W2-50 636 passed; every earlier suite green but the accepted reds (W1-42 ×2) and W1-49 ×2 (the retired 300k window, the orchestrator's P-W2-52); unit 2362 passed; gov check twice: secrets-indexing GREEN on the real stores (876 s, then 319 s with the clean results reused).
 
 ## The owner's DEC-853 (2026-10-19, P-W2-49 (a))
 
