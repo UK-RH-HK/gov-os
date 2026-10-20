@@ -43,6 +43,9 @@ SRC = REPO_ROOT / "src"
 # ---- the commits this suite reads with `git show` (never checked out)
 BASE_COMMIT = "b644d28a"      # this ticket's claim commit: the tree before its implementation
 W2_02_COMMIT = "2a35fd7b"     # W2-02's held branch: the audit-report type as W2-02 defines it (DEC-768 item 1)
+# Rewrite-Reason: DEC-874. W2-02's branch with its types merged with w2/integrate: every W2-54 commit is among its
+# ancestors, so "nothing of W2-02's other types" is judged on it as on HEAD (README, "Run 5 (DEC-874)").
+W2_02_MERGED_COMMIT = "4ce16df2"
 
 # ---- the files of this worktree the suite reads
 CHECKS_REL = "template/governance/kernel/checks"
@@ -52,6 +55,10 @@ SCHEMAS_REL = "template/governance/kernel/schemas"
 AUDIT_SCHEMA_REL = f"{SCHEMAS_REL}/audit-report.schema.json"
 COMMON_SCHEMA_REL = f"{SCHEMAS_REL}/common.schema.json"
 W2_02_OTHER_SCHEMAS = ("close.schema.json", "adoption-verdict.schema.json")
+W2_02_OTHER_TYPES = ("close", "adoption-verdict")
+SCHEMA_FOLDERS = (SCHEMAS_REL, "governance/kernel/schemas")
+SCHEMA_MODULE_REL = "src/gov/check/schema.py"
+OWN_TASK = "DAEO-0rfi"         # the Task trailer of every commit of this ticket (W2-02's carry DAEO-zflj)
 CHANGE_RECORD_REL = "docs/changes/W2-54-CIT-E.md"
 W1_43_REL = "docs/audit/wave-1/W1-43-wave-1-exit-audit.md"
 W1_43_SHA256 = "b14e17d6e71b2727c3cea123dec112fdccbeb27afc1f50b67f5e27294ecdac1d"
@@ -477,6 +484,165 @@ AUDIT_BODY = ("\n# An audit\n\n| item | class | evidence |\n|---|---|---|\n| CAP
 
 def audit_record(**overrides):
     return frontmatter(audit_front(**overrides), AUDIT_BODY)
+
+
+# --------------------------------------------------------------------------
+# Run 5 (DEC-874): W2-54's own change, read through git (README, "Run 5 (DEC-874)")
+# --------------------------------------------------------------------------
+#
+# Rewrite-Reason: DEC-874. "Nothing of W2-02's other types" is about W2-54's own change, not the tree: the commits of
+# a history that are no merge and whose Task trailer is OWN_TASK, each read against its one parent. Nothing is
+# checked out; ``repo`` is this repository, or a temporary one a case builds from scratch.
+
+_MARK = "\x01"
+
+
+def _git_out(repo, *args):
+    done = subprocess.run(["git", "-C", str(repo), *args], capture_output=True, text=True)
+    assert done.returncode == 0, f"git {' '.join(args)} failed in {repo}:\n{done.stderr}"
+    return done.stdout
+
+
+def _own_log(history, *args, repo=REPO_ROOT, task=OWN_TASK):
+    """``git log --no-merges --no-renames <args> <history>``, split by commit: ``[(commit, its lines)]`` for the
+    commits whose Task trailer is ``task``, newest first."""
+    text = _git_out(repo, "log", "--no-merges", "--no-renames",
+                    f"--format={_MARK}%H%x09%(trailers:key=Task,valueonly,separator=%x2C)", *args, history)
+    commits = []
+    for block in text.split(_MARK)[1:]:
+        head, _, rest = block.partition("\n")
+        commit, _, tasks = head.partition("\t")
+        if task in [value.strip() for value in tasks.split(",")]:
+            commits.append((commit, rest.splitlines()))
+    return commits
+
+
+def own_commits(history, repo=REPO_ROOT, task=OWN_TASK):
+    """The full hashes of ``history``'s own commits (no merge, Task trailer ``task``), newest first."""
+    return [commit for commit, _ in _own_log(history, repo=repo, task=task)]
+
+
+def own_files(history, repo=REPO_ROOT, task=OWN_TASK):
+    """``(commit, status, path)`` for every file an own commit of ``history`` adds or changes (``--name-status``
+    against its parent, renames as a deletion and an addition); deletions are left out."""
+    found = []
+    for commit, lines in _own_log(history, "--name-status", repo=repo, task=task):
+        for line in lines:
+            status, _, path = line.partition("\t")
+            if path and not status.startswith("D"):
+                found.append((commit, status, path))
+    return found
+
+
+def own_added_lines(history, rel, repo=REPO_ROOT, task=OWN_TASK):
+    """``(commit, line)`` for every line an own commit of ``history`` adds to ``rel`` (``-p`` against its parent)."""
+    found = []
+    for commit, lines in _own_log(history, "-p", "--", rel, repo=repo, task=task):
+        found.extend((commit, line[1:]) for line in lines if line.startswith("+") and not line.startswith("+++"))
+    return found
+
+
+def names_type(line, kind):
+    """``line`` names the type ``kind``: as a quoted string (a type map key, a standalone type) or its schema file."""
+    return bool(re.search(r"""(["'])""" + re.escape(kind) + r"\1", line)) or f"{kind}.schema.json" in line
+
+
+def other_schema_files_brought_in(history, repo=REPO_ROOT, task=OWN_TASK):
+    """Every ``(commit, status, path)`` by which an own commit adds or changes a schema file of W2-02's other types
+    under either schema folder."""
+    wanted = {f"{folder}/{name}" for folder in SCHEMA_FOLDERS for name in W2_02_OTHER_SCHEMAS}
+    return [entry for entry in own_files(history, repo, task) if entry[2] in wanted]
+
+
+def other_type_lines_brought_in(history, kind, repo=REPO_ROOT, task=OWN_TASK):
+    """Every ``(commit, line)`` by which an own commit adds ``kind`` to core-schema's module."""
+    return [(commit, line) for commit, line in own_added_lines(history, SCHEMA_MODULE_REL, repo, task)
+            if names_type(line, kind)]
+
+
+def last_own_commit_of(history, rel, repo=REPO_ROOT, task=OWN_TASK):
+    """The newest own commit of ``history`` that touches ``rel``; None when there is none."""
+    commits = [commit for commit, _ in _own_log(history, "--", rel, repo=repo, task=task)]
+    return commits[0] if commits else None
+
+
+# Runs ``python3 -m gov.check.schema`` with that one module read from the file named in argv[1] (a ``git show`` of one
+# commit's module); every other module is this worktree's (PYTHONPATH). Relative imports resolve as under ``-m``.
+_SCHEMA_AS = r'''
+import importlib.abc, importlib.util, runpy, sys
+_FILE = sys.argv[1]
+
+
+class _One(importlib.abc.MetaPathFinder):
+    def find_spec(self, name, path=None, target=None):
+        return importlib.util.spec_from_file_location(name, _FILE) if name == "gov.check.schema" else None
+
+
+sys.meta_path.insert(0, _One())
+sys.argv = [_FILE, *sys.argv[2:]]
+runpy.run_module("gov.check.schema", run_name="__main__", alter_sys=True)
+'''
+
+
+def core_schema_at(box, project, commit):
+    """Core-schema as its declaration says, in ``project``, with its module as ``commit`` leaves it: the declared
+    command with ``-m gov.check.schema`` read from ``git show <commit>:src/gov/check/schema.py`` (one named file,
+    nothing checked out). Its run and its findings."""
+    import shlex
+    declaration = yaml.safe_load((REPO_ROOT / CHECKS_REL / "core-schema.yaml").read_text(encoding="utf-8"))
+    argv = shlex.split(declaration["command"])
+    at = next((i for i in range(len(argv) - 1) if argv[i:i + 2] == ["-m", "gov.check.schema"]), None)
+    assert at is not None, f"core-schema's declared command runs no 'gov.check.schema': {declaration['command']}"
+    module = box.workdir / "tmp" / f"schema-at-{commit[:12]}.py"
+    module.write_bytes(show(commit, SCHEMA_MODULE_REL))
+    done = run([*argv[:at], "-c", _SCHEMA_AS, module, *argv[at + 2:]], cwd=project, env=box.env(),
+               timeout=CALL_TIMEOUT_S)
+    try:
+        findings = json.loads(done.stdout) if done.stdout.strip() else []
+    except ValueError:
+        raise AssertionError(f"core-schema did not print its findings as JSON\n{done.describe()}") from None
+    assert isinstance(findings, list), done.describe()
+    return done, findings
+
+
+def schema_project_at(project, files, commit):
+    """As ``schema_project``, with the common and audit-report schema files as ``commit`` holds them."""
+    project = new_repo(project)
+    for rel in (COMMON_SCHEMA_REL, AUDIT_SCHEMA_REL):
+        write(project, rel, show(commit, rel).decode("utf-8"))
+    for rel, text in files.items():
+        write(project, rel, text)
+    commit_all(project)
+    return project
+
+
+def own_task_repo(project, task, adds):
+    """A temporary repository built from scratch: a base commit (``Task: DAEO-base``) holding a stand-in core-schema
+    module; an own commit (``Task: OWN_TASK``) that adds the ``audit-report`` type, as W2-54 does; then one commit
+    carrying ``Task: <task>`` that writes ``adds`` (``{rel: text}``); then a merge of a side branch, the merge carrying
+    ``Task: OWN_TASK``, whose one commit (``Task: DAEO-zflj``) adds W2-02's other schema files (a merge is never an
+    own change)."""
+    project = new_repo(project)
+    write(project, SCHEMA_MODULE_REL, 'SCHEMA_MAP = {\n}\nSTANDALONE_TYPES = ("probe",)\n')
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", "base\n\nTask: DAEO-base")
+    write(project, SCHEMA_MODULE_REL, 'SCHEMA_MAP = {\n    "audit-report": "audit-report.schema.json",\n}\n'
+                                      'STANDALONE_TYPES = ("probe", "audit-report")\n')
+    write(project, AUDIT_SCHEMA_REL, "{}\n")
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", f"the audit-report type\n\nTask: {OWN_TASK}")
+    git(project, "checkout", "-q", "-b", "side")
+    for name in W2_02_OTHER_SCHEMAS:
+        write(project, f"{SCHEMAS_REL}/{name}", "{}\n")
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", "side\n\nTask: DAEO-zflj")
+    git(project, "checkout", "-q", "main")
+    for rel, text in adds.items():
+        write(project, rel, text)
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "--allow-empty", "-m", f"the change\n\nTask: {task}")
+    git(project, "merge", "-q", "--no-ff", "side", "-m", f"merge side\n\nTask: {task}")
+    return project
 
 
 # --------------------------------------------------------------------------

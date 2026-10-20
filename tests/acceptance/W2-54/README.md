@@ -82,7 +82,7 @@ retrieval returns 20 items for each, including same-id items and a chunk of a fi
 | S2 (the other keys unchanged) | `test_the_declaration_s_other_keys_are_unchanged` | pass |
 | **S3** `gov check` gives context-reproducibility green here | `test_w2_54_green_here.py`: `test_gov_check_gives_context_reproducibility_green_here` (and `test_the_suite_runs_this_worktree_s_code`, passes) | **red** |
 | **S4** `audit-report` exactly W2-02's; nothing of W2-02's other types; core-schema green here, W1-43 untouched | `test_w2_54_audit_report.py`: `test_the_schema_file_is_w2_02_s_byte_for_byte`, `test_a_record_in_the_audit_folder_that_states_no_type_is_held_as_an_audit_report[2]`, `test_a_record_of_type_audit_report_owes_no_shared_frontmatter[2]`, `test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes[3]`, `test_core_schema_is_green_on_this_repository_with_w1_43_untouched`; `test_w2_54_green_here.py::test_gov_check_gives_core_schema_green_here` | **red** |
-| S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict]`, `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` | pass |
+| S4 (nothing of W2-02's other types; W1-43 untouched) | `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD, 4ce16df2]`, `test_w2_02_s_other_types_are_judged_as_an_unknown_type[close, adoption-verdict × HEAD, 4ce16df2]` (read through git since run 5: "Run 5 (DEC-874)", at the end), `test_w2_54_green_here.py::test_the_w1_43_audit_report_is_untouched` | pass |
 | **F1** a context whose items or hash differ still fails the check, naming the ticket | `test_a_context_whose_items_differ_still_fails_the_check_naming_the_ticket`, `test_the_check_names_only_the_ticket_whose_context_differs` | pass |
 | **F2** a check past its declared limit still fails; no hard-block check weakened | `test_a_check_past_its_declared_limit_is_red`, `test_the_same_check_within_its_limit_is_green` (its control), `test_no_hard_block_check_is_weakened`, `test_the_two_checks_of_this_ticket_stay_hard_block[2]` | pass |
 | **F3** outside `docs/audit/` with no `type` still fails; an audit report lacking `milestone`, `commit` or `pack_sha256` fails naming the field | `test_a_record_outside_the_audit_folder_that_states_no_type_still_fails[docs/notes, docs/audit-archive, docs/reports/audit]` (pass); `test_an_audit_report_lacking_a_required_field_fails_naming_it[folder, stated × milestone, commit, pack_sha256]` (**red**) | mixed |
@@ -712,3 +712,52 @@ expectation is lowered, and the lexical route is not changed.
   that qualifies, and requires each at or above 80 (the pass line stays 80). Shown once with a throwaway outside the
   tree: the record's line with its headline set to `78.33` fails the case (the old reading passed it on
   `failed-approaches 100.0`); with `81.67`, as recorded, it passes.
+
+# Run 5 (DEC-874): "nothing of W2-02's other types" is read from W2-54's own commits
+
+DEC-874 (orchestrator, delegated, 2026-10-20) item 1: KPI S4's "nothing of W2-02's other types" (DEC-768 item 1) is
+about **W2-54's own change, not the tree**. Three cases judged the tree, so they were red on any tree that holds
+W2-02's merge (W2-02's own `close` and `adoption-verdict` then exist) although W2-54 did nothing wrong. They are
+corrected to that meaning; each change carries `Rewrite-Reason: DEC-874`. No other case and no other expectation of
+`test_w2_54_audit_report.py` changed (the schema file byte for byte as W2-02's at `2a35fd7b`, the audit folder, the
+fields, failure line 3, W1-43 untouched).
+
+**W2-54's own change** is the commits of a history that are **no merge** (`git log --no-merges`) and whose `Task:`
+trailer is `DAEO-0rfi` (read with `%(trailers:key=Task,valueonly)`), each read against its one parent. A merge of
+`w2/integrate` into this branch, or this branch's merge into `w2/integrate`, carries the same trailer but is no own
+change. Nothing is checked out; everything is `git log`, and `git show` of one named file.
+
+**Two histories** (a new parameter, `history`): `HEAD`, and `4ce16df2` (`w2_54_support.W2_02_MERGED_COMMIT`), W2-02's
+branch with its types merged with `w2/integrate`. All 38 of W2-54's own commits are among its ancestors. Both pass
+today. The existing ids gain this parameter: `[HEAD]`, `[4ce16df2]`, `[close-HEAD]`, `[close-4ce16df2]`,
+`[adoption-verdict-HEAD]`, `[adoption-verdict-4ce16df2]` (6 cases where there were 3: **24 in the file, 99 in the
+suite**).
+
+| case | before | after |
+|---|---|---|
+| `test_no_schema_file_of_w2_02_s_other_types_comes_with_it[history]` | `close.schema.json` and `adoption-verdict.schema.json` do not exist in this tree's two schema folders | no own commit of `history` adds or changes (`--name-status --no-renames`, deletions left out) `close.schema.json` or `adoption-verdict.schema.json` under `template/governance/kernel/schemas/` or `governance/kernel/schemas/`; the failure names the commit, its status and the path. `history` must hold at least one own commit |
+| `test_w2_02_s_other_types_are_judged_as_an_unknown_type[kind-history]` | core-schema from this tree judges a `kind` record exactly as a record of an unknown type | (1) no line an own commit of `history` adds to `src/gov/check/schema.py` (`-p`, `+` lines) names `kind` as a quoted string (a type map key, a standalone type) or `kind.schema.json`; the failure names the commit and the line. (2) **The behaviour, kept:** core-schema as W2-54's own **last commit to that module** leaves it (`4f753c72` today, in both histories): its declared command, with `gov.check.schema` read from `git show <commit>:src/gov/check/schema.py` into the case's temporary folder (every other module is this worktree's), in a project whose common and audit-report schema files are that commit's. A `kind` record gets the findings an unknown type gets, no more and no fewer (the assertion as before) |
+
+**Each case proves its reading first.** The fixture `histories_that_bring_in_w2_02_s_types` builds two temporary
+repositories from scratch (`w2_54_support.own_task_repo`). In each: an own commit that adds `audit-report` (as
+W2-54 does); then a commit that adds both schema files, a `"close"` type map entry and `"adoption-verdict"` among
+the standalone types, carrying `Task: DAEO-0rfi` in one repository and `Task: DAEO-zflj` in the other; then a merge
+carrying `Task: DAEO-0rfi` of a `DAEO-zflj` commit that adds both schema files. Each case's reading must name exactly
+the first repository's offending commit and find nothing in the second (so another Task's commit and a merge never
+count). Only then does it read the real history.
+
+**Shown red (throwaway outside the tree, the cases' own bodies run against a built history as `HEAD`):** an own
+commit adding `template/…/close.schema.json` fails case 1 (`… A template/governance/kernel/schemas/close.schema.json`);
+an own commit adding `governance/kernel/schemas/adoption-verdict.schema.json` fails it too; an own `"close"` map entry
+fails `[close-HEAD]` (`… +    "close": "close.schema.json",`); `"adoption-verdict"` added to the standalone types
+fails `[adoption-verdict-HEAD]`. When only `Task: DAEO-zflj` brings all of it in (with an own merge too), every case
+passes. The behavioural half tells W2-02's change apart: run as W2-02's `81eac9a7` leaves the module, a `close`
+record gets `SCHEMA_UNREADABLE` and an `adoption-verdict` record only `SCHEMA_UNREADABLE`, where an unknown type gets
+`SCHEMA_UNKNOWN_TYPE` (the case fails); as `4f753c72` leaves it, they are the same.
+
+**Why the behaviour is kept, and its limit.** The added-lines reading states S4's words. The run states what they
+mean: core-schema as W2-54 left it knows no `close` or `adoption-verdict` type. It runs W2-54's last module at
+`4f753c72`, which has no W2-02 commit among its ancestors. **Risk:** if a later W2-54 commit changes
+`src/gov/check/schema.py` after W2-02's merge has come into this branch, that module holds W2-02's types, and the
+behavioural half turns red although the line reading stays green. That would be a new finding for the lead, not a
+fault of the code. The line reading is the part that holds whatever is merged.
