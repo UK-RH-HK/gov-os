@@ -190,7 +190,11 @@ def test_a_wildcard_only_glob_is_allowed_and_the_hook_says_nothing_of_the_copy_o
     result = _ask(world, world.site(site).root, form, folders.depth_glob(name))
     what = f"{form} with one star per level of the stand-in {name} from the site '{site}'"
     protected.assert_allowed(result, what)
-    folders.assert_says_nothing(result, world, site, name, what)
+    # Rewritten by W2-58 (DEC-491): an allowed call has no reason to ask for; only the hook's output is checked, and it
+    # carries no path, no folder and no value of the file.
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(world.secrets(site, name)) if value and str(value) in said]
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
 
 
 # --------------------------------------------------------------------------

@@ -221,7 +221,17 @@ def test_a_search_on_a_pipe_with_a_path_is_allowed_and_the_hook_says_nothing_of_
     result = _ask(world, UNFED["on-a-pipe-with-the-absolute-start-as-its-path"], ROOT)
     protected.assert_allowed(result, what)
     for name in rnd.FILES:
-        rnd.assert_says_nothing(result, world, ROOT, name, what, more=("rg VALUE",))
+        _output_carries_nothing(result, tuple(world.secrets(rnd.site_of(ROOT), name))
+                                + (rnd.start_of(world, ROOT), "rg VALUE"), what)
+
+
+def _output_carries_nothing(result, values, what):
+    """An allowed call has no reason to ask for: only the hook's output is checked, and it carries none of ``values``
+    (a path, a folder, a value of the file). Rewritten by W2-58 (DEC-491): the case had asked a refusal's wording."""
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(values) if value and str(value) in said]
+    # Positions only: a failure must not print what the hook must not print.
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
 
 
 # --------------------------------------------------------------------------
@@ -246,7 +256,7 @@ def test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_
     what = f"{form} (the stand-in {name})"
     result = folders.ask_bash(world, batch.fill(world, site, name, command), WIDEST)
     protected.assert_allowed(result, what)
-    batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+    _output_carries_nothing(result, world.secrets(site, name), what)
 
 
 @pytest.mark.parametrize("name", rnd.FILES)

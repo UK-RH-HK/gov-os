@@ -246,7 +246,11 @@ def test_a_name_filter_search_is_allowed_and_the_hook_says_nothing_of_the_file_o
     result = rnd.ask_form(world, P_FORMS[form], start, f=_base(name))
     what = f"{form} from '{start}' with the name of the stand-in {name}"
     protected.assert_allowed(result, what)
-    rnd.assert_says_nothing(result, world, start, name, what, more=(f"--include='{_base(name)}'",))
+    # Rewritten by W2-58 (DEC-491): an allowed call has no reason to ask for; only the hook's output is checked.
+    values = tuple(world.secrets(rnd.site_of(start), name)) + (rnd.start_of(world, start), f"--include='{_base(name)}'")
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(values) if value and str(value) in said]
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
 
 
 # --------------------------------------------------------------------------

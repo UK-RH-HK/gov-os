@@ -294,7 +294,11 @@ def test_the_search_is_allowed_and_the_hook_says_nothing_of_the_file(world, star
     result = rnd.ask_form(world, P_FORMS[form], start)
     what = f"{form} from '{start}'"
     protected.assert_allowed(result, what)
-    rnd.assert_says_nothing(result, world, start, name, what)
+    # Rewritten by W2-58 (DEC-491): an allowed call has no reason to ask for; only the hook's output is checked.
+    values = tuple(world.secrets(rnd.site_of(start), name)) + (rnd.start_of(world, start),)
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(values) if value and str(value) in said]
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
 
 
 # --------------------------------------------------------------------------

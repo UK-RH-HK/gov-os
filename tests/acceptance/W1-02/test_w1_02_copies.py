@@ -123,6 +123,15 @@ def _ask(world, site, name, form, who=WIDEST):
     return batch.ask(world, tool_name, tool_input, who, cwd)
 
 
+def _output_carries_nothing(result, values, what):
+    """An allowed call has no reason to ask for: only the hook's output is checked, and it carries none of ``values``
+    (a path, a folder, a value of the file). Rewritten by W2-58 (DEC-491): the case had asked a refusal's wording."""
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(values) if value and str(value) in said]
+    # Positions only: a failure must not print what the hook must not print.
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
+
+
 def assert_refused_as_a_second_name(result, world, site, name, what):
     """W2-58 (the lead's reading of P-W2-58-TD-2 (i); DEC-548, DEC-553, DEC-778, DEC-821 item 4): a second name stays
     refused, now on the write side (a writable alias of a file the role may not write). Only that it is refused by a
@@ -249,6 +258,6 @@ def test_the_hook_s_answer_for_a_copy_names_neither_the_copy_nor_its_folder(worl
     what = f"{form} on the copy of the stand-in {name} at the site '{site}'"
     if form in READS:
         protected.assert_allowed(result, what)
-        batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+        _output_carries_nothing(result, world.secrets(site, name), what)
     else:
         assert_refused_as_a_second_name(result, world, site, name, what)
