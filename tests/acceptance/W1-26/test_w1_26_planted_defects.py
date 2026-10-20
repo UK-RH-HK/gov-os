@@ -306,25 +306,69 @@ def test_planted_schema_defect_record_type_non_string(project, sandbox, interfac
 # 9. fail-open: decision checker exception swallowed by bare except
 # --------------------------------------------------------------------------
 
+# revised after implementation (DEC-864 item 1; Rewrite-Reason: DEC-822 item 3,
+# DEC-835): the judge runs every declared check with its own interpreter and
+# package, never the judged project's ``src/gov``, so the raising checker is
+# planted in the judge's own code. The judge runs from an overlay in the
+# case's temporary folder: a ``gov`` and a ``gov.decisions`` package whose
+# import path continues into this worktree's ``src/``, so every module is this
+# worktree's but ``gov.decisions.checker``. That module runs the real
+# checker's source, then replaces ``check`` with one that leaves a marker and
+# raises. Nothing of the tree is copied; the judged project is as the suite
+# builds it.
+PLANTED_RAISE = "w1-26 planted decision checker is broken"
+
+
+def _judge_with_raising_decision_checker(base):
+    """The code root of a judge whose own decision checker raises, and its marker folder."""
+    judge, markers = base / "judge", base / "judge-markers"
+    real = support.SRC / "gov"
+    package = judge / "src" / "gov"
+    support.write(judge, "pyproject.toml",
+                  (support.REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    for folder, rel in ((package, ""), (package / "decisions", "decisions")):
+        real_init = real / rel / "__init__.py"
+        support.write(folder, "__init__.py",
+                      f"__path__.append({str(real / rel)!r})\n"
+                      f"exec(compile(open({str(real_init)!r}, encoding='utf-8').read(), "
+                      f"{str(real_init)!r}, 'exec'))\n")
+    real_checker = real / "decisions" / "checker.py"
+    support.write(package / "decisions", "checker.py",
+                  f"exec(compile(open({str(real_checker)!r}, encoding='utf-8').read(), "
+                  f"{str(real_checker)!r}, 'exec'))\n"
+                  "\n\n"
+                  "def check(root, *args, **kwargs):\n"
+                  "    import os, sys\n"
+                  f"    os.makedirs({str(markers)!r}, exist_ok=True)\n"
+                  f"    with open(os.path.join({str(markers)!r}, 'raised-%d' % os.getpid()), 'w') as out:\n"
+                  "        out.write(' '.join(sys.orig_argv))\n"
+                  f"    raise RuntimeError({PLANTED_RAISE!r})\n")
+    return judge, markers
+
+
 def test_planted_authority_defect_decision_checker_exception_not_swallowed(
-        project, sandbox, interface):
+        project, sandbox, interface, tmp_path):
     """When the decision checker raises, the authority family must not be GREEN.
 
     The bare ``except Exception: pass`` in authority.py swallows failures and
     lets the family pass silently. The correct behaviour is to report the error
     as a YELLOW or RED finding.
     """
-    project.write("src/gov/decisions/__init__.py", "")
-    project.write("src/gov/decisions/checker.py",
-                  "def check(root):\n    raise RuntimeError('checker is broken')\n")
+    judge, markers = _judge_with_raising_decision_checker(tmp_path)
     project.commit()
-    run = support.run_check(project, sandbox)
+    run = cli_support.run_gov_with_code(judge, project.root, sandbox, support.COMMAND, "--json")
+    reached = sorted(markers.glob("raised-*")) if markers.is_dir() else []
+    assert reached, (
+        f"the planted decision checker was never called by the judge: nothing was planted "
+        f"where the judge runs\n{run.describe()}"
+    )
     envelope = support.envelope_of(run, interface)
     result = envelope.get("result") or envelope.get("error", {}).get("details", {})
     status = support.family_status(result, "authority/role limits")
     assert status in (support.RED, support.YELLOW), (
         f"the decision checker raised but authority/role limits is {status!r}; "
-        f"the exception was silently swallowed\n{run.describe()}"
+        f"the exception was silently swallowed (raised in: "
+        f"{[path.read_text(encoding='utf-8') for path in reached]})\n{run.describe()}"
     )
 
 
