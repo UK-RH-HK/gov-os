@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.256 (the version table at the end of each section gives the history)
+**Version:** 0.257 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -8999,7 +8999,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   5. W2-18's KPI and paths widen to this repository. A ticket that changes a format the judge reads needs a release that accepts the new format first.
 
 ### DEC-823 — P-S2 (a) and (b): the close queue moves again; the test cache starts early
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the path map's `load_sensitive` list grows by one entry, by owner commit, DEC-766) · **Under:** DEC-757, DEC-762, DEC-766, DEC-780, DEC-806, DEC-813 · **Basis:** P-S2; P-W2-47 (W2-53's re-close at 12:01 on 2026-10-19: 13,454 passed, 3 failed: W1-42's two accepted reds and one W1-30 case that passes alone, 3 of 3, 17.8 s).
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the path map's `load_sensitive` list grows by one entry, by owner commit, DEC-766) · **Changed by:** item 4 (W2-48's place) by DEC-869: the very next free slot after W2-53's close (2026-10-20) · **Under:** DEC-757, DEC-762, DEC-766, DEC-780, DEC-806, DEC-813 · **Basis:** P-S2; P-W2-47 (W2-53's re-close at 12:01 on 2026-10-19: 13,454 passed, 3 failed: W1-42's two accepted reds and one W1-30 case that passes alone, 3 of 3, 17.8 s).
 - **Decision:**
   1. **(a) P-W2-47 as proposed:** `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py::test_after_a_run_cut_at_the_time_limit_no_process_of_it_lives_or_writes_into_the_project` joins `load_sensitive` by its exact id, with this entry and its fix row W2-M384. It still counts only if it passes in an isolated re-run inside the same close (DEC-757 item 3).
   2. **(b) Load comes out of the close, as W2-57's widened scope:** the close applies the resource gate to itself, or runs the timing-sensitive cases as their own isolated suite that is still a real check; and W2-57 settles W2-M384's cause (the test's timing, or the close leaving a process alive under load). The change to `gov close` is judged by the pinned close (DEC-822).
@@ -9468,5 +9468,25 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.256 | 2026-10-20 | Delegated: DEC-867 (W2-53's fourth refused close: W2-63's sources, W2-11's paths, the `secrets` name collision through W2-62 run 2 and row W2-L373, a fresh ticket checkpoint before each close). Next free id: DEC-868. |
+
+---
+
+## 257. The owner's standing rules of 2026-10-20: a fast pre-close gate, checks before the orchestrator's record commits, and W2-48 next (register v0.257, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-868 — A fast pre-close gate before every close; the governance checks before the orchestrator commits its record edits (standing)
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-780, DEC-867, DEC-861, DEC-851 · **Basis:** OWNER, 2026-10-20: W2-53's fourth close ran 76 minutes and was refused for faults a minute's check finds (DEC-867); `pytest tests --collect-only` from the root finds the `secrets` clash in 5.75 s.
+- **Decision:**
+  1. **Before every `gov close`, a fast pre-close gate, and the close starts only if it passes:** (a) `pytest --collect-only -q` over every suite the close will run, in one process, as the close runs them (it catches import and name clashes in seconds); (b) `gov check`, after the rebuild and with no commit in between (DEC-780); (c) the ticket's checkpoint, fresh. A failure stops the queue before the close, with its cause. The orchestrator's `tools/close_queue.sh` does this; leads run (a) in their worktrees before they return DONE.
+  2. **After its own edits to the register, the plan, the path map, tickets or briefs,** the orchestrator runs the governance checks those files feed (at least the path-map, schema and context checks) before it commits them, until the hooks are back on (W2-08). `tools/record_checks.sh` runs `core-pathmap`, `core-schema`, `core-mutation`, `core-authority`, `core-graph` and `context-reproducibility`.
+  3. **W2-07's card and ticket file carry the gate as a KPI,** so that it becomes part of `gov close` itself: any gate failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt.
+
+### DEC-869 — W2-48 takes the very next free slot after W2-53's close (standing until it starts)
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-823 item 4, DEC-847, DEC-852 · **Basis:** OWNER, 2026-10-20: until the test cache lands, every close costs over an hour · **Changes:** DEC-823 item 4 (W2-48's place in the order).
+- **Decision:** W2-48 takes the very next free slot after W2-53's close, ahead of every other keystone-2 ticket, the held closes' resumes included. Its three conditions stay (DEC-852: subprocess coverage or always re-run, the leads' verification uses the cache too, the nightly full run). The orchestrator reports when it starts.
+- Next free id: DEC-870.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.257 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-868 (the pre-close gate: collection in one process, `gov check` after the rebuild, a fresh checkpoint; the record-fed checks before the orchestrator's own commits; W2-07's KPI), DEC-869 (W2-48 next after W2-53's close, ahead of every other keystone-2 ticket). Next free id: DEC-870. |
 
 ---
