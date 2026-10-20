@@ -32,8 +32,6 @@ allowed_paths:
 - template/.rulesync/skills/orchestration/**
 - .rulesync/skills/audit/**
 - template/.rulesync/skills/audit/**
-- tests/acceptance/W1-35/test_w1_35_orchestration.py
-- tests/acceptance/W1-35/w1_35_orchestration_support.py
 kpis:
   success:
   - Every brief template and the orchestration skill carry the twelve-field rule, the payload-after rule, and "stop after two identical refusals and return" [AR-5, AR-6].
