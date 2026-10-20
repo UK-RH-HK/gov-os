@@ -1,0 +1,16 @@
+# W2-48 (DAEO-xxgp) lead checkpoint
+
+- Run 1. Base bdb96b77; branch w2/W2-48. Identity checked (orchestrator, DAEO-xxgp).
+- Install gate: PASSED — pytest-testmon 2.2.0 + coverage 7.16.2 under ~/.local, installed 2026-10-20 14:17 (registry commit b0756906 on w2/integrate).
+- td-1 DONE (session 1f74a191-3b6e-4d69-92fa-20ccec7b4456, sandboxed gov launch, xhigh): commit ceb4ec1d "acceptance tests, red", 46 tests, 12 files; twelve fields present. Tripwire 1: W2-48 head + acceptance W2-48 only (allowed); main tree head moved (orchestrator commits); W2-58 worktree ` M src/gov/guard/reads.py` (not ours).
+- Packages from td-1: P-1 module commands `python3 -m gov.testcache run|command|nightly` (rec a); P-2 interpreter plant = venv same version (rec a); P-3 subprocess coverage as mechanism, always-re-run fallback (rec a); P-4 `src/gov/close/command.py` needed for --no-cache and the call (rec widen paths; BLOCKS close-level cases: close 7, leads 3, nightly 2).
+- w2/integrate moved to 872874e6 (tool registry, DEC-871, checkpoint): merge it in before verification (DEC-750 form).
+- Verified facts (lead's own run): testmon 2.2.0 crashes with -p no:cacheprovider (KeyError 'lf'); all-reused run = "no tests ran" (exit 5); testmon has no working subprocess support (sub_cov_file vestigial); coverage installed a1_coverage.pth (child measures only when COVERAGE_PROCESS_START/CONFIG reaches it, and only when ~/.local site is on its path — tests that build a fresh env/HOME lose it).
+- Refusals: 1 write refusal (unresolvable variable in a Bash write target, my scratch test; redone with literal paths). Read refusals: 0.
+- Loop count: held by lead.
+- Next: CLOSE-RUNNING gate -> red check (W2-48 suite) -> engineer eng-1 (all in-path work; close wiring blocked by P-4) -> verify -> return PACKAGES (P-4).
+
+- Red check DONE 16:06: 46 failed (34 no module gov.testcache, 11 no test_cache in close answer, 1 research record missing) = README reasons. log/red-1.txt
+- Merge 9657051f (w2/integrate 872874e6 in, DEC-750 form). W2-53 now closed. integrate head f5738e5a (DAEO-0rfi checkpoint): merge again before verification.
+- Containment flagged 8dfd54e9 (owner Role: owner commit, DEC-871) brought in by my merge: not ours.
+- Next: eng-1 launched (briefs/eng-1.md, log/eng-1.json, tripwire-before-2.json).
