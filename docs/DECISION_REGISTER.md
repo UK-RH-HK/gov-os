@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.263 (the version table at the end of each section gives the history)
+**Version:** 0.264 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9585,5 +9585,23 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.263 | 2026-10-20 | Delegated: DEC-875 (W2-48: `src/gov/close/command.py` in its paths; the fixture defect revised; P-1 to P-3 confirmed; P-W2-48-5 and P-B to the owner). Next free id: DEC-876. |
+
+---
+
+## 264. The owner's answer of 2026-10-20 on P-W2-48-5: the cache measures more, the inputs are declared, a target for the round (register v0.264, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-876 — P-W2-48-5 (b) with (c), on conditions: fail safe, each widening proven, the nightly backstop, a measured target, and a fallback instead of another open round
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-726, DEC-843, DEC-852, DEC-869, DEC-875, DEC-861 · **Basis:** P-W2-48-5 (`governance/project/orchestration/packages/P-W2-48-5.md`): built safely to DEC-852, the cache reused only 16 % of W1-01 to W1-15's tests (83 % always ran).
+- **Decision:**
+  1. **(b), failing safe:** anything the cache still cannot see stays "always run". Each widening (coverage passed into children started with their own environment; `git` and similar programs keyed by their version) is proven by a test in which a change reached only that way invalidates the cached result.
+  2. **(c):** the path map declares narrow `test_inputs` (fixtures, templates and schemas: `fixtures/**`, `template/**`, `schemas/**`); the register and the ticket files are left out. Committed by the orchestrator under DEC-861.
+  3. **The backstop:** the nightly full uncached run (DEC-852 item 3); any test that fails there but passed through the cache is a P1 package about the cache.
+  4. **A target for the round,** measured and reported: at least 60 to 70 % of tests reused on a typical ticket's close, and a typical close under about 15 minutes. **If the round falls short,** no further open-ended round: a package with a fallback (for example, running only the suites the change's paths affect, with the nightly full run as backstop).
+  5. **Size:** W2-48 stands at about 1,680 lines (source 1,117: `testcache/__init__.py` 440, the pytest plugin 364, `commands.py` 165, `__main__.py` 81, `close/cache.py` 67; builder tests 364; the research record 199) against an estimate of 220, for what is meant to be mostly glue around testmon. The round simplifies where it can rather than adds, and its return says where the lines went.
+- Next free id: DEC-877.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.264 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-876 (P-W2-48-5 (b) with (c): fail safe, each widening proven, `test_inputs` declared, the nightly backstop, a measured target of 60 to 70 % reuse and a close under about 15 minutes, a fallback package if short, simplify not add). Next free id: DEC-877. |
 
 ---
