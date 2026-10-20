@@ -6,7 +6,8 @@
 - **Window (DEC-838):** full model window (1M); never a compaction threshold; never ask a session to stop or
   compact early. Usage is the limit: the digest gives daily/weekly allowance used (`claude -p "/usage"`).
 - **Checkpoint at every handover (DEC-837):** return, merge, package, compaction. RESUME HERE = full session
-  state; repo knowledge from retrieval. Keep it < 8,000 chars until W2-62 lands.
+  state; repo knowledge from retrieval. W2-62 merged: the hook now names this section's lines and size; DEC-792's
+  8,000-char limit is lifted, but keep it tight (the hook injects it whole only up to 10,000 chars).
 - **Memory used (DEC-836):** every brief says `gov retrieve`; from W2-04's merge every brief built with
   `gov context`; usage counted for the digest and K4's exit.
 - **Large and code questions (DEC-859, DEC-860):** never one giant query or context: batches (`--batch-size`,
@@ -39,8 +40,12 @@
 - **Owner pushed through `f0680605`.** I committed DEC-861 + DEC-862 (P-W2-51 (a) now, (b) in W2-12's card and
   ticket `DAEO-j8gn`, (c) never) as my first decision records (register §252, v0.252, next DEC-863). **Records
   since the owner's last push:** DEC-861, DEC-862 (shas in the digest). W2-37's ticket file: its lead at resume.
-- **Leads (00:14):** W2-62 verifying (engineer `7d8e49d8`); W2-59 engineer running (tests `922dd542`); W2-50 run 8
-  engineer running (merge-back `e61b67f5`, ticket `c2b094da`, tests `878467c9`). None has `ccf28d5c`.
+- **W2-62 returned PACKAGES (01:0x), work green, probe pass; MERGED `6e4b2750`;** DEC-863 (delegated) applied:
+  skill copies regenerated + roster `prompt:` (`d4096dde`), record `d0cd2167`. Re-verify in main tree running
+  (`tools/reverify_w2_62.sh` -> `log/reverify-W2-62/`). Close W2-62 later (quiet window; W1-49 reds first).
+- **P1 P-W2-52 (open):** W1-49's two tests require DEC-636's 300k window, retired by DEC-838 -> every close red.
+  Rec (a): new LITE ticket W2-63 (test designer revises them, Rewrite-Reason: DEC-838) before W2-53's re-close.
+- **Leads:** W2-59 verifying (rebuild-2); W2-50 run 8 verifying (fix `a403309e`). Neither has `ccf28d5c`.
 - **Merge `w2/integrate` into a lead's branch only at its return** (a commit under a running lead trips its stop
   rule; under a worker, containment, DEC-254). Then re-measure that lead's rebuild under the new map; then raise
   parallelism.

@@ -1,2 +1,1915 @@
 FFFFFF........FFFF...................................................... [ 35%]
-................................F...........................
+................................F...........................F......FFFF. [ 71%]
+......FFFFFF......FFFFFFFFFFFF......FF...................                [100%]
+=================================== FAILURES ===================================
+____ TestSettingsAfterTheHeldOutStep.test_generated_then_the_step_is_green _____
+
+self = <test_w1_38_heldout_step.TestSettingsAfterTheHeldOutStep object at 0x70627fcbf590>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_generated_then_the_step_is_green(self, generated_project, stand_in_paths):
+        _apply_step(generated_project, stand_in_paths)
+>       _assert_green(generated_project, stand_in_paths,
+                      "the project's settings are generated, then the held-out step")
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_generated_then_the_step_i0/stand-in-held-out/second']
+what = "the project's settings are generated, then the held-out step"
+
+    def _assert_green(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        named = _named(project, result)
+        assert support.SETTINGS_REL not in named, (
+            f"{what}: the findings name the project's settings file although it is what "
+            f"\"rulesync generate, then the held-out step\" gives; they name {sorted(named)}"
+        )
+>       assert result.returncode == 0 and not _findings(result), (
+            f"{what}: nothing differs, but the check is not green (exit {result.returncode}): {output}"
+        )
+E       AssertionError: the project's settings are generated, then the held-out step: nothing differs, but the check is not green (exit 1): {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:193: AssertionError
+__ TestSettingsAfterTheHeldOutStep.test_step_never_run_is_red_on_the_settings __
+
+self = <test_w1_38_heldout_step.TestSettingsAfterTheHeldOutStep object at 0x7062809455e0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_step_never_run_is_red_on_the_settings(self, generated_project, stand_in_paths):
+        """The project has a held-out file and its settings are what rulesync
+        alone generates: every Read deny rule of the step is missing."""
+        _write_held_out_file(generated_project, stand_in_paths)
+>       _assert_red_on_the_settings(
+            generated_project, stand_in_paths,
+            "the project has a held-out file and its settings hold none of its Read deny rules",
+        )
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:247: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_step_never_run_is_red_on_0/stand-in-held-out/second']
+what = 'the project has a held-out file and its settings hold none of its Read deny rules'
+
+    def _assert_red_on_the_settings(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        assert result.returncode != 0, f"{what}, but the check is green: {output}"
+        named = _named(project, result)
+>       assert named == {support.SETTINGS_REL}, (
+            f"{what}: the findings must name the project's settings file and no other file; "
+            f"they name {sorted(named)}"
+        )
+E       AssertionError: the project has a held-out file and its settings hold none of its Read deny rules: the findings must name the project's settings file and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:204: AssertionError
+__ TestSettingsAfterTheHeldOutStep.test_one_rule_lost_is_red_on_the_settings ___
+
+self = <test_w1_38_heldout_step.TestSettingsAfterTheHeldOutStep object at 0x70627fcbf2f0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_one_rule_lost_is_red_on_the_settings(self, generated_project, stand_in_paths):
+        """One of the two rules the step wrote is taken out again by hand."""
+        added = _apply_step(generated_project, stand_in_paths)
+    
+        def lose_one(settings):
+            settings["permissions"]["deny"].remove(added[-1])
+    
+        support.edit_settings(generated_project, lose_one)
+>       _assert_red_on_the_settings(
+            generated_project, stand_in_paths,
+            "one Read deny rule of the held-out file was removed from the project's settings",
+        )
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_one_rule_lost_is_red_on_t0/stand-in-held-out/second']
+what = "one Read deny rule of the held-out file was removed from the project's settings"
+
+    def _assert_red_on_the_settings(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        assert result.returncode != 0, f"{what}, but the check is green: {output}"
+        named = _named(project, result)
+>       assert named == {support.SETTINGS_REL}, (
+            f"{what}: the findings must name the project's settings file and no other file; "
+            f"they name {sorted(named)}"
+        )
+E       AssertionError: one Read deny rule of the held-out file was removed from the project's settings: the findings must name the project's settings file and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:204: AssertionError
+_ TestSettingsAfterTheHeldOutStep.test_rule_the_held_out_file_does_not_give_is_red_on_the_settings _
+
+self = <test_w1_38_heldout_step.TestSettingsAfterTheHeldOutStep object at 0x70627fcbec60>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/stand-in-held-out/second']
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0')
+
+    @needs_rulesync
+    def test_rule_the_held_out_file_does_not_give_is_red_on_the_settings(
+        self, generated_project, stand_in_paths, tmp_path,
+    ):
+        """A Read deny rule in the generator's own form, for a path the
+        held-out file does not name, beside the two it does name."""
+        added = _apply_step(generated_project, stand_in_paths)
+        other = str(tmp_path / "stand-in-held-out" / "not-in-the-file")
+        stray = added[0].replace(stand_in_paths[0], other)
+        assert stray != added[0] and stray not in _deny_rules(generated_project)
+    
+        def add_stray(settings):
+            settings["permissions"]["deny"].append(stray)
+    
+        support.edit_settings(generated_project, add_stray)
+>       _assert_red_on_the_settings(
+            generated_project, stand_in_paths,
+            "the project's settings hold a Read deny rule the held-out file does not give",
+        )
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_rule_the_held_out_file_do0/stand-in-held-out/second']
+what = "the project's settings hold a Read deny rule the held-out file does not give"
+
+    def _assert_red_on_the_settings(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        assert result.returncode != 0, f"{what}, but the check is green: {output}"
+        named = _named(project, result)
+>       assert named == {support.SETTINGS_REL}, (
+            f"{what}: the findings must name the project's settings file and no other file; "
+            f"they name {sorted(named)}"
+        )
+E       AssertionError: the project's settings hold a Read deny rule the held-out file does not give: the findings must name the project's settings file and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:204: AssertionError
+_______ TestProjectWithoutAHeldOutFile.test_generated_settings_are_green _______
+
+self = <test_w1_38_heldout_step.TestProjectWithoutAHeldOutFile object at 0x70627fa7c0b0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_generated_settings_are_gr0/project')
+
+    @needs_rulesync
+    def test_generated_settings_are_green(self, generated_project):
+        assert not os.path.lexists(_held_out_file(generated_project)), (
+            "the stand-in project as built holds a held-out file; the case needs one without"
+        )
+        result = _check(generated_project)
+>       assert result.returncode == 0 and not _findings(result), (
+            f"a project without a held-out file, as rulesync generates it, is not green: "
+            f"{support.output_of(result)}"
+        )
+E       AssertionError: a project without a held-out file, as rulesync generates it, is not green: {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:301: AssertionError
+_ TestProjectWithoutAHeldOutFile.test_stray_read_deny_rule_is_red_on_the_settings _
+
+self = <test_w1_38_heldout_step.TestProjectWithoutAHeldOutFile object at 0x70627fa7c9b0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_stray_read_deny_rule_is_red_on_the_settings(self, generated_project, stand_in_paths):
+        """The settings carry the step's rules and the project has no held-out
+        file (the file was taken away after the step): the rules have no source."""
+        _apply_step(generated_project, stand_in_paths)
+        _held_out_file(generated_project).unlink()
+>       _assert_red_on_the_settings(
+            generated_project, stand_in_paths,
+            "the project has no held-out file and its settings carry Read deny rules of one",
+        )
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_stray_read_deny_rule_is_r0/stand-in-held-out/second']
+what = 'the project has no held-out file and its settings carry Read deny rules of one'
+
+    def _assert_red_on_the_settings(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        assert result.returncode != 0, f"{what}, but the check is green: {output}"
+        named = _named(project, result)
+>       assert named == {support.SETTINGS_REL}, (
+            f"{what}: the findings must name the project's settings file and no other file; "
+            f"they name {sorted(named)}"
+        )
+E       AssertionError: the project has no held-out file and its settings carry Read deny rules of one: the findings must name the project's settings file and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:204: AssertionError
+______ TestStepRepeated.test_project_is_still_green_after_the_second_run _______
+
+self = <test_w1_38_heldout_step.TestStepRepeated object at 0x70627fcbf0e0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_project_is_still_green_after_the_second_run(self, generated_project, stand_in_paths):
+        _apply_step(generated_project, stand_in_paths)
+        _run_step(generated_project)
+>       _assert_green(generated_project, stand_in_paths,
+                      "the held-out step was run twice on the generated settings")
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:411: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_project_is_still_green_af0/stand-in-held-out/second']
+what = 'the held-out step was run twice on the generated settings'
+
+    def _assert_green(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        named = _named(project, result)
+        assert support.SETTINGS_REL not in named, (
+            f"{what}: the findings name the project's settings file although it is what "
+            f"\"rulesync generate, then the held-out step\" gives; they name {sorted(named)}"
+        )
+>       assert result.returncode == 0 and not _findings(result), (
+            f"{what}: nothing differs, but the check is not green (exit {result.returncode}): {output}"
+        )
+E       AssertionError: the held-out step was run twice on the generated settings: nothing differs, but the check is not green (exit 1): {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:193: AssertionError
+________ TestStepRepeated.test_whole_procedure_repeated_is_still_green _________
+
+self = <test_w1_38_heldout_step.TestStepRepeated object at 0x70627faf0290>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/project')
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_whole_procedure_repeated_is_still_green(self, generated_project, stand_in_paths):
+        """rulesync generate, the step, and both once more, as an owner who
+        applies the adapters again does it."""
+        _apply_step(generated_project, stand_in_paths)
+        once = _settings_bytes(generated_project)
+        again = support.run_rulesync_generate(generated_project)
+        assert again.returncode == 0, f"rulesync generate failed: {again.stderr}"
+        _run_step(generated_project)
+        assert _settings_bytes(generated_project) == once, (
+            "the apply procedure run a second time gave other settings than the first time"
+        )
+>       _assert_green(generated_project, stand_in_paths, "the apply procedure was run twice")
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:426: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/project')
+paths = ['/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_whole_procedure_repeated_0/stand-in-held-out/second']
+what = 'the apply procedure was run twice'
+
+    def _assert_green(project: Path, paths: list[str], what: str) -> None:
+        result = _check(project)
+        output = support.output_of(result)
+        _assert_no_stand_in_path(output, paths, f"the check's output ({what})")
+        named = _named(project, result)
+        assert support.SETTINGS_REL not in named, (
+            f"{what}: the findings name the project's settings file although it is what "
+            f"\"rulesync generate, then the held-out step\" gives; they name {sorted(named)}"
+        )
+>       assert result.returncode == 0 and not _findings(result), (
+            f"{what}: nothing differs, but the check is not green (exit {result.returncode}): {output}"
+        )
+E       AssertionError: the apply procedure was run twice: nothing differs, but the check is not green (exit 1): {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert (1 == 0)
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:193: AssertionError
+_ TestHeldOutStepThroughGovCheck.test_gov_check_is_green_after_the_apply_procedure _
+
+self = <test_w1_38_heldout_step.TestHeldOutStepThroughGovCheck object at 0x70627faf07a0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_after_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_after_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_after_0/sandbox/elsewhere'))
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_after_0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_after_0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_gov_check_is_green_after_the_apply_procedure(
+        self, generated_project, sandbox, stand_in_paths,
+    ):
+        _apply_step(generated_project, stand_in_paths)
+        entry, family, run = _gov_check(generated_project, sandbox)
+        _assert_no_stand_in_path(run.describe(), stand_in_paths, "gov check's output")
+>       assert (entry.get("status"), family.get("status")) == (support.GREEN, support.GREEN), (
+            f"the settings are generated, then the held-out step, but gov check shows the check as "
+            f"{entry.get('status')!r} and the family as {family.get('status')!r}\n{run.describe()}"
+        )
+E       AssertionError: the settings are generated, then the held-out step, but gov check shows the check as 'RED' and the family as 'RED'
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}], "provenance": {"commit": "a1eddc089742595dafa84ba0e1288082a3b3cbc8", "check_version": "1.0.0", "inputs_hash": "c861ccc7f8697d28"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "a1eddc089742595dafa84ba0e1288082a3b3cbc8", "check_version": "1.0.0", "inputs_hash": "55166c32aa229115"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "a1eddc089742595dafa84ba0e1288082a3b3cbc8", "check_version": "1.0.0", "inputs_hash": "7f226b350012ff35"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "a1eddc089742595dafa84ba0e1288082a3b3cbc8", "check_version": "1.0.0", "inputs_hash": "17054daac1f22a03"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert ('RED', 'RED') == ('GREEN', 'GREEN')
+E         
+E         At index 0 diff: 'RED' != 'GREEN'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:443: AssertionError
+___ TestHeldOutStepThroughGovCheck.test_gov_check_is_red_when_a_rule_is_lost ___
+
+self = <test_w1_38_heldout_step.TestHeldOutStepThroughGovCheck object at 0x70627faf0c20>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_red_when_a_r0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_red_when_a_r0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_red_when_a_r0/sandbox/elsewhere'))
+stand_in_paths = ['/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_red_when_a_r0/stand-in-held-out/first', '/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_red_when_a_r0/stand-in-held-out/second']
+
+    @needs_rulesync
+    def test_gov_check_is_red_when_a_rule_is_lost(self, generated_project, sandbox, stand_in_paths):
+        added = _apply_step(generated_project, stand_in_paths)
+    
+        def lose_one(settings):
+            settings["permissions"]["deny"].remove(added[0])
+    
+        support.edit_settings(generated_project, lose_one)
+        entry, family, run = _gov_check(generated_project, sandbox)
+        _assert_no_stand_in_path(run.describe(), stand_in_paths, "gov check's output")
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"a Read deny rule of the held-out file is missing from the settings, but gov check shows "
+            f"the check as {entry.get('status')!r} and the family as {family.get('status')!r}\n"
+            f"{run.describe()}"
+        )
+        named = support.named_files(generated_project, json.dumps(entry.get("findings")))
+>       assert named == {support.SETTINGS_REL}, (
+            f"the findings must name the project's settings file and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: the findings must name the project's settings file and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "ea9e98f46ccb687da26ea1cbf58bf73459ea8e5a", "check_version": "1.0.0", "inputs_hash": "8d1b3ce7d9762662"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "ea9e98f46ccb687da26ea1cbf58bf73459ea8e5a", "check_version": "1.0.0", "inputs_hash": "68e76682ec5add7a"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "ea9e98f46ccb687da26ea1cbf58bf73459ea8e5a", "check_version": "1.0.0", "inputs_hash": "25125be30f7b1c92"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "ea9e98f46ccb687da26ea1cbf58bf73459ea8e5a", "check_version": "1.0.0", "inputs_hash": "3171fcf747bd218d"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_heldout_step.py:464: AssertionError
+________ TestSkillGeneration.test_skill_body_matches_source[checkpoint] ________
+
+self = <test_w1_38_rulesync.TestSkillGeneration object at 0x70627fafe210>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_body_matches_source3/project')
+skill = 'checkpoint'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("skill", support.KERNEL_METHOD_SKILLS)
+    def test_skill_body_matches_source(self, generated_project, skill):
+        kernel_body = support.generated_body(support.read_kernel_skill(skill))
+        assert kernel_body.strip(), (
+            f"kernel skill {support.KERNEL_SKILLS_REL}/{skill}/SKILL.md has no body"
+        )
+    
+        gen_skill = generated_project / ".claude" / "skills" / skill / "SKILL.md"
+        assert gen_skill.is_file(), (
+            f".claude/skills/{skill}/SKILL.md was not generated; "
+            f"the kernel method skill '{skill}' is missing from the rulesync sources"
+        )
+        gen_body = support.generated_body(gen_skill.read_text(encoding="utf-8"))
+>       assert gen_body == kernel_body, (
+            f".claude/skills/{skill}/SKILL.md body does not match the kernel "
+            f"file byte for byte (kernel {len(kernel_body)} bytes, "
+            f"generated {len(gen_body)} bytes)"
+        )
+E       AssertionError: .claude/skills/checkpoint/SKILL.md body does not match the kernel file byte for byte (kernel 2985 bytes, generated 2083 bytes)
+E       assert '# Checkpoint...37, CAP-38.\n' == '# Checkpoint...37, CAP-38.\n'
+E         
+E         Skipping 2014 identical leading characters in diff, use -v to show
+E           -37).
+E         - 
+E         - ## The resume rule
+E         - 
+E         - The orchestrator's checkpoint opens with a RESUME HERE section. RESUME HERE holds the full session state: what is happening, what was decided, what is next and where things are. It sets no size limit of its own; DEC-792's 8,000-character limit is lifted (DEC-837). Knowledge of the repository comes from retrieval (`gov retrieve`) and the context packets (`gov context`), not from the resume (DEC-837)....
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:120: AssertionError
+_ TestRegisteredFamilyCheck.test_gov_check_is_green_on_a_clean_generated_project _
+
+self = <test_w1_38_rulesync.TestRegisteredFamilyCheck object at 0x70627faff410>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_on_a_c0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_on_a_c0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_gov_check_is_green_on_a_c0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_gov_check_is_green_on_a_clean_generated_project(self, generated_project, sandbox):
+        direct = support.run_portability_check(generated_project)
+>       assert direct.returncode == 0, (
+            f"the declared command is not clean on a freshly generated project: "
+            f"{support.output_of(direct)}"
+        )
+E       AssertionError: the declared command is not clean on a freshly generated project: {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:350: AssertionError
+__ TestKernelAgainstAdapterSource.test_kernel_role_changed_without_its_source __
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3dac0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_kernel_role_changed_without_its_source(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_KERNEL)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a kernel role file was changed without its rulesync source")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:492: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3dac0>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_role_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = 'a kernel role file was changed without its rulesync source'
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a kernel role file was changed without its rulesync source: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md'} and {'.rulesync/s...int/SKILL.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+_ TestKernelAgainstAdapterSource.test_role_source_changed_without_its_kernel_role _
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3df40>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_role_source_changed_without_its_kernel_role(self, generated_project, sandbox):
+        support.change_first_labelled_field(generated_project / self.ROLE_SOURCE)
+        support.regenerate(generated_project)
+>       self._assert_found(generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+                           "a role's rulesync source was changed without its kernel role file")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:499: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3df40>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_role_source_changed_witho0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = "a role's rulesync source was changed without its kernel role file"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a role's rulesync source was changed without its kernel role file: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md'} and {'.rulesync/s...int/SKILL.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+_ TestKernelAgainstAdapterSource.test_kernel_skill_changed_without_its_source __
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3e450>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_kernel_skill_changed_without_its_source(self, generated_project, sandbox):
+        support.append_line(generated_project / self.SKILL_KERNEL)
+>       self._assert_found(generated_project, sandbox, self.SKILL_KERNEL, self.SKILL_SOURCE,
+                           "a kernel skill file was changed without its rulesync source")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:505: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3e450>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_kernel_skill_changed_with0/sandbox/elsewhere'))
+kernel = 'governance/kernel/skills/planning/SKILL.md'
+source = '.rulesync/skills/planning/SKILL.md'
+what = 'a kernel skill file was changed without its rulesync source'
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a kernel skill file was changed without its rulesync source: the findings must name .rulesync/skills/planning/SKILL.md and no file outside the pair (governance/kernel/skills/planning/SKILL.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/skills/planning/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md', 'governance/kernel/skills/planning/SKILL.md']
+E       assert ('.rulesync/skills/planning/SKILL.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/skills/planning/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md', 'governance/kernel/skills/planning/SKILL.md'} and {'.rulesync/s...ing/SKILL.md'} <= {'.rulesync/s...ing/SKILL.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+_ TestKernelAgainstAdapterSource.test_skill_source_changed_without_its_kernel_skill _
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3e960>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_skill_source_changed_without_its_kernel_skill(self, generated_project, sandbox):
+        support.append_line(generated_project / self.SKILL_SOURCE)
+        support.regenerate(generated_project)
+>       self._assert_found(generated_project, sandbox, self.SKILL_KERNEL, self.SKILL_SOURCE,
+                           "a skill's rulesync source was changed without its kernel skill file")
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:512: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627fb3e960>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_skill_source_changed_with0/sandbox/elsewhere'))
+kernel = 'governance/kernel/skills/planning/SKILL.md'
+source = '.rulesync/skills/planning/SKILL.md'
+what = "a skill's rulesync source was changed without its kernel skill file"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a skill's rulesync source was changed without its kernel skill file: the findings must name .rulesync/skills/planning/SKILL.md and no file outside the pair (governance/kernel/skills/planning/SKILL.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/skills/planning/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md', 'governance/kernel/skills/planning/SKILL.md']
+E       assert ('.rulesync/skills/planning/SKILL.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/skills/planning/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md', 'governance/kernel/skills/planning/SKILL.md'} and {'.rulesync/s...ing/SKILL.md'} <= {'.rulesync/s...ing/SKILL.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+______ TestFindings.test_findings_name_exactly_the_edited_file[CLAUDE.md] ______
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb3f200>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the0/sandbox/elsewhere'))
+rel = 'CLAUDE.md'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", HAND_EDITED)
+    def test_findings_name_exactly_the_edited_file(self, generated_project, sandbox, rel):
+        _hand_edit(generated_project, rel)
+        entry, _family, run = _gov_check(generated_project, sandbox)
+        named = support.named_files(generated_project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{rel} was edited by hand; the findings name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: CLAUDE.md was edited by hand; the findings name ['.rulesync/skills/checkpoint/SKILL.md', 'CLAUDE.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": "CLAUDE.md"}], "provenance": {"commit": "c9943b21a1e9516a10fd4c26a9e6773492ac7526", "check_version": "1.0.0", "inputs_hash": "4ec8533ad0cdc24f"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "c9943b21a1e9516a10fd4c26a9e6773492ac7526", "check_version": "1.0.0", "inputs_hash": "6523f2c013c7d04d"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "c9943b21a1e9516a10fd4c26a9e6773492ac7526", "check_version": "1.0.0", "inputs_hash": "2d1b008cb15d5332"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "c9943b21a1e9516a10fd4c26a9e6773492ac7526", "check_version": "1.0.0", "inputs_hash": "2a82d85a095f7efd"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.rulesync/s...int/SKILL.md'} == {'CLAUDE.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:653: AssertionError
+______ TestFindings.test_findings_name_exactly_the_edited_file[AGENTS.md] ______
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb3f3b0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the1/sandbox/elsewhere'))
+rel = 'AGENTS.md'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", HAND_EDITED)
+    def test_findings_name_exactly_the_edited_file(self, generated_project, sandbox, rel):
+        _hand_edit(generated_project, rel)
+        entry, _family, run = _gov_check(generated_project, sandbox)
+        named = support.named_files(generated_project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{rel} was edited by hand; the findings name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: AGENTS.md was edited by hand; the findings name ['.rulesync/skills/checkpoint/SKILL.md', 'AGENTS.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": "AGENTS.md"}], "provenance": {"commit": "4bb1442358e99ca7a37dc6c9a69b53e053849d8e", "check_version": "1.0.0", "inputs_hash": "d2ea04d951b9a11f"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "4bb1442358e99ca7a37dc6c9a69b53e053849d8e", "check_version": "1.0.0", "inputs_hash": "501cabb20c7a35c4"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "4bb1442358e99ca7a37dc6c9a69b53e053849d8e", "check_version": "1.0.0", "inputs_hash": "3e4850e9aaa79e39"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "4bb1442358e99ca7a37dc6c9a69b53e053849d8e", "check_version": "1.0.0", "inputs_hash": "1461b3deb32957cd"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.rulesync/s...int/SKILL.md'} == {'AGENTS.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:653: AssertionError
+_ TestFindings.test_findings_name_exactly_the_edited_file[.claude/agents/engineer.md] _
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb3f4a0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the2/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the2/sandbox/elsewhere'))
+rel = '.claude/agents/engineer.md'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", HAND_EDITED)
+    def test_findings_name_exactly_the_edited_file(self, generated_project, sandbox, rel):
+        _hand_edit(generated_project, rel)
+        entry, _family, run = _gov_check(generated_project, sandbox)
+        named = support.named_files(generated_project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{rel} was edited by hand; the findings name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/agents/engineer.md was edited by hand; the findings name ['.claude/agents/engineer.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/agents/engineer.md"}], "provenance": {"commit": "d4da8cb13af53d60c939f34f8df2f9515737e53c", "check_version": "1.0.0", "inputs_hash": "1fb6dd30d762d69a"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "d4da8cb13af53d60c939f34f8df2f9515737e53c", "check_version": "1.0.0", "inputs_hash": "a38ff11519af908f"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d4da8cb13af53d60c939f34f8df2f9515737e53c", "check_version": "1.0.0", "inputs_hash": "c53138ffaaf9d081"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d4da8cb13af53d60c939f34f8df2f9515737e53c", "check_version": "1.0.0", "inputs_hash": "677d29db974087a4"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/age...int/SKILL.md'} == {'.claude/agents/engineer.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:653: AssertionError
+_ TestFindings.test_findings_name_exactly_the_edited_file[.claude/skills/planning/SKILL.md] _
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb3f710>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the3/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_findings_name_exactly_the3/sandbox/elsewhere'))
+rel = '.claude/skills/planning/SKILL.md'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", HAND_EDITED)
+    def test_findings_name_exactly_the_edited_file(self, generated_project, sandbox, rel):
+        _hand_edit(generated_project, rel)
+        entry, _family, run = _gov_check(generated_project, sandbox)
+        named = support.named_files(generated_project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{rel} was edited by hand; the findings name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/skills/planning/SKILL.md was edited by hand; the findings name ['.claude/skills/planning/SKILL.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/skills/planning/SKILL.md"}], "provenance": {"commit": "0776d630b41acc3b02b909a03392378900a038eb", "check_version": "1.0.0", "inputs_hash": "217fac100d7bf210"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "0776d630b41acc3b02b909a03392378900a038eb", "check_version": "1.0.0", "inputs_hash": "364f54a4aeba425f"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "0776d630b41acc3b02b909a03392378900a038eb", "check_version": "1.0.0", "inputs_hash": "5bebe3158bb441c2"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "0776d630b41acc3b02b909a03392378900a038eb", "check_version": "1.0.0", "inputs_hash": "633602701175d161"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/ski...int/SKILL.md'} == {'.claude/ski...ing/SKILL.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:653: AssertionError
+________________ TestFindings.test_one_hand_edit_is_one_finding ________________
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb40920>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_one_hand_edit_is_one_find0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_one_hand_edit_is_one_find0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_one_hand_edit_is_one_find0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_one_hand_edit_is_one_finding(self, generated_project, sandbox):
+        _hand_edit(generated_project, "AGENTS.md")
+        entry, _family, run = _gov_check(generated_project, sandbox)
+        findings = entry.get("findings")
+>       assert isinstance(findings, list) and len(findings) == 1, (
+            f"one file was edited by hand; the check reports "
+            f"{len(findings) if isinstance(findings, list) else findings!r} findings\n"
+            f"{run.describe()}"
+        )
+E       AssertionError: one file was edited by hand; the check reports 2 findings
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": "AGENTS.md"}], "provenance": {"commit": "eb68e88d791fec9a3c6ae660dac54d31d4db7585", "check_version": "1.0.0", "inputs_hash": "e2a9bccc4407b62b"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "eb68e88d791fec9a3c6ae660dac54d31d4db7585", "check_version": "1.0.0", "inputs_hash": "386da491dba44204"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "eb68e88d791fec9a3c6ae660dac54d31d4db7585", "check_version": "1.0.0", "inputs_hash": "799ea298db867448"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "eb68e88d791fec9a3c6ae660dac54d31d4db7585", "check_version": "1.0.0", "inputs_hash": "b76f62cfc9b57ca1"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert (True and 2 == 1)
+E        +  where True = isinstance([{'code': 'SOURCE_DIFFERS', 'file': '.rulesync/skills/checkpoint/SKILL.md', 'message': 'differs from governance/kernel...md'}, {'code': 'GENERATED_DIFFERS', 'file': 'AGENTS.md', 'message': 'is not what rulesync generates from its sources'}], list)
+E        +  and   2 = len([{'code': 'SOURCE_DIFFERS', 'file': '.rulesync/skills/checkpoint/SKILL.md', 'message': 'differs from governance/kernel...md'}, {'code': 'GENERATED_DIFFERS', 'file': 'AGENTS.md', 'message': 'is not what rulesync generates from its sources'}])
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:662: AssertionError
+_ TestFindings.test_rulesync_failure_without_a_file_is_reported_with_its_reason _
+
+self = <test_w1_38_rulesync.TestFindings object at 0x70627fb40d40>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rulesync_failure_without_0/project')
+mock_dir = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rulesync_failure_without_0/bin')
+
+    @needs_rulesync
+    def test_rulesync_failure_without_a_file_is_reported_with_its_reason(
+        self, generated_project, mock_dir,
+    ):
+        """rulesync fails and names no file: the check fails with rulesync's
+        own reason and names no file of the project."""
+        failing = support.write_mock_rulesync(mock_dir, (
+            'if [[ "$1" == "--version" ]]; then exec "$REAL" --version; fi\n'
+            f'echo "{RULESYNC_REASON}" >&2\n'
+            'exit 1'
+        ))
+        result = support.run_portability_check(
+            generated_project, env_override={"RULESYNC_BIN": str(failing)},
+        )
+        assert result.returncode != 0, (
+            "the check is green although rulesync failed"
+        )
+        output = support.output_of(result)
+        assert RULESYNC_REASON in output, (
+            f"the check does not report rulesync's reason ({RULESYNC_REASON!r}): {output}"
+        )
+        named = support.named_files(generated_project, output)
+>       assert not named, (
+            f"rulesync named no file, but the check names {sorted(named)}: "
+            f"a finding was guessed, not measured"
+        )
+E       AssertionError: rulesync named no file, but the check names ['.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']: a finding was guessed, not measured
+E       assert not {'.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md'}
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:690: AssertionError
+___ TestUnsourcedFile.test_file_without_a_source_is_found_and_named[command] ___
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627fb3e6f0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/sandbox/elsewhere'))
+kind = 'command'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(UNSOURCED))
+    def test_file_without_a_source_is_found_and_named(self, generated_project, sandbox, kind):
+        rel, text = UNSOURCED[kind]
+        assert rel.startswith(tuple(f"{folder}/" for folder in support.GENERATED_FOLDERS))
+        path = generated_project / rel
+        assert not path.exists(), f"{rel} is generated; the case needs a path without a source"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, rel,
+            f"{rel} was written by hand and has no rulesync source",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:861: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_0/sandbox/elsewhere'))
+rel = '.claude/commands/by-hand.md'
+what = '.claude/commands/by-hand.md was written by hand and has no rulesync source'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/commands/by-hand.md was written by hand and has no rulesync source: the findings must name .claude/commands/by-hand.md and no other file; they name ['.claude/commands/by-hand.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_WITHOUT_SOURCE", "message": "rulesync generates no such file from its sources", "file": ".claude/commands/by-hand.md"}], "provenance": {"commit": "6b630de80683031ad2f819328f7a269ac6860af8", "check_version": "1.0.0", "inputs_hash": "fdbef407e371e1ec"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "6b630de80683031ad2f819328f7a269ac6860af8", "check_version": "1.0.0", "inputs_hash": "adde47a98e3b18e5"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "6b630de80683031ad2f819328f7a269ac6860af8", "check_version": "1.0.0", "inputs_hash": "72942d119d55f9f6"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "6b630de80683031ad2f819328f7a269ac6860af8", "check_version": "1.0.0", "inputs_hash": "91c42ce1cfadff73"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/com...int/SKILL.md'} == {'.claude/com...s/by-hand.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestUnsourcedFile.test_file_without_a_source_is_found_and_named[file-in-a-generated-skill] _
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627faf52e0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/sandbox/elsewhere'))
+kind = 'file-in-a-generated-skill'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(UNSOURCED))
+    def test_file_without_a_source_is_found_and_named(self, generated_project, sandbox, kind):
+        rel, text = UNSOURCED[kind]
+        assert rel.startswith(tuple(f"{folder}/" for folder in support.GENERATED_FOLDERS))
+        path = generated_project / rel
+        assert not path.exists(), f"{rel} is generated; the case needs a path without a source"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, rel,
+            f"{rel} was written by hand and has no rulesync source",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:861: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_1/sandbox/elsewhere'))
+rel = '.claude/skills/planning/by-hand.md'
+what = '.claude/skills/planning/by-hand.md was written by hand and has no rulesync source'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/skills/planning/by-hand.md was written by hand and has no rulesync source: the findings must name .claude/skills/planning/by-hand.md and no other file; they name ['.claude/skills/planning/by-hand.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_WITHOUT_SOURCE", "message": "rulesync generates no such file from its sources", "file": ".claude/skills/planning/by-hand.md"}], "provenance": {"commit": "f590fc765100443918cc0d0d9ee5d1de584678c9", "check_version": "1.0.0", "inputs_hash": "9ac40502e8ba4e3e"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "f590fc765100443918cc0d0d9ee5d1de584678c9", "check_version": "1.0.0", "inputs_hash": "43c978e3356da5f4"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f590fc765100443918cc0d0d9ee5d1de584678c9", "check_version": "1.0.0", "inputs_hash": "9d21ac29e7f046ad"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f590fc765100443918cc0d0d9ee5d1de584678c9", "check_version": "1.0.0", "inputs_hash": "e811f569f6f47e41"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/ski...int/SKILL.md'} == {'.claude/ski...g/by-hand.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+____ TestUnsourcedFile.test_file_without_a_source_is_found_and_named[role] _____
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627faf7680>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/sandbox/elsewhere'))
+kind = 'role'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(UNSOURCED))
+    def test_file_without_a_source_is_found_and_named(self, generated_project, sandbox, kind):
+        rel, text = UNSOURCED[kind]
+        assert rel.startswith(tuple(f"{folder}/" for folder in support.GENERATED_FOLDERS))
+        path = generated_project / rel
+        assert not path.exists(), f"{rel} is generated; the case needs a path without a source"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, rel,
+            f"{rel} was written by hand and has no rulesync source",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:861: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_2/sandbox/elsewhere'))
+rel = '.claude/agents/by-hand.md'
+what = '.claude/agents/by-hand.md was written by hand and has no rulesync source'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/agents/by-hand.md was written by hand and has no rulesync source: the findings must name .claude/agents/by-hand.md and no other file; they name ['.claude/agents/by-hand.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_WITHOUT_SOURCE", "message": "rulesync generates no such file from its sources", "file": ".claude/agents/by-hand.md"}], "provenance": {"commit": "d9d2c32cdac04332c8f2cbfbf1065983fdca88df", "check_version": "1.0.0", "inputs_hash": "e2186498d326b92e"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "d9d2c32cdac04332c8f2cbfbf1065983fdca88df", "check_version": "1.0.0", "inputs_hash": "b568df2a2c29e626"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d9d2c32cdac04332c8f2cbfbf1065983fdca88df", "check_version": "1.0.0", "inputs_hash": "66a3c959bcaeff4f"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "d9d2c32cdac04332c8f2cbfbf1065983fdca88df", "check_version": "1.0.0", "inputs_hash": "4656dc7bb19489d1"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/age...int/SKILL.md'} == {'.claude/agents/by-hand.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestUnsourcedFile.test_file_without_a_source_is_found_and_named[skill-folder] _
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627faff2f0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/sandbox/elsewhere'))
+kind = 'skill-folder'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(UNSOURCED))
+    def test_file_without_a_source_is_found_and_named(self, generated_project, sandbox, kind):
+        rel, text = UNSOURCED[kind]
+        assert rel.startswith(tuple(f"{folder}/" for folder in support.GENERATED_FOLDERS))
+        path = generated_project / rel
+        assert not path.exists(), f"{rel} is generated; the case needs a path without a source"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, rel,
+            f"{rel} was written by hand and has no rulesync source",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:861: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_without_a_source_is_3/sandbox/elsewhere'))
+rel = '.claude/skills/by-hand/SKILL.md'
+what = '.claude/skills/by-hand/SKILL.md was written by hand and has no rulesync source'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/skills/by-hand/SKILL.md was written by hand and has no rulesync source: the findings must name .claude/skills/by-hand/SKILL.md and no other file; they name ['.claude/skills/by-hand/SKILL.md', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_WITHOUT_SOURCE", "message": "rulesync generates no such file from its sources", "file": ".claude/skills/by-hand/SKILL.md"}], "provenance": {"commit": "0f7a2a14b25c527badcf23b323f3357a2bcc0a27", "check_version": "1.0.0", "inputs_hash": "1f2b1d0c538f5189"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "0f7a2a14b25c527badcf23b323f3357a2bcc0a27", "check_version": "1.0.0", "inputs_hash": "a4d54ba7ad56c1ed"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "0f7a2a14b25c527badcf23b323f3357a2bcc0a27", "check_version": "1.0.0", "inputs_hash": "850943c92923b853"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "0f7a2a14b25c527badcf23b323f3357a2bcc0a27", "check_version": "1.0.0", "inputs_hash": "ad1789e87611fba7"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/ski...int/SKILL.md'} == {'.claude/ski...and/SKILL.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestUnsourcedFile.test_file_of_another_owner_is_not_a_finding[.claude/settings.local.json] _
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627fb42b10>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_of_another_owner_is_0/project')
+rel = '.claude/settings.local.json'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", support.OTHER_OWNERS)
+    def test_file_of_another_owner_is_not_a_finding(self, generated_project, rel):
+        """``.claude/settings.local.json`` is the user's (DEC-063) and
+        ``.claude/worktrees/`` holds whole checkouts (DEC-050): neither is
+        generated output, and the check stays green with them."""
+        path = generated_project / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}\n" if rel.endswith(".json") else "A file of another owner.\n",
+                        encoding="utf-8")
+        result = support.run_portability_check(generated_project)
+>       assert result.returncode == 0, (
+            f"{rel} is not generated output, but the check is not green with it: "
+            f"{support.output_of(result)}"
+        )
+E       AssertionError: .claude/settings.local.json is not generated output, but the check is not green with it: {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:877: AssertionError
+_ TestUnsourcedFile.test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md] _
+
+self = <test_w1_38_rulesync.TestUnsourcedFile object at 0x70627fb42c90>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_file_of_another_owner_is_1/project')
+rel = '.claude/worktrees/by-hand/.claude/agents/by-hand.md'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("rel", support.OTHER_OWNERS)
+    def test_file_of_another_owner_is_not_a_finding(self, generated_project, rel):
+        """``.claude/settings.local.json`` is the user's (DEC-063) and
+        ``.claude/worktrees/`` holds whole checkouts (DEC-050): neither is
+        generated output, and the check stays green with them."""
+        path = generated_project / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("{}\n" if rel.endswith(".json") else "A file of another owner.\n",
+                        encoding="utf-8")
+        result = support.run_portability_check(generated_project)
+>       assert result.returncode == 0, (
+            f"{rel} is not generated output, but the check is not green with it: "
+            f"{support.output_of(result)}"
+        )
+E       AssertionError: .claude/worktrees/by-hand/.claude/agents/by-hand.md is not generated output, but the check is not green with it: {
+E          "findings": [
+E           {
+E            "code": "SOURCE_DIFFERS",
+E            "message": "differs from governance/kernel/skills/checkpoint/SKILL.md",
+E            "file": ".rulesync/skills/checkpoint/SKILL.md"
+E           }
+E          ],
+E          "compared": {
+E           "rulesync_version": true,
+E           "kernel_files": 29,
+E           "generated_files": 44
+E          }
+E         }
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-m', 'gov.adapters.portability'], returncode=1, stdout='{\n "findings": [\n  {\n   ...n ],\n "compared": {\n  "rulesync_version": true,\n  "kernel_files": 29,\n  "generated_files": 44\n }\n}\n', stderr='').returncode
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:877: AssertionError
+__ TestSettingsHandEdit.test_key_added_by_hand_is_found_and_named[hook-entry] __
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb40e00>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/sandbox/elsewhere'))
+kind = 'hook-entry'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:926: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun0/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = '.claude/settings.json was given a key by hand (hook-entry)'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/settings.json was given a key by hand (hook-entry): the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "7d8efee9b6af689e363d9ae8410b8598fe3f9dc9", "check_version": "1.0.0", "inputs_hash": "18cdfeca9c1356c6"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "7d8efee9b6af689e363d9ae8410b8598fe3f9dc9", "check_version": "1.0.0", "inputs_hash": "891848b86e19be57"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "7d8efee9b6af689e363d9ae8410b8598fe3f9dc9", "check_version": "1.0.0", "inputs_hash": "796fd7a3d0b93b6f"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "7d8efee9b6af689e363d9ae8410b8598fe3f9dc9", "check_version": "1.0.0", "inputs_hash": "6a212aa55a2eadc1"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestSettingsHandEdit.test_key_added_by_hand_is_found_and_named[permission-allow-rule] _
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb40a40>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/sandbox/elsewhere'))
+kind = 'permission-allow-rule'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:926: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun1/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = '.claude/settings.json was given a key by hand (permission-allow-rule)'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/settings.json was given a key by hand (permission-allow-rule): the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "25182281d80185c81dd951bd1352106ac0ed7bba", "check_version": "1.0.0", "inputs_hash": "a410ac73b6f6b2ce"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "25182281d80185c81dd951bd1352106ac0ed7bba", "check_version": "1.0.0", "inputs_hash": "6dac850e28563099"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "25182281d80185c81dd951bd1352106ac0ed7bba", "check_version": "1.0.0", "inputs_hash": "86ff8bab7dfa4ea2"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "25182281d80185c81dd951bd1352106ac0ed7bba", "check_version": "1.0.0", "inputs_hash": "f4c0af4646f7274c"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestSettingsHandEdit.test_key_added_by_hand_is_found_and_named[permission-default-mode] _
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb41940>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/sandbox/elsewhere'))
+kind = 'permission-default-mode'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:926: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun2/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = '.claude/settings.json was given a key by hand (permission-default-mode)'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/settings.json was given a key by hand (permission-default-mode): the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "5b510e3c66a732fdfbe89c8885fb70c13d65408c", "check_version": "1.0.0", "inputs_hash": "9f816f889f645adc"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "5b510e3c66a732fdfbe89c8885fb70c13d65408c", "check_version": "1.0.0", "inputs_hash": "264ac6ff82cb4f8d"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "5b510e3c66a732fdfbe89c8885fb70c13d65408c", "check_version": "1.0.0", "inputs_hash": "292a5448f6108d01"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "5b510e3c66a732fdfbe89c8885fb70c13d65408c", "check_version": "1.0.0", "inputs_hash": "624d56bdb7712e3d"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestSettingsHandEdit.test_key_added_by_hand_is_found_and_named[top-level-env] _
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb402c0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/sandbox/elsewhere'))
+kind = 'top-level-env'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:926: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun3/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = '.claude/settings.json was given a key by hand (top-level-env)'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/settings.json was given a key by hand (top-level-env): the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "aeabe09fd8575cd0f98eb21aca74b1213fea092b", "check_version": "1.0.0", "inputs_hash": "bc97016f4ad2e86d"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "aeabe09fd8575cd0f98eb21aca74b1213fea092b", "check_version": "1.0.0", "inputs_hash": "865d6778477e42a6"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "aeabe09fd8575cd0f98eb21aca74b1213fea092b", "check_version": "1.0.0", "inputs_hash": "39d767ff61569d89"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "aeabe09fd8575cd0f98eb21aca74b1213fea092b", "check_version": "1.0.0", "inputs_hash": "4b419b47b34d8d46"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestSettingsHandEdit.test_key_added_by_hand_is_found_and_named[top-level-sandbox] _
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb432f0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/sandbox/elsewhere'))
+kind = 'top-level-sandbox'
+
+    @needs_rulesync
+    @pytest.mark.parametrize("kind", sorted(SETTINGS_ADDED))
+    def test_key_added_by_hand_is_found_and_named(self, generated_project, sandbox, kind):
+        support.edit_settings(generated_project, SETTINGS_ADDED[kind])
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"{support.SETTINGS_REL} was given a key by hand ({kind})",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:926: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_key_added_by_hand_is_foun4/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = '.claude/settings.json was given a key by hand (top-level-sandbox)'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: .claude/settings.json was given a key by hand (top-level-sandbox): the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "34873c05e6d2a8ac7a34d571505e12a410f045f8", "check_version": "1.0.0", "inputs_hash": "9b9d3684f1568606"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "34873c05e6d2a8ac7a34d571505e12a410f045f8", "check_version": "1.0.0", "inputs_hash": "dfc5056ce725a93a"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "34873c05e6d2a8ac7a34d571505e12a410f045f8", "check_version": "1.0.0", "inputs_hash": "df174055225b0651"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "34873c05e6d2a8ac7a34d571505e12a410f045f8", "check_version": "1.0.0", "inputs_hash": "bbe85aa660c007bf"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+______ TestSettingsHandEdit.test_rule_removed_by_hand_is_found_and_named _______
+
+self = <test_w1_38_rulesync.TestSettingsHandEdit object at 0x70627fb43710>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_rule_removed_by_hand_is_found_and_named(self, generated_project, sandbox):
+        def remove_one_deny_rule(settings):
+            deny = settings["permissions"]["deny"]
+            assert deny, "the generated settings hold no deny rule"
+            deny.pop()
+    
+        support.edit_settings(generated_project, remove_one_deny_rule)
+>       _assert_red_naming_exactly(
+            generated_project, sandbox, support.SETTINGS_REL,
+            f"a deny rule was removed by hand from {support.SETTINGS_REL}",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:939: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_rule_removed_by_hand_is_f0/sandbox/elsewhere'))
+rel = '.claude/settings.json'
+what = 'a deny rule was removed by hand from .claude/settings.json'
+
+    def _assert_red_naming_exactly(project, sandbox, rel, what):
+        """``gov check`` shows the check and its family RED, and the findings
+        name ``rel`` and no other file of the project."""
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert named == {rel}, (
+            f"{what}: the findings must name {rel} and no other file; "
+            f"they name {sorted(named)}\n{run.describe()}"
+        )
+E       AssertionError: a deny rule was removed by hand from .claude/settings.json: the findings must name .claude/settings.json and no other file; they name ['.claude/settings.json', '.rulesync/skills/checkpoint/SKILL.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E         gov check --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "check", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "one or more hard-block checks failed: adapter/model portability", "details": {"families": {"schema/invariants": {"status": "YELLOW", "family": "schema/invariants", "check_count": 0, "reason": "no registered check"}, "graph integrity": {"status": "YELLOW", "family": "graph integrity", "check_count": 0, "reason": "no registered check"}, "index freshness": {"status": "YELLOW", "family": "index freshness", "check_count": 0, "reason": "no registered check"}, "retrieval regression": {"status": "YELLOW", "family": "retrieval regression", "check_count": 0, "reason": "no registered check"}, "authority/role limits": {"status": "YELLOW", "family": "authority/role limits", "check_count": 0, "reason": "no registered check"}, "mutation scope": {"status": "YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "RED", "family": "adapter/model portability", "check_count": 1}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "adapter-portability", "family": "adapter/model portability", "severity": "hard-block", "status": "RED", "findings": [{"code": "SOURCE_DIFFERS", "message": "differs from governance/kernel/skills/checkpoint/SKILL.md", "file": ".rulesync/skills/checkpoint/SKILL.md"}, {"code": "GENERATED_DIFFERS", "message": "is not what rulesync generates from its sources", "file": ".claude/settings.json"}], "provenance": {"commit": "9e4ac7e5d297ce3b32fef97828237412672f8eee", "check_version": "1.0.0", "inputs_hash": "86f288e26458a104"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_NO_SPECS", "message": "openspec: nothing to validate"}], "provenance": {"commit": "9e4ac7e5d297ce3b32fef97828237412672f8eee", "check_version": "1.0.0", "inputs_hash": "1564314286a112d4"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "9e4ac7e5d297ce3b32fef97828237412672f8eee", "check_version": "1.0.0", "inputs_hash": "d7c8545aac75d04e"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "9e4ac7e5d297ce3b32fef97828237412672f8eee", "check_version": "1.0.0", "inputs_hash": "9f646450993122cb"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: schema/invariants, graph integrity, index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: RED
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: YELLOW (no registered check)
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: YELLOW (no registered check)
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert {'.claude/set...int/SKILL.md'} == {'.claude/settings.json'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md'
+E         Use -v to get more diff
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:825: AssertionError
+_ TestRoleToolsAgainstKernel.test_source_with_a_tool_the_kernel_role_does_not_name _
+
+self = <test_w1_38_rulesync.TestRoleToolsAgainstKernel object at 0x70627f990260>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_source_with_a_tool_the_kernel_role_does_not_name(self, generated_project, sandbox):
+        kernel = support.kernel_role_tools((generated_project / self.ROLE_KERNEL).read_text(encoding="utf-8"))
+        assert self.FOREIGN_TOOL not in kernel
+        self._change_tools(generated_project, lambda tools: [*tools, self.FOREIGN_TOOL])
+>       TestKernelAgainstAdapterSource()._assert_found(
+            generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+            f"a role's rulesync source names the tool {self.FOREIGN_TOOL}, which its kernel role does not",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:993: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627f919640>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_with_a_tool_the_ke0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = "a role's rulesync source names the tool NotebookEdit, which its kernel role does not"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a role's rulesync source names the tool NotebookEdit, which its kernel role does not: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md'} and {'.rulesync/s...int/SKILL.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+_ TestRoleToolsAgainstKernel.test_source_without_a_tool_the_kernel_role_names __
+
+self = <test_w1_38_rulesync.TestRoleToolsAgainstKernel object at 0x70627f9906b0>
+generated_project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/sandbox/elsewhere'))
+
+    @needs_rulesync
+    def test_source_without_a_tool_the_kernel_role_names(self, generated_project, sandbox):
+        kernel = support.kernel_role_tools((generated_project / self.ROLE_KERNEL).read_text(encoding="utf-8"))
+        removed = sorted(kernel)[-1]
+        self._change_tools(generated_project, lambda tools: [tool for tool in tools if tool != removed])
+>       TestKernelAgainstAdapterSource()._assert_found(
+            generated_project, sandbox, self.ROLE_KERNEL, self.ROLE_SOURCE,
+            f"a role's rulesync source lacks the tool {removed}, which its kernel role names",
+        )
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:1003: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <test_w1_38_rulesync.TestKernelAgainstAdapterSource object at 0x70627f925f70>
+project = PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-4268/test_source_without_a_tool_the0/sandbox/elsewhere'))
+kernel = 'governance/kernel/roles/engineer.md'
+source = '.rulesync/subagents/engineer.md'
+what = "a role's rulesync source lacks the tool Write, which its kernel role names"
+
+    def _assert_found(self, project, sandbox, kernel, source, what):
+        entry, family, run = _gov_check(project, sandbox)
+        assert (entry.get("status"), family.get("status")) == (support.RED, support.RED), (
+            f"{what}, but gov check shows the check as {entry.get('status')!r} and the "
+            f"family as {family.get('status')!r}\n{run.describe()}"
+        )
+        named = support.named_files(project, json.dumps(entry.get("findings")))
+>       assert source in named and named <= {source, kernel}, (
+            f"{what}: the findings must name {source} and no file outside the pair "
+            f"({kernel}); they name {sorted(named)}"
+        )
+E       AssertionError: a role's rulesync source lacks the tool Write, which its kernel role names: the findings must name .rulesync/subagents/engineer.md and no file outside the pair (governance/kernel/roles/engineer.md); they name ['.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md']
+E       assert ('.rulesync/subagents/engineer.md' in {'.rulesync/skills/checkpoint/SKILL.md', '.rulesync/subagents/engineer.md', 'governance/kernel/roles/engineer.md', 'governance/kernel/skills/checkpoint/SKILL.md'} and {'.rulesync/s...int/SKILL.md'} <= {'.rulesync/s.../engineer.md'}
+E         
+E         Extra items in the left set:
+E         '.rulesync/skills/checkpoint/SKILL.md'
+E         'governance/kernel/skills/checkpoint/SKILL.md')
+
+tests/acceptance/W1-38/test_w1_38_rulesync.py:484: AssertionError
+36 failed, 165 passed in 638.39s (0:10:38)
