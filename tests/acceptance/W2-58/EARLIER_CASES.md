@@ -31,7 +31,54 @@ test functions hit the rule.
 
 No case was deleted. No assertion of (a), (b) or of a write rule was in these functions.
 
-## Not rewritten: package P-W2-58-TD-1 (920 cases in 83 functions)
+## Second round, under the lead's answers to P-W2-58-TD-1 (a), TD-2 and TD-3 (2026-10-20)
+
+The lead's readings: (i) second names stay refused, now on the write side (DEC-821 item 4); (ii) copies of the two
+files elsewhere and the user-level settings file are open to reads; (iii) bounded-time refusals stay; (iv) a
+subagent is its acting role on the session's ticket; (v) the NUL-byte refusal stays. In every "for every role" case,
+the engineer of W1-02's fixture (`engineer-who-may-not-write-the-file`, ticket `W1-90`) keeps a refusal for its
+*content* search from the root, since the root holds `tests/acceptance/W1-90/` (DEC-821 item 1); a listing from
+above (`ls`, `find`, `--files`) is not aimed inside the folder and is allowed (W2-58 brief, item 3). Each file was
+run in its own process on the base's guard: every rewritten "allowed" case is red today (the old guard refuses it as
+a read of the two files), every kept case green.
+
+| File | Rewritten to | Cases | Run on the base |
+|---|---|---|---|
+| `test_w1_02_brace_bound.py` | the word *at* the bound (expanded and judged): allowed; the words past the bound stay refused | 4 | 4 failed, 42 passed |
+| `test_w1_02_protected_reads_forms.py` | all six refusal functions: allowed | 71 | 71 failed, 10 passed |
+| `test_w1_02_refusals_beyond_the_order.py` | decided as the same command on another file of the folder (or on `src/`), never refused as a read of the two files | 20 | 20 failed, 12 passed |
+| `test_w1_02_shell_keywords.py` | allowed; the engineer's root content search refused for (c) | 34 + 2 | 34 failed, 15 passed |
+| `test_w1_02_numbered_redirects.py` | allowed; the engineer's root content search refused for (c) | 52 + 1 | 52 failed, 18 passed |
+| `test_w1_02_search_on_a_pipe.py` | allowed; the engineer's root content search refused for (c) | 32 + 1 | 32 failed, 33 passed |
+| `test_w1_02_daily_spellings.py` | allowed; the engineer's root content search refused for (c) | 67 + 2 | 67 failed, 32 passed |
+| `test_w1_02_name_filters.py` | allowed; the engineer's root search *with a name filter* only asked not to be refused as a read of the two files (whether the filter keeps the acceptance folder out is not stated) | 168 | 168 failed, 76 passed |
+| `test_w1_02_wildcard_globs.py` | allowed (TD-2 (ii)) | 107 | 107 failed, 69 passed |
+| `test_w1_02_copies.py` | reads of copies and of the user-level settings file: allowed (TD-2 (ii)); second names of copies: refused, wording no longer asked (TD-2 (i)) | 107 + 19 | 107 failed, 19 passed |
+| `test_w1_02_holding_folders.py` | second names of holding folders: refused, wording no longer asked (TD-2 (i)) | 133 | 171 passed (file) |
+| `test_w1_02_second_names.py` | second names of the two files: refused, wording no longer asked (TD-2 (i)) | 76 | 120 passed (file, with holding folders 291) |
+
+**Kept as they are, by TD-2 (iii):** `test_w1_02_bounded_time.py::test_a_glob_of_many_star_pairs_that_takes_a_protected_file_in_is_refused_within_the_bound`
+(12) and `test_w1_02_fix_round_time.py`'s two functions (8). Their assertions (`assert_refused_in_time`,
+`assert_carries_none_of`) name no rule, so nothing ties them to the protected files. **Risk for the lead:** a run with
+a logging plugin shows each of these 20 cases refused today *with the protected rule's reason*, decided in time, not
+by the bound. An implementation that drops that rule and judges these inputs in time will allow them, and these
+cases go red unless the engineer keeps a bound-refusal for them.
+
+**Kept, unchanged:** `test_w1_02_second_names.py::test_an_interpreter_in_place_with_no_backup_is_decided_as_today` (2):
+it asks a refusal and no wording. Today the guard refuses it for naming the file; it is not a second name (no backup).
+Whether `perl -pi` by the orchestrator, who may write the settings file, stays refused is open.
+
+**Not yet done (left for the resume):**
+- `test_w1_02_root_searches.py::test_a_search_tool_call_from_the_root_is_refused_for_a_role_subagent_too` (2), by TD-2
+  (iv): the subagent acts as an engineer on `DAEO-zz91` (`W1-91`), and W1-02's fixture holds no
+  `tests/acceptance/W1-91/`, so whether the root search takes in "its" acceptance folder depends on whether (c) counts a
+  folder that does not exist.
+- `tests/acceptance/W2-50/test_w2_50_one_reader.py` (91 cases): the verdict stays refused (TD-2 (i)); `assert_refused_as_a_read`
+  and `_plain` still ask the read rule's decisions (DEC-508, DEC-525, DEC-548, DEC-553) and must be loosened to "refused,
+  no path".
+- The earlier "allowed" cases that (c) turns red (below): not yet rewritten.
+
+## Not rewritten in the first round: package P-W2-58-TD-1 (920 cases in 83 functions; all but the "not yet done" items above are now handled)
 
 Listed with the number of cases that hit the rule. Many need a reading of Policy 2 that no source states (see the
 package in the designer's return): a second name (a move, a hard or symbolic link) of the settings file or of the

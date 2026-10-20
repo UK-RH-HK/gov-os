@@ -88,6 +88,12 @@ are red (today's guard refuses them); the unchanged cases of both files stay gre
 cases in 83 functions not rewritten (package P-W2-58-TD-1) and W2-50's 91 second-name cases, is in
 [`EARLIER_CASES.md`](EARLIER_CASES.md).
 
+Second round (the lead's answers to TD-1 (a), TD-2, TD-3): 12 more W1-02 files rewritten. Reads and searches of the
+two files, of their copies and of the user-level settings file are now allowed. Second names stay refused, with the
+read rule's wording no longer asked. The engineer's content search from the root stays refused for (c) (DEC-821
+item 1). The bounded-time cases are kept. The table, the cases kept and the three items left for the resume are in
+`EARLIER_CASES.md`, "Second round".
+
 ## How the tests exercise this worktree's code
 
 Run from this worktree with `PYTHONPATH` set per command:
