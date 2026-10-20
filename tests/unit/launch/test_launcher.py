@@ -126,6 +126,35 @@ def test_a_prompt_that_names_an_argument_as_a_word_passes():
     launcher._check_cli_args(["-p", "Do not use --bare.", "--model", "haiku"])
 
 
+def _read_project(root: Path, sets: str) -> Path:
+    for rel, text in ((".tickets/DAEO-t95.md", "---\nid: DAEO-t95\nwbs_id: W2-95\nstatus: in_progress\n"
+                                               "role: engineer\n---\n"),
+                      ("governance/project/path-map.yaml", "namespaces: {}\n" + sets),
+                      ("tests/acceptance/W2-95/test_feature.py", "x\n")):
+        (root / rel).parent.mkdir(parents=True, exist_ok=True)
+        (root / rel).write_text(text, encoding="utf-8")
+    return root
+
+
+def test_the_settings_deny_the_read_tool_the_session_s_protected_parts(tmp_path, monkeypatch):
+    """W2-58, DEC-820 (c), (d): each rule holds a wildcard, which the sandbox of the commands skips on Linux."""
+    monkeypatch.setattr(launcher, "_runtime_rules", lambda root: [])
+    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    hidden: [eval/hidden/**]\n"
+                                   "    measures: {roles: [engineer]}\n")
+    deny = launcher.build_settings(root, "engineer", "DAEO-t95")["permissions"]["deny"]
+    reads = [rule for rule in deny if rule.startswith("Read(")]
+    assert reads == [f"Read(/{root}/tests/acceptance/W2-95/**)", f"Read(/{root}/eval/hidden/**)"]
+    assert launcher.build_settings(root, "independent-auditor", "DAEO-t95")["permissions"]["deny"] == [
+        rule for rule in launcher._tree_rules(root, "independent-auditor")]
+
+
+def test_a_malformed_evaluation_set_refuses_the_launch(tmp_path):
+    root = _read_project(tmp_path, "evaluation_sets:\n  m:\n    visible: [a]\n    measures: {roles: [research]}\n")
+    for role in ("engineer", "independent-auditor"):
+        with pytest.raises(GovError):
+            launcher.build_settings(root, role, "DAEO-t95")
+
+
 def test_a_refused_launch_leaves_no_temp_directory(tmp_path, monkeypatch):
     made = []
     monkeypatch.setattr(launcher.tempfile, "mkdtemp", lambda **kw: made.append(kw) or str(tmp_path))
