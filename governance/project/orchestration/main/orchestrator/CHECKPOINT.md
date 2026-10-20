@@ -33,6 +33,10 @@
   (the owner's push = acceptance); nothing left staged. Digest lists every record since the owner's last push (DEC,
   one line, sha). Exception until W2-12 (DEC-862): ratchet entries and escalation lifts stay the owner's Role: owner
   commits: prepare ready to commit + operator commands, ping ACT. Never read Decided-by alone (fails open).
+- **Supersession propagates (DEC-866):** on any supersede/cancel/change: mark the old entry's status line at once
+  (`SUPERSEDED by DEC-n` or "Changed by"); sweep by id AND value (tests, code, skills, briefs, KPIs, prompt, path
+  map); update each via its ticket or keep with a recorded reason; W2-55's check enforces it. Name every entry
+  that held the rule (DEC-838 missed DEC-208/237/248/451/636/665).
 - **Policy 1 (DEC-819):** `python3 governance/project/orchestration/sync_context.py`, gitleaks on staged, commit
   `-- <paths>`, `Task: DAEO-sdxk`, `Role: orchestrator`. **Policy 2 (DEC-820):** reads open but four.
 
@@ -50,7 +54,12 @@
   resume; rows W2-M386..390, W2-L364..371. **W2-59 run 2** launches 08:2x (`briefs/W2-59-A5-run2.md`).
 - **W2-58 run 1 STARTED 08:1x** (`DAEO-5j8b`, worktree from `9afe3d00`, paths narrowed, no `containment.py`);
   first lead rebuild under the new map: measure it from its return / `log/lead-usage.jsonl`.
-- **Closes wait on P-W2-52** (W1-49's two retired-window tests red everywhere). Queue: W2-53, W2-54, W2-62, W2-50.
+- **W2-63 DONE, MERGED `50c08ae3`** (W1-49 105/105 on DEC-838). DEC-865/866 committed `74d22909`; sweep applied
+  `f4d81448`, report `governance/project/orchestration/packages/SWEEP-2026-10-20.md`: nothing else refuses W2-53.
+- **CLOSE QUEUE RUNNING** (`tools/close_queue.sh` -> `log/close-queue-2026-10-20/`): lock `CLOSE-RUNNING` set, waits
+  for load < 3 x5 min, then rebuild + `gov close` once each: W2-53 (`DAEO-7rr2`), then W2-54 (`DAEO-0rfi`) only if
+  W2-53 closed. NO COMMIT until it ends (store must stay fresh). Then: W2-62, W2-50, W2-63 closes; W2-48 starts.
+- **W2-59's merge-back `3eadca4c` has no Task:/Role: trailers** (W2-63's lead saw it): DEC-750; raise at its return.
 - After a lead rebuild is measured: raise parallelism (DEC-847); next starts: W2-63 (if P-W2-52 (a)), W2-57, W2-48.
 - **Merge `w2/integrate` into a lead's branch only at its return** (a commit under a running lead trips its stop
   rule; under a worker, containment, DEC-254). Then re-measure that lead's rebuild under the new map; then raise
