@@ -61,7 +61,7 @@ The text below carries these answers; where an older sentence survives, this sec
   - **W2-19 is cut to what EXAMIN needs.** EXAMIN is Python with pytest. The Rust and TypeScript fixtures move to Wave 3 with UPIM and ASMO, and so does the Rust install (Q-6).
   - **Three tickets are new, each under the admission rule (iii):**
     - W2-59: the judge's own checks and hooks run from the pin;
-    - W2-60: the role, its skills and its model, effort and compaction loaded at launch;
+    - W2-60: the role, its skills and its model and effort loaded at launch, with no compaction threshold (DEC-838);
     - W2-61: the standing 20-question measure, split under Policy 2 (d).
   - W2-55 to W2-58 already have cards, and get ticket files.
   - Twelve tickets are widened, as listed in section 5.
@@ -105,7 +105,7 @@ Each capability below is used by EXAMIN's pilot (W2-27 to W2-30), and is proven 
 | 2 | `gov close` with the repository's own test command | One ticket closed at exit 0 with EXAMIN's command (CAP-44.h) | W2-57, W2-48, W2-07, W2-19 (Python part); clean closes here | 1 clean close here (W2-01, by `tk close`) |
 | 3 | The guard and Policy 2 | Every session in EXAMIN | W2-58, W2-42, W2-09 | Gate by record; DEC-508's listing refusals still enforced |
 | 4 | Sandboxed launches for every role, leads included | Every worker and lead in EXAMIN | W2-56, W2-21, W2-40 | Workers only (DEC-799) |
-| 5 | The role, its skills and its model, effort and compaction loaded at launch | Every session in EXAMIN | W2-60, W2-11, W2-21 | No role text loaded (lens E F2); no effort or compaction set (lens F F1) |
+| 5 | The role, its skills and its model and effort loaded at launch (no compaction threshold, DEC-838) | Every session in EXAMIN | W2-60, W2-11, W2-21 | No role text loaded (lens E F2); no effort or compaction set (lens F F1) |
 | 6 | Correct decision records | EXAMIN's own register | W2-02, W2-03, W2-55 | Every register chunk carries DEC-812 (lens B F4) |
 | 7 | The index on during edits | Every edit in EXAMIN | W2-06 | Any edit switches the index off (lens B F2) |
 | 8 | Bounded context packets with real text | Every session brief | W2-04 | 42 to 168 times the ceiling, ids only (lens B F1) |
@@ -134,7 +134,7 @@ Each item is in the adoption-ready set; each is pulled forward in its lite form 
 
 | Wave 3 item | Lite form in Wave 2 | Ticket |
 |---|---|---|
-| CAP-35.c, role defaults (tier and reasoning per role) | Each role file states its default model, effort and compaction threshold. The launcher applies and records them, and refuses a model that is not the role's (lens F Table 3, R1) | W2-11 (the role-file lines), W2-60, W2-21 |
+| CAP-35.c, role defaults (tier and reasoning per role) | Each role file states its default model and effort (no compaction threshold: DEC-838, DEC-839 item 5). The launcher applies and records them, and refuses a model that is not the role's (lens F Table 3, R1) | W2-11 (the role-file lines), W2-60, W2-21 |
 | CAP-36.a, per-run telemetry | One record per session id: model, effort, window, tokens, cost, minutes, turns, subagents. The role, ticket and task class come from the launch record; pass or fail and the repair count come from the close (lens F R6) | W2-60, W2-07 |
 | CAP-39.c, part: a cache keyed by inputs | The test-result cache (already pulled forward by DEC-726) | W2-48 |
 | CAP-44.i, part: interrupted-session recovery during adoption | "A failed or interrupted batch leaves a resumable record and no half-staged state" (already in W2-23's KPIs). The freeze stays the owner's | W2-23 |

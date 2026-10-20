@@ -34,7 +34,7 @@ kpis:
   - 'gov approve [DEC-724]: It is run by the owner in a plain terminal. It shows the staged register entries (ids and titles), asks for a typed one-time code, and commits exactly those entries, with the
     files staged beside them, with Role: owner; It refuses, with a named reason and nothing committed, when it is run with a Claude Code ancestor process, with a launched session''s identity (GOV_ROLE or
     GOV_TICKET set), or without an interactive terminal. This is the freeze lift''s test (DEC-409); It refuses when nothing is staged, or when a staged entry is not an owner entry'
-  - 'A register entry reads as the owner''s only when the commit that sets it ACCEPTED carries Role: owner and was made by gov approve, or by the owner''s own commit before W2-12 (or, once the owner chooses
+  - 'A register entry reads as the owner''s only when the commit that sets it ACCEPTED carries Role: owner and was made by gov approve, or by the owner''s own commit before W2-12, or (DEC-861, DEC-862 (b)) by the orchestrator''s decision-record commit with Decided-by: owner once it is in the owner''s pushed ref (or, once the owner chooses
     signatures, has a valid owner signature). Otherwise core-authority names it "transcribed" [AR-7, F-M6, W2-M258, W2-M108].'
   - A decision set ACTIVE without an owner approval fact turns core-authority red [W2-H049, W2-M227, W2-M257].
   - '"The decision checker could not run" is a finding, never green [W2-H037, W2-H048].'
@@ -92,7 +92,7 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-12), as approved (DEC-729). The list row
     - It is run by the owner in a plain terminal. It shows the staged register entries (ids and titles), asks for a typed one-time code, and commits exactly those entries, with the files staged beside them, with `Role: owner`.
     - It refuses, with a named reason and nothing committed, when it is run with a Claude Code ancestor process, with a launched session's identity (`GOV_ROLE` or `GOV_TICKET` set), or without an interactive terminal. This is the freeze lift's test (DEC-409).
     - It refuses when nothing is staged, or when a staged entry is not an owner entry.
-  - A register entry reads as the owner's only when the commit that sets it ACCEPTED carries `Role: owner` and was made by `gov approve`, or by the owner's own commit before W2-12 (or, once the owner chooses signatures, has a valid owner signature). Otherwise core-authority names it "transcribed" [AR-7, F-M6, W2-M258, W2-M108].
+  - A register entry reads as the owner's only when the commit that sets it ACCEPTED carries `Role: owner` and was made by `gov approve`, or by the owner's own commit before W2-12, or (DEC-861, DEC-862 (b)) by the orchestrator's decision-record commit with `Decided-by: owner` once it is in the owner's pushed ref (or, once the owner chooses signatures, has a valid owner signature). Otherwise core-authority names it "transcribed" [AR-7, F-M6, W2-M258, W2-M108].
   - A decision set ACTIVE without an owner approval fact turns core-authority red [W2-H049, W2-M227, W2-M257].
   - "The decision checker could not run" is a finding, never green [W2-H037, W2-H048].
   - Body edits that keep an approved decision ACTIVE are flagged [W2-L010]. An author date earlier than the committer date by more than a day is flagged [W2-M107].
