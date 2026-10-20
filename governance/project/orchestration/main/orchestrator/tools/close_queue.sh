@@ -6,7 +6,7 @@
 #   rebuild; and only then `gov close`, once. Any gate failure stops the queue before the close, with its cause.
 #   The queue stops at the first refusal. Usage: close_queue.sh <tk id> [<tk id> ...]. Literal paths only.
 cd /home/usain/Dynamic-Agentic-Engineering-OS || exit 1
-LOG=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/close-queue-run2
+LOG=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/log/close-queue-$(date +%Y%m%d-%H%M)
 LOCK=/home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/CLOSE-RUNNING
 mkdir -p "$LOG"
 date '+%F %T close queue: lock set' > "$LOCK"
@@ -16,7 +16,10 @@ while [ "$quiet" -lt 5 ]; do
   sleep 60
 done
 date '+%F %T quiet' >> "$LOG/queue.txt"
-for ticket in "$@"; do
+for item in "$@"; do
+  # An item is <tk id> or <tk id>:<DEC-n>, the owner's decision that lifts the ticket's escalation (DEC-862 (a)).
+  ticket=${item%%:*}; lift=""
+  [ "$item" != "$ticket" ] && lift="--owner-decision ${item#*:}"
   stop() { date '+%F %T '"$ticket"' STOPPED BEFORE THE CLOSE: '"$1" >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 2; }
   # (c) a fresh checkpoint of the ticket, committed before the rebuild.
   gov checkpoint --ticket "$ticket" --role orchestrator --trigger ticket-transition \
@@ -37,8 +40,11 @@ for ticket in "$@"; do
   date '+%F %T collect ok: '"$(tail -1 "$LOG/collect-$ticket.txt")" >> "$LOG/queue.txt"
   # (b) gov check after the rebuild, no commit in between.
   gov check --json > "$LOG/check-$ticket.json" 2> "$LOG/check-$ticket.err" || stop "gov check is not green (exit $?)"
+  # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
+  dirty=$(git status --porcelain | head -5 | tr '\n' ' ')
+  [ -z "$dirty" ] || stop "the working tree is not clean: $dirty"
   date '+%F %T check ok; close '"$ticket"' (load '"$(cut -d' ' -f1 /proc/loadavg)"')' >> "$LOG/queue.txt"
-  gov close "$ticket" --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
+  gov close "$ticket" $lift --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
   echo "$code" > "$LOG/close-$ticket.exit"
   date '+%F %T close '"$ticket"' exit '"$code" >> "$LOG/queue.txt"
   [ "$code" -eq 0 ] || break

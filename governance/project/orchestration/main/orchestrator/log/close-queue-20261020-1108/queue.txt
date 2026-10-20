@@ -1,0 +1,6 @@
+2026-10-20 11:41:58 quiet
+2026-10-20 11:41:58 rebuild before DAEO-0rfi
+2026-10-20 11:45:41 collect ok: 14685/14687 tests collected (2 deselected) in 5.66s
+2026-10-20 11:52:14 check ok; close DAEO-0rfi (load 3.45)
+2026-10-20 11:52:14 close DAEO-0rfi exit 1
+2026-10-20 11:52:14 lock removed

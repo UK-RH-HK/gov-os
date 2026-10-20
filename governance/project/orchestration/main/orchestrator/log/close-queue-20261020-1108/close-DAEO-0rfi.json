@@ -1,0 +1,1 @@
+{"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "TREE_NOT_COMMITTED", "message": "the working tree is not the commit being closed, so the close would measure another tree than it records: governance/project/orchestration/packages/P-W2-53.md", "details": {"ticket": "DAEO-0rfi", "paths": ["governance/project/orchestration/packages/P-W2-53.md"]}}}
