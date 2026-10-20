@@ -68,6 +68,39 @@ def _the_reading_tells_them_apart(repos, reading):
     assert other == [], f"the reading counts another Task's commit or a merge as W2-54's own: {other}"
 
 
+# Rewrite-Reason: DEC-874, second batch. The module readings read the checked-out branch whatever history they named,
+# and a walk limited to the module followed only the side W2-02's merge-back kept, so W2-54's own 4f753c72 was missed
+# on 4ce16df2 (README, "Run 5 (DEC-874)", "Second batch").
+NO_SUCH_HISTORY = "w254-no-such-revision"
+
+
+@pytest.fixture
+def a_merge_that_keeps_its_own_side_of_the_module(tmp_path):
+    """A temporary repository built from scratch in the shape of W2-02's merge-back (``w2_54_support.merge_back_repo``):
+    ``(repo, the merge, the own commit)``."""
+    return S.merge_back_repo(tmp_path / "merge-back")
+
+
+def _the_module_readings_read_the_named_history(merge_back, kind):
+    """Through a merge of another Task that keeps its own side of the module, the readings of the named history still
+    find the own commit that changed it, and count none of the other side's lines; the checked-out branch, which holds
+    no own commit, is not what is read; a history that does not exist is an error, not a pass."""
+    repo, merge, own = merge_back
+    assert S.last_own_commit_of(merge, S.SCHEMA_MODULE_REL, repo) == own, \
+        "through a merge that keeps its own side of the module, the reading misses the own commit that changed it"
+    assert own in {commit for commit, _ in S.own_added_lines(merge, S.SCHEMA_MODULE_REL, repo)}, \
+        "the own commit's added lines are not read through the merge"
+    assert S.other_type_lines_brought_in(merge, kind, repo) == [], "another Task's lines are counted as W2-54's own"
+    assert S.last_own_commit_of("HEAD", S.SCHEMA_MODULE_REL, repo) is None, \
+        "the checked-out branch holds no own commit, yet one is found: the named history is not what is read"
+    for reading in (lambda: S.other_type_lines_brought_in(NO_SUCH_HISTORY, kind, repo),
+                    lambda: S.last_own_commit_of(NO_SUCH_HISTORY, S.SCHEMA_MODULE_REL, repo),
+                    lambda: S.other_type_lines_brought_in(NO_SUCH_HISTORY, kind),
+                    lambda: S.last_own_commit_of(NO_SUCH_HISTORY, S.SCHEMA_MODULE_REL)):
+        with pytest.raises(AssertionError, match="bad revision"):
+            reading()
+
+
 @pytest.mark.parametrize("history", HISTORIES)
 def test_no_schema_file_of_w2_02_s_other_types_comes_with_it(history, histories_that_bring_in_w2_02_s_types):
     """Nothing of W2-02's other types: no commit of W2-54's own in ``history`` adds or changes a ``close`` or
@@ -120,13 +153,15 @@ def test_an_audit_report_s_fields_are_held_to_the_schema_s_shapes(box, tmp_path,
 @pytest.mark.parametrize("history", HISTORIES)
 @pytest.mark.parametrize("kind", S.W2_02_OTHER_TYPES)
 def test_w2_02_s_other_types_are_judged_as_an_unknown_type(box, tmp_path, kind, history,
-                                                           histories_that_bring_in_w2_02_s_types):
+                                                           histories_that_bring_in_w2_02_s_types,
+                                                           a_merge_that_keeps_its_own_side_of_the_module):
     """W2-54's own change adds no ``close`` or ``adoption-verdict`` type: no line its own commits in ``history`` add
     to ``src/gov/check/schema.py`` names it (a type map key, a standalone type, its schema file); and core-schema as
     W2-54's own last commit to that module leaves it (``git show`` of that one file, run as declared) gives a record
     of that type the findings a record of a type it does not know gets, no more and no fewer. Passes today."""
     _the_reading_tells_them_apart(histories_that_bring_in_w2_02_s_types,
                                   lambda repo: S.other_type_lines_brought_in("HEAD", kind, repo))
+    _the_module_readings_read_the_named_history(a_merge_that_keeps_its_own_side_of_the_module, kind)
     lines = S.other_type_lines_brought_in(history, kind)
     assert lines == [], f"W2-54's own commits add the type {kind} to {S.SCHEMA_MODULE_REL}:\n" + "\n".join(
         f"{commit[:12]} +{line}" for commit, line in lines)

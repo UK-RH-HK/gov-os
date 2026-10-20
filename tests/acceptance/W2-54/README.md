@@ -761,3 +761,37 @@ mean: core-schema as W2-54 left it knows no `close` or `adoption-verdict` type. 
 `src/gov/check/schema.py` after W2-02's merge has come into this branch, that module holds W2-02's types, and the
 behavioural half turns red although the line reading stays green. That would be a new finding for the lead, not a
 fault of the code. The line reading is the part that holds whatever is merged.
+
+## Second batch (after the first review of `0ccafe25`; `Rewrite-Reason: DEC-874`)
+
+**What was wrong.** The two readings of core-schema's module (`own_added_lines`, under `other_type_lines_brought_in`,
+and `last_own_commit_of`) ran `git log … -- src/gov/check/schema.py <history>`: the history stood after `--`, so git
+took it as a path and read the checked-out branch. `[…-4ce16df2]` therefore read `HEAD`'s history, and a revision
+that does not exist gave the same answer (`4f753c72`). Read on `4ce16df2` itself, a walk limited to the module follows
+only the side W2-02's merge-back `666f56d1` kept of it (W2-02's) and never reaches W2-54's `4f753c72`: all four
+parametrisations of `test_w2_02_s_other_types_are_judged_as_an_unknown_type` would fail ("no commit of W2-54's own …
+touches src/gov/check/schema.py"), here once W2-02 merges into `w2/integrate`, and on W2-02's branch after its re-merge.
+The file case's reading (no path, history last) did read the named history.
+
+**What changed (only the reading, in `w2_54_support._own_log`).** It runs `git log --no-merges --no-renames
+--full-history <args> <history> -- <paths>`: the history always stands before `--`, so it is always a revision (one that
+does not exist is git's `bad revision`, an error); `--full-history` keeps the walk limited to the module from pruning
+the side a merge did not keep, so every own commit that changes the module is found whatever merges lie between. The
+file case's reading goes through the same function (no path) and reads as before. Before → after, on this repository:
+`last_own_commit_of` gives `4f753c72` on `HEAD`, on `4ce16df2` and on a revision that does not exist → `4f753c72` on
+`HEAD` and `4ce16df2`, an error on a revision that does not exist; read on `4ce16df2` without `--full-history`, it would
+give none.
+
+**The case proves it first** (in addition to the two built histories above): a third built history
+(`w2_54_support.merge_back_repo`, fixture `a_merge_that_keeps_its_own_side_of_the_module`) in the shape of W2-02's
+merge-back. An own commit adds `audit-report` to the module on `main`; a `Task: DAEO-zflj` branch from the base writes
+the module with `close` and `adoption-verdict`, then merges `main` keeping its own side (`-s ours`); the checked-out
+branch is left at the base, with no own commit. Read at the merge, the last own commit of the module is the own commit,
+its added lines are read, no line of the type is counted; read at `HEAD` (the base) there is none, so the named history
+is what is read; a history that does not exist, in that repository and in this one, raises `bad revision`. Shown once
+with a throwaway outside the tree: the old reading and a reading of the named revision without `--full-history` both
+fail this self-check ("… misses the own commit that changed it"); the corrected one passes it.
+
+No expectation changed: the case's two assertions (no own added line names the type; core-schema as the last own
+commit to the module leaves it judges the record as an unknown type), the file case and every other case stay as they
+were; the ids are the same (24 in the file, 99 in the suite).

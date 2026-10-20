@@ -503,11 +503,17 @@ def _git_out(repo, *args):
     return done.stdout
 
 
-def _own_log(history, *args, repo=REPO_ROOT, task=OWN_TASK):
-    """``git log --no-merges --no-renames <args> <history>``, split by commit: ``[(commit, its lines)]`` for the
-    commits whose Task trailer is ``task``, newest first."""
-    text = _git_out(repo, "log", "--no-merges", "--no-renames",
-                    f"--format={_MARK}%H%x09%(trailers:key=Task,valueonly,separator=%x2C)", *args, history)
+def _own_log(history, *args, paths=(), repo=REPO_ROOT, task=OWN_TASK):
+    """``git log --no-merges --no-renames --full-history <args> <history> -- <paths>``, split by commit:
+    ``[(commit, its lines)]`` for the commits whose Task trailer is ``task``, newest first.
+
+    Second batch (DEC-874): ``history`` stands before ``--``, so it is always read as a revision (one that does not
+    exist is an error) and never as a path; ``--full-history`` keeps a path-limited walk from following only the side
+    a merge kept of ``paths`` (W2-02's merge-back ``666f56d1`` kept its own ``src/gov/check/schema.py``), so every own
+    commit that changes them is found whatever merges lie between."""
+    text = _git_out(repo, "log", "--no-merges", "--no-renames", "--full-history",
+                    f"--format={_MARK}%H%x09%(trailers:key=Task,valueonly,separator=%x2C)", *args, history,
+                    "--", *paths)
     commits = []
     for block in text.split(_MARK)[1:]:
         head, _, rest = block.partition("\n")
@@ -537,7 +543,7 @@ def own_files(history, repo=REPO_ROOT, task=OWN_TASK):
 def own_added_lines(history, rel, repo=REPO_ROOT, task=OWN_TASK):
     """``(commit, line)`` for every line an own commit of ``history`` adds to ``rel`` (``-p`` against its parent)."""
     found = []
-    for commit, lines in _own_log(history, "-p", "--", rel, repo=repo, task=task):
+    for commit, lines in _own_log(history, "-p", paths=(rel,), repo=repo, task=task):
         found.extend((commit, line[1:]) for line in lines if line.startswith("+") and not line.startswith("+++"))
     return found
 
@@ -562,7 +568,7 @@ def other_type_lines_brought_in(history, kind, repo=REPO_ROOT, task=OWN_TASK):
 
 def last_own_commit_of(history, rel, repo=REPO_ROOT, task=OWN_TASK):
     """The newest own commit of ``history`` that touches ``rel``; None when there is none."""
-    commits = [commit for commit, _ in _own_log(history, "--", rel, repo=repo, task=task)]
+    commits = [commit for commit, _ in _own_log(history, paths=(rel,), repo=repo, task=task)]
     return commits[0] if commits else None
 
 
@@ -643,6 +649,40 @@ def own_task_repo(project, task, adds):
     git(project, "commit", "-q", "--allow-empty", "-m", f"the change\n\nTask: {task}")
     git(project, "merge", "-q", "--no-ff", "side", "-m", f"merge side\n\nTask: {task}")
     return project
+
+
+def merge_back_repo(project):
+    """Second batch (DEC-874): a temporary repository built from scratch in the shape of W2-02's merge-back
+    ``666f56d1``. On ``main``, after a base commit (``Task: DAEO-base``), an own commit (``Task: OWN_TASK``) adds the
+    ``audit-report`` type to core-schema's module; on ``w2-02``, from the base, a commit (``Task: DAEO-zflj``) writes
+    the module with ``audit-report``, ``close`` and ``adoption-verdict`` and their schema files; then ``w2-02`` merges
+    ``main`` (``Task: DAEO-zflj``) keeping its own side (``-s ours``). The checked-out branch is then ``elsewhere``, at
+    the base: it holds no own commit, so only a reading of the named history finds one. Returns ``(project, the
+    merge's hash, the own commit's hash)``."""
+    project = new_repo(project)
+    write(project, SCHEMA_MODULE_REL, 'SCHEMA_MAP = {\n}\nSTANDALONE_TYPES = ("probe",)\n')
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", "base\n\nTask: DAEO-base")
+    base = git(project, "rev-parse", "HEAD").strip()
+    write(project, SCHEMA_MODULE_REL, 'SCHEMA_MAP = {\n    "audit-report": "audit-report.schema.json",\n}\n'
+                                      'STANDALONE_TYPES = ("probe", "audit-report")\n')
+    write(project, AUDIT_SCHEMA_REL, "{}\n")
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", f"the audit-report type\n\nTask: {OWN_TASK}")
+    own = git(project, "rev-parse", "HEAD").strip()
+    git(project, "checkout", "-q", "-b", "w2-02", base)
+    write(project, SCHEMA_MODULE_REL, 'SCHEMA_MAP = {\n    "audit-report": "audit-report.schema.json",\n'
+                                      '    "close": "close.schema.json",\n}\n'
+                                      'STANDALONE_TYPES = ("probe", "audit-report", "adoption-verdict")\n')
+    for name in ("audit-report.schema.json", *W2_02_OTHER_SCHEMAS):
+        write(project, f"{SCHEMAS_REL}/{name}", "{}\n")
+    git(project, "add", "-A")
+    git(project, "commit", "-q", "-m", "W2-02's types\n\nTask: DAEO-zflj")
+    git(project, "merge", "-q", "--no-ff", "-s", "ours", "main", "-m", "merge main, keeping W2-02's side\n\n"
+                                                                       "Task: DAEO-zflj")
+    merge = git(project, "rev-parse", "HEAD").strip()
+    git(project, "checkout", "-q", "-b", "elsewhere", base)
+    return project, merge, own
 
 
 # --------------------------------------------------------------------------
