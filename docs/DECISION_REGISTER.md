@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.266 (the version table at the end of each section gives the history)
+**Version:** 0.267 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9639,3 +9639,18 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.266 | 2026-10-20 | Owner (recorded by the orchestrator, DEC-861): DEC-878 (each countdown starts with one progress line: tickets closed / merged, not closed / built and held / in flight / not started out of the total; keystones done / in progress / ahead; how each is counted). Next free id: DEC-879. |
+
+## 267. The orchestrator's sequencing of 2026-10-20 after W2-59's last run (register v0.267, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-879 — W2-59 merges after the queued closes, so one re-pin holds every check they need; its old branch deleted; its review's rows; P-W2-59-8 to the owner (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** DEC-822, DEC-835, DEC-853 item 4, DEC-412, DEC-877, DEC-413, DEC-801 · **Basis:** W2-59's lead returned DONE (run 3, `log/W2-59-A5-run3.json`): head `1cad6aa0`, the second and last review passed at `fef0fcd5` (`docs/probes/DAEO-kh9l/PR-DAEO-kh9l.md`). The CIT-P's §5: once W2-59 merges, the pin is the judge, and "a fix to a check reaches the judge only with the next re-pin".
+- **Decision:**
+  1. **W2-59 merges after the queued closes** (W2-02, W2-54, W2-62, W2-63, W2-50), not at once. Merged now, the old pin (`fecb870c`) would judge those closes: it lacks W2-50's secrets fix, W2-54's `audit-report` type and W2-02's `close` type, so each close would refuse until a re-pin, and W2-02's type would need a second re-pin. After the queue, W2-59 merges, and the owner re-pins once at its merge commit, which then holds every fix, and regenerates the settings (an ACT ping then). The lead proposed merging at once; the order differs only in timing, which is the orchestrator's (prompt §3). If the queue stalls, W2-59 merges after W2-02's merge, and the re-pin waits for that.
+  2. **`w2/W2-59-old` is deleted** (DEC-412): run 3 verified the remade branch (same trees; the reviewer matched all ten re-applied commits by patch-id, message, author and trailers).
+  3. **The review's pass stands.** Its R2-D1 (a guard program that cannot run lets the call through) predates W2-59 and is not widened by it. It goes to the owner as P-W2-59-8 (`governance/project/orchestration/packages/P-W2-59-8.md`): ordinary work, fails open, and it touches the hooks.
+  4. **Rows:** W2-L386 (R2-F1, `PYTHONUSERBASE` under `-E`), W2-L387 (R2-F3, `gov --version` without git), W2-M397 (the template's hook source still starts the first `python3` on `PATH`), W2-L388 (R2-F2, the CIT-P's stale text at the head), W2-L389 (the launcher's own-ticket rule refuses a product-spec worker on an engineer ticket, so brief A4 there needs an engineer).
+- Next free id: DEC-880.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.267 | 2026-10-20 | Delegated: DEC-879 (W2-59 merges after the queued closes so one re-pin holds every fix; `w2/W2-59-old` deleted; the review's pass stands; P-W2-59-8 to the owner; rows W2-M397, W2-L386 to W2-L389). Next free id: DEC-880. |
