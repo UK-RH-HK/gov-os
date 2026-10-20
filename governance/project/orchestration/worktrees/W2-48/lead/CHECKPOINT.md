@@ -18,3 +18,15 @@
 - eng-1 DONE (session 71bddafd-ad32-4511-bab8-f543100b177d, sandboxed, high): commits 1df8233b, 635b690f (trailers ok). 32/46 pass; 12 held by P-4; 1 by P-A (timed figure); 1 P-C test defect (confirmed by lead: planted "ok\nok again" makes the fixture tool exit 1). unit 2387p/1s; W2-01 88p; W2-53 57p; W1-07 223p; W1-32 81p; collection ok. 1680 LOC added. Tripwire 2: W2-48 head only here; other trees changed by their own leads / W2-53 close.
 - Merge f233b944 (integrate 0cbe240a), clean.
 - Now: rebuild-1 (log/rebuild-1.*), then gov check, W2-48 suite, unit, timed uncached+cached runs (store in .gov-runtime/scratch/lead/testcache-store).
+
+- Verify (lead): rebuild-1 ok 17:21-17:35; gov.__file__ -> worktree src; gov check: core-schema RED (docs/close/DAEO-7rr2/CL-DAEO-7rr2.md type close, from integrate, not ours), YELLOW core-decision-citations, openspec-validate. W2-48 32p/14f (12 P-4, 1 P-A, 1 P-C); unit 2387p 1s; collection 14752/14754 (2 deselected).
+- Timed (store GOV_TESTCACHE_HOME in scratch): T0 unit uncached 47s, cached 53s (1152 reused/2388; 10 failures = builder tests nested under GOV_TESTCACHE_HOME, artefact confirmed: plain with var 9 fail, without 21 pass). T1 W1-01..15 running; then T2 W1-16, T3 W1-17..50, T4 W2-*.
+
+- T1 W1-01..15: uncached 1275s (load 29) 5702p 1e 28s; cached 690s (load 16). 97% always_runs (4858 unmeasured process). W1-07 check_declarations: 2 errors through cache (copytree of session live repo, objects vanish; likely detached git gc race), plain passes. lead run discards pytest output (no failure text). T2 W1-16 running.
+
+## END OF RUN 1 — status PACKAGES; head 17ddaf09
+- T1 cached: 178 reused of 5731; 5 reds only in the cached half (W1-02 p95 [engineer-deny-outside-the-ticket], W1-05 p95 x3, W1-05 switch-over record). T2 W1-16: uncached 677s (load 42-93; 2f 1e secrets/token cases), cached 582s (0 reds; 15 reused of 167). Totals over 8,286 tests: reuse 1345 (16%), always-run 6912 (83%). W1-17..50 and W2-* not timed (load 40-90 from other sessions; re-measure on the final code).
+- 17ddaf09 orchestrator: gov checkpoint record CP-DAEO-xxgp-0003 committed. Collection at head: 14752/14754 tests collected (2 deselected) in 6.77s.
+- Packages returned: P-W2-48-4 (widen paths by src/gov/close/command.py; blocks 12 cases), P-W2-48-5 (near-zero saving on this repository as built), P-W2-48-6 (= P-C, declared-command fixture defect), P-1..P-3 confirmations, P-B test_inputs.
+- Resume must: read the answers; if P-C, a fresh test designer revises that one case (Rewrite-Reason); a fresh engineer with the failing output only (wiring, cache-only false reds, pytest output for leads, GOV_TESTCACHE_HOME not inherited by tests, research figure); merge integrate; rebuild; full verification + timed pair; FULL review (max).
+- Left behind: /tmp/gov-testcache-{05t8_upy,fpsxsi6u,qtd2k3iv,rphh0v_7} (my probes) and .gov-runtime/scratch/lead/testcache-store (27M SQLite) and testcache-probe: rm needed approval. DO NOT copy the stores into the repository.

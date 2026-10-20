@@ -58,6 +58,34 @@
   RED adapter-portability, context-reproducibility (DEC-636, fixed upstream); YELLOW decision-citations, openspec.
 - Lead refusals run 2: 2 (a here-document; a $L write target), both redone in permitted forms. Read refusals 0.
 - Next: gov checkpoint + commit (the head to probe), then reviewer rev-1 (independent-auditor, effort max).
+- W1-05 live-hook p95 alone at load 6.5: 9 passed (counts as pass).
+- gov checkpoint CP-0009 committed 9b9faac3 (the probed head).
+
+## Review 1 (rev-1: gov launch independent-auditor, sandboxed, effort max), session b3eef354-6cf1-408e-9d9c-c01f77de26ca
+- judgement FAIL on F1. Twelve fields present. Tripwire 5: nothing changed here. Draft record:
+  .gov-runtime/scratch/lead/probes/PR-DAEO-kh9l-rev1-DRAFT-fail.md (NOT committed); full return log/rev-1-return.md.
+- F1 (ordinary yes, fails open): worker sessions inherit PYTHONPATH=<worktree>/src from the launch form (launcher passes
+  os.environ); the new hook lines start the pin's interpreter, which honours it, so the tree's guard decides. -> round:
+  test designer td-3 (W2-59 folder) then engineer eng-3 (.rulesync/hooks.jsonc + CIT-P F6), verify, then STOP.
+- F2 (ordinary yes, fails closed): merge 3eadca4c without Task: -> WORK_WITHOUT_TASK refuses other tickets' closes once
+  W2-59 lands. Lead's error. Package P-W2-59-5: blocks the second (last) review and the merge; not F1's fix.
+- F6 CIT-P text (rides with eng-3). F3, F4, F5, F7: Wave 3 rows (ordinary no). Launcher/launch form carrying
+  PYTHONPATH (reviewer's P-F1 (b)): outside paths, residual row.
+- Loop: implementer iteration 2 next (do not disclose).
+
+## F1 round
+- td-3 (gov launch, sandboxed, effort high), session f0601308-3e26-4e3a-83eb-4bfb111162c5: commit 6e95cd41 (Task, Role
+  independent-test-designer, Implements DEC-822/835, Rewrite-Reason, Co-Authored-By); 11 new cases; lead's red check:
+  9 failed 46 passed for the stated reasons (log/red-3.txt). Twelve fields; tripwire 6 clean here; refusals 0;
+  gov retrieve told yes, used yes (FACET_UNAVAILABLE). Its packages renumbered: its P-5 -> P-W2-59-6 (bare gov with a
+  per-command PYTHONPATH: pin or tree), its P-6 -> P-W2-59-7 (launcher passes PYTHONPATH; row for W2-56).
+- eng-3 (gov launch, sandboxed, effort high), session 3837368c-8114-4589-8cd5-1f1aab31cfd3: e791465b (lines start the
+  program with -E; CIT-P after the review) + 3c2d88b5 (CIT-P §11 count). Its runs: W2-59 55/55, W1-38 201, unit 16.
+  Twelve fields; tripwire 7 clean here; refusals 0; gov retrieve told yes, used yes (FACET_UNAVAILABLE).
+- Loop: implementer iteration 2 (converging). Next: full verification on 3c2d88b5 (rebuild-4, batches R3A..R3F,
+  unit, gov check), then return PACKAGES (P-W2-59-5 blocks the second review and the merge).
+- F2 package text drafted: scratchpad P-W2-59-5.md (to go into packages.md).
+
 - (old plan) After R2F: unit tests; W1-05 + W1-02 p95 alone; W1-25 alone; gov check again; then gov checkpoint, reviewer.
 
 ## Now: rebuild-3 then suites (batches A..E via run_suites.sh), unit, gov check. Code head cface154.

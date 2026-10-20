@@ -1,0 +1,5 @@
+W2-54 rc=1 secs=1305 :: 2 failed, 92 passed, 2 deselected in 1171.39s (0:19:31)
+W1-01 rc=0 secs=9 :: 49 passed, 28 skipped in 8.85s
+W1-02 rc=0 secs=1009 :: 3653 passed in 908.04s (0:15:08)
+W1-03 rc=0 secs=526 :: 364 passed in 472.21s (0:07:52)
+W1-04 rc=0 secs=145 :: 336 passed in 130.24s (0:02:10)

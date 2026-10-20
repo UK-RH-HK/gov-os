@@ -13,8 +13,11 @@ date -Is > "$L/$batch/start.txt"
 worst=0
 for s in "$@"; do
   t0=$(date +%s)
+  # Each suite its own temporary root: pytest keeps only the newest three numbered roots per user, so a parallel
+  # pytest elsewhere could remove a running suite's fixtures (W1-25's setup error in run 2).
+  bt="/tmp/claude-1000/-home-usain-gov-os-worktrees-W2-59/5116ebd4-4968-4639-ba28-0c5da4fd82d4/scratchpad/bt/$batch-$s"
   PATH=/home/usain/.nvm/versions/node/v22.23.3/bin:$PATH PYTHONPATH=/home/usain/gov-os-worktrees/W2-59/src \
-    python3 -m pytest "tests/acceptance/$s" -q -p no:cacheprovider -rs -rf > "$L/$batch/$s.txt" 2>&1
+    python3 -m pytest "tests/acceptance/$s" -q -p no:cacheprovider -rs -rf --basetemp "$bt" > "$L/$batch/$s.txt" 2>&1
   rc=$?
   t1=$(date +%s)
   echo "$s rc=$rc secs=$((t1-t0)) :: $(tail -1 "$L/$batch/$s.txt")" >> "$L/$batch/summary.txt"
