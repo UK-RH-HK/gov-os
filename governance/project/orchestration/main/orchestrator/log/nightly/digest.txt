@@ -1,0 +1,1 @@
+2026-10-21 19:00:17 head dbd3cc53: parallel exit 1 in 2121 s: 4 failed, 15465 passed, 30 skipped in 1906.02s (0:31:46) serial exit 0 in 2047 s: 263 passed, 1 warning in 1842.89s (0:30:42) verdict: red 2 

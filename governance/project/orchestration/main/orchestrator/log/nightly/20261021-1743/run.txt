@@ -1,2 +1,10 @@
 2026-10-21 17:49:28 quiet
 head dbd3cc53
+parallel exit 1 in 2121 s: 4 failed, 15465 passed, 30 skipped in 1906.02s (0:31:46)
+serial exit 0 in 2047 s: 263 passed, 1 warning in 1842.89s (0:30:42)
+red-alone tests/acceptance/W2-54/test_w2_54_time_limit.py::test_the_check_run_as_declared_on_this_repository_ends_green_within_its_limit: 1 failed in 0.06s
+red-alone tests/acceptance/W2-54/test_w2_54_green_here.py::test_gov_check_gives_context_reproducibility_green_here: 1 failed in 72.35s (0:01:12)
+accepted-red tests/acceptance/W1-42/test_w1_42_exit_report.py::test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-X-02]
+accepted-red tests/acceptance/W1-42/test_w1_42_exit_report.py::test_governance_share_is_measured_and_at_most_15_percent_on_each_programme
+verdict: red 2
+2026-10-21 19:00:17 done

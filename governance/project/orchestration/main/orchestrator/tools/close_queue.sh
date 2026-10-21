@@ -12,7 +12,7 @@ mkdir -p "$LOG"
 date '+%F %T close queue: lock set' > "$LOCK"
 quiet=0
 while [ "$quiet" -lt 5 ]; do
-  if awk '{exit !($1 < 3)}' /proc/loadavg; then quiet=$((quiet + 1)); else quiet=0; fi
+  if [ ! -e /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/NIGHTLY-RUNNING ] && awk '{exit !($1 < 3)}' /proc/loadavg; then quiet=$((quiet + 1)); else quiet=0; fi
   sleep 60
 done
 date '+%F %T quiet' >> "$LOG/queue.txt"

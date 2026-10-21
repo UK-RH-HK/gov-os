@@ -27,10 +27,15 @@ HEAD=$(git -C "$CLONE" rev-parse --short HEAD)
 echo "head $HEAD" >> "$OUT/run.txt"
 cd "$CLONE" || exit 2
 PLUG=$CLONE/src/gov/close/pytest_plugin
+# The tests that read the repository's own state (W2-54's green-here and time-limit cases) need its stores, as a
+# close has them after its rebuild: a fresh clone has none (the first rehearsal's two reds, 2026-10-21 19:00).
+env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src" python3 -m gov.cli.main rebuild --json \
+  > "$OUT/rebuild.json" 2> "$OUT/rebuild.err" || { echo "clone rebuild failed" >> "$OUT/run.txt"; rm -f "$ORCH/NIGHTLY-RUNNING"; exit 2; }
+echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")
 start=$(date +%s)
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
-  python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only \
+  python3 -m pytest tests -n auto --dist worksteal -q -p no:cacheprovider --no-header -p gov_close_serial_only \
   --junitxml="$OUT/parallel.xml" > "$OUT/parallel.txt" 2>&1
 p_exit=$?
 mid=$(date +%s)

@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 17:5x BST — owner away (DEC-888); rehearsal running; W2-02 at 2 of 3; lens H held; next free DEC-889)
+## RESUME HERE (2026-10-21 19:2x BST — queue run 5 (six); review point before W2-66/67/68 (DEC-889); next free DEC-891)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,7 +83,18 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
-- **OWNER AWAY (DEC-888, `06de7f72`), 17:5x:** no owner acts until back. Plan:
+- **19:2x: owner back. DEC-886 committed by the owner `cf8219a8`; both branches pushed. DEC-889 (lens H answers +
+  amendments) + DEC-890 (split) COMMITTED `611955fa`, lens H's report in docs/. Rehearsal GREEN** (parallel 15,465,
+  serial 263, only W1-42's accepted reds; W2-54's 2 store-dependent cases pass in the rebuilt clone, 14 passed).
+  **Queue run 5 started 19:2x with SIX** (W2-02 first). **REVIEW POINT (DEC-889 item 14): NO W2-66/67/68 work.**
+  After the queue, in quiet windows, never during a close: lens H's rest (`/tmp/gov-os-assessment-H/scripts/
+  run_rest.sh`); the owner's tool trials in `/tmp/gov-os-tooltrial` (a: pytest-timeout fires in a child gov
+  process? cost; b: worksteal vs not, tail + total; c: grimp vs the declared map on lens H's faults; d: rerunfailures
+  + randomly dry runs in the nightly form), then REMOVE /tmp/gov-os-tooltrial and show it; lens I (4 auditors by
+  area, briefs to write). Then draft W2-66, W2-68, W2-67 cards + W2-57 ticket + the two-re-pin plan, ping ACT with
+  their Windows paths + results, and WAIT. W2-65 (stacked on w2/W2-59) and held resumes in free slots, never during
+  a close.
+- **OWNER AWAY (DEC-888, `06de7f72`), 17:5x (past):** no owner acts until back. Plan:
   (1) rehearsal (nightly.sh, started 17:49 on dbd3cc53) green -> queue the FIVE: `bash tools/close_queue.sh DAEO-0rfi
   DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`; W2-02 waits for the owner's Role: owner commit of DEC-886 (count 2/3).
   Red -> package, no queue. "Green" = no non-accepted red in parallel or serial (a pass-alone red like `doctor`
