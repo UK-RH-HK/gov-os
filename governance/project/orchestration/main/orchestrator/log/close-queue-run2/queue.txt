@@ -1,6 +1,0 @@
-2026-10-20 10:56:16 quiet
-2026-10-20 10:56:16 rebuild before DAEO-7rr2
-2026-10-20 11:00:47 collect ok: 14685/14687 tests collected (2 deselected) in 5.61s
-2026-10-20 11:07:18 check ok; close DAEO-7rr2 (load 3.38)
-2026-10-20 11:07:18 close DAEO-7rr2 exit 4
-2026-10-20 11:07:18 lock removed

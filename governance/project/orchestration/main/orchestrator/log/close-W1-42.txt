@@ -1,8 +1,0 @@
-ca426ca9 W1-42: the worktree list after the worktree's removal, and the exit report's lines after the merge (no run 8c, the lead's scratch folder; DEC-713, DEC-715, DEC-716)
-hooks: 
-rebuild exit 0
-validator: RESULT: ALL PASS
-close DAEO-gjjf exit 3
-ca426ca9 W1-42: the worktree list after the worktree's removal, and the exit report's lines after the merge (no run 8c, the lead's scratch folder; DEC-713, DEC-715, DEC-716)
-ccc32181 Merge w1/W1-42: the Wave 1 exit run on the dev tiers, with its three red cases named in the exit report (DEC-713) and without a run 8c (DEC-716)
-?? .tickets/DAEO-ldvk.md

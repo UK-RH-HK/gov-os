@@ -1,6 +1,0 @@
-W1-07 exit=0 224 passed in 462.74s (0:07:42)
-W1-26 exit=1 2 failed, 412 passed, 1 skipped in 356.30s (0:05:56)
-W1-32 exit=0 81 passed in 134.97s (0:02:14)
-W1-02/test_w1_02_guard_hook.py exit=1 1 failed, 6 passed in 46.59s
-W1-05/test_w1_05_latency.py exit=4 no tests ran in 0.00s
-W1-05/test_w1_05_switch_over.py exit=4 no tests ran in 0.00s

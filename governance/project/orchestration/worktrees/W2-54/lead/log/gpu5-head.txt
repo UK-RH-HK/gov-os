@@ -1,1 +1,0 @@
-a0cb797e W2-54 (DAEO-0rfi): round 4c: the semantic unit test's stub fixture takes round 4's call shapes (host, /api/ps on the CPU, ensure) (DEC-811)

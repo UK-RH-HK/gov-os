@@ -1,8 +1,0 @@
-  - name: gov
-    version: "0.1.0"
-    sha256: "0ef910b0ab1f6377d83f2e1f2d300a1e50c3d2b11a42a8f0edb479b81b7f4c80"
-    install: "python3 -m pip install --user --break-system-packages -e /home/usain/Dynamic-Agentic-Engineering-OS"
-    uninstall: "python3 -m pip uninstall --break-system-packages gov"
-    date: "2026-10-10"
-    approved_by: "DEC-605"
-    note: "This repository's own command line, installed by the owner through the operator as an editable user-level install for /usr/bin/python3 (3.12.3): the script ~/.local/bin/gov, and 'import gov' resolving to this repository's src/gov. sha256 of the installed script ~/.local/bin/gov; an editable install has no wheel, the code that runs is this repository's working tree at its checked-out commit. The install created the git-ignored metadata folder src/gov.egg-info/, which stays; PyYAML was already present. Needed so that an adopted project's hooks and check commands find gov (package P-40); a runner tool of the exit package."

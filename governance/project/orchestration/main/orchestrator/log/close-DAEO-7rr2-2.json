@@ -1,1 +1,0 @@
-{"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "STORE_STALE", "message": "the record store is not of the commit being closed; run gov rebuild, then close again", "details": {"head": "5653a94148173f9e26256f4ae4b8ae9e4b65f037"}}}

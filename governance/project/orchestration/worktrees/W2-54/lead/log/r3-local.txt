@@ -1,9 +1,0 @@
-5c930db8 W2-54 (DAEO-0rfi): change record round 3: the lead's failing measurement, what decides the vector, a question embedded on the CPU
- 23:13:01 up 2 days, 16:00,  0 user,  load average: 6.05, 8.90, 10.85
-....................................                                     [100%]
-36 passed in 34.89s
-w1-46 live exit 0
-.                                                                        [100%]
-1 passed in 15.96s
-sandboxed exit 0
- 23:14:14 up 2 days, 16:01,  0 user,  load average: 25.67, 14.22, 12.56

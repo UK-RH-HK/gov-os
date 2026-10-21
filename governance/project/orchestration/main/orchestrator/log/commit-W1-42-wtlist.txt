@@ -1,7 +1,0 @@
-hooks: 
-validator: RESULT: ALL PASS
-M  docs/plan/wave-1-exit/EXIT-REPORT.md
-A  docs/plan/wave-1-exit/evidence/git-worktree-list.txt
-rebuild exit 0
-commit exit 0
-ca426ca9 W1-42: the worktree list after the worktree's removal, and the exit report's lines after the merge (no run 8c, the lead's scratch folder; DEC-713, DEC-715, DEC-716)

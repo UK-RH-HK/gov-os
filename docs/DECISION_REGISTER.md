@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.274 (the version table at the end of each section gives the history)
+**Version:** 0.275 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -8943,7 +8943,7 @@ The owner ordered an independent assessment on 2026-10-19 (lenses A to E, a synt
   3. It replaces, for P1 packages, the field list of the w2 prompt §7 ("question, why now, options, …"); the prompt says so (DEC-824).
 
 ### DEC-819 — Policy 1: commit the context (standing)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 4 corrected by DEC-856: `governance/**` was governance memory; the raw record leaves it (2026-10-19) · **Under:** Charter v5 §2 (the repository is the authoritative memory), MR-5, DEC-792 · **Basis:** OWNER, 2026-10-19; lens C F-1 and lens E F2 (the working rules and briefs live in git-ignored scratch).
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch) · **Changed by:** item 4 corrected by DEC-856: `governance/**` was governance memory; the raw record leaves it (2026-10-19) · **Under:** Charter v5 §2 (the repository is the authoritative memory), MR-5, DEC-792 · **Basis:** OWNER, 2026-10-19; lens C F-1 and lens E F2 (the working rules and briefs live in git-ignored scratch). · **Changed by:** DEC-887: the raw record's place is the branch `record/w2` (worktree `~/gov-os-worktrees/W2-00-record/`); its searchable part (README, sync script, packages, sessions, checkpoint copy) stays in the tree; the sync commits on `record/w2`
 - **Decision:**
   1. **Everything that is context goes into git,** so every worktree and session sees the same truth: the orchestrator's working rules, the brief templates and the briefs given, RESUME HERE and its archive, checkpoints, lead records (copied before a worktree is removed), decision packages, plans, reports and session summaries.
   2. **Never committed:** secrets and keys (gitleaks scans before every commit), the held-out material, derived indexes and stores, model files and large binary caches.
@@ -9311,7 +9311,7 @@ The owner committed DEC-831 to DEC-852 (`a5789de1`) and answered the two package
 The owner committed DEC-853 to DEC-855 (`7f95e6f5`) and answered P-W2-50 (`governance/project/orchestration/packages/P-W2-50.md`), the ping tests and the question of the read restrictions. Every entry below is the owner's; the owner commits them with `Role: owner`, with the files they govern, in one batch.
 
 ### DEC-856 — P-W2-50 (a) and (b): the raw orchestration record leaves governance memory; its searchable parts stay
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with the path-map edit, in the next batch; the path-map edit is the owner's, DEC-766) · **Under:** DEC-819, DEC-285, DEC-766, DEC-836 · **Basis:** P-W2-50: the rebuild took 1,258 s (lexical 396 s, semantic about 55 s, code graph about 808 s), most of it the per-file gitleaks gate; the orchestration record was 5,686 of the store's 7,606 files, 38 % of its chunks and 67 % of the code graph's nodes, because `governance/**` is the `project-overlay` namespace, governance memory · **Corrects:** DEC-819 item 4.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, with the path-map edit, in the next batch; the path-map edit is the owner's, DEC-766) · **Under:** DEC-819, DEC-285, DEC-766, DEC-836 · **Basis:** P-W2-50: the rebuild took 1,258 s (lexical 396 s, semantic about 55 s, code graph about 808 s), most of it the per-file gitleaks gate; the orchestration record was 5,686 of the store's 7,606 files, 38 % of its chunks and 67 % of the code graph's nodes, because `governance/**` is the `project-overlay` namespace, governance memory · **Corrects:** DEC-819 item 4. · **Changed by:** DEC-887: the `orchestration-record` namespace is removed; the raw record lives on the branch `record/w2`, outside the tree
 - **Decision:**
   1. **(a), now:** the raw orchestration record leaves governance memory, so the lexical index, the code graph and the per-file secrets gate no longer read it: `worktrees/**`, `main/checkpoints/**`, `main/orchestrator/log/**`, `briefs/**`, `drafts/**`, `specimen/**`, `pin/**`, `tools/**`, and the scripts, run files, drafts and notes at `main/orchestrator/` (by kind and name). **What agents need to search stays memory:** `packages/**`, `sessions/**`, `main/orchestrator/CHECKPOINT.md` (RESUME HERE), the `PR-*.md` packages, and the record's own `README.md` and `sync_context.py`.
   2. **The edit,** made by the orchestrator under the owner's authority to read `governance/project/path-map.yaml` with the Read tool for this edit (Policy 2: the path map holds names, not contents): `project-overlay`'s single pattern `governance/**` is replaced by explicit patterns that leave the raw parts out, and a new namespace `orchestration-record` (memory class `product`, as `fixtures/**`: kept out of governance memory; not embedded; export denied) holds them. Every tracked path still matches exactly one namespace: the pinned `gov.check.pathmap` passes (exit 0). A new kind of file in the record that no pattern matches fails that check, and gets its pattern then.
@@ -9845,3 +9845,41 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.274 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-886 (pre-decision for queue run 4: W1-07's `doctor` envelope case, if red in a close's regression and green alone, goes on `load_sensitive` by the owner's commit, fixed by W2-57, row W2-L409; any other new red is a package). Next free id: DEC-887. |
+
+## 275. The owner's answer of 2026-10-21 on P-REC-1: the raw orchestration record on its own branch (register v0.275, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-887 — The raw orchestration record moves to the branch `record/w2`; its searchable part stays in the tree; the sync commits there; one push line for both branches
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-819, DEC-856, DEC-848, DEC-861, DEC-866 · **Basis:** package P-REC-1 (`governance/project/orchestration/packages/P-REC-1.md`). The record was 8,248 of the tree's 10,286 files (80 %) and 49.3 MB of 67.4 MB (73 %). 13 acceptance suites copy the tree (48 % of test time, lens H). Today the tree's size crossed git's `gc.auto` threshold in W1-07's and W1-25's copies and made them race git's background gc (P-W2-02-C3). Three reds today came from the record's contents or paths.
+- **Decision (P-REC-1 (a), after this queue and before W2-66's test designer starts, with W2-67 still done):**
+  1. **The raw record moves to the branch `record/w2`,** in the worktree `~/gov-os-worktrees/W2-00-record/`. The searchable part stays in the main tree: packages, session summaries, the README and the checkpoint copy. The README says how to read the rest.
+  2. **The raw part leaves the main tree in one commit,** only after the orchestrator has verified that `record/w2` holds it byte for byte. No history is rewritten.
+  3. **The orchestrator's working-memory sync commits to `record/w2` from then on,** so record commits no longer move `w2/integrate`'s head: no stale store, no forced rebuild, no dirty tree before a close. The orchestrator confirms whether the guard allows the orchestrator, and only the orchestrator, to write that worktree.
+  4. **The owner's daily push carries both branches.** The operator's line goes into RESUME HERE and the prompt:
+     `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`.
+  5. **DEC-819's place for the record, the path-map namespace, the sync script and the prompt** are updated, under the rule about rules.
+  6. The owner accepted DEC-888's W2-66 / W2-68 split in the same message. That split is recorded with lens H's answers, once the owner confirms them (the owner's hold of 2026-10-21 on everything from lens H).
+- **How it was done (2026-10-21):**
+  - `record/w2` was created as an orphan branch in that worktree. Its first commit `0412d69e` imported `governance/project/orchestration/` from `w2/integrate` at `206974e1` with git itself (`git checkout w2/integrate -- …`), gitleaks clean.
+  - **Verified byte for byte:** the folder's tree object is `46610514` on both branches, and all 8,229 moved paths have the same blob on both.
+  - Then one commit on `w2/integrate` removed those 8,229 files and kept 20: `README.md`, `sync_context.py`, `packages/**`, `sessions/**`, `main/orchestrator/CHECKPOINT.md`.
+  - `sync_context.py` now copies into the record worktree and commits there (`--commit`). `--main` refreshes the checkpoint copy in the main tree for a commit that moves the head anyway.
+  - The path map's `orchestration-record` namespace (DEC-856) is removed, since no namespace here holds the record.
+- **Item 3, the guard (the orchestrator's finding, measured in `src/gov/guard/decide.py` `_path_allowed` and `src/gov/guard/runs.py` `own_folder`):** the guard as built cannot confirm "the orchestrator, and only the orchestrator".
+  - It refuses every session's tool writes (Write, Edit, Bash write targets) outside that session's own project root, except its scratch and its own run folder `~/gov-os-runs/<its ticket>/`. So no role's tool write lands in `~/gov-os-worktrees/W2-00-record/`, the orchestrator's included.
+  - The own-folder route needs the ticket `in_progress`, and W2-00 is `open`.
+  - The record is written only by git and by `sync_context.py`, which the guard does not judge (an opaque program, the accepted residual of prompt §2). A lead runs as role `orchestrator` too: its tool writes are refused there, but an opaque program of its own would not be stopped by the guard, only by its brief. Sandboxed workers cannot write there at all.
+  - This is the same protection the record had in the main tree.
+  - A guard rule that makes it "the main orchestrator of W2-00 only" is package P-REC-2, for the owner.
+- **Changes:** DEC-819 (the record's place: the branch `record/w2`; the searchable part in the tree); DEC-856 (its `orchestration-record` namespace removed).
+- **Where it goes (DEC-851):**
+  - this register (DEC-819's and DEC-856's status lines marked);
+  - the prompt §15 (Policy 1; the push line) and §12 (the push), v3.10;
+  - RESUME HERE (the push line);
+  - the path map;
+  - `governance/project/orchestration/README.md` and `sync_context.py`;
+  - not `LEAD-w2-common.md`: a lead writes only its own scratch, which the sync copies (nothing there names the record's place).
+- Next free id: DEC-888.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.275 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-887 (P-REC-1 (a): the raw orchestration record on the branch `record/w2`, verified byte for byte and removed from the tree in one commit; the searchable part kept; the sync commits on `record/w2`; the owner's push line for both branches; the guard's limit stated, P-REC-2 to the owner). Next free id: DEC-888. |
