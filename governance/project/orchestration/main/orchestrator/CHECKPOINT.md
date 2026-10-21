@@ -83,6 +83,10 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **23:0x: owner answered P-W2-62-H (a) + a STANDING RULE (DEC-891, drafted `drafts/register-278-DEC-891.md`, apply
+  list `drafts/DEC-891-apply.md`, commit when queue run 6 ends):** accepted-history entries for record/ticket-only
+  commits: I record from the owner's chat decision (list the commit's paths); entries for code/test/kernel commits:
+  the owner's own Role: owner commit (prepare + ACT), like DEC-862 (a). Then close W2-62 (`close_queue.sh DAEO-juee`).
 - **22:4x: W2-02 CLOSED `e52ad8a2` (20:58), W2-54 CLOSED `55162ea2` (22:28)** by clean gov close. Close success 3 of
   13. **W2-62 stopped at gate (e)** (uncounted): its claim commit 162f17ea9caf lacks Implements (my slip); the two
   merges named are exempt as the close reads them (adds nothing). Gate (e) now = `tools/trailer_gate.py` (the
