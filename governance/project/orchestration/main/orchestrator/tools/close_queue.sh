@@ -49,8 +49,11 @@ for item in "$@"; do
   done
   [ -z "$missing" ] || stop "commits of $ticket without Implements: and not accepted history:$missing"
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
-  dirty=$(git status --porcelain | head -5 | tr '\n' ' ')
-  [ -z "$dirty" ] || stop "the working tree is not clean: $dirty"
+  # Read as the close reads it (gov.close.repo.tree_differences): a file ignored only by an uncommitted .gitignore
+  # counts (W2-02's refused close of 2026-10-21), which git status does not show.
+  dirty=$(PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 \
+    /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/tree_diff.py "$ticket" | head -5 | tr '\n' ' ')
+  [ -z "$dirty" ] || stop "the working tree is not the commit, as the close reads it: $dirty"
   date '+%F %T check ok; close '"$ticket"' (load '"$(cut -d' ' -f1 /proc/loadavg)"')' >> "$LOG/queue.txt"
   gov close "$ticket" $lift --json > "$LOG/close-$ticket.json" 2> "$LOG/close-$ticket.err"; code=$?
   echo "$code" > "$LOG/close-$ticket.exit"
