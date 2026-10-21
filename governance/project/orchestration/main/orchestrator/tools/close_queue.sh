@@ -50,12 +50,11 @@ for item in "$@"; do
   gov check --json > "$LOG/check-$ticket.json" 2> "$LOG/check-$ticket.err" || stop "gov check is not green (exit $?)"
   # (e) every commit of the ticket (Task: <id>) carries Implements: (the close's trailer gate, TRAILER_MISSING),
   # unless the path map's accepted_history names it.
-  missing=""
-  for c in $(git log --format=%H --grep="^Task: $ticket\$" HEAD); do
-    git log -1 --format='%(trailers:key=Implements,valueonly)' "$c" | grep -q . || \
-      grep -q "${c:0:12}" governance/project/path-map.yaml || missing="$missing ${c:0:12}"
-  done
-  [ -z "$missing" ] || stop "commits of $ticket without Implements: and not accepted history:$missing"
+  # As the close reads it (_check_trailers): the trailers base, the accepted history, and DEC-436's merges that add
+  # nothing (W2-62's stop of 2026-10-21 named two such merges beside its claim commit).
+  missing=$(PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 \
+    /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/trailer_gate.py "$ticket" 2>&1) \
+    || stop "commits of $ticket lack a trailer, as the close reads them: $(echo "$missing" | tail -n +2 | tr '\n' ' ')"
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
   # Read as the close reads it (gov.close.repo.tree_differences): a file ignored only by an uncommitted .gitignore
   # counts (W2-02's refused close of 2026-10-21), which git status does not show.
