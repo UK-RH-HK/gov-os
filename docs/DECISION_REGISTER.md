@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.267 (the version table at the end of each section gives the history)
+**Version:** 0.268 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -4407,7 +4407,7 @@ fourth round.
     `PAUSE_NOT_SET` and `PAUSE_NOT_LIFTED`, and the flag's mode 0600.
 
 ### DEC-413 — Review rounds: at most two per FULL ticket; what is fixed after that; W1-50 keeps its seventh round
-- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220
+- **Status:** ACCEPTED (owner, 2026-10-06) · **Basis:** OWNER · **Under:** DEC-136, DEC-220 · **Changed by:** DEC-880 makes one exception, for W2-58 only: a third review limited to its narrow extra round
 - **Decision:**
   - A FULL ticket has at most two review rounds.
   - After the second, only two kinds of finding are fixed: fail-open holes, and silent changes to tests or ticket
@@ -7715,7 +7715,7 @@ The orchestrator's planning report of 2026-10-16 put five packages (P-W2-1 to P-
   3. Both passes stay under the finish line: each improvement is bounded to one run plus its probe, and what remains becomes a named residual.
 
 ### DEC-726 — Test-result caching at close comes forward as its own ticket
-- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-083, DEC-522 · **Basis:** every clean close runs the full regression, about an hour, one close at a time; about 50 hours of main-tree time over the wave (W2-M153). · **Changed by:** item 1's key restated as behaviour by DEC-843, with DEC-852's conditions (2026-10-19)
+- **Status:** ACCEPTED (owner, 2026-10-16; the owner commits this entry with `Role: owner`) · **Under:** DEC-083, DEC-522 · **Basis:** every clean close runs the full regression, about an hour, one close at a time; about 50 hours of main-tree time over the wave (W2-M153). · **Changed by:** item 1's key restated as behaviour by DEC-843, with DEC-852's conditions (2026-10-19) · **Changed by:** DEC-880: no result cache; from W2-66's merge a close runs the path-scoped regression, before it the full regression
 - **Decision:**
   1. W2-38's safe part becomes ticket W2-48, in layer 2: **test-result caching at close, keyed on exact input hashes** (the test files, the source they import, fixtures, configuration). Unchanged tests are reused and labelled as reused; they are never skipped on a guess.
   2. W2-48 evaluates pytest-testmon against a small built-in cache; any install comes as a package under DEC-083.
@@ -9170,7 +9170,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
 - **Decision:** DEC-460's "the 'Claude Opus 4.6' co-author lines come from subagent sessions and are not a defect" is wrong. They came from main sessions that ran unpinned on Opus 4.6. The cause of that switch is not established and does not reproduce with CLI 2.1.292. DEC-460's pin of main sessions stands; its keeping of `CLAUDE_CODE_SUBAGENT_MODEL=claude-opus-4-6` is replaced by DEC-839 item 3.
 
 ### DEC-841 — The Contract re-baseline, (a) now, through W2-49's CIT-P (plan §11 item 2; item 4)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the Contract changes only through W2-49's CIT-P, which the owner approves) · **Under:** DEC-105, DEC-722, DEC-829 item 4, Contract v4.x · **Basis:** OWNER, 2026-10-19; the plan's §8.
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the Contract changes only through W2-49's CIT-P, which the owner approves) · **Under:** DEC-105, DEC-722, DEC-829 item 4, Contract v4.x · **Basis:** OWNER, 2026-10-19; the plan's §8. · **Changed by:** DEC-880 pulls the lite form of W2-38 (path-scoped regression at close) back into Wave 2 as W2-66; the full W2-38 stays in Wave 3
 - **Decision:**
   1. **Option (a), now:** nine of the Contract's seventeen Wave 2 items move to Wave 3: CAP-04.a, CAP-04.d, CAP-22.b, CAP-22.c, CAP-30.c, CAP-30.g, CAP-32.d, CAP-37.e and CAP-53.b.
   2. They are carried by W2-49's CIT-P, as part of Contract v4.2 (Q-14), in W2-49's resume.
@@ -9185,7 +9185,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. Both entries' status lines gain a "Changed by" note (DEC-825).
 
 ### DEC-843 — W2-48: the key restated as behaviour; pytest-testmon and coverage as one DEC-083 package when it starts (plan §11 item 8)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the install itself comes as its own package under DEC-083) · **Under:** DEC-726, DEC-083, DEC-823 item 4 · **Basis:** OWNER, 2026-10-19; lens G R6, F6 · **Changes:** DEC-726 item 1 ("keyed on exact input hashes").
+- **Status:** SUPERSEDED by DEC-880 (2026-10-21; it was ACCEPTED, owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the install itself comes as its own package under DEC-083) · **Under:** DEC-726, DEC-083, DEC-823 item 4 · **Basis:** OWNER, 2026-10-19; lens G R6, F6 · **Changes:** DEC-726 item 1 ("keyed on exact input hashes"). · **Changed by:** superseded by DEC-880: testmon and coverage as the cache's glue fall away: W2-48's cache is withdrawn
 - **Decision:**
   1. W2-48's key KPI is restated as behaviour: each planted change re-runs every dependent test; a change outside every input reuses; every reuse is recorded, with the run it came from; a failed result is never reused.
   2. It is glued to pytest-testmon and coverage: `--testmon-env` set to a hash of the declared data globs and the test command; `.testmondata` written only by main-tree closes; `--testmon-noselect` for W2-24's and W2-46's full runs.
@@ -9207,7 +9207,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
 - **Decision:** the held-out index check, the lefthook measure (before W2-08) and the removal of S0b2's leftovers each come to the owner as exact operator commands, when its time comes, in the report that needs it. The bootstrap pin is done (`70aea435`).
 
 ### DEC-847 — Parallelism: no fixed number; as many leads as the tickets, the measured gate and the owner's limits allow, at most 10 (plan §11 item 12, replaced; standing)
-- **Status:** ACCEPTED (owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4.
+- **Status:** ACCEPTED (owner, 2026-10-19, in a follow-up that replaces the owner's first answer to item 12; the owner commits this entry with `Role: owner`, in the next batch; standing) · **Under:** DEC-780, DEC-786, DEC-798, DEC-838 · **Basis:** OWNER, 2026-10-19 · **Replaces:** the fixed caps of DEC-737 and DEC-776 (at most 3), DEC-786 item 1's "at most 3 leads", the w2 prompt §3's "up to 6", and the plan's 3 and 4. · **Changed by:** DEC-880: "fewer until W2-48 lands" reads "fewer until W2-66 lands"
 - **Decision:**
   1. **No fixed number.** The orchestrator starts as many leads as all of these allow, and decides it each time a slot could open:
      - **eligible tickets:** dependencies closed, or stackable under DEC-786;
@@ -9255,7 +9255,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   4. Applied in this batch to DEC-833 (both figures), DEC-836, DEC-837, DEC-838, DEC-839, DEC-847, DEC-848, DEC-849, DEC-850, DEC-852 and this entry.
 
 ### DEC-852 — W2-48's three conditions: subprocesses seen, the leads' runs served, a nightly full run (standing for item 3)
-- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; item 3 standing) · **Under:** DEC-726, DEC-843, DEC-780, DEC-850 · **Basis:** OWNER, 2026-10-19: many of this repository's tests run `gov` code in a separate process (`python3 -m gov …`), which an in-process coverage map does not see · **Changes:** DEC-843 (adds three conditions to W2-48's KPIs).
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; item 3 standing) · **Under:** DEC-726, DEC-843, DEC-780, DEC-850 · **Basis:** OWNER, 2026-10-19: many of this repository's tests run `gov` code in a separate process (`python3 -m gov …`), which an in-process coverage map does not see · **Changes:** DEC-843 (adds three conditions to W2-48's KPIs). · **Changed by:** items 1 and 2 (subprocesses seen; the leads' runs served by the cache) superseded by DEC-880 with the cache; item 3, the nightly full uncached run, stands as W2-66's backstop
 - **Decision:**
   1. **Subprocesses.** The cache sees the code a test runs in a separate process (subprocess coverage, configured and tested), or it always re-runs any test that starts a process. A test whose code changed never gets a reused result. A test proves it, with a change reached only through a subprocess.
   2. **The leads' verification.** The same cache serves the leads' suite runs in their worktrees, not only the close, with the same rules: exact inputs, failures never reused, `--no-cache` available. The common lead brief says so once W2-48 has merged; until then leads run every suite in full.
@@ -9481,7 +9481,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
   3. **W2-07's card and ticket file carry the gate as a KPI,** so that it becomes part of `gov close` itself: any gate failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt.
 
 ### DEC-869 — W2-48 takes the very next free slot after W2-53's close (standing until it starts)
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-823 item 4, DEC-847, DEC-852 · **Basis:** OWNER, 2026-10-20: until the test cache lands, every close costs over an hour · **Changes:** DEC-823 item 4 (W2-48's place in the order).
+- **Status:** SUPERSEDED by DEC-880 (2026-10-21; it was ACCEPTED, owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-823 item 4, DEC-847, DEC-852 · **Basis:** OWNER, 2026-10-20: until the test cache lands, every close costs over an hour · **Changes:** DEC-823 item 4 (W2-48's place in the order). · **Changed by:** superseded by DEC-880: W2-48 is withdrawn; the purpose (shorter closes) passes to W2-66
 - **Decision:** W2-48 takes the very next free slot after W2-53's close, ahead of every other keystone-2 ticket, the held closes' resumes included. Its three conditions stay (DEC-852: subprocess coverage or always re-run, the leads' verification uses the cache too, the nightly full run). The orchestrator reports when it starts.
 - Next free id: DEC-870.
 
@@ -9572,7 +9572,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 263. A delegated decision of 2026-10-20 on W2-48's run 1 (register v0.263, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-875 — W2-48: the close's wiring in its paths, the fixture defect revised, its test designer's choices confirmed; the saving's trade-off goes to the owner (delegated)
-- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-726, DEC-843, DEC-852, DEC-869 · **Basis:** W2-48's lead returned PACKAGES (run 1, `log/W2-48-A5-run1.json`): 32 of 46 acceptance cases pass; 12 wait on the close's wiring, one on a fixture defect, one on the time-saved figure. Each item below is P2 or P3, reversible, the lead's recommendation and the orchestrator's agree (confidence high or medium-high), and nothing in the Charter, the master rules, the Contract or the guard changes.
+- **Status:** SUPERSEDED by DEC-880 (2026-10-21; it was ACCEPTED, delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** MR-6, MR-3, DEC-726, DEC-843, DEC-852, DEC-869 · **Basis:** W2-48's lead returned PACKAGES (run 1, `log/W2-48-A5-run1.json`): 32 of 46 acceptance cases pass; 12 wait on the close's wiring, one on a fixture defect, one on the time-saved figure. Each item below is P2 or P3, reversible, the lead's recommendation and the orchestrator's agree (confidence high or medium-high), and nothing in the Charter, the master rules, the Contract or the guard changes. · **Changed by:** superseded by DEC-880: W2-48's round ends with its cache withdrawn
 - **Decision:**
   1. **P-W2-48-4 (a):** W2-48's paths gain `src/gov/close/command.py`, for the `--no-cache` option and the call into the cache only (about 15 lines; the KPIs already require both; no ticket in flight touches the file).
   2. **P-W2-48-6 (a):** a fresh test designer revises the planted change of `test_a_declared_command_runs_again_only_when_a_file_of_its_input_globs_changes` (it writes content its own fixture tool fails, while the test expects `passed`), with `Rewrite-Reason: DEC-875`.
@@ -9591,7 +9591,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 264. The owner's answer of 2026-10-20 on P-W2-48-5: the cache measures more, the inputs are declared, a target for the round (register v0.264, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-876 — P-W2-48-5 (b) with (c), on conditions: fail safe, each widening proven, the nightly backstop, a measured target, and a fallback instead of another open round
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-726, DEC-843, DEC-852, DEC-869, DEC-875, DEC-861 · **Basis:** P-W2-48-5 (`governance/project/orchestration/packages/P-W2-48-5.md`): built safely to DEC-852, the cache reused only 16 % of W1-01 to W1-15's tests (83 % always ran).
+- **Status:** SUPERSEDED by DEC-880 (2026-10-21; it was ACCEPTED, owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`) · **Under:** DEC-726, DEC-843, DEC-852, DEC-869, DEC-875, DEC-861 · **Basis:** P-W2-48-5 (`governance/project/orchestration/packages/P-W2-48-5.md`): built safely to DEC-852, the cache reused only 16 % of W1-01 to W1-15's tests (83 % always ran). · **Changed by:** superseded by DEC-880: W2-48's round ends with its cache withdrawn; the target passes to W2-66; item 2's `test_inputs` kept with DEC-880's reason
 - **Decision:**
   1. **(b), failing safe:** anything the cache still cannot see stays "always run". Each widening (coverage passed into children started with their own environment; `git` and similar programs keyed by their version) is proven by a test in which a change reached only that way invalidates the cached result.
   2. **(c):** the path map declares narrow `test_inputs` (fixtures, templates and schemas: `fixtures/**`, `template/**`, `schemas/**`); the register and the ticket files are left out. Committed by the orchestrator under DEC-861.
@@ -9654,3 +9654,40 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.267 | 2026-10-20 | Delegated: DEC-879 (W2-59 merges after the queued closes so one re-pin holds every fix; `w2/W2-59-old` deleted; the review's pass stands; P-W2-59-8 to the owner; rows W2-M397, W2-L386 to W2-L389). Next free id: DEC-880. |
+
+## 268. The owner's answers of 2026-10-21 on P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (register v0.268, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-880 — W2-58's one narrow extra round; W2-48's cache withdrawn and a lite W2-38 brought back as path-scoped regression (W2-66); W2-65; credentials out of the working trees
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-413, DEC-857, DEC-873, DEC-852, DEC-869, DEC-876, DEC-841, DEC-105, DEC-866, DEC-820, DEC-861 · **Basis:** the packages P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (`governance/project/orchestration/packages/`), from W2-58's run 2, W2-48's run 2 and W2-59's run 3.
+- **Decision:**
+  1. **P-W2-58-4 (a): one narrow extra round for W2-58, an exception to DEC-413 for this ticket only.**
+     - The guard expands `~` in every path it judges (Read, Grep, Glob, Edit, Write and Bash), with tests for each tool.
+     - The engineer's refusal of `python3 -B -m pytest` and `coverage run -m pytest` is fixed in the same round.
+     - Full verification, then a third review limited to the change.
+     - Then W2-58 merges, ahead of everything (DEC-857).
+  2. **P-W2-48-8 (b) with (d): W2-48's cache is withdrawn, and a lite W2-38 comes back from Wave 3 as a new ticket, W2-66: path-scoped regression at close.**
+     - **W2-48:** its branch is not merged; the ticket ends by this decision, not by a clean `gov close`. The branch `w2/W2-48` is kept as the record of the lesson: **testmon cannot see a repository whose tests run `gov` as a separate process.** Measured in its run 2: 11.5 % of tests reused, a close 79 min against 81 uncached (3 % saved); the research record is `docs/research/W2-48-cache-choice.md` on that branch. P-W2-48-9's fixes (F1 to F4) fall away with the cache.
+     - **W2-66:** a close runs the ticket's own suite, the unit tests, and the suites of every ticket whose allowed paths overlap the change. Its conditions:
+       - (a) any change under the shared core (`src/gov/close`, `src/gov/guard`, `src/gov/check`, `src/gov/records`, the retrieval core, the kernel hooks, the path map) runs the full suite;
+       - (b) the lead's full verification before every return stays as it is;
+       - (c) the nightly full uncached run stays; any failure there that a scoped close missed is a P1 package, and the path-to-suite map is corrected in the same package;
+       - (d) the full uncached runs at W2-24 and W2-46 stay.
+     - **Target:** a typical close under about 15 minutes, measured.
+     - **Re-baseline (DEC-105, applied now by the owner):** this pulls back the lite form of W2-38 (CAP-53.b's impact-selected tests), which DEC-841 moved to Wave 3; the full W2-38 stays in Wave 3.
+     - **Superseded and changed (DEC-866):**
+       - DEC-843 (testmon and coverage as the glue) is superseded.
+       - DEC-852 items 1 and 2 (subprocesses seen; the leads' runs served by the cache) are superseded; its item 3, the nightly full uncached run, stands as W2-66's backstop.
+       - DEC-869 (W2-48 first) is superseded: its purpose passes to W2-66.
+       - DEC-875 and DEC-876 are superseded with W2-48's round. DEC-876's target passes to W2-66; its item 2 (`test_inputs` in the path map) is kept, with this reason: W2-66 may use the declared inputs to map non-Python files to suites, or it removes them.
+       - DEC-726 is changed: there is no result cache; from W2-66's merge a close runs the path-scoped regression; before it, the full regression.
+       - DEC-847 is changed: "fewer leads until W2-48 lands" now reads "until W2-66 lands".
+       - The installs (pytest-testmon 2.2.0, coverage 7.16.2; the tool registry, DEC-843) stay installed and unused until the owner removes them; the registry says so.
+  3. **P-W2-59-8 (b): new ticket W2-65 (LITE).** If the guard's program cannot run, the tool call is refused, never allowed: the preToolUse and containment lines (`.rulesync/hooks.jsonc`, and the template's hook source) map every exit other than 0 and 2 to 2, with a message naming the program. One acceptance case per line. It lands before the owner's settings regeneration after W2-59's re-pin, so that one act installs both.
+  4. **P-W2-58-3 (c), with a row:** the owner moves any credentials out of the working trees; the orchestrator lists, by name only, the secret-named files in the repository and the worktrees; a row for the Wave 3 hardening pass (a search from above a secret-named file prints it).
+  5. **Delegated decisions accepted by the owner:** P-W2-48-7 (A) (now moot: the cache is withdrawn); W2-58's lead starting TD-6 and eng-3 with the pinned release's launcher (DEC-873 item 2).
+- **Where it goes (DEC-851):** this register, with the status lines of DEC-413, DEC-726, DEC-841, DEC-843, DEC-847, DEC-852, DEC-869, DEC-875 and DEC-876 marked; the prompt (§3, §15; v3.7); RESUME HERE; `LEAD-w2-common.md` (DEC-852 item 2 removed); the WBS (W2-58's, W2-48's, W2-38's cards; new W2-65 and W2-66); the plan's rows on W2-48; the ticket files of W2-58, W2-48, W2-65 and W2-66.
+- Next free id: DEC-881.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.268 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-880 (W2-58's one narrow extra round; W2-48's cache withdrawn, a lite W2-38 as W2-66, path-scoped regression at close with four conditions and a 15-minute target; W2-65; credentials out of the trees; DEC-843, DEC-869, DEC-875, DEC-876 superseded, DEC-852 items 1 and 2 superseded, DEC-413, DEC-726, DEC-841, DEC-847 changed). Next free id: DEC-881. |

@@ -34,6 +34,8 @@ kpis:
   - An evaluation set declared in the path map with a visible and a hidden part, a session measured by it is refused reads of the hidden part, and the measurement script scores it without showing the answers [DEC-820 (d)].
   - 'The listing and search refusals over governance/ and .claude/ (DEC-508) are gone: a search that starts at the repository root or governance/project/ is no longer refused for the protected files'' sake; the held-out list file''s names are readable and the held-out material''s contents refused; the settings file''s reads follow Policy 2; secrets stay refused [DEC-820 (a), (b), DEC-857 item 3]'
   - Reviewers and auditors read everything, tests and code alike [DEC-820].
+  - 'A path with a leading ~ is judged as its expanded form in every path the guard judges, on Read, Grep, Glob, Edit, Write and Bash: each of (a) to (d) refuses it exactly as it refuses the absolute path, and each write rule judges it as the absolute path; one test per tool [DEC-880 item 1, P-W2-58-4 (a)]'
+  - 'An engineer runs its own ticket''s tests with python3 -B -m pytest, python3 -m coverage run -m pytest and coverage run -m pytest, as with plain python3 -m pytest, and still cannot read their source [DEC-880 item 1]'
   failure:
   - Each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error still fails closed.
 profile: STANDARD
@@ -43,6 +45,7 @@ sources:
 - DEC-849
 - DEC-857
 - DEC-873
+- DEC-880
 est_loc: 150
 acceptance_tests:
   path: tests/acceptance/W2-58/
@@ -66,4 +69,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-58), from DEC-820 and DEC-821 (owner, 20
   - An evaluation set declared in the path map with a visible and a hidden part: a session measured by it is refused reads of the hidden part, and the measurement script scores it without showing the answers [DEC-820 (d)].
   - The listing and search refusals over `governance/` and `.claude/` (DEC-508) are gone: a search that starts at the repository root or `governance/project/` is no longer refused for the protected files' sake; the held-out list file's names are readable and the held-out material's contents refused; the settings file's reads follow Policy 2; secrets stay refused [DEC-820 (a), (b), DEC-857 item 3].
   - Reviewers and auditors read everything, tests and code alike [DEC-820].
+  - **DEC-880 (owner, 2026-10-21, P-W2-58-4 (a)): one narrow extra round, an exception to DEC-413.** A path with a leading `~` is judged as its expanded form in every path the guard judges, on Read, Grep, Glob, Edit, Write and Bash: each of (a) to (d) refuses it exactly as it refuses the absolute path, and each write rule judges it as the absolute path; one test per tool. An engineer runs its own ticket's tests with `python3 -B -m pytest`, `python3 -m coverage run -m pytest` and `coverage run -m pytest`, as with plain `python3 -m pytest`, and still cannot read their source. Full verification, then a third review limited to the change; then the merge, ahead of everything (DEC-857). `decide.py`'s paths widen to the `~` expansion of every judged path; a need in `containment.py` is a package.
 - **KPIs, failure:** each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error still fails closed.

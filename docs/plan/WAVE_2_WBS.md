@@ -904,6 +904,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - An evaluation set declared in the path map with a visible and a hidden part: a session measured by it is refused reads of the hidden part, and the measurement script scores it without showing the answers [DEC-820 (d)].
   - The listing and search refusals over `governance/` and `.claude/` (DEC-508) are gone; the held-out material's file names are readable and its contents refused; secrets stay refused [DEC-820 (a), (b)].
   - Reviewers and auditors read everything, tests and code alike [DEC-820].
+  - **DEC-880 (owner, 2026-10-21, P-W2-58-4 (a)): one narrow extra round, an exception to DEC-413.** A path with a leading `~` is judged as its expanded form in every path the guard judges (Read, Grep, Glob, Edit, Write and Bash), one test per tool; an engineer's `python3 -B -m pytest` and `coverage run -m pytest` of its own tests are allowed; full verification; a third review limited to the change; then the merge, ahead of everything (DEC-857). `decide.py`'s paths widen to the `~` expansion of every judged path.
 - **KPIs, failure:** each of (a) to (d) still refuses, by every read route an honest agent takes in ordinary work (DEC-801); no write rule widens; a guard error still fails closed.
 
 #### W2-59 The pinned judge: the declared checks and the hook lines run from the pin; the packaging gaps (STANDARD, engineer; CIT-P; DEC-822, DEC-835, DEC-854; keystone 1)
