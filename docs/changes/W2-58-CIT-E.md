@@ -129,3 +129,37 @@ DEC-218 for the held-out list).
 
 **Left for Wave 3.** A program run deliberately to evade the guard (an opaque interpreter that opens a refused file)
 is row W2-L374 (DEC-801, ADR-0001): an OS-level layer for (c) and (d) that keeps a channel to run the tests.
+
+## 7. The review round: the routes where the guard failed open
+
+An independent review found read routes, in ordinary work, where the guard failed open; the test designer added 178
+cases (`tests/acceptance/W2-58/test_w2_58_review.py`, commit `e49fd98d`, 117 red). This round makes the guard refuse
+them, in `src/gov/guard/reads.py` alone (DEC-821, DEC-873 item 1: the guard is the only layer for (c) and (d)).
+`decide.py`, `protected.py`, `heldout.py`, the launcher and the path map are unchanged.
+
+| # | Behaviour | Rule added |
+|---|---|---|
+| 1 | **File names given at run time.** | `_Judge.runtime`: a reading command fed names by a pipe into `xargs`, by a `while read` (or `until read`) loop whose body reads, by a `$(…)` or backtick substitution in its words, or by one in a `for` loop's list whose body reads, has the listing judged as a search from where it starts. `find <starts>` (only `-name`/`-iname` with no `!`/`-not` narrows), `git ls-files`/`git grep` (their pathspecs, `*` crossing folders; a magic pathspec counts as the whole tree), `rg --files`/`-l`, `grep -r`/`-l`, `ls` (`-R` as a search, else one folder), `echo`/`printf` (their words as paths) are placed; `grep`, `head`, `sort`, `sed`, `cut` and the like between them pass names on. A listing that cannot be placed (`cat list.txt`, `xargs -a`, an unknown `cd`, an unresolvable word, a subshell, `git diff --name-only`, a loop fed by a redirect) refuses with `RUNTIME_REFUSAL` a session that has a protected part whose files exist, and no other. The reading commands are a named list (`cat`, `grep`, `rg`, `head`, `sed`, `cp`, interpreters, git's `show`/`log`/`diff`/`grep`/`blame`…); `ls`, `wc`, `echo`, `rm`, `mv`, `cd` and pytest runs are not. |
+| 2 | **A subagent's reads.** | `policy_refusal`: the protected parts are the session role's and the subagent type's together (before: the type's alone when it was a role). Writes are unchanged. |
+| 3 | **A ticket named by its WBS id.** | `_ticket`: `.tickets/<id>.md`, or else the ticket file whose front matter gives `wbs_id: <id>` (as `decide._load_ticket` and the launcher take it). Its names (the id given, the file's name, `id`, `wbs_id`) are matched against an evaluation set's `measures.tickets`. A file that claims the WBS id and cannot be read for it refuses (fail closed). |
+| 4 | **The repository's credential names.** | `_Judge.secret`: a file name ending in `.env` at any depth, and a `.secrets` folder or anything under one at any depth, for every role; a search from a folder above is unchanged. |
+| 5 | **No write rule widens.** | `_Judge.rewrites`: `dd of=`, `truncate`, `sort -o`/`--output`, `rsync`'s destination, `patch`'s file (and `-o`, `-r`), `git checkout`, `git restore` that name `governance/project/held-out.yaml` or `.claude/settings.json` are judged by the acting role's allowed paths (`decide._get_allowed_paths`, `_path_allowed`, the write rules' own judgement); refused with `WRITE_FORM_REFUSAL`, which names the rule and DEC-821 and carries no path or content. Reading either file stays allowed. |
+
+Every new path is inside `policy_refusal`'s `try`: an exception refuses (fail closed); the builder suite caught one
+such during the work (a substitution that raised was refused, not allowed).
+
+**Evidence.** `tests/unit/guard/test_reads.py`: 52 cases added (the five behaviours, the allowed forms beside each);
+149 passed. The review file: 178 passed. The whole ticket suite: 749 passed (§4 row below).
+
+**Residuals the review named that were not built.**
+
+1. A listing narrowed by a filter (`git ls-files | grep src/ | xargs cat`) gets no credit for the filter: judged from
+   where the listing starts. A `find` narrowed by `-path`, `-not`, `-prune` or `-maxdepth` likewise.
+2. `cat $(git rev-parse --show-toplevel)/<file>` and other substitutions that give a folder are refused to a session
+   with a protected part (no listing to place); the literal tail after the substitution is not resolved.
+3. A reading command outside the named list (an unusual viewer) fed names at run time is not judged.
+4. Process substitution `<(…)`, `parallel`, `fd` and `tree` are not placed as listings; a `while read` loop fed by
+   `< <(find …)` is refused as unplaceable.
+5. Item 5 covers the two files only; `dd of=`, `truncate` and the rest stay unseen by the write rules elsewhere (a
+   write-side gap, as §5 item 4).
+6. Proportion: about 450 lines added to `reads.py` (item 1 is most of it) against the ticket's estimate of 150.
