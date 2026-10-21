@@ -23,11 +23,12 @@ import subprocess
 
 from gov.guard.decide import (ACCEPTANCE, KNOWN_ROLES, LONG_REFUSAL, _ASSIGN_RE,
                               _copy_args, _expand_token, _extract_bash_write_targets,
-                              _has_glob, _is_punct, _load_ticket, _parse_frontmatter)
-from gov.guard.heldout import _words, load_yaml_unique
-from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _MOST_RESOLVED,
-                                 _PATTERN_OPTIONS, _PIECE_RE, _RG_VALUED, _Glob,
-                                 _behind, _braces,
+                              _get_allowed_paths, _has_glob, _is_punct,
+                              _parse_frontmatter, _path_allowed)
+from gov.guard.heldout import CONFIG_REL, SETTINGS_REL, _words, load_yaml_unique
+from gov.guard.protected import (_FIND_NAMED, _GLUED_RE, _GREP_VALUED, _LS_RECURSIVE_RE,
+                                 _MOST_RESOLVED, _PATTERN_OPTIONS, _PIECE_RE,
+                                 _RECURSIVE_RE, _RG_VALUED, _Glob, _behind, _braces,
                                  _options, _shell_search, _spans, _uncommented)
 
 PATH_MAP_REL = "governance/project/path-map.yaml"
@@ -48,10 +49,52 @@ _GIT_QUIET = frozenset({"--stat", "--name-only", "--name-status", "--shortstat",
                         "--numstat"})
 _GIT_GREP_VALUED = frozenset("-e -f -A -B -C -m --max-depth --threads --context "
                              "--after-context --before-context --max-count".split())
+# The commands that open the files their words name, and git's that show a
+# file's text: one fed file names at run time reads what they name.
+_READERS = frozenset(
+    "cat tac nl head tail less more most bat view vi vim nvim nano emacs grep egrep "
+    "fgrep rg ag ack sed awk gawk mawk cut sort uniq paste join comm diff sdiff cmp "
+    "colordiff od xxd hexdump strings base64 cp scp rsync tar zip gzip gunzip zcat "
+    "bzip2 xz jq yq perl ruby node sh bash zsh dash source . iconv fold fmt pr "
+    "column expand unexpand".split())
+_GIT_SHOWS = frozenset({"show", "log", "diff", "grep", "blame", "annotate",
+                        "cat-file", "whatchanged", "archive", "format-patch"})
+# What passes the names of a listing on, or picks some of them.
+_FILTERS = frozenset("grep egrep fgrep rg head tail sort uniq cut tr tac sed awk "
+                     "cat".split())
+_XARGS_VALUED = frozenset("-a -d -E -I -L -n -P -s --arg-file --delimiter "
+                          "--max-args --max-procs --max-chars --process-slot-var".split())
+_LS_FILES_VALUED = frozenset("-x -X --exclude --exclude-from --exclude-per-directory "
+                             "--format --with-tree --abbrev".split())
+# A substitution's place in a command once it is set aside (item 1).
+_SUB_RE = re.compile(r"__gov_sub(\d+)__")
+# The writes the write rules do not read as writes (DEC-821, no write rule
+# widens): the files they write, for the two files the read rule once covered.
+_SORT_VALUED = frozenset("-o -k -t -S -T --output --key --field-separator "
+                         "--buffer-size --temporary-directory --parallel "
+                         "--batch-size --files0-from --compress-program "
+                         "--random-source --sort".split())
+_RSYNC_VALUED = frozenset("-e -f --rsh --filter --exclude --include --exclude-from "
+                          "--include-from --files-from --link-dest --compare-dest "
+                          "--copy-dest --backup-dir --suffix --chmod --chown "
+                          "--log-file --password-file --temp-dir --partial-dir".split())
+_PATCH_VALUED = frozenset("-i -o -p -d -D -F -z -B -Y -V -r -g --input --output "
+                          "--strip --directory --ifdef --fuzz --suffix --prefix "
+                          "--basename-prefix --version-control --reject-file "
+                          "--get".split())
 
-SECRET_REFUSAL = ("the call reads a secret or a key (.env, .env.*, *.pem, *.key, "
-                  "config/secrets*, ~/.ssh/, the CLI's key file), which is refused "
-                  "to every role (DEC-820 (a))")
+SECRET_REFUSAL = ("the call reads a secret or a key (.env, *.env, .env.*, *.pem, *.key, "
+                  "config/secrets*, a file under a .secrets folder, ~/.ssh/, the "
+                  "CLI's key file), which is refused to every role (DEC-820 (a))")
+RUNTIME_REFUSAL = ("the call reads files whose names another command gives at run "
+                   "time, from a listing whose start the guard cannot place, and this "
+                   "session is refused a part of the project (DEC-820 (c), (d)): "
+                   "name the folder the listing starts at")
+WRITE_FORM_REFUSAL = ("the command writes the held-out list or the settings file by a "
+                      "form the write rules do not read as a write (dd of=, truncate, "
+                      "sort -o, rsync, patch, git checkout, git restore), and the "
+                      "role's allowed paths do not name it: refused (DEC-821, no "
+                      "write rule widens)")
 TESTS_REFUSAL = ("the call reads the ticket's acceptance tests, the counterpart's "
                  "work, which is refused to the ticket's engineer (DEC-820 (c)): "
                  "run them with pytest, which shows their names, results and "
@@ -144,19 +187,20 @@ class _Part:
         return [f for f in self.files if folder == "/" or f.startswith(folder + "/")]
 
 
-def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
-    """The WBS id of the session's ticket; ``None`` when it has no ticket
-    file.  A ticket file that cannot be read for one refuses (fail closed)."""
-    if not ticket_id or "/" in ticket_id:
-        return None
-    path = os.path.join(root, ".tickets", f"{ticket_id}.md")
-    if not os.path.lexists(path):
-        return None
+_TICKET_FAULT = "the session's ticket file cannot be read for its WBS id"
+
+
+def _read_text(path: str) -> str:
     try:
         with open(path, encoding="utf-8") as f:
-            text = f.read()
+            return f.read()
     except (OSError, UnicodeDecodeError):
-        raise PolicyError("the session's ticket file cannot be read for its WBS id") from None
+        raise PolicyError(_TICKET_FAULT) from None
+
+
+def _front(text: str) -> tuple[str | None, str | None]:
+    """A ticket file's WBS id and id; one that cannot be read for them
+    refuses (fail closed)."""
     head = text.split("\n---", 1)[0][4:] if text.startswith("---\n") else None
     try:
         import yaml  # the C parser when there is one: the guard runs on every call
@@ -164,18 +208,49 @@ def _ticket_wbs(root: str, ticket_id: str | None) -> str | None:
                   if head is not None else None)
     except Exception:
         ticket = None
-    if isinstance(ticket, dict):
-        wbs = ticket.get("wbs_id")
-    else:
+    if not isinstance(ticket, dict):
         # Not YAML: the line reader the write rules use (a fixture's
         # allowed_paths may start with a *).  No front matter at all, refused.
-        loose = _parse_frontmatter(text)
-        if loose is None:
-            raise PolicyError("the session's ticket file cannot be read for its WBS id")
-        wbs = loose.get("wbs_id") or None
+        ticket = _parse_frontmatter(text)
+        if ticket is None:
+            raise PolicyError(_TICKET_FAULT)
+    wbs, tid = ticket.get("wbs_id") or None, ticket.get("id") or None
     if wbs is not None and not (isinstance(wbs, str) and _WBS_RE.fullmatch(wbs)):
-        raise PolicyError("the session's ticket file cannot be read for its WBS id")
-    return wbs  # None: a ticket with no WBS id names no acceptance folder
+        raise PolicyError(_TICKET_FAULT)
+    return wbs, tid if isinstance(tid, str) else None
+
+
+def _ticket(root: str, ticket_id: str | None) -> tuple[set[str], str | None]:
+    """The names the session's ticket goes by (the id it was given, its
+    file's name, its id, its WBS id) and its WBS id.  A ticket is named by
+    its file or, as the launcher and the write rules take it, by its WBS id
+    (item 3); with no such ticket, the id alone and no WBS id."""
+    if not ticket_id or "/" in ticket_id:
+        return set(), None
+    folder = os.path.join(root, ".tickets")
+    path = os.path.join(folder, f"{ticket_id}.md")
+    if os.path.lexists(path):
+        wbs, tid = _front(_read_text(path))
+        return {ticket_id, tid, wbs} - {None}, wbs
+    try:
+        names = sorted(os.listdir(folder))
+    except FileNotFoundError:
+        return {ticket_id}, None
+    except OSError:
+        raise PolicyError(_TICKET_FAULT) from None
+    # A file that gives the WBS id a line of its own is read in full.
+    line = re.compile(r"^wbs_id:[ \t]*['\"]?" + re.escape(ticket_id) + r"['\"]?[ \t]*$",
+                      re.M)
+    for name in names:
+        if not name.endswith(".md"):
+            continue
+        text = _read_text(os.path.join(folder, name))
+        if not line.search(text):
+            continue
+        wbs, tid = _front(text)
+        if wbs == ticket_id:
+            return {ticket_id, name[:-3], tid} - {None}, wbs
+    return {ticket_id}, None
 
 
 def _git(root: str, *args: str) -> subprocess.CompletedProcess:
@@ -276,14 +351,14 @@ def check_sets(root: str) -> None:
 def _hidden(root: str, role: str, ticket_id: str | None) -> list[str]:
     """The hidden globs of the sets that measure the session.  A malformed
     set refuses the sessions it could concern: all, unless its measures
-    are well formed and name neither the role nor the ticket."""
+    are well formed and name neither the role nor the ticket (by any name
+    it goes by)."""
     out: list[str] = []
     for entry in evaluation_sets(root).values():
         m = entry.get("measures") if isinstance(entry, dict) else None
         if _measures_ok(m):
             tickets = m.get("tickets", [])
-            ids = {ticket_id} | ({(_load_ticket(root, ticket_id) or {}).get("wbs_id")}
-                                 if tickets and ticket_id else set())
+            ids = _ticket(root, ticket_id)[0] if tickets else set()
             if role not in m.get("roles", []) and ids.isdisjoint(tickets):
                 continue
         fault = set_fault(entry)
@@ -299,7 +374,7 @@ def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
     root = os.path.realpath(root)
     out: list[_Part] = []
     if role in ("engineer", "independent-test-designer"):
-        wbs = _ticket_wbs(root, ticket_id)
+        wbs = _ticket(root, ticket_id)[1]
         if role == "engineer" and wbs:
             out.append(_Part(root, [f"{ACCEPTANCE}/{wbs}/**"], TESTS_REFUSAL))
         changed = _changed(root) if role == "independent-test-designer" else None
@@ -314,21 +389,131 @@ def parts(root: str, role: str, ticket_id: str | None) -> list[_Part]:
     return out
 
 
+# -- the shell's words ---------------------------------------------------------
+
+def _moved(name: str, args: list[str], ecwd: str | None) -> str | None:
+    """The folder a cd, pushd or popd moves to; ``None`` when it is not known."""
+    args = [a for a in args if not a.startswith("-")]
+    exp = (_expand_token(args[0]) if args else
+           os.environ.get("HOME") if name == "cd" else None)
+    if exp is None or _has_glob(exp) or name == "popd" or (
+            ecwd is None and not os.path.isabs(exp)):
+        return None
+    return os.path.join(ecwd or "/", exp)
+
+
+def _tests_run(name: str, args: list[str]) -> bool:
+    return name in ("pytest", "py.test") or (
+        name.startswith("python") and args[:2] == ["-m", "pytest"])
+
+
+def _xargs(args: list[str]) -> tuple[list[str], bool]:
+    """The command xargs runs, and whether its names come from a file (-a)."""
+    i, from_file = 0, False
+    while i < len(args) and args[i].startswith("-") and args[i] != "-":
+        a = args[i]
+        from_file = from_file or a in ("-a", "--arg-file") or a.startswith(
+            ("--arg-file=", "-a"))
+        i += 2 if a in _XARGS_VALUED else 1
+    return args[i:], from_file
+
+
+def _reads_files(words: list[str]) -> bool:
+    """True when the command opens the files its words name (item 1)."""
+    words = _behind(words)
+    if not words:
+        return False
+    name, args = os.path.basename(words[0]), words[1:]
+    if _tests_run(name, args):
+        return False
+    if name == "xargs":
+        return _reads_files(_xargs(args)[0])
+    if name == "git":
+        i = 0
+        while i < len(args) and args[i].startswith("-"):
+            i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree") else 1
+        return args[i:i + 1] != [] and args[i] in _GIT_SHOWS
+    return name in _READERS or name.startswith("python")
+
+
+def _simples(tokens: list[str]) -> list[tuple[list[str], str]]:
+    """The simple commands of a token list, each with the punctuation after
+    it; a redirect and its target are no words of the command."""
+    out: list[tuple[list[str], str]] = []
+    cur: list[str] = []
+    skip = False
+    for i, tok in enumerate(tokens):
+        if skip:
+            skip = False
+            continue
+        if not _is_punct(tok):
+            if not (tok.isdigit() and tokens[i + 1:i + 2]
+                    and _is_punct(tokens[i + 1]) and tokens[i + 1][0] in "<>"):
+                cur.append(tok)
+            continue
+        if ("<" in tok or ">" in tok) and i + 1 < len(tokens):
+            skip = True
+            continue
+        out.append((cur, tok.strip(" \t") or ";"))
+        cur = []
+    out.append((cur, ""))
+    return out
+
+
+def _pipelines(cmds: list[tuple[list[str], str]]) -> list[list[list[str]]]:
+    """The pipelines of a list of simple commands, each as its stages' words."""
+    out: list[list[list[str]]] = [[]]
+    for words, sep in cmds:
+        out[-1].append(words)
+        if sep not in ("|", "|&"):
+            out.append([])
+    return [p for p in out if any(p)]
+
+
+def _set_aside(command: str) -> tuple[str, list[str]]:
+    """*command* with each outermost ``$(...)`` and backtick substitution
+    replaced by a word of its own, and the commands they hold."""
+    outer: list[tuple[int, int, int, int]] = []  # its text's ends, its command's
+    for s, e in sorted(_spans(command)):
+        if command[s - 2:s] == "$(":
+            a, b = s - 2, min(e + 1, len(command))
+        elif command[s - 1:s] == "`":
+            a, b = s - 1, min(e + 1, len(command))
+        else:
+            continue  # <(...) and >(...) give a file, not names
+        if outer and a < outer[-1][1]:
+            continue  # inside one set aside already
+        outer.append((a, b, s, e))
+    text, subs, at = [], [], 0
+    for a, b, s, e in outer:
+        text.append(command[at:a] + f" __gov_sub{len(subs)}__ ")
+        subs.append(command[s:e])
+        at = b
+    return "".join(text) + command[at:], subs
+
+
 # -- the judge -----------------------------------------------------------------
 
 class _Judge:
-    def __init__(self, root: str, protected: list[_Part]):
+    def __init__(self, root: str, protected: list[_Part], may_write=None):
         self.root = os.path.realpath(root)
         self.parts = protected
+        # Whether the acting role's allowed paths take a path in (item 5).
+        self.may_write = may_write
         home = os.path.expanduser("~")
         self.ssh = os.path.realpath(os.path.join(home, ".ssh"))
         self.key = os.path.realpath(os.path.join(home, ".claude", ".credentials.json"))
+        self.two = {os.path.join(self.root, rel) for rel in (CONFIG_REL, SETTINGS_REL)}
+        self.two |= {os.path.realpath(p) for p in self.two}
         self.spent = 0  # the folders of the paths resolved so far (DEC-570)
         self.seen: dict[tuple[str, str], list[str]] = {}
 
     def secret(self, path: str) -> bool:
         name = os.path.basename(path)
-        return (name == ".env" or name.startswith(".env.")
+        # *.env and a .secrets folder at any depth: the repository's own
+        # names for provider credentials (.gitignore; item 4).
+        return (name.endswith(".env") or name.startswith(".env.")
+                or name == ".secrets" or "/.secrets/" in path
                 or name.endswith((".pem", ".key"))
                 or (name.startswith("secrets")
                     and os.path.basename(os.path.dirname(path)) == "config")
@@ -475,6 +660,10 @@ class _Judge:
                     why = self.command(c, cwd)
                     if why:
                         return why
+            for c in dict.fromkeys((command, _uncommented(command))):
+                why = self.runtime(c, cwd)
+                if why:
+                    return why
         return ""
 
     def glob_lead(self, pattern: str, start: str) -> str:
@@ -529,21 +718,56 @@ class _Judge:
             return "", ecwd
         name, args = os.path.basename(words[0]), words[1:]
         if name in ("cd", "pushd", "popd"):
-            args = [a for a in args if not a.startswith("-")]
-            exp = (_expand_token(args[0]) if args else
-                   os.environ.get("HOME") if name == "cd" else None)
-            if exp is None or _has_glob(exp) or name == "popd" or (
-                    ecwd is None and not os.path.isabs(exp)):
-                return "", None
-            return "", os.path.join(ecwd or "/", exp)
+            return "", _moved(name, args, ecwd)
         cwd = ecwd or self.root
+        why = self.rewrites(name, args, cwd)
+        if why:
+            return why, ecwd
         # DEC-820 (c): the engineer runs its tests and sees their results.
-        if name in ("pytest", "py.test") or (
-                name.startswith("python") and args[:2] == ["-m", "pytest"]):
+        if _tests_run(name, args):
             return "", ecwd
         if name == "git":
             return self.git(args, cwd), ecwd
         return self.reads(name, args, cwd, fed), ecwd
+
+    # -- the writes the write rules do not see (item 5) ----------------------
+
+    def rewrites(self, name: str, args: list[str], cwd: str) -> str:
+        """Why a write the write rules do not read as one, of the held-out
+        list or the settings file, is refused: the acting role's allowed
+        paths do not take the file in."""
+        if self.may_write is None:
+            return ""
+        targets: list[str] = []
+        if name == "dd":
+            targets = [a[3:] for a in args if a.startswith("of=")]
+        elif name == "truncate":
+            targets = _options(args, frozenset({"-s", "-r", "--size", "--reference"}))[0]
+        elif name == "sort":
+            targets = [v for o, v in _options(args, _SORT_VALUED)[1]
+                       if o in ("-o", "--output")]
+        elif name == "rsync":
+            targets = _options(args, _RSYNC_VALUED)[0][1:][-1:]
+        elif name == "patch":
+            operands, options = _options(args, _PATCH_VALUED)
+            targets = operands[:1] + [v for o, v in options if o in (
+                "-o", "--output", "-r", "--reject-file")]
+        elif name == "git":
+            i = 0
+            while i < len(args) and args[i].startswith("-"):
+                if args[i] == "-C" and i + 1 < len(args):
+                    cwd = os.path.join(cwd, _expand_token(args[i + 1]) or args[i + 1])
+                i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree") else 1
+            if args[i:i + 1] in (["checkout"], ["restore"]):
+                targets = [a for a in args[i + 1:] if a != "--" and not a.startswith("-")]
+        for t in targets:
+            exp = _expand_token(t)
+            if exp is None:
+                continue  # a word the hook cannot resolve names neither file
+            hits = [p for p in self.spellings(exp, cwd) if p in self.two]
+            if hits and not all(self.may_write(p) for p in hits):
+                return WRITE_FORM_REFUSAL
+        return ""
 
     def listed(self, text: str, cwd: str, names: list[str] | None = None,
                fold: bool = False) -> str:
@@ -711,6 +935,177 @@ class _Judge:
         lines = out.stdout.split()
         return out.returncode == 0 and len(lines) == 2 and lines[0] == lines[1]
 
+    # -- file names given at run time (item 1) -------------------------------
+
+    def runtime(self, command: str, cwd: str) -> str:
+        """Why a read whose file names another command gives at run time is
+        refused: a pipe into xargs, a ``while read`` loop fed by a pipe, a
+        substitution in a reading command's words (or in a ``for`` loop's
+        list that a reading command walks).  The listing is judged as a
+        search from where it starts."""
+        text, subs = _set_aside(command)
+        for body in subs:  # one inside another
+            why = self.runtime(body, cwd)
+            if why:
+                return why
+        cmds = _simples(_words(text))
+        ecwd: str | None = cwd
+        where: list[str | None] = []
+        for words, _ in cmds:
+            where.append(ecwd)
+            plain = _behind(words)
+            if plain and os.path.basename(plain[0]) in ("cd", "pushd", "popd"):
+                ecwd = _moved(os.path.basename(plain[0]), plain[1:], ecwd)
+        for i, (words, _) in enumerate(cmds):
+            bare = [w for w in words if not _ASSIGN_RE.match(w)]
+            plain = _behind(words)
+            if not plain:
+                continue
+            # The stages of the pipeline that feeds this command.
+            k = i
+            while k and cmds[k - 1][1] in ("|", "|&"):
+                k -= 1
+            feed = [w for w, _ in cmds[k:i]]
+            listings: list[list[list[str]]] = []
+            if bare[:1] in (["while"], ["until"]) and "read" in bare:
+                if self._body_reads(cmds, i):
+                    # Not fed by a pipe: names from a redirect, no listing it can place.
+                    listings.append(feed or [["cat", "--"]])
+            elif os.path.basename(plain[0]) == "xargs":
+                run, from_file = _xargs(plain[1:])
+                if _reads_files(run):
+                    if from_file:
+                        listings.append([["cat", "--"]])  # no listing it can place
+                    elif feed:
+                        listings.append(feed)
+            held = [int(n) for w in words for n in _SUB_RE.findall(w)]
+            if held and not _SUB_RE.search(plain[0]) and (
+                    self._body_reads(cmds, i) if bare[:1] == ["for"]
+                    else _reads_files(words)):
+                for n in held:
+                    if n < len(subs):
+                        listings += _pipelines(_simples(_words(subs[n])))
+            for stages in listings:
+                why = self.listing(stages, where[k] if stages is feed else where[i])
+                if why:
+                    return why
+        return ""
+
+    @staticmethod
+    def _body_reads(cmds: list[tuple[list[str], str]], i: int) -> bool:
+        """True when the loop that starts at command *i* runs a reading
+        command (up to its ``done``)."""
+        depth = 0
+        for words, _ in cmds[i:]:
+            first = next((w for w in words if not _ASSIGN_RE.match(w)), "")
+            if first in ("while", "until", "for", "select"):
+                depth += 1
+            elif first == "done":
+                depth -= 1
+                if depth <= 0:
+                    return False
+            elif _reads_files(words):  # behind a do, too
+                return True
+        return False
+
+    def listing(self, stages: list[list[str]], cwd: str | None) -> str:
+        """Why the names a listing gives take in a part's files that exist;
+        a listing whose start the guard cannot place refuses a session that
+        has such files, and no other (fail closed)."""
+        if not any(p.files for p in self.parts):
+            return ""
+        if cwd is None:
+            return RUNTIME_REFUSAL
+        placed = False
+        for words in stages:
+            words = _behind(words)
+            if not words or any(_SUB_RE.search(w) for w in words):
+                return RUNTIME_REFUSAL
+            kind, why = self.lists(os.path.basename(words[0]), words[1:], cwd)
+            if why:
+                return why
+            # A listing with a word the hook cannot resolve is not placed.
+            if kind is None or (kind and any(_expand_token(w) is None for w in words)):
+                return RUNTIME_REFUSAL
+            placed = placed or kind
+        return "" if placed else RUNTIME_REFUSAL
+
+    def lists(self, name: str, args: list[str], cwd: str) -> tuple[bool | None, str]:
+        """``(True, why)`` for a listing judged from where it starts,
+        ``(False, "")`` for a filter of names, ``(None, "")`` for a command
+        whose output the guard cannot place."""
+        args = [_expand_token(a) or a for a in args]
+        name = "grep" if name in ("egrep", "fgrep") else name
+        if name == "find":
+            while args and args[0] in ("-H", "-L", "-P"):
+                args = args[1:]
+            n = next((i for i, a in enumerate(args) if a.startswith("-") or a in "!("),
+                     len(args))
+            tests = args[n:]
+            names = [v for o, v in zip(tests, tests[1:]) if o in ("-name", "-iname")]
+            if not names or {"!", "-not"} & set(tests) or (
+                    _FIND_NAMED - {"-name", "-iname"}) & set(tests):
+                names = None  # only a positive test on the name narrows it
+            fold = "-iname" in tests
+            return True, next((why for s in args[:n] or ["."] for why in [
+                self.at(s, cwd, False) or self.above(s, cwd, names=names, fold=fold)]
+                if why), "")
+        if name == "git":
+            i = 0
+            while i < len(args) and args[i].startswith("-"):
+                if args[i] == "-C" and i + 1 < len(args):
+                    cwd = os.path.join(cwd, args[i + 1])
+                i += 2 if args[i] in ("-C", "-c", "--git-dir", "--work-tree") else 1
+            sub, rest = (args[i], args[i + 1:]) if i < len(args) else ("", [])
+            if sub == "ls-files":
+                specs = _options(rest, _LS_FILES_VALUED)[0]
+            elif sub == "grep":
+                dd = rest.index("--") if "--" in rest else len(rest)
+                operands, options = _options(rest[:dd], _GIT_GREP_VALUED)
+                if _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
+                    operands = operands[1:]
+                specs = [o for o in operands if os.path.lexists(os.path.join(cwd, o))]
+                specs += rest[dd + 1:]
+            else:
+                return None, ""
+            if not specs or any(s.startswith(":") for s in specs):
+                specs = ["."]  # a magic pathspec is not read: the whole tree
+            return True, next((why for s in specs for why in [self.spec(s, cwd, False)]
+                               if why), "")
+        if name in ("grep", "rg"):
+            listed = name == "rg" and not {"--files", "-l", "--files-with-matches", "-L",
+                                           "--files-without-match"}.isdisjoint(args)
+            search = _shell_search(name, list(args), False)
+            if name == "grep" and search is None:
+                operands, options = _options(list(args), _GREP_VALUED)
+                if _PATTERN_OPTIONS.isdisjoint(o for o, _ in options):
+                    operands = operands[1:]
+                if not operands:
+                    return False, ""  # it picks some of the names fed to it
+                search = (operands, [], [])
+            elif name == "rg" and not listed:
+                return False, ""
+            for p in search[0]:
+                why = self.at(p, cwd) or self.above(p, cwd, search[1] + search[2],
+                                                    fold=bool(search[2]))
+                if why:
+                    return True, why
+            return True, ""
+        if name == "ls":
+            deep = any(_LS_RECURSIVE_RE.match(a) for a in args)
+            for t in [a for a in args if not a.startswith("-")] or ["."]:
+                why = self.at(t, cwd, False) or (
+                    self.above(t, cwd) if deep else self.listed(t, cwd))
+                if why:
+                    return True, why
+            return True, ""
+        if name in ("echo", "printf"):
+            return True, next((why for a in args for why in [self.at(a, cwd, False)]
+                               if why), "")
+        if name in _FILTERS:
+            return False, ""
+        return None, ""
+
 
 def acting_role(role: str | None, subagent_type: str | None) -> str:
     """The role whose reads are judged: the subagent's type when it is a
@@ -724,10 +1119,27 @@ def policy_refusal(tool_name: str, tool_input: dict, project_root: str, cwd: str
                    role: str | None, ticket_id: str | None,
                    subagent_type: str | None = None) -> str:
     """Why a read tool's or a Bash call is refused under Policy 2's (a),
-    (c) and (d), or ``""``.  Any error refuses (fail closed)."""
+    (c) and (d), or ``""``.  A subagent is refused what its session's role
+    is refused on the ticket and what its own type is refused (item 2).
+    A Bash write of the held-out list or the settings file that the write
+    rules do not read as one is judged by the acting role's allowed paths
+    (item 5).  Any error refuses (fail closed)."""
     try:
-        protected = parts(project_root, acting_role(role, subagent_type), ticket_id)
-        return _Judge(project_root, protected).tool(tool_name, tool_input, cwd)
+        session = (role or "").strip()
+        acting = acting_role(role, subagent_type)
+        protected = [p for r in dict.fromkeys((session, acting))
+                     for p in parts(project_root, r, ticket_id)]
+        may_write = None
+        if tool_name == "Bash":
+            pats: list[str] | None = None
+
+            def may_write(path: str) -> bool:
+                nonlocal pats
+                if pats is None:
+                    pats = _get_allowed_paths(acting, ticket_id, project_root,
+                                              session_role=session)
+                return _path_allowed(path, project_root, pats, acting)
+        return _Judge(project_root, protected, may_write).tool(tool_name, tool_input, cwd)
     except PolicyError as exc:
         return f"{exc}: the call is refused (fail closed, DEC-820)"
     except Exception:

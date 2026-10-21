@@ -17,9 +17,9 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 from gov.guard.decide import LONG_REFUSAL, decide  # noqa: E402
-from gov.guard.reads import (CHANGED_REFUSAL, HIDDEN_REFUSAL, SECRET_REFUSAL,  # noqa: E402
-                             TESTS_REFUSAL, PolicyError, check_sets, policy_refusal,
-                             set_fault)
+from gov.guard.reads import (CHANGED_REFUSAL, HIDDEN_REFUSAL, RUNTIME_REFUSAL,  # noqa: E402
+                             SECRET_REFUSAL, TESTS_REFUSAL, WRITE_FORM_REFUSAL, PolicyError,
+                             check_sets, policy_refusal, set_fault)
 
 TICKET = "DAEO-t95"
 SETS = ("evaluation_sets:\n  m:\n    visible: [docs/q.md]\n"
@@ -174,11 +174,103 @@ def test_each_route_is_decided_as_policy_2_says(project, role, tool, tool_input,
     assert _why(project, role, tool, tool_input) == why
 
 
-def test_the_acting_role_is_the_subagent_s(project):
+def test_a_subagent_is_refused_its_session_s_and_its_type_s_parts(project):
     read = {"file_path": "tests/acceptance/W2-95/test_feature.py"}
     assert _why(project, "orchestrator", "Read", read, agent="engineer") == TESTS_REFUSAL
-    assert _why(project, "engineer", "Read", read, agent="independent-auditor") == ""
-    assert _why(project, "engineer", "Read", read, agent="Explore") == TESTS_REFUSAL
+    for agent in ("independent-auditor", "orchestrator", "research", "product-spec",
+                  "independent-test-designer", "Explore", None):
+        assert _why(project, "engineer", "Read", read, agent=agent) == TESTS_REFUSAL, agent
+    for agent in ("Explore", "general-purpose", None):
+        assert _why(project, "orchestrator", "Read", read, agent=agent) == "", agent
+    changed = {"file_path": "src/app/main.py"}
+    for agent in ("engineer", "independent-auditor"):
+        assert _why(project, "independent-test-designer", "Read", changed,
+                    agent=agent) == CHANGED_REFUSAL, agent
+
+
+def test_a_ticket_named_by_its_wbs_id_is_refused_as_by_its_id(project):
+    read = {"file_path": "tests/acceptance/W2-95/test_feature.py"}
+    assert _why(project, "engineer", "Read", read, ticket="W2-95") == TESTS_REFUSAL
+    assert _why(project, "engineer", *_bash("cat tests/acceptance/W2-96/test_other.py"),
+                ticket="W2-95") == ""
+    assert _why(project, "engineer", "Read", read, ticket="W2-99") == ""
+    _put(project, "governance/project/path-map.yaml",
+         "evaluation_sets:\n  m:\n    hidden: [eval/hidden/**]\n"
+         f"    measures: {{tickets: [{TICKET}]}}\n")
+    hidden = {"file_path": "eval/hidden/a.yaml"}
+    assert _why(project, "engineer", "Read", hidden, ticket="W2-95") == HIDDEN_REFUSAL
+    assert _why(project, "orchestrator", "Read", hidden, ticket="W2-96") == ""
+    # A file that claims the WBS id and cannot be read for it refuses.
+    _put(project, f".tickets/{TICKET}.md", "---\nwbs_id: W2-95\nx: [\n")
+    assert "fail closed" in _why(project, "engineer", "Read", read, ticket="W2-95")
+
+
+@pytest.mark.parametrize("rel", ["deepseek.env", "services/api/provider.env",
+                                 ".secrets/token.txt", "ops/deploy/.secrets/api.json"])
+def test_the_repository_s_credential_names_are_secrets(project, rel):
+    _put(project, rel)
+    for role in ("engineer", "independent-auditor", "orchestrator"):
+        for tool, tool_input in (("Read", {"file_path": rel}), _bash(f"cat {rel}"),
+                                 _bash(f"cp {rel} /tmp/x")):
+            assert _why(project, role, tool, tool_input) == SECRET_REFUSAL, (role, tool_input)
+    # A search from a folder above stays as it was.
+    assert _why(project, "independent-auditor", *_bash("grep -rn q .")) == ""
+
+
+RUNTIME = [
+    # (role, command, refused): the listing judged from where it starts.
+    ("engineer", "git ls-files | xargs grep -n q", TESTS_REFUSAL),
+    ("engineer", "find . -name '*.py' | xargs grep -n q", TESTS_REFUSAL),
+    ("engineer", "grep -n q $(git ls-files '*.py')", TESTS_REFUSAL),
+    ("engineer", "cat `find tests -name test_feature.py`", TESTS_REFUSAL),
+    ("engineer", 'find . -print | while read f; do grep -H q "$f"; done', TESTS_REFUSAL),
+    ("engineer", "for f in $(git ls-files); do cat $f; done", TESTS_REFUSAL),
+    ("engineer", "ls tests/acceptance/W2-95 | xargs cat", TESTS_REFUSAL),
+    ("engineer", "git ls-files src | xargs grep -n q", ""),
+    ("engineer", "find src -name '*.py' | xargs grep -n q", ""),
+    ("engineer", "git ls-files src | grep main | xargs cat", ""),
+    ("engineer", "find . -name '*.md' | xargs cat", ""),
+    ("engineer", "git ls-files | xargs wc -l", ""),
+    ("engineer", "for f in $(git ls-files); do echo $f; done", ""),
+    ("engineer", "git commit -m \"$(cat msg.txt)\"", ""),
+    ("engineer", "python3 -m pytest tests/acceptance/W2-95/ -q | tail -5", ""),
+    ("engineer", "cat list.txt | xargs cat", RUNTIME_REFUSAL),
+    ("engineer", "xargs -a list.txt cat", RUNTIME_REFUSAL),
+    ("engineer", "cd $NOWHERE_SET && git ls-files | xargs cat", RUNTIME_REFUSAL),
+    ("engineer", "cat $(git rev-parse --show-toplevel)/x", RUNTIME_REFUSAL),
+    ("independent-test-designer", "git ls-files src | xargs cat", CHANGED_REFUSAL),
+    ("independent-test-designer", "cat $(find src -name main.py)", CHANGED_REFUSAL),
+    ("research", "find eval -name '*.yaml' | xargs cat", HIDDEN_REFUSAL),
+    ("research", "grep -n q $(git ls-files eval)", HIDDEN_REFUSAL),
+    ("orchestrator", "git ls-files | xargs grep -n q", ""),
+    ("orchestrator", "cat list.txt | xargs cat", ""),
+    ("independent-auditor", "cat $(find tests -name test_feature.py)", ""),
+]
+
+
+@pytest.mark.parametrize("role, command, why", RUNTIME)
+def test_file_names_given_at_run_time_are_judged_as_a_search(project, role, command, why):
+    assert _why(project, role, *_bash(command)) == why
+
+
+def test_an_engineer_with_no_acceptance_folder_is_refused_no_listing(project):
+    _git(project, "rm", "-rq", "tests/acceptance/W2-95")
+    for command in ("git ls-files | xargs grep -n q", "cat list.txt | xargs cat"):
+        assert _why(project, "engineer", *_bash(command)) == "", command
+
+
+@pytest.mark.parametrize("form", ["dd if=docs/q.md of={f}", "truncate -s 0 {f}",
+                                  "sort -o {f} docs/q.md", "rsync docs/q.md {f}",
+                                  "patch {f} docs/q.md", "git checkout -- {f}",
+                                  "git restore {f}"])
+@pytest.mark.parametrize("rel", ["governance/project/held-out.yaml", ".claude/settings.json"])
+def test_a_write_the_write_rules_do_not_see_of_the_two_files_stays_refused(project, form, rel):
+    command = form.format(f=rel)
+    for role in ("engineer", "independent-test-designer", "research"):
+        assert _why(project, role, *_bash(command)) == WRITE_FORM_REFUSAL, (role, command)
+        assert _why(project, role, *_bash(f"cat {rel}")) == ""
+    assert _why(project, "engineer", *_bash(form.format(f="src/app/main.py"))) == ""
+    assert "DEC-821" in WRITE_FORM_REFUSAL and "{" not in WRITE_FORM_REFUSAL
 
 
 def test_a_part_that_does_not_exist_is_refused_only_where_a_call_aims_at_it(project, tmp_path):
