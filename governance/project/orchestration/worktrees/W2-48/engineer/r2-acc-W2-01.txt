@@ -1,0 +1,708 @@
+FF.................................................................FFFFF [ 81%]
+FFFFFFF......FFF                                                         [100%]
+=================================== FAILURES ===================================
+_ test_a_ticket_commit_an_owner_decision_names_is_accepted_and_listed_by_the_close[the full id] _
+
+length = 40, project = <w2_01_support.Project object at 0x764b1903ed80>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_a...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_an_owner_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("length", (40, 8), ids=("the full id", "an abbreviated id"))
+    def test_a_ticket_commit_an_owner_decision_names_is_accepted_and_listed_by_the_close(length, project, sandbox,
+                                                                                        interface):
+        claim = _claim_without_implements(project)
+        _accept(project, claim, "DEC-900", length=length)
+        support.checkpointed(project, TICKET)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_accepted_history.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-hist', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-40i1"}}}\n', stderr='', seconds=3.526277964003384)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-hist --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.48, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.84, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [{"commit": "643c9026ca5229bde759b6f5715c0ee52819848e", "decision": "DEC-900"}], "test_cache": {"run": "20261020T203504Z-8b029a4d", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_an_owner_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "e2f24c7f530937fb2966764b7f9818efd58b9996", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-hist/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-40i1"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_ticket_commit_an_owner_decision_names_is_accepted_and_listed_by_the_close[an abbreviated id] _
+
+length = 8, project = <w2_01_support.Project object at 0x764b18fc7770>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_a...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_an_owner_1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("length", (40, 8), ids=("the full id", "an abbreviated id"))
+    def test_a_ticket_commit_an_owner_decision_names_is_accepted_and_listed_by_the_close(length, project, sandbox,
+                                                                                        interface):
+        claim = _claim_without_implements(project)
+        _accept(project, claim, "DEC-900", length=length)
+        support.checkpointed(project, TICKET)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_accepted_history.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-hist', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-o8vu"}}}\n', stderr='', seconds=3.197007125010714)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-hist --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.35, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.8, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [{"commit": "643c9026ca5229bde759b6f5715c0ee52819848e", "decision": "DEC-900"}], "test_cache": {"run": "20261020T203508Z-dd84d482", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_an_owner_1/project/.gov-runtime/testcache/shared", "from": null, "commit": "ec2331ac6a86dbf17c20ea71ae5c8f4068b6f168", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-hist/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-o8vu"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_reopened_ticket_with_an_earlier_record_and_a_passing_later_one_closes[the later record under a round name] _
+
+names = 'the later record under a round name'
+project = <w2_01_support.Project object at 0x764b18ec5ca0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_an0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("names", tuple(NAMES))
+    def test_a_reopened_ticket_with_an_earlier_record_and_a_passing_later_one_closes(names, project, sandbox,
+                                                                                    interface):
+        earlier, later = NAMES[names]
+>       _round_one_closed(project, sandbox, interface, earlier)
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:45: in _round_one_closed
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-29e1"}}}\n', stderr='', seconds=2.6754526239819825)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.22, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.72, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203837Z-29c4c4fd", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_an0/project/.gov-runtime/testcache/shared", "from": null, "commit": "cb208ed641f35060e2603e5dc1d0d7075a48abf0", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-29e1"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_reopened_ticket_with_an_earlier_record_and_a_passing_later_one_closes[the earlier record under a round name] _
+
+names = 'the earlier record under a round name'
+project = <w2_01_support.Project object at 0x764b18ec49e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_an1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("names", tuple(NAMES))
+    def test_a_reopened_ticket_with_an_earlier_record_and_a_passing_later_one_closes(names, project, sandbox,
+                                                                                    interface):
+        earlier, later = NAMES[names]
+>       _round_one_closed(project, sandbox, interface, earlier)
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:45: in _round_one_closed
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-cnle"}}}\n', stderr='', seconds=2.903713925043121)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.32, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.72, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203840Z-ae685dae", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_an1/project/.gov-runtime/testcache/shared", "from": null, "commit": "79bba932ccdc951f8866faaf6aef121c67fe59f3", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-cnle"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_fix_round_after_a_failing_probe_closes_on_the_passing_record_of_the_fix _
+
+project = <w2_01_support.Project object at 0x764b18ec5fd0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_fix_round_after...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_fix_round_after_a_faili0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_fix_round_after_a_failing_probe_closes_on_the_passing_record_of_the_fix(project, sandbox, interface):
+        """Round one's probe failed, so the ticket was not closed; the fix round is probed and passes. The failing
+        record is of round one's code, not of the final code (DEC-500: "a record that says the probe of the final
+        code failed refuses")."""
+        support.create_ticket(project, TICKET, WBS, profile="FULL")
+        first = support.engineer_commit(project, TICKET, {FEATURE: "# feature, round one\n"})
+        support.probe_recorded(project, TICKET, first, judgement="fail", name=f"PR-{TICKET}")
+        fixed = support.engineer_commit(project, TICKET, {FEATURE: "# feature, fixed\n"})
+        support.probe_recorded(project, TICKET, fixed, name=f"PR-{TICKET}-round-2")
+        support.checkpointed(project, TICKET)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       support.closed(run, interface)
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-zqvh"}}}\n', stderr='', seconds=2.723817970021628)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.28, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.72, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203844Z-6863e782", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_fix_round_after_a_faili0/project/.gov-runtime/testcache/shared", "from": null, "commit": "90895bf6c51e7eaf3a74f4577279398c6fc3ab19", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-zqvh"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+______ test_a_reopened_ticket_with_only_the_earlier_record_still_refuses _______
+
+project = <w2_01_support.Project object at 0x764b18eeae70>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_on0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_reopened_ticket_with_only_the_earlier_record_still_refuses(project, sandbox, interface):
+>       _round_one_closed(project, sandbox, interface, f"PR-{TICKET}")
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:45: in _round_one_closed
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-8gt8"}}}\n', stderr='', seconds=2.774752246972639)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.28, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.72, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203847Z-ca7af740", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_reopened_ticket_with_on0/project/.gov-runtime/testcache/shared", "from": null, "commit": "9352e52a0a5876eefe1c8d8a671f237ba94ce101", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-8gt8"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_failing_later_record_beside_a_passing_earlier_one_refuses[the later record under a round name] _
+
+names = 'the later record under a round name'
+project = <w2_01_support.Project object at 0x764b18ec7260>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_r...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_record_be0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("names", tuple(NAMES))
+    def test_a_failing_later_record_beside_a_passing_earlier_one_refuses(names, project, sandbox, interface):
+        """Refused today too, but by round one's record (the gate stops at its first finding); the refusal must be the
+        later record's judgement."""
+        earlier, later = NAMES[names]
+>       _round_one_closed(project, sandbox, interface, earlier)
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:45: in _round_one_closed
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-xlip"}}}\n', stderr='', seconds=2.7137364159571007)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.25, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.71, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203851Z-57590946", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_record_be0/project/.gov-runtime/testcache/shared", "from": null, "commit": "bd5f8692ea2d6107d9a2a050af7f2047963870f1", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-xlip"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_failing_later_record_beside_a_passing_earlier_one_refuses[the earlier record under a round name] _
+
+names = 'the earlier record under a round name'
+project = <w2_01_support.Project object at 0x764b18ec41a0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_r...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_record_be1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("names", tuple(NAMES))
+    def test_a_failing_later_record_beside_a_passing_earlier_one_refuses(names, project, sandbox, interface):
+        """Refused today too, but by round one's record (the gate stops at its first finding); the refusal must be the
+        later record's judgement."""
+        earlier, later = NAMES[names]
+>       _round_one_closed(project, sandbox, interface, earlier)
+
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:127: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/test_w2_01_probe_rounds.py:45: in _round_one_closed
+    support.closed(support.run_close(project, sandbox, TICKET), interface)
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rond', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-ui3o"}}}\n', stderr='', seconds=2.7444368369760923)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rond --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.29, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.73, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203854Z-fb378d5b", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_failing_later_record_be1/project/.gov-runtime/testcache/shared", "from": null, "commit": "4a71abd1bb7425b54970845a21815ab0b4731e87", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-rond/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-ui3o"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_ticket_commit_before_the_base_does_not_refuse_the_close[creating commit without Implements] _
+
+shape = 'creating commit without Implements'
+project = <w2_01_support.Project object at 0x764b18eebb60>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_b...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("shape", SHAPES)
+    def test_a_ticket_commit_before_the_base_does_not_refuse_the_close(shape, project, sandbox, interface):
+        early = _early(project, shape)
+        base = _boundary(project)
+        project.set_path_map(**{support.BASE_KEY: base})
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        assert not support.mentions(run.envelope().get("error") or {}, early), \
+            f"the commit {early[:12]} before the base {base[:12]} is judged\n{run.describe()}"
+>       support.closed(run, interface)
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-pu8e"}}}\n', stderr='', seconds=2.969605081016198)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.26, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.68, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "accepted_history": [], "trailers_base_move": {"from": null, "to": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "commits_out_of_judgement": 4}, "test_cache": {"run": "20261020T203858Z-a5dd36e3", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th0/project/.gov-runtime/testcache/shared", "from": null, "commit": "a77d7dae0002f3c06bcc1f558bca4db7410f240b", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-pu8e"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_ticket_commit_before_the_base_does_not_refuse_the_close[claim commit with Task: only] _
+
+shape = 'claim commit with Task: only'
+project = <w2_01_support.Project object at 0x764b18ee9a00>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_b...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("shape", SHAPES)
+    def test_a_ticket_commit_before_the_base_does_not_refuse_the_close(shape, project, sandbox, interface):
+        early = _early(project, shape)
+        base = _boundary(project)
+        project.set_path_map(**{support.BASE_KEY: base})
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        assert not support.mentions(run.envelope().get("error") or {}, early), \
+            f"the commit {early[:12]} before the base {base[:12]} is judged\n{run.describe()}"
+>       support.closed(run, interface)
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-jc47"}}}\n', stderr='', seconds=3.2269058040110394)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.31, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.76, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "3bde134c1ea5d9165857f691ea149491ac3238af", "accepted_history": [], "trailers_base_move": {"from": null, "to": "3bde134c1ea5d9165857f691ea149491ac3238af", "commits_out_of_judgement": 4}, "test_cache": {"run": "20261020T203902Z-f8ddba2a", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th1/project/.gov-runtime/testcache/shared", "from": null, "commit": "d62f779e7a6e2a22b58058ec196a76fb014c75e8", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-jc47"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_ticket_commit_before_the_base_does_not_refuse_the_close[engineer commit without Implements] _
+
+shape = 'engineer commit without Implements'
+project = <w2_01_support.Project object at 0x764b18ec7e30>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_b...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th2/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("shape", SHAPES)
+    def test_a_ticket_commit_before_the_base_does_not_refuse_the_close(shape, project, sandbox, interface):
+        early = _early(project, shape)
+        base = _boundary(project)
+        project.set_path_map(**{support.BASE_KEY: base})
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        assert not support.mentions(run.envelope().get("error") or {}, early), \
+            f"the commit {early[:12]} before the base {base[:12]} is judged\n{run.describe()}"
+>       support.closed(run, interface)
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-wv4y"}}}\n', stderr='', seconds=3.3462813739897683)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.34, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.92, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "624bc518af4fa5c8498e49f453f55bfe59007040", "accepted_history": [], "trailers_base_move": {"from": null, "to": "624bc518af4fa5c8498e49f453f55bfe59007040", "commits_out_of_judgement": 5}, "test_cache": {"run": "20261020T203906Z-e4312931", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_ticket_commit_before_th2/project/.gov-runtime/testcache/shared", "from": null, "commit": "b9cf85df5fa30a33c9cd2cfd5c20c92dd35a6b65", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-wv4y"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+______________ test_the_close_names_the_base_it_used[the full id] ______________
+
+length = 40, project = <w2_01_support.Project object at 0x764b18ec4fb0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_t...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_the_base_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("length", (40, 8), ids=("the full id", "an abbreviated id"))
+    def test_the_close_names_the_base_it_used(length, project, sandbox, interface):
+        """KPI 6: the output names the base used, as a full commit id under ``trailers_base``."""
+        _early(project, SHAPES[0])
+        base = _boundary(project)
+        project.set_path_map(**{support.BASE_KEY: base[:length]})
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-8g3k"}}}\n', stderr='', seconds=3.839538800995797)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.56, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.95, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "accepted_history": [], "trailers_base_move": {"from": null, "to": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "commits_out_of_judgement": 4}, "test_cache": {"run": "20261020T203910Z-3402068c", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_the_base_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "7a0f54aabccb7a4f833731fc4a8cdc7ba456f59c", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-8g3k"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+___________ test_the_close_names_the_base_it_used[an abbreviated id] ___________
+
+length = 8, project = <w2_01_support.Project object at 0x764b18eeb1d0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_t...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_the_base_1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("length", (40, 8), ids=("the full id", "an abbreviated id"))
+    def test_the_close_names_the_base_it_used(length, project, sandbox, interface):
+        """KPI 6: the output names the base used, as a full commit id under ``trailers_base``."""
+        _early(project, SHAPES[0])
+        base = _boundary(project)
+        project.set_path_map(**{support.BASE_KEY: base[:length]})
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:86: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-80u8"}}}\n', stderr='', seconds=3.0560499079874717)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.29, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.74, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "accepted_history": [], "trailers_base_move": {"from": null, "to": "dc80fd75bf77873bf97480daeca65cd29d87bc59", "commits_out_of_judgement": 4}, "test_cache": {"run": "20261020T203914Z-10a9341b", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_names_the_base_1/project/.gov-runtime/testcache/shared", "from": null, "commit": "573e3223ce0baf5253dd5594121b64b88f0f7af3", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-80u8"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_a_project_without_a_base_is_judged_whole_and_the_close_says_no_base_was_used _
+
+project = <w2_01_support.Project object at 0x764b18ef6e40>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_without...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_without_a_base_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_project_without_a_base_is_judged_whole_and_the_close_says_no_base_was_used(project, sandbox,
+                                                                                           interface):
+        """KPI 6, a clone's path map without a base: the whole history is judged (DEC-482), and the answer says that
+        no base was used (``trailers_base`` present and null)."""
+        support.create_ticket(project, TICKET, WBS)
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:100: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... their class; use --disposition to classify", "repair_ticket": "pro-aan9"}}}\n', stderr='', seconds=2.8025778319570236)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.26, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.75, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203918Z-a5bc0efa", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_without_a_base_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "3966063917fc81ed10c38351d15e6d2a4ec19ec6", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-aan9"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+_ test_the_close_reports_a_move_of_the_base_with_its_count[from an earlier base] _
+
+first = True, project = <w2_01_support.Project object at 0x764b18ee9a30>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports_a_move_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("first", (True, False), ids=("from an earlier base", "from no base"))
+    def test_the_close_reports_a_move_of_the_base_with_its_count(first, project, sandbox, interface):
+        new, old, count = _moved_project(project, first)
+        support.create_ticket(project, TICKET, WBS)
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-plcy"}}}\n', stderr='', seconds=2.621703089971561)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.23, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.67, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "b80c28800a8d8314a6d527fc78941d6dffde5e15", "accepted_history": [], "trailers_base_move": {"from": "73397dfde7f114e263811832a4563266d18e2ff9", "to": "b80c28800a8d8314a6d527fc78941d6dffde5e15", "commits_out_of_judgement": 3}, "test_cache": {"run": "20261020T203936Z-ad64c236", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports_a_move_0/project/.gov-runtime/testcache/shared", "from": null, "commit": "28eadc53fa2ea37b100fd4428d513b78f4759147", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-plcy"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+____ test_the_close_reports_a_move_of_the_base_with_its_count[from no base] ____
+
+first = False, project = <w2_01_support.Project object at 0x764b18ec7d10>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports_a_move_1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("first", (True, False), ids=("from an earlier base", "from no base"))
+    def test_the_close_reports_a_move_of_the_base_with_its_count(first, project, sandbox, interface):
+        new, old, count = _moved_project(project, first)
+        support.create_ticket(project, TICKET, WBS)
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-bxy0"}}}\n', stderr='', seconds=2.618194234033581)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.22, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.67, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": "3e96044c95440b0d80cdd37147773a79cb6b0383", "accepted_history": [], "trailers_base_move": {"from": null, "to": "3e96044c95440b0d80cdd37147773a79cb6b0383", "commits_out_of_judgement": 3}, "test_cache": {"run": "20261020T203939Z-ac99db51", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_the_close_reports_a_move_1/project/.gov-runtime/testcache/shared", "from": null, "commit": "5c043bcfcde7cb89a9a8a20d4592287914d7d3dd", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-bxy0"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+__________ test_a_project_that_never_recorded_a_base_reports_no_move ___________
+
+project = <w2_01_support.Project object at 0x764b18ef40e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_that_ne...gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_that_never_reco0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_project_that_never_recorded_a_base_reports_no_move(project, sandbox, interface):
+        """The other side: no path map of the project's history holds a base, so no move is reported."""
+        support.create_ticket(project, TICKET, WBS)
+        _ready(project)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       result = support.closed(run, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-01/test_w2_01_trailers_base.py:228: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-01/w2_01_support.py:284: in closed
+    return base.result_of(run, interface)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-base', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "pro-kvie"}}}\n', stderr='', seconds=2.741044263006188)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-base --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["the test run of tests ended with exit code 0 and stated no result: nothing of it was measured"], "tests_run": {"passed": 0, "failed": 0, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.3, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.74, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T203942Z-563cab77", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/gov-launch-engineer-v45jfxaw/claude-1000/pytest-of-usain/pytest-44/test_a_project_that_never_reco0/project/.gov-runtime/testcache/shared", "from": null, "commit": "d65ec4a9d3c18fca47efa2b6402b2b69da590a4a", "clean": true, "wrote_entries": true, "keys": ["795369c59c094169d342098f5f4456cd"], "tests": [{"id": "tests/acceptance/W1-base/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 1, "failed": 0, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-kvie"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+17 failed, 71 passed in 281.99s (0:04:41)

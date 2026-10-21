@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "register-entry",
+  "description": "A decision entry: one entry of the decision register as a record of its own (AR-1, DEC-718): its id, status, owner, date and its own span, the text its own hash is taken over. Decisions are headings in the register, not files (DEC-274); core-schema does not read the register, and the store's record of each entry is held to this schema by the ticket that builds it (W2-03), which also gives the span its form.",
+  "type": "object",
+  "required": ["id", "type", "status", "owner", "date", "span"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/decision_id" },
+    "type": { "const": "register-entry" },
+    "status": { "description": "The entry's status word, as its `Status:` line gives it (ACCEPTED, for example).", "type": "string", "minLength": 1 },
+    "owner": { "description": "Who decided, as the entry's `Status:` line names it (the owner, or the role it was delegated to).", "type": "string", "minLength": 1 },
+    "date": { "description": "The date of the decision, as the entry's `Status:` line gives it.", "type": "string", "minLength": 1 },
+    "span": { "description": "The entry's own text in the register, from its heading to the next; its form is the store's (W2-03)." }
+  }
+}

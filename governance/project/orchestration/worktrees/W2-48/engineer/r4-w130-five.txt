@@ -1,0 +1,131 @@
+..FF.                                                                    [100%]
+=================================== FAILURES ===================================
+_____________ test_iteration_count_hidden_across_multiple_failures _____________
+
+project = <w1_30_support.Project object at 0x78fef0030770>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_iteration_count_hi.../gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_iteration_count_hidden_ac0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_iteration_count_hidden_across_multiple_failures(project, sandbox, interface):
+        """KPI F3, CAP-59.b: even after multiple failures, the count stays hidden."""
+        _failing_project(project)
+        for i in range(3):
+            run = support.run_close(project, sandbox, TICKET)
+>           envelope = support.envelope_of(run, interface)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_iteration.py:378: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/w1_30_support.py:763: in envelope_of
+    envelope = cli_support.assert_envelope(run, interface, command=COMMAND)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:438: in assert_envelope
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('close', 'PROJ-iter', '--json'), returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File...              ^^^^^^^^^^\nAttributeError: \'Session\' object has no attribute \'state\'\n', seconds=2.4135715709999204)
+
+    def envelope(self):
+        """Standard output as one JSON object."""
+        try:
+            data = json.loads(self.stdout)
+        except ValueError:
+>           raise AssertionError(f"standard output is not one JSON document\n{self.describe()}") from None
+E           AssertionError: standard output is not one JSON document
+E           gov close PROJ-iter --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_iteration_count_hidden_ac0/sandbox/bin/gov", line 8, in <module>
+E               sys.exit(_target())
+E                        ^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/cli/main.py", line 217, in main
+E               outcome = command.handler(root, args, config)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/command.py", line 216, in run
+E               _refuse_for(root, ticket, found, disposition, packet, test_runs, {**report, "test_cache": cache.refusal()})
+E                                                                                                         ^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/cache.py", line 62, in refusal
+E               record = self.record()
+E                        ^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/cache.py", line 56, in record
+E               self._record = self.session.finish()
+E                              ^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/testcache/__init__.py", line 496, in finish
+E               return {"run": self.run, "engine": engine(), "cache": self.state(), **self.reason(),  # no absolute path
+E                                                                     ^^^^^^^^^^
+E           AttributeError: 'Session' object has no attribute 'state'
+
+tests/acceptance/W1-07/w1_07_support.py:399: AssertionError
+__________ test_a_failing_case_of_the_parallel_run_is_named_as_before __________
+
+project = <w1_30_support.Project object at 0x78fef02020f0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_a_failing_case_of_.../gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_a_failing_case_of_the_par0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tmp_path = PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_a_failing_case_of_the_par0')
+
+    def test_a_failing_case_of_the_parallel_run_is_named_as_before(project, sandbox, interface, tmp_path):
+        """The findings of today, in the parallel form: the failing case is named, the declared case still runs
+        (both runs go to their end), and the refusal is counted once."""
+        entry, declared, _ = DECLARED["a unit test file"]
+        told = _told(tmp_path)
+        _build(project, told, declared=[entry], bodies={"test_unit_one": "assert False, 'planted failure'"})
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py:185: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/w1_30_support.py:697: in refused
+    envelope = envelope_of(run, interface)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-30/w1_30_support.py:763: in envelope_of
+    envelope = cli_support.assert_envelope(run, interface, command=COMMAND)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:438: in assert_envelope
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('close', 'PROJ-para', '--json'), returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File...              ^^^^^^^^^^\nAttributeError: \'Session\' object has no attribute \'state\'\n', seconds=3.9122412930009887)
+
+    def envelope(self):
+        """Standard output as one JSON object."""
+        try:
+            data = json.loads(self.stdout)
+        except ValueError:
+>           raise AssertionError(f"standard output is not one JSON document\n{self.describe()}") from None
+E           AssertionError: standard output is not one JSON document
+E           gov close PROJ-para --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-4/test_a_failing_case_of_the_par0/sandbox/bin/gov", line 8, in <module>
+E               sys.exit(_target())
+E                        ^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/cli/main.py", line 217, in main
+E               outcome = command.handler(root, args, config)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/command.py", line 216, in run
+E               _refuse_for(root, ticket, found, disposition, packet, test_runs, {**report, "test_cache": cache.refusal()})
+E                                                                                                         ^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/cache.py", line 62, in refusal
+E               record = self.record()
+E                        ^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/close/cache.py", line 56, in record
+E               self._record = self.session.finish()
+E                              ^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-48/src/gov/testcache/__init__.py", line 496, in finish
+E               "commit": self.commit, "clean": self.clean, "wrote_entries": bool(writes),  # no absolute path
+E                                                             ^^^^^^^^^^
+E           AttributeError: 'Session' object has no attribute 'state'
+
+tests/acceptance/W1-07/w1_07_support.py:399: AssertionError
+2 failed, 3 passed in 28.43s

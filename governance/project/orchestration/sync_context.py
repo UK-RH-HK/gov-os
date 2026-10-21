@@ -56,6 +56,11 @@ def plan():
         if not src.is_dir():
             continue
         for dirpath, dirnames, filenames in os.walk(src):
+            # A folder with its own .gitignore is a tool's store that ignores itself (W2-48's test-cache stores):
+            # copied, it is ignored only by that uncommitted file, which refuses a close (TREE_NOT_COMMITTED).
+            if ".gitignore" in filenames:
+                dirnames[:] = []
+                continue
             dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS)
             for name in sorted(filenames):
                 path = Path(dirpath) / name

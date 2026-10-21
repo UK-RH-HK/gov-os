@@ -1,0 +1,29 @@
+........................................................................ [ 10%]
+........................................................................ [ 21%]
+........................................................................ [ 31%]
+..........................................................F............. [ 42%]
+........................................................................ [ 52%]
+........................................................................ [ 63%]
+........................................................................ [ 73%]
+........................................................................ [ 84%]
+........................................................................ [ 94%]
+.....................................                                    [100%]
+=================================== FAILURES ===================================
+_________ test_a_flag_put_over_the_placeholder_during_a_command_stays __________
+the launched session did not run the probe to its end (the probe's results file: ''), so this case observed nothing.
+the session's exit code: 0
+tool calls of the session: ['Bash: {"command": "bash .gov-runtime/scratch/w1-50-pause/probe.sh", "description": "Run the specified probe script"}']
+what the harness answered to them: ['an error: \'Exit code 1\\nbwrap: Can\\\'t bind mount /oldroot/dev/null on /newroot/tmp/pytest-of-usain/pytest-5434/test_a_flag_put_over_the_place0/repo/.gov-runtime/freeze: Unable to remount destination "/newroot/tmp/pytest-of-usain/pytest-5434/test_a_flag_put_over_the_place0/repo/.gov-runtime/freeze" with correct flags: Invalid argument\'']
+the session's final answer: 'DONE' (subtype 'success', is_error False)
+the end of its error output: ''
+=============================== warnings summary ===============================
+tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200
+  /home/usain/gov-os-worktrees/W2-58/tests/acceptance/W1-50/test_w1_50_freeze_launcher.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200
+  /home/usain/gov-os-worktrees/W2-58/tests/acceptance/W1-50/test_w1_50_freeze_live_pause.py:200: PytestUnknownMarkWarning: Unknown pytest.mark.local_only - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.local_only
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 failed, 684 passed, 2 warnings in 212.86s (0:03:32)

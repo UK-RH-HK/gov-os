@@ -1,0 +1,162 @@
+........................................................................ [ 14%]
+.............................................FFF........................ [ 28%]
+.................................................................F...... [ 42%]
+..................................................................F..... [ 56%]
+........................................................................ [ 70%]
+........................................................................ [ 84%]
+........................................................................ [ 98%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+______________________ test_iteration_count_not_in_output ______________________
+
+project = <w1_30_support.Project object at 0x7d9cd35946b0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_iteration_count_not_in_ou0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_iteration_count_not_in_ou0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_iteration_count_not_in_output(project, sandbox, interface):
+        """KPI F3, CAP-59.b: no iteration count in any output seen by the looping session."""
+        _failing_project(project)
+        run = support.run_close(project, sandbox, TICKET)
+        envelope = support.envelope_of(run, interface)
+        result_or_details = envelope.get("result", {}) or envelope.get("error", {}).get("details", {})
+        serialised = json.dumps(result_or_details).lower()
+        for field in ITERATION_FIELDS:
+>           assert field not in serialised, \
+                f"the output exposes '{field}' to the looping session (CAP-59.b)"
+E           AssertionError: the output exposes 'iteration_count' to the looping session (CAP-59.b)
+E           assert 'iteration_count' not in '{"findings"... "pro-poc2"}'
+E             
+E             'iteration_count' is contained here:
+E               5175/test_iteration_count_not_in_ou0/project/.gov-runtime/testcache/shared", "from": null, "commit": "0a4722de4445c7dc3513ca47464aa38e58f95876", "clean": true, "wrote_entries": true, "keys": ["a5cc02e9bb7251cab240574405361ce6"], "tests": [{"id": "tests/acceptance/w1-iter/test_fail.py::test_fail", "result": "failed"}], "counts": {"passed": 0, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-poc2"}
+E             ?           +++++++++++++++
+
+tests/acceptance/W1-30/test_w1_30_iteration.py:357: AssertionError
+__________________________ test_budget_not_in_output ___________________________
+
+project = <w1_30_support.Project object at 0x7d9cd3594620>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_budget_not_in_output0/sandbox/home'), tmpdir=PosixPath('...andbox/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_budget_not_in_output0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_budget_not_in_output(project, sandbox, interface):
+        """KPI F3, CAP-59.b: no budget in any output seen by the looping session."""
+        _failing_project(project)
+        run = support.run_close(project, sandbox, TICKET)
+        envelope = support.envelope_of(run, interface)
+        result_or_details = envelope.get("result", {}) or envelope.get("error", {}).get("details", {})
+        serialised = json.dumps(result_or_details).lower()
+        for field in BUDGET_FIELDS:
+>           assert field not in serialised, \
+                f"the output exposes '{field}' to the looping session (CAP-59.b)"
+E           AssertionError: the output exposes 'budget' to the looping session (CAP-59.b)
+E           assert 'budget' not in '{"findings"... "pro-vd41"}'
+E             
+E             'budget' is contained here:
+E               5175/test_budget_not_in_output0/project/.gov-runtime/testcache/shared", "from": null, "commit": "2216cdad468f64cd8f7809b85cade2694aeb8a06", "clean": true, "wrote_entries": true, "keys": ["a5cc02e9bb7251cab240574405361ce6"], "tests": [{"id": "tests/acceptance/w1-iter/test_fail.py::test_fail", "result": "failed"}], "counts": {"passed": 0, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-vd41"}
+E             ?           ++++++
+
+tests/acceptance/W1-30/test_w1_30_iteration.py:369: AssertionError
+_____________ test_iteration_count_hidden_across_multiple_failures _____________
+
+project = <w1_30_support.Project object at 0x7d9cd3594b30>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_iteration_count_hidden_ac0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_iteration_count_hidden_ac0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_iteration_count_hidden_across_multiple_failures(project, sandbox, interface):
+        """KPI F3, CAP-59.b: even after multiple failures, the count stays hidden."""
+        _failing_project(project)
+        for i in range(3):
+            run = support.run_close(project, sandbox, TICKET)
+            envelope = support.envelope_of(run, interface)
+            serialised = json.dumps(envelope).lower()
+            for field in ITERATION_FIELDS + BUDGET_FIELDS:
+>               assert field not in serialised, \
+                    f"iteration {i + 1}: output exposes '{field}' (CAP-59.b)"
+E               AssertionError: iteration 1: output exposes 'iteration_count' (CAP-59.b)
+E               assert 'iteration_count' not in '{"ok": fals...pro-ofbj"}}}'
+E                 
+E                 'iteration_count' is contained here:
+E                   5175/test_iteration_count_hidden_ac0/project/.gov-runtime/testcache/shared", "from": null, "commit": "98ff28a6c14e093c6d25c929dcc7ee4b0e18fb56", "clean": true, "wrote_entries": true, "keys": ["a5cc02e9bb7251cab240574405361ce6"], "tests": [{"id": "tests/acceptance/w1-iter/test_fail.py::test_fail", "result": "failed"}], "counts": {"passed": 0, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-ofbj"}}}
+E                 ?           +++++++++++++++
+
+tests/acceptance/W1-30/test_w1_30_iteration.py:381: AssertionError
+__________ test_a_failing_case_of_the_parallel_run_is_named_as_before __________
+
+project = <w1_30_support.Project object at 0x7d9cd35956d0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_failing_case_of_the_par0/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_failing_case_of_the_par0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_failing_case_of_the_par0')
+
+    def test_a_failing_case_of_the_parallel_run_is_named_as_before(project, sandbox, interface, tmp_path):
+        """The findings of today, in the parallel form: the failing case is named, the declared case still runs
+        (both runs go to their end), and the refusal is counted once."""
+        entry, declared, _ = DECLARED["a unit test file"]
+        told = _told(tmp_path)
+        _build(project, told, declared=[entry], bodies={"test_unit_one": "assert False, 'planted failure'"})
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        error = support.refused(run, interface, support.EXIT_CHECK_FAILED)
+        assert "test_unit_one" in support.error_text(error), \
+            f"the refusal does not name the failing case of the parallel run\n{run.describe()}"
+        details = {key: value for key, value in (error.get("details") or {}).items() if key != support.TEST_RUNS_KEY}
+>       assert declared not in support.error_text({**error, "details": details}), \
+            f"the refusal names the declared case, which passed, outside the statement of its runs\n{run.describe()}"
+E       AssertionError: the refusal names the declared case, which passed, outside the statement of its runs
+E         gov close PROJ-para --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/unit/test_unit_one.py::test_unit_one - AssertionError: planted f..."], "tests_run": {"passed": 3, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.21, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.73, "passed": 2, "failed": 1, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "regression", "form": "serial-afterwards", "seconds": 0.35, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "cases": ["tests/unit/test_unit_two.py"]}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T230743Z-c921cb8e", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/pytest-of-usain/pytest-5175/test_a_failing_case_of_the_par0/project/.gov-runtime/testcache/shared", "from": null, "commit": "2ff586cb1bbd15b1aecca936e8663267086fb2ef", "clean": true, "wrote_entries": true, "keys": ["a5cc02e9bb7251cab240574405361ce6"], "tests": [{"id": "tests/acceptance/W1-other/test_latency_p95_live_session_serial_only.py::test_latency_p95_live_session_serial_only", "result": "passed"}, {"id": "tests/acceptance/W1-other/test_other_suite.py::test_other_suite", "result": "passed"}, {"id": "tests/acceptance/W1-para/test_first_acceptance.py::test_first_acceptance", "result": "passed"}, {"id": "tests/acceptance/W1-para/test_second_acceptance.py::test_second_acceptance", "result": "passed"}, {"id": "tests/unit/test_unit_one.py::test_unit_one", "result": "failed"}, {"id": "tests/unit/test_unit_two.py::test_unit_two", "result": "passed"}], "counts": {"passed": 5, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-6dp8"}}}
+E         
+E         stderr:
+E         
+E       assert 'test_unit_two' not in '{"code": "C..."pro-6dp8"}}'
+E         
+E         'test_unit_two' is contained here:
+E           ests/unit/test_unit_two.py::test_unit_two", "result": "passed"}], "counts": {"passed": 5, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "pro-6dp8"}}
+E         ?           +++++++++++++
+
+tests/acceptance/W1-30/test_w1_30_r11_parallel_runs.py:189: AssertionError
+_ test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close_does[no probe record] _
+
+finding = 'no probe record'
+project = <w1_30_support.Project object at 0x7d9cd357cda0>
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_close_refused_with_ever1/sandbox/home'), tmpdir=PosixP...x/pycache'), elsewhere=PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_close_refused_with_ever1/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-5175/test_a_close_refused_with_ever1')
+
+    @pytest.mark.parametrize("finding", FINDINGS)
+    def test_a_close_refused_with_every_test_green_states_each_run_as_a_passed_close_does(finding, project, sandbox,
+                                                                                          interface, tmp_path):
+        """The only finding is a trailer's or the probe's. The twin without it closes; the refused close states
+        the runs the twin states."""
+        _build(project, finding=finding)
+        twin = support.Project(tmp_path / "twin")
+        _build(twin, finding=None if finding == "no probe record" else "none")
+    
+        run = support.run_close(project, sandbox, TICKET)
+        twin_run = support.run_close(twin, sandbox, TICKET)
+    
+>       passed = support.runs_stated_by(support.result_of(twin_run, interface), "the twin's result")
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_r13_refused_runs.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-rfrn', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...t their class; use --disposition to classify", "repair_ticket": "twi-s95l"}}}\n', stderr='', seconds=2.090181804029271)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-rfrn --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["ERROR gw1 - Different tests were collected between gw0 and gw1. The differenc..."], "tests_run": {"passed": 0, "failed": 0, "errors": 1, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 0.67, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "workers": 2}, {"run": "acceptance", "form": "serial-afterwards", "seconds": 0.33, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "cases": ["tests/acceptance/W1-rfrn/test_apart.py::test_apart"]}, {"run": "regression", "form": "parallel", "seconds": 0.63, "passed": 0, "failed": 0, "errors": 1, "skipped": 0, "reused": 0, "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T231410Z-a410d2d1", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": "/tmp/pytest-of-usain/pytest-5175/test_a_close_refused_with_ever1/twin/.gov-runtime/testcache/shared", "from": null, "commit": "9a4d710545ecdde9745867e8a52922c4a0c1311b", "clean": true, "wrote_entries": true, "keys": ["a5cc02e9bb7251cab240574405361ce6"], "tests": [{"id": "gw1", "result": "error"}, {"id": "tests/acceptance/W1-rfrn/test_apart.py::test_apart", "result": "passed"}, {"id": "tests/acceptance/W1-rfrn/test_pass.py::test_pass", "result": "passed"}], "counts": {"passed": 2, "failed": 0, "error": 1, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "twi-s95l"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:772: AssertionError
+5 failed, 507 passed in 2008.01s (0:33:28)
