@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 15:5x BST — queue run 4 (six closes); lens H running; next free DEC-886)
+## RESUME HERE (2026-10-21 18:0x BST — W2-02 refused twice (count 2 of 3); record moved to record/w2; lens H held by the owner; next free DEC-888)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -57,6 +57,11 @@
   namespaces); W1-07 `doctor` envelope red under load, green alone (NEW, row W2-L409). DEC-885. Gate (f) added to
   the queue: the record-reading suites (W1-06, W1-08, W1-27 path compliance, W1-07 envelope; 2 min). **Queue run 4
   started 15:5x with the same six.** A 2nd W2-02 refusal for the same W1-07 case -> package to the owner.
+- **DEC-886 (owner pre-decision, 15:5x) DRAFTED** (`drafts/register-274-DEC-886.md`, commit after the queue or at
+  the trigger): if W1-07's `doctor` envelope case is red again in a close's regression AND green alone -> NO
+  package: prepare its load_sensitive entry (DEC-886, fixed_by W2-57, row W2-L409) per
+  `drafts/ACT-DEC-886-load-sensitive.md`, ping ACT for the owner's Role: owner commit, re-run that close once it's
+  in. ANY OTHER new red -> package (P1 + ping).
 - **DEC-883 (owner) COMMITTED `f3a1079a` with DEC-884 and DEC-885** (was drafted during the queue) (the queue runs; a tracked edit mid-close could turn the
   record-reading tests red): `drafts/register-271-DEC-883.md` + `drafts/DEC-883-apply.md` (register, W2-66 card
   and ticket, W2-57 card, prompt v3.9). Batched closes on one head (one rebuild/check/regression, then each
@@ -70,7 +75,32 @@
   run, red batch attributed); then ONE combined re-pin (W2-58+59+65+66) + settings regeneration as an ACT ping.
   **W2-59 and W2-65 stay UNMERGED** (W2-65 built stacked on w2/W2-59), merge together just before the re-pin; an
   earlier merge needs a package first. Other slots: held tickets' resumes by keystone.
-- **Lens H (DEC-881) RUNNING since 08:5x:** independent auditor, effort max, from the main tree; brief
+- **DEC-887 (owner, P-REC-1 (a)) DONE `dbd3cc53`:** the raw record is on branch `record/w2` (worktree
+  `~/gov-os-worktrees/W2-00-record/`, import `0412d69e`, tree 46610514 identical); 8,229 files left the tree in one
+  commit; tree now 2,060 files. **Policy 1 from now:** `python3 governance/project/orchestration/sync_context.py
+  --commit "<subject>"` commits on record/w2 (never moves w2/integrate; safe during closes); `--main` refreshes the
+  CHECKPOINT copy only with a head-moving decision commit, never during a close. **Owner's daily push:**
+  `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
+  writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
+  unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **OWNER HOLD (18:0x): commit NOTHING from lens H, start NO W2-66/W2-68 work, until the owner confirms in writing.**
+  Lens H's drafts renumber on commit: owner answers -> DEC-888, the split -> DEC-889 (the owner accepted the split).
+- **Lens H answers (was "DEC-887") + split (was "DEC-888") DRAFTED, HELD** (W2-66 split into W2-66 selection+evidence and W2-68
+  batching+reuse+fingerprints; P-H-8) DRAFTED** (`drafts/register-275-DEC-887-888.md`). **THE AFTER-QUEUE LIST is
+  `drafts/AFTER-QUEUE.md` (17 steps): follow it in order.** Built now (scratch, untracked): `tools/nightly.sh` +
+  `tools/nightly_alone.py` (close's form, clone under ~/gov-os-runs/W2-00/nightly, re-run fails alone, digest
+  line); `tools/record_checks.sh` + the record-reading suites (P-H-1). P-REC-1 (record off the tree: orphan branch
+  `record/w2` + worktree, searchable part kept; rec (a)) drafted in `drafts/P-REC-1.md`.
+- **Lens H RETURNED 16:19, PARTIAL** (report complete; trials cut by the close lock: 9 of 32 planted faults incl.
+  the 3 widest-reaching modules, 65 mutation items incl. all of record.py not run; resumable
+  `/tmp/gov-os-assessment-H/scripts/run_rest.sh`). Report sha256 b10437c3...f173 at
+  `.gov-runtime/scratch/assessment/2026-10/H-test-strategy.md` -> COPY to `docs/assessment/2026-10/` AFTER THE QUEUE
+  (a new file now would stop the next close's gate (d)). Its venv/pip-cache/wheels: removal refused to it; REMOVED
+  by me 16:2x (no tool was installed; only pip + its shim). 19 findings, 9 packages: P-H-2 + P-H-9 (P1, W2-66's
+  card before its test designer), P-H-3 nightly glue now, P-H-1 record-reading set after record commits, P-H-4 lead
+  verification in the close's form, P-H-5 test hygiene W2-67, P-H-6 capability placement, P-H-7 SubagentStop
+  reason, P-H-8 corrections (delegable). Sent to the owner 16:2x + ping.
+- **Lens H (DEC-881), history:** independent auditor, effort max, from the main tree; brief
   `briefs/assessment-H.md`, log `log/assessment-H.json`; report to `.gov-runtime/scratch/assessment/2026-10/
   H-test-strategy.md` -> copy byte for byte to `docs/assessment/2026-10/`; install exception (venv under
   `/tmp/gov-os-assessment-H/` only, removed at the end: confirm with `ls -la`). On return: copy, confirm removal,
