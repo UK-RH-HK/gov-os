@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 18:0x BST — W2-02 refused twice (count 2 of 3); record moved to record/w2; lens H held by the owner; next free DEC-888)
+## RESUME HERE (2026-10-21 17:5x BST — owner away (DEC-888); rehearsal running; W2-02 at 2 of 3; lens H held; next free DEC-889)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,6 +83,15 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **OWNER AWAY (DEC-888, `06de7f72`), 17:5x:** no owner acts until back. Plan:
+  (1) rehearsal (nightly.sh, started 17:49 on dbd3cc53) green -> queue the FIVE: `bash tools/close_queue.sh DAEO-0rfi
+  DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`; W2-02 waits for the owner's Role: owner commit of DEC-886 (count 2/3).
+  Red -> package, no queue. "Green" = no non-accepted red in parallel or serial (a pass-alone red like `doctor`
+  would refuse every close: then also wait). (2) P-REC-2 (b): row W2-L410. (3) lens H held. (4) free slots AFTER
+  rehearsal/queue (quiet window): W2-65 stacked on w2/W2-59, nightly, held resumes by keystone. (5) next report
+  starts with ONE ordered list of owner acts.
+  **DEC-886's entry is set aside as `drafts/DEC-886-entry.patch`** (the tree must be clean for closes): re-apply with
+  `git apply` when no close runs, for the owner's commit (commands in packages/P-W2-02-C3.md).
 - **OWNER HOLD (18:0x): commit NOTHING from lens H, start NO W2-66/W2-68 work, until the owner confirms in writing.**
   Lens H's drafts renumber on commit: owner answers -> DEC-888, the split -> DEC-889 (the owner accepted the split).
 - **Lens H answers (was "DEC-887") + split (was "DEC-888") DRAFTED, HELD** (W2-66 split into W2-66 selection+evidence and W2-68

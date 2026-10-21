@@ -1,0 +1,15 @@
+diff --git a/governance/project/path-map.yaml b/governance/project/path-map.yaml
+index a1722c15..713a9d12 100644
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -386,6 +386,10 @@ load_sensitive:
+     decision: DEC-871
+     reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
+     fixed_by: W2-57
++  - test: "tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]"
++    decision: DEC-886
++    reason: "fails in the close's parallel regression (W2-02's closes, 2026-10-21 15:36 at load about 3 and 17:26 at load 2.9) and passes alone, 3 of 3 in 5.4 to 6.0 s at load 2.8 to 3.9"
++    fixed_by: W2-57
+ # The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
+ # in `tickets`) is refused reads of the hidden part by the guard (no sandbox Read rule, DEC-873), and reads the visible part.
+ # memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under
