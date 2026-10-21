@@ -176,3 +176,31 @@ such during the work (a substitution that raised was refused, not allowed).
 5. Item 5 covers the two files only; `dd of=`, `truncate` and the rest stay unseen by the write rules elsewhere (a
    write-side gap, as §5 item 4).
 6. Proportion: about 450 lines added to `reads.py` (item 1 is most of it) against the ticket's estimate of 150.
+
+## 8. DEC-880 item 1: the narrow extra round
+
+The second review found two gaps; the owner granted one narrow extra round for them (DEC-880 item 1, P-W2-58-4 (a)).
+The test designer added `tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py` (commit `7f06a037`, 21 red).
+
+| # | Behaviour | Change |
+|---|---|---|
+| 1 | **A path with a leading `~` is judged as its expanded form.** The file tools' resolver (`_Judge.spellings`) joined `~/…` to the working folder; the Bash routes, the held-out rule (b) and the write rules' Bash targets already expanded it. | `decide._expand_home`, at the top of `decide()`: the path fields of Read (`file_path`), Grep (`path`), Glob (`path`, `pattern`), Write, Edit, MultiEdit (`file_path`) and NotebookEdit (`notebook_path`) with a leading `~` are expanded once, before any rule, so the held-out rule, the protected-file rule, Policy 2's (a), (c), (d) and the write rules all judge the absolute path. `~` and `~/…` take the guard's own `HOME`; `~user` the system's users. A `~` that cannot be expanded (no `HOME`, an unknown user) refuses with `HOME_REFUSAL`, for a read and a write alike (fail closed). Grep's `glob` is a name pattern, not a path, and is unchanged. |
+| 2 | **The engineer runs its tests with interpreter flags or under coverage.** `_tests_run` knew only `pytest`, `py.test` and `python… -m pytest`. | `reads._tests_run`: `python…` with flags that take no code or file (`-B`, `-u`, `-O`, `-OO`, `-E`, `-s`, `-I`, `-W <arg>`, `-X <arg>`, `-W`/`-X` glued to their value) before `-m pytest` or `-m coverage run … -m pytest`; `coverage run [options] -m pytest`, its options a named list (`-a`, `--branch`, `-L`, `-p`, `--timid`, and `--concurrency`, `--context`, `--data-file`, `--debug`, `--include`, `--omit`, `--source`, `--save-signal` with a value). `--rcfile`, which reads a file, is not among them; nor are glued short flags (`-BO`), `-c`, a script, or another coverage command. Anything else falls to the read rules as before: `python3 -B <file>`, `coverage run <file>`, `coverage annotate <file>` stay refused, and a line that joins a run with a `cat` of the source is refused for the `cat`. |
+
+Every Bash route already expanded `~` (`_expand_token`), so Bash needed no change. `containment.py`, `protected.py`,
+`heldout.py`, the launcher and the path map are unchanged.
+
+**Evidence.** `tests/unit/guard/test_reads.py`: 30 cases added (each tool with a `~` path for (a), (c), (d), the write
+rules allowing and refusing as for the absolute path, an unexpandable `~` refused with and without `HOME`; seven
+allowed test runs, nine refused source reads). The hook answers a `~` Read in about 7 ms and a flagged pytest run in
+about 6 ms (DEC-570). Every run with `PYTHONPATH=/home/usain/gov-os-worktrees/W2-58/src` (DEC-732), at `841f8479`:
+
+| Suite | Result |
+|---|---|
+| `tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py` | 54 passed (21 failed before) |
+| `tests/acceptance/W2-58` (`-m "not local_only"`) | 803 passed, 5 deselected (the live cases, the lead's) |
+| `tests/acceptance/W1-02` (by file, 43 files) | 3655 passed |
+| `W1-03` | 364 passed |
+| `W1-47` | 983 passed |
+| `W2-50` (by file, 13 files) | 636 passed (`secrets_scan_scale` alone takes about 9 minutes) |
+| `tests/unit/guard` | 1054 passed (1024 before) |
