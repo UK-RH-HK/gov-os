@@ -66,6 +66,15 @@ _XARGS_VALUED = frozenset("-a -d -E -I -L -n -P -s --arg-file --delimiter "
                           "--max-args --max-procs --max-chars --process-slot-var".split())
 _LS_FILES_VALUED = frozenset("-x -X --exclude --exclude-from --exclude-per-directory "
                              "--format --with-tree --abbrev".split())
+# The interpreter's flags that take no code and no file, before -m pytest
+# (DEC-880 item 1); -W and -X take a word.
+_PYTHON_FLAGS = frozenset("-B -u -O -OO -E -s -I".split())
+# coverage run's options before -m pytest: --rcfile, which reads a file, is
+# none of them.
+_COVERAGE_FLAGS = frozenset("-a --append --branch -L --pylib -p --parallel-mode "
+                            "--timid".split())
+_COVERAGE_VALUED = frozenset("--concurrency --context --data-file --debug --include "
+                             "--omit --source --save-signal".split())
 # A substitution's place in a command once it is set aside (item 1).
 _SUB_RE = re.compile(r"__gov_sub(\d+)__")
 # The writes the write rules do not read as writes (DEC-821, no write rule
@@ -402,9 +411,45 @@ def _moved(name: str, args: list[str], ecwd: str | None) -> str | None:
     return os.path.join(ecwd or "/", exp)
 
 
+def _coverage_pytest(args: list[str]) -> bool:
+    """True when *args* are ``run [its options] -m pytest …``; an option
+    that reads a file (--rcfile) is none of them."""
+    if args[:1] != ["run"]:
+        return False
+    i = 1
+    while i < len(args) and args[i] != "-m":
+        a = args[i]
+        if a in _COVERAGE_FLAGS or ("=" in a and a.split("=", 1)[0] in _COVERAGE_VALUED):
+            i += 1
+        elif a in _COVERAGE_VALUED:
+            i += 2
+        else:
+            return False
+    return args[i:i + 2] == ["-m", "pytest"]
+
+
 def _tests_run(name: str, args: list[str]) -> bool:
-    return name in ("pytest", "py.test") or (
-        name.startswith("python") and args[:2] == ["-m", "pytest"])
+    """True when the command runs pytest (DEC-820 (c)): itself, an
+    interpreter with flags that take no code or file, or under coverage
+    (DEC-880 item 1)."""
+    if name in ("pytest", "py.test"):
+        return True
+    if name == "coverage":
+        return _coverage_pytest(args)
+    if not name.startswith("python"):
+        return False
+    i = 0
+    while i < len(args) and args[i] != "-m":
+        a = args[i]
+        if a in _PYTHON_FLAGS or (a[:2] in ("-W", "-X") and len(a) > 2):
+            i += 1
+        elif a in ("-W", "-X"):
+            i += 2
+        else:
+            return False
+    rest = args[i + 1:]
+    return rest[:1] == ["pytest"] or (rest[:1] == ["coverage"]
+                                      and _coverage_pytest(rest[1:]))
 
 
 def _xargs(args: list[str]) -> tuple[list[str], bool]:

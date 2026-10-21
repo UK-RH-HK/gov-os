@@ -1018,6 +1018,36 @@ def _long_path(tool_name, tool_input: dict) -> bool:
                and len(tool_input[key]) > MOST_PATH for key in fields)
 
 
+# DEC-880 item 1: the fields of a file tool's call that name a path, a
+# leading ``~`` of which is judged as its expanded form by every rule.
+_HOME_FIELDS = {"Read": ("file_path",), "Grep": ("path",),
+                "Glob": ("path", "pattern"), "Write": ("file_path",),
+                "Edit": ("file_path",), "MultiEdit": ("file_path",),
+                "NotebookEdit": ("notebook_path",)}
+HOME_REFUSAL = ("a path of the call starts with a ~ the guard cannot expand "
+                "(no HOME, or a user the system does not know), so it is not "
+                "known to be free of what is refused: refused (DEC-880)")
+
+
+def _expand_home(tool_name, tool_input: dict) -> dict | None:
+    """*tool_input* with a leading ``~`` of each path field expanded: ``~``
+    against the guard's own HOME, ``~user`` against the system's users;
+    ``None`` when one cannot be expanded (fail closed)."""
+    fields = _HOME_FIELDS.get(tool_name, ()) if isinstance(tool_name, str) else ()
+    out = tool_input
+    for key in fields:
+        value = tool_input.get(key)
+        if not (isinstance(value, str) and value.startswith("~")):
+            continue
+        if value.split("/", 1)[0] == "~" and not os.environ.get("HOME"):
+            return None
+        exp = os.path.expanduser(value)
+        if exp.startswith("~"):
+            return None
+        out = {**out, key: exp}
+    return out
+
+
 # -- main decision -------------------------------------------------------------
 
 def decide(
@@ -1049,6 +1079,11 @@ def decide(
         command = tool_input.get("command")
         if isinstance(command, str) and len(command) > MOST_READ:
             return "deny", LONG_REFUSAL
+    # DEC-880 item 1: a file tool's path with a leading ~ is judged as its
+    # expanded form; one the guard cannot expand refuses.
+    tool_input = _expand_home(tool_name, tool_input)
+    if tool_input is None:
+        return "deny", HOME_REFUSAL
     # Nor does a file tool's call hold a path longer than the guard resolves.
     if _long_path(tool_name, tool_input):
         return "deny", LONG_PATH_REFUSAL

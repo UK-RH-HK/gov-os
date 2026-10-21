@@ -347,3 +347,85 @@ def test_the_decision_refuses_through_the_read_rules_and_leaves_writes_to_the_al
         assert decision == "deny" and "tests/acceptance/W2-95" in reason, command
     for reason in (SECRET_REFUSAL, TESTS_REFUSAL, CHANGED_REFUSAL, HIDDEN_REFUSAL):
         assert "DEC-820" in reason and "W2-95" not in reason and ".py" not in reason
+
+
+# -- DEC-880 item 1: ~ paths, and the engineer's flagged test runs ------------------
+
+TILDE = [
+    ("engineer", "Read", {"file_path": "~/proj/tests/acceptance/W2-95/test_feature.py"},
+     ("deny", TESTS_REFUSAL)),
+    ("independent-auditor", "Read", {"file_path": "~/.ssh/id_ed25519"}, ("deny", SECRET_REFUSAL)),
+    ("research", "Read", {"file_path": "~/proj/eval/hidden/a.yaml"}, ("deny", HIDDEN_REFUSAL)),
+    ("independent-test-designer", "Read", {"file_path": "~/proj/src/app/main.py"},
+     ("deny", CHANGED_REFUSAL)),
+    ("engineer", "Grep", {"pattern": "x", "path": "~/proj"}, ("deny", TESTS_REFUSAL)),
+    ("engineer", "Glob", {"pattern": "*.py", "path": "~/proj/tests/acceptance/W2-95"},
+     ("deny", TESTS_REFUSAL)),
+    ("engineer", "Glob", {"pattern": "~/proj/tests/acceptance/W2-95/*.py"},
+     ("deny", TESTS_REFUSAL)),
+    ("engineer", "Bash", {"command": "cat ~/proj/tests/acceptance/W2-95/test_feature.py"},
+     ("deny", TESTS_REFUSAL)),
+    ("engineer", "Read", {"file_path": "~/proj/src/app/main.py"}, ("allow", "")),
+    ("engineer", "Write", {"file_path": "~/proj/src/app/new.py", "content": "x"}, ("allow", "")),
+    ("engineer", "Edit", {"file_path": "~/proj/src/app/main.py", "old_string": "c",
+                          "new_string": "d"}, ("allow", "")),
+]
+
+
+@pytest.mark.parametrize("role,tool,tool_input,expected", TILDE)
+def test_a_tilde_path_is_judged_as_its_expanded_form(project, role, tool, tool_input, expected):
+    got = decide(tool, tool_input, str(project), role, TICKET, cwd=str(project), flag="absent")
+    assert got == expected
+
+
+@pytest.mark.parametrize("tool,tool_input", [
+    ("Write", {"file_path": "~/proj/docs/q.md", "content": "x"}),
+    ("Edit", {"file_path": "~/proj/tests/acceptance/W2-95/x.py", "old_string": "a",
+              "new_string": "b"}),
+])
+def test_no_write_rule_widens_for_a_tilde_path(project, tool, tool_input):
+    decision, reason = decide(tool, tool_input, str(project), "engineer", TICKET,
+                              cwd=str(project), flag="absent")
+    assert decision == "deny" and str(project) in reason
+
+
+def test_a_tilde_the_guard_cannot_expand_refuses(project, monkeypatch):
+    from gov.guard.decide import HOME_REFUSAL
+    for tool_input in ({"file_path": "~gov-no-such-user-x/a.py"},):
+        for tool in ("Read", "Write"):
+            assert decide(tool, tool_input, str(project), "orchestrator", TICKET,
+                          cwd=str(project), flag="absent") == ("deny", HOME_REFUSAL)
+    monkeypatch.delenv("HOME")
+    for tool in ("Read", "Write", "Edit"):
+        assert decide(tool, {"file_path": "~/proj/src/app/main.py"}, str(project), "engineer",
+                      TICKET, cwd=str(project), flag="absent") == ("deny", HOME_REFUSAL)
+    assert decide("Glob", {"pattern": "~/proj/*"}, str(project), "orchestrator", TICKET,
+                  cwd=str(project), flag="absent") == ("deny", HOME_REFUSAL)
+
+
+@pytest.mark.parametrize("command", [
+    "python3 -B -m pytest tests/acceptance/W2-95 -q",
+    "python3 -u -O -W ignore -X dev -m pytest tests/acceptance/W2-95",
+    "python3 -Wignore -Xdev -m pytest tests/acceptance/W2-95/test_feature.py",
+    "python3 -m coverage run -m pytest tests/acceptance/W2-95",
+    "python3 -B -m coverage run --branch --source=src --omit '*/x/*' -m pytest tests/acceptance/W2-95",
+    "coverage run -m pytest tests/acceptance/W2-95",
+    "coverage run -p --data-file=.gov-runtime/scratch/c -m pytest tests/acceptance/W2-95 -q",
+])
+def test_the_engineer_runs_its_tests_with_flags_or_under_coverage(project, command):
+    assert _why(project, "engineer", *_bash(command)) == ""
+
+
+@pytest.mark.parametrize("command", [
+    "python3 -B tests/acceptance/W2-95/test_feature.py",
+    "python3 -B -c 'import sys' tests/acceptance/W2-95/test_feature.py",
+    "python3 -BO -m pytest tests/acceptance/W2-95",
+    "coverage run tests/acceptance/W2-95/test_feature.py",
+    "coverage run --rcfile tests/acceptance/W2-95/test_feature.py -m pytest src",
+    "coverage annotate tests/acceptance/W2-95/test_feature.py",
+    "python3 -m coverage report --include tests/acceptance/W2-95/test_feature.py",
+    "python3 -B -m pytest tests/acceptance/W2-95 && cat tests/acceptance/W2-95/test_feature.py",
+    "coverage run -m pytest tests/acceptance/W2-95; head ~/proj/tests/acceptance/W2-95/test_more.py",
+])
+def test_their_source_stays_refused(project, command):
+    assert _why(project, "engineer", *_bash(command)) == TESTS_REFUSAL
