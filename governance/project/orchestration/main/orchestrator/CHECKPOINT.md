@@ -87,7 +87,13 @@
   amendments) + DEC-890 (split) COMMITTED `611955fa`, lens H's report in docs/. Rehearsal GREEN** (parallel 15,465,
   serial 263, only W1-42's accepted reds; W2-54's 2 store-dependent cases pass in the rebuilt clone, 14 passed).
   **Queue run 5 started 19:2x with SIX** (W2-02 first). **REVIEW POINT (DEC-889 item 14): NO W2-66/67/68 work.**
-  After the queue, in quiet windows, never during a close: lens H's rest (`/tmp/gov-os-assessment-H/scripts/
+  **After the queue, in order:** (1) `bash tools/tooltrials.sh` (background; lens H's rest, then 5 full parallel
+  runs b1 load / b2 worksteal / a-cost timeout / d1 rerunfailures / d2 randomly, then trial a's planted child hang,
+  then c grimp; results `log/tooltrials/<stamp>/run.txt`); b2 counts as tonight's nightly; (2) lens I: launch the
+  four `briefs/assessment-I1..4.md` together (independent-auditor, effort max, from the main tree, as lens H), then
+  a synthesis session (brief to write); (3) remove /tmp/gov-os-tooltrial, show it; (4) the review-point drafts.
+  W2-65 lead in a free slot only when no close/trial/lens run needs the quiet window.
+  (Older note:) After the queue, in quiet windows, never during a close: lens H's rest (`/tmp/gov-os-assessment-H/scripts/
   run_rest.sh`); the owner's tool trials in `/tmp/gov-os-tooltrial` (a: pytest-timeout fires in a child gov
   process? cost; b: worksteal vs not, tail + total; c: grimp vs the declared map on lens H's faults; d: rerunfailures
   + randomly dry runs in the nightly form), then REMOVE /tmp/gov-os-tooltrial and show it; lens I (4 auditors by
