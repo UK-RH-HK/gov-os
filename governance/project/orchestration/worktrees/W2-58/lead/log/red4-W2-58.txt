@@ -1,0 +1,596 @@
+........................................................................ [  8%]
+........................................................................ [ 17%]
+........................................................................ [ 26%]
+........................................................................ [ 35%]
+........................................................................ [ 44%]
+........................................................................ [ 53%]
+........................................................................ [ 62%]
+........................................................................ [ 71%]
+........................................................................ [ 80%]
+........................................................................ [ 89%]
+...................................F.FFFFFF.....FFFFF...FFFF............ [ 98%]
+F....F..FFF.....                                                         [100%]
+=================================== FAILURES ===================================
+____ test_read_judges_a_tilde_path_as_its_absolute_path[a-auditor-ssh-key] _____
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[a-auditor-ssh-key]>>
+case = 'a-auditor-ssh-key'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/.ssh/id_ed25519'}, label='Read ~/.ssh/id_ed25519')
+who = 'auditor-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: auditor-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519, got deny): Read ~/.ssh/id_ed25519 was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+____ test_read_judges_a_tilde_path_as_its_absolute_path[a-engineer-ssh-key] ____
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[a-engineer-ssh-key]>>
+case = 'a-engineer-ssh-key'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/.ssh/id_ed25519'}, label='Read ~/.ssh/id_ed25519')
+who = 'engineer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519, got deny): Read ~/.ssh/id_ed25519 was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_read_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-test] _
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-test]>>
+case = 'c-engineer-T-acceptance-test'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/test_feature.py'}, label='Read ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/test_feature.py')
+who = 'engineer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95/test_feature.py, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95/test_feature.py, got deny): Read ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/test_feature.py was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_read_judges_a_tilde_path_as_its_absolute_path[c-test-designer-added-file] _
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[c-test-designer-added-file]>>
+case = 'c-test-designer-added-file'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/gov-os-worktrees/W2-95/src/app/added.py'}, label='Read ~/gov-os-worktrees/W2-95/src/app/added.py')
+who = 'test-designer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/added.py, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: test-designer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/added.py, got deny): Read ~/gov-os-worktrees/W2-95/src/app/added.py was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_read_judges_a_tilde_path_as_its_absolute_path[c-test-designer-changed-file] _
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[c-test-designer-changed-file]>>
+case = 'c-test-designer-changed-file'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/gov-os-worktrees/W2-95/src/app/main.py'}, label='Read ~/gov-os-worktrees/W2-95/src/app/main.py')
+who = 'test-designer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: test-designer-on-T (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got deny): Read ~/gov-os-worktrees/W2-95/src/app/main.py was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_read_judges_a_tilde_path_as_its_absolute_path[d-measured-by-role-hidden] _
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[d-measured-by-role-hidden]>>
+case = 'd-measured-by-role-hidden'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml'}, label='Read ~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml')
+who = 'measured-by-role (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measured-by-role (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml, got deny): Read ~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_read_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden] _
+
+request = <FixtureRequest for <Function test_read_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden]>>
+case = 'd-measured-by-ticket-hidden'
+
+    @pytest.mark.parametrize("case", sorted(READ_CASES))
+    def test_read_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), expected = READ_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)
+>       _assert_both(world, session, s.read(path), s.read(_tilde(world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Read', input={'file_path': '~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml'}, label='Read ~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml')
+who = 'measured-by-ticket (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml, got deny): '
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measured-by-ticket (the other spelling, Read /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml, got deny): Read ~/gov-os-worktrees/W2-95/eval/memory/hidden/answers.yaml was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+____ test_grep_judges_a_tilde_path_as_its_absolute_path[a-engineer-ssh-key] ____
+
+request = <FixtureRequest for <Function test_grep_judges_a_tilde_path_as_its_absolute_path[a-engineer-ssh-key]>>
+case = 'a-engineer-ssh-key'
+
+    @pytest.mark.parametrize("case", sorted(GREP_CASES))
+    def test_grep_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), pattern, expected = GREP_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)   # rel "." is the project folder itself (pathlib drops the ".")
+>       _assert_both(world, session, s.grep(path=path, pattern=pattern), s.grep(path=_tilde(world, path), pattern=pattern),
+                     expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Grep', input={'pattern': 'STAND', 'output_mode': 'content', 'path': '~/.ssh/id_ed25519'}, label="Grep 'STAND' (path ~/.ssh/id_ed25519)")
+who = "engineer-on-T (the other spelling, Grep 'STAND' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519), got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Grep 'STAND' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/.ssh/id_ed25519), got deny): Grep 'STAND' (path ~/.ssh/id_ed25519) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_grep_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder] _
+
+request = <FixtureRequest for <Function test_grep_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder]>>
+case = 'c-engineer-T-acceptance-folder'
+
+    @pytest.mark.parametrize("case", sorted(GREP_CASES))
+    def test_grep_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), pattern, expected = GREP_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)   # rel "." is the project folder itself (pathlib drops the ".")
+>       _assert_both(world, session, s.grep(path=path, pattern=pattern), s.grep(path=_tilde(world, path), pattern=pattern),
+                     expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Grep', input={'pattern': 'zqxw58', 'output_mode': 'content', 'path': '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95'}, label="Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95)")
+who = "engineer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95), got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95), got deny): Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_grep_judges_a_tilde_path_as_its_absolute_path[c-engineer-from-the-project-root] _
+
+request = <FixtureRequest for <Function test_grep_judges_a_tilde_path_as_its_absolute_path[c-engineer-from-the-project-root]>>
+case = 'c-engineer-from-the-project-root'
+
+    @pytest.mark.parametrize("case", sorted(GREP_CASES))
+    def test_grep_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), pattern, expected = GREP_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)   # rel "." is the project folder itself (pathlib drops the ".")
+>       _assert_both(world, session, s.grep(path=path, pattern=pattern), s.grep(path=_tilde(world, path), pattern=pattern),
+                     expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Grep', input={'pattern': 'zqxw58', 'output_mode': 'content', 'path': '~/gov-os-worktrees/W2-95'}, label="Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95)")
+who = "engineer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95), got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95), got deny): Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_grep_judges_a_tilde_path_as_its_absolute_path[c-test-designer-changed-folder] _
+
+request = <FixtureRequest for <Function test_grep_judges_a_tilde_path_as_its_absolute_path[c-test-designer-changed-folder]>>
+case = 'c-test-designer-changed-folder'
+
+    @pytest.mark.parametrize("case", sorted(GREP_CASES))
+    def test_grep_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), pattern, expected = GREP_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)   # rel "." is the project folder itself (pathlib drops the ".")
+>       _assert_both(world, session, s.grep(path=path, pattern=pattern), s.grep(path=_tilde(world, path), pattern=pattern),
+                     expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Grep', input={'pattern': 'zqxw58', 'output_mode': 'content', 'path': '~/gov-os-worktrees/W2-95/src/app'}, label="Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95/src/app)")
+who = "test-designer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app), got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: test-designer-on-T (the other spelling, Grep 'zqxw58' (path /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app), got deny): Grep 'zqxw58' (path ~/gov-os-worktrees/W2-95/src/app) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_grep_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden-folder] _
+
+request = <FixtureRequest for <Function test_grep_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden-folder]>>
+case = 'd-measured-by-ticket-hidden-folder'
+
+    @pytest.mark.parametrize("case", sorted(GREP_CASES))
+    def test_grep_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), pattern, expected = GREP_CASES[case]
+        world = _world(request, name)
+        path = _absolute(world, where, rel)   # rel "." is the project folder itself (pathlib drops the ".")
+>       _assert_both(world, session, s.grep(path=path, pattern=pattern), s.grep(path=_tilde(world, path), pattern=pattern),
+                     expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Grep', input={'pattern': 'q1', 'output_mode': 'content', 'path': '~/gov-os-worktrees/W2-95/eval/memory/hidden'}, label="Grep 'q1' (path ~/gov-os-worktrees/W2-95/eval/memory/hidden)")
+who = "measured-by-ticket (the other spelling, Grep 'q1' (path /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden), got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measured-by-ticket (the other spelling, Grep 'q1' (path /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden), got deny): Grep 'q1' (path ~/gov-os-worktrees/W2-95/eval/memory/hidden) was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_glob_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder-as-path] _
+
+request = <FixtureRequest for <Function test_glob_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder-as-path]>>
+case = 'c-engineer-T-acceptance-folder-as-path'
+
+    @pytest.mark.parametrize("case", sorted(GLOB_CASES))
+    def test_glob_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), form, expected = GLOB_CASES[case]
+        world = _world(request, name)
+        folder = _absolute(world, where, rel)
+>       _assert_both(world, session, _glob(folder, form), _glob(_tilde(world, folder), form), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Glob', input={'pattern': '*', 'path': '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95'}, label="Glob '*' in ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95")
+who = "engineer-on-T (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95, got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95, got deny): Glob '*' in ~/gov-os-worktrees/W2-95/tests/acceptance/W2-95 was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_glob_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder-in-pattern] _
+
+request = <FixtureRequest for <Function test_glob_judges_a_tilde_path_as_its_absolute_path[c-engineer-T-acceptance-folder-in-pattern]>>
+case = 'c-engineer-T-acceptance-folder-in-pattern'
+
+    @pytest.mark.parametrize("case", sorted(GLOB_CASES))
+    def test_glob_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), form, expected = GLOB_CASES[case]
+        world = _world(request, name)
+        folder = _absolute(world, where, rel)
+>       _assert_both(world, session, _glob(folder, form), _glob(_tilde(world, folder), form), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Glob', input={'pattern': '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/*'}, label="Glob '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/*'")
+who = "engineer-on-T (the other spelling, Glob '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95/*', got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Glob '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/tests/acceptance/W2-95/*', got deny): Glob '~/gov-os-worktrees/W2-95/tests/acceptance/W2-95/*' was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_glob_judges_a_tilde_path_as_its_absolute_path[d-measured-by-role-hidden-folder] _
+
+request = <FixtureRequest for <Function test_glob_judges_a_tilde_path_as_its_absolute_path[d-measured-by-role-hidden-folder]>>
+case = 'd-measured-by-role-hidden-folder'
+
+    @pytest.mark.parametrize("case", sorted(GLOB_CASES))
+    def test_glob_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), form, expected = GLOB_CASES[case]
+        world = _world(request, name)
+        folder = _absolute(world, where, rel)
+>       _assert_both(world, session, _glob(folder, form), _glob(_tilde(world, folder), form), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Glob', input={'pattern': '*', 'path': '~/gov-os-worktrees/W2-95/eval/memory/hidden'}, label="Glob '*' in ~/gov-os-worktrees/W2-95/eval/memory/hidden")
+who = "measured-by-role (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden, got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measured-by-role (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden, got deny): Glob '*' in ~/gov-os-worktrees/W2-95/eval/memory/hidden was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+_ test_glob_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden-folder] _
+
+request = <FixtureRequest for <Function test_glob_judges_a_tilde_path_as_its_absolute_path[d-measured-by-ticket-hidden-folder]>>
+case = 'd-measured-by-ticket-hidden-folder'
+
+    @pytest.mark.parametrize("case", sorted(GLOB_CASES))
+    def test_glob_judges_a_tilde_path_as_its_absolute_path(request, case):
+        name, session, (where, rel), form, expected = GLOB_CASES[case]
+        world = _world(request, name)
+        folder = _absolute(world, where, rel)
+>       _assert_both(world, session, _glob(folder, form), _glob(_tilde(world, folder), form), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:86: in _assert_both
+    s.assert_refused(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='allow', reason='', returncode=0, stdout='', stderr='')
+call = Call(tool='Glob', input={'pattern': '*', 'path': '~/gov-os-worktrees/W2-95/eval/memory/hidden'}, label="Glob '*' in ~/gov-os-worktrees/W2-95/eval/memory/hidden")
+who = "measured-by-ticket (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden, got deny): "
+
+    def assert_refused(result, call, who=""):
+>       assert result.decision == "deny", f"{who}{call} was not refused: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: measured-by-ticket (the other spelling, Glob '*' in /tmp/pytest-of-usain/pytest-5466/eval2/home/gov-os-worktrees/W2-95/eval/memory/hidden, got deny): Glob '*' in ~/gov-os-worktrees/W2-95/eval/memory/hidden was not refused: decision=allow exit=0 reason='' stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:520: AssertionError
+__ test_write_judges_a_tilde_path_as_its_absolute_path[inside-allowed-paths] ___
+
+branch_world = World(sandbox=Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4'), home=PosixPath('/tmp/pytest-of-usain...est-5466/branch4/pycache')), project=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95'))
+target = 'inside-allowed-paths'
+
+    @pytest.mark.parametrize("target", sorted(WRITE_TARGETS))
+    def test_write_judges_a_tilde_path_as_its_absolute_path(branch_world, target):
+        rel, expected = WRITE_TARGETS[target]
+        path = branch_world.path(rel)
+>       _assert_both(branch_world, "engineer-on-T", s.write_call(path), s.write_call(_tilde(branch_world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:207: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:88: in _assert_both
+    s.assert_allowed(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Write to '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/~/gov...ch4/home/gov-os-worktrees/W2-95/~/gov-os-worktrees/W2-95/src/app/main.py\' denied for role \'engineer\'"}}', stderr='')
+call = Call(tool='Write', input={'file_path': '~/gov-os-worktrees/W2-95/src/app/main.py', 'content': 'written by the W2-58 acceptance test\n'}, label='Write ~/gov-os-worktrees/W2-95/src/app/main.py')
+who = 'engineer-on-T (the other spelling, Write /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got allow): '
+
+    def assert_allowed(result, call, who=""):
+>       assert result.decision == "allow", f"{who}{call} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Write /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got allow): Write ~/gov-os-worktrees/W2-95/src/app/main.py was not allowed: decision=deny exit=0 reason="Write to '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/~/gov-os-worktrees/W2-95/src/app/main.py' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:516: AssertionError
+___ test_edit_judges_a_tilde_path_as_its_absolute_path[inside-allowed-paths] ___
+
+branch_world = World(sandbox=Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4'), home=PosixPath('/tmp/pytest-of-usain...est-5466/branch4/pycache')), project=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95'))
+target = 'inside-allowed-paths'
+
+    @pytest.mark.parametrize("target", sorted(WRITE_TARGETS))
+    def test_edit_judges_a_tilde_path_as_its_absolute_path(branch_world, target):
+        rel, expected = WRITE_TARGETS[target]
+        path = branch_world.path(rel)
+>       _assert_both(branch_world, "engineer-on-T", s.edit_call(path), s.edit_call(_tilde(branch_world, path)), expected)
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:214: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:88: in _assert_both
+    s.assert_allowed(result, call, who)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="Edit to '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/~/gov-...ch4/home/gov-os-worktrees/W2-95/~/gov-os-worktrees/W2-95/src/app/main.py\' denied for role \'engineer\'"}}', stderr='')
+call = Call(tool='Edit', input={'file_path': '~/gov-os-worktrees/W2-95/src/app/main.py', 'old_string': 'hooks', 'new_string': 'hooks'}, label='Edit ~/gov-os-worktrees/W2-95/src/app/main.py')
+who = 'engineer-on-T (the other spelling, Edit /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got allow): '
+
+    def assert_allowed(result, call, who=""):
+>       assert result.decision == "allow", f"{who}{call} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer-on-T (the other spelling, Edit /tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/src/app/main.py, got allow): Edit ~/gov-os-worktrees/W2-95/src/app/main.py was not allowed: decision=deny exit=0 reason="Edit to '/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95/~/gov-os-worktrees/W2-95/src/app/main.py' denied for role 'engineer'" stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:516: AssertionError
+_ test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage[coverage-run] _
+
+branch_world = World(sandbox=Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4'), home=PosixPath('/tmp/pytest-of-usain...est-5466/branch4/pycache')), project=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95'))
+form = 'coverage-run'
+
+    @pytest.mark.parametrize("form", sorted(FLAGGED_RUNS))
+    def test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage(branch_world, form):
+        """Allowed exactly as the plain run is: both asked, both allowed."""
+        for command in (PLAIN_RUN, FLAGGED_RUNS[form]):
+            call = s.bash(command)
+>           s.assert_allowed(branch_world.ask(call, s.ENGINEER, s.T), call, "engineer on T: ")
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refus...\'s engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages"}}', stderr='')
+call = Call(tool='Bash', input={'command': 'coverage run -m pytest tests/acceptance/W2-95/', 'description': 'W2-58 acceptance call'}, label='Bash `coverage run -m pytest tests/acceptance/W2-95/`')
+who = 'engineer on T: '
+
+    def assert_allowed(result, call, who=""):
+>       assert result.decision == "allow", f"{who}{call} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer on T: Bash `coverage run -m pytest tests/acceptance/W2-95/` was not allowed: decision=deny exit=0 reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refused to the ticket's engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages" stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:516: AssertionError
+_ test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage[python3-B] _
+
+branch_world = World(sandbox=Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4'), home=PosixPath('/tmp/pytest-of-usain...est-5466/branch4/pycache')), project=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95'))
+form = 'python3-B'
+
+    @pytest.mark.parametrize("form", sorted(FLAGGED_RUNS))
+    def test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage(branch_world, form):
+        """Allowed exactly as the plain run is: both asked, both allowed."""
+        for command in (PLAIN_RUN, FLAGGED_RUNS[form]):
+            call = s.bash(command)
+>           s.assert_allowed(branch_world.ask(call, s.ENGINEER, s.T), call, "engineer on T: ")
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refus...\'s engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages"}}', stderr='')
+call = Call(tool='Bash', input={'command': 'python3 -B -m pytest tests/acceptance/W2-95/ -q', 'description': 'W2-58 acceptance call'}, label='Bash `python3 -B -m pytest tests/acceptance/W2-95/ -q`')
+who = 'engineer on T: '
+
+    def assert_allowed(result, call, who=""):
+>       assert result.decision == "allow", f"{who}{call} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer on T: Bash `python3 -B -m pytest tests/acceptance/W2-95/ -q` was not allowed: decision=deny exit=0 reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refused to the ticket's engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages" stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:516: AssertionError
+_ test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage[python3-m-coverage-run] _
+
+branch_world = World(sandbox=Sandbox(base=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4'), home=PosixPath('/tmp/pytest-of-usain...est-5466/branch4/pycache')), project=PosixPath('/tmp/pytest-of-usain/pytest-5466/branch4/home/gov-os-worktrees/W2-95'))
+form = 'python3-m-coverage-run'
+
+    @pytest.mark.parametrize("form", sorted(FLAGGED_RUNS))
+    def test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage(branch_world, form):
+        """Allowed exactly as the plain run is: both asked, both allowed."""
+        for command in (PLAIN_RUN, FLAGGED_RUNS[form]):
+            call = s.bash(command)
+>           s.assert_allowed(branch_world.ask(call, s.ENGINEER, s.T), call, "engineer on T: ")
+
+tests/acceptance/W2-58/test_w2_58_tilde_and_test_runs.py:241: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+result = Decision(decision='deny', reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refus...\'s engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages"}}', stderr='')
+call = Call(tool='Bash', input={'command': 'python3 -m coverage run -m pytest tests/acceptance/W2-95/', 'description': 'W2-58 acceptance call'}, label='Bash `python3 -m coverage run -m pytest tests/acceptance/W2-95/`')
+who = 'engineer on T: '
+
+    def assert_allowed(result, call, who=""):
+>       assert result.decision == "allow", f"{who}{call} was not allowed: {result.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: engineer on T: Bash `python3 -m coverage run -m pytest tests/acceptance/W2-95/` was not allowed: decision=deny exit=0 reason="the call reads the ticket's acceptance tests, the counterpart's work, which is refused to the ticket's engineer (DEC-820 (c)): run them with pytest, which shows their names, results and failure messages" stderr=''
+
+tests/acceptance/W2-58/w2_58_support.py:516: AssertionError
+21 failed, 787 passed in 195.91s (0:03:15)

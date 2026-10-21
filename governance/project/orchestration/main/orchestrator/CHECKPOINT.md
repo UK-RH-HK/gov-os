@@ -1,8 +1,8 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-881)
+## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-882)
 
-### Standing owner rules (short; full text: register §248-§268, prompt v3.7; DEC-851)
+### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
   limit (`claude -p "/usage"` in the digest).
 - **Checkpoint at every handover (DEC-837):** return, merge, package, compaction. Keep this section < 10,000 chars.
@@ -48,6 +48,12 @@
   `bash tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`.
 - **In flight (1): W2-58 run 3** (DEC-880 item 1: `~` expansion on Read/Grep/Glob/Edit/Write/Bash + flagged pytest
   forms, full verification, 3rd review limited to the change), started 08:3x, `log/W2-58-A5-run3.json`.
+- **Lens H (DEC-881) RUNNING since 08:5x:** independent auditor, effort max, from the main tree; brief
+  `briefs/assessment-H.md`, log `log/assessment-H.json`; report to `.gov-runtime/scratch/assessment/2026-10/
+  H-test-strategy.md` -> copy byte for byte to `docs/assessment/2026-10/`; install exception (venv under
+  `/tmp/gov-os-assessment-H/` only, removed at the end: confirm with `ls -la`). On return: copy, confirm removal,
+  give the owner path + one paragraph per part A/B/C + its packages. **W2-66's test designer waits for it;** bring
+  its findings into W2-66's card/ticket under a recorded decision first.
 - **W2-59 DONE, HELD (DEC-879):** head `1cad6aa0`, last review pass. Merge after the queue; then W2-65 (after W2-59,
   same hooks file); then ONE ACT ping: owner re-pins at W2-65's merge commit + regenerates settings.
 - **W2-48 WITHDRAWN** (DEC-880): ticket closed by the owner's decision; branch `w2/W2-48` kept (`2c3c46b5`, research
