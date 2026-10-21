@@ -149,7 +149,20 @@ Every new path is inside `policy_refusal`'s `try`: an exception refuses (fail cl
 such during the work (a substitution that raised was refused, not allowed).
 
 **Evidence.** `tests/unit/guard/test_reads.py`: 52 cases added (the five behaviours, the allowed forms beside each);
-149 passed. The review file: 178 passed. The whole ticket suite: 749 passed (§4 row below).
+149 passed. The hook answers a typical call in 2 to 6 ms (DEC-570). Every run with
+`PYTHONPATH=/home/usain/gov-os-worktrees/W2-58/src` (DEC-732), at `42ee5416`:
+
+| Suite | Result |
+|---|---|
+| `tests/acceptance/W2-58/test_w2_58_review.py` | 178 passed (117 failed before) |
+| `tests/acceptance/W2-58` (`-m "not local_only"`) | 749 passed, 5 deselected (the live cases, the lead's) |
+| `tests/acceptance/W1-02` (by file, 43 files) | all green, `copies`, `name_filters`, `root_searches`, `search_on_a_pipe`, `wildcard_globs`, `protected_reads_open` included (§5 items 1, 2 no longer red) |
+| `W1-03` | 364 passed |
+| `W1-05` (by file) | 86, 11, 2 passed (the switch-over record, which runs W1-02, is green) |
+| `W1-47` | 983 passed |
+| `W1-50` | 683 passed, 2 failed (`freeze_launcher`, `freeze_live_pause`: live sessions, the API refused by the sandbox's proxy, as at `d545c34b`) |
+| `W2-50` (by file, 13 files) | 636 passed |
+| `tests/unit/guard`, `tests/unit/launch` | 1024, 138 passed |
 
 **Residuals the review named that were not built.**
 
