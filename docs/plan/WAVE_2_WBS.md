@@ -19,7 +19,7 @@ decisions: [DEC-078, DEC-083, DEC-086, DEC-096, DEC-104, DEC-105, DEC-136, DEC-1
 **Changes since the first draft (owner's review).**
 - **DEC-720 to DEC-724** answer P-W2-1 to P-W2-5. Contract v4.2 is lite: CAP-44.h with A7 and A10, and CAP-43.b. Signed tags stay in Wave 3, so releases are hash-pinned (W2-16, W2-49).
 - **DEC-725:** W2-13 becomes a ranked lexical route (BM25, SQLite FTS5). EXP-003 is split into W2-15a (baseline) and W2-15b (final), with bounded improvements in W2-32 between them.
-- **DEC-726:** test-result caching at close is its own ticket, W2-48, in layer 2.
+- **DEC-726:** test-result caching at close is its own ticket, W2-48, in layer 2. **Changed by DEC-880 (owner, 2026-10-21):** W2-48's cache is withdrawn; a close runs a path-scoped regression from W2-66's merge, the full regression before it.
 - **DEC-727:** EXAMIN adoption on the copy (W2-27) depends only on the safety-critical subset. The real repository (W2-29) stays gated by W2-25 and W2-15b.
 - **DEC-723:** agents never write in `~/gov-os-workbench`. (Its listing refusal was replaced by DEC-820: reads there are open except the held-out material's contents; DEC-866.)
 - **Proposed:** a coordination ticket, W2-00, for the main session's identity (P-W2-6).
@@ -117,7 +117,7 @@ Three tracks.
 | W2-23 | A | Adoption safety on a real repository | implementation | engineer | FULL | W2-18 | 220 | W2-H036, W2-H035, W2-H050 |
 | W2-24 | A | Track A gate run | integration | orchestrator | FULL | every other Track A ticket | 0 | AR-1 … AR-10 |
 | W2-25 | A | Track A independent audit | audit | independent-auditor | FULL | W2-24 | 0 | AR block verdict |
-| W2-48 | A | Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (DEC-843, DEC-852) | implementation | engineer | FULL | W2-01 | 220 | W2-H044, W2-M153, DEC-726 |
+| W2-48 | A | **WITHDRAWN (DEC-880; its purpose passes to W2-66).** Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (DEC-843, DEC-852) | implementation | engineer | FULL | W2-01 | 220 | W2-H044, W2-M153, DEC-726 |
 | W2-49 | A | Contract v4.2, lite: CAP-44.h with A7 and A10, CAP-43.b (CIT-P) | specification | product-spec | STANDARD | W2-51 (closes after it, DEC-744) | 0 | DEC-722 |
 | W2-50 | A | The durable scratch root: `~/gov-os-runs/<own ticket>/` in the guard and the launcher's sandbox (CIT-P) | implementation | engineer | FULL | W2-01 | 120 | DEC-728, W2-M355 |
 | W2-51 | A | The Wave 2 plan validator (DEC-744) | implementation | engineer | STANDARD | W2-01 | 120 | exit criterion 7's two-way check |
@@ -517,6 +517,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
 - **KPIs, failure:** the fixture's own instruction files and every untracked file survive an adoption and its rollback byte for byte.
 
 #### W2-48 Test-result cache at close and in the leads' runs, glued to pytest-testmon, subprocesses seen, a nightly full run (FULL, engineer; DEC-726, DEC-843, DEC-852)
+- **WITHDRAWN (owner, 2026-10-21, DEC-880 item 2, P-W2-48-8 (d)).** The cache is not merged; the ticket ends by that decision, not by a clean `gov close`. The lesson: testmon cannot see a repository whose tests run `gov` as a separate process (run 2: 11.5 % of tests reused, a close 79 min against 81). Branch `w2/W2-48` is kept as the record; its research record is `docs/research/W2-48-cache-choice.md`. Its purpose, a shorter close, passes to **W2-66** (path-scoped regression); DEC-852 item 3's nightly full run stays as W2-66's backstop. The text below is the history of the withdrawn ticket.
 - **Priority (DEC-869, owner, 2026-10-20; replacing DEC-823 item 4's place):** it takes the very next free slot after W2-53's close, ahead of every other keystone-2 ticket, the held closes' resumes included: until it lands, every close costs over an hour. Its three conditions stay (DEC-852).
 - **Restated by the owner, 2026-10-19 (DEC-843, DEC-852):** the key KPI as behaviour; glued to pytest-testmon and coverage; three conditions added (subprocesses, the leads' runs, a nightly full run). The ticket file `DAEO-xxgp` carries the same lines.
 - **Allowed paths:** `src/gov/testcache/**` (new), `src/gov/close/cache*` (the call from close only), `src/gov/close/command.py` (the `--no-cache` option and the call into the cache only; DEC-875), `.coveragerc` (new: subprocess coverage only), `tests/unit/testcache/**`, `docs/research/W2-48-cache-choice.md`.
@@ -790,6 +791,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - The lead commits these lines to the ticket file first, in its worktree.
 
 #### W2-38 Profile from impact; impact-selected tests at close (FULL, engineer)
+- **Wave 3 (DEC-841), except its lite form:** path-scoped regression at close comes back into Wave 2 as **W2-66** (owner, 2026-10-21, DEC-880 item 2). The profile from impact and `gov impact`'s selection stay here, for Wave 3; W2-48's cache, which the KPI below builds on, is withdrawn.
 - **Allowed paths:** `src/gov/impact/profile*`, `src/gov/close/select*`, `tests/unit/impact/**`, `tests/unit/close/test_select*`.
 - **KPIs:**
   - An R0 change runs only the LITE checks, and an R3 change raises the FULL gate and readiness rows, with the profile computed by `gov impact` [CAP-53.b].
@@ -940,6 +942,27 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - Every record on `w2/integrate` today, the close records of `docs/close/` included, still validates.
 - **KPIs, failure:** a record that its schema refuses fails `core-schema`, naming the record and the rule; check-jsonschema missing or failing to run is RED, never green.
 
+#### W2-65 The guard's hook lines refuse a call when the guard program cannot run (LITE, engineer; DEC-880 item 3; keystone 1)
+- **Why:** P-W2-59-8 (W2-59's second review, R2-D1): Claude Code blocks a PreToolUse call only on exit 2 or a deny decision, and the hook lines pass their program's exit code on, so a guard program that cannot run (a half-finished edit) exits 1 and the call goes through. Ordinary work, fails open; it predates W2-59. Ticket `DAEO-e82f`.
+- **Starts** after W2-59 merges (both change `.rulesync/hooks.jsonc`); it lands before the owner's settings regeneration after the re-pin, so one act installs both.
+- **Allowed paths:** `.rulesync/hooks.jsonc` and `template/.rulesync/hooks.jsonc` (the preToolUse and containment lines' exit mapping only), `tests/unit/hooks/**`.
+- **KPIs, success:** the preToolUse and containment lines end with exit 2 whenever their program ends with anything but 0 or 2, naming the program; 0, 2 and a deny decision pass through; the template's hook source does the same; one acceptance case per line.
+- **KPIs, failure:** a program that exits 1 or cannot start lets the call through; a line that turns exit 0 into a refusal.
+
+#### W2-66 Path-scoped regression at close: the lite W2-38 (FULL, engineer; DEC-880 item 2, DEC-726, DEC-852 item 3; keystone 2)
+- **Why:** W2-48's cache saved 3 % (testmon cannot see this repository's `gov` subprocesses) and was withdrawn (DEC-880). A close runs what the change can affect; the full regression stays as the backstop. Ticket `DAEO-c1uz`; it takes in W2-H044 and W2-M153.
+- **Place:** keystone 2, in the slot DEC-869 gave W2-48: the next free slot after W2-58's merge, ahead of every other keystone-2 start. It shares `src/gov/close/command.py` with W2-07 and W2-57, which run after it.
+- **Allowed paths:** `src/gov/close/select.py` (new), `src/gov/close/nightly.py` (new), `src/gov/close/command.py` (the call into the selection, `--full` and the record's lines only), `governance/project/path-map.yaml` (a shared-core list only, reviewed by the orchestrator), `template/governance/kernel/schemas/path-map.schema.json` (the same key), `tests/unit/close/test_select*`, `tests/unit/close/test_nightly*`, `docs/research/W2-66-scoped-close.md`.
+- **KPIs, success:**
+  - A close runs the ticket's own suite, `tests/unit`, and the suites of every ticket whose `allowed_paths` overlap the change; the record names each suite and why.
+  - The owner's four conditions (DEC-880 item 2):
+    - (a) any change under the shared core (`src/gov/close`, `src/gov/guard`, `src/gov/check`, `src/gov/records`, the retrieval core, the kernel hooks, the path map) runs the full suite, and so does a file the mapping cannot place or a missing map;
+    - (b) the lead's full verification before every return stays as it is;
+    - (c) the nightly full uncached run stays; a failure there that a scoped close missed is a P1 package, with the path-to-suite map corrected in it;
+    - (d) W2-24's and W2-46's full uncached runs stay (`gov close --full`).
+  - Target, measured: a typical close under about 15 minutes, against the full regression on the same head.
+- **KPIs, failure:** anything less than the full regression for the shared core, an unplaced file or a missing map; a scoped record that says "full"; a failure left unreported.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
@@ -1009,7 +1032,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 **What the owner's changes did to the path.**
 - The ranked lexical route and EXP-003's two passes (DEC-725) now set the critical path: the real repository waits for W2-15b.
 - The copy's adoption moved earlier (DEC-727).
-- W2-48 takes the close queue off the critical path from layer 3 on (DEC-726).
+- W2-48 takes the close queue off the critical path from layer 3 on (DEC-726). **Changed by DEC-880:** W2-48 is withdrawn; W2-66's path-scoped regression does this.
 - W2-50 (DEC-728) adds a ticket in layer 2 but no time to the critical path or the copy path. It has about 5 days of slack before W2-14 and W2-15a need it.
 
 ## 4. Size and estimate per track
@@ -1025,7 +1048,7 @@ When a layer holds more ready tickets than free slots, they are taken in this or
 - **Durations.** Each ticket's duration is about 1 day plus 1 day per 150 est. LOC, plus half a day for FULL. Research is 1.5 days; integration and audit are 1 day each.
   - The critical path from these is ≈ 20.5 days.
   - The upper end adds 30 % for the systematic overruns of Wave 1 (W2-I040) and a day's owner turnaround on each package the path waits for.
-- **Closes.** Before W2-48, every close runs the full regression (≈ 1 hour) after a full rebuild (≈ 4 min), one at a time. That costs ≈ 7 hours over layers 1 and 2. From layer 3 on, a close runs only the tests whose inputs changed, plus the uncached runs at W2-24 and W2-46.
+- **Closes.** Before W2-48, every close runs the full regression (≈ 1 hour) after a full rebuild (≈ 4 min), one at a time. That costs ≈ 7 hours over layers 1 and 2. From layer 3 on, a close runs only the tests whose inputs changed, plus the uncached runs at W2-24 and W2-46. **Changed by DEC-880:** from W2-66's merge a close runs the path-scoped regression (its own suite, the unit tests, the suites of overlapping tickets; the full suite for the shared core); before it, the full regression.
 - **Against the first draft** (18 to 24 days): ≈ 3 days longer. Most of that is the two EXP-003 passes and the bigger W2-13 now in front of the real repository. The cache took most of the ≈ 50 hours of serial close time off the path.
 - **Unknowns.** EXAMIN's size is unknown until W2-26. A repository larger than DEC-078's envelope adds W2-45 to the copy's gate and two to four days.
 

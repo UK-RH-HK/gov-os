@@ -209,7 +209,7 @@ tools:
     uninstall: "/usr/bin/python3 -m pip uninstall --break-system-packages pytest-testmon"
     date: "2026-10-20"
     approved_by: "DEC-843"
-    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/testmon, installed by the owner through the operator for W2-48's test-result cache (DEC-843 item 3, package P-W2-54, Q-13); sha256 of its wheel pytest_testmon-2.2.0-py3-none-any.whl from PyPI, verified by the orchestrator against the downloaded wheel. Installed with --no-deps: its dependencies pytest 9.0.3 and coverage 7.16.2 are pinned on their own. The pinned judge's interpreter (~/.local/share/gov-os/pin-fecb870c/bin/python) has the user site enabled and imports it from the same place (checked 2026-10-20). pytest loads the plugin only when a run asks for it (--testmon)."
+    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/testmon, installed by the owner through the operator for W2-48's test-result cache (DEC-843 item 3, package P-W2-54, Q-13); sha256 of its wheel pytest_testmon-2.2.0-py3-none-any.whl from PyPI, verified by the orchestrator against the downloaded wheel. Installed with --no-deps: its dependencies pytest 9.0.3 and coverage 7.16.2 are pinned on their own. The pinned judge's interpreter (~/.local/share/gov-os/pin-fecb870c/bin/python) has the user site enabled and imports it from the same place (checked 2026-10-20). pytest loads the plugin only when a run asks for it (--testmon). Unused since DEC-880 (owner, 2026-10-21): W2-48's cache was withdrawn; kept installed until the owner removes it with the uninstall command above."
   - name: coverage
     version: "7.16.2"
     sha256: "5375ebd99038021b35e99dc88255022912c06565d316212f4a576e4b08d30f5d"
@@ -217,7 +217,7 @@ tools:
     uninstall: "/usr/bin/python3 -m pip uninstall --break-system-packages coverage"
     date: "2026-10-20"
     approved_by: "DEC-843"
-    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/coverage, installed by the owner through the operator with pytest-testmon (DEC-843 item 3, package P-W2-54); sha256 of its wheel coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl from PyPI, verified by the orchestrator. The pinned judge's interpreter imports it from the user site too (checked 2026-10-20). Its subprocess measurement (DEC-852 item 1) is configured by W2-48."
+    note: "Python package for /usr/bin/python3 (3.12.3) at ~/.local/lib/python3.12/site-packages/coverage, installed by the owner through the operator with pytest-testmon (DEC-843 item 3, package P-W2-54); sha256 of its wheel coverage-7.16.2-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl from PyPI, verified by the orchestrator. The pinned judge's interpreter imports it from the user site too (checked 2026-10-20). Its subprocess measurement (DEC-852 item 1) is configured by W2-48. Unused since DEC-880 (owner, 2026-10-21): W2-48's cache was withdrawn; kept installed until the owner removes it with the uninstall command above."
   - name: gov
     version: "0.1.0"
     sha256: "385fd5f0eceb04e926be2294149cc761235855fb5e13dd31ba9e1cefe3d5f7bd"
