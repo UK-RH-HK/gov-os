@@ -1,0 +1,17 @@
+[38;2;56;56;56m╭──────────────────────────────────────────╮[m
+[38;2;56;56;56m│[m 🥊 lefthook  v2.1.15   hook:  [1mpre-commit[m [38;2;56;56;56m│[m
+[38;2;56;56;56m╰──────────────────────────────────────────╯[m
+┃  checks ❯ 
+gov ci: CHECK_FAILED: hard-block checks failed: index-freshness, recovery-rebuild
+
+exit status 3
+┃  staged-secrets ❯ 
+{
+  "scans": 2,
+  "secrets": 0
+}
+
+[38;2;56;56;56m  ────────────────────────────────────[m
+summary: (done in 290.06 seconds)
+✔️ staged-secrets (0.57 seconds)
+🥊 checks (289.49 seconds)

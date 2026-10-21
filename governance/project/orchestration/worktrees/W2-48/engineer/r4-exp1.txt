@@ -1,0 +1,69 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_a_test_that_failed_in_a_refused_close_runs_again_in_the_next_close ____
+
+tmp_path = PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_failed_in_a_r0')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_failed.../gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_failed_in_a_r0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+told = PosixPath('/tmp/gov-launch-engineer-6g5xad_c/claude-1000/pytest-of-usain/pytest-3/test_a_test_that_failed_in_a_r0/told')
+
+    def test_a_test_that_failed_in_a_refused_close_runs_again_in_the_next_close(tmp_path, sandbox, interface, told):
+        project = support.governed_project(tmp_path / "flaky-project", told,
+                                           extra={"tests/unit/test_flaky.py": _flaky(told)})
+        support.ticket_ready(project, TICKET_A, WBS_A, TEST_A, {"src/example/feature.py": "# ticket A\n"},
+                             ["src/example/**"])
+    
+>       run, refused = support.close(project, sandbox, told, TICKET_A)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-48/test_w2_48_close.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/w2_48_support.py:780: in close
+    check_honest(cached)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='gov close PROJ-aaaa --json ', returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...it/test_beta.py::test_beta': 1, 'tests/unit/test_alpha.py::test_alpha': 1, 'tests/unit/test_flaky.py::test_flaky': 1}))
+
+    def check_honest(run):
+        """What every record must hold against what really ran (KPIs 2 and 5, failure KPI 2): a test labelled
+        passed, failed or error ran in this run; a test that ran is never labelled reused; a reused test names the
+        run it came from. Collection errors (an id without ``::``) are not told and are left out."""
+        problems = []
+        for test_id, entry in run.labels.items():
+            result = entry.get("result")
+            told = run.ran.get(test_id, 0)
+            if "::" in test_id and result in (PASSED, FAILED, ERROR) and not told:
+                problems.append(f"{test_id} is labelled {result!r} but did not run in this run: a result taken from "
+                                "the cache is labelled `reused`, never `passed`")
+            if result == REUSED and told:
+                problems.append(f"{test_id} ran in this run but is labelled `reused`")
+            if result == REUSED:
+                source = entry.get("from")
+                if not (isinstance(source, dict) and isinstance(source.get("run"), str) and source["run"]):
+                    problems.append(f"{test_id} is reused without the run it came from (`from: {{run, commit}}`)")
+        for test_id in run.ran:
+            if "::" in test_id and test_id not in run.labels:
+                problems.append(f"{test_id} ran but the record does not list it (every test is listed, never silently)")
+>       assert not problems, "the record does not say what really ran:\n  " + "\n  ".join(problems) + "\n" + \
+               ^^^^^^^^^^^^
+            run.describe()
+E       AssertionError: the record does not say what really ran:
+E         tests/acceptance/W9-aaaa/test_ticket_a.py::test_ticket_a ran but the record does not list it (every test is listed, never silently)
+E         tests/unit/test_beta.py::test_beta ran but the record does not list it (every test is listed, never silently)
+E         tests/unit/test_alpha.py::test_alpha ran but the record does not list it (every test is listed, never silently)
+E       gov close PROJ-aaaa --json 
+E       exit code: 3
+E       record (without tests): {"run": "20261020T234311Z-bdfa5aa3", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": ".gov-runtime/testcache/shared", "from": null, "commit": "4a34b9f07b0144ae651ee619c3c4e27b2cfc00cc", "clean": true, "wrote_entries": true, "keys": ["2bb0bfa2ec968bc62a9a48c5b78ae988"], "counts": {"passed": 3, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}
+E         tests/acceptance/W9-aaaa/test_ticket_a.py::test_ticket_a: record None; ran 1 time(s) in this run
+E         tests/unit/test_alpha.py::test_alpha: record None; ran 1 time(s) in this run
+E         tests/unit/test_beta.py::test_beta: record None; ran 1 time(s) in this run
+E         tests/unit/test_flaky.py::test_flaky: record 'failed'; ran 1 time(s) in this run
+E       stdout (end):
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["FAILED tests/unit/test_flaky.py::test_flaky - AssertionError: a planted failu..."], "tests_run": {"passed": 2, "failed": 1, "errors": 0, "skipped": 0}, "disposition": "unclassed", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 1.53, "passed": 1, "failed": 0, "errors": 0, "skipped": 0, "reused": 0, "tests": [{"id": "tests/acceptance/W9-aaaa/test_ticket_a.py::test_ticket_a", "result": "passed"}], "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.88, "passed": 2, "failed": 1, "errors": 0, "skipped": 0, "reused": 0, "tests": [{"id": "tests/unit/test_alpha.py::test_alpha", "result": "passed"}, {"id": "tests/unit/test_beta.py::test_beta", "result": "passed"}, {"id": "tests/unit/test_flaky.py::test_flaky", "result": "failed"}], "workers": 2}], "trailers_base": null, "accepted_history": [], "test_cache": {"run": "20261020T234311Z-bdfa5aa3", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "shared", "store": ".gov-runtime/testcache/shared", "from": null, "commit": "4a34b9f07b0144ae651ee619c3c4e27b2cfc00cc", "clean": true, "wrote_entries": true, "keys": ["2bb0bfa2ec968bc62a9a48c5b78ae988"], "tests": [{"id": "tests/unit/test_flaky.py::test_flaky", "result": "failed"}], "counts": {"passed": 3, "failed": 1, "error": 0, "skipped": 0, "reused": 0}}, "note": "findings await their class; use --disposition to classify", "repair_ticket": "fp-grz3"}}}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:404: AssertionError
+=========================== short test summary info ============================
+FAILED tests/acceptance/W2-48/test_w2_48_close.py::test_a_test_that_failed_in_a_refused_close_runs_again_in_the_next_close
+1 failed, 1 passed in 9.40s

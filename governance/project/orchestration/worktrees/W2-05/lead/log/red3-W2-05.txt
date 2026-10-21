@@ -1,0 +1,194 @@
+.................FFFFF.......                                            [100%]
+=================================== FAILURES ===================================
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[trace variables] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat1')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat1/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = 'trace variables'
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat1/traces')
+what = 'the containment check with trace variables'
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with trace variables: a child git call wrote the planted trace target(s) ['git_trace', 'git_trace2', 'git_trace2_event']
+E       assert not ['git_trace', 'git_trace2', 'git_trace2_event']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:55: AssertionError
+_ test_the_containment_check_catches_the_change_whatever_its_environment_holds[a trace setting in the person's git configuration] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat2')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat2/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+plant = "a trace setting in the person's git configuration"
+
+    @pytest.mark.parametrize("plant", ("a decoy GIT_DIR and GIT_INDEX_FILE", "trace variables",
+                                       "a trace setting in the person's git configuration"))
+    def test_the_containment_check_catches_the_change_whatever_its_environment_holds(tmp_path, decoy, plant):
+        import w1_03_support as w103
+        project = w103.make_project(tmp_path / "project")
+        sandbox = w103.make_sandbox(tmp_path / "sandbox")
+        traces = tmp_path / "traces"
+        call = w103.script_call(sandbox, "echo changed >> README.md")
+        guard = w103.run_guard(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID)
+        w103.assert_let_through(guard, call)
+        bash = w103.run_bash(project, call.command, sandbox)
+        if plant.startswith("a decoy"):
+            environment = support.planted(decoy[0])
+        elif plant == "trace variables":
+            environment = support.trace_plants(traces)
+        else:
+            traces.mkdir()
+            (sandbox.home / ".gitconfig").write_text(f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+            xdg = tmp_path / "xdg"
+            support.write(xdg, "git/config", f"[trace2]\n\teventTarget = {traces / 'xdg-config-trace2'}\n")
+            environment = {"XDG_CONFIG_HOME": str(xdg)}
+    
+        result = w103.run_check(project, call, sandbox, role=w103.ENGINEER, ticket=w103.TICKET_ID, bash=bash,
+                                environment=environment)
+    
+        w103.assert_caught(result, "README.md", what=f"`echo changed >> README.md` with {plant} in the hook's environment")
+>       assert_no_trace(traces, f"the containment check with {plant}")
+
+tests/acceptance/W2-05/test_w2_05_planted.py:284: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+folder = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_containment_check_cat2/traces')
+what = "the containment check with a trace setting in the person's git configuration"
+
+    def assert_no_trace(folder, what):
+        written = support.written_traces(folder)
+>       assert not written, f"{what}: a child git call wrote the planted trace target(s) {written}"
+E       AssertionError: the containment check with a trace setting in the person's git configuration: a child git call wrote the planted trace target(s) ['user-config-trace2']
+E       assert not ['user-config-trace2']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:55: AssertionError
+_ test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_gov_close_runs_its_subpro0')
+decoy = (PosixPath('/tmp/pytest-of-usain/pytest-3580/test_gov_close_runs_its_subpro0/elsewhere/decoy'), {'.git/COMMIT_EDITMSG'...b07c9b45d3bbf7d6c312dfe', '.git/description': '85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee', ...})
+
+    def test_gov_close_runs_its_subprocesses_and_the_ticket_tests_with_a_sanitised_environment(tmp_path, decoy):
+        """Red until W2-53 merges (``src/gov/close/**``)."""
+        import w2_01_support as w201
+        base = w201.base
+        ticket, wbs = "PROJ-genv", "W1-genv"
+        record = tmp_path / "seen-by-the-test.json"
+        traces = tmp_path / "traces"
+        project = w201.Project(tmp_path / "project")
+        w201.create_ticket(project, ticket, wbs)
+        project.write(f"tests/acceptance/{wbs}/test_records_its_environment.py", _ENV_TEST.format(record=str(record)))
+        project.commit("acceptance tests: the environment", who=w201.TEST_DESIGNER,
+                       trailers=w201.trailers_of(ticket, role="independent-test-designer"), exact=True)
+        w201.engineer_commit(project, ticket, {"src/example/feature.py": "# feature\n"})
+        w201.checkpointed(project, ticket)
+        sandbox = w201.cli_support.make_sandbox(tmp_path / "sandbox")
+        interface = w201.cli_support.load_interface(w201.REPO_ROOT)
+        plants = dict(support.planted(decoy[0]), **support.trace_plants(traces))
+        traces.mkdir(exist_ok=True)
+        gitconfig = Path(sandbox.home) / ".gitconfig"
+        gitconfig.write_text((gitconfig.read_text() if gitconfig.is_file() else "")
+                             + f"[trace2]\n\teventTarget = {traces / 'user-config-trace2'}\n")
+        env = dict(base.sandbox_env(sandbox), **plants)
+    
+        run = base.run_close(project, sandbox, ticket, env=env)
+    
+        assert record.is_file(), f"gov close did not run the ticket's acceptance test:\n{run.describe()}"
+        reached = sorted(set(json.loads(record.read_text())) & set(plants))
+>       assert not reached, f"the planted {reached} reached the test run of gov close (W2-M161):\n{run.describe()}"
+E       AssertionError: the planted ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', 'GIT_TRACE_SETUP'] reached the test run of gov close (W2-M161):
+E         gov close PROJ-genv --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "close", "result": {"ticket": "PROJ-genv", "close_record": "docs/close/PROJ-genv/CL-PROJ-genv.md", "checkpoint": "docs/checkpoints/PROJ-genv/CP-PROJ-genv-0002.md", "test_runs": [{"run": "acceptance", "form": "parallel", "seconds": 2.34, "passed": 2, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}, {"run": "regression", "form": "parallel", "seconds": 0.59, "passed": 0, "failed": 0, "errors": 0, "skipped": 0, "workers": 2}], "governance_share": {"measured": "not measured", "estimated": "not measured", "total": "not measured"}, "trailers_base": null, "accepted_history": []}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['GIT_DIR', 'GIT_INDEX_FILE', 'GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE_PACKET', ...]
+
+tests/acceptance/W2-05/test_w2_05_planted.py:333: AssertionError
+____________ test_the_guard_hook_does_not_run_the_git_first_on_path ____________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_guard_hook_does_not_r0')
+
+    def test_the_guard_hook_does_not_run_the_git_first_on_path(tmp_path):
+        """Red until W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tool_input = w102.edit_tool_input("Write", project / "src/gov/guard/decide.py")
+        plain = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID)
+        assert plain.decision == "allow", f"the guard did not allow an in-scope write; the case needs it: {plain.describe()}"
+        fake = tmp_path / "fake-bin"
+        fake.mkdir()
+        mark = tmp_path / "fake-git-ran"
+        (fake / "git").write_text(f"#!/bin/sh\necho \"$*\" >> {support.sh_quote(mark)}\nexec {support.GIT} \"$@\"\n")
+        (fake / "git").chmod(0o755)
+    
+        result = w102.run_hook(project, "Write", tool_input, sandbox, role=w102.ENGINEER, ticket=w102.TICKET_ID,
+                               extra_env={"PATH": f"{fake}:{os.environ.get('PATH', support.SYSTEM_PATH)}"})
+    
+        ran = mark.read_text().splitlines() if mark.is_file() else []
+>       assert not ran, f"the guard hook ran the git first on PATH, not git by absolute path (W2-L160): {ran[:3]}"
+E       AssertionError: the guard hook ran the git first on PATH, not git by absolute path (W2-L160): ['-C /tmp/pytest-of-usain/pytest-3580/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+E       assert not ['-C /tmp/pytest-of-usain/pytest-3580/test_the_guard_hook_does_not_r0/project rev-parse --git-common-dir']
+
+tests/acceptance/W2-05/test_w2_05_planted.py:365: AssertionError
+_ test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_guard_hook_refuses_wi0')
+fifo_cleanup = [PosixPath('/tmp/pytest-of-usain/pytest-3580/test_the_guard_hook_refuses_wi0/project/.git/worktrees/wt/HEAD')]
+
+    def test_the_guard_hook_refuses_within_its_own_limit_when_the_freeze_look_up_hangs(tmp_path, fifo_cleanup):
+        """The worktree's ``HEAD`` in its git directory is a fifo: every git that opens it waits. The guard's freeze
+        look-up must give up within its own limit and refuse (DEC-580), before the hook's 20 s deadline. Red until
+        W2-50 merges (``src/gov/guard/decide.py``)."""
+        w102, project, sandbox = _guard_project(tmp_path)
+        tree = tmp_path / "wt"
+        w102.git(project, "worktree", "add", "-q", str(tree), "-b", "w2-05/guard")
+        head = support.git_dir_of(tree) / "HEAD"
+        head.unlink()
+        os.mkfifo(head)
+        fifo_cleanup.append(head)
+    
+        result = w102.run_hook(tree, "Write", w102.edit_tool_input("Write", tree / "src/gov/guard/decide.py"), sandbox,
+                               role=w102.ENGINEER, ticket=w102.TICKET_ID)
+    
+>       assert result.decision != "timeout", (
+            f"the guard hook did not answer within the hook's {w102.HOOK_TIMEOUT_S:.0f} s deadline while its freeze "
+            f"look-up waited (W2-L160: the look-up has no limit of its own): {result.describe()}")
+E       AssertionError: the guard hook did not answer within the hook's 20 s deadline while its freeze look-up waited (W2-L160: the look-up has no limit of its own): decision=timeout exit=None stdout='' stderr=''
+E       assert 'timeout' != 'timeout'
+E        +  where 'timeout' = HookResult(decision='timeout', returncode=None, stdout='', stderr='', seconds=20.021244760020636).decision
+
+tests/acceptance/W2-05/test_w2_05_planted.py:384: AssertionError
+5 failed, 24 passed in 59.89s

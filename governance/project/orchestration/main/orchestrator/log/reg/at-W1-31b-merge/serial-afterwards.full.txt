@@ -1,0 +1,21 @@
+................................................................F....... [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+...............................................                          [100%]
+=================================== FAILURES ===================================
+E   AssertionError: the session does not name the loop count 23: '**Active tickets:** ZQ-71 (engineer implementing, review-repair loop 17), ZQ-88 (waiting for audit)\n\n**Open owner decisions:** OD-913 (rename ledger module?), OD-927 (keep slow parser?)\n\n**Next action:** Start the audit of ZQ-88, then read the review of ZQ-71.'
+    assert '23' in '**Active tickets:** ZQ-71 (engineer implementing, review-repair loop 17), ZQ-88 (waiting for audit)\n\n**Open owner d...dger module?), OD-927 (keep slow parser?)\n\n**Next action:** Start the audit of ZQ-88, then read the review of ZQ-71.'
+     +  where '**Active tickets:** ZQ-71 (engineer implementing, review-repair loop 17), ZQ-88 (waiting for audit)\n\n**Open owner d...dger module?), OD-927 (keep slow parser?)\n\n**Next action:** Start the audit of ZQ-88, then read the review of ZQ-71.' = _reply(Live(compact={'is_error': False, 'duration_api_ms': 0, 'num_turns': 0, 'stop_reason': None, 'session_id': '081aeace-31...ritten part of this checkpoint\n<!-- GENERATED STATE BLOCK END -->\n', head='bb389f2ff9ee6aadcca9c8e77eff9c03bf9c0d72'))
+/home/usain/Dynamic-Agentic-Engineering-OS/tests/acceptance/W1-49/test_w1_49_live_session.py:200: AssertionError: the session does not name the loop count 23: '**Active tickets:** ZQ-71 (engineer implementing, review-repair loop 17), ZQ-88 (waiting for audit)\n\n**Open owner decisions:** OD-913 (rename ledger module?), OD-927 (keep slow parser?)\n\n**Next action:** Start the audit of ZQ-88, then read the review of ZQ-71.'
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-49/test_w1_49_live_session.py::test_after_the_compaction_the_session_names_the_loop_counts[23]
+1 failed, 262 passed in 1535.62s (0:25:35)

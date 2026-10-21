@@ -1,0 +1,11 @@
+W2-59 rc=0 secs=23 :: 44 passed in 13.78s
+W1-38 rc=0 secs=283 :: 201 passed in 268.90s (0:04:28)
+W1-26 rc=1 secs=371 :: 1 failed, 411 passed, 1 skipped in 353.50s (0:05:53)
+W2-01 rc=0 secs=582 :: 88 passed in 551.23s (0:09:11)
+W2-53 rc=0 secs=275 :: 57 passed in 255.70s (0:04:15)
+W2-54 rc=1 secs=1887 :: 2 failed, 92 passed, 2 deselected in 1792.26s (0:29:52)
+W1-01 rc=0 secs=10 :: 49 passed, 28 skipped in 7.19s
+W1-02 rc=0 secs=786 :: 3653 passed in 740.16s (0:12:20)
+W1-03 rc=0 secs=133 :: 364 passed in 112.89s (0:01:52)
+W1-04 rc=0 secs=151 :: 336 passed in 143.71s (0:02:23)
+W1-05 rc=1 secs=460 :: 10 failed, 89 passed in 433.30s (0:07:13)

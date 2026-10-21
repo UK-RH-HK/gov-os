@@ -1,0 +1,39 @@
+.FF.                                                                     [100%]
+=================================== FAILURES ===================================
+___________ test_gov_check_gives_context_reproducibility_green_here ____________
+
+gov_check_here = (<w2_54_support.Run object at 0x7394eb3ebd10>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '93ace3dc9a592a354dffa90146df8a825a8cbd87', 'inputs_hash': '20049c0a2cd37fc8'}, ...}, ...})
+
+    def test_gov_check_gives_context_reproducibility_green_here(gov_check_here):
+        """*Red.* The context-reproducibility check, in ``gov check --json`` on this repository, is GREEN."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CONTEXT_CHECK_ID)
+        assert entry is not None, f"gov check lists no {S.CONTEXT_CHECK_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CONTEXT_CHECK_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: context-reproducibility is RED here: [{"code": "CHECK_FAILED", "message": "context-reproducibility did not end within its time limit of 60 seconds"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:26: AssertionError
+_________________ test_gov_check_gives_core_schema_green_here __________________
+
+gov_check_here = (<w2_54_support.Run object at 0x7394eb3ebd10>, {'adapter-portability': {'family': 'adapter/model portability', 'findin...ersion': '1.0.0', 'commit': '93ace3dc9a592a354dffa90146df8a825a8cbd87', 'inputs_hash': '20049c0a2cd37fc8'}, ...}, ...})
+
+    def test_gov_check_gives_core_schema_green_here(gov_check_here):
+        """*Red.* Core-schema, in ``gov check --json`` on this repository, is GREEN."""
+        done, checks = gov_check_here
+        entry = checks.get(S.CORE_SCHEMA_ID)
+        assert entry is not None, f"gov check lists no {S.CORE_SCHEMA_ID}\n{done.describe(1500)}"
+>       assert entry.get("status") == S.GREEN, \
+            f"{S.CORE_SCHEMA_ID} is {entry.get('status')} here: {S.canonical(entry.get('findings'))[:3000]}"
+E       AssertionError: core-schema is RED here: [{"code": "SCHEMA_INVALID_TYPE", "message": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md: 'type' field is missing or not a string", "path": "docs/audit/wave-1/W1-43-wave-1-exit-audit.md"}]
+E       assert 'RED' == 'GREEN'
+E         
+E         - GREEN
+E         + RED
+
+tests/acceptance/W2-54/test_w2_54_green_here.py:36: AssertionError
+2 failed, 2 passed in 344.13s (0:05:44)

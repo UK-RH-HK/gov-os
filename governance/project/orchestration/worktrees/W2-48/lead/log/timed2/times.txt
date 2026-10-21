@@ -1,0 +1,4 @@
+T uncached parallel exit=3 3080s head=b6dfe034 dirty=0 load_start=2.73 load_end=2.06
+T uncached serial exit=3 1801s head=b6dfe034 dirty=0 load_start=2.06 load_end=7.46
+T cached parallel exit=3 2948s head=b6dfe034 dirty=2 load_start=14.13 load_end=2.23
+T cached serial exit=0 1780s head=b6dfe034 dirty=2 load_start=2.23 load_end=2.80

@@ -1,0 +1,9 @@
+W1-02/test_w1_02_copies.py exit=0 secs=22 126 passed in 17.94s
+W1-02/test_w1_02_name_filters.py exit=0 secs=49 244 passed in 44.69s
+W1-02/test_w1_02_root_searches.py exit=0 secs=38 236 passed in 33.31s
+W1-02/test_w1_02_search_on_a_pipe.py exit=0 secs=11 65 passed in 11.49s
+W1-02/test_w1_02_wildcard_globs.py exit=0 secs=22 176 passed in 17.96s
+W1-02/test_w1_02_protected_reads_open.py exit=0 secs=25 164 passed in 21.27s
+W1-05/test_w1_05_switch_over_record.py exit=1 secs=218 1 failed, 1 passed in 194.92s (0:03:14)
+W2-58 exit=0 secs=266 563 passed in 240.48s (0:04:00)
+done

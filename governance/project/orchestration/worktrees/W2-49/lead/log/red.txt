@@ -1,0 +1,1723 @@
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF [ 94%]
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+___________________ test_cit_e_names_its_proposal_and_source ___________________
+
+    def test_cit_e_names_its_proposal_and_source():
+        """The CIT-E is the execution record of W2-49's CIT-P, under DEC-722."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_e_records_each_change_the_cit_p_names[CAP-44.h] ___________
+
+change = 'CAP-44.h (the lite verdict)', pattern = 'CAP-44\\.h'
+
+    @pytest.mark.parametrize(
+        "change, pattern",
+        [
+            ("CAP-44.h (the lite verdict)", r"CAP-44\.h"),
+            ("the A7 gate of CAP-44.f", gate("A7")),
+            ("the A10 gate of CAP-44.f", gate("A10")),
+            ("CAP-43.b (the lite manifest and file hashes)", r"CAP-43\.b"),
+            ("the Contract's version 4.2", r"(?<![\d.])4\.2(?![\d])"),
+        ],
+        ids=["CAP-44.h", "A7", "A10", "CAP-43.b", "v4.2"],
+    )
+    def test_cit_e_records_each_change_the_cit_p_names(change, pattern):
+        """Each change of the CIT-P is confirmed as made, or listed as a difference."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+______________ test_cit_e_records_each_change_the_cit_p_names[A7] ______________
+
+change = 'the A7 gate of CAP-44.f', pattern = '(?<![\\w-])A7(?!\\d)'
+
+    @pytest.mark.parametrize(
+        "change, pattern",
+        [
+            ("CAP-44.h (the lite verdict)", r"CAP-44\.h"),
+            ("the A7 gate of CAP-44.f", gate("A7")),
+            ("the A10 gate of CAP-44.f", gate("A10")),
+            ("CAP-43.b (the lite manifest and file hashes)", r"CAP-43\.b"),
+            ("the Contract's version 4.2", r"(?<![\d.])4\.2(?![\d])"),
+        ],
+        ids=["CAP-44.h", "A7", "A10", "CAP-43.b", "v4.2"],
+    )
+    def test_cit_e_records_each_change_the_cit_p_names(change, pattern):
+        """Each change of the CIT-P is confirmed as made, or listed as a difference."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____________ test_cit_e_records_each_change_the_cit_p_names[A10] ______________
+
+change = 'the A10 gate of CAP-44.f', pattern = '(?<![\\w-])A10(?!\\d)'
+
+    @pytest.mark.parametrize(
+        "change, pattern",
+        [
+            ("CAP-44.h (the lite verdict)", r"CAP-44\.h"),
+            ("the A7 gate of CAP-44.f", gate("A7")),
+            ("the A10 gate of CAP-44.f", gate("A10")),
+            ("CAP-43.b (the lite manifest and file hashes)", r"CAP-43\.b"),
+            ("the Contract's version 4.2", r"(?<![\d.])4\.2(?![\d])"),
+        ],
+        ids=["CAP-44.h", "A7", "A10", "CAP-43.b", "v4.2"],
+    )
+    def test_cit_e_records_each_change_the_cit_p_names(change, pattern):
+        """Each change of the CIT-P is confirmed as made, or listed as a difference."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_e_records_each_change_the_cit_p_names[CAP-43.b] ___________
+
+change = 'CAP-43.b (the lite manifest and file hashes)', pattern = 'CAP-43\\.b'
+
+    @pytest.mark.parametrize(
+        "change, pattern",
+        [
+            ("CAP-44.h (the lite verdict)", r"CAP-44\.h"),
+            ("the A7 gate of CAP-44.f", gate("A7")),
+            ("the A10 gate of CAP-44.f", gate("A10")),
+            ("CAP-43.b (the lite manifest and file hashes)", r"CAP-43\.b"),
+            ("the Contract's version 4.2", r"(?<![\d.])4\.2(?![\d])"),
+        ],
+        ids=["CAP-44.h", "A7", "A10", "CAP-43.b", "v4.2"],
+    )
+    def test_cit_e_records_each_change_the_cit_p_names(change, pattern):
+        """Each change of the CIT-P is confirmed as made, or listed as a difference."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____________ test_cit_e_records_each_change_the_cit_p_names[v4.2] _____________
+
+change = "the Contract's version 4.2", pattern = '(?<![\\d.])4\\.2(?![\\d])'
+
+    @pytest.mark.parametrize(
+        "change, pattern",
+        [
+            ("CAP-44.h (the lite verdict)", r"CAP-44\.h"),
+            ("the A7 gate of CAP-44.f", gate("A7")),
+            ("the A10 gate of CAP-44.f", gate("A10")),
+            ("CAP-43.b (the lite manifest and file hashes)", r"CAP-43\.b"),
+            ("the Contract's version 4.2", r"(?<![\d.])4\.2(?![\d])"),
+        ],
+        ids=["CAP-44.h", "A7", "A10", "CAP-43.b", "v4.2"],
+    )
+    def test_cit_e_records_each_change_the_cit_p_names(change, pattern):
+        """Each change of the CIT-P is confirmed as made, or listed as a difference."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_______________ test_cit_e_states_its_differences_from_the_cit_p _______________
+
+    def test_cit_e_states_its_differences_from_the_cit_p():
+        """The CIT-E says what differs from the proposal, or that nothing does."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+__________ test_cit_e_records_every_covers_item_the_contract_changed ___________
+
+    def test_cit_e_records_every_covers_item_the_contract_changed():
+        """Every covers item whose wave or wording changed in v4.2, or that v4.2 added, is in the CIT-E."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____________ test_cit_e_records_every_moved_item_the_cit_p_names ______________
+
+    def test_cit_e_records_every_moved_item_the_cit_p_names():
+        """The CIT-P's items among CAP-44.f, CAP-44.h and CAP-43.b each appear in the CIT-E."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_e_records_the_owner_approval_before_the_change ____________
+
+    def test_cit_e_records_the_owner_approval_before_the_change():
+        """CAP-33: the Contract changes only after independent review and the owner's approval of the CIT-P."""
+>       cit_e = read_doc(CIT_E)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_e.py:84: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-E.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-E.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+________________ test_cit_p_exists_and_names_its_source_dec_722 ________________
+
+    def test_cit_p_exists_and_names_its_source_dec_722():
+        """DEC-722 is the owner decision behind every change the CIT-P proposes."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+____________ test_cit_p_names_cap_44h_lite_with_the_three_verdicts _____________
+
+    def test_cit_p_names_cap_44h_lite_with_the_three_verdicts():
+        """CAP-44.h, lite: ADOPTED_HEALTHY, ADOPTED_WITH_ACCEPTED_EXCEPTIONS, NOT_ADOPTED_HEALTHY (DEC-722)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:33: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+____________ test_cit_p_states_the_conditions_a_lite_verdict_checks ____________
+
+    def test_cit_p_states_the_conditions_a_lite_verdict_checks():
+        """CAP-44.h, lite: the conditions a lite verdict checks."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:43: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+______ test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks[A7] ______
+
+name = 'A7'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks(name):
+        """CAP-44.f, lite: the A7 and A10 gates, with what each lite gate checks."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____ test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks[A10] ______
+
+name = 'A10'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cit_p_names_each_lite_gate_of_cap_44f_with_what_it_checks(name):
+        """CAP-44.f, lite: the A7 and A10 gates, with what each lite gate checks."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____________ test_cit_p_says_what_of_cap_44f_stays_for_wave_3[A9] _____________
+
+name = 'A9'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cit_p_says_what_of_cap_44f_stays_for_wave_3(name):
+        """CAP-44.f: A9 and A11 stay in Wave 3 (the W2-49 card, DEC-722)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+____________ test_cit_p_says_what_of_cap_44f_stays_for_wave_3[A11] _____________
+
+name = 'A11'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cit_p_says_what_of_cap_44f_stays_for_wave_3(name):
+        """CAP-44.f: A9 and A11 stay in Wave 3 (the W2-49 card, DEC-722)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+____________ test_cit_p_names_cap_43b_lite_manifest_and_file_hashes ____________
+
+    def test_cit_p_names_cap_43b_lite_manifest_and_file_hashes():
+        """CAP-43.b, lite: the manifest and file hashes (DEC-722)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____________ test_cit_p_says_the_rest_of_cap_43b_stays_for_wave_3 _____________
+
+    def test_cit_p_says_the_rest_of_cap_43b_stays_for_wave_3():
+        """CAP-43.b: everything but the manifest and file hashes stays in Wave 3."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:77: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+________________ test_cit_p_keeps_cap_02c_signed_tags_in_wave_3 ________________
+
+    def test_cit_p_keeps_cap_02c_signed_tags_in_wave_3():
+        """CAP-02.c (signed release tags) stays in Wave 3 (DEC-722 item 2)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:87: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_p_keeps_the_qualification_certificate_in_wave_3 ___________
+
+    def test_cit_p_keeps_the_qualification_certificate_in_wave_3():
+        """The qualification certificate stays in Wave 3 (the W2-49 card); in the Contract, CAP-43.c."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-02] _________________
+
+ticket = 'W2-02'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-16] _________________
+
+ticket = 'W2-16'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-18] _________________
+
+ticket = 'W2-18'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-27] _________________
+
+ticket = 'W2-27'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-28] _________________
+
+ticket = 'W2-28'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-29] _________________
+
+ticket = 'W2-29'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_________________ test_cit_p_names_each_impacted_ticket[W2-30] _________________
+
+ticket = 'W2-30'
+
+    @pytest.mark.parametrize("ticket", ["W2-02", "W2-16", "W2-18", "W2-27", "W2-28", "W2-29", "W2-30"])
+    def test_cit_p_names_each_impacted_ticket(ticket):
+        """The impact: W2-02, W2-16, W2-18 and W2-27 to W2-30 (the W2-49 card)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:102: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_p_names_exit_criteria_6_and_7_in_its_impact[6] ____________
+
+number = 6
+
+    @pytest.mark.parametrize("number", [6, 7])
+    def test_cit_p_names_exit_criteria_6_and_7_in_its_impact(number):
+        """The impact: Wave 2 exit criteria 6 (the healthy verdict) and 7 (the lite items, both ways)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+___________ test_cit_p_names_exit_criteria_6_and_7_in_its_impact[7] ____________
+
+number = 7
+
+    @pytest.mark.parametrize("number", [6, 7])
+    def test_cit_p_names_exit_criteria_6_and_7_in_its_impact(number):
+        """The impact: Wave 2 exit criteria 6 (the healthy verdict) and 7 (the lite items, both ways)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_____ test_cit_p_presents_dec_105_three_options_with_their_cost[apply-now] _____
+
+option = 'apply now'
+
+    @pytest.mark.parametrize("option", ["apply now", "defer", "re-?baseline"], ids=["apply-now", "defer", "re-baseline"])
+    def test_cit_p_presents_dec_105_three_options_with_their_cost(option):
+        """A change to a closed specification gives three costed options (DEC-105, CAP-33.e)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_______ test_cit_p_presents_dec_105_three_options_with_their_cost[defer] _______
+
+option = 'defer'
+
+    @pytest.mark.parametrize("option", ["apply now", "defer", "re-?baseline"], ids=["apply-now", "defer", "re-baseline"])
+    def test_cit_p_presents_dec_105_three_options_with_their_cost(option):
+        """A change to a closed specification gives three costed options (DEC-105, CAP-33.e)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+____ test_cit_p_presents_dec_105_three_options_with_their_cost[re-baseline] ____
+
+option = 're-?baseline'
+
+    @pytest.mark.parametrize("option", ["apply now", "defer", "re-?baseline"], ids=["apply-now", "defer", "re-baseline"])
+    def test_cit_p_presents_dec_105_three_options_with_their_cost(option):
+        """A change to a closed specification gives three costed options (DEC-105, CAP-33.e)."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+________________ test_cit_p_goes_the_cap_33_route_to_the_owner _________________
+
+    def test_cit_p_goes_the_cap_33_route_to_the_owner():
+        """CAP-33: CIT-P, independent review, the owner's approval, versioned promotion."""
+>       cit_p = read_doc(CIT_P)
+                ^^^^^^^^^^^^^^^
+
+tests/acceptance/W2-49/test_w2_49_cit_p.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+rel = 'docs/changes/W2-49-CIT-P.md'
+
+    def read_doc(rel: str) -> str:
+        path = ROOT / rel
+        if not path.is_file():
+>           pytest.fail(f"{rel} does not exist yet (W2-49 has not written it)")
+E           Failed: docs/changes/W2-49-CIT-P.md does not exist yet (W2-49 has not written it)
+
+tests/acceptance/W2-49/w2_49_support.py:61: Failed
+_______ test_yaml_version_is_4_2_with_a_change_log_entry_citing_dec_722 ________
+
+    def test_yaml_version_is_4_2_with_a_change_log_entry_citing_dec_722():
+        data = load_yaml_text(read_doc(CONTRACT_YAML))
+>       assert str(data.get("version")) == "4.2", f"contract.yaml is version {data.get('version')!r}, not 4.2"
+E       AssertionError: contract.yaml is version '4.1', not 4.2
+E       assert '4.1' == '4.2'
+E         
+E         - 4.2
+E         + 4.1
+
+tests/acceptance/W2-49/test_w2_49_contract.py:71: AssertionError
+__________ test_yaml_change_log_keeps_every_earlier_version_unchanged __________
+
+    def test_yaml_change_log_keeps_every_earlier_version_unchanged():
+        """Every version of the specification is kept (CAP-33.e, DEC-105)."""
+        before = load_yaml_text(read_base(CONTRACT_YAML))["change_log"]
+        after = load_yaml_text(read_doc(CONTRACT_YAML)).get("change_log", [])
+>       assert str(load_yaml_text(read_doc(CONTRACT_YAML)).get("version")) == "4.2", "contract.yaml is not version 4.2"
+E       AssertionError: contract.yaml is not version 4.2
+E       assert '4.1' == '4.2'
+E         
+E         - 4.2
+E         + 4.1
+
+tests/acceptance/W2-49/test_w2_49_contract.py:81: AssertionError
+________ test_markdown_version_is_4_2_with_a_change_row_citing_dec_722 _________
+
+    def test_markdown_version_is_4_2_with_a_change_row_citing_dec_722():
+        text = read_doc(CONTRACT_MD)
+        model = md_model(text)
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______________ test_cap_44h_verdict_moves_to_wave_2_lite[yaml] ________________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_44h_verdict_moves_to_wave_2_lite(model):
+        """CAP-44.h, lite: the three verdicts ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______________ test_cap_44f_gate_moves_to_wave_2_lite[yaml-A7] ________________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A7'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cap_44f_gate_moves_to_wave_2_lite(model, name):
+        """CAP-44.f, lite: the A7 and A10 gates move to Wave 2."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______________ test_cap_44f_gate_moves_to_wave_2_lite[yaml-A10] _______________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A10'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cap_44f_gate_moves_to_wave_2_lite(model, name):
+        """CAP-44.f, lite: the A7 and A10 gates move to Wave 2."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_cap_43b_manifest_and_file_hashes_move_to_wave_2_lite[yaml] ________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_43b_manifest_and_file_hashes_move_to_wave_2_lite(model):
+        """CAP-43.b, lite: the manifest and file hashes."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__________________ test_cap_44f_gate_stays_in_wave_3[yaml-A9] __________________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A9'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cap_44f_gate_stays_in_wave_3(model, name):
+        """CAP-44.f: A9 (new knowledge fabric) and A11 (full audit) stay in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_________________ test_cap_44f_gate_stays_in_wave_3[yaml-A11] __________________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A11'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cap_44f_gate_stays_in_wave_3(model, name):
+        """CAP-44.f: A9 (new knowledge fabric) and A11 (full audit) stay in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_rest_of_cap_43b_stays_in_wave_3[yaml-CLI/runtime versions] ________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'CLI/runtime versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+____ test_rest_of_cap_43b_stays_in_wave_3[yaml-adapter/capability versions] ____
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'adapter/capability versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_________ test_rest_of_cap_43b_stays_in_wave_3[yaml-affected indexes] __________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'affected indexes'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+___________ test_rest_of_cap_43b_stays_in_wave_3[yaml-release notes] ___________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'release notes'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____ test_rest_of_cap_43b_stays_in_wave_3[yaml-required human decisions] ______
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'required human decisions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+________ test_rest_of_cap_43b_stays_in_wave_3[yaml-rollback procedure] _________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'rollback procedure'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__________ test_rest_of_cap_43b_stays_in_wave_3[yaml-schema versions] __________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'schema versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_________ test_rest_of_cap_43b_stays_in_wave_3[yaml-semantic version] __________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'semantic version'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_rest_of_cap_43b_stays_in_wave_3[yaml-supported migrations] ________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'supported migrations'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+____________ test_cap_02c_signed_release_tag_stays_in_wave_3[yaml] _____________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_02c_signed_release_tag_stays_in_wave_3(model):
+        """CAP-02.c (SSH-signed release tag) stays in Wave 3 (DEC-722 item 2)."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_________ test_qualification_certificate_cap_43c_stays_in_wave_3[yaml] _________
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_qualification_certificate_cap_43c_stays_in_wave_3(model):
+        """The qualification certificate (CAP-43.c, release certification by qualification) stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____________ test_cap_44h_verdict_moves_to_wave_2_lite[markdown] ______________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_44h_verdict_moves_to_wave_2_lite(model):
+        """CAP-44.h, lite: the three verdicts ADOPTED_HEALTHY / ADOPTED_WITH_ACCEPTED_EXCEPTIONS / NOT_ADOPTED_HEALTHY."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:116: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____________ test_cap_44f_gate_moves_to_wave_2_lite[markdown-A7] ______________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A7'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cap_44f_gate_moves_to_wave_2_lite(model, name):
+        """CAP-44.f, lite: the A7 and A10 gates move to Wave 2."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____________ test_cap_44f_gate_moves_to_wave_2_lite[markdown-A10] _____________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A10'
+
+    @pytest.mark.parametrize("name", ["A7", "A10"])
+    def test_cap_44f_gate_moves_to_wave_2_lite(model, name):
+        """CAP-44.f, lite: the A7 and A10 gates move to Wave 2."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____ test_cap_43b_manifest_and_file_hashes_move_to_wave_2_lite[markdown] ______
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_43b_manifest_and_file_hashes_move_to_wave_2_lite(model):
+        """CAP-43.b, lite: the manifest and file hashes."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:137: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+________________ test_cap_44f_gate_stays_in_wave_3[markdown-A9] ________________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A9'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cap_44f_gate_stays_in_wave_3(model, name):
+        """CAP-44.f: A9 (new knowledge fabric) and A11 (full audit) stay in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______________ test_cap_44f_gate_stays_in_wave_3[markdown-A11] ________________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+name = 'A11'
+
+    @pytest.mark.parametrize("name", ["A9", "A11"])
+    def test_cap_44f_gate_stays_in_wave_3(model, name):
+        """CAP-44.f: A9 (new knowledge fabric) and A11 (full audit) stay in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____ test_rest_of_cap_43b_stays_in_wave_3[markdown-CLI/runtime versions] ______
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'CLI/runtime versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__ test_rest_of_cap_43b_stays_in_wave_3[markdown-adapter/capability versions] __
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'adapter/capability versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_rest_of_cap_43b_stays_in_wave_3[markdown-affected indexes] ________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'affected indexes'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_________ test_rest_of_cap_43b_stays_in_wave_3[markdown-release notes] _________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'release notes'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+___ test_rest_of_cap_43b_stays_in_wave_3[markdown-required human decisions] ____
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'required human decisions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+______ test_rest_of_cap_43b_stays_in_wave_3[markdown-rollback procedure] _______
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'rollback procedure'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+________ test_rest_of_cap_43b_stays_in_wave_3[markdown-schema versions] ________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'schema versions'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_rest_of_cap_43b_stays_in_wave_3[markdown-semantic version] ________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'semantic version'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____ test_rest_of_cap_43b_stays_in_wave_3[markdown-supported migrations] ______
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+part = 'supported migrations'
+
+    @pytest.mark.parametrize("part", sorted(CAP_43B_REST))
+    def test_rest_of_cap_43b_stays_in_wave_3(model, part):
+        """CAP-43.b: every release content but the manifest and file hashes stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:161: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__________ test_cap_02c_signed_release_tag_stays_in_wave_3[markdown] ___________
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_cap_02c_signed_release_tag_stays_in_wave_3(model):
+        """CAP-02.c (SSH-signed release tag) stays in Wave 3 (DEC-722 item 2)."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:169: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_______ test_qualification_certificate_cap_43c_stays_in_wave_3[markdown] _______
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_qualification_certificate_cap_43c_stays_in_wave_3(model):
+        """The qualification certificate (CAP-43.c, release certification by qualification) stays in Wave 3."""
+>       require_v42(model)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='markdown', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-r...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's markdown file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+____________________ test_no_other_covers_item_changes_wave ____________________
+
+ymodel = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+base = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_no_other_covers_item_changes_wave(ymodel, base):
+        """Only CAP-44.f, CAP-44.h and CAP-43.b may change wave in place, and only to W2."""
+>       require_v42(ymodel)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+________________________ test_no_covers_item_is_removed ________________________
+
+ymodel = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+base = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_no_covers_item_is_removed(ymodel, base):
+        """Covers ids are cited by tickets and tests; a split keeps the original id."""
+>       require_v42(ymodel)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:205: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__________ test_new_covers_items_are_only_splits_of_cap_43_and_cap_44 __________
+
+ymodel = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+base = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_new_covers_items_are_only_splits_of_cap_43_and_cap_44(ymodel, base):
+        """A split may add covers items to CAP-43 and CAP-44 only, each in W2 or W3."""
+>       require_v42(ymodel)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:212: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+_____________ test_no_capability_is_added_removed_or_changes_wave ______________
+
+ymodel = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+base = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def test_no_capability_is_added_removed_or_changes_wave(ymodel, base):
+        """The capability-level waves (and so §1 Counts) are unchanged; CAP-44 stays W3 because A11 stays."""
+>       require_v42(ymodel)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:224: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+__________ test_yaml_and_markdown_agree_on_every_covers_item_and_wave __________
+
+    def test_yaml_and_markdown_agree_on_every_covers_item_and_wave():
+        """contract.yaml and CONTRACT_v4.md hold the same covers items in the same waves."""
+        y, m = current_model("yaml"), current_model("markdown")
+>       require_v42(y)
+
+tests/acceptance/W2-49/test_w2_49_contract.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+model = ContractModel(source='yaml', version='4.1', covers=[Covers(cap='CAP-01', id='CAP-01.a', wave='W1', text='Machine-reada...W1', 'CAP-56': 'W1', 'CAP-57': 'W1', 'CAP-58': 'W1', 'CAP-59': 'W1', 'CAP-60': 'NONE', 'CAP-61': 'W1', 'CAP-62': 'W1'})
+
+    def require_v42(model: ContractModel) -> None:
+>       assert model.version == "4.2", (
+               ^^^^^^^^^^^^^^^^^^^^^^
+            f"the Contract's {model.source} file is version {model.version!r}, not 4.2: "
+            "Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)"
+        )
+E       AssertionError: the Contract's yaml file is version '4.1', not 4.2: Contract v4.2 is not written yet (it waits for the owner's approval of the CIT-P, CAP-33)
+
+tests/acceptance/W2-49/w2_49_support.py:215: AssertionError
+76 failed in 1.53s

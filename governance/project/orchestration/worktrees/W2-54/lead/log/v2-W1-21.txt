@@ -1,0 +1,98 @@
+................................................FFF............F........ [ 56%]
+.......................................................                  [100%]
+=================================== FAILURES ===================================
+_________________ test_a_retrieval_writes_nothing[a question] __________________
+
+api = <w1_21_support.Api object at 0x7726532e5460>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-3400/test_a_retrieval_writes_nothin0/repo')
+ollama = <w1_21_support.OllamaStandIn object at 0x77265366cef0>, kwargs = {}
+
+    @pytest.mark.parametrize("kwargs", [{}, {"ticket": support.TICKET_IN_SCOPE, "radius": support.RADIUS_FULL},
+                                        {"batch_size": 1}], ids=["a question", "a ticket", "batches of one"])
+    def test_a_retrieval_writes_nothing(api, repo, ollama, kwargs):
+        """A read command writes nowhere (DEC-317): not the index, not the store, not a cache."""
+        api.build(repo, ollama.host)
+        before = support.tree(repo)
+        support.check_bundle(api.retrieve(repo, support.PHRASE, host=ollama.host, **kwargs), root=repo)
+>       assert support.tree(repo) == before, "the retrieval wrote or changed a file of the project"
+E       AssertionError: the retrieval wrote or changed a file of the project
+E       assert {'.gitignore'...b72c9a5', ...} == {'.gitignore'...6c94426', ...}
+E         
+E         Omitting 37 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'.gov-runtime/query-vectors.db': '93866499f4323d3a7270bf6663e17e80fe48e2ed4736e5d2aebd8b5d1ae539e1'}
+E         Use -v to get more diff
+
+tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py:139: AssertionError
+__________________ test_a_retrieval_writes_nothing[a ticket] ___________________
+
+api = <w1_21_support.Api object at 0x7726532e5460>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-3400/test_a_retrieval_writes_nothin1/repo')
+ollama = <w1_21_support.OllamaStandIn object at 0x77265366cef0>
+kwargs = {'radius': 3, 'ticket': 'RT-0001'}
+
+    @pytest.mark.parametrize("kwargs", [{}, {"ticket": support.TICKET_IN_SCOPE, "radius": support.RADIUS_FULL},
+                                        {"batch_size": 1}], ids=["a question", "a ticket", "batches of one"])
+    def test_a_retrieval_writes_nothing(api, repo, ollama, kwargs):
+        """A read command writes nowhere (DEC-317): not the index, not the store, not a cache."""
+        api.build(repo, ollama.host)
+        before = support.tree(repo)
+        support.check_bundle(api.retrieve(repo, support.PHRASE, host=ollama.host, **kwargs), root=repo)
+>       assert support.tree(repo) == before, "the retrieval wrote or changed a file of the project"
+E       AssertionError: the retrieval wrote or changed a file of the project
+E       assert {'.gitignore'...b72c9a5', ...} == {'.gitignore'...6c94426', ...}
+E         
+E         Omitting 37 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'.gov-runtime/query-vectors.db': '93866499f4323d3a7270bf6663e17e80fe48e2ed4736e5d2aebd8b5d1ae539e1'}
+E         Use -v to get more diff
+
+tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py:139: AssertionError
+_______________ test_a_retrieval_writes_nothing[batches of one] ________________
+
+api = <w1_21_support.Api object at 0x7726532e5460>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-3400/test_a_retrieval_writes_nothin2/repo')
+ollama = <w1_21_support.OllamaStandIn object at 0x77265366cef0>
+kwargs = {'batch_size': 1}
+
+    @pytest.mark.parametrize("kwargs", [{}, {"ticket": support.TICKET_IN_SCOPE, "radius": support.RADIUS_FULL},
+                                        {"batch_size": 1}], ids=["a question", "a ticket", "batches of one"])
+    def test_a_retrieval_writes_nothing(api, repo, ollama, kwargs):
+        """A read command writes nowhere (DEC-317): not the index, not the store, not a cache."""
+        api.build(repo, ollama.host)
+        before = support.tree(repo)
+        support.check_bundle(api.retrieve(repo, support.PHRASE, host=ollama.host, **kwargs), root=repo)
+>       assert support.tree(repo) == before, "the retrieval wrote or changed a file of the project"
+E       AssertionError: the retrieval wrote or changed a file of the project
+E       assert {'.gitignore'...b72c9a5', ...} == {'.gitignore'...6c94426', ...}
+E         
+E         Omitting 37 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'.gov-runtime/query-vectors.db': '93866499f4323d3a7270bf6663e17e80fe48e2ed4736e5d2aebd8b5d1ae539e1'}
+E         Use -v to get more diff
+
+tests/acceptance/W1-21/test_w1_21_closure_and_gaps.py:139: AssertionError
+_______________________ test_the_command_writes_nothing ________________________
+
+cli = <w1_21_support.Api object at 0x7726532e5460>
+repo = PosixPath('/tmp/pytest-of-usain/pytest-3400/test_the_command_writes_nothin0/repo')
+ollama = <w1_21_support.OllamaStandIn object at 0x77265366cef0>
+
+    def test_the_command_writes_nothing(cli, repo, ollama):
+        cli.build(repo, ollama.host)
+        before = support.tree(repo)
+        answered(cli.command(repo, "--ticket", support.TICKET_IN_SCOPE, support.PHRASE, host=ollama.host)).bundle()
+>       assert support.tree(repo) == before, "gov retrieve wrote or changed a file of the project"
+E       AssertionError: gov retrieve wrote or changed a file of the project
+E       assert {'.gitignore'...b72c9a5', ...} == {'.gitignore'...6c94426', ...}
+E         
+E         Omitting 37 identical items, use -vv to show
+E         Left contains 1 more item:
+E         {'.gov-runtime/query-vectors.db': '93866499f4323d3a7270bf6663e17e80fe48e2ed4736e5d2aebd8b5d1ae539e1'}
+E         Use -v to get more diff
+
+tests/acceptance/W1-21/test_w1_21_command.py:111: AssertionError
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+4 failed, 123 passed in 214.73s (0:03:34)

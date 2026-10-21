@@ -1,0 +1,27 @@
+...............F......................................                   [100%]
+=================================== FAILURES ===================================
+__ test_the_research_record_records_the_planted_change_set_and_the_time_saved __
+
+    def test_the_research_record_records_the_planted_change_set_and_the_time_saved():
+        path = support.REPO_ROOT / support.RESEARCH_REL
+        assert path.is_file(), (f"{support.RESEARCH_REL} does not exist: it records the planted change set's results and "
+                                "the time saved on this repository's suite (KPI 11)")
+        text = path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+    
+        missing = [tool for tool in ("pytest-testmon", "coverage") if tool not in text]
+        assert not missing, f"{support.RESEARCH_REL} does not name the glue it records: {missing}"
+        unrecorded = [name for name, words in CLASSES.items()
+                      if not any(RESULT_WORDS.search(line) and any(word in line.lower() for word in words)
+                                 for line in lines)]
+        assert not unrecorded, (
+            f"{support.RESEARCH_REL} does not record the result of each class of the planted change set: for each, a line "
+            f"names the class and its result (ran, re-ran, reused): missing {unrecorded}")
+        saved = [line for line in lines if "saved" in line.lower() and DURATION.search(line)]
+>       assert saved, (f"{support.RESEARCH_REL} does not state the time saved on this repository's suite: a line with "
+                       "\"saved\" and a duration (seconds, minutes or hours)")
+E       AssertionError: docs/research/W2-48-cache-choice.md does not state the time saved on this repository's suite: a line with "saved" and a duration (seconds, minutes or hours)
+E       assert []
+
+tests/acceptance/W2-48/test_w2_48_glue_and_research.py:59: AssertionError
+1 failed, 53 passed in 302.24s (0:05:02)

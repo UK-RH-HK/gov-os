@@ -1,0 +1,244 @@
+.............................................FFF...F.................... [ 72%]
+..........................F                                              [100%]
+=================================== FAILURES ===================================
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Edit-engineer] ________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/systmp'))
+name = 'Edit-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Edit call for its PreToolUse hooks, per round (ms): 127.4, 123.6, 254.3; the bound is 100 ms
+E       assert 0.12364588998025283 < 0.1
+E        +  where 0.12364588998025283 = min([0.12737208104226738, 0.12364588998025283, 0.25429895002162084])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-engineer] ________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/systmp'))
+name = 'Glob-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 137.4, 132.1, 155.0; the bound is 100 ms
+E       assert 0.1320612949784845 < 0.1
+E        +  where 0.1320612949784845 = min([0.13741406396729872, 0.1320612949784845, 0.1549870420130901])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Glob-no-role] _________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/systmp'))
+name = 'Glob-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Glob call for its PreToolUse hooks, per round (ms): 136.5, 238.4, 112.0; the bound is 100 ms
+E       assert 0.1120229609659873 < 0.1
+E        +  where 0.1120229609659873 = min([0.13653145800344646, 0.23844026803271845, 0.1120229609659873])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer] ________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5142/w1-05-sandbox0/systmp'))
+name = 'Read-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Read call for its PreToolUse hooks, per round (ms): 108.2, 257.5, 111.4; the bound is 100 ms
+E       assert 0.1081744460389018 < 0.1
+E        +  where 0.1081744460389018 = min([0.1081744460389018, 0.2574575130129233, 0.11138777097221464])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+_____ test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over _____
+
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+
+    def test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over(switched_over):
+        """With the hooks wired, the acceptance tests of W1-02, W1-03 and W1-04 exist and pass.
+    
+        This runs the three suites in a child pytest process, so it takes as long as they do.
+        """
+        directories = []
+        for wbs_id in support.DEPENDENCIES:
+            directory = support.REPO_ROOT / support.ACCEPTANCE_REL / wbs_id
+            assert directory.is_dir() and list(directory.glob("test_*.py")), (
+                f"the hooks are wired, but {support.ACCEPTANCE_REL}/{wbs_id}/ holds no acceptance tests"
+            )
+            directories.append(str(directory))
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", *directories, "-q", "-x", "-p", "no:cacheprovider"],
+            cwd=str(support.REPO_ROOT), capture_output=True, text=True, timeout=1800, check=False,
+        )
+        tail = "\n".join(proc.stdout.strip().splitlines()[-15:])
+>       assert proc.returncode == 0, (
+            "the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:\n" + tail
+        )
+E       AssertionError: the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:
+E                     if rounds[-1] < LATENCY_BOUND_S:
+E                         break
+E         >       assert min(rounds) < LATENCY_BOUND_S, (
+E                     "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+E                     + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+E                 )
+E         E       AssertionError: p95 decision time per round (ms): 114.1, 373.7, 124.1; the bound is 100 ms
+E         E       assert 0.11411663104081526 < 0.1
+E         E        +  where 0.11411663104081526 = min([0.11411663104081526, 0.3736954120104201, 0.12408134201541543])
+E         
+E         tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+E         =========================== short test summary info ============================
+E         FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[test-designer-allow]
+E         !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+E         1 failed, 619 passed in 222.25s (0:03:42)
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '-m', 'pytest', '/home/usain/gov-os-worktrees/W2-02/tests/acceptance/W1-02'...!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 619 passed in 222.25s (0:03:42)\n', stderr='').returncode
+
+tests/acceptance/W1-05/test_w1_05_switch_over_record.py:66: AssertionError
+5 failed, 94 passed in 356.12s (0:05:56)

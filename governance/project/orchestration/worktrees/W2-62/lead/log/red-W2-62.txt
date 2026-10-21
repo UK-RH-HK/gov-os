@@ -1,0 +1,919 @@
+FFF.FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF.....................                [100%]
+=================================== FAILURES ===================================
+_________ test_the_skill_says_resume_here_holds_the_full_session_state _________
+
+    def test_the_skill_says_resume_here_holds_the_full_session_state():
+        """Success 5: the full session state: what is happening, what was decided, what is next, where things are."""
+        part = _sections(_text(support.SKILL), r"RESUME HERE")
+>       assert part, "the checkpoint skill does not speak of the RESUME HERE section"
+E       AssertionError: the checkpoint skill does not speak of the RESUME HERE section
+E       assert ''
+
+tests/acceptance/W2-62/test_w2_62_documents.py:63: AssertionError
+_ test_the_skill_says_repository_knowledge_comes_from_retrieval_and_the_context_packets _
+
+    def test_the_skill_says_repository_knowledge_comes_from_retrieval_and_the_context_packets():
+        """Success 5: repository knowledge comes from retrieval and the context packets, not from the resume."""
+        part = _sections(_text(support.SKILL), r"RESUME HERE")
+        missing = _missing(part, {
+            "knowledge of the repository": r"knowledge|what the repository (?:holds|says)",
+            "retrieval": r"retriev",
+            "the context packets": r"context packets?",
+        })
+>       assert not missing, f"where the checkpoint skill speaks of RESUME HERE, it does not name {missing}"
+E       AssertionError: where the checkpoint skill speaks of RESUME HERE, it does not name ['knowledge of the repository', 'retrieval', 'the context packets']
+E       assert not ['knowledge of the repository', 'retrieval', 'the context packets']
+
+tests/acceptance/W2-62/test_w2_62_documents.py:83: AssertionError
+________ test_the_skill_says_a_checkpoint_is_written_at_every_handover _________
+
+    def test_the_skill_says_a_checkpoint_is_written_at_every_handover():
+        """Success 5: at every handover: a worker's return, a merge, a package, a compaction (DEC-837 item 3)."""
+        part = _sections(_text(support.SKILL), r"hand-?overs?\b|hand(?:ing)? over")
+>       assert part, "the checkpoint skill does not speak of a handover"
+E       AssertionError: the checkpoint skill does not speak of a handover
+E       assert ''
+
+tests/acceptance/W2-62/test_w2_62_documents.py:89: AssertionError
+________ test_the_research_record_exists_and_names_the_measured_harness ________
+docs/changes/W2-62-CIT-P.md does not exist
+_____ test_the_research_record_gives_the_measured_sizes_and_what_happened ______
+docs/changes/W2-62-CIT-P.md does not exist
+____ test_the_research_record_gives_the_conclusion_the_bound_and_the_route _____
+docs/changes/W2-62-CIT-P.md does not exist
+_ test_the_main_tree_names_the_rosters_prompt[governance/project/prompts/w2-orchestrator.md] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r0/sandbox/bin'))
+prompt = 'governance/project/prompts/w2-orchestrator.md'
+
+    @pytest.mark.parametrize("prompt", PROMPTS)
+    def test_the_main_tree_names_the_rosters_prompt(tmp_path, sandbox, prompt):
+        """Success 4, item 7: the roster's prompt, read now with the checkpoint; no other prompt, never Wave 1's."""
+        project = _project(tmp_path, support.roster(prompt))
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+        injection = run.injection
+>       assert prompt in injection, f"the injection does not name the roster's prompt {prompt}: {injection[:400]!r}"
+E       AssertionError: the injection does not name the roster's prompt governance/project/prompts/w2-orchestrator.md: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+E       assert 'governance/project/prompts/w2-orchestrator.md' in 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:48: AssertionError
+_ test_the_main_tree_names_the_rosters_prompt[governance/project/prompts/zephyr-wave-7.md] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r1')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r1/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r1/sandbox/bin'))
+prompt = 'governance/project/prompts/zephyr-wave-7.md'
+
+    @pytest.mark.parametrize("prompt", PROMPTS)
+    def test_the_main_tree_names_the_rosters_prompt(tmp_path, sandbox, prompt):
+        """Success 4, item 7: the roster's prompt, read now with the checkpoint; no other prompt, never Wave 1's."""
+        project = _project(tmp_path, support.roster(prompt))
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+        injection = run.injection
+>       assert prompt in injection, f"the injection does not name the roster's prompt {prompt}: {injection[:400]!r}"
+E       AssertionError: the injection does not name the roster's prompt governance/project/prompts/zephyr-wave-7.md: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+E       assert 'governance/project/prompts/zephyr-wave-7.md' in 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:48: AssertionError
+_ test_the_main_tree_names_the_rosters_prompt[docs/runbooks/orchestrator-of-the-wave.md] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r2')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r2/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_main_tree_names_the_r2/sandbox/bin'))
+prompt = 'docs/runbooks/orchestrator-of-the-wave.md'
+
+    @pytest.mark.parametrize("prompt", PROMPTS)
+    def test_the_main_tree_names_the_rosters_prompt(tmp_path, sandbox, prompt):
+        """Success 4, item 7: the roster's prompt, read now with the checkpoint; no other prompt, never Wave 1's."""
+        project = _project(tmp_path, support.roster(prompt))
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+        injection = run.injection
+>       assert prompt in injection, f"the injection does not name the roster's prompt {prompt}: {injection[:400]!r}"
+E       AssertionError: the injection does not name the roster's prompt docs/runbooks/orchestrator-of-the-wave.md: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+E       assert 'docs/runbooks/orchestrator-of-the-wave.md' in 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:48: AssertionError
+_ test_in_a_worktree_the_lead_is_sent_to_appendix_a5_of_the_rosters_prompt[governance/project/prompts/w2-orchestrator.md] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is0/sandbox/bin'))
+prompt = 'governance/project/prompts/w2-orchestrator.md'
+
+    @pytest.mark.parametrize("prompt", PROMPTS[:2])
+    def test_in_a_worktree_the_lead_is_sent_to_appendix_a5_of_the_rosters_prompt(tmp_path, sandbox, prompt):
+        """Success 4, item 7 in a linked worktree: the ticket-lead sentence, appendix A5 of the roster's prompt, the
+        lead checkpoint."""
+        project = _project(tmp_path, support.roster(prompt))
+        worktree = support.add_worktree(project, tmp_path / "worktrees" / "lead-fixture")
+        cp = _section(worktree, LEAD)
+        run = support.run_sessionstart(worktree, sandbox, "resume", ticket=LEAD_TICKET)
+        support.assert_well_formed(run)
+        injection = run.injection
+        lowered = injection.lower()
+        assert f"ticket lead for {LEAD_TICKET}".lower() in lowered and "appendix a5" in lowered, (
+            f"the injection does not say `ticket lead for {LEAD_TICKET}` and `appendix A5`: {injection[:400]!r}")
+>       assert prompt in injection and support.W1_PROMPT not in injection, (
+            f"the lead is not sent to appendix A5 of the roster's prompt {prompt}: {injection[:400]!r}")
+E       AssertionError: the lead is not sent to appendix A5 of the roster's prompt governance/project/prompts/w2-orchestrator.md: 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your checkpoint .gov-runtime/scratch/lead/CHECKPOINT.md now.\n\nThe RESUME HERE section of .gov-runtime/scratch/lead/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: brav'
+E       assert ('governance/project/prompts/w2-orchestrator.md' in 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your check...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT')
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:70: AssertionError
+_ test_in_a_worktree_the_lead_is_sent_to_appendix_a5_of_the_rosters_prompt[governance/project/prompts/zephyr-wave-7.md] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is1')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is1/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_lead_is1/sandbox/bin'))
+prompt = 'governance/project/prompts/zephyr-wave-7.md'
+
+    @pytest.mark.parametrize("prompt", PROMPTS[:2])
+    def test_in_a_worktree_the_lead_is_sent_to_appendix_a5_of_the_rosters_prompt(tmp_path, sandbox, prompt):
+        """Success 4, item 7 in a linked worktree: the ticket-lead sentence, appendix A5 of the roster's prompt, the
+        lead checkpoint."""
+        project = _project(tmp_path, support.roster(prompt))
+        worktree = support.add_worktree(project, tmp_path / "worktrees" / "lead-fixture")
+        cp = _section(worktree, LEAD)
+        run = support.run_sessionstart(worktree, sandbox, "resume", ticket=LEAD_TICKET)
+        support.assert_well_formed(run)
+        injection = run.injection
+        lowered = injection.lower()
+        assert f"ticket lead for {LEAD_TICKET}".lower() in lowered and "appendix a5" in lowered, (
+            f"the injection does not say `ticket lead for {LEAD_TICKET}` and `appendix A5`: {injection[:400]!r}")
+>       assert prompt in injection and support.W1_PROMPT not in injection, (
+            f"the lead is not sent to appendix A5 of the roster's prompt {prompt}: {injection[:400]!r}")
+E       AssertionError: the lead is not sent to appendix A5 of the roster's prompt governance/project/prompts/zephyr-wave-7.md: 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your checkpoint .gov-runtime/scratch/lead/CHECKPOINT.md now.\n\nThe RESUME HERE section of .gov-runtime/scratch/lead/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: brav'
+E       assert ('governance/project/prompts/zephyr-wave-7.md' in 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your check...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT')
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:70: AssertionError
+_______________ test_two_projects_with_two_prompts_get_two_paths _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_two_projects_with_two_pro0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_two_projects_with_two_pro0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_two_projects_with_two_pro0/sandbox/bin'))
+
+    def test_two_projects_with_two_prompts_get_two_paths(tmp_path, sandbox):
+        """Success 4, item 7: the prompt is never a constant."""
+        named = []
+        for n, prompt in enumerate(PROMPTS[:2]):
+            project = support.make_project(tmp_path / f"repo-{n}", support.roster(prompt), prompts=PROMPTS)
+            _section(project, ORCH)
+            injection = support.run_sessionstart(project, sandbox, "resume").injection
+            named.append([candidate for candidate in (*PROMPTS, support.W1_PROMPT) if candidate in injection])
+>       assert named == [[PROMPTS[0]], [PROMPTS[1]]], f"the prompts named in the two projects: {named}"
+E       AssertionError: the prompts named in the two projects: [['governance/project/prompts/w1-orchestrator.md'], ['governance/project/prompts/w1-orchestrator.md']]
+E       assert [['governance...estrator.md']] == [['governance...r-wave-7.md']]
+E         
+E         At index 0 diff: ['governance/project/prompts/w1-orchestrator.md'] != ['governance/project/prompts/w2-orchestrator.md']
+E         Use -v to get more diff
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:83: AssertionError
+______ test_with_no_setting_the_main_tree_names_no_prompt[no roster file] ______
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_0/sandbox/bin'))
+case = 'no roster file'
+
+    @pytest.mark.parametrize("case", tuple(ABSENT))
+    def test_with_no_setting_the_main_tree_names_no_prompt(tmp_path, sandbox, case):
+        """Success 4, item 7: no prompt at all, in particular not Wave 1's; the checkpoint and its instruction stay."""
+        project = _project(tmp_path, ABSENT[case])
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its aud'
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+______ test_with_no_setting_the_main_tree_names_no_prompt[no prompt key] _______
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_1')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_1/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_1/sandbox/bin'))
+case = 'no prompt key'
+
+    @pytest.mark.parametrize("case", tuple(ABSENT))
+    def test_with_no_setting_the_main_tree_names_no_prompt(tmp_path, sandbox, case):
+        """Success 4, item 7: no prompt at all, in particular not Wave 1's; the checkpoint and its instruction stay."""
+        project = _project(tmp_path, ABSENT[case])
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its aud'
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+_ test_with_no_setting_the_main_tree_names_no_prompt[a prompt key under another role only] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_2')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_2/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_2/sandbox/bin'))
+case = 'a prompt key under another role only'
+
+    @pytest.mark.parametrize("case", tuple(ABSENT))
+    def test_with_no_setting_the_main_tree_names_no_prompt(tmp_path, sandbox, case):
+        """Success 4, item 7: no prompt at all, in particular not Wave 1's; the checkpoint and its instruction stay."""
+        project = _project(tmp_path, ABSENT[case])
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its aud'
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+_ test_with_no_setting_the_main_tree_names_no_prompt[a roster that is not valid YAML] _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_3')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_3/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_main_3/sandbox/bin'))
+case = 'a roster that is not valid YAML'
+
+    @pytest.mark.parametrize("case", tuple(ABSENT))
+    def test_with_no_setting_the_main_tree_names_no_prompt(tmp_path, sandbox, case):
+        """Success 4, item 7: no prompt at all, in particular not Wave 1's; the checkpoint and its instruction stay."""
+        project = _project(tmp_path, ABSENT[case])
+        cp = _section(project, ORCH)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its aud'
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+______________ test_with_no_setting_the_worktree_names_no_prompt _______________
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_workt0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_workt0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_the_workt0/sandbox/bin'))
+
+    def test_with_no_setting_the_worktree_names_no_prompt(tmp_path, sandbox):
+        """Success 4, item 7 in a linked worktree: no prompt, the lead checkpoint and its instruction stay."""
+        project = _project(tmp_path, None)
+        worktree = support.add_worktree(project, tmp_path / "worktrees" / "lead-fixture")
+        cp = _section(worktree, LEAD)
+        run = support.run_sessionstart(worktree, sandbox, "resume", ticket=LEAD_TICKET)
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your check...rm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-PROMPT'
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your checkpoint .gov-runtime/scratch/lead/CHECKPOINT.md now.\n\nThe RESUME HERE section of .gov-runtime/scratch/lead/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing'
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+_ test_with_no_setting_and_no_checkpoint_the_path_and_the_gap_are_still_named __
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_and_no_ch0')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_and_no_ch0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_with_no_setting_and_no_ch0/sandbox/bin'))
+
+    def test_with_no_setting_and_no_checkpoint_the_path_and_the_gap_are_still_named(tmp_path, sandbox):
+        """Items 6 and 7 together: no prompt named, the checkpoint's path named and said to be missing."""
+        project = _project(tmp_path, support.roster(None))
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+>       support.assert_names_no_prompt(run.injection)
+
+tests/acceptance/W2-62/test_w2_62_prompt_in_force.py:122: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = "Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\n.gov-runtime/scratch/orchestrator/CHECKPOINT.md is missing, can't be read or has no RESUME HERE section."
+
+    def assert_names_no_prompt(injection):
+>       assert PROMPTS_DIR not in injection, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the roster names no prompt and the injection names one under {PROMPTS_DIR}: "
+            f"{injection[max(0, injection.find(PROMPTS_DIR) - 100):][:300]!r}")
+E       AssertionError: the roster names no prompt and the injection names one under governance/project/prompts/: "Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\n.gov-runtime/scratch/orchestrator/CHECKPOINT.md is missing, can't be read or has no RESUME HERE section."
+
+tests/acceptance/W2-62/w2_62_support.py:414: AssertionError
+___ test_a_section_that_fits_is_injected_whole_with_the_instruction[startup] ___
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in0/sandbox/bin'))
+source = 'startup'
+
+    @pytest.mark.parametrize("source", SOURCES)
+    def test_a_section_that_fits_is_injected_whole_with_the_instruction(project, sandbox, source):
+        """Items 2 and 3 (success 1, 2): the path, `lines a-b`, `n characters`, read in full first; the section whole."""
+        cp = support.checkpoint(support.section_text(3_000, "TOKEN-FITS"))
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...mber oscar papa quebec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...bec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS', first=7, last=33)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-33` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+___ test_a_section_that_fits_is_injected_whole_with_the_instruction[resume] ____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in1/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in1/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in1/sandbox/bin'))
+source = 'resume'
+
+    @pytest.mark.parametrize("source", SOURCES)
+    def test_a_section_that_fits_is_injected_whole_with_the_instruction(project, sandbox, source):
+        """Items 2 and 3 (success 1, 2): the path, `lines a-b`, `n characters`, read in full first; the section whole."""
+        cp = support.checkpoint(support.section_text(3_000, "TOKEN-FITS"))
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...mber oscar papa quebec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...bec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS', first=7, last=33)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-33` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+___ test_a_section_that_fits_is_injected_whole_with_the_instruction[compact] ___
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in2/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in2/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in2/sandbox/bin'))
+source = 'compact'
+
+    @pytest.mark.parametrize("source", SOURCES)
+    def test_a_section_that_fits_is_injected_whole_with_the_instruction(project, sandbox, source):
+        """Items 2 and 3 (success 1, 2): the path, `lines a-b`, `n characters`, read in full first; the section whole."""
+        cp = support.checkpoint(support.section_text(3_000, "TOKEN-FITS"))
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...mber oscar papa quebec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...bec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS', first=7, last=33)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-33` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+____ test_a_section_that_fits_is_injected_whole_with_the_instruction[clear] ____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in3/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in3/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_fits_is_in3/sandbox/bin'))
+source = 'clear'
+
+    @pytest.mark.parametrize("source", SOURCES)
+    def test_a_section_that_fits_is_injected_whole_with_the_instruction(project, sandbox, source):
+        """Items 2 and 3 (success 1, 2): the path, `lines a-b`, `n characters`, read in full first; the section whole."""
+        cp = support.checkpoint(support.section_text(3_000, "TOKEN-FITS"))
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:52: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...mber oscar papa quebec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...bec romeo sierra tango uniform victor whiskey\n- LAST-LINE-MARKER the section ends here: TOKEN-FITS', first=7, last=33)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-33` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+_______________ test_a_section_that_ends_at_the_end_of_the_file ________________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_ends_at_th0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_ends_at_th0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_that_ends_at_th0/sandbox/bin'))
+
+    def test_a_section_that_ends_at_the_end_of_the_file(project, sandbox):
+        """Item 2 edge: no later heading; the trailing empty lines of the file are not part of the range."""
+        cp = support.checkpoint(support.section_text(2_000, "TOKEN-EOF"), after="", trailing="\n\n")
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...iform victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-EOF'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...y xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-EOF', first=7, last=24)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-24` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+___________ test_a_section_with_empty_lines_before_the_next_heading ____________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_with_empty_line0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_with_empty_line0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_with_empty_line0/sandbox/bin'))
+
+    def test_a_section_with_empty_lines_before_the_next_heading(project, sandbox):
+        """Item 2 edge: the range ends at the section's last line that is not empty, not at the next heading."""
+        cp = support.checkpoint(support.section_text(2_000, "TOKEN-GAP"), trailing="\n\n\n")
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...iform victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-GAP'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...y xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-GAP', first=7, last=24)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-24` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+________________ test_a_heading_with_more_text_at_the_top_level ________________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_heading_with_more_text_0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_heading_with_more_text_0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_heading_with_more_text_0/sandbox/bin'))
+
+    def test_a_heading_with_more_text_at_the_top_level(project, sandbox):
+        """Item 2 edge: a level-1 heading that begins with RESUME HERE runs to the end of the written part."""
+        section = support.section_text(2_500, "TOKEN-H1", heading="# RESUME HERE (read this first)")
+        cp = support.checkpoint(section, before="Notes before any heading.\n\n", after="")
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...bec romeo sierra tango uniform victor whiskey xray yankee zulu alp\n- LAST-LINE-MARKER the section ends here: TOKEN-H1'
+cp = Checkpoint(text='Notes before any heading.\n\n# RESUME HERE (read this first)\n\n- Active tickets: ZQ-71 (engineer imp...ngo uniform victor whiskey xray yankee zulu alp\n- LAST-LINE-MARKER the section ends here: TOKEN-H1', first=3, last=24)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 3-24` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n# RESUME HERE (read this first)\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie de'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+________ test_a_fenced_hash_line_does_not_end_the_section_or_its_range _________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_fenced_hash_line_does_n0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_fenced_hash_line_does_n0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_fenced_hash_line_does_n0/sandbox/bin'))
+
+    def test_a_fenced_hash_line_does_not_end_the_section_or_its_range(project, sandbox):
+        """Item 2 edge: `#` lines inside a fenced code block are not headings; the range runs past the block."""
+        head = support.section_text(1_500, "TOKEN-BEFORE-FENCE")
+        section = (head + "\n\nRun this first:\n\n" + FENCE + "sh\n# FENCED-COMMENT-MARKER rebuild the index\n"
+                   "## FENCED-HEADING-MARKER quoted heading of the same level\nzephyr index --rebuild ZQ-71\n"
+                   + FENCE + "\n\n- AFTER-BLOCK-MARKER the section's real last line: TOKEN-FENCE")
+        cp = support.checkpoint(section)
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, "resume")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:99: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = "Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...of the same level\nzephyr index --rebuild ZQ-71\n```\n\n- AFTER-BLOCK-MARKER the section's real last line: TOKEN-FENCE"
+cp = Checkpoint(text="# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...zephyr index --rebuild ZQ-71\n```\n\n- AFTER-BLOCK-MARKER the section's real last line: TOKEN-FENCE", first=7, last=29)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-29` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+______________ test_a_section_followed_by_a_generated_state_block ______________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_followed_by_a_g0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_followed_by_a_g0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_followed_by_a_g0/sandbox/bin'))
+
+    def test_a_section_followed_by_a_generated_state_block(project, sandbox):
+        """Item 2 edge, item 5: the section is the written part's last; the block is not in its range or its size."""
+        cp = support.checkpoint(support.section_text(2_000, "TOKEN-BLOCK"), after="", trailing="\n")
+        path = support.write_checkpoint(project, ORCH, cp, age_s=support.STALE_AGE_S)
+        support.compact(project, sandbox)
+        assert support.BLOCK_BEGIN in path.read_text(encoding="utf-8"), "precompact.py appended no state block"
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:111: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...orm victor whiskey xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-BLOCK'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...xray yankee zulu alpha bravo charlie delta e\n- LAST-LINE-MARKER the section ends here: TOKEN-BLOCK', first=7, last=24)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-24` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nCHECKPOINT OLDER THAN STATE BLOCK: the written part of .gov-runtime/scratch/orchestrator/CHECKPOINT.md is older than the generated state block at the end of that file. Re-derive state from git and the tickets before acting.\n\nThe RESUME HERE section of .gov-runtime/scr'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+__________ test_in_a_worktree_the_leads_section_is_named_by_its_lines __________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_leads_s0/repo')
+worktree = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_leads_s0/worktrees/lead-fixture')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_leads_s0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_in_a_worktree_the_leads_s0/sandbox/bin'))
+
+    def test_in_a_worktree_the_leads_section_is_named_by_its_lines(project, worktree, sandbox):
+        """Items 2 and 3 in a linked worktree: the lead checkpoint, its range and size, its section whole."""
+        support.write_checkpoint(project, ORCH, support.checkpoint(support.section_text(2_000, "TOKEN-ORCH")))
+        cp = support.checkpoint(support.section_text(2_400, "TOKEN-LEAD"), before="# Lead checkpoint\n\n")
+        support.write_checkpoint(worktree, LEAD, cp)
+        run = support.run_sessionstart(worktree, sandbox, "resume", ticket="LD-4242")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, LEAD)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:124: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your check... sierra tango uniform victor whiskey xray yankee zulu alpha brav\n- LAST-LINE-MARKER the section ends here: TOKEN-LEAD'
+cp = Checkpoint(text='# Lead checkpoint\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waitin...rm victor whiskey xray yankee zulu alpha brav\n- LAST-LINE-MARKER the section ends here: TOKEN-LEAD', first=3, last=23)
+rel = '.gov-runtime/scratch/lead/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 3-23` (ranges found: []): 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your checkpoint .gov-runtime/scratch/lead/CHECKPOINT.md now.\n\nThe RESUME HERE section of .gov-runtime/scratch/lead/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: brav'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+____ test_the_fit_edge_whole_at_the_bound_and_never_cut_one_character_over _____
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_fit_edge_whole_at_the0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_fit_edge_whole_at_the0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_the_fit_edge_whole_at_the0/sandbox/bin'))
+
+    def test_the_fit_edge_whole_at_the_bound_and_never_cut_one_character_over(project, sandbox):
+        """Items 1, 3, 4. The edge is measured from the hook's own answer: a 2,500-character section of 60 lines gives
+        the length of everything else; a section of 60 lines at the same place that brings the injection to exactly
+        10,000 characters fits and is injected whole; one character more does not fit and is never cut."""
+        lines = 60
+    
+        def at(size, token):
+            cp = support.checkpoint(support.section_text(size, token, lines=lines))
+            support.write_checkpoint(project, ORCH, cp)
+            return cp, support.run_sessionstart(project, sandbox, "resume")
+    
+        small, run = at(2_500, "TOKEN-SMALL")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, small, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:147: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...delta echo foxtro\n- note 0050: bravo charlie delta echo foxtro\n- LAST-LINE-MARKER the section ends here: TOKEN-SMALL'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...- note 0050: bravo charlie delta echo foxtro\n- LAST-LINE-MARKER the section ends here: TOKEN-SMALL', first=7, last=66)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-66` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot\n'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+__ test_a_section_of_50000_characters_is_named_by_its_lines_never_cut[resume] __
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac0/sandbox/bin'))
+source = 'resume'
+
+    @pytest.mark.parametrize("source", ("resume", "compact"))
+    def test_a_section_of_50000_characters_is_named_by_its_lines_never_cut(project, sandbox, source):
+        """Failure line, items 1, 2, 4: within the bound, the instruction whole with the exact range and size, no
+        9,000-character cut, no `truncated`. Taking exactly the stated lines gives the whole section."""
+        cp = _big()
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 50000 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...liett kilo lima mike november oscar papa queb\n- LAST-LINE-MARKER the section ends here: TOKEN-50K', first=7, last=460)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-460` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+_ test_a_section_of_50000_characters_is_named_by_its_lines_never_cut[compact] __
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac1/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac1/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac1/sandbox/bin'))
+source = 'compact'
+
+    @pytest.mark.parametrize("source", ("resume", "compact"))
+    def test_a_section_of_50000_characters_is_named_by_its_lines_never_cut(project, sandbox, source):
+        """Failure line, items 1, 2, 4: within the bound, the instruction whole with the exact range and size, no
+        9,000-character cut, no `truncated`. Taking exactly the stated lines gives the whole section."""
+        cp = _big()
+        support.write_checkpoint(project, ORCH, cp)
+        run = support.run_sessionstart(project, sandbox, source)
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:176: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 50000 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...liett kilo lima mike november oscar papa queb\n- LAST-LINE-MARKER the section ends here: TOKEN-50K', first=7, last=460)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-460` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nThe RESUME HERE section of .gov-runtime/scratch/orchestrator/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: bravo charlie delta echo foxtrot '
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+_______________ test_a_section_of_50000_characters_in_a_worktree _______________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac2/repo')
+worktree = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac2/worktrees/lead-fixture')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac2/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac2/sandbox/bin'))
+
+    def test_a_section_of_50000_characters_in_a_worktree(project, worktree, sandbox):
+        """Failure line in a linked worktree: the lead checkpoint's range and size, no cut."""
+        cp = _big("TOKEN-LEAD-50K")
+        support.write_checkpoint(worktree, LEAD, cp)
+        run = support.run_sessionstart(worktree, sandbox, "compact", ticket="LD-4242")
+        support.assert_well_formed(run)
+>       support.assert_instruction(run.injection, cp, LEAD)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:188: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your check...: the first 9000 of 50000 characters of the section are shown; the rest is in .gov-runtime/scratch/lead/CHECKPOINT.md]'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m... kilo lima mike november oscar papa queb\n- LAST-LINE-MARKER the section ends here: TOKEN-LEAD-50K', first=7, last=460)
+rel = '.gov-runtime/scratch/lead/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-460` (ranges found: []): 'You are the ticket lead for LD-4242; read appendix A5 of governance/project/prompts/w1-orchestrator.md and your checkpoint .gov-runtime/scratch/lead/CHECKPOINT.md now.\n\nThe RESUME HERE section of .gov-runtime/scratch/lead/CHECKPOINT.md:\n\n## RESUME HERE\n\n- Active tickets: ZQ-71 (engineer implementing), ZQ-88 (waiting for its audit)\n\n### Loop counts\n\n- ZQ-71 review-repair loop: 17\n\n- note 0000: brav'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+____________ test_a_section_of_50000_characters_after_a_compaction _____________
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac3/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac3/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_section_of_50000_charac3/sandbox/bin'))
+
+    def test_a_section_of_50000_characters_after_a_compaction(project, sandbox):
+        """Failure line, items 4 and 5: with the staleness warning, the warning and the instruction are both whole."""
+        cp = support.checkpoint(support.section_text(50_000, "TOKEN-STALE-50K"), after="", trailing="\n")
+        support.write_checkpoint(project, ORCH, cp, age_s=support.STALE_AGE_S)
+        support.compact(project, sandbox)
+        run = support.run_sessionstart(project, sandbox, "compact")
+        support.assert_well_formed(run)
+        support.assert_warns_older(run.injection, ORCH)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...rst 9000 of 50000 characters of the section are shown; the rest is in .gov-runtime/scratch/orchestrator/CHECKPOINT.md]'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...kilo lima mike november oscar papa queb\n- LAST-LINE-MARKER the section ends here: TOKEN-STALE-50K', first=7, last=460)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-460` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nCHECKPOINT OLDER THAN STATE BLOCK: the written part of .gov-runtime/scratch/orchestrator/CHECKPOINT.md is older than the generated state block at the end of that file. Re-derive state from git and the tickets before acting.\n\nThe RESUME HERE section of .gov-runtime/scr'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+_______ test_a_long_ready_list_is_trimmed_not_the_section_or_the_warning _______
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_is_trim0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_is_trim0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_is_trim0/sandbox/bin'))
+
+    def test_a_long_ready_list_is_trimmed_not_the_section_or_the_warning(project, sandbox):
+        """Items 1, 3, 5 (success 3): section that fits + warning + a 30,000-character ready list + a ticket."""
+        cp = support.checkpoint(support.section_text(5_000, "TOKEN-OPTIONAL"), trailing="")
+        support.write_checkpoint(project, ORCH, cp, age_s=support.STALE_AGE_S)
+        support.compact(project, sandbox)
+        sandbox.tk_ready(support.long_ready_list())
+        run = support.run_sessionstart(project, sandbox, "compact", ticket="ZQ-71")
+        support.assert_well_formed(run)
+        support.assert_warns_older(run.injection, ORCH)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:217: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...nted ready ticket number 0059 of the long ready list\nRDY-0060 [open] - Invented ready ticket number 0060 of the long '
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m...ber oscar papa quebec romeo sierra tangox\n- LAST-LINE-MARKER the section ends here: TOKEN-OPTIONAL', first=7, last=51)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-51` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nCHECKPOINT OLDER THAN STATE BLOCK: the written part of .gov-runtime/scratch/orchestrator/CHECKPOINT.md is older than the generated state block at the end of that file. Re-derive state from git and the tickets before acting.\n\nThe RESUME HERE section of .gov-runtime/scr'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+_ test_a_long_ready_list_with_a_50000_character_section_stays_within_the_bound _
+
+project = PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_with_a_0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_with_a_0/sandbox/home'), bin=PosixPath('/tmp/pytest-of-usain/pytest-4210/test_a_long_ready_list_with_a_0/sandbox/bin'))
+
+    def test_a_long_ready_list_with_a_50000_character_section_stays_within_the_bound(project, sandbox):
+        """Items 1, 4, 5: everything long at once; the instruction and the warning stay whole, inside the bound."""
+        cp = support.checkpoint(support.section_text(50_000, "TOKEN-ALL-LONG"), after="", trailing="\n")
+        support.write_checkpoint(project, ORCH, cp, age_s=support.STALE_AGE_S)
+        support.compact(project, sandbox)
+        sandbox.tk_ready(support.long_ready_list())
+        run = support.run_sessionstart(project, sandbox, "resume", ticket="ZQ-71")
+        support.assert_well_formed(run)
+        support.assert_warns_older(run.injection, ORCH)
+>       support.assert_instruction(run.injection, cp, ORCH)
+
+tests/acceptance/W2-62/test_w2_62_resume_in_full.py:230: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+injection = 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/C...[open] - Invented ready ticket number 0004 of the long ready list\nRDY-0005 [open] - Invented ready ticket number 0005'
+cp = Checkpoint(text='# Orchestrator checkpoint (stand-in, every name invented)\n\n## Earlier log\n\n- EARLIER-LOG-MARKER m... kilo lima mike november oscar papa queb\n- LAST-LINE-MARKER the section ends here: TOKEN-ALL-LONG', first=7, last=460)
+rel = '.gov-runtime/scratch/orchestrator/CHECKPOINT.md'
+
+    def assert_instruction(injection, cp, rel):
+        """KPI 2: the instruction to read the section in full before anything else, with the path, the exact
+        line range (``lines <first>-<last>``) and the size (``<n> characters``)."""
+        assert rel in injection, f"the injection does not name the checkpoint {rel}: {injection[:400]!r}"
+        found = ranges(injection)
+>       assert (cp.first, cp.last) in found, (
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"the injection does not give the section's line range `lines {cp.first}-{cp.last}` "
+            f"(ranges found: {found}): {injection[:400]!r}")
+E       AssertionError: the injection does not give the section's line range `lines 7-460` (ranges found: []): 'Read now, before anything else: governance/project/prompts/w1-orchestrator.md and .gov-runtime/scratch/orchestrator/CHECKPOINT.md.\n\nCHECKPOINT OLDER THAN STATE BLOCK: the written part of .gov-runtime/scratch/orchestrator/CHECKPOINT.md is older than the generated state block at the end of that file. Re-derive state from git and the tickets before acting.\n\nThe RESUME HERE section of .gov-runtime/scr'
+
+tests/acceptance/W2-62/w2_62_support.py:375: AssertionError
+35 failed, 22 passed, 1 deselected in 4.34s

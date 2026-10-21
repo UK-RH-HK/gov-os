@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {"hooks": [{"type": "command", "command": "python3 -c \"import json; print(json.dumps({'hookSpecificOutput': {'hookEventName': 'SessionStart', 'additionalContext': 'SPECIMEN-SESSIONSTART-PACKET alpha beta gamma delta'}}))\""}]}
+    ],
+    "PostToolUse": [
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "python3 -c \"import json; print(json.dumps({'hookSpecificOutput': {'hookEventName': 'PostToolUse', 'additionalContext': 'SPECIMEN-POSTTOOLUSE-OUTPUT epsilon zeta eta theta'}}))\""}]}
+    ]
+  }
+}

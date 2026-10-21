@@ -1,0 +1,11 @@
+07:33:36
+ 07:33:36 up 2 days, 23:53,  0 user,  load average: 9.93, 6.20, 6.17
+shared 11434:
+{"models":[{"name":"qwen3-embedding:0.6b","model":"qwen3-embedding:0.6b","size":2370652077,"digest":"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d","details":{"parent_model":"","format":"gguf","family":"qwen3","families":["qwen3"],"parameter_size":"595.78M","quantization_level":"Q8_0"},"expires_at":"2026-10-19T07:38:08.140500027+01:00","size_vram":2370652077,"context_length":4096}]}
+cpu 11435:
+{"models":[{"name":"qwen3-embedding:0.6b","model":"qwen3-embedding:0.6b","size":2371270737,"digest":"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d","details":{"parent_model":"","format":"gguf","family":"qwen3","families":["qwen3"],"parameter_size":"595.78M","quantization_level":"Q8_0"},"expires_at":"2026-10-19T07:38:35.546415562+01:00","size_vram":0,"context_length":4096}]}
+3836 MiB, 16303 MiB
+ 422673 28796  2-23:10:36 /home/usain/.local/ollama/bin/ollama serve
+ 617175 965940      03:11 /home/usain/.local/ollama/lib/ollama/llama-server --model /home/usain/.ollama/models/blobs/sha256-06507c7b42688469c4e7298b0a1e16deff06
+ 617412 1185312     02:59 /home/usain/.local/ollama/lib/ollama/llama-server --model /home/usain/.ollama/models/blobs/sha256-06507c7b42688469c4e7298b0a1e16deff06
+1798039 37088    03:32:59 /home/usain/.local/ollama/bin/ollama serve

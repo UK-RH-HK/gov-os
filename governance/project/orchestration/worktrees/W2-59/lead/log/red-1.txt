@@ -1,0 +1,1259 @@
+/home/usain/gov-os-worktrees/W2-59/src/gov/__init__.py
+FFFF.FFF....FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF                             [100%]
+=================================== FAILURES ===================================
+__________ test_the_wheel_ships_the_baseline_in_the_retrieval_package __________
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+
+    def test_the_wheel_ships_the_baseline_in_the_retrieval_package(stand_in):
+        with zipfile.ZipFile(stand_in.wheel) as wheel:
+            names = wheel.namelist()
+>           assert support.BASELINE_IN_PACKAGE in names, (
+                f"the wheel {stand_in.wheel.name} built from this worktree has no {support.BASELINE_IN_PACKAGE}; its "
+                f"data files: {[name for name in names if not name.endswith('.py')]}")
+E           AssertionError: the wheel gov-0.1.0-py3-none-any.whl built from this worktree has no gov/retrieval/retrieve_baseline.yaml; its data files: ['gov-0.1.0.dist-info/METADATA', 'gov-0.1.0.dist-info/WHEEL', 'gov-0.1.0.dist-info/entry_points.txt', 'gov-0.1.0.dist-info/top_level.txt', 'gov-0.1.0.dist-info/RECORD']
+E           assert 'gov/retrieval/retrieve_baseline.yaml' in ['gov/__init__.py', 'gov/adapters/__init__.py', 'gov/adapters/portability.py', 'gov/adopt/__init__.py', 'gov/adopt/command.py', 'gov/adopt/legacy.py', ...]
+E            +  where 'gov/retrieval/retrieve_baseline.yaml' = support.BASELINE_IN_PACKAGE
+
+tests/acceptance/W2-59/test_w2_59_baseline.py:22: AssertionError
+________________ test_the_installed_package_holds_the_baseline _________________
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+
+    def test_the_installed_package_holds_the_baseline(stand_in):
+        installed = stand_in.site / support.BASELINE_IN_PACKAGE
+>       assert installed.is_file(), f"the installed package has no {installed}"
+E       AssertionError: the installed package has no /tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = PosixPath('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml').is_file
+
+tests/acceptance/W2-59/test_w2_59_baseline.py:32: AssertionError
+_______ test_the_installed_check_does_not_fail_for_want_of_its_baseline ________
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_installed_check_does_0')
+
+    def test_the_installed_check_does_not_fail_for_want_of_its_baseline(stand_in, tmp_path):
+        """Dev tiers are configured (a temporary folder with a query set and no tier): the installed check reaches its
+        own answer, "no dev tier could be indexed", and does not end on a missing baseline file."""
+        tiers = tmp_path / "dev-tiers"
+        tiers.mkdir()
+        (tiers / "dev-queryset.yaml").write_text("queries: []\n", encoding="utf-8")
+        project = support.make_repository(tmp_path / "project")
+        box = support.make_box(tmp_path / "box", stand_in)
+        env = support.base_env(box.home, f"{box.local_bin}:{support.SYSTEM_PATH}")
+        env["GOV_DEV_TIERS"] = str(tiers)
+        done = support.run([stand_in.python, "-m", "gov.retrieval.retrieve_check"], cwd=project, env=env)
+>       assert "retrieve_baseline" not in done.stderr and "Traceback" not in done.stderr, (
+            f"the installed retrieval-regression check failed on its baseline\n{done.describe()}")
+E       AssertionError: the installed retrieval-regression check failed on its baseline
+E         $ /tmp/w259-pin-rhwhvg_k/venv/bin/python -m gov.retrieval.retrieve_check  (in /tmp/pytest-of-usain/pytest-4247/test_the_installed_check_does_0/project)
+E         exit: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>
+E             main()
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 40, in main
+E             baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
+E                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml'
+E         
+E       assert ('retrieve_baseline' not in "Traceback (...line.yaml'\n"
+E         
+E         'retrieve_baseline' is contained here:
+E           retrieval/retrieve_baseline.yaml')
+
+tests/acceptance/W2-59/test_w2_59_baseline.py:47: AssertionError
+___ test_the_installed_check_reads_its_thresholds_from_the_installed_package ___
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+gitleaks = PosixPath('/home/usain/.local/bin/gitleaks')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_installed_check_reads0')
+
+    @pytest.mark.local_only
+    def test_the_installed_check_reads_its_thresholds_from_the_installed_package(stand_in, gitleaks, tmp_path):
+        """The project holds baselines of its own, with other thresholds, where a lookup from the project would find
+        them; the measured check prints the installed package's thresholds."""
+        values = support.baseline_values()
+        decoy = "# a baseline of the project's own\nhit_at_5: 7\nforbidden_citations: 99\n"
+        files = {"src/gov/retrieval/retrieve_baseline.yaml": decoy, "retrieve_baseline.yaml": decoy}
+        project = support.make_repository(tmp_path / "project", files, support.RETRIEVAL_PROJECTS["this-repository"])
+        done = support.retrieval_check(stand_in, project, tmp_path, gitleaks)
+>       assert f"(baseline: {float(values['hit_at_5'])})" in done.stdout, (
+            f"the measured check did not print the installed hit@5 baseline {float(values['hit_at_5'])}\n"
+            f"{done.describe()}")
+E       AssertionError: the measured check did not print the installed hit@5 baseline 80.0
+E         $ /tmp/w259-pin-rhwhvg_k/venv/bin/python -m gov.retrieval.retrieve_check  (in /tmp/pytest-of-usain/pytest-4247/test_the_installed_check_reads0/project)
+E         exit: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>
+E             main()
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 40, in main
+E             baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
+E                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml'
+E         
+E       assert '(baseline: 80.0)' in ''
+E        +  where '' = Run(args=(PosixPath('/tmp/w259-pin-rhwhvg_k/venv/bin/python'), '-m', 'gov.retrieval.retrieve_check'), cwd='/tmp/pytest...ile or directory: \'/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml\'\n').stdout
+
+tests/acceptance/W2-59/test_w2_59_baseline.py:61: AssertionError
+_ test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path[preToolUse[0]] _
+
+event = 'preToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"', 'timeout': 60, 'type': 'command'}
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path(event, index, entry):
+        command = entry["command"]
+        assert not VERSIONED_PIN.search(command), (
+            f"{event}[{index}] writes a versioned pin path, which moves with each re-pin: {command!r}")
+        assert "/.local/share/gov-os/pin-" not in command, f"{event}[{index}] names a pin by its version: {command!r}"
+>       assert not re.search(r"PYTHONPATH=[^ ]*(\$CLAUDE_PROJECT_DIR|\$\{CLAUDE_PROJECT_DIR\}|\bsrc\b)", command), (
+            f"{event}[{index}] puts the project's src on the import path: {command!r}")
+E       AssertionError: preToolUse[0] puts the project's src on the import path: 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"'
+E       assert not <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'>
+E        +  where <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'> = <function search at 0x7ddc1ec063e0>('PYTHONPATH=[^ ]*(\\$CLAUDE_PROJECT_DIR|\\$\\{CLAUDE_PROJECT_DIR\\}|\\bsrc\\b)', 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"')
+E        +    where <function search at 0x7ddc1ec063e0> = re.search
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:53: AssertionError
+_ test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path[postToolUse[0]] _
+
+event = 'postToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path(event, index, entry):
+        command = entry["command"]
+        assert not VERSIONED_PIN.search(command), (
+            f"{event}[{index}] writes a versioned pin path, which moves with each re-pin: {command!r}")
+        assert "/.local/share/gov-os/pin-" not in command, f"{event}[{index}] names a pin by its version: {command!r}"
+>       assert not re.search(r"PYTHONPATH=[^ ]*(\$CLAUDE_PROJECT_DIR|\$\{CLAUDE_PROJECT_DIR\}|\bsrc\b)", command), (
+            f"{event}[{index}] puts the project's src on the import path: {command!r}")
+E       AssertionError: postToolUse[0] puts the project's src on the import path: 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"'
+E       assert not <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'>
+E        +  where <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'> = <function search at 0x7ddc1ec063e0>('PYTHONPATH=[^ ]*(\\$CLAUDE_PROJECT_DIR|\\$\\{CLAUDE_PROJECT_DIR\\}|\\bsrc\\b)', 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"')
+E        +    where <function search at 0x7ddc1ec063e0> = re.search
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:53: AssertionError
+_ test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path[postToolUseFailure[0]] _
+
+event = 'postToolUseFailure', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_names_no_versioned_pin_path_and_puts_no_project_src_on_the_import_path(event, index, entry):
+        command = entry["command"]
+        assert not VERSIONED_PIN.search(command), (
+            f"{event}[{index}] writes a versioned pin path, which moves with each re-pin: {command!r}")
+        assert "/.local/share/gov-os/pin-" not in command, f"{event}[{index}] names a pin by its version: {command!r}"
+>       assert not re.search(r"PYTHONPATH=[^ ]*(\$CLAUDE_PROJECT_DIR|\$\{CLAUDE_PROJECT_DIR\}|\bsrc\b)", command), (
+            f"{event}[{index}] puts the project's src on the import path: {command!r}")
+E       AssertionError: postToolUseFailure[0] puts the project's src on the import path: 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"'
+E       assert not <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'>
+E        +  where <re.Match object; span=(0, 35), match='PYTHONPATH="$CLAUDE_PROJECT_DIR/src'> = <function search at 0x7ddc1ec063e0>('PYTHONPATH=[^ ]*(\\$CLAUDE_PROJECT_DIR|\\$\\{CLAUDE_PROJECT_DIR\\}|\\bsrc\\b)', 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"')
+E        +    where <function search at 0x7ddc1ec063e0> = re.search
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:53: AssertionError
+__ test_the_line_starts_its_program_with_the_pin_s_interpreter[preToolUse[0]] __
+
+event = 'preToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: preToolUse[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/box/decoy-bin/python3)
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/box/markers/path-python3-1180624')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/box/markers/path-python3-1180624')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/box/home'), local_bin=PosixPath('...gr0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_ test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUse[0]] __
+
+event = 'postToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: postToolUse[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/box/decoy-bin/python3)
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/box/markers/path-python3-1180631')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/box/markers/path-python3-1180631')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/box/home'), local_bin=PosixPath('...gr1/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr1/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_ test_the_line_starts_its_program_with_the_pin_s_interpreter[postToolUseFailure[0]] _
+
+event = 'postToolUseFailure', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: postToolUseFailure[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/box/decoy-bin/python3)
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/box/markers/path-python3-1180637')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/box/markers/path-python3-1180637')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/box/home'), local_bin=PosixPath('...gr2/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr2/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+__ test_the_line_starts_its_program_with_the_pin_s_interpreter[preCompact[0]] __
+
+event = 'preCompact', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: preCompact[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/box/decoy-bin/python3)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/project)
+E         exit: 0
+E         stdout:
+E         {"systemMessage": "PreCompact: checkpoint not written (No module named 'gov'). The compaction proceeds."}
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/box/markers/path-python3-1180643')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/box/markers/path-python3-1180643')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/box/home'), local_bin=PosixPath('...gr3/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr3/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_ test_the_line_starts_its_program_with_the_pin_s_interpreter[sessionStart[0]] _
+
+event = 'sessionStart', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"', 'matcher': 'compact|clear|resume', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: sessionStart[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/box/decoy-bin/python3)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/box/markers/path-python3-1180649')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/box/markers/path-python3-1180649')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/box/home'), local_bin=PosixPath('...gr4/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr4/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_____ test_the_line_starts_its_program_with_the_pin_s_interpreter[stop[0]] _____
+
+event = 'stop', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: stop[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/box/decoy-bin/python3)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/box/markers/path-python3-1180656')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/box/markers/path-python3-1180656')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/box/home'), local_bin=PosixPath('...gr5/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr5/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_ test_the_line_starts_its_program_with_the_pin_s_interpreter[subagentStop[0]] _
+
+event = 'subagentStop', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6')
+
+    @pytest.mark.parametrize("event,index,entry", ENTRIES, ids=IDS)
+    def test_the_line_starts_its_program_with_the_pin_s_interpreter(event, index, entry, pin_markers, tmp_path):
+        """The pin's interpreter starts (its instrumentation leaves a marker); the ``python3`` first on ``PATH`` does
+        not."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"{event}[{index}] started the python3 first on PATH ({box.decoy_bin / 'python3'})\n{done.describe()}")
+E       AssertionError: subagentStop[0] started the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/box/decoy-bin/python3)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/subagentstop.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/project)
+E         exit: 2
+E         stdout:
+E         {"hookSpecificOutput": {"hookEventName": "SubagentStop", "blockReason": "Worker return contract incomplete. Missing fields: status, work_completed, files_changed, evidence, tests, discoveries, risks, lessons, proposed_decisions, unresolved, recommended_next_action", "missingFields": ["status", "work_completed", "files_changed", "evidence", "tests", "discoveries", "risks", "lessons", "proposed_decisions", "unresolved", "recommended_next_action"]}}
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/box/markers/path-python3-1180662')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/box/markers/path-python3-1180662')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/box/home'), local_bin=PosixPath('...gr6/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_starts_its_progr6/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:64: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preToolUse[0]] _
+
+event = 'preToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+E       AssertionError: preToolUse[0] imported the project's own /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/project/src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/box/markers/tree-gov-1180669')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/box/markers/tree-gov-1180669')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/box/home'), local_bin=PosixPath('...rt0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:80: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUse[0]] _
+
+event = 'postToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+E       AssertionError: postToolUse[0] imported the project's own /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/project/src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/box/markers/tree-gov-1180675')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/box/markers/tree-gov-1180675')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/box/home'), local_bin=PosixPath('...rt1/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import1/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:80: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[postToolUseFailure[0]] _
+
+event = 'postToolUseFailure', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+E       AssertionError: postToolUseFailure[0] imported the project's own /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/project/src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/box/markers/tree-gov-1180681')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/box/markers/tree-gov-1180681')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/box/home'), local_bin=PosixPath('...rt2/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import2/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:80: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[preCompact[0]] _
+
+event = 'preCompact', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import3')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: preCompact[0]'s program did not import the pin's installed package (/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/precompact.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import3/project)
+E         exit: 0
+E         stdout:
+E         {"systemMessage": "PreCompact: checkpoint not written (No module named 'gov'). The compaction proceeds."}
+E         stderr:
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:82: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[sessionStart[0]] _
+
+event = 'sessionStart', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"', 'matcher': 'compact|clear|resume', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import4')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: sessionStart[0]'s program did not import the pin's installed package (/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/sessionstart.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import4/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:82: AssertionError
+_ test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src[stop[0]] _
+
+event = 'stop', index = 0
+entry = {'command': 'python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py"', 'timeout': 60, 'type': 'command'}
+pin_markers = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import5')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in IMPORTS_GOV],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in IMPORTS_GOV])
+    def test_the_line_s_program_imports_the_pin_s_package_not_the_project_s_src(
+            event, index, entry, pin_markers, tmp_path):
+        """The program's governance code is the pin's installed package; the project's own ``src/gov`` is not imported
+        (preCompact and sessionStart are measured in a project without ``src/``: package P-W2-59-1)."""
+        box = support.make_box(tmp_path / "box", pin_markers)
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=event not in PROGRAM_ADDS_SRC)
+        done = support.run_hook_line(entry["command"], event, project, box)
+        assert not box.marks("tree-gov-"), (
+            f"{event}[{index}] imported the project's own {project}/src/gov\n{done.describe()}")
+>       assert pin_markers.marks("pin-gov-"), (
+            f"{event}[{index}]'s program did not import the pin's installed package ({pin_markers.site / 'gov'})\n"
+            f"{done.describe()}")
+E       AssertionError: stop[0]'s program did not import the pin's installed package (/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov)
+E         $ sh -c python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/stop.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_s_program_import5/project)
+E         exit: 0
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = marks('pin-gov-')
+E        +    where marks = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:82: AssertionError
+____ test_without_a_pin_the_pretooluse_line_blocks_the_call[preToolUse[0]] _____
+
+event = 'preToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"', 'timeout': 60, 'type': 'command'}
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] == "preToolUse"],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] == "preToolUse"])
+    def test_without_a_pin_the_pretooluse_line_blocks_the_call(event, index, entry, tmp_path):
+        """No ``gov`` link and no ``gov`` on ``PATH``: the call is blocked (exit 2 or a deny decision), and neither the
+        project's ``src`` nor the ``python3`` first on ``PATH`` stands in for the pin."""
+        box, project, path = _without_pin(tmp_path)
+        done = support.run_hook_line(entry["command"], event, project, box, path=path)
+        assert support.denies(done), (
+            f"with no pin to be found, {event}[{index}] lets the call through (exit {done.returncode}; only exit 2 or "
+            f"a deny decision blocks)\n{done.describe()}")
+>       assert not box.marks("tree-gov-"), (
+            f"with no pin, {event}[{index}] fell back to the project's own src/gov\n{done.describe()}")
+E       AssertionError: with no pin, preToolUse[0] fell back to the project's own src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0/box/markers/tree-gov-1180710')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0/box/markers/tree-gov-1180710')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0/box/home'), local_bin=PosixPath('...ol0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_pretool0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:107: AssertionError
+_ test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUse[0]] __
+
+event = 'postToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in ("postToolUse", "postToolUseFailure")],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in ("postToolUse", "postToolUseFailure")])
+    def test_without_a_pin_the_after_call_lines_do_not_end_silently(event, index, entry, tmp_path):
+        """The containment check cannot run without the pin: the line ends with an error (non-zero), never as a
+        silent success, and no other install stands in for the pin."""
+        box, project, path = _without_pin(tmp_path)
+        done = support.run_hook_line(entry["command"], event, project, box, path=path)
+        assert done.returncode not in (0, None), (
+            f"with no pin to be found, {event}[{index}] ends as a silent success\n{done.describe()}")
+>       assert not box.marks("tree-gov-"), (
+            f"with no pin, {event}[{index}] fell back to the project's own src/gov\n{done.describe()}")
+E       AssertionError: with no pin, postToolUse[0] fell back to the project's own src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0/box/markers/tree-gov-1180717')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0/box/markers/tree-gov-1180717')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0/box/home'), local_bin=PosixPath('..._c0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:122: AssertionError
+_ test_without_a_pin_the_after_call_lines_do_not_end_silently[postToolUseFailure[0]] _
+
+event = 'postToolUseFailure', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"', 'matcher': 'Bash', 'timeout': 60, 'type': 'command'}
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] in ("postToolUse", "postToolUseFailure")],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] in ("postToolUse", "postToolUseFailure")])
+    def test_without_a_pin_the_after_call_lines_do_not_end_silently(event, index, entry, tmp_path):
+        """The containment check cannot run without the pin: the line ends with an error (non-zero), never as a
+        silent success, and no other install stands in for the pin."""
+        box, project, path = _without_pin(tmp_path)
+        done = support.run_hook_line(entry["command"], event, project, box, path=path)
+        assert done.returncode not in (0, None), (
+            f"with no pin to be found, {event}[{index}] ends as a silent success\n{done.describe()}")
+>       assert not box.marks("tree-gov-"), (
+            f"with no pin, {event}[{index}] fell back to the project's own src/gov\n{done.describe()}")
+E       AssertionError: with no pin, postToolUseFailure[0] fell back to the project's own src/gov
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/posttooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         containment: cannot import check logic: No module named 'gov.guard'
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1/box/markers/tree-gov-1180724')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1/box/markers/tree-gov-1180724')] = marks('tree-gov-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1/box/home'), local_bin=PosixPath('..._c1/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_without_a_pin_the_after_c1/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:122: AssertionError
+_ test_the_line_follows_the_owner_s_rollback_to_an_editable_install[preToolUse[0]] _
+
+event = 'preToolUse', index = 0
+entry = {'command': 'PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"', 'timeout': 60, 'type': 'command'}
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0')
+
+    @pytest.mark.parametrize("event,index,entry", [e for e in ENTRIES if e[0] == "preToolUse"],
+                             ids=[i for i, e in zip(IDS, ENTRIES) if e[0] == "preToolUse"])
+    def test_the_line_follows_the_owner_s_rollback_to_an_editable_install(event, index, entry, tmp_path):
+        """The owner's documented rollback replaces the link by an editable install's own ``gov`` script (DEC-605:
+        ``pip install --user -e``: a script at ``~/.local/bin/gov`` whose first line names the system interpreter, the
+        package found through the user site folder). The line then starts that install's interpreter, not the
+        ``python3`` first on ``PATH``, and not with the project's ``src``."""
+        box = support.make_box(tmp_path / "box", None)
+        rollback = box.local_bin / "gov"
+        rollback.write_text(f"#!{support.REAL_PYTHON}\nimport sys\nfrom gov.cli.main import main\nsys.exit(main())\n",
+                            encoding="utf-8")
+        rollback.chmod(0o755)
+        env = support.base_env(box.home, support.SYSTEM_PATH)
+        site = subprocess.run([support.REAL_PYTHON, "-c", "import site; print(site.getusersitepackages())"],
+                              env=env, capture_output=True, text=True, check=True).stdout.strip()
+        assert site.startswith(str(box.home) + os.sep), f"the user site folder {site} is not under the case's home"
+        os.makedirs(site, exist_ok=True)
+        with open(os.path.join(site, "w259_rollback.pth"), "w", encoding="utf-8") as pth:
+            pth.write(f"{support.SRC}\n")
+            pth.write(f"import os; open(os.path.join({str(box.markers)!r}, 'rollback-python-%d' % os.getpid()), "
+                      f"'w').close()\n")
+        project = support.hook_project(tmp_path / "project", box.markers, with_src=True)
+        done = support.run_hook_line(entry["command"], event, project, box)
+>       assert not box.marks("path-python3-"), (
+            f"after the rollback, {event}[{index}] started the python3 first on PATH\n{done.describe()}")
+E       AssertionError: after the rollback, preToolUse[0] started the python3 first on PATH
+E         $ sh -c PYTHONPATH="$CLAUDE_PROJECT_DIR/src" python3 "$CLAUDE_PROJECT_DIR/template/governance/kernel/hooks/pretooluse.py"  (in /tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0/project)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0/box/markers/path-python3-1180734')]
+E        +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0/box/markers/path-python3-1180734')] = marks('path-python3-')
+E        +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0/box/home'), local_bin=PosixPath('...ne0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_line_follows_the_owne0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_hook_lines.py:151: AssertionError
+_________ test_no_declared_check_imports_the_project_s_own_gov_package _________
+
+judged = {'control': (Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-control0/box/home'), local_bin=PosixPath('/tmp...rsion': '1.0.0', 'commit': 'f78eaa92ec04f9488cd323e8a6f294024d3ec754', 'inputs_hash': 'c8f79170400df37f'}, ...}, ...})}
+
+    def test_no_declared_check_imports_the_project_s_own_gov_package(judged):
+        """Every declared check runs the judge's installed package: the ``gov`` under the project's ``src/`` is never
+        imported (it would be with the project's ``src`` on the checks' import path)."""
+        box, project, done, _ = judged["decoy"]
+        imported = box.marks("tree-gov-")
+>       assert not imported, (
+            f"{len(imported)} declared check process(es) imported the project's own {project}/src/gov instead of the "
+            f"judge's installed package\n{done.describe()}")
+E       AssertionError: 19 declared check process(es) imported the project's own /tmp/pytest-of-usain/pytest-4247/judge-decoy0/project/src/gov instead of the judge's installed package
+E         $ /tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/home/.local/bin/gov check --json  (in /tmp/pytest-of-usain/pytest-4247/judge-decoy0/project)
+E         exit: 3
+E         stdout:
+E         4", "check_version": "1.0.0", "inputs_hash": "4a3acb01f069d339"}}, {"id": "retrieval-regression", "family": "retrieval-regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "retrieval-regression exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.retrieval.retrieve_check' (ModuleNotFoundError: No module named 'gov.retrieval')"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "b63195c1cde8a195"}}, {"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.secrets"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "13a02f236281f155"}}, {"id": "skill-regression-a", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-a exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "a7802e98962580ef"}}, {"id": "skill-regression-b1", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-b1 exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "e267b7b3f183faab"}}, {"id": "skill-regression-orchestration", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-orchestration exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "99411ec497d7b357"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "4d1104ebe469d71a"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "7f5b58168e32f4a7"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "865858fe0bfa2b49"}}]}}}
+E         
+E         stderr:
+E           adapter/model portability: RED
+E           audit reproducibility: RED
+E           authority/role limits: RED
+E           command-contract consistency: YELLOW
+E           concurrency/claims: RED
+E           context reproducibility: RED
+E           fresh-agent reconstruction: RED
+E           graph integrity: RED
+E           index freshness: RED
+E           mutation scope: RED
+E           path-map compliance: RED
+E           product traceability: RED
+E           recovery/rebuild: RED
+E           retrieval regression: RED
+E           schema/invariants: RED
+E           secrets indexing: RED
+E           skill regression: RED
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/tree-gov-1180747'), PosixPath('/tmp/pytest-of-us...rkers/tree-gov-1180755'), PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/tree-gov-1180757'), ...]
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:42: AssertionError
+__ test_a_check_edited_in_the_tree_does_not_change_the_pinned_judge_s_verdict __
+
+judged = {'control': (Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-control0/box/home'), local_bin=PosixPath('/tmp...rsion': '1.0.0', 'commit': 'f78eaa92ec04f9488cd323e8a6f294024d3ec754', 'inputs_hash': 'c8f79170400df37f'}, ...}, ...})}
+
+    def test_a_check_edited_in_the_tree_does_not_change_the_pinned_judge_s_verdict(judged):
+        """The project's ``src/gov/check/schema.py`` is edited to report a finding; the judge's verdict for the schema
+        check is the installed check's, the same as in the control project, and names no finding of the edited one."""
+        _, _, done, results = judged["decoy"]
+        _, _, control_done, control = judged["control"]
+        assert "core-schema" in results and "core-schema" in control, (
+            f"the schema check was not run\n{done.describe()}\n{control_done.describe()}")
+>       assert not any("No module named" in json.dumps(finding) for finding in control["core-schema"]["findings"]), (
+            f"in the control project the judge's schema check could not import the judge's own package: "
+            f"{control['core-schema']}\n{control_done.describe()}")
+E       AssertionError: in the control project the judge's schema check could not import the judge's own package: {'id': 'core-schema', 'family': 'schema/invariants', 'severity': 'hard-block', 'status': 'RED', 'findings': [{'code': 'CHECK_FAILED', 'message': 'core-schema exited with code 1', 'stderr': "/usr/bin/python3.12: Error while finding module specification for 'gov.check.schema' (ModuleNotFoundError: No module named 'gov')"}], 'provenance': {'commit': '43e1759cfeb01a1075792da6656a921842d86c71', 'check_version': '1.0.0', 'inputs_hash': '71b5341e43f7c0c8'}}
+E         $ /tmp/pytest-of-usain/pytest-4247/judge-control0/box/home/.local/bin/gov check --json  (in /tmp/pytest-of-usain/pytest-4247/judge-control0/project)
+E         exit: 3
+E         stdout:
+E         .12: Error while finding module specification for 'gov.retrieval.retrieve_check' (ModuleNotFoundError: No module named 'gov')"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "c41bd0d599982002"}}, {"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.secrets' (ModuleNotFoundError: No module named 'gov')"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "84ce7704cec2a9ce"}}, {"id": "skill-regression-a", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-a exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.check.skill_validator' (ModuleNotFoundError: No module named 'gov')"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "3064ada17f0ec822"}}, {"id": "skill-regression-b1", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-b1 exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.check.skill_validator' (ModuleNotFoundError: No module named 'gov')"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "afd67e3540ac5fec"}}, {"id": "skill-regression-orchestration", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-orchestration exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.check.skill_validator' (ModuleNotFoundError: No module named 'gov')"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "a75d20b1c0aae194"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "24237a6775fa325b"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "4a6ff41db9565c7e"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "43e1759cfeb01a1075792da6656a921842d86c71", "check_version": "1.0.0", "inputs_hash": "61f668188566c519"}}]}}}
+E         
+E         stderr:
+E           adapter/model portability: RED
+E           audit reproducibility: RED
+E           authority/role limits: RED
+E           command-contract consistency: YELLOW
+E           concurrency/claims: RED
+E           context reproducibility: RED
+E           fresh-agent reconstruction: RED
+E           graph integrity: RED
+E           index freshness: RED
+E           mutation scope: RED
+E           path-map compliance: RED
+E           product traceability: RED
+E           recovery/rebuild: RED
+E           retrieval regression: RED
+E           schema/invariants: RED
+E           secrets indexing: RED
+E           skill regression: RED
+E         
+E       assert not True
+E        +  where True = any(<generator object test_a_check_edited_in_the_tree_does_not_change_the_pinned_judge_s_verdict.<locals>.<genexpr> at 0x7ddc1d64d460>)
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:54: AssertionError
+____ test_a_declared_python3_command_does_not_run_the_python3_first_on_path ____
+
+judged = {'control': (Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-control0/box/home'), local_bin=PosixPath('/tmp...rsion': '1.0.0', 'commit': 'f78eaa92ec04f9488cd323e8a6f294024d3ec754', 'inputs_hash': 'c8f79170400df37f'}, ...}, ...})}
+
+    def test_a_declared_python3_command_does_not_run_the_python3_first_on_path(judged):
+        """A declaration's ``python3`` names the check's interpreter: the judge's own, never the first on ``PATH``."""
+        for name in ("decoy", "control"):
+            box, _, done, _ = judged[name]
+            used = box.marks("path-python3-")
+>           assert not used, (
+                f"{len(used)} declared check(s) in the {name} project ran the python3 first on PATH "
+                f"({box.decoy_bin / 'python3'})\n{done.describe()}")
+E           AssertionError: 19 declared check(s) in the decoy project ran the python3 first on PATH (/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/decoy-bin/python3)
+E             $ /tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/home/.local/bin/gov check --json  (in /tmp/pytest-of-usain/pytest-4247/judge-decoy0/project)
+E             exit: 3
+E             stdout:
+E             4", "check_version": "1.0.0", "inputs_hash": "4a3acb01f069d339"}}, {"id": "retrieval-regression", "family": "retrieval-regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "retrieval-regression exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.retrieval.retrieve_check' (ModuleNotFoundError: No module named 'gov.retrieval')"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "b63195c1cde8a195"}}, {"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.secrets"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "13a02f236281f155"}}, {"id": "skill-regression-a", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-a exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "a7802e98962580ef"}}, {"id": "skill-regression-b1", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-b1 exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "e267b7b3f183faab"}}, {"id": "skill-regression-orchestration", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-orchestration exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "99411ec497d7b357"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "4d1104ebe469d71a"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "7f5b58168e32f4a7"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "865858fe0bfa2b49"}}]}}}
+E             
+E             stderr:
+E               adapter/model portability: RED
+E               audit reproducibility: RED
+E               authority/role limits: RED
+E               command-contract consistency: YELLOW
+E               concurrency/claims: RED
+E               context reproducibility: RED
+E               fresh-agent reconstruction: RED
+E               graph integrity: RED
+E               index freshness: RED
+E               mutation scope: RED
+E               path-map compliance: RED
+E               product traceability: RED
+E               recovery/rebuild: RED
+E               retrieval regression: RED
+E               schema/invariants: RED
+E               secrets indexing: RED
+E               skill regression: RED
+E             
+E           assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/path-python3-1180747'), PosixPath('/tmp/pytest-o...th-python3-1180755'), PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/path-python3-1180757'), ...]
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:69: AssertionError
+________ test_a_declared_gov_command_does_not_run_the_gov_first_on_path ________
+
+judged = {'control': (Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-control0/box/home'), local_bin=PosixPath('/tmp...rsion': '1.0.0', 'commit': 'f78eaa92ec04f9488cd323e8a6f294024d3ec754', 'inputs_hash': 'c8f79170400df37f'}, ...}, ...})}
+
+    def test_a_declared_gov_command_does_not_run_the_gov_first_on_path(judged):
+        """A declaration that starts with ``gov`` (``fresh-agent-reconstruction``) runs the judge's own ``gov``: the
+        ``gov`` first on ``PATH`` does not run and does not give the verdict."""
+        _, _, _, control = judged["control"]
+        for name in ("decoy", "control"):
+            box, _, done, results = judged[name]
+>           assert not box.marks("path-gov-"), (
+                f"the gov first on PATH ({box.decoy_bin / 'gov'}) ran for a declared check in the {name} project\n"
+                f"{done.describe()}")
+E           AssertionError: the gov first on PATH (/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/decoy-bin/gov) ran for a declared check in the decoy project
+E             $ /tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/home/.local/bin/gov check --json  (in /tmp/pytest-of-usain/pytest-4247/judge-decoy0/project)
+E             exit: 3
+E             stdout:
+E             4", "check_version": "1.0.0", "inputs_hash": "4a3acb01f069d339"}}, {"id": "retrieval-regression", "family": "retrieval-regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "retrieval-regression exited with code 1", "stderr": "/usr/bin/python3.12: Error while finding module specification for 'gov.retrieval.retrieve_check' (ModuleNotFoundError: No module named 'gov.retrieval')"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "b63195c1cde8a195"}}, {"id": "secrets-indexing", "family": "secrets-indexing", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "secrets-indexing exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.secrets"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "13a02f236281f155"}}, {"id": "skill-regression-a", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-a exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "a7802e98962580ef"}}, {"id": "skill-regression-b1", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-b1 exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "e267b7b3f183faab"}}, {"id": "skill-regression-orchestration", "family": "skill regression", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "skill-regression-orchestration exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.skill_validator"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "99411ec497d7b357"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "4d1104ebe469d71a"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "7f5b58168e32f4a7"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "f78eaa92ec04f9488cd323e8a6f294024d3ec754", "check_version": "1.0.0", "inputs_hash": "865858fe0bfa2b49"}}]}}}
+E             
+E             stderr:
+E               adapter/model portability: RED
+E               audit reproducibility: RED
+E               authority/role limits: RED
+E               command-contract consistency: YELLOW
+E               concurrency/claims: RED
+E               context reproducibility: RED
+E               fresh-agent reconstruction: RED
+E               graph integrity: RED
+E               index freshness: RED
+E               mutation scope: RED
+E               path-map compliance: RED
+E               product traceability: RED
+E               recovery/rebuild: RED
+E               retrieval regression: RED
+E               schema/invariants: RED
+E               secrets indexing: RED
+E               skill regression: RED
+E             
+E           assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/path-gov-1180769')]
+E            +  where [PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers/path-gov-1180769')] = marks('path-gov-')
+E            +    where marks = Box(home=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/home'), local_bin=PosixPath('/tmp/pytest-of-usai...test-4247/judge-decoy0/box/decoy-bin'), markers=PosixPath('/tmp/pytest-of-usain/pytest-4247/judge-decoy0/box/markers')).marks
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:80: AssertionError
+_ test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[installed] _
+
+layout = 'installed'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_a_declared_check_runs_wit0')
+
+    @pytest.mark.parametrize("layout", sorted(support.KERNEL_LAYOUTS))
+    def test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath(
+            layout, stand_in, tmp_path):
+        """A probe declared in either kernel layout (DEC-579) reports the interpreter that ran it, the ``gov`` package
+        it would import and its ``PYTHONPATH``: the judge's environment, the judge's installed package, and no
+        ``PYTHONPATH`` entry naming the project (DEC-822 item 3: that variable chooses only the code under test)."""
+        box = support.make_box(tmp_path / "box", stand_in, decoy_gov=True)
+        out = tmp_path / "probe.json"
+        code = ("import importlib.util, json, os, sys; spec = importlib.util.find_spec('gov'); "
+                "d = {'prefix': sys.prefix, 'executable': sys.executable, "
+                "'pythonpath': os.environ.get('PYTHONPATH', ''), 'gov': spec.origin if spec else None}; "
+                f"open({str(out)!r}, 'w').write(json.dumps(d))")
+        declaration = {"id": "w259-probe", "family": "schema/invariants", "tier": "G1", "severity": "warning",
+                       "command": f'python3 -c "{code}"'}
+        rel = f"{support.KERNEL_LAYOUTS[layout]}/checks/w259-probe.yaml"
+        project = support.make_repository(tmp_path / "project", {rel: yaml.safe_dump(declaration, sort_keys=False),
+                                                                 **support.tree_gov_files(box.markers)})
+        done = support.judge_check(box, project, decoys_first=True)
+        assert out.is_file(), f"the declared probe did not run\n{done.describe()}"
+        seen = json.loads(out.read_text(encoding="utf-8"))
+>       assert Path(seen["prefix"]).resolve() == stand_in.venv.resolve(), (
+            f"the declared check ran with the interpreter of {seen['prefix']} ({seen['executable']}), not the judge's "
+            f"environment {stand_in.venv}")
+E       AssertionError: the declared check ran with the interpreter of /usr (/usr/bin/python3.12), not the judge's environment /tmp/w259-pin-rhwhvg_k/venv
+E       assert PosixPath('/usr') == PosixPath('/tmp/w259-pin-rhwhvg_k/venv')
+E        +  where PosixPath('/usr') = resolve()
+E        +    where resolve = PosixPath('/usr').resolve
+E        +      where PosixPath('/usr') = Path('/usr')
+E        +  and   PosixPath('/tmp/w259-pin-rhwhvg_k/venv') = resolve()
+E        +    where resolve = PosixPath('/tmp/w259-pin-rhwhvg_k/venv').resolve
+E        +      where PosixPath('/tmp/w259-pin-rhwhvg_k/venv') = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers')).venv
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:109: AssertionError
+_ test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath[template] _
+
+layout = 'template'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_a_declared_check_runs_wit1')
+
+    @pytest.mark.parametrize("layout", sorted(support.KERNEL_LAYOUTS))
+    def test_a_declared_check_runs_with_the_judge_s_interpreter_package_and_no_project_pythonpath(
+            layout, stand_in, tmp_path):
+        """A probe declared in either kernel layout (DEC-579) reports the interpreter that ran it, the ``gov`` package
+        it would import and its ``PYTHONPATH``: the judge's environment, the judge's installed package, and no
+        ``PYTHONPATH`` entry naming the project (DEC-822 item 3: that variable chooses only the code under test)."""
+        box = support.make_box(tmp_path / "box", stand_in, decoy_gov=True)
+        out = tmp_path / "probe.json"
+        code = ("import importlib.util, json, os, sys; spec = importlib.util.find_spec('gov'); "
+                "d = {'prefix': sys.prefix, 'executable': sys.executable, "
+                "'pythonpath': os.environ.get('PYTHONPATH', ''), 'gov': spec.origin if spec else None}; "
+                f"open({str(out)!r}, 'w').write(json.dumps(d))")
+        declaration = {"id": "w259-probe", "family": "schema/invariants", "tier": "G1", "severity": "warning",
+                       "command": f'python3 -c "{code}"'}
+        rel = f"{support.KERNEL_LAYOUTS[layout]}/checks/w259-probe.yaml"
+        project = support.make_repository(tmp_path / "project", {rel: yaml.safe_dump(declaration, sort_keys=False),
+                                                                 **support.tree_gov_files(box.markers)})
+        done = support.judge_check(box, project, decoys_first=True)
+        assert out.is_file(), f"the declared probe did not run\n{done.describe()}"
+        seen = json.loads(out.read_text(encoding="utf-8"))
+>       assert Path(seen["prefix"]).resolve() == stand_in.venv.resolve(), (
+            f"the declared check ran with the interpreter of {seen['prefix']} ({seen['executable']}), not the judge's "
+            f"environment {stand_in.venv}")
+E       AssertionError: the declared check ran with the interpreter of /usr (/usr/bin/python3.12), not the judge's environment /tmp/w259-pin-rhwhvg_k/venv
+E       assert PosixPath('/usr') == PosixPath('/tmp/w259-pin-rhwhvg_k/venv')
+E        +  where PosixPath('/usr') = resolve()
+E        +    where resolve = PosixPath('/usr').resolve
+E        +      where PosixPath('/usr') = Path('/usr')
+E        +  and   PosixPath('/tmp/w259-pin-rhwhvg_k/venv') = resolve()
+E        +    where resolve = PosixPath('/tmp/w259-pin-rhwhvg_k/venv').resolve
+E        +      where PosixPath('/tmp/w259-pin-rhwhvg_k/venv') = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers')).venv
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:109: AssertionError
+____ test_a_gov_package_at_the_project_s_root_is_not_imported_by_the_checks ____
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0')
+
+    def test_a_gov_package_at_the_project_s_root_is_not_imported_by_the_checks(stand_in, tmp_path):
+        """The project's root is the checks' working folder; a ``gov`` package there is project data like any other
+        and is never imported by a declared check (a ``-m`` run puts its working folder first on the import path)."""
+        box = support.make_box(tmp_path / "box", stand_in)
+        copies = {rel: source for rel, source in support.declared_check_copies().items()
+                  if Path(rel).name in ("core-schema.yaml", "core-graph.yaml")}
+        project = support.make_repository(tmp_path / "project", support.tree_gov_files(box.markers, prefix=""), copies)
+        done = support.judge_check(box, project, decoys_first=False)
+        results = support.check_results(done)
+        imported = box.marks("root-gov-")
+>       assert not imported, (
+            f"{len(imported)} declared check process(es) imported the gov package at the project's root "
+            f"{project / 'gov'}\n{done.describe()}")
+E       AssertionError: 2 declared check process(es) imported the gov package at the project's root /tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0/project/gov
+E         $ /tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0/box/home/.local/bin/gov check --json  (in /tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0/project)
+E         exit: 3
+E         stdout:
+E         YELLOW", "family": "mutation scope", "check_count": 0, "reason": "no registered check"}, "path-map compliance": {"status": "YELLOW", "family": "path-map compliance", "check_count": 0, "reason": "no registered check"}, "context reproducibility": {"status": "YELLOW", "family": "context reproducibility", "check_count": 0, "reason": "no registered check"}, "concurrency/claims": {"status": "YELLOW", "family": "concurrency/claims", "check_count": 0, "reason": "no registered check"}, "adapter/model portability": {"status": "YELLOW", "family": "adapter/model portability", "check_count": 0, "reason": "no registered check"}, "skill regression": {"status": "GREEN", "family": "skill regression", "check_count": 1}, "command-contract consistency": {"status": "YELLOW", "family": "command-contract consistency", "check_count": 0, "reason": "no registered check"}, "secrets indexing": {"status": "YELLOW", "family": "secrets indexing", "check_count": 0, "reason": "no registered check"}, "recovery/rebuild": {"status": "YELLOW", "family": "recovery/rebuild", "check_count": 0, "reason": "no registered check"}, "fresh-agent reconstruction": {"status": "YELLOW", "family": "fresh-agent reconstruction", "check_count": 0, "reason": "no registered check"}, "product traceability": {"status": "YELLOW", "family": "product traceability", "check_count": 2}, "audit reproducibility": {"status": "YELLOW", "family": "audit reproducibility", "check_count": 0, "reason": "no registered check"}}, "checks": [{"id": "core-graph", "family": "graph integrity", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "core-graph exited with code 1", "stderr": "/usr/bin/python3.12: No module named gov.check.graph"}], "provenance": {"commit": "85a7f386c76e01ee94ee85b79e2ca293f08e8030", "check_version": "1.0.0", "inputs_hash": "7cb361be02e3ed65"}}, {"id": "core-schema", "family": "schema/invariants", "severity": "hard-block", "status": "RED", "findings": [{"code": "W259_TREE_EDIT", "message": "the check as edited in the tree"}], "provenance": {"commit": "85a7f386c76e01ee94ee85b79e2ca293f08e8030", "check_version": "1.0.0", "inputs_hash": "cc948f444e88c071"}}, {"id": "openspec-validate", "family": "product traceability", "severity": "hard-block", "status": "YELLOW", "findings": [{"code": "OPENSPEC_ABSENT", "message": "openspec is not on PATH"}], "provenance": {"commit": "85a7f386c76e01ee94ee85b79e2ca293f08e8030", "check_version": "1.0.0", "inputs_hash": "ff8f674ba55588ae"}}, {"id": "skill-version", "family": "skill regression", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "85a7f386c76e01ee94ee85b79e2ca293f08e8030", "check_version": "1.0.0", "inputs_hash": "5792bc046c79d647"}}, {"id": "readiness", "family": "product traceability", "severity": "hard-block", "status": "GREEN", "findings": [], "provenance": {"commit": "85a7f386c76e01ee94ee85b79e2ca293f08e8030", "check_version": "1.0.0", "inputs_hash": "736a7f56a0c93eb6"}}]}}}
+E         
+E         stderr:
+E         families with no registered check: index freshness, retrieval regression, authority/role limits, mutation scope, path-map compliance, context reproducibility, concurrency/claims, adapter/model portability, command-contract consistency, secrets indexing, recovery/rebuild, fresh-agent reconstruction, audit reproducibility
+E           adapter/model portability: YELLOW (no registered check)
+E           audit reproducibility: YELLOW (no registered check)
+E           authority/role limits: YELLOW (no registered check)
+E           command-contract consistency: YELLOW (no registered check)
+E           concurrency/claims: YELLOW (no registered check)
+E           context reproducibility: YELLOW (no registered check)
+E           fresh-agent reconstruction: YELLOW (no registered check)
+E           graph integrity: RED
+E           index freshness: YELLOW (no registered check)
+E           mutation scope: YELLOW (no registered check)
+E           path-map compliance: YELLOW (no registered check)
+E           product traceability: YELLOW
+E           recovery/rebuild: YELLOW (no registered check)
+E           retrieval regression: YELLOW (no registered check)
+E           schema/invariants: RED
+E           secrets indexing: YELLOW (no registered check)
+E           skill regression: GREEN
+E         
+E       assert not [PosixPath('/tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0/box/markers/root-gov-1180861'), PosixPath('/tmp/pytest-of-usain/pytest-4247/test_a_gov_package_at_the_proj0/box/markers/root-gov-1180863')]
+
+tests/acceptance/W2-59/test_w2_59_judge_checks.py:131: AssertionError
+_ test_doctor_reads_the_canary_declarations_of_the_project_under_check[installed] _
+
+layout = 'installed'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_doctor_reads_the_canary_d0')
+
+    @pytest.mark.parametrize("layout", sorted(support.KERNEL_LAYOUTS))
+    def test_doctor_reads_the_canary_declarations_of_the_project_under_check(layout, stand_in, tmp_path):
+        """The project declares one canary query per index; with no index built, each query is run and missed, so the
+        answer names the project's query: the declaration was read from the project, not from the install path."""
+        kernel = support.KERNEL_LAYOUTS[layout]
+        files = {f"{kernel}/canaries/{index}.yaml": f'canaries:\n  - query: "{PROJECT_CANARY.format(index=index)}"\n'
+                 for index in ("lexical", "semantic")}
+        project = support.make_repository(tmp_path / "project", files)
+        done, canaries = _doctor(stand_in, project, tmp_path)
+        text = json.dumps(canaries)
+>       assert support.DECOY_CANARY not in text, (
+            f"gov doctor read the canary declaration at the installed package's location "
+            f"({stand_in.install_path_root / kernel / 'canaries'}): {text}")
+E       AssertionError: gov doctor read the canary declaration at the installed package's location (/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/governance/kernel/canaries): {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}
+E       assert 'w259 decoy ...install path' not in '{"status": ...ll path"]}}}'
+E         
+E         'w259 decoy canary at the install path' is contained here:
+E           isses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}
+E         ?           +++++++++++++++++++++++++++++++++++++
+
+tests/acceptance/W2-59/test_w2_59_project_root.py:46: AssertionError
+_ test_doctor_reads_the_canary_declarations_of_the_project_under_check[template] _
+
+layout = 'template'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_doctor_reads_the_canary_d1')
+
+    @pytest.mark.parametrize("layout", sorted(support.KERNEL_LAYOUTS))
+    def test_doctor_reads_the_canary_declarations_of_the_project_under_check(layout, stand_in, tmp_path):
+        """The project declares one canary query per index; with no index built, each query is run and missed, so the
+        answer names the project's query: the declaration was read from the project, not from the install path."""
+        kernel = support.KERNEL_LAYOUTS[layout]
+        files = {f"{kernel}/canaries/{index}.yaml": f'canaries:\n  - query: "{PROJECT_CANARY.format(index=index)}"\n'
+                 for index in ("lexical", "semantic")}
+        project = support.make_repository(tmp_path / "project", files)
+        done, canaries = _doctor(stand_in, project, tmp_path)
+        text = json.dumps(canaries)
+>       assert support.DECOY_CANARY not in text, (
+            f"gov doctor read the canary declaration at the installed package's location "
+            f"({stand_in.install_path_root / kernel / 'canaries'}): {text}")
+E       AssertionError: gov doctor read the canary declaration at the installed package's location (/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/template/governance/kernel/canaries): {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}
+E       assert 'w259 decoy ...install path' not in '{"status": ...ll path"]}}}'
+E         
+E         'w259 decoy canary at the install path' is contained here:
+E           isses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}
+E         ?           +++++++++++++++++++++++++++++++++++++
+
+tests/acceptance/W2-59/test_w2_59_project_root.py:46: AssertionError
+_ test_doctor_does_not_fall_back_to_the_install_path_when_the_project_declares_no_canary _
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_doctor_does_not_fall_back0')
+
+    def test_doctor_does_not_fall_back_to_the_install_path_when_the_project_declares_no_canary(stand_in, tmp_path):
+        """A project without canary declarations is answered as such; the declarations at the installed package's
+        location are never read in their place."""
+        project = support.make_repository(tmp_path / "project")
+        done, canaries = _doctor(stand_in, project, tmp_path)
+>       assert support.DECOY_CANARY not in json.dumps(canaries), (
+            f"with no canary declaration in the project, gov doctor read the one at the installed package's location: "
+            f"{canaries}\n{done.describe()}")
+E       AssertionError: with no canary declaration in the project, gov doctor read the one at the installed package's location: {'status': 'unmeasured', 'indices': {'lexical': {'passed': False, 'status': 'FACET_UNAVAILABLE', 'misses': ['w259 decoy canary at the install path']}, 'semantic': {'passed': False, 'status': 'FACET_UNAVAILABLE', 'misses': ['w259 decoy canary at the install path']}}}
+E         $ /tmp/pytest-of-usain/pytest-4247/test_doctor_does_not_fall_back0/box/home/.local/bin/gov doctor --json  (in /tmp/pytest-of-usain/pytest-4247/test_doctor_does_not_fall_back0/project)
+E         exit: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "unmeasured", "config_present": false, "binary_installed": false}, "path_map": {"status": "unmeasured", "reason": "no path-map.yaml", "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL"}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert 'w259 decoy ...install path' not in '{"status": ...ll path"]}}}'
+E         
+E         'w259 decoy canary at the install path' is contained here:
+E           isses": ["w259 decoy canary at the install path"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["w259 decoy canary at the install path"]}}}
+E         ?           +++++++++++++++++++++++++++++++++++++
+
+tests/acceptance/W2-59/test_w2_59_project_root.py:61: AssertionError
+_ test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[adopted] _
+
+layout = 'adopted'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+gitleaks = PosixPath('/home/usain/.local/bin/gitleaks')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_retrieval_check_adopt0')
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("layout", sorted(support.RETRIEVAL_PROJECTS))
+    def test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files(layout, stand_in, gitleaks, tmp_path):
+        """The project holds a valid path map and gitleaks configuration; the ones at the installed package's location
+        cannot be read. The check adopts the cloned tier with the project's files, so the tier is indexed and measured
+        (it prints its hit@5); read from the install path, nothing is indexed or the check fails on the decoy.
+        Today it fails first on its missing baseline (KPI 4), before it reads either file."""
+        project = support.make_repository(tmp_path / "project", copies=support.RETRIEVAL_PROJECTS[layout])
+        done = support.retrieval_check(stand_in, project, tmp_path, gitleaks)
+        output = done.stdout + done.stderr
+>       assert support.DECOY_MARK not in output and "Traceback" not in output, (
+            f"the retrieval-regression check failed reading a file at the installed package's location\n"
+            f"{done.describe()}")
+E       AssertionError: the retrieval-regression check failed reading a file at the installed package's location
+E         $ /tmp/w259-pin-rhwhvg_k/venv/bin/python -m gov.retrieval.retrieve_check  (in /tmp/pytest-of-usain/pytest-4247/test_the_retrieval_check_adopt0/project)
+E         exit: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>
+E             main()
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 40, in main
+E             baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
+E                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml'
+E         
+E       assert ('w259 decoy ...install path' not in "Traceback (...line.yaml'\n"
+E         
+E         'w259 decoy at the install path' is contained here:
+E         ?           -----
+E           line.yaml' and 'Traceback' not in "Traceback (...line.yaml'\n"
+E         
+E         'Traceback' is contained here:
+E           Traceback (most recent call last):
+E         ? +++++++++
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>...
+E         
+E         ...Full output truncated (11 lines hidden), use '-vv' to show)
+
+tests/acceptance/W2-59/test_w2_59_project_root.py:76: AssertionError
+_ test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files[this-repository] _
+
+layout = 'this-repository'
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+gitleaks = PosixPath('/home/usain/.local/bin/gitleaks')
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_retrieval_check_adopt1')
+
+    @pytest.mark.local_only
+    @pytest.mark.parametrize("layout", sorted(support.RETRIEVAL_PROJECTS))
+    def test_the_retrieval_check_adopts_each_dev_tier_from_the_project_s_own_files(layout, stand_in, gitleaks, tmp_path):
+        """The project holds a valid path map and gitleaks configuration; the ones at the installed package's location
+        cannot be read. The check adopts the cloned tier with the project's files, so the tier is indexed and measured
+        (it prints its hit@5); read from the install path, nothing is indexed or the check fails on the decoy.
+        Today it fails first on its missing baseline (KPI 4), before it reads either file."""
+        project = support.make_repository(tmp_path / "project", copies=support.RETRIEVAL_PROJECTS[layout])
+        done = support.retrieval_check(stand_in, project, tmp_path, gitleaks)
+        output = done.stdout + done.stderr
+>       assert support.DECOY_MARK not in output and "Traceback" not in output, (
+            f"the retrieval-regression check failed reading a file at the installed package's location\n"
+            f"{done.describe()}")
+E       AssertionError: the retrieval-regression check failed reading a file at the installed package's location
+E         $ /tmp/w259-pin-rhwhvg_k/venv/bin/python -m gov.retrieval.retrieve_check  (in /tmp/pytest-of-usain/pytest-4247/test_the_retrieval_check_adopt1/project)
+E         exit: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "<frozen runpy>", line 198, in _run_module_as_main
+E           File "<frozen runpy>", line 88, in _run_code
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>
+E             main()
+E           File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 40, in main
+E             baseline = yaml.safe_load(baseline_path.read_text(encoding="utf-8"))
+E                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1029, in read_text
+E             with self.open(mode='r', encoding=encoding, errors=errors) as f:
+E                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 1015, in open
+E             return io.open(self, mode, buffering, encoding, errors, newline)
+E                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E         FileNotFoundError: [Errno 2] No such file or directory: '/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_baseline.yaml'
+E         
+E       assert ('w259 decoy ...install path' not in "Traceback (...line.yaml'\n"
+E         
+E         'w259 decoy at the install path' is contained here:
+E         ?           -----
+E           line.yaml' and 'Traceback' not in "Traceback (...line.yaml'\n"
+E         
+E         'Traceback' is contained here:
+E           Traceback (most recent call last):
+E         ? +++++++++
+E             File "<frozen runpy>", line 198, in _run_module_as_main
+E             File "<frozen runpy>", line 88, in _run_code
+E             File "/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages/gov/retrieval/retrieve_check.py", line 151, in <module>...
+E         
+E         ...Full output truncated (11 lines hidden), use '-vv' to show)
+
+tests/acceptance/W2-59/test_w2_59_project_root.py:76: AssertionError
+_ test_from_this_worktree_s_code_outside_any_project_it_names_the_version_and_head _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_from_this_worktree_s_code0')
+
+    def test_from_this_worktree_s_code_outside_any_project_it_names_the_version_and_head(tmp_path):
+        outside = tmp_path / "outside"
+        outside.mkdir()
+        done = _worktree_code_version(outside, tmp_path)
+>       assert done.returncode == 0, f"gov --version, with no command and outside any project, failed\n{done.describe()}"
+E       AssertionError: gov --version, with no command and outside any project, failed
+E         $ /usr/bin/python3.12 -m gov.cli.main --version  (in /tmp/pytest-of-usain/pytest-4247/test_from_this_worktree_s_code0/outside)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         usage: gov [-h] <command> ...
+E         gov: error: the following arguments are required: <command>
+E         
+E       assert 2 == 0
+E        +  where 2 = Run(args=('/usr/bin/python3.12', '-m', 'gov.cli.main', '--version'), cwd='/tmp/pytest-of-usain/pytest-4247/test_from_t...de=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: the following arguments are required: <command>\n').returncode
+
+tests/acceptance/W2-59/test_w2_59_version.py:38: AssertionError
+_ test_inside_another_git_repository_it_names_the_code_s_commit_not_that_repository_s _
+
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_inside_another_git_reposi0')
+
+    def test_inside_another_git_repository_it_names_the_code_s_commit_not_that_repository_s(tmp_path):
+        other = support.make_repository(tmp_path / "other")
+        other_head = support.git(other, "rev-parse", "HEAD")
+        done = _worktree_code_version(other, tmp_path)
+>       assert done.returncode == 0, done.describe()
+E       AssertionError: $ /usr/bin/python3.12 -m gov.cli.main --version  (in /tmp/pytest-of-usain/pytest-4247/test_inside_another_git_reposi0/other)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         usage: gov [-h] <command> ...
+E         gov: error: the following arguments are required: <command>
+E         
+E       assert 2 == 0
+E        +  where 2 = Run(args=('/usr/bin/python3.12', '-m', 'gov.cli.main', '--version'), cwd='/tmp/pytest-of-usain/pytest-4247/test_inside...de=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: the following arguments are required: <command>\n').returncode
+
+tests/acceptance/W2-59/test_w2_59_version.py:48: AssertionError
+______ test_the_installed_pin_names_its_version_and_never_a_wrong_commit _______
+
+stand_in = StandIn(root=PosixPath('/tmp/w259-pin-rhwhvg_k'), wheel=PosixPath('/tmp/w259-pin-rhwhvg_k/dist/gov-0.1.0-py3-none-any....h('/tmp/w259-pin-rhwhvg_k/venv/lib/python3.12/site-packages'), markers=PosixPath('/tmp/w259-pin-rhwhvg_k/pin-markers'))
+tmp_path = PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_installed_pin_names_i0')
+
+    def test_the_installed_pin_names_its_version_and_never_a_wrong_commit(stand_in, tmp_path):
+        other = support.make_repository(tmp_path / "other")
+        other_head = support.git(other, "rev-parse", "HEAD")
+        box = support.make_box(tmp_path / "box", stand_in)
+        env = support.base_env(box.home, f"{box.local_bin}:{support.SYSTEM_PATH}")
+        done = support.run([box.local_bin / "gov", "--version"], cwd=other, env=env)
+>       assert done.returncode == 0, f"the installed gov --version failed\n{done.describe()}"
+E       AssertionError: the installed gov --version failed
+E         $ /tmp/pytest-of-usain/pytest-4247/test_the_installed_pin_names_i0/box/home/.local/bin/gov --version  (in /tmp/pytest-of-usain/pytest-4247/test_the_installed_pin_names_i0/other)
+E         exit: 2
+E         stdout:
+E         
+E         stderr:
+E         usage: gov [-h] <command> ...
+E         gov: error: the following arguments are required: <command>
+E         
+E       assert 2 == 0
+E        +  where 2 = Run(args=(PosixPath('/tmp/pytest-of-usain/pytest-4247/test_the_installed_pin_names_i0/box/home/.local/bin/gov'), '--ve...de=2, stdout='', stderr='usage: gov [-h] <command> ...\ngov: error: the following arguments are required: <command>\n').returncode
+
+tests/acceptance/W2-59/test_w2_59_version.py:58: AssertionError
+39 failed, 5 passed in 6.20s
+exit 1

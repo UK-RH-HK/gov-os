@@ -1,0 +1,11 @@
+.........ss.....s...............ssss................ssssssssssssssssssss [ 93%]
+s....                                                                    [100%]
+=========================== short test summary info ============================
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_history.py:15: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_history.py:109: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:62: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:68: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [13] tests/acceptance/W1-01/test_w1_01_settings_deny.py:82: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [7] tests/acceptance/W1-01/test_w1_01_settings_deny.py:88: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_settings_deny.py:94: W1-05 is closed: the interim guardrail is retired (DEC-084)
+49 passed, 28 skipped in 8.37s

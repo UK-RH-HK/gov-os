@@ -1,0 +1,4 @@
+
+## Wave 2 list, ranked high: one stable launch command for leads and workers (2026-10-16; DEC-715)
+
+- **`gov launch lead <ticket>` (or the like), one command for leads as well as workers** (high, beside starting leads through the launcher). Run 8c of W1-42 could not be started from the orchestrator's session: hand-written launches drifted from the owner's allow rules, and the auto-mode classifier denied even the owner's form ("Create Unsafe Agents"). The command builds the whole invocation itself (absolute paths, identity in `--settings`, model, background mode, log and PID files); the kernel template's settings carry one narrow allow rule, `Bash(gov launch:*)`, in place of the broad rule for any `claude` command; it refuses an unknown ticket or role, records the model and PID, and behaves the same from any session. Raw `claude` launches stay unallowed by design.

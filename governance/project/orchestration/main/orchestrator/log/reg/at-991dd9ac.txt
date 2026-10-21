@@ -1,0 +1,26 @@
+W1-01: 46 passed, 28 skipped in 6.42s
+W1-06: 96 passed in 0.67s
+W1-07: 227 passed in 94.94s (0:01:34)
+W1-04: 336 passed in 137.06s (0:02:17)
+W1-02: 1 failed, 528 passed in 141.64s (0:02:21)
+W1-08: 209 passed in 69.71s (0:01:09)
+W1-09: 77 passed in 30.25s
+W1-10: 76 passed in 6.10s
+W1-12: 21 passed in 4.99s
+W1-03: 364 passed in 110.43s (0:01:50)
+W1-15: 92 passed in 50.47s
+W1-17: 65 passed in 49.86s
+W1-18: 15 passed in 8.57s
+W1-47: 970 passed in 208.14s (0:03:28)
+W1-25: 52 passed in 24.59s
+W1-34: 8 passed in 0.01s
+W1-37: 4 passed in 0.02s
+W1-45: 105 passed in 20.90s
+W1-05: 1 failed, 98 passed in 406.75s (0:06:46)
+W1-46: 494 passed in 126.13s (0:02:06)
+W1-48: 172 passed in 0.41s
+W1-49: 105 passed in 27.54s
+W1-50: 26 failed, 17 passed in 11.06s
+unit: 671 passed in 19.86s
+RESULT: ALL PASS
+NOTE: the two failures are the 100 ms p95 latency cases (W1-02 engineer-allow-from-ticket-frontmatter, W1-05 Write-engineer), run while the W1-16 lead ran its suites; both files re-run alone at load 1: W1-02 guard_hook 7 passed, W1-05 live_hooks 86 passed.

@@ -1,0 +1,21 @@
+{
+  "digest": "d4788441aa56d013058bcd01f1bc4d121e4df2e5c1c58fde2d6eb3db55b1d871",
+  "store": {
+    "digest": "d4788441aa56d013058bcd01f1bc4d121e4df2e5c1c58fde2d6eb3db55b1d871",
+    "invalid": []
+  },
+  "stores": {
+    "lexical": {
+      "status": "recreated"
+    },
+    "semantic": {
+      "status": "recreated"
+    },
+    "codeintel": {
+      "status": "recreated"
+    }
+  },
+  "timing": {
+    "lexical_s": 0.9
+  }
+}

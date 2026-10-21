@@ -1,0 +1,8 @@
+## A compliance report to verify, not to take as given (DEC-459)
+
+The owner ordered a rule-by-rule compliance report for Wave 1. A read-only subagent of the orchestrator compiled it on 2026-10-07 at `3021a87e`; it is reproduced in full below, unedited. It is a claim by the audited party's own subagent, not evidence. Verify it independently: re-run each count with the command it names, open each commit and decision it cites, and say for every row of its two end tables whether you confirm it, correct it or cannot verify it. Look for deviations it does not list. Give special weight to: (1) the three closes it says were recorded as green while the regression summary shows failures (W1-26 `64172c93`, W1-23 `a7964c97`, W1-50 `b894a7b7`), for which it found no record of a re-run alone; (2) worker sessions and co-author lines naming a model other than the one pinned; (3) designer briefs that name private identifiers of the implementation (independence by knowledge rests on instruction only); (4) decisions recorded after the work they authorise; (5) delegated decisions that touch containment, the freeze or the launcher; (6) its own list "what could not be verified", including the containment finding recorded against the subagent's own read-only call. The same prohibitions bind you as bound it (the held-out file, the live settings file, the workbench, the oracle).
+
+The orchestrator appends the report as it stands when your brief is assembled (the file `.gov-runtime/scratch/orchestrator/COMPLIANCE.md`), together with anything the orchestrator has since added under the heading "Orchestrator's notes on the report" (kept apart from the report's text).
+
+---
+

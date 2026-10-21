@@ -1,0 +1,10 @@
+load 200 3.086064s
+03:43:50
+ 03:43:50 up 2 days, 20:20,  0 user,  load average: 7.55, 5.40, 10.21
+shared 11434:
+{"models":[{"name":"qwen3-embedding:0.6b","model":"qwen3-embedding:0.6b","size":2370652077,"digest":"ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d","details":{"parent_model":"","format":"gguf","family":"qwen3","families":["qwen3"],"parameter_size":"595.78M","quantization_level":"Q8_0"},"expires_at":"2026-10-19T03:48:50.315242234+01:00","size_vram":2370652077,"context_length":4096}]}
+cpu 11435:
+
+3835 MiB, 16303 MiB
+ 422673 29220  2-19:37:36 /home/usain/.local/ollama/bin/ollama serve
+1797265 613228      00:01 /home/usain/.local/ollama/lib/ollama/llama-server --model /home/usain/.ollama/models/blobs/sha256-06507c7b42688469c4e7298b0a1e16deff06

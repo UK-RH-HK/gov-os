@@ -1,0 +1,35 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-9.0.3, pluggy-1.6.0 -- /usr/bin/python3
+rootdir: /home/usain/gov-os-worktrees/W2-54
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.13.0, xdist-3.8.0, testmon-2.2.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 25 items
+
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_no_schema_file_of_w2_02_s_other_types_comes_with_it[HEAD] PASSED [  4%]
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_no_schema_file_of_w2_02_s_other_types_comes_with_it[4ce16df2] PASSED [  8%]
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-HEAD] PASSED [ 12%]
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[close-4ce16df2] PASSED [ 16%]
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-HEAD] PASSED [ 20%]
+tests/acceptance/W2-54/test_w2_54_audit_report.py::test_w2_02_s_other_types_are_judged_as_an_unknown_type[adoption-verdict-4ce16df2] PASSED [ 24%]
+tests/unit/check/test_schema_audit_report.py::test_a_typeless_record_in_the_audit_folder_is_an_audit_report PASSED [ 28%]
+tests/unit/check/test_schema_audit_report.py::test_a_record_stating_type_audit_report_is_held_to_the_schema PASSED [ 32%]
+tests/unit/check/test_schema_audit_report.py::test_an_audit_report_lacking_a_field_fails_naming_it[milestone] PASSED [ 36%]
+tests/unit/check/test_schema_audit_report.py::test_an_audit_report_lacking_a_field_fails_naming_it[commit] PASSED [ 40%]
+tests/unit/check/test_schema_audit_report.py::test_an_audit_report_lacking_a_field_fails_naming_it[pack_sha256] PASSED [ 44%]
+tests/unit/check/test_schema_audit_report.py::test_a_commit_of_the_wrong_shape_fails PASSED [ 48%]
+tests/unit/check/test_schema_audit_report.py::test_a_typeless_record_outside_the_audit_folder_still_fails[docs/notes] PASSED [ 52%]
+tests/unit/check/test_schema_audit_report.py::test_a_typeless_record_outside_the_audit_folder_still_fails[docs/audit-archive] PASSED [ 56%]
+tests/unit/check/test_schema_audit_report.py::test_a_typeless_record_outside_the_audit_folder_still_fails[docs/reports/audit] PASSED [ 60%]
+tests/unit/check/test_schema_audit_report.py::test_the_other_types_of_w2_02_stay_unknown[HEAD] PASSED [ 64%]
+tests/unit/check/test_schema_audit_report.py::test_the_other_types_of_w2_02_stay_unknown[4ce16df2] PASSED [ 68%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-0rfi-True-close-in-schema-map] PASSED [ 72%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-0rfi-True-adoption-verdict-in-standalone-types] PASSED [ 76%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-0rfi-True-close-schema-file] PASSED [ 80%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-0rfi-True-adoption-verdict-schema-file] PASSED [ 84%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-zflj-False-close-in-schema-map] PASSED [ 88%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-zflj-False-adoption-verdict-in-standalone-types] PASSED [ 92%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-zflj-False-close-schema-file] PASSED [ 96%]
+tests/unit/check/test_schema_audit_report.py::test_the_reading_of_w2_54_own_commits_fails_only_on_its_own[DAEO-zflj-False-adoption-verdict-schema-file] PASSED [100%]
+
+============================== 25 passed in 4.45s ==============================

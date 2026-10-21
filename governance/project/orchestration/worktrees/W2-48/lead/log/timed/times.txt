@@ -1,0 +1,6 @@
+T0 uncached exit=3 47s head=f233b944 load=8.19
+T0 cached exit=3 53s head=f233b944 load=8.61
+T1 uncached exit=3 1275s head=f233b944 load=29.01
+T1 cached exit=3 690s head=f233b944 load=16.30
+T2 uncached exit=3 677s head=f233b944 load=42.73
+T2 cached exit=0 582s head=f233b944 load=46.04

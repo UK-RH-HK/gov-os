@@ -1,0 +1,18 @@
+25:E       AssertionError: with the session's environment {'PYTHONPATH': '<tmp>/project/src'}, preToolUse[0] imported the project's own <tmp>/project/src/gov: the code under test, not the pin, decided the call
+58:E       AssertionError: after the rollback, with PYTHONPATH=<tmp>/project/src, preToolUse[0] imported the inherited path's gov
+89:E       AssertionError: with PYTHONPATH=<tmp>/project/src, postToolUse[0]'s program imported that folder's gov, not the pin's
+121:E       AssertionError: with PYTHONPATH=<tmp>/project/src, postToolUseFailure[0]'s program imported that folder's gov, not the pin's
+153:E       AssertionError: with PYTHONPATH=<tmp>/inherited/src, preCompact[0]'s program imported that folder's gov, not the pin's
+184:E       AssertionError: with PYTHONPATH=<tmp>/inherited/src, sessionStart[0]'s program imported that folder's gov, not the pin's
+215:E       AssertionError: with PYTHONPATH=<tmp>/project/src, stop[0]'s program imported that folder's gov, not the pin's
+252:E           AssertionError: with PYTHONPATH=<tmp>/project/src, subagentStop[0]'s interpreter started with that folder on its import path (its sitecustomize ran)
+287:E       AssertionError: with PYTHONPATH=<tmp>/project/src, preToolUse[0] imported the project's own gov to decide the call
+300:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_the_guard_line_refuses_what_the_pin_s_guard_refuses_whatever_the_session_s_import_path[preToolUse[0]-worker-pythonpath]
+301:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_after_the_rollback_with_a_worker_s_pythonpath_the_guard_line_runs_the_editable_install[preToolUse[0]]
+302:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUse[0]]
+303:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[postToolUseFailure[0]]
+304:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[preCompact[0]]
+305:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[sessionStart[0]]
+306:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[stop[0]]
+307:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_with_a_worker_s_pythonpath_the_line_s_program_runs_the_pin_s_code[subagentStop[0]]
+308:FAILED tests/acceptance/W2-59/test_w2_59_hook_lines_worker_env.py::test_a_command_that_sets_pythonpath_itself_is_let_through_and_runs_the_tree_s_code[preToolUse[0]]

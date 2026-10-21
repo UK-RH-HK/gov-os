@@ -1,0 +1,28 @@
+............F............................                                [100%]
+=================================== FAILURES ===================================
+____________ test_a_warm_query_answers_within_half_a_second_at_p95 _____________
+
+measured = {'a-dev': {'answers': [{'facets': {'lexical': {'available': True, 'facet': 'lexical', 'reason': None, 'state': 'AVAILA...659006387, 0.2765791769779753, 0.47597474898793735, 0.37397163998684846, 0.295893211994553, 0.20138720198883675, ...]}}
+
+    @FULL
+    def test_a_warm_query_answers_within_half_a_second_at_p95(measured):
+        seconds = [value for result in measured.values() for value in result["seconds"]]
+        assert len(seconds) >= 50, f"only {len(seconds)} queries were timed"
+        slowest = sorted(seconds)[-3:]
+>       assert support.p95(seconds) <= support.WARM_P95_LIMIT_S, \
+            f"warm p95 is {support.p95(seconds):.3f} s over {len(seconds)} queries " \
+            f"(limit {support.WARM_P95_LIMIT_S} s; the three slowest: {[round(value, 3) for value in slowest]})"
+E       AssertionError: warm p95 is 0.545 s over 52 queries (limit 0.5 s; the three slowest: [0.545, 0.584, 0.697])
+E       assert 0.5450380950060207 <= 0.5
+E        +  where 0.5450380950060207 = <function p95 at 0x7b5514d73d80>([0.4374382340174634, 0.325287068990292, 0.42326826899079606, 0.3568760670023039, 0.2982224209990818, 0.3357643290073611, ...])
+E        +    where <function p95 at 0x7b5514d73d80> = support.p95
+E        +  and   0.5 = support.WARM_P95_LIMIT_S
+
+tests/acceptance/W1-19/test_w1_19_real_models.py:181: AssertionError
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+1 failed, 40 passed in 153.81s (0:02:33)

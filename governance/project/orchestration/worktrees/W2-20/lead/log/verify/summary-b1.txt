@@ -1,0 +1,12 @@
+W1-41 exit=0 242 passed in 2390.98s (0:39:50)
+W1-42 exit=1 2 failed, 22 passed in 0.38s
+W1-44 exit=0 5 passed in 5.63s
+W1-45 exit=0 105 passed in 64.39s (0:01:04)
+W1-46 exit=0 493 passed in 246.77s (0:04:06)
+W1-47 exit=0 983 passed in 367.17s (0:06:07)
+W1-48 exit=0 172 passed in 1.10s
+W1-49 exit=0 105 passed in 56.10s
+W1-50 exit=0 685 passed, 2 warnings in 470.62s (0:07:50)
+W2-20 exit=0 22 passed in 4.24s
+unit exit=0 2116 passed, 1 skipped in 166.54s (0:02:46)
+validate exit=1 KeyError: 'wbs_id'
