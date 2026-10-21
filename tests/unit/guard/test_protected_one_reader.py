@@ -19,7 +19,7 @@ import pytest
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "src"))
 from gov.guard.heldout import SETTINGS_REL  # noqa: E402
-from gov.guard.protected import READ_REFUSAL, _second_names, read_refusal  # noqa: E402
+from gov.guard.protected import SECOND_NAME_REFUSAL, _second_names, read_refusal  # noqa: E402
 
 
 @pytest.fixture()
@@ -56,12 +56,14 @@ def test_the_second_names_are_read_as_the_write_rule_reads_the_call(name, args, 
     ("mv -S.t .claude/settings.json {N}", "project"), ("cp -lS.t {F} {N}", "project"),
     ("cp -l {F} -- -t", "temp"), ("cp -rlS.t {D} {N}", "project"), ("cp -l --reflink=auto {F} -- -t", "temp")))
 @pytest.mark.parametrize("role", ("orchestrator", "engineer"))
-def test_a_second_name_however_the_options_are_written_is_a_read(box, command, cwd, role):
+def test_a_second_name_however_the_options_are_written_is_refused(box, command, cwd, role):
+    """W2-58: refused for its own reason now, the write side (DEC-821 item 4)."""
     project, temp = box
     paths = {"F": project / SETTINGS_REL, "D": (project / SETTINGS_REL).parent, "N": temp / "new",
              "T": temp}
     folder = project if cwd == "project" else temp
-    assert read_refusal("Bash", {"command": command.format(**paths)}, str(project), str(folder)) == READ_REFUSAL
+    assert read_refusal("Bash", {"command": command.format(**paths)}, str(project),
+                        str(folder)) == SECOND_NAME_REFUSAL
 
 
 @pytest.mark.parametrize("command, cwd", (

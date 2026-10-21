@@ -158,7 +158,8 @@ def test_the_search_program_asked_only_for_its_version_is_allowed_for_a_session_
 
 
 # --------------------------------------------------------------------------
-# Refused as today: the folder is searched all the same
+# Refused before W2-58, allowed under Policy 2: the folder is searched all the same
+# (rewritten: DEC-821 item 3, DEC-857 item 3; the engineer's search from the root refused for (c), DEC-821 item 1)
 # --------------------------------------------------------------------------
 
 UNFED = {
@@ -181,10 +182,10 @@ UNFED = {
 
 
 @pytest.mark.parametrize("form", sorted(UNFED))
-def test_a_search_of_the_root_stays_refused_whatever_stands_before_it(world, form):
-    """Stays refused (green before and after): a pipe changes nothing when the program does not read it."""
+def test_a_search_of_the_root_is_allowed_under_policy_2_whatever_stands_before_it(world, form):
+    """A pipe changes nothing when the program does not read it: a search of the root, which Policy 2 opens."""
     result = _ask(world, UNFED[form], ROOT)
-    rnd.assert_refused_by_the_rule(result, f"the search '{form}' at the root")
+    protected.assert_allowed(result, f"the search '{form}' at the root")
 
 
 UNFED_AT_A_COPY = ("on-a-pipe-with-a-dot-as-its-path", "the-first-command-of-a-pipeline", "grep-r-on-a-pipe")
@@ -192,9 +193,9 @@ UNFED_AT_A_COPY = ("on-a-pipe-with-a-dot-as-its-path", "the-first-command-of-a-p
 
 @pytest.mark.parametrize("site", SITES)
 @pytest.mark.parametrize("form", UNFED_AT_A_COPY)
-def test_a_search_of_a_copy_s_folder_stays_refused_whatever_stands_before_it(world, form, site):
+def test_a_search_of_a_copy_s_folder_is_allowed_under_policy_2_whatever_stands_before_it(world, form, site):
     result = _ask(world, UNFED[form], site)
-    rnd.assert_refused_by_the_rule(result, f"the search '{form}' in a session that stands in the site '{site}'")
+    protected.assert_allowed(result, f"the search '{form}' in a session that stands in the site '{site}'")
 
 
 UNFED_BY_ROLE = [(folders.NOT_A_WRITER, "on-a-pipe-with-the-absolute-start-as-its-path"),
@@ -202,23 +203,39 @@ UNFED_BY_ROLE = [(folders.NOT_A_WRITER, "on-a-pipe-with-the-absolute-start-as-it
 
 
 @pytest.mark.parametrize("who,form", UNFED_BY_ROLE, ids=[f"{who}-{form}" for who, form in UNFED_BY_ROLE])
-def test_a_search_of_the_root_stays_refused_for_other_roles(world, who, form):
+def test_a_search_of_the_root_is_decided_by_policy_2_for_other_roles(world, who, form):
+    """The engineer's content search from the root takes in its ticket's acceptance folder (``tests/acceptance/W1-90/``):
+    refused for (c) (DEC-821 item 1). The session with no role: allowed."""
     result = _ask(world, UNFED[form], ROOT, who)
-    rnd.assert_refused_by_the_rule(result, f"the search '{form}' at the root by '{who}'")
+    what = f"the search '{form}' at the root by '{who}'"
+    if who == folders.NOT_A_WRITER:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        protected.assert_allowed(result, what)
 
 
-def test_the_refusal_of_a_search_on_a_pipe_with_a_path_names_the_rule_and_no_path(world):
-    """The command carries the root: a refusal that echoes the command fails."""
+def test_a_search_on_a_pipe_with_a_path_is_allowed_and_the_hook_says_nothing_of_the_files(world):
+    """Before Policy 2 the refusal named the rule and no path; now the search is allowed and the hook's output
+    carries nothing of the files, the root or the command."""
     what = "the search on a pipe with the absolute root as its path"
     result = _ask(world, UNFED["on-a-pipe-with-the-absolute-start-as-its-path"], ROOT)
-    rnd.assert_refused_by_the_rule(result, what)
-    rnd.assert_names_a_rule_and_a_decision(result, what)
+    protected.assert_allowed(result, what)
     for name in rnd.FILES:
-        rnd.assert_says_nothing(result, world, ROOT, name, what, more=("rg VALUE",))
+        _output_carries_nothing(result, tuple(world.secrets(rnd.site_of(ROOT), name))
+                                + (rnd.start_of(world, ROOT), "rg VALUE"), what)
+
+
+def _output_carries_nothing(result, values, what):
+    """An allowed call has no reason to ask for: only the hook's output is checked, and it carries none of ``values``
+    (a path, a folder, a value of the file). Rewritten by W2-58 (DEC-491): the case had asked a refusal's wording."""
+    said = protected.output_of(result)
+    shown = [index for index, value in enumerate(values) if value and str(value) in said]
+    # Positions only: a failure must not print what the hook must not print.
+    assert not shown, f"the hook's output for {what} carries {len(shown)} value(s) it must not (positions {shown})"
 
 
 # --------------------------------------------------------------------------
-# Refused as today: what feeds the program is a read of a protected file
+# Refused before W2-58, allowed under Policy 2: what feeds the program is a read of a protected file or a copy
 # --------------------------------------------------------------------------
 
 # label -> (site of the file, the command; ``{abs}`` the file, ``{rel}`` its project-relative path).
@@ -232,18 +249,19 @@ FEEDS_A_FILE = {
 
 @pytest.mark.parametrize("name", rnd.FILES)
 @pytest.mark.parametrize("form", sorted(FEEDS_A_FILE))
-def test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_stays_refused(world, form, name):
-    """Refused as the read it is, and the refusal says nothing of the file (green before and after)."""
+def test_a_pipe_or_a_redirect_that_feeds_a_protected_file_to_the_search_program_is_allowed_under_policy_2(world, form,
+                                                                                                           name):
+    """The read it is (of the file, or of a copy in a sibling checkout) is open; the hook says nothing of the file."""
     site, command = FEEDS_A_FILE[form]
     what = f"{form} (the stand-in {name})"
     result = folders.ask_bash(world, batch.fill(world, site, name, command), WIDEST)
-    rnd.assert_refused_by_the_rule(result, what)
-    batch.assert_says_nothing_of_the_file(result, world, site, name, what)
+    protected.assert_allowed(result, what)
+    _output_carries_nothing(result, world.secrets(site, name), what)
 
 
 @pytest.mark.parametrize("name", rnd.FILES)
-def test_in_a_folder_that_holds_a_protected_file_the_search_program_on_a_pipe_stays_refused(world, name):
-    """As today, no change: the rule of the earlier batches refuses that program there with no path, fed or not."""
+def test_in_a_folder_that_holds_a_protected_file_the_search_program_on_a_pipe_is_allowed_under_policy_2(world, name):
+    """Before Policy 2 the program was refused there with no path, fed or not; now the folder is read as any."""
     result = folders.ask_bash(world, "git log --oneline | rg VALUE", WIDEST, world.site("own").folder(name))
-    rnd.assert_refused_by_the_rule(
+    protected.assert_allowed(
         result, f"the search program as the reader of a pipe in the folder that holds the stand-in {name}")

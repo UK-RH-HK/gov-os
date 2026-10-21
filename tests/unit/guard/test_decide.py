@@ -1914,6 +1914,7 @@ class TestLinkThenWrite:
         project = _make_project(tmp_path, _std_tickets())
         os.makedirs(os.path.join(project, "src"))
         os.makedirs(os.path.join(project, "tests/acceptance/W1-99"))
+        os.makedirs(os.path.join(project, "tests/acceptance/W1-98"))
         return project
 
     @pytest.mark.parametrize("command", [
@@ -1925,6 +1926,9 @@ class TestLinkThenWrite:
         # A relative name of a symbolic link is not resolved: refused.
         "ln -s ../tests/acceptance/W1-99 src/l && touch src/l/t.py",
         "ln -s a.py src/l.py && touch src/b.py",
+        # DEC-820 (c), W2-58: the engineer's own acceptance folder is not
+        # named, a link to it included.
+        "ln -s {p}/tests/acceptance/W1-99 src/l",
     ])
     def test_link_and_write_denied(self, tmp_path, command):
         project = self._project(tmp_path)
@@ -1933,7 +1937,7 @@ class TestLinkThenWrite:
     @pytest.mark.parametrize("command", [
         "ln -s {p}/src/a.py src/l.py",
         "ln src/a.py src/l.py",
-        "ln -s {p}/tests/acceptance/W1-99 src/l",
+        "ln -s {p}/tests/acceptance/W1-98 src/l",  # another ticket's tests
         "ln -s {p}/src/a.py src/l.py && echo x > src/l.py",
         "ln src/a.py src/l.py && touch src/b.py",
     ])

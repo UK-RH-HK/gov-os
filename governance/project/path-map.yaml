@@ -427,3 +427,13 @@ load_sensitive:
     decision: DEC-871
     reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
     fixed_by: W2-57
+# The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
+# in `tickets`) is refused reads of the hidden part by the guard (no sandbox Read rule, DEC-873), and reads the visible part.
+# memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under
+# fixtures/, a product-memory namespace the indexer never reads. W2-61 narrows `measures` to tickets.
+evaluation_sets:
+  memory-retrieval:
+    visible: ["docs/assessment/2026-10/B-memory-retrieval.md"]
+    hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
+    measures:
+      roles: [engineer, research]

@@ -1,5 +1,12 @@
 """W1-02 — a search after a shell keyword is judged as the search it is (DEC-570).
 
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): the
+search is still judged as the search it is, and under Policy 2 (DEC-820) that
+search, from the root, from a copy's folder or in a folder that holds a
+protected file, is allowed; so is a read of either file found after a keyword.
+For every role, the engineer's content search from the root stays refused, now
+for (c): the root holds its ticket's acceptance folder (DEC-821 item 1).
+
 DEC-570: "A search after a shell keyword (``do``, ``then``, ``else``, ``if``,
 ``while``, ``until``, and a ``!`` in front) is judged as the search it is."
 ``elif`` is held with them.
@@ -42,8 +49,19 @@ def world(hook, tmp_path_factory):
     return fix.make_world(tmp_path_factory.mktemp("shell-keywords"))
 
 
+def assert_policy_2(result, command, who, start, what):
+    """W2-58 (DEC-821 item 3, DEC-857 item 3): allowed; but an engineer's content search from the root takes in its
+    ticket's acceptance folder (``tests/acceptance/W1-90/``) and is refused for (c) (DEC-821 item 1). A listing
+    from above (``ls``, ``find``) is not aimed inside that folder and stays allowed."""
+    listing = any(f" {word} " in f" {command} " for word in ("ls", "find"))
+    if who == folders.NOT_A_WRITER and start == ROOT and not listing:
+        assert result.decision == "deny", f"{what} was not refused (Policy 2 (c)): {result.describe()}"
+    else:
+        fix.assert_allowed(result, what)
+
+
 # --------------------------------------------------------------------------
-# Refused: a search of the folder after a keyword
+# Refused before W2-58, allowed under Policy 2: a search of the folder after a keyword
 # --------------------------------------------------------------------------
 
 AFTER_A_KEYWORD = {
@@ -61,10 +79,10 @@ AFTER_A_KEYWORD = {
 
 
 @pytest.mark.parametrize("form", sorted(AFTER_A_KEYWORD))
-def test_a_search_of_the_root_after_a_shell_keyword_is_refused(world, form):
-    """Point 2: the keyword is not the command. Red before the change: allowed."""
+def test_a_search_of_the_root_after_a_shell_keyword_is_allowed_under_policy_2(world, form):
+    """Point 2: the keyword is not the command; the search is judged as the search it is, which Policy 2 opens."""
     result = fix.ask_command(world, AFTER_A_KEYWORD[form])
-    fix.assert_refused_command(result, world, AFTER_A_KEYWORD[form], ROOT, f"a search as {form}, at the root")
+    fix.assert_allowed(result, f"a search as {form}, at the root")
 
 
 AT_A_COPY = ("the-body-of-a-loop-over-words-the-other-program", "the-condition-of-an-if-the-other-program",
@@ -77,11 +95,10 @@ COPY_CASES = [(AT_A_COPY[(2 * row + step) % len(AT_A_COPY)], site)
 
 
 @pytest.mark.parametrize("form,site", COPY_CASES, ids=fix.ids(COPY_CASES))
-def test_a_search_after_a_shell_keyword_is_refused_from_a_copy_s_folder(world, form, site):
-    """Point 2 from ``<P>``: a sibling checkout, a folder below the root, the stand-in home."""
+def test_a_search_after_a_shell_keyword_is_allowed_from_a_copy_s_folder(world, form, site):
+    """Point 2 from ``<P>``: a sibling checkout, a folder below the root, the stand-in home; open under Policy 2."""
     result = fix.ask_command(world, AFTER_A_KEYWORD[form], site)
-    fix.assert_refused_command(result, world, AFTER_A_KEYWORD[form], site,
-                               f"a search as {form}, in a session that stands in the site '{site}'")
+    fix.assert_allowed(result, f"a search as {form}, in a session that stands in the site '{site}'")
 
 
 IN_A_HOLDING_FOLDER = ("the-condition-of-an-if-the-other-program", "the-body-of-a-loop-over-words-the-other-program",
@@ -90,25 +107,24 @@ IN_A_HOLDING_FOLDER = ("the-condition-of-an-if-the-other-program", "the-body-of-
 
 @pytest.mark.parametrize("start", sorted(fix.HOLDING))
 @pytest.mark.parametrize("form", IN_A_HOLDING_FOLDER)
-def test_a_search_after_a_shell_keyword_is_refused_in_a_folder_that_holds_a_protected_file(world, form, start):
-    """The rule from before the round refuses the search with no path there; the keyword gets it through today."""
+def test_a_search_after_a_shell_keyword_is_allowed_in_a_folder_that_holds_a_protected_file(world, form, start):
+    """Before Policy 2 the search with no path was refused there; now the folder is read as any folder."""
     result = fix.ask_command(world, AFTER_A_KEYWORD[form], start)
-    fix.assert_refused_command(result, world, AFTER_A_KEYWORD[form], start, f"a search as {form}, in {start}")
+    fix.assert_allowed(result, f"a search as {form}, in {start}")
 
 
 BY_ROLE = fix.share(AFTER_A_KEYWORD)
 
 
 @pytest.mark.parametrize("who,form", BY_ROLE, ids=fix.ids(BY_ROLE))
-def test_a_search_after_a_shell_keyword_is_refused_for_every_role(world, who, form):
+def test_a_search_after_a_shell_keyword_is_decided_by_policy_2_for_every_role(world, who, form):
     """An engineer, the test designer and a session with no role (the orchestrator asks every form above)."""
     result = fix.ask_command(world, AFTER_A_KEYWORD[form], ROOT, who)
-    fix.assert_refused_command(result, world, AFTER_A_KEYWORD[form], ROOT,
-                               f"a search as {form}, at the root, by '{who}'")
+    assert_policy_2(result, AFTER_A_KEYWORD[form], who, ROOT, f"a search as {form}, at the root, by '{who}'")
 
 
 # --------------------------------------------------------------------------
-# Refused before and after: a read of a protected file after a keyword
+# Refused before W2-58, allowed under Policy 2: a read of a protected file (or a copy) after a keyword
 # --------------------------------------------------------------------------
 
 # ``{rel}`` the file's project-relative path, ``{abs}`` the file or the copy (``w1_02_copies_support.fill``).
@@ -122,12 +138,13 @@ READS = {
 
 @pytest.mark.parametrize("name", fix.FILES)
 @pytest.mark.parametrize("form", sorted(READS))
-def test_a_read_of_a_protected_file_after_a_shell_keyword_stays_refused(world, form, name):
-    """Measured: the guard refuses these today (it reads every word of a command). Held, green before and after."""
+def test_a_read_of_a_protected_file_after_a_shell_keyword_is_allowed_under_policy_2(world, form, name):
+    """The guard reads every word of a command; the read it finds (of the file, or of a copy in a sibling checkout)
+    is open under Policy 2."""
     site, command = READS[form]
     what = f"a read of the stand-in {name} as {form}"
     result = folders.ask_bash(world, batch.fill(world, site, name, command), fix.WIDEST)
-    fix.assert_refused(result, world, ROOT if site == "own" else site, what)
+    fix.assert_allowed(result, what)
 
 
 # --------------------------------------------------------------------------
