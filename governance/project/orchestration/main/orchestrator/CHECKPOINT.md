@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 19:2x BST — queue run 5 (six); review point before W2-66/67/68 (DEC-889); next free DEC-891)
+## RESUME HERE (2026-10-22 00:2x BST — W2-02, W2-54 closed; W2-63 refused (P-W2-63-C1); closes held; tool trials running; next free DEC-892)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,6 +83,14 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **10-22 00:2x: W2-63's close REFUSED** (count 1; repair `log/repair-tickets/DAEO-nkk9.md`): NO_ACCEPTANCE_TESTS (a
+  test-revision ticket has no tests/acceptance/W2-63/: NEW, structural), W1-38 TestUnsourcedFile[by-hand] RULESYNC
+  (seen class DEC-871, new id; passes alone), W1-46 crates.io (network, passes alone now). Package
+  `packages/P-W2-63-C1.md`: rec (1)(a) a LITE test round writing tests/acceptance/W2-63/ + (1)(b) a W2-66 KPI; (2)(a)
+  the W1-38 entry as the owner's commit (patch `drafts/W1-38-unsourced-entry.patch`, DEC-892 register entry first);
+  (3)(a) a row. **DEC-891 COMMITTED `4166d8d9`** (accepted history 162f17ea + the rule). W2-02/W2-54 worktrees and
+  branches removed. **Closes of W2-50, W2-58, W2-62 HELD** for the owner's answer (the W1-38 flake would refuse them).
+  **tooltrials.sh RUNNING since 00:2x** (lens H rest first). Then lens I.
 - **23:0x: owner answered P-W2-62-H (a) + a STANDING RULE (DEC-891, drafted `drafts/register-278-DEC-891.md`, apply
   list `drafts/DEC-891-apply.md`, commit when queue run 6 ends):** accepted-history entries for record/ticket-only
   commits: I record from the owner's chat decision (list the commit's paths); entries for code/test/kernel commits:
