@@ -83,7 +83,7 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Allowed paths:** `src/gov/close/**` (except `src/gov/close/cache*`, W2-48's), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
+- **Allowed paths:** `src/gov/close/**` (except W2-66's and W2-68's new modules, `select.py`, `nightly.py`, `batch.py` and `fingerprint.py`; W2-48's `cache*` was withdrawn, DEC-880), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
 - **KPIs, success:**
   - `gov close` judges a ticket by its class [W2-H045]:
     - an implementation ticket on its acceptance tests;

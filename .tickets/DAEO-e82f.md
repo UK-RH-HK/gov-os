@@ -19,11 +19,13 @@ allowed_paths:
 - .rulesync/hooks.jsonc
 - template/.rulesync/hooks.jsonc
 - tests/unit/hooks/**
+- template/governance/kernel/hooks/subagentstop.py
 kpis:
   success:
   - 'The preToolUse line and the containment line in .rulesync/hooks.jsonc end with exit 2 whenever their program ends with any exit other than 0 or 2 (a syntax error, an import error, a missing file, a crash), with a message on stderr naming the program; exit 0 and exit 2 and a deny decision pass through unchanged [DEC-880 item 3, P-W2-59-8 (b)]'
   - 'The template''s hook source (template/.rulesync/hooks.jsonc), which adopted projects receive, does the same for its two lines [DEC-880 item 3]'
   - 'One acceptance case per line: a guard program that cannot run blocks the tool call it was asked about [DEC-880 item 3]'
+  - 'The SubagentStop hook gives its block reason as Claude Code reads it (on standard error, or as a block decision with its reason), so a helper whose final message lacks the twelve fields learns what is missing; one acceptance case [DEC-889 item 8, P-H-7]'
   failure:
   - A preToolUse or containment program that exits 1, or cannot start, lets the call through; a line that turns exit 0 into a refusal.
 profile: LITE
@@ -32,6 +34,7 @@ sources:
 - DEC-822
 - DEC-835
 - DEC-884
+- DEC-889
 est_loc: 30
 acceptance_tests:
   path: tests/acceptance/W2-65/
@@ -52,5 +55,6 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-65), from DEC-880 item 3 (owner, 2026-10
   - The preToolUse and containment lines end with exit 2 whenever their program ends with anything other than 0 or 2, with a message naming the program; 0, 2 and a deny decision pass through unchanged.
   - The template's hook source does the same.
   - One acceptance case per line: a program that cannot run blocks the call.
+  - **P-H-7 rides along (DEC-889 item 8):** the SubagentStop hook gives its block reason as Claude Code reads it (on standard error, or as `{"decision": "block", "reason": …}`), so a helper whose final message lacks the twelve fields learns what is missing; one acceptance case.
 - **KPIs, failure:** a program that exits 1 or cannot start lets the call through; a line that turns exit 0 into a refusal.
 - **Consequence to know:** a session whose guard program is broken then cannot use any tool, Edit included, so the file is fixed from another session (the orchestrator's, or the owner's terminal). No work is lost.

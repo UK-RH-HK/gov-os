@@ -27,7 +27,7 @@ allowed_paths:
 kpis:
   success:
   - An R0 change runs only the LITE checks, and an R3 change raises the FULL gate and readiness rows, with the profile computed by gov impact [CAP-53.b].
-  - A close runs the tests gov impact names, on top of W2-48's cache. The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
+  - A close runs the tests gov impact names, on top of W2-66's path-scoped selection (W2-48's cache was withdrawn, DEC-880). The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
   failure:
   - A change whose impact misses a test that would fail is caught by the milestone run and recorded as a learning event.
 profile: FULL
@@ -54,5 +54,5 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-38), as approved (DEC-729). The list row
 - **Allowed paths:** `src/gov/impact/profile*`, `src/gov/close/select*`, `tests/unit/impact/**`, `tests/unit/close/test_select*`.
 - **KPIs:**
   - An R0 change runs only the LITE checks, and an R3 change raises the FULL gate and readiness rows, with the profile computed by `gov impact` [CAP-53.b].
-  - A close runs the tests `gov impact` names, on top of W2-48's cache. The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
+  - A close runs the tests `gov impact` names, on top of W2-66's path-scoped selection (W2-48's cache was withdrawn, DEC-880). The full suite runs at milestones and in CI [W2-H043, W2-M240, W2-M241, W2-M163].
 - **Failure:** a change whose impact misses a test that would fail is caught by the milestone run and recorded as a learning event.

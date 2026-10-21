@@ -199,7 +199,7 @@ W2-32 and W2-15b are on the real repository's path, not the copy's. So they trai
     - W2-37: DEC-812 plus the code graph (keystone 4);
   - W2-26: re-scoped (DEC-827), then closed after W2-07.
 - **W2-57 (FULL; DEC-813, DEC-823):** load out of the close. One ordinary-work row rides in it: lens A's ancestry case of the commit range (W2-H023), if its test designer finds it reachable in ordinary work.
-- **W2-48 (FULL), glued (lens G R6, F6). WITHDRAWN by DEC-880 (owner, 2026-10-21):** testmon cannot see this repository's `gov` subprocesses (11.5 % reused, 3 % saved); a lite W2-38 comes back as W2-66, path-scoped regression at close, with the nightly full run as backstop. The text below is the history:
+- **W2-48 (FULL), glued (lens G R6, F6). WITHDRAWN by DEC-880 (owner, 2026-10-21):** per-test tracking made almost every test "always run" here, mostly through folder listings (7,076 tests) and reads of undeclared files (3,750), with dot-files (125) and only about 500 child processes the cache could not follow (lens H, finding 12; DEC-889) (11.5 % reused, 3 % saved); a lite W2-38 comes back as W2-66, path-scoped regression at close, with the nightly full run as backstop. The text below is the history:
   - pytest-testmon and coverage, one DEC-083 install package (Q-13), raised when W2-48 starts;
   - `--testmon-env` set to a hash of the declared data globs and the test command;
   - deselected tests recorded as "reused", with the run they came from;
