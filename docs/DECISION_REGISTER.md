@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.268 (the version table at the end of each section gives the history)
+**Version:** 0.269 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9691,3 +9691,26 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.268 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-880 (W2-58's one narrow extra round; W2-48's cache withdrawn, a lite W2-38 as W2-66, path-scoped regression at close with four conditions and a 15-minute target; W2-65; credentials out of the trees; DEC-843, DEC-869, DEC-875, DEC-876 superseded, DEC-852 items 1 and 2 superseded, DEC-413, DEC-726, DEC-841, DEC-847 changed). Next free id: DEC-881. |
+
+## 269. The owner's order of 2026-10-21: lens H, the test strategy (register v0.269, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-881 — A further independent lens, H (test strategy: audit, research, design), with one install exception; W2-66's test designer waits for its report
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-820, DEC-880, DEC-839, DEC-855, DEC-861 · **Basis:** the owner's order of 2026-10-21, after DEC-880 withdrew W2-48's cache.
+- **Decision:**
+  1. **Lens H, now:** one more fresh independent auditor (Opus 5.5, `--effort max`), with the same rules as the other lenses. Its reads are open except Policy 2's four refusals; it changes nothing in the repository and writes only its report, `docs/assessment/2026-10/H-test-strategy.md`, which the orchestrator copies from its scratch path.
+     - It has three parts: AUDIT what the Gov OS does today (A1 to A6), RESEARCH industry practice and free tools to glue (B1, B2), and DESIGN the target, for the Gov OS and for adopted repositories (C1 to C6).
+     - The reference is the layered model: L1 immediate (seconds), L2 affected components (minutes), L3 merge (5 to 30 minutes), L4 nightly full run, L5 release qualification.
+     - It ends with owner packages in the six parts. The brief is `.gov-runtime/scratch/orchestrator/briefs/assessment-H.md`.
+  2. **The owner's exception, for lens H only:** it may install candidate tools for a trial in a throwaway virtual environment under `/tmp/gov-os-assessment-H/`, never the user site, never the pin's environment, never the repository. The tools come from official package indexes, with each tool's version and hash recorded. It removes that environment when done. Its trials run on its own clone under `/tmp`.
+  3. **The leads and the close queue keep running** beside it. Lens H checks the resource gate and the close lock before every heavy run.
+  4. **W2-66** (`DAEO-c1uz`, path-scoped regression at close) may be created; it was, under DEC-880. **Its test designer starts only after lens H reports,** so that its card can take lens H's findings. The orchestrator brings lens H's findings into W2-66's card and ticket file, under a recorded decision, before that start.
+  5. **When lens H finishes,** the orchestrator:
+     - copies the report;
+     - confirms that the `/tmp` environment is removed;
+     - gives the owner its path, a one-paragraph summary of each part (A, B, C), and its owner packages.
+- **Where it goes (DEC-851):** this register; W2-66's card in `docs/plan/WAVE_2_WBS.md` and its ticket file; the prompt §3 order line (v3.8); RESUME HERE. It does not reach the lead or auditor briefs: it is one lens, not a standing rule.
+- Next free id: DEC-882.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.269 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-881 (lens H, the test strategy, with an install exception in a throwaway virtual environment under `/tmp/gov-os-assessment-H/`; W2-66's test designer starts only after lens H reports). Next free id: DEC-882. |
