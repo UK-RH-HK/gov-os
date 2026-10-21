@@ -885,6 +885,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 #### W2-57 Load out of the close: W1-46's live cases and W1-30's time-limit case hold under load (FULL, independent-test-designer then engineer; DEC-813, DEC-823, W2-M364, W2-M384)
 - **Why:** W1-46's 23 live-session cases fail at setup under the full regression's parallel load (a launched session runs a step without its `cd`, so its probe script is not found) and pass alone; their 23 `load_sensitive` entries hide that. W1-46 proves the launcher and the sandbox, so it must be solid before EXAMIN (DEC-813). W1-30's r13 time-limit case failed once in W2-53's re-close at load about 25 and passes alone (DEC-823): either its timing is load-sensitive, or the close leaves a process alive under load. A single timing case must not hold the close queue again (DEC-823 (b)).
 - **Starts** in the first free slot after the closes now queued (DEC-806, as the revised plan orders them); **closes** before W2-24 starts. Tests first: the independent test designer on the fixtures and the close's behaviour under load; then a fresh engineer on `gov close`; then a reviewer. The close change is judged by the pinned close (DEC-822).
+- **DEC-883 item 5 (owner, 2026-10-21):** find out why each of the 263 serial-only tests (29 minutes of every close) must run alone, and run in parallel every one that safely can, with lens H's findings; each case kept serial names its reason.
 - **Allowed paths:** `tests/acceptance/W1-46/**` and `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py` (the test designer: the fixtures and READMEs; no expectation lowered, every change with a `Rewrite-Reason:`); `tests/acceptance/W2-57/**` (the test designer); `src/gov/close/**` (the engineer: the close's own resource gate, or its isolated suite for the timing-sensitive cases, only), `tests/unit/close/**`, `docs/changes/W2-57-CIT-E.md`.
 - **KPIs, success:**
   - W1-46's 36 live cases pass inside the full regression run under its usual parallel load, three runs in a row, each with the load recorded [DEC-813, W2-M364].
@@ -921,6 +922,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - `gov --version` names the version and the commit.
 - **KPIs, failure:** a check edited in the tree does not change the verdict of the pinned judge; a wheel without the data file fails the build or its test; a module that still reads the repository from its install path fails a test.
 - **After it merges,** the owner re-pins at its merge commit, which must also hold W2-50's secrets fix (DEC-853 item 4).
+- **Held unmerged (DEC-884, owner, 2026-10-21):** it merges together with W2-65 just before the one combined re-pin, after W2-66 is merged and trialled; first it merges `w2/integrate` back, with trailers, and is re-verified. Merged earlier, it would make the hooks call today's pin, which predates W2-58, and bring the old read refusals back; an earlier merge needs a package to the owner first. The owner re-pins once, at the combined merge commit (W2-58, W2-59, W2-65, W2-66).
 
 #### W2-61 The standing 20-question measure, split under Policy 2 (d) (STANDARD; the questions by an independent auditor session, the script by an engineer; DEC-828, DEC-833, DEC-860; keystone 4)
 - **Why:** the accepted plan's §4.4, order 6 (DEC-828 item 4): lens B's 20 questions become the standing measure at each release and on EXAMIN's copy. Ticket file at its start (DEC-825 item 7).
@@ -944,25 +946,54 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 
 #### W2-65 The guard's hook lines refuse a call when the guard program cannot run (LITE, engineer; DEC-880 item 3; keystone 1)
 - **Why:** P-W2-59-8 (W2-59's second review, R2-D1): Claude Code blocks a PreToolUse call only on exit 2 or a deny decision, and the hook lines pass their program's exit code on, so a guard program that cannot run (a half-finished edit) exits 1 and the call goes through. Ordinary work, fails open; it predates W2-59. Ticket `DAEO-e82f`.
-- **Starts** after W2-59 merges (both change `.rulesync/hooks.jsonc`); it lands before the owner's settings regeneration after the re-pin, so one act installs both.
+- **Starts (DEC-884):** built stacked on `w2/W2-59` (both change `.rulesync/hooks.jsonc`; DEC-786), in a slot W2-66 does not need; it merges together with W2-59 just before the one combined re-pin, and the owner's settings regeneration follows the re-pin.
 - **Allowed paths:** `.rulesync/hooks.jsonc` and `template/.rulesync/hooks.jsonc` (the preToolUse and containment lines' exit mapping only), `tests/unit/hooks/**`.
 - **KPIs, success:** the preToolUse and containment lines end with exit 2 whenever their program ends with anything but 0 or 2, naming the program; 0, 2 and a deny decision pass through; the template's hook source does the same; one acceptance case per line.
 - **KPIs, failure:** a program that exits 1 or cannot start lets the call through; a line that turns exit 0 into a refusal.
 
-#### W2-66 Path-scoped regression at close: the lite W2-38 (FULL, engineer; DEC-880 item 2, DEC-726, DEC-852 item 3; keystone 2)
-- **Why:** W2-48's cache saved 3 % (testmon cannot see this repository's `gov` subprocesses) and was withdrawn (DEC-880). A close runs what the change can affect; the full regression stays as the backstop. Ticket `DAEO-c1uz`; it takes in W2-H044 and W2-M153.
-- **Place:** keystone 2, in the slot DEC-869 gave W2-48: the next free slot after W2-58's merge, ahead of every other keystone-2 start. It shares `src/gov/close/command.py` with W2-07 and W2-57, which run after it.
-- **Entry (DEC-881, owner, 2026-10-21):** its test designer starts only after lens H (`docs/assessment/2026-10/H-test-strategy.md`, the test strategy) reports; lens H's findings come into this card and the ticket file under a recorded decision first.
-- **Allowed paths:** `src/gov/close/select.py` (new), `src/gov/close/nightly.py` (new), `src/gov/close/command.py` (the call into the selection, `--full` and the record's lines only), `governance/project/path-map.yaml` (a shared-core list only, reviewed by the orchestrator), `template/governance/kernel/schemas/path-map.schema.json` (the same key), `tests/unit/close/test_select*`, `tests/unit/close/test_nightly*`, `docs/research/W2-66-scoped-close.md`.
+#### W2-66 Path-scoped regression and batched closes at close: the lite W2-38 (FULL, engineer; DEC-880 item 2, DEC-883, DEC-884, DEC-726, DEC-852 item 3; keystone 2)
+- **Why:** W2-48's cache saved 3 %, because testmon cannot see this repository's `gov` subprocesses, and it was withdrawn (DEC-880). The queue of 2026-10-21 showed six closes running the same code six times, at about 85 minutes each (DEC-883). A close runs what the change can affect, a batch of queued closes shares one regression, and the full regression stays as the backstop. Ticket `DAEO-c1uz`; it takes in W2-H044 and W2-M153.
+- **Place (DEC-884):** the first slot, ahead of every other ticket, once lens H's findings are in this card (DEC-881: its test designer starts only after lens H reports; lens H refines DEC-883's details). It shares `src/gov/close/command.py` with W2-07 and W2-57, which run after it.
+- **Allowed paths:**
+  - new: `src/gov/close/select.py`, `src/gov/close/nightly.py`, `src/gov/close/batch.py`, `src/gov/close/fingerprint.py`;
+  - `src/gov/close/command.py`: the calls into these, `--full` and the record's lines only;
+  - `src/gov/close/repo.py`: the store-freshness check only;
+  - `src/gov/store/**`: the fingerprint a rebuild records and the incremental record load only;
+  - `governance/project/path-map.yaml` and `template/governance/kernel/schemas/path-map.schema.json`: the shared-core and record-only lists only, reviewed by the orchestrator;
+  - `tests/unit/close/test_select*`, `test_nightly*`, `test_batch*`, `test_fingerprint*`, `tests/unit/store/test_fingerprint*`, `docs/research/W2-66-scoped-close.md`.
 - **KPIs, success:**
-  - A close runs the ticket's own suite, `tests/unit`, and the suites of every ticket whose `allowed_paths` overlap the change; the record names each suite and why.
-  - The owner's four conditions (DEC-880 item 2):
-    - (a) any change under the shared core (`src/gov/close`, `src/gov/guard`, `src/gov/check`, `src/gov/records`, the retrieval core, the kernel hooks, the path map) runs the full suite, and so does a file the mapping cannot place or a missing map;
+  - **Path scope (DEC-880):** a close runs the ticket's own suite, `tests/unit`, and the suites of every ticket whose `allowed_paths` overlap the change; the record names each suite and why.
+  - **The owner's four conditions (DEC-880 item 2):**
+    - (a) any change under the shared core (`src/gov/close`, `src/gov/guard`, `src/gov/check`, `src/gov/records`, the retrieval core, the kernel hooks, the path map) runs the full suite, and so does a file the mapping cannot place, or a missing map;
     - (b) the lead's full verification before every return stays as it is;
     - (c) the nightly full uncached run stays; a failure there that a scoped close missed is a P1 package, with the path-to-suite map corrected in it;
     - (d) W2-24's and W2-46's full uncached runs stay (`gov close --full`).
-  - Target, measured: a typical close under about 15 minutes, against the full regression on the same head.
-- **KPIs, failure:** anything less than the full regression for the shared core, an unplaced file or a missing map; a scoped record that says "full"; a failure left unreported.
+  - **Batched closes (DEC-883 item 1):**
+    - queued closes on one integrated head share one rebuild, one `gov check` and one full regression on that head;
+    - then each ticket's own checks run, one after another: its acceptance suite, the tests that read records, its trailers, paths, probe record and checkpoint;
+    - no code merges while a batch runs;
+    - each close record cites the batch's run (fingerprint, commit) and states its validation scope.
+  - **A red batch (item 2):**
+    - nothing in it closes on that run;
+    - the cause is found by `git bisect` over the batch's merges, or by the failing tests' own ticket, with the evidence;
+    - the causing ticket is repaired and the batch re-runs; an unrelated ticket waits for a green run; a close never cites a red regression;
+    - an outside cause is fixed by the orchestrator and recorded.
+  - **Same code (item 3):** a close whose code fingerprint (record-only paths left out, such as `docs/checkpoints/` and `governance/project/orchestration/`) equals the last fully passing run's reuses it, and runs only its own checks. A failing run is never reused; any code difference runs fresh.
+  - **The index (item 4):** a store built on the same code fingerprint is fresh; the record-only commits' records load incrementally.
+  - **Target, measured:** a typical close under about 15 minutes; a batch in about one regression's time plus a few minutes per ticket, against today's queue (six closes, about 8.5 hours).
+- **The ladder before the re-pin (DEC-884 item 4):**
+  - its FULL review;
+  - then a trial of the batched close on a dev-tier programme or a fixture repository, measured: the time per batch; reuse correct; a planted code change forcing a fresh run; a red batch attributed, nothing closing on it;
+  - then the owner's one combined re-pin (W2-58, W2-59, W2-65, W2-66), as an ACT ping.
+- **KPIs, failure:**
+  - anything less than the full regression for the shared core, an unplaced file or a missing map;
+  - a scoped record that says "full";
+  - a failure left unreported;
+  - a close citing a red run, or another fingerprint's run;
+  - a reused run on different code;
+  - a store accepted on another code fingerprint;
+  - a record-only list that hides a code path;
+  - a code merge during a batch.
 
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.

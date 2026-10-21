@@ -83,12 +83,32 @@ def ignored(paths):
     return {Path(p) for p in done.stdout.splitlines()}
 
 
+def namespaced():
+    """A test of whether a path lies in a namespace of the path map: a copy in none fails W1-08's case, and so
+    every close (W2-02's refused close of 2026-10-21: a new scratch folder, `packages-pending/`)."""
+    import yaml
+    namespaces = yaml.safe_load((ROOT / "governance/project/path-map.yaml").read_text())["namespaces"]
+    patterns = [p for entry in namespaces.values() for p in entry.get("paths", [])]
+
+    def matches(rel: str, pattern: str) -> bool:  # `*` inside one folder, `**` across folders (the path map's language)
+        parts = [re.escape(part).replace(r"\*", "[^/]*") for part in pattern.split("**")]
+        return re.fullmatch(".*".join(parts), rel) is not None
+
+    return lambda rel: any(matches(rel, p) for p in patterns)
+
+
 def main():
     check = "--check" in sys.argv[1:]
     pairs = [(s, d) for s, d in plan() if not d.exists() or d.read_bytes() != s.read_bytes()]
     skip = ignored([d.relative_to(ROOT) for _, d in pairs])
     pairs = [(s, d) for s, d in pairs if d.relative_to(ROOT) not in skip]
-    print(f"{len(pairs)} file(s) new or changed; {len(skip)} left out because git ignores them")
+    in_namespace = namespaced()
+    outside = [d for _, d in pairs if not in_namespace(d.relative_to(ROOT).as_posix())]
+    pairs = [(s, d) for s, d in pairs if d not in outside]
+    for d in outside:
+        print("left out, in no namespace of the path map:", d.relative_to(ROOT), file=sys.stderr)
+    print(f"{len(pairs)} file(s) new or changed; {len(skip)} left out because git ignores them; "
+          f"{len(outside)} left out because no namespace holds them")
     if check:
         for s, d in pairs:
             print("  ", d.relative_to(ROOT))

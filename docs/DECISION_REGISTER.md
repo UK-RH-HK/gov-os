@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.270 (the version table at the end of each section gives the history)
+**Version:** 0.273 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9643,7 +9643,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 267. The orchestrator's sequencing of 2026-10-20 after W2-59's last run (register v0.267, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-879 — W2-59 merges after the queued closes, so one re-pin holds every check they need; its old branch deleted; its review's rows; P-W2-59-8 to the owner (delegated)
-- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** DEC-822, DEC-835, DEC-853 item 4, DEC-412, DEC-877, DEC-413, DEC-801 · **Basis:** W2-59's lead returned DONE (run 3, `log/W2-59-A5-run3.json`): head `1cad6aa0`, the second and last review passed at `fef0fcd5` (`docs/probes/DAEO-kh9l/PR-DAEO-kh9l.md`). The CIT-P's §5: once W2-59 merges, the pin is the judge, and "a fix to a check reaches the judge only with the next re-pin".
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-20; listed in the digest; the owner overturns it at will) · **Under:** DEC-822, DEC-835, DEC-853 item 4, DEC-412, DEC-877, DEC-413, DEC-801 · **Basis:** W2-59's lead returned DONE (run 3, `log/W2-59-A5-run3.json`): head `1cad6aa0`, the second and last review passed at `fef0fcd5` (`docs/probes/DAEO-kh9l/PR-DAEO-kh9l.md`). The CIT-P's §5: once W2-59 merges, the pin is the judge, and "a fix to a check reaches the judge only with the next re-pin". · **Changed by:** DEC-883 item 1 (c) makes "no code merges while a batch runs" the batch rule of W2-66; DEC-884: W2-59 merges together with W2-65 just before the combined re-pin, not after the queue
 - **Decision:**
   1. **W2-59 merges after the queued closes** (W2-02, W2-54, W2-62, W2-63, W2-50), not at once. Merged now, the old pin (`fecb870c`) would judge those closes: it lacks W2-50's secrets fix, W2-54's `audit-report` type and W2-02's `close` type, so each close would refuse until a re-pin, and W2-02's type would need a second re-pin. After the queue, W2-59 merges, and the owner re-pins once at its merge commit, which then holds every fix, and regenerates the settings (an ACT ping then). The lead proposed merging at once; the order differs only in timing, which is the orchestrator's (prompt §3). If the queue stalls, W2-59 merges after W2-02's merge, and the re-pin waits for that.
   2. **`w2/W2-59-old` is deleted** (DEC-412): run 3 verified the remade branch (same trees; the reviewer matched all ten re-applied commits by patch-id, message, author and trailers).
@@ -9658,7 +9658,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 268. The owner's answers of 2026-10-21 on P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (register v0.268, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-880 — W2-58's one narrow extra round; W2-48's cache withdrawn and a lite W2-38 brought back as path-scoped regression (W2-66); W2-65; credentials out of the working trees
-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-413, DEC-857, DEC-873, DEC-852, DEC-869, DEC-876, DEC-841, DEC-105, DEC-866, DEC-820, DEC-861 · **Basis:** the packages P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (`governance/project/orchestration/packages/`), from W2-58's run 2, W2-48's run 2 and W2-59's run 3. · **Changed by:** DEC-882: DEC-843 is superseded in its items 1 and 2 only; its item 3, the install approval, stands while the tools are installed
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-413, DEC-857, DEC-873, DEC-852, DEC-869, DEC-876, DEC-841, DEC-105, DEC-866, DEC-820, DEC-861 · **Basis:** the packages P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (`governance/project/orchestration/packages/`), from W2-58's run 2, W2-48's run 2 and W2-59's run 3. · **Changed by:** DEC-882: DEC-843 is superseded in its items 1 and 2 only; its item 3, the install approval, stands while the tools are installed; DEC-884: the settings regeneration follows the combined re-pin (item 3)
 - **Decision:**
   1. **P-W2-58-4 (a): one narrow extra round for W2-58, an exception to DEC-413 for this ticket only.**
      - The guard expands `~` in every path it judges (Read, Grep, Glob, Edit, Write and Bash), with tests for each tool.
@@ -9738,3 +9738,91 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.270 | 2026-10-21 | Delegated: DEC-882 (DEC-843's item 3 stands, correcting DEC-880's wider mark; suite logs out of the orchestration record; W2-58's review rows W2-M399, W2-L401 to W2-L408). Next free id: DEC-883. |
+
+## 271. The owner's decision of 2026-10-21 for W2-66: batched closes on one head, no repeat regression on the same code (register v0.271, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-883 — Batched closes (a merge queue): one rebuild, one check and one full regression per integrated head; same code, no repeat regression; the index fresh by code fingerprint; the serial-only tests examined
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-880, DEC-881, DEC-879, DEC-726, DEC-780, DEC-868, DEC-866, DEC-861 · **Basis:** the orchestrator's measurement of the close queue of 2026-10-21. A close takes about 85 minutes: a full rebuild of about 6 min, `gov check` of about 7 min, and `gov close` of 72 min, of which the ticket's own suite is 24 s, the parallel regression 31 min and the serial-only tests 29 min. The queue's six closes run the same code six times, because only records are committed between them. The pinned judge has no way to reuse a run, and needs a store built at exactly HEAD. Lens H's findings refine the details when they come (DEC-881).
+- **Decision (for W2-66):**
+  1. **Batched closes, a merge queue.** Queued closes on the same integrated head form one batch:
+     - a. one rebuild, one `gov check` and one full regression for the whole batch, on that head;
+     - b. then each ticket's own checks, one after another: its acceptance suite, the tests that read records, its trailers, paths, probe record and checkpoint;
+     - c. no code merges into `w2/integrate` while a batch runs (as DEC-879 does today); merges wait for the batch to end;
+     - d. each close record cites the batch's run (its fingerprint and commit), and states its validation scope under the evidence rule.
+  2. **When a batch's regression fails:**
+     - a. no ticket in the batch closes on that run;
+     - b. the failure is attributed to its cause, by `git bisect` over the batch's merges or by the failing tests' own ticket, and recorded with the evidence;
+     - c. the ticket that caused it gets its repair; the batch re-runs once that fix is in. A ticket proven unrelated still waits for a green run: a close never cites a red regression;
+     - d. a cause outside every ticket (the environment, load, records) is fixed by the orchestrator and recorded, as today.
+  3. **Same code, no repeat regression.** A close whose code is byte-identical to the last fully passing run reuses that run as its evidence, and runs only its own ticket's checks. Byte-identical means the same tree fingerprint, which leaves out record-only paths such as `docs/checkpoints/` and `governance/project/orchestration/`. A failing run is never reused, and any code difference means a fresh run.
+  4. **The same fingerprint for the index.** The store-freshness check accepts a store built on the same code fingerprint, so a record-only commit doesn't force a full rebuild.
+     - The orchestrator's design note for W2-66 and lens H to settle: the record store indexes records itself, so it still has to hold the record-only commit's records (for example the new checkpoint). That part is an incremental load of the changed records, measured in seconds; the lexical, semantic and code indexes are reused when the code fingerprint matches.
+  5. **The serial-only tests** (263 tests, 29 minutes): find out why each must run alone, and run in parallel every one that safely can. This goes to lens H's findings and W2-57.
+- **Target:** a batch of queued closes in about the time of one regression plus a few minutes per ticket; measured and reported.
+- **Until W2-66 lands, today's queue runs as it is.** Items 3 and 4 change what the judge accepts, so they take effect only after a re-pin that holds W2-66.
+- **Where it goes (DEC-851):**
+  - this register;
+  - W2-66's card in `docs/plan/WAVE_2_WBS.md` and its ticket file `.tickets/DAEO-c1uz.md` (KPIs, paths, estimate);
+  - W2-57's card (item 5);
+  - the prompt §3 (closes) and §15 (closes), v3.9;
+  - RESUME HERE.
+  It does not reach the lead or auditor briefs: leads run no closes, and their full verification stays (DEC-880 item 2 (b)).
+- Next free id: DEC-884.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.271 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-883 (batched closes on one integrated head: one rebuild, one check, one full regression, then each ticket's own checks; a red batch closes nothing and is attributed by bisect; same code reuses the last passing run; the index fresh by code fingerprint; the serial-only tests examined; target about one regression per batch). Next free id: DEC-884. |
+
+## 272. The owner's order of 2026-10-21 after the close queue: W2-66 first, one combined re-pin (register v0.272, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-884 — W2-66 takes the first slot; no re-pin until it is built, reviewed, merged and trialled; W2-59 and W2-65 merge together just before one combined re-pin
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-880, DEC-881, DEC-883, DEC-879, DEC-822, DEC-853 item 4, DEC-786, DEC-861 · **Basis:** the owner's order of 2026-10-21. Today's pin (`fecb870c`) predates W2-58. W2-59 makes the hooks and the declared checks call the pinned judge, so merged before a re-pin it would bring the old read refusals back.
+- **Decision:**
+  1. **W2-66 comes first.** After lens H reports and its findings go into W2-66's card (DEC-881), W2-66 takes the first slot, ahead of every other ticket.
+  2. **No re-pin and no install of judge updates until W2-66 is built, reviewed and merged.** Then one combined re-pin carries:
+     - W2-58: reads open;
+     - W2-59: checks and hooks on the pin;
+     - W2-65: the guard fails safe;
+     - W2-66: batched closes, same-code reuse, the index fingerprint.
+     The owner re-pins once, not twice.
+  3. **W2-59 and W2-65 stay unmerged until that point, and merge together just before the re-pin.**
+     - If a reason forces W2-59 or W2-65 to merge earlier, the orchestrator brings the owner a package first.
+     - W2-65 shares `.rulesync/hooks.jsonc` with W2-59, so it is built stacked on `w2/W2-59` (DEC-786).
+     - Each of the two branches merges `w2/integrate` back in, with its trailers, before the joint merge, and is re-verified there.
+  4. **The ladder before the re-pin.** W2-66 has its FULL review, then a trial of the batched close on a dev-tier programme or a fixture repository, measured:
+     - the time per batch;
+     - reuse correct;
+     - a planted code change forcing a fresh run;
+     - a red batch attributed, with nothing closing on it.
+     Then the orchestrator gives the owner the re-pin commands as an ACT ping. The settings regeneration from `.rulesync/hooks.jsonc` follows the re-pin, in the same ping.
+  5. **Meanwhile,** the slots W2-66 doesn't need run the held tickets' resumes by keystone, as the machine and the close queue allow.
+- **Changes:** DEC-879 item 1 (W2-59 merges after the queued closes, then the re-pin): W2-59 now merges together with W2-65 just before the combined re-pin. DEC-880 item 3 (W2-65 lands before the settings regeneration after W2-59's re-pin): the regeneration follows the combined re-pin. DEC-853 item 4 (the re-pin at a commit holding W2-50's fix): still holds, since the combined re-pin's commit holds it.
+- **Where it goes (DEC-851):**
+  - this register;
+  - the prompt §3 (order) and §15, v3.9, with DEC-883;
+  - RESUME HERE;
+  - the cards and ticket files of W2-66 (first slot, the ladder), W2-59 (held, merges with W2-65 before the re-pin) and W2-65 (stacked on `w2/W2-59`, merges with it).
+  It does not reach the lead or auditor briefs.
+- Next free id: DEC-885.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.272 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-884 (W2-66 first after lens H; no re-pin until W2-66 is built, reviewed, merged and trialled on a dev tier or fixture; W2-59 and W2-65, stacked, merge together just before one combined re-pin of W2-58, W2-59, W2-65 and W2-66; the held tickets' resumes meanwhile; DEC-879 item 1 and DEC-880 item 3 changed). Next free id: DEC-885. |
+
+## 273. A delegated decision of 2026-10-21 on W2-02's refused close (register v0.273, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-885 — W2-02's close refused on two reds: a copy in no namespace (mine) and W1-07's `doctor` envelope case under load; the sync keeps to the path map's namespaces (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-21; listed in the digest; the owner overturns it at will) · **Under:** DEC-819, DEC-868, DEC-882, DEC-757 · **Basis:** the close queue of 2026-10-21 (`log/close-queue-20261021-1401/`). `gov close DAEO-zflj` exited 3 at 15:36, CHECK_FAILED, after its full run (regression 15,411 passed and 4 failed; serial 263 passed). Repair ticket DAEO-ke7i, moved to `log/repair-tickets/`. W2-02's count is now 1. Two reds are not on `accepted_reds`:
+  - `tests/acceptance/W1-08/test_w1_08_path_map.py::test_every_tracked_path_matches_exactly_one_namespace`: two tracked paths in no namespace, `governance/project/orchestration/main/orchestrator/packages-pending/P-W2-48-8.md` and `…/P-W2-58-4.md`. My sync copied a new scratch folder of mine into the record (`21302ae9`). Both files are byte-identical to the committed packages under `packages/`.
+  - `tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]`: red in the parallel regression, green alone on the same tree at load 5. The close keeps no failure text, so its cause is not measured.
+- **Decision:**
+  1. The two copies are removed and the scratch folder deleted.
+  2. `sync_context.py` copies no file into a path that no namespace of the path map holds, and names each file it leaves out (it also no longer copies suite logs or self-ignoring folders, DEC-882, `c3b32d31`).
+  3. W1-07's `doctor` case gets a row, W2-L409: a candidate for W2-57's look at load, and for lens H's flaky-test findings. It is not put on `load_sensitive`, which only the owner grows (DEC-766).
+  4. The queue re-runs with all six tickets once the fixes are committed. A second refusal of W2-02 for the same W1-07 case goes to the owner as a package (prompt §3).
+- **Classification:** the W1-08 red is the orchestrator's own slip (the process); the W1-07 red is load or a flake, first seen.
+- Next free id: DEC-886.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.273 | 2026-10-21 | Delegated: DEC-885 (W2-02's close refused: copies in no namespace, mine, removed, the sync keeps to the namespaces; W1-07's `doctor` case red under load, row W2-L409; the queue re-runs). Next free id: DEC-886. |
