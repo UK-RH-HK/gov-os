@@ -3,3 +3,5 @@
 2026-10-21 22:50:29 collect ok: 15762/15764 tests collected (2 deselected) in 6.40s
 2026-10-21 22:52:21 records ok: 80 passed in 107.45s (0:01:47)
 2026-10-21 22:57:38 check ok; close DAEO-pl6k (load 3.13)
+2026-10-22 00:11:19 close DAEO-pl6k exit 3
+2026-10-22 00:11:19 lock removed
