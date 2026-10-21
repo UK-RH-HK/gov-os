@@ -1,91 +1,82 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-20 20:40 BST — Wave 2 by keystones; 4 leads in flight; next free DEC-880)
+## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-881)
 
-### Standing owner rules (short; full text: register §248-§265, prompt v3.5; DEC-851)
+### Standing owner rules (short; full text: register §248-§268, prompt v3.7; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
   limit (`claude -p "/usage"` in the digest).
 - **Checkpoint at every handover (DEC-837):** return, merge, package, compaction. Keep this section < 10,000 chars.
 - **Memory used (DEC-836):** every brief says `gov retrieve`; from W2-04 briefs built with `gov context`; counted.
 - **Large/code questions (DEC-859/860):** batches, ranked, stacked; code graph by traversal and pages.
-- **Parallelism (DEC-847):** no fixed cap; measured gate (by hand: load1 < 20, MemAvailable >= 6710886 kB, in the
-  launch command); owner's usage; never in a close's quiet window; ceiling 10; fewer until W2-48. Countdown says
-  number in flight + why.
-- **W2-58 ahead of everything (DEC-873; DEC-821's sandbox clause re-baselined; row W2-L374).** Until it lands take
-  read refusals, never another form; search named folders; count them for the digest.
+- **Parallelism (DEC-847, DEC-880):** no fixed cap; measured gate (by hand: load1 < 20, MemAvailable >= 6710886 kB,
+  in the launch command); owner's usage; never in a close's quiet window; ceiling 10; fewer until W2-66.
+- **W2-58 ahead of everything (DEC-857, DEC-873, DEC-880).** Until it lands take read refusals, never another form;
+  search named folders; count them for the digest.
 - **Notify (DEC-855):** six-part package in my message + `governance/project/orchestration/packages/<id>.md`; start
   all independent work; LAST ACTION `~/.local/bin/owner-ping "<P1|P2|COMMIT|ACT> <id> | gates <...> | <need>"`.
   Never AskUserQuestion; no secret/key/held-out path/file content; leads never ping. Gates nothing -> digest.
-- **Current owner instruction (2026-10-20):** run the close queue behind the gate; **ping only if a close is
-  refused, saying whether the cause is new or already seen.**
-- **W2-48 (DEC-852, DEC-876):** subprocess code seen; fail safe; each widening proven by a test; `test_inputs`
-  declared (65039414); nightly full uncached run; target >= 60-70 % reuse, close < ~15 min, else a fallback
-  PACKAGE (no open round); simplify (1,680 lines vs 220).
+  Owner (10-20): during the close queue, ping only if a close is refused, saying new or already-seen cause.
+- **No test cache (DEC-880):** W2-48 withdrawn (testmon can't see `gov` subprocesses; 11.5 % reuse, 3 % saved).
+  W2-66 = path-scoped regression at close: own suite + unit + suites of tickets whose allowed_paths overlap; FULL
+  suite for shared core (close, guard, check, records, retrieval core, kernel hooks, path map), unplaced file or no
+  map; lead's full verification unchanged; nightly full uncached run stays (a miss = P1 + map fix); W2-24/W2-46
+  full. Target < ~15 min typical close, measured. W2-66 takes the next slot after W2-58's merge (DEC-869's place).
+- **Progress line (DEC-878):** first line of every countdown: tickets closed / merged-not-closed / built and held /
+  in flight / not started of 58 (57 - W2-48 withdrawn + W2-65 + W2-66; W2-00 apart; each in its first state, in
+  flight before merged); keystones done / in progress / ahead of 9.
 - **Effort (DEC-839):** opus-5-5; high; max auditors/FULL probes/packages; xhigh FULL designers.
 - **I commit owner decision records (DEC-861):** `Task: decision-record`, `Role: orchestrator`, `Decided-by: owner
   (chat, <date>)`; never Role: owner; never push. Ratchet entries/escalation lifts stay Role: owner commits until
   W2-12 (DEC-862): prepare + ping ACT.
 - **Supersession propagates (DEC-866):** mark at once, sweep by id and value, update or keep with a reason.
 - **Pre-close gate (DEC-868):** collect-only in one process; gov check after rebuild; fresh ticket checkpoint;
-  clean tree; trailers; `tools/close_queue.sh <id>[:DEC-n] ...`. Record edits: `tools/record_checks.sh` first.
-- **Policy 1 (DEC-819):** sync_context.py, gitleaks staged, commit `-- <paths>`, Task: DAEO-sdxk.
+  clean tree AS THE CLOSE READS IT (`tools/tree_diff.py`); trailers; `tools/close_queue.sh <id>[:DEC-n] ...` (commits
+  each clean close's outputs). Record edits: `tools/record_checks.sh` first. No main-tree commits while it runs.
+- **Policy 1 (DEC-819):** sync_context.py (skips self-ignoring folders), gitleaks staged, commit `-- <paths>`,
+  Task: DAEO-sdxk.
 - **Also:** CAP-10 both figures (DEC-833); recalibrate after K2 (DEC-834); owner's daily backup push (DEC-848).
 
-### Where things stand (20:40)
+### Where things stand (10-21 09:0x)
 - **Owner pushed through `8dfd54e9`.** Records since: DEC-872 `4b6e5766`; DEC-873 `19357fcb`,`6e125150`; DEC-874
-  `5f346750`; DEC-875 `8542a970`,`e6976ef3`; DEC-876 `65039414`; registry (testmon, coverage, DEC-843) `b0756906`;
-  DEC-877 `97fc656a` (delegated); DEC-878 (the progress line, owner) below.
-- **Closed by gov close:** W2-53 (15:53, outputs `a1565e56`). Close success 1 of 8 runs.
-- **Merged, not closed:** W2-54, W2-62, W2-63, W2-50. core-schema RED on W2-53's close record until W2-02 merges
-  (DEC-872). context-reproducibility RED only while the store lacks DEC-873 (next rebuild).
-- **In flight (2: W2-58, W2-48):** W2-58 run 2 (DEC-873, `log/W2-58-A5-run2.json`); W2-48 run 2 (DEC-876,
-  `log/W2-48-A5-run2.json`); W2-54 run 5 (DEC-874: fix the 4 cases contradicting W2-02's types;
-  `log/W2-54-A5-run5.json`); W2-59 run 3 (DEC-877, 20:40, `log/W2-59-A5-run3.json`; last run: merge-back with
-  trailers, CIT-P ids, verify, 2nd/last CIT-P review).
-- **W2-59's branch remade by me under DEC-412 (DEC-877):** new head `d3e594bf` (same tree as old `3d6a27f8`),
-  merge `e48a601d` trailered. Old kept as `w2/W2-59-old`: delete after run 3 verifies. After W2-59 merges the
-  owner re-pins at the merge commit, then regenerates settings from `.rulesync/hooks.jsonc` (ping ACT then).
-- **W2-02 waiting:** after W2-54 run 5 merges, W2-02 run 5 (re-merge, re-verify, probe, merge).
-- **W2-02 run 5 DONE (probe pass), MERGED `94ac7951` (00:1x 10-21); core-schema GREEN on main.** Rows W2-L390..396.
-  **Close queue STARTED** (`tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e`; the script
-  now commits each clean close's ticket file + close record before the next). Log `log/close-queue-<ts>/queue.txt`.
-  After it: merge W2-59 (DEC-879), ping ACT for the re-pin + settings. Refused close -> ping P1, new or seen cause.
-- **W2-59 run 3 DONE (23:3x): head `1cad6aa0`, last review PASS at `fef0fcd5`. HELD, NOT MERGED (DEC-879):** merge it
-  after the queued closes (W2-02, W2-54, W2-62, W2-63, W2-50), so the owner's single re-pin at its merge commit
-  holds every check fix; then ping ACT (re-pin, regenerate settings). If the queue stalls: merge after W2-02's merge.
-  `w2/W2-59-old` deleted. P-W2-59-8 (P1, guard program that can't run lets calls through; rec (b) W2-65 LITE before
-  the regeneration) in packages/, to the owner in the report + digest (gates nothing; no ping per the owner).
-- **W2-54 run 5 DONE (last review passed), MERGED `6855cdf3` (21:1x).** W2-02 run 5 launched behind the load gate
-  (`briefs/W2-02-A5-run5.md`, `log/W2-02-A5-run5.json`). Rows W2-M395/396, W2-L382..385 added.
-- **secrets-indexing false positive (row W2-M395):** the check scans SQLite raw bytes as one text; in W2-54's store
-  a record's `properties` length byte + row id 27437's two bytes + `codeFunction…` spell a gov-token-lower match
-  (located by `scratchpad/exact_hit.py`, no content printed). Row ids change per rebuild: any rebuild may turn it
-  RED by chance. Main store clean today (0 hits). If the queue's rebuild hits it, gate (b) stops the queue (not a
-  refusal): bring a P1 package (options: W2-45's per-value scan now as a small ticket; or an owner call), never
-  rebuild-until-green.
-- **`.git/config.lock`** zero-byte read-only placeholder (16:06, likely a sandboxed worker): recheck, leave alone.
+  `5f346750`; DEC-875 `8542a970`,`e6976ef3`; DEC-876 `65039414`; registry `b0756906`; DEC-877 `97fc656a`; DEC-878
+  `172961fa`; DEC-879 `fcc82099`; DEC-880 `b772b2fe` (+ its follow-up commit: cards, tickets, prompt v3.7, brief).
+- **Closed:** W2-01 (tk), W2-53 (gov close). Close success 1 of 9 runs (W2-02 refused 02:37, TREE_NOT_COMMITTED,
+  cause mine and fixed: copied self-ignoring stores; sync + gate (d) fixed `c3b32d31`).
+- **Merged, not closed:** W2-02 `94ac7951`, W2-54 `6855cdf3`, W2-62, W2-63, W2-50. core-schema GREEN on main.
+- **Queue run 2 STOPPED by me at 08:2x** before any close (only its rebuild lost; checkpoint commit `bceec2e9`
+  stays) to give W2-58 the machine (DEC-880 "ahead of everything"). Re-run after W2-58 merges, with W2-58 added:
+  `bash tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`.
+- **In flight (1): W2-58 run 3** (DEC-880 item 1: `~` expansion on Read/Grep/Glob/Edit/Write/Bash + flagged pytest
+  forms, full verification, 3rd review limited to the change), started 08:3x, `log/W2-58-A5-run3.json`.
+- **W2-59 DONE, HELD (DEC-879):** head `1cad6aa0`, last review pass. Merge after the queue; then W2-65 (after W2-59,
+  same hooks file); then ONE ACT ping: owner re-pins at W2-65's merge commit + regenerates settings.
+- **W2-48 WITHDRAWN** (DEC-880): ticket closed by the owner's decision; branch `w2/W2-48` kept (`2c3c46b5`, research
+  record on it); worktree to remove after a sync. 44 `/tmp/gov-testcache-*` leftovers.
+- **New tickets:** W2-65 `DAEO-e82f` (LITE, hook lines exit 2 when the guard program can't run); W2-66 `DAEO-c1uz`
+  (FULL, path-scoped regression). Cards in WBS §2.
+- **Credentials (P-W2-58-3):** none in any tree by name; only two tracked fixtures
+  (`fixtures/brownfield/project/.env`, `fixtures/brownfield/project/config/secrets.yaml`). Row W2-M398.
+- **secrets-indexing false positive (row W2-M395):** raw SQLite bytes can spell a token by chance per rebuild. If a
+  queue rebuild hits it, gate (b) stops the queue: bring a P1 package; never rebuild-until-green.
+- **`.git/config.lock`** zero-byte read-only placeholder (recreated 20:34 10-20): leave alone; `git branch -D` worked.
 
 ### Next
 1. On each return: read the JSON `result` (`json.loads(t[t.index('{'):])['result']`); merge per prompt §3
    (`--no-ff`, Task/Role trailers, tree == merge-tree); checkpoint; sync.
-2. Close queue after W2-02 merges: `bash tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e`
-   (+ W2-48 `DAEO-xxgp` after its merge). After each close: commit outputs, repair ticket -> `log/repair-tickets/`,
-   sync, remove worktree + branch. Refused -> ping P1 (new or seen cause).
-3. Later: W2-64 (W2-02's widening); re-measure a lead rebuild, raise parallelism; daily digest (records since last
-   push, usage, refusal counts, memory-use counts).
-4. Before each start: WBS/LIST/tk edits (DEC-825 item 7). Next free: ticket W2-65; rows W2-H063, W2-M398, W2-L397.
-   Briefs: `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
+2. W2-58 DONE -> merge -> queue (six) -> merge W2-59 -> W2-65 -> ACT ping (re-pin + settings) -> W2-66 start.
+3. Later: W2-64; held tickets' resumes by keystone; daily digest (records since push, usage, refusals, memory use).
+4. Next free: ticket W2-67; rows W2-H063, W2-M399, W2-L401. Briefs: `tools/build_lead_brief.py <part> <out> ID= W2=
+   PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Standing rules (short; the prompt holds the full text)
-- Report: countdown first, its first line the progress line (DEC-878: tickets closed / merged-not-closed / built
-  and held / in flight / not started of 57, W2-00 apart, each in its first state, in flight before merged;
-  keystones done / in progress / ahead of 9), phone-readable, evidence, last line `OWNER_ACTION: <P1|P2|COMMIT|COMMIT-NEEDED|none>
-  <ids> - <summary>`. Lead launch per prompt §4, gate in the same command, Bash background, timeout 7200000.
+- Report: countdown first (progress line first), phone-readable, evidence, last line `OWNER_ACTION: <P1|P2|COMMIT|
+  COMMIT-NEEDED|none> <ids> - <summary>`. Lead launch per prompt §4, gate in the same command, Bash background.
 - Commits: trailers Task/Implements/Role/Co-Authored-By; `-- <paths>`; merges `--no-ff`, tree == merge-tree.
 - Closes (DEC-780): quiet window; rebuild immediately before; fresh checkpoint; once only.
-- Never: push/tag/rebase/main; amend w2/integrate; `gov approve`; `rebuild --no-embeddings`; tk close a W2 ticket;
-  hooks; --no-verify; secrets/held-out contents; ~/gov-os-workbench; grow accepted_reds/load_sensitive; weaken a
-  hard-block check; let the ratchet retry; `$VAR` write targets; heredocs/backticks in commands (DEC-409).
+- Never: push/tag/rebase/main; amend w2/integrate; `gov approve`; `rebuild --no-embeddings`; tk close a W2 ticket
+  without the owner's decision; hooks; --no-verify; secrets/held-out contents; ~/gov-os-workbench; grow
+  accepted_reds/load_sensitive; weaken a hard-block check; let the ratchet retry; `$VAR` write targets (also in
+  sed -i!); heredocs/backticks in commands (DEC-409).
 
 ## Archive
 The long history moved to `CHECKPOINT-ARCHIVE.md` beside this file (DEC-792, 2026-10-18).

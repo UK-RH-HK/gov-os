@@ -68,3 +68,9 @@
 - RESUME (if P-W2-58-4 (a)): fresh TD batch for `~` via Read/Grep/Glob ((a),(c),(d)) and flagged pytest/coverage runs; red check; fresh engineer (reads.py file-tool resolver expanduser; _tests_run forms); rebuild; full regression (scratchpad run_suites.py into log/v5/); unit; gov check; collect; gov checkpoint commit; third probe limited to the delta; probe record if pass.
 - NEXT (was): batches 2-4 into log/v4/, unit, collect, gov checkpoint commit, review 2 (python3 scratchpad/make_rev2.py <head> makes briefs/rev-2.md), probe record if pass.
 - NEXT (was): batch 3 (W1-31..45) running; batch 4 (W1-46..50, W2-01, W2-50, W2-53, W2-54, W2-62); tests/unit; collect-only; gov checkpoint + commit; reviewer briefs/rev-1.md (fill @@HEAD@@) with worktree's own gov launch independent-auditor, effort max.
+
+## Run 3 (DEC-880 item 1: one narrow extra round, exception to DEC-413)
+
+- Start: head bbbe20fa, tree clean, identity orchestrator/DAEO-5j8b, hooks: only samples, no CLOSE-RUNNING.
+- Step 1 merge done: dfb3bf40 (`--no-ff`, parents bbbe20fa + b772b2fe; trailers Task: DAEO-5j8b, Implements: DEC-880, Role: orchestrator, Co-Authored-By). No conflict (path-map auto-merged). Tree 54c37d65 = merge-tree of the parents. Ticket file now has the two DEC-880 KPI lines.
+- NEXT: TD-8 (briefs/td-4.md, log/td-8.json, tripwire-before-15): `~` per tool (Read, Grep, Glob, Edit, Write, Bash) vs (a),(c),(d), a write rule; pytest forms (-B, coverage run, python3 -m coverage run). Then red check, eng-6 (briefs/eng-5.md), verification into log/v5/, checkpoint commit, review 3 (briefs/rev-3.md, delta only), probe record if pass.
