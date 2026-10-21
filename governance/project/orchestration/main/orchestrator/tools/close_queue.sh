@@ -38,6 +38,14 @@ for item in "$@"; do
     stop "collection failed (exit $code): $(grep -E '^ERROR' "$LOG/collect-$ticket.txt" | head -3 | tr '\n' ' ')"
   fi
   date '+%F %T collect ok: '"$(tail -1 "$LOG/collect-$ticket.txt")" >> "$LOG/queue.txt"
+  # (f) the suites that read the records themselves (the register, the path map, the registry, the record copies),
+  # which the orchestrator's own record commits can turn red (DEC-882, DEC-885): stop before the close, uncounted.
+  env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src \
+    python3 -m pytest -q -p no:cacheprovider --no-header tests/acceptance/W1-06/test_w1_06_approvals.py \
+    tests/acceptance/W1-08/test_w1_08_path_map.py tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py \
+    tests/acceptance/W1-07/test_w1_07_envelope.py > "$LOG/records-$ticket.txt" 2>&1 \
+    || stop "a suite that reads the records is red: $(grep -E '^FAILED|^ERROR' "$LOG/records-$ticket.txt" | head -3 | tr '\n' ' ')"
+  date '+%F %T records ok: '"$(tail -1 "$LOG/records-$ticket.txt")" >> "$LOG/queue.txt"
   # (b) gov check after the rebuild, no commit in between.
   gov check --json > "$LOG/check-$ticket.json" 2> "$LOG/check-$ticket.err" || stop "gov check is not green (exit $?)"
   # (e) every commit of the ticket (Task: <id>) carries Implements: (the close's trailer gate, TRAILER_MISSING),

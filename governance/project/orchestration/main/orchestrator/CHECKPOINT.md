@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-883)
+## RESUME HERE (2026-10-21 15:5x BST — queue run 4 (six closes); lens H running; next free DEC-886)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -52,13 +52,31 @@
   records) and are fixed by DEC-882 (`9d8c1887`): DEC-843 item 3 stands (registry approved_by, xxgp's input); suite
   logs (W1-27.txt) out of the orchestration record + sync rule. Rows W2-M399, W2-L401..408. **Queue run 3 STARTED**
   with six: W2-02, W2-54, W2-62, W2-63, W2-50, W2-58 (`DAEO-5j8b`). Then merge W2-59, W2-65, ACT ping, W2-66.
+- **Queue run 3 (14:06-15:36): W2-02's close REFUSED, CHECK_FAILED** (count 1; repair `log/repair-tickets/DAEO-ke7i.md`):
+  W1-08 namespace red = MY sync copied scratch `packages-pending/` into the record (NEW cause; fixed, sync keeps to
+  namespaces); W1-07 `doctor` envelope red under load, green alone (NEW, row W2-L409). DEC-885. Gate (f) added to
+  the queue: the record-reading suites (W1-06, W1-08, W1-27 path compliance, W1-07 envelope; 2 min). **Queue run 4
+  started 15:5x with the same six.** A 2nd W2-02 refusal for the same W1-07 case -> package to the owner.
+- **DEC-883 (owner) COMMITTED `f3a1079a` with DEC-884 and DEC-885** (was drafted during the queue) (the queue runs; a tracked edit mid-close could turn the
+  record-reading tests red): `drafts/register-271-DEC-883.md` + `drafts/DEC-883-apply.md` (register, W2-66 card
+  and ticket, W2-57 card, prompt v3.9). Batched closes on one head (one rebuild/check/regression, then each
+  ticket's own checks; no code merges during a batch; red batch closes nothing, bisect, repair, re-run); same code
+  fingerprint reuses the last passing run; store fresh by code fingerprint (record-only commits loaded
+  incrementally); serial-only 263 tests examined (W2-57, lens H). Target ~ one regression per batch. APPLY FIRST
+  when the queue ends, before merging W2-59. Today's queue runs as is.
+- **DEC-884 (owner) COMMITTED `f3a1079a`** (`drafts/register-272-DEC-884.md`, items 6-10 of
+  `drafts/DEC-883-apply.md`): **W2-66 FIRST** (after lens H's findings are in its card); **NO re-pin** until W2-66 is
+  built, FULL-reviewed, merged and trialled (dev tier or fixture: time/batch, reuse correct, planted change -> fresh
+  run, red batch attributed); then ONE combined re-pin (W2-58+59+65+66) + settings regeneration as an ACT ping.
+  **W2-59 and W2-65 stay UNMERGED** (W2-65 built stacked on w2/W2-59), merge together just before the re-pin; an
+  earlier merge needs a package first. Other slots: held tickets' resumes by keystone.
 - **Lens H (DEC-881) RUNNING since 08:5x:** independent auditor, effort max, from the main tree; brief
   `briefs/assessment-H.md`, log `log/assessment-H.json`; report to `.gov-runtime/scratch/assessment/2026-10/
   H-test-strategy.md` -> copy byte for byte to `docs/assessment/2026-10/`; install exception (venv under
   `/tmp/gov-os-assessment-H/` only, removed at the end: confirm with `ls -la`). On return: copy, confirm removal,
   give the owner path + one paragraph per part A/B/C + its packages. **W2-66's test designer waits for it;** bring
   its findings into W2-66's card/ticket under a recorded decision first.
-- **W2-59 DONE, HELD (DEC-879):** head `1cad6aa0`, last review pass. Merge after the queue; then W2-65 (after W2-59,
+- **W2-59 DONE, HELD (DEC-879, now DEC-884: merges with W2-65 just before the combined re-pin):** head `1cad6aa0`, last review pass. OLD PLAN (superseded by DEC-884): merge after the queue; then W2-65 (after W2-59,
   same hooks file); then ONE ACT ping: owner re-pins at W2-65's merge commit + regenerates settings.
 - **W2-48 WITHDRAWN** (DEC-880): ticket closed by the owner's decision; branch `w2/W2-48` kept (`2c3c46b5`, research
   record on it); worktree to remove after a sync. 44 `/tmp/gov-testcache-*` leftovers.
@@ -73,7 +91,7 @@
 ### Next
 1. On each return: read the JSON `result` (`json.loads(t[t.index('{'):])['result']`); merge per prompt §3
    (`--no-ff`, Task/Role trailers, tree == merge-tree); checkpoint; sync.
-2. W2-58 DONE -> merge -> queue (six) -> merge W2-59 -> W2-65 -> ACT ping (re-pin + settings) -> W2-66 start.
+2. Queue ends -> commit DEC-883 + DEC-884 (record checks first) -> lens H returns: its findings into W2-66 (decision) -> W2-66 FIRST (FULL, review, trial) -> W2-65 stacked on w2/W2-59 in a free slot -> merge W2-59 + W2-65 together -> ACT ping (combined re-pin + settings). Free slots: held resumes by keystone.
 3. Later: W2-64; held tickets' resumes by keystone; daily digest (records since push, usage, refusals, memory use).
 4. Next free: ticket W2-67; rows W2-H063, W2-M400, W2-L409. Briefs: `tools/build_lead_brief.py <part> <out> ID= W2=
    PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
