@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.269 (the version table at the end of each section gives the history)
+**Version:** 0.270 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9185,7 +9185,7 @@ The orchestrator brought the revised plan (`docs/plan/WAVE_2_REVISED_PLAN.md`, P
   3. Both entries' status lines gain a "Changed by" note (DEC-825).
 
 ### DEC-843 — W2-48: the key restated as behaviour; pytest-testmon and coverage as one DEC-083 package when it starts (plan §11 item 8)
-- **Status:** SUPERSEDED by DEC-880 (2026-10-21; it was ACCEPTED, owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the install itself comes as its own package under DEC-083) · **Under:** DEC-726, DEC-083, DEC-823 item 4 · **Basis:** OWNER, 2026-10-19; lens G R6, F6 · **Changes:** DEC-726 item 1 ("keyed on exact input hashes"). · **Changed by:** superseded by DEC-880: testmon and coverage as the cache's glue fall away: W2-48's cache is withdrawn
+- **Status:** ACCEPTED (owner, 2026-10-19; the owner commits this entry with `Role: owner`, in the next batch; the install itself comes as its own package under DEC-083) · **Under:** DEC-726, DEC-083, DEC-823 item 4 · **Basis:** OWNER, 2026-10-19; lens G R6, F6 · **Changes:** DEC-726 item 1 ("keyed on exact input hashes"). · **Changed by:** items 1 and 2 (the behaviour key; the glue to pytest-testmon and coverage) superseded by DEC-880: W2-48's cache is withdrawn; item 3 (the two tools' install package) stands while they are installed (DEC-882 corrects DEC-880's wider mark)
 - **Decision:**
   1. W2-48's key KPI is restated as behaviour: each planted change re-runs every dependent test; a change outside every input reuses; every reuse is recorded, with the run it came from; a failed result is never reused.
   2. It is glued to pytest-testmon and coverage: `--testmon-env` set to a hash of the declared data globs and the test command; `.testmondata` written only by main-tree closes; `--testmon-noselect` for W2-24's and W2-46's full runs.
@@ -9658,7 +9658,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 268. The owner's answers of 2026-10-21 on P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (register v0.268, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-880 — W2-58's one narrow extra round; W2-48's cache withdrawn and a lite W2-38 brought back as path-scoped regression (W2-66); W2-65; credentials out of the working trees
-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-413, DEC-857, DEC-873, DEC-852, DEC-869, DEC-876, DEC-841, DEC-105, DEC-866, DEC-820, DEC-861 · **Basis:** the packages P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (`governance/project/orchestration/packages/`), from W2-58's run 2, W2-48's run 2 and W2-59's run 3.
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-413, DEC-857, DEC-873, DEC-852, DEC-869, DEC-876, DEC-841, DEC-105, DEC-866, DEC-820, DEC-861 · **Basis:** the packages P-W2-58-4, P-W2-48-8, P-W2-59-8 and P-W2-58-3 (`governance/project/orchestration/packages/`), from W2-58's run 2, W2-48's run 2 and W2-59's run 3. · **Changed by:** DEC-882: DEC-843 is superseded in its items 1 and 2 only; its item 3, the install approval, stands while the tools are installed
 - **Decision:**
   1. **P-W2-58-4 (a): one narrow extra round for W2-58, an exception to DEC-413 for this ticket only.**
      - The guard expands `~` in every path it judges (Read, Grep, Glob, Edit, Write and Bash), with tests for each tool.
@@ -9714,3 +9714,27 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.269 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-881 (lens H, the test strategy, with an install exception in a throwaway virtual environment under `/tmp/gov-os-assessment-H/`; W2-66's test designer starts only after lens H reports). Next free id: DEC-882. |
+
+## 270. A delegated decision of 2026-10-21 after W2-58's merge: three incoming reds, my own (register v0.270, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-882 — DEC-843's install approval stands; suite logs stay out of the orchestration record; W2-58's review rows (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-21; listed in the digest; the owner overturns it at will) · **Under:** DEC-880, DEC-866, DEC-819, DEC-801, DEC-802 · **Basis:** W2-58's lead returned DONE (run 3, `log/W2-58-A5-run3.json`; merged `4845b9b8`). It named three reds in every tree since my DEC-880 records, none its own:
+  - W1-06's `test_every_approving_decision_is_accepted_by_the_owner`: the tool registry's `approved_by: "DEC-843"` for pytest-testmon and coverage, after I marked all of DEC-843 superseded;
+  - `context-reproducibility`, and W2-54's two cases on it: W2-48's ticket file cites DEC-843;
+  - W1-27's `test_old_path_inside_its_new_path_is_not_stale`: two copies of W1-27's own failing output (under W2-48's and W2-58's lead logs in the orchestration record) name the test's fixture path, and the test copies the repository.
+  Each would have refused every queued close.
+- **Decision:**
+  1. **DEC-843 is superseded in its items 1 and 2 only** (the behaviour key; the glue to pytest-testmon and coverage). Its item 3, the install package of the two tools, stands while they are installed, as DEC-880 item 2 keeps them. DEC-880's sweep marked the whole entry, wider than the owner's order (DEC-852 and DEC-869 "where they no longer hold"); its status line now says so. The registry's `approved_by` stays.
+  2. **Suite logs stay out of the orchestration record.**
+    - The two copies are removed.
+    - `sync_context.py` no longer copies a suite's raw output under a lead's `log/` folder (`W1-27.txt` and the like); the leads' JSON results carry the outcomes.
+    - Row W2-M399 asks `gov doctor`'s moved-path check to treat the orchestration record as history, as it does `docs/source/` (W2-45).
+  3. **W2-58's third review: rows.**
+    - Its findings 1, 2, 3, 6 and 7 become rows for the Wave 3 hardening pass (W2-L401 to W2-L405; ordinary work: no).
+    - Its residuals 4 and 5 become rows that ride a later guard ticket (W2-L406, W2-L407; DEC-802).
+    - The live cases' leftover run folder becomes row W2-L408.
+- Next free id: DEC-883.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.270 | 2026-10-21 | Delegated: DEC-882 (DEC-843's item 3 stands, correcting DEC-880's wider mark; suite logs out of the orchestration record; W2-58's review rows W2-M399, W2-L401 to W2-L408). Next free id: DEC-883. |

@@ -17,6 +17,7 @@ flags is removed again and named, never committed. ``--check`` copies nothing an
 """
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -29,6 +30,7 @@ SKIP_DIRS = {"context", "__pycache__", ".git", "xdist-wheels", "vendor-src", "as
 SKIP_SUFFIXES = {".tgz", ".gz", ".zip", ".whl", ".pyc", ".sqlite", ".sqlite3", ".db", ".npy", ".npz", ".bin",
                  ".gguf", ".safetensors", ".pt", ".onnx", ".lance", ".parquet", ".env"}
 MAX_BYTES = 2 * 1024 * 1024
+SUITE_LOG = re.compile(r"W[12]-\d{2}[a-z]?([._-][^/]*)?\.(txt|log|out|err)")
 
 
 def sources():
@@ -64,6 +66,11 @@ def plan():
             dirnames[:] = sorted(d for d in dirnames if d not in SKIP_DIRS)
             for name in sorted(filenames):
                 path = Path(dirpath) / name
+                # A suite's raw output under a log folder (W1-27.txt and the like) can name a test's own fixture
+                # paths, and a test that copies the repository then finds them (W1-27's moved-path case, DEC-882);
+                # the leads' JSON results carry the suites' outcomes.
+                if SUITE_LOG.fullmatch(name) and "log" in path.relative_to(src).parts:
+                    continue
                 if wanted(path):
                     yield path, dst / path.relative_to(src)
 
