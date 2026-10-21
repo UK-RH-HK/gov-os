@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.275 (the version table at the end of each section gives the history)
+**Version:** 0.276 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9883,3 +9883,24 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.275 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-887 (P-REC-1 (a): the raw orchestration record on the branch `record/w2`, verified byte for byte and removed from the tree in one commit; the searchable part kept; the sync commits on `record/w2`; the owner's push line for both branches; the guard's limit stated, P-REC-2 to the owner). Next free id: DEC-888. |
+
+## 276. The owner's plan of 2026-10-21 while away from the PC (register v0.276, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-888 — While the owner is away: the five other closes after a green rehearsal, W2-02 after DEC-886's commit; P-REC-2 (b); lens H held; free slots; one list of owner acts
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-886, DEC-887, DEC-883, DEC-884, DEC-880, DEC-801, DEC-855, DEC-861 · **Basis:** the owner's message of 2026-10-21. The owner cannot make owner acts, commits or file reviews for a while.
+- **Decision:**
+  1. **The rehearsal decides the queue.**
+     - If the rehearsal on the slim tree is green, the orchestrator runs the close queue for the five other tickets (W2-54, W2-62, W2-63, W2-50, W2-58), behind the full gate.
+     - W2-02 waits: its count is 2 of 3, and its likely trigger is what DEC-886 covers, so it runs only after the owner's `Role: owner` commit of DEC-886's entry.
+     - If the rehearsal is red, the queue does not run, and its cause comes to the owner as a package.
+  2. **P-REC-2 (b):** a Wave 3 row (W2-L410). A write into the record worktree needs a deliberate construction (DEC-801).
+  3. **Lens H stays held:** nothing from it is committed, and W2-66, W2-67 and W2-68 do not start, until the owner has read the report and confirmed in writing.
+  4. **Meanwhile, free slots** (as the machine and the queue allow) take work that depends neither on lens H nor on the owner: W2-65 (stacked on W2-59), the nightly run, and the held tickets' resumes by keystone.
+  5. **One list of owner acts:** everything that needs the owner (owner commits, ACT pings, P1 decisions) is collected in one list at the top of the next report, in the order the owner should do them. Pings go as usual; work that does not depend on the answer does not stop.
+- **The orchestrator's reading of item 1 "green":** the rehearsal is green when no test outside `accepted_reds` fails in its parallel or serial run. A case that fails in the parallel run and passes alone, the `doctor` case among them, would refuse every close on this tree, not only W2-02's. So such a case also keeps the queue waiting until it is covered by an owner-committed entry. The orchestrator says so in its report; the owner overturns it at will.
+- **Where it goes (DEC-851):** this register; RESUME HERE; the list's row W2-L410. It is a plan for the owner's absence, not a standing rule; it does not reach the prompt or the briefs.
+- Next free id: DEC-889.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.276 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-888 (while the owner is away: the five other closes after a green rehearsal; W2-02 after DEC-886's owner commit; P-REC-2 (b), row W2-L410; lens H held; free slots for W2-65, the nightly run and the held resumes; one ordered list of owner acts). Next free id: DEC-889. |
