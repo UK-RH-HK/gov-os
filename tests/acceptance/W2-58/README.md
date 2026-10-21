@@ -180,6 +180,35 @@ Readings the review cases take:
 - Item 3's launch reads `GOV_TICKET` from the settings' `env` block when it is there, else from the process
   environment the stand-in CLI records (W1-46's rule, DEC-183).
 
+## The narrow extra round (sixth round, after the implementation; DEC-880 item 1, P-W2-58-4 (a))
+
+The second review found two behaviours the suite missed. The ticket file states them as its last two success KPI
+lines (DEC-880). The cases are in `test_w2_58_tilde_and_test_runs.py`. They were written by a fresh test designer who
+did not read the implementation: only the guard's answers were used. No existing case changed. The test count goes
+from 754 to 808 (54 added: 21 red, 33 green). The 5 `local_only` cases are unchanged.
+
+**How `~` is set up.** The guard is run as a program (`w2_58_support.ask_guard`), as in every other case. Its `HOME` is
+the test's temporary `home/` folder (`w2_58_support.base_environment`). The fixture project lies inside it, at
+`<tmp-home>/gov-os-worktrees/W2-95`, so `~/gov-os-worktrees/W2-95/<path>` and the absolute
+`<tmp-home>/gov-os-worktrees/W2-95/<path>` name the same file. The stand-in secret is `<tmp-home>/.ssh/id_ed25519`,
+made by the fixture. No real home folder is named. Each case of item 1 asks the guard for **both spellings** of the
+same file and asserts both get the case's answer. A failure message shows what the other spelling got.
+
+| Behaviour | Tests | Red today because |
+|---|---|---|
+| 1. A path with a leading `~` is judged as its expanded form: (a) to (d) refuse it as they refuse the absolute path | `::test_read_judges_a_tilde_path_as_its_absolute_path` (refused: (c) the engineer on T × T's test file; (c) the test designer on T × `src/app/main.py`, `src/app/added.py`; (d) measured by role, by ticket × the hidden file; (a) engineer, auditor × `~/.ssh/id_ed25519`, and × a `.env` file. Allowed: the engineer's own code, the test designer's unchanged code, the visible part, the auditor × T's test); `::test_grep_judges_a_tilde_path_as_its_absolute_path` (refused: the engineer with path T's acceptance folder and path the project root `~/gov-os-worktrees/W2-95`; the test designer with path `src/app`; measured by ticket with path the hidden folder; the engineer with path `~/.ssh/id_ed25519` and `.env`. Allowed: the engineer in `src`, the test designer in `src/other`, measured in the visible folder); `::test_glob_judges_a_tilde_path_as_its_absolute_path` (refused: the engineer, Glob `*` in T's acceptance folder and pattern `<folder>/*` with no path; measured by role and by ticket, Glob `*` in the hidden folder. Allowed: the engineer in `src/app`, measured in the visible folder); `::test_bash_judges_a_tilde_path_as_its_absolute_path` (refused: `cat` of T's test (engineer), `grep -rn … src/app` (test designer), `cat` of the hidden file (measured by ticket), `cat ~/.ssh/id_ed25519` (engineer, auditor), `cat` of `.env`. Allowed: `cat` of own code, `cat` of unchanged code) | 16 red: the Read, Grep and Glob refusals of (a) under `~/.ssh`, (c) and (d). The absolute spelling is refused and the `~` spelling is allowed (`decision=allow`): the guard does not expand `~` for the file tools. Green: Read and Grep of `.env` by `~` (the name rule matches the file's name, whatever its folder); every allowed case (the `~` spelling, not taken as the protected file, is allowed as before); every Bash case (the guard already expands `~` in a command's words). |
+| 1. Each write rule judges a `~` path as the absolute path | `::test_write_judges_a_tilde_path_as_its_absolute_path`, `::test_edit_judges_a_tilde_path_as_its_absolute_path` (the engineer on T, allowed paths `src/app/**`: refused T's test file, `governance/project/held-out.yaml`, `.claude/settings.json`, `docs/notes.md` (outside); allowed `src/app/main.py` (inside)) | 2 red: Write and Edit of `~/…/src/app/main.py` are refused, while the absolute path is allowed. The guard joins the unexpanded `~/…` to the project folder (`<project>/~/gov-os-worktrees/W2-95/src/app/main.py`), which is outside the allowed paths. The four refusals are green today, but only because of that join: the `~` path is refused, not judged as its absolute path. They hold the "no write rule widens" half once `~` is expanded. |
+| 2. The engineer runs its own tests with `python3 -B -m pytest`, `python3 -m coverage run -m pytest`, `coverage run -m pytest`, as with plain `python3 -m pytest`, and still cannot read their source | `::test_the_engineer_runs_its_tests_with_interpreter_flags_or_under_coverage` (each form, and the plain run in the same case); `::test_the_engineer_still_cannot_read_its_tests_source` (Read, `cat`); `::test_a_test_run_joined_with_a_read_of_the_source_is_refused` (plain run `; cat`, `python3 -B …; cat`, `python3 -m coverage run … && cat`, `coverage run …; head -n 5`) | 3 red: each flagged or coverage run is refused with "the call reads the ticket's acceptance tests … (DEC-820 (c))", while the plain run is allowed. The source and joined cases are green today; they hold the "still cannot read their source" half. |
+
+Readings these cases take:
+
+- **Glob "a pattern under it"** is the folder's full `~` path with `/*` and no `path`. The absolute twin of that pattern
+  is refused today.
+- **The project-root Grep** (`~/gov-os-worktrees/W2-95`) is item 3's root search: it takes in T's acceptance folder, so
+  it is refused to the engineer on T, as the absolute project folder is.
+- **Edit's twin of "inside the allowed paths"** is an existing file (`src/app/main.py`). Write's is the same file, so
+  that one target serves both tools.
+
 ### The live cases
 
 Each live case starts a real session through `gov launch` (the CLI at `~/.local/bin/claude`, the caller's own
