@@ -1,1 +1,264 @@
-...........F.F.FF....F..........
+...........F.F.FF....F......................................             [100%]
+=================================== FAILURES ===================================
+_ test_a_change_to_a_file_only_a_python_child_reads_is_a_failure_never_a_reused_pass _
+
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0')
+told = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a...endent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/sandbox/elsewhere'))
+
+    def test_a_change_to_a_file_only_a_python_child_reads_is_a_failure_never_a_reused_pass(tmp_path, told, sandbox):
+        tree = _tree(tmp_path, told, {"notes.md": PROJECT_NOTES, "src/pkg/notes_reader.py": NOTES_READER,
+                                      "tests/test_child_reads_notes.py": TEST_CHILD_READS_NOTES})
+    
+>       _stale_pass_never_reported(
+            tree, told, sandbox, NOTES_ID, "notes.md", PROJECT_NOTES_CHANGED, "notes.md now says `status: revised`",
+            "notes.md changed in a commit. It is neither code nor a declared input (`test_inputs`), and only the Python "
+            "child test_child_reads_notes starts reads it (python3 -m pkg.notes_reader, with an environment the test "
+            "builds from scratch; the test process never opens it). The same read made by the test's own process makes "
+            "that test run every time; made by a child it must not leave a stale pass (DEC-876 condition 1, fail safe)")
+
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:200: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:188: in _stale_pass_never_reported
+    support.assert_ran(third, [test_id], f"{why}. {EITHER_WAY}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change...s': {'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'reused': 7}, 'seconds': 2.62, 'exit_code': 0}, ran=Counter())
+ids = ['tests/test_child_reads_notes.py::test_child_reads_notes']
+why = 'notes.md changed in a commit. It is neither code nor a declared input (`test_inputs`), and only the Python child test...the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not'
+
+    def assert_ran(run, ids, why):
+        """Each of ``ids`` ran in this run (the told log) and is labelled with its own result, never reused."""
+        problems = []
+        for test_id in ids:
+            result = run.result_of(test_id)
+            if not run.ran.get(test_id):
+                problems.append(f"{test_id} did not run in this run (the record says {result!r})")
+            elif result not in RAN_RESULTS:
+                problems.append(f"{test_id} ran, but the record says {result!r}")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to run: {why}. A test whose input changed, or that cannot be reused, runs, and the record "
+            f"(`{RECORD_KEY}.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:\n  "
+            + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to run: notes.md changed in a commit. It is neither code nor a declared input (`test_inputs`), and only the Python child test_child_reads_notes starts reads it (python3 -m pkg.notes_reader, with an environment the test builds from scratch; the test process never opens it). The same read made by the test's own process makes that test run every time; made by a child it must not leave a stale pass (DEC-876 condition 1, fail safe). `python3 -m gov.testcache run --json tests` may meet this either way: by seeing that view (and running the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E         tests/test_child_reads_notes.py::test_child_reads_notes did not run in this run (the record says 'reused')
+E       (in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T224851Z-9df870f0", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/tree/.gov-runtime/testcache/local", "commit": "36ca6c00b532b699506518db09f5dd02b057ce66", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 2.62, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_child_reads_notes.py::test_child_reads_notes: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'reused' from {'run': '20261020T224840Z-f6a5ec15', 'commit': '1a63976b8530ad3a4f5ad9bb54294511f6fda54b'}; ran 0 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T224851Z-9df870f0", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_file_only_a0/tree/.gov-runtime/testcache/local", "commit": "36ca6c00b532b699506518db09f5dd02b057ce66", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_child_reads_notes.py::test_child_reads_notes", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "reused", "from": {"run": "20261020T224840Z-f6a5ec15", "commit": "1a63976b8530ad3a4f5ad9bb54294511f6fda54b"}}], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 2.62, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:486: AssertionError
+_ test_a_new_commit_seen_only_through_git_run_on_the_project_is_a_failure_never_a_reused_pass _
+
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0')
+told = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a...endent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/sandbox/elsewhere'))
+
+    def test_a_new_commit_seen_only_through_git_run_on_the_project_is_a_failure_never_a_reused_pass(
+            tmp_path, told, sandbox):
+        tree = _tree(tmp_path, told, {"tests/test_git_history.py": TEST_GIT_HISTORY})
+    
+>       _stale_pass_never_reported(
+            tree, told, sandbox, GIT_HISTORY_ID, "docs/notes.md", support.NOTES_CHANGED,
+            "the project's history now holds two commits",
+            "a new commit was made in the project (it changes docs/notes.md, outside every input), and "
+            "test_git_history runs git rev-list --count HEAD with the project's root as its working directory. git "
+            f"({list(support.KNOWN_PROGRAMS)}) is keyed by its version, but what it reads there is the project's own "
+            "history and tree, which its version does not tell; the git is the same, and the result changed "
+            "(DEC-876 condition 1, fail safe)")
+
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:240: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:188: in _stale_pass_never_reported
+    support.assert_ran(third, [test_id], f"{why}. {EITHER_WAY}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_co...s': {'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'reused': 7}, 'seconds': 1.03, 'exit_code': 0}, ran=Counter())
+ids = ['tests/test_git_history.py::test_git_history']
+why = 'a new commit was made in the project (it changes docs/notes.md, outside every input), and test_git_history runs git r...the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not'
+
+    def assert_ran(run, ids, why):
+        """Each of ``ids`` ran in this run (the told log) and is labelled with its own result, never reused."""
+        problems = []
+        for test_id in ids:
+            result = run.result_of(test_id)
+            if not run.ran.get(test_id):
+                problems.append(f"{test_id} did not run in this run (the record says {result!r})")
+            elif result not in RAN_RESULTS:
+                problems.append(f"{test_id} ran, but the record says {result!r}")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to run: {why}. A test whose input changed, or that cannot be reused, runs, and the record "
+            f"(`{RECORD_KEY}.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:\n  "
+            + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to run: a new commit was made in the project (it changes docs/notes.md, outside every input), and test_git_history runs git rev-list --count HEAD with the project's root as its working directory. git (['git']) is keyed by its version, but what it reads there is the project's own history and tree, which its version does not tell; the git is the same, and the result changed (DEC-876 condition 1, fail safe). `python3 -m gov.testcache run --json tests` may meet this either way: by seeing that view (and running the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E         tests/test_git_history.py::test_git_history did not run in this run (the record says 'reused')
+E       (in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T224907Z-a17509e4", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/tree/.gov-runtime/testcache/local", "commit": "31310b7713e753061db2dfcd90df32404120b21c", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 1.03, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_git_history.py::test_git_history: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'reused' from {'run': '20261020T224903Z-f7923190', 'commit': 'fbce005228753d255a3599f931cc78fb1dc9c392'}; ran 0 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T224907Z-a17509e4", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_new_commit_seen_only_th0/tree/.gov-runtime/testcache/local", "commit": "31310b7713e753061db2dfcd90df32404120b21c", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_git_history.py::test_git_history", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "reused", "from": {"run": "20261020T224903Z-f7923190", "commit": "fbce005228753d255a3599f931cc78fb1dc9c392"}}], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 1.03, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:486: AssertionError
+_ test_a_change_to_a_python_file_a_test_reads_as_text_is_a_failure_never_a_reused_pass _
+
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0')
+told = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a...endent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/sandbox/elsewhere'))
+
+    def test_a_change_to_a_python_file_a_test_reads_as_text_is_a_failure_never_a_reused_pass(tmp_path, told, sandbox):
+        tree = _tree(tmp_path, told, {"src/pkg/scanned.py": SCANNED, "tests/test_source_text.py": TEST_SOURCE_TEXT})
+    
+>       _stale_pass_never_reported(
+            tree, told, sandbox, SOURCE_TEXT_ID, "src/pkg/scanned.py", SCANNED_CHANGED,
+            "src/pkg/scanned.py now holds a function that calls print",
+            "src/pkg/scanned.py changed in a commit: a new function, which no test executes, was added. "
+            "test_source_text reads that file as text (it never imports it) and holds that it calls no print. Coverage "
+            "sees the code a test executes, not the files it reads as text, so what the test read changed unseen "
+            "(DEC-876 condition 1, fail safe)")
+
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:272: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:188: in _stale_pass_never_reported
+    support.assert_ran(third, [test_id], f"{why}. {EITHER_WAY}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change...s': {'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'reused': 7}, 'seconds': 0.53, 'exit_code': 0}, ran=Counter())
+ids = ['tests/test_source_text.py::test_source_text']
+why = 'src/pkg/scanned.py changed in a commit: a new function, which no test executes, was added. test_source_text reads tha...the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not'
+
+    def assert_ran(run, ids, why):
+        """Each of ``ids`` ran in this run (the told log) and is labelled with its own result, never reused."""
+        problems = []
+        for test_id in ids:
+            result = run.result_of(test_id)
+            if not run.ran.get(test_id):
+                problems.append(f"{test_id} did not run in this run (the record says {result!r})")
+            elif result not in RAN_RESULTS:
+                problems.append(f"{test_id} ran, but the record says {result!r}")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to run: {why}. A test whose input changed, or that cannot be reused, runs, and the record "
+            f"(`{RECORD_KEY}.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:\n  "
+            + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to run: src/pkg/scanned.py changed in a commit: a new function, which no test executes, was added. test_source_text reads that file as text (it never imports it) and holds that it calls no print. Coverage sees the code a test executes, not the files it reads as text, so what the test read changed unseen (DEC-876 condition 1, fail safe). `python3 -m gov.testcache run --json tests` may meet this either way: by seeing that view (and running the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E         tests/test_source_text.py::test_source_text did not run in this run (the record says 'reused')
+E       (in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T224916Z-15c38544", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/tree/.gov-runtime/testcache/local", "commit": "b43d13855313a085a573e525ee4ccd2e7c8f76af", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 0.53, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_source_text.py::test_source_text: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'reused' from {'run': '20261020T224913Z-1adf74c4', 'commit': '2986db2e02589e4dfd81e6b707840edf99d333d5'}; ran 0 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T224916Z-15c38544", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_change_to_a_python_file0/tree/.gov-runtime/testcache/local", "commit": "b43d13855313a085a573e525ee4ccd2e7c8f76af", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_source_text.py::test_source_text", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "reused", "from": {"run": "20261020T224913Z-1adf74c4", "commit": "2986db2e02589e4dfd81e6b707840edf99d333d5"}}], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 0.53, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:486: AssertionError
+_ test_a_file_added_to_a_folder_a_test_lists_is_a_failure_never_a_reused_pass __
+
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0')
+told = PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/told')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a...endent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/sandbox/elsewhere'))
+
+    def test_a_file_added_to_a_folder_a_test_lists_is_a_failure_never_a_reused_pass(tmp_path, told, sandbox):
+        tree = _tree(tmp_path, told, {**PLUGINS, "tests/test_listing.py": TEST_LISTING})
+        rel, text = PLUGIN_ADDED
+    
+>       _stale_pass_never_reported(
+            tree, told, sandbox, LISTING_ID, rel, text, f"src/pkg/plugins/ now also holds {rel.rsplit('/', 1)[1]}",
+            f"{rel} was added in a commit, a module no test imports. test_listing lists the folder src/pkg/plugins/ "
+            "(os.listdir; it never imports it) and holds its module names. No file the test opened or executed "
+            "changed; which files the folder holds did (DEC-876 condition 1, fail safe)")
+
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W2-48/test_w2_48_fail_safe.py:188: in _stale_pass_never_reported
+    support.assert_ran(third, [test_id], f"{why}. {EITHER_WAY}")
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Cached(what='(in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_a...s': {'passed': 0, 'failed': 0, 'error': 0, 'skipped': 0, 'reused': 7}, 'seconds': 2.38, 'exit_code': 0}, ran=Counter())
+ids = ['tests/test_listing.py::test_listing']
+why = 'src/pkg/plugins/three.py was added in a commit, a module no test imports. test_listing lists the folder src/pkg/plugi...the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not'
+
+    def assert_ran(run, ids, why):
+        """Each of ``ids`` ran in this run (the told log) and is labelled with its own result, never reused."""
+        problems = []
+        for test_id in ids:
+            result = run.result_of(test_id)
+            if not run.ran.get(test_id):
+                problems.append(f"{test_id} did not run in this run (the record says {result!r})")
+            elif result not in RAN_RESULTS:
+                problems.append(f"{test_id} ran, but the record says {result!r}")
+>       assert not problems, (
+               ^^^^^^^^^^^^
+            f"expected to run: {why}. A test whose input changed, or that cannot be reused, runs, and the record "
+            f"(`{RECORD_KEY}.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:\n  "
+            + "\n  ".join(problems) + "\n" + run.describe())
+E       AssertionError: expected to run: src/pkg/plugins/three.py was added in a commit, a module no test imports. test_listing lists the folder src/pkg/plugins/ (os.listdir; it never imports it) and holds its module names. No file the test opened or executed changed; which files the folder holds did (DEC-876 condition 1, fail safe). `python3 -m gov.testcache run --json tests` may meet this either way: by seeing that view (and running the test again when what it saw changed) or by running such a test every time; both are accepted, a reused pass is not. A test whose input changed, or that cannot be reused, runs, and the record (`test_cache.tests[]`) labels it with this run's result (passed, failed, error), never `reused`:
+E         tests/test_listing.py::test_listing did not run in this run (the record says 'reused')
+E       (in /tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/tree) python3 -m gov.testcache run --json tests
+E       exit code: 0
+E       record (without tests): {"run": "20261020T224923Z-54380f1c", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/tree/.gov-runtime/testcache/local", "commit": "ef4954a2020f502e9c23c3b7d8e45abd72c7e382", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 2.38, "exit_code": 0}
+E         tests/fixtured/test_fixtured.py::test_fixtured: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_alpha.py::test_alpha: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_beta.py::test_beta: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_data.py::test_data: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_listing.py::test_listing: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E         tests/test_subprocess.py::test_subprocess_fresh: record 'reused' from {'run': '20261020T224917Z-e9b1f3e6', 'commit': '01f0222f4e6c622e2120d9ff4581285357a87e2a'}; ran 0 time(s) in this run
+E       stdout (end):
+E       {"ok": true, "command": "run", "result": {"test_cache": {"run": "20261020T224923Z-54380f1c", "engine": "pytest-testmon 2.2.0 + coverage 7.16.2", "cache": "used", "scope": "local", "store": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/tree/.gov-runtime/testcache/local", "from": "/tmp/gov-launch-independent-test-designer-c6ydu2jg/claude-1000/pytest-of-usain/pytest-1/test_a_file_added_to_a_folder_0/tree/.gov-runtime/testcache/local", "commit": "ef4954a2020f502e9c23c3b7d8e45abd72c7e382", "clean": true, "wrote_entries": true, "keys": ["2919ffa584877d9632a4788892fbc60e"], "tests": [{"id": "tests/fixtured/test_fixtured.py::test_fixtured", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_alpha.py::test_alpha", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_beta.py::test_beta", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_data.py::test_data", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_listing.py::test_listing", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_subprocess.py::test_subprocess", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}, {"id": "tests/test_subprocess.py::test_subprocess_fresh", "result": "reused", "from": {"run": "20261020T224917Z-e9b1f3e6", "commit": "01f0222f4e6c622e2120d9ff4581285357a87e2a"}}], "counts": {"passed": 0, "failed": 0, "error": 0, "skipped": 0, "reused": 7}, "seconds": 2.38, "exit_code": 0}}, "session": ""}
+E       
+E       stderr (end):
+
+tests/acceptance/W2-48/w2_48_support.py:486: AssertionError
+__ test_the_research_record_records_the_planted_change_set_and_the_time_saved __
+
+    def test_the_research_record_records_the_planted_change_set_and_the_time_saved():
+        path = support.REPO_ROOT / support.RESEARCH_REL
+        assert path.is_file(), (f"{support.RESEARCH_REL} does not exist: it records the planted change set's results and "
+                                "the time saved on this repository's suite (KPI 11)")
+        text = path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+    
+        missing = [tool for tool in ("pytest-testmon", "coverage") if tool not in text]
+        assert not missing, f"{support.RESEARCH_REL} does not name the glue it records: {missing}"
+        unrecorded = [name for name, words in CLASSES.items()
+                      if not any(RESULT_WORDS.search(line) and any(word in line.lower() for word in words)
+                                 for line in lines)]
+        assert not unrecorded, (
+            f"{support.RESEARCH_REL} does not record the result of each class of the planted change set: for each, a line "
+            f"names the class and its result (ran, re-ran, reused): missing {unrecorded}")
+        saved = [line for line in lines if "saved" in line.lower() and DURATION.search(line)]
+>       assert saved, (f"{support.RESEARCH_REL} does not state the time saved on this repository's suite: a line with "
+                       "\"saved\" and a duration (seconds, minutes or hours)")
+E       AssertionError: docs/research/W2-48-cache-choice.md does not state the time saved on this repository's suite: a line with "saved" and a duration (seconds, minutes or hours)
+E       assert []
+
+tests/acceptance/W2-48/test_w2_48_glue_and_research.py:59: AssertionError
+5 failed, 55 passed in 327.01s (0:05:27)
