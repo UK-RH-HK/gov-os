@@ -178,7 +178,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 
 ## 3. The rest of the list, by severity
 
-791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), W2-L343 (DEC-741), W2-M360 and W2-L344 to W2-L348 (DEC-757), W2-H056, W2-L349, W2-L350 and W2-M361 to W2-M363 (DEC-758), W2-H057 (DEC-759), W2-H058 and W2-L351 (DEC-761), W2-M364 and W2-L352 (DEC-762), and W2-M365, W2-M366 and W2-L353 (DEC-763), W2-L354 (DEC-765), W2-M367 (DEC-768), and W2-H059 and W2-H060 (DEC-772), and W2-H061 (DEC-781), and W2-H062, W2-M368 and W2-M369 (DEC-779, DEC-785, W2-50's last review) and W2-M370 (W2-54's run 2, DEC-782), and W2-M371 (DEC-790), W2-M372 and W2-M373 (DEC-792), and W2-M374 (DEC-798), and W2-M375 to W2-M377 (DEC-807, DEC-808), and W2-M378 and W2-M379 (DEC-810), and W2-M380 to W2-M383 and W2-L355 (DEC-812), and W2-L356 to W2-L361 (W2-54's review), and W2-M384 (DEC-823), and W2-L362 (DEC-856), and W2-L363 (DEC-863), and W2-M386 to W2-M390 and W2-L364 to W2-L371 (DEC-864), and W2-L372 (W2-63), and W2-L373 (DEC-867), and W2-M391 (DEC-870), and W2-M392 (P-W2-55), and W2-L374 (DEC-873), and W2-M393, W2-M394 and W2-L375 to W2-L381 (DEC-877), and W2-M395, W2-M396 and W2-L382 to W2-L385 (W2-54 run 5), and W2-M397 and W2-L386 to W2-L389 (DEC-879), and W2-L390 to W2-L396 (W2-02 run 5), and W2-M398 and W2-L397 to W2-L400 (DEC-880, W2-58 run 2), and W2-M399 and W2-L401 to W2-L408 (DEC-882), and W2-L409 (DEC-885), and W2-L410 (DEC-888), and W2-M400 to W2-M402 and W2-L411 to W2-L413 (DEC-889), so 919 are open, 62 of them high, 401 medium and 413 low. Within a severity they are grouped by owner, then in the order of their sources. 42 more items closed or were superseded in the record; they are in §4.
+791 open items: 53 high, 356 medium, 341 low, 41 info. Items added after the Wave 2 plan's approval: W2-H054 (DEC-732), W2-M357 (DEC-735), W2-M358 (DEC-736), W2-H055, W2-M359 and W2-L342 (DEC-743), W2-L343 (DEC-741), W2-M360 and W2-L344 to W2-L348 (DEC-757), W2-H056, W2-L349, W2-L350 and W2-M361 to W2-M363 (DEC-758), W2-H057 (DEC-759), W2-H058 and W2-L351 (DEC-761), W2-M364 and W2-L352 (DEC-762), and W2-M365, W2-M366 and W2-L353 (DEC-763), W2-L354 (DEC-765), W2-M367 (DEC-768), and W2-H059 and W2-H060 (DEC-772), and W2-H061 (DEC-781), and W2-H062, W2-M368 and W2-M369 (DEC-779, DEC-785, W2-50's last review) and W2-M370 (W2-54's run 2, DEC-782), and W2-M371 (DEC-790), W2-M372 and W2-M373 (DEC-792), and W2-M374 (DEC-798), and W2-M375 to W2-M377 (DEC-807, DEC-808), and W2-M378 and W2-M379 (DEC-810), and W2-M380 to W2-M383 and W2-L355 (DEC-812), and W2-L356 to W2-L361 (W2-54's review), and W2-M384 (DEC-823), and W2-L362 (DEC-856), and W2-L363 (DEC-863), and W2-M386 to W2-M390 and W2-L364 to W2-L371 (DEC-864), and W2-L372 (W2-63), and W2-L373 (DEC-867), and W2-M391 (DEC-870), and W2-M392 (P-W2-55), and W2-L374 (DEC-873), and W2-M393, W2-M394 and W2-L375 to W2-L381 (DEC-877), and W2-M395, W2-M396 and W2-L382 to W2-L385 (W2-54 run 5), and W2-M397 and W2-L386 to W2-L389 (DEC-879), and W2-L390 to W2-L396 (W2-02 run 5), and W2-M398 and W2-L397 to W2-L400 (DEC-880, W2-58 run 2), and W2-M399 and W2-L401 to W2-L408 (DEC-882), and W2-L409 (DEC-885), and W2-L410 (DEC-888), and W2-M400 to W2-M402 and W2-L411 to W2-L413 (DEC-889), so 919 were opened; W2-02's close (2026-10-21) closed 7 of them (W2-M260, W2-M304, W2-M310, W2-M316, W2-M317, W2-L243, W2-L260, now in section 4), so 912 are open, 62 of them high, 396 medium and 411 low. Within a severity they are grouped by owner, then in the order of their sources. 49 more items closed or were superseded in the record; they are in §4.
 
 - **How the list was made:** helpers read every line of `bootstrap.md` and the register, and gave one row per item. The orchestrator added the exit report's residuals and the audit's findings, and merged rows with the same title (2 merged).
 - **What remains to check:** a row is carried as the source recorded it. Rows that name one problem from two places may remain; the source references join them. Before a ticket picks a row up, its state is re-checked against the code at that time, because a later commit may have fixed it unrecorded.
@@ -251,7 +251,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-H061 | `openspec-validate`, a hard-block check, never measures anything here: it is yellow with "openspec is not on PATH" without node, and yellow with "nothing to validate" with it, and a yellow check does not refuse a close: a false green | owner | Either this repository gets real openspec content that the check validates, green or red, or an owner decision declares the check not applicable here and the check states that; it never stays silently yellow (W2-45). | the blocker sweep, 2026-10-18 (DEC-775, DEC-781) |
 | W2-H062 | A backup left by `cp`, `mv` or `install` with `-b`, `-S` or `--backup` onto the settings file is not counted as a second name by the guard's read rule (it is for `sed -i`, DEC-553), so the original can be read at the backup's name; only a session with the orchestrator role reaches it, which today includes every lead (found by W2-50's run-7 review, R1, older than that round) | engineer | The read rule counts the backup name of `-b`, `-S` and `--backup` as a second name of a protected file and refuses it, with a reason (the Wave 3 hardening pass, DEC-801: it needs a deliberate `cp -b` onto the settings file; was W2-42, DEC-785). | W2-50's run-7 review, 2026-10-18 (DEC-779, DEC-785, DEC-801) |
 
-### 3.2 medium (401)
+### 3.2 medium (396)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -392,7 +392,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M135 | Freeze mirror location follows the process's home directory | engineer | The mirror is resolved from the password database rather than HOME. | B:1382 (DEC-429) |
 | W2-M136 | No checkpoint on context-utilisation threshold (KPI line 3) | engineer | A hook or watchdog writes a checkpoint on crossing the utilisation threshold. | B:1428 (DEC-445) |
 | W2-M137 | Open decisions and loop counts preserved for the orchestrator only | engineer | Worker checkpoints carry open decisions and loop counts, or the KPI is re-scoped. | B:1440 (DEC-096) |
-| W2-M138 | Audit validator does not check milestone value or pack_sha256 target | engineer | The validator checks milestone against the plan and the hash against the pack. | B:1478 (DEC-441) |
+| W2-M138 | Audit validator does not check milestone value or pack_sha256 target | engineer | The validator checks milestone against the plan and the hash against the pack. | B:1478 (DEC-441) (W2-02's part closed by its close, `e52ad8a2`, 2026-10-21; the rest stays open) |
 | W2-M139 | Claude Code extension newer than CLI reported as drift; doctor exits 3 | engineer | Doctor treats a newer extension above the minimum as passing, or the pin is updated. | B:1619 (DEC-210, DEC-448) |
 | W2-M140 | Several tools pass doctor by version only, not by hash | engineer | Registered hashes are of artefacts present on the machine and are compared. | B:1630 (DEC-448) |
 | W2-M141 | core-graph red: depends_on names W1 ids, not record ids | engineer | core-graph is green on this repository. | B:1690 (DEC-466) |
@@ -514,7 +514,6 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M257 | human_gate gap: a gate never written as a decision package | engineer | A planted gate with no package turns core-authority red. | R:6713 (DEC-627, DEC-643) |
 | W2-M258 | How the system knows a register entry is the owner's (owner-signed decisions) | engineer | Owner decision commits are signed, and gov close and core-authority accept only entries with a valid owner signature. | R:6266 (DEC-582, DEC-627) |
 | W2-M259 | A hard-block policy key is covered by any declaring check | engineer | A policy key counts as covered only by a hard-block check of a stated tier, and a case with a warning-only declarer is red. | R:6636 (DEC-622) |
-| W2-M260 | Type with absent schema file not reported unmeasured | engineer | The schema check reports unmeasured for any type with no schema file. | R:6636 (DEC-622) |
 | W2-M261 | rulesync writes no env block; adopted projects elsewhere lack auto-compact window | engineer | An adopted project on a fresh machine gets the env entry through a documented, generated mechanism. | R:6789 (DEC-636, DEC-643) |
 | W2-M262 | Close's test-runner cases and secrets scan fail under concurrent machine load | engineer | Those cases and the scan pass in a close run beside another active session. | R:6887 (DEC-647) |
 | W2-M263 | product-traceability-trailers red 'nothing is judged' right after adoption | engineer | Just after adoption the trailers check reads unmeasured or green, not red, until a ticket closes after the base. | R:6900 (DEC-647, DEC-648) |
@@ -555,23 +554,19 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M298 | Namespace policy fields free text; permitted_roles meaning unconfirmed | product-spec | Closed lists defined, permitted_roles meaning confirmed, and tests cover them | B:397 (DEC-289) |
 | W2-M299 | Failure, research, decision-package and checkpoint schemas lack type fields | product-spec | Type-specific required fields defined for these four record types | B:409 |
 | W2-M300 | New top-level folder fails the namespace coverage check until added | product-spec | Documented procedure or default namespace for new top-level folders | B:416 |
-| W2-M301 | Charter, contract and plan load invalid; templates load as records | product-spec | Core documents load valid, templates excluded, decisions resolvable, duplicates refused | B:454 (DEC-274) |
+| W2-M301 | Charter, contract and plan load invalid; templates load as records | product-spec | Core documents load valid, templates excluded, decisions resolvable, duplicates refused | B:454 (DEC-274) (W2-02's part closed by its close, `e52ad8a2`, 2026-10-21; the rest stays open) |
 | W2-M302 | Readiness record lacks profile and capability-type fields | product-spec | Schema carries the fields or checker reads them from the contract YAML | B:605 |
 | W2-M303 | OpenSpec does not force readiness before tasks | product-spec | Schema makes tasks/apply depend on readiness | B:609 |
-| W2-M304 | Schema does not hold the five decision-package status values | product-spec | Decision-package schema constrains these fields | B:627 (DEC-328) |
 | W2-M305 | Nothing writes specification frontmatter; bare gov readiness INVALID | product-spec | Template or skill writes frontmatter and bare readiness passes on a valid change | B:801 (DEC-350) |
 | W2-M306 | Undecided which tickets each lesson constrains | product-spec | A decision assigns each lesson's constrained tickets. | B:1256 (DEC-435) |
 | W2-M307 | Installed projects must ignore .gov-runtime/ and compiled files | product-spec | The template's ignore file covers .gov-runtime/ and compiled files, and adoption verifies it. | B:1597 |
 | W2-M308 | Doctor hard-codes six registry entries; registry lacks location fields | product-spec | Registry schema fields for location and hash scope, with doctor reading only those. | B:1622 |
-| W2-M309 | Record store names three docs invalid for lacking a type key | product-spec | The files carry valid frontmatter or are classed as non-records. | B:1662 (DEC-448) |
-| W2-M310 | core-schema red: legacy records without state_class | product-spec | core-schema is green on this repository. | B:1691 (DEC-466) |
+| W2-M309 | Record store names three docs invalid for lacking a type key | product-spec | The files carry valid frontmatter or are classed as non-records. | B:1662 (DEC-448) (W2-02's part closed by its close, `e52ad8a2`, 2026-10-21; the rest stays open) |
 | W2-M311 | Shipped path map invalid against the kernel's path-map schema | product-spec | The shipped path map validates against the schema. | B:1978 (DEC-499) |
 | W2-M312 | Adapter generation not run at copy; project-owned .rulesync paths undefined | product-spec | A spec names the project-owned .rulesync paths, and the copy runs generation or checks it. | B:1982 (DEC-488) |
 | W2-M313 | Project values in skill and briefs are unfilled, unchecked placeholders | product-spec | Adoption or a check fills the placeholders and flags unfilled ones | B:2170 |
 | W2-M314 | Template settings register three hook programs; four more are unregistered | product-spec | The template registers every hook it ships, or removes the unused ones | B:2472 |
 | W2-M315 | Each declaring check catches only one kind of violation of its policy | product-spec | Each policy key has checks covering its main violation kinds | B:2558; R:6636 (DEC-612, DEC-622) |
-| W2-M316 | Kernel has no record type for an audit report | product-spec | The kernel defines an audit-report type with a schema | B:2643 (DEC-624) |
-| W2-M317 | Kernel record type for audit and adoption verdict reports | product-spec | The kernel schema has a verdict or audit-report type, and the A5 verdict validates under it. | R:6670 (DEC-624, DEC-626) |
 | W2-M318 | Brief's PYTHONPATH=<clone>/src falls through to installed gov when no src/ | product-spec | Briefs and templates name the gov in use explicitly, and a clone without src/ is reported. | R:6959 (DEC-654) |
 | W2-M319 | Template path map ships only paths | product-spec | The template path map carries those fields and a tests/** namespace, and validates. | R:7034 (DEC-662) |
 | W2-M320 | Rule for a closed specification changed in place | product-spec | A rule exists, and a check flags an in-place edit of a closed specification. | R:7144 (DEC-674, DEC-680) |
@@ -657,7 +652,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-M389 | `precompact.py` and `sessionstart.py` put the project's `src` on their own import path, so a hook program imports the tree's code, not the pin's | engineer | The hook programs import the pinned package only (W2-10, which holds the kernel hooks). | W2-59 run 1, P-W2-59-1 (b), 2026-10-20 (ordinary work: yes; other: they fail soft; DEC-864) |
 | W2-M390 | The hook programs themselves are still read from the tree: a ticket that changes a hook program and the package it imports would block every tool call until a re-pin | engineer | A hook program and the package it imports move together on the pin ladder, or the program checks the pin's version and says what to re-pin (W2-18). | W2-59 run 1's residual, 2026-10-20 (ordinary work: yes; fails closed; DEC-864) |
 
-### 3.3 low (413)
+### 3.3 low (411)
 
 | ID | Item | Owner | Closes when | Sources |
 |---|---|---|---|---|
@@ -837,7 +832,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L174 | CLAUDE_PROJECT_DIR unset or empty makes all seven hook commands exit 2 | engineer | Hooks fall back or give a clear refusal | B:2525 |
 | W2-L175 | Trailers check in a worktree without a built store reads ids as unresolved | engineer | The trailers check builds or locates a store in worktrees | B:2528 |
 | W2-L176 | Record relabelled as a new type leaves type-selecting checks | engineer | Type changes are detected, or checks select by location as well | B:2560 |
-| W2-L177 | Type with no schema file not reported unmeasured; id grammars unapplied | engineer | Missing schemas are reported unmeasured and id grammars are applied | B:2564 |
+| W2-L177 | Type with no schema file not reported unmeasured; id grammars unapplied | engineer | Missing schemas are reported unmeasured and id grammars are applied | B:2564 (W2-02's part closed by its close, `e52ad8a2`, 2026-10-21; the rest stays open) |
 | W2-L178 | ci/command.py still passes family names the policy rule ignores | engineer | The parameter is removed | B:2565 |
 | W2-L179 | Dead entries in gitleaks config, doctor's historical paths and a closed ticket | engineer | The dead entries are removed | B:2643 (DEC-624) |
 | W2-L180 | Any supplementary lookup failure becomes 'index unavailable' | engineer | Failures are reported by kind | B:2341 (DEC-552) |
@@ -877,7 +872,7 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L214 | Lesser guard probe findings from W1-02's last round | engineer | Each of the four shapes has a case showing a bounded, explained result. | R:6323 (DEC-587) |
 | W2-L215 | gov doctor checks hook time limit exceeds guard's own deadline | engineer | gov doctor reports unhealthy when any guard hook entry's limit is at or below the guard deadline. | R:6257 (DEC-580) |
 | W2-L216 | Guard refuses creating the folder of an allowed file | engineer | mkdir of a parent folder of an allowed path is allowed by the guard. | R:5453 (DEC-497) |
-| W2-L217 | Schema check residuals: new types, depends_on shape, id grammars, success form | engineer | The schema check applies the new id grammars and depends_on shape, and the success form with findings inside is not green. | R:6636 (DEC-622) |
+| W2-L217 | Schema check residuals: new types, depends_on shape, id grammars, success form | engineer | The schema check applies the new id grammars and depends_on shape, and the success form with findings inside is not green. | R:6636 (DEC-622) (W2-02's part closed by its close, `e52ad8a2`, 2026-10-21; the rest stays open) |
 | W2-L218 | Dead argument the CI command passes to the policy rule | engineer | The argument is removed from gov ci, or the rule uses it, and a test holds which. | R:6620 (DEC-621) |
 | W2-L219 | Context and gate-check residuals: ticket names, duplicate ids, both layouts, messages | engineer | Each shape has a case, and ticket files with other extensions and duplicate ids are measured or refused by name. | R:6843 (DEC-643) |
 | W2-L220 | Adapter check held-out step residuals | engineer | Distinct finding codes with a remedy text, and a consistent project-root rule between the check and the generator. | R:6856 (DEC-644) |
@@ -903,7 +898,6 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L240 | Ticket schema requires only kpis, role, allowed_paths | product-spec | Decision on required ticket fields reflected in the schema | B:403 |
 | W2-L241 | Record status is any non-empty string; ticket type unpinned | product-spec | Schemas constrain status values per record type | B:405 |
 | W2-L242 | Id grammars undecided except lesson_id; link fields have no grammar | product-spec | Id grammars decided and validated | B:407 (DEC-252, DEC-227) |
-| W2-L243 | Committed ADRs lack state_class | product-spec | Both ADRs carry state_class and validate | B:418 |
 | W2-L244 | Four unnamed edge keys need checking against Framework 11.2 | product-spec | Product-spec check recorded against archived Framework 11.2 | B:461 (DEC-277, DEC-012) |
 | W2-L245 | blocked can return an empty reason list; cannot-be-read code needs decision | product-spec | Reason code decided and returned | B:581 |
 | W2-L246 | feature-readiness vs readiness naming mismatch with G-07/G-08 | product-spec | Sources and briefs use readiness.yaml | B:602 (DEC-305) |
@@ -920,7 +914,6 @@ Every line passes, in this order, before any pilot adoption of an owner reposito
 | W2-L257 | Launcher command in a code span in brief-lead.md and the role file | product-spec | Templates and role files follow the skill rule, or the validator covers them | B:2172 |
 | W2-L258 | Five brief templates have no record frontmatter or schema | product-spec | The briefs have frontmatter and a schema the schema check runs | B:2174 |
 | W2-L259 | Repository orchestrator prompt still duplicates the rules in the skill | product-spec | The prompt defers to the skill and briefs | B:2175 |
-| W2-L260 | Kernel path-map schema lacks close_workers and close_timeout | product-spec | The path-map schema declares both keys | B:2237 (DEC-554) |
 | W2-L261 | Ticket schema's second form admits any id grammar for depends_on | product-spec | The schema check validates depends_on forms | B:2561 |
 | W2-L262 | Documents still point to cli/ as present | product-spec | No active document presents cli/ as present | B:2643 (DEC-624) |
 | W2-L263 | carried-code namespace keeps the cli/** pattern and retention text | product-spec | The namespace is updated or removed | B:2643 (DEC-624) |
@@ -1169,3 +1162,10 @@ These rows are kept so that a reader of the sources sees where each item went.
 | W2-C040 | The semantic canary misses (FACET_UNAVAILABLE) | full rebuild of 2026-10-16 (DEC-718 item 4) | A F-M2 (DEC-709, DEC-718) |
 | W2-C041 | Outward actions after 2026-10-07 unrecorded | DEC-718 item 5 | A F-M9 (DEC-465, DEC-718) |
 | W2-C042 | FULL tickets W1-16 and W1-21 (and three follow-ups of 2026-10-07) have no probe record | accepted as named exceptions, DEC-718 item 7 | A F-M11 (DEC-565, DEC-718) |
+| W2-M260 | Type with absent schema file not reported unmeasured | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `81eac9a7` | R:6636 (DEC-622) |
+| W2-M304 | Schema does not hold the five decision-package status values | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `81eac9a7` | B:627 (DEC-328) |
+| W2-M310 | core-schema red: legacy records without state_class | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `81eac9a7` | B:1691 (DEC-466) |
+| W2-M316 | Kernel has no record type for an audit report | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `81eac9a7` | B:2643 (DEC-624) |
+| W2-M317 | Kernel record type for audit and adoption verdict reports | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `81eac9a7` | R:6670 (DEC-624, DEC-626) |
+| W2-L243 | Committed ADRs lack state_class | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `6359bd00` | B:418 |
+| W2-L260 | Kernel path-map schema lacks close_workers and close_timeout | W2-02, closed by `gov close` (`e52ad8a2`, 2026-10-21); the fix `1c21d0d2` | B:2237 (DEC-554) |
