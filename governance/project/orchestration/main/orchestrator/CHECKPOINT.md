@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-882)
+## RESUME HERE (2026-10-21 09:0x BST — W2-58 run 3 in flight, queue held for it; next free DEC-883)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -46,8 +46,12 @@
 - **Queue run 2 STOPPED by me at 08:2x** before any close (only its rebuild lost; checkpoint commit `bceec2e9`
   stays) to give W2-58 the machine (DEC-880 "ahead of everything"). Re-run after W2-58 merges, with W2-58 added:
   `bash tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`.
-- **In flight (1): W2-58 run 3** (DEC-880 item 1: `~` expansion on Read/Grep/Glob/Edit/Write/Bash + flagged pytest
+- **In flight (0 leads; lens H runs):** (was W2-58 run 3, DEC-880 item 1: `~` expansion on Read/Grep/Glob/Edit/Write/Bash + flagged pytest
   forms, full verification, 3rd review limited to the change), started 08:3x, `log/W2-58-A5-run3.json`.
+- **W2-58 run 3 DONE (third review pass), MERGED `4845b9b8` (14:0x).** Its three incoming reds were MINE (DEC-880's
+  records) and are fixed by DEC-882 (`9d8c1887`): DEC-843 item 3 stands (registry approved_by, xxgp's input); suite
+  logs (W1-27.txt) out of the orchestration record + sync rule. Rows W2-M399, W2-L401..408. **Queue run 3 STARTED**
+  with six: W2-02, W2-54, W2-62, W2-63, W2-50, W2-58 (`DAEO-5j8b`). Then merge W2-59, W2-65, ACT ping, W2-66.
 - **Lens H (DEC-881) RUNNING since 08:5x:** independent auditor, effort max, from the main tree; brief
   `briefs/assessment-H.md`, log `log/assessment-H.json`; report to `.gov-runtime/scratch/assessment/2026-10/
   H-test-strategy.md` -> copy byte for byte to `docs/assessment/2026-10/`; install exception (venv under
@@ -71,7 +75,7 @@
    (`--no-ff`, Task/Role trailers, tree == merge-tree); checkpoint; sync.
 2. W2-58 DONE -> merge -> queue (six) -> merge W2-59 -> W2-65 -> ACT ping (re-pin + settings) -> W2-66 start.
 3. Later: W2-64; held tickets' resumes by keystone; daily digest (records since push, usage, refusals, memory use).
-4. Next free: ticket W2-67; rows W2-H063, W2-M399, W2-L401. Briefs: `tools/build_lead_brief.py <part> <out> ID= W2=
+4. Next free: ticket W2-67; rows W2-H063, W2-M400, W2-L409. Briefs: `tools/build_lead_brief.py <part> <out> ID= W2=
    PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Standing rules (short; the prompt holds the full text)
