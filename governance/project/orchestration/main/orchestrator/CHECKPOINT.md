@@ -83,6 +83,11 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **DEC-895 (owner, standing) DRAFTED** (`drafts/register-282-DEC-895.md`; commit after queue run 8, with the prompt
+  v3.15 §5/§3/§15 and LEAD-common edits): (1) every ratchet/accepted-history entry validated with the PIN's readers
+  before the ACT (`tools/validate_entry.py <patch> [register]`, run with the pin's python -E) and the ACT ping says it
+  passed; (2) after EVERY merge run `tools/probe_impact.py <merge>`: a merged-not-closed FULL ticket whose judged
+  files changed gets its fresh probe scheduled at once, in parallel, noted in the queue. Both tools tested.
 - **10-22 11:40: W2-50's close REFUSED** (count 1; repair `log/repair-tickets/DAEO-h8r2.md`): PROBE_INVALID (W2-58's
   conflict-resolving merge eb0f1454 changed W2-50's probed files: NEW, structural) + the DEC-892 entry refused (its
   text lacked the test's file path: MY slip). **DEC-893 + DEC-894 COMMITTED `da3d77e1`:** DEC-892's text names the
