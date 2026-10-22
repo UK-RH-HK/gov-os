@@ -1003,6 +1003,38 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a record-only list that hides a code path;
   - a code merge during a batch.
 
+#### W2-69 The secrets check reads what the stores hold: no chance red from where a scan begins (FULL, engineer; DEC-897; keystone 2)
+- **Why:**
+  - The secrets-indexing check, a hard-block check, feeds a store's content to `gitleaks stdin` as one input.
+  - A read of gitleaks that begins inside a word makes a rule's leading word boundary match there, so a fragment of a longer identifier is taken for a token. Where the reads begin moves with every rebuild, so any rebuild can turn `gov check` and a close RED by chance.
+  - W2-62's queue of 2026-10-22 stopped this way (P-W2-62-G1: a `gov-token-lower` hit, 62 bytes inside an 84-character identifier, in no tracked file).
+  - Ticket `DAEO-rmbe`; it takes in W2-M404.
+- **The design question (owner, DEC-897 item 1):** should the check scan the indexed text (the rows, as text) instead of the raw database bytes? That option comes with:
+  - each store compacted (`VACUUM`) after each rebuild, so no deleted text survives in free pages;
+  - a boundary-aware raw scan kept only as a backstop.
+  The tests decide; the answer and its evidence go in `docs/research/W2-69-secrets-scan.md` before the code. Row W2-M395 (W2-45) is settled by the choice or left to W2-45 with a reason.
+- **Place:**
+  - Rides in the first re-pin (W2-58, W2-59, W2-65, W2-66, W2-07; DEC-896).
+  - Starts in a free slot after W2-50's run 9 returns (W2-50 shares `src/gov/secrets/__init__.py`).
+  - Until it is pinned, DEC-897 (b) allows one proven re-run of a close's queue per close.
+- **Allowed paths:**
+  - `src/gov/secrets/**`;
+  - `src/gov/rebuild/command.py`: the compaction step after each store's build only;
+  - `tests/unit/secrets/**`, `tests/unit/rebuild/test_compaction*`;
+  - `docs/research/W2-69-secrets-scan.md`.
+- **KPIs, success:**
+  - A real token is found at every offset and in every form the stores hold it (a stored value, a row read as text, UTF-16 text, across every read or split boundary), at a word boundary as the rule defines it.
+  - An embedded fragment of a longer identifier is not flagged, at every offset relative to any read edge, for every rule with a leading word boundary.
+  - Deleted text does not survive a rebuild: neither in the rows nor in free pages.
+  - The design question is answered with evidence.
+  - Every file under `.gov-runtime/` scanned today is still scanned, with every rule set. A scan that cannot finish fails closed. DEC-853's clean-result reuse stays, and a finding is never reused.
+- **KPIs, failure:**
+  - a real token missed at any offset or in any form;
+  - a word-internal fragment flagged at a read edge;
+  - deleted text left in free pages after a rebuild;
+  - a file the check scanned before no longer scanned;
+  - an unfinished scan passing as clean.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
