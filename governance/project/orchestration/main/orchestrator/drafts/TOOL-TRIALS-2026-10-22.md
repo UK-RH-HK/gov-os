@@ -76,3 +76,26 @@
 - **Worksteal:** adopt it, after W2-67 removes or bounds the nested reruns (6 tests) or W2-57 puts them in the serial run. Otherwise worksteal turns them red under load.
 - **The shared core:** the declared map is safe on all 32 faults, with no widening needed. But in the three widest-reaching modules its recall is 0.10 to 0.46. The W2-66 draft proposes adding `src/gov/config/**`, `src/gov/tasks/tickets.py` and `src/gov/store/**` to the shared core, so a change there runs the full suite.
 - **grimp:** not a selector; at most a helper for test-side imports.
+
+## The two unexplained results, explained (the owner's item d, 2026-10-22; DEC-892)
+
+### The `tests/unit/secrets` collection errors in all five runs
+- **Measured** on the trial clone with the venv:
+  - collection of `tests/unit/secrets` fails (3 errors) with pytest-randomly loaded, and with pytest-rerunfailures loaded;
+  - it collects all 26 tests with only pytest-timeout loaded, and with the system interpreter.
+- **The cause:** each of the two plugins imports the standard library's `secrets` before collection, so the test package named `secrets` clashes with it (row W2-L373).
+- **Not in a real close or on the head:** the closes' interpreter loads none of these plugins, and W2-02's and W2-54's closes and the rehearsal ran the folder green.
+- **The consequence:** rerunfailures and randomly enter the nightly only after W2-L373's rename (DEC-892).
+
+### The 9 extra failures of the timeout run
+- **What they are:** the nested-run class, tests that start their own pytest run with a 60-second limit. They are `tests/unit/close`'s `test_parallel_runs` and `test_run_and_record`, and W1-47's guard builder-test case; under worksteal they land beside the heaviest tests.
+- **A confound found while explaining:** pytest-randomly, once installed in the venv, loaded itself in every run. So all five runs ran in shuffled orders, b1 and b2 included, and worksteal's 9 % compares two different random orders. It is re-measured once the nested runs are gone (DEC-892 a).
+- **Not in a real close or on the head:** none of these tests failed in W2-02's or W2-54's close (`--dist load`, file order) or in the rehearsal.
+- pytest-timeout itself fired on no test: no test reached 900 s.
+
+## The owner's rulings on this report (2026-10-22, DEC-892)
+- a. **Worksteal:** in neither the close, the nightly nor the leads until W2-67 or W2-57 removes the nested runs; then re-measured.
+- b. **Per-test limits:** pytest-timeout, `--timeout-method signal`, as an owner install package when W2-66 needs it.
+- c. **The three widest-reaching modules** go into W2-66's shared core.
+- d. **Explained above:** no package.
+- e. **Trial d is redone** with `-rR` and the seed recorded, and with `-p no:randomly` for the rerunfailures run so that its order is the file's. Then `/tmp/gov-os-tooltrial` is removed and shown.

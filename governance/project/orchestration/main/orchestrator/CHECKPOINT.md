@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 09:3x BST — trials done; lens I running (4); closes held for P-W2-63-C1; next free DEC-892)
+## RESUME HERE (2026-10-22 09:4x BST — DEC-892; W1-38 entry awaits the owner; lens I running; next free DEC-893)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,6 +83,14 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **10-22 09:4x: DEC-892 COMMITTED `8d625805`** (P-W2-63-C1 answers + trial-report rulings): W2-63 merged-not-closed
+  until W2-07 reads acceptance_tests.path (no folder, no exception); W1-38 entry -> owner's Role: owner commit
+  (patch `drafts/W1-38-unsourced-entry.patch`, ACT pinged); the rulesync probe = W2-57's FIRST item (test revision);
+  gate (g) network check in close_queue.sh (`tools/net_check.py`, 17 hosts ok); worksteal OUT of nightly/leads until
+  W2-67/W2-57; pytest-timeout (signal) as an owner install package when W2-66 needs it; the 3 widest modules into
+  W2-66's shared core; (d) explained (rerunfailures/randomly break tests/unit/secrets: W2-L373 first; randomly
+  autoloaded in all trial runs). **AFTER the owner's W1-38 commit: `bash tools/close_queue.sh DAEO-kl5e DAEO-5j8b
+  DAEO-juee`.** Redo trial d (-rR, seed, -p no:randomly for d1) in a quiet window, then remove /tmp/gov-os-tooltrial.
 - **10-22 09:3x: TRIALS DONE** (report `drafts/TOOL-TRIALS-2026-10-22.md`): lens H rest 32/32 faults by the declared
   map (recall 0.10-0.46 in the 3 widest modules), mutation 92.1/92.7/87.9 %; worksteal -9 % wall but 6 nested-run
   reds; pytest-timeout (signal) fires in child hangs, no leftovers, no measurable cost; grimp 27/32, no selector;

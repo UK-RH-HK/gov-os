@@ -46,6 +46,16 @@ for item in "$@"; do
     tests/acceptance/W1-07/test_w1_07_envelope.py > "$LOG/records-$ticket.txt" 2>&1 \
     || stop "a suite that reads the records is red: $(grep -E '^FAILED|^ERROR' "$LOG/records-$ticket.txt" | head -3 | tr '\n' ' ')"
   date '+%F %T records ok: '"$(tail -1 "$LOG/records-$ticket.txt")" >> "$LOG/queue.txt"
+  # (g) DEC-892: the live tests' allowlisted hosts are reachable; if not, hold and retry (every 10 min, up to 6 times),
+  # rather than spend a close on a network failure (W2-63's close of 2026-10-22, static.crates.io).
+  tries=0
+  until python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/net_check.py > "$LOG/net-$ticket.txt" 2>&1; do
+    tries=$((tries + 1))
+    date '+%F %T network not ready ('"$tries"'): '"$(grep unreachable "$LOG/net-$ticket.txt" | head -3 | tr '\n' ' ')" >> "$LOG/queue.txt"
+    [ "$tries" -ge 6 ] && stop "the allowlisted hosts stayed unreachable for an hour: $(grep unreachable "$LOG/net-$ticket.txt" | tr '\n' ' ')"
+    sleep 600
+  done
+  date '+%F %T network ok: '"$(tail -1 "$LOG/net-$ticket.txt")" >> "$LOG/queue.txt"
   # (b) gov check after the rebuild, no commit in between.
   gov check --json > "$LOG/check-$ticket.json" 2> "$LOG/check-$ticket.err" || stop "gov check is not green (exit $?)"
   # (e) every commit of the ticket (Task: <id>) carries Implements: (the close's trailer gate, TRAILER_MISSING),
