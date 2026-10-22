@@ -116,7 +116,12 @@
   Still to look at: /tmp/pytest-of-usain (61 run folders since 10-20: retention not working), 44
   /tmp/gov-testcache-*, /tmp/gov-os-tooltrial (1,341; remove after trial d), "another review's folder, 8.9M". My write to ~/gov-os-runs was REFUSED by the guard
   (no W2-00 folder): do not retry.
-- **Lens I synthesis LAUNCHED** behind the gate (`log/assessment-IS.json`); brief BUILT
+- **Lens I synthesis DONE (20:50):** `assessment/2026-10/I-SYNTHESIS.md` (3,256 verdicts, 86 % valid; 48/119 planted
+  faults passed, 24 fail open or lose work, latent; 3 live gaps, no round; P-IS-1..16). **REVIEW BUNDLE DRAFTED:**
+  `drafts/review-bundle/00-INDEX.md` + 01 W2-66 ticket, 02 W2-66 card, 03 W2-68 card, 04 W2-67 card, 05 W2-57
+  ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections (W2-70 = new small ticket for P-IS-3's two
+  retirements). AFTER W2-50's queue: copy I1-I4 + I-SYNTHESIS byte for byte to docs/assessment/2026-10/ (record
+  commit), then ACT ping (Windows paths) and WAIT. (Earlier:) brief BUILT
   `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output
   `assessment/2026-10/I-SYNTHESIS.md`; sections: diagnosis, counts, fails-open, changes by ticket, retirements,
   owner decisions in work order, disagreements). Launch it (independent-auditor, effort max, from the main tree,

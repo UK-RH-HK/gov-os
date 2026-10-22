@@ -1,0 +1,5 @@
+2026-10-22 20:50:35 quiet
+2026-10-22 20:50:35 rebuild before DAEO-kl5e
+2026-10-22 20:54:32 collect ok: 15762/15764 tests collected (2 deselected) in 6.62s
+2026-10-22 20:56:46 records ok: 80 passed in 110.51s (0:01:50)
+2026-10-22 20:56:49 network ok: allowlisted hosts checked: 17; unreachable: 0
