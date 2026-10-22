@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 09:54 BST — queue run 7 (W2-50, W2-58, W2-62); lens I running; DEC-893 drafted; next free DEC-893)
+## RESUME HERE (2026-10-22 11:53 BST — W2-50 refused (fresh probe next); queue run 8 (W2-58, W2-62); lens I running; next free DEC-895)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,6 +83,13 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **10-22 11:40: W2-50's close REFUSED** (count 1; repair `log/repair-tickets/DAEO-h8r2.md`): PROBE_INVALID (W2-58's
+  conflict-resolving merge eb0f1454 changed W2-50's probed files: NEW, structural) + the DEC-892 entry refused (its
+  text lacked the test's file path: MY slip). **DEC-893 + DEC-894 COMMITTED `da3d77e1`:** DEC-892's text names the
+  full test id (the pin's ratchet now counts 32 load_sensitive, refuses 0); placeholder times corrected in 8
+  packages + W2-L414; the scan exempts lines marked `<!-- placeholder-examples -->`. **Queue run 8 STARTED 11:53:
+  W2-58, W2-62** (STANDARD, no probe gate). **Then W2-50 run 9** (`briefs/W2-50-A5-run9.md`: merge integrate,
+  fresh FULL probe, no code change), then W2-50's re-close.
 - **10-22 09:54: owner committed the W1-38 entry `49c24ac9` (Role: owner) and pushed both branches. Queue run 7
   STARTED: W2-50, W2-58, W2-62** (gate (g) network ok, trailers ok). **DEC-893 (owner, standing) DRAFTED**
   (`scratchpad register-280-DEC-893.md`): a placeholder scan (`tools/placeholder_scan.py`, now in

@@ -23,9 +23,14 @@ def angle_scope(name: str) -> bool:
     return name.endswith(".patch") or name.endswith("path-map.yaml")
 
 
+EXEMPT = "<!-- placeholder-examples -->"  # a line that defines the rule and names its examples, marked as such
+
+
 def scan_lines(name: str, numbered):
     hits = []
     for no, line in numbered:
+        if EXEMPT in line:
+            continue
         for m in GENERAL.finditer(line):
             hits.append((name, no, m.group(0)))
         if angle_scope(name):
