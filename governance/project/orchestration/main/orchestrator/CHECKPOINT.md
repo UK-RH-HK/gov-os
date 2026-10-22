@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 14:20 BST — DEC-896 committed; W2-62's close stopped at gate (b), P1 P-W2-62-G1 sent; W2-50 run 9 next; lens I running; next free DEC-897)
+## RESUME HERE (2026-10-22 15:10 BST — DEC-897 committed; W2-62's queue re-run once under DEC-897 (b); W2-50 run 9 running; lens I running; next free DEC-898)
 
 ### Standing owner rules (short; full text in the register and prompt v3.16; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -51,15 +51,17 @@
 - **Closed (gov close):** W2-01 (tk), W2-53, W2-02 `e52ad8a2`, W2-54 `55162ea2`. Close success 3 of 16 runs
   (gate stops uncounted). Refusal repair tickets in `log/repair-tickets/` (W2-58 DAEO-aneq, W2-50 DAEO-h8r2,
   W2-63 DAEO-nkk9).
-- **W2-62's close STOPPED at gate (b) 13:56** (uncounted; no close spent): secrets-indexing RED on
-  `.gov-runtime/codeintel/home/code.db`. Diagnosed (positions only): rule gov-token-lower, 62 bytes INSIDE an
-  84-char identifier; gitleaks clean on the whole line, red on the line cut at the match start: a read of gitleaks
-  starting mid-word makes `\b` match. NEW cause (not W2-M395's byte join). **P1 `drafts/P-W2-62-G1.md`** (file
-  into packages/ with the next record commit): rec (a) FULL ticket W2-69 (no read begins inside a word; in the
-  first re-pin; row W2-M404) + (b) one re-run of W2-62's queue now as an owner exception. PINGED; WAIT for answer.
-  If (b): `bash tools/close_queue.sh DAEO-juee`; red again -> stop, closes wait for (a).
-- **W2-50 run 9** (`briefs/W2-50-A5-run9.md`, merge integrate, fresh FULL probe, no code change; worktree head
-  `b9a5e5cd`): launch when the gate opens (load was 22.8 at 14:20), log `log/W2-50-A5-run9.json`; then its re-close.
+- **W2-62's queue stopped at gate (b) 13:56** (uncounted): secrets-indexing chance red (gov-token-lower, 62 bytes
+  inside an 84-char identifier, no tracked file; gitleaks clean on the whole line, red on it cut at the match). P1
+  `packages/P-W2-62-G1.md` -> **DEC-897 (owner, answered by 15:01; committed with this record)**: (a) W2-69 FULL in the
+  first re-pin, design question widened (scan rows as text + VACUUM after each rebuild, boundary-aware raw scan as
+  backstop; tests: real token at every offset and form, no embedded fragment flagged, no deleted text survives);
+  row W2-M404. (b) ONE re-run of a close's queue only on that proof, evidence in the queue log + report, at most one
+  per close; any other or second red stops the queue until W2-69 is pinned; same for W2-50's re-close.
+  **W2-62's one re-run: `bash tools/close_queue.sh DAEO-juee`, started after the DEC-897 commit.** W2-69's card
+  (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
+- **W2-50 run 9 lead RUNNING since about 15:00** (`briefs/W2-50-A5-run9.md`: merge integrate, fresh FULL probe, no
+  code change; log `log/W2-50-A5-run9.json`; its workers pause while CLOSE-RUNNING exists). Then its re-close.
 - **Lens I: 4 auditors RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
@@ -73,11 +75,11 @@
 - **Worktrees to remove after a sync:** W2-48's (branch kept, `2c3c46b5`); 44 `/tmp/gov-testcache-*` leftovers.
 
 ### Next
-1. Owner answers P-W2-62-G1 -> record the decision (DEC-897), act on it.
-2. W2-50 run 9 when the gate opens; on return: read `result`, checkpoint, sync, then its re-close (gates a-h).
+1. W2-62's queue (one DEC-897 re-run): closed -> mark rows, commit outputs; red -> stop, closes wait for W2-69.
+2. W2-50 run 9 on return: read `result`, checkpoint, sync, then its re-close (gates a-h).
 3. Lens I returns -> synthesis -> copy reports -> review-bundle drafts -> ACT ping -> WAIT.
 4. Daily digest (records since push, usage, refusals counted, memory use); trial d redo; worktree cleanup.
-5. Next free: DEC-897; ticket W2-69 (W2-67, W2-68 are planned cards); rows W2-M404, W2-L415, W2-H063. Briefs:
+5. Next free: DEC-898; ticket W2-69 (to create; W2-67, W2-68 are planned cards); rows W2-M405, W2-L415, W2-H063. Briefs:
    `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Never
