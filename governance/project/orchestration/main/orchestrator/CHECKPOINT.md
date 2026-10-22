@@ -83,6 +83,13 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **DEC-896 (owner) DRAFTED** (`drafts/register-283-DEC-896.md`; commit after W2-62's close, with the prompt v3.16
+  §3/§7/§15): P-W2-58-C1 (a) a W2-07 KPI (decision records under an ACCEPTED decision count as measured) + (d)
+  corrected: my ticket-file commits carry `Task: <ticket>`; the test-selection lists move to their own file
+  (`governance/project/test-map.yaml`, W2-66/W2-68's), the path map is named by NO ticket; **W2-07 comes forward with
+  W2-66, before the first re-pin** (which then carries W2-07); W2-07's card drafted for the review bundle (KPIs: the
+  decision-record rule, test-revision tickets on acceptance_tests.path, a stale probe named before the run). Until
+  that re-pin: no close unless gates (a)-(h) all predict a pass; W2-58 and W2-63 wait.
 - **10-22 13:28: W2-58's close REFUSED, WORK_WITHOUT_TASK** (count 1; repair `log/repair-tickets/DAEO-aneq.md`): 7
   `Task: decision-record` commits in its range changed its paths (path-map.yaml: 6, incl. 3 owner commits) or its
   ticket file (my b772b2fe, against prompt §7). No exemption in the pin; no rewrite. W2-63 has the same (my
