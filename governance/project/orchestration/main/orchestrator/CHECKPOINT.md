@@ -96,7 +96,11 @@
   F-1, F-2, F-7, F-10, F-14 + Part 4.2's serial-list changes; W2-66 gets Part 4.1 for its test map. Also F-6 (a
   failed restore labelled "reverted" passes all 1,357 containment cases), F-3 (decisions Policy 2 replaced lack
   "Changed by" marks: a DEC-866 sweep for me), F-4 (DEC-769 item 3 missing from W2-21's ticket).
-- **Lens I: area 4's resume RUNNING (log `log/assessment-I4-resume.json`)**; then the synthesis (`log/assessment-I1..4.json`; reports to
+- **Lens I: area 4's resume RUNNING (log `log/assessment-I4-resume.json`)**; then the synthesis: brief BUILT
+  `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output
+  `assessment/2026-10/I-SYNTHESIS.md`; sections: diagnosis, counts, fails-open, changes by ticket, retirements,
+  owner decisions in work order, disagreements). Launch it (independent-auditor, effort max, from the main tree,
+  gate in the command) when I4 returns (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
 - **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly
