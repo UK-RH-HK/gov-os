@@ -75,7 +75,13 @@
   its report). Resume auditor `briefs/assessment-I4-resume.md` (preface: finish from the drafts, runs in the
   foreground, never end a turn with a run pending) QUEUED behind the close lock + gate, log
   `log/assessment-I4-resume.json`. Lesson for every future auditor brief: foreground runs only.
-- **Lens I: areas 1-3 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
+- **Lens I3 DONE (18:26):** `assessment/2026-10/I3-retrieval-context-resume.md` (878 verdicts: 796 valid, 38 weak,
+  26 duplicate, 8 obsolete, 6 outdated, 4 flaky; 17 findings; packages R1-R6, O1-O4; T-A3 = 42 rows for me).
+  BEFORE THOSE TICKETS START (bundle): W2-65's paths lack `src/gov/hooks/subagentstop.py` (W1-29's identity case
+  would go red at its close); W2-04, W2-37, W2-32 paths need the test files their revisions touch. Into the bundle
+  too: `gov retrieve` gives every register item the id DEC-891 (23 of 23); `gov context` ok:true at about 1.19M
+  tokens against a 6,000 ceiling; 5 planted faults that fail open or lose work pass every test.
+- **Lens I: areas 1-2 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
 - **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly

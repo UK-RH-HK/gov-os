@@ -10,6 +10,13 @@ Containment flagged six `Role: owner` decision-record commits that came in with 
 
 Repair ticket DAEO-h8r2 also names a refused load_sensitive entry (W1-38 rulesync, DEC-892): the path map is owner-only; reported, not acted on.
 
+## Progress (run 9)
+
+- Rebuild `log/rebuild-9.*`: ok, 15:01–15:12. gov.__file__ = /home/usain/gov-os-worktrees/W2-50/src/gov/__init__.py.
+- Waited 15:11–16:45 for the orchestrator's close (DAEO-juee, CLOSE-RUNNING).
+- `log/v9/` (script `verify9.sh a|p|s`): W2-50 636 passed (29 min, load up to 84); unit/guard 1054 passed; unit/launch 138 passed; gov check exit 0, YELLOW core-decision-citations, openspec-validate, the rest GREEN (secrets-indexing included).
+- Stage p (the close's parallel run of tests/) started 18:02; then stage s (serial-only, collect-only); then `gov checkpoint` + commit; then fill HEAD_SHA and VERIFICATION_SUMMARY in briefs/rev-9.md and launch the reviewer (tripwire-before-12).
+
 ## Loop count
 
 Run 9: no implementation iteration (no code changes). Reviews: 8 so far (run 8's passed).
