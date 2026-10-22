@@ -4550,3 +4550,113 @@ P2 items go into one daily digest.
   without the owner's decision; hooks; --no-verify; secrets/held-out contents; ~/gov-os-workbench; grow
   accepted_reds/load_sensitive; weaken a hard-block check; let the ratchet retry; `$VAR` write targets (also in
   sed -i!); heredocs/backticks in commands (DEC-409).
+
+## RESUME HERE's state part, moved 2026-10-22 22:22 BST
+
+### Plan in force (DEC-884, DEC-889 items 14-15, DEC-892, DEC-896)
+- **REVIEW POINT (DEC-889 item 14): NO W2-66/67/68 work.** After lens I reports: draft W2-66's ticket + card
+  (selection + evidence; test-map.yaml, never the path map; 3 widest modules in the shared core; JUnit; time
+  limits; record-only list), W2-68's card (batching, reuse, fingerprints, red batch, trial; test-map.yaml), W2-67's
+  card (per-test copies, nested reruns), W2-57's ticket file (P-H-9 item 5; rulesync probe FIRST, a test revision;
+  the 22 serial-only entries), W2-07's card (3 KPIs: decision records under an ACCEPTED decision measured;
+  test-revision tickets on acceptance_tests.path; stale probe named before the run), the re-pin plan. Then ACT ping
+  with Windows paths (`\\wsl.localhost\Ubuntu-24.04\...`), the trial results, lens I's report. WAIT.
+- **Re-pins:** first after W2-66 (ladder trial) and W2-07: carries W2-58, W2-59, W2-65, W2-66, W2-07; second after
+  W2-68. W2-59 + W2-65 (stacked on w2/W2-59) unmerged until just before the first; earlier needs a package.
+- **W2-58 and W2-63 merged-not-closed, wait for the first re-pin** (W2-58: WORK_WITHOUT_TASK, P-W2-58-C1/DEC-896;
+  W2-63: no tests/acceptance/W2-63, DEC-892).
+- Free slots (never during a close): W2-65, W2-57, the nightly (no worksteal), held resumes by keystone.
+
+### Where things stand (10-22 14:20)
+- **Owner pushed through `49c24ac9`.** Since: DEC-893+894 `da3d77e1`; DEC-895 `365f1307`; W2-58 checkpoint
+  `bddd22f6`; W2-62 checkpoint `2b20aa27`; **DEC-896 `c4f2b303`** (register v0.283, prompt v3.16 §3/§7/§15,
+  P-W2-58-C1 filed). DEC-896 does not reach the lead or auditor briefs (leads don't commit ticket files or
+  the path map).
+- **Closed (gov close):** W2-01 (tk), W2-53, W2-02 `e52ad8a2`, W2-54 `55162ea2`. Close success 3 of 16 runs
+  (gate stops uncounted). Refusal repair tickets in `log/repair-tickets/` (W2-58 DAEO-aneq, W2-50 DAEO-h8r2,
+  W2-63 DAEO-nkk9).
+- **W2-62's queue stopped at gate (b) 13:56** (uncounted): secrets-indexing chance red (gov-token-lower, 62 bytes
+  inside an 84-char identifier, no tracked file; gitleaks clean on the whole line, red on it cut at the match). P1
+  `packages/P-W2-62-G1.md` -> **DEC-897 (owner, answered by 15:01; committed with this record)**: (a) W2-69 FULL in the
+  first re-pin, design question widened (scan rows as text + VACUUM after each rebuild, boundary-aware raw scan as
+  backstop; tests: real token at every offset and form, no embedded fragment flagged, no deleted text survives);
+  row W2-M404. (b) ONE re-run of a close's queue only on that proof, evidence in the queue log + report, at most one
+  per close; any other or second red stops the queue until W2-69 is pinned; same for W2-50's re-close.
+  **W2-62's one re-run: `bash tools/close_queue.sh DAEO-juee`, started after the DEC-897 commit.** W2-69's card
+  (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
+- **W2-50 CLOSED `01488b72` (22:17, clean gov close; gate (b) green 21:02).** Row W2-M355 to §4 `68314b8e`
+  (912 open); worktree + branch removed. Close success 5 of 18. **Lens I's five reports in docs `210721e0`**
+  (byte-identical). **W2-69 may start now** (no overlap in flight): brief A5 lead, FULL, with W2-L373 + the
+  P-IS-5 corrections if the owner takes them.
+- **W2-62 CLOSED `d7daf01b` (16:44, clean gov close after the one DEC-897 re-run; gate (b) green 15:33).** Rows
+  W2-M372/M373 to §4 + closing checkpoint `466c63ae` (Task: DAEO-juee); worktree + branch removed. Close success 4
+  of 17. close_queue.sh now commits `docs/checkpoints/<id>/` with the outputs (gov close writes a last one).
+- **W2-69 `DAEO-rmbe` CREATED `89f043e2`** (ticket + WBS card, Task: DAEO-rmbe; FULL; DEC-897's design question;
+  paths src/gov/secrets/**, rebuild/command.py compaction step, tests/unit/secrets/**, tests/unit/rebuild/
+  test_compaction*, docs/research/W2-69-secrets-scan.md). Starts in a free slot after W2-50 run 9 returns; rides
+  in the first re-pin. NOTE: the store loads tickets from HEAD only, so a new ticket reads 'not measured' in
+  context-reproducibility until committed and rebuilt (expected; no rebuild needed before its commit).
+- **Lens I area 4 ended PARTIAL, no report (return read 16:17):** it ended its turn with its own background runs pending
+  (in `claude -p` that ends the session). Drafts in `/tmp/gov-os-assessment-I4/drafts/` (36G folder: REMOVE after
+  its report). Resume auditor `briefs/assessment-I4-resume.md` (preface: finish from the drafts, runs in the
+  foreground, never end a turn with a run pending) QUEUED behind the close lock + gate, log
+  `log/assessment-I4-resume.json`. Lesson for every future auditor brief: foreground runs only.
+- **Lens I3 DONE (18:26):** `assessment/2026-10/I3-retrieval-context-resume.md` (878 verdicts: 796 valid, 38 weak,
+  26 duplicate, 8 obsolete, 6 outdated, 4 flaky; 17 findings; packages R1-R6, O1-O4; T-A3 = 42 rows for me).
+  BEFORE THOSE TICKETS START (bundle): W2-65's paths lack `src/gov/hooks/subagentstop.py` (W1-29's identity case
+  would go red at its close); W2-04, W2-37, W2-32 paths need the test files their revisions touch. Into the bundle
+  too: `gov retrieve` gives every register item the id DEC-891 (23 of 23); `gov context` ok:true at about 1.19M
+  tokens against a 6,000 ceiling; 5 planted faults that fail open or lose work pass every test.
+- **Lens I2 DONE (18:55):** `assessment/2026-10/I2-close-checks-ratchet.md` (418 of 1,459 functions: 306 valid, 58
+  weak, 16 outdated, 23 flaky, 4 duplicate, 1 obsolete, 10 not reproducible; 14 findings; P-I2-1..7). Put P-I2-1
+  (routes out for list entries; W2-57's paths; DEC-889 item 5 in its card), P-I2-2 (area 2's record-reading tests in
+  W2-68's set), P-I2-4 (small ticket for W2-M214 before W2-27) to the owner BEFORE W2-13/14/19/57/27/68 start;
+  P-I2-3 revisions into the W2-19/57/67/07 cards at the review point. Also: 7 of 23 planted faults caught by
+  nothing in area 2 (incl. the ratchet's field rule, the path-map check); W1-26's base fixture red before any
+  defect (40 cases cannot fail); 26 load_sensitive entries name cases the close already runs alone.
+  For W2-69's brief: `tests/unit/secrets` errors at collection when stdlib `secrets` is imported first (W2-L373).
+- **Lens I1 DONE (19:36):** `assessment/2026-10/I1-guard-launcher-sandbox.md` (540 of 2,042 functions: 465 valid, 34
+  outdated, 15 obsolete, 12 duplicate, 11 flaky, 3 weak; 14 findings; P-I1-1..9). Send P-I1-5 (retire the two
+  nested reruns: 14.6 min per close, unblocks worksteal) and P-I1-9 (Policy 2 (c)'s base branch is hard-coded to
+  w2/integrate: F-12, fails open, feature-gated -> W2-27 entry criterion, DEC-803) FIRST in the bundle; W2-57 gets
+  F-1, F-2, F-7, F-10, F-14 + Part 4.2's serial-list changes; W2-66 gets Part 4.1 for its test map. Also F-6 (a
+  failed restore labelled "reverted" passes all 1,357 containment cases), F-3 (decisions Policy 2 replaced lack
+  "Changed by" marks: a DEC-866 sweep for me), F-4 (DEC-769 item 3 missing from W2-21's ticket).
+- **Lens I4 returned PARTIAL (20:12), report complete:** `assessment/2026-10/I4-records-plan-rest.md` (1,420
+  functions: 1,235 valid, 109 weak, 61 duplicate, 13 outdated, 2 flaky; P-I4-1..5; high findings: A8's retirement
+  guard held by no test; W1-27's doctor suite blind to 5 behaviours; the probe's 10 s limit -> 30 red-able cases +
+  a silent 181-case skip; W1-08's case the only working path-map guard). Not done: area-wide parallel x3, the
+  clone rebuild (gov retrieve answered nothing). Its folder hit the disk's inodes (94 %): clone, worktrees and
+  tmp REMOVED by me, then I1-I3's clones/tmp too (evidence folders kept: I1 91M, I2 73M, I3 67M, I4 34M).
+  Disk before 20:15: 640 GB used (67 %), 62,589,143 inodes (94 %); after 20:30: 486 GB (51 %), 45,983,305 (69 %).
+  Still to look at: /tmp/pytest-of-usain (61 run folders since 10-20: retention not working), 44
+  /tmp/gov-testcache-*, /tmp/gov-os-tooltrial (1,341; remove after trial d), "another review's folder, 8.9M". My write to ~/gov-os-runs was REFUSED by the guard
+  (no W2-00 folder): do not retry.
+- **Lens I synthesis DONE (20:50):** `assessment/2026-10/I-SYNTHESIS.md` (3,256 verdicts, 86 % valid; 48/119 planted
+  faults passed, 24 fail open or lose work, latent; 3 live gaps, no round; P-IS-1..16). **REVIEW BUNDLE DRAFTED:**
+  `drafts/review-bundle/00-INDEX.md` + 01 W2-66 ticket, 02 W2-66 card, 03 W2-68 card, 04 W2-67 card, 05 W2-57
+  ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections (W2-70 = new small ticket for P-IS-3's two
+  retirements). ACT PINGED after W2-50's close; WAITING for the owner's answers (P-IS-1..7, the re-pin plan, DEC-898's
+  figures, area 4's resume). Then: record (DEC-899...), commit drafts (ticket files with their Task), W2-70. (Earlier:) brief BUILT
+  `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output
+  `assessment/2026-10/I-SYNTHESIS.md`; sections: diagnosis, counts, fails-open, changes by ticket, retirements,
+  owner decisions in work order, disagreements). Launch it (independent-auditor, effort max, from the main tree,
+  gate in the command) when I4 returns (`log/assessment-I1..4.json`; reports to
+  `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
+  reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
+- **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly
+  with its seed) in a quiet window, then REMOVE /tmp/gov-os-tooltrial and show it.
+- **Placeholder in the path map:** the W1-38 load_sensitive reason's time (real: between 00:12 and 00:16 on 10-22)
+  is folded into the owner's next ratchet commit or W2-57's removal.
+- **Credentials (P-W2-58-3):** only two tracked fixtures (`fixtures/brownfield/project/.env`,
+  `fixtures/brownfield/project/config/secrets.yaml`), row W2-M398.
+- **`.git/config.lock`:** zero-byte read-only placeholder; leave alone.
+- **Worktrees to remove after a sync:** W2-48's (branch kept, `2c3c46b5`); 44 `/tmp/gov-testcache-*` leftovers.
+
+### Next
+1. W2-69: brief (A5 lead, FULL) for a free slot after W2-50 run 9 returns; no overlap in flight.
+2. W2-50 run 9 on return: read `result`, checkpoint, sync, then its re-close (gates a-h).
+3. Lens I returns -> synthesis -> copy reports -> review-bundle drafts -> ACT ping -> WAIT.
+4. Daily digest (records since push, usage, refusals counted, memory use); trial d redo; worktree cleanup.
+5. Next free: DEC-898; ticket W2-70 (W2-67, W2-68 are planned cards); rows W2-M405, W2-L415, W2-H063. Briefs:
+   `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
