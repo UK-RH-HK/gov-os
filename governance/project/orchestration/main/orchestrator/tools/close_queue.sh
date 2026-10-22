@@ -82,11 +82,11 @@ for item in "$@"; do
   [ "$code" -eq 0 ] || break
   # A clean close leaves its ticket file and close record uncommitted; commit them, so that the next ticket's
   # gate (d) finds a clean tree (as W2-53's outputs were committed, a1565e56).
-  git add ".tickets/$ticket.md" "docs/close/$ticket/" > "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be staged"
+  git add ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" > "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be staged"
   gitleaks git --staged --redact --no-banner --config .gitleaks.toml . >> "$LOG/outputs-$ticket.txt" 2>&1 || stop "gitleaks flagged the close's outputs"
-  git commit -q -m "$ticket closed by gov close (exit 0, $(date '+%F %H:%M')): the ticket and its close record" \
+  git commit -q -m "$ticket closed by gov close (exit 0, $(date '+%F %H:%M')): the ticket, its close record and its closing checkpoint" \
     --trailer "Task: $ticket" --trailer "Implements: DEC-868" --trailer "Role: orchestrator" \
-    --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -- ".tickets/$ticket.md" "docs/close/$ticket/" \
+    --trailer "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" -- ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" \
     >> "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be committed"
   date '+%F %T outputs of '"$ticket"' committed: '"$(git log -1 --format=%h)" >> "$LOG/queue.txt"
 done
