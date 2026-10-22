@@ -1,6 +1,6 @@
 ---
 id: DAEO-juee
-status: in_progress
+status: closed
 deps: []
 links: []
 created: 2026-10-19T21:21:16Z
