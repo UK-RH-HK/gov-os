@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 15:10 BST — DEC-897 committed; W2-62's queue re-run once under DEC-897 (b); W2-50 run 9 running; lens I running; next free DEC-898)
+## RESUME HERE (2026-10-22 17:17 BST — W2-62 CLOSED d7daf01b; W2-69 created DAEO-rmbe; W2-50 run 9 running; lens I 1-3 running, 4 resume queued; next free DEC-898)
 
 ### Standing owner rules (short; full text in the register and prompt v3.16; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -62,7 +62,14 @@
   (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
 - **W2-50 run 9 lead RUNNING since about 15:00** (`briefs/W2-50-A5-run9.md`: merge integrate, fresh FULL probe, no
   code change; log `log/W2-50-A5-run9.json`; its workers pause while CLOSE-RUNNING exists). Then its re-close.
-- **W2-62's re-run passed every gate (gate (b) green 15:33:24); `gov close DAEO-juee` RUNNING since 15:33.**
+- **W2-62 CLOSED `d7daf01b` (16:44, clean gov close after the one DEC-897 re-run; gate (b) green 15:33).** Rows
+  W2-M372/M373 to §4 + closing checkpoint `466c63ae` (Task: DAEO-juee); worktree + branch removed. Close success 4
+  of 17. close_queue.sh now commits `docs/checkpoints/<id>/` with the outputs (gov close writes a last one).
+- **W2-69 `DAEO-rmbe` CREATED `89f043e2`** (ticket + WBS card, Task: DAEO-rmbe; FULL; DEC-897's design question;
+  paths src/gov/secrets/**, rebuild/command.py compaction step, tests/unit/secrets/**, tests/unit/rebuild/
+  test_compaction*, docs/research/W2-69-secrets-scan.md). Starts in a free slot after W2-50 run 9 returns; rides
+  in the first re-pin. NOTE: the store loads tickets from HEAD only, so a new ticket reads 'not measured' in
+  context-reproducibility until committed and rebuilt (expected; no rebuild needed before its commit).
 - **Lens I area 4 ended PARTIAL, no report (return read 16:17):** it ended its turn with its own background runs pending
   (in `claude -p` that ends the session). Drafts in `/tmp/gov-os-assessment-I4/drafts/` (36G folder: REMOVE after
   its report). Resume auditor `briefs/assessment-I4-resume.md` (preface: finish from the drafts, runs in the
@@ -81,11 +88,11 @@
 - **Worktrees to remove after a sync:** W2-48's (branch kept, `2c3c46b5`); 44 `/tmp/gov-testcache-*` leftovers.
 
 ### Next
-1. W2-62's queue (one DEC-897 re-run): closed -> mark rows, commit outputs; red -> stop, closes wait for W2-69.
+1. W2-69: brief (A5 lead, FULL) for a free slot after W2-50 run 9 returns; no overlap in flight.
 2. W2-50 run 9 on return: read `result`, checkpoint, sync, then its re-close (gates a-h).
 3. Lens I returns -> synthesis -> copy reports -> review-bundle drafts -> ACT ping -> WAIT.
 4. Daily digest (records since push, usage, refusals counted, memory use); trial d redo; worktree cleanup.
-5. Next free: DEC-898; ticket W2-69 (to create; W2-67, W2-68 are planned cards); rows W2-M405, W2-L415, W2-H063. Briefs:
+5. Next free: DEC-898; ticket W2-70 (W2-67, W2-68 are planned cards); rows W2-M405, W2-L415, W2-H063. Briefs:
    `tools/build_lead_brief.py <part> <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
 
 ### Never
