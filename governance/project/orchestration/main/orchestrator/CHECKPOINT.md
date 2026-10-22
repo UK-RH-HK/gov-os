@@ -62,7 +62,13 @@
   (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
 - **W2-50 run 9 lead RUNNING since about 15:00** (`briefs/W2-50-A5-run9.md`: merge integrate, fresh FULL probe, no
   code change; log `log/W2-50-A5-run9.json`; its workers pause while CLOSE-RUNNING exists). Then its re-close.
-- **Lens I: 4 auditors RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
+- **W2-62's re-run passed every gate (gate (b) green 15:33:24); `gov close DAEO-juee` RUNNING since 15:33.**
+- **Lens I area 4 ended PARTIAL, no report (return read 16:17):** it ended its turn with its own background runs pending
+  (in `claude -p` that ends the session). Drafts in `/tmp/gov-os-assessment-I4/drafts/` (36G folder: REMOVE after
+  its report). Resume auditor `briefs/assessment-I4-resume.md` (preface: finish from the drafts, runs in the
+  foreground, never end a turn with a run pending) QUEUED behind the close lock + gate, log
+  `log/assessment-I4-resume.json`. Lesson for every future auditor brief: foreground runs only.
+- **Lens I: areas 1-3 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
 - **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly

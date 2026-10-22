@@ -1,0 +1,16 @@
+DEC-897 (b) re-run evidence for DAEO-juee (W2-62), the one re-run of this close's queue.
+Recorded 2026-10-22 by the orchestrator; positions, lengths and classes only, never the bytes.
+
+Stop: 13:56:51, gate (b), gov check exit 3, secrets-indexing RED on .gov-runtime/codeintel/home/code.db (rebuilt 13:44:28).
+Rule id: gov-token-lower (both rule sets), one finding, matched length 62.
+Where: the check's zero-stripped copy, data line 593370; the same 62 bytes occur once in the raw file bytes
+  (offset 50423543), no zero byte inside or just before them; 0 occurrences in the row text.
+Enclosing word: 84 characters (22 lower-case letters and underscores before the match), so the rule's leading \b
+  cannot match there as written.
+Tracked files holding the 62 bytes: 0; holding the word head plus the 62 bytes: 0.
+Cut test: gitleaks on the whole 15,268-byte line: exit 0; on the line cut at the match's first byte: exit 3.
+  The rule's own regex with \b: no match in the line; without \b: 3 candidates, all inside words.
+Conclusion: a read of gitleaks beginning inside a word; no secret stored (row W2-M404, fixed by W2-69).
+Re-run: bash tools/close_queue.sh DAEO-juee, after commit 89e760fb. At most one per close; any other red or a
+  second red stops the queue until W2-69 is pinned.
+Scripts: scratchpad rc_probe.py, line_of.py, chunk_edge.py, source_of.py.
