@@ -1,2 +1,6 @@
 2026-10-22 13:44:28 quiet
 2026-10-22 13:44:28 rebuild before DAEO-juee
+2026-10-22 13:49:10 collect ok: 15762/15764 tests collected (2 deselected) in 6.19s
+2026-10-22 13:51:13 records ok: 80 passed in 105.92s (0:01:45)
+2026-10-22 13:51:15 network ok: allowlisted hosts checked: 17; unreachable: 0
+2026-10-22 13:56:51 DAEO-juee STOPPED BEFORE THE CLOSE: gov check is not green (exit 3)
