@@ -1,8 +1,0 @@
-.........................................                                [100%]
-===================== W1-19 measured mean hit@5 (DEC-414) ======================
-W1-19 hit@5: mean of the 10 classes = 83.33
-W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
-W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
-W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
-W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
-41 passed in 94.89s (0:01:34)

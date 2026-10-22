@@ -1,4 +1,0 @@
-.
-W2-54 shared GPU: the CPU embedder serves at 127.0.0.1:11435 (port 11435); its qwen3-embedding:0.6b size 2371270737 bytes (2.21 GiB), size_vram 0; the shared runner at 127.0.0.1:11434: size 2370652077, size_vram 2370652077; digest ['ac6da0dfba84a81fdbfbaf330198c33cd77c4cdfc53e8bc50eb581914a15621d']
-.
-2 passed in 35.07s

@@ -5,9 +5,11 @@ Every independent-auditor brief the orchestrator writes for W2-25, W2-28, W2-30 
 ## Standing rules for your session (owner, DEC-836, DEC-838, DEC-849, DEC-850)
 
 - You use your model's full window; nobody asks you to stop or compact early. You run at `--effort max`.
-- Use `gov retrieve` for what you need to know, and say in your report which questions it answered.
+- Use `gov retrieve` for what you need to know, and say in your report which questions it answered. Take a large question in batches (`--batch-size`, `--continue`), ranked and stacked, never one giant query or context (DEC-860); ask a code question through the code-graph tool's own traversal, small and targeted, and read the whole graph only in pages, never one query over its row cap (DEC-859).
 - Until W2-58 lands, the guard still refuses some reads Policy 2 opened (searches that start at the repository root, `governance/project/` or `.claude/`): take the refusal, never look for another form, search named folders instead, and count the refusals in your report.
 - You never ask or notify the owner directly, never use a question box and never run `owner-ping` (DEC-855): anything that needs the owner goes into your report as a package, in the six parts of DEC-818, saying whether it blocks your audit or only part of it.
+
+- An entry whose status line says `SUPERSEDED by DEC-n`, or whose "Changed by" note covers a part, is not in force for that part; judge against the newer entry. Anything you find still enforcing a superseded decision without a recorded reason is a finding, naming both decisions and the place (DEC-866).
 
 ## How you judge (owner, the w2 prompt's section 14)
 

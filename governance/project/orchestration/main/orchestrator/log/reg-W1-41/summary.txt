@@ -1,5 +1,0 @@
-parallel: 13168 passed, 31 skipped in 1576.59s (0:26:16) [1721 s wall, load 5.16]
-declared entries: 55
-serial-afterwards: 263 passed in 1582.63s (0:26:22) [1730 s wall, load 1.79]
-validator: RESULT: ALL PASS
-PARTS: read every line above; a part is green only if its line has 'passed' and no 'failed' and no 'error'

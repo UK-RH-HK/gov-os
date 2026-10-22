@@ -1,9 +1,0 @@
-W1-02: 1690 passed in 178.88s (0:02:58)
-W1-05: 99 passed in 492.95s (0:08:12)
-W1-47: 970 passed in 258.07s (0:04:18)
-W1-50: 666 passed, 2 warnings in 251.02s (0:04:11)
-W1-46: 493 passed in 150.95s (0:02:30)
-W1-28: 149 passed in 46.04s
-W1-38: 87 passed in 90.22s (0:01:30)
-unit: 1728 passed in 69.02s (0:01:09)
-validator: RESULT: ALL PASS

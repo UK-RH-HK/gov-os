@@ -1,4 +1,13 @@
-"""W1-02 — a second name for the settings file or the held-out file is a read (DEC-548, DP-3).
+"""W1-02 — a second name for the settings file or the held-out file (DEC-548, DP-3) stays refused.
+
+Rewritten by W2-58's test designer, by the lead's reading of P-W2-58-TD-2 (i)
+(DEC-821 item 4: no write rule widens): a second name stays refused, for every
+role, now on the write side (a writable alias of a file the role may not
+write). Only the read rule's wording is no longer asked; each case asks a
+rule's refusal and a message that carries no path, folder or value of the files.
+The perl in-place case (no backup) is unchanged: it asks a refusal and no wording.
+
+Before Policy 2:
 
 DEC-548: "A command that gives either file a second name is refused as a read,
 for every role: a move or rename of the file, a hard or symbolic link to it, a
@@ -39,6 +48,19 @@ NOT_A_WRITER = "engineer-who-may-not-write-the-file"
 def world(hook, tmp_path_factory):
     """One project with both stand-in files for the module: the cases only ask the guard for decisions."""
     return batch.make_world(tmp_path_factory.mktemp("second-names"))
+
+
+def _refused(world, result, what):
+    """W2-58 (the lead's reading of P-W2-58-TD-2 (i); DEC-548, DEC-553, DEC-778, DEC-821 item 4): a second name stays
+    refused, now on the write side, whichever rule refuses it. Asked: a rule's refusal (exit code 0), and a message
+    that carries no path, folder or value of either file. The read rule's wording is no longer asked."""
+    assert result.decision == "deny" and result.returncode == 0, (
+        f"{what} was not refused by a rule: decision={result.decision} exit={result.returncode}")
+    said = batch.protected.output_of(result)
+    values = {value for site in world.sites.values() for name in site.names for value in world.secrets(site.name, name)}
+    shown = [value for value in values if value and str(value) in said]
+    # The values are not put in the message: a failure must not print what a refusal must not print.
+    assert not shown, f"the refusal of {what} carries {len(shown)} path(s), folder(s) or value(s) of the files"
 
 
 # ``{rel}`` and ``{abs}`` are the file, ``{dir}`` its folder; ``{scratch}`` and ``{tmp}`` are places every known
@@ -89,7 +111,7 @@ def _ask(world, name, text, who):
 def test_a_second_name_for_a_protected_file_is_refused_as_a_read(world, form, name):
     """DP-3: each form, relative and absolute, by the orchestrator, which may write the file today."""
     result = _ask(world, name, SECOND_NAMES[form], WIDEST)
-    batch.assert_refused_by_the_rule(result, f"Bash {form} on the stand-in {name} by the {WIDEST}")
+    _refused(world,result, f"Bash {form} on the stand-in {name} by the {WIDEST}")
 
 
 @pytest.mark.parametrize("name", FILES)
@@ -98,7 +120,7 @@ def test_a_second_name_for_a_protected_file_is_refused_as_a_read(world, form, na
 def test_a_second_name_is_refused_as_a_read_whether_or_not_the_role_may_write_the_file(world, form, who, name):
     """DP-3: "for every role": an engineer whose ticket names the file, and one whose ticket does not."""
     result = _ask(world, name, SECOND_NAMES[form], who)
-    batch.assert_refused_by_the_rule(result, f"Bash {form} on the stand-in {name} by an {who}")
+    _refused(world,result, f"Bash {form} on the stand-in {name} by an {who}")
 
 
 @pytest.mark.parametrize("name", FILES)
@@ -107,7 +129,7 @@ def test_the_refusal_of_a_second_name_names_the_rule_and_nothing_of_the_file(wor
     """A refusal names the rule and the decision: no path, no folder, no value of the file."""
     result = _ask(world, name, SECOND_NAMES[form], WIDEST)
     what = f"Bash {form} on the stand-in {name}"
-    batch.assert_refused_by_the_rule(result, what)
+    _refused(world,result, what)
     batch.assert_says_nothing_of_the_file(result, world, OWN, name, what)
 
 

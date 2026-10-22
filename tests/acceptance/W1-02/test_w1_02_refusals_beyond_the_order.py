@@ -1,4 +1,12 @@
-"""W1-02 — the refusals beyond the order stand as built (DEC-548, DP-5).
+"""W1-02 — the refusals beyond the order (DEC-548, DP-5): under Policy 2, decided as for any file.
+
+Rewritten by W2-58's test designer (DEC-821 item 3, DEC-857 item 3): each
+refusal below existed for the two protected files' sake; under Policy 2
+(DEC-820) each call is decided as the same command on another file of the
+folder (or on ``src/``) is, by the same role, and is never refused as a read
+of the two files. The two git commands held as allowed are unchanged.
+
+Before Policy 2:
 
 DEC-548: "The refusals beyond the order stand as built: a shell command that
 only mentions the settings file's path as text; a shell word that is a folder
@@ -37,8 +45,18 @@ def _ask(world, name, text, who=WIDEST):
     return batch.ask_bash(world, batch.fill(world, OWN, name, text), who)
 
 
+def assert_decided_as_for_an_ordinary_file(world, name, text, control, who, what):
+    """W2-58 (DEC-821 item 3, DEC-857 item 3): the call is decided as the same command on an ordinary file or folder
+    (``control``) is, by the same role; a refusal, if any, is not the read rule's."""
+    result, ordinary = _ask(world, name, text, who), _ask(world, name, control, who)
+    assert (result.decision, result.returncode) == (ordinary.decision, ordinary.returncode), (
+        f"{what}: decided {result.decision} (exit {result.returncode}), but the same command on an ordinary file is "
+        f"decided {ordinary.decision} (exit {ordinary.returncode})")
+    assert not batch.RULE_RE.search(protected.reason_of(result)), f"{what} was refused as a read of the two files"
+
+
 # --------------------------------------------------------------------------
-# Refused, as built
+# Refused as built before W2-58; under Policy 2 decided as for any file (rewritten: DEC-821 item 3, DEC-857 item 3)
 # --------------------------------------------------------------------------
 
 MENTIONS = {
@@ -50,10 +68,11 @@ MENTIONS = {
 
 @pytest.mark.parametrize("who", (WIDEST, "engineer-who-may-not-write-the-file"))
 @pytest.mark.parametrize("form", sorted(MENTIONS))
-def test_a_command_that_only_mentions_the_settings_file_s_path_is_refused(world, form, who):
-    """DP-5: the path as text is a read as far as the guard can tell; sessions write "the settings file"."""
-    result = _ask(world, SETTINGS, MENTIONS[form], who)
-    batch.assert_refused_by_the_rule(result, f"{form} that mentions the stand-in settings file's path, by '{who}'")
+def test_a_command_that_only_mentions_the_settings_file_s_path_is_decided_as_for_any_file(world, form, who):
+    """DP-5 before Policy 2: the path as text was refused as a read; now it is decided as the same text naming
+    another file of the folder."""
+    assert_decided_as_for_an_ordinary_file(world, SETTINGS, MENTIONS[form], MENTIONS[form].replace("{rel}", "{nrel}"),
+                                           who, f"{form} that mentions the stand-in settings file's path, by '{who}'")
 
 
 FOLDER_WORDS = {
@@ -66,16 +85,21 @@ FOLDER_WORDS = {
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(FOLDER_WORDS))
-def test_a_folder_that_holds_either_file_is_refused_in_a_command_that_does_not_read(world, form, name):
-    result = _ask(world, name, FOLDER_WORDS[form])
-    batch.assert_refused_by_the_rule(result, f"{form} (the folder of the stand-in {name})")
+def test_a_folder_that_holds_either_file_is_decided_as_any_folder_in_a_command_that_does_not_read(world, form, name):
+    control = FOLDER_WORDS[form].replace("{dir}", "src").replace("{absdir}", "{project}/src")
+    assert_decided_as_for_an_ordinary_file(world, name, FOLDER_WORDS[form], control, WIDEST,
+                                           f"{form} (the folder of the stand-in {name})")
 
 
 @pytest.mark.parametrize("command", ("git add {above}", "test -d {above}"), ids=("git-add", "test"))
-def test_a_folder_above_the_held_out_file_inside_the_project_is_refused_in_a_command_that_does_not_read(world, command):
+def test_a_folder_above_the_held_out_file_inside_the_project_is_decided_as_any_folder(world, command):
     above = world.site(OWN).rel(HELD).split("/")[0]
     result = batch.ask_bash(world, command.format(above=above), WIDEST)
-    batch.assert_refused_by_the_rule(result, "a command that names a folder above the stand-in held-out file")
+    ordinary = batch.ask_bash(world, command.format(above="src"), WIDEST)
+    what = "a command that names a folder above the stand-in held-out file"
+    assert (result.decision, result.returncode) == (ordinary.decision, ordinary.returncode), (
+        f"{what}: decided {result.decision}, the same command on src/ {ordinary.decision}")
+    assert not batch.RULE_RE.search(protected.reason_of(result)), f"{what} was refused as a read of the two files"
 
 
 GIT_WITH_A_FOLDER_OPTION = {
@@ -86,9 +110,10 @@ GIT_WITH_A_FOLDER_OPTION = {
 
 @pytest.mark.parametrize("name", FILES)
 @pytest.mark.parametrize("form", sorted(GIT_WITH_A_FOLDER_OPTION))
-def test_git_diff_stat_with_a_folder_option_is_refused(world, form, name):
-    result = _ask(world, name, GIT_WITH_A_FOLDER_OPTION[form])
-    batch.assert_refused_by_the_rule(result, f"`git -C <dir> diff --stat` with {form} on the stand-in {name}")
+def test_git_diff_stat_with_a_folder_option_is_decided_as_for_any_file(world, form, name):
+    text = GIT_WITH_A_FOLDER_OPTION[form]
+    assert_decided_as_for_an_ordinary_file(world, name, text, text.replace("{rel}", "{nrel}"), WIDEST,
+                                           f"`git -C <dir> diff --stat` with {form} on the stand-in {name}")
 
 
 # --------------------------------------------------------------------------

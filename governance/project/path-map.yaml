@@ -54,8 +54,21 @@ namespaces:
     embedding_policy: embedded
     provenance: charter, contract, decisions, plan and lessons, written under a ticket or an owner decision; git history
     deletion_rebuild: authoritative; restored from git only
+  # DEC-856 (P-W2-50 (a)): the overlay is governance memory. DEC-887 (owner, 2026-10-21, P-REC-1 (a)): the raw
+  # orchestration record moved to the branch record/w2; only its searchable part (the README, the sync script,
+  # packages, session summaries and the checkpoint copy) stays in this tree, under this namespace.
   project-overlay:
-    paths: ["governance/**"]
+    paths:
+      - "governance/*"
+      - "governance/adoption/**"
+      - "governance/project/*"
+      - "governance/project/briefs/**"
+      - "governance/project/prompts/**"
+      - "governance/project/orchestration/*"
+      - "governance/project/orchestration/packages/**"
+      - "governance/project/orchestration/sessions/**"
+      - "governance/project/orchestration/main/orchestrator/CHECKPOINT.md"
+      - "governance/project/orchestration/main/orchestrator/PR-*.md"
     memory_class: governance
     sensitivity: restricted
     permitted_roles: [orchestrator, product-spec, independent-test-designer, engineer, independent-auditor, research]
@@ -64,6 +77,8 @@ namespaces:
     embedding_policy: not embedded
     provenance: the project overlay, written by the orchestrator or under a ticket; git history
     deletion_rebuild: authoritative; restored from git only
+  # DEC-887 (owner, 2026-10-21): the raw orchestration record (DEC-856's `orchestration-record` namespace) lives on
+  # the branch record/w2, outside this tree; no namespace here holds it.
   kernel-template:
     paths: ["template/**"]
     memory_class: governance
@@ -219,6 +234,21 @@ trailers_base: "1c33dd28"
 accepted_history:
   - commit: "93bcb247990552c07dfbe9a20c685830b47e46d2"
     decision: DEC-717
+  - commit: "e7bf7a3e895eb42a779dbdb5eed99ad94ab1b2cf"
+    decision: DEC-871
+  - commit: "851b6230603f9e63f60f45c92465c641b33b857f"
+    decision: DEC-871
+  - commit: "7bacecd21045f56eb1d3b3da9afd9a9ccd1d5197"
+    decision: DEC-871
+  - commit: "162f17ea9cafeec96687d2a83c43c060c08d3e1b"
+    decision: DEC-891
+# The data files this project's tests read, for the test-result cache (W2-48; DEC-876, P-W2-48-5 (c)): narrow on
+# purpose, fixtures, templates and schemas. The register and the ticket files are left out; a test that reads a
+# non-Python file outside these globs is always run (the cache fails safe).
+test_inputs:
+  - "fixtures/**"
+  - "template/**"
+  - "schemas/**"
 # gov close of this project (DEC-549, DEC-554): the time limit of each of its test runs, in seconds.
 # The worker count stays at its default, auto.
 close_timeout: 7200
@@ -350,3 +380,29 @@ load_sensitive:
     decision: DEC-823
     reason: "fails once in the full regression at load about 25 and passes alone, 3 of 3 in 17.8 s with a 2 s reaping margin (W2-53's re-close, 2026-10-19 12:01)"
     fixed_by: W2-M384
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestRegisteredFamilyCheck::test_gov_check_is_green_on_a_clean_generated_project"
+    decision: DEC-871
+    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
+    fixed_by: W2-57
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestSettingsHandEdit::test_key_added_by_hand_is_found_and_named[top-level-env]"
+    decision: DEC-871
+    reason: "rulesync --version gave no answer within the portability check's 10-second probe under the close's parallel load; passes alone, 7 of 7 in 13.7 s (W2-53's close, 2026-10-20 13:49)"
+    fixed_by: W2-57
+  - test: "tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]"
+    decision: DEC-886
+    reason: "fails in the close's parallel regression (W2-02's closes, 2026-10-21 15:36 at load about 3 and 17:26 at load 2.9) and passes alone, 3 of 3 in 5.4 to 6.0 s at load 2.8 to 3.9"
+    fixed_by: W2-57
+  - test: "tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]"
+    decision: DEC-892
+    reason: "RULESYNC_FAILED in the close's parallel regression (W2-63's close, 2026-10-22 00:11): rulesync --version gave no answer within the portability check's 10-second probe under load, as DEC-871's two W1-38 cases; passes alone (2 passed in 2.9 s, 2026-10-22 00:2x)"
+    fixed_by: W2-57
+# The evaluation sets (DEC-820 (d), DEC-845, W2-58): a session a set measures (its role in `roles`, or its ticket
+# in `tickets`) is refused reads of the hidden part by the guard (no sandbox Read rule, DEC-873), and reads the visible part.
+# memory-retrieval is W2-61's: lens B's 20 questions are visible; the hidden part, which W2-61 fills, lies under
+# fixtures/, a product-memory namespace the indexer never reads. W2-61 narrows `measures` to tickets.
+evaluation_sets:
+  memory-retrieval:
+    visible: ["docs/assessment/2026-10/B-memory-retrieval.md"]
+    hidden: ["fixtures/evaluation/memory-retrieval/hidden/**"]
+    measures:
+      roles: [engineer, research]

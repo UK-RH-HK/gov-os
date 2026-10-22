@@ -31,12 +31,18 @@ kpis:
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - 'The pre-close gate, inside gov close (DEC-868): before its regression, the close collects every suite it will run, in one process, as it runs them (pytest --collect-only), runs gov check with no
+    commit since the rebuild, and checks that the ticket''s checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt'
+  - 'A test-revision ticket is judged on the acceptance tests its ticket file names in acceptance_tests.path (another ticket''s folder), not on a folder of its own [DEC-892]'
   failure:
   - A research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
+  - A tree with a collection error (an import or name clash), a RED gov check or a stale checkpoint is refused by the gate within minutes, not after the regression [DEC-868].
 profile: STANDARD
 sources:
 - DEC-729
 - DEC-738
+- DEC-868
+- DEC-892
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -79,17 +85,19 @@ list_rows:
 
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list rows it takes in are in `list_rows` and in `docs/plan/WAVE_2_TRIAGE.md`; a row's state is re-checked against the code when the ticket picks it up (DEC-718).
 
-- **Allowed paths:** `src/gov/close/**` (except `src/gov/close/cache*`, W2-48's), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
+- **Allowed paths:** `src/gov/close/**` (except W2-66's and W2-68's new modules, `select.py`, `nightly.py`, `batch.py` and `fingerprint.py`; W2-48's `cache*` was withdrawn, DEC-880), `src/gov/telemetry/**`, `tests/unit/close/**`, `tests/unit/telemetry/**`.
 - **KPIs, success:**
   - `gov close` judges a ticket by its class [W2-H045]:
     - an implementation ticket on its acceptance tests;
     - a specification ticket on its closed readiness record and its acceptance tests;
     - an audit ticket on its report and the audit validator;
     - a research ticket on its evidence record;
-    - an integration or coordination ticket on its named evidence files.
+    - an integration or coordination ticket on its named evidence files;
+    - a test-revision ticket on the acceptance tests its ticket file names in `acceptance_tests.path` (another ticket's folder), not on a folder of its own (DEC-892; W2-63 waits for this).
   - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in `.tickets/` [F-m8, W2-L209, W2-L236, AR-9].
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
+  - **The pre-close gate, inside `gov close` (DEC-868, owner, 2026-10-20):** before its regression, the close collects every suite it will run, in one process, as it runs them (`pytest --collect-only`), runs `gov check` with no commit since the rebuild, and checks that the ticket's checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt. Failure: a tree with a collection error (an import or name clash, as `tests/unit/secrets` shadowing the standard library), a RED `gov check` or a stale checkpoint is refused within minutes, not after the regression.
 - **KPIs, failure:** a research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
 - **Row W2-M263 (DEC-738 item 4, 2026-10-17):** re-triaged from W2-01. RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.
