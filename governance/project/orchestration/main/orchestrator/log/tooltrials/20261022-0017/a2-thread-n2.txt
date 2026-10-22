@@ -1,0 +1,12 @@
+bringing up nodes...
+bringing up nodes...
+
+[gw0] node down: Not properly terminated
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________ tests/acceptance/W1-07/test_w1_07_envelope.py _________________
+[gw0] linux -- Python 3.12.3 /tmp/gov-os-tooltrial/bin/python
+worker 'gw0' crashed while running 'tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]'
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]
+1 failed in 60.70s (0:01:00)

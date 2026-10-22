@@ -1,0 +1,866 @@
+[
+ {
+  "id": "B2:src/gov/status/command.py:65:compare-flip:0",
+  "file": "src/gov/status/command.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 38,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 253.7
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 628.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 759.1
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 0.4
+  }
+ },
+ {
+  "id": "B2:src/gov/status/command.py:105:negate-condition:1",
+  "file": "src/gov/status/command.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 38,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 253.7
+  },
+  "grimp": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 628.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 759.1
+  },
+  "lensH_static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 0.4
+  }
+ },
+ {
+  "id": "B2:src/gov/checkpoint/record.py:169:return-none:0",
+  "file": "src/gov/checkpoint/record.py",
+  "core": false,
+  "F": 5,
+  "upstream_grimp": 4,
+  "declared": {
+   "detect": true,
+   "recall": 0.6,
+   "time": 262.1
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.2,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.6,
+   "time": 268.6
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.2,
+   "time": 46.4
+  }
+ },
+ {
+  "id": "B2:src/gov/checkpoint/record.py:139:or-and:1",
+  "file": "src/gov/checkpoint/record.py",
+  "core": false,
+  "F": 201,
+  "upstream_grimp": 4,
+  "declared": {
+   "detect": true,
+   "recall": 0.1044776119402985,
+   "time": 262.1
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.07960199004975124,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.15422885572139303,
+   "time": 268.6
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.07960199004975124,
+   "time": 46.4
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/claims.py:37:negate-condition:0",
+  "file": "src/gov/tasks/claims.py",
+  "core": false,
+  "F": 77,
+  "upstream_grimp": 3,
+  "declared": {
+   "detect": true,
+   "recall": 0.1038961038961039,
+   "time": 2227.4
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.025974025974025976,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.1038961038961039,
+   "time": 2233.9
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.025974025974025976,
+   "time": 68.0
+  }
+ },
+ {
+  "id": "B2:src/gov/adapters/portability.py:114:return-none:1",
+  "file": "src/gov/adapters/portability.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 6,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 607.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 524.0
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1106.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1.7
+  }
+ },
+ {
+  "id": "B2:src/gov/decisions/checker.py:222:return-none:0",
+  "file": "src/gov/decisions/checker.py",
+  "core": false,
+  "F": 2,
+  "upstream_grimp": 11,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 194.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 631.4
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 727.9
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 43.1
+  }
+ },
+ {
+  "id": "B2:src/gov/cli/main.py:121:return-none:0",
+  "file": "src/gov/cli/main.py",
+  "core": false,
+  "F": 10,
+  "upstream_grimp": 4,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1012.6
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 70.4
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1019.1
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 0.9
+  }
+ },
+ {
+  "id": "B2:src/gov/doctor/command.py:217:negate-condition:1",
+  "file": "src/gov/doctor/command.py",
+  "core": false,
+  "F": 1,
+  "upstream_grimp": 21,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2811.0
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 628.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3316.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 5.8
+  }
+ },
+ {
+  "id": "B2:src/gov/pause/command.py:288:return-none:0",
+  "file": "src/gov/pause/command.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 10,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 630.2
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.25,
+   "time": 592.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1135.6
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.25,
+   "time": 0.6
+  }
+ },
+ {
+  "id": "B2:src/gov/context/__init__.py:196:and-or:0",
+  "file": "src/gov/context/__init__.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 24,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4017.6
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 628.1
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4523.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 38.6
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/claims.py:73:and-or:1",
+  "file": "src/gov/tasks/claims.py",
+  "core": false,
+  "F": 1,
+  "upstream_grimp": 3,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2227.4
+  },
+  "grimp": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2233.9
+  },
+  "lensH_static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 68.0
+  }
+ },
+ {
+  "id": "B2:src/gov/pause/command.py:157:compare-flip:1",
+  "file": "src/gov/pause/command.py",
+  "core": false,
+  "F": 21,
+  "upstream_grimp": 10,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 630.2
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.14285714285714285,
+   "time": 592.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1135.6
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.14285714285714285,
+   "time": 0.6
+  }
+ },
+ {
+  "id": "B2:src/gov/launch/launcher.py:244:negate-condition:1",
+  "file": "src/gov/launch/launcher.py",
+  "core": false,
+  "F": 31,
+  "upstream_grimp": 8,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2050.7
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.1935483870967742,
+   "time": 598.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2556.1
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.1935483870967742,
+   "time": 6.2
+  }
+ },
+ {
+  "id": "B2:src/gov/telemetry/counter.py:102:drop-not:1",
+  "file": "src/gov/telemetry/counter.py",
+  "core": false,
+  "F": 33,
+  "upstream_grimp": 28,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2324.6
+  },
+  "grimp": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 628.1
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2830.0
+  },
+  "lensH_static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 37.5
+  }
+ },
+ {
+  "id": "B2:src/gov/lock/__init__.py:123:compare-flip:1",
+  "file": "src/gov/lock/__init__.py",
+  "core": false,
+  "F": 12,
+  "upstream_grimp": 1,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.3333333333333333,
+   "time": 0.2
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.3333333333333333,
+   "time": 5.9
+  }
+ },
+ {
+  "id": "B2:src/gov/telemetry/counter.py:74:or-and:0",
+  "file": "src/gov/telemetry/counter.py",
+  "core": false,
+  "F": 130,
+  "upstream_grimp": 28,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2324.6
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.038461538461538464,
+   "time": 628.1
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2830.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.038461538461538464,
+   "time": 37.5
+  }
+ },
+ {
+  "id": "B2:src/gov/readiness/checker.py:108:compare-flip:0",
+  "file": "src/gov/readiness/checker.py",
+  "core": false,
+  "F": 140,
+  "upstream_grimp": 10,
+  "declared": {
+   "detect": true,
+   "recall": 0.5571428571428572,
+   "time": 2270.4
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.06428571428571428,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.5571428571428572,
+   "time": 2277.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.06428571428571428,
+   "time": 53.2
+  }
+ },
+ {
+  "id": "B2:src/gov/readiness/checker.py:140:and-or:1",
+  "file": "src/gov/readiness/checker.py",
+  "core": false,
+  "F": 137,
+  "upstream_grimp": 10,
+  "declared": {
+   "detect": true,
+   "recall": 0.5620437956204379,
+   "time": 2270.4
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.06569343065693431,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.5620437956204379,
+   "time": 2277.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.06569343065693431,
+   "time": 53.2
+  }
+ },
+ {
+  "id": "B2:src/gov/lock/__init__.py:94:return-none:0",
+  "file": "src/gov/lock/__init__.py",
+  "core": false,
+  "F": 71,
+  "upstream_grimp": 1,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.28169014084507044,
+   "time": 0.2
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.28169014084507044,
+   "time": 5.9
+  }
+ },
+ {
+  "id": "B2:src/gov/cli/main.py:184:negate-condition:1",
+  "file": "src/gov/cli/main.py",
+  "core": false,
+  "F": 196,
+  "upstream_grimp": 4,
+  "declared": {
+   "detect": true,
+   "recall": 0.5867346938775511,
+   "time": 1012.6
+  },
+  "grimp": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 70.4
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.5867346938775511,
+   "time": 1019.1
+  },
+  "lensH_static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 0.9
+  }
+ },
+ {
+  "id": "B2:src/gov/doctor/command.py:159:drop-not:0",
+  "file": "src/gov/doctor/command.py",
+  "core": false,
+  "F": 2,
+  "upstream_grimp": 21,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2811.0
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 628.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3316.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 5.8
+  }
+ },
+ {
+  "id": "B2:src/gov/adapters/portability.py:50:return-none:0",
+  "file": "src/gov/adapters/portability.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 6,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 607.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.75,
+   "time": 524.0
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1106.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.75,
+   "time": 1.7
+  }
+ },
+ {
+  "id": "B2:src/gov/launch/launcher.py:227:negate-condition:0",
+  "file": "src/gov/launch/launcher.py",
+  "core": false,
+  "F": 659,
+  "upstream_grimp": 8,
+  "declared": {
+   "detect": true,
+   "recall": 0.9878603945371776,
+   "time": 2050.7
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.009104704097116844,
+   "time": 598.3
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.9878603945371776,
+   "time": 2556.1
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.009104704097116844,
+   "time": 6.2
+  }
+ },
+ {
+  "id": "B2:src/gov/store/loader.py:116:return-none:0",
+  "file": "src/gov/store/loader.py",
+  "core": false,
+  "F": 17,
+  "upstream_grimp": 2,
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2222.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.058823529411764705,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2229.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.058823529411764705,
+   "time": 82.4
+  }
+ },
+ {
+  "id": "B2:src/gov/context/__init__.py:358:return-none:1",
+  "file": "src/gov/context/__init__.py",
+  "core": false,
+  "F": 282,
+  "upstream_grimp": 24,
+  "declared": {
+   "detect": true,
+   "recall": 0.8333333333333334,
+   "time": 4017.6
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.02127659574468085,
+   "time": 628.1
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.8333333333333334,
+   "time": 4523.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.02127659574468085,
+   "time": 38.6
+  }
+ },
+ {
+  "id": "B2:src/gov/decisions/checker.py:227:return-none:1",
+  "file": "src/gov/decisions/checker.py",
+  "core": false,
+  "F": 620,
+  "upstream_grimp": 11,
+  "declared": {
+   "detect": true,
+   "recall": 0.27741935483870966,
+   "time": 194.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.05806451612903226,
+   "time": 631.4
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.27741935483870966,
+   "time": 727.9
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.05806451612903226,
+   "time": 43.1
+  }
+ },
+ {
+  "id": "B2:src/gov/config/loader.py:111:negate-condition:1",
+  "file": "src/gov/config/loader.py",
+  "core": false,
+  "F": 520,
+  "upstream_grimp": 3,
+  "declared": {
+   "detect": true,
+   "recall": 0.10192307692307692,
+   "time": 1649.3
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.007692307692307693,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.10192307692307692,
+   "time": 1655.8
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.007692307692307693,
+   "time": 104.1
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/tickets.py:22:return-none:0",
+  "file": "src/gov/tasks/tickets.py",
+  "core": false,
+  "F": 1270,
+  "upstream_grimp": 1,
+  "declared": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.06220472440944882,
+   "time": 12.0
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.1346456692913386,
+   "time": 68.0
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/tickets.py:19:compare-flip:1",
+  "file": "src/gov/tasks/tickets.py",
+  "core": false,
+  "F": 1270,
+  "upstream_grimp": 1,
+  "declared": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.06220472440944882,
+   "time": 12.0
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.1346456692913386,
+   "time": 68.0
+  }
+ },
+ {
+  "id": "B2:src/gov/config/loader.py:214:negate-condition:0",
+  "file": "src/gov/config/loader.py",
+  "core": false,
+  "F": 4,
+  "upstream_grimp": 3,
+  "declared": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 1649.3
+  },
+  "grimp": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 1655.8
+  },
+  "lensH_static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 104.1
+  }
+ },
+ {
+  "id": "B2:src/gov/store/loader.py:197:return-none:1",
+  "file": "src/gov/store/loader.py",
+  "core": false,
+  "F": 942,
+  "upstream_grimp": 2,
+  "declared": {
+   "detect": true,
+   "recall": 0.32802547770700635,
+   "time": 2222.5
+  },
+  "grimp": {
+   "detect": true,
+   "recall": 0.08598726114649681,
+   "time": 69.5
+  },
+  "grimp_or_decl": {
+   "detect": true,
+   "recall": 0.32802547770700635,
+   "time": 2229.0
+  },
+  "lensH_static": {
+   "detect": true,
+   "recall": 0.08598726114649681,
+   "time": 82.4
+  }
+ }
+]

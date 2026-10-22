@@ -1,0 +1,20 @@
+src/gov/checkpoint/record.py: sampled 40, run 38, killed 35, survived 3, not covered 2, not run 0, timeouts 0, race-only (inconclusive) 0, 2135 s; score 92.1 % of run, 87.5 % counting not covered as survived
+   by operator (killed, survived): {'int-plus-one': (7, 1), 'drop-not': (3, 0), 'negate-condition': (7, 1), 'return-none': (3, 0), 'or-and': (4, 1), 'compare-flip': (8, 0), 'bool-swap': (1, 0), 'drop-call': (2, 0)}
+   survivor: line 185 int-plus-one: '60' -> '61' (463 tests ran, none failed)
+   survivor: line 52 or-and: ' or ' -> ' and ' (557 tests ran, none failed)
+   survivor: line 183 negate-condition: 'created.tzinfo is None' -> 'not (created.tzinfo is None)' (463 tests ran, none failed)
+   survivor: line 73 return-none: 'datetime.min.replace(tzinfo=timezone.utc)' -> 'None' (not covered)
+   survivor: line 32 int-plus-one: '0' -> '1' (not covered)
+src/gov/close/ratchet.py: sampled 43, run 41, killed 38, survived 3, not covered 2, not run 0, timeouts 0, race-only (inconclusive) 0, 265 s; score 92.7 % of run, 88.4 % counting not covered as survived
+   by operator (killed, survived): {'return-none': (10, 0), 'compare-flip': (10, 0), 'or-and': (3, 0), 'int-plus-one': (3, 2), 'drop-not': (2, 0), 'negate-condition': (6, 0), 'drop-call': (2, 0), 'and-or': (2, 1)}
+   survivor: line 44 int-plus-one: '128' -> '129' (25 tests ran, none failed)
+   survivor: line 93 and-or: ' and ' -> ' or ' (30 tests ran, none failed)
+   survivor: line 95 return-none: 'f"it does not give each of {\', \'.join(FIELDS[key])}"' -> 'None' (not covered)
+   survivor: line 107 return-none: 'f"no commit of the history of {commit} adds it"' -> 'None' (not covered)
+   survivor: line 108 int-plus-one: '12' -> '13' (25 tests ran, none failed)
+src/gov/tasks/claims.py: sampled 33, run 33, killed 29, survived 4, not covered 0, not run 0, timeouts 0, race-only (inconclusive) 0, 446 s; score 87.9 % of run, 87.9 % counting not covered as survived
+   by operator (killed, survived): {'return-none': (4, 0), 'and-or': (3, 0), 'compare-flip': (7, 0), 'drop-not': (1, 0), 'bool-swap': (2, 1), 'negate-condition': (6, 0), 'or-and': (1, 0), 'drop-call': (5, 2), 'int-plus-one': (0, 1)}
+   survivor: line 39 drop-call: 'time.sleep(0.01)' -> 'pass' (2 tests ran, none failed)
+   survivor: line 50 bool-swap: 'True' -> 'False' (86 tests ran, none failed)
+   survivor: line 52 int-plus-one: '0o644' -> '421' (86 tests ran, none failed)
+   survivor: line 60 drop-call: 'os.close(descriptor)' -> 'pass' (84 tests ran, none failed)

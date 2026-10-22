@@ -1,0 +1,39 @@
+planted faults run: 32; detected by the full run (F non-empty): 32
+declared         detects 32/32  mean recall 0.76 (lowest 0.10)  mean selected time    1572 s (13.9% of part 1's 11292 s; median 18.2%)
+declared_no_unit detects 29/32  mean recall 0.52 (lowest 0.00)  mean selected time    1404 s (12.4% of part 1's 11292 s; median 16.7%)
+static           detects 27/32  mean recall 0.25 (lowest 0.00)  mean selected time      35 s ( 0.3% of part 1's 11292 s; median  0.3%)
+measured_suite   detects 32/32  mean recall 1.00 (lowest 1.00)  mean selected time    5753 s (50.9% of part 1's 11292 s; median 43.5%)
+measured_test    detects 32/32  mean recall 1.00 (lowest 1.00)  mean selected time    3256 s (28.8% of part 1's 11292 s; median 26.2%)
+
+src/gov/status/command.py:65:compare-flip:0                     exec=   91 F=   4 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-32,unit
+src/gov/status/command.py:105:negate-condition:1                exec=   59 F=   4 decl_recall=1.00 decl=Y decl-nu=Y stat=N meas=Y meas=Y F_suites=W1-32
+src/gov/checkpoint/record.py:169:return-none:0                  exec=    7 F=   5 decl_recall=0.60 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-25,W1-30,unit
+src/gov/checkpoint/record.py:139:or-and:1                       exec=  495 F= 201 decl_recall=0.10 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-25,W1-29,W1-30,W2-01,W2-02,W2-53,unit
+src/gov/tasks/claims.py:37:negate-condition:0                   exec=   78 F=  77 decl_recall=0.10 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-09,W1-28,W1-32,unit
+src/gov/adapters/portability.py:114:return-none:1               exec=    4 F=   4 decl_recall=1.00 decl=Y decl-nu=N stat=Y meas=Y meas=Y F_suites=unit
+src/gov/decisions/checker.py:222:return-none:0                  exec=    2 F=   2 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-11,unit
+src/gov/cli/main.py:121:return-none:0                           exec=   10 F=  10 decl_recall=1.00 decl=Y decl-nu=N stat=Y meas=Y meas=Y F_suites=unit
+src/gov/doctor/command.py:217:negate-condition:1                exec=    2 F=   1 decl_recall=1.00 decl=Y decl-nu=N stat=Y meas=Y meas=Y F_suites=unit
+src/gov/pause/command.py:288:return-none:0                      exec=    4 F=   4 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-50,unit
+src/gov/context/__init__.py:196:and-or:0                        exec=    4 F=   4 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-24,unit
+src/gov/tasks/claims.py:73:and-or:1                             exec=   14 F=   1 decl_recall=1.00 decl=Y decl-nu=Y stat=N meas=Y meas=Y F_suites=W1-09
+src/gov/pause/command.py:157:compare-flip:1                     exec=   25 F=  21 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-28,W1-50,unit
+src/gov/launch/launcher.py:244:negate-condition:1               exec=   61 F=  31 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-28,W1-46,unit
+src/gov/telemetry/counter.py:102:drop-not:1                     exec=   61 F=  33 decl_recall=1.00 decl=Y decl-nu=Y stat=N meas=Y meas=Y F_suites=W1-30,W1-31
+src/gov/lock/__init__.py:123:compare-flip:1                     exec=   34 F=  12 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-39,unit
+src/gov/telemetry/counter.py:74:or-and:0                        exec=  155 F= 130 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-30,W1-31,unit
+src/gov/readiness/checker.py:108:compare-flip:0                 exec=  222 F= 140 decl_recall=0.56 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-13,W1-14,W1-32,unit
+src/gov/readiness/checker.py:140:and-or:1                       exec=  223 F= 137 decl_recall=0.56 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-13,W1-14,W1-32,unit
+src/gov/lock/__init__.py:94:return-none:0                       exec=   71 F=  71 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-39,unit
+src/gov/cli/main.py:184:negate-condition:1                      exec=  240 F= 196 decl_recall=0.59 decl=Y decl-nu=Y stat=N meas=Y meas=Y F_suites=W1-07,W1-13,W1-20,W1-25,W1-28,W1-32,W1-33,W1-39,W1
+src/gov/doctor/command.py:159:drop-not:0                        exec=   69 F=   2 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-27,unit
+src/gov/adapters/portability.py:50:return-none:0                exec=  168 F=   4 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-38,unit
+src/gov/launch/launcher.py:227:negate-condition:0               exec=  665 F= 659 decl_recall=0.99 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-28,W1-32,W1-33,W1-38,W1-46,W1-50,W2-50,unit
+src/gov/store/loader.py:116:return-none:0                       exec=  162 F=  17 decl_recall=1.00 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-10,unit
+src/gov/context/__init__.py:358:return-none:1                   exec=  565 F= 282 decl_recall=0.83 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-24,W1-30,W1-41,W2-01,W2-02,W2-53,W2-54,unit
+src/gov/decisions/checker.py:227:return-none:1                  exec=  668 F= 620 decl_recall=0.28 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-11,W1-26,W1-30,W2-01,W2-02,W2-53,unit
+src/gov/config/loader.py:111:negate-condition:1                 exec=  646 F= 520 decl_recall=0.10 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-07,W1-08,W1-15,W1-17,W1-19,W1-21,W1-22,W1-24,W1
+src/gov/tasks/tickets.py:22:return-none:0                       exec= 1440 F=1270 decl_recall=0.46 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-09,W1-13,W1-14,W1-24,W1-25,W1-28,W1-29,W1-30,W1
+src/gov/tasks/tickets.py:19:compare-flip:1                      exec= 1443 F=1270 decl_recall=0.46 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-09,W1-13,W1-14,W1-24,W1-25,W1-28,W1-29,W1-30,W1
+src/gov/config/loader.py:214:negate-condition:0                 exec=  836 F=   4 decl_recall=0.50 decl=Y decl-nu=Y stat=N meas=Y meas=Y F_suites=W1-07,W1-25,W1-27
+src/gov/store/loader.py:197:return-none:1                       exec= 1406 F= 942 decl_recall=0.33 decl=Y decl-nu=Y stat=Y meas=Y meas=Y F_suites=W1-09,W1-10,W1-11,W1-13,W1-14,W1-20,W1-21,W1-22,W1

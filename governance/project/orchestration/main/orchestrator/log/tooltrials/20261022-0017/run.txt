@@ -1,0 +1,24 @@
+2026-10-22 00:22:28 0 lens H rest: start
+2026-10-22 02:21:57 0 lens H rest: exit 0 (2026-10-22 02:21:57 chain end)
+2026-10-22 02:29:22 clone 4166d8d9
+2026-10-22 02:42:32 clone rebuilt: exit 0
+2026-10-22 02:50:58 b1-load: start (load 0.11)
+2026-10-22 03:24:22 b1-load: exit 1 in 2004 s: 2 failed, 15441 passed, 30 skipped, 3 errors in 1889.76s (0:31:29)
+2026-10-22 03:30:44 b2-worksteal: start (load 0.29)
+2026-10-22 04:01:08 b2-worksteal: exit 1 in 1824 s: 8 failed, 15435 passed, 30 skipped, 3 errors in 1715.92s (0:28:35)
+2026-10-22 04:08:36 a-cost-timeout: start (load 0.03)
+2026-10-22 04:41:21 a-cost-timeout: exit 1 in 1965 s: 11 failed, 15432 passed, 30 skipped, 3 errors in 1835.31s (0:30:35)
+2026-10-22 04:47:47 d1-rerunfailures: start (load 0.21)
+2026-10-22 05:19:25 d1-rerunfailures: exit 1 in 1898 s: 2 failed, 15441 passed, 30 skipped, 3 errors, 5 rerun in 1765.45s (0:29:25)
+2026-10-22 05:25:55 d2-randomly: start (load 0.06)
+2026-10-22 05:59:01 d2-randomly: exit 1 in 1986 s: 3 failed, 15440 passed, 30 skipped, 3 errors in 1835.72s (0:30:35)
+2026-10-22 06:05:34 a: hang planted in 
+2026-10-22 06:09:08 a (alone): exit 0 in 214 s; children of the hang clone still alive: 0; 
+2026-10-22 06:09:18 a (n2): exit 0 in 10 s; children of the hang clone still alive: 0; 
+2026-10-22 06:09:18 c: grimp analysis exit 0
+2026-10-22 06:09:18 done
+2026-10-22 09:26:19 a2: hang planted:  1 file changed, 1 insertion(+)
+2026-10-22 09:27:34 a2 (signal, alone): exit 1 in 75 s; children still alive: 0; Timeout ++++++++++++++++++++++++++++++++++++
+2026-10-22 09:28:47 a2 (signal, n2): exit 1 in 73 s; children still alive: 0; Timeout (>60.0s) from pytest-timeout.
+2026-10-22 09:29:59 a2 (thread, alone): exit 1 in 72 s; children still alive: 0; Timeout ++++++++++++++++++++++++++++++++++++
+2026-10-22 09:31:13 a2 (thread, n2): exit 1 in 74 s; children still alive: 0; 

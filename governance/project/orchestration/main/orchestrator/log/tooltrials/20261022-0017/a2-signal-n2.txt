@@ -1,0 +1,77 @@
+bringing up nodes...
+bringing up nodes...
+
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_______________ test_every_command_returns_the_envelope[doctor] ________________
+[gw0] linux -- Python 3.12.3 /tmp/gov-os-tooltrial/bin/python
+
+request = <FixtureRequest for <Function test_every_command_returns_the_envelope[doctor]>>
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+args = ('doctor',)
+
+    @pytest.mark.parametrize("args", support.EVERY_INVOCATION, ids=support.label)
+    def test_every_command_returns_the_envelope(request, interface, args):
+        # Revised after implementation: W1-27's rebuild recreates the lexical index through its owner
+        # and its secrets filter (DEC-440); the size of the copied tree, not the behaviour, made the
+        # case time out.
+        gov = request.getfixturevalue("small_gov" if args[0] in support.TREE_SENSITIVE_COMMANDS else "gov")
+>       run = gov(*args, "--json")
+              ^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-07/test_w1_07_envelope.py:23: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-07/conftest.py:70: in _gov
+    return support.run_gov(project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:409: in run_gov
+    return run_gov_with_code(code_root, project, sandbox, *args, cwd=cwd)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:425: in run_gov_with_code
+    done = subprocess.run([sys.executable, str(launcher), *args], cwd=str(cwd or project), env=env,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2115: in _communicate
+    ready = selector.select(timeout)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <selectors.PollSelector object at 0x73ca20d8d8b0>, timeout = 180000
+
+    def select(self, timeout=None):
+        # This is shared between poll() and epoll().
+        # epoll() has a different signature and handling of timeout parameter.
+        if timeout is None:
+            timeout = None
+        elif timeout <= 0:
+            timeout = 0
+        else:
+            # poll() has a resolution of 1 millisecond, round away from
+            # zero to wait *at least* timeout seconds.
+            timeout = math.ceil(timeout * 1e3)
+        ready = []
+        try:
+>           fd_event_list = self._selector.poll(timeout)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: Timeout (>60.0s) from pytest-timeout.
+
+/usr/lib/python3.12/selectors.py:415: Failed
+----------------------------- Captured stdout call -----------------------------
+~~~~~~~~~~~~~~~~~~~~~ Stack of <unknown> (127312982963904) ~~~~~~~~~~~~~~~~~~~~~
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 411, in _perform_spawn
+    reply.run()
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 341, in run
+    self._result = func(*args, **kwargs)
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 1160, in _thread_receiver
+    msg = Message.from_io(io)
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 567, in from_io
+    header = io.read(9)  # type 1, channel 4, payload 4
+  File "/home/usain/.local/lib/python3.12/site-packages/execnet/gateway_base.py", line 534, in read
+    data = self._read(numbytes - len(buf))
+=========================== short test summary info ============================
+FAILED tests/acceptance/W1-07/test_w1_07_envelope.py::test_every_command_returns_the_envelope[doctor]
+1 failed in 60.46s (0:01:00)

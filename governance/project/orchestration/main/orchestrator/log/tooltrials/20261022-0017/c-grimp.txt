@@ -1,0 +1,39 @@
+grimp 3.17: graph of gov built in 0.01 s, 115 modules
+planted faults run: 32; detected by the full run: 32
+declared       detects 32/32  mean recall 0.76 (lowest 0.10)  mean time    1572 s (13.9% of the full run's 11292 s; median 18.2%)
+grimp          detects 27/32  mean recall 0.24 (lowest 0.00)  mean time     331 s ( 2.9% of the full run's 11292 s; median  4.6%)
+grimp_or_decl  detects 32/32  mean recall 0.77 (lowest 0.10)  mean time    1828 s (16.2% of the full run's 11292 s; median 19.7%)
+lensH_static   detects 27/32  mean recall 0.25 (lowest 0.00)  mean time      35 s ( 0.3% of the full run's 11292 s; median  0.3%)
+
+src/gov/status/command.py:65:compare-flip:0                         core=N F=   4 ups= 38 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/status/command.py:105:negate-condition:1                    core=N F=   4 ups= 38 declared=Y grimp=N grimp_or_decl=Y lensH_static=N
+src/gov/checkpoint/record.py:169:return-none:0                      core=N F=   5 ups=  4 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/checkpoint/record.py:139:or-and:1                           core=N F= 201 ups=  4 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/tasks/claims.py:37:negate-condition:0                       core=N F=  77 ups=  3 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/adapters/portability.py:114:return-none:1                   core=N F=   4 ups=  6 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/decisions/checker.py:222:return-none:0                      core=N F=   2 ups= 11 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/cli/main.py:121:return-none:0                               core=N F=  10 ups=  4 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/doctor/command.py:217:negate-condition:1                    core=N F=   1 ups= 21 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/pause/command.py:288:return-none:0                          core=N F=   4 ups= 10 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/context/__init__.py:196:and-or:0                            core=N F=   4 ups= 24 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/tasks/claims.py:73:and-or:1                                 core=N F=   1 ups=  3 declared=Y grimp=N grimp_or_decl=Y lensH_static=N
+src/gov/pause/command.py:157:compare-flip:1                         core=N F=  21 ups= 10 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/launch/launcher.py:244:negate-condition:1                   core=N F=  31 ups=  8 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/telemetry/counter.py:102:drop-not:1                         core=N F=  33 ups= 28 declared=Y grimp=N grimp_or_decl=Y lensH_static=N
+src/gov/lock/__init__.py:123:compare-flip:1                         core=N F=  12 ups=  1 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/telemetry/counter.py:74:or-and:0                            core=N F= 130 ups= 28 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/readiness/checker.py:108:compare-flip:0                     core=N F= 140 ups= 10 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/readiness/checker.py:140:and-or:1                           core=N F= 137 ups= 10 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/lock/__init__.py:94:return-none:0                           core=N F=  71 ups=  1 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/cli/main.py:184:negate-condition:1                          core=N F= 196 ups=  4 declared=Y grimp=N grimp_or_decl=Y lensH_static=N
+src/gov/doctor/command.py:159:drop-not:0                            core=N F=   2 ups= 21 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/adapters/portability.py:50:return-none:0                    core=N F=   4 ups=  6 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/launch/launcher.py:227:negate-condition:0                   core=N F= 659 ups=  8 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/store/loader.py:116:return-none:0                           core=N F=  17 ups=  2 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/context/__init__.py:358:return-none:1                       core=N F= 282 ups= 24 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/decisions/checker.py:227:return-none:1                      core=N F= 620 ups= 11 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/config/loader.py:111:negate-condition:1                     core=N F= 520 ups=  3 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/tasks/tickets.py:22:return-none:0                           core=N F=1270 ups=  1 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/tasks/tickets.py:19:compare-flip:1                          core=N F=1270 ups=  1 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
+src/gov/config/loader.py:214:negate-condition:0                     core=N F=   4 ups=  3 declared=Y grimp=N grimp_or_decl=Y lensH_static=N
+src/gov/store/loader.py:197:return-none:1                           core=N F= 942 ups=  2 declared=Y grimp=Y grimp_or_decl=Y lensH_static=Y
