@@ -1,0 +1,371 @@
+...........FF.F...................EEEEEEEEEEEEEEEEEEEEEEE............... [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+...............................................                          [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_a_research_install_succeeds_into_a_venv_inside_the_experiment_folder _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_a_research_install_outside_the_repository_fails_at_the_write_fence _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+__ ERROR at setup of test_a_research_bash_write_to_a_sibling_directory_fails ___
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_a_research_write_to_a_new_path_outside_the_folder_is_refused_or_reported _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[api.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[raw.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[objects.githubusercontent.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[codeload.github.com] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[pypi.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[files.pythonhosted.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[registry.npmjs.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[huggingface.co] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[export.arxiv.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.python.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.rs] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[static.crates.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[developer.mozilla.org] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_sandbox_accepts_a_connection_to_a_starting_host_of_the_research_allowlist[docs.readthedocs.io] _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_ ERROR at setup of test_the_research_allowlist_refuses_a_domain_that_is_not_on_it _
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+_____ ERROR at setup of test_each_session_uses_a_temp_directory_of_its_own _____
+the launched research session did not run the probe to its end (no complete experiments/spikes/exp-901/results.txt)
+gov launch research DAEO-zz97 -- -p Do exactly these two steps, once each, and nothing else. If a step is refused or fails, do not retry it and do not work around it. Step 1: run this Bash command as written: cd experiments/spikes/exp-901 && uv --no-cache venv .venv && uv --no-cache pip install --offline --no-index --python .venv/bin/python vendor/w1_46_probe-0.1-py3-none-any.whl  Step 2: run this Bash command as written: cd /tmp/pytest-of-usain/pytest-5984/w1-46-live-research0/repo && bash experiments/spikes/exp-901/probe.sh  Then answer DONE. --permission-mode acceptEdits --model haiku --max-turns 8 --allowedTools Bash,Write
+exit code: 0
+stdout:
+Step 1 completed successfully. Step 2 failed: the probe.sh script was not found at that path.
+
+stderr:
+
+=================================== FAILURES ===================================
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-engineer] ________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-sandbox0/systmp'))
+name = 'Read-engineer'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Read call for its PreToolUse hooks, per round (ms): 151.1, 115.5, 159.8; the bound is 100 ms
+E       assert 0.11548932397272438 < 0.1
+E        +  where 0.11548932397272438 = min([0.15113303600810468, 0.11548932397272438, 0.15976396400947124])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+________ test_a_call_waits_under_100_ms_p95_for_the_hook[Read-no-role] _________
+
+live = PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-live0/repo')
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+sandbox = Sandbox(home=PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-sandbox0/home'), tmpdir=PosixPath('/tmp/pytest-of-usain/pytest-5984/w1-05-sandbox0/systmp'))
+name = 'Read-no-role'
+
+    @pytest.mark.parametrize("name", sorted(TIMED_CALLS))
+    def test_a_call_waits_under_100_ms_p95_for_the_hook(live, switched_over, sandbox, name):
+        """W1-02's budget, "decision in < 100 ms p95", through the wiring, for the read-only tools as well.
+    
+        The time is what the call waits: every PreToolUse command registered for the
+        tool, started together, from the first start to the last exit. p95 over 40
+        calls after a warm-up. A round that misses the bound is repeated, up to
+        three rounds, so a single stall of the machine does not fail the test.
+        """
+        tool_name, reader, relpath = TIMED_CALLS[name]
+        role, ticket = READERS[reader]
+        if relpath is None:
+            tool_input = support.read_input(tool_name, live)
+        else:
+            tool_input = support.write_input(tool_name, live / relpath)
+    
+        def call():
+            return support.timed_pre_tool_use(live, switched_over, sandbox, tool_name, tool_input, role, ticket)
+    
+        for _ in range(LATENCY_WARM_UP):
+            call()
+        rounds = []
+        for _ in range(LATENCY_ROUNDS):
+            samples = []
+            for _ in range(LATENCY_SAMPLES):
+                result, seconds = call()
+                assert result.ran, f"{tool_name} reached no registered PreToolUse command: {result.describe()}"
+                assert result.decision == "allow", f"the timed {tool_name} was not allowed: {result.describe()}"
+                samples.append(seconds)
+            rounds.append(support.p95(samples))
+            if rounds[-1] < LATENCY_BOUND_S:
+                break
+>       assert min(rounds) < LATENCY_BOUND_S, (
+            f"p95 wait of a {tool_name} call for its PreToolUse hooks, per round (ms): "
+            + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+            + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+        )
+E       AssertionError: p95 wait of a Read call for its PreToolUse hooks, per round (ms): 101.7, 158.7, 237.7; the bound is 100 ms
+E       assert 0.10173441597726196 < 0.1
+E        +  where 0.10173441597726196 = min([0.10173441597726196, 0.15869528299663216, 0.23770816600881517])
+
+tests/acceptance/W1-05/test_w1_05_live_hooks.py:205: AssertionError
+_____ test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over _____
+
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+
+    def test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over(switched_over):
+        """With the hooks wired, the acceptance tests of W1-02, W1-03 and W1-04 exist and pass.
+    
+        This runs the three suites in a child pytest process, so it takes as long as they do.
+        """
+        directories = []
+        for wbs_id in support.DEPENDENCIES:
+            directory = support.REPO_ROOT / support.ACCEPTANCE_REL / wbs_id
+            assert directory.is_dir() and list(directory.glob("test_*.py")), (
+                f"the hooks are wired, but {support.ACCEPTANCE_REL}/{wbs_id}/ holds no acceptance tests"
+            )
+            directories.append(str(directory))
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", *directories, "-q", "-x", "-p", "no:cacheprovider"],
+            cwd=str(support.REPO_ROOT), capture_output=True, text=True, timeout=1800, check=False,
+        )
+        tail = "\n".join(proc.stdout.strip().splitlines()[-15:])
+>       assert proc.returncode == 0, (
+            "the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:\n" + tail
+        )
+E       AssertionError: the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:
+E         mode = 511, parents = True, exist_ok = True
+E         
+E             def mkdir(self, mode=0o777, parents=False, exist_ok=False):
+E                 """
+E                 Create a new directory at this given path.
+E                 """
+E                 try:
+E         >           os.mkdir(self, mode)
+E         E           OSError: [Errno 28] No space left on device: '/tmp/pytest-of-usain/pytest-5985/nul-bytes0/sandbox'
+E         
+E         /usr/lib/python3.12/pathlib.py:1313: OSError
+E         =========================== short test summary info ============================
+E         ERROR tests/acceptance/W1-02/test_w1_02_nul_bytes.py::test_a_nul_byte_in_a_path_or_a_glob_of_a_reading_tool_is_refused[Glob-path-the-held-out-file-s-folder-with-the-byte-at-its-end]
+E         !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+E         1626 passed, 1 error in 287.78s (0:04:47)
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '-m', 'pytest', '/home/usain/gov-os-worktrees/W2-50/tests/acceptance/W1-02'...!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1626 passed, 1 error in 287.78s (0:04:47)\n', stderr='').returncode
+
+tests/acceptance/W1-05/test_w1_05_switch_over_record.py:66: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:153: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+3 failed, 237 passed, 1 warning, 23 errors in 2041.98s (0:34:01)

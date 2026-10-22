@@ -89,7 +89,14 @@
   nothing in area 2 (incl. the ratchet's field rule, the path-map check); W1-26's base fixture red before any
   defect (40 cases cannot fail); 26 load_sensitive entries name cases the close already runs alone.
   For W2-69's brief: `tests/unit/secrets` errors at collection when stdlib `secrets` is imported first (W2-L373).
-- **Lens I: area 1 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
+- **Lens I1 DONE (19:36):** `assessment/2026-10/I1-guard-launcher-sandbox.md` (540 of 2,042 functions: 465 valid, 34
+  outdated, 15 obsolete, 12 duplicate, 11 flaky, 3 weak; 14 findings; P-I1-1..9). Send P-I1-5 (retire the two
+  nested reruns: 14.6 min per close, unblocks worksteal) and P-I1-9 (Policy 2 (c)'s base branch is hard-coded to
+  w2/integrate: F-12, fails open, feature-gated -> W2-27 entry criterion, DEC-803) FIRST in the bundle; W2-57 gets
+  F-1, F-2, F-7, F-10, F-14 + Part 4.2's serial-list changes; W2-66 gets Part 4.1 for its test map. Also F-6 (a
+  failed restore labelled "reverted" passes all 1,357 containment cases), F-3 (decisions Policy 2 replaced lack
+  "Changed by" marks: a DEC-866 sweep for me), F-4 (DEC-769 item 3 missing from W2-21's ticket).
+- **Lens I: area 4's resume RUNNING (log `log/assessment-I4-resume.json`)**; then the synthesis (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
 - **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly
