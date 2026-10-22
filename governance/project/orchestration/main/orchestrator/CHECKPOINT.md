@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 17:17 BST — W2-62 CLOSED d7daf01b; W2-69 created DAEO-rmbe; W2-50 run 9 running; lens I 1-3 running, 4 resume queued; next free DEC-898)
+## RESUME HERE (2026-10-22 22:21 BST — W2-50 CLOSED 01488b72; lens I in docs; review bundle ACT-pinged, WAITING; next free DEC-899)
 
 ### Standing owner rules (short; full text in the register and prompt v3.16; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -65,13 +65,10 @@
   per close; any other or second red stops the queue until W2-69 is pinned; same for W2-50's re-close.
   **W2-62's one re-run: `bash tools/close_queue.sh DAEO-juee`, started after the DEC-897 commit.** W2-69's card
   (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
-- **W2-50 run 9 DONE:** merge of integrate `95fb5070`, probed `6a3d3bfd` (pass, `PR-DAEO-kl5e-run-9.md`, head
-  `28f88286`); merged into integrate `2bf30b7c` (tree == merge-tree; probe_impact 0). Gates e/h/d/disk predicted
-  pass. **Re-close QUEUED** (`close_queue.sh DAEO-kl5e`, started after 2bf30b7c). DEC-897 (b) applies: one
-  proven re-run if the secrets check reds by chance. Risks: two W1-38 rulesync cases not on load_sensitive
-  (`TestGenerateCheck::test_check_clean_after_generate`, `TestRegisteredFamilyCheck::test_gov_check_lists_the_
-  check_under_the_family`) can red under load; candidate rows for them + the inode exhaustion. After W2-50
-  closes: W2-69 may start (no overlap left in flight).
+- **W2-50 CLOSED `01488b72` (22:17, clean gov close; gate (b) green 21:02).** Row W2-M355 to §4 `68314b8e`
+  (912 open); worktree + branch removed. Close success 5 of 18. **Lens I's five reports in docs `210721e0`**
+  (byte-identical). **W2-69 may start now** (no overlap in flight): brief A5 lead, FULL, with W2-L373 + the
+  P-IS-5 corrections if the owner takes them.
 - **W2-62 CLOSED `d7daf01b` (16:44, clean gov close after the one DEC-897 re-run; gate (b) green 15:33).** Rows
   W2-M372/M373 to §4 + closing checkpoint `466c63ae` (Task: DAEO-juee); worktree + branch removed. Close success 4
   of 17. close_queue.sh now commits `docs/checkpoints/<id>/` with the outputs (gov close writes a last one).
@@ -120,8 +117,8 @@
   faults passed, 24 fail open or lose work, latent; 3 live gaps, no round; P-IS-1..16). **REVIEW BUNDLE DRAFTED:**
   `drafts/review-bundle/00-INDEX.md` + 01 W2-66 ticket, 02 W2-66 card, 03 W2-68 card, 04 W2-67 card, 05 W2-57
   ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections (W2-70 = new small ticket for P-IS-3's two
-  retirements). AFTER W2-50's queue: copy I1-I4 + I-SYNTHESIS byte for byte to docs/assessment/2026-10/ (record
-  commit), then ACT ping (Windows paths) and WAIT. (Earlier:) brief BUILT
+  retirements). ACT PINGED after W2-50's close; WAITING for the owner's answers (P-IS-1..7, the re-pin plan, DEC-898's
+  figures, area 4's resume). Then: record (DEC-899...), commit drafts (ticket files with their Task), W2-70. (Earlier:) brief BUILT
   `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output
   `assessment/2026-10/I-SYNTHESIS.md`; sections: diagnosis, counts, fails-open, changes by ticket, retirements,
   owner decisions in work order, disagreements). Launch it (independent-auditor, effort max, from the main tree,
