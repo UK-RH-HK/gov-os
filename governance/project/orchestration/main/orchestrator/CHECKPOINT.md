@@ -81,7 +81,15 @@
   would go red at its close); W2-04, W2-37, W2-32 paths need the test files their revisions touch. Into the bundle
   too: `gov retrieve` gives every register item the id DEC-891 (23 of 23); `gov context` ok:true at about 1.19M
   tokens against a 6,000 ceiling; 5 planted faults that fail open or lose work pass every test.
-- **Lens I: areas 1-2 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
+- **Lens I2 DONE (18:55):** `assessment/2026-10/I2-close-checks-ratchet.md` (418 of 1,459 functions: 306 valid, 58
+  weak, 16 outdated, 23 flaky, 4 duplicate, 1 obsolete, 10 not reproducible; 14 findings; P-I2-1..7). Put P-I2-1
+  (routes out for list entries; W2-57's paths; DEC-889 item 5 in its card), P-I2-2 (area 2's record-reading tests in
+  W2-68's set), P-I2-4 (small ticket for W2-M214 before W2-27) to the owner BEFORE W2-13/14/19/57/27/68 start;
+  P-I2-3 revisions into the W2-19/57/67/07 cards at the review point. Also: 7 of 23 planted faults caught by
+  nothing in area 2 (incl. the ratchet's field rule, the path-map check); W1-26's base fixture red before any
+  defect (40 cases cannot fail); 26 load_sensitive entries name cases the close already runs alone.
+  For W2-69's brief: `tests/unit/secrets` errors at collection when stdlib `secrets` is imported first (W2-L373).
+- **Lens I: area 1 RUNNING since about 09:30** (`log/assessment-I1..4.json`; reports to
   `.gov-runtime/scratch/assessment/2026-10/I<n>-<slug>.md`). Then: write + launch the synthesis brief; copy the
   reports byte for byte into `docs/assessment/2026-10/`; then the review-bundle drafts.
 - **Trials done** (`packages/TOOL-TRIALS-2026-10-22.md`). Redo trial d (rerunfailures -rR, -p no:randomly; randomly
