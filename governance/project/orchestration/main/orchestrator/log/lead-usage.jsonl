@@ -6694,3 +6694,4 @@
 {"t": "2026-10-22T09:52:50", "load1": 15.53, "mem_available_kb": 18694856, "trees": {"main": {"procs": 27, "rss_kb": 1910468, "cpu_pct": 14.0}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
 {"t": "2026-10-22T09:53:23", "load1": 17.26, "mem_available_kb": 18699100, "trees": {"main": {"procs": 24, "rss_kb": 1922720, "cpu_pct": 15.2}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
 {"t": "2026-10-22T09:53:56", "load1": 19.35, "mem_available_kb": 18088436, "trees": {"main": {"procs": 27, "rss_kb": 1913216, "cpu_pct": 18.2}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:54:30", "load1": 19.91, "mem_available_kb": 18431856, "trees": {"main": {"procs": 24, "rss_kb": 1919548, "cpu_pct": 14.4}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}

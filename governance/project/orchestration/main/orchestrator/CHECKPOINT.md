@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 10:0x BST — queue run 7 (W2-50, W2-58, W2-62); lens I running; DEC-893 drafted; next free DEC-893)
+## RESUME HERE (2026-10-22 09:54 BST — queue run 7 (W2-50, W2-58, W2-62); lens I running; DEC-893 drafted; next free DEC-893)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -36,19 +36,19 @@
   Task: DAEO-sdxk.
 - **Also:** CAP-10 both figures (DEC-833); recalibrate after K2 (DEC-834); owner's daily backup push (DEC-848).
 
-### Where things stand (10-21 09:0x)
+### Where things stand (10-21 around 09:05)
 - **Owner pushed through `8dfd54e9`.** Records since: DEC-872 `4b6e5766`; DEC-873 `19357fcb`,`6e125150`; DEC-874
   `5f346750`; DEC-875 `8542a970`,`e6976ef3`; DEC-876 `65039414`; registry `b0756906`; DEC-877 `97fc656a`; DEC-878
   `172961fa`; DEC-879 `fcc82099`; DEC-880 `b772b2fe` (+ its follow-up commit: cards, tickets, prompt v3.7, brief).
 - **Closed:** W2-01 (tk), W2-53 (gov close). Close success 1 of 9 runs (W2-02 refused 02:37, TREE_NOT_COMMITTED,
   cause mine and fixed: copied self-ignoring stores; sync + gate (d) fixed `c3b32d31`).
 - **Merged, not closed:** W2-02 `94ac7951`, W2-54 `6855cdf3`, W2-62, W2-63, W2-50. core-schema GREEN on main.
-- **Queue run 2 STOPPED by me at 08:2x** before any close (only its rebuild lost; checkpoint commit `bceec2e9`
+- **Queue run 2 STOPPED by me at around 08:25** before any close (only its rebuild lost; checkpoint commit `bceec2e9`
   stays) to give W2-58 the machine (DEC-880 "ahead of everything"). Re-run after W2-58 merges, with W2-58 added:
   `bash tools/close_queue.sh DAEO-zflj DAEO-0rfi DAEO-juee DAEO-pl6k DAEO-kl5e DAEO-5j8b`.
 - **In flight (0 leads; lens H runs):** (was W2-58 run 3, DEC-880 item 1: `~` expansion on Read/Grep/Glob/Edit/Write/Bash + flagged pytest
-  forms, full verification, 3rd review limited to the change), started 08:3x, `log/W2-58-A5-run3.json`.
-- **W2-58 run 3 DONE (third review pass), MERGED `4845b9b8` (14:0x).** Its three incoming reds were MINE (DEC-880's
+  forms, full verification, 3rd review limited to the change), started around 08:35, `log/W2-58-A5-run3.json`.
+- **W2-58 run 3 DONE (third review pass), MERGED `4845b9b8` (around 14:05).** Its three incoming reds were MINE (DEC-880's
   records) and are fixed by DEC-882 (`9d8c1887`): DEC-843 item 3 stands (registry approved_by, xxgp's input); suite
   logs (W1-27.txt) out of the orchestration record + sync rule. Rows W2-M399, W2-L401..408. **Queue run 3 STARTED**
   with six: W2-02, W2-54, W2-62, W2-63, W2-50, W2-58 (`DAEO-5j8b`). Then merge W2-59, W2-65, ACT ping, W2-66.
@@ -56,8 +56,8 @@
   W1-08 namespace red = MY sync copied scratch `packages-pending/` into the record (NEW cause; fixed, sync keeps to
   namespaces); W1-07 `doctor` envelope red under load, green alone (NEW, row W2-L409). DEC-885. Gate (f) added to
   the queue: the record-reading suites (W1-06, W1-08, W1-27 path compliance, W1-07 envelope; 2 min). **Queue run 4
-  started 15:5x with the same six.** A 2nd W2-02 refusal for the same W1-07 case -> package to the owner.
-- **DEC-886 (owner pre-decision, 15:5x) DRAFTED** (`drafts/register-274-DEC-886.md`, commit after the queue or at
+  started around 15:55 with the same six.** A 2nd W2-02 refusal for the same W1-07 case -> package to the owner.
+- **DEC-886 (owner pre-decision, around 15:55) DRAFTED** (`drafts/register-274-DEC-886.md`, commit after the queue or at
   the trigger): if W1-07's `doctor` envelope case is red again in a close's regression AND green alone -> NO
   package: prepare its load_sensitive entry (DEC-886, fixed_by W2-57, row W2-L409) per
   `drafts/ACT-DEC-886-load-sensitive.md`, ping ACT for the owner's Role: owner commit, re-run that close once it's
@@ -83,7 +83,7 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
-- **10-22 10:0x: owner committed the W1-38 entry `49c24ac9` (Role: owner) and pushed both branches. Queue run 7
+- **10-22 09:54: owner committed the W1-38 entry `49c24ac9` (Role: owner) and pushed both branches. Queue run 7
   STARTED: W2-50, W2-58, W2-62** (gate (g) network ok, trailers ok). **DEC-893 (owner, standing) DRAFTED**
   (`scratchpad register-280-DEC-893.md`): a placeholder scan (`tools/placeholder_scan.py`, now in
   record_checks.sh) refuses "00:2x", "xx", "TBD", "<..>" in entries/patches/records before the owner or a commit.
