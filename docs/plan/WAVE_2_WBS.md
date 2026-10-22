@@ -285,7 +285,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
     - a specification ticket on its closed readiness record and its acceptance tests;
     - an audit ticket on its report and the audit validator;
     - a research ticket on its evidence record;
-    - an integration or coordination ticket on its named evidence files.
+    - an integration or coordination ticket on its named evidence files;
+    - a test-revision ticket on the acceptance tests its ticket file names in `acceptance_tests.path` (another ticket's folder), not on a folder of its own (DEC-892; W2-63 waits for this).
   - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in `.tickets/` [F-m8, W2-L209, W2-L236, AR-9].
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
@@ -890,6 +891,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
 - **Why:** W1-46's 23 live-session cases fail at setup under the full regression's parallel load (a launched session runs a step without its `cd`, so its probe script is not found) and pass alone; their 23 `load_sensitive` entries hide that. W1-46 proves the launcher and the sandbox, so it must be solid before EXAMIN (DEC-813). W1-30's r13 time-limit case failed once in W2-53's re-close at load about 25 and passes alone (DEC-823): either its timing is load-sensitive, or the close leaves a process alive under load. A single timing case must not hold the close queue again (DEC-823 (b)).
 - **Starts** in the first free slot after the closes now queued (DEC-806, as the revised plan orders them); **closes** before W2-24 starts. Tests first: the independent test designer on the fixtures and the close's behaviour under load; then a fresh engineer on `gov close`; then a reviewer. The close change is judged by the pinned close (DEC-822).
 - **DEC-883 item 5 (owner, 2026-10-21):** find out why each of the 263 serial-only tests (29 minutes of every close) must run alone, and run in parallel every one that safely can, with lens H's findings; each case kept serial names its reason.
+- **First item (DEC-892, owner, 2026-10-22):** fix the rulesync probe: rulesync's start exceeds the portability check's 10-second probe under the close's load, the cause of W1-38's three `load_sensitive` entries (DEC-871 ×2, DEC-892). A test revision with a `Rewrite-Reason:`, in the next free slot.
 - **Allowed paths:** `tests/acceptance/W1-46/**` and `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py` (the test designer: the fixtures and READMEs; no expectation lowered, every change with a `Rewrite-Reason:`); `tests/acceptance/W2-57/**` (the test designer); `src/gov/close/**` (the engineer: the close's own resource gate, or its isolated suite for the timing-sensitive cases, only), `tests/unit/close/**`, `docs/changes/W2-57-CIT-E.md`.
 - **KPIs, success:**
   - W1-46's 36 live cases pass inside the full regression run under its usual parallel load, three runs in a row, each with the load recorded [DEC-813, W2-M364].

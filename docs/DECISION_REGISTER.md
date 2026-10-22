@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.278 (the version table at the end of each section gives the history)
+**Version:** 0.279 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -9474,7 +9474,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 257. The owner's standing rules of 2026-10-20: a fast pre-close gate, checks before the orchestrator's record commits, and W2-48 next (register v0.257, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-868 — A fast pre-close gate before every close; the governance checks before the orchestrator commits its record edits (standing)
-- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-780, DEC-867, DEC-861, DEC-851 · **Basis:** OWNER, 2026-10-20: W2-53's fourth close ran 76 minutes and was refused for faults a minute's check finds (DEC-867); `pytest tests --collect-only` from the root finds the `secrets` clash in 5.75 s.
+- **Status:** ACCEPTED (owner, 2026-10-20, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-20)`; standing) · **Under:** DEC-780, DEC-867, DEC-861, DEC-851 · **Basis:** OWNER, 2026-10-20: W2-53's fourth close ran 76 minutes and was refused for faults a minute's check finds (DEC-867); `pytest tests --collect-only` from the root finds the `secrets` clash in 5.75 s. · **Changed by:** DEC-892: before each close, the live tests' allowlisted hosts are confirmed reachable; if not, the queue holds and retries
 - **Decision:**
   1. **Before every `gov close`, a fast pre-close gate, and the close starts only if it passes:** (a) `pytest --collect-only -q` over every suite the close will run, in one process, as the close runs them (it catches import and name clashes in seconds); (b) `gov check`, after the rebuild and with no commit in between (DEC-780); (c) the ticket's checkpoint, fresh. A failure stops the queue before the close, with its cause. The orchestrator's `tools/close_queue.sh` does this; leads run (a) in their worktrees before they return DONE.
   2. **After its own edits to the register, the plan, the path map, tickets or briefs,** the orchestrator runs the governance checks those files feed (at least the path-map, schema and context checks) before it commits them, until the hooks are back on (W2-08). `tools/record_checks.sh` runs `core-pathmap`, `core-schema`, `core-mutation`, `core-authority`, `core-graph` and `context-reproducibility`.
@@ -9908,7 +9908,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 277. The owner's answers of 2026-10-21 to lens H, with amendments, and the delegated split of W2-66 (register v0.277, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-889 — Lens H's packages decided, with the owner's amendments: the selection and the record-reading set refined; worksteal, per-test limits and JUnit XML; the glue; the tool trials; a review point before W2-66, W2-67 and W2-68; two re-pins planned; lens I
-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat, after reading lens H's full report, the register draft and W2-66's ticket; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-881, DEC-883, DEC-884, DEC-880, DEC-852 item 3, DEC-887, DEC-888, DEC-866, DEC-861 · **Basis:** lens H's report, `docs/assessment/2026-10/H-test-strategy.md` (PARTIAL: trials cut by the close lock), its 19 findings and 9 packages.
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat, after reading lens H's full report, the register draft and W2-66's ticket; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-881, DEC-883, DEC-884, DEC-880, DEC-852 item 3, DEC-887, DEC-888, DEC-866, DEC-861 · **Basis:** lens H's report, `docs/assessment/2026-10/H-test-strategy.md` (PARTIAL: trials cut by the close lock), its 19 findings and 9 packages. · **Changed by:** DEC-892: item 11 a (worksteal) is deferred until W2-67 or W2-57 removes the nested runs; item 11 b's mechanism is pytest-timeout with the signal method, an owner install package when W2-66 needs it; item 12's rerunfailures and randomly enter the nightly only after W2-L373's rename
 - **Decision:**
   1. **P-H-2 (a).** W2-66 takes all of the following in:
      - shared test helpers followed (such as `w1_07_support`, imported by 14 suites);
@@ -10072,3 +10072,43 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.278 | 2026-10-21 | Owner (recorded by the orchestrator, DEC-861): DEC-891 (P-W2-62-H (a): W2-62's claim commit 162f17ea9caf accepted as history; standing: accepted-history entries for record-only commits are recorded by the orchestrator from the owner's chat decision; entries for code, test or kernel commits stay the owner's own Role: owner commits). Next free id: DEC-892. |
+
+## 279. The owner's answers of 2026-10-22 on P-W2-63-C1 and on the tool trials' report (register v0.279, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-892 — W2-63 waits for W2-07's ticket-class close; W1-38's third rulesync case load-sensitive and the probe W2-57's first item; a network check before each close; worksteal deferred; pytest-timeout; the widest modules in the shared core
+- **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-871, DEC-883, DEC-889, DEC-890, DEC-866, DEC-861 · **Basis:** package P-W2-63-C1 (`governance/project/orchestration/packages/P-W2-63-C1.md`) and the tool trials' report (`governance/project/orchestration/packages/TOOL-TRIALS-2026-10-22.md`).
+- **Decision, on P-W2-63-C1:**
+  1. **(1) Not (a).** No tests are written into a W2-63 folder just to satisfy the close: that is busywork and test bloat. W2-63 stays merged, not closed, until the close reads a ticket's declared `acceptance_tests.path`. That fix is a KPI of **W2-07** (the close by ticket class; test-revision tickets are its case), not of W2-66. No exception and no decision-close.
+  2. **(2) (a).** W1-38's `TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]` becomes a `load_sensitive` entry with `decision: DEC-892` and `fixed_by: W2-57`, by the owner's `Role: owner` commit (DEC-862 (a)); the orchestrator prepares it.
+     - It is the third W1-38 case from the same cause: rulesync's start exceeds a 10-second probe under load.
+     - So fixing that probe is **W2-57's first item, in the next free slot**, as a test revision with a `Rewrite-Reason:`.
+  3. **(3) (a), a row,** and a **pre-close check:** before each close, the live tests' allowlisted hosts are confirmed reachable. If not, the queue holds and retries later, rather than spend a close on a network failure.
+  4. **Then** W2-50, W2-58 and W2-62 close, after the owner's W1-38 commit and with the network check green.
+- **Decision, on the trial report:**
+  - a. **Worksteal:** agreed. It goes into neither the close, the nightly nor the leads until W2-67 or W2-57 removes the nested runs; then it is re-measured. This amends DEC-889 item 11 a.
+  - b. **Per-test limits:** pytest-timeout with the `signal` method, as an owner install package for the owner's approval when W2-66 needs it.
+  - c. **The three widest-reaching modules** (`src/gov/config/loader.py`, `src/gov/tasks/tickets.py`, `src/gov/store/loader.py`) go into the shared core (always the full run) in W2-66's draft. Only 10 to 46 % of their catching tests were selected.
+  - d. **The two unexplained results are explained before drafting;** either that appears in a real close or on `w2/integrate`'s head is a package. The orchestrator's finding:
+    - **The `tests/unit/secrets` collection errors** come from pytest-randomly and pytest-rerunfailures. Either one, once loaded, imports the standard library's `secrets` before collection, so the test package named `secrets` clashes with it (row W2-L373). pytest-timeout alone collects all 26 tests. The closes' interpreter loads none of these plugins: the head collects the folder, and W2-02's and W2-54's closes ran it. No package; but glueing rerunfailures or randomly into the nightly (DEC-889 item 12) needs W2-L373's rename first.
+    - **The 9 extra failures of the timeout run** are the nested-run class: tests that start their own pytest run with a 60-second limit, which under worksteal land beside the heaviest tests. In addition, pytest-randomly, once installed in the trial venv, loaded itself and shuffled the order of all five trial runs. None of these tests failed in a real close (W2-02's and W2-54's, under `--dist load` and in file order) or in the rehearsal. No package.
+  - e. **Trial d is redone** with the rerun ids (`-rR`) and the seed recorded, in a quiet window; then `/tmp/gov-os-tooltrial` is removed and its removal shown.
+  - All of this goes into the review bundle (DEC-889 item 14).
+- **Changes:**
+  - DEC-889 item 11 a (worksteal deferred) and item 11 b (the mechanism chosen);
+  - DEC-889 item 12 (rerunfailures and randomly in the nightly only after W2-L373);
+  - DEC-868 (the pre-close gate gains the network check).
+- **Where it goes (DEC-851):**
+  - this register, with DEC-889's and DEC-868's status lines marked;
+  - the prompt §15 (the pre-close gate's network check; the nightly without worksteal), v3.13;
+  - `LEAD-w2-common.md` (the leads' verification without worksteal);
+  - RESUME HERE;
+  - W2-07's card and ticket file (test-revision tickets);
+  - W2-57's card (the rulesync probe first);
+  - W2-63's ticket file (it waits for W2-07);
+  - the list's rows;
+  - the orchestrator's queue and nightly scripts.
+- Next free id: DEC-893.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.279 | 2026-10-22 | Owner (recorded by the orchestrator, DEC-861): DEC-892 (W2-63 stays merged until W2-07's close reads a ticket's acceptance_tests.path; W1-38's third rulesync case load-sensitive by the owner's commit, the probe W2-57's first item; a network check before each close; worksteal deferred; pytest-timeout with the signal method as an owner install package when W2-66 needs it; the three widest modules in W2-66's shared core; the trial results explained). Next free id: DEC-893. |

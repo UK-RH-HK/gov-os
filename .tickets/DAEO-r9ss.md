@@ -33,6 +33,7 @@ kpis:
   - An interrupted close leaves nothing that blocks the next close [W2-M158].
   - 'The pre-close gate, inside gov close (DEC-868): before its regression, the close collects every suite it will run, in one process, as it runs them (pytest --collect-only), runs gov check with no
     commit since the rebuild, and checks that the ticket''s checkpoint is fresh; any failure refuses at once, naming its cause, before any test runs, and spends no ratchet attempt'
+  - 'A test-revision ticket is judged on the acceptance tests its ticket file names in acceptance_tests.path (another ticket''s folder), not on a folder of its own [DEC-892]'
   failure:
   - A research ticket without an evidence record refuses; an audit ticket whose report fails the validator refuses.
   - A tree with a collection error (an import or name clash), a RED gov check or a stale checkpoint is refused by the gate within minutes, not after the regression [DEC-868].
@@ -41,6 +42,7 @@ sources:
 - DEC-729
 - DEC-738
 - DEC-868
+- DEC-892
 est_loc: 160
 acceptance_tests:
   path: tests/acceptance/W2-07/
@@ -90,7 +92,8 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729). The list row
     - a specification ticket on its closed readiness record and its acceptance tests;
     - an audit ticket on its report and the audit validator;
     - a research ticket on its evidence record;
-    - an integration or coordination ticket on its named evidence files.
+    - an integration or coordination ticket on its named evidence files;
+    - a test-revision ticket on the acceptance tests its ticket file names in `acceptance_tests.path` (another ticket's folder), not on a folder of its own (DEC-892; W2-63 waits for this).
   - A refused close writes a complete repair ticket (role, allowed paths, KPIs) that stays tracked in `.tickets/` [F-m8, W2-L209, W2-L236, AR-9].
   - The close record carries the measured governance share [W2-M166, W2-M286].
   - Adoption-gap and baseline refusals do not count toward the escalation counter; a repeated identical refusal reuses its repair ticket [W2-H038, W2-M249, W2-M252].
