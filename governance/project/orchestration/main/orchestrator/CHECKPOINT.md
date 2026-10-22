@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 14:25 BST — DEC-896 committed; W2-62's close stopped at gate (b), P1 P-W2-62-G1 sent; W2-50 run 9 next; lens I running; next free DEC-897)
+## RESUME HERE (2026-10-22 14:20 BST — DEC-896 committed; W2-62's close stopped at gate (b), P1 P-W2-62-G1 sent; W2-50 run 9 next; lens I running; next free DEC-897)
 
 ### Standing owner rules (short; full text in the register and prompt v3.16; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -43,7 +43,7 @@
   W2-63: no tests/acceptance/W2-63, DEC-892).
 - Free slots (never during a close): W2-65, W2-57, the nightly (no worksteal), held resumes by keystone.
 
-### Where things stand (10-22 14:25)
+### Where things stand (10-22 14:20)
 - **Owner pushed through `49c24ac9`.** Since: DEC-893+894 `da3d77e1`; DEC-895 `365f1307`; W2-58 checkpoint
   `bddd22f6`; W2-62 checkpoint `2b20aa27`; **DEC-896 `c4f2b303`** (register v0.283, prompt v3.16 §3/§7/§15,
   P-W2-58-C1 filed). DEC-896 does not reach the lead or auditor briefs (leads don't commit ticket files or

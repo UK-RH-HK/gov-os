@@ -4322,7 +4322,7 @@ P2 items go into one daily digest.
   ~/gov-os-workbench or EXAMIN's real repo; edit a reviewed ticket's file on w2/integrate; grow accepted_reds/
   load_sensitive without the owner; weaken a hard-block check; let the ratchet retry; strip CLAUDE* from my close.
 
-## Former RESUME HERE, moved 2026-10-22 14:25 BST
+## Former RESUME HERE, moved 2026-10-22 14:19 BST
 
 ### RESUME HERE (as it stood) (2026-10-22 13:36 BST — W2-58 refused (P-W2-58-C1); W2-62 closing; W2-50 fresh probe next; lens I running; next free DEC-896)
 
