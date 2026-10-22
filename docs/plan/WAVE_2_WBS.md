@@ -481,7 +481,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - `gov resources` reads free memory, load, and every live Gov OS session on the machine from a machine-wide registry under `~/.gov-os/machine/`, whichever repository started it.
   - The gate opens or shuts with a named reason.
   - A stale entry (dead PID) is cleared [W2-M244, W2-M188, W2-M262].
-- **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading.
+  - **The disk (owner, DEC-898 item 1):** the gate shuts below a floor of free space and of free inodes on the shared disk (100 GiB and 10,000,000 by default, in the configuration). `gov launch` refuses a start while it is shut, naming the reading. `gov close` calls the same reading before a close; that call is W2-07's or W2-66's, whose paths hold the close.
+- **KPIs, failure:** a session in another repository counts against the gate; a start while the gate is shut is refused with the reading; a launch with the disk below either floor; a gate that reads space but not inodes.
 
 #### W2-21 Stable launch: `gov launch lead`, the ticket-lead role, launch records (FULL, engineer, with a product-spec worker for the role file)
 - **DEC-779 (owner, 2026-10-18), priority raised:** W2-21 takes the next free slot after W2-50 closes, ahead of any Track C ticket, so that the leads are sandboxed as early as possible. It leaves the held W2-20's `src/gov/launch/gate*` alone until W2-20 merges. Until W2-21 lands, a guard text-parsing hole that only unsandboxed sessions can reach, or that needs a precondition no session can create through the guard, is a row for every guard ticket.
