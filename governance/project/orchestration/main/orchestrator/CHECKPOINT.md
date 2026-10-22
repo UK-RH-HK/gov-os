@@ -96,7 +96,14 @@
   F-1, F-2, F-7, F-10, F-14 + Part 4.2's serial-list changes; W2-66 gets Part 4.1 for its test map. Also F-6 (a
   failed restore labelled "reverted" passes all 1,357 containment cases), F-3 (decisions Policy 2 replaced lack
   "Changed by" marks: a DEC-866 sweep for me), F-4 (DEC-769 item 3 missing from W2-21's ticket).
-- **Lens I: area 4's resume RUNNING (log `log/assessment-I4-resume.json`)**; then the synthesis: brief BUILT
+- **Lens I4 returned PARTIAL (20:12), report complete:** `assessment/2026-10/I4-records-plan-rest.md` (1,420
+  functions: 1,235 valid, 109 weak, 61 duplicate, 13 outdated, 2 flaky; P-I4-1..5; high findings: A8's retirement
+  guard held by no test; W1-27's doctor suite blind to 5 behaviours; the probe's 10 s limit -> 30 red-able cases +
+  a silent 181-case skip; W1-08's case the only working path-map guard). Not done: area-wide parallel x3, the
+  clone rebuild (gov retrieve answered nothing). Its folder hit the disk's inodes (94 %): clone, worktrees and
+  tmp REMOVED by me (evidence folders kept, 34M; inodes 83 %). My write to ~/gov-os-runs was REFUSED by the guard
+  (no W2-00 folder): do not retry.
+- **Lens I synthesis LAUNCHED** behind the gate (`log/assessment-IS.json`); brief BUILT
   `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output
   `assessment/2026-10/I-SYNTHESIS.md`; sections: diagnosis, counts, fails-open, changes by ticket, retirements,
   owner decisions in work order, disagreements). Launch it (independent-auditor, effort max, from the main tree,
