@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 09:4x BST — DEC-892; W1-38 entry awaits the owner; lens I running; next free DEC-893)
+## RESUME HERE (2026-10-22 10:0x BST — queue run 7 (W2-50, W2-58, W2-62); lens I running; DEC-893 drafted; next free DEC-893)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,6 +83,13 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
+- **10-22 10:0x: owner committed the W1-38 entry `49c24ac9` (Role: owner) and pushed both branches. Queue run 7
+  STARTED: W2-50, W2-58, W2-62** (gate (g) network ok, trailers ok). **DEC-893 (owner, standing) DRAFTED**
+  (`scratchpad register-280-DEC-893.md`): a placeholder scan (`tools/placeholder_scan.py`, now in
+  record_checks.sh) refuses "00:2x", "xx", "TBD", "<..>" in entries/patches/records before the owner or a commit.
+  The committed entry's "00:2x" (real: between 00:12 and 00:16) is folded into the owner's next ratchet commit or
+  W2-57's removal. AFTER THE QUEUE: commit DEC-893 + correct my 8 packages' "From" times (each package's adding
+  commit time) + P-W2-63-C1's and W2-L414's "00:2x". Habit to drop: never write "HH:Mx" times in records.
 - **10-22 09:4x: DEC-892 COMMITTED `8d625805`** (P-W2-63-C1 answers + trial-report rulings): W2-63 merged-not-closed
   until W2-07 reads acceptance_tests.path (no folder, no exception); W1-38 entry -> owner's Role: owner commit
   (patch `drafts/W1-38-unsourced-entry.patch`, ACT pinged); the rulesync probe = W2-57's FIRST item (test revision);

@@ -26,4 +26,10 @@ env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH=/home/usain/Dynamic-Agentic-E
 code=$?
 echo "record-reading suites exit $code: $(tail -1 "$OUT/record-reading.out")"
 [ "$code" -eq 0 ] || status=1
+# DEC-893 (owner, standing): no placeholder ("00:2x", "xx", "TBD", "<…>" in an entry) in any prepared entry, patch or
+# record before it reaches the owner or a commit: uncommitted changes, untracked files and the prepared patches.
+python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/placeholder_scan.py > "$OUT/placeholders.out" 2>&1
+code=$?
+echo "placeholder scan exit $code: $(tail -1 "$OUT/placeholders.out")"
+[ "$code" -eq 0 ] || { status=1; grep '^placeholder:' "$OUT/placeholders.out" | head -10; }
 exit $status

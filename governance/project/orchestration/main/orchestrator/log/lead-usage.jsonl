@@ -6683,3 +6683,14 @@
 {"t": "2026-10-22T09:46:46", "load1": 33.86, "mem_available_kb": 18472112, "trees": {"main": {"procs": 25, "rss_kb": 1861844, "cpu_pct": 16.2}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17120, "cpu_pct": 0.0}}}
 {"t": "2026-10-22T09:47:20", "load1": 31.07, "mem_available_kb": 19182316, "trees": {"main": {"procs": 25, "rss_kb": 1855296, "cpu_pct": 35.4}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17120, "cpu_pct": 0.0}}}
 {"t": "2026-10-22T09:47:50", "load1": 21.19, "mem_available_kb": 19639616, "trees": {"main": {"procs": 19, "rss_kb": 1794916, "cpu_pct": 0.0}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17120, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:48:23", "load1": 15.21, "mem_available_kb": 19915212, "trees": {"main": {"procs": 19, "rss_kb": 1826508, "cpu_pct": 11.0}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17120, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:48:57", "load1": 12.85, "mem_available_kb": 18099412, "trees": {"main": {"procs": 22, "rss_kb": 1842268, "cpu_pct": 12.8}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17120, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:49:30", "load1": 10.1, "mem_available_kb": 19860968, "trees": {"main": {"procs": 19, "rss_kb": 1885064, "cpu_pct": 10.8}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:50:03", "load1": 8.28, "mem_available_kb": 19795028, "trees": {"main": {"procs": 19, "rss_kb": 1880772, "cpu_pct": 11.1}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:50:37", "load1": 6.96, "mem_available_kb": 19891792, "trees": {"main": {"procs": 19, "rss_kb": 1841580, "cpu_pct": 9.4}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:51:10", "load1": 7.45, "mem_available_kb": 18662840, "trees": {"main": {"procs": 22, "rss_kb": 1856068, "cpu_pct": 6.5}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:51:43", "load1": 10.22, "mem_available_kb": 18424448, "trees": {"main": {"procs": 22, "rss_kb": 1889628, "cpu_pct": 11.8}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:52:16", "load1": 14.23, "mem_available_kb": 18580808, "trees": {"main": {"procs": 22, "rss_kb": 1881164, "cpu_pct": 13.1}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:52:50", "load1": 15.53, "mem_available_kb": 18694856, "trees": {"main": {"procs": 27, "rss_kb": 1910468, "cpu_pct": 14.0}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:53:23", "load1": 17.26, "mem_available_kb": 18699100, "trees": {"main": {"procs": 24, "rss_kb": 1922720, "cpu_pct": 15.2}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
+{"t": "2026-10-22T09:53:56", "load1": 19.35, "mem_available_kb": 18088436, "trees": {"main": {"procs": 27, "rss_kb": 1913216, "cpu_pct": 18.2}, "W2-54 (deleted)": {"procs": 1, "rss_kb": 17056, "cpu_pct": 0.0}}}
