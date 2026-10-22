@@ -19,6 +19,8 @@ while [ "$quiet" -lt 5 ]; do
   if [ ! -e "$ORCH/CLOSE-RUNNING" ] && awk '{exit !($1 < 3)}' /proc/loadavg; then quiet=$((quiet + 1)); else quiet=0; fi
   sleep 60
 done
+# DEC-898: free disk space and free inodes above the floor, or no run.
+disk=$(bash "$ORCH/tools/disk_gate.sh" 2>&1) || { date "+%F %T nightly NOT STARTED: $disk" > "$OUT/run.txt"; exit 2; }
 date '+%F %T nightly: lock set' > "$ORCH/NIGHTLY-RUNNING"
 date '+%F %T quiet' > "$OUT/run.txt"
 CLONE=$RUNS/$STAMP

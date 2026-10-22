@@ -7,6 +7,11 @@
   section < 10,000 chars (older text: CHECKPOINT-ARCHIVE.md). **Memory used (DEC-836):** `gov retrieve` in every brief.
 - **Parallelism (DEC-847/880):** gate in the launch command (load1 < 20, MemAvailable >= 6710886 kB); never in a
   close's quiet window; ceiling 10; fewer until W2-66.
+- **Disk and scratch (DEC-898, `17515bba`):** `bash tools/disk_gate.sh &&` in every launch command (>= 100 GiB and
+  >= 10,000,000 inodes free; figures provisional until the owner confirms); queue/nightly/trials call it. Every
+  auditor/trial/research brief: 30 GB + 2,000,000 files budget; lead + workers 20 GB + 1,000,000; own TMPDIR,
+  pytest's own retention (never per-run --basetemp), clean up as they go, scratch size in the return's evidence;
+  over budget -> stop heavy work, return PACKAGES/PARTIAL, I ping P1. W2-20 KPI `efa2e4b0`.
 - **Notify (DEC-855):** six-part package in my message + `packages/<id>.md`; start all independent work; LAST ACTION
   `~/.local/bin/owner-ping "<P1|P2|COMMIT|ACT> <id> | gates <...> | <need>"`; never AskUserQuestion; no secret,
   key, held-out path or file content. During a queue: ping only if a close is refused (new or seen cause).
@@ -60,8 +65,13 @@
   per close; any other or second red stops the queue until W2-69 is pinned; same for W2-50's re-close.
   **W2-62's one re-run: `bash tools/close_queue.sh DAEO-juee`, started after the DEC-897 commit.** W2-69's card
   (WBS) and ticket (`Task: <its id>` on its ticket-file commit) after the queue.
-- **W2-50 run 9 lead RUNNING since about 15:00** (`briefs/W2-50-A5-run9.md`: merge integrate, fresh FULL probe, no
-  code change; log `log/W2-50-A5-run9.json`; its workers pause while CLOSE-RUNNING exists). Then its re-close.
+- **W2-50 run 9 DONE:** merge of integrate `95fb5070`, probed `6a3d3bfd` (pass, `PR-DAEO-kl5e-run-9.md`, head
+  `28f88286`); merged into integrate `2bf30b7c` (tree == merge-tree; probe_impact 0). Gates e/h/d/disk predicted
+  pass. **Re-close QUEUED** (`close_queue.sh DAEO-kl5e`, started after 2bf30b7c). DEC-897 (b) applies: one
+  proven re-run if the secrets check reds by chance. Risks: two W1-38 rulesync cases not on load_sensitive
+  (`TestGenerateCheck::test_check_clean_after_generate`, `TestRegisteredFamilyCheck::test_gov_check_lists_the_
+  check_under_the_family`) can red under load; candidate rows for them + the inode exhaustion. After W2-50
+  closes: W2-69 may start (no overlap left in flight).
 - **W2-62 CLOSED `d7daf01b` (16:44, clean gov close after the one DEC-897 re-run; gate (b) green 15:33).** Rows
   W2-M372/M373 to §4 + closing checkpoint `466c63ae` (Task: DAEO-juee); worktree + branch removed. Close success 4
   of 17. close_queue.sh now commits `docs/checkpoints/<id>/` with the outputs (gov close writes a last one).
@@ -101,7 +111,10 @@
   guard held by no test; W1-27's doctor suite blind to 5 behaviours; the probe's 10 s limit -> 30 red-able cases +
   a silent 181-case skip; W1-08's case the only working path-map guard). Not done: area-wide parallel x3, the
   clone rebuild (gov retrieve answered nothing). Its folder hit the disk's inodes (94 %): clone, worktrees and
-  tmp REMOVED by me (evidence folders kept, 34M; inodes 83 %). My write to ~/gov-os-runs was REFUSED by the guard
+  tmp REMOVED by me, then I1-I3's clones/tmp too (evidence folders kept: I1 91M, I2 73M, I3 67M, I4 34M).
+  Disk before 20:15: 640 GB used (67 %), 62,589,143 inodes (94 %); after 20:30: 486 GB (51 %), 45,983,305 (69 %).
+  Still to look at: /tmp/pytest-of-usain (61 run folders since 10-20: retention not working), 44
+  /tmp/gov-testcache-*, /tmp/gov-os-tooltrial (1,341; remove after trial d), "another review's folder, 8.9M". My write to ~/gov-os-runs was REFUSED by the guard
   (no W2-00 folder): do not retry.
 - **Lens I synthesis LAUNCHED** behind the gate (`log/assessment-IS.json`); brief BUILT
   `briefs/assessment-IS.md` (head + JUDGEMENT.md word for word + tail; read-only, no tests; output

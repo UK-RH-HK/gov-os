@@ -21,6 +21,8 @@ for item in "$@"; do
   ticket=${item%%:*}; lift=""
   [ "$item" != "$ticket" ] && lift="--owner-decision ${item#*:}"
   stop() { date '+%F %T '"$ticket"' STOPPED BEFORE THE CLOSE: '"$1" >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 2; }
+  # DEC-898: free disk space and free inodes above the floor, or no close.
+  disk=$(bash /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/disk_gate.sh 2>&1) || stop "$disk"
   # (c) a fresh checkpoint of the ticket, committed before the rebuild.
   gov checkpoint --ticket "$ticket" --role orchestrator --trigger ticket-transition \
     --next "gov close $ticket (pre-close gate passed)" --json > "$LOG/checkpoint-$ticket.json" 2>&1 || stop "gov checkpoint failed"

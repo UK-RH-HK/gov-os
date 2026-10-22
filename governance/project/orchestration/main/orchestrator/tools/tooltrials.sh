@@ -24,6 +24,8 @@ quiet() {
       q=$((q + 1)); else q=0; fi
     sleep 60
   done
+  # DEC-898: free disk space and free inodes above the floor, or the trials stop.
+  disk=$(bash "$ORCH/tools/disk_gate.sh" 2>&1) || { log "STOPPED: $disk"; exit 2; }
 }
 log() { echo "$(date '+%F %T') $*" >> "$OUT/run.txt"; }
 

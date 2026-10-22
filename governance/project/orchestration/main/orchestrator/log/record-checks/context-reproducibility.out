@@ -1,2 +1,3 @@
 ERROR: DAEO-rmbe: .tickets/DAEO-rmbe.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
-context-reproducibility: 0 ticket(s) failed, 1 error(s)
+ERROR: DAEO-r30l: mandatory input 'DEC-898' not found in the store
+context-reproducibility: 0 ticket(s) failed, 2 error(s)
