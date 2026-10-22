@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.279 (the version table at the end of each section gives the history)
+**Version:** 0.281 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10079,7 +10079,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 - **Status:** ACCEPTED (owner, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-757, DEC-762, DEC-766, DEC-862 (a), DEC-871, DEC-883, DEC-889, DEC-890, DEC-866, DEC-861 · **Basis:** package P-W2-63-C1 (`governance/project/orchestration/packages/P-W2-63-C1.md`) and the tool trials' report (`governance/project/orchestration/packages/TOOL-TRIALS-2026-10-22.md`).
 - **Decision, on P-W2-63-C1:**
   1. **(1) Not (a).** No tests are written into a W2-63 folder just to satisfy the close: that is busywork and test bloat. W2-63 stays merged, not closed, until the close reads a ticket's declared `acceptance_tests.path`. That fix is a KPI of **W2-07** (the close by ticket class; test-revision tickets are its case), not of W2-66. No exception and no decision-close.
-  2. **(2) (a).** W1-38's `TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]` becomes a `load_sensitive` entry with `decision: DEC-892` and `fixed_by: W2-57`, by the owner's `Role: owner` commit (DEC-862 (a)); the orchestrator prepares it.
+  2. **(2) (a).** W1-38's `tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]` becomes a `load_sensitive` entry (the full test id added 2026-10-22, DEC-894: the ratchet reads the test's file path in the decision's text and refused the entry without it) with `decision: DEC-892` and `fixed_by: W2-57`, by the owner's `Role: owner` commit (DEC-862 (a)); the orchestrator prepares it.
      - It is the third W1-38 case from the same cause: rulesync's start exceeds a 10-second probe under load.
      - So fixing that probe is **W2-57's first item, in the next free slot**, as a test revision with a `Rewrite-Reason:`.
   3. **(3) (a), a row,** and a **pre-close check:** before each close, the live tests' allowlisted hosts are confirmed reachable. If not, the queue holds and retries later, rather than spend a close on a network failure.
@@ -10112,3 +10112,49 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.279 | 2026-10-22 | Owner (recorded by the orchestrator, DEC-861): DEC-892 (W2-63 stays merged until W2-07's close reads a ticket's acceptance_tests.path; W1-38's third rulesync case load-sensitive by the owner's commit, the probe W2-57's first item; a network check before each close; worksteal deferred; pytest-timeout with the signal method as an owner install package when W2-66 needs it; the three widest modules in W2-66's shared core; the trial results explained). Next free id: DEC-893. |
+
+## 280. The owner's rule of 2026-10-22 on placeholders (register v0.280, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-893 — No placeholder reaches the owner or a commit: a scan in the record checks
+- **Status:** ACCEPTED (owner, standing, 2026-10-22, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`) · **Under:** DEC-868, DEC-862 (a), DEC-861, DEC-851 · **Basis:** the owner's `Role: owner` commit of DEC-892's W1-38 entry (`49c24ac9`, 2026-10-22). The entry's reason carries an unfilled placeholder, "2026-10-22 00:2x", which the orchestrator had prepared. <!-- placeholder-examples -->
+- **Decision:**
+  1. **The committed entry is not corrected now.** The real time goes into the owner's next ratchet commit, or into W2-57's removal of the entry. The alone run fell between 00:12 and 00:16 on 2026-10-22: after W2-63's refused close ended at 00:11, and before the DEC-891 commit at 00:16.
+  2. **The rule (standing):** the orchestrator's record checks include a scan that refuses placeholders in any prepared entry, patch or record before it reaches the owner or a commit:
+     - an unfilled time or date (`00:2x`, `16:xx`, `2026-10-xx`); <!-- placeholder-examples -->
+     - `TBD`, `TODO`, `XXX`, a whole-word `xx`, `???`; <!-- placeholder-examples -->
+     - in path-map lines and patches, an angle-bracket slot (`<n>`, `<time>`).
+     The scan is `tools/placeholder_scan.py`, run by `tools/record_checks.sh`, and also on a package or entry before it is sent (`placeholder_scan.py <file>`). It caught the committed entry (`--commit 49c24ac9`) and passes `cf8219a8`.
+  3. **The orchestrator's earlier records** that carry approximate times as placeholders are corrected in its next record commit (the "From" lines of eight packages, P-W2-63-C1's and row W2-L414's "00:2x"). DEC-892's register entry carries none. <!-- placeholder-examples -->
+- **Where it goes (DEC-851):**
+  - this register;
+  - the prompt §15 (the record checks), v3.14;
+  - RESUME HERE;
+  - the orchestrator's `tools/record_checks.sh`.
+  It does not reach the leads' or auditors' briefs: they prepare no owner entries.
+- Next free id: DEC-894.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.280 | 2026-10-22 | Owner (recorded by the orchestrator, DEC-861): DEC-893 (no placeholder reaches the owner or a commit: a scan in the record checks; the committed W1-38 entry's time folded into the next ratchet commit or W2-57's removal). Next free id: DEC-894. |
+
+## 281. A delegated decision of 2026-10-22 on W2-50's refused close (register v0.281, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-894 — DEC-892's entry names its test in full; W2-50 takes a fresh FULL probe on the integrated head; W2-58 and W2-62 close first (delegated)
+- **Status:** ACCEPTED (delegated, orchestrator, 2026-10-22; listed in the digest; the owner overturns it at will) · **Under:** DEC-892, DEC-754, DEC-739, DEC-733, DEC-413, DEC-866 · **Basis:** queue run 7 (`log/close-queue-20261022-0954/`). `gov close DAEO-kl5e` ran from 10:28 to 11:40 and exited 3 (CHECK_FAILED). Acceptance had 636 passed; the regression 14,830 passed and 2 failed (W1-42's accepted reds); the serial run 263 passed. W2-50's count is now 1. Repair ticket DAEO-h8r2 is in `log/repair-tickets/`. Two findings:
+  1. **`PROBE_INVALID`:** "merge eb0f1454 holds the probed commit and its probed paths are not the probed code (git cannot compute its own merge of its parents)". `eb0f1454` is W2-58's merge of `w2/integrate` into its own branch. It resolved a conflict, and W2-58's own work rewrote the files W2-50's review judged (`src/gov/guard/decide.py`, `protected.py`, `launch/launcher.py`). So W2-50's probe no longer describes the code at the head. The gate works as designed (DEC-754).
+  2. **The DEC-892 entry refused:** "DEC-892 does not name the test". The ratchet (`gov/close/ratchet.py`, `_refused_because`) needs the test's file path in the decision's text, and the orchestrator's record of DEC-892 named the case by its class and name only. The orchestrator's slip.
+- **Decision:**
+  1. **DEC-892's text names the test in full,** `tests/acceptance/W1-38/test_w1_38_rulesync.py::TestUnsourcedFile::test_file_of_another_owner_is_not_a_finding[.claude/worktrees/by-hand/.claude/agents/by-hand.md]`, with a note. The owner's entry (`49c24ac9`) is unchanged. The orchestrator checks the entry with the pinned ratchet's own reading before the next close.
+  2. **W2-50's repair, a new round by its lead** (prompt §3), with three steps:
+     - merge `w2/integrate` into `w2/W2-50`, with its trailers;
+     - a fresh FULL probe (brief A3, `JUDGEMENT.md`, `--effort max`) of W2-50's work as it stands on the merged head, W2-58's changes to the same files included;
+     - commit the probe record if it passes.
+     Then the orchestrator merges `w2/W2-50` (git's own merge) and W2-50 re-closes. W2-50's code is not changed by the round.
+  3. **W2-58 and W2-62 close first** (both STANDARD, so the probe gate does not apply), after the entry is checked, with the network check green.
+- **Classification:** finding 1, "Ordinary work: yes; Consequence: other (fails closed)", a structural case of two tickets changing the same files, caught as designed; finding 2, the orchestrator's slip (the process).
+- **Rows:** W2-M403. A FULL ticket closed after a later ticket changes its probed files needs a fresh probe; the close could say so before the full regression runs (W2-07's pre-close gate).
+- Next free id: DEC-895.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.281 | 2026-10-22 | Delegated: DEC-894 (DEC-892's entry names its test in full; W2-50 takes a fresh FULL probe on the integrated head; W2-58 and W2-62 close first; row W2-M403). Next free id: DEC-895. |

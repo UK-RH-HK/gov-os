@@ -1,6 +1,6 @@
 # P-REC-2 — Only the main orchestrator of W2-00 may write the record worktree: a guard rule (P2; gates nothing)
 
-**From:** the W2 orchestrator, 2026-10-21 18:xx BST, on DEC-887 item 3 (the owner: "Confirm the guard allows the orchestrator, and only the orchestrator, to write that worktree").
+**From:** the W2 orchestrator, 2026-10-21 17:42 (the time of the commit that filed it) BST, on DEC-887 item 3 (the owner: "Confirm the guard allows the orchestrator, and only the orchestrator, to write that worktree").
 
 ## 1. Context
 - DEC-887 moved the raw orchestration record to the branch `record/w2`, in the worktree `~/gov-os-worktrees/W2-00-record/`. The orchestrator's sync writes and commits there.

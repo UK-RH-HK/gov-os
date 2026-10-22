@@ -1,6 +1,6 @@
 # P-REC-1 — Keep Policy 1, take the raw orchestration record out of the checked-out tree (P2; the owner's item 10 of 2026-10-21; gates nothing)
 
-**From:** the W2 orchestrator, 2026-10-21 16:4x BST, on lens H's finding 2 and P-H-5.
+**From:** the W2 orchestrator, 2026-10-21 17:42 (the time of the commit that filed it) BST, on lens H's finding 2 and P-H-5.
 
 ## 1. Context
 - Policy 1 (DEC-819) commits the orchestrator's and the leads' working memory: `sync_context.py` copies the git-ignored scratch folders into `governance/project/orchestration/`, and the owner's push keeps it.
