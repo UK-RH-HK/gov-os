@@ -4,3 +4,5 @@
 2026-10-22 12:12:06 records ok: 80 passed in 101.37s (0:01:41)
 2026-10-22 12:12:09 network ok: allowlisted hosts checked: 17; unreachable: 0
 2026-10-22 12:17:35 check ok; close DAEO-5j8b (load 3.92)
+2026-10-22 13:28:18 close DAEO-5j8b exit 3
+2026-10-22 13:28:18 lock removed

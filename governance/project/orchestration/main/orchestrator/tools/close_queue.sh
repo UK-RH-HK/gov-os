@@ -65,6 +65,10 @@ for item in "$@"; do
   missing=$(PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src python3 \
     /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/trailer_gate.py "$ticket" 2>&1) \
     || stop "commits of $ticket lack a trailer, as the close reads them: $(echo "$missing" | tail -n +2 | tr '\n' ' ')"
+  # (h) the close's work-without-a-task gate, with the pinned judge's code (W2-58's refused close of 2026-10-22).
+  unmeasured=$(/home/usain/.local/share/gov-os/pin-fecb870c/bin/python -E \
+    /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/unmeasured_gate.py "$ticket" 2>&1) \
+    || stop "work without a task in $ticket's range, as the close reads it: $(echo "$unmeasured" | head -4 | tr '\n' ' ')"
   # (d) the working tree is the commit being closed: nothing modified, staged or untracked (TREE_NOT_COMMITTED).
   # Read as the close reads it (gov.close.repo.tree_differences): a file ignored only by an uncommitted .gitignore
   # counts (W2-02's refused close of 2026-10-21), which git status does not show.

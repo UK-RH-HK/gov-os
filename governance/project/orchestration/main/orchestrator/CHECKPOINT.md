@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 11:53 BST — W2-50 refused (fresh probe next); queue run 8 (W2-58, W2-62); lens I running; next free DEC-895)
+## RESUME HERE (2026-10-22 13:36 BST — W2-58 refused (P-W2-58-C1); W2-62 closing; W2-50 fresh probe next; lens I running; next free DEC-896)
 
 ### Standing owner rules (short; full text: register §248-§269, prompt v3.8; DEC-851)
 - **Window (DEC-838):** full window (1M); no compaction threshold; never ask a session to stop early. Usage is the
@@ -83,7 +83,14 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`. Guard: no role's tool
   writes land in the record worktree (outside every root; W2-00 not in_progress so no own folder); sync + git are
   unjudged; P-REC-2 (rec (b) Wave 3 row) to the owner.
-- **DEC-895 (owner, standing) DRAFTED** (`drafts/register-282-DEC-895.md`; commit after queue run 8, with the prompt
+- **10-22 13:28: W2-58's close REFUSED, WORK_WITHOUT_TASK** (count 1; repair `log/repair-tickets/DAEO-aneq.md`): 7
+  `Task: decision-record` commits in its range changed its paths (path-map.yaml: 6, incl. 3 owner commits) or its
+  ticket file (my b772b2fe, against prompt §7). No exemption in the pin; no rewrite. W2-63 has the same (my
+  8d625805). Package `drafts/P-W2-58-C1.md` (rec (a) a W2-07 rule-based KPI + (d) prevention: my commits to a ticket
+  file carry `Task: <ticket>`; no ticket's paths name the path map). **Gate (h) added** (`tools/unmeasured_gate.py`,
+  pin's code). **DEC-895 COMMITTED `365f1307`.** **W2-62's close RUNNING since 13:36** (gate h: 0 unmeasured).
+  Then W2-50 run 9 (fresh probe). PRACTICE NOW: a commit changing a ticket file carries `Task: <that ticket>`.
+- **DEC-895 (owner, standing) DRAFTED (now committed)** (`drafts/register-282-DEC-895.md`; commit after queue run 8, with the prompt
   v3.15 §5/§3/§15 and LEAD-common edits): (1) every ratchet/accepted-history entry validated with the PIN's readers
   before the ACT (`tools/validate_entry.py <patch> [register]`, run with the pin's python -E) and the ACT ping says it
   passed; (2) after EVERY merge run `tools/probe_impact.py <merge>`: a merged-not-closed FULL ticket whose judged
