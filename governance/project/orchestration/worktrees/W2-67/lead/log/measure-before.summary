@@ -1,0 +1,6 @@
+label=before start=2026-10-23T14:16:57+01:00 tmp_before_inodes=1
+parallel peak_inodes=2319921 peak_kb=20614940
+parallel exit=0 seconds=311
+serial peak_inodes=2319921 peak_kb=20747460
+serial exit=0 seconds=22
+end=2026-10-23T14:22:30+01:00 tmp_after_inodes=2345441 tmp_after=20G basefolders=3

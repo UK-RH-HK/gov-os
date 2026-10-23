@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.937" timestamp="2026-10-23T16:05:53.655248+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r8_no_embeddings" name="test_the_mode_writes_only_under_gov_runtime" time="1.906"><failure message="AssertionError: the mode wrote outside .gov-runtime/&#10;assert not ['created: rebuild-wrote-here.txt']&#10; +  where ['created: rebuild-wrote-here.txt'] = &lt;function snapshot_difference at 0x798beaa04fe0&gt;({'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...}, {'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...})&#10; +    where &lt;function snapshot_difference at 0x798beaa04fe0&gt; = support.snapshot_difference&#10; +    and   {'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...} = &lt;function snapshot at 0x798beaa04f40&gt;(PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-50/test_the_mode_writes_only_unde0/repo'))&#10; +      where &lt;function snapshot at 0x798beaa04f40&gt; = support.snapshot">gov = &lt;function gov.&lt;locals&gt;._gov at 0x798bea8ca840&gt;
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tiny = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-50/test_the_mode_writes_only_unde0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-50/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-50/test_the_mode_writes_only_unde0/sandbox/elsewhere'))
+
+    def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
+        # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): it
+        # snapshotted sandbox.elsewhere, which nothing uses. The home the command is given (HOME) is snapshotted too.
+        # (The code index's daemon folder, /tmp/gov-cbm-&lt;uid&gt;, is not: in the designer's sandbox it is read-only, so
+        # whether the mode may write there could not be seen; returned as an open point, W2-67 batch 1b.)
+        before = support.snapshot(tiny)
+        before_elsewhere = support.snapshot(sandbox.elsewhere, skip=())
+        before_home = support.snapshot(sandbox.home, skip=())
+    
+        _rebuilt(gov, interface, MODE)
+    
+&gt;       assert not support.snapshot_difference(before, support.snapshot(tiny)), "the mode wrote outside .gov-runtime/"
+E       AssertionError: the mode wrote outside .gov-runtime/
+E       assert not ['created: rebuild-wrote-here.txt']
+E        +  where ['created: rebuild-wrote-here.txt'] = &lt;function snapshot_difference at 0x798beaa04fe0&gt;({'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...}, {'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...})
+E        +    where &lt;function snapshot_difference at 0x798beaa04fe0&gt; = support.snapshot_difference
+E        +    and   {'.gitleaks.toml': '606f3be144c3edceb6fa846e078c9d47513a26c015ab8e7a17d5515a5f7acec8', 'docs': 'dir', 'docs/note.md': '63c2e21e757725afd4f5b0adcb8ea84d0f163173e181ff15a6ce75f10e090f56', 'governance': 'dir', ...} = &lt;function snapshot at 0x798beaa04f40&gt;(PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-50/test_the_mode_writes_only_unde0/repo'))
+E        +      where &lt;function snapshot at 0x798beaa04f40&gt; = support.snapshot
+
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py:281: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="4.813" timestamp="2026-10-23T16:01:11.093176+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r2" name="test_rebuild_does_not_silently_drop_lexical_tables" time="4.766"><failure message="AssertionError: the row planted for test.py, which git does not hold, survives the rebuild: lexical_file holds ['.gitleaks.toml', 'governance/project/path-map.yaml', 'test.py']&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;a6ca63939a45be8896f0ff26a0263ca24d4aca54c2896c3636797c6903f2036d&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;a6ca63939a45be8896f0ff26a0263ca24d4aca54c2896c3636797c6903f2036d&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;sqlite_vec cannot be loaded: no vector can be stored or compared&quot;, &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/9f967068c930fbf8'&quot;}}, &quot;timing&quot;: {&quot;lexical_s&quot;: 0.0}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert 'test.py' not in {'.gitleaks.toml', 'governance/project/path-map.yaml', 'test.py'}">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-40/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-40/test_rebuild_does_not_silently0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-40/test_rebuild_does_not_silently0')
+
+    def test_rebuild_does_not_silently_drop_lexical_tables(sandbox, tmp_path):
+        """Existing lexical index tables must not be silently deleted by rebuild.
+    
+        The current implementation deletes ``store.db`` entirely and rebuilds
+        only the record graph, silently losing the lexical (and semantic) tables.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): it repeated the table-presence check of
+        ``test_rebuild_recreates_lexical_index`` and never read the planted
+        row's fate.  The table is kept and recreated from git: the row planted
+        for a file git does not hold is gone after the rebuild, and the
+        project's own tracked file is there.
+        """
+        rebuild_project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        run1, _ = w2_67b_support.rebuild(rebuild_project, sandbox)
+    
+        store_path = rebuild_project / ".gov-runtime" / "store.db"
+        conn = sqlite3.connect(str(store_path))
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS lexical_file "
+            "(path TEXT PRIMARY KEY, blob TEXT NOT NULL, indexed INTEGER NOT NULL)"
+        )
+        conn.execute("INSERT INTO lexical_file VALUES ('test.py', 'abc123', 1)")
+        conn.commit()
+        conn.close()
+    
+        run2, _ = w2_67b_support.rebuild(rebuild_project, sandbox)
+    
+        tables = _tables_in_store(rebuild_project)
+        assert "lexical_file" in tables, (
+            f"rebuild silently dropped lexical_file; tables after rebuild: "
+            f"{sorted(tables)}\n{run2.describe()}"
+        )
+        paths = {row[0] for row in w2_67b_support.store_rows(rebuild_project, "SELECT path FROM lexical_file")}
+&gt;       assert "test.py" not in paths, (
+            f"the row planted for test.py, which git does not hold, survives the rebuild: lexical_file holds "
+            f"{sorted(paths)}\n{run2.describe()}"
+        )
+E       AssertionError: the row planted for test.py, which git does not hold, survives the rebuild: lexical_file holds ['.gitleaks.toml', 'governance/project/path-map.yaml', 'test.py']
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "a6ca63939a45be8896f0ff26a0263ca24d4aca54c2896c3636797c6903f2036d", "store": {"digest": "a6ca63939a45be8896f0ff26a0263ca24d4aca54c2896c3636797c6903f2036d", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "sqlite_vec cannot be loaded: no vector can be stored or compared", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/9f967068c930fbf8'"}}, "timing": {"lexical_s": 0.0}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert 'test.py' not in {'.gitleaks.toml', 'governance/project/path-map.yaml', 'test.py'}
+
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py:124: AssertionError</failure></testcase></testsuite></testsuites>

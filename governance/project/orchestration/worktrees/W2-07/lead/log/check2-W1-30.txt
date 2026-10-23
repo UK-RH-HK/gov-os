@@ -1,0 +1,500 @@
+bringing up nodes...
+bringing up nodes...
+
+F.F..........F......F......F......F....F................F.........F..... [ 14%]
+........................................F............................... [ 28%]
+..............................................................F......... [ 42%]
+F....................................................................... [ 56%]
+........................................................................ [ 70%]
+.............F....................F..................................... [ 84%]
+........................................................................ [ 98%]
+........                                                                 [100%]
+=================================== FAILURES ===================================
+_ test_the_close_record_of_a_ticket_that_changes_no_governance_file_claims_no_check_result _
+[gw8] linux -- Python 3.12.3 /usr/bin/python3
+
+project_with_checks = <function project_with_checks.<locals>.make at 0x75c541fb7600>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw8/test_the_close_record_of_a_tic0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw8/test_the_close_record_of_a_tic0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_the_close_record_of_a_ticket_that_changes_no_governance_file_claims_no_check_result(
+            project_with_checks, sandbox, interface):
+        project = _no_governance_change(project_with_checks, sandbox)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       support.result_of(run, interface)
+
+tests/acceptance/W1-30/test_w1_30_governance_checks.py:280: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-gvc1', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...--disposition to classify", "counted": false, "repair_ticket": "pro-b1in"}}}\n', stderr='', seconds=1.8149229830596596)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-gvc1 --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check license-present is RED at commit 26b7c44a934b: [{\"code\": \"CHECK_FAILED\", \"message\": \"license-present exited with code 1\", \"stderr\": null}]", "governance check family 'graph integrity' is RED at commit 26b7c44a934b"], "check_commit": "26b7c44a934bb0e2728d40bb4af73c186c4f851d", "red_checks": [{"id": "license-present", "family": "graph integrity", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "license-present exited with code 1", "stderr": null}], "provenance": {"commit": "26b7c44a934bb0e2728d40bb4af73c186c4f851d", "check_version": "1.0.0", "inputs_hash": "b2098ed191f99a1d"}}], "red_families": ["graph integrity"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-b1in"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError
+___ test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed ____
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x7484b6841700>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_the_answer_of_a_failing_c0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_the_answer_of_a_failing_c0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_the_answer_of_a_failing_close_with_a_class_says_the_context_failed(project, sandbox, interface):
+        """The answer names the failing test (the finding) and, beside it, that the context failed and why; it
+        carries no hash."""
+        run, error = _failing_close_with_a_class_and_no_context(project, sandbox, interface)
+        text = support.error_text(error)
+>       assert "test_fail" in text, f"the answer does not name the failing test\n{run.describe()}"
+E       AssertionError: the answer does not name the failing test
+E         gov close PROJ-ctxf --json --disposition repair
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed", "details": {"findings": ["governance check context-reproducibility is RED at commit 687bfc56a25f: [{\"code\": \"CHECK_FAILED\", \"message\": \"ERROR: PROJ-ctxf: mandatory input 'DEC-old' is superseded and cannot satisfy a current requirement\\nunmeasured: every ticket's context computation failed\"}]", "governance check core-authority is RED at commit 687bfc56a25f: [{\"code\": \"FRONTMATTER_UNREADABLE\", \"ids\": [], \"paths\": [\".tickets/PROJ-ctxf.md\"], \"message\": \".tickets/PROJ-ctxf.md: the frontmatter writes a key twice\"}, {\"code\": \"SUPERSEDED_SATISFYING_REQUIREMENT\", \"ids\": [\"DEC-old\", \"PROJ-ctxf\"], \"paths\": [\"docs/adr/DEC-old.md\", \".tickets/PROJ-ctxf.md\"], \"message\": \"DEC-old is SUPERSEDED but satisfies a requirement of PROJ-ctxf\"}]", "governance check family 'authority/role limits' is RED at commit 687bfc56a25f", "governance check family 'context reproducibility' is RED at commit 687bfc56a25f"], "check_commit": "687bfc56a25f8d38904c4214b180371ab789bde6", "red_checks": [{"id": "context-reproducibility", "family": "context-reproducibility", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "ERROR: PROJ-ctxf: mandatory input 'DEC-old' is superseded and cannot satisfy a current requirement\nunmeasured: every ticket's context computation failed"}], "provenance": {"commit": "687bfc56a25f8d38904c4214b180371ab789bde6", "check_version": "1.0.0", "inputs_hash": "4286bf9b50685bee"}}, {"id": "core-authority", "family": "authority/role limits", "severity": "hard-block", "status": "RED", "findings": [{"code": "FRONTMATTER_UNREADABLE", "ids": [], "paths": [".tickets/PROJ-ctxf.md"], "message": ".tickets/PROJ-ctxf.md: the frontmatter writes a key twice"}, {"code": "SUPERSEDED_SATISFYING_REQUIREMENT", "ids": ["DEC-old", "PROJ-ctxf"], "paths": ["docs/adr/DEC-old.md", ".tickets/PROJ-ctxf.md"], "message": "DEC-old is SUPERSEDED but satisfies a requirement of PROJ-ctxf"}], "provenance": {"commit": "687bfc56a25f8d38904c4214b180371ab789bde6", "check_version": "1.0.0", "inputs_hash": "a13838639b234667"}}], "red_families": ["authority/role limits", "context reproducibility"], "disposition": "repair", "test_runs": [], "trailers_base": null, "accepted_history": [], "counted": false, "repair_ticket": "pro-j5iy"}}}
+E         
+E         stderr:
+E         
+E       assert 'test_fail' in '{"code": "CHECK_FAILED", "message": "tests or checks failed", "details": {"findings": ["governance check context-repr...pair", "test_runs": [], "trailers_base": null, "accepted_history": [], "counted": false, "repair_ticket": "pro-j5iy"}}'
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:198: AssertionError
+_______________ test_a_missing_mandatory_input_refuses_the_close _______________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737ca809b0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_missing_mandatory_input_refuses_the_close(project, sandbox, interface):
+        """BLOCKED: the ticket names a source no record has."""
+        support.build_ticket(project, TICKET, WBS, sources=["DEC-gone"])
+        support.load_store(project, sandbox)
+>       _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-gone")
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w1_30_support.Project object at 0x78737ca809b0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+code = 'BLOCKED', named = ('DEC-gone',)
+error = {'code': 'BLOCKED', 'details': {'missing': 'DEC-gone', 'ticket': 'PROJ-ctxf'}, 'message': "mandatory input 'DEC-gone' not found in the store"}
+@py_assert0 = None, @py_assert2 = None
+
+    def _refused_for_the_context(project, sandbox, interface, code, *named):
+        """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+        error = support.context_error(project, sandbox, TICKET)
+        assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
+    
+        run = support.run_close(project, sandbox, TICKET, store=False)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+        for record_id in named:
+            assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+        support.assert_not_closed(project, TICKET)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_mandatory_input0/project') = <w1_30_support.Project object at 0x78737ca809b0>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:60: AssertionError
+________________ test_a_missing_depends_on_id_refuses_the_close ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c457ef0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_missing_depends_on_id_refuses_the_close(project, sandbox, interface):
+        """BLOCKED: an id under ``depends_on`` is a mandatory input too (W1-24 S4)."""
+        support.build_ticket(project, TICKET, WBS, depends_on=["W1-gone"])
+        support.load_store(project, sandbox)
+>       _refused_for_the_context(project, sandbox, interface, "BLOCKED", "W1-gone")
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w1_30_support.Project object at 0x78737c457ef0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+code = 'BLOCKED', named = ('W1-gone',)
+error = {'code': 'BLOCKED', 'details': {'missing': 'W1-gone', 'ticket': 'PROJ-ctxf'}, 'message': "mandatory input 'W1-gone' not found in the store"}
+@py_assert0 = None, @py_assert2 = None
+
+    def _refused_for_the_context(project, sandbox, interface, code, *named):
+        """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+        error = support.context_error(project, sandbox, TICKET)
+        assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
+    
+        run = support.run_close(project, sandbox, TICKET, store=False)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+        for record_id in named:
+            assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+        support.assert_not_closed(project, TICKET)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_missing_depends_on_id_r0/project') = <w1_30_support.Project object at 0x78737c457ef0>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:60: AssertionError
+__________________ test_a_superseded_source_refuses_the_close __________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c4dbc80>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_superseded_source_refuses_the_close(project, sandbox, interface):
+        """BLOCKED: the ticket's source is superseded; the error names it."""
+        _decisions(project, DEC_old=("SUPERSEDED", {"superseded_by": "DEC-new"}),
+                   DEC_new=("ACTIVE", {"supersedes": ["DEC-old"]}))
+        support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+        support.load_store(project, sandbox)
+>       _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-old")
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w1_30_support.Project object at 0x78737c4dbc80>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+code = 'BLOCKED', named = ('DEC-old',)
+error = {'code': 'BLOCKED', 'details': {'superseded': 'DEC-old', 'ticket': 'PROJ-ctxf'}, 'message': "mandatory input 'DEC-old' is superseded and cannot satisfy a current requirement"}
+@py_assert0 = None, @py_assert2 = None
+
+    def _refused_for_the_context(project, sandbox, interface, code, *named):
+        """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+        error = support.context_error(project, sandbox, TICKET)
+        assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
+    
+        run = support.run_close(project, sandbox, TICKET, store=False)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+        for record_id in named:
+            assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+        support.assert_not_closed(project, TICKET)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_superseded_source_refus0/project') = <w1_30_support.Project object at 0x78737c4dbc80>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:60: AssertionError
+________ test_a_source_superseded_by_several_records_refuses_the_close _________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c329dc0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_source_superseded_by_several_records_refuses_the_close(project, sandbox, interface):
+        """BLOCKED: more than one record supersedes the ticket's source."""
+        _decisions(project, DEC_old=("SUPERSEDED", {}),
+                   DEC_new1=("ACTIVE", {"supersedes": ["DEC-old"]}),
+                   DEC_new2=("ACTIVE", {"supersedes": ["DEC-old"]}))
+        support.build_ticket(project, TICKET, WBS, sources=["DEC-old"])
+        support.load_store(project, sandbox)
+>       _refused_for_the_context(project, sandbox, interface, "BLOCKED", "DEC-old")
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:93: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w1_30_support.Project object at 0x78737c329dc0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+code = 'BLOCKED', named = ('DEC-old',)
+error = {'code': 'BLOCKED', 'details': {'superseded': 'DEC-old', 'ticket': 'PROJ-ctxf'}, 'message': "mandatory input 'DEC-old' is superseded and cannot satisfy a current requirement"}
+@py_assert0 = None, @py_assert2 = None
+
+    def _refused_for_the_context(project, sandbox, interface, code, *named):
+        """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+        error = support.context_error(project, sandbox, TICKET)
+        assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
+    
+        run = support.run_close(project, sandbox, TICKET, store=False)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+        for record_id in named:
+            assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+        support.assert_not_closed(project, TICKET)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_source_superseded_by_se0/project') = <w1_30_support.Project object at 0x78737c329dc0>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:60: AssertionError
+_______________ test_two_contradicting_sources_refuse_the_close ________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c32a4e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_two_contradicting_sources_refuse_the_close(project, sandbox, interface):
+        """CONTRADICTION: two active decisions among the ticket's sources, neither superseding the other."""
+        _decisions(project, DEC_other=("ACTIVE", {}))
+        support.build_ticket(project, TICKET, WBS, sources=[BASE, "DEC-other"])
+        support.load_store(project, sandbox)
+>       _refused_for_the_context(project, sandbox, interface, "CONTRADICTION", BASE, "DEC-other")
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = <w1_30_support.Project object at 0x78737c32a4e0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+code = 'CONTRADICTION', named = ('DEC-000', 'DEC-other')
+error = {'code': 'CONTRADICTION', 'details': {'conflicting': ['DEC-000', 'DEC-other'], 'ticket': 'PROJ-ctxf'}, 'message': "conflicting mandatory inputs at the same level (decision): 'DEC-000' and 'DEC-other'"}
+@py_assert0 = None, @py_assert2 = None
+
+    def _refused_for_the_context(project, sandbox, interface, code, *named):
+        """The otherwise green ticket's context gives ``code``; the close is refused for it and counted."""
+        error = support.context_error(project, sandbox, TICKET)
+        assert error["code"] == code, f"the fixture is wrong: gov context gives {error}"
+    
+        run = support.run_close(project, sandbox, TICKET, store=False)
+        text = support.error_text(support.refused(run, interface, support.EXIT_CHECK_FAILED))
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+        for record_id in named:
+            assert record_id in text, f"the refusal does not name {record_id}\n{run.describe()}"
+        support.assert_not_closed(project, TICKET)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_two_contradicting_sources0/project') = <w1_30_support.Project object at 0x78737c32a4e0>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:60: AssertionError
+___________ test_a_project_without_a_record_store_refuses_the_close ____________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c328470>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_project_without_a_record_store_refuses_the_close(project, sandbox, interface):
+        """Refused with the context's reason: the answer says the context failed and carries the code
+        ``gov context`` gives; no close record, the ticket in progress."""
+        run, error, of_context = _close_without_a_store(project, sandbox, interface)
+        text = support.error_text(error)
+        assert "context" in text.lower(), f"the refusal does not say the context failed\n{run.describe()}"
+>       assert STORE_MISSING in text or of_context["message"] in text, \
+            f"the refusal does not give the context's reason ({of_context})\n{run.describe()}"
+E       AssertionError: the refusal does not give the context's reason ({'code': 'STORE_MISSING', 'message': '.gov-runtime/store.db: no store at /tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/project; load it first', 'details': {'root': '/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/project'}})
+E         gov close PROJ-ctxf --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check context-reproducibility is RED at commit 5298b5f97427: [{\"code\": \"CHECK_FAILED\", \"message\": \"context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/projec\"}]", "governance check recovery-rebuild is RED at commit 5298b5f97427: [{\"code\": \"CHECK_FAILED\", \"message\": \"recovery-rebuild exited with code 1\", \"stderr\": \"unmeasured\"}]", "governance check family 'context reproducibility' is RED at commit 5298b5f97427", "governance check family 'recovery/rebuild' is RED at commit 5298b5f97427"], "check_commit": "5298b5f97427b8f382861592f8f7f099a5ed3480", "red_checks": [{"id": "context-reproducibility", "family": "context-reproducibility", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "context-reproducibility: cannot read the store or the ticket folder: .gov-runtime/store.db: no store at /tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/projec"}], "provenance": {"commit": "5298b5f97427b8f382861592f8f7f099a5ed3480", "check_version": "1.0.0", "inputs_hash": "a4ea6e51a5b81bf4"}}, {"id": "recovery-rebuild", "family": "recovery/rebuild", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "recovery-rebuild exited with code 1", "stderr": "unmeasured"}], "provenance": {"commit": "5298b5f97427b8f382861592f8f7f099a5ed3480", "check_version": "1.0.0", "inputs_hash": "11f6d9cecd3e1db2"}}], "red_families": ["context reproducibility", "recovery/rebuild"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-44ot"}}}
+E         
+E         stderr:
+E         
+E       assert ('STORE_MISSING' in '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-44ot"}}' or '.gov-runtime/store.db: no store at /tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_project_without_a_recor0/project; load it first' in '{"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details"..., "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-44ot"}}')
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:146: AssertionError
+________________ test_a_refusal_for_no_record_store_is_counted _________________
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x78737c329f40>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_refusal_for_no_record_s0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_refusal_for_no_record_s0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_refusal_for_no_record_store_is_counted(project, sandbox, interface):
+        """DEC-455: the refusal is one iteration."""
+        _close_without_a_store(project, sandbox, interface)
+>       assert support.iteration_count(project.root, TICKET) == 1, "the refusal is not counted as one iteration"
+E       AssertionError: the refusal is not counted as one iteration
+E       assert 0 == 1
+E        +  where 0 = <function iteration_count at 0x78737c8f7f60>(PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_refusal_for_no_record_s0/project'), 'PROJ-ctxf')
+E        +    where <function iteration_count at 0x78737c8f7f60> = support.iteration_count
+E        +    and   PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_refusal_for_no_record_s0/project') = <w1_30_support.Project object at 0x78737c329f40>.root
+
+tests/acceptance/W1-30/test_w1_30_context_failures.py:154: AssertionError
+_____ test_a_ticket_that_changes_no_governance_file_needs_no_check_result ______
+[gw7] linux -- Python 3.12.3 /usr/bin/python3
+
+project_with_checks = <function project_with_checks.<locals>.make at 0x78f690ee8cc0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw7/test_a_ticket_that_changes_no_0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw7/test_a_ticket_that_changes_no_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_a_ticket_that_changes_no_governance_file_needs_no_check_result(project_with_checks, sandbox, interface):
+        project = _no_governance_change(project_with_checks, sandbox)
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+>       support.result_of(run, interface)
+
+tests/acceptance/W1-30/test_w1_30_governance_checks.py:270: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-gvc1', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess... --disposition to classify", "counted": false, "repair_ticket": "pro-pi93"}}}\n', stderr='', seconds=2.076273277052678)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-gvc1 --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check license-present is RED at commit e78742acdb95: [{\"code\": \"CHECK_FAILED\", \"message\": \"license-present exited with code 1\", \"stderr\": null}]", "governance check family 'graph integrity' is RED at commit e78742acdb95"], "check_commit": "e78742acdb95db7021e86f7c54c9003f2cb44f55", "red_checks": [{"id": "license-present", "family": "graph integrity", "severity": "hard-block", "status": "RED", "findings": [{"code": "CHECK_FAILED", "message": "license-present exited with code 1", "stderr": null}], "provenance": {"commit": "e78742acdb95db7021e86f7c54c9003f2cb44f55", "check_version": "1.0.0", "inputs_hash": "1083564dbbd87466"}}], "red_families": ["graph integrity"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-pi93"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError
+____________________ test_each_refusal_opens_repair_ticket _____________________
+[gw5] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x7484afea72f0>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_each_refusal_opens_repair0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw5/test_each_refusal_opens_repair0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
+        """DEC-454, S2/S6: each of the first two containment refusals opens a repair
+        ticket recording the finding and 'unclassed'.
+        """
+        project.add_ticket(TICKET, WBS)
+        project.add_passing_test(WBS)
+        project.write("src/example/feature.py", "# feature\n")
+        project.write("src/other/out_of_scope.py", "# out of scope\n")
+        project.commit("implement out of scope", who=IMPL, trailers=TRAILERS)
+        project.add_checkpoint(TICKET)
+        project.commit("checkpoint", who=support.ORCHESTRATOR)
+        tickets_before = set((project.root / ".tickets").glob("*.md"))
+        support.run_close(project, sandbox, TICKET)
+        tickets_after_1 = set((project.root / ".tickets").glob("*.md"))
+        new_1 = tickets_after_1 - tickets_before
+        assert len(new_1) >= 1, "the first refusal must open a repair ticket"
+        support.run_close(project, sandbox, TICKET)
+        tickets_after_2 = set((project.root / ".tickets").glob("*.md"))
+        new_2 = tickets_after_2 - tickets_after_1
+>       assert len(new_2) >= 1, "the second refusal must also open a repair ticket"
+E       AssertionError: the second refusal must also open a repair ticket
+E       assert 0 >= 1
+E        +  where 0 = len(set())
+
+tests/acceptance/W1-30/test_w1_30_iteration.py:492: AssertionError
+_ test_an_installed_skill_whose_frontmatter_cannot_be_read_is_listed_as_not_measured _
+[gw3] linux -- Python 3.12.3 /usr/bin/python3
+
+project = <w1_30_support.Project object at 0x773facadef30>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_an_installed_skill_whose_0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw3/test_an_installed_skill_whose_0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_an_installed_skill_whose_frontmatter_cannot_be_read_is_listed_as_not_measured(project, sandbox,
+                                                                                           interface):
+        _installed_skill(project, "change", "1.0.0")
+        project.write(f"{INSTALLED}/skills/broken/SKILL.md", "---\nname: [not closed\n---\n# broken\n")
+    
+>       listed = _listed(project, sandbox, interface)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-30/test_w1_30_r13_installed_skills.py:44: in _listed
+    support.result_of(run, interface)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+run = Run(args=('close', 'PROJ-skil', '--json'), returncode=3, stdout='{"ok": false, "command": "close", "result": {}, "sess...e --disposition to classify", "counted": false, "repair_ticket": "pro-vgox"}}}\n', stderr='', seconds=3.06234942690935)
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def result_of(run, interface):
+        """The result dict when gov close succeeds."""
+        envelope = envelope_of(run, interface)
+>       assert envelope["ok"] is True, f"gov close did not succeed\n{run.describe()}"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: gov close did not succeed
+E       gov close PROJ-skil --json
+E       exit code: 3
+E       stdout:
+E       {"ok": false, "command": "close", "result": {}, "session": "", "error": {"code": "CHECK_FAILED", "message": "tests or checks failed; findings are unclassed and await disposition", "details": {"findings": ["governance check core-authority is RED at commit ef71ad2cfb56: [{\"code\": \"FRONTMATTER_UNREADABLE\", \"ids\": [], \"paths\": [\"governance/kernel/skills/broken/SKILL.md\"], \"message\": \"governance/kernel/skills/broken/SKILL.md: the frontmatter is not valid YAML: while parsing a flow sequence in \\\"<unicode string>\\\", line 1, column 7: name: [not closed ^ expected ',' or ']', but got '<stream end>' in \\\"<unicode string>\\\", line 1, column 18: name: [not closed ^\"}]", "governance check family 'authority/role limits' is RED at commit ef71ad2cfb56"], "check_commit": "ef71ad2cfb564d19045a83488a74be8ba247fe44", "red_checks": [{"id": "core-authority", "family": "authority/role limits", "severity": "hard-block", "status": "RED", "findings": [{"code": "FRONTMATTER_UNREADABLE", "ids": [], "paths": ["governance/kernel/skills/broken/SKILL.md"], "message": "governance/kernel/skills/broken/SKILL.md: the frontmatter is not valid YAML: while parsing a flow sequence in \"<unicode string>\", line 1, column 7: name: [not closed ^ expected ',' or ']', but got '<stream end>' in \"<unicode string>\", line 1, column 18: name: [not closed ^"}], "provenance": {"commit": "ef71ad2cfb564d19045a83488a74be8ba247fe44", "check_version": "1.0.0", "inputs_hash": "405017ca07b5617d"}}], "red_families": ["authority/role limits"], "disposition": "unclassed", "test_runs": [], "trailers_base": null, "accepted_history": [], "note": "findings await their class; use --disposition to classify", "counted": false, "repair_ticket": "pro-vgox"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-30/w1_30_support.py:788: AssertionError
+_ test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing[a folder of notes] _
+[gw4] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = 'notes/meeting.txt'
+project = <w1_30_support.Project object at 0x78737c3b9820>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_commit_without_trailers0/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw4/test_a_commit_without_trailers0/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("rel", [OUTSIDE, "notes/meeting.txt"],
+                             ids=["a source folder outside the ticket's paths", "a folder of notes"])
+    def test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing(
+            rel, project, sandbox, interface):
+        """The converse: the folder holds none of the ticket's acceptance tests, is not inside its allowed paths,
+        holds neither its file nor a governance file."""
+        support.build_ticket(project, TICKET, WBS)
+        commit = support.no_trailers_commit(project, "elsewhere", {rel: "# none of the ticket's\n"})
+        support.checkpointed(project, TICKET)
+        _task_less(project, commit, rel)
+        assert not rel.startswith(support.GOVERNANCE_PREFIXES + (support.ACCEPTANCE_PREFIX, support.TICKETS_PREFIX,
+                                                                 "src/example/"))
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        support.result_of(run, interface)
+        assert support.ticket_status(project.root, TICKET) == "closed"
+        front = support.the_close_record(project, TICKET)
+        claimed = {key: front[key] for key in (support.CHECK_COMMIT_KEY, support.CHECK_RESULT_KEY) if front.get(key)}
+>       assert not claimed, f"the close record claims a check result although no governance file changed: {claimed}"
+E       AssertionError: the close record claims a check result although no governance file changed: {'check_commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'governance_checks': {'families': {'schema/invariants': {'status': 'GREEN', 'family': 'schema/invariants', 'check_count': 1}, 'graph integrity': {'status': 'GREEN', 'family': 'graph integrity', 'check_count': 1}, 'index freshness': {'status': 'YELLOW', 'family': 'index freshness', 'check_count': 0, 'reason': 'no registered check'}, 'retrieval regression': {'status': 'YELLOW', 'family': 'retrieval regression', 'check_count': 0, 'reason': 'no registered check'}, 'authority/role limits': {'status': 'GREEN', 'family': 'authority/role limits', 'check_count': 2}, 'mutation scope': {'status': 'GREEN', 'family': 'mutation scope', 'check_count': 1}, 'path-map compliance': {'status': 'GREEN', 'family': 'path-map compliance', 'check_count': 1}, 'context reproducibility': {'status': 'GREEN', 'family': 'context reproducibility', 'check_count': 1}, 'concurrency/claims': {'status': 'GREEN', 'family': 'concurrency/claims', 'check_count': 1}, 'adapter/model portability': {'status': 'YELLOW', 'family': 'adapter/model portability', 'check_count': 0, 'reason': 'no registered check'}, 'skill regression': {'status': 'GREEN', 'family': 'skill regression', 'check_count': 1}, 'command-contract consistency': {'status': 'GREEN', 'family': 'command-contract consistency', 'check_count': 1}, 'secrets indexing': {'status': 'YELLOW', 'family': 'secrets indexing', 'check_count': 0, 'reason': 'no registered check'}, 'recovery/rebuild': {'status': 'GREEN', 'family': 'recovery/rebuild', 'check_count': 1}, 'fresh-agent reconstruction': {'status': 'GREEN', 'family': 'fresh-agent reconstruction', 'check_count': 1}, 'product traceability': {'status': 'YELLOW', 'family': 'product traceability', 'reason': 'no closed ticket', 'check_count': 3}, 'audit reproducibility': {'status': 'YELLOW', 'family': 'audit reproducibility', 'reason': 'not applicable until the first audit', 'check_count': 1}}, 'checks': [{'id': 'audit-reproducibility', 'family': 'audit reproducibility', 'severity': 'hard-block', 'status': 'YELLOW', 'reason': 'not applicable until the first audit', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '8e567f5b9b2d852c'}}, {'id': 'context-reproducibility', 'family': 'context-reproducibility', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'ab5f59800294f9d4'}}, {'id': 'core-authority', 'family': 'authority/role limits', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '0772739a67c532d3'}}, {'id': 'core-claims', 'family': 'concurrency/claims', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '52e71466df3551f0'}}, {'id': 'core-commands', 'family': 'command-contract consistency', 'severity': 'warning', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'aa85d4d386a5815d'}}, {'id': 'core-decision-citations', 'family': 'authority/role limits', 'severity': 'warning', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '0c2618c223fe9db5'}}, {'id': 'core-graph', 'family': 'graph integrity', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'c35facc1b8f01075'}}, {'id': 'core-mutation', 'family': 'mutation scope', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'e035297cb76f1f8f'}}, {'id': 'core-pathmap', 'family': 'path-map compliance', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'e2edba6051fc86e0'}}, {'id': 'core-schema', 'family': 'schema/invariants', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '2ee5bfb34c0316f0'}}, {'id': 'fresh-agent-reconstruction', 'family': 'fresh-agent-reconstruction', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'e91ad0eef235d890'}}, {'id': 'product-traceability-trailers', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'YELLOW', 'reason': 'no closed ticket', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '8c8e946f67b87f8f'}}, {'id': 'recovery-rebuild', 'family': 'recovery/rebuild', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'cb2948d70b1aa3eb'}}, {'id': 'openspec-validate', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'YELLOW', 'findings': [{'code': 'OPENSPEC_ABSENT', 'message': 'openspec is not on PATH'}], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '6de23cf8b66f1726'}}, {'id': 'skill-version', 'family': 'skill regression', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': 'f537f27c8f0f1659'}}, {'id': 'readiness', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'check_version': '1.0.0', 'inputs_hash': '47f49574d2fdc1a6'}}]}}
+E       assert not {'check_commit': 'bce89c96dfa0f79940adb6a8c0e4adffbdb9cb84', 'governance_checks': {'checks': [{'family': 'audit reprod...'command-contract consistency': {'check_count': 1, 'family': 'command-contract consistency', 'status': 'GREEN'}, ...}}}
+
+tests/acceptance/W1-30/test_w1_30_r8_commits.py:220: AssertionError
+_ test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing[a source folder outside the ticket's paths] _
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+rel = 'src/other/outside.py'
+project = <w1_30_support.Project object at 0x7cd774b45d60>
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw0/test_a_commit_without_trailers3/sand...sixPath('/tmp/gov-os-lead-W2-07/pytest-of-usain/pytest-0/popen-gw0/test_a_commit_without_trailers3/sandbox/elsewhere'))
+interface = Interface(required={'ok': <class 'bool'>, 'command': <class 'str'>, 'result': <class 'dict'>, 'session': <class 'str'>}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    @pytest.mark.parametrize("rel", [OUTSIDE, "notes/meeting.txt"],
+                             ids=["a source folder outside the ticket's paths", "a folder of notes"])
+    def test_a_commit_without_trailers_that_changes_only_a_folder_that_is_none_of_the_tickets_refuses_nothing(
+            rel, project, sandbox, interface):
+        """The converse: the folder holds none of the ticket's acceptance tests, is not inside its allowed paths,
+        holds neither its file nor a governance file."""
+        support.build_ticket(project, TICKET, WBS)
+        commit = support.no_trailers_commit(project, "elsewhere", {rel: "# none of the ticket's\n"})
+        support.checkpointed(project, TICKET)
+        _task_less(project, commit, rel)
+        assert not rel.startswith(support.GOVERNANCE_PREFIXES + (support.ACCEPTANCE_PREFIX, support.TICKETS_PREFIX,
+                                                                 "src/example/"))
+    
+        run = support.run_close(project, sandbox, TICKET)
+    
+        support.result_of(run, interface)
+        assert support.ticket_status(project.root, TICKET) == "closed"
+        front = support.the_close_record(project, TICKET)
+        claimed = {key: front[key] for key in (support.CHECK_COMMIT_KEY, support.CHECK_RESULT_KEY) if front.get(key)}
+>       assert not claimed, f"the close record claims a check result although no governance file changed: {claimed}"
+E       AssertionError: the close record claims a check result although no governance file changed: {'check_commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'governance_checks': {'families': {'schema/invariants': {'status': 'GREEN', 'family': 'schema/invariants', 'check_count': 1}, 'graph integrity': {'status': 'GREEN', 'family': 'graph integrity', 'check_count': 1}, 'index freshness': {'status': 'YELLOW', 'family': 'index freshness', 'check_count': 0, 'reason': 'no registered check'}, 'retrieval regression': {'status': 'YELLOW', 'family': 'retrieval regression', 'check_count': 0, 'reason': 'no registered check'}, 'authority/role limits': {'status': 'GREEN', 'family': 'authority/role limits', 'check_count': 2}, 'mutation scope': {'status': 'GREEN', 'family': 'mutation scope', 'check_count': 1}, 'path-map compliance': {'status': 'GREEN', 'family': 'path-map compliance', 'check_count': 1}, 'context reproducibility': {'status': 'GREEN', 'family': 'context reproducibility', 'check_count': 1}, 'concurrency/claims': {'status': 'GREEN', 'family': 'concurrency/claims', 'check_count': 1}, 'adapter/model portability': {'status': 'YELLOW', 'family': 'adapter/model portability', 'check_count': 0, 'reason': 'no registered check'}, 'skill regression': {'status': 'GREEN', 'family': 'skill regression', 'check_count': 1}, 'command-contract consistency': {'status': 'GREEN', 'family': 'command-contract consistency', 'check_count': 1}, 'secrets indexing': {'status': 'YELLOW', 'family': 'secrets indexing', 'check_count': 0, 'reason': 'no registered check'}, 'recovery/rebuild': {'status': 'GREEN', 'family': 'recovery/rebuild', 'check_count': 1}, 'fresh-agent reconstruction': {'status': 'GREEN', 'family': 'fresh-agent reconstruction', 'check_count': 1}, 'product traceability': {'status': 'YELLOW', 'family': 'product traceability', 'reason': 'no closed ticket', 'check_count': 3}, 'audit reproducibility': {'status': 'YELLOW', 'family': 'audit reproducibility', 'reason': 'not applicable until the first audit', 'check_count': 1}}, 'checks': [{'id': 'audit-reproducibility', 'family': 'audit reproducibility', 'severity': 'hard-block', 'status': 'YELLOW', 'reason': 'not applicable until the first audit', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '57ece7406c91b488'}}, {'id': 'context-reproducibility', 'family': 'context-reproducibility', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '99ccc029ba9ffb46'}}, {'id': 'core-authority', 'family': 'authority/role limits', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '89406a611019fb84'}}, {'id': 'core-claims', 'family': 'concurrency/claims', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '8427401df9dbe4d0'}}, {'id': 'core-commands', 'family': 'command-contract consistency', 'severity': 'warning', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'd059b6bf5e3fab87'}}, {'id': 'core-decision-citations', 'family': 'authority/role limits', 'severity': 'warning', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'e4e00b9c0fb8ceef'}}, {'id': 'core-graph', 'family': 'graph integrity', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '13f59aa9f2272faa'}}, {'id': 'core-mutation', 'family': 'mutation scope', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '0dc41c0dc5dc59d4'}}, {'id': 'core-pathmap', 'family': 'path-map compliance', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'c28656f02419614f'}}, {'id': 'core-schema', 'family': 'schema/invariants', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'fd820bde4a8efe91'}}, {'id': 'fresh-agent-reconstruction', 'family': 'fresh-agent-reconstruction', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '14decdf13523f69e'}}, {'id': 'product-traceability-trailers', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'YELLOW', 'reason': 'no closed ticket', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'eb279575da11e913'}}, {'id': 'recovery-rebuild', 'family': 'recovery/rebuild', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'de4fb1bcae4c8d20'}}, {'id': 'openspec-validate', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'YELLOW', 'findings': [{'code': 'OPENSPEC_ABSENT', 'message': 'openspec is not on PATH'}], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': '7fc5e4920cecf63f'}}, {'id': 'skill-version', 'family': 'skill regression', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'ad1173a4e07a0956'}}, {'id': 'readiness', 'family': 'product traceability', 'severity': 'hard-block', 'status': 'GREEN', 'findings': [], 'provenance': {'commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'check_version': '1.0.0', 'inputs_hash': 'f4a3dab8109e9e32'}}]}}
+E       assert not {'check_commit': '1183be2ac6a3157d3a23d15a560297a5bdeeb293', 'governance_checks': {'checks': [{'family': 'audit reprod...'command-contract consistency': {'check_count': 1, 'family': 'command-contract consistency', 'status': 'GREEN'}, ...}}}
+
+tests/acceptance/W1-30/test_w1_30_r8_commits.py:220: AssertionError
+14 failed, 498 passed in 259.10s (0:04:19)

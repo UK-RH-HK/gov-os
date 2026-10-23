@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.867" timestamp="2026-10-23T15:25:28.207707+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_path_compliance_r2" name="test_old_path_standalone_is_stale_when_new_path_elsewhere" time="0.821"><failure message="AssertionError: doctor does not report the standalone old path as stale even though it appears on its own (not as part of the new path) — DEC-456 says a standalone old path is still reported&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;reason&quot;: &quot;no tool-registry.yaml&quot;, &quot;tools&quot;: []}, &quot;hooks&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;config_present&quot;: false, &quot;binary_installed&quot;: false}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;], &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;MINIMAL&quot;, &quot;systems_identified&quot;: 0, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert []&#10; +  where [] = &lt;function references_to at 0x771165c3eca0&gt;([], 'standalone_target.py', 'docs/plan/tools/validate_refs.py')&#10; +    where &lt;function references_to at 0x771165c3eca0&gt; = w2_67b_support.references_to">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-6/test_o...endent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-6/test_old_path_standalone_is_st0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-6/test_old_path_standalone_is_st0')
+
+    def test_old_path_standalone_is_stale_when_new_path_elsewhere(sandbox, tmp_path):
+        """A file that names the old path on its own is reported as stale, also
+        when the same file names the new path elsewhere.
+    
+        Counter-case for point 3: the exception is narrow — only an occurrence
+        of the old path that is a part of the new path is suppressed.  A
+        standalone old path in the same file is still reported.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+        that doctor always emits): the case reads the entry for the file that
+        names both paths in ``path_compliance.moved_references``, on a small
+        committed project of its own.
+        """
+        project = w2_67_doctor.small_project(tmp_path / "repo")
+        old_name = "standalone_target.py"
+        new_rel = f"docs/source/originals/{old_name}"
+        w2_67b_support.move_committed(project, old_name, new_rel)
+        refs_rel = "docs/plan/tools/validate_refs.py"
+        w2_67b_support.write_committed(project, refs_rel, f'NEW_PATH = "{new_rel}"\nOLD_PATH = "{old_name}"\n',
+                                       "add file with both old and new path")
+    
+        run = w2_67_doctor.doctor(project, sandbox)
+        references = w2_67b_support.moved_references(run)
+    
+&gt;       assert w2_67b_support.references_to(references, old_name, refs_rel), (
+            "doctor does not report the standalone old path as stale even "
+            "though it appears on its own (not as part of the new path) — "
+            f"DEC-456 says a standalone old path is still reported\n"
+            f"{run.describe()}"
+        )
+E       AssertionError: doctor does not report the standalone old path as stale even though it appears on its own (not as part of the new path) — DEC-456 says a standalone old path is still reported
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "unmeasured", "config_present": false, "binary_installed": false}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"], "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL", "systems_identified": 0, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert []
+E        +  where [] = &lt;function references_to at 0x771165c3eca0&gt;([], 'standalone_target.py', 'docs/plan/tools/validate_refs.py')
+E        +    where &lt;function references_to at 0x771165c3eca0&gt; = w2_67b_support.references_to
+
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py:269: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="8.574" timestamp="2026-10-23T14:34:05.060243+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc" time="4.577"><failure message="AssertionError: W1-25 (conftest live -&gt; _copy): per-test copies of a planted tree of 7200 objects race git's garbage collection.&#10;  - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)&#10;  - per-test copies that carry the session copy's .git: 0 of 2&#10;  - copies that raised: ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/1c\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/test-0/repo/.git/objects/1c\', &quot;[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/1c\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/', 'Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/a6\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/test-1/repo/.git/objects/a6\', &quot;[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/a6\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/']&#10;  - copies with objects missing (git fsck): none&#10;  The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).&#10;assert (not ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_te...-25-live/repo/.git/objects/a6\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/'])">planted = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/w2-67-planted0/source')
+point_copier_at = &lt;function point_copier_at.&lt;locals&gt;._point at 0x7c4829c842c0&gt;
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0')
+
+    def test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc(planted, point_copier_at, tmp_path):
+        """W1-25: ``live`` (copy_working_tree and its fixture tickets) and ``_copy`` (the copytree behind
+        ``raw_project`` and ``project``; ``built`` and the live-session case copy the same ``live`` the same way)."""
+        conftest = conftest_of("W1-25")
+        point_copier_at(planted)
+        session = body(conftest.live)(_Factory(tmp_path / "session"))
+&gt;       judge_chain("W1-25 (conftest live -&gt; _copy)", session,
+                    lambda index: conftest._copy(session, tmp_path / f"test-{index}"),
+                    [tmp_path / "session", *(tmp_path / f"test-{index}" for index in range(WORKERS))])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:251: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'W1-25 (conftest live -&gt; _copy)'
+session = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo')
+make_copy = &lt;function test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc.&lt;locals&gt;.&lt;lambda&gt; at 0x7c4829c27b00&gt;
+folders = [PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_tes...aunch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/test-1')]
+
+    def judge_chain(label, session, make_copy, folders):
+        """The KPI's either/or for a session copy and the per-test copies made from it."""
+        try:
+            if (session / ".git").is_dir():
+                (session / ".git" / SESSION_MARK).write_text("session copy\n", encoding="utf-8")
+            copies, errors = copies_at_once(make_copy)
+            gc = automatic_gc(session)
+            carried = [copy for copy in copies if (copy / ".git" / SESSION_MARK).exists()]
+            broken = {str(copy): problem for copy in copies if (copy / ".git").is_dir() and (problem := fsck(copy))}
+            races = bool(gc) and (bool(carried) or bool(errors))
+&gt;           assert not errors and not broken and not races, (
+                f"{label}: per-test copies of a planted tree of {PLANTED_FILES} objects race git's garbage collection.\n"
+                f"- automatic gc in the session copy after its commit: {gc or 'none'}\n"
+                f"- per-test copies that carry the session copy's .git: {len(carried)} of {WORKERS}\n"
+                f"- copies that raised: {errors or 'none'}\n"
+                f"- copies with objects missing (git fsck): {broken or 'none'}\n"
+                "The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git "
+                "(I3 F9, I4 F5)."
+            )
+E           AssertionError: W1-25 (conftest live -&gt; _copy): per-test copies of a planted tree of 7200 objects race git's garbage collection.
+E             - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)
+E             - per-test copies that carry the session copy's .git: 0 of 2
+E             - copies that raised: ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/1c\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/test-0/repo/.git/objects/1c\', "[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/1c\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/', 'Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/a6\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/test-1/repo/.git/objects/a6\', "[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_test_copies_of_0/session/w1-25-live/repo/.git/objects/a6\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/']
+E             - copies with objects missing (git fsck): none
+E             The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).
+E           assert (not ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_25_per_te...-25-live/repo/.git/objects/a6\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/'])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:218: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc" time="3.911"><failure message="AssertionError: W1-27 (conftest live -&gt; project): per-test copies of a planted tree of 7200 objects race git's garbage collection.&#10;  - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)&#10;  - per-test copies that carry the session copy's .git: 0 of 2&#10;  - copies that raised: ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/24\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/test-0/repo/.git/objects/24\', &quot;[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/24\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/', 'Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/3d\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/test-1/repo/.git/objects/3d\', &quot;[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/3d\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/']&#10;  - copies with objects missing (git fsck): none&#10;  The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).&#10;assert (not ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_te...-27-live/repo/.git/objects/3d\'&quot;), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/'])">planted = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/w2-67-planted0/source')
+point_copier_at = &lt;function point_copier_at.&lt;locals&gt;._point at 0x7c48299207c0&gt;
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0')
+
+    def test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc(planted, point_copier_at, tmp_path):
+        """W1-27: ``live`` (copy_working_tree) and ``project`` (a copytree of it), from its conftest."""
+        conftest = conftest_of("W1-27")
+        point_copier_at(planted)
+        session = body(conftest.live)(_Factory(tmp_path / "session"))
+&gt;       judge_chain("W1-27 (conftest live -&gt; project)", session,
+                    lambda index: body(conftest.project)(session, tmp_path / f"test-{index}"),
+                    [tmp_path / "session", *(tmp_path / f"test-{index}" for index in range(WORKERS))])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:261: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+label = 'W1-27 (conftest live -&gt; project)'
+session = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo')
+make_copy = &lt;function test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc.&lt;locals&gt;.&lt;lambda&gt; at 0x7c48299213a0&gt;
+folders = [PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_tes...aunch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/test-1')]
+
+    def judge_chain(label, session, make_copy, folders):
+        """The KPI's either/or for a session copy and the per-test copies made from it."""
+        try:
+            if (session / ".git").is_dir():
+                (session / ".git" / SESSION_MARK).write_text("session copy\n", encoding="utf-8")
+            copies, errors = copies_at_once(make_copy)
+            gc = automatic_gc(session)
+            carried = [copy for copy in copies if (copy / ".git" / SESSION_MARK).exists()]
+            broken = {str(copy): problem for copy in copies if (copy / ".git").is_dir() and (problem := fsck(copy))}
+            races = bool(gc) and (bool(carried) or bool(errors))
+&gt;           assert not errors and not broken and not races, (
+                f"{label}: per-test copies of a planted tree of {PLANTED_FILES} objects race git's garbage collection.\n"
+                f"- automatic gc in the session copy after its commit: {gc or 'none'}\n"
+                f"- per-test copies that carry the session copy's .git: {len(carried)} of {WORKERS}\n"
+                f"- copies that raised: {errors or 'none'}\n"
+                f"- copies with objects missing (git fsck): {broken or 'none'}\n"
+                "The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git "
+                "(I3 F9, I4 F5)."
+            )
+E           AssertionError: W1-27 (conftest live -&gt; project): per-test copies of a planted tree of 7200 objects race git's garbage collection.
+E             - automatic gc in the session copy after its commit: 1 pack(s) in .git/objects/pack (3 files)
+E             - per-test copies that carry the session copy's .git: 0 of 2
+E             - copies that raised: ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/24\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/test-0/repo/.git/objects/24\', "[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/24\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/', 'Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/3d\', \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/test-1/repo/.git/objects/3d\', "[Errno 2] No such file or directory: \'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_test_copies_of_0/session/w1-27-live/repo/.git/objects/3d\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/']
+E             - copies with objects missing (git fsck): none
+E             The KPI: every per-test copy commits with gc.auto=0, or copies the working files without .git (I3 F9, I4 F5).
+E           assert (not ['Error: [(\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-1/test_w1_27_per_te...-27-live/repo/.git/objects/3d\'"), (\'/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/'])
+
+tests/acceptance/W1-27/test_w2_67_copies.py:218: AssertionError</failure></testcase></testsuite></testsuites>

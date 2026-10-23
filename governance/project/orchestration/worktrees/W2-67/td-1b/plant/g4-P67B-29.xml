@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.191" timestamp="2026-10-23T16:03:54.172708+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_recovery_check_r2" name="test_recovery_rebuild_check_reports_unmeasured_when_no_store" time="0.158"><failure message="AssertionError: the check does not report unmeasured when there is no store (DEC-425)&#10;  exit code: 1&#10;  stdout: &#10;  stderr: store.db missing&#10;  &#10;assert 'unmeasured' in 'store.db missing\n'&#10; +  where 'store.db missing\n' = &lt;built-in method lower of str object at 0x7a68fc48ea70&gt;()&#10; +    where &lt;built-in method lower of str object at 0x7a68fc48ea70&gt; = ('' + 'store.db missing\n').lower&#10; +      where '' = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='store.db missing\n').stdout&#10; +      and   'store.db missing\n' = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='store.db missing\n').stderr">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-46/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-46/test_recovery_rebuild_check_re0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-46/test_recovery_rebuild_check_re0')
+
+    def test_recovery_rebuild_check_reports_unmeasured_when_no_store(sandbox, tmp_path):
+        """When no derived state exists, the check must report unmeasured cleanly (DEC-425).
+    
+        It must not crash with a Python traceback, and it must not exit 0
+        (green).
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        assert not (project / ".gov-runtime" / "store.db").exists()
+    
+        result = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+    
+        assert "Traceback" not in result.stderr, (
+            f"the recovery-rebuild check crashes instead of reporting "
+            f"unmeasured when no store exists (DEC-425):\n{result.stderr}"
+        )
+        assert result.returncode != 0, (
+            f"the check exits 0 (green) when there is no store — "
+            f"should be unmeasured, never green (DEC-425)\n{_outcome(result)}"
+        )
+&gt;       assert "unmeasured" in (result.stdout + result.stderr).lower(), (
+            f"the check does not report unmeasured when there is no store (DEC-425)\n{_outcome(result)}"
+        )
+E       AssertionError: the check does not report unmeasured when there is no store (DEC-425)
+E         exit code: 1
+E         stdout: 
+E         stderr: store.db missing
+E         
+E       assert 'unmeasured' in 'store.db missing\n'
+E        +  where 'store.db missing\n' = &lt;built-in method lower of str object at 0x7a68fc48ea70&gt;()
+E        +    where &lt;built-in method lower of str object at 0x7a68fc48ea70&gt; = ('' + 'store.db missing\n').lower
+E        +      where '' = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='store.db missing\n').stdout
+E        +      and   'store.db missing\n' = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='store.db missing\n').stderr
+
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:177: AssertionError</failure></testcase></testsuite></testsuites>

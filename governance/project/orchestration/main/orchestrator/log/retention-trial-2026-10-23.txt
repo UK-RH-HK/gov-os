@@ -1,0 +1,8 @@
+disk gate open: 835 GiB free, 59881099 inodes free
+2026-10-23 14:09:27 clone at de2b5bf1
+2026-10-23 14:28:00 clone rebuilt
+2026-10-23 14:28:00 waiting for the verification lock
+2026-10-23 15:14:07 parallel exit 1 in 2732 s (lock wait included): 3 failed, 15464 passed, 30 skipped, 1 error in 2459.20s (0:40:59)
+2026-10-23 15:14:07 the planted failing test's folder kept: 1 file(s) named kept-marker.txt
+2026-10-23 15:14:07 peak: 165707 inodes, 0.912978 GB; after the run: 129629 inodes
+2026-10-23 15:14:07 trial done

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="8" time="32.075" timestamp="2026-10-23T15:59:20.669663+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_is_an_act_command" time="3.126" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_recreates_derived_stores" time="6.044" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_fresh_clone_doctor_rebuild" time="4.008" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_needs_only_git" time="3.521"><failure message="AssertionError: gov rebuild did not succeed&#10;gov rebuild --json&#10;exit code: 1&#10;stdout:&#10;{&quot;ok&quot;: false, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;REBUILD_FAILED&quot;, &quot;message&quot;: &quot;rebuild failed on the lexical index: [Errno 2] No such file or directory: 'gitleaks'&quot;, &quot;details&quot;: {&quot;store&quot;: &quot;lexical&quot;, &quot;error&quot;: &quot;[Errno 2] No such file or directory: 'gitleaks'&quot;}}}&#10;&#10;stderr:">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_...ependent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_rebuild_needs_only_git0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_rebuild_needs_only_git0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7c28ddc9b830&gt;
+
+    def test_rebuild_needs_only_git(sandbox, tmp_path, monkeypatch):
+        """Rebuild works with only the content in git, nothing else.
+    
+        A fresh tiny project (no .gov-runtime, no external state) must
+        rebuild successfully. This proves rebuild draws only from git.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): the folder it deleted never existed, and it ran
+        with every tool of the machine on PATH.  A first rebuild now leaves a
+        ``.gov-runtime``, which is removed, and the second runs with a PATH that
+        holds git alone; it must succeed and recreate the lexical store.
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        w2_67b_support.rebuild(project, sandbox)
+        shutil.rmtree(project / ".gov-runtime")
+        git_only = tmp_path / "git-only-bin"
+        git_only.mkdir()
+        git_binary = shutil.which("git")
+        assert git_binary, "git is not on PATH"
+        (git_only / "git").symlink_to(git_binary)
+        monkeypatch.setenv("PATH", str(git_only))
+&gt;       run, result = w2_67b_support.rebuild(project, sandbox)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:171: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_rebuild_needs_only_git0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_...ependent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-30/test_rebuild_needs_only_git0/sandbox/elsewhere'))
+
+    def rebuild(project, sandbox):
+        """``gov rebuild --json``: the run and its API-0002 envelope, which must say ok."""
+        run = gov(project, sandbox, "rebuild", "--json")
+        envelope = support.assert_envelope(run, w2_67_doctor.interface(), command="rebuild")
+&gt;       assert envelope.get("ok") is True and isinstance(envelope.get("result"), dict), \
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            f"gov rebuild did not succeed\n{run.describe()}"
+E       AssertionError: gov rebuild did not succeed
+E       gov rebuild --json
+E       exit code: 1
+E       stdout:
+E       {"ok": false, "command": "rebuild", "result": {}, "session": "", "error": {"code": "REBUILD_FAILED", "message": "rebuild failed on the lexical index: [Errno 2] No such file or directory: 'gitleaks'", "details": {"store": "lexical", "error": "[Errno 2] No such file or directory: 'gitleaks'"}}}
+E       
+E       stderr:
+
+tests/acceptance/W1-27/w2_67b_support.py:56: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_digest_matches_store_loader" time="3.303" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r2" name="test_rebuild_result_names_unreconstructed_stores" time="3.029" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r2" name="test_rebuild_does_not_silently_drop_lexical_tables" time="4.834" /><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r3" name="test_rebuild_result_names_derived_stores_with_measured_status" time="4.126" /></testsuite></testsuites>

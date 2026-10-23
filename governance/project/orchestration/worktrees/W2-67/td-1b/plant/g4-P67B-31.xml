@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.937" timestamp="2026-10-23T16:05:51.497035+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r8_no_embeddings" name="test_the_mode_writes_only_under_gov_runtime" time="1.906"><failure message="AssertionError: the mode wrote in the home it was given:&#10;  created: .gov-planted&#10;assert not ['created: .gov-planted']">gov = &lt;function gov.&lt;locals&gt;._gov at 0x7d0ea17c6840&gt;
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+tiny = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-49/test_the_mode_writes_only_unde0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-49/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-49/test_the_mode_writes_only_unde0/sandbox/elsewhere'))
+
+    def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
+        # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): it
+        # snapshotted sandbox.elsewhere, which nothing uses. The home the command is given (HOME) is snapshotted too.
+        # (The code index's daemon folder, /tmp/gov-cbm-&lt;uid&gt;, is not: in the designer's sandbox it is read-only, so
+        # whether the mode may write there could not be seen; returned as an open point, W2-67 batch 1b.)
+        before = support.snapshot(tiny)
+        before_elsewhere = support.snapshot(sandbox.elsewhere, skip=())
+        before_home = support.snapshot(sandbox.home, skip=())
+    
+        _rebuilt(gov, interface, MODE)
+    
+        assert not support.snapshot_difference(before, support.snapshot(tiny)), "the mode wrote outside .gov-runtime/"
+        assert not support.snapshot_difference(before_elsewhere, support.snapshot(sandbox.elsewhere, skip=()))
+        written = support.snapshot_difference(before_home, support.snapshot(sandbox.home, skip=()))
+&gt;       assert not written, "the mode wrote in the home it was given:\n" + "\n".join(written)
+E       AssertionError: the mode wrote in the home it was given:
+E         created: .gov-planted
+E       assert not ['created: .gov-planted']
+
+tests/acceptance/W1-27/test_w1_27_rebuild_r8_no_embeddings.py:284: AssertionError</failure></testcase></testsuite></testsuites>

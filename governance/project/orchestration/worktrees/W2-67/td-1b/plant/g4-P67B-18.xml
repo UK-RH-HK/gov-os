@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.309" timestamp="2026-10-23T16:00:38.634302+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_is_an_act_command" time="3.262"><failure message="AssertionError: rebuild changed the project outside .gov-runtime:&#10;  created: rebuild-wrote-here.txt&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;ba65c34a0dd8fdb4b1c8cf6d5de14bd5b281d5a681934bfd436b027d32ff20a4&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;ba65c34a0dd8fdb4b1c8cf6d5de14bd5b281d5a681934bfd436b027d32ff20a4&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;sqlite_vec cannot be loaded: no vector can be stored or compared&quot;, &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/3901b408134841b7'&quot;}}, &quot;timing&quot;: {&quot;lexical_s&quot;: 1.0}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert not ['created: rebuild-wrote-here.txt']">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-32/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-32/test_rebuild_is_an_act_command0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-32/test_rebuild_is_an_act_command0')
+
+    def test_rebuild_is_an_act_command(sandbox, tmp_path):
+        """``rebuild`` is an act command (DEC-317): it returns an envelope and may change derived state.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): it accepted any envelope, REBUILD_FAILED
+        included.  The rebuild must now succeed, write its store under
+        ``.gov-runtime/``, and change nothing else in the project.
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        before = support.snapshot(project, skip=(".git", ".gov-runtime"))
+        run, _ = w2_67b_support.rebuild(project, sandbox)
+        assert (project / ".gov-runtime" / "store.db").is_file(), f"rebuild wrote no store\n{run.describe()}"
+        changed = support.snapshot_difference(before, support.snapshot(project, skip=(".git", ".gov-runtime")))
+&gt;       assert not changed, "rebuild changed the project outside .gov-runtime:\n" + "\n".join(changed) + \
+            f"\n{run.describe()}"
+E       AssertionError: rebuild changed the project outside .gov-runtime:
+E         created: rebuild-wrote-here.txt
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "ba65c34a0dd8fdb4b1c8cf6d5de14bd5b281d5a681934bfd436b027d32ff20a4", "store": {"digest": "ba65c34a0dd8fdb4b1c8cf6d5de14bd5b281d5a681934bfd436b027d32ff20a4", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "sqlite_vec cannot be loaded: no vector can be stored or compared", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/3901b408134841b7'"}}, "timing": {"lexical_s": 1.0}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert not ['created: rebuild-wrote-here.txt']
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:45: AssertionError</failure></testcase></testsuite></testsuites>

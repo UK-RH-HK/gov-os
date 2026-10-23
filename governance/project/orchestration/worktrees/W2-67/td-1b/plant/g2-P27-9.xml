@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="2.532" timestamp="2026-10-23T15:39:45.363903+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_doctor" name="test_doctor_report_mentions_isolation" time="1.328" /><testcase classname="tests.acceptance.W1-27.test_w1_27_isolation_r2" name="test_doctor_isolation_is_measured_not_constant" time="1.147"><failure message="AssertionError: a .gov-runtime whose parent (/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer/inner) is not the git root (/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer) is not reported as not isolated: {'status': 'pass', 'isolated': True, 'method': 'runtime_parent_matches_git_root', 'git_root': '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer'}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;reason&quot;: &quot;no tool-registry.yaml&quot;, &quot;tools&quot;: []}, &quot;hooks&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;config_present&quot;: false, &quot;binary_installed&quot;: false}, &quot;path_map&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;reason&quot;: &quot;no path-map.yaml&quot;, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;isolated&quot;: true, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;git_root&quot;: &quot;/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;MINIMAL&quot;}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert (True is False)&#10; +  where True = &lt;built-in method get of dict object at 0x73fbcd286200&gt;('isolated')&#10; +    where &lt;built-in method get of dict object at 0x73fbcd286200&gt; = {'git_root': '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer', 'isolated': True, 'method': 'runtime_parent_matches_git_root', 'status': 'pass'}.get">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0')
+
+    def test_doctor_isolation_is_measured_not_constant(sandbox, tmp_path):
+        """The isolation section must reflect actual measurement, not a constant stub (DEC-425).
+    
+        A result that is exactly ``{"status": "pass", "isolated": True}`` with
+        no additional evidence is never measured — it is the same regardless of
+        input.  Per DEC-425: an unmeasured check must report "unmeasured",
+        never "pass".
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion matches a key name
+        that doctor always emits): it rejected one exact stub only, and the copy
+        had no ``.gov-runtime``, so the measured branch never ran.  Two small
+        committed projects now give both outcomes: a ``.gov-runtime`` at the
+        repository's root is isolated, and one in a subfolder (its parent is not
+        the git root) is not.
+        """
+        own = w2_67_doctor.small_project(tmp_path / "own")
+        (own / ".gov-runtime").mkdir()
+        own_run = w2_67_doctor.doctor(own, sandbox)
+        isolation = w2_67_doctor.section(own_run, "isolation")
+        assert not _is_constant_stub(isolation), (
+            f"the isolation check is a constant stub: {isolation} — it reports "
+            f"'pass' with no measurement evidence (DEC-425)\n{own_run.describe()}"
+        )
+        assert isolation.get("isolated") is True and isolation.get("status") == "pass", (
+            f"a .gov-runtime at the repository's root is not reported isolated: {isolation}\n{own_run.describe()}"
+        )
+    
+        outer = w2_67_doctor.small_project(tmp_path / "outer")
+        inner = outer / "inner"
+        (inner / ".gov-runtime").mkdir(parents=True)
+        inner_run = support.run_gov_with_code(support.REPO_ROOT, inner, sandbox, "doctor", "--json")
+        nested = w2_67_doctor.section(inner_run, "isolation")
+&gt;       assert nested.get("isolated") is False and nested.get("status") == "fail", (
+            f"a .gov-runtime whose parent ({inner}) is not the git root ({outer}) is not reported as not isolated: "
+            f"{nested}\n{inner_run.describe()}"
+        )
+E       AssertionError: a .gov-runtime whose parent (/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer/inner) is not the git root (/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer) is not reported as not isolated: {'status': 'pass', 'isolated': True, 'method': 'runtime_parent_matches_git_root', 'git_root': '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer'}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "unmeasured", "config_present": false, "binary_installed": false}, "path_map": {"status": "unmeasured", "reason": "no path-map.yaml", "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "pass", "isolated": true, "method": "runtime_parent_matches_git_root", "git_root": "/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL"}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert (True is False)
+E        +  where True = &lt;built-in method get of dict object at 0x73fbcd286200&gt;('isolated')
+E        +    where &lt;built-in method get of dict object at 0x73fbcd286200&gt; = {'git_root': '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-18/test_doctor_isolation_is_measu0/outer', 'isolated': True, 'method': 'runtime_parent_matches_git_root', 'status': 'pass'}.get
+
+tests/acceptance/W1-27/test_w1_27_isolation_r2.py:63: AssertionError</failure></testcase></testsuite></testsuites>

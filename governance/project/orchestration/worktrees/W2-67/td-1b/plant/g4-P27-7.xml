@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.067" timestamp="2026-10-23T16:00:51.134385+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_digest_matches_store_loader" time="3.018"><failure message="AssertionError: rebuild digest 0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89 does not match store digest 98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0&#10;  rebuild:&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;sqlite_vec cannot be loaded: no vector can be stored or compared&quot;, &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/02069efbcbe21212'&quot;}}, &quot;timing&quot;: {&quot;lexical_s&quot;: 0.8}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert '0cb7fa07eeab...15eadcebf0c89' == '98c0fbecdae5...3baee70af7bc0'&#10;  &#10;  - 98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0&#10;  + 0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-37/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-37/test_rebuild_digest_matches_st0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-37/test_rebuild_digest_matches_st0')
+
+    def test_rebuild_digest_matches_store_loader(sandbox, tmp_path):
+        """The digest reported by rebuild matches what the store loader computes (CAP-07.a).
+    
+        After rebuild, running ``gov status --json`` (which loads the store) and comparing its session digest with
+        the rebuild's reported digest confirms they agree.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): the envelope's session is a string, so the
+        digests were never compared.  The rebuild's digest is now compared with
+        the one the store loader computes from the store it left
+        (``gov.store.digest``, this worktree's code).
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        run_reb, result = w2_67b_support.rebuild(project, sandbox)
+        rebuild_digest = result.get("digest")
+        assert rebuild_digest is not None, f"rebuild has no digest\n{run_reb.describe()}"
+    
+        loaded = support.run_python_snippet(
+            support.REPO_ROOT, sandbox,
+            f"from pathlib import Path\nfrom gov.store import digest\nprint(digest(Path({str(project)!r})))\n")
+        assert loaded.returncode == 0, f"the store loader failed: {loaded.stderr}"
+        store_digest = loaded.stdout.strip()
+&gt;       assert rebuild_digest == store_digest, (
+            f"rebuild digest {rebuild_digest} does not match store digest {store_digest}\n"
+            f"rebuild:\n{run_reb.describe()}"
+        )
+E       AssertionError: rebuild digest 0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89 does not match store digest 98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0
+E         rebuild:
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89", "store": {"digest": "98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "sqlite_vec cannot be loaded: no vector can be stored or compared", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "not_recreated", "reason": "[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/02069efbcbe21212'"}}, "timing": {"lexical_s": 0.8}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert '0cb7fa07eeab...15eadcebf0c89' == '98c0fbecdae5...3baee70af7bc0'
+E         
+E         - 98c0fbecdae5106f15690158ff23c95cf22301af0f92441c9b23baee70af7bc0
+E         + 0cb7fa07eeab32b9c14429f0fa10322fc59c32ff85109651f6015eadcebf0c89
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:207: AssertionError</failure></testcase></testsuite></testsuites>

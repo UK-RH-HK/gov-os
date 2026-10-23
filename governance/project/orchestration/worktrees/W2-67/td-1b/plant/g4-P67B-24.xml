@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="2" time="7.878" timestamp="2026-10-23T16:00:54.719615+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r2" name="test_rebuild_result_names_unreconstructed_stores" time="3.509"><failure message="AssertionError: the semantic index was not recreated but rebuild does not name it not_recreated with a reason; tables: ['commit_paths', 'commits', 'edges', 'lexical_chunk', 'lexical_file', 'lexical_fts', 'lexical_fts_config', 'lexical_fts_content', 'lexical_fts_data', 'lexical_fts_docsize', 'lexical_fts_idx', 'lexical_parent', 'records', 'register_entries', 'trailers']&#10;  result: {'digest': 'e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3', 'store': {'digest': 'e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3', 'invalid': []}, 'stores': {'lexical': {'status': 'recreated'}, 'semantic': {'status': 'recreated', 'embedding': 'no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors'}, 'codeintel': {'status': 'recreated'}}, 'timing': {'lexical_s': 0.9}}&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;recreated&quot;, &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;recreated&quot;}}, &quot;timing&quot;: {&quot;lexical_s&quot;: 0.9}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert ('recreated' == 'not_recreated'&#10;  &#10;  - not_recreated&#10;  ? ----&#10;  + recreated)">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-38/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-38/test_rebuild_result_names_unre0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-38/test_rebuild_result_names_unre0')
+
+    def test_rebuild_result_names_unreconstructed_stores(sandbox, tmp_path):
+        """If rebuild cannot recreate a derived store it must name it in the result.
+    
+        The semantic index requires a model (Ollama + qwen3-embedding).  If
+        the model is absent, rebuild must say so by name — not silently drop
+        the tables.  "Semantic needs a model that may be absent" is answered
+        by the sources or returned as a package, never by silently dropping
+        the tables.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): ``stores.semantic`` is always in the result.
+        The case now reads the status and reason of each store: one whose
+        tables are not in the store is ``not_recreated`` with a reason, and the
+        lexical store, whose tables are there, is ``recreated``.
+        """
+        rebuild_project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        run, result = w2_67b_support.rebuild(rebuild_project, sandbox)
+        tables = _tables_in_store(rebuild_project)
+        stores = result.get("stores")
+        assert isinstance(stores, dict) and stores, f"the result names no store: {result}\n{run.describe()}"
+    
+        if not SEMANTIC_TABLES.issubset(tables):
+            semantic = stores.get("semantic") or {}
+&gt;           assert semantic.get("status") == "not_recreated" and semantic.get("reason"), (
+                f"the semantic index was not recreated but rebuild does not "
+                f"name it not_recreated with a reason; tables: {sorted(tables)}\n"
+                f"result: {result}\n{run.describe()}"
+            )
+E           AssertionError: the semantic index was not recreated but rebuild does not name it not_recreated with a reason; tables: ['commit_paths', 'commits', 'edges', 'lexical_chunk', 'lexical_file', 'lexical_fts', 'lexical_fts_config', 'lexical_fts_content', 'lexical_fts_data', 'lexical_fts_docsize', 'lexical_fts_idx', 'lexical_parent', 'records', 'register_entries', 'trailers']
+E             result: {'digest': 'e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3', 'store': {'digest': 'e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3', 'invalid': []}, 'stores': {'lexical': {'status': 'recreated'}, 'semantic': {'status': 'recreated', 'embedding': 'no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors'}, 'codeintel': {'status': 'recreated'}}, 'timing': {'lexical_s': 0.9}}
+E             gov rebuild --json
+E             exit code: 0
+E             stdout:
+E             {"ok": true, "command": "rebuild", "result": {"digest": "e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3", "store": {"digest": "e135d3ec3c27950ebdb4a02c38acf2d1a07981a51ef8717c3e878701b16ae7b3", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "recreated"}}, "timing": {"lexical_s": 0.9}}, "session": ""}
+E             
+E             stderr:
+E             
+E           assert ('recreated' == 'not_recreated'
+E             
+E             - not_recreated
+E             ? ----
+E             + recreated)
+
+tests/acceptance/W1-27/test_w1_27_rebuild_r2.py:165: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r3" name="test_rebuild_result_names_derived_stores_with_measured_status" time="4.317" /></testsuite></testsuites>

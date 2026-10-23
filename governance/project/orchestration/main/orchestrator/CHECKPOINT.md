@@ -54,6 +54,12 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **DEC-905 `ac119c37`: the retention trial HELD** (peak 165,707 inodes / 0.91 GB vs 5.3M / 47 GB; failing test's
+  folder kept; 30 skips = rehearsal's). The option is the default (LEAD-common, nightly.sh, W2-66 KPI `bfddcb07`);
+  bridge cap ENDED; lock KEPT (delegated); TMPDIR kept short (a long one breaks W2-58's sandbox sockets).
+  **P1 `packages/P-W1-01-H.md` PINGED:** W1-01's MR-3 history case red on integrate since the owner's `c9a08678`
+  (my slip: B validated without the full regression). Rec (a): W2-70 widened to revise it (narrow owner-commit
+  exemption) + (c) future retirements as designer commits. Leads report it as known, not theirs.
 - **DEC-904 (owner) `6b496169`** on P-W2-07-A-B: retention trial (`tools/retention_trial.sh`, RUNNING, results in
   `/tmp/gov-os-trial-retention/out/run.txt`; if it holds -> the option becomes the default for close, nightly, leads);
   allow rule for a lead's own temp at the settings regeneration; bridge cap 6,000,000 / 60 GB per verification run,

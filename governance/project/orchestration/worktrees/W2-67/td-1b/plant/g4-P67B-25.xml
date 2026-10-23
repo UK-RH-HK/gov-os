@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="4.021" timestamp="2026-10-23T16:01:06.612212+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild_r3" name="test_rebuild_result_names_derived_stores_with_measured_status" time="3.970"><failure message="AssertionError: store semantic is not recreated with a constant or missing reason: {'status': 'not_recreated', 'reason': 'requires ollama and qwen3-embedding model', 'embedding': 'no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors'}&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;5be4ddba4c57dfebdf2f354ee172b347fbf5d4df8cf64d36ba57c32bd58713e4&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;5be4ddba4c57dfebdf2f354ee172b347fbf5d4df8cf64d36ba57c32bd58713e4&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;requires ollama and qwen3-embedding model&quot;, &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;requires ollama and qwen3-embedding model&quot;}}, &quot;timing&quot;: {&quot;lexical_s&quot;: 0.8}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert (True and 'requires ollama and qwen3-embedding model' and 'requires ollama and qwen3-embedding model' not in ('requires ollama and qwen3-embedding model', 'requires code intelligence tool', 'skipped'))&#10; +  where True = isinstance('requires ollama and qwen3-embedding model', str)">rebuild_gov = &lt;function rebuild_gov.&lt;locals&gt;._gov at 0x78c03f553880&gt;
+rebuild_project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-39/test_rebuild_result_names_deri0/repo')
+interface = Interface(required={'ok': &lt;class 'bool'&gt;, 'command': &lt;class 'str'&gt;, 'result': &lt;class 'dict'&gt;, 'session': &lt;class 'str'&gt;}, optional={'error': ('code', 'message', 'details')}, exit_codes=(0, 1, 2, 3, 4))
+
+    def test_rebuild_result_names_derived_stores_with_measured_status(rebuild_gov, rebuild_project, interface):
+        """The rebuild result names every derived store with a status:
+        ``"recreated"`` or ``"not_recreated"`` with a reason that is not a
+        constant sentence.
+    
+        KPI: "rebuild recreates every derived store" [CAP-07.a].
+        Currently fails: the result has only a ``"skipped"`` list with constant
+        reason strings like ``"requires ollama and qwen3-embedding model"``.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+        """
+        py_file = rebuild_project / "sample.py"
+        py_file.write_text("x = 1\n", encoding="utf-8")
+        support.commit_all(rebuild_project, "add a tracked file")
+    
+        run = rebuild_gov("rebuild", "--json")
+        envelope = support.assert_envelope(run, interface, command="rebuild")
+        assert run.returncode == 0, f"rebuild failed\n{run.describe()}"
+    
+        result = envelope.get("result") or {}
+        result_text = json.dumps(result)
+    
+        has_stores_key = "stores" in result or "derived_stores" in result
+        has_status_per_store = False
+        has_constant_only = True
+    
+        stores = result.get("stores") or result.get("derived_stores") or {}
+        if isinstance(stores, dict):
+            for name, entry in stores.items():
+                if isinstance(entry, dict) and "status" in entry:
+                    has_status_per_store = True
+                    if entry["status"] == "not_recreated" and "reason" in entry:
+                        reason = entry["reason"]
+                        if not isinstance(reason, str) or reason not in (
+                            "requires ollama and qwen3-embedding model",
+                            "requires code intelligence tool",
+                            "skipped",
+                        ):
+                            has_constant_only = False
+        elif isinstance(stores, list):
+            for entry in stores:
+                if isinstance(entry, dict) and "status" in entry:
+                    has_status_per_store = True
+    
+        uses_skipped_list = "skipped" in result and isinstance(result["skipped"], list)
+    
+        assert not uses_skipped_list or has_stores_key, (
+            f"rebuild result uses a 'skipped' list instead of naming every "
+            f"derived store with a per-store status (recreated/not_recreated "
+            f"with a measured reason)\nresult keys: {list(result.keys())}\n"
+            f"result: {result}\n{run.describe()}"
+        )
+    
+        # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): the facts
+        # computed above were never asserted. Every store has a status, recreated or not_recreated, and each store not
+        # recreated gives a reason that is not one of the constant sentences.
+        assert has_stores_key and isinstance(stores, dict) and stores and has_status_per_store, (
+            f"rebuild result does not name its derived stores with a status each\nresult: {result}\n{run.describe()}"
+        )
+        for name, entry in stores.items():
+            assert isinstance(entry, dict) and entry.get("status") in ("recreated", "not_recreated"), (
+                f"store {name} has no status recreated or not_recreated: {entry}\n{run.describe()}"
+            )
+            if entry["status"] == "not_recreated":
+                reason = entry.get("reason")
+&gt;               assert isinstance(reason, str) and reason and reason not in (
+                    "requires ollama and qwen3-embedding model", "requires code intelligence tool", "skipped",
+                ), f"store {name} is not recreated with a constant or missing reason: {entry}\n{run.describe()}"
+E               AssertionError: store semantic is not recreated with a constant or missing reason: {'status': 'not_recreated', 'reason': 'requires ollama and qwen3-embedding model', 'embedding': 'no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors'}
+E                 gov rebuild --json
+E                 exit code: 0
+E                 stdout:
+E                 {"ok": true, "command": "rebuild", "result": {"digest": "5be4ddba4c57dfebdf2f354ee172b347fbf5d4df8cf64d36ba57c32bd58713e4", "store": {"digest": "5be4ddba4c57dfebdf2f354ee172b347fbf5d4df8cf64d36ba57c32bd58713e4", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "requires ollama and qwen3-embedding model", "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}, "codeintel": {"status": "not_recreated", "reason": "requires ollama and qwen3-embedding model"}}, "timing": {"lexical_s": 0.8}}, "session": ""}
+E                 
+E                 stderr:
+E                 
+E               assert (True and 'requires ollama and qwen3-embedding model' and 'requires ollama and qwen3-embedding model' not in ('requires ollama and qwen3-embedding model', 'requires code intelligence tool', 'skipped'))
+E                +  where True = isinstance('requires ollama and qwen3-embedding model', str)
+
+tests/acceptance/W1-27/test_w1_27_rebuild_r3.py:218: AssertionError</failure></testcase></testsuite></testsuites>

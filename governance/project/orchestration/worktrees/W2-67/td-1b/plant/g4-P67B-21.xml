@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1.781" timestamp="2026-10-23T16:00:43.774459+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_recreates_derived_stores" time="0.340"><failure message="FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_rebuild_recreates_derived0/repo/.gov-runtime'">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_rebuild_recreates_derived0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_rebuild_recreates_derived0')
+
+    def test_rebuild_recreates_derived_stores(sandbox, tmp_path):
+        """After rebuild, the derived stores under ``.gov-runtime/`` exist.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): it checked that ``.gov-runtime`` exists only.
+        The store is now removed after a first rebuild, and the second must
+        recreate it: its lexical index holds the project's document, and the
+        result names the lexical store recreated.
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        w2_67b_support.write_committed(project, "docs/guide.md", "a document the lexical index holds\n")
+        w2_67b_support.rebuild(project, sandbox)
+&gt;       shutil.rmtree(project / ".gov-runtime")
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib/python3.12/shutil.py:775: in rmtree
+    onexc(os.lstat, path, err)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_rebuild_recreates_derived0/repo/.gov-runtime')
+ignore_errors = False, onerror = None
+
+    def rmtree(path, ignore_errors=False, onerror=None, *, onexc=None, dir_fd=None):
+        """Recursively delete a directory tree.
+    
+        If dir_fd is not None, it should be a file descriptor open to a directory;
+        path will then be relative to that directory.
+        dir_fd may not be implemented on your platform.
+        If it is unavailable, using it will raise a NotImplementedError.
+    
+        If ignore_errors is set, errors are ignored; otherwise, if onexc or
+        onerror is set, it is called to handle the error with arguments (func,
+        path, exc_info) where func is platform and implementation dependent;
+        path is the argument to that function that caused it to fail; and
+        the value of exc_info describes the exception. For onexc it is the
+        exception instance, and for onerror it is a tuple as returned by
+        sys.exc_info().  If ignore_errors is false and both onexc and
+        onerror are None, the exception is reraised.
+    
+        onerror is deprecated and only remains for backwards compatibility.
+        If both onerror and onexc are set, onerror is ignored and onexc is used.
+        """
+    
+        sys.audit("shutil.rmtree", path, dir_fd)
+        if ignore_errors:
+            def onexc(*args):
+                pass
+        elif onerror is None and onexc is None:
+            def onexc(*args):
+                raise
+        elif onexc is None:
+            if onerror is None:
+                def onexc(*args):
+                    raise
+            else:
+                # delegate to onerror
+                def onexc(*args):
+                    func, path, exc = args
+                    if exc is None:
+                        exc_info = None, None, None
+                    else:
+                        exc_info = type(exc), exc, exc.__traceback__
+                    return onerror(func, path, exc_info)
+    
+        if _use_fd_functions:
+            # While the unsafe rmtree works fine on bytes, the fd based does not.
+            if isinstance(path, bytes):
+                path = os.fsdecode(path)
+            # Note: To guard against symlink races, we use the standard
+            # lstat()/open()/fstat() trick.
+            try:
+&gt;               orig_st = os.lstat(path, dir_fd=dir_fd)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               FileNotFoundError: [Errno 2] No such file or directory: '/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_rebuild_recreates_derived0/repo/.gov-runtime'
+
+/usr/lib/python3.12/shutil.py:773: FileNotFoundError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_fresh_clone_doctor_rebuild" time="1.362"><failure message="AssertionError: doctor does not report the clone's index fresh after the rebuild: {'status': 'unmeasured', 'index_status': 'missing', 'stale': []}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;reason&quot;: &quot;no tool-registry.yaml&quot;, &quot;tools&quot;: []}, &quot;hooks&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;config_present&quot;: false, &quot;binary_installed&quot;: false}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;], &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;MINIMAL&quot;, &quot;systems_identified&quot;: 0, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert ('missing', 'unmeasured') == ('fresh', 'pass')&#10;  &#10;  At index 0 diff: 'missing' != 'fresh'&#10;  Use -v to get more diff">tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-34/test_fresh_clone_doctor_rebuil0')
+
+    def test_fresh_clone_doctor_rebuild(tmp_path):
+        """A fresh clone followed by doctor followed by rebuild works (CAP-46.a).
+    
+        The sequence is: create a tiny project (simulating a fresh clone), run
+        ``gov doctor --json``, then run ``gov rebuild --json``. Both must succeed.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): it made no clone and did not read doctor's
+        verdict.  The tiny project is now committed and cloned with git; doctor
+        in the clone reports its sections, with no index yet; rebuild succeeds;
+        and doctor then reports the clone's index fresh.
+        """
+        origin = w2_67b_support.rebuild_project(tmp_path / "origin")
+        w2_67b_support.write_committed(origin, "docs/guide.md", "a document of the project\n")
+        clone = tmp_path / "clone"
+        support.git(tmp_path, "clone", "-q", str(origin), str(clone))
+        sandbox = support.make_sandbox(tmp_path / "sandbox")
+    
+        first = w2_67_doctor.doctor(clone, sandbox)
+        freshness = w2_67_doctor.section(first, "index_freshness")
+        assert freshness.get("index_status") != "fresh", (
+            f"doctor in a fresh clone reports an index no rebuild has built: {freshness}\n{first.describe()}"
+        )
+        w2_67b_support.rebuild(clone, sandbox)
+        second = w2_67_doctor.doctor(clone, sandbox)
+        freshness = w2_67_doctor.section(second, "index_freshness")
+&gt;       assert (freshness.get("index_status"), freshness.get("status")) == ("fresh", "pass"), (
+            f"doctor does not report the clone's index fresh after the rebuild: {freshness}\n{second.describe()}"
+        )
+E       AssertionError: doctor does not report the clone's index fresh after the rebuild: {'status': 'unmeasured', 'index_status': 'missing', 'stale': []}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "unmeasured", "config_present": false, "binary_installed": false}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"], "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL", "systems_identified": 0, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert ('missing', 'unmeasured') == ('fresh', 'pass')
+E         
+E         At index 0 diff: 'missing' != 'fresh'
+E         Use -v to get more diff
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:137: AssertionError</failure></testcase></testsuite></testsuites>

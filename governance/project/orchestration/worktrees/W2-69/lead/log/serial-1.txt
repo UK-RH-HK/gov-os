@@ -1,0 +1,65 @@
+..............F......................................................... [ 27%]
+........................................................................ [ 54%]
+........................................................................ [ 82%]
+...............................................                          [100%]
+=================================== FAILURES ===================================
+_____ test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over _____
+
+switched_over = {'$schema': 'https://json.schemastore.org/claude-code-settings.json', 'hooks': {'PostToolUse': [{'hooks': [{'command':...do:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]}}
+
+    def test_the_dependencies_pass_their_acceptance_tests_at_the_switch_over(switched_over):
+        """With the hooks wired, the acceptance tests of W1-02, W1-03 and W1-04 exist and pass.
+    
+        This runs the three suites in a child pytest process, so it takes as long as they do.
+        """
+        directories = []
+        for wbs_id in support.DEPENDENCIES:
+            directory = support.REPO_ROOT / support.ACCEPTANCE_REL / wbs_id
+            assert directory.is_dir() and list(directory.glob("test_*.py")), (
+                f"the hooks are wired, but {support.ACCEPTANCE_REL}/{wbs_id}/ holds no acceptance tests"
+            )
+            directories.append(str(directory))
+        proc = subprocess.run(
+            [sys.executable, "-m", "pytest", *directories, "-q", "-x", "-p", "no:cacheprovider"],
+            cwd=str(support.REPO_ROOT), capture_output=True, text=True, timeout=1800, check=False,
+        )
+        tail = "\n".join(proc.stdout.strip().splitlines()[-15:])
+>       assert proc.returncode == 0, (
+            "the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:\n" + tail
+        )
+E       AssertionError: the hooks are wired, but the acceptance tests of W1-02, W1-03 and W1-04 do not all pass:
+E                     if rounds[-1] < LATENCY_BOUND_S:
+E                         break
+E         >       assert min(rounds) < LATENCY_BOUND_S, (
+E                     "p95 decision time per round (ms): " + ", ".join(f"{value * 1000:.1f}" for value in rounds)
+E                     + f"; the bound is {LATENCY_BOUND_S * 1000:.0f} ms"
+E                 )
+E         E       AssertionError: p95 decision time per round (ms): 151.7, 167.8, 166.6; the bound is 100 ms
+E         E       assert 0.15165651903953403 < 0.1
+E         E        +  where 0.15165651903953403 = min([0.15165651903953403, 0.16780591197311878, 0.1665665190666914])
+E         
+E         tests/acceptance/W1-02/test_w1_02_guard_hook.py:73: AssertionError
+E         =========================== short test summary info ============================
+E         FAILED tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms[no-role-deny]
+E         !!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+E         1 failed, 618 passed in 149.43s (0:02:29)
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['/usr/bin/python3', '-m', 'pytest', '/home/usain/gov-os-worktrees/W2-69/tests/acceptance/W1-02'...!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!\n1 failed, 618 passed in 149.43s (0:02:29)\n', stderr='').returncode
+
+tests/acceptance/W1-05/test_w1_05_switch_over_record.py:66: AssertionError
+=============================== warnings summary ===============================
+tests/acceptance/W1-19/test_w1_19_real_models.py::test_the_dev_query_set_mean_hit_at_5_is_at_or_above_the_pass_line_of_80
+  tests/acceptance/W1-19/test_w1_19_real_models.py:153: PytestWarning: record_property is incompatible with junit_family 'xunit2' (use 'legacy' or 'xunit1')
+    @FULL
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= W1-21 measured on the dev tiers ========================
+mean hit@5 of gov.retrieval.retrieve: 81.67 (pass line 80); per class {'decisions': 83.3, 'failed-approaches': 100.0, 'tests': 80.0, 'stale-evidence': 66.7, 'current-vs-superseded': 100.0, 'deletable': 40.0, 'callers-impact': 100.0, 'where-defined': 83.3, 'why': 80.0, 'history': 83.3}; missed ['DQ-A-07', 'DQ-A-09', 'DQ-A-10', 'DQ-A-13', 'DQ-A-18', 'DQ-A-21', 'DQ-A-24', 'DQ-B-03', 'DQ-B-14', 'DQ-B-28']
+forbidden citations in the first five of gov.retrieval.retrieve: 2 (baseline 2): [('DQ-B-12', 'docs/adr/adr-003.md'), ('DQ-B-13', 'pyargus/src/pyargus/imaging/old_gridder.py')]
+===================== W1-19 measured mean hit@5 (DEC-414) ======================
+W1-19 hit@5: mean of the 10 classes = 83.33
+W1-19 hit@5: at or above the pass line of 80 on the dev tiers (DEC-414)
+W1-19 hit@5: below the S0b2 R1 baseline of 85 (-1.67); the baseline is not a pass line here
+W1-19 hit@5: per class: callers-impact=100.0, current-vs-superseded=100.0, decisions=83.3, deletable=40.0, failed-approaches=100.0, history=83.3, stale-evidence=83.3, tests=80.0, where-defined=83.3, why=80.0
+W1-19 hit@5: missed (9): DQ-A-07, DQ-A-10, DQ-A-13, DQ-A-18, DQ-A-21, DQ-A-24, DQ-B-03, DQ-B-14, DQ-B-28
+1 failed, 262 passed, 1 warning in 1515.17s (0:25:15)

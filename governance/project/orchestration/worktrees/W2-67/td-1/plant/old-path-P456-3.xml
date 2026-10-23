@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.872" timestamp="2026-10-23T14:38:27.147040+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_path_compliance_r2" name="test_old_path_inside_its_new_path_is_not_stale" time="0.824"><failure message="AssertionError: doctor reports subpath_target.py as a moved-path reference although it appears only as part of its own new path (docs/source/originals/subpath_target.py) in the file that names the new path (DEC-456 point 3)&#10;  gov doctor --json&#10;  exit code: 3&#10;  stdout:&#10;  {&quot;ok&quot;: false, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {}, &quot;session&quot;: &quot;&quot;, &quot;error&quot;: {&quot;code&quot;: &quot;DOCTOR_UNHEALTHY&quot;, &quot;message&quot;: &quot;one or more health checks failed or reported drift: path_compliance&quot;, &quot;details&quot;: {&quot;healthy&quot;: false, &quot;tools&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;reason&quot;: &quot;no tool-registry.yaml&quot;, &quot;tools&quot;: []}, &quot;hooks&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;config_present&quot;: false, &quot;binary_installed&quot;: false}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;fail&quot;, &quot;moved_references&quot;: [{&quot;old_path&quot;: &quot;subpath_target.py&quot;, &quot;new_path&quot;: &quot;docs/source/originals/subpath_target.py&quot;, &quot;referenced_in&quot;: &quot;docs/plan/tools/validate_paths.py&quot;}, {&quot;old_path&quot;: &quot;control_target.py&quot;, &quot;new_path&quot;: &quot;docs/source/originals/control_target.py&quot;, &quot;referenced_in&quot;: &quot;notes.md&quot;}], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;], &quot;embedding&quot;: &quot;no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors&quot;}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;MINIMAL&quot;, &quot;systems_identified&quot;: 0, &quot;systems_total&quot;: 22}}}}&#10;  &#10;  stderr:&#10;  &#10;assert not [{'new_path': 'docs/source/originals/subpath_target.py', 'old_path': 'subpath_target.py', 'referenced_in': 'docs/plan/tools/validate_paths.py'}]">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-7/test_o...endent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-7/test_old_path_inside_its_new_p0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-3y47rb3g/claude-1000/pytest-of-usain/pytest-7/test_old_path_inside_its_new_p0')
+
+    def test_old_path_inside_its_new_path_is_not_stale(sandbox, tmp_path):
+        """An occurrence of an old path that is only a part of its own new path,
+        in the file that names the new path, is not a stale reference.
+    
+        DEC-456: the validator script names the new path
+        docs/source/originals/&lt;file&gt;, which contains the old path (the bare
+        file name) as a suffix.  Doctor reports it because the old path is
+        contained in the new one.  This is not a stale reference.
+    
+        Revised (W2-67, I4 §2.1; Rewrite-Reason: the result depends on every
+        tracked file's text): the case builds a small committed project of its
+        own instead of a copy of the whole tree, and runs this worktree's code
+        in it (DEC-732).  It reads doctor's ``path_compliance`` section, and a
+        control in the same project (a standalone reference to another moved
+        file) must be reported, so a doctor that reports nothing cannot pass.
+        """
+        project = w2_67_doctor.small_project(tmp_path / "repo")
+    
+        control_old = "control_target.py"
+        control_new = f"docs/source/originals/{control_old}"
+        (project / control_old).write_text("# control\n", encoding="utf-8")
+        support.commit_all(project, f"add {control_old}")
+        (project / control_new).parent.mkdir(parents=True, exist_ok=True)
+        (project / control_old).rename(project / control_new)
+        support.commit_all(project, f"move {control_old} to {control_new}")
+        (project / "notes.md").write_text(f"See {control_old} for the old layout.\n", encoding="utf-8")
+        support.commit_all(project, "a standalone reference to the control's old path")
+    
+        old_name = "subpath_target.py"
+        new_rel = f"docs/source/originals/{old_name}"
+    
+        old = project / old_name
+        old.write_text("# content\n", encoding="utf-8")
+        support.commit_all(project, f"add {old_name}")
+    
+        new = project / new_rel
+        new.parent.mkdir(parents=True, exist_ok=True)
+        old.rename(new)
+        support.commit_all(project, f"move {old_name} to {new_rel}")
+    
+        validator = project / "docs" / "plan" / "tools" / "validate_paths.py"
+        validator.parent.mkdir(parents=True, exist_ok=True)
+        validator.write_text(
+            f'FRAMEWORK_PATH = "{new_rel}"\n',
+            encoding="utf-8",
+        )
+        support.commit_all(project, "add validator referencing new path")
+    
+        run = w2_67_doctor.doctor(project, sandbox)
+        compliance = w2_67_doctor.section(run, "path_compliance")
+        references = compliance.get("moved_references")
+        assert isinstance(references, list), f"path_compliance.moved_references is not a list\n{run.describe()}"
+        assert any(ref.get("old_path") == control_old and ref.get("referenced_in") == "notes.md"
+                   for ref in references), (
+            f"the control's standalone reference to {control_old} in notes.md is not reported, so the "
+            f"stale-path check did not run on this project\n{run.describe()}"
+        )
+&gt;       assert not [ref for ref in references if old_name in str(ref.get("old_path"))], (
+            f"doctor reports {old_name} as a moved-path reference although it appears only as part of its own "
+            f"new path ({new_rel}) in the file that names the new path (DEC-456 point 3)\n{run.describe()}"
+        )
+E       AssertionError: doctor reports subpath_target.py as a moved-path reference although it appears only as part of its own new path (docs/source/originals/subpath_target.py) in the file that names the new path (DEC-456 point 3)
+E         gov doctor --json
+E         exit code: 3
+E         stdout:
+E         {"ok": false, "command": "doctor", "result": {}, "session": "", "error": {"code": "DOCTOR_UNHEALTHY", "message": "one or more health checks failed or reported drift: path_compliance", "details": {"healthy": false, "tools": {"status": "unmeasured", "reason": "no tool-registry.yaml", "tools": []}, "hooks": {"status": "unmeasured", "config_present": false, "binary_installed": false}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "fail", "moved_references": [{"old_path": "subpath_target.py", "new_path": "docs/source/originals/subpath_target.py", "referenced_in": "docs/plan/tools/validate_paths.py"}, {"old_path": "control_target.py", "new_path": "docs/source/originals/control_target.py", "referenced_in": "notes.md"}], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"], "embedding": "no namespace is embedded: no namespace of the path map says `embedding_policy: embedded`, so no file reaches the semantic vectors"}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "MINIMAL", "systems_identified": 0, "systems_total": 22}}}}
+E         
+E         stderr:
+E         
+E       assert not [{'new_path': 'docs/source/originals/subpath_target.py', 'old_path': 'subpath_target.py', 'referenced_in': 'docs/plan/tools/validate_paths.py'}]
+
+tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py:244: AssertionError</failure></testcase></testsuite></testsuites>

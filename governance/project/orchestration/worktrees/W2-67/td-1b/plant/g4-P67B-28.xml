@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="4.804" timestamp="2026-10-23T16:03:48.943575+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_recovery_check_r2" name="test_recovery_rebuild_command_not_unconditionally_exit_zero" time="2.003"><failure message="AssertionError: the check is not green on a clean store&#10;  exit code: 1&#10;  stdout: &#10;  stderr: mismatch: current=6b9d9c9bad2b7da065b39a4e2b7163c8003e646f5871a989c77d81b094b460ef rebuilt=28abe508d254fe2a8f016d9340d558bcdd96ab46dce8266d6a1426bf2e25c8e6&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='mismatch: current...4e2b7163c8003e646f5871a989c77d81b094b460ef rebuilt=28abe508d254fe2a8f016d9340d558bcdd96ab46dce8266d6a1426bf2e25c8e6\n').returncode">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_recovery_rebuild_command_0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_recovery_rebuild_command_0')
+
+    def test_recovery_rebuild_command_not_unconditionally_exit_zero(sandbox, tmp_path):
+        """The check command must not unconditionally exit 0 (CAP-38.b).
+    
+        A command that computes one digest and calls ``exit(0)`` without
+        comparing two values is a fail-open: it cannot detect a mismatch
+        between the current store and a clean rebuild.  Run on the same
+        project, it exits 0 on the clean store and non-zero once it is
+        tampered with.
+        """
+        project = _rebuilt_project(tmp_path, sandbox)
+        clean = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+&gt;       assert clean.returncode == 0, f"the check is not green on a clean store\n{_outcome(clean)}"
+E       AssertionError: the check is not green on a clean store
+E         exit code: 1
+E         stdout: 
+E         stderr: mismatch: current=6b9d9c9bad2b7da065b39a4e2b7163c8003e646f5871a989c77d81b094b460ef rebuilt=28abe508d254fe2a8f016d9340d558bcdd96ab46dce8266d6a1426bf2e25c8e6
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='mismatch: current...4e2b7163c8003e646f5871a989c77d81b094b460ef rebuilt=28abe508d254fe2a8f016d9340d558bcdd96ab46dce8266d6a1426bf2e25c8e6\n').returncode
+
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:114: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_recovery_check_r2" name="test_recovery_rebuild_command_exits_nonzero_on_tampered_store" time="2.771"><failure message="AssertionError: the check is not green on the clean store (the control)&#10;  exit code: 1&#10;  stdout: &#10;  stderr: mismatch: current=91397b35cca77795085c529480361969df2ada64be7d00d7595d27cf379964ec rebuilt=12da07e0d8484a2df6635b675409f01038051d1516ec2150279cb70e377a84fd&#10;  &#10;assert 1 == 0&#10; +  where 1 = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='mismatch: current...9480361969df2ada64be7d00d7595d27cf379964ec rebuilt=12da07e0d8484a2df6635b675409f01038051d1516ec2150279cb70e377a84fd\n').returncode">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_recovery_rebuild_command_1/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-45/test_recovery_rebuild_command_1')
+
+    def test_recovery_rebuild_command_exits_nonzero_on_tampered_store(sandbox, tmp_path):
+        """After tampering with store.db, the check must exit non-zero.
+    
+        A correct implementation deletes derived state (in a throwaway copy),
+        rebuilds, and compares digests.  A tampered store has a different
+        digest from a clean rebuild.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+        """
+        project = _rebuilt_project(tmp_path, sandbox)
+        control = _run_check_command(project, sandbox, code_root=support.REPO_ROOT)
+&gt;       assert control.returncode == 0, f"the check is not green on the clean store (the control)\n{_outcome(control)}"
+E       AssertionError: the check is not green on the clean store (the control)
+E         exit code: 1
+E         stdout: 
+E         stderr: mismatch: current=91397b35cca77795085c529480361969df2ada64be7d00d7595d27cf379964ec rebuilt=12da07e0d8484a2df6635b675409f01038051d1516ec2150279cb70e377a84fd
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['sh', '-c', 'python3 -m gov.rebuild.check'], returncode=1, stdout='', stderr='mismatch: current...9480361969df2ada64be7d00d7595d27cf379964ec rebuilt=12da07e0d8484a2df6635b675409f01038051d1516ec2150279cb70e377a84fd\n').returncode
+
+tests/acceptance/W1-27/test_w1_27_recovery_check_r2.py:140: AssertionError</failure></testcase></testsuite></testsuites>

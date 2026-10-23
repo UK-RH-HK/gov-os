@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.421" timestamp="2026-10-23T16:01:39.413746+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_recreates_derived_stores" time="0.380"><failure message="AssertionError: rebuild did not recreate the store&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;0000000000000000000000000000000000000000000000000000000000000000&quot;, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;planted&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;not_recreated&quot;, &quot;reason&quot;: &quot;planted&quot;}}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert False&#10; +  where False = is_file()&#10; +    where is_file = ((PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-42/test_rebuild_recreates_derived0/repo') / '.gov-runtime') / 'store.db').is_file">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-42/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-42/test_rebuild_recreates_derived0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-42/test_rebuild_recreates_derived0')
+
+    def test_rebuild_recreates_derived_stores(sandbox, tmp_path):
+        """After rebuild, the derived stores under ``.gov-runtime/`` exist.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): it checked that ``.gov-runtime`` exists only.
+        The store is now removed after a first rebuild, and the second must
+        recreate it: its lexical index holds the project's document, and the
+        result names the lexical store recreated.
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+        w2_67b_support.write_committed(project, "docs/guide.md", "a document the lexical index holds\n")
+        w2_67b_support.rebuild(project, sandbox)
+        shutil.rmtree(project / ".gov-runtime", ignore_errors=True)
+        run, result = w2_67b_support.rebuild(project, sandbox)
+        assert (result.get("stores") or {}).get("lexical", {}).get("status") == "recreated", (
+            f"the result does not name the lexical store recreated\n{run.describe()}"
+        )
+&gt;       assert (project / ".gov-runtime" / "store.db").is_file(), f"rebuild did not recreate the store\n{run.describe()}"
+E       AssertionError: rebuild did not recreate the store
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "0000000000000000000000000000000000000000000000000000000000000000", "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "not_recreated", "reason": "planted"}, "codeintel": {"status": "not_recreated", "reason": "planted"}}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert False
+E        +  where False = is_file()
+E        +    where is_file = ((PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-42/test_rebuild_recreates_derived0/repo') / '.gov-runtime') / 'store.db').is_file
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:74: AssertionError</failure></testcase></testsuite></testsuites>

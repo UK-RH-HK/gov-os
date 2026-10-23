@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.735" timestamp="2026-10-23T16:00:46.015080+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_rebuild" name="test_rebuild_needs_only_git" time="0.681"><failure message="AssertionError: standard output is not one JSON document&#10;gov rebuild --json&#10;exit code: 1&#10;stdout:&#10;&#10;stderr:&#10;Traceback (most recent call last):&#10;  File &quot;/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-35/test_rebuild_needs_only_git0/sandbox/bin/gov&quot;, line 12, in &lt;module&gt;&#10;    sys.exit(_target())&#10;             ^^^^^^^^^&#10;  File &quot;/home/usain/gov-os-worktrees/W2-67/src/gov/cli/main.py&quot;, line 217, in main&#10;    outcome = command.handler(root, args, config)&#10;              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;  File &quot;/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-1b/plant/w2_67b_child.py&quot;, line 127, in planted&#10;    raise RuntimeError(&quot;planted: no earlier store&quot;)&#10;RuntimeError: planted: no earlier store">sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-35/test_...ependent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-35/test_rebuild_needs_only_git0/sandbox/elsewhere'))
+tmp_path = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-35/test_rebuild_needs_only_git0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7cfab3382480&gt;
+
+    def test_rebuild_needs_only_git(sandbox, tmp_path, monkeypatch):
+        """Rebuild works with only the content in git, nothing else.
+    
+        A fresh tiny project (no .gov-runtime, no external state) must
+        rebuild successfully. This proves rebuild draws only from git.
+    
+        Revised after implementation: rebuild goes through the lexical index's
+        owner and its secrets filter (DEC-440); the fixture's size, not the
+        behaviour, made it time out.
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what
+        the case's name claims): the folder it deleted never existed, and it ran
+        with every tool of the machine on PATH.  A first rebuild now leaves a
+        ``.gov-runtime``, which is removed, and the second runs with a PATH that
+        holds git and the secrets filter's gitleaks alone (the lexical index's
+        owner runs that filter on every file and fails closed without it,
+        DEC-440); it must succeed and recreate the lexical store.
+        """
+        project = w2_67b_support.rebuild_project(tmp_path / "repo")
+&gt;       w2_67b_support.rebuild(project, sandbox)
+
+tests/acceptance/W1-27/test_w1_27_rebuild.py:165: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-27/w2_67b_support.py:55: in rebuild
+    envelope = support.assert_envelope(run, w2_67_doctor.interface(), command="rebuild")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-07/w1_07_support.py:438: in assert_envelope
+    envelope = run.envelope()
+               ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = Run(args=('rebuild', '--json'), returncode=1, stdout='', stderr='Traceback (most recent call last):\n  File "/tmp/gov-...aise RuntimeError("planted: no earlier store")\nRuntimeError: planted: no earlier store\n', seconds=0.6566419799346477)
+
+    def envelope(self):
+        """Standard output as one JSON object."""
+        try:
+            data = json.loads(self.stdout)
+        except ValueError:
+&gt;           raise AssertionError(f"standard output is not one JSON document\n{self.describe()}") from None
+E           AssertionError: standard output is not one JSON document
+E           gov rebuild --json
+E           exit code: 1
+E           stdout:
+E           
+E           stderr:
+E           Traceback (most recent call last):
+E             File "/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-35/test_rebuild_needs_only_git0/sandbox/bin/gov", line 12, in &lt;module&gt;
+E               sys.exit(_target())
+E                        ^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-67/src/gov/cli/main.py", line 217, in main
+E               outcome = command.handler(root, args, config)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E             File "/home/usain/gov-os-worktrees/W2-67/.gov-runtime/scratch/td-1b/plant/w2_67b_child.py", line 127, in planted
+E               raise RuntimeError("planted: no earlier store")
+E           RuntimeError: planted: no earlier store
+
+tests/acceptance/W1-07/w1_07_support.py:399: AssertionError</failure></testcase></testsuite></testsuites>

@@ -37,14 +37,14 @@ echo "clone rebuilt" >> "$OUT/run.txt"
 ENTRIES=$(python3 -c "import sys; sys.path.insert(0, 'src'); from gov.close.pytest_plugin.gov_close_serial_only import entries; print('\n'.join(entries(__import__('pathlib').Path('.'))))")
 start=$(date +%s)
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
-  flock /tmp/gov-os-verify.lock python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:-} \
+  flock /tmp/gov-os-verify.lock python3 -m pytest tests -n auto -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
   --junitxml="$OUT/parallel.xml" > "$OUT/parallel.txt" 2>&1
 p_exit=$?
 mid=$(date +%s)
 # shellcheck disable=SC2086
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH="$CLONE/src:$PLUG" GOV_CLOSE_SERIAL_ONLY_OF="$CLONE" \
   GOV_CLOSE_SERIAL_ONLY_GIVEN="$ENTRIES" \
-  flock /tmp/gov-os-verify.lock python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:-} \
+  flock /tmp/gov-os-verify.lock python3 -m pytest $ENTRIES -q -p no:cacheprovider --no-header -p gov_close_serial_only ${NIGHTLY_PYTEST_EXTRA:--o tmp_path_retention_policy=failed} \
   --junitxml="$OUT/serial.xml" > "$OUT/serial.txt" 2>&1
 s_exit=$?
 end=$(date +%s)

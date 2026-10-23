@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="4" time="4.171" timestamp="2026-10-23T16:13:50.159565+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w1_27_doctor_r7" name="test_home_tool_wrong_sha256_not_ok[sqlite-vec]" time="1.515"><failure message="AssertionError: sha256_match is true for sqlite-vec with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)&#10;  entry: {'name': 'sqlite-vec', 'pinned_version': '0.1.9', 'found_version': None, 'sha256_match': True, 'ok': True}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;tools&quot;: [{&quot;name&quot;: &quot;sqlite-vec&quot;, &quot;pinned_version&quot;: &quot;0.1.9&quot;, &quot;found_version&quot;: null, &quot;sha256_match&quot;: true, &quot;ok&quot;: true}]}, &quot;hooks&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;config_present&quot;: true, &quot;binary_installed&quot;: true}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;INTERMEDIATE&quot;, &quot;systems_identified&quot;: 15, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert True is not True&#10; +  where True = &lt;built-in method get of dict object at 0x7b150499b040&gt;('sha256_match')&#10; +    where &lt;built-in method get of dict object at 0x7b150499b040&gt; = {'found_version': None, 'name': 'sqlite-vec', 'ok': True, 'pinned_version': '0.1.9', ...}.get">gov = &lt;function gov.&lt;locals&gt;._gov at 0x7b150494ff60&gt;
+project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no0/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no0/sandbox/elsewhere'))
+name = 'sqlite-vec', version = '0.1.9'
+home_path_fn = &lt;function &lt;lambda&gt; at 0x7b150494efc0&gt;
+
+    @pytest.mark.parametrize("name,version,home_path_fn", HOME_TOOLS)
+    def test_home_tool_wrong_sha256_not_ok(
+        gov, project, sandbox, name, version, home_path_fn,
+    ):
+        """An entry for a tool under the home with a wrong sha256:
+        ``sha256_match`` is not true and ``ok`` is not true (no version can
+        be read for any of these tools, and the hash does not match).
+    
+        Fake content is placed under the sandbox home at the path the code
+        should check.  On this machine, the code uses ``_real_home()`` and
+        finds the real installation, falsely reporting ``sha256_match: true``;
+        on a clean machine, absent → ``sha256_match: false`` (the assertion
+        passes, masking the bug).
+    
+        DEC-452: a tool passes only when the version read equals the pin, or
+        the file's hash equals the pinned hash.
+        DEC-425: sha256_match must not be true when no hash was computed.
+    
+        RED on this machine (the real tool is installed under the real home).
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the planted input is not where
+        doctor reads it): it placed only a ``placeholder`` file, so every branch
+        answered "not found" before any hash was compared.  The case now places
+        the file each branch reads, with fake content (``vec0.so``; an Ollama
+        manifest naming a model blob; the venv's ``bin/python``; the
+        ``model.safetensors`` at the pinned revision), under the sandbox home,
+        which doctor reads; the entry must then be not ok with a reason other
+        than absence.
+        """
+        fake_dir = home_path_fn(sandbox.home)
+        fake_dir.mkdir(parents=True, exist_ok=True)
+        (fake_dir / "placeholder").write_text(
+            "fake content for testing\n", encoding="utf-8",
+        )
+        _place_the_file_doctor_reads(name, version, fake_dir)
+    
+        wrong_sha = "0" * 64
+        registry = support.tool_entry_yaml(
+            name, version, wrong_sha,
+            install="echo install", uninstall="echo uninstall",
+            date="2026-01-01", approved_by="test",
+        )
+        support.write_tool_registry(project, registry)
+    
+        run = gov("doctor", "--json")
+        envelope = run.envelope()
+        sections = _doctor_sections(envelope)
+        entry = _find_tool_entry(sections, name)
+    
+        assert entry is not None, (
+            f"doctor has no entry for {name}\n"
+            f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+        )
+&gt;       assert entry.get("sha256_match") is not True, (
+            f"sha256_match is true for {name} with a wrong pin ({wrong_sha}) "
+            f"— no hash was computed, so sha256_match must not be true "
+            f"(DEC-425)\n"
+            f"entry: {entry}\n{run.describe()}"
+        )
+E       AssertionError: sha256_match is true for sqlite-vec with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)
+E         entry: {'name': 'sqlite-vec', 'pinned_version': '0.1.9', 'found_version': None, 'sha256_match': True, 'ok': True}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "pass", "tools": [{"name": "sqlite-vec", "pinned_version": "0.1.9", "found_version": null, "sha256_match": true, "ok": true}]}, "hooks": {"status": "pass", "config_present": true, "binary_installed": true}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "INTERMEDIATE", "systems_identified": 15, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert True is not True
+E        +  where True = &lt;built-in method get of dict object at 0x7b150499b040&gt;('sha256_match')
+E        +    where &lt;built-in method get of dict object at 0x7b150499b040&gt; = {'found_version': None, 'name': 'sqlite-vec', 'ok': True, 'pinned_version': '0.1.9', ...}.get
+
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py:531: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_doctor_r7" name="test_home_tool_wrong_sha256_not_ok[qwen3-embedding]" time="0.874"><failure message="AssertionError: sha256_match is true for qwen3-embedding with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)&#10;  entry: {'name': 'qwen3-embedding', 'pinned_version': '0.6b', 'found_version': None, 'sha256_match': True, 'ok': True}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;tools&quot;: [{&quot;name&quot;: &quot;qwen3-embedding&quot;, &quot;pinned_version&quot;: &quot;0.6b&quot;, &quot;found_version&quot;: null, &quot;sha256_match&quot;: true, &quot;ok&quot;: true}]}, &quot;hooks&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;config_present&quot;: true, &quot;binary_installed&quot;: true}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;INTERMEDIATE&quot;, &quot;systems_identified&quot;: 15, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert True is not True&#10; +  where True = &lt;built-in method get of dict object at 0x7b1504774580&gt;('sha256_match')&#10; +    where &lt;built-in method get of dict object at 0x7b1504774580&gt; = {'found_version': None, 'name': 'qwen3-embedding', 'ok': True, 'pinned_version': '0.6b', ...}.get">gov = &lt;function gov.&lt;locals&gt;._gov at 0x7b15047b42c0&gt;
+project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no1/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no1/sandbox/elsewhere'))
+name = 'qwen3-embedding', version = '0.6b'
+home_path_fn = &lt;function &lt;lambda&gt; at 0x7b150494f060&gt;
+
+    @pytest.mark.parametrize("name,version,home_path_fn", HOME_TOOLS)
+    def test_home_tool_wrong_sha256_not_ok(
+        gov, project, sandbox, name, version, home_path_fn,
+    ):
+        """An entry for a tool under the home with a wrong sha256:
+        ``sha256_match`` is not true and ``ok`` is not true (no version can
+        be read for any of these tools, and the hash does not match).
+    
+        Fake content is placed under the sandbox home at the path the code
+        should check.  On this machine, the code uses ``_real_home()`` and
+        finds the real installation, falsely reporting ``sha256_match: true``;
+        on a clean machine, absent → ``sha256_match: false`` (the assertion
+        passes, masking the bug).
+    
+        DEC-452: a tool passes only when the version read equals the pin, or
+        the file's hash equals the pinned hash.
+        DEC-425: sha256_match must not be true when no hash was computed.
+    
+        RED on this machine (the real tool is installed under the real home).
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the planted input is not where
+        doctor reads it): it placed only a ``placeholder`` file, so every branch
+        answered "not found" before any hash was compared.  The case now places
+        the file each branch reads, with fake content (``vec0.so``; an Ollama
+        manifest naming a model blob; the venv's ``bin/python``; the
+        ``model.safetensors`` at the pinned revision), under the sandbox home,
+        which doctor reads; the entry must then be not ok with a reason other
+        than absence.
+        """
+        fake_dir = home_path_fn(sandbox.home)
+        fake_dir.mkdir(parents=True, exist_ok=True)
+        (fake_dir / "placeholder").write_text(
+            "fake content for testing\n", encoding="utf-8",
+        )
+        _place_the_file_doctor_reads(name, version, fake_dir)
+    
+        wrong_sha = "0" * 64
+        registry = support.tool_entry_yaml(
+            name, version, wrong_sha,
+            install="echo install", uninstall="echo uninstall",
+            date="2026-01-01", approved_by="test",
+        )
+        support.write_tool_registry(project, registry)
+    
+        run = gov("doctor", "--json")
+        envelope = run.envelope()
+        sections = _doctor_sections(envelope)
+        entry = _find_tool_entry(sections, name)
+    
+        assert entry is not None, (
+            f"doctor has no entry for {name}\n"
+            f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+        )
+&gt;       assert entry.get("sha256_match") is not True, (
+            f"sha256_match is true for {name} with a wrong pin ({wrong_sha}) "
+            f"— no hash was computed, so sha256_match must not be true "
+            f"(DEC-425)\n"
+            f"entry: {entry}\n{run.describe()}"
+        )
+E       AssertionError: sha256_match is true for qwen3-embedding with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)
+E         entry: {'name': 'qwen3-embedding', 'pinned_version': '0.6b', 'found_version': None, 'sha256_match': True, 'ok': True}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "pass", "tools": [{"name": "qwen3-embedding", "pinned_version": "0.6b", "found_version": null, "sha256_match": true, "ok": true}]}, "hooks": {"status": "pass", "config_present": true, "binary_installed": true}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "INTERMEDIATE", "systems_identified": 15, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert True is not True
+E        +  where True = &lt;built-in method get of dict object at 0x7b1504774580&gt;('sha256_match')
+E        +    where &lt;built-in method get of dict object at 0x7b1504774580&gt; = {'found_version': None, 'name': 'qwen3-embedding', 'ok': True, 'pinned_version': '0.6b', ...}.get
+
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py:531: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_doctor_r7" name="test_home_tool_wrong_sha256_not_ok[reranker-venv]" time="0.890"><failure message="AssertionError: sha256_match is true for reranker-venv with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)&#10;  entry: {'name': 'reranker-venv', 'pinned_version': 'sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0', 'found_version': None, 'sha256_match': True, 'ok': True}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;tools&quot;: [{&quot;name&quot;: &quot;reranker-venv&quot;, &quot;pinned_version&quot;: &quot;sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0&quot;, &quot;found_version&quot;: null, &quot;sha256_match&quot;: true, &quot;ok&quot;: true}]}, &quot;hooks&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;config_present&quot;: true, &quot;binary_installed&quot;: true}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;INTERMEDIATE&quot;, &quot;systems_identified&quot;: 15, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert True is not True&#10; +  where True = &lt;built-in method get of dict object at 0x7b1504842100&gt;('sha256_match')&#10; +    where &lt;built-in method get of dict object at 0x7b1504842100&gt; = {'found_version': None, 'name': 'reranker-venv', 'ok': True, 'pinned_version': 'sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0', ...}.get">gov = &lt;function gov.&lt;locals&gt;._gov at 0x7b15047b4360&gt;
+project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no2/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no2/sandbox/elsewhere'))
+name = 'reranker-venv'
+version = 'sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0'
+home_path_fn = &lt;function &lt;lambda&gt; at 0x7b150494f100&gt;
+
+    @pytest.mark.parametrize("name,version,home_path_fn", HOME_TOOLS)
+    def test_home_tool_wrong_sha256_not_ok(
+        gov, project, sandbox, name, version, home_path_fn,
+    ):
+        """An entry for a tool under the home with a wrong sha256:
+        ``sha256_match`` is not true and ``ok`` is not true (no version can
+        be read for any of these tools, and the hash does not match).
+    
+        Fake content is placed under the sandbox home at the path the code
+        should check.  On this machine, the code uses ``_real_home()`` and
+        finds the real installation, falsely reporting ``sha256_match: true``;
+        on a clean machine, absent → ``sha256_match: false`` (the assertion
+        passes, masking the bug).
+    
+        DEC-452: a tool passes only when the version read equals the pin, or
+        the file's hash equals the pinned hash.
+        DEC-425: sha256_match must not be true when no hash was computed.
+    
+        RED on this machine (the real tool is installed under the real home).
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the planted input is not where
+        doctor reads it): it placed only a ``placeholder`` file, so every branch
+        answered "not found" before any hash was compared.  The case now places
+        the file each branch reads, with fake content (``vec0.so``; an Ollama
+        manifest naming a model blob; the venv's ``bin/python``; the
+        ``model.safetensors`` at the pinned revision), under the sandbox home,
+        which doctor reads; the entry must then be not ok with a reason other
+        than absence.
+        """
+        fake_dir = home_path_fn(sandbox.home)
+        fake_dir.mkdir(parents=True, exist_ok=True)
+        (fake_dir / "placeholder").write_text(
+            "fake content for testing\n", encoding="utf-8",
+        )
+        _place_the_file_doctor_reads(name, version, fake_dir)
+    
+        wrong_sha = "0" * 64
+        registry = support.tool_entry_yaml(
+            name, version, wrong_sha,
+            install="echo install", uninstall="echo uninstall",
+            date="2026-01-01", approved_by="test",
+        )
+        support.write_tool_registry(project, registry)
+    
+        run = gov("doctor", "--json")
+        envelope = run.envelope()
+        sections = _doctor_sections(envelope)
+        entry = _find_tool_entry(sections, name)
+    
+        assert entry is not None, (
+            f"doctor has no entry for {name}\n"
+            f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+        )
+&gt;       assert entry.get("sha256_match") is not True, (
+            f"sha256_match is true for {name} with a wrong pin ({wrong_sha}) "
+            f"— no hash was computed, so sha256_match must not be true "
+            f"(DEC-425)\n"
+            f"entry: {entry}\n{run.describe()}"
+        )
+E       AssertionError: sha256_match is true for reranker-venv with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)
+E         entry: {'name': 'reranker-venv', 'pinned_version': 'sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0', 'found_version': None, 'sha256_match': True, 'ok': True}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "pass", "tools": [{"name": "reranker-venv", "pinned_version": "sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0", "found_version": null, "sha256_match": true, "ok": true}]}, "hooks": {"status": "pass", "config_present": true, "binary_installed": true}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "INTERMEDIATE", "systems_identified": 15, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert True is not True
+E        +  where True = &lt;built-in method get of dict object at 0x7b1504842100&gt;('sha256_match')
+E        +    where &lt;built-in method get of dict object at 0x7b1504842100&gt; = {'found_version': None, 'name': 'reranker-venv', 'ok': True, 'pinned_version': 'sentence-transformers 6.1.0, torch 2.14.1+cu130, transformers 5.18.0, huggingface-hub 1.33.0', ...}.get
+
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py:531: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w1_27_doctor_r7" name="test_home_tool_wrong_sha256_not_ok[reranker]" time="0.848"><failure message="AssertionError: sha256_match is true for reranker with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)&#10;  entry: {'name': 'reranker', 'pinned_version': 'Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473', 'found_version': None, 'sha256_match': True, 'ok': True}&#10;  gov doctor --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;doctor&quot;, &quot;result&quot;: {&quot;healthy&quot;: true, &quot;tools&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;tools&quot;: [{&quot;name&quot;: &quot;reranker&quot;, &quot;pinned_version&quot;: &quot;Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473&quot;, &quot;found_version&quot;: null, &quot;sha256_match&quot;: true, &quot;ok&quot;: true}]}, &quot;hooks&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;config_present&quot;: true, &quot;binary_installed&quot;: true}, &quot;path_map&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;unclassified_count&quot;: 0, &quot;unclassified&quot;: []}, &quot;path_compliance&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;moved_references&quot;: [], &quot;historical_excluded&quot;: 0}, &quot;index_freshness&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;index_status&quot;: &quot;missing&quot;, &quot;stale&quot;: []}, &quot;canaries&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;indices&quot;: {&quot;lexical&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}, &quot;semantic&quot;: {&quot;passed&quot;: false, &quot;status&quot;: &quot;FACET_UNAVAILABLE&quot;, &quot;misses&quot;: [&quot;juniper lantern protocol sentinel&quot;]}}}, &quot;framework_lock&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;match&quot;: &quot;MISSING&quot;, &quot;reason&quot;: &quot;no framework.lock&quot;}, &quot;isolation&quot;: {&quot;status&quot;: &quot;unmeasured&quot;, &quot;isolated&quot;: null, &quot;method&quot;: &quot;runtime_parent_matches_git_root&quot;, &quot;reason&quot;: &quot;no .gov-runtime directory&quot;}, &quot;claude_code&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;drift&quot;: false, &quot;cli_version&quot;: &quot;2.1.292&quot;, &quot;cli_sha256&quot;: &quot;a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3&quot;, &quot;extension_version&quot;: null, &quot;extension_binary_sha256&quot;: null, &quot;pinned_version&quot;: null, &quot;pinned_sha256&quot;: null, &quot;issues&quot;: []}, &quot;held_out&quot;: {&quot;status&quot;: &quot;report&quot;, &quot;missing&quot;: true, &quot;reason&quot;: &quot;governance/project/held-out.yaml is missing&quot;}, &quot;adoption_level&quot;: {&quot;status&quot;: &quot;pass&quot;, &quot;level&quot;: &quot;INTERMEDIATE&quot;, &quot;systems_identified&quot;: 15, &quot;systems_total&quot;: 22}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert True is not True&#10; +  where True = &lt;built-in method get of dict object at 0x7b1504851480&gt;('sha256_match')&#10; +    where &lt;built-in method get of dict object at 0x7b1504851480&gt; = {'found_version': None, 'name': 'reranker', 'ok': True, 'pinned_version': 'Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473', ...}.get">gov = &lt;function gov.&lt;locals&gt;._gov at 0x7b15047b44a0&gt;
+project = PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no3/repo')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-launch-independent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_...ndent-test-designer-guf4c97v/claude-1000/pytest-of-usain/pytest-52/test_home_tool_wrong_sha256_no3/sandbox/elsewhere'))
+name = 'reranker'
+version = 'Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473'
+home_path_fn = &lt;function &lt;lambda&gt; at 0x7b150494f1a0&gt;
+
+    @pytest.mark.parametrize("name,version,home_path_fn", HOME_TOOLS)
+    def test_home_tool_wrong_sha256_not_ok(
+        gov, project, sandbox, name, version, home_path_fn,
+    ):
+        """An entry for a tool under the home with a wrong sha256:
+        ``sha256_match`` is not true and ``ok`` is not true (no version can
+        be read for any of these tools, and the hash does not match).
+    
+        Fake content is placed under the sandbox home at the path the code
+        should check.  On this machine, the code uses ``_real_home()`` and
+        finds the real installation, falsely reporting ``sha256_match: true``;
+        on a clean machine, absent → ``sha256_match: false`` (the assertion
+        passes, masking the bug).
+    
+        DEC-452: a tool passes only when the version read equals the pin, or
+        the file's hash equals the pinned hash.
+        DEC-425: sha256_match must not be true when no hash was computed.
+    
+        RED on this machine (the real tool is installed under the real home).
+    
+        Revised (W2-67, I4 F1; Rewrite-Reason: the planted input is not where
+        doctor reads it): it placed only a ``placeholder`` file, so every branch
+        answered "not found" before any hash was compared.  The case now places
+        the file each branch reads, with fake content (``vec0.so``; an Ollama
+        manifest naming a model blob; the venv's ``bin/python``; the
+        ``model.safetensors`` at the pinned revision), under the sandbox home,
+        which doctor reads; the entry must then be not ok with a reason other
+        than absence.
+        """
+        fake_dir = home_path_fn(sandbox.home)
+        fake_dir.mkdir(parents=True, exist_ok=True)
+        (fake_dir / "placeholder").write_text(
+            "fake content for testing\n", encoding="utf-8",
+        )
+        _place_the_file_doctor_reads(name, version, fake_dir)
+    
+        wrong_sha = "0" * 64
+        registry = support.tool_entry_yaml(
+            name, version, wrong_sha,
+            install="echo install", uninstall="echo uninstall",
+            date="2026-01-01", approved_by="test",
+        )
+        support.write_tool_registry(project, registry)
+    
+        run = gov("doctor", "--json")
+        envelope = run.envelope()
+        sections = _doctor_sections(envelope)
+        entry = _find_tool_entry(sections, name)
+    
+        assert entry is not None, (
+            f"doctor has no entry for {name}\n"
+            f"tools section: {sections.get('tools', {})}\n{run.describe()}"
+        )
+&gt;       assert entry.get("sha256_match") is not True, (
+            f"sha256_match is true for {name} with a wrong pin ({wrong_sha}) "
+            f"— no hash was computed, so sha256_match must not be true "
+            f"(DEC-425)\n"
+            f"entry: {entry}\n{run.describe()}"
+        )
+E       AssertionError: sha256_match is true for reranker with a wrong pin (0000000000000000000000000000000000000000000000000000000000000000) — no hash was computed, so sha256_match must not be true (DEC-425)
+E         entry: {'name': 'reranker', 'pinned_version': 'Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473', 'found_version': None, 'sha256_match': True, 'ok': True}
+E         gov doctor --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "doctor", "result": {"healthy": true, "tools": {"status": "pass", "tools": [{"name": "reranker", "pinned_version": "Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473", "found_version": null, "sha256_match": true, "ok": true}]}, "hooks": {"status": "pass", "config_present": true, "binary_installed": true}, "path_map": {"status": "pass", "unclassified_count": 0, "unclassified": []}, "path_compliance": {"status": "pass", "moved_references": [], "historical_excluded": 0}, "index_freshness": {"status": "unmeasured", "index_status": "missing", "stale": []}, "canaries": {"status": "unmeasured", "indices": {"lexical": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}, "semantic": {"passed": false, "status": "FACET_UNAVAILABLE", "misses": ["juniper lantern protocol sentinel"]}}}, "framework_lock": {"status": "unmeasured", "match": "MISSING", "reason": "no framework.lock"}, "isolation": {"status": "unmeasured", "isolated": null, "method": "runtime_parent_matches_git_root", "reason": "no .gov-runtime directory"}, "claude_code": {"status": "pass", "drift": false, "cli_version": "2.1.292", "cli_sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3", "extension_version": null, "extension_binary_sha256": null, "pinned_version": null, "pinned_sha256": null, "issues": []}, "held_out": {"status": "report", "missing": true, "reason": "governance/project/held-out.yaml is missing"}, "adoption_level": {"status": "pass", "level": "INTERMEDIATE", "systems_identified": 15, "systems_total": 22}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert True is not True
+E        +  where True = &lt;built-in method get of dict object at 0x7b1504851480&gt;('sha256_match')
+E        +    where &lt;built-in method get of dict object at 0x7b1504851480&gt; = {'found_version': None, 'name': 'reranker', 'ok': True, 'pinned_version': 'Qwen/Qwen3-Reranker-0.6B@e61197ed45024b0ed8a2d74b80b4d909f1255473', ...}.get
+
+tests/acceptance/W1-27/test_w1_27_doctor_r7.py:531: AssertionError</failure></testcase></testsuite></testsuites>
