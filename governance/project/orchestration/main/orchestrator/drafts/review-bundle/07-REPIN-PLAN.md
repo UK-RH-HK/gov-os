@@ -21,6 +21,7 @@
   4. **Just before the re-pin, W2-59 and W2-65 merge together.** Each first merges `w2/integrate` back with trailers and is re-verified (DEC-884). An earlier merge of either still needs a package first.
   5. `tools/probe_impact.py` after every merge (DEC-895). A FULL ticket whose probe went stale gets its fresh probe before the re-pin.
 - **The owner's acts, in order** (one ACT ping, with the exact commands and their checks):
+  0. **The pin's environment includes pytest-timeout 2.4.0** (the same wheel as the leads' install, DEC-892 b), so the close's per-test limit works under the pin.
   1. **The re-pin itself:** build the wheel at the merge commit that holds all six, install it under a new pin folder named for that commit (as `pin-fecb870c` is for today's), and point `~/.local/bin/gov` at it.
   2. **The settings regeneration** (DEC-884). If P-I1-2 is taken, it drops the `docs/source` read-deny rules, which protect a folder that left the tree on 2026-10-01.
   3. **A smoke run** of the pinned `gov check` and one guard decision, which I run and report.

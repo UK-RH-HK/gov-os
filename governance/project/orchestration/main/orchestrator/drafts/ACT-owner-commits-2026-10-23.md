@@ -44,4 +44,21 @@ git diff --stat
 git commit -m "Owner decision DEC-900: W1-42's RETR-X-02 case and governance-share case retired with both accepted_reds entries (AR-9 ruled: the stated gap)" --trailer "Task: decision-record" --trailer "Role: owner" -- governance/project/path-map.yaml tests/acceptance/W1-42/README.md tests/acceptance/W1-42/test_w1_42_exit_report.py
 ```
 
-After both: `git status --short` shows nothing. The orchestrator then runs its record checks and sees the next close's ratchet read the shorter lists.
+## The install for W2-66: pytest-timeout 2.4.0 (DEC-892 b, DEC-889 item 13)
+
+W2-66's per-test limit uses pytest-timeout with the signal method, which the tool trials measured.
+- **Wheel:** sha256 `c42667e5cdadb151aeb5b26d114aff6bdf5a907f176a007a30b940d3d865b5c2`, as in the trial install.
+- **Where:** the user site of `/usr/bin/python3`, where pytest and pytest-xdist live, so the leads' and workers' runs load it.
+- **Behaviour:** installed, it changes no run that does not pass `--timeout`.
+- **Requirement file:** `drafts/pytest-timeout-requirements.txt`, one line, with the hash.
+
+```
+/usr/bin/python3 -m pip install --user --break-system-packages --require-hashes -r /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/drafts/pytest-timeout-requirements.txt
+/usr/bin/python3 -c "import pytest_timeout; print(pytest_timeout.__file__)"
+```
+
+**After it:**
+- I record it in `governance/project/tool-registry.yaml` (approved by DEC-892), in the form of pytest-xdist's entry.
+- The close runs from the pin's own environment, so the first re-pin's environment gets the same wheel. I add that to the re-pin plan's acts.
+
+After both commits: `git status --short` shows nothing. The orchestrator then runs its record checks and sees the next close's ratchet read the shorter lists.

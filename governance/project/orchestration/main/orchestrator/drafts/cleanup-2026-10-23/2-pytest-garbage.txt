@@ -1,0 +1,2 @@
+/tmp/pytest-of-usain/garbage-59a0ebda-66f4-4522-803a-7853fb584e6a
+/tmp/pytest-of-usain/garbage-eafd88aa-0899-4fb6-be09-d5836f92da2e
