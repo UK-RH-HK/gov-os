@@ -19,16 +19,6 @@ allowed_paths:
 - src/gov/adapters/portability.py
 - src/gov/doctor/command.py
 - src/gov/close/serial.py
-- tests/acceptance/serial-only.txt
-- tests/acceptance/W1-30/test_w1_30_r11_declared_here.py
-- tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py
-- tests/acceptance/W1-38/**
-- tests/acceptance/W1-33/w1_33_support.py
-- tests/acceptance/W1-07/**
-- tests/acceptance/W1-46/**
-- tests/acceptance/W1-50/**
-- tests/acceptance/W1-02/**
-- tests/acceptance/W2-57/**
 - tests/unit/close/test_serial*
 - tests/unit/adapters/test_portability*
 - docs/changes/W2-57-CIT-E.md
@@ -75,3 +65,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-57). Sources: DEC-813, DEC-823, DEC-883 
 - **Until it lands (the orchestrator's interim guard, no product change):** the close queue checks that a close's skip count equals the expected 31, so a silent rulesync skip stops the queue (P-IS-6, from I4 F2).
 - **Route out for every entry:** P-IS-6's second table. The two `accepted_reds` are W1-42's, not this ticket's (P-IS-8).
 - **The 28 entries that name list rows** rather than a ticket are outside W2-19's check. Their removal rests on the orchestrator's commit, on the dates DEC-890 gives rows (P-IS-6, the W2-57 block).
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/serial-only.txt`, `tests/acceptance/W1-30/test_w1_30_r11_declared_here.py`, `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py`, `tests/acceptance/W1-38/**`, `tests/acceptance/W1-33/w1_33_support.py`, `tests/acceptance/W1-07/**`, `tests/acceptance/W1-46/**`, `tests/acceptance/W1-50/**`, `tests/acceptance/W1-02/**`, `tests/acceptance/W2-57/**`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
