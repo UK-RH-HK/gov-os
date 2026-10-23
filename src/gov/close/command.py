@@ -1122,7 +1122,9 @@ def _check_governance(root: Path, commits: list[dict], every: bool = False) -> t
 def _check_governance_blocks(root: Path, commits: list[dict], every: bool = False) -> dict:
     """What the close record states of the governance checks (A7, DEC-480); where the runner blocks, what it
     reports as blocking is a finding like a failing test."""
-    checked, blocking = _check_governance(root, commits, every)
+    changed = any(p.startswith(_GOVERNANCE_PREFIXES) for c in commits for p in c["paths"])
+    checked, blocking = _check_governance(root, commits, True) if every and not changed else \
+        _check_governance(root, commits)
     if blocking is None:
         return checked
     at = f"at commit {checked['check_commit'][:12]}"
