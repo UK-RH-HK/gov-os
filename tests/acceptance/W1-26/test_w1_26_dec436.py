@@ -179,20 +179,34 @@ def test_family_only_red_check_not_green(project, sandbox, interface):
     )
 
 
-def test_family_only_unmeasured_check_not_green(project, sandbox, interface):
+def test_family_only_unmeasured_check_not_green(green_project, sandbox, interface):
     """A family whose only registered check is unmeasured (no query set) must
-    not be shown GREEN (DEC-425)."""
-    project.add_check_declaration("unmeasured-check", "retrieval regression",
-                                  severity="hard-block",
-                                  command="python3 -c \"import json,sys; "
-                                          "json.dump({'status':'unmeasured'},sys.stdout)\"")
+    not be shown GREEN (DEC-425).
+
+    Revised (W2-67, I2 F3 and sample row 9): the command's inner double quotes
+    made the suite's declaration invalid YAML, so ``gov check`` refused it
+    (CHECK_DECLARATION_INVALID) before any check ran, and the family it then did
+    not find was "not GREEN". The declaration is now valid YAML, on the green base
+    (whose kernel retrieval-regression declaration is left out, so this check is
+    the family's only one): the check runs, its own entry is not GREEN, and
+    neither is the family.
+    """
+    import yaml
+    project = green_project
+    command = "python3 -c \"import json,sys; json.dump({'status':'unmeasured'},sys.stdout)\""
+    project.write(f"{support.CHECKS_REL}/unmeasured-check.yaml",
+                  yaml.safe_dump({"id": "unmeasured-check", "family": "retrieval regression", "tier": "G1",
+                                  "severity": "hard-block", "command": command}, sort_keys=False))
     project.commit()
     run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
+    result, _ = support.result_and_envelope(run, interface)
+    entry = support.check_entry(result, "unmeasured-check")
+    assert entry.get("status") in (support.RED, support.YELLOW), (
+        f"the unmeasured check is {entry.get('status')!r}: {entry}\n{run.describe()}"
+    )
     status = support.family_status(result, "retrieval regression")
-    assert status != support.GREEN, (
-        f"'retrieval regression' is unmeasured but is shown GREEN"
+    assert status in (support.RED, support.YELLOW), (
+        f"'retrieval regression' is unmeasured but is shown {status!r}\n{run.describe()}"
     )
 
 
@@ -312,7 +326,7 @@ def test_record_with_unknown_type_not_silently_skipped(green_project, sandbox, i
 
 # --- 2c. Command module discovery ---
 
-def test_new_command_module_discovered_by_commands_check(project, sandbox, interface):
+def test_new_command_module_discovered_by_commands_check(green_project, sandbox, interface):
     """A new command module planted at ``src/gov/<name>/command.py`` is
     discovered by the commands check.
 
@@ -320,34 +334,37 @@ def test_new_command_module_discovered_by_commands_check(project, sandbox, inter
     ``src/gov/*/command.py``), a new module changes its output.  If it
     uses only the Contract's RESERVED_COMMANDS list, the new module is
     invisible — but that is acceptable because RESERVED_COMMANDS is
-    definitional (see the note above).  This test asserts the weaker
-    property: adding a command module changes the check's output OR the
-    check explicitly reports the Contract list.
+    definitional (see the note above).
+
+    Revised (W2-67, W2-L379, DEC-877 item 5): the case asserted "adding a
+    command module changes the check's output OR the check explicitly reports
+    the Contract list", and "the output changed" was always true (the output
+    carries the commit id). The list of reserved commands is the
+    Contract's (definitional); what the check derives from the repository is
+    which of their modules exist. So the case starts from a project where one
+    reserved command (``adopt``) has no module file: the check's own entry has a
+    finding that names it; then the command's new module is planted at
+    ``src/gov/adopt/command.py``, and the check's entry is GREEN with no finding.
     """
+    project = green_project
     project.add_check_declaration("cmd-check", "command-contract consistency",
                                   severity="warning",
                                   command="python3 -m gov.check.commands")
+    assert project.remove_reserved_command_module("adopt"), "the project held no module file for adopt"
     project.commit()
     run1 = support.run_check(project, sandbox)
+    result1, _ = support.result_and_envelope(run1, interface)
+    before = support.check_entry(result1, "cmd-check")
+    assert before.get("status") != support.GREEN and support.findings_naming(before, "adopt"), (
+        f"with no module file for adopt, the commands check has no finding that names it: {before}\n"
+        f"{run1.describe()}"
+    )
 
-    project.write("src/gov/invented_cmd/__init__.py", "")
-    project.write("src/gov/invented_cmd/command.py",
-                  "def register(subparsers):\n    subparsers.add_parser('invented_cmd')\n")
+    project.write("src/gov/adopt/command.py",
+                  "def register(subparsers):\n    subparsers.add_parser('adopt')\n")
     project.commit()
     run2 = support.run_check(project, sandbox)
-
-    envelope2 = support.envelope_of(run2, interface)
-    result2 = envelope2.get("result") or envelope2.get("error", {}).get("details", {})
-    output2 = json.dumps(result2) + run2.stdout
-
-    changed = (run2.stdout != run1.stdout or run2.returncode != run1.returncode)
-    mentions_invented = "invented_cmd" in output2 or "invented" in output2.lower()
-
-    assert changed or mentions_invented, (
-        f"adding a command module at src/gov/invented_cmd/command.py was invisible "
-        f"to the commands check — the output did not change and the module is not "
-        f"mentioned\n{run2.describe()}"
-    )
+    support.assert_check_green(run2, interface, "cmd-check")
 
 
 # --- 2d. Path-map namespace discovery ---
@@ -409,7 +426,21 @@ def test_check_declaration_for_unregistered_family_runs(project, sandbox, interf
 # Point 3 — Readiness check uses its evaluator's result (R9/F15)
 # =====================================================================
 
-def test_readiness_check_all_return_value_not_ignored(project, sandbox, interface):
+def _check_with_the_projects_own_code(project, sandbox, interface):
+    """``gov check --json`` run with the ``gov`` package of the project's own ``src/``: the copy of this worktree's
+    ``src/`` the project was built with, plus what the case planted in it. The readiness check imports
+    ``gov.readiness.checker`` in the ``gov`` process itself, so a module planted in the project is read only when
+    that process runs the project's code (W2-L379). Returns ``(result, run)``."""
+    for rel in ("src/gov/check/runner.py", "src/gov/check/command.py"):
+        assert (project.root / rel).read_bytes() == (support.REPO_ROOT / rel).read_bytes(), \
+            f"the project's {rel} is not this worktree's: the code that judges would not be the code under test"
+    project.commit()
+    run = cli_support.run_gov_with_code(project.root, project.root, sandbox, support.COMMAND, "--json")
+    result, _ = support.result_and_envelope(run, interface)
+    return result, run
+
+
+def test_readiness_check_all_return_value_not_ignored(green_project, sandbox, interface):
     """When ``check_all`` returns findings via its return value (not by raising
     an exception), ``gov check`` must report the family as not GREEN.
 
@@ -420,7 +451,15 @@ def test_readiness_check_all_return_value_not_ignored(project, sandbox, interfac
     This test replaces the readiness checker with one whose ``check_all``
     returns a dict indicating failure — without raising — and asserts that
     ``gov check`` does not report the readiness-related family as GREEN.
+
+    Revised (W2-67, W2-L379, DEC-877 item 5): the planted module was never
+    imported (``gov check`` ran this worktree's code, not the project's), and the
+    loop looked for a family whose name holds "readiness", which no family has.
+    ``gov check`` now runs the project's own code, and the ``readiness`` check's
+    own entry is RED with a finding that names the specification ``check_all``
+    returned not closed.
     """
+    project = green_project
     project.write("src/gov/readiness/__init__.py",
                   "from gov.readiness.checker import check, check_all, close\n"
                   "__all__ = ['check', 'check_all', 'close']\n")
@@ -453,35 +492,30 @@ def test_readiness_check_all_return_value_not_ignored(project, sandbox, interfac
                   "\n"
                   "def specifications(root):\n"
                   "    return []\n")
-    project.commit()
-    run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    families = support.families_of(result)
-
-    readiness_green = False
-    for family_name, entry in families.items():
-        if "readiness" in family_name.lower():
-            status = entry.get("status") if isinstance(entry, dict) else entry
-            if status == support.GREEN:
-                readiness_green = True
-                break
-
-    assert not readiness_green, (
+    result, run = _check_with_the_projects_own_code(project, sandbox, interface)
+    entry = support.check_entry(result, "readiness")
+    assert entry.get("status") == support.RED and support.findings_naming(entry, "SPEC-test"), (
         f"check_all returned a failure dict (closed=False) without raising, but "
-        f"the readiness-related family is GREEN — the return value was ignored\n"
-        f"{run.describe()}"
+        f"the readiness check is not RED with a finding that names SPEC-test — the return value was ignored: "
+        f"{entry}\n{run.describe()}"
     )
+    assert support.family_status(result, entry.get("family")) == support.RED, run.describe()
 
 
-def test_readiness_check_all_exception_caught(project, sandbox, interface):
+def test_readiness_check_all_exception_caught(green_project, sandbox, interface):
     """When ``check_all`` raises an exception with findings, ``gov check`` must
     report the family as not GREEN.
 
     Complement to the return-value test: ensures the exception path also works.
     (This overlaps with test_w1_26_readiness.py but uses a mock checker to
     isolate the integration point.)
+
+    Revised (W2-67, W2-L379, DEC-877 item 5): as the return-value case, the
+    planted module was never imported and no family's name holds "readiness".
+    ``gov check`` now runs the project's own code, and the ``readiness`` check's
+    own entry is RED with a finding that carries the raised error's message.
     """
+    project = green_project
     project.write("src/gov/readiness/__init__.py",
                   "from gov.readiness.checker import check, check_all, close\n"
                   "__all__ = ['check', 'check_all', 'close']\n")
@@ -520,21 +554,10 @@ def test_readiness_check_all_exception_caught(project, sandbox, interface):
                   "\n"
                   "def specifications(root):\n"
                   "    return []\n")
-    project.commit()
-    run = support.run_check(project, sandbox)
-    envelope = support.envelope_of(run, interface)
-    result = envelope.get("result") or envelope.get("error", {}).get("details", {})
-    families = support.families_of(result)
-
-    readiness_green = False
-    for family_name, entry in families.items():
-        if "readiness" in family_name.lower():
-            status = entry.get("status") if isinstance(entry, dict) else entry
-            if status == support.GREEN:
-                readiness_green = True
-                break
-
-    assert not readiness_green, (
-        f"check_all raised GovError with findings, but the readiness-related "
-        f"family is GREEN — the exception was swallowed\n{run.describe()}"
+    result, run = _check_with_the_projects_own_code(project, sandbox, interface)
+    entry = support.check_entry(result, "readiness")
+    assert entry.get("status") == support.RED and support.findings_naming(entry, "readiness check_all failed"), (
+        f"check_all raised GovError with findings, but the readiness check is not RED with a finding that "
+        f"carries its message — the exception was swallowed: {entry}\n{run.describe()}"
     )
+    assert support.family_status(result, entry.get("family")) == support.RED, run.describe()
