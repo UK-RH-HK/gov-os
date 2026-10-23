@@ -355,3 +355,14 @@ So W2-45 need not build a per-value scan of its own. Whether W2-45's ticket drop
 - **The code-graph tool's SQLite** does not zero freed space. Compacting it from gov depends on the tool not holding the file. Seen today: no `-wal`, no `-shm`, rollback journal.
 - **On-disk VACUUM of `store.db`** was not timed: no file copy was made, to stay within scratch. In memory it took 0.31 s; on disk, expect a few seconds.
 - **Today's two-rule-set scans** were run on every input. Option A keeps both, and it keeps 2 gitleaks runs per file. It could join all of a store's chunks into one input per rule set, as tested, because findings map back to chunks by line.
+
+## 15. What the implementation changed and measured
+
+Added by the engineer after the code (2026-10-23, commits on `w2/W2-69` after `ab381f94`).
+
+- **Freed regions are read also without their zero bytes.** Section 11 read freed space only as it is. The acceptance case `freed-space-a-freeblock-of-a-utf16-store` (a token deleted from a UTF-16 store, left in a freeblock) was missed that way. Each freed region now gets both forms, like a value. The word-internal cases on freed rows, UTF-16 stores and blobs stay green.
+- **Both edges of a piece are cut at a true boundary.** A piece ends just after a space, else just after a byte that is no word byte (section 14, read ends). Where a window holds neither, the cut is inside a word. The piece then begins or ends with one neutral word byte (`_`), so no read seems to begin or end a word there.
+- **Each store is read under a shared lock.** The values and the freed-space parse come from the bytes read while the lock is held, so the digest kept for DEC-853 is of what was judged. A store that is locked, damaged or cannot be parsed is judged by its raw bytes, in pieces, and also without its zero bytes.
+- **Virtual tables are not read themselves.** Their rows are in their own tables, which are read. So a store whose FTS5 table needs a module this Python lacks is still read value by value.
+- **The overflow tails** of section 14 are read: the unused tail of each overflow chain's last page. A builder test shows the tail is read and the live value before it is not.
+- **Time on W1-15's stand-in** (60 files of 4 KiB and a SQLite store of about 9 MB, load average about 40): 4.1 s against 4.5 to 4.9 s for the check before this change.
