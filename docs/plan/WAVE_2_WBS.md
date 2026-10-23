@@ -1077,6 +1077,18 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a file the check scanned before no longer scanned;
   - an unfinished scan passing as clean.
 
+#### W2-70 Retire the two nested reruns: W1-05's switch-over case and W1-47's builder rerun (LITE, independent-test-designer; DEC-899, P-IS-3 (a))
+- **Why:** W1-05's switch-over case re-runs three suites the same close has already run (14.6 minutes of every close). W1-47's builder case re-runs `tests/unit/guard`. Both block worksteal (I1 F-5, DEC-892 a). Ticket `DAEO-uzme`.
+- **Starts now; merges early; closes** once W2-07's test-revision class is pinned (DEC-896 item 3), as W2-63 does. The 15 unit nested runs are bounded in W2-67.
+- **Allowed paths:** `tests/acceptance/W1-05/**`, `tests/acceptance/W1-47/**`, `tests/acceptance/serial-only.txt`, W1-30's r11 file.
+- **KPIs, success:**
+  - both cases retired in one commit with a `Retire-Reason:` naming DEC-899;
+  - the switch-over line out of `serial-only.txt`, and W1-30's r11 test updated;
+  - the suites they re-ran still run as themselves.
+- **KPIs, failure:**
+  - a covered suite that no longer runs;
+  - any other test changed.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
