@@ -510,7 +510,8 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - Signals reach the session's process group, and temporary folders are removed on every ending [W2-M187, W2-M095, W2-L105].
   - Launched sessions can run `gov check`, `gov rebuild` and their own suite inside the sandbox [W2-M275, W2-M094, W2-M097, W2-M181].
   - The kernel template's settings carry one narrow allow rule, `Bash(gov launch:*)` [DEC-715].
-- **KPIs, failure:** a raw `claude` launch stays unallowed in the template.
+  - **(DEC-902)** A sandboxed worker's temp folder is removed when the worker ends, whatever its exit, and a test shows none left under `/tmp` after a worker's run. Two engineers' temps of 2026-10-20 held 4.1 million inodes and 36 GiB; W2-C002's fix at W1-28 no longer holds [W2-M405].
+- **KPIs, failure:** a raw `claude` launch stays unallowed in the template; a worker's temp folder left behind.
 - **DEC-769 (owner, 2026-10-18), leads sandboxed:** first a feasibility test of one to two hours (can a sandboxed lead start a sandboxed worker on this machine?), its result recorded; then leads run in the operating-system sandbox, their worktree writable and `tests/acceptance/**`, every other worktree and every other ticket's folder read-only; the independent test designer writes only `tests/acceptance/<its WBS id>/`. The orchestrator's session stays unsandboxed. DEC-770: once this closes, a guard text-reading hole only an unsandboxed session can reach becomes a row.
 
 #### W2-22 `gov doctor` green (STANDARD, engineer)
