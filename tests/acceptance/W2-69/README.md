@@ -240,3 +240,140 @@ view's text) still hold under the design (the freed-space backstop, the schema t
   through to the index; the same token at offset 1,000 was kept out. It fails open at indexing time; the check is the
   backstop. Package P-3 in the designer's return.
 - `gov retrieve` gave `FACET_UNAVAILABLE` (both facets stale); the sources were read by name.
+
+## Tests added after implementation, from the review (DEC-136)
+
+A second batch, by a fresh independent test designer (MR-3), from the five behaviours the FULL review found the
+suite missed, as the lead's brief states them (DEC-136, DEC-462: behaviour and sources only). The implementation
+was not read: the files `git diff --name-only w2/integrate...HEAD` names, other than this folder, were neither
+opened nor searched; the check and the rebuild were run and their output read, and the base code was read as it
+stands on `w2/integrate`. No case of the first batch was changed or rewritten.
+
+**38 cases in 4 files**, and a support module of their own (`w2_69_review_support.py`); they reuse the first
+batch's support module, its fixtures, its way of building a project, a store and a token at run time, its stand-in
+gitleaks and learning runs, its stand-in embedder, and its three lock files (`slot`) for the heavy check runs:
+
+| File | Cases | Behaviour | KPI |
+|---|---|---|---|
+| `test_w2_69_review_long_key_blocks.py` | 22 | 1 | K1 |
+| `test_w2_69_review_fts_stored_terms.py` | 9 | 2 | K2 (W2-M404) |
+| `test_w2_69_review_raw_judgement_not_reused.py` | 4 | 3 | K5 (DEC-853) |
+| `test_w2_69_review_rebuild_root_and_held_store.py` | 3 | 4 (2), 5 (1) | K3 |
+
+Run them as the suite is run ("Run" above): `PYTHONPATH` set to this worktree's `src/` per command, never in
+settings; every child is given it (DEC-732). The lead checks it with
+`PYTHONPATH=/home/usain/gov-os-worktrees/W2-69/src python3 -c "import gov; print(gov.__file__)"`, which prints
+`/home/usain/gov-os-worktrees/W2-69/src/gov/__init__.py`.
+
+### Behaviour 1 — a long private-key block is found wherever it lies (K1, "across every boundary where the check splits or reads its input"; fails open)
+
+A private-key block of the size real keys have, up to 8,192 bytes, is a finding wherever it lies in a long text.
+Built at run time in four shapes gitleaks' `private-key` rule matches: PEM (`RSA PRIVATE KEY`, lines of 64), PKCS#8
+(`PRIVATE KEY`), OpenSSH (lines of 70, the body beginning as every OpenSSH key's does), an armoured PGP private key
+block (a blank line after its armour header, a checksum line); each of 4,000, 4,600, 6,600 and 8,192 bytes exactly.
+
+| Test | Red today because |
+|---|---|
+| `long_key::test_premise_each_key_block_is_a_finding_whole_and_none_once_cut` × 4 shapes (every size: whole, a `private-key` finding by the kernel's rules; cut at a quarter, the middle or three quarters, neither part a finding; the sheltered block below no finding under `extend` and a finding by the project's rules alone) | passes today (a premise) |
+| `long_key::test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it` × 2 forms (a plain file under `.gov-runtime/`, a single SQLite text value; 256 KiB each) × 2 layouts × 4 shapes. The places are learned as the first batch learns them (a learning run on the clean text, the stand-in gitleaks keeping each input), up to three spread over the text, half where gitleaks reads in the check's input, half where the check splits it. **Paragraph text** (paragraphs of six lines and a blank line, 433 bytes): the block, followed by a blank line, at every paragraph start from a paragraph before its full length ahead of the place to a paragraph after it (190 blocks a case). **Text without blank lines** (lines of 72 bytes): the place at 1, 2, 3, 8, 24, 64, 160, 400 and 1,000 bytes from the block's start and from its end, and at 11 points spread between (342 blocks a case). Each block is one file or store; one run of the check judges all of them, the clean text beside them as a control | **red today, 16**: "the check missed N of M private-key blocks: a block of S bytes across content offset P (…): block start at […] bytes from it". The check gives gitleaks pieces of about 16 KB that overlap by about 4.1 KB, so a block of 4,600 bytes or more is missed wherever a piece's start or end falls inside it and no piece holds it whole: 15 of 190 in paragraph text, 42 to 48 of 342 without blank lines; the 4,000-byte blocks are found. **The PGP shape is missed far more** (193 and 205 of 342 without blank lines, at every size, 4,000 included): the check gives gitleaks its pieces as one input, gitleaks ends a read at a blank line, and the armour's blank line after its header becomes the end of one of its reads (see "Discoveries of the second batch"). The code before this ticket gave gitleaks the whole text and found the blocks at the check's splits |
+| `long_key::test_a_long_key_block_only_the_projects_own_rules_find_is_found_wherever_the_check_splits_inside_it` × 2 forms: a project whose own rules hold the expression of gitleaks' `private-key` rule, a PEM block of 4,600 and of 8,192 bytes holding the run of the alphabet that gitleaks' global allowlist shelters under `extend`, so only the scan with the project's rules alone finds it (DEC-347); text without blank lines (174 blocks a case) | **red today, 2**: "the check missed 30 of 174", as above, on the second rule set |
+
+**Residual (not required, not tested):** a block spread over several separate stored values (a document's text cut
+into chunks of 1,200 characters, one value each) is not required to be found from those values. A block whole in one
+value, or in one plain file, is.
+
+### Behaviour 2 — a full-text index's stored terms raise no chance red (K2, W2-M404; fails closed)
+
+The setting: a full-text index built with the lexical index's own tokenizer (`porter unicode61 tokenchars '_'`, as
+`src/gov/retrieval/lexical.py` holds it on `w2/integrate`). 240 documents, each with an identifier (`zqrvNNN_` and a
+token-shaped string ending in a digit, so stemming does not touch it) and its neighbour (`zqrvNNN_a7`, which shares
+the identifier's whole head up to that string and sorts just before it), written in six transactions (several
+segments). The index stores the identifier as the string after the shared prefix: its stored text begins inside the
+word. The project's four rules, each with its own string; the index keeps its terms in lower case.
+
+| Test | Red today because |
+|---|---|
+| `fts::test_premise_the_string_is_a_finding_alone_and_none_inside_its_identifier` × 4 rules (both rule sets; and the stored, lower-case form alone: a `gov-token-digit`, `gov-token-lower`, `gov-token-lower` finding for the digit, lower and upper strings; none for the canary, whose rule asks for upper case) | passes today (a premise) |
+| `fts::test_a_full_text_index_storing_identifiers_after_a_shared_prefix_is_no_finding` × 2 states: **as written** and **optimised, then vacuumed** (the rebuild's compaction); one store per rule under `.gov-runtime/fts/`; the premise checks that each store's bytes hold the string right after a byte that is no word character | **red today, 2**: "the check flagged the full-text index of ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']". The canary's index is green today (its stored form is no finding by any rule); its case guards the change |
+| `fts::test_control_a_real_token_at_a_word_boundary_in_such_an_index_is_found` × 2 states (the same indexes, and one document with the rule's string standing alone) | passes today; the control |
+| `fts::test_a_rebuilt_lexical_index_storing_identifiers_after_a_shared_prefix_is_no_finding` (`gov rebuild --json`, full, against the stand-in embedder, the code-graph tool hidden from `PATH`; sources holding 120 identifiers and neighbours per rule; the premise checks the rebuilt stores hold the strings after a non-word byte) | **red today**: "after a full rebuild … the check is red on the stores the rebuild wrote" |
+
+### Behaviour 3 — a raw-bytes judgement is never reused; a brief lock is waited out (K5, DEC-853 "a changed store is always scanned in full", "a finding is never reused"; fails open)
+
+Two stores whose token a value holds but whose raw bytes hold no whole token (premises: a value holds it; gitleaks
+finds nothing in the raw bytes, nor in them without their zero bytes, under both rule sets):
+`a-token-across-a-page-and-its-overflow-page` (a github-pat shape across the end of a long value's part on its table's
+page; two 4-byte page numbers stand between its halves) and `a-token-value-after-a-word-byte-of-its-header` (the
+project's digit token, 19 characters, alone as a value: its serial type 51 is the byte `3`, right before it).
+
+| Test | Red today because |
+|---|---|
+| `raw_judgement::test_a_clean_result_of_a_raw_bytes_judgement_is_never_reused_once_the_values_can_be_read` × 2 stores. Run 1: another process holds the store with `BEGIN EXCLUSIVE` for the whole run (the check judges it by its raw bytes, as the first batch requires; what it decides is not asked). Run 2: the lock released, the store's bytes unchanged (premise: the same SHA-256); the token must be found | **red today, 2**: "run 2, the lock released and nothing else changed: the check did not find the token … run 1: exit code 0" (the check reuses run 1's clean result: "clean result reused, not scanned again") |
+| `raw_judgement::test_a_lock_held_briefly_is_waited_out_and_the_store_judged_by_its_values` × 2 stores: the lock released 1.0 s after the check starts; the token must be found in that run | **red today, 2**: "did not wait the lock out … exit code 0 after 1.0 s" (the check meets the lock, judges the raw bytes and is green before the lock is released) |
+
+The first batch's cases on a store locked for the whole run stay as they are.
+
+### Behaviour 4 — a rebuild given the project as a relative path (K3; today it fails in the new step)
+
+| Test | Red today because |
+|---|---|
+| `rebuild::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store` × 2: `--root .` from the project's folder; the folder's name from its parent. Each rebuilds a project of 24 pages and a module by its absolute path (premise: the code-graph store is built), deletes 20 pages, commits, and rebuilds by the relative path: exit 0, the result envelope with every store recreated, no traceback, and no SQLite file under `.gov-runtime/` with a free page | **red today, 2**: exit 1 and a traceback (`ValueError: '…/.gov-runtime/codeintel/home/…' is not in the subpath of '.'`, and of `'rebuild-project'`); the code-graph store is left uncompacted |
+
+**The code-graph store is the real tool's** where `codebase-memory-mcp` is on `PATH` (it is on this machine: the red
+run used it), marked as W1-16's cases are (`local_only`; it starts the tool's daemon, whose folder the case removes).
+Where the tool is absent, a stand-in first on `PATH` (`w2_69_review_support.install_code_stand_in`) answers
+`config set` and `cli … index_repository` and writes a SQLite store with free pages as `code.db` in the tool's home
+(`CBM_CACHE_DIR`).
+
+### Behaviour 5 — a store the rebuild cannot compact is reported where the lead sees it (K3; fails closed, silently)
+
+| Test | Red today because |
+|---|---|
+| `rebuild::test_a_store_the_rebuild_cannot_compact_is_named_with_its_reason_on_standard_error`: the stand-in code-graph tool writes `code.db` (free pages) in the tool's home and starts another process that holds it (an open read transaction) until the test releases it after the rebuild; the code index is the rebuild's last store, so the store is held from its build to the rebuild's end. Premises: the holder held it, and the store keeps free pages. The JSON result names the store; a line of standard error names it (project-relative or absolute) with the reason (the reason the JSON result gives next to it, or words of a lock: `lock`, `busy`, `held`, `holds`, `in use`). The exit code is not asked | **red today**: "its standard error does not name the store with the reason (the JSON result gives ["not compacted: database is locked"])"; standard error is empty |
+
+This case always uses the stand-in tool (whether or not the real one is on `PATH`): no daemon starts.
+
+### The cases that can only run alone
+
+- `tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py::test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store`
+  (both parameter sets; real-model-or-daemon: with the real code-graph tool on `PATH` it starts the codebase-memory
+  daemon, as the first batch's code-graph case and W1-16's cases do). `tests/acceptance/serial-only.txt` is outside
+  this designer's paths: the entry is returned to the lead. Every other case of this batch runs beside other suites.
+
+### Run time and scratch
+
+Measured on this machine (20 processors, load average 15 to 35 from other sessions): behaviour 1, 3.6 min under
+`-n 8` (its sweeps wait for the first batch's three lock files; a sweep alone takes about 16 to 30 s); behaviours 2 and 3,
+10 s under `-n 6`; behaviours 4 and 5, 48 s under `-n 3` (a rebuild 15 to 20 s). A sweep case writes up to 342 files
+of 256 KiB (about 86 MB) and removes them; the rebuild cases a few MB.
+
+### Red run (second batch)
+
+On `w2/W2-69` at `3fd2b5a1` plus these files, file by file, to the end (never `-x`), with the command of "Run" and
+`-n 8`, `-n 6` and `-n 3`: **28 failed, 10 passed, 0 skipped** — behaviour 1: 18 of 22 red (the 4 premises pass);
+behaviour 2: 3 of 9 red (the 4 premises and the 2 controls pass); behaviour 3: 4 of 4; behaviour 4: 2 of 2;
+behaviour 5: 1 of 1. Each red case fails for the reason its row states. The first batch's 215 cases: see the
+designer's return.
+
+### Readings chosen in the second batch (the lead's to confirm)
+
+- **R9 — "Use both rule sets" (behaviour 1)** is read as: the blocks of the main sweeps are found by the kernel's rules
+  (gitleaks' defaults, which the kernel's file extends); two more cases give a project whose own rules hold the key
+  rule a block that only the scan with the project's rules alone finds (DEC-347), so a split of the second scan is
+  tested too.
+- **R10 — behaviour 3, run 1** is not judged: a check that judges the locked store by its raw bytes is green there
+  (the token is not whole in them), and one that finds the token some other way is not wrong. Only run 2 (and the
+  brief lock's one run) must find it.
+- **R11 — "a lock held only briefly"** is a lock released 1.0 s after the check's process starts. On a machine so
+  loaded that the check reaches the store only after that, the case passes without testing the wait.
+- **R12 — "the reason" on standard error (behaviour 5)** is the reason the JSON result gives next to the store, or
+  words of a lock; the wording of the line is not asked.
+
+### Discoveries of the second batch
+
+- **An armoured PGP block is missed at every size, 4,000 bytes included, in text without blank lines.** The check
+  gives gitleaks its overlapping pieces as one input (about 348 KB for 256 KiB of text); gitleaks reads that input
+  in parts that end at a blank line, so the blank line after a PGP block's armour header becomes the end of one of
+  gitleaks' reads, and the block is cut although a piece holds it whole. Any secret that spans a blank line is exposed to
+  the same cut. Behaviour 1's PGP cases show it.
+- `gov retrieve` gave `FACET_UNAVAILABLE` again; the sources were read by name.
