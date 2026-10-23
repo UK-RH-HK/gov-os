@@ -908,8 +908,6 @@ def _run_tests(root: Path, test_path: Path, timeout: int,
             scope["runs"].append(_evidence.read_junit(root, root / junit, test_path))
         if stated is not None:
             run = {"run": "regression" if ignore is not None else "acceptance", "form": form, **ran}
-            if junit is not None:
-                run["junit_xml"] = junit
             if form == "parallel":
                 run["workers"] = workers
                 if scope is not None:
