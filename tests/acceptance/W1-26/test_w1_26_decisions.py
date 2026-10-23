@@ -101,11 +101,13 @@ def test_duplicate_id_flagged(project, sandbox, interface):
     support.assert_red(run, interface)
 
 
-def test_supersession_cycle_flagged(project, sandbox, interface):
-    """A supersession cycle is flagged."""
+def test_supersession_cycle_flagged(green_project, sandbox, interface):
+    """A supersession cycle is flagged: ``core-authority`` is RED with a finding that names both decisions of the
+    cycle."""
+    project = green_project
     project.add_decision("DEC-CYC-001", "SUPERSEDED", superseded_by="DEC-CYC-002")
     project.add_decision("DEC-CYC-002", "SUPERSEDED", superseded_by="DEC-CYC-001",
                           supersedes=["DEC-CYC-001"])
     project.commit()
     run = support.run_check(project, sandbox)
-    support.assert_red(run, interface)
+    support.assert_check_red_naming(run, interface, "core-authority", "DEC-CYC-001", "DEC-CYC-002")
