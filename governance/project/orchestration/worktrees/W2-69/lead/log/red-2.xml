@@ -1,0 +1,1000 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="27" skipped="0" tests="253" time="608.367" timestamp="2026-10-23T19:06:01.166830+01:00" hostname="Usain"><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_after_a_full_rebuild_no_sqlite_store_has_a_free_page" time="37.826" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-plain-file]" time="1.194" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-a-dropped-table]" time="1.355" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-utf16le-plain-file]" time="1.204" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-end-of-a-value]" time="1.242" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-utf16le-dashed-token]" time="21.147" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-lines-github-pat]" time="37.254" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-blob-github-pat]" time="48.468" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-plain-file-in-a-nested-folder]" time="1.412" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-utf16le-plain-file-with-a-bom]" time="1.688" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-schema-a-default-value]" time="1.755" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-a-free-page]" time="1.735" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-plain-file-with-zero-bytes]" time="2.720" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-utf16le-store]" time="1.465" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-schema-a-trigger]" time="3.268" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-a-freeblock]" time="2.629" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-value-in-a-full-text-index]" time="3.265" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-text-value]" time="1.451" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-a-freeblock-of-a-utf16-store]" time="2.497" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-schema-a-view]" time="1.834" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-text-value-in-an-integer-column]" time="3.883" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-value-longer-than-one-gitleaks-read]" time="1.852" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-start-of-a-value]" time="2.631" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-a-freed-overflow-chain]" time="3.279" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-value-of-a-table-without-rowid]" time="3.263" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-utf16be-plain-file]" time="3.091" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[the-write-ahead-log]" time="5.491" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[freed-space-the-unused-space-of-a-page]" time="3.678" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-value-that-is-only-the-token]" time="3.281" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-utf16be-store]" time="3.392" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[one-value-among-five-thousand]" time="3.973" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_premise_the_string_is_a_finding_alone_and_none_inside_its_identifier[gov-canary]" time="13.120" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_control_every_form_without_a_token_is_green" time="10.095" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_premise_each_key_block_is_a_finding_whole_and_none_once_cut[openssh]" time="52.207" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-paragraphs-pem-rsa]" time="39.696"><failure message="AssertionError: sqlite-value, paragraphs, pem-rsa: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 27.2 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00171.db&#10;  secret found in derived store: .gov-runtime/keys/case-00172.db&#10;  secret found in derived store: .gov-runtime/keys/case-00173.db&#10;  secret found in derived store: .gov-runtime/keys/case-00183.db&#10;  secret found in derived store: .gov-runtime/keys/case-00184.db&#10;  secret found in derived store: .gov-runtime/keys/case-00185.db&#10;  secret found in derived store: .gov-runtime/keys/case-00186.db&#10;  secret found in derived store: .gov-runtime/keys/case-00187.db&#10;  secret found in derived store: .gov-runtime/keys/case-00188.db&#10;  secret found in derived store: .gov-runtime/keys/case-00189.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_0/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_0/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_0/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_0/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'paragraphs', shape = 'pem-rsa'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, paragraphs, pem-rsa: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 27.2 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00171.db
+E         secret found in derived store: .gov-runtime/keys/case-00172.db
+E         secret found in derived store: .gov-runtime/keys/case-00173.db
+E         secret found in derived store: .gov-runtime/keys/case-00183.db
+E         secret found in derived store: .gov-runtime/keys/case-00184.db
+E         secret found in derived store: .gov-runtime/keys/case-00185.db
+E         secret found in derived store: .gov-runtime/keys/case-00186.db
+E         secret found in derived store: .gov-runtime/keys/case-00187.db
+E         secret found in derived store: .gov-runtime/keys/case-00188.db
+E         secret found in derived store: .gov-runtime/keys/case-00189.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-long-value-github-pat]" time="52.978" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_raw_judgement_not_reused" name="test_a_clean_result_of_a_raw_bytes_judgement_is_never_reused_once_the_values_can_be_read[a-token-across-a-page-and-its-overflow-page]" time="16.921"><failure message="AssertionError: run 2, the lock released and nothing else changed: the check did not find the token a value of .gov-runtime/a-token-across-a-page-and-its-overflow-page.db holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code 0). A clean result of a raw-bytes judgement was reused in place of reading the values&#10;  exit code: 0 after 5.9 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  &#10;  stderr (tail):&#10;  secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-token-across-a-page-and-its-overflow-page.db sha256 cf220548f9e7cf3ede782cfcd3405fc93c8f9f3caffa07aa5a546d7cc68cccad&#10;  &#10;assert (0 == 1)&#10; +  where 0 = CheckRun(returncode=0, stdout='', stderr='secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-tok...ge.db sha256 cf220548f9e7cf3ede782cfcd3405fc93c8f9f3caffa07aa5a546d7cc68cccad\n', seconds=5.9182981349295005, calls=[]).returncode&#10; +  and   1 = support.FINDING_EXIT">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b0/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b0/w2-69/project')
+store = 'a-token-across-a-page-and-its-overflow-page'
+
+    @pytest.mark.parametrize("store", STORES)
+    def test_a_clean_result_of_a_raw_bytes_judgement_is_never_reused_once_the_values_can_be_read(sandbox, project, store):
+        rel, token = _build(project, store, f"reuse-{store}")
+        path = project / rel
+        digest = support.sha256_file(path)
+        holder = _hold(path)
+        try:
+            first = support.run_check(sandbox, project)
+        finally:
+            _release(holder)
+        assert first.returncode is not None, f"run 1: the check did not end within its declared limit\n{first.describe()}"
+        assert token not in first.stdout + first.stderr, "run 1: the check printed the token"
+        assert support.sha256_file(path) == digest, "premise: the store's bytes are unchanged by the lock"
+        second = support.run_check(sandbox, project)
+        assert second.returncode is not None, f"run 2: the check did not end within its limit\n{second.describe()}"
+        assert token not in second.stdout + second.stderr, "run 2: the check printed the token"
+&gt;       assert second.returncode == support.FINDING_EXIT and second.names(rel), (
+            f"run 2, the lock released and nothing else changed: the check did not find the token a value of {rel} "
+            f"holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code "
+            f"{first.returncode}). A clean result of a raw-bytes judgement was reused in place of reading the values\n"
+            f"{second.describe()}")
+E       AssertionError: run 2, the lock released and nothing else changed: the check did not find the token a value of .gov-runtime/a-token-across-a-page-and-its-overflow-page.db holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code 0). A clean result of a raw-bytes judgement was reused in place of reading the values
+E         exit code: 0 after 5.9 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         
+E         stderr (tail):
+E         secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-token-across-a-page-and-its-overflow-page.db sha256 cf220548f9e7cf3ede782cfcd3405fc93c8f9f3caffa07aa5a546d7cc68cccad
+E         
+E       assert (0 == 1)
+E        +  where 0 = CheckRun(returncode=0, stdout='', stderr='secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-tok...ge.db sha256 cf220548f9e7cf3ede782cfcd3405fc93c8f9f3caffa07aa5a546d7cc68cccad\n', seconds=5.9182981349295005, calls=[]).returncode
+E        +  and   1 = support.FINDING_EXIT
+
+tests/acceptance/W2-69/test_w2_69_review_raw_judgement_not_reused.py:125: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_premise_the_string_is_a_finding_alone_and_none_inside_its_identifier[gov-token-digit]" time="12.315" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-lines-dashed-token]" time="33.903" /><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_a_word_deleted_from_the_sources_is_in_no_store_after_the_next_rebuild" time="54.729" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_premise_the_string_is_a_finding_alone_and_none_inside_its_identifier[gov-token-lower]" time="13.155" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_raw_judgement_not_reused" name="test_a_clean_result_of_a_raw_bytes_judgement_is_never_reused_once_the_values_can_be_read[a-token-value-after-a-word-byte-of-its-header]" time="19.419"><failure message="AssertionError: run 2, the lock released and nothing else changed: the check did not find the token a value of .gov-runtime/a-token-value-after-a-word-byte-of-its-header.db holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code 0). A clean result of a raw-bytes judgement was reused in place of reading the values&#10;  exit code: 0 after 5.3 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  &#10;  stderr (tail):&#10;  secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-token-value-after-a-word-byte-of-its-header.db sha256 b463899d6241e87e9b703ab116f5b6f5a4fdc777ce6bc15983ccfb5157893bab&#10;  &#10;assert (0 == 1)&#10; +  where 0 = CheckRun(returncode=0, stdout='', stderr='secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-tok...der.db sha256 b463899d6241e87e9b703ab116f5b6f5a4fdc777ce6bc15983ccfb5157893bab\n', seconds=5.264205657993443, calls=[]).returncode&#10; +  and   1 = support.FINDING_EXIT">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b1/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_clean_result_of_a_raw_b1/w2-69/project')
+store = 'a-token-value-after-a-word-byte-of-its-header'
+
+    @pytest.mark.parametrize("store", STORES)
+    def test_a_clean_result_of_a_raw_bytes_judgement_is_never_reused_once_the_values_can_be_read(sandbox, project, store):
+        rel, token = _build(project, store, f"reuse-{store}")
+        path = project / rel
+        digest = support.sha256_file(path)
+        holder = _hold(path)
+        try:
+            first = support.run_check(sandbox, project)
+        finally:
+            _release(holder)
+        assert first.returncode is not None, f"run 1: the check did not end within its declared limit\n{first.describe()}"
+        assert token not in first.stdout + first.stderr, "run 1: the check printed the token"
+        assert support.sha256_file(path) == digest, "premise: the store's bytes are unchanged by the lock"
+        second = support.run_check(sandbox, project)
+        assert second.returncode is not None, f"run 2: the check did not end within its limit\n{second.describe()}"
+        assert token not in second.stdout + second.stderr, "run 2: the check printed the token"
+&gt;       assert second.returncode == support.FINDING_EXIT and second.names(rel), (
+            f"run 2, the lock released and nothing else changed: the check did not find the token a value of {rel} "
+            f"holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code "
+            f"{first.returncode}). A clean result of a raw-bytes judgement was reused in place of reading the values\n"
+            f"{second.describe()}")
+E       AssertionError: run 2, the lock released and nothing else changed: the check did not find the token a value of .gov-runtime/a-token-value-after-a-word-byte-of-its-header.db holds (run 1 judged the store by its raw bytes, where the token is not whole; run 1: exit code 0). A clean result of a raw-bytes judgement was reused in place of reading the values
+E         exit code: 0 after 5.3 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         
+E         stderr (tail):
+E         secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-token-value-after-a-word-byte-of-its-header.db sha256 b463899d6241e87e9b703ab116f5b6f5a4fdc777ce6bc15983ccfb5157893bab
+E         
+E       assert (0 == 1)
+E        +  where 0 = CheckRun(returncode=0, stdout='', stderr='secrets-indexing: clean result reused, not scanned again: .gov-runtime/a-tok...der.db sha256 b463899d6241e87e9b703ab116f5b6f5a4fdc777ce6bc15983ccfb5157893bab\n', seconds=5.264205657993443, calls=[]).returncode
+E        +  and   1 = support.FINDING_EXIT
+
+tests/acceptance/W2-69/test_w2_69_review_raw_judgement_not_reused.py:125: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-blob-dashed-token]" time="33.992" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_premise_the_string_is_a_finding_alone_and_none_inside_its_identifier[gov-token-upper]" time="13.535" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-paragraphs-pkcs8]" time="44.615"><failure message="AssertionError: sqlite-value, paragraphs, pkcs8: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 32.2 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00171.db&#10;  secret found in derived store: .gov-runtime/keys/case-00172.db&#10;  secret found in derived store: .gov-runtime/keys/case-00173.db&#10;  secret found in derived store: .gov-runtime/keys/case-00183.db&#10;  secret found in derived store: .gov-runtime/keys/case-00184.db&#10;  secret found in derived store: .gov-runtime/keys/case-00185.db&#10;  secret found in derived store: .gov-runtime/keys/case-00186.db&#10;  secret found in derived store: .gov-runtime/keys/case-00187.db&#10;  secret found in derived store: .gov-runtime/keys/case-00188.db&#10;  secret found in derived store: .gov-runtime/keys/case-00189.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_1/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_1/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_1/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_1/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'paragraphs', shape = 'pkcs8'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, paragraphs, pkcs8: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 32.2 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00171.db
+E         secret found in derived store: .gov-runtime/keys/case-00172.db
+E         secret found in derived store: .gov-runtime/keys/case-00173.db
+E         secret found in derived store: .gov-runtime/keys/case-00183.db
+E         secret found in derived store: .gov-runtime/keys/case-00184.db
+E         secret found in derived store: .gov-runtime/keys/case-00185.db
+E         secret found in derived store: .gov-runtime/keys/case-00186.db
+E         secret found in derived store: .gov-runtime/keys/case-00187.db
+E         secret found in derived store: .gov-runtime/keys/case-00188.db
+E         secret found in derived store: .gov-runtime/keys/case-00189.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_raw_judgement_not_reused" name="test_a_lock_held_briefly_is_waited_out_and_the_store_judged_by_its_values[a-token-across-a-page-and-its-overflow-page]" time="9.138"><failure message="AssertionError: another process held .gov-runtime/a-token-across-a-page-and-its-overflow-page.db for 1.0 s after the check started, then released it: the check did not wait the lock out and judge the store by its values, which hold a token (exit code 0 after 2.4 s)&#10;  exit code: 0 after 2.4 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  &#10;  stderr (tail):&#10;  &#10;assert (0 == 1)&#10; +  where 0 = CheckRun(returncode=0, stdout='', stderr='', seconds=2.4184846360003576, calls=[]).returncode&#10; +  and   1 = support.FINDING_EXIT">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_lock_held_briefly_is_wa0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_lock_held_briefly_is_wa0/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_lock_held_briefly_is_wa0/w2-69/project')
+store = 'a-token-across-a-page-and-its-overflow-page'
+
+    @pytest.mark.parametrize("store", STORES)
+    def test_a_lock_held_briefly_is_waited_out_and_the_store_judged_by_its_values(sandbox, project, store):
+        rel, token = _build(project, store, f"brief-{store}")
+        path = project / rel
+        holder = _hold(path)
+        released = threading.Event()
+        timer = threading.Timer(BRIEF_S, lambda: (_release(holder), released.set()))
+        began = time.monotonic()
+        proc = subprocess.Popen(support.check_command(), shell=True, cwd=str(project),
+                                env=support.base_environment(sandbox), stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, text=True, start_new_session=True)
+        timer.start()
+        try:
+            stdout, stderr = proc.communicate(timeout=support.declared_limit_s())
+            code = proc.returncode
+        except subprocess.TimeoutExpired:
+            support._kill_group(proc)
+            stdout, stderr = proc.communicate()
+            code = None
+        finally:
+            timer.join()
+            support._kill_group(proc)
+        run = support.CheckRun(code, stdout, stderr, time.monotonic() - began)
+        assert released.is_set(), "premise: the lock was released"
+        assert run.returncode is not None, f"the check did not end within its declared limit\n{run.describe()}"
+        assert token not in run.stdout + run.stderr, "the check printed the token"
+&gt;       assert run.returncode == support.FINDING_EXIT and run.names(rel), (
+            f"another process held {rel} for {BRIEF_S} s after the check started, then released it: the check did not "
+            f"wait the lock out and judge the store by its values, which hold a token (exit code {run.returncode} after "
+            f"{run.seconds:.1f} s)\n{run.describe()}")
+E       AssertionError: another process held .gov-runtime/a-token-across-a-page-and-its-overflow-page.db for 1.0 s after the check started, then released it: the check did not wait the lock out and judge the store by its values, which hold a token (exit code 0 after 2.4 s)
+E         exit code: 0 after 2.4 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         
+E         stderr (tail):
+E         
+E       assert (0 == 1)
+E        +  where 0 = CheckRun(returncode=0, stdout='', stderr='', seconds=2.4184846360003576, calls=[]).returncode
+E        +  and   1 = support.FINDING_EXIT
+
+tests/acceptance/W2-69/test_w2_69_review_raw_judgement_not_reused.py:158: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_a_full_text_index_storing_identifiers_after_a_shared_prefix_is_no_finding[as-written]" time="3.836"><failure message="AssertionError: as-written: the check flagged the full-text index of ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']: it holds token-shaped strings only inside identifiers (stored after the prefix a neighbouring term shares)&#10;  exit code: 1 after 3.3 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  secret found in derived store: .gov-runtime/fts/gov-token-digit.db&#10;  secret found in derived store: .gov-runtime/fts/gov-token-lower.db&#10;  secret found in derived store: .gov-runtime/fts/gov-token-upper.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing0/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing0/w2-69/project')
+state = 'as-written'
+
+    @pytest.mark.parametrize("state", STATES)
+    def test_a_full_text_index_storing_identifiers_after_a_shared_prefix_is_no_finding(sandbox, project, state):
+        rels = _stores(project, state)
+        run = support.run_check(sandbox, project)
+        assert run.returncode is not None, f"the check did not end within its declared limit\n{run.describe()}"
+        tokens = [token for _sep, token in review.review_k2_strings().values()]
+        assert not any(t in run.stdout + run.stderr or t.lower() in run.stdout + run.stderr for t in tokens), (
+            "the check printed a token-shaped string")
+        named = [rule for rule, rel in rels.items() if run.names(rel)]
+&gt;       assert not named, (
+            f"{state}: the check flagged the full-text index of {named}: it holds token-shaped strings only inside "
+            f"identifiers (stored after the prefix a neighbouring term shares)\n{run.describe(800)}")
+E       AssertionError: as-written: the check flagged the full-text index of ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']: it holds token-shaped strings only inside identifiers (stored after the prefix a neighbouring term shares)
+E         exit code: 1 after 3.3 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         secret found in derived store: .gov-runtime/fts/gov-token-digit.db
+E         secret found in derived store: .gov-runtime/fts/gov-token-lower.db
+E         secret found in derived store: .gov-runtime/fts/gov-token-upper.db
+E         
+E         stderr (tail):
+E         
+E       assert not ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']
+
+tests/acceptance/W2-69/test_w2_69_review_fts_stored_terms.py:91: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_premise_each_key_block_is_a_finding_whole_and_none_once_cut[pgp]" time="56.390" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-blank-lines-github-pat]" time="52.771" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_raw_judgement_not_reused" name="test_a_lock_held_briefly_is_waited_out_and_the_store_judged_by_its_values[a-token-value-after-a-word-byte-of-its-header]" time="10.693" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_a_full_text_index_storing_identifiers_after_a_shared_prefix_is_no_finding[optimised-and-vacuumed]" time="6.521"><failure message="AssertionError: optimised-and-vacuumed: the check flagged the full-text index of ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']: it holds token-shaped strings only inside identifiers (stored after the prefix a neighbouring term shares)&#10;  exit code: 1 after 6.2 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  secret found in derived store: .gov-runtime/fts/gov-token-digit.db&#10;  secret found in derived store: .gov-runtime/fts/gov-token-lower.db&#10;  secret found in derived store: .gov-runtime/fts/gov-token-upper.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing1/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_full_text_index_storing1/w2-69/project')
+state = 'optimised-and-vacuumed'
+
+    @pytest.mark.parametrize("state", STATES)
+    def test_a_full_text_index_storing_identifiers_after_a_shared_prefix_is_no_finding(sandbox, project, state):
+        rels = _stores(project, state)
+        run = support.run_check(sandbox, project)
+        assert run.returncode is not None, f"the check did not end within its declared limit\n{run.describe()}"
+        tokens = [token for _sep, token in review.review_k2_strings().values()]
+        assert not any(t in run.stdout + run.stderr or t.lower() in run.stdout + run.stderr for t in tokens), (
+            "the check printed a token-shaped string")
+        named = [rule for rule, rel in rels.items() if run.names(rel)]
+&gt;       assert not named, (
+            f"{state}: the check flagged the full-text index of {named}: it holds token-shaped strings only inside "
+            f"identifiers (stored after the prefix a neighbouring term shares)\n{run.describe(800)}")
+E       AssertionError: optimised-and-vacuumed: the check flagged the full-text index of ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']: it holds token-shaped strings only inside identifiers (stored after the prefix a neighbouring term shares)
+E         exit code: 1 after 6.2 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         secret found in derived store: .gov-runtime/fts/gov-token-digit.db
+E         secret found in derived store: .gov-runtime/fts/gov-token-lower.db
+E         secret found in derived store: .gov-runtime/fts/gov-token-upper.db
+E         
+E         stderr (tail):
+E         
+E       assert not ['gov-token-digit', 'gov-token-lower', 'gov-token-upper']
+
+tests/acceptance/W2-69/test_w2_69_review_fts_stored_terms.py:91: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-long-value-dashed-token]" time="41.196" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_control_a_real_token_at_a_word_boundary_in_such_an_index_is_found[as-written]" time="3.597" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_control_a_real_token_at_a_word_boundary_in_such_an_index_is_found[optimised-and-vacuumed]" time="6.454" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-lines-private-key-block]" time="71.532" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[dot-from-the-project]" time="118.709"><failure message="AssertionError: gov rebuild --json given the project relatively (dot-from-the-project) did not return its result&#10;  gov rebuild --json --root .&#10;  exit code: 1&#10;  stdout:&#10;  &#10;  stderr:&#10;  Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py&quot;, line 232, in &lt;module&gt;&#10;      sys.exit(main())&#10;               ^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py&quot;, line 217, in main&#10;      outcome = command.handler(root, args, config)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py&quot;, line 161, in run&#10;      compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob(&quot;*&quot;)&#10;                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py&quot;, line 161, in &lt;genexpr&gt;&#10;      compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob(&quot;*&quot;)&#10;                                          ^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/pathlib.py&quot;, line 682, in relative_to&#10;      raise ValueError(f&quot;{str(self)!r} is not in the subpath of {str(other)!r}&quot;)&#10;  ValueError: '/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje0/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json' is not in the subpath of '.'&#10;  &#10;assert (1 == 0)&#10; +  where 1 = GovRun(args=('rebuild', '--json', '--root', '.'), returncode=1, stdout='', stderr='Traceback (most recent call last):\...ild_given_the_proje0/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json\' is not in the subpath of \'.\'\n').returncode">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje0/w2-69/pycache'))
+embedder = &lt;w2_69_support.EmbedderStandIn object at 0x70b59ddda5d0&gt;
+how = 'dot-from-the-project'
+
+    @needs_vectors
+    @pytest.mark.parametrize("how", HOW)
+    def test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store(sandbox, embedder, how):
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=REAL_TOOL)
+        if not REAL_TOOL:
+            env = review.with_code_stand_in(env, review.install_code_stand_in(sandbox))
+        daemon = support.code_daemon_dir(project)
+        try:
+            first = support.rebuild(project, env)
+            assert support.store_status(first, "codeintel") == "recreated", (
+                f"premise: the code-graph store was built by the rebuild given the absolute path\n{first.describe()}")
+            assert support.sqlite_files(project / R / "codeintel"), "premise: a SQLite store in the code-graph tool's home"
+            for n in range(KEPT, PAGES):
+                (project / f"docs/page{n:02d}.md").unlink()
+            support.commit_all(project, "most pages deleted")
+            if how == "dot-from-the-project":
+                run = support.run_gov(project, env, "rebuild", "--json", "--root", ".")
+            else:
+                run = support.run_gov(project.parent, env, "rebuild", "--json", "--root", project.name)
+            free = _free(project)
+        finally:
+            if daemon is not None and daemon.is_dir():
+                shutil.rmtree(daemon, ignore_errors=True)
+&gt;       assert run.returncode == 0 and "Traceback" not in run.stderr, (
+            f"gov rebuild --json given the project relatively ({how}) did not return its result\n{run.describe()}")
+E       AssertionError: gov rebuild --json given the project relatively (dot-from-the-project) did not return its result
+E         gov rebuild --json --root .
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E           File "&lt;frozen runpy&gt;", line 88, in _run_code
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py", line 232, in &lt;module&gt;
+E             sys.exit(main())
+E                      ^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py", line 217, in main
+E             outcome = command.handler(root, args, config)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py", line 161, in run
+E             compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob("*")
+E                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py", line 161, in &lt;genexpr&gt;
+E             compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob("*")
+E                                                 ^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 682, in relative_to
+E             raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E         ValueError: '/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje0/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json' is not in the subpath of '.'
+E         
+E       assert (1 == 0)
+E        +  where 1 = GovRun(args=('rebuild', '--json', '--root', '.'), returncode=1, stdout='', stderr='Traceback (most recent call last):\...ild_given_the_proje0/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json\' is not in the subpath of \'.\'\n').returncode
+
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py:104: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_fts_stored_terms" name="test_a_rebuilt_lexical_index_storing_identifiers_after_a_shared_prefix_is_no_finding" time="29.242"><failure message="AssertionError: after a full rebuild of sources holding token-shaped strings only inside identifiers, the check is red on the stores the rebuild wrote (the lexical index stores each identifier after the prefix its neighbour shares)&#10;  exit code: 1 after 5.6 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  secret found in derived store: .gov-runtime/store.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert (1 == 0)&#10; +  where 1 = CheckRun(returncode=1, stdout='secret found in derived store: .gov-runtime/store.db\n', stderr='', seconds=5.6171023530187085, calls=[]).returncode">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_rebuilt_lexical_index_s0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw4/test_a_rebuilt_lexical_index_s0/w2-69/pycache'))
+embedder = &lt;w2_69_support.EmbedderStandIn object at 0x7f20bb887170&gt;
+
+    @needs_vectors
+    def test_a_rebuilt_lexical_index_storing_identifiers_after_a_shared_prefix_is_no_finding(sandbox, embedder):
+        """``gov rebuild --json`` (full, the semantic index against the stand-in embedder; the code-graph tool hidden, so
+        no daemon starts) in a project whose sources hold the identifiers and their neighbours; then the check."""
+        files = {f"docs/ids-{rule}.md": f"# {rule}\n\n" + "".join(review.identifier_lines(rule, 120)) for rule in RULES}
+        files["docs/intro.md"] = "# Intro\n\n" + support.prose(2000, "intro")
+        project = support.make_rebuild_project(sandbox, files)
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=False)
+        run = support.rebuild(project, env)
+        assert support.store_status(run, "lexical") == "recreated", f"premise: the lexical index\n{run.describe()}"
+        data = b"".join(path.read_bytes() for path in support.sqlite_files(project / R))
+        stored = {rule: review.stored_as_a_suffix(data, review.review_k2_strings()[rule][1]) for rule in RULES}
+        assert all(stored.values()), (
+            f"premise: the rebuilt index stores each identifier as its string after the shared prefix: {stored}")
+        check = support.run_check(sandbox, project, env=support.base_environment(sandbox))
+        assert check.returncode is not None, f"the check did not end within its declared limit\n{check.describe()}"
+        tokens = [token for _sep, token in review.review_k2_strings().values()]
+        assert not any(t in check.stdout + check.stderr or t.lower() in check.stdout + check.stderr for t in tokens), (
+            "the check printed a token-shaped string")
+&gt;       assert check.returncode == 0 and not check.stdout.strip(), (
+            f"after a full rebuild of sources holding token-shaped strings only inside identifiers, the check is red on "
+            f"the stores the rebuild wrote (the lexical index stores each identifier after the prefix its neighbour "
+            f"shares)\n{check.describe(800)}")
+E       AssertionError: after a full rebuild of sources holding token-shaped strings only inside identifiers, the check is red on the stores the rebuild wrote (the lexical index stores each identifier after the prefix its neighbour shares)
+E         exit code: 1 after 5.6 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         secret found in derived store: .gov-runtime/store.db
+E         
+E         stderr (tail):
+E         
+E       assert (1 == 0)
+E        +  where 1 = CheckRun(returncode=1, stdout='secret found in derived store: .gov-runtime/store.db\n', stderr='', seconds=5.6171023530187085, calls=[]).returncode
+
+tests/acceptance/W2-69/test_w2_69_review_fts_stored_terms.py:142: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_a_secret_removed_from_the_sources_leaves_no_residue_the_check_finds" time="68.522" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-paragraphs-openssh]" time="40.529"><failure message="AssertionError: sqlite-value, paragraphs, openssh: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 28.4 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00171.db&#10;  secret found in derived store: .gov-runtime/keys/case-00172.db&#10;  secret found in derived store: .gov-runtime/keys/case-00173.db&#10;  secret found in derived store: .gov-runtime/keys/case-00183.db&#10;  secret found in derived store: .gov-runtime/keys/case-00184.db&#10;  secret found in derived store: .gov-runtime/keys/case-00185.db&#10;  secret found in derived store: .gov-runtime/keys/case-00186.db&#10;  secret found in derived store: .gov-runtime/keys/case-00187.db&#10;  secret found in derived store: .gov-runtime/keys/case-00188.db&#10;  secret found in derived store: .gov-runtime/keys/case-00189.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_2/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_2/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_2/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_2/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_2/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'paragraphs', shape = 'openssh'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, paragraphs, openssh: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 28.4 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00171.db
+E         secret found in derived store: .gov-runtime/keys/case-00172.db
+E         secret found in derived store: .gov-runtime/keys/case-00173.db
+E         secret found in derived store: .gov-runtime/keys/case-00183.db
+E         secret found in derived store: .gov-runtime/keys/case-00184.db
+E         secret found in derived store: .gov-runtime/keys/case-00185.db
+E         secret found in derived store: .gov-runtime/keys/case-00186.db
+E         secret found in derived store: .gov-runtime/keys/case-00187.db
+E         secret found in derived store: .gov-runtime/keys/case-00188.db
+E         secret found in derived store: .gov-runtime/keys/case-00189.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-many-values-github-pat]" time="16.409" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_premise_each_key_block_is_a_finding_whole_and_none_once_cut[pem-rsa]" time="50.721" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-blank-lines-dashed-token]" time="30.609" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-paragraphs-pem-rsa]" time="46.929"><failure message="AssertionError: plain-file, paragraphs, pem-rsa: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 28.4 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00171.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00172.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00173.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00183.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00184.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00185.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00186.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00187.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00188.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00189.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_0/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_0/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_0/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_0/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'paragraphs', shape = 'pem-rsa'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, paragraphs, pem-rsa: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 28.4 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00171.txt
+E         secret found in derived store: .gov-runtime/keys/case-00172.txt
+E         secret found in derived store: .gov-runtime/keys/case-00173.txt
+E         secret found in derived store: .gov-runtime/keys/case-00183.txt
+E         secret found in derived store: .gov-runtime/keys/case-00184.txt
+E         secret found in derived store: .gov-runtime/keys/case-00185.txt
+E         secret found in derived store: .gov-runtime/keys/case-00186.txt
+E         secret found in derived store: .gov-runtime/keys/case-00187.txt
+E         secret found in derived store: .gov-runtime/keys/case-00188.txt
+E         secret found in derived store: .gov-runtime/keys/case-00189.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-many-values-dashed-token]" time="29.056" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-paragraphs-pgp]" time="40.396"><failure message="AssertionError: sqlite-value, paragraphs, pgp: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 26.9 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00171.db&#10;  secret found in derived store: .gov-runtime/keys/case-00172.db&#10;  secret found in derived store: .gov-runtime/keys/case-00173.db&#10;  secret found in derived store: .gov-runtime/keys/case-00183.db&#10;  secret found in derived store: .gov-runtime/keys/case-00184.db&#10;  secret found in derived store: .gov-runtime/keys/case-00185.db&#10;  secret found in derived store: .gov-runtime/keys/case-00186.db&#10;  secret found in derived store: .gov-runtime/keys/case-00187.db&#10;  secret found in derived store: .gov-runtime/keys/case-00188.db&#10;  secret found in derived store: .gov-runtime/keys/case-00189.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_3/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_3/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_3/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_3/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_3/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'paragraphs', shape = 'pgp'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, paragraphs, pgp: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 26.9 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00171.db
+E         secret found in derived store: .gov-runtime/keys/case-00172.db
+E         secret found in derived store: .gov-runtime/keys/case-00173.db
+E         secret found in derived store: .gov-runtime/keys/case-00183.db
+E         secret found in derived store: .gov-runtime/keys/case-00184.db
+E         secret found in derived store: .gov-runtime/keys/case-00185.db
+E         secret found in derived store: .gov-runtime/keys/case-00186.db
+E         secret found in derived store: .gov-runtime/keys/case-00187.db
+E         secret found in derived store: .gov-runtime/keys/case-00188.db
+E         secret found in derived store: .gov-runtime/keys/case-00189.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-long-value-private-key-block]" time="65.415" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-longword-github-pat]" time="48.366" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-utf16-store-value-github-pat]" time="59.464" /><testcase classname="tests.acceptance.W2-69.test_w2_69_deleted_text_after_rebuild" name="test_the_code_graph_store_holds_no_deleted_word_and_no_free_page_after_a_rebuild" time="109.047" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_premise_each_key_block_is_a_finding_whole_and_none_once_cut[pkcs8]" time="50.488" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-paragraphs-pkcs8]" time="72.790"><failure message="AssertionError: plain-file, paragraphs, pkcs8: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 26.3 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00171.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00172.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00173.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00183.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00184.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00185.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00186.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00187.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00188.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00189.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_1/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_1/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_1/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_1/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'paragraphs', shape = 'pkcs8'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, paragraphs, pkcs8: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 26.3 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00171.txt
+E         secret found in derived store: .gov-runtime/keys/case-00172.txt
+E         secret found in derived store: .gov-runtime/keys/case-00173.txt
+E         secret found in derived store: .gov-runtime/keys/case-00183.txt
+E         secret found in derived store: .gov-runtime/keys/case-00184.txt
+E         secret found in derived store: .gov-runtime/keys/case-00185.txt
+E         secret found in derived store: .gov-runtime/keys/case-00186.txt
+E         secret found in derived store: .gov-runtime/keys/case-00187.txt
+E         secret found in derived store: .gov-runtime/keys/case-00188.txt
+E         secret found in derived store: .gov-runtime/keys/case-00189.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-no-blank-lines-pem-rsa]" time="62.625"><failure message="AssertionError: sqlite-value, no-blank-lines, pem-rsa: the check missed 48 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 44.1 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00322.db&#10;  secret found in derived store: .gov-runtime/keys/case-00323.db&#10;  secret found in derived store: .gov-runtime/keys/case-00324.db&#10;  secret found in derived store: .gov-runtime/keys/case-00325.db&#10;  secret found in derived store: .gov-runtime/keys/case-00326.db&#10;  secret found in derived store: .gov-runtime/keys/case-00327.db&#10;  secret found in derived store: .gov-runtime/keys/case-00338.db&#10;  secret found in derived store: .gov-runtime/keys/case-00339.db&#10;  secret found in derived store: .gov-runtime/keys/case-00340.db&#10;  secret found in derived store: .gov-runtime/keys/case-00341.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_4/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_4/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_4/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_4/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_4/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'no-blank-lines', shape = 'pem-rsa'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, no-blank-lines, pem-rsa: the check missed 48 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 44.1 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00322.db
+E         secret found in derived store: .gov-runtime/keys/case-00323.db
+E         secret found in derived store: .gov-runtime/keys/case-00324.db
+E         secret found in derived store: .gov-runtime/keys/case-00325.db
+E         secret found in derived store: .gov-runtime/keys/case-00326.db
+E         secret found in derived store: .gov-runtime/keys/case-00327.db
+E         secret found in derived store: .gov-runtime/keys/case-00338.db
+E         secret found in derived store: .gov-runtime/keys/case-00339.db
+E         secret found in derived store: .gov-runtime/keys/case-00340.db
+E         secret found in derived store: .gov-runtime/keys/case-00341.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store[a-relative-path-from-its-parent]" time="102.192"><failure message="AssertionError: gov rebuild --json given the project relatively (a-relative-path-from-its-parent) did not return its result&#10;  gov rebuild --json --root rebuild-project&#10;  exit code: 1&#10;  stdout:&#10;  &#10;  stderr:&#10;  Traceback (most recent call last):&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 198, in _run_module_as_main&#10;    File &quot;&lt;frozen runpy&gt;&quot;, line 88, in _run_code&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py&quot;, line 232, in &lt;module&gt;&#10;      sys.exit(main())&#10;               ^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py&quot;, line 217, in main&#10;      outcome = command.handler(root, args, config)&#10;                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py&quot;, line 161, in run&#10;      compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob(&quot;*&quot;)&#10;                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py&quot;, line 161, in &lt;genexpr&gt;&#10;      compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob(&quot;*&quot;)&#10;                                          ^^^^^^^^^^^^^^^^^^^^^^&#10;    File &quot;/usr/lib/python3.12/pathlib.py&quot;, line 682, in relative_to&#10;      raise ValueError(f&quot;{str(self)!r} is not in the subpath of {str(other)!r}&quot;)&#10;  ValueError: '/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje1/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json' is not in the subpath of 'rebuild-project'&#10;  &#10;assert (1 == 0)&#10; +  where 1 = GovRun(args=('rebuild', '--json', '--root', 'rebuild-project'), returncode=1, stdout='', stderr='Traceback (most recen...proje1/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json\' is not in the subpath of \'rebuild-project\'\n').returncode">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje1/w2-69/pycache'))
+embedder = &lt;w2_69_support.EmbedderStandIn object at 0x70b59dbbdb50&gt;
+how = 'a-relative-path-from-its-parent'
+
+    @needs_vectors
+    @pytest.mark.parametrize("how", HOW)
+    def test_a_rebuild_given_the_project_relatively_returns_its_result_and_compacts_every_store(sandbox, embedder, how):
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=REAL_TOOL)
+        if not REAL_TOOL:
+            env = review.with_code_stand_in(env, review.install_code_stand_in(sandbox))
+        daemon = support.code_daemon_dir(project)
+        try:
+            first = support.rebuild(project, env)
+            assert support.store_status(first, "codeintel") == "recreated", (
+                f"premise: the code-graph store was built by the rebuild given the absolute path\n{first.describe()}")
+            assert support.sqlite_files(project / R / "codeintel"), "premise: a SQLite store in the code-graph tool's home"
+            for n in range(KEPT, PAGES):
+                (project / f"docs/page{n:02d}.md").unlink()
+            support.commit_all(project, "most pages deleted")
+            if how == "dot-from-the-project":
+                run = support.run_gov(project, env, "rebuild", "--json", "--root", ".")
+            else:
+                run = support.run_gov(project.parent, env, "rebuild", "--json", "--root", project.name)
+            free = _free(project)
+        finally:
+            if daemon is not None and daemon.is_dir():
+                shutil.rmtree(daemon, ignore_errors=True)
+&gt;       assert run.returncode == 0 and "Traceback" not in run.stderr, (
+            f"gov rebuild --json given the project relatively ({how}) did not return its result\n{run.describe()}")
+E       AssertionError: gov rebuild --json given the project relatively (a-relative-path-from-its-parent) did not return its result
+E         gov rebuild --json --root rebuild-project
+E         exit code: 1
+E         stdout:
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "&lt;frozen runpy&gt;", line 198, in _run_module_as_main
+E           File "&lt;frozen runpy&gt;", line 88, in _run_code
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py", line 232, in &lt;module&gt;
+E             sys.exit(main())
+E                      ^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/cli/main.py", line 217, in main
+E             outcome = command.handler(root, args, config)
+E                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py", line 161, in run
+E             compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob("*")
+E                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/home/usain/gov-os-worktrees/W2-69/src/gov/rebuild/command.py", line 161, in &lt;genexpr&gt;
+E             compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob("*")
+E                                                 ^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/lib/python3.12/pathlib.py", line 682, in relative_to
+E             raise ValueError(f"{str(self)!r} is not in the subpath of {str(other)!r}")
+E         ValueError: '/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_rebuild_given_the_proje1/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json' is not in the subpath of 'rebuild-project'
+E         
+E       assert (1 == 0)
+E        +  where 1 = GovRun(args=('rebuild', '--json', '--root', 'rebuild-project'), returncode=1, stdout='', stderr='Traceback (most recen...proje1/w2-69/rebuild-project/.gov-runtime/codeintel/home/config.json\' is not in the subpath of \'rebuild-project\'\n').returncode
+
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py:104: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-longword-dashed-token]" time="40.834" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_a_token_is_red_naming_it[a-damaged-page]" time="2.303" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-blob-of-its-bytes]" time="4.148" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[sqlite-utf16-store-value-dashed-token]" time="39.369" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_a_token_is_red_naming_it[truncated]" time="4.213" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-blob-of-utf16be-bytes]" time="3.755" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_no_token_is_scanned_by_its_raw_bytes[garbage-after-the-header]" time="6.440" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_every_form" name="test_a_real_token_is_found_in_every_form_a_store_holds_it[a-blob-of-utf16le-bytes]" time="3.056" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_finding_in_freed_space_is_never_reused" time="15.959" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_no_token_is_scanned_by_its_raw_bytes[a-damaged-page]" time="7.064" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_no_token_is_scanned_by_its_raw_bytes[truncated]" time="5.892" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-utf16le-github-pat]" time="30.186" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_store_another_process_holds_locked_is_judged_by_its_raw_bytes[a-token]" time="2.184" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-paragraphs-openssh]" time="28.454"><failure message="AssertionError: plain-file, paragraphs, openssh: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 24.2 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00171.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00172.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00173.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00183.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00184.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00185.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00186.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00187.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00188.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00189.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_2/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_2/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_2/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_2/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_2/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'paragraphs', shape = 'openssh'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, paragraphs, openssh: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 24.2 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00171.txt
+E         secret found in derived store: .gov-runtime/keys/case-00172.txt
+E         secret found in derived store: .gov-runtime/keys/case-00173.txt
+E         secret found in derived store: .gov-runtime/keys/case-00183.txt
+E         secret found in derived store: .gov-runtime/keys/case-00184.txt
+E         secret found in derived store: .gov-runtime/keys/case-00185.txt
+E         secret found in derived store: .gov-runtime/keys/case-00186.txt
+E         secret found in derived store: .gov-runtime/keys/case-00187.txt
+E         secret found in derived store: .gov-runtime/keys/case-00188.txt
+E         secret found in derived store: .gov-runtime/keys/case-00189.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_value_only_the_projects_own_rules_find_is_red_in_every_form[a-text-value]" time="6.388" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-no-blank-lines-pkcs8]" time="51.958"><failure message="AssertionError: sqlite-value, no-blank-lines, pkcs8: the check missed 48 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 39.4 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00322.db&#10;  secret found in derived store: .gov-runtime/keys/case-00323.db&#10;  secret found in derived store: .gov-runtime/keys/case-00324.db&#10;  secret found in derived store: .gov-runtime/keys/case-00325.db&#10;  secret found in derived store: .gov-runtime/keys/case-00326.db&#10;  secret found in derived store: .gov-runtime/keys/case-00327.db&#10;  secret found in derived store: .gov-runtime/keys/case-00338.db&#10;  secret found in derived store: .gov-runtime/keys/case-00339.db&#10;  secret found in derived store: .gov-runtime/keys/case-00340.db&#10;  secret found in derived store: .gov-runtime/keys/case-00341.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_5/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_5/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_5/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_5/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_5/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'no-blank-lines', shape = 'pkcs8'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, no-blank-lines, pkcs8: the check missed 48 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 39.4 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00322.db
+E         secret found in derived store: .gov-runtime/keys/case-00323.db
+E         secret found in derived store: .gov-runtime/keys/case-00324.db
+E         secret found in derived store: .gov-runtime/keys/case-00325.db
+E         secret found in derived store: .gov-runtime/keys/case-00326.db
+E         secret found in derived store: .gov-runtime/keys/case-00327.db
+E         secret found in derived store: .gov-runtime/keys/case-00338.db
+E         secret found in derived store: .gov-runtime/keys/case-00339.db
+E         secret found in derived store: .gov-runtime/keys/case-00340.db
+E         secret found in derived store: .gov-runtime/keys/case-00341.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_store_another_process_holds_locked_is_judged_by_its_raw_bytes[no-token]" time="3.273" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[hang-a-sqlite-value]" time="70.736" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_value_only_the_projects_own_rules_find_is_red_in_every_form[freed-space]" time="8.594" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[signal-a-sqlite-value]" time="14.475" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_value_only_the_projects_own_rules_find_is_red_in_every_form[a-utf16le-blob]" time="7.711" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_value_only_the_projects_own_rules_find_is_red_in_every_form[a-plain-file]" time="5.849" /><testcase classname="tests.acceptance.W2-69.test_w2_69_design_note_first" name="test_the_design_note_was_committed_before_any_code_of_this_ticket" time="0.611" /><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-oneline-github-pat]" time="32.409" /><testcase classname="tests.acceptance.W2-69.test_w2_69_unit_folder_renamed" name="test_unit_collection_is_clean_with_a_plugin_that_imports_the_standard_librarys_secrets_first[one-process]" time="5.122" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-paragraphs-pgp]" time="27.860"><failure message="AssertionError: plain-file, paragraphs, pgp: the check missed 15 of 190 private-key blocks:&#10;    a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it&#10;    a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it&#10;    a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it&#10;  exit code: 1 after 23.9 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00171.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00172.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00173.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00183.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00184.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00185.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00186.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00187.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00188.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00189.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_3/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_3/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_3/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_3/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_3/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'paragraphs', shape = 'pgp'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, paragraphs, pgp: the check missed 15 of 190 private-key blocks:
+E           a block of 4600 bytes across content offset 252006 (a read of gitleaks): block start at [-2598] bytes from it
+E           a block of 6600 bytes across content offset 252006 (a read of gitleaks): block start at [-4330, -3897, -3464, -3031, -2598] bytes from it
+E           a block of 8192 bytes across content offset 252006 (a read of gitleaks): block start at [-6062, -5629, -5196, -4763, -4330, -3897, -3464, -3031, -2598] bytes from it
+E         exit code: 1 after 23.9 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00171.txt
+E         secret found in derived store: .gov-runtime/keys/case-00172.txt
+E         secret found in derived store: .gov-runtime/keys/case-00173.txt
+E         secret found in derived store: .gov-runtime/keys/case-00183.txt
+E         secret found in derived store: .gov-runtime/keys/case-00184.txt
+E         secret found in derived store: .gov-runtime/keys/case-00185.txt
+E         secret found in derived store: .gov-runtime/keys/case-00186.txt
+E         secret found in derived store: .gov-runtime/keys/case-00187.txt
+E         secret found in derived store: .gov-runtime/keys/case-00188.txt
+E         secret found in derived store: .gov-runtime/keys/case-00189.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 252006): [-2598], (6600, 252006): [-4330, -3897, -3464, -3031, -2598], (8192, 252006): [-6062, -5629, -5196, -4763, -4330, -3897, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[exit-code-a-sqlite-value]" time="10.312" /><testcase classname="tests.acceptance.W2-69.test_w2_69_unit_folder_renamed" name="test_the_unit_folder_named_secrets_is_gone" time="0.000" /><testcase classname="tests.acceptance.W2-69.test_w2_69_unit_folder_renamed" name="test_the_checks_builder_tests_are_under_secrets_check" time="0.001" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[artifactory-api-key]" time="10.062" /><testcase classname="tests.acceptance.W2-69.test_w2_69_unit_folder_renamed" name="test_unit_collection_is_clean_with_a_plugin_that_imports_the_standard_librarys_secrets_first[two-xdist-workers]" time="12.172" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[signal-freed-space]" time="13.783" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[artifactory-reference-token]" time="12.255" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_project_rules_string_is_a_token_alone_and_none_inside_its_word[gov-canary]" time="9.307" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[authress-service-client-access-key]" time="7.491" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[exit-code-freed-space]" time="7.321" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-no-blank-lines-openssh]" time="42.852"><failure message="AssertionError: sqlite-value, no-blank-lines, openssh: the check missed 42 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it&#10;  exit code: 1 after 33.3 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00323.db&#10;  secret found in derived store: .gov-runtime/keys/case-00324.db&#10;  secret found in derived store: .gov-runtime/keys/case-00325.db&#10;  secret found in derived store: .gov-runtime/keys/case-00326.db&#10;  secret found in derived store: .gov-runtime/keys/case-00327.db&#10;  secret found in derived store: .gov-runtime/keys/case-00337.db&#10;  secret found in derived store: .gov-runtime/keys/case-00338.db&#10;  secret found in derived store: .gov-runtime/keys/case-00339.db&#10;  secret found in derived store: .gov-runtime/keys/case-00340.db&#10;  secret found in derived store: .gov-runtime/keys/case-00341.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64], (4600, 249669): [-400, -383, -160, -64], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_6/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_6/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_6/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_6/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_6/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'no-blank-lines', shape = 'openssh'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, no-blank-lines, openssh: the check missed 42 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it
+E         exit code: 1 after 33.3 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00323.db
+E         secret found in derived store: .gov-runtime/keys/case-00324.db
+E         secret found in derived store: .gov-runtime/keys/case-00325.db
+E         secret found in derived store: .gov-runtime/keys/case-00326.db
+E         secret found in derived store: .gov-runtime/keys/case-00327.db
+E         secret found in derived store: .gov-runtime/keys/case-00337.db
+E         secret found in derived store: .gov-runtime/keys/case-00338.db
+E         secret found in derived store: .gov-runtime/keys/case-00339.db
+E         secret found in derived store: .gov-runtime/keys/case-00340.db
+E         secret found in derived store: .gov-runtime/keys/case-00341.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64], (4600, 249669): [-400, -383, -160, -64], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_project_rules_string_is_a_token_alone_and_none_inside_its_word[gov-token-digit]" time="4.647" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-no-blank-lines-pem-rsa]" time="37.223"><failure message="AssertionError: plain-file, no-blank-lines, pem-rsa: the check missed 48 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 35.2 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00322.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00323.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00324.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00325.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00326.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00327.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00338.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00339.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00340.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00341.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_4/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_4/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_4/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_4/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_4/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'no-blank-lines', shape = 'pem-rsa'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, no-blank-lines, pem-rsa: the check missed 48 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 35.2 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00322.txt
+E         secret found in derived store: .gov-runtime/keys/case-00323.txt
+E         secret found in derived store: .gov-runtime/keys/case-00324.txt
+E         secret found in derived store: .gov-runtime/keys/case-00325.txt
+E         secret found in derived store: .gov-runtime/keys/case-00326.txt
+E         secret found in derived store: .gov-runtime/keys/case-00327.txt
+E         secret found in derived store: .gov-runtime/keys/case-00338.txt
+E         secret found in derived store: .gov-runtime/keys/case-00339.txt
+E         secret found in derived store: .gov-runtime/keys/case-00340.txt
+E         secret found in derived store: .gov-runtime/keys/case-00341.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_real_token_across_read_edges" name="test_a_real_token_is_found_across_every_place_a_read_begins_or_ends[plain-oneline-dashed-token]" time="22.507" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_rebuild_root_and_held_store" name="test_a_store_the_rebuild_cannot_compact_is_named_with_its_reason_on_standard_error" time="52.692"><failure message="AssertionError: another process held .gov-runtime/codeintel/home/code.db during the rebuild, which could not compact it: its standard error does not name the store with the reason (the JSON result gives [&quot;not compacted: database is locked&quot;])&#10;  gov rebuild --json&#10;  exit code: 0&#10;  stdout:&#10;  {&quot;ok&quot;: true, &quot;command&quot;: &quot;rebuild&quot;, &quot;result&quot;: {&quot;digest&quot;: &quot;67395ebbe3871f7df92767438805b9c5785872443f3812ea33765bbea7e02315&quot;, &quot;store&quot;: {&quot;digest&quot;: &quot;67395ebbe3871f7df92767438805b9c5785872443f3812ea33765bbea7e02315&quot;, &quot;invalid&quot;: []}, &quot;stores&quot;: {&quot;lexical&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;semantic&quot;: {&quot;status&quot;: &quot;recreated&quot;}, &quot;codeintel&quot;: {&quot;status&quot;: &quot;recreated&quot;}}, &quot;compaction&quot;: {&quot;.gov-runtime/store.db&quot;: &quot;compacted&quot;, &quot;.gov-runtime/codeintel/home/code.db&quot;: &quot;not compacted: database is locked&quot;}, &quot;timing&quot;: {&quot;lexical_s&quot;: 4.5}}, &quot;session&quot;: &quot;&quot;}&#10;  &#10;  stderr:&#10;  &#10;assert ([])">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_store_the_rebuild_canno0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw7/test_a_store_the_rebuild_canno0/w2-69/pycache'))
+embedder = &lt;w2_69_support.EmbedderStandIn object at 0x70b59dbbdeb0&gt;
+
+    @needs_vectors
+    def test_a_store_the_rebuild_cannot_compact_is_named_with_its_reason_on_standard_error(sandbox, embedder):
+        project = support.make_rebuild_project(sandbox, _files())
+        env = support.rebuild_environment(sandbox, embedder, with_code_tool=False)
+        env = review.with_code_stand_in(env, review.install_code_stand_in(sandbox))
+        hold = sandbox.elsewhere / "code-store-hold"
+        env["W2_69_HOLD"] = str(hold)
+        daemon = support.code_daemon_dir(project)
+        try:
+            run = support.run_gov(project, env, "rebuild", "--json")
+        finally:
+            Path(str(hold) + ".release").touch()
+            if daemon is not None and daemon.is_dir():
+                shutil.rmtree(daemon, ignore_errors=True)
+        end = time.monotonic() + 30
+        while not Path(str(hold) + ".release.done").exists() and time.monotonic() &lt; end:
+            time.sleep(0.05)       # the holder lets the store go before the test reads it
+        rel = review.CODE_STORE_REL
+        absolute = str(project / rel)
+        assert Path(str(hold) + ".ready").exists(), f"premise: another process held {rel} during the rebuild"
+        assert support.free_pages(project / rel) &gt; 0, f"premise: the rebuild could not compact {rel}\n{run.describe()}"
+        envelope = run.envelope()
+        payload = envelope.get("result") if envelope.get("ok") else envelope.get("error")
+        assert payload and any(rel in text or absolute in text for text in _strings(payload)), (
+            f"the rebuild's JSON result does not name {rel}, which it could not compact\n{run.describe()}")
+        lines = [line for line in run.stderr.splitlines() if rel in line or absolute in line]
+        reasons = [reason for reason in _json_reason(payload, rel) if reason.strip()]
+        told = any(_REASON.search(line) for line in lines) or any(
+            reason in run.stderr or reason.split(":", 1)[-1].strip() in run.stderr for reason in reasons)
+&gt;       assert lines and told, (
+            f"another process held {rel} during the rebuild, which could not compact it: its standard error does not "
+            f"name the store with the reason (the JSON result gives {json.dumps(reasons)})\n{run.describe()}")
+E       AssertionError: another process held .gov-runtime/codeintel/home/code.db during the rebuild, which could not compact it: its standard error does not name the store with the reason (the JSON result gives ["not compacted: database is locked"])
+E         gov rebuild --json
+E         exit code: 0
+E         stdout:
+E         {"ok": true, "command": "rebuild", "result": {"digest": "67395ebbe3871f7df92767438805b9c5785872443f3812ea33765bbea7e02315", "store": {"digest": "67395ebbe3871f7df92767438805b9c5785872443f3812ea33765bbea7e02315", "invalid": []}, "stores": {"lexical": {"status": "recreated"}, "semantic": {"status": "recreated"}, "codeintel": {"status": "recreated"}}, "compaction": {".gov-runtime/store.db": "compacted", ".gov-runtime/codeintel/home/code.db": "not compacted: database is locked"}, "timing": {"lexical_s": 4.5}}, "session": ""}
+E         
+E         stderr:
+E         
+E       assert ([])
+
+tests/acceptance/W2-69/test_w2_69_review_rebuild_root_and_held_store.py:184: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[aws-access-token]" time="13.201" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_project_rules_string_is_a_token_alone_and_none_inside_its_word[gov-token-lower]" time="9.234" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[signal-a-plain-file]" time="13.043" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_project_rules_string_is_a_token_alone_and_none_inside_its_word[gov-token-upper]" time="10.498" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[aws-amazon-bedrock-api-key-long-lived]" time="11.033" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_scan_that_cannot_finish_fails_closed[exit-code-a-plain-file]" time="11.697" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[1password-secret-key]" time="10.267" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_the_default_rules_with_a_leading_boundary_are_the_ones_covered" time="0.093" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[digitalocean-refresh-token]" time="7.740" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[cloudflare-origin-ca-key]" time="8.760" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[clickhouse-cloud-api-secret-key]" time="8.205" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_without_gitleaks_the_check_fails_closed" time="1.927" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[adobe-client-secret]" time="7.830" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_an_unchanged_sqlite_store_is_reused_and_a_change_in_its_freed_space_is_scanned_again" time="9.535" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[easypost-api-token]" time="6.818" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[curl-auth-header]" time="6.639" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[flyio-access-token]" time="4.943" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-no-blank-lines-pkcs8]" time="29.835"><failure message="AssertionError: plain-file, no-blank-lines, pkcs8: the check missed 48 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 27.0 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00322.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00323.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00324.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00325.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00326.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00327.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00338.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00339.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00340.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00341.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_5/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_5/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_5/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_5/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_5/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'no-blank-lines', shape = 'pkcs8'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, no-blank-lines, pkcs8: the check missed 48 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 27.0 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00322.txt
+E         secret found in derived store: .gov-runtime/keys/case-00323.txt
+E         secret found in derived store: .gov-runtime/keys/case-00324.txt
+E         secret found in derived store: .gov-runtime/keys/case-00325.txt
+E         secret found in derived store: .gov-runtime/keys/case-00326.txt
+E         secret found in derived store: .gov-runtime/keys/case-00327.txt
+E         secret found in derived store: .gov-runtime/keys/case-00338.txt
+E         secret found in derived store: .gov-runtime/keys/case-00339.txt
+E         secret found in derived store: .gov-runtime/keys/case-00340.txt
+E         secret found in derived store: .gov-runtime/keys/case-00341.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[airtable-personnal-access-token]" time="4.553" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[easypost-test-api-token]" time="4.690" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[curl-auth-user]" time="8.032" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[grafana-cloud-api-token]" time="4.608" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[sqlite-value-no-blank-lines-pgp]" time="45.315"><failure message="AssertionError: sqlite-value, no-blank-lines, pgp: the check missed 193 of 342 private-key blocks:&#10;    a block of 4000 bytes across content offset 59445 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it&#10;    a block of 4000 bytes across content offset 249669 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-8191, -8190, -8189, -8184, -8168, -8128, -8032, -7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 35.9 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00289.db&#10;  secret found in derived store: .gov-runtime/keys/case-00290.db&#10;  secret found in derived store: .gov-runtime/keys/case-00309.db&#10;  secret found in derived store: .gov-runtime/keys/case-00310.db&#10;  secret found in derived store: .gov-runtime/keys/case-00311.db&#10;  secret found in derived store: .gov-runtime/keys/case-00312.db&#10;  secret found in derived store: .gov-runtime/keys/case-00338.db&#10;  secret found in derived store: .gov-runtime/keys/case-00339.db&#10;  secret found in derived store: .gov-runtime/keys/case-00340.db&#10;  secret found in derived store: .gov-runtime/keys/case-00341.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4000, 59445): [-3999, -3998, -3997, -3992, -3976, -3936, ...], (4000, 249669): [-3999, -3998, -3997, -3992, -3976, -... [-4599, -4598, -4597, -4592, -4576, -4536, ...], (4600, 249669): [-4599, -4598, -4597, -4592, -4576, -4536, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_7/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_7/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_7/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_7/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_private_key_block_7/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value', layout = 'no-blank-lines', shape = 'pgp'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, no-blank-lines, pgp: the check missed 193 of 342 private-key blocks:
+E           a block of 4000 bytes across content offset 59445 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it
+E           a block of 4000 bytes across content offset 249669 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-8191, -8190, -8189, -8184, -8168, -8128, -8032, -7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 35.9 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00289.db
+E         secret found in derived store: .gov-runtime/keys/case-00290.db
+E         secret found in derived store: .gov-runtime/keys/case-00309.db
+E         secret found in derived store: .gov-runtime/keys/case-00310.db
+E         secret found in derived store: .gov-runtime/keys/case-00311.db
+E         secret found in derived store: .gov-runtime/keys/case-00312.db
+E         secret found in derived store: .gov-runtime/keys/case-00338.db
+E         secret found in derived store: .gov-runtime/keys/case-00339.db
+E         secret found in derived store: .gov-runtime/keys/case-00340.db
+E         secret found in derived store: .gov-runtime/keys/case-00341.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4000, 59445): [-3999, -3998, -3997, -3992, -3976, -3936, ...], (4000, 249669): [-3999, -3998, -3997, -3992, -3976, -... [-4599, -4598, -4597, -4592, -4576, -4536, ...], (4600, 249669): [-4599, -4598, -4597, -4592, -4576, -4536, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[gcp-api-key]" time="4.664" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[alibaba-access-key-id]" time="5.027" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[facebook-access-token]" time="9.292" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[grafana-service-account-token]" time="6.108" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[gitlab-pat-routable]" time="61.512" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[anthropic-admin-api-key]" time="7.811" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[databricks-api-token]" time="8.728" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[heroku-api-key-v2]" time="9.917" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[facebook-page-access-token]" time="11.436" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_every_file_the_check_scans_today_is_still_scanned_with_every_rule_set" time="5.840" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[anthropic-api-key]" time="10.298" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[digitalocean-access-token]" time="9.654" /><testcase classname="tests.acceptance.W2-69.test_w2_69_still_scanned_and_closed" name="test_a_sqlite_file_that_cannot_be_read_and_holds_a_token_is_red_naming_it[garbage-after-the-header]" time="2.185" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[huggingface-access-token]" time="6.806" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[octopus-deploy-api-key]" time="6.916" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[infracost-api-token]" time="6.734" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[kubernetes-secret-yaml]" time="0.005" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[maxmind-license-key]" time="6.149" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[digitalocean-pat]" time="5.944" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-no-blank-lines-openssh]" time="30.864"><failure message="AssertionError: plain-file, no-blank-lines, openssh: the check missed 42 of 342 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it&#10;  exit code: 1 after 27.9 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00323.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00324.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00325.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00326.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00327.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00337.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00338.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00339.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00340.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00341.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64], (4600, 249669): [-400, -383, -160, -64], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_6/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_6/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_6/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_6/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_6/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'no-blank-lines', shape = 'openssh'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, no-blank-lines, openssh: the check missed 42 of 342 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-2200, -1650, -1100, -1000, -550, -400, -160, -64] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64] bytes from it
+E         exit code: 1 after 27.9 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00323.txt
+E         secret found in derived store: .gov-runtime/keys/case-00324.txt
+E         secret found in derived store: .gov-runtime/keys/case-00325.txt
+E         secret found in derived store: .gov-runtime/keys/case-00326.txt
+E         secret found in derived store: .gov-runtime/keys/case-00327.txt
+E         secret found in derived store: .gov-runtime/keys/case-00337.txt
+E         secret found in derived store: .gov-runtime/keys/case-00338.txt
+E         secret found in derived store: .gov-runtime/keys/case-00339.txt
+E         secret found in derived store: .gov-runtime/keys/case-00340.txt
+E         secret found in derived store: .gov-runtime/keys/case-00341.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64], (4600, 249669): [-400, -383, -160, -64], (6600, 59445): [-2200, -1650, -1100, -1000, -550, -400, ...], (6600, 249669): [-2200, -1650, -1100, -1000, -550, -400, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[huggingface-organization-api-token]" time="6.954" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[openai-api-key]" time="8.803" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[intra42-client-secret]" time="7.036" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[notion-api-token]" time="8.962" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[planetscale-api-token]" time="9.500" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[prefect-api-token]" time="8.007" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[jwt]" time="8.138" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[openshift-user-token]" time="7.828" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[npm-access-token]" time="6.804" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[planetscale-oauth-token]" time="7.306" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[pulumi-api-token]" time="5.982" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[jwt-base64]" time="7.226" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_key_block_only_the_projects_own_rules_find_is_found_wherever_the_check_splits_inside_it[plain-file]" time="25.228"><failure message="AssertionError: plain-file, the project's rules alone: the check missed 30 of 174 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 22.6 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00154.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00155.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00156.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00157.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00158.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00159.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00170.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00171.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00172.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00173.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (8192, 59445): [-3413, -2731, -2048, -1365, -1000, -683, ...], (8192, 249669): [-3413, -2731, -2048, -1365, -1000, -683, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the0/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the0/w2-69/pycache'))
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the0/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the0/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_a_long_key_block_only_the_projects_own_rules_find_is_found_wherever_the_check_splits_inside_it(
+            sandbox, stand_in, slots, form):
+        """The second rule set (DEC-347): the block holds the run of the alphabet that gitleaks' global allowlist
+        shelters under ``extend``, and the project's own rules hold the key rule, so only the scan with the project's
+        rules alone finds it."""
+        extended, _alone = review.config_with_a_private_key_rule()
+        project = support.make_check_project(sandbox, name="project-own-key-rule", gitleaks_toml=extended)
+        blocks = {size: review.key_block("pem-rsa", size, f"own-{form}-{size}", sheltered=True) for size in (4600, 8192)}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, "no-blank-lines", blocks)
+&gt;       assert not missed, _report(f"{form}, the project's rules alone", run, cases, missed, kinds)
+E       AssertionError: plain-file, the project's rules alone: the check missed 30 of 174 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 22.6 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00154.txt
+E         secret found in derived store: .gov-runtime/keys/case-00155.txt
+E         secret found in derived store: .gov-runtime/keys/case-00156.txt
+E         secret found in derived store: .gov-runtime/keys/case-00157.txt
+E         secret found in derived store: .gov-runtime/keys/case-00158.txt
+E         secret found in derived store: .gov-runtime/keys/case-00159.txt
+E         secret found in derived store: .gov-runtime/keys/case-00170.txt
+E         secret found in derived store: .gov-runtime/keys/case-00171.txt
+E         secret found in derived store: .gov-runtime/keys/case-00172.txt
+E         secret found in derived store: .gov-runtime/keys/case-00173.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (8192, 59445): [-3413, -2731, -2048, -1365, -1000, -683, ...], (8192, 249669): [-3413, -2731, -2048, -1365, -1000, -683, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:182: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[perplexity-api-key]" time="7.890" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[rubygems-api-token]" time="8.212" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[readme-api-token]" time="7.453" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[planetscale-password]" time="9.343" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sendinblue-api-token]" time="9.339" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[settlemint-application-access-token]" time="8.736" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[scalingo-api-token]" time="7.222" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[shippo-api-token]" time="6.877" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[postman-api-token]" time="7.061" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it[plain-file-no-blank-lines-pgp]" time="40.842"><failure message="AssertionError: plain-file, no-blank-lines, pgp: the check missed 205 of 342 private-key blocks:&#10;    a block of 4000 bytes across content offset 59445 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it&#10;    a block of 4000 bytes across content offset 249669 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24, -8, -3, -2, -1] bytes from it&#10;    a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it&#10;    a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24, -8, -3, -2, -1] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-8191, -8190, -8189, -8184, -8168, -8128, -8032, -7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24, -8, -3, -2, -1] bytes from it&#10;  exit code: 1 after 36.5 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;  ime/keys/case-00285.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00286.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00287.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00288.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00289.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00290.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00309.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00310.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00311.txt&#10;  secret found in derived store: .gov-runtime/keys/case-00312.txt&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4000, 59445): [-3999, -3998, -3997, -3992, -3976, -3936, ...], (4000, 249669): [-3999, -3998, -3997, -3992, -3976, -... [-4599, -4598, -4597, -4592, -4576, -4536, ...], (4600, 249669): [-4599, -4598, -4597, -4592, -4576, -4536, ...], ...}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_7/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_7/w2-69/pycache'))
+project = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_7/w2-69/project')
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_7/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw5/test_a_long_private_key_block_7/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'plain-file', layout = 'no-blank-lines', shape = 'pgp'
+
+    @pytest.mark.parametrize("form,layout,shape", CASES, ids=[f"{f}-{lay}-{s}" for f, lay, s in CASES])
+    def test_a_long_private_key_block_is_found_wherever_the_check_splits_or_reads_inside_it(sandbox, project, stand_in,
+                                                                                            slots, form, layout, shape):
+        blocks = {size: review.key_block(shape, size, f"{form}-{layout}-{shape}-{size}") for size in review.KEY_SIZES}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, layout, blocks)
+&gt;       assert not missed, _report(f"{form}, {layout}, {shape}", run, cases, missed, kinds)
+E       AssertionError: plain-file, no-blank-lines, pgp: the check missed 205 of 342 private-key blocks:
+E           a block of 4000 bytes across content offset 59445 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it
+E           a block of 4000 bytes across content offset 249669 (a read of gitleaks): block start at [-3999, -3998, -3997, -3992, -3976, -3936, -3840, -3667, -3600, -3333, -3000, -2667, -2333, -2000, -1667, -1333, -1000, -667, -400, -333, -160, -64, -24, -8, -3] bytes from it
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-4599, -4598, -4597, -4592, -4576, -4536, -4440, -4217, -4200, -3833, -3600, -3450, -3067, -2683, -2300, -1917, -1533, -1150, -1000, -767, -400, -383, -160, -64, -24, -8, -3, -2, -1] bytes from it
+E           a block of 6600 bytes across content offset 59445 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24] bytes from it
+E           a block of 6600 bytes across content offset 249669 (a read of gitleaks): block start at [-6599, -6598, -6597, -6592, -6576, -6536, -6440, -6200, -6050, -5600, -5500, -4950, -4400, -3850, -3300, -2750, -2200, -1650, -1100, -1000, -550, -400, -160, -64, -24, -8, -3, -2, -1] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-8191, -8190, -8189, -8184, -8168, -8128, -8032, -7792, -7509, -7192, -6827, -6144, -5461, -4779, -4096, -3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24, -8, -3, -2, -1] bytes from it
+E         exit code: 1 after 36.5 s; gitleaks runs seen: 0
+E         stdout (tail):
+E         ime/keys/case-00285.txt
+E         secret found in derived store: .gov-runtime/keys/case-00286.txt
+E         secret found in derived store: .gov-runtime/keys/case-00287.txt
+E         secret found in derived store: .gov-runtime/keys/case-00288.txt
+E         secret found in derived store: .gov-runtime/keys/case-00289.txt
+E         secret found in derived store: .gov-runtime/keys/case-00290.txt
+E         secret found in derived store: .gov-runtime/keys/case-00309.txt
+E         secret found in derived store: .gov-runtime/keys/case-00310.txt
+E         secret found in derived store: .gov-runtime/keys/case-00311.txt
+E         secret found in derived store: .gov-runtime/keys/case-00312.txt
+E         
+E         stderr (tail):
+E         
+E       assert not {(4000, 59445): [-3999, -3998, -3997, -3992, -3976, -3936, ...], (4000, 249669): [-3999, -3998, -3997, -3992, -3976, -... [-4599, -4598, -4597, -4592, -4576, -4536, ...], (4600, 249669): [-4599, -4598, -4597, -4592, -4576, -4536, ...], ...}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:168: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sentry-org-token]" time="7.139" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sendgrid-api-token]" time="8.035" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sidekiq-sensitive-url]" time="7.556" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[settlemint-personal-access-token]" time="8.297" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[square-access-token]" time="8.793" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[gitlab-runner-authentication-token-routable]" time="65.997" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sentry-user-token]" time="7.128" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[sourcegraph-access-token]" time="7.929" /><testcase classname="tests.acceptance.W2-69.test_w2_69_review_long_key_blocks" name="test_a_long_key_block_only_the_projects_own_rules_find_is_found_wherever_the_check_splits_inside_it[sqlite-value]" time="43.420"><failure message="AssertionError: sqlite-value, the project's rules alone: the check missed 30 of 174 private-key blocks:&#10;    a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;    a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it&#10;  exit code: 1 after 26.0 s; gitleaks runs seen: 0&#10;  stdout (tail):&#10;   .gov-runtime/keys/case-00154.db&#10;  secret found in derived store: .gov-runtime/keys/case-00155.db&#10;  secret found in derived store: .gov-runtime/keys/case-00156.db&#10;  secret found in derived store: .gov-runtime/keys/case-00157.db&#10;  secret found in derived store: .gov-runtime/keys/case-00158.db&#10;  secret found in derived store: .gov-runtime/keys/case-00159.db&#10;  secret found in derived store: .gov-runtime/keys/case-00170.db&#10;  secret found in derived store: .gov-runtime/keys/case-00171.db&#10;  secret found in derived store: .gov-runtime/keys/case-00172.db&#10;  secret found in derived store: .gov-runtime/keys/case-00173.db&#10;  &#10;  stderr (tail):&#10;  &#10;assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (8192, 59445): [-3413, -2731, -2048, -1365, -1000, -683, ...], (8192, 249669): [-3413, -2731, -2048, -1365, -1000, -683, ...]}">sandbox = Sandbox(base=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the1/w2-...=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the1/w2-69/pycache'))
+stand_in = StandIn(bin=PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the1/w2-6...ead-W2-69/pytest-of-usain/pytest-29/popen-gw6/test_a_long_key_block_only_the1/w2-69/elsewhere/gitleaks-stand-in/kept'))
+slots = PosixPath('/tmp/gov-os-lead-W2-69/pytest-of-usain/pytest-29/w2-69-slots')
+form = 'sqlite-value'
+
+    @pytest.mark.parametrize("form", sorted(FORMS))
+    def test_a_long_key_block_only_the_projects_own_rules_find_is_found_wherever_the_check_splits_inside_it(
+            sandbox, stand_in, slots, form):
+        """The second rule set (DEC-347): the block holds the run of the alphabet that gitleaks' global allowlist
+        shelters under ``extend``, and the project's own rules hold the key rule, so only the scan with the project's
+        rules alone finds it."""
+        extended, _alone = review.config_with_a_private_key_rule()
+        project = support.make_check_project(sandbox, name="project-own-key-rule", gitleaks_toml=extended)
+        blocks = {size: review.key_block("pem-rsa", size, f"own-{form}-{size}", sheltered=True) for size in (4600, 8192)}
+        run, cases, missed, kinds = _sweep(sandbox, project, stand_in, slots, form, "no-blank-lines", blocks)
+&gt;       assert not missed, _report(f"{form}, the project's rules alone", run, cases, missed, kinds)
+E       AssertionError: sqlite-value, the project's rules alone: the check missed 30 of 174 private-key blocks:
+E           a block of 4600 bytes across content offset 59445 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 4600 bytes across content offset 249669 (a read of gitleaks): block start at [-400, -383, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 59445 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E           a block of 8192 bytes across content offset 249669 (a read of gitleaks): block start at [-3413, -2731, -2048, -1365, -1000, -683, -400, -160, -64, -24] bytes from it
+E         exit code: 1 after 26.0 s; gitleaks runs seen: 0
+E         stdout (tail):
+E          .gov-runtime/keys/case-00154.db
+E         secret found in derived store: .gov-runtime/keys/case-00155.db
+E         secret found in derived store: .gov-runtime/keys/case-00156.db
+E         secret found in derived store: .gov-runtime/keys/case-00157.db
+E         secret found in derived store: .gov-runtime/keys/case-00158.db
+E         secret found in derived store: .gov-runtime/keys/case-00159.db
+E         secret found in derived store: .gov-runtime/keys/case-00170.db
+E         secret found in derived store: .gov-runtime/keys/case-00171.db
+E         secret found in derived store: .gov-runtime/keys/case-00172.db
+E         secret found in derived store: .gov-runtime/keys/case-00173.db
+E         
+E         stderr (tail):
+E         
+E       assert not {(4600, 59445): [-400, -383, -160, -64, -24], (4600, 249669): [-400, -383, -160, -64, -24], (8192, 59445): [-3413, -2731, -2048, -1365, -1000, -683, ...], (8192, 249669): [-3413, -2731, -2048, -1365, -1000, -683, ...]}
+
+tests/acceptance/W2-69/test_w2_69_review_long_key_blocks.py:182: AssertionError</failure></testcase><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-blank-lines-gov-canary]" time="5.230" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[settlemint-service-access-token]" time="7.197" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[stripe-access-token]" time="7.666" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-blank-lines-gov-token-digit]" time="6.132" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-blank-lines-gov-token-lower]" time="6.196" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-lines-gov-canary]" time="9.853" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-longword-gov-canary]" time="24.128" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-longword-gov-token-lower]" time="23.458" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-oneline-gov-canary]" time="5.902" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-blank-lines-gov-token-upper]" time="30.093" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-oneline-gov-token-digit]" time="6.450" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-lines-gov-token-digit]" time="29.381" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-oneline-gov-token-upper]" time="14.766" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[vault-batch-token]" time="10.445" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-longword-gov-token-digit]" time="13.610" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-longword-gov-token-upper]" time="17.846" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-utf16le-gov-token-digit]" time="9.694" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[vault-service-token]" time="8.444" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-oneline-gov-token-lower]" time="8.651" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-lines-gov-token-lower]" time="15.013" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-utf16le-gov-token-lower]" time="8.362" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-utf16le-gov-canary]" time="9.256" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-blob-gov-token-digit]" time="17.063" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-blob-gov-canary]" time="6.982" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-blob-gov-token-lower]" time="9.244" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-utf16le-gov-token-upper]" time="7.455" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-blob-gov-token-upper]" time="19.713" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-freed-rows-gov-token-lower]" time="8.680" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-freed-rows-gov-canary]" time="8.087" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[plain-lines-gov-token-upper]" time="10.255" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-full-text-index-gov-canary]" time="13.986" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-freed-rows-gov-token-upper]" time="9.333" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_a_default_rules_string_is_a_token_alone_and_none_inside_its_word[grafana-api-key]" time="6.853" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-full-text-index-gov-token-lower]" time="5.018" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-full-text-index-gov-token-upper]" time="9.287" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-freed-rows-gov-token-digit]" time="13.777" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-long-value-gov-token-upper]" time="15.255" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-long-value-gov-canary]" time="9.183" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-long-value-gov-token-lower]" time="19.728" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-many-values-gov-canary]" time="9.033" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-long-value-gov-token-digit]" time="10.626" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-full-text-index-gov-token-digit]" time="10.618" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-many-values-gov-token-digit]" time="15.213" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-many-values-gov-token-lower]" time="15.273" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16-store-gov-canary]" time="15.218" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16-store-gov-token-lower]" time="10.618" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-many-values-gov-token-upper]" time="13.759" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16-store-gov-token-upper]" time="13.672" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16le-blob-gov-canary]" time="9.078" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16-store-gov-token-digit]" time="9.132" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_premise_the_w2_62_identifier_is_no_finding_whole_and_a_finding_cut" time="3.742" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16le-blob-gov-token-digit]" time="14.167" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_every_default_rule_is_no_finding_at_a_read_edge[plain-lines-a-read-begins-inside-the-word]" time="83.842" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_the_identifier_of_the_w2_62_stop_is_no_finding_at_any_offset[sqlite-long-value]" time="30.086" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16le-blob-gov-token-upper]" time="17.435" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_a_project_rule_is_no_finding_at_any_offset[sqlite-utf16le-blob-gov-token-lower]" time="10.061" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_the_identifier_of_the_w2_62_stop_is_no_finding_at_any_offset[plain-oneline]" time="25.348" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_the_identifier_of_the_w2_62_stop_is_no_finding_at_any_offset[sqlite-many-values]" time="19.099" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_the_identifier_of_the_w2_62_stop_is_no_finding_at_any_offset[plain-lines]" time="13.341" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_every_default_rule_is_no_finding_at_a_read_edge[plain-lines-a-read-ends-inside-the-word]" time="82.932" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_bytes_of_different_values_never_join_into_a_finding[a-text-an-integer-and-a-text]" time="21.472" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_bytes_of_different_values_never_join_into_a_finding[two-adjacent-text-values]" time="15.512" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_every_default_rule_is_no_finding_at_a_read_edge[sqlite-long-value-a-read-ends-inside-the-word]" time="71.709" /><testcase classname="tests.acceptance.W2-69.test_w2_69_word_internal_fragments" name="test_a_word_internal_string_of_every_default_rule_is_no_finding_at_a_read_edge[sqlite-long-value-a-read-begins-inside-the-word]" time="8.487" /></testsuite></testsuites>

@@ -211,4 +211,119 @@ bringing up nodes...
 ........................................................................ [ 96%]
 ........................................................................ [ 97%]
 ........................................................................ [ 97%]
-...........................................
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 98%]
+........................................................................ [ 99%]
+........................................................................ [ 99%]
+.....................                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_only_the_test_designer_commits_to_acceptance_tests ____________
+[gw0] linux -- Python 3.12.3 /usr/bin/python3
+
+repo_root = PosixPath('/home/usain/gov-os-worktrees/W2-70')
+deny_rules = ['Bash(sudo:*)', 'Edit(**/*.key)', 'Edit(**/*.pem)', 'Edit(**/.env*)', 'Edit(./docs/source/**)', 'Edit(config/secrets*)', ...]
+w1_05_landed = True
+
+    def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rules, w1_05_landed):
+        """KPI failure 1: no implementer commit touches tests/acceptance/** before W1-05 lands.
+    
+        DEC-253 (rewrite after implementation, "owner decision: integration merges"):
+        a merge commit passes when every change it brings under tests/acceptance/
+        comes from commits on the merged side carrying the test designer's role.
+    
+        DEC-906 item 2 (rewrite, W2-70): a non-merge commit without the test
+        designer's role passes only when its full id is listed in the path map's
+        ``acceptance_exemptions`` ({commit: <full sha>, decision: <DEC id>}, beside
+        ``accepted_history``). Any other commit stays red, an owner's included: a
+        ``Role: owner`` trailer alone exempts nothing until W2-44 binds trailers to
+        the launch. The list's only entry is the owner's own commit
+        ``c9a08678644485a7528bc875164e110881b63d93``, citing DEC-900.
+    
+        Expected red until that entry is committed: this case fails naming
+        ``c9a086786444``. It is the owner's entry, not this ticket's; once it is in,
+        the case is green. (A note for W1-01's README, which is not in W2-70's
+        paths.)
+        """
+        if not w1_05_landed:
+            tool, target = ACCEPTANCE_PROBE
+            assert support.denying_rules(deny_rules, tool, target, repo_root), (
+                f"the interim guardrail is not in force: {tool} on {target} is not denied"
+            )
+        offenders = support.acceptance_test_offenders(repo_root)
+>       assert not offenders, (
+            "commits touch tests/acceptance/** without the trailer "
+            f"`Role: {support.TEST_DESIGNER_ROLE}`, and are not listed by their full id in "
+            f"{support.PATH_MAP_REL} `{support.EXEMPTIONS_KEY}`:\n" + "\n".join(offenders)
+        )
+E       AssertionError: commits touch tests/acceptance/** without the trailer `Role: independent-test-designer`, and are not listed by their full id in governance/project/path-map.yaml `acceptance_exemptions`:
+E         c9a086786444
+E       assert not ['c9a086786444']
+
+tests/acceptance/W1-01/test_w1_01_history.py:65: AssertionError
+_ test_a_move_of_very_many_merge_commits_with_24_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit[orchestrator-trailers-dropped-near-the-newest] _
+[gw9] linux -- Python 3.12.3 /usr/bin/python3
+
+project = PosixPath('/tmp/gov-os-lead-W2-70/pytest-of-usain/pytest-1/popen-gw9/test_a_move_of_very_many_merge0/project')
+sandbox = Sandbox(home=PosixPath('/tmp/gov-os-lead-W2-70/pytest-of-usain/pytest-1/popen-gw9/test_a_move_of_very_many_merge0/sand...sixPath('/tmp/gov-os-lead-W2-70/pytest-of-usain/pytest-1/popen-gw9/test_a_move_of_very_many_merge0/sandbox/elsewhere'))
+call = <function call.<locals>._call at 0x77d1db632f20>
+case = 'orchestrator-trailers-dropped-near-the-newest'
+
+    @pytest.mark.parametrize("case", sorted(CHAINS), ids=sorted(CHAINS))
+    def test_a_move_of_very_many_merge_commits_with_24_parents_that_undoes_a_test_is_a_finding_within_the_hook_s_limit(
+            project, sandbox, call, case):
+        """Review finding, DEC-410. In the orchestrator's own call ``main`` is moved along a chain of merge commits
+        with 24 parents each; one of them holds the tree from before a test designer's change of an acceptance
+        test. The post-command hook ends by itself within the harness's limit and the call adds a finding: one that
+        names the undone test, or one for the move as a whole. Which of the two is not pinned."""
+        trailers, dropping = CHAINS[case]
+        shape = many.chain_of_merge_commits_with_24_parents(project, sandbox, trailers, dropping)
+        before = check_support.git(project, "rev-parse", "HEAD").strip()
+>       result, _ = call(project, shape.command, ORCHESTRATOR, TICKET)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/acceptance/W1-50/test_w1_50_move_of_very_many_merge_commits.py:73: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/acceptance/W1-50/conftest.py:65: in _call
+    bash = check_support.run_bash(project, the_call.command, sandbox)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/acceptance/W1-03/w1_03_support.py:428: in run_bash
+    return subprocess.run(["bash", "-c", command], cwd=str(project), env=env, capture_output=True,
+/usr/lib/python3.12/subprocess.py:550: in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:1209: in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/lib/python3.12/subprocess.py:2116: in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <Popen: returncode: -9 args: ['bash', '-c', 'bash /tmp/gov-os-lead-W2-70/pyt...>
+endtime = 616644.052265756, orig_timeout = 30.0, stdout_seq = []
+stderr_seq = [], skip_check_and_raise = False
+
+    def _check_timeout(self, endtime, orig_timeout, stdout_seq, stderr_seq,
+                       skip_check_and_raise=False):
+        """Convenience for checking if a timeout has expired."""
+        if endtime is None:
+            return
+        if skip_check_and_raise or _time() > endtime:
+>           raise TimeoutExpired(
+                    self.args, orig_timeout,
+                    output=b''.join(stdout_seq) if stdout_seq else None,
+                    stderr=b''.join(stderr_seq) if stderr_seq else None)
+E           subprocess.TimeoutExpired: Command '['bash', '-c', 'bash /tmp/gov-os-lead-W2-70/pytest-of-usain/pytest-1/popen-gw9/test_a_move_of_very_many_merge0/sandbox/elsewhere/calls/call-0210.sh']' timed out after 30.0 seconds
+
+/usr/lib/python3.12/subprocess.py:1253: TimeoutExpired
+=========================== short test summary info ============================
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_history.py:17: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_history.py:223: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:62: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [2] tests/acceptance/W1-01/test_w1_01_settings_deny.py:68: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [13] tests/acceptance/W1-01/test_w1_01_settings_deny.py:82: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [7] tests/acceptance/W1-01/test_w1_01_settings_deny.py:88: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-01/test_w1_01_settings_deny.py:94: W1-05 is closed: the interim guardrail is retired (DEC-084)
+SKIPPED [1] tests/acceptance/W1-26/test_w1_26_command.py:44: the full project does not pass gov check yet
+SKIPPED [1] tests/unit/retrieval/test_lexical.py:54: could not import 'govbridge.core.chunking': No module named 'govbridge'
+2 failed, 15469 passed, 30 skipped in 2656.38s (0:44:16)

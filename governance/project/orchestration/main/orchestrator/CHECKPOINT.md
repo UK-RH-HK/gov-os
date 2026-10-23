@@ -57,7 +57,7 @@
 - **W2-07 run 2 returned PACKAGES (head `d2eee219`, batch of 196 green, gov check green):** 14 more W1-30 cases ->
   **DEC-908 (delegated) `e4b745a6`** (ticket `2d32b7bb`; DEC-455/480/454 marked; row W2-L416); T3 = DEC-906 (W1-01
   known; W2-70 also covers the merge case, `488972e4`). Its temp removed. **Run 3 QUEUED** (`log/W2-07-A5-run3.json`).
-- **Owner commit C (the exemption entry) VALIDATED and ACT-PINGED:** `drafts/ACT-owner-commit-C-2026-10-23.md`,
+- **Owner commit C MADE `18ad2382` (Role: owner; pushed with record/w2), was VALIDATED:** `drafts/ACT-owner-commit-C-2026-10-23.md`,
   patch `OWNER-C-acceptance-exemption.patch` (applies to `488972e4`); pin readers pass; full run: 15,466 passed, 30
   skipped, only W1-01's known red (`log/exemption-validation-2026-10-23.txt`). After it: tell W2-70 the entry is in.
 - **W2-67 round 1 returned PACKAGES (test design done, head `60f71c42`):** the launcher refused an engineer on a
@@ -103,7 +103,7 @@
 - **Later packages:** P-IS-13 when W2-32 starts (owner leans (a)); P-IS-9..12, 14, 15 before their tickets.
 
 ### Where things stand (10-23 10:37)
-- **Owner pushed through `49c24ac9`.** Since then all of DEC-893..DEC-901 and the commits above (unpushed).
+- **Owner pushed through `18ad2382` (w2/integrate) and record/w2 (10-23).** Since then all of DEC-893..DEC-901 and the commits above (unpushed).
 - **Closed (gov close):** W2-01 (tk), W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed /
   2 merged-not-closed / 10 built and held / 3 in flight / 39 not started, of 60 (58 + W2-69, added 10-22 and
   missed in two reports' totals, + W2-70; W2-57, W2-67, W2-68 were cards already counted); keystones 0 / 8 / 1.

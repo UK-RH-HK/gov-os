@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="24" time="15.065" timestamp="2026-10-23T19:20:11.003025+01:00" hostname="Usain"><testcase classname="tests.acceptance.W1-27.test_w2_67_temp_folders" name="test_the_pytest_configuration_passes_no_basetemp_and_keeps_three_base_folders" time="0.001" /><testcase classname="tests.acceptance.W1-27.test_w2_67_temp_folders" name="test_a_run_after_older_runs_leaves_at_most_three_base_folders" time="0.238" /><testcase classname="tests.acceptance.W1-27.test_w2_67_temp_folders" name="test_a_base_folder_of_a_run_still_going_is_kept" time="0.289" /><testcase classname="tests.acceptance.W1-27.test_w2_67_temp_folders" name="test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention" time="0.169"><failure message="AssertionError: a per-run base folder or another retention count (DEC-898): {'tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py': [&quot;line 93: an argument list passes '--basetemp'&quot;]}&#10;assert not {'tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py': [&quot;line 93: an argument list passes '--basetemp'&quot;]}">def test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention():
+        """Green on the head: a guard."""
+        wrong = {str(path.relative_to(REPO_ROOT)): found for path in _round_1_sources() if (found := _settings_in(path))}
+&gt;       assert not wrong, f"a per-run base folder or another retention count (DEC-898): {wrong}"
+E       AssertionError: a per-run base folder or another retention count (DEC-898): {'tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py': ["line 93: an argument list passes '--basetemp'"]}
+E       assert not {'tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py': ["line 93: an argument list passes '--basetemp'"]}
+
+tests/acceptance/W1-27/test_w2_67_temp_folders.py:125: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_run_given_a_per_run_basetemp_is_refused_at_the_start[separate]" time="0.254"><failure message="AssertionError: a run given a per-run --basetemp (separate) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas0/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: None&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas0/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas0')
+form = 'separate'
+
+    @pytest.mark.parametrize("form", list(FORMS))
+    def test_a_run_given_a_per_run_basetemp_is_refused_at_the_start(tmp_path, form):
+        run = given_run(tmp_path, form)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"a run given a per-run --basetemp ({form}) is not refused at the start as DEC-907 item 2 "
+                              f"says: " + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: a run given a per-run --basetemp (separate) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp /tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas0/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: None
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas0/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_temp_folders" name="test_a_run_after_killed_runs_leaves_at_most_three_base_folders" time="0.249"><failure message="AssertionError: 6 base folders left behind, more than 3 (DEC-898): ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5']. Each older one holds a .lock naming pid 4194305, which no process holds: the runs that wrote them were killed.&#10;assert 6 &lt;= 3&#10; +  where 6 = len(['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5'])">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_after_killed_runs_l0')
+
+    def test_a_run_after_killed_runs_leaves_at_most_three_base_folders(tmp_path):
+        """Five runs that were killed left their base folders with their ``.lock``, naming processes that no longer
+        exist. A full run leaves at most three base folders behind (DEC-898)."""
+        tmpdir, home = tmp_path / "tmp", tmp_path / "home"
+        home.mkdir()
+        root = _user_root(tmpdir)
+        dead = _dead_pid()
+        for number in range(OLD_RUNS):
+            _plant_run(root, number, lock_pid=dead)
+        _run_probe(tmpdir, home)
+        left = _base_folders(root)
+&gt;       assert len(left) &lt;= KEEP, (
+            f"{len(left)} base folders left behind, more than {KEEP} (DEC-898): {left}. Each older one holds a .lock "
+            f"naming pid {dead}, which no process holds: the runs that wrote them were killed."
+        )
+E       AssertionError: 6 base folders left behind, more than 3 (DEC-898): ['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5']. Each older one holds a .lock naming pid 4194305, which no process holds: the runs that wrote them were killed.
+E       assert 6 &lt;= 3
+E        +  where 6 = len(['pytest-0', 'pytest-1', 'pytest-2', 'pytest-3', 'pytest-4', 'pytest-5'])
+
+tests/acceptance/W1-27/test_w2_67_temp_folders.py:210: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_run_given_a_per_run_basetemp_is_refused_at_the_start[equals]" time="0.259"><failure message="AssertionError: a run given a per-run --basetemp (equals) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_run_given_a_per_run_bas0/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: None&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_run_given_a_per_run_bas0/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_run_given_a_per_run_bas0')
+form = 'equals'
+
+    @pytest.mark.parametrize("form", list(FORMS))
+    def test_a_run_given_a_per_run_basetemp_is_refused_at_the_start(tmp_path, form):
+        run = given_run(tmp_path, form)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"a run given a per-run --basetemp ({form}) is not refused at the start as DEC-907 item 2 "
+                              f"says: " + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: a run given a per-run --basetemp (equals) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_run_given_a_per_run_bas0/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: None
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_run_given_a_per_run_bas0/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_run_given_a_per_run_basetemp_is_refused_at_the_start[PYTEST_ADDOPTS]" time="0.253"><failure message="AssertionError: a run given a per-run --basetemp (PYTEST_ADDOPTS) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67&#10;  PYTEST_ADDOPTS: '--basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas1/given-basetemp'&#10;  GOV_ALLOW_BASETEMP: None&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas1/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas1')
+form = 'PYTEST_ADDOPTS'
+
+    @pytest.mark.parametrize("form", list(FORMS))
+    def test_a_run_given_a_per_run_basetemp_is_refused_at_the_start(tmp_path, form):
+        run = given_run(tmp_path, form)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"a run given a per-run --basetemp ({form}) is not refused at the start as DEC-907 item 2 "
+                              f"says: " + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: a run given a per-run --basetemp (PYTEST_ADDOPTS) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67
+E         PYTEST_ADDOPTS: '--basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas1/given-basetemp'
+E         GOV_ALLOW_BASETEMP: None
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_run_given_a_per_run_bas1/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_run_given_a_per_run_basetemp_is_refused_at_the_start[parallel-n2]" time="0.563"><failure message="AssertionError: a run given a per-run --basetemp (parallel-n2) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['popen-gw0']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 -n 2 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_given_a_per_run_bas0/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: None&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_given_a_per_run_bas0/given-basetemp/popen-gw0/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  bringing up nodes...&#10;  bringing up nodes...&#10;  &#10;  .                                                                        [100%]&#10;  1 passed in 0.31s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start', 'its output does not name DEC-898', &quot;the folder it was given received ['popen-gw0']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_given_a_per_run_bas0')
+form = 'parallel-n2'
+
+    @pytest.mark.parametrize("form", list(FORMS))
+    def test_a_run_given_a_per_run_basetemp_is_refused_at_the_start(tmp_path, form):
+        run = given_run(tmp_path, form)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"a run given a per-run --basetemp ({form}) is not refused at the start as DEC-907 item 2 "
+                              f"says: " + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: a run given a per-run --basetemp (parallel-n2) is not refused at the start as DEC-907 item 2 says: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['popen-gw0']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 -n 2 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_given_a_per_run_bas0/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: None
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw1/test_a_run_given_a_per_run_bas0/given-basetemp/popen-gw0/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         bringing up nodes...
+E         bringing up nodes...
+E         
+E         .                                                                        [100%]
+E         1 passed in 0.31s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start', 'its output does not name DEC-898', "the folder it was given received ['popen-gw0']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:123: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_gov_allow_basetemp_1_lets_the_run_use_the_folder_it_was_given[equals]" time="0.249" /><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_gov_allow_basetemp_1_lets_the_run_use_the_folder_it_was_given[separate]" time="0.251" /><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_flag_value_other_than_1_opens_nothing[0]" time="0.271"><failure message="AssertionError: GOV_ALLOW_BASETEMP='0' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_10/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: '0'&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_10/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_10')
+value = '0'
+
+    @pytest.mark.parametrize("value", ["0", "true", "yes", ""], ids=["0", "true", "yes", "empty"])
+    def test_a_flag_value_other_than_1_opens_nothing(tmp_path, value):
+        run = given_run(tmp_path, "equals", flag=value)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"{FLAG}={value!r} opened the refusal of a per-run --basetemp, which only {FLAG}=1 opens: "
+                              + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: GOV_ALLOW_BASETEMP='0' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_10/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: '0'
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_10/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:140: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_flag_value_other_than_1_opens_nothing[true]" time="0.265"><failure message="AssertionError: GOV_ALLOW_BASETEMP='true' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_10/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: 'true'&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_10/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_10')
+value = 'true'
+
+    @pytest.mark.parametrize("value", ["0", "true", "yes", ""], ids=["0", "true", "yes", "empty"])
+    def test_a_flag_value_other_than_1_opens_nothing(tmp_path, value):
+        run = given_run(tmp_path, "equals", flag=value)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"{FLAG}={value!r} opened the refusal of a per-run --basetemp, which only {FLAG}=1 opens: "
+                              + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: GOV_ALLOW_BASETEMP='true' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_10/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: 'true'
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_10/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:140: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_gov_allow_basetemp_1_lets_the_run_use_the_folder_it_was_given[PYTEST_ADDOPTS]" time="0.250" /><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_flag_value_other_than_1_opens_nothing[yes]" time="0.260"><failure message="AssertionError: GOV_ALLOW_BASETEMP='yes' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_11/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: 'yes'&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_11/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_11')
+value = 'yes'
+
+    @pytest.mark.parametrize("value", ["0", "true", "yes", ""], ids=["0", "true", "yes", "empty"])
+    def test_a_flag_value_other_than_1_opens_nothing(tmp_path, value):
+        run = given_run(tmp_path, "equals", flag=value)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"{FLAG}={value!r} opened the refusal of a per-run --basetemp, which only {FLAG}=1 opens: "
+                              + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: GOV_ALLOW_BASETEMP='yes' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_11/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: 'yes'
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw2/test_a_flag_value_other_than_11/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:140: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_flag_value_other_than_1_opens_nothing[empty]" time="0.250"><failure message="AssertionError: GOV_ALLOW_BASETEMP='' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&#10;  command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_11/given-basetemp&#10;  PYTEST_ADDOPTS: None&#10;  GOV_ALLOW_BASETEMP: ''&#10;  exit code: 0&#10;  tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_11/given-basetemp/test_the_probe_records_its_tem0']&#10;  output (last 1500 characters):&#10;  .                                                                        [100%]&#10;  1 passed in 0.02s&#10;  &#10;assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', &quot;the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']&quot;]">tmp_path = PosixPath('/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_11')
+value = ''
+
+    @pytest.mark.parametrize("value", ["0", "true", "yes", ""], ids=["0", "true", "yes", "empty"])
+    def test_a_flag_value_other_than_1_opens_nothing(tmp_path, value):
+        run = given_run(tmp_path, "equals", flag=value)
+        problems = refusal_problems(run)
+&gt;       assert not problems, (f"{FLAG}={value!r} opened the refusal of a per-run --basetemp, which only {FLAG}=1 opens: "
+                              + "; ".join(problems) + f"\n{run.describe()}")
+E       AssertionError: GOV_ALLOW_BASETEMP='' opened the refusal of a per-run --basetemp, which only GOV_ALLOW_BASETEMP=1 opens: it ended with exit code 0, not a refusal; it ran the probe case (1 time(s)): the refusal did not come at the start; its output does not name DEC-898; the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']
+E         command: /usr/bin/python3 -m pytest tests/acceptance/W1-27/w2_67_basetemp_probe.py -q -p no:cacheprovider --rootdir=/home/usain/gov-os-worktrees/W2-67 --basetemp=/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_11/given-basetemp
+E         PYTEST_ADDOPTS: None
+E         GOV_ALLOW_BASETEMP: ''
+E         exit code: 0
+E         tests run (temp folders recorded): ['/tmp/gov-os-lead-W2-67/pytest-of-usain/pytest-0/popen-gw0/test_a_flag_value_other_than_11/given-basetemp/test_the_probe_records_its_tem0']
+E         output (last 1500 characters):
+E         .                                                                        [100%]
+E         1 passed in 0.02s
+E         
+E       assert not ['it ended with exit code 0, not a refusal', 'it ran the probe case (1 time(s)): the refusal did not come at the start...-898', "the folder it was given received ['test_the_probe_records_its_tem0', 'test_the_probe_records_its_temcurrent']"]
+
+tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py:140: AssertionError</failure></testcase><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_run_given_no_basetemp_is_not_refused" time="0.242" /><testcase classname="tests.acceptance.W1-27.test_w2_67_basetemp_refusal" name="test_a_parallel_run_given_no_basetemp_is_not_refused" time="0.522" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_w1_07_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc" time="9.206" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_w1_25_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc" time="9.540" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_w1_27_per_test_copies_of_a_7000_object_tree_do_not_race_gits_gc" time="9.167" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs[W1-26-FullProject]" time="3.610" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs[W1-27-copy_working_tree-per-test]" time="3.641" /><testcase classname="tests.acceptance.W1-27.test_w2_67_copies" name="test_a_per_test_copy_from_the_working_files_carries_no_copied_git_while_gc_runs[W1-26-Project-copy_tree]" time="3.640" /></testsuite></testsuites>
