@@ -903,19 +903,46 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - No placeholder file that the sandbox makes can reach a commit [DEC-799].
 - **KPIs, failure:** a write outside the list from a script still fails; `/tmp/gov-cbm-<uid>` is never on the write list (DEC-799 item 2); a launch whose sandbox cannot be built still refuses to start.
 
-#### W2-57 Load out of the close: W1-46's live cases and W1-30's time-limit case hold under load (FULL, independent-test-designer then engineer; DEC-813, DEC-823, W2-M364, W2-M384)
-- **Why:** W1-46's 23 live-session cases fail at setup under the full regression's parallel load (a launched session runs a step without its `cd`, so its probe script is not found) and pass alone; their 23 `load_sensitive` entries hide that. W1-46 proves the launcher and the sandbox, so it must be solid before EXAMIN (DEC-813). W1-30's r13 time-limit case failed once in W2-53's re-close at load about 25 and passes alone (DEC-823): either its timing is load-sensitive, or the close leaves a process alive under load. A single timing case must not hold the close queue again (DEC-823 (b)).
-- **Starts** in the first free slot after the closes now queued (DEC-806, as the revised plan orders them); **closes** before W2-24 starts. Tests first: the independent test designer on the fixtures and the close's behaviour under load; then a fresh engineer on `gov close`; then a reviewer. The close change is judged by the pinned close (DEC-822).
-- **DEC-883 item 5 (owner, 2026-10-21):** find out why each of the 263 serial-only tests (29 minutes of every close) must run alone, and run in parallel every one that safely can, with lens H's findings; each case kept serial names its reason.
-- **First item (DEC-892, owner, 2026-10-22):** fix the rulesync probe: rulesync's start exceeds the portability check's 10-second probe under the close's load, the cause of W1-38's three `load_sensitive` entries (DEC-871 ×2, DEC-892). A test revision with a `Rewrite-Reason:`, in the next free slot.
-- **Allowed paths:** `tests/acceptance/W1-46/**` and `tests/acceptance/W1-30/test_w1_30_r13_probe_findings.py` (the test designer: the fixtures and READMEs; no expectation lowered, every change with a `Rewrite-Reason:`); `tests/acceptance/W2-57/**` (the test designer); `src/gov/close/**` (the engineer: the close's own resource gate, or its isolated suite for the timing-sensitive cases, only), `tests/unit/close/**`, `docs/changes/W2-57-CIT-E.md`.
+#### W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry (FULL, independent-test-designer then engineer; DEC-813, DEC-823, DEC-883 item 5, DEC-889 item 5, DEC-892 item 2; lens I's P-IS-6)
+- **Why:**
+  - The serial phase takes about 31 minutes of every close, and most refused closes since 2026-10-20 came from listed cases or load-caused reds.
+  - The rulesync probe's 10-second limit turns load into reds, greens and a silent skip of up to 181 W1-38 cases. That is a live fail-open (I4 F2).
+  - **This card replaces DEC-813's KPI.** That KPI had W1-46's live cases pass under the close's parallel load; DEC-889 item 5 moves live and real-model tests to the nightly instead (I2 F14).
+- Ticket `DAEO-cy5o`. **Starts** in a free slot after the review point, the probe first (DEC-892 item 2). It **closes** before W2-24 starts (DEC-813).
+- **Allowed paths (widened, I2 F12):**
+  - `src/gov/adapters/portability.py` and `src/gov/doctor/command.py` (the probes only);
+  - `src/gov/close/serial.py` (new: the serial phase and its reasons);
+  - `tests/acceptance/serial-only.txt`;
+  - W1-30's r11 and r13 files;
+  - `tests/acceptance/W1-38/**`, `W1-07/**`, `W1-46/**`, `W1-50/**`, `W1-02/**`;
+  - W1-33's `w1_33_support.py`;
+  - `tests/acceptance/W2-57/**`;
+  - `tests/unit/close/test_serial*`, `tests/unit/adapters/test_portability*`;
+  - `docs/changes/W2-57-CIT-E.md`.
 - **KPIs, success:**
-  - W1-46's 36 live cases pass inside the full regression run under its usual parallel load, three runs in a row, each with the load recorded [DEC-813, W2-M364].
-  - Each launched session runs its steps from its own working folder, so its probe script is found whatever runs beside it [W2-M364].
-  - W2-M384's cause is settled and recorded: the case's timing made robust, or the close's ending of a timed-out run's processes fixed under load; the case passes inside three full regressions under load [DEC-823, W2-M384].
-  - The close takes load out of its own run: it reads the resource gate before its regression and waits or refuses with a named reason when the gate is shut, or it runs the cases named timing-sensitive as their own isolated suite, still a real check that fails the close when they fail [DEC-823 (b)].
-  - Then the orchestrator commits the removal of W1-46's 23 entries and W1-30's entry from `load_sensitive` (DEC-861: a removal only shrinks the list; an addition would stay the owner's commit, DEC-862) [DEC-766, DEC-813, DEC-823].
-- **KPIs, failure:** a case that still errors or fails under load keeps its entry and fails the ticket; no case is skipped, serialised by marker alone, or weakened to pass; a timing-sensitive case that fails in its isolated suite still fails the close.
+  - **The probe's four effects (P-I4-5 (a)):**
+    - a limit a loaded machine meets;
+    - W1-38's fixture fails, never skips, on a timeout;
+    - the 9 cases a timeout satisfies assert the reason;
+    - W1-33's research case fails the same way;
+    - 0 rulesync skips or timeouts in three closes' worth of parallel runs.
+  - **The doctor probes:** limits a loaded machine meets, with failure text kept (W1-07 `[doctor]`).
+  - **The serial-only list reworked as P-IS-6's table:**
+    - every kept entry names its reason;
+    - W1-16's 94 non-daemon cases, W1-09's two races and W1-50's read-merge case run in parallel;
+    - the live and real-model files move to the nightly;
+    - latency cases stay alone.
+  - **Revisions:** W1-30's r11 test reads the reworked list. Also W1-30's r13 limit, W1-50's `CLAUDE*` removal (DEC-784), a p95 case for a designer's read, and W2-M332's timing without the memory sampler.
+  - **The close's resource gate** covers W1-02's 5-second bound and the guard's 20-second deadline. The network check probes through the session's route.
+  - **Then the orchestrator commits the removal** of every entry this ticket makes unnecessary (DEC-861).
+  - **Already removed** by the owner's commit (DEC-899 item 3): W1-02's and W1-05's p95 entries. Their cases stay alone in the serial phase, and W2-M332 keeps its date before W2-24.
+- **KPIs, failure:**
+  - a timeout that skips or passes a case;
+  - a serial entry without a reason;
+  - a live file left in the close;
+  - a case weakened, skipped or serialised by marker alone;
+  - a list entry added.
+- **Until it lands:** the close queue checks that each close's skip count equals the expected 31 (the orchestrator's interim guard).
 
 #### W2-58 Policy 2 in the guard and the launcher: reads open, four refusals (STANDARD, engineer; DEC-820, DEC-821; keystone 3)
 - **Why:** the owner's Policy 2 (DEC-820) opens reads to everything but four things, and needs two refusals the guard does not make yet: the counterpart's work on the same ticket (c), and the hidden half of an evaluation set (d). The listing refusals of DEC-508 go. The change is approved by the owner in DEC-821 (CAP-33).
