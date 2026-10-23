@@ -168,6 +168,44 @@ moved-path case the new path). The two DEC-456 counter-cases keep the excluded p
 project (`docs/SOURCES.md`, the old `cli/` tree), so the exclusion and the report are seen together. The
 unclassified case gained a covered control path (`src/covered.py`), which must not be reported.
 
+### Group 2: doctor's sections (`test_w1_27_doctor.py` ×8, `doctor_r5` ×1, `isolation_r2` ×1)
+
+| Fault | In words | How (in `w2_67b_child.py`) |
+|---|---|---|
+| P27-11 (I4) | a tool doctor cannot find reported with its pinned version only (nothing says why) | not-ok entries of `_check_tools` keep only `name`, `pinned_version`, `ok` |
+| P67B-6 | the found version is the pin: doctor reads the registry, not the tool | every entry's `found_version` set to its `pinned_version` |
+| P67B-7 | framework.lock always MATCH | `_check_framework_lock` returns `{"status": "pass", "match": "MATCH"}` |
+| P67B-8 | hooks always wired | `_check_hooks` returns pass, `config_present` and `binary_installed` true |
+| P67B-9 | the index always fresh | `_check_index_freshness` returns pass, `fresh`, no stale file |
+| P67B-10 | every canary passes, measured or not | every index `passed`, `AVAILABLE`, no miss; status pass |
+| P67B-11 | the lexical canary never passes | `lexical.passed` false, a planted miss |
+| P27-9 (I4) | isolation reported whatever the runtime folder's parent (DEC-425) | a measured result (with `git_root`) set to isolated, pass |
+| P67B-12 | the constant stub the round-2 case names | `_check_isolation` returns `{"status": "pass", "isolated": True}` |
+| P27-1, P27-4 | as in group 1 | as in group 1 |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_doctor_real_registry_every_entry_reported` | its "not ok with a reason" half was met by `pinned_version`, which every entry carries | P27-11: `entry 'pytest-xdist' is not ok but says nothing about why (…): {'name': 'pytest-xdist', 'pinned_version': '3.8.0', 'ok': False}` | green, 6.9 s (whole-tree copy, real home: machine-dependent, as before) | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_tool_versions` | `tool` anywhere; no version read | P67B-6: `the tool at another version is not reported as pinned 1.0.0, found 9.9.9: {… 'found_version': '1.0.0' …}` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_hooks` | `hook` anywhere | P67B-8: `doctor reports hooks wired on a project with no lefthook.yml: {'status': 'pass', 'config_present': True, …}` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_path_map_coverage` | `path` anywhere | P27-4: `doctor does not count docs/guide.md as unclassified under a path map of src/**: {'status': 'pass', 'unclassified_count': 0, 'unclassified': []}` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_index_freshness` | `index` or `fresh` anywhere | P67B-9: `doctor reports a fresh index before any index was built: {'status': 'pass', 'index_status': 'fresh', 'stale': []}` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_canaries` | `canar` anywhere | P67B-10: `the lexical canary does not miss on a project with no index: {'status': 'pass', …}`; P67B-11: `the lexical canary does not pass once the rebuilt index holds its queries ['juniper lantern protocol sentinel']` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_framework_lock` | `framework` or `lock` anywhere; MATCH or DRIFT never read | P67B-7: `a project with no framework.lock is not unmeasured (DEC-425): {'status': 'pass', 'match': 'MATCH'}` | green | the assertion matches a key name that doctor always emits |
+| `test_doctor_report_mentions_isolation` | `isolat` anywhere | P67B-12: `isolation is reported with no .gov-runtime to measure (DEC-425): {'status': 'pass', 'isolated': True}`; P27-9: green (the round-2 case holds that rule) | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_doctor_r5.py::test_stale_path_in_live_document_is_reported` | the same always-true alternative | P27-1: `doctor does not report a reference to a moved path inside a live document` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_isolation_r2.py::test_doctor_isolation_is_measured_not_constant` | rejected one exact stub only; the copy had no `.gov-runtime` | P27-9: `a .gov-runtime whose parent (…/outer/inner) is not the git root (…/outer) is not reported as not isolated`; P67B-12: `the isolation check is a constant stub` | green | the assertion matches a key name that doctor always emits |
+
+Head: the nine small-project cases, 9 passed in 19.8 s (`g2-head.xml`). Each reads its section's typed fields on
+small committed projects of its own, one input that makes the section measure and, where it can pass, one it
+must not pass: two fake tools (pinned 2.0.0 found 2.0.0; pinned 1.0.0 found 9.9.9); no `lefthook.yml` and one;
+`**` and `src/**`; no index, a rebuild, a change after it (the changed file stale, the other not); the lexical
+canary's own missed queries, read from doctor's report, written into a document and rebuilt; no `framework.lock`
+(unmeasured) and an installed project (`.copier-answers.yml`) without its lock (fail); no `.gov-runtime`
+(unmeasured), the project's own (isolated, its git root named), and one in a subfolder (not isolated).
+`framework_lock`'s MATCH and DRIFT need an installed kernel and its lock (no `gov` command writes one); W1-39's
+lock cases hold them, so this case holds the two verdicts reachable without an install.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
