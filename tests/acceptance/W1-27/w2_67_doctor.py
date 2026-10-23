@@ -7,13 +7,22 @@ reads the value of the section it claims, wherever doctor put it, never a key na
 
 from __future__ import annotations
 
+import functools
+
 import w1_27_support as support
+
+LEVELS = ("MINIMAL", "INTERMEDIATE", "ADOPTED_HEALTHY")   # lowest first (CAP-54.a)
+
+
+@functools.cache
+def interface():
+    """The envelope fields and exit codes of ``docs/interfaces/API-0002.yaml``, read from this worktree."""
+    return support.base.load_interface(support.REPO_ROOT)
 
 
 def sections(run):
     """The doctor sections of a run: ``result`` when healthy, else ``error.details``."""
-    envelope = run.envelope()
-    assert envelope.get("command") == "doctor", f"not a doctor envelope\n{run.describe()}"
+    envelope = support.assert_envelope(run, interface(), command="doctor")
     if envelope.get("ok") is True:
         found = envelope.get("result")
     else:
