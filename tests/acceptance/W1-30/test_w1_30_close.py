@@ -367,7 +367,12 @@ def test_checkpoint_exists_before_ticket_status_changes(project, sandbox, interf
 # --------------------------------------------------------------------------
 
 def test_regression_includes_other_acceptance_folders(project, sandbox, interface):
-    """A2: regression tests include other tickets' acceptance suites."""
+    """A2, as W2-66 reads it (DEC-880 item 2, I2 F9): another ticket's acceptance folder runs, and blocks the close
+    when red, whenever the run includes it. This project has no test map, so its close runs the full regression
+    (W2-66: a missing test map runs everything), and the other folder is in it. The scoped cases (the selection
+    includes the folder, or leaves it out and names it and why) are in ``test_w1_30_regression_scope.py``."""
+    assert not (project.root / "governance" / "project" / "test-map.yaml").exists(), \
+        "the fixture holds a test map: this case is the full run's, which a project without one gets"
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
     project.write("src/example/feature.py", "# feature\n")
@@ -381,6 +386,8 @@ def test_regression_includes_other_acceptance_folders(project, sandbox, interfac
     envelope = support.envelope_of(run, interface)
     assert envelope["ok"] is False, \
         "a failing test in another ticket's acceptance folder must block close"
+    assert f"tests/acceptance/{other_wbs}/test_other.py" in json.dumps(envelope.get("error")), \
+        f"the refusal does not name the other ticket's failing test, so something else refused it\n{run.describe()}"
 
 
 def test_regression_runs_to_end_all_failures_collected(project, sandbox, interface):
