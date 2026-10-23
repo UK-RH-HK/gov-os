@@ -27,6 +27,7 @@ SPECIFICATION_CLASS = "specification"
 # The governance records a decision-record commit may change (DEC-896 item 1), beside the register itself.
 RECORD_PREFIXES = ("docs/plan/", "governance/project/prompts/", "governance/project/briefs/",
                    "governance/project/orchestration/")
+DECISION_RECORD_TASK = "decision-record"  # the Task: of the orchestrator's decision-record commits (DEC-896)
 DECISION_ID = re.compile(r"\bDEC-\d+\b")
 ROW_ID = re.compile(r"\bW\d+-[A-Z]+\d+\b")
 # DEC-898: the floors of the shared disk until W2-20's reading lands, as top-level keys of the path map.
@@ -111,14 +112,16 @@ def check_specification(root: Path, ticket: str) -> None:
 # ---------------------------------------------------------------------------
 
 def decision_records(root: Path, commits: list[dict], settings: dict) -> set[str]:
-    """The commits of ``commits`` that are measured by their decision: they change only governance records and
-    name, in their subject or an ``Implements:`` trailer, an ACCEPTED owner decision of the register."""
+    """The commits of ``commits`` that are measured by their decision: decision-record commits (``Task:
+    decision-record``) that change only governance records and name, in their subject or an ``Implements:``
+    trailer, an ACCEPTED owner decision of the register. Any other commit that names no task stays unmeasured."""
     register = settings.get(_history.REGISTER_KEY)
 
     def a_record(path: str) -> bool:
         return path.startswith(RECORD_PREFIXES) or path in (register, _history.PATH_MAP_REL)
 
-    candidates = [c for c in commits if c["paths"] and all(a_record(p) for p in c["paths"])]
+    candidates = [c for c in commits if c["trailers"].get("Task") == [DECISION_RECORD_TASK]
+                  and c["paths"] and all(a_record(p) for p in c["paths"])]
     if not candidates:
         return set()
     entries = _history.register_entries(root, register)
