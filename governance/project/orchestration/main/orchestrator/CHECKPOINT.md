@@ -54,6 +54,12 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **W2-07 run 2 returned PACKAGES (head `d2eee219`, batch of 196 green, gov check green):** 14 more W1-30 cases ->
+  **DEC-908 (delegated) `e4b745a6`** (ticket `2d32b7bb`; DEC-455/480/454 marked; row W2-L416); T3 = DEC-906 (W1-01
+  known; W2-70 also covers the merge case, `488972e4`). Its temp removed. **Run 3 QUEUED** (`log/W2-07-A5-run3.json`).
+- **Owner commit C (the exemption entry) VALIDATED and ACT-PINGED:** `drafts/ACT-owner-commit-C-2026-10-23.md`,
+  patch `OWNER-C-acceptance-exemption.patch` (applies to `488972e4`); pin readers pass; full run: 15,466 passed, 30
+  skipped, only W1-01's known red (`log/exemption-validation-2026-10-23.txt`). After it: tell W2-70 the entry is in.
 - **W2-67 round 1 returned PACKAGES (test design done, head `60f71c42`):** the launcher refused an engineer on a
   test-designer ticket (my ticket-file slip). **DEC-907 (delegated) `82e86d54`** + ticket `a6af5bb1`: role engineer,
   acceptance files in the body; the fixtures by a second fresh designer; conftest refuses per-run --basetemp (opt-out

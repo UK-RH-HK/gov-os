@@ -1,0 +1,17 @@
+disk gate open: 814 GiB free, 57515113 inodes free
+2026-10-23 17:09:12 clone at 83a3867e
+acceptance_exemptions added (1 entry)
+2026-10-23 17:09:12 patch written:  1 file changed, 6 insertions(+)
+pin's config loader: reads the patched path map
+load_sensitive: 30 entries, 30 counted, 0 finding(s)
+accepted_reds: 0 entries, 0 counted, 0 finding(s)
+accepted_history: 5 entries (unchanged: True)
+acceptance_exemptions: [{'commit': 'c9a08678644485a7528bc875164e110881b63d93', 'decision': 'DEC-900'}] -> as decided
+PIN CHECK PASSED
+placeholder scan: 0 hit(s)
+2026-10-23 17:09:14 core-pathmap exit 0
+2026-10-23 17:09:15 core-schema exit 0
+2026-10-23 17:34:30 clone rebuilt; waiting for the verification lock
+2026-10-23 18:32:07 parallel exit 1 in 3457 s (lock wait included): 1 failed, 15466 passed, 30 skipped in 2747.00s (0:45:47)
+FAILED tests/acceptance/W1-01/test_w1_01_history.py::test_only_the_test_designer_commits_to_acceptance_tests
+2026-10-23 18:32:07 validation done
