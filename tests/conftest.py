@@ -8,12 +8,17 @@
   removes one whose ``.lock`` is younger than three days, and a killed run
   leaves its ``.lock`` behind. At the end of a run, the controlling process
   removes the numbered base folders past pytest's own retention whose run is
-  over: no ``.lock``, or a ``.lock`` naming a process that does not exist.
-  A folder whose liveness cannot be read is kept.
+  shown to be over. A folder whose run cannot be shown to be over is kept;
+  pytest's own three-day rule removes it later.
 - Each Bash command of a sandboxed session runs in a PID namespace of its own,
-  so a ``.lock``'s pid alone cannot show that a run in another command is
-  over. The controlling process therefore also holds a shared ``flock`` on
-  its own ``.lock`` while it runs; a folder whose ``.lock`` is held is kept.
+  so a ``.lock``'s pid cannot show whether a run in another command is over:
+  the pid may name another process, or a live one the sweeper cannot see.
+  The controlling process of a run of these suites therefore holds a shared
+  ``flock`` on its own ``.lock`` from the moment its base folder is made, and
+  then writes ``.lock-held`` beside it. A run is over when its folder has no
+  ``.lock``; when its ``.lock`` is not held but ``.lock-held`` is there (the
+  run that held it is gone); or when its ``.lock`` names a pid no namespace
+  can have (``pid_max`` or above). Any other folder is kept, whatever its pid.
 
 The conftest sets no base folder and changes no retention count or policy.
 """
@@ -32,6 +37,7 @@ from _pytest.pathlib import maybe_delete_a_numbered_dir
 from _pytest.tmpdir import get_user
 
 _ALLOW = "GOV_ALLOW_BASETEMP"
+_HELD = ".lock-held"
 _NUMBERED = re.compile(r"pytest-(\d+)")
 _refused = False
 _held = None
@@ -57,38 +63,49 @@ def pytest_configure(config):
     )
 
 
-def _hold(config) -> None:
+def _hold(basetemp: Path) -> None:
     """Hold a shared flock on this run's own ``.lock`` while the process lives."""
     global _held
-    if _held is not None or _is_worker(config):
-        return
-    factory = getattr(config, "_tmp_path_factory", None)
-    if factory is None or factory._basetemp is None or factory._given_basetemp is not None:
+    if _held is not None:
         return
     try:
-        fd = os.open(factory._basetemp / ".lock", os.O_RDONLY)
+        fd = os.open(basetemp / ".lock", os.O_RDONLY)
     except OSError:
         return
     fcntl.flock(fd, fcntl.LOCK_SH)
     _held = fd
-
-
-@pytest.hookimpl(wrapper=True)
-def pytest_runtestloop(session):
-    _hold(session.config)
-    return (yield)
-
-
-@pytest.hookimpl(wrapper=True)
-def pytest_runtest_setup(item):
     try:
-        return (yield)
-    finally:
-        _hold(item.config)
+        os.close(os.open(basetemp / _HELD, os.O_WRONLY | os.O_CREAT, 0o600))
+    except OSError:
+        pass  # without the mark the folder is only ever kept
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_sessionstart(session):
+    """Hold the ``.lock`` as soon as pytest makes this run's base folder."""
+    config = session.config
+    factory = getattr(config, "_tmp_path_factory", None)
+    if _is_worker(config) or factory is None or factory._given_basetemp is not None:
+        return
+    make = factory.getbasetemp
+
+    def getbasetemp() -> Path:
+        basetemp = make()
+        _hold(basetemp)
+        return basetemp
+
+    factory.getbasetemp = getbasetemp
+
+
+def _pid_max() -> int | None:
+    try:
+        return int(Path("/proc/sys/kernel/pid_max").read_text())
+    except (OSError, ValueError):
+        return None
 
 
 def _run_is_over(folder: Path) -> bool:
-    """True only when the run that made ``folder`` is known to be over."""
+    """True only when the run that made ``folder`` is shown to be over."""
     lock = folder / ".lock"
     try:
         fd = os.open(lock, os.O_RDONLY | os.O_NOFOLLOW)
@@ -101,18 +118,14 @@ def _run_is_over(folder: Path) -> bool:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except OSError:
             return False  # a live run holds it
+        # Held exclusively here, no run can take the lock and write the mark.
+        if os.path.lexists(folder / _HELD):
+            return True  # the run that held it is gone
         pid = os.read(fd, 32).decode("ascii", "replace").strip()
     finally:
         os.close(fd)
-    if not pid.isdigit() or int(pid) <= 0:
-        return False
-    try:
-        os.kill(int(pid), 0)
-    except ProcessLookupError:
-        return True
-    except OSError:
-        return False
-    return False
+    limit = _pid_max()
+    return pid.isdigit() and limit is not None and int(pid) >= limit
 
 
 def _pytest_root(factory) -> Path:
