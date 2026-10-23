@@ -60,7 +60,7 @@
   ONE AT A TIME under `flock /tmp/gov-os-verify.lock` (nightly.sh + LEAD-common + trial use it); W2-67 forward
   (`DAEO-9nys` `de2b5bf1`, claimed `f9cf898e`, round 1 lead QUEUED behind the gate, `log/W2-67-A5-run1.json`);
   W2-07's batch widened (`3b5b04b5`); W2-07 run 2 QUEUED behind the gate (`log/W2-07-A5-run2.json`), then W2-66's
-  run 2 (verification after W2-07's). `/tmp/gov-os-lead-W2-07/` removed; W2-66's removal running.
+  run 2 (verification after W2-07's). Both stopped runs' temps REMOVED after the holder re-check (disk 130 -> 75 GiB, inodes 8,057,115 -> 1,927,340).
 - **W2-07 run 1 returned PACKAGES (head `44062fec`, implementation complete, 40/40 own):** P1 `packages/P-W2-07-A-B.md`
   (`17e5c3a9`), PINGED: A = the lead budget vs a full run (1,062,156 inodes at 13.6 %; rec (a) pytest
   `-o tmp_path_retention_policy=failed` after a measured trial + (b) a 5,000,000 / 50 GB verification cap meanwhile
