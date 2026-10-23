@@ -23,7 +23,7 @@
 - **The owner's acts, in order** (one ACT ping, with the exact commands and their checks):
   0. **The pin's environment includes pytest-timeout 2.4.0** (the same wheel as the leads' install, DEC-892 b), so the close's per-test limit works under the pin.
   1. **The re-pin itself:** build the wheel at the merge commit that holds all six, install it under a new pin folder named for that commit (as `pin-fecb870c` is for today's), and point `~/.local/bin/gov` at it.
-  2. **The settings regeneration** (DEC-884). If P-I1-2 is taken, it drops the `docs/source` read-deny rules, which protect a folder that left the tree on 2026-10-01.
+  2. **The settings regeneration** (DEC-884). It carries DEC-904 item 2's allow rule: a lead may remove only its own temp folder, by its literal path `/tmp/gov-os-lead-<its W2 id>`. If P-I1-2 is taken, it drops the `docs/source` read-deny rules, which protect a folder that left the tree on 2026-10-01.
   3. **A smoke run** of the pinned `gov check` and one guard decision, which I run and report.
 - **What it changes for the closes:**
   - closes become scoped (W2-66);

@@ -54,6 +54,13 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **DEC-904 (owner) `6b496169`** on P-W2-07-A-B: retention trial (`tools/retention_trial.sh`, RUNNING, results in
+  `/tmp/gov-os-trial-retention/out/run.txt`; if it holds -> the option becomes the default for close, nightly, leads);
+  allow rule for a lead's own temp at the settings regeneration; bridge cap 6,000,000 / 60 GB per verification run,
+  ONE AT A TIME under `flock /tmp/gov-os-verify.lock` (nightly.sh + LEAD-common + trial use it); W2-67 forward
+  (`DAEO-9nys` `de2b5bf1`, claimed `f9cf898e`, round 1 lead QUEUED behind the gate, `log/W2-67-A5-run1.json`);
+  W2-07's batch widened (`3b5b04b5`); W2-07 run 2 QUEUED behind the gate (`log/W2-07-A5-run2.json`), then W2-66's
+  run 2 (verification after W2-07's). `/tmp/gov-os-lead-W2-07/` removed; W2-66's removal running.
 - **W2-07 run 1 returned PACKAGES (head `44062fec`, implementation complete, 40/40 own):** P1 `packages/P-W2-07-A-B.md`
   (`17e5c3a9`), PINGED: A = the lead budget vs a full run (1,062,156 inodes at 13.6 %; rec (a) pytest
   `-o tmp_path_retention_policy=failed` after a measured trial + (b) a 5,000,000 / 50 GB verification cap meanwhile
