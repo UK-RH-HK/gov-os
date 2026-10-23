@@ -37,6 +37,7 @@ kpis:
   - 'The close record''s evidence block states the scope (scoped, full), the base commit, the head, the tree, every suite and case run, every suite left out and why, every skip with its reason and the skip count, the failing tests with their failure text kept, and the run''s JUnit XML file; the schema line is W2-64''s [DEC-889 item 12, DEC-890 item 1, I4 F5]'
   - 'gov close --full runs the full regression and the record says so; W2-24 and W2-46 use it [DEC-880 item 2 (d)]'
   - 'Every test has a per-test time limit (pytest-timeout with the signal method, an owner install package at this ticket''s start), set above the slowest test''s measured time (900 s held in the trial); a test that passes it fails, naming the limit [DEC-889 item 11 b, DEC-892 b]'
+  - 'The close''s pytest runs (its parallel run and its serial-only cases) pass -o tmp_path_retention_policy=failed, so a passing test''s temp folder goes as the test ends and a failing test''s stays; the evidence block names it [DEC-905, DEC-904 item 1]'
   - 'The parallel run''s distribution mode is one setting; it stays the default (no worksteal) until the nested reruns are gone and worksteal is re-measured in the nightly [DEC-892 a, P-IS-3]'
   - 'One command runs the nightly full uncached regression on w2/integrate''s head in the close''s form, with JUnit XML: every failing test is re-run alone; a red that fails alone is a P1 package with git bisect run over the commits since the last green night; a red that passes alone is a flaky candidate; a test that fails there and that a scoped close since the last green night passed or did not run is a P1 package with the test map corrected in it; coverage.py with lens H''s shim writes the measured map weekly [DEC-880 item 2 (c), DEC-852 item 3, DEC-889 items 4 and 12]'
   - 'Measured and reported in docs/research/W2-66-scoped-close.md, on a quiet machine: the time of a typical scoped close (one module outside the shared core and its tests) against the full close, and the selection''s catch rate on lens H''s planted faults, the three widest modules included; the 15-minute target is stated as reached by W2-66 with W2-68, W2-57''s serial rework and worksteal together [DEC-889 item 11 e]'
@@ -63,6 +64,7 @@ sources:
 - DEC-891
 - DEC-899
 - DEC-903
+- DEC-905
 est_loc: 400
 acceptance_tests:
   path: tests/acceptance/W2-66/
