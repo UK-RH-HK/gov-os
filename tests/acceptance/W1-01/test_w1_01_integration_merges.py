@@ -10,6 +10,11 @@ parallel run (DEC-235):
   ``Role: independent-test-designer``;
 - every non-merge commit is checked exactly as before.
 
+DEC-906 item 2, read through ``merge_offences`` by DEC-908 item 3 (rewrite,
+W2-70): a commit the merge brings passes too when its full id is listed in the
+path map's ``acceptance_exemptions``; an unlisted commit without the role, an
+owner's included, keeps the merge red.
+
 Each test builds a small git repository in a temporary directory and asks the
 rule of ``test_only_the_test_designer_commits_to_acceptance_tests``
 (``w1_01_support.acceptance_test_offenders``) which commits offend. The last
@@ -208,11 +213,73 @@ def test_a_non_merge_commit_with_the_role_still_passes(repo):
 
 
 # --------------------------------------------------------------------------
+# DEC-908 item 3: a merge that brings a commit of the exemption list (DEC-906)
+# --------------------------------------------------------------------------
+
+OWNER_TEST_FILE = f"{ACCEPTANCE}/W1-93/test_retired.py"
+
+
+def _path_map(repo, body):
+    """The fixture's stand-in path map, written last and left untracked, where the case reads this repository's."""
+    path = repo / support.PATH_MAP_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("version: 1\naccepted_history: []\n" + body, encoding="utf-8")
+
+
+def _listing(*shas):
+    return f"{support.EXEMPTIONS_KEY}:\n" + "".join(f'  - commit: "{sha}"\n    decision: DEC-900\n' for sha in shas)
+
+
+def _ticket_merges_back_owner_commits(repo, count):
+    """A branch ``ticket`` made before ``count`` owner commits on ``integrate``; it merges ``integrate`` back."""
+    _ticket_branch(repo, ({OTHER_TEST_FILE: "NEW = 1\n"}, DESIGNER))
+    owners = [_commit(repo, {OWNER_TEST_FILE: f"VALUE = {n}\n"}, f"Owner decision: retirement {n}", role="owner")
+              for n in range(count)]
+    _git(repo, "checkout", "-q", "ticket")
+    merge = _merge(repo, "integrate", role="orchestrator")
+    assert merge in support.commits_touching(ACCEPTANCE, repo), "premise: the merge touches tests/acceptance"
+    return owners, merge
+
+
+def test_a_merge_that_brings_a_listed_commit_passes(repo):
+    """A ``Role: owner`` commit listed by its full id: the merge that brings it back has no offence."""
+    (owner,), merge = _ticket_merges_back_owner_commits(repo, 1)
+    assert support.merge_offences(merge, ACCEPTANCE, repo), "premise: unlisted, the merge is red"
+    _path_map(repo, _listing(owner))
+    assert support.merge_offences(merge, ACCEPTANCE, repo) == [], (
+        f"the merge {merge[:12]} brings only {owner[:12]}, listed by its full id, and is still an offence"
+    )
+    assert _offenders(repo) == [], "a commit listed by its full id, or the merge bringing it, is an offender"
+
+
+@pytest.mark.parametrize("listing", ["only-the-other", "abbreviated", "empty-list", "no-key"])
+def test_a_merge_that_brings_an_unlisted_commit_without_the_role_stays_red(repo, listing):
+    """Two owner commits; the second is never listed by its full id. ``Role: owner`` alone exempts nothing."""
+    (first, second), merge = _ticket_merges_back_owner_commits(repo, 2)
+    _path_map(repo, {"only-the-other": _listing(first),
+                     "abbreviated": _listing(second[:7], second[:12], second[:39]),
+                     "empty-list": f"{support.EXEMPTIONS_KEY}: []\n",
+                     "no-key": ""}[listing])
+    offences = support.merge_offences(merge, ACCEPTANCE, repo)
+    text = "\n".join(offences)
+    assert second[:12] in text, f"the merge brings the unlisted {second[:12]} and does not name it: {offences}"
+    assert (first[:12] in text) is (listing != "only-the-other"), f"the owner commit {first[:12]}, {listing}: {offences}"
+    assert any(line.startswith(merge[:12]) for line in _offenders(repo)), (
+        f"the merge {merge[:12]} that brings an unlisted commit is not an offender"
+    )
+
+
+# --------------------------------------------------------------------------
 # The history of this repository
 # --------------------------------------------------------------------------
 
 def test_the_integration_merges_of_this_repository_pass(repo_root):
-    """Every merge commit on HEAD's history that touches tests/acceptance/** passes the DEC-253 rule."""
+    """Every merge commit on HEAD's history that touches tests/acceptance/** passes the DEC-253 rule.
+
+    Rewrite (W2-70, DEC-908 item 3): ``merge_offences`` reads the path map's
+    ``acceptance_exemptions`` (DEC-906), so a branch made before the listed
+    ``c9a08678`` may merge the line that holds it back.
+    """
     merges = [sha for sha in support.commits_touching(ACCEPTANCE, repo_root)
               if len(support.commit_parents(sha, repo_root)) > 1
               and DESIGNER not in support.commit_roles(sha, repo_root)]
