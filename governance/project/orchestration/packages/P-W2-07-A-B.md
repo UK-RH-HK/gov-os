@@ -80,6 +80,14 @@ The causes:
   - row W2-M149 contradicts DEC-487 and DEC-490 (could-not-measure is uncounted);
   - a refused close now commits its repair ticket, so the next close needs a rebuild.
 
+## Addendum, the same day: W2-66's run 1 returned with the same limit (P-W2-66-S1)
+
+- **The scale is confirmed.** W2-66's lead's full parallel run, in the close's form, on its own head, left 5,306,782 files and folders and about 47 GB in `/tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-1`. That is five times a lead's budget. The cause is the same: per-test whole-tree copies, kept by pytest's retention until the session ends. Its lead stopped all heavy work, as DEC-898 says, and could not remove the folder (`rm -rf` needs a permission it cannot get).
+- **W2-66's lead recommends A (a) too:** `-o tmp_path_retention_policy=failed`, which in pytest 9 removes a passed test's `tmp_path` as the test ends, measured on one run first. It notes that module-scoped `tmp_path_factory` copies are not covered, so W2-67's per-test-copy hygiene stays the lasting fix.
+- **The cap in my (b) must fit a run of about 5,300,000 files and folders and 47 GB.** So the bridge cap I propose, until (a)'s trial reports, is **6,000,000 files and folders and 60 GB per lead's verification run, one such run at a time.** Two at once would bring the disk's free inodes near DEC-898's floor of 10,000,000; 65 million are free today.
+- **Also to approve:** removing `/tmp/gov-os-lead-W2-66/` with W2-07's.
+- **W2-66's other package, P-W2-66-T1, I decided as delegated (DEC-903,** `f4165cee`, `a0197576`): W1-39's overlay case, outdated by DEC-896 item 2, is named for W2-66's test designer.
+
 ## 6. What it blocks, and what waiting costs
 
 - **Blocks:** W2-07's DONE. Through it: W2-66's merge order and the first re-pin.
