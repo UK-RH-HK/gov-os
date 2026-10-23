@@ -206,6 +206,21 @@ canary's own missed queries, read from doctor's report, written into a document 
 `framework_lock`'s MATCH and DRIFT need an installed kernel and its lock (no `gov` command writes one); W1-39's
 lock cases hold them, so this case holds the two verdicts reachable without an install.
 
+**`doctor_r7`'s home-tool case (×4, parametrised).** With the sandbox home empty, doctor's entries read `vec0.so not
+found`, `ollama models directory not found`, `reranker venv not found`, `model directory not found` (seen with a
+probe): doctor reads the home it is given (`HOME`), not the real one, so the module docstring's residual no longer
+holds, and no hash was ever compared. The case now places the file each branch reads, under the parametrised home
+path, with fake content: `sqlite_vec/vec0.so`; an Ollama manifest (`manifests/registry.ollama.ai/library/<name>/<tag>`)
+naming a model blob (`blobs/sha256-<hex>`); the venv's `bin/python` (a link to the interpreter running the suite,
+which `uv pip freeze` reads); `snapshots/<pinned revision>/model.safetensors`. It keeps `sha256_match` not true and
+adds `ok` not true and a reason other than absence. P67B-32 (in `w2_67b_child.py`): a no-binary tool whose file is
+found passes without its hash compared (`_check_no_binary_tool`'s result set to ok and matched when its reason is not
+an absence).
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_w1_27_doctor_r7.py::test_home_tool_wrong_sha256_not_ok[sqlite-vec, qwen3-embedding, reranker-venv, reranker]` | placed no file a branch reads, so every branch answered "not found" before any hash | P67B-32: `sha256_match is true for <name> with a wrong pin (000…)`, all four | green, 4 passed in 7.6 s (`g2-head-r7.xml`) | the planted input is not where doctor reads it |
+
 ### Group 3: Claude Code drift (`test_w1_27_drift.py` ×6)
 
 Where doctor reads its input, seen on the head with a probe (one doctor run per placement): the CLI is the
