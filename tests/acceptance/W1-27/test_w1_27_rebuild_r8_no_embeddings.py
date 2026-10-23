@@ -270,8 +270,10 @@ def test_two_rebuilds_in_the_mode_give_the_same_digest(gov, interface):
 def test_the_mode_writes_only_under_gov_runtime(gov, interface, tiny, sandbox):
     # Revised (W2-67, I4 F1; Rewrite-Reason: the assertion does not read what the case's name claims): it
     # snapshotted sandbox.elsewhere, which nothing uses. The home the command is given (HOME) is snapshotted too.
-    # (The code index's daemon folder, /tmp/gov-cbm-<uid>, is not: in the designer's sandbox it is read-only, so
-    # whether the mode may write there could not be seen; returned as an open point, W2-67 batch 1b.)
+    # The code index's daemon folder is not (W2-67 batch 1c): every rebuild that reaches the code index, this mode
+    # included and the tool absent included, makes /tmp/gov-cbm-<uid>/<its root's hash>/ for the tool's lock and
+    # socket files, which cannot live under .gov-runtime/ (DEC-338: a socket path is limited to 108 bytes). That
+    # place is written by design; the evidence is in README-W2-67.md.
     before = support.snapshot(tiny)
     before_elsewhere = support.snapshot(sandbox.elsewhere, skip=())
     before_home = support.snapshot(sandbox.home, skip=())

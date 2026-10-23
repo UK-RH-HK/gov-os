@@ -343,6 +343,70 @@ Findings on the head (not asserted red; for the tickets that own the code):
   section is `fail` (both unavailable: `unmeasured`); the canaries case does not assert the section's status after the
   rebuild.
 
+## KPI 5, batch 1c: the two pieces the code index's daemon folder held back
+
+Independent test designer (MR-3), batch 1c, 2026-10-23, run outside the sandbox that made `/tmp/gov-cbm-<uid>`
+read-only for batch 1b. The same rule and the same method: a pytest plugin, `w2_67c_plant.py` (`-p w2_67c_plant`,
+its folder on `PYTHONPATH`), wraps `w1_07_support.write_launcher` in the test process, and each launcher a case
+writes imports `w2_67c_child.py` and applies the faults named in `W2_67_PLANT` in that `gov` process only. Both
+modules and every run's JUnit XML are in `.gov-runtime/scratch/td-1c/` (`r4-<fault>.xml`, `r4-head.xml`,
+`r8-head.xml`). `src/` is never written and the tree is never copied. A command, for one fault:
+
+    W2_67_PLANT=P67C-1 PYTHONPATH=<worktree>/src:<worktree>/.gov-runtime/scratch/td-1c \
+      python3 -m pytest -p no:cacheprovider -p no:xdist -p w2_67c_plant -q --junitxml=<scratch>/r4-P67C-1.xml <node id>
+
+### `test_w1_27_rebuild_r4.py::test_rebuild_codeintel_reason_is_measured`
+
+The case now gives three tiny projects (`w2_67b_support.rebuild_project`, this worktree's code) the same full
+rebuild, each with a PATH of its own: git and gitleaks (the lexical index's owner fails closed without its secrets
+filter, DEC-440) and the code index's tool in one of three states the case sets and so knows. `answers`: a stand-in
+`codebase-memory-mcp` that answers every call with a successful MCP envelope; the case requires that it was asked
+`index_repository` and that the code index is `recreated`. `fails`: a stand-in whose settings call succeeds and
+whose every tool call (`cli`) ends with exit code 37; the case requires that it was asked, `not_recreated`, a reason
+naming the tool and `37`, and no word of absence. `absent`: no tool on PATH; `not_recreated`, and a reason naming the
+tool as not there (`no such file`, `not found`, `not on path`, `absent`, `missing` or `not installed`). The old
+assertion (not the constant `no code index module exists`) is kept for all three. The case no longer uses the
+session copy of the whole tree.
+
+| Fault | In words | How (in `w2_67c_child.py`) |
+|---|---|---|
+| P67C-1 | a constant reason for a code index not rebuilt, whatever the tool answered | `gov.rebuild.command.run` wrapped: a `not_recreated` code index's reason set to `codebase-memory-mcp did not answer` |
+| P67C-2 | the outcome does not follow the measurement | the code index entry always `not_recreated` with the absent tool's reason |
+| P67C-3 | round 4's fault: the tool is never asked, the reason is the old constant | `gov.codeintel.index` raises `no code index module exists` |
+| P67C-4 | the tool's answer dropped from the reason | every digit removed from a `not_recreated` reason |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_rebuild_codeintel_reason_is_measured` | any reason other than one fixed text passed, whatever the tool answered (r4:282) | P67C-1: `the reason does not name the tool and the exit code 37 it answered with …: {'status': 'not_recreated', 'reason': 'codebase-memory-mcp did not answer'}`; P67C-2: `the code index's tool answered, yet the code index is not recreated (DEC-440): {'status': 'not_recreated', 'reason': "[Errno 2] No such file or directory: 'codebase-memory-mcp'"}`; P67C-3: `the code index reason is the constant 'no code index module exists' …`; P67C-4: `… the exit code 37 …: {… 'reason': 'codebase-memory-mcp index_repository failed (exit code )'}` | green, 1 passed in 8.8 s (`r4-head.xml`) | the assertion does not read what the case's name claims |
+
+On the head the three reasons read: `answers` recreated (no reason); `fails`
+`codebase-memory-mcp index_repository failed (exit code 37)`; `absent`
+`[Errno 2] No such file or directory: 'codebase-memory-mcp'`.
+
+### `test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime`: the daemon folder left out, by design
+
+Not revised further; only its comment changed. The code index's daemon folder is written by every rebuild that
+reaches the code index, by design: `gov.codeintel` makes `daemon_dir(root)`, `/tmp/gov-cbm-<uid>/` and the first 16
+hex digits of the sha256 of the resolved root, before it asks the tool, for the tool's lock and socket files.
+DEC-338 places them there because a socket path is limited to 108 bytes, so they cannot live under
+`.gov-runtime/`; they are "not index files", so CAP-12.a's failure line "an index file outside `.gov-runtime/`" does
+not cover them. A snapshot of that place would make the case red on the head for what a decision allows. A
+snapshot of the whole `/tmp/gov-cbm-<uid>` would also catch every concurrent worker's rebuild, which writes its own
+folder there.
+
+Seen on the head (2026-10-23, the projects of these runs, each mapped to its folder):
+
+| Run | Project | Daemon folder after the run |
+|---|---|---|
+| this case, `--no-embeddings`, real tool on PATH (`r8-head.xml`, 1 passed in 11.8 s) | `…/test_the_mode_writes_only_unde0/repo` | `/tmp/gov-cbm-1000/5647770e6d54062f/cbm-daemon-1000/`, 11 files of the tool (`cbm-*.lock`, `*.rw`, `*.turn`) |
+| the r4 case under P67C-4 (the code index's real code) | `answers/repo`, `fails/repo`, `absent/repo` | each has its folder (`a4dbfeebcbb4b9ae`, `36ad016e7173d362`, `43cba013bfc2633c`), empty: made even with no tool on PATH |
+| the r4 case under P67C-3 (the code index never called) | `answers/repo` | no folder |
+
+Finding (not asserted; returned): nothing removes these folders. On 2026-10-23 `/tmp/gov-cbm-1000` held 11,014
+of them, 138,273 files and folders in all (`du -s --inodes`), one folder per project root any rebuild or code-index
+case ever used. A test project's root is new on every run, so every run adds folders there; `TMPDIR` does not move
+them (DEC-898's inode share).
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
@@ -357,3 +421,5 @@ Findings on the head (not asserted red; for the tickets that own the code):
   `test_w1_27_recovery_check_r2.py` (3).
 - Revised in place: `test_w1_27_path_compliance_r2.py` (1 case), `test_w1_27_held_out.py` (2 cases),
   `test_w1_27_adoption.py` (3 cases).
+- Revised in place by batch 1c: `test_w1_27_rebuild_r4.py` (1 case); `test_w1_27_rebuild_r8_no_embeddings.py`
+  (the write-scope case's comment only).
