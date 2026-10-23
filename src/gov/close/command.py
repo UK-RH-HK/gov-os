@@ -1292,10 +1292,18 @@ def _scope_limit(root: Path, scope: dict, env: dict) -> list[str]:
     """The per-test limit of every run (pytest-timeout, the signal method), and the check result in ``env``.
     ``TIMEOUT_PLUGIN_ABSENT`` when the runs' interpreter cannot load pytest-timeout: nothing ran, nothing is
     recorded (DEC-892 b)."""
+    import os
+
     if scope["check_result"]:
         env[CHECK_RESULT_VARIABLE] = scope["check_result"]
     else:
         env.pop(CHECK_RESULT_VARIABLE, None)
+    for key, value in (scope.get("env") or {}).items():  # the nightly's coverage shim (gov.close.nightly)
+        if key == "PYTHONPATH":
+            if value not in env["PYTHONPATH"].split(os.pathsep):
+                env[key] = os.pathsep.join([env[key], value])
+        else:
+            env[key] = value
     if scope["limit"] is None:
         if _started(root, [sys.executable, "-c", f"import {_TIMEOUT_PLUGIN}"], env).returncode != 0:
             raise GovError("TIMEOUT_PLUGIN_ABSENT",
