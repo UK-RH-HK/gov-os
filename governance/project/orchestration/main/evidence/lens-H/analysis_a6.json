@@ -1,0 +1,248 @@
+{
+ "src/gov/checkpoint/record.py": {
+  "sampled": 40,
+  "killed": 35,
+  "survived": 3,
+  "uncovered": 2,
+  "notrun": 0,
+  "timeout": 0,
+  "race": 0,
+  "seconds": 2135,
+  "ops": {
+   "int-plus-one": [
+    7,
+    1
+   ],
+   "drop-not": [
+    3,
+    0
+   ],
+   "negate-condition": [
+    7,
+    1
+   ],
+   "return-none": [
+    3,
+    0
+   ],
+   "or-and": [
+    4,
+    1
+   ],
+   "compare-flip": [
+    8,
+    0
+   ],
+   "bool-swap": [
+    1,
+    0
+   ],
+   "drop-call": [
+    2,
+    0
+   ]
+  },
+  "survivors": [
+   {
+    "line": 185,
+    "op": "int-plus-one",
+    "old": "60",
+    "new": "61",
+    "why": "463 tests ran, none failed"
+   },
+   {
+    "line": 52,
+    "op": "or-and",
+    "old": " or ",
+    "new": " and ",
+    "why": "557 tests ran, none failed"
+   },
+   {
+    "line": 183,
+    "op": "negate-condition",
+    "old": "created.tzinfo is None",
+    "new": "not (created.tzinfo is None)",
+    "why": "463 tests ran, none failed"
+   },
+   {
+    "line": 73,
+    "op": "return-none",
+    "old": "datetime.min.replace(tzinfo=timezone.utc)",
+    "new": "None",
+    "why": "not covered"
+   },
+   {
+    "line": 32,
+    "op": "int-plus-one",
+    "old": "0",
+    "new": "1",
+    "why": "not covered"
+   }
+  ],
+  "score_run": 92.1,
+  "score_with_uncovered": 87.5
+ },
+ "src/gov/close/ratchet.py": {
+  "sampled": 43,
+  "killed": 38,
+  "survived": 3,
+  "uncovered": 2,
+  "notrun": 0,
+  "timeout": 0,
+  "race": 0,
+  "seconds": 265,
+  "ops": {
+   "return-none": [
+    10,
+    0
+   ],
+   "compare-flip": [
+    10,
+    0
+   ],
+   "or-and": [
+    3,
+    0
+   ],
+   "int-plus-one": [
+    3,
+    2
+   ],
+   "drop-not": [
+    2,
+    0
+   ],
+   "negate-condition": [
+    6,
+    0
+   ],
+   "drop-call": [
+    2,
+    0
+   ],
+   "and-or": [
+    2,
+    1
+   ]
+  },
+  "survivors": [
+   {
+    "line": 44,
+    "op": "int-plus-one",
+    "old": "128",
+    "new": "129",
+    "why": "25 tests ran, none failed"
+   },
+   {
+    "line": 93,
+    "op": "and-or",
+    "old": " and ",
+    "new": " or ",
+    "why": "30 tests ran, none failed"
+   },
+   {
+    "line": 95,
+    "op": "return-none",
+    "old": "f\"it does not give each of {', '.join(FIELDS[key])}\"",
+    "new": "None",
+    "why": "not covered"
+   },
+   {
+    "line": 107,
+    "op": "return-none",
+    "old": "f\"no commit of the history of {commit} adds it\"",
+    "new": "None",
+    "why": "not covered"
+   },
+   {
+    "line": 108,
+    "op": "int-plus-one",
+    "old": "12",
+    "new": "13",
+    "why": "25 tests ran, none failed"
+   }
+  ],
+  "score_run": 92.7,
+  "score_with_uncovered": 88.4
+ },
+ "src/gov/tasks/claims.py": {
+  "sampled": 33,
+  "killed": 29,
+  "survived": 4,
+  "uncovered": 0,
+  "notrun": 0,
+  "timeout": 0,
+  "race": 0,
+  "seconds": 446,
+  "ops": {
+   "return-none": [
+    4,
+    0
+   ],
+   "and-or": [
+    3,
+    0
+   ],
+   "compare-flip": [
+    7,
+    0
+   ],
+   "drop-not": [
+    1,
+    0
+   ],
+   "bool-swap": [
+    2,
+    1
+   ],
+   "negate-condition": [
+    6,
+    0
+   ],
+   "or-and": [
+    1,
+    0
+   ],
+   "drop-call": [
+    5,
+    2
+   ],
+   "int-plus-one": [
+    0,
+    1
+   ]
+  },
+  "survivors": [
+   {
+    "line": 39,
+    "op": "drop-call",
+    "old": "time.sleep(0.01)",
+    "new": "pass",
+    "why": "2 tests ran, none failed"
+   },
+   {
+    "line": 50,
+    "op": "bool-swap",
+    "old": "True",
+    "new": "False",
+    "why": "86 tests ran, none failed"
+   },
+   {
+    "line": 52,
+    "op": "int-plus-one",
+    "old": "0o644",
+    "new": "421",
+    "why": "86 tests ran, none failed"
+   },
+   {
+    "line": 60,
+    "op": "drop-call",
+    "old": "os.close(descriptor)",
+    "new": "pass",
+    "why": "84 tests ran, none failed"
+   }
+  ],
+  "score_run": 87.9,
+  "score_with_uncovered": 87.9
+ }
+}

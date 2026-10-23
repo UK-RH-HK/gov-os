@@ -12,7 +12,10 @@
   - W2-07 (the close by ticket class; the commit gates first);
   - W2-69 (the secrets check reads what the stores hold).
 - **Order of work before it:**
-  1. **W2-66 and W2-07**, side by side, each to its FULL or STANDARD ladder. W2-66 also passes its fixture trial.
+  1. **W2-66 and W2-07, built in parallel** (owner, DEC-899 item 2), each to its FULL or STANDARD ladder.
+     - **W2-07 merges first.**
+     - **Then W2-66** merges `w2/integrate` back, re-verifies, gets a fresh FULL probe on the merged head, and passes its fixture trial.
+     - Both edit `src/gov/close/command.py`, so this order keeps a merge from invalidating the other's review.
   2. **W2-69** in a free slot, now that W2-50 is closing. Its tests decide the design question (DEC-897).
   3. **W2-65**, stacked on `w2/W2-59` (built in a free slot), after the P-IS-5 correction to its paths.
   4. **Just before the re-pin, W2-59 and W2-65 merge together.** Each first merges `w2/integrate` back with trailers and is re-verified (DEC-884). An earlier merge of either still needs a package first.
@@ -27,6 +30,7 @@
   - the commit gates refuse within minutes;
   - DEC-897 (b)'s re-run exception ends (W2-69).
   The merged-not-closed tickets close in the queue after it: W2-58, W2-63 (on W2-07's revision class), and any held this way. Under DEC-896 item 4, nothing closes before it unless gates (a) to (h) all predict a pass.
+- **The interim skip guard (DEC-899 item 7)** expects a full regression with 31 skips. With scoped closes after the re-pin, it is restated before the first scoped close: a scoped close that runs W1-38 must show no rulesync skip, until W2-57 lands.
 - **Rollback:** the old pin folder stays. Re-pointing `~/.local/bin/gov` at `pin-fecb870c` restores today's judge in one command.
 
 ## The second re-pin

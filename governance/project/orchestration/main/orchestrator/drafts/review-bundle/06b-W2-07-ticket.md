@@ -96,7 +96,8 @@ list_rows:
 Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-07), as approved (DEC-729), with DEC-868, DEC-892, DEC-896 item 3, DEC-898 and lens I's P-IS-4.
 
 - **Place (DEC-896 item 3):** it comes forward to sit with W2-66, before the first re-pin, and rides in it.
-  - It shares `src/gov/close/command.py` with W2-66: W2-66 writes the record's evidence lines, W2-07 the gates. The two run in sequence, or stacked under DEC-786.
+  - It shares `src/gov/close/command.py` with W2-66: W2-66 writes the record's evidence lines, W2-07 the gates.
+  - **The merge order (owner, DEC-899 item 2):** the two are built in parallel, and **W2-07 merges first.** Then W2-66 merges `w2/integrate` back, re-verifies and gets a fresh FULL probe before the re-pin.
 - **Allowed paths:** `src/gov/close/**`, except W2-66's and W2-68's new modules (`select.py`, `nightly.py`, `evidence.py`, `batch.py`, `fingerprint.py`). Also `src/gov/telemetry/**`, `tests/unit/close/**` and `tests/unit/telemetry/**`, and, for its test designer only, the W1-30 cases named above.
 - **It unblocks** the test-revision tickets: W2-63, W2-67's revisions and W2-70 close on its class once it is pinned.
 - **Row W2-M263 (DEC-738 item 4):** RED stays when nothing comes after the base (DEC-479; W1-30's test); this ticket owns how the close reports it.

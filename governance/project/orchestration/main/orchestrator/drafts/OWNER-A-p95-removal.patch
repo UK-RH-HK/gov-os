@@ -1,0 +1,19 @@
+diff --git a/governance/project/path-map.yaml b/governance/project/path-map.yaml
+index 6b629591..cb4df361 100644
+--- a/governance/project/path-map.yaml
++++ b/governance/project/path-map.yaml
+@@ -268,14 +268,6 @@ accepted_reds:
+ # isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
+ # names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
+ load_sensitive:
+-  - test: "tests/acceptance/W1-02/test_w1_02_guard_hook.py::test_decision_p95_is_under_100_ms"
+-    decision: DEC-757
+-    reason: "p95 latency under parallel load (DEC-372)"
+-    fixed_by: W2-M332
+-  - test: "tests/acceptance/W1-05/test_w1_05_live_hooks.py::test_a_call_waits_under_100_ms_p95_for_the_hook"
+-    decision: DEC-757
+-    reason: "p95 latency under parallel load (DEC-372)"
+-    fixed_by: W2-M332
+   - test: "tests/acceptance/W1-19/test_w1_19_real_models.py::test_a_warm_query_answers_within_half_a_second_at_p95"
+     decision: DEC-757
+     reason: "p95 latency under parallel load (DEC-372)"

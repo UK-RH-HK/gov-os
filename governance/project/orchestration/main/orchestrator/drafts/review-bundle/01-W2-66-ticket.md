@@ -82,9 +82,9 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-66), from DEC-880 item 2, DEC-883, DEC-8
   - child processes the cache could not follow: only about 500.
   The owner withdrew the cache and brought back the lite form of W2-38. A close runs what the change can affect, the full regression stays as the backstop, and the nightly full run catches a miss within a day (DEC-880). Batching, reuse and the fingerprints are W2-68's (DEC-890).
 - **Place:**
-  - The first slot, once the owner has confirmed this draft at the review point (DEC-889 item 14).
-  - Before its test designer starts, the owner settles P-IS-1 and P-IS-2.
-  - It shares `src/gov/close/command.py` with W2-07 and W2-57. W2-07 sits beside it (DEC-896); the record's lines here, the gates there.
+  - The first slot, the review point passed (DEC-899), with P-IS-1 and P-IS-2 (a) settled.
+  - It shares `src/gov/close/command.py` with W2-07 and W2-57: the record's lines here, the gates in W2-07.
+  - **The merge order (owner, DEC-899 item 2):** W2-66 and W2-07 are built in parallel, and **W2-07 merges first.** Then this ticket merges `w2/integrate` back into its branch, with its trailers, re-verifies in full, and gets a fresh FULL probe on the merged head before the re-pin. So no merge invalidates the other's review (the W2-50/W2-58 pattern).
 - **The ladder (DEC-884 item 4, DEC-889 item 15, DEC-896):**
   - its FULL review;
   - a trial of the scoped close on a fixture repository: a planted change in the shared core runs everything; a planted change in one module runs its suites; a record-only commit runs the record-reading set;

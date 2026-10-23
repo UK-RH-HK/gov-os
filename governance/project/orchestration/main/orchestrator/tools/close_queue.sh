@@ -82,6 +82,11 @@ for item in "$@"; do
   echo "$code" > "$LOG/close-$ticket.exit"
   date '+%F %T close '"$ticket"' exit '"$code" >> "$LOG/queue.txt"
   [ "$code" -eq 0 ] || break
+  # The interim skip guard (owner, DEC-899 item 7), until W2-57 lands: the full regression's skip count must be the
+  # expected 31, or the queue stops here, before the close's outputs are committed (a silent rulesync skip, I4 F2).
+  skips=$(python3 /home/usain/Dynamic-Agentic-Engineering-OS/.gov-runtime/scratch/orchestrator/tools/skip_gate.py "$LOG/close-$ticket.json" 2>&1) \
+    || { date '+%F %T '"$ticket"' STOPPED AFTER THE CLOSE, OUTPUTS NOT COMMITTED: '"$skips" >> "$LOG/queue.txt"; rm -f "$LOCK"; exit 3; }
+  date '+%F %T '"$skips" >> "$LOG/queue.txt"
   # A clean close leaves its ticket file and close record uncommitted; commit them, so that the next ticket's
   # gate (d) finds a clean tree (as W2-53's outputs were committed, a1565e56).
   git add ".tickets/$ticket.md" "docs/close/$ticket/" "docs/checkpoints/$ticket/" > "$LOG/outputs-$ticket.txt" 2>&1 || stop "the close's outputs could not be staged"

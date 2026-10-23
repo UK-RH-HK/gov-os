@@ -30,6 +30,7 @@
   - **Revisions:** W1-30's r11 test reads the reworked list. Also W1-30's r13 limit, W1-50's `CLAUDE*` removal (DEC-784), a p95 case for a designer's read, and W2-M332's timing without the memory sampler.
   - **The close's resource gate** covers W1-02's 5-second bound and the guard's 20-second deadline. The network check probes through the session's route.
   - **Then the orchestrator commits the removal** of every entry this ticket makes unnecessary (DEC-861).
+  - **Already removed** by the owner's commit (DEC-899 item 3): W1-02's and W1-05's p95 entries. Their cases stay alone in the serial phase, and W2-M332 keeps its date before W2-24.
 - **KPIs, failure:**
   - a timeout that skips or passes a case;
   - a serial entry without a reason;

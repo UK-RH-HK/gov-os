@@ -1,0 +1,1254 @@
+[
+ {
+  "id": "B2:src/gov/status/command.py:65:compare-flip:0",
+  "file": "src/gov/status/command.py",
+  "op": "compare-flip",
+  "n_exec": 91,
+  "F": 4,
+  "F_suites": [
+   "W1-32",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 253.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 85.9
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 0.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1737.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 349.3
+  }
+ },
+ {
+  "id": "B2:src/gov/status/command.py:105:negate-condition:1",
+  "file": "src/gov/status/command.py",
+  "op": "negate-condition",
+  "n_exec": 59,
+  "F": 4,
+  "F_suites": [
+   "W1-32"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 253.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 85.9
+  },
+  "static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 0.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1737.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 349.3
+  }
+ },
+ {
+  "id": "B2:src/gov/checkpoint/record.py:169:return-none:0",
+  "file": "src/gov/checkpoint/record.py",
+  "op": "return-none",
+  "n_exec": 7,
+  "F": 5,
+  "F_suites": [
+   "W1-25",
+   "W1-30",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.6,
+   "time": 262.1
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.4,
+   "time": 94.3
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.2,
+   "time": 46.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4906.5
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2961.8
+  }
+ },
+ {
+  "id": "B2:src/gov/checkpoint/record.py:139:or-and:1",
+  "file": "src/gov/checkpoint/record.py",
+  "op": "or-and",
+  "n_exec": 495,
+  "F": 201,
+  "F_suites": [
+   "W1-25",
+   "W1-29",
+   "W1-30",
+   "W2-01",
+   "W2-02",
+   "W2-53",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.1044776119402985,
+   "time": 262.1
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.06965174129353234,
+   "time": 94.3
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.07960199004975124,
+   "time": 46.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4906.5
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2961.8
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/claims.py:37:negate-condition:0",
+  "file": "src/gov/tasks/claims.py",
+  "op": "negate-condition",
+  "n_exec": 78,
+  "F": 77,
+  "F_suites": [
+   "W1-09",
+   "W1-28",
+   "W1-32",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.1038961038961039,
+   "time": 2227.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.07792207792207792,
+   "time": 2059.6
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.025974025974025976,
+   "time": 68.0
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9314.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4526.9
+  }
+ },
+ {
+  "id": "B2:src/gov/adapters/portability.py:114:return-none:1",
+  "file": "src/gov/adapters/portability.py",
+  "op": "return-none",
+  "n_exec": 4,
+  "F": 4,
+  "F_suites": [
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 607.5
+  },
+  "declared_no_unit": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 439.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1.7
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4027.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1072.2
+  }
+ },
+ {
+  "id": "B2:src/gov/decisions/checker.py:222:return-none:0",
+  "file": "src/gov/decisions/checker.py",
+  "op": "return-none",
+  "n_exec": 2,
+  "F": 2,
+  "F_suites": [
+   "W1-11",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 194.5
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 26.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 43.1
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4296.6
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3279.7
+  }
+ },
+ {
+  "id": "B2:src/gov/cli/main.py:121:return-none:0",
+  "file": "src/gov/cli/main.py",
+  "op": "return-none",
+  "n_exec": 10,
+  "F": 10,
+  "F_suites": [
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1012.6
+  },
+  "declared_no_unit": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 844.8
+  },
+  "static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 0.9
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9807.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 8037.5
+  }
+ },
+ {
+  "id": "B2:src/gov/doctor/command.py:217:negate-condition:1",
+  "file": "src/gov/doctor/command.py",
+  "op": "negate-condition",
+  "n_exec": 2,
+  "F": 1,
+  "F_suites": [
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2811.0
+  },
+  "declared_no_unit": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 2643.2
+  },
+  "static": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 5.8
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3549.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2210.6
+  }
+ },
+ {
+  "id": "B2:src/gov/pause/command.py:288:return-none:0",
+  "file": "src/gov/pause/command.py",
+  "op": "return-none",
+  "n_exec": 4,
+  "F": 4,
+  "F_suites": [
+   "W1-50",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 630.2
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.75,
+   "time": 462.4
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.25,
+   "time": 0.6
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1366.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 111.4
+  }
+ },
+ {
+  "id": "B2:src/gov/context/__init__.py:196:and-or:0",
+  "file": "src/gov/context/__init__.py",
+  "op": "and-or",
+  "n_exec": 4,
+  "F": 4,
+  "F_suites": [
+   "W1-24",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4017.6
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 3849.8
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 38.6
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 6967.9
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3782.6
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/claims.py:73:and-or:1",
+  "file": "src/gov/tasks/claims.py",
+  "op": "and-or",
+  "n_exec": 14,
+  "F": 1,
+  "F_suites": [
+   "W1-09"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2227.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2059.6
+  },
+  "static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 68.0
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9314.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4526.9
+  }
+ },
+ {
+  "id": "B2:src/gov/pause/command.py:157:compare-flip:1",
+  "file": "src/gov/pause/command.py",
+  "op": "compare-flip",
+  "n_exec": 25,
+  "F": 21,
+  "F_suites": [
+   "W1-28",
+   "W1-50",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 630.2
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.8571428571428571,
+   "time": 462.4
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.14285714285714285,
+   "time": 0.6
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1366.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 111.4
+  }
+ },
+ {
+  "id": "B2:src/gov/launch/launcher.py:244:negate-condition:1",
+  "file": "src/gov/launch/launcher.py",
+  "op": "negate-condition",
+  "n_exec": 61,
+  "F": 31,
+  "F_suites": [
+   "W1-28",
+   "W1-46",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2050.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.8064516129032258,
+   "time": 1882.9
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.1935483870967742,
+   "time": 6.2
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2377.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 613.4
+  }
+ },
+ {
+  "id": "B2:src/gov/telemetry/counter.py:102:drop-not:1",
+  "file": "src/gov/telemetry/counter.py",
+  "op": "drop-not",
+  "n_exec": 61,
+  "F": 33,
+  "F_suites": [
+   "W1-30",
+   "W1-31"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2324.6
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2156.8
+  },
+  "static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 37.5
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4459.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1238.0
+  }
+ },
+ {
+  "id": "B2:src/gov/lock/__init__.py:123:compare-flip:1",
+  "file": "src/gov/lock/__init__.py",
+  "op": "compare-flip",
+  "n_exec": 34,
+  "F": 12,
+  "F_suites": [
+   "W1-39",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.6666666666666666,
+   "time": 214.9
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.3333333333333333,
+   "time": 5.9
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3549.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1051.5
+  }
+ },
+ {
+  "id": "B2:src/gov/telemetry/counter.py:74:or-and:0",
+  "file": "src/gov/telemetry/counter.py",
+  "op": "or-and",
+  "n_exec": 155,
+  "F": 130,
+  "F_suites": [
+   "W1-30",
+   "W1-31",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2324.6
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.9615384615384616,
+   "time": 2156.8
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.038461538461538464,
+   "time": 37.5
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4459.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1238.0
+  }
+ },
+ {
+  "id": "B2:src/gov/readiness/checker.py:108:compare-flip:0",
+  "file": "src/gov/readiness/checker.py",
+  "op": "compare-flip",
+  "n_exec": 222,
+  "F": 140,
+  "F_suites": [
+   "W1-13",
+   "W1-14",
+   "W1-32",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.5571428571428572,
+   "time": 2270.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.4928571428571429,
+   "time": 2102.6
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.06428571428571428,
+   "time": 53.2
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 6760.8
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2105.3
+  }
+ },
+ {
+  "id": "B2:src/gov/readiness/checker.py:140:and-or:1",
+  "file": "src/gov/readiness/checker.py",
+  "op": "and-or",
+  "n_exec": 223,
+  "F": 137,
+  "F_suites": [
+   "W1-13",
+   "W1-14",
+   "W1-32",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.5620437956204379,
+   "time": 2270.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.49635036496350365,
+   "time": 2102.6
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.06569343065693431,
+   "time": 53.2
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 6760.8
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2105.3
+  }
+ },
+ {
+  "id": "B2:src/gov/lock/__init__.py:94:return-none:0",
+  "file": "src/gov/lock/__init__.py",
+  "op": "return-none",
+  "n_exec": 71,
+  "F": 71,
+  "F_suites": [
+   "W1-39",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 382.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.7183098591549296,
+   "time": 214.9
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.28169014084507044,
+   "time": 5.9
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3549.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1051.5
+  }
+ },
+ {
+  "id": "B2:src/gov/cli/main.py:184:negate-condition:1",
+  "file": "src/gov/cli/main.py",
+  "op": "negate-condition",
+  "n_exec": 240,
+  "F": 196,
+  "F_suites": [
+   "W1-07",
+   "W1-13",
+   "W1-20",
+   "W1-25",
+   "W1-28",
+   "W1-32",
+   "W1-33",
+   "W1-39",
+   "W1-40",
+   "W1-46",
+   "W1-50"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.5867346938775511,
+   "time": 1012.6
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5867346938775511,
+   "time": 844.8
+  },
+  "static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 0.9
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9807.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 8037.5
+  }
+ },
+ {
+  "id": "B2:src/gov/doctor/command.py:159:drop-not:0",
+  "file": "src/gov/doctor/command.py",
+  "op": "drop-not",
+  "n_exec": 69,
+  "F": 2,
+  "F_suites": [
+   "W1-27",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2811.0
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 2643.2
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 5.8
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3549.3
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2210.6
+  }
+ },
+ {
+  "id": "B2:src/gov/adapters/portability.py:50:return-none:0",
+  "file": "src/gov/adapters/portability.py",
+  "op": "return-none",
+  "n_exec": 168,
+  "F": 4,
+  "F_suites": [
+   "W1-38",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 607.5
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.25,
+   "time": 439.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.75,
+   "time": 1.7
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4027.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 1072.2
+  }
+ },
+ {
+  "id": "B2:src/gov/launch/launcher.py:227:negate-condition:0",
+  "file": "src/gov/launch/launcher.py",
+  "op": "negate-condition",
+  "n_exec": 665,
+  "F": 659,
+  "F_suites": [
+   "W1-28",
+   "W1-32",
+   "W1-33",
+   "W1-38",
+   "W1-46",
+   "W1-50",
+   "W2-50",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.9878603945371776,
+   "time": 2050.7
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.9787556904400607,
+   "time": 1882.9
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.009104704097116844,
+   "time": 6.2
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2377.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 613.4
+  }
+ },
+ {
+  "id": "B2:src/gov/store/loader.py:116:return-none:0",
+  "file": "src/gov/store/loader.py",
+  "op": "return-none",
+  "n_exec": 162,
+  "F": 17,
+  "F_suites": [
+   "W1-10",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 2222.5
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.9411764705882353,
+   "time": 2054.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.058823529411764705,
+   "time": 82.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9753.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 7456.1
+  }
+ },
+ {
+  "id": "B2:src/gov/context/__init__.py:358:return-none:1",
+  "file": "src/gov/context/__init__.py",
+  "op": "return-none",
+  "n_exec": 565,
+  "F": 282,
+  "F_suites": [
+   "W1-24",
+   "W1-30",
+   "W1-41",
+   "W2-01",
+   "W2-02",
+   "W2-53",
+   "W2-54",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.8333333333333334,
+   "time": 4017.6
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.8120567375886525,
+   "time": 3849.8
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.02127659574468085,
+   "time": 38.6
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 6967.9
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3782.6
+  }
+ },
+ {
+  "id": "B2:src/gov/decisions/checker.py:227:return-none:1",
+  "file": "src/gov/decisions/checker.py",
+  "op": "return-none",
+  "n_exec": 668,
+  "F": 620,
+  "F_suites": [
+   "W1-11",
+   "W1-26",
+   "W1-30",
+   "W2-01",
+   "W2-02",
+   "W2-53",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.27741935483870966,
+   "time": 194.5
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.21935483870967742,
+   "time": 26.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.05806451612903226,
+   "time": 43.1
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4296.6
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 3279.7
+  }
+ },
+ {
+  "id": "B2:src/gov/config/loader.py:111:negate-condition:1",
+  "file": "src/gov/config/loader.py",
+  "op": "negate-condition",
+  "n_exec": 646,
+  "F": 520,
+  "F_suites": [
+   "W1-07",
+   "W1-08",
+   "W1-15",
+   "W1-17",
+   "W1-19",
+   "W1-21",
+   "W1-22",
+   "W1-24",
+   "W1-25",
+   "W1-26",
+   "W1-27",
+   "W1-30",
+   "W1-35",
+   "W1-41",
+   "W1-44",
+   "W2-54",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.10192307692307692,
+   "time": 1649.3
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.09423076923076923,
+   "time": 1481.5
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.007692307692307693,
+   "time": 104.1
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9859.9
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 8754.7
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/tickets.py:22:return-none:0",
+  "file": "src/gov/tasks/tickets.py",
+  "op": "return-none",
+  "n_exec": 1440,
+  "F": 1270,
+  "F_suites": [
+   "W1-09",
+   "W1-13",
+   "W1-14",
+   "W1-24",
+   "W1-25",
+   "W1-28",
+   "W1-29",
+   "W1-30",
+   "W1-31",
+   "W1-32",
+   "W1-38",
+   "W1-41",
+   "W2-01",
+   "W2-02",
+   "W2-53",
+   "W2-54",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.3409448818897638,
+   "time": 2059.6
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.1346456692913386,
+   "time": 68.0
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9314.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4539.0
+  }
+ },
+ {
+  "id": "B2:src/gov/tasks/tickets.py:19:compare-flip:1",
+  "file": "src/gov/tasks/tickets.py",
+  "op": "compare-flip",
+  "n_exec": 1443,
+  "F": 1270,
+  "F_suites": [
+   "W1-09",
+   "W1-13",
+   "W1-14",
+   "W1-24",
+   "W1-25",
+   "W1-28",
+   "W1-29",
+   "W1-30",
+   "W1-31",
+   "W1-32",
+   "W1-38",
+   "W1-41",
+   "W2-01",
+   "W2-02",
+   "W2-53",
+   "W2-54",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.4645669291338583,
+   "time": 2227.4
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.3409448818897638,
+   "time": 2059.6
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.1346456692913386,
+   "time": 68.0
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9314.7
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 4539.0
+  }
+ },
+ {
+  "id": "B2:src/gov/config/loader.py:214:negate-condition:0",
+  "file": "src/gov/config/loader.py",
+  "op": "negate-condition",
+  "n_exec": 836,
+  "F": 4,
+  "F_suites": [
+   "W1-07",
+   "W1-25",
+   "W1-27"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 1649.3
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.5,
+   "time": 1481.5
+  },
+  "static": {
+   "detect": false,
+   "recall": 0.0,
+   "time": 104.1
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9859.9
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 8754.7
+  }
+ },
+ {
+  "id": "B2:src/gov/store/loader.py:197:return-none:1",
+  "file": "src/gov/store/loader.py",
+  "op": "return-none",
+  "n_exec": 1406,
+  "F": 942,
+  "F_suites": [
+   "W1-09",
+   "W1-10",
+   "W1-11",
+   "W1-13",
+   "W1-14",
+   "W1-20",
+   "W1-21",
+   "W1-22",
+   "W1-24",
+   "W1-26",
+   "W1-30",
+   "W1-32",
+   "W1-41",
+   "W1-44",
+   "W2-01",
+   "W2-02",
+   "W2-50",
+   "W2-53",
+   "W2-54",
+   "unit"
+  ],
+  "declared": {
+   "detect": true,
+   "recall": 0.32802547770700635,
+   "time": 2222.5
+  },
+  "declared_no_unit": {
+   "detect": true,
+   "recall": 0.24203821656050956,
+   "time": 2054.7
+  },
+  "static": {
+   "detect": true,
+   "recall": 0.08598726114649681,
+   "time": 82.4
+  },
+  "measured_suite": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 9753.4
+  },
+  "measured_test": {
+   "detect": true,
+   "recall": 1.0,
+   "time": 7456.1
+  }
+ }
+]

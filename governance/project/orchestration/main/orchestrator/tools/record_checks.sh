@@ -20,7 +20,8 @@ done
 # need a fresh store, which a record edit never has).
 env -u PYTEST_ADDOPTS -u PYTEST_PLUGINS PYTHONPATH=/home/usain/Dynamic-Agentic-Engineering-OS/src timeout 900 \
   python3 -m pytest -q -p no:cacheprovider --no-header tests/acceptance/W1-06/test_w1_06_approvals.py \
-  tests/acceptance/W1-08/test_w1_08_path_map.py tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py \
+  tests/acceptance/W1-08/test_w1_08_path_map.py tests/acceptance/W1-08/test_w1_08_ticket.py \
+  tests/acceptance/W1-27/test_w1_27_path_compliance_r2.py \
   tests/acceptance/W1-07/test_w1_07_envelope.py tests/acceptance/W1-33/test_w1_33_agent_definitions.py \
   tests/acceptance/W1-49/test_w1_49_threshold.py > "$OUT/record-reading.out" 2>&1
 code=$?
