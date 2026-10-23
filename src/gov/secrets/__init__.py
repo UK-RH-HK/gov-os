@@ -49,14 +49,20 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 2  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 3  # the form of the record and of what a scan reads; another form is never trusted
 # gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
-# is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one.
-_PIECE, _OVERLAP = 16_000, 4_096
+# is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one:
+# 9 KiB holds a private-key block of 8,192 bytes (an RSA 8192 key).
+_PIECE, _OVERLAP = 24_000, 9_216
 _SPACES = tuple(bytes([byte]) for byte in b" \t\n\v\f\r")
 _LAST_NON_WORD = re.compile(rb"(?s:.*)[^0-9A-Za-z_]")
 _INSIDE = b"_"  # stands for the rest of a word cut where no boundary was found, so no read seems to begin a word
+# A blank line of the text gets a form feed, a space to the rules but none to gitleaks' reads: so no read ends inside
+# a piece, and a match across a blank line (an armoured PGP key) is whole in one read.
+_BLANK = re.compile(rb"(\n[ \t\r]*)(?=\n)")
 _SQLITE = b"SQLite format 3\0"
+_BUSY_S = 10.0  # how long a store's lock held by another process is waited out before the store is judged by its bytes
+_FTS5 = re.compile(rb"\s*CREATE\s+VIRTUAL\s+TABLE\b.*?\bUSING\s+fts5\b", re.IGNORECASE | re.DOTALL)
 
 __all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
 
@@ -105,7 +111,9 @@ def _cut(chunk: bytes, low: int, high: int) -> tuple[int, bool]:
 
 
 def _pieces(chunk: bytes):
-    """``chunk`` in pieces of at most ``_PIECE`` bytes, each overlapping the next by at least ``_OVERLAP``."""
+    """``chunk``, its blank lines kept from ending a read, in pieces of at most ``_PIECE`` bytes, each overlapping the
+    next by at least ``_OVERLAP``."""
+    chunk = _BLANK.sub(rb"\1\f", chunk)
     start, lead = 0, b""
     while len(chunk) - start > _PIECE:
         end, edge = _cut(chunk, start + 2 * _OVERLAP, start + _PIECE)
@@ -211,6 +219,35 @@ def _varint(content: bytes, at: int) -> tuple[int, int]:
     raise AssertionError
 
 
+def _fts_terms(rowid: int, block: bytes) -> list[bytes] | None:
+    """The terms of the FTS5 leaf page ``block`` (row ``rowid`` of an FTS5 ``_data`` table), each whole, without the
+    byte that names its index. A page stores a term after the prefix it shares with the term before it, so its bytes
+    hold that term's tail after a byte that is no word byte: read whole, a term begins where its text did.
+
+    None where the block is no leaf page (the averages, the structure, a doclist index, tombstones) or does not parse.
+    """
+    segment = rowid >> 37
+    if not 0 < segment < 1 << 16 or rowid >> 31 & 0x3F:  # a leaf: a segment's page, of height 0 and no doclist index
+        return None
+    try:
+        footer = _number(block, 2, 2)  # where the page's term offsets begin
+        if footer < 4:
+            raise ValueError("no leaf page")
+        terms, term, at, offset = [], b"", footer, 0
+        while at < len(block):
+            step, at = _varint(block, at)
+            offset += step
+            keep, cursor = (0, offset) if not terms else _varint(block, offset)
+            size, cursor = _varint(block, cursor)
+            if offset < 4 or keep > len(term) or cursor + size > footer:
+                raise ValueError("a term out of its page")
+            term = term[:keep] + block[cursor:cursor + size]
+            terms.append(term[1:])
+        return terms
+    except ValueError:
+        return None
+
+
 def _freed(content: bytes) -> list[bytes]:
     """The freed space of the SQLite file ``content``, region by region: each freelist page, the unused tail of each
     freelist trunk and of each overflow chain's last page, and each b-tree page's freeblocks and unallocated gap;
@@ -275,34 +312,45 @@ def _freed(content: bytes) -> list[bytes]:
     return [form for region in regions if region.strip(b"\0") for form in _forms(region)]
 
 
-def _store(path: Path) -> tuple[bytes, list[bytes]]:
-    """The bytes of the file at ``path``, and the texts it is judged by.
+def _store(path: Path) -> tuple[bytes, list[bytes], bool]:
+    """The bytes of the file at ``path``, the texts it is judged by, and whether a clean verdict on them may be kept.
 
-    A SQLite store is read under a shared lock, so its bytes and its values are of one state: it is judged by each
-    value it holds, ``sqlite_master`` included (text as stored, a blob also without its zero bytes), and by each region
-    of its freed space. Any other file, or a store that cannot be read, is judged by its bytes.
+    A SQLite store is read under a shared lock, waited for up to ``_BUSY_S``, so its bytes and its values are of one
+    state: it is judged by each value it holds, ``sqlite_master`` included (text as stored, a blob also without its
+    zero bytes; an FTS5 index's pages by their terms, each whole), and by each region of its freed space. Any other
+    file is judged by its bytes. So is a store that cannot be read, but a clean verdict on its bytes is not kept: once
+    its values can be read, they are.
     """
     with open(path, "rb") as handle:
         if handle.read(len(_SQLITE)) != _SQLITE:
             content = path.read_bytes()
-            return content, _forms(content)
+            return content, _forms(content), True
     connection = None
     try:
-        connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True, timeout=0)
+        connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True, timeout=_BUSY_S)
         connection.text_factory = bytes
         connection.execute("BEGIN")
         schema = connection.execute("SELECT type, name, tbl_name, sql FROM sqlite_master").fetchall()  # the shared lock
         content = path.read_bytes()
         chunks = [value for row in schema for value in row if value]
+        indexes = {name.lower() + b"_data" for kind, name, _, sql in schema
+                   if kind == b"table" and _FTS5.match(sql or b"")}
         for kind, name, _, sql in schema:  # a virtual table's rows are those of its own tables
             if kind == b"table" and not (sql or b"").upper().startswith(b"CREATE VIRTUAL"):
                 quoted = name.decode("utf-8").replace('"', '""')
+                if name.lower() in indexes:
+                    for rowid, block in connection.execute(f'SELECT id, block FROM "{quoted}"'):
+                        leaf = isinstance(rowid, int) and isinstance(block, bytes)
+                        terms = _fts_terms(rowid, block) if leaf else None
+                        chunks += (form for value in ([block] if terms is None else terms)
+                                   if isinstance(value, bytes) for form in _forms(value))
+                    continue
                 for row in connection.execute(f'SELECT * FROM "{quoted}"'):
                     chunks += (form for value in row if isinstance(value, bytes) for form in _forms(value))
-        return content, chunks + _freed(content)
+        return content, chunks + _freed(content), True
     except (sqlite3.Error, ValueError, IndexError):  # damaged, locked or no SQLite after all: judged by its bytes
         content = path.read_bytes()
-        return content, _forms(content)
+        return content, _forms(content), False
     finally:
         if connection is not None:
             connection.close()
@@ -399,13 +447,14 @@ def stores_with_secrets(root: Path) -> list[str]:
 
     def judge(path: Path) -> bool:
         with large if path.stat().st_size >= _LARGE else contextlib.nullcontext():
-            content, chunks = _store(path)
+            content, chunks, kept = _store(path)
             digest = hashlib.sha256(content).hexdigest()
             if digest in trusted:
                 reused[path] = digest
             elif _scan(rules, chunks):
                 return True  # a finding is never recorded
-            clean.add(digest)
+            if kept or digest in trusted:
+                clean.add(digest)
             return False
 
     # Every file is read and judged, the largest first, as many at a time as there are processors, so a large

@@ -2,13 +2,15 @@
 
 Regression evidence only (MR-3). They cover what the acceptance tests leave to the builder: a deleted word leaves
 neither the full-text index's rows nor the freed pages of a store the rebuild compacts, a store that cannot be
-compacted is named with its reason, and the check's freed-space reader takes the unused tail of an overflow chain's
+compacted is named with its reason (in the result and on standard error), a project given by a relative path has its
+code-graph stores compacted, and the check's freed-space reader takes the unused tail of an overflow chain's
 last page without reading the live value before it.
 """
 from __future__ import annotations
 
 import argparse
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -58,11 +60,25 @@ def test_a_deleted_word_is_in_no_row_and_no_freed_byte_after_the_rebuild(tmp_pat
     connection.close()
 
 
-def test_a_store_that_cannot_be_compacted_is_named_with_its_reason(tmp_path, rebuild):
+def test_a_store_that_cannot_be_compacted_is_named_with_its_reason(tmp_path, rebuild, capsys):
     path = tmp_path / ".gov-runtime" / "store.db"
     path.parent.mkdir(parents=True)
     path.write_bytes(b"SQLite format 3\0" + b"\x07" * 4000)
-    assert rebuild(tmp_path)["compaction"][".gov-runtime/store.db"].startswith("not compacted: ")
+    reason = rebuild(tmp_path)["compaction"][".gov-runtime/store.db"]
+    assert reason.startswith("not compacted: ")
+    assert f"rebuild: .gov-runtime/store.db {reason}" in capsys.readouterr().err
+
+
+def test_a_relative_root_compacts_the_code_graph_tool_s_stores(tmp_path, rebuild, monkeypatch):
+    from gov.codeintel import home
+
+    path = home(tmp_path) / "code.db"
+    path.parent.mkdir(parents=True)
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE nodes (name TEXT)")
+    connection.close()
+    monkeypatch.chdir(tmp_path)
+    assert rebuild(Path("."))["compaction"] == {".gov-runtime/codeintel/home/code.db": "compacted"}
 
 
 def test_the_freed_space_holds_an_overflow_tail_and_never_the_live_value(tmp_path):

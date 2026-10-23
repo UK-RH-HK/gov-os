@@ -38,6 +38,7 @@ def _compact(root: Path, rels) -> dict:
     """Each SQLite store at ``rels`` with its full-text indexes optimised, then vacuumed, so that no deleted text is
     left in its rows or its freed space (DEC-897); what could not be compacted is named with its reason."""
     import sqlite3
+    import sys
 
     done: dict = {}
     for rel in rels:
@@ -60,6 +61,7 @@ def _compact(root: Path, rels) -> dict:
             continue
         except (OSError, sqlite3.Error) as exc:
             done[rel] = f"not compacted: {exc}"
+            print(f"rebuild: {rel} not compacted: {exc}", file=sys.stderr)
     return done
 
 
@@ -157,9 +159,9 @@ def run(root: Path, args, config: dict) -> dict:
             "reason": str(exc),
         }
     else:
-        tool_home = codeintel_home(root)
-        compaction |= _compact(root, sorted(path.relative_to(root).as_posix() for path in tool_home.rglob("*")
-                                             if path.is_file()) if tool_home.is_dir() else ())
+        tool_home, project = codeintel_home(root), Path(root).resolve()  # the tool's home is a resolved path
+        compaction |= _compact(project, sorted(path.relative_to(project).as_posix() for path in tool_home.rglob("*")
+                                                if path.is_file()) if tool_home.is_dir() else ())
 
     return {
         "digest": store_result["digest"],

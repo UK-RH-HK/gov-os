@@ -366,3 +366,33 @@ Added by the engineer after the code (2026-10-23, commits on `w2/W2-69` after `a
 - **Virtual tables are not read themselves.** Their rows are in their own tables, which are read. So a store whose FTS5 table needs a module this Python lacks is still read value by value.
 - **The overflow tails** of section 14 are read: the unused tail of each overflow chain's last page. A builder test shows the tail is read and the live value before it is not.
 - **Time on W1-15's stand-in** (60 files of 4 KiB and a SQLite store of about 9 MB, load average about 40): 4.1 s against 4.5 to 4.9 s for the check before this change.
+
+**After the review's acceptance cases (2026-10-23, a later engineer round).** Four repairs:
+
+- **An FTS5 index is read as its terms.**
+  - A leaf page stores each term after the prefix it shares with the term before it, behind one or two varint bytes. Read as raw bytes, the stored tail of an identifier (`…sk_1…` after a shared head) begins after a byte that is no word byte. So a leading-`\b` rule matched it, even after `optimize` and `VACUUM`.
+  - Each block of an FTS5 table's `_data` table that is a leaf page is now decoded from its page index into whole terms, without the leading byte that names the index (`0` for the main one). Each term is its own chunk.
+  - Any other block (the averages, the structure, doclist-index and tombstone pages), and a leaf that does not parse, is read by its bytes as before.
+  - The `_content` and `_idx` tables are read value by value, as before.
+- **Long blocks, and blank lines inside them.**
+  - The overlap goes from 4,096 to 9,216 bytes, so a private-key block of 8,192 bytes is whole in one piece. Pieces go from 16,000 to 24,000 bytes, still under gitleaks' peek of 25,000 (section 4).
+  - A blank line inside a chunk now ended one of gitleaks' reads, so an armoured PGP key (a blank line after its header) was split. Each blank line of a chunk now gets a form feed before its second newline. To the rules, a form feed is a space (`\s`), but gitleaks' search for a blank line stops at it. So the only blank lines left are those between pieces.
+- **A raw-bytes verdict on a store is not kept.**
+  - The check now waits up to 10 s for a lock held by another process.
+  - A SQLite store that still cannot be read is judged by its bytes, but a clean verdict on them is no longer recorded for DEC-853's reuse: the next run reads its values.
+  - A clean result held from before is still reused for the same bytes. `_FORM` goes to 3, so no clean result of the earlier form is trusted.
+- **The rebuild:**
+  - The code-graph tool's stores are found from the resolved project. A relative `--root` made `relative_to` raise, and the rebuild returned no result.
+  - A store that cannot be compacted is named on standard error with its reason, as well as in the JSON result.
+
+**Time on a larger stand-in.** A 65 MB store, with an FTS5 index of the lexical tokenizer over three copies of `docs/` and `src/gov/`, plus 300 text files of about 20 MB in all. The two versions of the check were run alternately, at a load average of 19 to 28:
+
+- the check before this round: 20.9 s and 21.2 s;
+- after it: 21.0 s and 17.2 s.
+
+Bytes given to gitleaks:
+
+| Input | Before (MB) | After (MB) | Why |
+|---|---|---|---|
+| The store | 69.7 | 59.6 | Terms in place of whole leaf pages and their doclists |
+| The files | 31.2 | 37.4 | The wider overlap |
