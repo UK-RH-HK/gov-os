@@ -206,6 +206,37 @@ canary's own missed queries, read from doctor's report, written into a document 
 `framework_lock`'s MATCH and DRIFT need an installed kernel and its lock (no `gov` command writes one); W1-39's
 lock cases hold them, so this case holds the two verdicts reachable without an install.
 
+### Group 3: Claude Code drift (`test_w1_27_drift.py` ×6)
+
+Where doctor reads its input, seen on the head with a probe (one doctor run per placement): the CLI is the
+`claude` on the PATH doctor is given (a fake at `HOME/.local/bin/claude` is not read; this machine's real CLI,
+2.1.292, is read instead); the extension is read under `HOME/.vscode-server/extensions` or `HOME/.vscode/extensions`
+(the sandbox's home). Each case now puts the fake CLI first on that PATH (`monkeypatch` of the test process's
+`PATH`, which the launcher's environment copies) and the fake extension under `HOME/.vscode-server/extensions`.
+
+| Fault | In words | How (in `w2_67b_child.py`: `_check_claude_code`'s issues of one rule removed; drift and status follow the rest) |
+|---|---|---|
+| P27-6 (I4) | no drift for a CLI newer than the registry (DEC-210) | `CLI … newer than registry …` |
+| P67B-13 | the CLI and the extension differing not reported (DEC-210) | `… differs from extension …` |
+| P67B-14 | the extension's bundled binary hash at the recorded version not compared (DEC-214) | `extension binary sha256 mismatch …` |
+| P67B-15 | the CLI below the minimum not a failure (DEC-210) | `CLI version … below minimum …` |
+| P67B-16 | the extension below the minimum not a failure (DEC-210) | `extension version … below minimum …` |
+| P67B-17 | the CLI at the recorded version with another hash not a failure (DEC-214) | `… has sha256 mismatch` |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_cli_newer_than_registry_is_drift` | the fake CLI was off doctor's PATH; `drift` always a key | P27-6: `doctor does not report drift for CLI newer than registry: {'status': 'pass', 'drift': False, 'cli_version': '2.1.300', …}` | green | the fake CLI is never read |
+| `test_cli_and_extension_different_versions_is_drift` | the fake extension was not under the home doctor reads | P67B-13: `doctor does not report drift for CLI/extension version mismatch: {'status': 'pass', …}` | green | the planted input is not where doctor reads it |
+| `test_extension_bundled_binary_different_sha256_is_drift` | the same two reasons | P67B-14: `doctor does not report drift for extension binary sha256 mismatch: {'status': 'pass', …}` | green | the planted input is not where doctor reads it |
+| `test_cli_below_minimum_is_failure` | the fake never read; green on the real CLI's drift | P67B-15: `doctor raises no failure naming the CLI's 2.1.280: {'status': 'pass', …}`; P27-6: green (no longer rests on that drift) | green | the fake CLI is never read |
+| `test_extension_below_minimum_is_failure` | the extension never read | P67B-16: `doctor raises no failure naming the extension's 2.1.280: {'status': 'drift', …}`; P27-6: green | green | the fake extension is never read |
+| `test_cli_at_recorded_version_different_sha256_is_failure` | the real CLI (2.1.292) is not at the recorded version, so the rule never ran | P67B-17: `the CLI at its recorded version with another sha256 raises no failure (or only drift): {'status': 'pass', …}`; P27-6: green | green | the fake CLI is never read |
+
+Head: 6 passed in 3.2 s (`g3-head.xml`), on small committed projects of their own. Each case first asserts that
+doctor read the fakes (`cli_version`, `extension_version`, the hashes), then the issue its rule raises, with its
+type (`drift` or `failure`), the section's status and, for the failures, `ok` not true. The CLI/extension case
+records the extension's version and binary, so the difference is the only rule that applies.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
