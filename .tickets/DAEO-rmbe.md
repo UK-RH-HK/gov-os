@@ -20,10 +20,6 @@ allowed_paths:
 - src/gov/rebuild/command.py
 - tests/unit/secrets/**
 - tests/unit/secrets_check/**
-- tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py
-- tests/acceptance/W2-50/w2_50_scan_support.py
-- tests/acceptance/W2-50/test_w2_50_never_indexed.py
-- tests/acceptance/W2-50/test_w2_50_last_review.py
 - tests/unit/rebuild/test_compaction*
 - docs/research/W2-69-secrets-scan.md
 kpis:
@@ -94,3 +90,4 @@ Card: `docs/plan/WAVE_2_WBS.md` §2 (W2-69), from DEC-897 (owner, 2026-10-22, P-
   - deleted text left in free pages;
   - a file no longer scanned;
   - an unfinished scan passing as clean.
+- **The test designer's files (MR-3: named here, never in the implementer's `allowed_paths`; DEC-899):** `tests/acceptance/W2-50/test_w2_50_secrets_scan_scale.py`, `tests/acceptance/W2-50/w2_50_scan_support.py`, `tests/acceptance/W2-50/test_w2_50_never_indexed.py`, `tests/acceptance/W2-50/test_w2_50_last_review.py`. Each change carries a `Rewrite-Reason:`; no expectation is lowered.
