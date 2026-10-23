@@ -213,7 +213,8 @@ def _varint(content: bytes, at: int) -> tuple[int, int]:
 
 def _freed(content: bytes) -> list[bytes]:
     """The freed space of the SQLite file ``content``, region by region: each freelist page, the unused tail of each
-    freelist trunk and of each overflow chain's last page, and each b-tree page's freeblocks and unallocated gap.
+    freelist trunk and of each overflow chain's last page, and each b-tree page's freeblocks and unallocated gap;
+    each also without its zero bytes, where it holds any (a UTF-16 store's deleted text).
 
     Raises ValueError where the file's structure does not hold.
     """
@@ -271,7 +272,7 @@ def _freed(content: bytes) -> list[bytes]:
             while left > usable - 4:
                 left, page = left - (usable - 4), _number(take(page), 0, 4)
             regions.append(take(page)[4 + left:])
-    return [region for region in regions if region.strip(b"\0")]
+    return [form for region in regions if region.strip(b"\0") for form in _forms(region)]
 
 
 def _store(path: Path) -> tuple[bytes, list[bytes]]:
