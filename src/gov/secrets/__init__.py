@@ -14,6 +14,12 @@ Each gitleaks run may take a minute plus a second a megabyte, so a store is deci
 reads at 1 MB/s or faster (DEC-853). A store whose bytes were scanned clean before, by the same rule sets
 and the same gitleaks, is not scanned again: the check's record of clean results says so, and the reuse
 is labelled on standard error with the store's path and digest. A finding is never recorded.
+
+What gitleaks reads (DEC-897, docs/research/W2-69-secrets-scan.md): a SQLite store is judged by each value it
+holds and by each region of its freed space, each on its own; any other file, or a store that cannot be read, by
+its bytes. Each is given in overlapping pieces that begin and end at a true boundary, a blank line after each, so
+that gitleaks begins a read only where the text itself could begin a match, and a token across a cut is still
+seen whole in one piece.
 """
 
 from __future__ import annotations
@@ -43,7 +49,14 @@ GOVERNANCE = "governance"
 _LEAKS, _TIMEOUT_S = 3, 60
 _FLOOR = 1_000_000  # bytes a second: the slowest gitleaks a store must still be decided at (DEC-853)
 _LARGE = 64 << 20  # a file of this size or more is read and scanned at most two at a time, for memory
-_FORM = 1  # the form of the record and of what a scan reads; another form is never trusted
+_FORM = 2  # the form of the record and of what a scan reads; another form is never trusted
+# gitleaks reads standard input in fragments that end at the first blank line within 25,000 bytes of a read: a piece
+# is shorter, so every fragment begins at a piece's start. Pieces overlap, so a match up to the overlap is whole in one.
+_PIECE, _OVERLAP = 16_000, 4_096
+_SPACES = tuple(bytes([byte]) for byte in b" \t\n\v\f\r")
+_LAST_NON_WORD = re.compile(rb"(?s:.*)[^0-9A-Za-z_]")
+_INSIDE = b"_"  # stands for the rest of a word cut where no boundary was found, so no read seems to begin a word
+_SQLITE = b"SQLite format 3\0"
 
 __all__ = ["indexable", "path_holds_secret", "stores_with_secrets"]
 
@@ -81,12 +94,47 @@ def _rules(root: Path) -> tuple[str, ...]:
     return tuple("\n".join(f"{json.dumps(key)} = {_toml(item)}" for key, item in each.items()) for each in configs)
 
 
+def _cut(chunk: bytes, low: int, high: int) -> tuple[int, bool]:
+    """The last place in ``low..high`` just after a space, else just after a byte that is no word byte; else ``high``,
+    with False: the cut is inside a word."""
+    after = max(chunk.rfind(space, low - 1, high) for space in _SPACES)
+    if after >= 0:
+        return after + 1, True
+    found = _LAST_NON_WORD.match(chunk, low - 1, high)
+    return (found.end(), True) if found else (high, False)
+
+
+def _pieces(chunk: bytes):
+    """``chunk`` in pieces of at most ``_PIECE`` bytes, each overlapping the next by at least ``_OVERLAP``."""
+    start, lead = 0, b""
+    while len(chunk) - start > _PIECE:
+        end, edge = _cut(chunk, start + 2 * _OVERLAP, start + _PIECE)
+        yield lead + chunk[start:end] + (b"" if edge else _INSIDE)
+        start, edge = _cut(chunk, start + 1, end - _OVERLAP)
+        lead = b"" if edge else _INSIDE
+    yield lead + chunk[start:]
+
+
+def _forms(content: bytes) -> list[bytes]:
+    """``content`` as it is and, when it holds zero bytes (UTF-16 text), without them."""
+    return [content, content.replace(b"\0", b"")] if b"\0" in content else [content]
+
+
 def _holds_secret(rules: tuple[str, ...], content: bytes) -> bool:
-    """Whether gitleaks finds a secret in ``content`` by any of ``rules``. Raises when gitleaks cannot run or does not decide."""
+    """Whether gitleaks finds a secret in ``content``, one text, by any of ``rules``."""
+    return _scan(rules, _forms(content))
+
+
+def _scan(rules: tuple[str, ...], chunks) -> bool:
+    """Whether gitleaks finds a secret in any of ``chunks`` by any of ``rules``. Raises when gitleaks cannot run or does not decide.
+
+    Each chunk is a text of its own: its pieces are never joined to another chunk's but by a blank line.
+    """
     # The leading newline keeps gitleaks from skipping content it would take for a binary file.
-    parts = [b"\n", content]
-    if b"\0" in content:  # UTF-16 text: the same content without its zero bytes is scanned too
-        parts += [b"\n", content.replace(b"\0", b"")]
+    parts = [b"\n"]
+    for chunk in chunks:
+        for piece in _pieces(chunk):
+            parts += (piece, b"\n\n")
     data = b"".join(parts)  # one copy, read by every scan
     # The rules go by the environment, so no file of them is written; a configuration path there would win over them.
     env = {key: value for key, value in os.environ.items() if key != "GITLEAKS_CONFIG"}
@@ -144,20 +192,119 @@ def path_holds_secret(root: Path, path: str) -> bool:
     return _holds_secret(_rules(root), os.fsencode("\n".join([path, *Path(path).parts])))
 
 
-def _store_content(path: Path, content: bytes | None = None) -> bytes:
-    """What a derived store holds: the bytes of the file (``content``, read if not given) and, for a SQLite file, its rows as text too."""
-    if content is None:
-        content = path.read_bytes()  # deleted rows and the text of views are in the bytes
-    if not content.startswith(b"SQLite format 3\0"):
-        return content
-    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+def _number(content: bytes, at: int, size: int) -> int:
+    if at < 0 or at + size > len(content):
+        raise ValueError("outside the file")
+    return int.from_bytes(content[at:at + size])
+
+
+def _varint(content: bytes, at: int) -> tuple[int, int]:
+    """A SQLite variable-length integer at ``at``, and where it ends."""
+    value = 0
+    for step in range(9):
+        byte = _number(content, at + step, 1)
+        if step == 8:
+            return (value << 8) | byte, at + 9
+        value = (value << 7) | (byte & 0x7F)
+        if byte < 0x80:
+            return value, at + step + 1
+    raise AssertionError
+
+
+def _freed(content: bytes) -> list[bytes]:
+    """The freed space of the SQLite file ``content``, region by region: each freelist page, the unused tail of each
+    freelist trunk and of each overflow chain's last page, and each b-tree page's freeblocks and unallocated gap.
+
+    Raises ValueError where the file's structure does not hold.
+    """
+    size = _number(content, 16, 2)
+    size = 65536 if size == 1 else size
+    usable = size - content[20]
+    if size < 512 or size & (size - 1) or len(content) % size or usable < 480:
+        raise ValueError("no SQLite page layout")
+    pages, seen, regions = len(content) // size, set(), []
+
+    def take(number: int) -> bytes:  # a page off the b-tree: freelist or overflow, each taken once
+        if not 1 <= number <= pages or number in seen:
+            raise ValueError("a page out of the file or taken twice")
+        seen.add(number)
+        return content[(number - 1) * size:(number - 1) * size + usable]
+
+    trunk = _number(content, 32, 4)
+    while trunk:
+        data = take(trunk)
+        count = _number(data, 4, 4)
+        if 8 + 4 * count > usable:
+            raise ValueError("a freelist trunk overflows its page")
+        regions += [data[8 + 4 * count:], *(take(_number(data, 8 + 4 * each, 4)) for each in range(count))]
+        trunk = _number(data, 0, 4)
+    most_index, least = (usable - 12) * 64 // 255 - 23, (usable - 12) * 32 // 255 - 23
+    for number in range(1, pages + 1):
+        base = (number - 1) * size
+        at = base + (100 if number == 1 else 0)
+        kind = content[at]
+        if number in seen or kind not in (2, 5, 10, 13):
+            continue
+        head = 8 if kind in (10, 13) else 12
+        cells, start = _number(content, at + 3, 2), _number(content, at + 5, 2) or 65536
+        if not at + head + 2 * cells <= base + start <= base + usable:
+            raise ValueError("a b-tree page's cells overlap")
+        regions.append(content[at + head + 2 * cells:base + start])
+        block = _number(content, at + 1, 2)
+        while block:
+            follow, length = _number(content, base + block, 2), _number(content, base + block + 2, 2)
+            if block < start or block + length > usable or (follow and follow <= block):
+                raise ValueError("a freeblock out of its page")
+            regions.append(content[base + block + 4:base + block + length])
+            block = follow
+        for each in range(cells if kind != 5 else 0):  # a cell whose payload overflows: the tail of its chain's last page
+            cell = base + _number(content, at + head + 2 * each, 2) + (4 if kind == 2 else 0)
+            payload, cell = _varint(content, cell)
+            if kind == 13:
+                cell = _varint(content, cell)[1]
+            most = usable - 35 if kind == 13 else most_index
+            if payload <= most:
+                continue
+            local = least + (payload - least) % (usable - 4)
+            local = least if local > most else local
+            left, page = payload - local, _number(content, cell + local, 4)
+            while left > usable - 4:
+                left, page = left - (usable - 4), _number(take(page), 0, 4)
+            regions.append(take(page)[4 + left:])
+    return [region for region in regions if region.strip(b"\0")]
+
+
+def _store(path: Path) -> tuple[bytes, list[bytes]]:
+    """The bytes of the file at ``path``, and the texts it is judged by.
+
+    A SQLite store is read under a shared lock, so its bytes and its values are of one state: it is judged by each
+    value it holds, ``sqlite_master`` included (text as stored, a blob also without its zero bytes), and by each region
+    of its freed space. Any other file, or a store that cannot be read, is judged by its bytes.
+    """
+    with open(path, "rb") as handle:
+        if handle.read(len(_SQLITE)) != _SQLITE:
+            content = path.read_bytes()
+            return content, _forms(content)
+    connection = None
     try:
-        tables = [name for (name,) in connection.execute("SELECT name FROM sqlite_master WHERE type = 'table'")]
-        rows = (row for name in tables for row in connection.execute(f'SELECT * FROM "{name}"'))
-        text = "\n".join(" ".join(str(value) for value in row) for row in rows)
-        return content + b"\n" + text.encode("utf-8", "replace")
+        connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True, timeout=0)
+        connection.text_factory = bytes
+        connection.execute("BEGIN")
+        schema = connection.execute("SELECT type, name, tbl_name, sql FROM sqlite_master").fetchall()  # the shared lock
+        content = path.read_bytes()
+        chunks = [value for row in schema for value in row if value]
+        for kind, name, _, sql in schema:  # a virtual table's rows are those of its own tables
+            if kind == b"table" and not (sql or b"").upper().startswith(b"CREATE VIRTUAL"):
+                quoted = name.decode("utf-8").replace('"', '""')
+                for row in connection.execute(f'SELECT * FROM "{quoted}"'):
+                    chunks += (form for value in row if isinstance(value, bytes) for form in _forms(value))
+        return content, chunks + _freed(content)
+    except (sqlite3.Error, ValueError, IndexError):  # damaged, locked or no SQLite after all: judged by its bytes
+        content = path.read_bytes()
+        return content, _forms(content)
     finally:
-        connection.close()
+        if connection is not None:
+            connection.close()
 
 
 def _scanner(rules: tuple[str, ...]) -> str | None:
@@ -251,11 +398,11 @@ def stores_with_secrets(root: Path) -> list[str]:
 
     def judge(path: Path) -> bool:
         with large if path.stat().st_size >= _LARGE else contextlib.nullcontext():
-            content = path.read_bytes()
+            content, chunks = _store(path)
             digest = hashlib.sha256(content).hexdigest()
             if digest in trusted:
                 reused[path] = digest
-            elif _holds_secret(rules, _store_content(path, content)):
+            elif _scan(rules, chunks):
                 return True  # a finding is never recorded
             clean.add(digest)
             return False
