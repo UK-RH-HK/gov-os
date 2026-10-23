@@ -120,6 +120,54 @@ project, as I4 proposed ("compare the levels before and after the stages").
 path compliance r2 ×3 (the old-path case aside); rebuild ×5; rebuild r2, r3, r4, r8; recovery check r2 ×3;
 `test_rebuild_does_not_silently_drop_lexical_tables`. Time ran out; see the designer's return for the order.
 
+## KPI 5, batch 1b: the rest of W1-27's weak cases
+
+Independent test designer (MR-3), batch 1b, 2026-10-23. The same rule as batch 1: each case reads the value of the
+key it claims, wherever doctor or rebuild put it, is shown red under a planted fault of the behaviour it claims and
+green on the head, keeps its name, and lowers no expectation.
+
+**Planting a fault (batch 1b).** The same method as batch 1, with its own modules, kept with the evidence in
+`.gov-runtime/scratch/td-1b/plant/` (written in the session scratch folder and copied there as single named files):
+`w2_67b_plant.py`, a pytest plugin (`-p w2_67b_plant`, the folder on `PYTHONPATH`), wraps
+`w1_07_support.write_launcher` in the test process; each launcher a case writes first imports `w2_67b_child.py`
+from that folder and applies the faults named in `W2_67_PLANT` (comma-separated) in that `gov` process only.
+`src/` is never written and the tree is never copied. Each run's JUnit XML is in the same folder (`g<group>-<fault>.xml`,
+`g<group>-head.xml`). A command, for one fault:
+
+    W2_67_PLANT=P27-1 PYTHONPATH=<worktree>/src:<worktree>/.gov-runtime/scratch/td-1b/plant \
+      python3 -m pytest -p no:cacheprovider -p no:xdist -p w2_67b_plant -q --junitxml=<plant>/g1-P27-1.xml <node ids>
+
+`w2_67b_support.py` holds this batch's helpers: a file written and committed in a small project, a moved path git
+records, and `path_compliance.moved_references` read through `w2_67_doctor.section`.
+
+### Group 1: path compliance (`test_w1_27_path_compliance.py` ×3, `test_w1_27_path_compliance_r2.py` ×3)
+
+| Fault | In words | How (in `w2_67b_child.py`) |
+|---|---|---|
+| P27-1 (I4) | a moved-path reference never reported (CAP-06.d) | `_check_path_compliance`'s result with `moved_references = []`, status pass |
+| P27-4 (I4) | never an unclassified path (CAP-06.d) | `_check_path_map`'s result with no unclassified path, count 0, status pass |
+| P67B-1 | the path matcher matches no pattern: every tracked path unclassified (CAP-06.a) | `_match_pattern` returns false |
+| P67B-2 | `src/gov/cli/` left out of the stale-path check as if it were the old `cli/` tree (DEC-456 point 2) | `_excluded_from_stale_check` true also under `src/gov/cli/` |
+| P67B-3 | every document under `docs/` left out, not `docs/SOURCES.md` alone (DEC-456 point 1) | `_excluded_from_stale_check` true also under `docs/` |
+| P67B-4 | DEC-456 point 3 too broad: a file that names the new path is never reported | `_has_standalone_old_path` returns false |
+| P67B-5 | an unrelated section fails, so doctor is unhealthy whatever path_map says | `_check_tools`'s status `fail` (combined with P27-4) |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_w1_27_path_compliance.py::test_full_coverage_is_healthy` | read only top-level values of `result` (empty when doctor is unhealthy); the count is nested | P67B-1: `doctor reports unclassified paths on a project whose path map covers every tracked path (**): {'status': 'fail', 'unclassified_count': 5, …}` | green | the case reads result, which is empty when doctor is unhealthy |
+| `test_w1_27_path_compliance.py::test_unclassified_path_is_reported` | `ok` false on every machine for the tools section alone; `path` is a key name | P27-4: `doctor is ok despite unclassified paths`; P27-4 + P67B-5 (doctor unhealthy for tools): `doctor does not name docs/outside.md … as unclassified: {'status': 'pass', 'unclassified_count': 0, 'unclassified': []}`; P67B-5 alone: green | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_path_compliance.py::test_moved_path_reference_is_reported` | no file named the old path; `moved` is the key `moved_references` | P27-1: `doctor does not report docs/notes.md's reference to the moved path src/gov/doctor/old_module.py` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_path_compliance_r2.py::test_stale_path_in_live_document_not_sources_is_reported` | `moved` always there | P27-1 and P67B-3: `doctor does not report a reference to a moved path in a live document` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_path_compliance_r2.py::test_stale_path_in_src_gov_cli_is_reported` | the same always-true alternative | P27-1 and P67B-2: `doctor does not report a reference to a moved path in src/gov/cli/` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_path_compliance_r2.py::test_old_path_standalone_is_stale_when_new_path_elsewhere` | the same always-true alternative | P27-1 and P67B-4: `doctor does not report the standalone old path as stale` | green | the assertion matches a key name that doctor always emits |
+
+Head: the six, 6 passed in 6.7 s (`g1-head.xml`). Each runs on a small committed project of its own with this
+worktree's code (`w2_67_doctor.small_project`, `w2_67_doctor.doctor`), not on a copy of the whole tree, and reads
+`path_map` or the named entry of `path_compliance.moved_references` (old path, the file that names it, and for the
+moved-path case the new path). The two DEC-456 counter-cases keep the excluded place beside the live one in the same
+project (`docs/SOURCES.md`, the old `cli/` tree), so the exclusion and the report are seen together. The
+unclassified case gained a covered control path (`src/covered.py`), which must not be reported.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
