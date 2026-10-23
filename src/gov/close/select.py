@@ -273,7 +273,7 @@ def plan(root: Path, wbs: str, *, full_asked: bool = False) -> dict:
             why_full.append({"reason": "SHARED_CORE", "paths": core})
         tickets = _tickets(root)
         couplings = test_map.get("couplings") or []
-        unplaced = [p for p in paths if not (
+        unplaced = [p for p in paths if p not in core and not (
             suite_of(p) or _any(p, test_map.get("record_only"))
             or any(_any(p, c["paths"]) for c in couplings) or any(_any(p, t[2]) for t in tickets))]
         if unplaced:
@@ -351,8 +351,8 @@ def _form(root: Path, own: str, suites: list[str], targets: list[str]):
             if "" in cases or not (root / file).is_file():
                 continue  # the whole file runs
             for name in _top_level_tests(root / file):
-                if not any(case == name or case.startswith(name + "::") or case.startswith(name + "[")
-                           or case.startswith(name) for case in cases):
+                # pytest deselects by the id's beginning: a name that begins a target's is kept, so it runs too
+                if not any(case.startswith(name) for case in cases):
                     deselect.append(f"{file}::{name}")
     return ignore, deselect, left_out
 
