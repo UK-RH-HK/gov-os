@@ -99,6 +99,9 @@ described here instead.)
 | `test_w1_27_path_compliance_r2.py::test_old_path_inside_its_new_path_is_not_stale` | copies the whole tree, and doctor greps every tracked file: its result depended on every file's text (red on 2026-10-21 when a lead log named its fixture) | P456-3: `doctor reports subpath_target.py as a moved-path reference although it appears only as part of its own new path …`; P27-1: `the control's standalone reference to control_target.py in notes.md is not reported` | green, 0.85 s (9 to 14 s before) | the result depends on every tracked file's text |
 | `test_w1_27_held_out.py::test_missing_held_out_yaml_is_reported` | asserted `held` anywhere; the key `held_out` is always printed | P27-2: `doctor does not report the missing held-out.yaml` | green | the assertion matches a key name that doctor always emits |
 | `test_w1_27_held_out.py::test_present_held_out_yaml_is_not_reported` | read only `result`, `{}` whenever doctor is unhealthy | P27-2: `doctor reports held-out.yaml as missing when it is present` | green | the case read only `result`, empty whenever doctor is unhealthy |
+| `test_w1_27_adoption.py::test_doctor_report_mentions_adoption_level` | asserted `adopt` or `level` anywhere; the key `adoption_level` is always printed | P27-3: `ADOPTED_HEALTHY although ['canaries', 'framework_lock', 'index_freshness', 'isolation'] are unmeasured (DEC-425)` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_adoption.py::test_minimal_kernel_passes_at_minimal_level` | asserted `minimal`, `kernel` or `level` in `result`; `level` is a key of every adoption section | P27-3: `minimal kernel project does not report the minimal adoption level` | green | the assertion matches a key name that doctor always emits |
+| `test_w1_27_adoption.py::test_completed_stages_raise_adoption_level` | failed only without any of five words, and `healthy` is always a key | P27-3: `the completed stages do not raise the adoption level: before ADOPTED_HEALTHY, after ADOPTED_HEALTHY` | green | the assertion matches a key name that doctor always emits |
 
 Each revised case keeps its name and its rule, reads the section it claims (`w2_67_doctor.section`: `result` when
 doctor is healthy, `error.details` when it exits 3 with `DOCTOR_UNHEALTHY`), keeps the API-0002 envelope check, and
@@ -107,7 +110,12 @@ be reported), so a doctor that reports nothing cannot pass it. The held-out and 
 committed projects of their own (`w2_67_doctor.small_project`) with this worktree's code, not on a copy of the
 whole tree.
 
-**Not revised in this batch** (the remaining 37 of the 40, and the duplicate): adoption ×3; `test_w1_27_doctor.py` ×8;
+The adoption cases read the level's value: a defined level (`MINIMAL` < `INTERMEDIATE` < `ADOPTED_HEALTHY`), never
+`ADOPTED_HEALTHY` while another section is unmeasured (DEC-425); the lowest level for the minimal kernel project; and
+a higher level with this repository's path map than with the stages taken out (a minimal path map) on the same
+project, as I4 proposed ("compare the levels before and after the stages").
+
+**Not revised in this batch** (the remaining 34 of the 40, and the duplicate): `test_w1_27_doctor.py` ×8;
 `doctor_r5`'s stale-path case; `doctor_r7`'s home-tool sha256 case; drift ×6; `isolation_r2`; path compliance ×3;
 path compliance r2 ×3 (the old-path case aside); rebuild ×5; rebuild r2, r3, r4, r8; recovery check r2 ×3;
 `test_rebuild_does_not_silently_drop_lexical_tables`. Time ran out; see the designer's return for the order.
@@ -117,4 +125,5 @@ path compliance r2 ×3 (the old-path case aside); rebuild ×5; rebuild r2, r3, r
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
 - `w2_67_tmp_probe.py`: the one case the nested runs start (not collected by a run of `tests`).
 - `w2_67_doctor.py`: reading doctor's sections; a small committed project; doctor with this worktree's code.
-- Revised in place: `test_w1_27_path_compliance_r2.py` (1 case), `test_w1_27_held_out.py` (2 cases).
+- Revised in place: `test_w1_27_path_compliance_r2.py` (1 case), `test_w1_27_held_out.py` (2 cases),
+  `test_w1_27_adoption.py` (3 cases).
