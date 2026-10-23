@@ -341,7 +341,8 @@ class Fixture:
         """The record of a nightly full run on ``head`` (README, "Interface", the nightly record), committed by the
         orchestrator: a record-only commit."""
         rel = f"{NIGHTLY_DIR_REL}/NR-20261001T0{self._minute % 10}0000Z-{head[:12]}.json"
-        record = {"branch": "main", "head": head, "tree": tree_of(self.root, head), "scope": FULL,
+        tree = close_support.git(self.root, "rev-parse", f"{head}^{{tree}}", check=False).strip() or None
+        record = {"branch": "main", "head": head, "tree": tree, "scope": FULL,
                   "verdict": verdict, "base": None, "junit_xml": [], "failures": [], "packages": []}
         return self.record_commit({rel: json.dumps(record, indent=2) + "\n"}, "the nightly run's record") and rel
 
