@@ -29,7 +29,7 @@ import sys
 from pathlib import Path
 
 from gov.cli.errors import GovError
-from gov.close import history as _history, ratchet as _ratchet, state as _state, tool as _tool
+from gov.close import gates as _gates, history as _history, ratchet as _ratchet, state as _state, tool as _tool
 from gov.close.repo import (commits_since as _commits_since, git as _git, names_no_task as _names_no_task,
                             read_commits as _read_commits, store_is_of_head as _store_is_of_head,
                             ticket_commits as _ticket_commits, tickets_of_head as _tickets_of_head,
@@ -152,7 +152,9 @@ def run(root: Path, args, config: dict):
     if not owner_decision and state["count"] >= ESCALATION_AT:
         raise _state.blocked("three consecutive non-converging iterations reached", state)
 
-    # What is measured is the commit that is recorded, with records of that commit (DEC-487)
+    # What is measured is the commit that is recorded, with records of that commit (DEC-487); what an
+    # interrupted close of this ticket left is taken back first (W2-M158)
+    _gates.take_back_interrupted(root, ticket, _close_record_rel(ticket))
     _check_tree(root, ticket)
     _check_store(root)
     if owner_decision:
@@ -176,19 +178,43 @@ def run(root: Path, args, config: dict):
     # Every gate is asked, whatever an earlier one found (DEC-492)
     found: list[_Finding] = []
 
-    def gate(check, *given):
+    def gate(check, *given, **named):
         try:
-            return check(*given)
+            return check(*given, **named)
         except _Finding as f:
             found.append(f)
 
+    # The commit gates, before any test (DEC-868 item 3, DEC-896 item 3): a refusal here spends no attempt
     brought = frozenset()  # the merges that are git's own merge on the probed paths (DEC-754); none on a refusal
+    accepted_probes: dict = {}  # failed probe records accepted by an owner's decision (DEC-790)
     if profile == "FULL":
-        brought = gate(_check_probe, root, ticket, commits, others, inside, own, tickets) or frozenset()
+        brought = gate(_check_probe, root, ticket, commits, others, inside, own, tickets,
+                       accepted=accepted_probes) or frozenset()
     gate(_check_trailers, root, commits, ticket, history)
     gate(_check_accepted_history, history["refused"])
-    gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought], own, tickets)
+    recorded = _gates.decision_records(root, others, settings)  # measured by their decision (DEC-896 item 1)
+    gate(_check_unmeasured, ticket, [c for c in others if c["sha"] not in brought | recorded], own, tickets)
+    for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE):
+        gate(_gates.check_ratchet_lists, root, key)
+    if found:
+        _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
+
+    # The pre-close gate (DEC-868 item 1): the collection of every suite in one process, gov check, the checkpoint
+    kind = _gates.ticket_class(front)
+    folder = _gates.acceptance_folder(root, front, wbs)
+    gate(_gates.check_collection, root, [root / "tests"] + ([] if folder.is_relative_to(root / "tests")
+                                                            else [folder]), timeout)
+    checked = gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c, tickets)],
+                   every=True)
+    gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
+    if found:
+        _refuse_for(root, ticket, found, disposition, None, [], report, counted=False)
+    disk = _gates.check_disk(root, settings)  # DEC-898: before the regression
+
     gate(_check_containment, root, commits)
+    if kind == _gates.SPECIFICATION_CLASS:
+        gate(_gates.check_specification, root, ticket)
+    evidence = gate(_gates.check_evidence, root, ticket, front) if kind in _gates.EVIDENCE_CLASSES else None
     # Acceptance tests, then the regression tests (A2): all of tests/ except
     # the ticket's acceptance folder. Both run to their end, in parallel, and the cases the project declares
     # as serial-only afterwards (DEC-527); ``test_runs`` are the runs as they were made.
@@ -197,14 +223,13 @@ def run(root: Path, args, config: dict):
     # result, and the reds of the runs are judged by the lists, after both runs.
     told = {"results": {}, "rootdirs": {}, "env": None} \
         if any(settings.get(key) for key in (_ratchet.ACCEPTED_REDS, _ratchet.LOAD_SENSITIVE)) else None
-    test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers, told)
-    counts = gate(_check_tests, root, root / "tests", timeout, root / "tests" / "acceptance" / wbs, test_runs,
-                  workers, told)
+    no_counts = dict.fromkeys(("passed", "failed", "errors", "skipped"), 0)
+    if kind in _gates.EVIDENCE_CLASSES and not _gates.has_tests(folder):  # judged on its evidence (W2-H045)
+        test_counts = no_counts
+    else:
+        test_counts = gate(_check_acceptance, root, ticket, wbs, timeout, test_runs, workers, told, folder=folder)
+    counts = gate(_check_tests, root, root / "tests", timeout, folder, test_runs, workers, told)
     reds = gate(_check_reds, root, told, timeout) if told is not None else None
-    # A commit of the range that names no task and changes a governance file has the checks run too (DEC-490)
-    checked = gate(_check_governance_blocks, root,
-                   commits + [c for c in others if _names_no_task(c, tickets)])
-    gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
     packet = gate(_build_context, root, ticket)  # Context (DEC-454, DEC-470)
 
     if found:
@@ -229,6 +254,8 @@ def run(root: Path, args, config: dict):
     }
     record.update(checked)
     record.update(reds or {})
+    judged = _judged_by(kind, evidence, accepted_probes, disk)  # what this close judged besides its tests
+    record.update(judged)
     record[SHARE_KEY] = dict.fromkeys(SHARE_PARTS, NOT_MEASURED)
     record["created"] = _now()  # one time of the record, whether or not it is written again with its share
 
@@ -248,7 +275,19 @@ def run(root: Path, args, config: dict):
         _write_count(root, ticket, reset)
 
     return {"ticket": ticket, "close_record": close_record_path,
-            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report, **(reds or {})}
+            "checkpoint": checkpoint_path, "test_runs": test_runs, SHARE_KEY: share, **report, **(reds or {}),
+            **judged}
+
+
+def _judged_by(kind: str, evidence: list[str] | None, accepted_probes: dict, disk: dict) -> dict:
+    """What the close record and the answer state of the gates of W2-07: the ticket's class, the evidence it was
+    judged on, the decisions that accepted a failed probe's findings, the disk's reading."""
+    judged = {"ticket_class": kind or "implementation", "disk": disk}
+    if evidence is not None:
+        judged["evidence"] = evidence
+    if accepted_probes:
+        judged["probe_accepted_by"] = accepted_probes
+    return judged
 
 
 def _time_limit(given, settings: dict):
@@ -279,12 +318,13 @@ def _workers(settings: dict):
 
 
 def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str | None,
-                packet: dict | None, test_runs: list[dict] | None = None, report: dict | None = None) -> None:
+                packet: dict | None, test_runs: list[dict] | None = None, report: dict | None = None,
+                counted: bool = True) -> None:
     """The one refusal of a run, for every finding of its gates (DEC-492): each named once, in the gates'
     order. One gate's refusal is that gate's, with its code; several are ``CHECK_FAILED`` with each gate's
     part under ``parts``. ``test_runs`` are the runs made, stated as a passed close states them (DEC-566);
     ``report`` is what the trailer gate judged by (the base, the accepted history), stated as a passed close
-    states it."""
+    states it. A refusal of the commit gates or the pre-close gate is not ``counted`` (DEC-868 item 3)."""
     lines = list(dict.fromkeys(line for f in found for line in f.findings))
     not_measured = list(dict.fromkeys(part for f in found for part in f.not_measured))
     codes = sorted({f.code for f in found})
@@ -310,7 +350,7 @@ def _refuse_for(root: Path, ticket: str, found: list[_Finding], disposition: str
     _refuse(root, ticket, codes[0] if len(codes) == 1 else "CHECK_FAILED", message, lines, details,
             exit_code=found[0].exit_code if len(found) == 1 else EXIT_CHECK_FAILED,
             disposition=disposition, context_hash=packet["hash"] if packet and disposition else None,
-            context_reason=context_reason, not_measured=not_measured)
+            context_reason=context_reason, not_measured=not_measured, counted=counted)
 
 
 # ---------------------------------------------------------------------------
@@ -321,7 +361,7 @@ def _check_tree(root: Path, ticket: str) -> None:
     """``TREE_NOT_COMMITTED`` when the working tree is not ``HEAD``, with the paths.
 
     The one path that refuses nothing is what a refused close of this ticket left: an untracked ticket
-    file whose parent is the ticket (its repair ticket, DEC-490).
+    file whose parent is the ticket (its repair ticket, DEC-490), where it could not be committed (AR-9).
     """
     from gov.tasks.tickets import TICKETS_REL, frontmatter
 
@@ -565,11 +605,12 @@ def _check_containment(root: Path, commits: list[dict]) -> None:
 # ---------------------------------------------------------------------------
 
 def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict], inside, own,
-                 tickets: frozenset[str]) -> None:
+                 tickets: frozenset[str], accepted: dict | None = None) -> None:
     """The probe record of a FULL-profile ticket is evidence only if the implementer could not have written
     it (DEC-137, DEC-487). ``others`` are the other commits of the ticket's range, ``inside`` says whether a
     path is inside the ticket's allowed paths, ``own`` whether it is the ticket's work (``_work_of``),
-    ``tickets`` are the project's.
+    ``tickets`` are the project's. ``accepted`` gets, of each failed record an owner's decision accepts, the
+    decisions (DEC-790).
 
     A commit of the ticket after the probed one refuses only for a path that is the ticket's work: inside its
     allowed paths, one of its acceptance tests, or its own file (DEC-581).
@@ -646,9 +687,13 @@ def _check_probe(root: Path, ticket: str, commits: list[dict], others: list[dict
         judgement = str(pf.get("judgement", "")).strip()
         if not judgement:
             raise invalid("probe has no judgement")
-        if judgement not in PROBE_PASSED:
-            raise invalid(f"the probe's judgement is {judgement!r}, not {' or '.join(PROBE_PASSED)}",
-                          judgement=judgement)
+        if judgement not in PROBE_PASSED:  # DEC-790: unless an owner's decision accepts its every finding
+            decisions, why = _gates.probe_accepted_by(root, rel, pf, _gates.register_of(root))
+            if why:
+                raise invalid(f"the probe's judgement is {judgement!r}, not {' or '.join(PROBE_PASSED)}: {why}",
+                              judgement=judgement)
+            if accepted is not None:
+                accepted[rel] = decisions
         if not pf.get("probed_commit"):
             raise invalid("probe record does not name the probed commit")
         probed = str(pf["probed_commit"])
@@ -749,13 +794,14 @@ def _check_tests(root: Path, test_path: Path, timeout: int, ignore: Path | None 
 
 
 def _check_acceptance(root: Path, ticket: str, wbs: str, timeout: int, stated: list | None = None,
-                      workers=AUTO_WORKERS, told: dict | None = None) -> dict:
+                      workers=AUTO_WORKERS, told: dict | None = None, folder: Path | None = None) -> dict:
     """The counts of the ticket's acceptance run. The acceptance tests are part of the ticket's work
-    (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492)."""
-    folder = root / "tests" / "acceptance" / wbs
+    (DEC-480): without one there is no run, and the refusal says of it that it was not measured (DEC-492).
+    ``folder`` is the one the ticket declares (DEC-892), else ``tests/acceptance/<wbs>/``."""
+    folder = folder or root / "tests" / "acceptance" / wbs
     if not folder.is_dir() or not any(folder.rglob("test_*.py")):
         raise _Finding("NO_ACCEPTANCE_TESTS",
-                       f"no acceptance tests for {ticket} in tests/acceptance/{wbs}/",
+                       f"no acceptance tests for {ticket} in {folder.relative_to(root).as_posix()}/",
                        {"ticket": ticket, "wbs": wbs},
                        not_measured=[f"the acceptance run of {ticket}: not measured, it has no acceptance tests"])
     return _check_tests(root, folder, timeout, stated=stated, workers=workers, told=told)
@@ -1032,7 +1078,7 @@ def _alone(root: Path, test: str, told: dict, timeout: int) -> str:
 # Governance checks (A7)
 # ---------------------------------------------------------------------------
 
-def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, dict | None]:
+def _check_governance(root: Path, commits: list[dict], every: bool = False) -> tuple[dict, dict | None]:
     """W1-26's judgement of the project at the commit being closed, when the
     ticket's commits change a governance file (DEC-454, DEC-480).
 
@@ -1044,9 +1090,9 @@ def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, dict | Non
     ``red_families``, as it gave them; ``None`` where it does not block. This
     command has no rule of its own about checks and stands on no result but
     this run's: ``CHECKS_NOT_MEASURED`` when the runner's answer is not one of
-    the commit being closed.
+    the commit being closed. With ``every`` it runs whatever the commits change (the pre-close gate, DEC-868).
     """
-    if not any(p.startswith(_GOVERNANCE_PREFIXES) for c in commits for p in c["paths"]):
+    if not every and not any(p.startswith(_GOVERNANCE_PREFIXES) for c in commits for p in c["paths"]):
         return {}, None
 
     from gov.check.runner import HARD_BLOCK, RED, run_checks
@@ -1073,10 +1119,10 @@ def _check_governance(root: Path, commits: list[dict]) -> tuple[dict, dict | Non
     return stated, {"red_checks": red, "red_families": red_families} if blocks else None
 
 
-def _check_governance_blocks(root: Path, commits: list[dict]) -> dict:
+def _check_governance_blocks(root: Path, commits: list[dict], every: bool = False) -> dict:
     """What the close record states of the governance checks (A7, DEC-480); where the runner blocks, what it
     reports as blocking is a finding like a failing test."""
-    checked, blocking = _check_governance(root, commits)
+    checked, blocking = _check_governance(root, commits, every)
     if blocking is None:
         return checked
     at = f"at commit {checked['check_commit'][:12]}"
@@ -1109,12 +1155,18 @@ def _refuse(root: Path, ticket: str, code: str, message: str,
             findings: list[str], details: dict | None = None, *,
             exit_code: int = EXIT_CHECK_FAILED,
             disposition: str | None = None, context_hash: str | None = None,
-            context_reason: str | None = None, not_measured: list[str] | None = None):
+            context_reason: str | None = None, not_measured: list[str] | None = None, counted: bool = True):
     """Count the refusal, open its repair ticket, write the escalation at the
     third, and raise the refusal. The next attempt after the third is blocked
-    in ``run`` before anything runs."""
+    in ``run`` before anything runs. A refusal that is not ``counted`` (a gate before any test: an adoption gap,
+    a baseline, DEC-868 item 3, W2-H038) leaves the counter as it is."""
     from datetime import datetime, timezone
 
+    if not counted:
+        details = {"findings": findings, **(details or {}), "counted": False}
+        details["repair_ticket"] = _open_repair_ticket(
+            root, ticket, findings, disposition, context_hash, context_reason, not_measured)
+        raise GovError(code, message, details, exit_code=exit_code)
     state = _read_count(root, ticket)
     earlier = _state.read_escalation(root, ticket)
     outcomes = state["outcomes"] + [{
