@@ -32,7 +32,7 @@ kpis:
   - The fusion receives a ranked lexical list beside the semantic one, so that lexical, semantic and the reranker each contribute. The dev queryset's lexical-only hit@5 is recorded in the ticket's evidence
     [DEC-725].
   - Lexical search returns "unavailable" instead of raising [W2-M071]. Retrieval latency stays within the retrieve budget on the dev tiers.
-  - A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42's RETR-X-02 case is retired, so this ticket's own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].
+  - 'A question about an id that exists nowhere stops with a named reason and no unrelated items: the stated gap, as the owner ruled for RETR-X-02 (DEC-900, AR-9), and as W1-21 asserts; W1-42''s RETR-X-02 case is retired, so this ticket''s own acceptance tests hold the requirement [AR-9, W2-M296, DEC-900].'
   failure:
   - RETR-A-04's bundle is unchanged (citations, three parent expansions, stopping reason).
   - 'The secrets filter applies to the FTS5 table as to the old index: a planted canary is never indexed.'
