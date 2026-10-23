@@ -291,6 +291,17 @@ Head: 3 passed in 4.0 s (`g4-head-recovery.xml`), on the tiny rebuild project wi
 check declaration. The tampered case names the mismatch (`mismatch` in the check's report, no traceback) and holds
 the clean store green first.
 
+**`rebuild_r8`'s write-scope case.** P67B-31 (in `w2_67b_child.py`): rebuild writes `$HOME/.gov-planted` after it
+runs.
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_w1_27_rebuild_r8_no_embeddings.py::test_the_mode_writes_only_under_gov_runtime` | snapshotted `sandbox.elsewhere`, which nothing uses, not the home | P67B-31: `the mode wrote in the home it was given: created: .gov-planted`; P67B-18: `the mode wrote outside .gov-runtime/` | green, 1.9 s | the assertion does not read what the case's name claims |
+
+The code index's daemon folder (`/tmp/gov-cbm-<uid>`, I4's second place) is not snapshotted: in this session's
+sandbox it is read-only (`[Errno 30] Read-only file system: '/tmp/gov-cbm-1000/…'`, the code index's reason on
+every rebuild here), so what the mode writes there could not be seen; it is left open in the designer's return.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
