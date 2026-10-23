@@ -37,7 +37,9 @@
 ### Plan in force (DEC-884, DEC-889 items 14-15, DEC-892, DEC-896, DEC-897)
 - **REVIEW POINT: NO W2-66/67/68 work until the owner confirms the bundle in writing.** Bundle:
   `drafts/review-bundle/00-INDEX.md` (+01 W2-66 ticket, 02 W2-66 card, 03 W2-68 card, 04 W2-67 card, 05 W2-57
-  ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections). ACT pinged 10-22 after W2-50's close. Needs:
+  ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections; added 10-23 on the owner's ask: 03b W2-68 ticket,
+  04b W2-67 ticket, 05b W2-57 card, 06b W2-07 ticket, 09 W2-70 ticket + card, 10 register draft DEC-899, and
+  ALL-DRAFTS-AND-PACKAGES.md (98,649 bytes, built by scratchpad combine_bundle.py, verbatim parts)). ACT pinged 10-22 after W2-50's close. Needs:
   P-IS-1..7 (rec (a) each; the owner chooses the two p95 entries in P-IS-6), the re-pin plan, DEC-898's figures,
   area 4's resume (rec no; the nightly covers it). P-IS-3 (a) -> new small ticket W2-70 (retire W1-05's
   switch-over + W1-47's builder rerun; merges early, closes after W2-07 is pinned).

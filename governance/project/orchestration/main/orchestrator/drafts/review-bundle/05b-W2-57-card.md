@@ -1,0 +1,39 @@
+#### W2-57 Load out of the close: the rulesync probe, the serial-only list, and a route out for every list entry (FULL, independent-test-designer then engineer; DEC-813, DEC-823, DEC-883 item 5, DEC-889 item 5, DEC-892 item 2; lens I's P-IS-6)
+- **Why:**
+  - The serial phase takes about 31 minutes of every close, and most refused closes since 2026-10-20 came from listed cases or load-caused reds.
+  - The rulesync probe's 10-second limit turns load into reds, greens and a silent skip of up to 181 W1-38 cases. That is a live fail-open (I4 F2).
+  - **This card replaces DEC-813's KPI.** That KPI had W1-46's live cases pass under the close's parallel load; DEC-889 item 5 moves live and real-model tests to the nightly instead (I2 F14).
+- **Starts** in a free slot after the review point, the probe first (DEC-892 item 2). It **closes** before W2-24 starts (DEC-813).
+- **Allowed paths (widened, I2 F12):**
+  - `src/gov/adapters/portability.py` and `src/gov/doctor/command.py` (the probes only);
+  - `src/gov/close/serial.py` (new: the serial phase and its reasons);
+  - `tests/acceptance/serial-only.txt`;
+  - W1-30's r11 and r13 files;
+  - `tests/acceptance/W1-38/**`, `W1-07/**`, `W1-46/**`, `W1-50/**`, `W1-02/**`;
+  - W1-33's `w1_33_support.py`;
+  - `tests/acceptance/W2-57/**`;
+  - `tests/unit/close/test_serial*`, `tests/unit/adapters/test_portability*`;
+  - `docs/changes/W2-57-CIT-E.md`.
+- **KPIs, success:**
+  - **The probe's four effects (P-I4-5 (a)):**
+    - a limit a loaded machine meets;
+    - W1-38's fixture fails, never skips, on a timeout;
+    - the 9 cases a timeout satisfies assert the reason;
+    - W1-33's research case fails the same way;
+    - 0 rulesync skips or timeouts in three closes' worth of parallel runs.
+  - **The doctor probes:** limits a loaded machine meets, with failure text kept (W1-07 `[doctor]`).
+  - **The serial-only list reworked as P-IS-6's table:**
+    - every kept entry names its reason;
+    - W1-16's 94 non-daemon cases, W1-09's two races and W1-50's read-merge case run in parallel;
+    - the live and real-model files move to the nightly;
+    - latency cases stay alone.
+  - **Revisions:** W1-30's r11 test reads the reworked list. Also W1-30's r13 limit, W1-50's `CLAUDE*` removal (DEC-784), a p95 case for a designer's read, and W2-M332's timing without the memory sampler.
+  - **The close's resource gate** covers W1-02's 5-second bound and the guard's 20-second deadline. The network check probes through the session's route.
+  - **Then the orchestrator commits the removal** of every entry this ticket makes unnecessary (DEC-861).
+- **KPIs, failure:**
+  - a timeout that skips or passes a case;
+  - a serial entry without a reason;
+  - a live file left in the close;
+  - a case weakened, skipped or serialised by marker alone;
+  - a list entry added.
+- **Until it lands:** the close queue checks that each close's skip count equals the expected 31 (the orchestrator's interim guard).
