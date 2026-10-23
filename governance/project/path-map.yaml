@@ -255,15 +255,7 @@ close_timeout: 7200
 # gov close's owner-accepted known reds, a ratchet (DEC-757): each red by exact test id, the owner's decision
 # that accepts it, its reason and the ticket that fixes it. Only an owner's commit adds an entry; a listed test
 # that passes leaves the list in the same close.
-accepted_reds:
-  - test: "tests/acceptance/W1-42/test_w1_42_exit_report.py::test_retrieval_query_ran_with_bundles_expansions_notes_and_stopping_reason[RETR-X-02]"
-    decision: DEC-757
-    reason: "RETR-X-02 has no named parent expansion yet (DEC-714)"
-    fixed_by: W2-13
-  - test: "tests/acceptance/W1-42/test_w1_42_exit_report.py::test_governance_share_is_measured_and_at_most_15_percent_on_each_programme"
-    decision: DEC-757
-    reason: "The governance share is not measured per programme yet (DEC-713)"
-    fixed_by: W2-14
+accepted_reds: []
 # gov close's named load-sensitive tests (DEC-757): a listed test that fails counts only if it passes in an
 # isolated re-run inside the same close, reported by name. Only an owner's commit adds an entry. Each entry
 # names the ticket or the Wave 3 row that fixes it (DEC-762); the list shrinks as they close.
