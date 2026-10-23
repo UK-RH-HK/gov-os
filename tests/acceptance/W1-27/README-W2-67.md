@@ -270,6 +270,27 @@ the secrets filter's tool is returned as a package (the designer's return). Ever
 project built for this worktree's code (`w2_67b_support.rebuild_project`, `rebuild`), except r3's, which keeps the
 suite's fixtures. The clone case clones the tiny committed project it built, never this repository.
 
+**The recovery check (`test_w1_27_recovery_check_r2.py` ×3).** The declared command
+(`python3 -m gov.rebuild.check`) runs through `sh -c`, not a launcher, so the plugin also wraps `subprocess.run` in
+the test process for that one command: its `PYTHONPATH` starts with `.gov-runtime/scratch/td-1b/plant/site/`, whose
+`sitecustomize.py` applies the same faults in the check's process.
+
+| Fault | In words | How |
+|---|---|---|
+| P67B-27 | the check fails open: it exits 0 whatever it found (CAP-38.b) | `sys.exit` exits 0 |
+| P67B-28 | the check always finds a mismatch | `gov.store.digest` returns a new value each call |
+| P67B-29 | the check exits non-zero without saying unmeasured (DEC-425) | `print`'s `unmeasured` becomes `store.db missing` |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_recovery_rebuild_command_not_unconditionally_exit_zero` | read the declaration's text, which never holds `exit(0)` | P67B-27: `the check command exits 0 on a tampered store as on a clean one, making it a fail-open`; P67B-28: `the check is not green on a clean store` | green | the assertion does not read what the case's name claims |
+| `test_recovery_rebuild_command_exits_nonzero_on_tampered_store` | a crash also exits non-zero; no clean store held green | P67B-27: `the recovery-rebuild check exits 0 on a tampered store`; P67B-28: `the check is not green on the clean store (the control)` | green | the assertion does not read what the case's name claims |
+| `test_recovery_rebuild_check_reports_unmeasured_when_no_store` | `unmeasured` never asserted; a non-zero exit of any cause passed | P67B-29: `the check does not report unmeasured when there is no store (DEC-425) … stderr: store.db missing` | green | the assertion does not read what the case's name claims |
+
+Head: 3 passed in 4.0 s (`g4-head-recovery.xml`), on the tiny rebuild project with this worktree's code and its
+check declaration. The tampered case names the mismatch (`mismatch` in the check's report, no traceback) and holds
+the clean store green first.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
