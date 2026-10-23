@@ -147,31 +147,36 @@ def check_ratchet_lists(root: Path, key: str) -> None:
 # The pre-close gate (DEC-868 item 1 (a)) and the disk (DEC-898)
 # ---------------------------------------------------------------------------
 
-def check_collection(root: Path, folders: list[Path], timeout) -> None:
-    """Every suite the close will run, collected in one process as the close runs them: a collection error
-    refuses, naming each file that cannot be collected."""
+def check_collection(root: Path, suites: list[tuple[Path, Path | None]], timeout) -> None:
+    """Every suite the close will run, each ``(folder, ignored)`` collected in one process as the close runs it
+    (the acceptance folder; ``tests/`` without it): a collection error refuses, naming each file that cannot be
+    collected."""
     from gov.close.command import _INTERPRETER_PLACES, _INTERPRETER_VARIABLES, _TEST_RUNNER_VARIABLES, _started
 
-    paths = [str(f) for f in folders if f.is_dir()]
-    if not paths:
-        return
     env = {key: value for key, value in os.environ.items()
            if key not in _TEST_RUNNER_VARIABLES
            and (not key.startswith(_INTERPRETER_VARIABLES) or key in _INTERPRETER_PLACES)}
     env["PYTHONPATH"] = str(Path(root) / "src")
-    cmd = [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider", "--no-header", *paths]
-    try:
-        done = _started(root, cmd, env, timeout)
-    except subprocess.TimeoutExpired:
-        lines = [f"the collection of the suites the close runs exceeded the time limit of {timeout}s"]
-    else:
-        if done.returncode in (0, 5):
-            return
-        lines = sorted({line.strip() for line in done.stdout.split("\n") if line.startswith("ERROR ")}) or \
-            [f"the collection exited {done.returncode}: {(done.stdout + done.stderr).strip()[-300:]}"]
-    raise _finding("COLLECTION_FAILED", "the suites the close runs cannot be collected: " + "; ".join(lines),
-                   {"collected": [Path(p).relative_to(root).as_posix() for p in paths]},
-                   [f"collect: {line}" for line in lines])
+    lines, collected = [], []
+    for folder, ignored in suites:
+        if not folder.is_dir():
+            continue
+        collected.append(folder.relative_to(root).as_posix())
+        cmd = [sys.executable, "-m", "pytest", "--collect-only", "-q", "-p", "no:cacheprovider", "--no-header",
+               str(folder)] + (["--ignore", str(ignored)] if ignored is not None else [])
+        try:
+            done = _started(root, cmd, env, timeout)
+        except subprocess.TimeoutExpired:
+            lines.append(f"the collection of {collected[-1]} exceeded the time limit of {timeout}s")
+            continue
+        if done.returncode not in (0, 5):
+            lines += sorted({line.strip() for line in done.stdout.split("\n") if line.startswith("ERROR ")}) or \
+                [f"the collection of {collected[-1]} exited {done.returncode}: "
+                 f"{(done.stdout + done.stderr).strip()[-300:]}"]
+    if lines:
+        lines = list(dict.fromkeys(lines))
+        raise _finding("COLLECTION_FAILED", "the suites the close runs cannot be collected: " + "; ".join(lines),
+                       {"collected": collected}, [f"collect: {line}" for line in lines])
 
 
 def check_disk(root: Path, settings: dict) -> dict:

@@ -202,8 +202,7 @@ def run(root: Path, args, config: dict):
     # The pre-close gate (DEC-868 item 1): the collection of every suite in one process, gov check, the checkpoint
     kind = _gates.ticket_class(front)
     folder = _gates.acceptance_folder(root, front, wbs)
-    gate(_gates.check_collection, root, [root / "tests"] + ([] if folder.is_relative_to(root / "tests")
-                                                            else [folder]), timeout)
+    gate(_gates.check_collection, root, [(folder, None), (root / "tests", folder)], timeout)
     checked = gate(_check_governance_blocks, root, commits + [c for c in others if _names_no_task(c, tickets)],
                    every=True)
     gate(_check_checkpoint, root, ticket)  # Watchdog (B1)
