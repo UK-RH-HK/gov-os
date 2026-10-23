@@ -236,7 +236,7 @@ def _blobs_under(commit, path, root):
     return blobs
 
 
-def merge_offences(sha, path, root=REPO_ROOT):
+def merge_offences(sha, path, root=REPO_ROOT, exempt=None):
     """Why a merge commit without the test designer's role may not pass (DEC-253); empty when it passes.
 
     A merge commit passes when every change it brings under ``path`` comes from
@@ -245,12 +245,17 @@ def merge_offences(sha, path, root=REPO_ROOT):
     - every file under ``path`` in which the merge differs from its first parent
       is, in the merge, exactly what one of the other parents holds (the same
       content, or absent in both). Anything else is a change the merge commit
-      makes itself, beyond what its parents hold;
+      makes itself, beyond what its parents hold, whatever the merge brings;
     - every non-merge commit that is reachable from another parent, is not
-      reachable from the first parent, and touches ``path``, carries the role.
-      A merge commit on the merged side is judged by this same rule when the
-      history walk reaches it.
+      reachable from the first parent, and touches ``path``, carries the role,
+      or has its full id listed in the path map's ``acceptance_exemptions``
+      (DEC-906 item 2, read through this function by DEC-908 item 3; ``exempt``
+      is that list, read from ``root`` when not given). A ``Role: owner``
+      trailer alone exempts nothing. A merge commit on the merged side is
+      judged by this same rule when the history walk reaches it.
     """
+    if exempt is None:
+        exempt = acceptance_exemptions(root)
     first, *others = commit_parents(sha, root)
     merged = _blobs_under(sha, path, root)
     base = _blobs_under(first, path, root)
@@ -266,7 +271,8 @@ def merge_offences(sha, path, root=REPO_ROOT):
     for parent in others:
         side = git("rev-list", "--no-merges", "--full-history", f"{first}..{parent}", "--", path,
                    root=root).split()
-        without = [c[:12] for c in side if TEST_DESIGNER_ROLE not in commit_roles(c, root)]
+        without = [c[:12] for c in side
+                   if TEST_DESIGNER_ROLE not in commit_roles(c, root) and c not in exempt]
         if without:
             offences.append(
                 f"it brings commits without `Role: {TEST_DESIGNER_ROLE}`: " + ", ".join(without)
@@ -307,7 +313,8 @@ def acceptance_test_offenders(root=REPO_ROOT, path="tests/acceptance"):
       the path map's ``acceptance_exemptions`` (DEC-906 item 2). A ``Role: owner``
       trailer alone exempts nothing.
     - Any other merge commit is an offender unless ``merge_offences`` is empty
-      (DEC-253: an integration merge of test-designer commits).
+      (DEC-253: an integration merge of test-designer commits, or of commits
+      listed in the same ``acceptance_exemptions``, DEC-908 item 3).
     """
     exempt = acceptance_exemptions(root)
     offenders = []
@@ -318,7 +325,7 @@ def acceptance_test_offenders(root=REPO_ROOT, path="tests/acceptance"):
             if sha not in exempt:
                 offenders.append(sha[:12])
             continue
-        offences = merge_offences(sha, path, root)
+        offences = merge_offences(sha, path, root, exempt)
         if offences:
             offenders.append(f"{sha[:12]} (merge: {'; '.join(offences)})")
     return offenders
