@@ -303,6 +303,7 @@ Every ticket's acceptance tests are at `tests/acceptance/<W2 id>/`, written by a
   - **The commit gates run first,** and stop before any test when one refuses, spending no ratchet attempt (DEC-868 item 3). They are the trailers, task-less work, accepted history, the probe gate, and the ratchet's own reading of both lists' entries. On 2026-10-22 two closes spent about 70 minutes each before refusing on commit findings (I2 F13, I4 F14, F17).
   - **Named for its test designer** (cases this ticket turns red): `tests/acceptance/W1-30/test_w1_30_no_acceptance_tests.py` (3 functions, 6 cases) and `test_collection_error_refuses_close`. **For its engineer:** the unit `test_a_collection_error_is_a_finding` (I2 F9).
   - **Optional:** the missing case for the close record's packet hash, made a constant in a planted fault that nothing caught (I2 PF9).
+- **The test designer's batch, widened (owner, DEC-904 item 6):** the W1-30 fixture green under the in-close `gov check` (175 cases), the 20 gate-order cases to DEC-868 item 3's order, and the repair-ticket case to KPI 8, each with a `Rewrite-Reason:` naming its decision and no expectation lowered; listed in the ticket file.
 - **Added by DEC-898 (owner):** before its regression, `gov close` reads the shared disk's free space and free inodes (W2-20's reading once it lands; until then the same floors, 100 GiB and 10,000,000 inodes, from the configuration). Below the floor it refuses at once, naming the reading, and spends no attempt.
 - **KPIs, failure:**
   - a research ticket without an evidence record, or an audit ticket whose report fails the validator, closes;
@@ -1152,11 +1153,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - **Nested runs fail under load and block worksteal** (I1 F-5, I2 F5).
   - **pytest's temp folders are not cleaned:** `/tmp/pytest-of-usain` holds 61 run folders since 2026-10-20. One auditor's per-run base folders filled the disk's inodes on 2026-10-22 (DEC-898).
   - **About 277 weak or outdated functions** cannot fail for the fault they claim to catch, or encode an old rule (I-SYNTHESIS §5.2).
-- **Place:**
-  - Starts after W2-66 merges (DEC-889 item 7).
-  - Its acceptance-test revisions can close only once W2-07's test-revision class lands, so it is planned to close after W2-07 (DEC-892 item 1, P-IS-7).
-  - Once DEC-769 item 3 is built, its designer writes only the folders this card names (P-IS-11).
-  - The two acceptance reruns are not here: P-IS-3 (a) retires them now, in a small ticket of their own (W2-70 in the bundle's index).
+- **Place (owner, DEC-904 item 5):** the next free slot. Ticket `DAEO-9nys`. Round 1 now, on the folders no ticket in flight holds; round 2 (W1-30 and `tests/unit/close`) after W2-07 and W2-66 merge; round 3 (W2-50's cases) after W2-69 merges. Its acceptance revisions close after W2-07 is pinned (DEC-892 item 1, DEC-896 item 3); the two acceptance reruns are W2-70's.
 - **Allowed paths:**
   - for the engineer: the fixtures and helpers that make whole-tree copies (`tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-25/**`, the W1-27 old-path case's fixture);
   - `tests/unit/close/**` (the 15 nested-run functions only; it runs after W2-07, which holds that folder);

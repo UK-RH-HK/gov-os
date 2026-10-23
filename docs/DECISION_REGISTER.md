@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.288 (the version table at the end of each section gives the history)
+**Version:** 0.289 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -5366,7 +5366,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 ## 127. One delegated decision on W1-30: the test designer's seven points on DEC-487 (register v0.127, appended by the W1 orchestrator on branch `w1/integrate`)
 
 ### DEC-490 — DEC-487 made exact: which task-less commits refuse, the judgement words, what a refusal's own files do to the tree rule, the exit codes
-- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer wrote the cases for DEC-487 (commit `ed52a286`: 43 new cases, 39 red for the reviewer's reasons) and returned seven points no source settles (`log/W1-30-r8-cases.json`). Recorded before the engineer's change (DEC-463).
+- **Status:** ACCEPTED (orchestrator, delegated under DEC-416, 2026-10-07; told to the owner, who may replace it) · **Basis:** W1-30's test designer wrote the cases for DEC-487 (commit `ed52a286`: 43 new cases, 39 red for the reviewer's reasons) and returned seven points no source settles (`log/W1-30-r8-cases.json`). Recorded before the engineer's change (DEC-463). · **Changed by:** DEC-904 item 6 (for one part): an untracked repair ticket of the ticket being closed no longer passes silently; W2-07's KPI 8 commits the repair ticket in the close.
 - **Decision:**
   - **A commit that names no task** (DEC-487 said: refuses). Made exact: among the commits after the ticket's first, one that names no task refuses the close when it changes the ticket's acceptance tests, a path inside the ticket's allowed paths, or the ticket's own file: that is work on this ticket which no ticket measured. One that changes a governance file has the governance checks run, as a ticket commit would. After the probed commit, one that changes a path inside the ticket's allowed paths makes the probe stale. Any other task-less commit (a decision record, a checkpoint, a probe record, another folder) refuses nothing. A commit that names another ticket is that ticket's.
   - **The judgement of a probe record** is `pass` or `passed` to be accepted; `fail`, `failed` or any other value refuses.
@@ -5407,7 +5407,7 @@ Answered by the owner on 2026-10-07 in two messages; DEC-450 decided by the orch
 - **Orchestrator's reading, recorded as such:** DEC-476 keeps `gov close` without a baseline inside it, so "do not count toward escalation" is applied outside the tool: where the tool's own counter is raised by such a refusal, the orchestrator does not treat it as an iteration, and a block reached only by such refusals is brought to the owner as that, not as a looping ticket.
 
 ### DEC-493 — W1-39's allowed paths gain the doctor call site, the overlay's path map, Copier's standard answers file and an ignore file
-- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-7, from the W1-39 lead's packages P-1, P-2 and P-5 and two residuals of earlier tickets.
+- **Status:** ACCEPTED (owner, 2026-10-07) · **Basis:** package P-7, from the W1-39 lead's packages P-1, P-2 and P-5 and two residuals of earlier tickets. · **Changed by:** DEC-896 item 2 and DEC-903 (for one part): the overlay holds the path map and the test map.
 - **Decision:** W1-39's `allowed_paths` gain, each in its own commit with `Task: DAEO-5ylr`:
   - `src/gov/doctor/command.py` and `tests/unit/doctor/**`, for the lock-comparison call only;
   - `template/governance/project/**`, shipping a minimal path map that an update never overwrites;
@@ -9908,7 +9908,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 277. The owner's answers of 2026-10-21 to lens H, with amendments, and the delegated split of W2-66 (register v0.277, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-889 — Lens H's packages decided, with the owner's amendments: the selection and the record-reading set refined; worksteal, per-test limits and JUnit XML; the glue; the tool trials; a review point before W2-66, W2-67 and W2-68; two re-pins planned; lens I
-- **Status:** ACCEPTED (owner, 2026-10-21, in the chat, after reading lens H's full report, the register draft and W2-66's ticket; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-881, DEC-883, DEC-884, DEC-880, DEC-852 item 3, DEC-887, DEC-888, DEC-866, DEC-861 · **Basis:** lens H's report, `docs/assessment/2026-10/H-test-strategy.md` (PARTIAL: trials cut by the close lock), its 19 findings and 9 packages. · **Changed by:** DEC-892: item 11 a (worksteal) is deferred until W2-67 or W2-57 removes the nested runs; item 11 b's mechanism is pytest-timeout with the signal method, an owner install package when W2-66 needs it; item 12's rerunfailures and randomly enter the nightly only after W2-L373's rename · **Changed by:** DEC-896 item 3: item 15's first re-pin comes after W2-66 and W2-07 and carries W2-07 too. · **Changed by:** DEC-899: items 7, 14 and 15 settled at the review point (the drafts confirmed; two re-pins with W2-07 merging before W2-66).
+- **Status:** ACCEPTED (owner, 2026-10-21, in the chat, after reading lens H's full report, the register draft and W2-66's ticket; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-21)`) · **Under:** DEC-881, DEC-883, DEC-884, DEC-880, DEC-852 item 3, DEC-887, DEC-888, DEC-866, DEC-861 · **Basis:** lens H's report, `docs/assessment/2026-10/H-test-strategy.md` (PARTIAL: trials cut by the close lock), its 19 findings and 9 packages. · **Changed by:** DEC-892: item 11 a (worksteal) is deferred until W2-67 or W2-57 removes the nested runs; item 11 b's mechanism is pytest-timeout with the signal method, an owner install package when W2-66 needs it; item 12's rerunfailures and randomly enter the nightly only after W2-L373's rename · **Changed by:** DEC-896 item 3: item 15's first re-pin comes after W2-66 and W2-07 and carries W2-07 too. · **Changed by:** DEC-899: items 7, 14 and 15 settled at the review point (the drafts confirmed; two re-pins with W2-07 merging before W2-66). · **Changed by:** DEC-904 item 5: W2-67 comes forward to the next free slot.
 - **Decision:**
   1. **P-H-2 (a).** W2-66 takes all of the following in:
      - shared test helpers followed (such as `w1_07_support`, imported by 14 suites);
@@ -10272,7 +10272,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 285. The owner's standing rule of 2026-10-22 on disk space, inodes and scratch budgets (register v0.285, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-898 — The resource gate checks free disk space and free inodes; every auditor, trial and lead has a scratch budget, cleans up as it goes and reports its scratch size
-- **Status:** ACCEPTED (owner, 2026-10-22, in the chat, standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`). The rule is the owner's. The figures in items 1 and 2 are the orchestrator's proposal, in force provisionally until the owner confirms or changes them. They are stricter only. · **Under:** DEC-798, DEC-847, DEC-880, DEC-889 item 16, DEC-855, DEC-851, DEC-861 · **Basis:** · **Changed by:** DEC-899 item 5: the figures are confirmed by the owner and no longer provisional. · **Changed by:** DEC-902: the weekly sweep joins the scratch rules (only in a quiet moment, nothing newer than 24 hours, nothing held open, nothing cited as evidence).
+- **Status:** ACCEPTED (owner, 2026-10-22, in the chat, standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`). The rule is the owner's. The figures in items 1 and 2 are the orchestrator's proposal, in force provisionally until the owner confirms or changes them. They are stricter only. · **Under:** DEC-798, DEC-847, DEC-880, DEC-889 item 16, DEC-855, DEC-851, DEC-861 · **Basis:** · **Changed by:** DEC-899 item 5: the figures are confirmed by the owner and no longer provisional. · **Changed by:** DEC-902: the weekly sweep joins the scratch rules (only in a quiet moment, nothing newer than 24 hours, nothing held open, nothing cited as evidence). · **Changed by:** DEC-904 item 3: until the retention trial reports, a verification run may use 6,000,000 inodes and 60 GB, one at a time under `/tmp/gov-os-verify.lock`, the disk floor still enforced.
   - **Lens I area 4's folder** (`/tmp/gov-os-assessment-I4/`) held about 7.0 million files and folders (61 GB). About 5.3 million files (46 GB) were in `tmp/bt/`: from 18:31 to 19:04 that auditor gave each planted-fault run its own pytest base folder, which skips pytest's clean-up of old folders, and the suites it ran make whole-tree copies per test.
   - **The disk's inodes reached 98 % use.** One run could not write its result (ENOSPC).
   - **Before the orchestrator's clean-up of the four lens I folders** (about 20:15): 62,589,143 of 67,108,864 inodes used (94 %); 640 GB of 1,007 GB used (67 %).
@@ -10485,3 +10485,63 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.288 | 2026-10-23 | Delegated (orchestrator): DEC-903 (W1-39's overlay case named for W2-66's test designer, outdated by DEC-896 item 2; `src/gov/cli/errors.py` corrected in W2-66's shared core; W2-07's six interface readings accepted; the path map's `test_inputs` removed at W2-66's merge). Next free id: DEC-904. |
+
+## 289. The owner's answers of 2026-10-23 on P-W2-07-A-B (register v0.289, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-904 — A full verification run against the scratch budget: the retention trial, a lead's own clean-up rule, a bridge cap with one run at a time; W2-67 forward; W2-07's test-designer batch widened to the 196 cases
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-902, DEC-880 item 2 (b), DEC-889 items 6 and 7, DEC-868, DEC-896, DEC-899, DEC-903, DEC-866, MR-3 · **Basis:** package P-W2-07-A-B with its addendum (`governance/project/orchestration/packages/P-W2-07-A-B.md`). W2-07's and W2-66's leads stopped their full verification runs at DEC-898's lead budget: 1,062,156 inodes at about 13.6 % of W2-07's run; 5,306,782 inodes and 47 GB for W2-66's.
+- **Decision:**
+  1. **A (a), the retention trial.** pytest's `tmp_path_retention_policy=failed` is tried on one full run in the close's form, measured:
+     - the peak inodes and size of the run's temp folder;
+     - the wall time, against a run without it;
+     - that the results are unchanged;
+     - that a failing test's folder is still kept.
+     If it holds, it becomes the default for the close (W2-66's close command), the nightly run and the leads' verification.
+  2. **A (c), a lead's own clean-up.** An allow rule lets a lead remove only its own temp folder, by its literal path (`/tmp/gov-os-lead-<its W2 id>`). It is carried in the settings regeneration after the first re-pin. Until then, the orchestrator removes a returned lead's temp folder.
+  3. **A (b), the bridge until (a)'s trial reports:**
+     - 6,000,000 files and folders and 60 GB per verification run;
+     - **one verification run at a time** across every session (each full run takes the lock `/tmp/gov-os-verify.lock` with `flock`, and waits while another holds it);
+     - the disk floor (100 GiB and 10,000,000 inodes free) still enforced across all sessions.
+     DEC-898 is marked changed accordingly.
+  4. **The two stopped runs' temp folders** (`/tmp/gov-os-lead-W2-07/`, `/tmp/gov-os-lead-W2-66/`) are removed now, after a re-check just before removal that no process holds anything in them.
+  5. **W2-67 (test hygiene) comes forward to the next free slot.** It removes the tree-copying tests that cause these inode explosions and much of the close time. Its acceptance revisions still close after W2-07 is pinned (DEC-896 item 3).
+     - **The orchestrator's application of the overlap rule (the prompt §3):** W2-67 starts with the folders no ticket in flight holds. Its W1-30 and `tests/unit/close` work waits for W2-07's and W2-66's merges, and its W2-50 scale and hang cases wait for W2-69's.
+  6. **B (a), W2-07's test-designer batch widened to the 196 cases.** Each revision carries a `Rewrite-Reason:` naming its decision, and no expectation is lowered.
+     - W1-30's shared fixture (`tests/acceptance/W1-30/w1_30_support.py`, `tests/acceptance/W1-30/conftest.py`), so its fixture projects are green under the in-close `gov check` (DEC-868 item 1 (b)). This clears 175 cases.
+     - The 20 gate-order cases, to DEC-868 item 3's order:
+       - `test_w1_30_r9_every_finding.py` (8);
+       - `test_w1_30_r13_refused_runs.py` (3);
+       - `test_w1_30_check_blocks.py::test_a_refusal_where_gov_check_blocks_is_counted`;
+       - `test_w1_30_governance_checks.py::test_a_refusal_for_a_red_check_is_counted`;
+       - `test_w1_30_close.py::test_regression_runs_to_end_all_failures_collected`;
+       - `test_w1_30_containment_places.py` (2);
+       - `test_w1_30_iteration.py::test_mixed_causes_reach_escalation`;
+       - `test_w1_30_repair_ticket.py` (2);
+       - `tests/acceptance/W2-53/test_w2_53_load_sensitive.py::test_an_entry_the_owner_did_not_add_is_refused_naming_it_and_its_test_is_not_run_again`.
+     - The repair-ticket case to KPI 8: `test_w1_30_r8_tree.py::test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured`.
+     - **The superseded expectations, marked under DEC-866:**
+       - DEC-492 (marked `17e5c3a9`);
+       - DEC-490's part that an untracked repair ticket of the ticket being closed does not refuse: changed by W2-07's KPI 8, the close commits its repair ticket;
+       - DEC-493's overlay holding exactly the path map: changed by DEC-896 item 2 and DEC-903.
+  7. **P-W2-07-C and DEC-903:** accepted by the owner, as delegated.
+  8. **The order:** resume W2-07's verification first (it merges before W2-66), then W2-66's, one verification run at a time under the bridge cap.
+- **Changes:**
+  - DEC-898 (the bridge cap per verification run; one at a time; the lock);
+  - DEC-889 item 7 (W2-67's place);
+  - DEC-490 (the untracked repair ticket);
+  - DEC-493 (the overlay);
+  - DEC-880 item 2 (b) (the leads' verification, now under the lock and the cap).
+- **Where it goes (DEC-851):**
+  - this register, with DEC-898's, DEC-889's, DEC-490's and DEC-493's status lines marked;
+  - the prompt §3 (W2-67's place) and §15 (the cap, the lock, the trial), v3.21;
+  - `LEAD-w2-common.md` (the cap and the lock for a verification run; the orchestrator removes a returned lead's temp folder until the allow rule);
+  - RESUME HERE;
+  - W2-07's ticket file (its own commit, `Task: DAEO-r9ss`);
+  - W2-67's card and its ticket file (its own commit);
+  - the re-pin plan's settings regeneration (the allow rule);
+  - the orchestrator's `nightly.sh` and the trial (under the lock).
+- Next free id: DEC-905.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.289 | 2026-10-23 | Owner (recorded by the orchestrator, DEC-861): DEC-904 (P-W2-07-A-B with its addendum: the retention trial, measured, then the default for the close, the nightly and the leads; a lead's own temp clean-up by literal path at the settings regeneration; the bridge cap of 6,000,000 inodes and 60 GB per verification run, one at a time under a lock, the disk floor still enforced; the two stopped runs' temp folders removed; W2-67 forward to the next free slot; W2-07's test-designer batch widened to the 196 cases; DEC-490 and DEC-493 marked; P-W2-07-C and DEC-903 accepted; W2-07's verification first, then W2-66's). Next free id: DEC-905. |
