@@ -56,6 +56,9 @@
   `efa2e4b0`; W2-50 merge `2bf30b7c`, closed `01488b72`, row `68314b8e`; lens I in docs `210721e0`.
 - **Closed (gov close):** W2-01 (tk), W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed /
   2 merged-not-closed / 10 built and held / 0 in flight / 40 not started, of 58; keystones 0 / 8 / 1.
+- **Owner share (10-23 09:52), KEEP until the owner says delete:** `.gov-runtime/scratch/owner-share/review-2026-10-22/`
+  (27 numbered copies + README + SHA256SUMS, 1.7M) and `review-2026-10-22.zip` (510,610 bytes); gitleaks and the
+  secrets-indexing scan clean on both; `owner-share/.gitignore` (`*`) keeps it out of the record sync.
 - **Lens I:** all five reports in `docs/assessment/2026-10/` (I1..I4, I-SYNTHESIS; byte-identical). Their evidence
   folders kept under `/tmp/gov-os-assessment-I1..4` and `-H` (clones, mutation copies, temp trees removed).
 - **Disk (DEC-898):** 332 GB used (35 %), 30.4M inodes (46 %), from 640 GB / 62.6M (94 %) at 20:15. Still to look
