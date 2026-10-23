@@ -1,4 +1,4 @@
-"""Support code for the W1-01 acceptance tests (standard library only).
+"""Support code for the W1-01 acceptance tests (standard library, and PyYAML for the path map).
 
 Two things live here:
 
@@ -21,7 +21,8 @@ Two things live here:
      characters; a rule without ``*`` matches the exact command. A compound
      command is denied when any of its parts is denied.
 
-2. Readers for the records the ticket names: git history and ticket frontmatter.
+2. Readers for the records the ticket names: git history and ticket frontmatter,
+   and the path map's ``acceptance_exemptions`` (DEC-906; read with PyYAML).
 """
 
 from __future__ import annotations
@@ -35,6 +36,8 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 SETTINGS_REL = ".claude/settings.json"
 BOOTSTRAP_REL = "governance/project/bootstrap.md"
 TOOL_REGISTRY_REL = "governance/project/tool-registry.yaml"
+PATH_MAP_REL = "governance/project/path-map.yaml"
+EXEMPTIONS_KEY = "acceptance_exemptions"
 TEST_DESIGNER_ROLE = "independent-test-designer"
 
 FILE_EDIT_TOOLS = ("Edit", "Write", "NotebookEdit")
@@ -271,20 +274,49 @@ def merge_offences(sha, path, root=REPO_ROOT):
     return offences
 
 
+def acceptance_exemptions(root=REPO_ROOT):
+    """{full commit id: decision} of the path map's ``acceptance_exemptions`` (DEC-906 item 2).
+
+    The list sits beside ``accepted_history`` and only the owner commits to it.
+    Each entry is ``{commit: <full sha>, decision: <DEC id>}``. No path map, no
+    key, an empty list, and an entry of another shape (no ``DEC-<n>`` decision,
+    a commit that is not a string) exempt nothing. A commit is matched by its
+    whole id only, so an abbreviated id exempts nothing.
+    """
+    path = Path(root) / PATH_MAP_REL
+    if not path.is_file():
+        return {}
+    import yaml
+
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    entries = data.get(EXEMPTIONS_KEY) if isinstance(data, dict) else None
+    exempt = {}
+    for entry in entries if isinstance(entries, list) else []:
+        commit = entry.get("commit") if isinstance(entry, dict) else None
+        decision = entry.get("decision") if isinstance(entry, dict) else None
+        if isinstance(commit, str) and isinstance(decision, str) and re.fullmatch(r"DEC-\d+", decision.strip()):
+            exempt[commit.strip()] = decision.strip()
+    return exempt
+
+
 def acceptance_test_offenders(root=REPO_ROOT, path="tests/acceptance"):
     """One line per commit on HEAD's history that touches ``path`` and may not.
 
     - A commit that carries ``Role: independent-test-designer`` passes.
-    - Any other non-merge commit is an offender.
+    - Any other non-merge commit is an offender, unless its full id is listed in
+      the path map's ``acceptance_exemptions`` (DEC-906 item 2). A ``Role: owner``
+      trailer alone exempts nothing.
     - Any other merge commit is an offender unless ``merge_offences`` is empty
       (DEC-253: an integration merge of test-designer commits).
     """
+    exempt = acceptance_exemptions(root)
     offenders = []
     for sha in commits_touching(path, root):
         if TEST_DESIGNER_ROLE in commit_roles(sha, root):
             continue
         if len(commit_parents(sha, root)) < 2:
-            offenders.append(sha[:12])
+            if sha not in exempt:
+                offenders.append(sha[:12])
             continue
         offences = merge_offences(sha, path, root)
         if offences:

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import os
 import re
+import subprocess
 
 import pytest
 
@@ -40,7 +42,19 @@ def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rule
     DEC-253 (rewrite after implementation, "owner decision: integration merges"):
     a merge commit passes when every change it brings under tests/acceptance/
     comes from commits on the merged side carrying the test designer's role.
-    Every non-merge commit is checked as before.
+
+    DEC-906 item 2 (rewrite, W2-70): a non-merge commit without the test
+    designer's role passes only when its full id is listed in the path map's
+    ``acceptance_exemptions`` ({commit: <full sha>, decision: <DEC id>}, beside
+    ``accepted_history``). Any other commit stays red, an owner's included: a
+    ``Role: owner`` trailer alone exempts nothing until W2-44 binds trailers to
+    the launch. The list's only entry is the owner's own commit
+    ``c9a08678644485a7528bc875164e110881b63d93``, citing DEC-900.
+
+    Expected red until that entry is committed: this case fails naming
+    ``c9a086786444``. It is the owner's entry, not this ticket's; once it is in,
+    the case is green. (A note for W1-01's README, which is not in W2-70's
+    paths.)
     """
     if not w1_05_landed:
         tool, target = ACCEPTANCE_PROBE
@@ -50,7 +64,107 @@ def test_only_the_test_designer_commits_to_acceptance_tests(repo_root, deny_rule
     offenders = support.acceptance_test_offenders(repo_root)
     assert not offenders, (
         "commits touch tests/acceptance/** without the trailer "
-        f"`Role: {support.TEST_DESIGNER_ROLE}`:\n" + "\n".join(offenders)
+        f"`Role: {support.TEST_DESIGNER_ROLE}`, and are not listed by their full id in "
+        f"{support.PATH_MAP_REL} `{support.EXEMPTIONS_KEY}`:\n" + "\n".join(offenders)
+    )
+
+
+# --------------------------------------------------------------------------
+# DEC-906 item 2: the exemption list, against repositories built here
+# --------------------------------------------------------------------------
+
+_FIXTURE_TEST = "tests/acceptance/W1-99/test_fixture.py"
+# Fixed author, committer and dates: two commits differ in their id only by what they hold.
+_FIXTURE_ENV = {
+    "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_SYSTEM": os.devnull,
+    "GIT_AUTHOR_NAME": "The owner", "GIT_AUTHOR_EMAIL": "owner@example.invalid",
+    "GIT_COMMITTER_NAME": "The owner", "GIT_COMMITTER_EMAIL": "owner@example.invalid",
+    "GIT_AUTHOR_DATE": "2026-10-23T09:00:00Z", "GIT_COMMITTER_DATE": "2026-10-23T09:00:00Z",
+}
+
+
+def _git(repo, *args):
+    proc = subprocess.run(["git", "-C", str(repo), "-c", "commit.gpgsign=false", *args], capture_output=True,
+                          text=True, check=False, env=dict(os.environ, **_FIXTURE_ENV))
+    assert proc.returncode == 0, f"git {' '.join(args)} failed in the fixture repository: {proc.stderr.strip()}"
+    return proc.stdout.strip()
+
+
+def _commit(repo, files, subject, role):
+    for rel, text in files.items():
+        (repo / rel).parent.mkdir(parents=True, exist_ok=True)
+        (repo / rel).write_text(text, encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-q", "-m", subject, "--trailer", "Task: decision-record", "--trailer", f"Role: {role}")
+    return _git(repo, "rev-parse", "HEAD")
+
+
+def _fixture_repo(directory):
+    """A repository with one commit outside tests/acceptance/ (the same id in every fixture repository)."""
+    directory.mkdir()
+    _git(directory, "init", "-q", "-b", "main")
+    _commit(directory, {"README.md": "# fixture\n"}, "base", "orchestrator")
+    return directory
+
+
+def _path_map(repo, body):
+    """The fixture's stand-in path map, in the working tree, where the case reads this repository's."""
+    path = repo / support.PATH_MAP_REL
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("version: 1\naccepted_history: []\n" + body, encoding="utf-8")
+
+
+def _listing(*shas, decision="DEC-900"):
+    return f"{support.EXEMPTIONS_KEY}:\n" + "".join(f'  - commit: "{sha}"\n    decision: {decision}\n' for sha in shas)
+
+
+def _named(sha, offenders):
+    return any(line.split()[0] == sha[:12] for line in offenders)
+
+
+def test_a_listed_owner_commit_is_not_an_offender(tmp_path):
+    """DEC-906 item 2: a non-merge ``Role: owner`` commit touching tests/acceptance/, listed by its full id."""
+    repo = _fixture_repo(tmp_path / "repo")
+    listed = _commit(repo, {_FIXTURE_TEST: "VALUE = 1\n"}, "Owner decision: a retirement", "owner")
+    _commit(repo, {_FIXTURE_TEST: "VALUE = 2\n"}, "the designer revises", support.TEST_DESIGNER_ROLE)
+    assert listed in support.commits_touching("tests/acceptance", repo), "premise: the owner commit touches tests"
+    _path_map(repo, _listing(listed))
+    assert support.acceptance_test_offenders(repo) == [], f"{listed} is listed by its full id and is still named"
+
+
+@pytest.mark.parametrize("listing", ["the-first-only", "empty-list", "no-key", "no-path-map"])
+def test_an_unlisted_owner_commit_stays_an_offender(tmp_path, listing):
+    """Any other owner commit stays red; a path map with no list or an empty one exempts nothing."""
+    repo = _fixture_repo(tmp_path / "repo")
+    first = _commit(repo, {_FIXTURE_TEST: "VALUE = 1\n"}, "Owner decision: a retirement", "owner")
+    second = _commit(repo, {_FIXTURE_TEST: "VALUE = 2\n"}, "Owner decision: another retirement", "owner")
+    if listing != "no-path-map":
+        _path_map(repo, {"the-first-only": _listing(first), "empty-list": f"{support.EXEMPTIONS_KEY}: []\n",
+                         "no-key": ""}[listing])
+    offenders = support.acceptance_test_offenders(repo)
+    assert _named(second, offenders), f"the unlisted owner commit {second[:12]} is not an offender: {offenders}"
+    assert _named(first, offenders) is (listing != "the-first-only"), (
+        f"the owner commit {first[:12]} with {listing}: {offenders}"
+    )
+
+
+def test_only_the_exact_listed_commit_is_exempt(tmp_path):
+    """A look-alike of the listed commit (same parent, message, trailers, author and dates, other content) has
+    another full id and stays red; an abbreviated id of a real offender exempts nothing."""
+    subject = "Owner decision DEC-900: a retirement"
+    twin = _fixture_repo(tmp_path / "twin")
+    listed = _commit(twin, {_FIXTURE_TEST: "VALUE = 'as listed'\n"}, subject, "owner")
+    repo = _fixture_repo(tmp_path / "repo")
+    assert _git(repo, "rev-parse", "HEAD") == _git(twin, "rev-parse", f"{listed}^"), "premise: the same parent"
+    look_alike = _commit(repo, {_FIXTURE_TEST: "VALUE = 'other content'\n"}, subject, "owner")
+    assert look_alike != listed, "premise: the look-alike's content differs, so its id differs"
+    assert _git(repo, "show", "-s", "--format=%B%an%ae%ad%cd", look_alike) == \
+        _git(twin, "show", "-s", "--format=%B%an%ae%ad%cd", listed), "premise: message, trailers, author and dates match"
+    _path_map(repo, _listing(listed, look_alike[:7], look_alike[:12], look_alike[:39]))
+    offenders = support.acceptance_test_offenders(repo)
+    assert offenders == [look_alike[:12]], (
+        f"the look-alike {look_alike[:12]} of the listed {listed[:12]}, listed only by abbreviated ids, "
+        f"is not the one offender: {offenders}"
     )
 
 
