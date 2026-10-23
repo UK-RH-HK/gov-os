@@ -54,6 +54,11 @@
   load_sensitive 30); pytest-timeout 2.4.0 installed (user site); pushed w2/integrate `c9a08678`, record/w2
   `d8e5e53d`; cleanup lists 1, 2, 4, 6 deleted by the owner (74 G used, 1.83 M inodes). **DEC-902 `f78f9799`**
   (standing sweep; prompt v3.20; registry; rows W2-M405 -> W2-21 `9662354e`, W2-L415 -> W2-57 `a05b5f66`).
+- **W2-69 run 1 returned PACKAGES (head `cfea8a26`):** the chance red fixed (rows read value by value, freed space
+  as backstop, pieces pinned by blank lines, compaction), 253/253 own cases, gov check green, W2-L373 done; review 2
+  (last, DEC-413) failed on F1': 10-14 KB key blocks missed at piece edges (fails open). **P1 `packages/
+  P-W2-69-R2-1.md` (`f47c3c47`) PINGED:** rec (a) one more round + one probe beyond DEC-413 (owner exception), with
+  P-3 (filter cases) and P-4 (two daemon cases to serial-only.txt by its designer). Its temp removed.
 - **W2-70 DONE and MERGED `efdc4188`** (tree == merge-tree; probe_impact 0): the two nested reruns retired; W1-01's
   history and merge cases read `acceptance_exemptions` (owner commit C `18ad2382`); final run 15,476 passed, 0
   failed; serial 262 passed. **W1-01's red has LEFT integrate.** Merged-not-closed: closes once W2-07 is pinned.

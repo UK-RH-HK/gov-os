@@ -61,10 +61,21 @@
   passed 64.6 s (log/ab-w1-19.txt). Timed path (fusion search, refresh False) runs no ticket code.
 - Lead commit cfea8a26 = CP-DAEO-rmbe-0006 = HEAD TO PROBE for review 2.
 
-## Now
-- review 2 (LAST, DEC-413) running: brief `briefs/reviewer-2.md`, log `log/reviewer-2.json`, tripwire-before-7.
-- If PASS: write docs/probes/DAEO-rmbe/PR-DAEO-rmbe.md, commit (only that), DEC-868 collect check, return DONE.
-- If FAIL: no third review; findings -> return (residuals / package), draft under probes/.
+## Review 2 (session 1097b092-6b28-4a54-b722-5997c78dc932, sandboxed, max) at cfea8a26: FAIL — the LAST review
+- F1' yes/fails open: private-key blocks > 9,216 bytes (the overlap) missed past gitleaks' first read (~55 KB) when a
+  piece cut falls inside; base found them in paragraph text (0-1 of 53 missed vs 6-15 of 53). PGP exports with 2-3
+  subkeys ~10.4-13.6 KB. Filter shares the miss.
+- F2 no/fails open (damaged FTS5 leaf read as no terms) -> Wave 3 row. F3 no/other (fts5vocab blocks compaction)
+  -> DEC-803 entry criterion.
+- Draft: probes/PR-DAEO-rmbe-review2-DRAFT-fail.md. No probe record committed (only passing ones are, DEC-733).
+- Tripwire 7: no change here.
+- collect-3 at cfea8a26: "16023/16025 tests collected (2 deselected) in 7.77s".
+
+## Returned: PACKAGES (P-W2-69-R2-1 for F1', DEC-413/DEC-105 options a/b/c; plus P-3, P-4)
+- Nothing may be committed after cfea8a26 except a passing probe record of that head.
+- A resume (if the owner picks (a)): a fresh test-design batch for blocks of ~9-24 KB past the first read
+  (paragraph text and no blank lines, filter and check), a fresh engineer, re-verify, and a probe the owner
+  allows beyond DEC-413's two.
 - Then: red check of the new cases; engineer-2 (fresh, old form) with the failing output only; verify (rebuild,
   close-form suites, gov check); review 2 = the second and LAST review (DEC-413); probe record if pass.
 
