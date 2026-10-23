@@ -79,6 +79,7 @@ def test_the_record_reading_set_reads_the_pre_close_gate_s_own_check_result(fixt
     ``gov check`` again."""
     support.widget_change(fixture, sandbox)
     gate = support.close_support.run_gov(fixture.root, sandbox, "check", "--json")
+    assert gate.stdout.strip(), f"the fixture's gate printed no check result\n{gate.describe()}"
     result = tmp_path / "gate-check.json"
     result.write_text(gate.stdout, encoding="utf-8")
     run = fixture.close(sandbox, support.CHECK_RESULT_OPTION, str(result))

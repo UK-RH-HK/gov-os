@@ -31,7 +31,7 @@ settings, its test runs).
 | Suite | Ticket's paths | Role in the cases |
 |---|---|---|
 | `W2-aa` | `src/gov/widget/**` | the ticket closed (`PROJ-aaaa`) |
-| `W1-bb`, `W1-bz` | `src/gov/widget/**`, `src/gov/widget/thing.py` | overlap a widget change; W1-bb imports a name from a bare `conftest` (W1-35's form, lens H finding 17), so a run given the two folders as a list cannot collect it |
+| `W1-bb`, `W2-bz` | `src/gov/widget/**`, `src/gov/widget/thing.py` | overlap a widget change; W1-bb imports a name from a bare `conftest` (W1-35's form, lens H finding 17), so a run given the two folders as a list cannot collect it |
 | `W2-cc`, `W1-dd` | gadget, gizmo | not reached by a widget change |
 | `W1-gg`, `W1-hh`, `W2-ii` | gear, hinge, idle | `gg_support` (W1-gg) is imported by `hh_support` (W1-hh), imported by W2-ii |
 | `W1-rr` | reader | `test_rr_records.py` reads the register: the record-reading set |

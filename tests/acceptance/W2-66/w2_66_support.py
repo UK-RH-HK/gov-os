@@ -124,7 +124,7 @@ TICKET, WBS = "PROJ-aaaa", "W2-aa"
 SUITES = {
     "W2-aa": ("PROJ-aaaa", ["src/gov/widget/**"]),         # the ticket closed by every case
     "W1-bb": ("PROJ-bbbb", ["src/gov/widget/**"]),         # overlaps a widget change; W1-35's bare conftest import
-    "W1-bz": ("PROJ-bzbz", ["src/gov/widget/thing.py"]),   # overlaps it too, with a conftest of its own
+    "W2-bz": ("PROJ-bzbz", ["src/gov/widget/thing.py"]),   # overlaps it too, with a conftest of its own
     "W2-cc": ("PROJ-cccc", ["src/gov/gadget/**"]),
     "W1-dd": ("PROJ-dddd", ["src/gov/gizmo/**"]),
     "W1-gg": ("PROJ-gggg", ["src/gov/gear/**"]),           # holds gg_support
@@ -233,8 +233,8 @@ def project_files(told):
     files["tests/acceptance/W1-bb/conftest.py"] = 'BB_NAME = "bb"\n'
     files[node_of("W1-bb").split("::")[0]] = _telling(case_of("W1-bb"), told, body="assert BB_NAME == 'bb'",
                                                       head="from conftest import BB_NAME  # noqa: E402\n")
-    files["tests/acceptance/W1-bz/conftest.py"] = 'BZ_NAME = "bz"\n'
-    files[node_of("W1-bz").split("::")[0]] = _telling(case_of("W1-bz"), told, body="assert BZ_NAME == 'bz'",
+    files["tests/acceptance/W2-bz/conftest.py"] = 'BZ_NAME = "bz"\n'
+    files[node_of("W2-bz").split("::")[0]] = _telling(case_of("W2-bz"), told, body="assert BZ_NAME == 'bz'",
                                                       head="from conftest import BZ_NAME  # noqa: E402\n")
     # Test-side imports of shared helpers: W2-ii imports W1-hh's helper, which imports W1-gg's.
     files[GG_HELPER] = "VALUE = 1\n"

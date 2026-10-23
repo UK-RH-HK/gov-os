@@ -1,7 +1,7 @@
 """Part 1, KPI 1, 3, 4 and 5: a one-module change outside the shared core runs a scoped regression.
 
 One close of the fixture project, shared by the module's cases: the ticket changes ``src/gov/widget/thing.py``
-(its own paths, and W1-bb's and W1-bz's), on a project whose base is the initial commit (a green nightly
+(its own paths, and W1-bb's, a Wave 1 ticket's, and W2-bz's, a Wave 2 ticket's), on a project whose base is the initial commit (a green nightly
 record names it, committed after it: a record-only commit inside the change). README, "Part 1".
 """
 
@@ -74,7 +74,7 @@ def test_the_unit_tests_run_and_are_named(scoped):
     assert support.UNIT in why, f"tests/unit is not named with {support.UNIT}: {evidence.get('selected')}"
 
 
-@pytest.mark.parametrize("wbs", ["W1-bb", "W1-bz"])
+@pytest.mark.parametrize("wbs", ["W1-bb", "W2-bz"])
 def test_a_suite_whose_ticket_paths_overlap_the_change_runs_and_is_named_with_why(scoped, wbs):
     evidence = _evidence(scoped)
     fixture, _, _ = scoped
@@ -101,11 +101,11 @@ def test_a_suite_the_change_cannot_reach_is_left_out_and_named_with_why(scoped, 
 
 
 def test_the_selection_keeps_the_full_runs_form_so_a_bare_conftest_import_still_collects(scoped):
-    """W1-35's collection (lens H finding 17): W1-bb imports a name from a bare ``conftest``; with W1-bz selected
+    """W1-35's collection (lens H finding 17): W1-bb imports a name from a bare ``conftest``; with W2-bz selected
     too, a run given the two folders as a list fails to collect it. The full run's form collects it."""
     fixture, run, _ = scoped
-    assert fixture.ran(support.case_of("W1-bb")) and fixture.ran(support.case_of("W1-bz")), \
-        f"W1-bb or W1-bz did not run: the selection does not keep the full run's form\n{run.describe()}"
+    assert fixture.ran(support.case_of("W1-bb")) and fixture.ran(support.case_of("W2-bz")), \
+        f"W1-bb or W2-bz did not run: the selection does not keep the full run's form\n{run.describe()}"
 
 
 def test_the_record_reading_set_runs_on_a_scoped_close_and_is_named(scoped):
