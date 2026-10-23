@@ -1,7 +1,7 @@
 # Governance OS — Tool & Architecture Decision Register
 
 **Register ID:** GOV-DR
-**Version:** 0.286 (the version table at the end of each section gives the history)
+**Version:** 0.287 (the version table at the end of each section gives the history)
 **Date:** 2026-10-20
 **Applies to:** the current Rust Governance OS repository *and/or* a new assembled `gov-os` repository
 **Normative sources this register interprets (not replaces):**
@@ -10272,7 +10272,7 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 ## 285. The owner's standing rule of 2026-10-22 on disk space, inodes and scratch budgets (register v0.285, recorded by the W2 orchestrator on branch `w2/integrate`)
 
 ### DEC-898 — The resource gate checks free disk space and free inodes; every auditor, trial and lead has a scratch budget, cleans up as it goes and reports its scratch size
-- **Status:** ACCEPTED (owner, 2026-10-22, in the chat, standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`). The rule is the owner's. The figures in items 1 and 2 are the orchestrator's proposal, in force provisionally until the owner confirms or changes them. They are stricter only. · **Under:** DEC-798, DEC-847, DEC-880, DEC-889 item 16, DEC-855, DEC-851, DEC-861 · **Basis:** · **Changed by:** DEC-899 item 5: the figures are confirmed by the owner and no longer provisional.
+- **Status:** ACCEPTED (owner, 2026-10-22, in the chat, standing; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-22)`). The rule is the owner's. The figures in items 1 and 2 are the orchestrator's proposal, in force provisionally until the owner confirms or changes them. They are stricter only. · **Under:** DEC-798, DEC-847, DEC-880, DEC-889 item 16, DEC-855, DEC-851, DEC-861 · **Basis:** · **Changed by:** DEC-899 item 5: the figures are confirmed by the owner and no longer provisional. · **Changed by:** DEC-902: the weekly sweep joins the scratch rules (only in a quiet moment, nothing newer than 24 hours, nothing held open, nothing cited as evidence).
   - **Lens I area 4's folder** (`/tmp/gov-os-assessment-I4/`) held about 7.0 million files and folders (61 GB). About 5.3 million files (46 GB) were in `tmp/bt/`: from 18:31 to 19:04 that auditor gave each planted-fault run its own pytest base folder, which skips pytest's clean-up of old folders, and the suites it ran make whole-tree copies per test.
   - **The disk's inodes reached 98 % use.** One run could not write its result (ENOSPC).
   - **Before the orchestrator's clean-up of the four lens I folders** (about 20:15): 62,589,143 of 67,108,864 inodes used (94 %); 640 GB of 1,007 GB used (67 %).
@@ -10408,3 +10408,55 @@ The owner committed DEC-859 and DEC-860 (`f0680605`) and set a standing rule tha
 | Version | Date | Change |
 |---|---|---|
 | 0.286 | 2026-10-23 | Owner (recorded by the orchestrator, DEC-861): DEC-899 (the review point: the drafts of W2-66, W2-07, W2-68, W2-67, W2-57 and W2-70 confirmed with P-IS-1 to P-IS-7 (a), P-I1-2 at the settings regeneration; W2-66 and W2-07 built in parallel, W2-07 merging first, W2-66 merging back with a fresh probe; W1-02's and W1-05's p95 load_sensitive entries removed by the owner's commit; two re-pins; DEC-898's figures confirmed; area 4 not resumed; the interim skip guard; P-IS-13 and the other packages later; the share archived and deleted; a disk inventory). DEC-900 (the AR-9 ruling: RETR-X-02's accepted outcome is the stated gap; W1-42's two accepted reds retired with their entries in one owner commit; accepted_reds empty). Delegated: DEC-901 (DEC-281's 0.30 kept with a recorded reason). Next free id: DEC-902. |
+
+## 287. The owner's acts and standing rule of 2026-10-23 on the disk (register v0.287, recorded by the W2 orchestrator on branch `w2/integrate`)
+
+### DEC-902 — The weekly sweep, a standing rule; the cleanup of 2026-10-23; the owner's commits A and B; pytest-timeout installed
+- **Status:** ACCEPTED (owner, 2026-10-23, in the chat, standing for item 1; recorded and committed by the orchestrator with `Role: orchestrator`, `Task: decision-record`, `Decided-by: owner (chat, 2026-10-23)`) · **Under:** DEC-898, DEC-899 items 3 and 10, DEC-900, DEC-892 b, DEC-889 item 13, DEC-861, DEC-851 · **Basis:** the cleanup proposal (`governance/project/orchestration/packages/CLEANUP-PROPOSAL-2026-10-23.md`, filed with this record) and the disk inventory behind it.
+- **Decision:**
+  1. **The sweep (owner, standing).**
+     - **What:** the orchestrator sweeps throwaway areas under `/tmp` and run folders, weekly (on Monday) and when the disk gate (DEC-898) nears its floor.
+     - **What it may remove:**
+       - pytest's `garbage-*` folders and its numbered run folders other than the newest three;
+       - Claude Code's session temp folders under `/tmp/claude-1000` of sessions not running;
+       - the launcher's `/tmp/gov-launch-*` folders;
+       - the code-graph daemon's run folders under `/tmp/gov-cbm-1000`;
+       - `/tmp/gov-check-*` and `/tmp/gov-testcache-*`;
+       - the worktrees and branches of closed tickets, after a sync.
+     - **Its conditions:**
+       - only in a quiet moment: no lead, close, nightly run or trial running;
+       - nothing modified in the last 24 hours;
+       - nothing a running process holds open (`lsof`);
+       - nothing cited as evidence;
+       - never the live session's own folder, and never the live code-graph daemon's folder.
+     - **What it never touches:** `~/.cache`, a ticket in progress's `~/gov-os-runs/` folder, the record worktree, the owner's EXAMIN copy and the workbench.
+     - **How it runs:** by `.gov-runtime/scratch/orchestrator/tools/sweep.py`. It lists what it removed and what it skipped, and why.
+     - **The figures before and after** go in the daily digest.
+  2. **The cleanup of 2026-10-23 (owner's acts).**
+     - **Removed by the owner:** lists 1, 2, 4 and 6 of the proposal, 289 folders, none skipped.
+       - Claude Code's finished sessions' temp, pytest's two garbage folders, the launcher's two engineer temps, W2-48's cache folders and the empty check folders.
+       - Before: 332 GB used (35 %), 30,267,328 inodes used (46 %).
+       - After: 74 GB used (8 %), 882 GB available; 1,826,466 inodes used (3 %), 65,282,398 free.
+     - **Lists 3 and 5 (pytest's old run folders, 58; the code-graph run folders, 10,575)** are approved only under item 1's conditions, because leads are running and the daemon shares that folder. The orchestrator runs them in the first quiet moment and lists what it skipped and why.
+  3. **The owner's commits:**
+     - `596870bd`: W1-02's and W1-05's p95 `load_sensitive` entries removed (DEC-899 item 3);
+     - `c9a08678`: W1-42's RETR-X-02 case and governance-share case retired with both `accepted_reds` entries (DEC-900).
+     Both are `Role: owner`, both were validated with the pinned ratchet first (DEC-895), and `accepted_reds` is empty. The owner pushed `w2/integrate` at `c9a08678` and `record/w2` at `d8e5e53d`.
+  4. **pytest-timeout 2.4.0** is installed by the owner in the user site of `/usr/bin/python3`, its wheel's hash checked (sha256 `c42667e5cdadb151aeb5b26d114aff6bdf5a907f176a007a30b940d3d865b5c2`). It is recorded in the tool registry, approved by DEC-892. The first re-pin's environment gets the same wheel.
+  5. **Two rows:**
+     - **W2-M405:** the launcher left two engineer sandboxes' temp folders behind on 2026-10-20, 4.1 million inodes and 36 GiB. W2-C002's fix at W1-28 no longer holds. Fixed by W2-21: the launcher removes a sandboxed worker's temp folder when the worker ends.
+     - **W2-L415:** two W1-38 rulesync cases (`TestGenerateCheck::test_check_clean_after_generate` and `TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family`) errored under load in W2-50's run 9 (`rulesync generate` timed out at 30 s) and passed alone. They are not on `load_sensitive`. Fixed by W2-57's first item (the probe's limits).
+- **Changes:** DEC-899 item 10 (the proposal decided); DEC-898 (the sweep joins its scratch rules).
+- **Where it goes (DEC-851):**
+  - this register;
+  - the prompt §15 (the sweep, beside the disk gate; the daily digest's figures), v3.20;
+  - RESUME HERE;
+  - the tool registry;
+  - the Wave 2 list (rows W2-M405, W2-L415);
+  - W2-21's card (the launcher's temp clean-up, row W2-M405).
+  It does not reach the lead or auditor briefs: the sweep is the orchestrator's, and DEC-898 already tells sessions to clean up after themselves.
+- Next free id: DEC-903.
+
+| Version | Date | Change |
+|---|---|---|
+| 0.287 | 2026-10-23 | Owner (recorded by the orchestrator, DEC-861): DEC-902 (standing: a weekly sweep of throwaway areas under /tmp and run folders, only in a quiet moment, nothing newer than 24 hours, nothing held open, nothing cited as evidence, never the live session's or daemon's folder, figures in the daily digest; the cleanup of 2026-10-23: lists 1, 2, 4 and 6 removed by the owner, 74 GB and 1.8 M inodes used after; lists 3 and 5 under the sweep's conditions; the owner's commits 596870bd and c9a08678; pytest-timeout 2.4.0 installed; rows W2-M405 and W2-L415). Next free id: DEC-903. |
