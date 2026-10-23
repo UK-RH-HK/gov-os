@@ -20,9 +20,10 @@ Behaviour 5: another process holds a SQLite store under ``.gov-runtime/`` during
 ``gov rebuild --json``, so the rebuild cannot compact it: the rebuild names that
 store, with the reason, on its standard error as well as in its JSON result. The
 held store is the code-graph store, written by the stand-in tool, which starts the
-holding process before it returns (the code index is the rebuild's last store, so
-the store is held from its build to the end of the rebuild). Its exit code is not
-asked. Today the JSON result alone names it.
+holding process (an exclusive lock, so no way of compacting gets through) before
+it returns: the code index is the rebuild's last store, so the store is held from
+its build to the end of the rebuild. Its exit code is not asked. Today the JSON
+result alone names it.
 
 Every rebuild is full (never ``--no-embeddings``): the semantic index is built
 against the first batch's stand-in embedder on a loopback port.
@@ -34,6 +35,7 @@ import importlib.util
 import json
 import re
 import shutil
+import time
 from pathlib import Path
 
 import pytest
@@ -164,6 +166,9 @@ def test_a_store_the_rebuild_cannot_compact_is_named_with_its_reason_on_standard
         Path(str(hold) + ".release").touch()
         if daemon is not None and daemon.is_dir():
             shutil.rmtree(daemon, ignore_errors=True)
+    end = time.monotonic() + 30
+    while not Path(str(hold) + ".release.done").exists() and time.monotonic() < end:
+        time.sleep(0.05)       # the holder lets the store go before the test reads it
     rel = review.CODE_STORE_REL
     absolute = str(project / rel)
     assert Path(str(hold) + ".ready").exists(), f"premise: another process held {rel} during the rebuild"

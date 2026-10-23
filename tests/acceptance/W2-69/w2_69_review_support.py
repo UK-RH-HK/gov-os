@@ -186,14 +186,14 @@ _HOLDER = r'''
 import os, sqlite3, sys, time
 path, ready, release = sys.argv[1:4]
 connection = sqlite3.connect(path, isolation_level=None)
-connection.execute("BEGIN")
-connection.execute("SELECT count(*) FROM sqlite_master").fetchone()
+connection.execute("BEGIN EXCLUSIVE")
 open(ready, "w").close()
 end = time.monotonic() + 900
 while time.monotonic() < end and not os.path.exists(release):
     time.sleep(0.05)
 connection.execute("ROLLBACK")
 connection.close()
+open(release + ".done", "w").close()
 '''
 
 _CODE_STAND_IN = r'''#!@PYTHON@
