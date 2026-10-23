@@ -28,6 +28,7 @@ from pathlib import Path
 import pytest
 
 import w1_27_support as support
+import w2_67_doctor
 
 
 # =========================================================================== #
@@ -183,7 +184,7 @@ def test_stale_path_in_src_gov_cli_is_reported(gov, project, interface):
 # Point 3: an old path inside its new path is not a stale reference (DEC-456)
 # =========================================================================== #
 
-def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
+def test_old_path_inside_its_new_path_is_not_stale(sandbox, tmp_path):
     """An occurrence of an old path that is only a part of its own new path,
     in the file that names the new path, is not a stale reference.
 
@@ -191,8 +192,25 @@ def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
     docs/source/originals/<file>, which contains the old path (the bare
     file name) as a suffix.  Doctor reports it because the old path is
     contained in the new one.  This is not a stale reference.
+
+    Revised (W2-67, I4 §2.1; Rewrite-Reason: the result depends on every
+    tracked file's text): the case builds a small committed project of its
+    own instead of a copy of the whole tree, and runs this worktree's code
+    in it (DEC-732).  It reads doctor's ``path_compliance`` section, and a
+    control in the same project (a standalone reference to another moved
+    file) must be reported, so a doctor that reports nothing cannot pass.
     """
-    support.write_path_map(project, support.minimal_valid_path_map())
+    project = w2_67_doctor.small_project(tmp_path / "repo")
+
+    control_old = "control_target.py"
+    control_new = f"docs/source/originals/{control_old}"
+    (project / control_old).write_text("# control\n", encoding="utf-8")
+    support.commit_all(project, f"add {control_old}")
+    (project / control_new).parent.mkdir(parents=True, exist_ok=True)
+    (project / control_old).rename(project / control_new)
+    support.commit_all(project, f"move {control_old} to {control_new}")
+    (project / "notes.md").write_text(f"See {control_old} for the old layout.\n", encoding="utf-8")
+    support.commit_all(project, "a standalone reference to the control's old path")
 
     old_name = "subpath_target.py"
     new_rel = f"docs/source/originals/{old_name}"
@@ -214,7 +232,19 @@ def test_old_path_inside_its_new_path_is_not_stale(gov, project, interface):
     )
     support.commit_all(project, "add validator referencing new path")
 
-    run = gov("doctor", "--json")
+    run = w2_67_doctor.doctor(project, sandbox)
+    compliance = w2_67_doctor.section(run, "path_compliance")
+    references = compliance.get("moved_references")
+    assert isinstance(references, list), f"path_compliance.moved_references is not a list\n{run.describe()}"
+    assert any(ref.get("old_path") == control_old and ref.get("referenced_in") == "notes.md"
+               for ref in references), (
+        f"the control's standalone reference to {control_old} in notes.md is not reported, so the "
+        f"stale-path check did not run on this project\n{run.describe()}"
+    )
+    assert not [ref for ref in references if old_name in str(ref.get("old_path"))], (
+        f"doctor reports {old_name} as a moved-path reference although it appears only as part of its own "
+        f"new path ({new_rel}) in the file that names the new path (DEC-456 point 3)\n{run.describe()}"
+    )
     text = json.dumps(run.envelope())
 
     assert "subpath_target" not in text, (
