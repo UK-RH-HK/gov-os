@@ -1,6 +1,6 @@
 # CHECKPOINT — W2 orchestrator (`orchestrator DAEO-sdxk`)
 
-## RESUME HERE (2026-10-22 22:21 BST — W2-50 CLOSED 01488b72; lens I in docs; review bundle ACT-pinged, WAITING; next free DEC-899)
+## RESUME HERE (2026-10-23 10:37 BST — review point passed (DEC-899..901); W2-66, W2-07, W2-69 IN FLIGHT; ACT pending: owner commits A and B, install, cleanup; next free DEC-902)
 
 ### Standing owner rules (short; full text in the register and prompt v3.18; DEC-851)
 - **Window (DEC-838):** full window, no compaction threshold. **Checkpoint at every handover (DEC-837);** keep this
@@ -34,54 +34,48 @@
   `git -C /home/usain/Dynamic-Agentic-Engineering-OS push origin w2/integrate record/w2`.
 - **Supersession (DEC-866):** mark at once, sweep by id and value.
 
-### Plan in force (DEC-884, DEC-889 items 14-15, DEC-892, DEC-896, DEC-897)
-- **REVIEW POINT: NO W2-66/67/68 work until the owner confirms the bundle in writing.** Bundle:
-  `drafts/review-bundle/00-INDEX.md` (+01 W2-66 ticket, 02 W2-66 card, 03 W2-68 card, 04 W2-67 card, 05 W2-57
-  ticket, 06 W2-07 card, 07 re-pin plan, 08 P-IS-5 corrections; added 10-23 on the owner's ask: 03b W2-68 ticket,
-  04b W2-67 ticket, 05b W2-57 card, 06b W2-07 ticket, 09 W2-70 ticket + card, 10 register draft DEC-899, and
-  ALL-DRAFTS-AND-PACKAGES.md (98,649 bytes, built by scratchpad combine_bundle.py, verbatim parts)). ACT pinged 10-22 after W2-50's close. Needs:
-  P-IS-1..7 (rec (a) each; the owner chooses the two p95 entries in P-IS-6), the re-pin plan, DEC-898's figures,
-  area 4's resume (rec no; the nightly covers it). P-IS-3 (a) -> new small ticket W2-70 (retire W1-05's
-  switch-over + W1-47's builder rerun; merges early, closes after W2-07 is pinned).
-- **First re-pin:** W2-58, W2-59, W2-65, W2-66, W2-07, W2-69; second: W2-68. W2-59 + W2-65 unmerged until just
-  before the first (an earlier merge needs a package). Until the first re-pin: no close unless gates (a)-(h)
-  predict a pass; DEC-897 (b): one proven re-run per close on a secrets chance red.
-- **W2-58, W2-63 merged-not-closed, wait for the first re-pin.**
-- Free slots now: **W2-69** (FULL; brief A5 to write; W2-L373 and P-IS-5 if taken), W2-65 (stacked on w2/W2-59;
-  after P-IS-5's path fix), the nightly (no worksteal; covers area 4's missing runs), held resumes by keystone.
+### Plan in force (DEC-896, DEC-897, DEC-899, DEC-900)
+- **Review point PASSED (DEC-899, `2f048613`).** Confirmed and committed, each ticket file with its Task:
+  - W2-66 `DAEO-c1uz` `eaabff01`; W2-07 `DAEO-r9ss` `6ec371c4`; W2-57 `DAEO-cy5o` (new) `e51689e5`;
+  - W2-70 `DAEO-uzme` (new, LITE) `a9aa5d55`; W2-68 + W2-67 cards `f4064457` (their ticket files when W2-66 merges);
+  - W2-13 `d48bdd92` + `120f6c72` (AR-9 ruled; quote fix); W2-14 `8c828e85`; W2-65 `d562ad04`; W2-69 `306d11c2`;
+  - MR-3 fixes `6a7995a5 b7bf96c8 230dc88a 2359abf0 b930ed41` (no tests/acceptance in an engineer's allowed_paths:
+    the test designer's files named in the body).
+- **IN FLIGHT (3 leads, started about 10:37 on `c2d539c6`):** W2-66 (`log/W2-66-A5-run1.json`), W2-07
+  (`log/W2-07-A5-run1.json`), W2-69 (`log/W2-69-A5-run1.json`). **W2-07 MERGES FIRST; then W2-66 merges integrate
+  back, re-verifies, fresh FULL probe** (owner exception to the overlap rule, DEC-899 item 2). W2-66 needs
+  pytest-timeout (owner install package, in the ACT ping). On each return: merge per §3, probe_impact, sync.
+- **First re-pin:** W2-58, W2-59, W2-65, W2-66, W2-07, W2-69 (W2-59 + W2-65 merge together just before it); the
+  settings regeneration drops `docs/source` read-deny rules (P-I1-2). Second: W2-68. Until then: no close unless
+  gates (a)-(h) predict a pass; DEC-897 (b); **the interim skip guard (DEC-899 item 7): close_queue.sh stops after a
+  close whose regression skip count is not 31, outputs uncommitted (`tools/skip_gate.py`)**.
+- **W2-58, W2-63 merged-not-closed, wait for the first re-pin.** W2-70 to start (LITE, test designer) in a slot.
+- **Owner acts pending (ACT pinged with them):** commit A (p95 entries out) then B (W1-42 retirement, accepted_reds
+  empty), `drafts/ACT-owner-commits-2026-10-23.md` (validated with the pin: 30 load_sensitive counted, 0 findings);
+  the pytest-timeout install; the disk cleanup proposal (`drafts/CLEANUP-PROPOSAL-2026-10-23.md`).
+- **Later packages:** P-IS-13 when W2-32 starts (owner leans (a)); P-IS-9..12, 14, 15 before their tickets.
 
-### Where things stand (10-22 22:22)
-- **Owner pushed through `49c24ac9`.** Since: DEC-893+894 `da3d77e1`; DEC-895 `365f1307`; DEC-896 `c4f2b303`;
-  DEC-897 `89e760fb`; W2-62 closed `d7daf01b` + rows `466c63ae`; W2-69 `89f043e2`; DEC-898 `17515bba`; W2-20 KPI
-  `efa2e4b0`; W2-50 merge `2bf30b7c`, closed `01488b72`, row `68314b8e`; lens I in docs `210721e0`.
+### Where things stand (10-23 10:37)
+- **Owner pushed through `49c24ac9`.** Since then all of DEC-893..DEC-901 and the commits above (unpushed).
 - **Closed (gov close):** W2-01 (tk), W2-53, W2-02, W2-54, W2-62, W2-50. Close success 5 of 18. Progress: 6 closed /
-  2 merged-not-closed / 10 built and held / 0 in flight / 40 not started, of 58; keystones 0 / 8 / 1.
-- **Owner share (10-23 09:52), KEEP until the owner says delete:** `.gov-runtime/scratch/owner-share/review-2026-10-22/`
-  (27 numbered copies + README + SHA256SUMS, 1.7M) and `review-2026-10-22.zip` (510,610 bytes); gitleaks and the
-  secrets-indexing scan clean on both; `owner-share/.gitignore` (`*`) keeps it out of the record sync.
-- **Lens I:** all five reports in `docs/assessment/2026-10/` (I1..I4, I-SYNTHESIS; byte-identical). Their evidence
-  folders kept under `/tmp/gov-os-assessment-I1..4` and `-H` (clones, mutation copies, temp trees removed).
-- **Disk (DEC-898):** 332 GB used (35 %), 30.4M inodes (46 %), from 640 GB / 62.6M (94 %) at 20:15. Still to look
-  at: `/tmp/pytest-of-usain` (61 run folders since 10-20), 44 `/tmp/gov-testcache-*`, `/tmp/gov-os-tooltrial`
-  (remove after trial d). My write to `~/gov-os-runs/W2-00/...` was refused by the guard: do not retry.
-- **Candidate rows (with the next record commit):** W1-38's `TestGenerateCheck::test_check_clean_after_generate`
-  and `TestRegisteredFamilyCheck::test_gov_check_lists_the_check_under_the_family` red under load, not on
-  load_sensitive (W2-50 run 9); the inode exhaustion of 10-22 (DEC-898).
-- **Trials:** redo trial d (rerunfailures -rR, -p no:randomly; randomly with its seed) in a quiet window, then
-  REMOVE /tmp/gov-os-tooltrial and show it.
-- **Path map placeholder:** the W1-38 load_sensitive reason's time (real: between 00:12 and 00:16 on 10-22) goes
-  into the owner's next ratchet commit or W2-57's removal.
-- **Credentials:** only two tracked fixtures (`fixtures/brownfield/project/.env`, `.../config/secrets.yaml`), W2-M398.
-- **`.git/config.lock`:** zero-byte read-only placeholder; leave alone. **W2-48's worktree** to remove after a sync
-  (branch kept, `2c3c46b5`).
+  2 merged-not-closed / 10 built and held / 3 in flight / 39 not started, of 60 (58 + W2-69, added 10-22 and
+  missed in two reports' totals, + W2-70; W2-57, W2-67, W2-68 were cards already counted); keystones 0 / 8 / 1.
+- **Lens H's raw files archived** `record/w2` `f8525d6a` (main/evidence/lens-H, sha256 in its README); the share's
+  README + SHA256SUMS `9e9c5768`; every share file has a committed original; **the share DELETED**.
+- **My slips today, fixed:** W2-13's KPI unquoted colon (ticket schema red) and five MR-3 paths (core-mutation red),
+  both from committing with core-schema only; record_checks.sh now runs W1-08's ticket test. Run the FULL
+  record_checks.sh before every ticket commit.
+- **Disk:** 332 GB used, 30.4M inodes. Inventory: `scratchpad/disk-inventory.tsv` (+ disk_inventory2.py output).
+- **Candidate rows:** W1-38's two rulesync cases red under load (W2-50 run 9); the inode exhaustion of 10-22.
+- **Trials:** redo trial d in a quiet window, then REMOVE /tmp/gov-os-tooltrial and show it.
+- **Path map placeholder:** the W1-38 load_sensitive reason's time (real: between 00:12 and 00:16 on 10-22).
+- **`.git/config.lock`:** leave alone. **W2-48's worktree** to remove after a sync (branch kept, `2c3c46b5`).
 
 ### Next
-1. Owner answers the bundle -> record (DEC-899 on), commit the confirmed drafts (each ticket file with its Task),
-   create W2-70 if P-IS-3 (a), start W2-66 + W2-07, then W2-69.
-2. Meanwhile: W2-69's lead brief; the nightly run in a quiet window; the daily digest (records since push, usage,
-   refusals, memory use); trial d redo; pytest-of-usain + testcache clean-up.
-3. Next free: DEC-899; ticket W2-70; rows W2-M405, W2-L415, W2-H063. Briefs: `tools/build_lead_brief.py <part>
-   <out> ID= W2= PROFILE= PATHS= ROWS= SOURCES= IMPL= EST=`.
+1. Owner's ACT: the two commits (A then B), the install, the cleanup approval. After A and B: record checks.
+2. Lead returns: W2-07 first -> merge; W2-66 -> merge back + fresh probe; W2-69 -> merge. probe_impact each.
+3. W2-70's lead in a free slot; the nightly in a quiet window; the daily digest.
+4. Next free: DEC-902; ticket W2-71; rows W2-M405, W2-L415, W2-H063.
 
 ### Never
 push/tag/rebase/main; amend w2/integrate; `gov approve`; Role: owner; `rebuild --no-embeddings`; tk close a W2

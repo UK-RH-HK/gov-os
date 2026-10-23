@@ -1,7 +1,3 @@
-ERROR: DAEO-cy5o: .tickets/DAEO-cy5o.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
-ERROR: DAEO-uzme: .tickets/DAEO-uzme.md is a file of the ticket folder that the store holds no record of (it cannot be read as a ticket, or the store was loaded before it); not measured
-ERROR: DAEO-7y6v: mandatory input 'DEC-900' not found in the store
-ERROR: DAEO-e82f: mandatory input 'DEC-899' not found in the store
-ERROR: DAEO-rmbe: mandatory input 'DEC-899' not found in the store
-ERROR: DAEO-zqvn: mandatory input 'DEC-900' not found in the store
-context-reproducibility: 0 ticket(s) failed, 6 error(s)
+Loading weights:   0%|          | 0/310 [00:00<?, ?it/s]Loading weights: 100%|██████████| 310/310 [00:00<00:00, 3758.03it/s]
+Default prompt name is set to 'query'. This prompt will be applied to all inference calls, except if a `prompt` or `prompt_name` parameter is provided.
+context-reproducibility: green
