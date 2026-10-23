@@ -1,44 +1,40 @@
 # W2-66 (DAEO-c1uz) lead checkpoint
 
-## State
-- Run 1. Started 2026-10-23 10:35. Base head c2d539c6 on w2/W2-66.
-- Head now 967f6205 (td-1's six commits: 14cd488a, 32cd885f [W1-30, Rewrite-Reason], 4c22e4aa, 6c45acd6, c05a31a5, 967f6205; all trailers checked: Task, Role: independent-test-designer, Implements: DEC-880, Co-Authored-By).
-- pytest-timeout: absent at 10:35; present at ~11:35 (2.4.0 in ~/.local/lib/python3.12/site-packages; not in the tool registry yet; the orchestrator's install). So KPI 8 is built in this run.
+## State: STOPPED on the scratch budget (DEC-898), returned PACKAGES (run 1)
+- Branch w2/W2-66, code head a384480a (eng-1), then the lead's checkpoint commit made at this stop (see git log).
+- Base c2d539c6. Commits: td-1 14cd488a, 32cd885f (W1-30, Rewrite-Reason), 4c22e4aa, 6c45acd6, c05a31a5, 967f6205;
+  lead 1475b46c (CP-0002); eng-1 388d5892, 117b6e64, 528013b3, a8bf29f8, a384480a.
+- pytest-timeout 2.4.0 installed in ~/.local (user site), not yet in the tool registry.
 
-## Decided (by the brief / register)
-- W2-07 merges first; this ticket returns DONE unmerged; run 2 merges w2/integrate back, re-verifies, fresh FULL probe.
-- Never write governance/project/path-map.yaml; test_inputs moves into the test map; its removal from the path map is the orchestrator's edit (name in return).
-- Interface: td-1's INTERFACE payload (in log/td-1.json result) is passed verbatim to the engineer.
+## Why stopped
+- After the lead's full parallel run (44 min, head a384480a), /tmp/gov-os-lead-W2-66/pytest-of-usain/pytest-1 holds
+  5,306,769 files and folders, about 47 GB (budget 20 GB / 1,000,000). `rm -rf` of it needs approval in this
+  session: not done, no other form tried. Package P-W2-66-S1.
 
-## Done
-1. td-1 (sandboxed, gov launch, xhigh): DONE, 12 fields OK. session cd7a3fdc-fc87-4c79-8b41-b9ff19d5006f, 33 min. 139 cases (W2-66 134 + W1-30 5).
-   - tripwire 1: worktree changes only tests/acceptance/W2-66, W1-30 and an empty harness folder tests/acceptance/.claude/.cc-writes (also in W2-58; invisible to git). Other trees: main tree head c2d539c6->c9a08678 (orchestrator's DEC-899/900 commits, W1-42 folder), W2-00-record head, W2-07 its own designer, W2-69 sandbox placeholder dotfiles (its lead's worker). None from td-1.
-   - did NOT use gov retrieve (says so). Guard read refusals: 0. Other refusals: a cd&&pytest compound needing approval; rm -rf of its smoke temp refused.
-2. Red check (lead): 133 failed, 6 passed, 136 s; every red for a README reason (64 no test map, 44 no evidence block, 4 no schema, 7 unknown --full/--check-result/nightly, 3 no report, 3 limit, 2 serial not scoped...). log/red.out, log/red.xml.
+## Verification so far (head a384480a)
+- rebuild-1: exit 0 (lexical, semantic, codeintel recreated). gov.__file__ = /home/usain/gov-os-worktrees/W2-66/src/gov/__init__.py
+- collect-only (DEC-868): "15912/15914 tests collected (2 deselected) in 10.41s", exit 0.
+- gov check: exit 0, 17 families, no RED; YELLOW: authority/role limits (core-decision-citations, old commits), product traceability (openspec-validate: openspec not on PATH in my run).
+- parallel run: 6 failed, 15613 passed, 30 skipped in 2648.76s (44:08). Failures:
+  - W2-66 research x3 (report not written yet: eng-2's round, expected);
+  - W1-42 x2 (accepted_reds in this branch; retired on w2/integrate by DEC-900);
+  - W1-39 test_w1_39_copy.py::test_copy_creates_the_overlay: CAUSED by this ticket (template's test-map copy enters the overlay; the case holds DEC-493's list) -> package P-W2-66-T1.
+- serial-only run: NOT run (stopped before it). Script ready: /tmp/gov-os-lead-W2-66/run-serial.sh (55 entries).
 
-## Discoveries for the return
-- KPI's src/gov/errors.py does not exist: it is src/gov/cli/errors.py (record correction for orchestrator).
-- DEC-891 places hold code (orchestration/sync_context.py, docs/plan/tools/validate_s1.py, docs/plan/wave-1-exit/apply_adapter_output.py): record_only = DEC-891 minus those.
-- Ticket names designer file test_w1_30_regression*, test lived in test_w1_30_close.py; revised in place (one function) + new test_w1_30_regression_scope.py.
-- W1-30's original function would not turn red (no test map -> full) — revised to state its precondition and to require the refusal to name the failing test.
-- --check-result + GOV_CLOSE_CHECK_RESULT: the close supplies the gate's result; W2-54's green-here cases still run gov check until a test designer revises them to read it (residual: outside this ticket's named files).
-- TIMEOUT_PLUGIN_ABSENT: every close refuses where the runs' interpreter lacks pytest-timeout -> the re-pin's venv must hold pytest-timeout (risk for the return).
-
-3. Lead checkpoint commit 1475b46c (CP-DAEO-c1uz-0002).
-4. eng-1 (engineer, high, sandboxed, gov launch): DONE, 12 fields OK, session bfb46feb-c499-4428-944c-28170c2b03f8, 33 min.
-   Commits 388d5892, 117b6e64, 528013b3, a8bf29f8, a384480a (trailers OK). +1417/-15 (est 400).
-   Its runs: acceptance 136 pass / 3 fail (research report, deferred); tests/unit/close 398; W1-30+W2-01+W2-53 661.
-   Tripwire 2: in W2-66 only the head; no acceptance folder change. Others: W2-07, W2-69 own work.
-   No gov retrieve. Read refusals 3 (DEC-820 (c), its own over-wide ls/grep/scan of tests/acceptance).
-   Packages it raised: failure text --tb=line (recommend defer W2-68); W2-54 green-here reading GOV_CLOSE_CHECK_RESULT (test revision, outside paths).
-   Notes: JUnit under .gov-runtime/close/<ticket>/<stamp>/; nightly worktree in mkdtemp (not .gov-runtime), records/xml under .gov-runtime/nightly; nightly does `git worktree prune`; nightly does no rebuild (reviewer to judge).
-
-## Next
-- Verify (in progress): rebuild-1 (log/rebuild-1.*), import check, collect-only, parallel run, serial run, gov check.
-- Then: eng-2 for docs/research/W2-66-scoped-close.md (KPI 11; measurement env TBD), review (A3, max), fixture trial, return.
+## Next (a resume)
+1. When the orchestrator answers S1 (cleanup of pytest-1; verification form, e.g. `-o tmp_path_retention_policy=failed`):
+2. td-2: W1-39 overlay case revision with Rewrite-Reason: DEC-896 item 2 (if T1 (a)).
+3. eng-2: brief briefs/eng-2.md is written (old launch form, report + measurement); fill in the lead's full-run figures
+   (parallel 44.1 min: 15613 passed, 6 failed, 30 skipped; serial: from the next run).
+4. Full verification again (parallel + serial), gov check; review (A3, max, JUDGEMENT.md); fixture trial section; return DONE.
+- Then run 2 (after W2-07 merges): merge w2/integrate back, re-verify, fresh FULL probe.
 
 ## Loop count
 - 1 (eng-1)
 
+## Workers
+- td-1: gov launch, sandboxed, xhigh; DONE; 12 fields; no gov retrieve; refusals 0 read (2 other: compound approval, rm).
+- eng-1: gov launch, sandboxed, high; DONE; 12 fields; no gov retrieve; 3 read refusals (DEC-820 (c), its own over-wide reads); rm not granted.
+
 ## Guard read refusals counted
-- lead: 0; td-1: 0
+- lead: 0 (two permission prompts on rm -rf at this stop, not guard read refusals); td-1: 0; eng-1: 3.

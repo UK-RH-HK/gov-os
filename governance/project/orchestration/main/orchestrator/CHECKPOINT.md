@@ -59,7 +59,13 @@
   `-o tmp_path_retention_policy=failed` after a measured trial + (b) a 5,000,000 / 50 GB verification cap meanwhile
   + (c) an allow rule for a lead to rm its own temp at the settings regeneration; I remove `/tmp/gov-os-lead-W2-07/`
   on approval); B = widen W2-07's designer batch (W1-30 fixture green at gov check: 175; 20 gate-order cases; 1
-  repair-ticket case). C delegated (six readings). W2-66 and W2-69 will meet A at their full verification.
+  repair-ticket case). C delegated (six readings, DEC-903).
+- **W2-66 run 1 returned PACKAGES (head `ba38ab8d`; tests 134, impl built):** its full run left 5,306,782 inodes /
+  47 GB in `/tmp/gov-os-lead-W2-66/` (addendum to P-W2-07-A-B `7df69957`: bridge cap 6,000,000 / 60 GB, one run at a
+  time; approve removing both leads' temps). P-W2-66-T1 decided as delegated **DEC-903** (`f4165cee`, ticket
+  `a0197576`: W1-39 overlay case for its designer; `src/gov/cli/errors.py`). Its next round: serial run, the report +
+  fixture trial (`briefs/eng-2.md` in its worktree), the review. At W2-66's merge: remove `test_inputs` from the path map.
+  W2-69 is still running and will meet A at its full verification.
 - **SWEEP lists 3 + 5 PENDING a quiet moment** (no `claude -p`, close, nightly or trial):
   `python3 tools/sweep.py --apply --only pytest-runs,code-graph` (dry run: 49 + 10,118 would go; skips: <24 h,
   held open, the 14 live roots' code-graph folders). Report what it skipped and why. Weekly sweep: Mondays.
