@@ -16,7 +16,8 @@ ignores refuses nothing.
 untracked ticket file whose parent is the ticket being closed does not refuse the next close. Every other
 untracked, not ignored file and every change to a tracked file does, the ticket's own file included." The
 second close after a refusal, with the repair ticket left as the refusal left it, is measured: it is refused
-for the failing test again (exit code 3) and counted. An untracked ticket file that names another ticket as its
+for the failing test again (exit code 3) and counted. (Revised for W2-07, KPI 8: the refused close now commits
+its repair ticket, so none is left untracked; the second close is still measured.) An untracked ticket file that names another ticket as its
 parent, or none, is a file like any other and refuses for the tree; the ticket of those cases is green, so
 nothing else refuses.
 """
@@ -127,17 +128,29 @@ def test_a_file_git_ignores_refuses_nothing(project, sandbox, interface):
 # --------------------------------------------------------------------------
 
 def test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measured(project, sandbox, interface):
-    """Nothing is committed between the two closes. The second is refused for the failing test, not for the
-    tree: exit code 3, counted, a repair ticket of its own."""
+    """Revised for W2-07 (KPI 8, AR-9, W2-L209; DEC-490's part on an untracked repair ticket is changed by it,
+    DEC-866): the refused close commits its repair ticket, in a commit that holds only that ticket, so it is
+    tracked and nothing is left beside the commit. Nothing else is committed between the two closes. The second
+    is refused for the failing test, not for the tree: exit code 3, counted. Its findings are the first's, so
+    it reuses the first's repair ticket and names it (the ticket's KPI on a repeated identical refusal,
+    W2-M252)."""
     support.build_ticket(project, TICKET, WBS, failing=True)
+    before = support.head_of(project)
     first = support.run_close(project, sandbox, TICKET)
     support.refused(first, interface, support.EXIT_CHECK_FAILED)
-    left = project.waiting_paths()
     repairs = support.other_tickets(project.root, TICKET)
-    assert len(repairs) == 1 and left == support.untracked_paths(project) == [f".tickets/{repairs[0].name}"], \
-        f"the fixture is wrong: the refused close left {left}, not one untracked repair ticket\n{first.describe()}"
+    assert len(repairs) == 1, f"the refused close opened {[p.name for p in repairs]}, not one repair ticket\n" \
+                              f"{first.describe()}"
+    rel = f".tickets/{repairs[0].name}"
+    left = project.waiting_paths()
+    assert left == [] and support.untracked_paths(project) == [], \
+        f"the refused close left {left} beside its commit: the repair ticket is not tracked\n{first.describe()}"
+    changed = [line for line in support.git(project.root, "log", "--format=", "--name-only", f"{before}..HEAD")
+               .splitlines() if line.strip()]
+    assert changed == [rel], \
+        f"the refusal's commits hold {changed}, not the repair ticket {rel} alone\n{first.describe()}"
     assert support.frontmatter_of(repairs[0]).get("parent") == TICKET, \
-        f"the fixture is wrong: the repair ticket's parent is {support.frontmatter_of(repairs[0]).get('parent')!r}"
+        f"the repair ticket's parent is {support.frontmatter_of(repairs[0]).get('parent')!r}"
 
     run = support.run_close(project, sandbox, TICKET)
 
@@ -146,8 +159,10 @@ def test_a_second_close_with_the_refusals_repair_ticket_left_untracked_is_measur
         f"the second close was not refused for the failing acceptance test\n{run.describe()}"
     assert support.iteration_count(project.root, TICKET) == 2, \
         f"the second close was not counted: the count is {support.iteration_count(project.root, TICKET)}\n{run.describe()}"
-    assert len(support.other_tickets(project.root, TICKET)) == 2, \
-        f"the second refusal opened no repair ticket of its own\n{run.describe()}"
+    assert [p.name for p in support.other_tickets(project.root, TICKET)] == [repairs[0].name], \
+        f"the second, identical refusal did not reuse the first's repair ticket\n{run.describe()}"
+    assert repairs[0].stem in support.error_text(error), \
+        f"the second refusal does not name the repair ticket {repairs[0].stem} it reuses\n{run.describe()}"
     support.assert_not_closed(project, TICKET)
 
 
