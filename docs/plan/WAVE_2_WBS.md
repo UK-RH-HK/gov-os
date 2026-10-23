@@ -1027,7 +1027,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
     - both hook copies;
     - the path map and the test map;
     - DEC-892 c's three widest modules;
-    - `src/gov/cli/main.py` and `src/gov/errors.py`, until measured.
+    - `src/gov/cli/main.py` and `src/gov/cli/errors.py` (DEC-903), until measured.
     An unplaced file or a missing map also runs everything.
   - **The couplings that imports cannot see** are declared in the test map (text reads, the rerank worker's process, the hook copies, fixture inputs, declared checks). W1-07's three contract files run on every close.
   - **The serial-only tests** are scoped by the same selection.
@@ -1040,7 +1040,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
     - the nightly command (failures re-run alone, `git bisect run`, a scoped miss as a P1 with the map corrected, the weekly coverage map);
     - the time measured and the 15-minute target's scope stated;
     - the lead's verification unchanged.
-  - **The test designer revises** W1-30's `test_regression_includes_other_acceptance_folders` (a valid case this ticket turns red).
+  - **The test designer revises** W1-30's `test_regression_includes_other_acceptance_folders` and W1-39's `test_copy_creates_the_overlay` (valid cases this ticket turns red; DEC-903).
 - **KPIs, failure:**
   - less than the full regression for the shared core, an unplaced file or a missing map;
   - a scoped record that says full;
