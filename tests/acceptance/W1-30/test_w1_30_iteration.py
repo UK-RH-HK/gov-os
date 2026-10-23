@@ -473,6 +473,11 @@ def test_mixed_causes_reach_escalation(project, sandbox, interface):
 def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
     """DEC-454, S2/S6: each of the first two containment refusals opens a repair
     ticket recording the finding and 'unclassed'.
+
+    Revised for W2-07 (KPI 10, W2-M252; DEC-454's "each refusal opens a repair ticket" changed, DEC-908): the
+    first refusal opens a repair ticket and names it; a second refusal with the same finding reuses that repair
+    ticket and names it, and opens none. A fresh checkpoint stands before the second close, so the case does
+    not rest on how the checkpoint gate reads the first refusal's repair-ticket commit (row W2-L416).
     """
     project.add_ticket(TICKET, WBS)
     project.add_passing_test(WBS)
@@ -482,14 +487,26 @@ def test_each_refusal_opens_repair_ticket(project, sandbox, interface):
     project.add_checkpoint(TICKET)
     project.commit("checkpoint", who=support.ORCHESTRATOR)
     tickets_before = set((project.root / ".tickets").glob("*.md"))
-    support.run_close(project, sandbox, TICKET)
+    run_1 = support.run_close(project, sandbox, TICKET)
+    text_1 = support.error_text(support.refused(run_1, interface, support.EXIT_CHECK_FAILED))
+    assert "src/other/out_of_scope.py" in text_1, f"the first close is not refused for containment\n{run_1.describe()}"
     tickets_after_1 = set((project.root / ".tickets").glob("*.md"))
     new_1 = tickets_after_1 - tickets_before
-    assert len(new_1) >= 1, "the first refusal must open a repair ticket"
-    support.run_close(project, sandbox, TICKET)
+    assert len(new_1) == 1, f"the first refusal must open a repair ticket: {sorted(p.name for p in new_1)}"
+    repair = next(iter(new_1)).stem
+    assert repair in text_1, f"the first refusal does not name its repair ticket {repair}\n{run_1.describe()}"
+
+    project.add_checkpoint(TICKET)
+    project.commit("checkpoint", who=support.ORCHESTRATOR)
+    run_2 = support.run_close(project, sandbox, TICKET)
+    text_2 = support.error_text(support.refused(run_2, interface, support.EXIT_CHECK_FAILED))
+    assert "src/other/out_of_scope.py" in text_2, f"the second close is not refused for containment\n{run_2.describe()}"
     tickets_after_2 = set((project.root / ".tickets").glob("*.md"))
     new_2 = tickets_after_2 - tickets_after_1
-    assert len(new_2) >= 1, "the second refusal must also open a repair ticket"
+    assert not new_2, \
+        f"the identical second refusal opened another repair ticket: {sorted(p.name for p in new_2)}\n{run_2.describe()}"
+    assert repair in text_2, \
+        f"the identical second refusal does not name the repair ticket it reuses ({repair})\n{run_2.describe()}"
 
 
 def test_unknown_ticket_does_not_count(project, sandbox, interface):
