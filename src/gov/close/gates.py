@@ -153,9 +153,17 @@ def check_ratchet_lists(root: Path, key: str) -> None:
 def check_collection(root: Path, suites: list[tuple[Path, Path | None]], timeout) -> None:
     """Every suite the close will run, each ``(folder, ignored)`` collected in one process as the close runs it
     (the acceptance folder; ``tests/`` without it): a collection error refuses, naming each file that cannot be
-    collected."""
-    from gov.close.command import _INTERPRETER_PLACES, _INTERPRETER_VARIABLES, _TEST_RUNNER_VARIABLES, _started
+    collected. The collection has the time limit of a run, and never less than the default one: the limit of the
+    tests is not the collection's. ``TEST_RUNNER_ABSENT`` where the interpreter has no pytest: nothing ran."""
+    import importlib.util
+    from gov.close.command import (DEFAULT_TIMEOUT, _INTERPRETER_PLACES, _INTERPRETER_VARIABLES,
+                                   _TEST_RUNNER_VARIABLES, _started)
 
+    absent = GovError("TEST_RUNNER_ABSENT", f"pytest is not installed for {sys.executable}: no test was run",
+                      {"python": sys.executable})
+    if importlib.util.find_spec("pytest") is None:
+        raise absent
+    timeout = max(timeout, DEFAULT_TIMEOUT)
     env = {key: value for key, value in os.environ.items()
            if key not in _TEST_RUNNER_VARIABLES
            and (not key.startswith(_INTERPRETER_VARIABLES) or key in _INTERPRETER_PLACES)}
@@ -172,6 +180,8 @@ def check_collection(root: Path, suites: list[tuple[Path, Path | None]], timeout
         except subprocess.TimeoutExpired:
             lines.append(f"the collection of {collected[-1]} exceeded the time limit of {timeout}s")
             continue
+        if done.returncode == 1 and "No module named pytest" in done.stderr:  # pytest from the caller's path only
+            raise absent
         if done.returncode not in (0, 5):
             lines += sorted({line.strip() for line in done.stdout.split("\n") if line.startswith("ERROR ")}) or \
                 [f"the collection of {collected[-1]} exited {done.returncode}: "

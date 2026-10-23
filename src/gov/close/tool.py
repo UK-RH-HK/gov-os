@@ -99,7 +99,8 @@ def open_repair_ticket(root: Path, ticket: str, findings: list[str],
     import hashlib
     from gov.tasks.tickets import TICKETS_REL
 
-    fingerprint = "sha256:" + hashlib.sha256("\n".join(sorted(set(findings))).encode("utf-8")).hexdigest()
+    # A short fingerprint, which no reader takes for the context hash (64 digits) a repair ticket may carry
+    fingerprint = "findings-" + hashlib.sha256("\n".join(sorted(set(findings))).encode("utf-8")).hexdigest()[:16]
     again = _open_repair_of(root, ticket, fingerprint)
     if again:  # a repeated identical refusal reuses its repair ticket (W2-M252)
         return again
