@@ -140,7 +140,10 @@ def test_several_gates_are_one_refusal_counted_once_with_one_repair_ticket_that_
     assert error.details["repair_ticket"] == repair.stem
     text = repair.read_text(encoding="utf-8")
     assert all(f"- {line}" in text for line in lines) and f"- {NO_ACCEPTANCE_RUN}" in text
-    assert text.count("FAILED test_x") == 1
+    # each finding once in the findings, and once among the KPIs of the complete repair ticket (KPI 8, AR-9)
+    assert text.count("- FAILED test_x\n") == 1
+    kpis = frontmatter(repair)["kpis"]["success"]
+    assert len(kpis) == len(lines) and sum("FAILED test_x" in kpi for kpi in kpis) == 1
 
 
 def test_gates_with_one_code_keep_it(root):
