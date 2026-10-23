@@ -68,7 +68,7 @@ so a root `tests/conftest.py` is loaded once it exists), a `TMPDIR` of the case'
 | Case | On the head |
 |---|---|
 | `test_the_pytest_configuration_passes_no_basetemp_and_keeps_three_base_folders` | green: a guard (no `addopts` with `--basetemp`; `tmp_path_retention_count` absent or 3; DEC-904 item 1's `tmp_path_retention_policy=failed` trial is allowed) |
-| `test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention` | green: a guard (no argument list with `--basetemp`, no assignment of a base folder or of the retention count, in `tests/conftest.py` and round 1's folders) |
+| `test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention` | green: a guard (no argument list with `--basetemp`, no assignment of a base folder or of the retention count, in `tests/conftest.py` and round 1's folders; the `--basetemp` refusal's own `FORMS` table exempt, DEC-907 item 2: batch 4 below) |
 | `test_a_run_after_older_runs_leaves_at_most_three_base_folders` | green: a guard (five finished runs' folders; pytest's own retention leaves `pytest-3`, `-4`, `-5`) |
 | `test_a_run_after_killed_runs_leaves_at_most_three_base_folders` | **red**: `6 base folders left behind, more than 3 (DEC-898): ['pytest-0', …, 'pytest-5']`. Each older folder holds the `.lock` a killed run leaves, naming a pid no process holds; pytest keeps any folder whose lock is younger than three days, whatever the retention count. This is how `/tmp/pytest-of-usain` came to 61 run folders (the card) |
 | `test_a_base_folder_of_a_run_still_going_is_kept` | green: a guard. A folder whose `.lock` names a running process is another run's and must stay: a clean-up that removed it would break a concurrent session |
@@ -406,6 +406,51 @@ Finding (not asserted; returned): nothing removes these folders. On 2026-10-23 `
 of them, 138,273 files and folders in all (`du -s --inodes`), one folder per project root any rebuild or code-index
 case ever used. A test project's root is new on every run, so every run adds folders there; `TMPDIR` does not move
 them (DEC-898's inode share).
+
+## KPI 4, batch 4: the static guard and the `--basetemp` refusal's own cases
+
+Independent test designer (MR-3), batch 4, 2026-10-23. One revision, of
+`test_w2_67_temp_folders.py::test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention`, with
+`Rewrite-Reason: DEC-907 item 2`. Batch 3's files are unchanged.
+
+**The conflict.** KPI 4 (batch 1) says nothing passes a per-run `--basetemp`, and its static guard looks for an
+argument list that passes one in round 1's folders. KPI 6 (DEC-907 item 2, newer) says the root `tests/conftest.py`
+refuses a run given one, and batch 3's cases (`test_w2_67_basetemp_refusal.py`) can only show that refusal by giving
+a nested run a `--basetemp` on purpose, into a folder in the case's own `tmp_path`. On the head (`23974ac7`) the guard
+was red for that alone: `{'tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py': ["line 93: an argument list passes
+'--basetemp'"]}`.
+
+**The exemption (in the guard, `REFUSAL_CASES`, `REFUSAL_TABLE`, `_refusal_forms`).** One file, and one place in it:
+an argument list inside that file's module-level `FORMS` table (one-parameter lambdas) whose every `--basetemp` is the
+separate option followed by the lambda's own parameter (`given` or `str(given)`), **and only while** the file uses the
+table as `list(FORMS)` or `FORMS[...](tmp_path / "<name>")` (a plain name, so the folder stays in the case's
+`tmp_path`), assigns the table once and never rebinds `tmp_path` or the parameter. Anything else voids the exemption,
+and the finding is reported as before. Every other source in round 1's folders and `tests/conftest.py` is judged as
+before.
+
+**Shown (2026-10-23, this worktree's `src/`, `-o tmp_path_retention_policy=failed`):**
+
+- Green on the head with the revision: the two static guards, 2 passed.
+- **Plant A, red:** a throwaway untracked source, `tests/acceptance/W1-27/w2_67_td4_plant.py` (not a `test_` file, never
+  committed; emptied after its run, since `rm` was refused in the designer's session), holding a plain `subprocess.run([..., "--basetemp", str(folder)])` and the refusal's exact `FORMS` form
+  and call copied into another file: `AssertionError: a per-run base folder or another retention count (DEC-898):
+  {'tests/acceptance/W1-27/w2_67_td4_plant.py': ["line 8: an argument list passes '--basetemp'", "line 12: an argument
+  list passes '--basetemp'"]}`. The same form is exempt only in the named file.
+- **Plant B, red for each change inside the named file:** a scratch script wrote changed copies of the refusal file
+  under a scratch root, pointed the guard module's `REPO_ROOT` there and called the guard's own `_settings_in`. The
+  unchanged copy: no finding. Found: a list outside `FORMS` (line 160); a `FORMS` form with a fixed folder (93); the
+  table handed `Path("/tmp") / …` (93); `tmp_path / "/tmp/x"` (93); `tmp_path` rebound (93); another use of the table,
+  `FORMS["extra"] = …` (93); a `FORMS` form with `"--basetemp=/tmp/fixed"` (92); a second `FORMS` table (93, 160).
+- **The three KPI files** (`test_w2_67_temp_folders.py`, `test_w2_67_basetemp_refusal.py`, `test_w2_67_copies.py`,
+  `-n 3 --dist loadfile`): before, 10 failed and 14 passed (39.9 s); after, 9 failed and 15 passed (51.2 s). Only the
+  guard changed, red to green. Still red, as expected until the root `tests/conftest.py` exists:
+  `test_a_run_after_killed_runs_leaves_at_most_three_base_folders` and the 8 refusal cases. `--dist loadfile` keeps
+  the copy cases on one worker: three at once would hold about 150,000 files and folders, more than a designer's
+  share (DEC-898); the peak seen was 52,084.
+
+**Not changed (found):** the guard reads string constants only, so an f-string (`f"--basetemp={folder}"`) in an
+argument list is not seen. The refusal file's other three forms (lines 92, 94, 95) are f-strings, and the guard never
+reported them. Closing that gap is a separate strengthening, returned in the designer's return.
 
 ## Files
 

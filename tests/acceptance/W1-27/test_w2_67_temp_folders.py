@@ -4,7 +4,9 @@
 Two kinds of case:
 
 - **What the repository says** (no run): the pytest configuration and the Python sources of round 1's folders
-  pass no ``--basetemp``, set no base folder and change no retention count.
+  pass no ``--basetemp``, set no base folder and change no retention count. One place is exempt, by DEC-907 item 2
+  (KPI 6, newer): the ``--basetemp`` refusal's own cases (``test_w2_67_basetemp_refusal.py``) give a nested run a
+  per-run ``--basetemp`` on purpose, into a folder in the case's own ``tmp_path``, to see the run refused.
 - **What a run leaves behind**: a nested pytest, bounded to one worker and one tiny case (``w2_67_tmp_probe.py``),
   started from the repository root with the repository's own configuration and a ``TMPDIR`` of the case's own.
   The case first plants older base folders under ``TMPDIR/pytest-of-<user>/``, as earlier runs leave them, then
@@ -44,6 +46,11 @@ CONFIG_FILES = ("pyproject.toml", "pytest.ini", "tox.ini", "setup.cfg")
 # Round 1's folders (DEC-904 item 5): the root conftest and the folders this round may touch.
 ROUND_1 = ("tests/conftest.py", "tests/acceptance/W1-07", "tests/acceptance/W1-25", "tests/acceptance/W1-26",
            "tests/acceptance/W1-27", "tests/acceptance/W2-02", "tests/unit/guard")
+# DEC-907 item 2: the refusal's own cases pass a per-run --basetemp on purpose. Exempt in that one file, and only
+# there: an argument list of its FORMS table that passes the table's own parameter (the folder given) after
+# --basetemp, while every use of the table hands it a folder in the case's tmp_path (see _refusal_forms).
+REFUSAL_CASES = "tests/acceptance/W1-27/test_w2_67_basetemp_refusal.py"
+REFUSAL_TABLE = "FORMS"
 NUMBERED = re.compile(r"^pytest-(\d+)$")
 
 
@@ -95,15 +102,64 @@ def _round_1_sources():
             yield from (item for item in sorted(path.rglob("*.py")) if "__pycache__" not in item.parts)
 
 
+def _passes_basetemp(item):
+    return isinstance(item, ast.Constant) and isinstance(item.value, str) and item.value.split("=", 1)[0] == BASETEMP
+
+
+def _hands_own_folder(call, form):
+    """``FORMS[...](tmp_path / "<name>")``: a form of the table called with one folder in the case's ``tmp_path``."""
+    return isinstance(call, ast.Call) and call.func is form and len(call.args) == 1 and not call.keywords and \
+        isinstance(arg := call.args[0], ast.BinOp) and isinstance(arg.op, ast.Div) and \
+        isinstance(arg.left, ast.Name) and arg.left.id == "tmp_path" and isinstance(arg.right, ast.Constant) and \
+        isinstance(arg.right.value, str) and re.fullmatch(r"[\w-]+", arg.right.value) is not None
+
+
+def _refusal_forms(tree):
+    """The argument lists the refusal cases' file may pass ``--basetemp`` in (DEC-907 item 2): those of its one
+    module-level ``FORMS`` table (one-parameter lambdas) whose every ``--basetemp`` is the separate option followed by
+    that parameter, alone or as ``str(...)``. None when the file uses the table other than as ``list(FORMS)`` or
+    ``FORMS[...](tmp_path / "<name>")``, or rebinds ``tmp_path``: a folder given is then not sure to be the case's."""
+    parents = {child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)}
+    names = [node for node in ast.walk(tree) if isinstance(node, ast.Name)]
+    if any(node.id == "tmp_path" and not isinstance(node.ctx, ast.Load) for node in names):
+        return set()
+    tables = []
+    for node in (node for node in names if node.id == REFUSAL_TABLE):
+        use = parents[node]
+        if isinstance(use, ast.Assign) and use in tree.body and use.targets == [node] and \
+                isinstance(use.value, ast.Dict):
+            tables.append(use.value)
+        elif not (ast.unparse(use) == f"list({REFUSAL_TABLE})" or
+                  isinstance(use, ast.Subscript) and use.value is node and _hands_own_folder(parents.get(use), use)):
+            return set()
+    if len(tables) != 1:
+        return set()
+    exempt = set()
+    for form in tables[0].values:
+        if not (isinstance(form, ast.Lambda) and len(form.args.args) == 1):
+            continue
+        given = form.args.args[0].arg
+        if any(isinstance(node, ast.Name) and node.id == given and not isinstance(node.ctx, ast.Load)
+               for node in ast.walk(form.body)):
+            continue
+        for node in ast.walk(form.body):
+            if isinstance(node, (ast.List, ast.Tuple)) and all(
+                    item.value == BASETEMP and index + 1 < len(node.elts) and
+                    ast.unparse(node.elts[index + 1]) in (given, f"str({given})")
+                    for index, item in enumerate(node.elts) if _passes_basetemp(item)):
+                exempt.add(node)
+    return exempt
+
+
 def _settings_in(path):
     """Where a source passes ``--basetemp`` in an argument list, sets a base folder, or sets the retention count."""
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
+    exempt = _refusal_forms(tree) if path.relative_to(REPO_ROOT).as_posix() == REFUSAL_CASES else set()
     found = []
     for node in ast.walk(tree):
-        if isinstance(node, (ast.List, ast.Tuple)):
+        if isinstance(node, (ast.List, ast.Tuple)) and node not in exempt:
             for item in node.elts:
-                if isinstance(item, ast.Constant) and isinstance(item.value, str) and \
-                        item.value.split("=", 1)[0] == BASETEMP:
+                if _passes_basetemp(item):
                     found.append(f"line {node.lineno}: an argument list passes {item.value!r}")
         if isinstance(node, (ast.Assign, ast.AugAssign, ast.AnnAssign)):
             for target in (node.targets if isinstance(node, ast.Assign) else [node.target]):
@@ -120,7 +176,8 @@ def _settings_in(path):
 
 
 def test_no_source_of_round_1_passes_a_per_run_basetemp_or_changes_the_retention():
-    """Green on the head: a guard."""
+    """Green on the head: a guard. The refusal's own cases (DEC-907 item 2) are exempt for their FORMS table alone:
+    an argument list that passes --basetemp anywhere else, in that file or another, is still found."""
     wrong = {str(path.relative_to(REPO_ROOT)): found for path in _round_1_sources() if (found := _settings_in(path))}
     assert not wrong, f"a per-run base folder or another retention count (DEC-898): {wrong}"
 
