@@ -37,3 +37,34 @@ def references_to(references, old_path, referenced_in):
     """The entries reporting ``old_path`` as referenced in ``referenced_in``."""
     return [ref for ref in references
             if isinstance(ref, dict) and ref.get("old_path") == old_path and ref.get("referenced_in") == referenced_in]
+
+
+def rebuild_project(destination):
+    """W1-27's tiny rebuild project (``.gitleaks.toml`` and a path map), built for this worktree's code."""
+    return support.make_rebuild_project(support.REPO_ROOT, destination)
+
+
+def gov(project, sandbox, *args, cwd=None):
+    """``gov <args>`` in ``project`` with this worktree's code (DEC-732)."""
+    return support.run_gov_with_code(support.REPO_ROOT, project, sandbox, *args, cwd=cwd)
+
+
+def rebuild(project, sandbox):
+    """``gov rebuild --json``: the run and its API-0002 envelope, which must say ok."""
+    run = gov(project, sandbox, "rebuild", "--json")
+    envelope = support.assert_envelope(run, w2_67_doctor.interface(), command="rebuild")
+    assert envelope.get("ok") is True and isinstance(envelope.get("result"), dict), \
+        f"gov rebuild did not succeed\n{run.describe()}"
+    return run, envelope["result"]
+
+
+def store_rows(project, sql):
+    """Rows of a read-only query on the project's ``.gov-runtime/store.db``."""
+    import sqlite3
+    path = project / ".gov-runtime" / "store.db"
+    assert path.is_file(), f"{path} does not exist"
+    connection = sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+    try:
+        return connection.execute(sql).fetchall()
+    finally:
+        connection.close()

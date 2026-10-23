@@ -237,6 +237,39 @@ doctor read the fakes (`cli_version`, `extension_version`, the hashes), then the
 type (`drift` or `failure`), the section's status and, for the failures, `ok` not true. The CLI/extension case
 records the extension's version and binary, so the difference is the only rule that applies.
 
+### Group 4: rebuild (`test_w1_27_rebuild.py` ×5, `rebuild_r2` ×1, `rebuild_r3` ×1) and group 5 (`rebuild_r2`'s duplicate)
+
+| Fault | In words | How (in `w2_67b_child.py`: `gov.rebuild.command.run` wrapped) |
+|---|---|---|
+| P27-7 (I4) | a reversed digest (CAP-20.a) | the result's `digest` reversed |
+| P67B-18 | rebuild writes outside `.gov-runtime` | a file written at the project's root after the rebuild |
+| P67B-20 | rebuild fails | `run` raises |
+| P67B-21 | rebuild reports stores it never builds | `run` returns a result naming the lexical store recreated, and builds nothing |
+| P67B-22 | rebuild needs the state an earlier run left (not in git) | `run` raises when no `.gov-runtime/store.db` exists |
+| P67B-23 | rebuild needs a tool other than git and gitleaks | `run` raises when `codebase-memory-mcp` is not on PATH |
+| P67B-24 | a store not rebuilt reported recreated | every `not_recreated` store set to `recreated`, its reason removed |
+| P67B-25 | a constant reason for every store not rebuilt | each `not_recreated` reason set to `requires ollama and qwen3-embedding model` |
+| P67B-26 | rebuild keeps every lexical row an earlier store held | the rows of `lexical_file` read before the rebuild are inserted again after it |
+
+| Case | Weak because (I4 §2.2) | Plant: red (seen) | Head | Rewrite-Reason |
+|---|---|---|---|---|
+| `test_rebuild_is_an_act_command` | accepted any envelope, REBUILD_FAILED included; the write scope never checked | P67B-18: `rebuild changed the project outside .gov-runtime: created: rebuild-wrote-here.txt`; P67B-20: `standard output is not one JSON document` (exit 1) | green | the assertion does not read what the case's name claims |
+| `test_rebuild_recreates_derived_stores` | checked that `.gov-runtime` exists only | P67B-21: `rebuild did not recreate the store` | green, 5.9 s | the assertion does not read what the case's name claims |
+| `test_fresh_clone_doctor_rebuild` | made no clone; doctor's verdict not read | P67B-21: `doctor does not report the clone's index fresh after the rebuild: {'status': 'unmeasured', 'index_status': 'missing', …}` | green | the assertion does not read what the case's name claims |
+| `test_rebuild_needs_only_git` | the folder it deleted never existed; every tool of the machine on PATH | P67B-22 and P67B-23: the rebuild fails (`standard output is not one JSON document`, exit 1) | green, 6.0 s | the assertion does not read what the case's name claims |
+| `test_rebuild_digest_matches_store_loader` | the envelope's session is a string, so the digests were never compared | P27-7: `rebuild digest 0cb7fa07… does not match store digest 98c0fbec…` | green | the assertion does not read what the case's name claims |
+| `test_w1_27_rebuild_r2.py::test_rebuild_result_names_unreconstructed_stores` | `stores.semantic` always present | P67B-24: `the semantic index was not recreated but rebuild does not name it not_recreated with a reason` | green | the assertion does not read what the case's name claims |
+| `test_w1_27_rebuild_r3.py::test_rebuild_result_names_derived_stores_with_measured_status` | computed its facts and never asserted them | P67B-25: `store semantic is not recreated with a constant or missing reason: {… 'reason': 'requires ollama and qwen3-embedding model' …}`; P67B-24: green (every store then recreated, which the case allows) | green | the assertion does not read what the case's name claims |
+| `test_w1_27_rebuild_r2.py::test_rebuild_does_not_silently_drop_lexical_tables` (group 5, the duplicate) | the same table-presence check as `test_rebuild_recreates_lexical_index`; the planted row's fate never read | P67B-26: `the row planted for test.py, which git does not hold, survives the rebuild: lexical_file holds ['.gitleaks.toml', 'governance/project/path-map.yaml', 'test.py']` | green | the assertion does not read what the case's name claims |
+
+Head: the eight, 7 passed and `test_rebuild_needs_only_git` red at first (`g4-head.xml`): with git alone on PATH,
+`REBUILD_FAILED … rebuild failed on the lexical index: [Errno 2] No such file or directory: 'gitleaks'`. The
+lexical index's owner runs the secrets filter on every file and fails closed without it (DEC-440), so the case
+holds a PATH of git and gitleaks alone (green, `g4-head-needs-only-git.xml`), and whether "needs only git" admits
+the secrets filter's tool is returned as a package (the designer's return). Every case runs on W1-27's tiny rebuild
+project built for this worktree's code (`w2_67b_support.rebuild_project`, `rebuild`), except r3's, which keeps the
+suite's fixtures. The clone case clones the tiny committed project it built, never this repository.
+
 ## Files
 
 - `test_w2_67_copies.py`, `test_w2_67_temp_folders.py`: the new KPI tests (6 + 5 cases).
