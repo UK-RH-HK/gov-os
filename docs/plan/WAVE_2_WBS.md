@@ -1155,6 +1155,7 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - **pytest's temp folders are not cleaned:** `/tmp/pytest-of-usain` holds 61 run folders since 2026-10-20. One auditor's per-run base folders filled the disk's inodes on 2026-10-22 (DEC-898).
   - **About 277 weak or outdated functions** cannot fail for the fault they claim to catch, or encode an old rule (I-SYNTHESIS §5.2).
 - **Place (owner, DEC-904 item 5):** the next free slot. Ticket `DAEO-9nys`. Round 1 now, on the folders no ticket in flight holds; round 2 (W1-30 and `tests/unit/close`) after W2-07 and W2-66 merge; round 3 (W2-50's cases) after W2-69 merges. Its acceptance revisions close after W2-07 is pinned (DEC-892 item 1, DEC-896 item 3); the two acceptance reruns are W2-70's.
+- **Roles (DEC-907):** an engineer's ticket for its builder files (`tests/unit/guard/**`, `tests/conftest.py`, `tests/unit/close/**`); its acceptance files are its test designers', named in the ticket file (MR-3); the copying fixtures by a second, fresh test designer. The conftest refuses a per-run `--basetemp` with one opt-out flag.
 - **Allowed paths:**
   - for the engineer: the fixtures and helpers that make whole-tree copies (`tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-25/**`, the W1-27 old-path case's fixture);
   - `tests/unit/close/**` (the 15 nested-run functions only; it runs after W2-07, which holds that folder);
