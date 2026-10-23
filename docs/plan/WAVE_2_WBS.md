@@ -1089,6 +1089,96 @@ EXAMIN's real repository is never written before W2-25 passes, W2-15b reports, W
   - a covered suite that no longer runs;
   - any other test changed.
 
+#### W2-68 Batched closes, reuse on the same code, and two fingerprints (FULL, engineer; DEC-883, DEC-889 item 2, DEC-890; keystone 2)
+- **Why:** the queue of 2026-10-21 ran six closes on the same code, about 85 minutes each (DEC-883). Queued closes on one head share one regression. A close on code that already passed reuses that run. A store built on the same code fingerprint is fresh.
+- **Starts** when W2-66 has merged and passed its ladder (DEC-890). The second re-pin follows it (DEC-889 item 15).
+- **Entry criterion:** the record-reading set is settled and in W2-66's test map (P-IS-2). Without it, reuse would let a close pass on a red head (I2 F6, I3 F5).
+- **Allowed paths:**
+  - new: `src/gov/close/batch.py`, `src/gov/close/fingerprint.py`;
+  - `src/gov/close/command.py`: the calls and the record's lines only;
+  - `src/gov/close/repo.py`: the store-freshness check only;
+  - `src/gov/store/**`: the fingerprints a rebuild records and the incremental record load only;
+  - `tests/unit/close/test_batch*`, `test_fingerprint*`, `tests/unit/store/test_fingerprint*`;
+  - `docs/research/W2-68-batched-close.md`.
+  It reads the test map's record-only list; it does not write it.
+- **KPIs, success:**
+  - **A batch (DEC-883 item 1):**
+    - queued closes on one integrated head share one rebuild, one `gov check` and one full regression on that head;
+    - then each ticket's own checks run, one after another: its acceptance suite, the record-reading set, its trailers, paths, probe record and checkpoint;
+    - no code merges while a batch runs;
+    - each close record cites the batch's run (fingerprint, commit, JUnit XML) and its scope.
+  - **A red batch (DEC-883 item 2, DEC-889 item 2 b):**
+    - failing tests re-run alone first; a red that passes alone is a flaky candidate, not bisected;
+    - a red that fails alone is attributed by `git bisect` over the batch's merges, or by the failing tests' own ticket, with the evidence;
+    - nothing closes on a red run; the causing ticket is repaired and the batch re-runs; an unrelated ticket waits for a green run;
+    - an outside cause is fixed by the orchestrator and recorded.
+  - **Same code (DEC-883 item 3, DEC-889 item 2):**
+    - a close whose code fingerprint (record-only paths left out) equals the last fully passing run's reuses it, and runs its own checks and the record-reading set;
+    - a failing run is never reused;
+    - the reused evidence states the reused run's skip count, so a silent skip is not inherited unseen (I4 F2).
+  - **Two fingerprints (DEC-889 item 2, item 4):**
+    - the code fingerprint governs the code index;
+    - changed record files refresh their lexical and semantic chunks incrementally;
+    - a lexical index whose record files differ is never fresh.
+  - **The path map counts as code for the fingerprint:** it is in the shared core (DEC-880), so a change to it runs fresh. The synthesis asks this question; the recommendation is to keep DEC-880's answer.
+  - **Re-read against two fingerprints:** W1-30's `test_a_store_rebuilt_without_embeddings_is_stale_one_commit_later` (I2 §2.6), by its test designer with a `Rewrite-Reason:`.
+  - **Its trial (DEC-884 item 4),** on a fixture or dev-tier programme, measured:
+    - the time per batch;
+    - reuse correct;
+    - a planted code change forcing a fresh run;
+    - a planted record-only commit running the set and nothing else;
+    - a red batch attributed, with nothing closing on it.
+- **KPIs, failure:**
+  - a close that cites a red run or another fingerprint's run;
+  - a reused run on different code;
+  - a store accepted on another code fingerprint;
+  - a lexical index fresh with changed records;
+  - a code merge during a batch;
+  - a red that passes alone being bisected;
+  - reused evidence that hides a skip.
+- About 300 lines (DEC-890).
+
+#### W2-67 Test hygiene: per-test copies, nested runs, temp folders, and the weak tests' revisions (FULL, independent-test-designer for the acceptance revisions, engineer for the builder tests; DEC-889 item 7, P-H-5, DEC-892 item 1, DEC-898; lens I's P-IS-3 and P-IS-7)
+- **Why:** lens H and lens I found these.
+  - **Per-test copies race git's garbage collection.** A copied tree past about 6,700 loose objects races git's background gc. It errored W1-25's and W1-07's cases in refused closes (I3 F9, I4 F5).
+  - **Nested runs fail under load and block worksteal** (I1 F-5, I2 F5).
+  - **pytest's temp folders are not cleaned:** `/tmp/pytest-of-usain` holds 61 run folders since 2026-10-20. One auditor's per-run base folders filled the disk's inodes on 2026-10-22 (DEC-898).
+  - **About 277 weak or outdated functions** cannot fail for the fault they claim to catch, or encode an old rule (I-SYNTHESIS §5.2).
+- **Place:**
+  - Starts after W2-66 merges (DEC-889 item 7).
+  - Its acceptance-test revisions can close only once W2-07's test-revision class lands, so it is planned to close after W2-07 (DEC-892 item 1, P-IS-7).
+  - Once DEC-769 item 3 is built, its designer writes only the folders this card names (P-IS-11).
+  - The two acceptance reruns are not here: P-IS-3 (a) retires them now, in a small ticket of their own (W2-70 in the bundle's index).
+- **Allowed paths:**
+  - for the engineer: the fixtures and helpers that make whole-tree copies (`tests/acceptance/W1-07/w1_07_support.py`, `tests/acceptance/W1-25/**`, the W1-27 old-path case's fixture);
+  - `tests/unit/close/**` (the 15 nested-run functions only; it runs after W2-07, which holds that folder);
+  - `tests/unit/guard/**` (the fixed `/tmp` folder only);
+  - the root `tests/conftest.py` (the temp-folder rule only).
+  - For the test designer, each with a `Rewrite-Reason:` and no expectation lowered:
+    - `tests/acceptance/W1-26/**`, `W1-27/**`, `W1-30/**`, `W2-02/**`, `W2-50/**` (the large-store and hang cases only);
+    - the folders of I3's T-A3 rows (I3 §4.5), each named in the ticket file when it is written.
+- **KPIs, success:**
+  - **Copies (I3 F9, I4 §2.1):** every per-test copy either commits with `gc.auto=0` or copies the working files without `.git`. W1-27's old-path case gets a project of its own instead of a whole-tree copy. A planted 7,000-object tree runs every copying case green in parallel.
+  - **Nested runs (I2 F5):** the 15 unit close functions that start a nested pytest get a bound a loaded machine meets (one worker, or a measured limit). After them, worksteal is re-measured in the nightly in file order (DEC-892 a, P-IS-3).
+  - **Long cases (I1 F-11):** W2-50's large-store and hang cases run against a declared short limit. The guard unit test's fixed `/tmp` folder becomes `tmp_path`.
+  - **Temp folders (DEC-898):** the suites keep pytest's own retention of three base folders, and nothing passes a per-run `--basetemp`. A full run leaves at most three base folders behind.
+  - **The weak tests (P-IS-7 (a)):** each revised case is first shown red against a planted fault, then green on the head. The order is the code a planned ticket will change first:
+    - `gov doctor`'s 40 W1-27 cases, before W2-22, W2-18 or W2-09 changes doctor;
+    - W1-26's 45 planted-defect cases, their fixture shown green before any defect;
+    - W1-30's 13 first-round cases;
+    - W2-02's unmeasured case;
+    - T-A3's 42 rows.
+    Revisions of files that an open ticket already holds ride in that ticket instead (P-IS-7 (a)): W2-11 the skills' 41, W2-34 W1-09's and W1-14's, W2-65 the unit hooks, W2-44 containment's PF-7 case, W2-04 W1-24's.
+  - **Slimming, optional:** W1-02's 121 spelling functions merged; 27 renames ("as a read", "four worker roles"); the two dead modules and the stale help line (`src/gov/cli/commands/status.py`, `check.py`) go to W2-22.
+- **KPIs, failure:**
+  - a revised case that cannot fail for its fault;
+  - an expectation lowered;
+  - a copy that still races gc;
+  - a nested run left unbounded;
+  - a per-run base folder;
+  - a test changed in a folder this card does not name.
+- About 600 to 900 lines of test code (I2's estimate for its share), and about 150 to 200 functions, most one fixture line and one assertion each.
+
 #### W2-62 Resume in full: the session-start hook delivers the whole RESUME HERE block and names the prompt in force (STANDARD, engineer; CIT-P; DEC-837; keystone 3)
 - **Why:** the owner's item 1f (DEC-837): the resume must come back whole after every compaction. Split out of W2-10 so that it lands first; it takes W2-10's rows W2-M372 and W2-M373. Ticket file `DAEO-juee`.
 - **Starts** at once: no dependency, and no ticket in flight shares its paths.
